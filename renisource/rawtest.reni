@@ -1,0 +1,17 @@
+x1: 7;
+x2: 10 + 3;
+x3: x1 + x2;
+x3 printnum();
+f: function arg+1;
+f(2) printnum();
+
+# f1: function 
+# (
+#   y: data 3;
+#   f: function arg*y+x;
+#   f(2)
+# ) AT 2;
+# 
+# f1()printnum();
+
+

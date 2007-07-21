@@ -1,0 +1,116 @@
+################################################################
+# Reni system source
+# Windoes
+# Copyright (C) 2001 by Harald Hoyer
+################################################################
+
+
+Windows: object
+{
+	private PixelAddr: function object
+	{
+		x: integer(arg AT 0);
+		y: integer(arg AT 1);
+
+		+ : function scope
+		{
+			Return: variable data this;
+			Return+:= arg;
+		};
+
+		- : function scope
+		{
+			Return: variable data this;
+			Return-:= arg;
+		};
+
+		/ : function scope
+		{
+			Return: variable data this;
+			Return/:= arg;
+		};
+
+		+:= : modifying function scope
+		{
+			x+:= arg x;
+			y+:= arg y;
+		};
+
+		-:= : modifying function scope
+		{
+			x-:= arg x;
+			y-:= arg y;
+		};
+
+		/:= : modifying function scope
+		{
+			x/:= arg;
+			y/:= arg;
+		};
+	};
+
+
+	PixelVectors: function object
+	{
+		inherit PixelAddr(arg);
+		+:= : modifying function {inherited(PixelVectors(arg))};
+		-:= : modifying function {inherited(PixelVectors(arg))};
+	};
+
+
+	PixelPoints: function object
+	{
+		void(arg);
+		inherit PixelAddr(0,0);
+		+:= : modifying function {inherited(PixelVectors(arg))};
+		-:= : modifying function {inherited(PixelVectors(arg))};
+	};
+
+
+	Fonts: function object ?;
+
+
+	GraphicInterfaces: function object
+	{
+		DefaultFont: function prototype
+		{
+			void(arg)
+			Fonts() __ref__;
+		};
+
+		PixelSizeOfText: function prototype
+		{
+			string(arg AT 0  ) drop();
+			Font  (arg NEXT 0) drop();
+			PixelVectors();
+		};
+
+		PixelSizeOfClient: function prototype
+		{
+			void(arg);
+			PixelVectors();
+		};
+
+		AtOrigin: function prototype
+		{
+			PixelPoints(arg);
+			GraphicInterfaces() variable;
+		};
+	};
+
+
+	Applications: function object
+	{
+		OnShow: function prototype {arg consider_as(GraphicInterfaces());()};
+	};
+
+
+};
+
+
+
+
+################################################################
+# End
+################################################################
+

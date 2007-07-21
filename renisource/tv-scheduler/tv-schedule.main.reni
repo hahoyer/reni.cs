@@ -1,0 +1,41 @@
+################################################################
+# Reni example source
+# TV-Scheduler
+# Copyright (C) 2001 by Harald Hoyer
+################################################################
+
+
+Scheduler: object
+{
+	inherit Windows Applications ();
+
+	OnShow := function scope
+	{
+		Text: data string("TV Scheduler");
+		Font: data arg DefaultFont();
+
+		TextSize: data arg PixelSizeOfText(Text, Font);
+		WindowSize: data arg PixelSizeOfClient();
+
+		TextOrigin: data Windows PixelPoints() + (WindowSize - TextSize) / 2;
+		arg AtOrigin(TextOrigin) ShowText(Text, Font);
+	};
+};
+
+
+Station: object
+{
+	Name: string(arg AT 0);
+	Logo: BitMap(arg NEXT 0);
+};
+
+
+B4
+
+
+
+
+################################################################
+# End
+################################################################
+

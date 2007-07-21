@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="8,00"
+	Name="renisource"
+	ProjectGUID="{35E96DF4-0D75-49C3-A0EB-8E3D0EC39C8B}"
+	SccProjectName="&quot;$/Current/renisource&quot;, WEGAAAAA"
+	SccLocalPath="."
+	SccProvider="MSSCCI:Microsoft Visual SourceSafe"
+	Keyword="MakeFileProj"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory=".\Debug"
+			IntermediateDirectory=".\Debug"
+			ConfigurationType="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				ReBuildCommandLine=" /a"
+				Output="renisource.exe"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory=".\Release"
+			IntermediateDirectory=".\Release"
+			ConfigurationType="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				ReBuildCommandLine=" /a"
+				Output="renisource.exe"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<File
+			RelativePath=".\main.reni"
+			>
+		</File>
+		<File
+			RelativePath=".\rawtest.reni"
+			>
+		</File>
+		<File
+			RelativePath=".\system.reni"
+			>
+		</File>
+		<File
+			RelativePath=".\test.reni"
+			>
+		</File>
+		<File
+			RelativePath=".\tv-scheduler\tv-schedule.main.reni"
+			>
+		</File>
+		<File
+			RelativePath=".\tv-scheduler\tv-schedule.reni"
+			>
+		</File>
+		<File
+			RelativePath=".\Windows\Windows.reni"
+			>
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

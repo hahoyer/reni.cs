@@ -1,0 +1,13 @@
+x: data Array(string()type)("a","aa");
+
+xx: function object
+{
+	inherit system compiler();
+
+	#buildrule("Windows.renicode", "Windows.reni");
+	buildrule("TVSched.renicode", "TVSched.reni", "Windows.renicode");
+
+	exec();
+};
+
+xx();

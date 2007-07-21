@@ -1,0 +1,78 @@
+#       Reni Test source Copyright (C) 2000 by Harald Hoyer
+
+z: data integer(1)dump();
+z println(); 
+
+fak: function (arg < 1 then 1 else arg = 1 then arg+0 else fak(arg-1)*arg);
+fak(integer(4))dump()println();
+
+s: data string(" 0123456789ABCDEFGHI");
+s println(); 
+
+x: data integer(1);
+(x > 0)dump()println();
+
+integer(137) dump() println();
+
+################################################################
+# Defining a simple object hierarchy:
+# (For reader's convenience symbols defined here are prefixed with X1_.
+#   This prefix can be removed in any case without changes in semantic.)
+################################################################
+
+X1_node: function object 
+(
+    # Base object. It defines two function prototypes "X1_dump" and "X1_IsTerminal".
+    # "dump" should convert the data into human readable string. A level is
+    #   used to protect agains recursive strutures
+    # For "IsTerminal" a default implementation is priovided
+
+    X1_dump: data prototype( function integer(arg+1) dump() );
+    X1_IsTerminal: data prototype (function false );
+    X1_IsTerminal:= (function false);
+);
+
+
+X1_leaf: function object 
+(
+    # Object that inherits from "X1_node". 
+    # It contains a string data field and implements "X1_dump" and "X1_IsTerminal"
+
+    inherit X1_node();
+    X1_Title: data string(arg);
+    X1_dump := (function X1_Title);
+    X1_IsTerminal := (function true);
+);
+
+
+X1_fork: function object 
+(
+    # Object that also inherits from "node". 
+    # It contains two nodes and implements only "dump"
+    # In addition it implements a helper function that is used in "dump"
+
+    inherit X1_node();
+    X1_L: data (arg AT 0) consider_as (X1_node() type);
+    X1_R: data (arg NEXT 1) consider_as (X1_node() type);
+
+    X1_FullDump: (function(
+        string("(") * X1_L X1_dump(arg) * "," * X1_R X1_dump(arg) * ")";
+    ));
+
+    X1_dump := (function(
+        arg = 0 then string("...") else X1_FullDump(integer(arg-1))
+    ))
+);
+
+
+# Example of usage. 
+
+X1_x1: data (X1_leaf("Left leaf"));
+X1_x2: data X1_leaf("Right leaf");
+X1_x: data X1_fork(X1_x1,X1_x2);
+X1_x X1_dump(10) println();
+    
+################################################################
+# End
+################################################################
+
