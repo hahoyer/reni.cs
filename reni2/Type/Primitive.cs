@@ -1,0 +1,54 @@
+namespace Reni.Type
+{
+    /// <summary>
+    /// Primitive type, no destructor or move handler.
+    /// </summary>
+    public abstract class Primitive : Base
+    {
+        /// <summary>
+        /// Destructors the specified category.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// [created 02.06.2006 09:47]
+        sealed public override Result DestructorHandler(Category category)
+        {
+            return EmptyHandler(category);
+        }
+
+        /// <summary>
+        /// Arrays the destructor.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// [created 04.06.2006 00:51]
+        sealed public override Result ArrayDestructorHandler(Category category, int count)
+        {
+            return EmptyHandler(category);
+        }
+
+        /// <summary>
+        /// Moves the handler.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// [created 05.06.2006 16:47]
+        sealed public override Result MoveHandler(Category category)
+        {
+            return EmptyHandler(category);
+        }
+
+        /// <summary>
+        /// Arrays the move handler.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// [created 05.06.2006 16:54]
+        sealed public override Result ArrayMoveHandler(Category category, int count)
+        {
+            return EmptyHandler(category);
+        }
+    }
+}

@@ -1,0 +1,894 @@
+using System;
+using HWClassLibrary.Debug;
+using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Context;
+using Reni.Parser;
+using Reni.Parser.TokenClass;
+using Reni.Syntax;
+
+namespace Reni.Type
+{
+    /// <summary>
+    /// Summary description for Base.
+    /// </summary>
+    [AdditionalNodeInfo("DebuggerDumpString")]
+    public abstract class Base : ReniObject
+    {
+        private readonly HWClassLibrary.Helper.DictionaryEx<int, Aligner> _aligner = new HWClassLibrary.Helper.DictionaryEx<int, Aligner>();
+        private readonly HWClassLibrary.Helper.DictionaryEx<int, Array> _array = new HWClassLibrary.Helper.DictionaryEx<int, Array>();
+        private readonly HWClassLibrary.Helper.DictionaryEx<int, Sequence> _chain = new HWClassLibrary.Helper.DictionaryEx<int, Sequence>();
+        private readonly HWClassLibrary.Helper.DictionaryEx<Base, Pair> _pair = new HWClassLibrary.Helper.DictionaryEx<Base, Pair>();
+        private readonly HWClassLibrary.Helper.DictionaryEx<RefAlignParam, Ref> _ref = new HWClassLibrary.Helper.DictionaryEx<RefAlignParam, Ref>();
+        private TypeType _typeType;
+        private static readonly Bit _bit = new Bit();
+        private static readonly Void _void = new Void();
+
+        public Base(int objectId)
+            : base(objectId)
+        {
+        }
+
+        public Base()
+        {
+        }
+
+        /// <summary>
+        /// The size of type
+        /// </summary>
+        [Node]
+        public abstract Size Size { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is ref.
+        /// </summary>
+        /// <value><c>true</c> if this instance is ref; otherwise, <c>false</c>.</value>
+        /// [created 01.06.2006 22:51]
+        [DumpData(false)]
+        virtual public bool IsRef { get { return false; } }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is void.
+        /// </summary>
+        /// <value><c>true</c> if this instance is void; otherwise, <c>false</c>.</value>
+        /// [created 05.06.2006 16:27]
+        [DumpData(false)]
+        virtual public bool IsVoid { get { return false; } }
+
+        /// <summary>
+        /// Gets the size of the unref.
+        /// </summary>
+        /// <value>The size of the unref.</value>
+        /// [created 06.06.2006 00:08]
+        [DumpData(false)]
+        virtual public Size UnrefSize { get { return Size; } }
+
+        /// <summary>
+        /// Creates the void.type instance
+        /// </summary>
+        /// <returns></returns>
+        /// created 08.01.2007 01:43
+        [DumpData(false)]
+        public static Base CreateVoid { get { return _void; } }
+
+        /// <summary>
+        /// Creates the bit.type instance
+        /// </summary>
+        [DumpData(false)]
+        static public Base CreateBit { get { return _bit; } }
+
+        /// <summary>
+        /// Create aligner type
+        /// </summary>
+        /// <param name="alignBits"></param>
+        /// <returns></returns>
+        public Base CreateAlign(int alignBits)
+        {
+            if (Size.Align(alignBits) == Size)
+                return this;
+            return _aligner.Find(alignBits, delegate { return new Aligner(this, alignBits); });
+        }
+
+        /// <summary>
+        /// Creates array type
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public Array CreateArray(int count)
+        {
+            return _array.Find(count, delegate { return new Array(this, count); });
+        }
+
+        /// <summary>
+        /// Creates the number.
+        /// </summary>
+        /// <param name="bitCount">The bit count.</param>
+        /// <returns></returns>
+        /// created 13.01.2007 23:45
+        public static Base CreateNumber(int bitCount)
+        {
+            return CreateBit.CreateSequence(bitCount);
+        }
+        /// <summary>
+        /// Creates the pair.
+        /// </summary>
+        /// <param name="second">The second.</param>
+        /// <returns></returns>
+        /// created 19.11.2006 22:56
+        public virtual Base CreatePair(Base second)
+        {
+            return second.CreateReversePair(this);
+        }
+
+        protected virtual Base CreateReversePair(Base first)
+        {
+            return first._pair.Find(this, delegate { return new Pair(first, this); });
+        }
+
+        /// <summary>
+        /// Create a reference to a type
+        /// </summary>
+        /// <param name="refAlignParam">Alignment  and size of the reference</param>
+        /// <returns></returns>
+        public virtual Ref CreateRef(RefAlignParam refAlignParam)
+        {
+            return _ref.Find(refAlignParam, delegate { return new Ref(this, refAlignParam); });
+        }
+        /// <summary>
+        /// Create chain type
+        /// </summary>
+        /// <param name="elementCount">The elementCount.</param>
+        /// <returns></returns>
+        public Sequence CreateSequence(int elementCount)
+        {
+            return _chain.Find(elementCount, delegate { return new Sequence(this, elementCount); });
+        }
+
+        private Base TypeType
+        {
+            get
+            {
+                if (_typeType == null)
+                    _typeType = new TypeType(this);
+                return _typeType;
+            }
+        }
+
+        /// <summary>
+        /// Gets the dump print text.
+        /// </summary>
+        /// <value>The dump print text.</value>
+        /// created 08.01.2007 17:54
+        virtual public string DumpPrintText
+        {
+            get
+            {
+                NotImplementedMethod();
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has empty value.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance has empty value; otherwise, <c>false</c>.
+        /// </value>
+        /// created 09.01.2007 03:21
+        [DumpData(false)]
+        virtual public bool HasEmptyValue
+        {
+            get
+            {
+                NotImplementedMethod();
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Searches the definable token at type
+        /// </summary>
+        /// <param name="t">The t.</param>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
+        public virtual SearchResult SearchDefineable(DefineableToken t)
+        {
+            return t.TokenClass.DefaultOperation(this);
+        }
+
+        /// <summary>
+        /// Searches the defineable from sequence.
+        /// </summary>
+        /// <param name="t">The t.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// created 13.01.2007 19:35
+        virtual public SearchResult SearchDefineableFromSequence(DefineableToken t, int count)
+        {
+            return null;
+        }
+        /// <summary>
+        /// Searches the defineable prefix.
+        /// </summary>
+        /// <param name="defineable">The defineable.</param>
+        /// <returns></returns>
+        /// created 02.02.2007 21:51
+        internal virtual PrefixSearchResult PrefixSearchDefineable(DefineableToken t)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Searches the defineable prefix from sequence.
+        /// </summary>
+        /// <param name="defineable">The defineable.</param>
+        /// <returns></returns>
+        /// created 02.02.2007 22:09
+        internal virtual PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken t)
+        {
+            return null;
+        }
+        /// <summary>
+        /// Destructors the specified category.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// [created 02.06.2006 09:47]
+        virtual public Result DestructorHandler(Category category)
+        {
+            NotImplementedMethod(category);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Arrays the destructor.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// [created 04.06.2006 00:51]
+        virtual public Result ArrayDestructorHandler(Category category, int count)
+        {
+            NotImplementedMethod(category, count);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Moves the handler.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// [created 05.06.2006 16:47]
+        virtual public Result MoveHandler(Category category)
+        {
+            NotImplementedMethod(category);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Arrays the move handler.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// [created 05.06.2006 16:54]
+        virtual public Result ArrayMoveHandler(Category category, int count)
+        {
+            NotImplementedMethod(category, count);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Creates the arg.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// [created 04.06.2006 01:04]
+        public Result CreateArgResult(Category category)
+        {
+            return CreateResult(category, delegate { return CreateArgCode(); });
+        }
+
+        /// <summary>
+        /// Creates the arg code.
+        /// </summary>
+        /// <returns></returns>
+        /// created 30.01.2007 23:40
+        public Code.Base CreateArgCode()
+        {
+            return Code.Base.CreateArg(Size);
+        }
+
+        /// <summary>
+        /// Creates the result.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 18:11
+        public Result CreateResult(Category category)
+        {
+            return CreateResult(category, delegate { return Code.Base.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)); });
+        }
+
+        /// <summary>
+        /// Creates the result.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="codeAndRefs">The code and refs.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 18:11
+        public Result CreateResult(Category category, Result codeAndRefs)
+        {
+            Result result = new Result();
+            if (category.HasSize) result.Size = Size;
+            if (category.HasType) result.Type = this;
+            if (category.HasCode) result.Code = codeAndRefs.Code;
+            if (category.HasRefs) result.Refs = codeAndRefs.Refs;
+            return result;
+        }
+
+        /// <summary>
+        /// Creates the result.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="getCode">The get code.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 14:38
+        public Result CreateResult(Category category, Result.GetCode getCode)
+        {
+            return CreateResult(category, getCode, delegate { return Refs.None(); });
+        }
+
+        /// <summary>
+        /// Creates the result.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 14:38
+        public Result CreateContextRefResult<C>(Category category, C context) where C : Context.Base
+        {
+            return CreateResult(
+                category, 
+                delegate { return Code.Base.CreateContextRef(context); }, 
+                delegate { return Refs.Context(context); });
+        }
+
+        /// <summary>
+        /// Creates the result.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="getCode">The get code.</param>
+        /// <param name="getRefs">The get refs.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 14:38
+        public Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs)
+        {
+            Result result = new Result();
+            if (category.HasSize) result.Size = Size;
+            if (category.HasType) result.Type = this;
+            if (category.HasCode) result.Code = getCode();
+            if (category.HasRefs) result.Refs = getRefs();
+            return result;
+        }
+
+        /// <summary>
+        /// Applies the function.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <returns></returns>
+        /// created 29.10.2006 18:24
+        virtual public Result ApplyFunction(Context.Base context, Category category, Syntax.Base args)
+        {
+            NotImplementedMethod(context, category, args);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Visits from chain. Object is provided by use of "Arg" code element
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="memberElem">The member elem.</param>
+        /// <returns></returns>
+        public Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
+        {
+            bool trace = context.ObjectId == -4 && memberElem.ObjectId == 2 && category.HasRefs;
+            StartMethodDumpWithBreak(trace,context,category,memberElem);
+            SearchResult searchResult = SearchDefineable(memberElem.DefineableToken);
+            if (searchResult != null)
+            {
+                Result result = searchResult.VisitApply(context, category, memberElem.Args);
+                Tracer.ConditionalBreak(trace, result.Dump());
+                return ReturnMethodDumpWithBreak(trace, result);
+            }
+            NotImplementedMethod(context, category, memberElem);
+            return null;
+        }
+
+        /// <summary>
+        /// Empties the handler.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// created 30.12.2006 16:40
+        public static Result EmptyHandler(Category category)
+        {
+            return CreateVoidResult(category - Category.Type - Category.Size);
+        }
+
+        /// <summary>
+        /// Creates the void result.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// created 10.01.2007 02:58
+        public static Result CreateVoidResult(Category category)
+        {
+            return CreateVoid.CreateResult(category);
+        }
+
+        /// <summary>
+        /// Checks if type is a reference and dereferences instance.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <returns></returns>
+        /// created 05.01.2007 01:10
+        virtual public Result Dereference(Result result)
+        {
+            return result;
+        }
+
+        /// <summary>
+        /// Types the operator.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// created 07.01.2007 21:14
+        public Result TypeOperator(Category category)
+        {
+            Result result = CreateVoidResult(category).Clone();
+            if (category.HasType) result.Type = TypeType;
+            return result;
+        }
+
+        /// <summary>
+        /// Dumps the print code.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 17:29
+        internal virtual Result DumpPrint(Category category)
+        {
+            NotImplementedMethod(category);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Creates the result for DumpPrint-call. Object is provided as reference by use of "Arg" code element
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="refAlignParam">The ref align param.</param>
+        /// <returns></returns>
+        /// created 15.05.2007 23:42 on HAHOYER-DELL by hh
+        virtual internal Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
+        {
+            Result argResult = CreateRef(refAlignParam).ConvertTo(category, this);
+            return DumpPrint(category).UseWithArg(argResult);
+        }
+        /// <summary>
+        /// Dumps the print code from array.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 17:29
+        virtual public Result ArrayDumpPrint(Category category, int count)
+        {
+            NotImplementedMethod(category, count);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Dumps the print code from array.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 17:29
+        internal virtual Result SequenceDumpPrint(Category category, int count)
+        {
+            NotImplementedMethod(category, count);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// type where the dump print is implemented (array variant).
+        /// </summary>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// created 08.01.2007 17:33
+        virtual public Base DumpPrintArrayType(int count)
+        {
+            NotImplementedMethod(count);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Applies the type operator.
+        /// </summary>
+        /// <param name="argResult">The arg result.</param>
+        /// <returns></returns>
+        /// created 10.01.2007 15:45
+        virtual public Result ApplyTypeOperator(Result argResult)
+        {
+            return argResult.Type.ConvertTo(argResult.Complete, this).UseWithArg(argResult);
+        }
+
+        // Conversion
+ 
+        /// <summary>
+        /// Commons the type.
+        /// </summary>
+        /// <param name="dest">The dest.</param>
+        /// <returns></returns>
+        /// created 09.01.2007 01:20
+        public Base CommonType(Base dest)
+        {
+            if(IsConvertableTo(dest,true))
+                return dest;
+            if (dest.IsConvertableTo(this, true))
+                return this;
+            NotImplementedMethod(dest);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Conversions the specified category.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="dest">The dest.</param>
+        /// <returns></returns>
+        /// created 11.01.2007 21:26
+        public Result Conversion(Category category, Base dest)
+        {
+            if(category.HasCode || category.HasRefs)
+            {
+                if (IsConvertableTo(dest, true))
+                    return ConvertTo(category, dest);
+                NotImplementedMethod(category, dest);
+                throw new NotImplementedException();
+            }
+            return dest.CreateResult(category);
+        }
+
+        /// <summary>
+        /// Converts to.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="dest">The dest.</param>
+        /// <returns></returns>
+        /// created 11.01.2007 22:12
+        public Result ConvertTo(Category category, Base dest)
+        {
+            if (this == dest)
+                return ConvertToItself(category);
+            return ConvertToVirt(category, dest);
+        }
+
+        /// <summary>
+        /// Converts to itself.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// created 30.01.2007 22:57
+        public virtual Result ConvertToItself(Category category)
+        {
+            return CreateArgResult(category);
+        }
+
+        /// <summary>
+        /// Converts to.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="dest">The dest.</param>
+        /// <returns></returns>
+        /// created 11.01.2007 22:12
+        public virtual Result ConvertToVirt(Category category, Base dest)
+        {
+            NotImplementedMethod(category, dest);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has converter from bit.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance has converter from bit; otherwise, <c>false</c>.
+        /// </value>
+        /// created 11.01.2007 22:43
+        [DumpData(false)]
+        virtual public bool HasConverterFromBit
+        {
+            get
+            {
+                NotImplementedMethod();
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the type of the sequence element.
+        /// </summary>
+        /// <value>The type of the sequence element.</value>
+        /// created 13.01.2007 19:46
+        [DumpData(false)]
+        virtual public Base SequenceElementType
+        {
+            get
+            {
+                NotImplementedMethod();
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the type of the sequence element.
+        /// </summary>
+        /// <value>The type of the sequence element.</value>
+        /// created 13.01.2007 19:46
+        [DumpData(false)]
+        virtual public int SequenceCount
+        {
+            get
+            {
+                NotImplementedMethod(); 
+                throw new NotImplementedException();
+            }
+        }
+
+        static private Pending _pending = null;
+
+        /// <summary>
+        /// Gets the type in case of pending visits
+        /// </summary>
+        /// <value>The pending.</value>
+        /// created 24.01.2007 22:23
+        public static Base Pending
+        {
+            get
+            {
+                if(_pending == null)
+                    _pending = new Pending();
+
+                return _pending;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is pending.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
+        /// </value>
+        /// created 09.02.2007 00:26
+        [DumpData(false)]
+        virtual public bool IsPending { get { return false; } }
+
+        /// <summary>
+        /// Visits as sequence.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="elementType">Type of the element.</param>
+        /// <returns></returns>
+        /// created 13.01.2007 22:20
+        virtual public Result VisitAsSequence(Category category, Base elementType)
+        {
+            int count = SequenceCount;
+            Base resultType = elementType.CreateSequence(count);
+            return ConvertTo(category,resultType);
+        }
+
+        /// <summary>
+        /// Determines whether [is convertable to] [the specified dest].
+        /// </summary>
+        /// <param name="dest">The dest.</param>
+        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <returns>
+        /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
+        /// </returns>
+        /// created 11.01.2007 22:09
+        public bool IsConvertableTo(Base dest, bool useConverter)
+        {
+            if (this == dest)
+                return IsConvertableToItself(useConverter);
+            if(useConverter && HasConverterTo(dest))
+                return true;
+            return IsConvertableToVirt(dest, useConverter);
+        }
+
+        /// <summary>
+        /// Determines whether [has converter to] [the specified dest].
+        /// </summary>
+        /// <param name="dest">The dest.</param>
+        /// <returns>
+        /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
+        /// </returns>
+        virtual public bool HasConverterTo(Base dest)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether [is convertable to virt] [the specified dest].
+        /// </summary>
+        /// <param name="dest">The dest.</param>
+        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <returns>
+        /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
+        /// </returns>
+        /// created 30.01.2007 22:42
+        virtual public bool IsConvertableToVirt(Base dest, bool useConverter)
+        {
+            NotImplementedMethod(dest, useConverter);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Determines whether [is convertable to itself] [the specified use converter].
+        /// </summary>
+        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <returns>
+        /// 	<c>true</c> if [is convertable to itself] [the specified use converter]; otherwise, <c>false</c>.
+        /// </returns>
+        /// created 30.01.2007 23:02
+        virtual public bool IsConvertableToItself(bool useConverter)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Creates the operation.
+        /// </summary>
+        /// <param name="token">The token.</param>
+        /// <param name="argResult">The arg result.</param>
+        /// <param name="objResult">The obj result.</param>
+        /// <param name="size">The size.</param>
+        /// <returns></returns>
+        /// created 13.01.2007 21:18
+        virtual public Code.Base CreateOperation(Defineable token, Result objResult, Size size, Result argResult)
+        {
+            NotImplementedMethod(token, objResult, size, argResult.Code);
+            return null;
+        }
+
+        /// <summary>
+        /// Creates the operation.
+        /// </summary>
+        /// <param name="token">The token.</param>
+        /// <param name="result">The result.</param>
+        /// <returns></returns>
+        /// created 02.02.2007 23:28
+        virtual public Code.Base CreateOperation(Defineable token, Result result)
+        {
+            NotImplementedMethod(token, result);
+            return null;
+        }
+        /// <summary>
+        /// Operations the type of the result.
+        /// </summary>
+        /// <param name="token">The token.</param>
+        /// <param name="objBitCount">The obj bit count.</param>
+        /// <param name="argBitCount">The arg bit count.</param>
+        /// <returns></returns>
+        /// created 13.01.2007 21:43
+        virtual public Base OperationResultType(Defineable token, int objBitCount, int argBitCount)
+        {
+            NotImplementedMethod(token,objBitCount,argBitCount);
+            return null;
+        }
+
+        /// <summary>
+        /// Thens the else with pending.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="condRefs">The cond refs.</param>
+        /// <param name="elseOrThenRefs">The else or then refs.</param>
+        /// <returns></returns>
+        public Result ThenElseWithPending(Category category, Refs condRefs, Refs elseOrThenRefs)
+        {
+            Tracer.Assert(!category.HasCode);
+
+            return CreateResult
+                (
+                category,
+                delegate { return null; },
+                delegate { return condRefs.Pair(elseOrThenRefs); }
+                );
+        }
+
+        /// <summary>
+        /// Creates the ref code for context.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
+        /// created 01.07.07 19:16 on HAHOYER-DELL by h
+        internal virtual Code.Base CreateRefCodeForContext(Context.Base context)
+        {
+            NotImplementedMethod(context);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class Pending: Base
+    {
+        /// <summary>
+        /// The size of type
+        /// </summary>
+        public override Size Size { get { return Reni.Size.Pending; } }
+
+        /// <summary>
+        /// Gets the dump print text.
+        /// </summary>
+        /// <value>The dump print text.</value>
+        /// created 08.01.2007 17:54
+        public override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
+
+        /// <summary>
+        /// Converts to.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="dest">The dest.</param>
+        /// <returns></returns>
+        /// created 11.01.2007 22:12
+        public override Result ConvertToVirt(Category category, Base dest)
+        {
+            return dest.CreateResult
+                (
+                category,
+                delegate { return Code.Base.Pending; },
+                delegate { return Refs.Pending; }
+                );
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is pending.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
+        /// </value>
+        /// created 09.02.2007 00:26
+        public override bool IsPending { get { return true; } }
+
+        /// <summary>
+        /// Visits as sequence.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="elementType">Type of the element.</param>
+        /// <returns></returns>
+        /// created 13.01.2007 22:20
+        public override Result VisitAsSequence(Category category, Base elementType)
+        {
+            return CreateResult(category);
+        }
+
+        /// <summary>
+        /// Determines whether [is convertable to virt] [the specified dest].
+        /// </summary>
+        /// <param name="dest">The dest.</param>
+        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <returns>
+        /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
+        /// </returns>
+        /// created 30.01.2007 22:42
+        public override bool IsConvertableToVirt(Base dest, bool useConverter)
+        {
+            return true;
+        }
+    }
+}
+
