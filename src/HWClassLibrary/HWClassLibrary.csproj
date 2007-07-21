@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{0402FAE1-D5D6-490F-BC68-C26C8873C0B2}</ProjectGuid>
     <AssemblyName>HWClassLibrary</AssemblyName>
-    <TargetType>CSharp.Library.UnitTest</TargetType>
+    <TargetTypeEx>CSharp.Library.UnitTest</TargetTypeEx>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assembly.cs" />

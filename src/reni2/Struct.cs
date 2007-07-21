@@ -531,12 +531,11 @@ namespace Reni
             {
                 Result iResult = _list[i].VisitType(context).MoveHandler(category);
                 if(!iResult.IsEmpty)
-                {
-                    NotImplementedMethod(category,context,currentCompilePosition,);
+                {                                                                
+                    NotImplementedMethod(category,context,currentCompilePosition, "i", i, "iResult", iResult);
                 }
-                    return true;
             }
-            return false;
+            return Type.Base.EmptyHandler(category);
         }
     }
 

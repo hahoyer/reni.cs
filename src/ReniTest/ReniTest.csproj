@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{A639A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
     <AssemblyName>ReniTest</AssemblyName>
-    <TargetType>CSharp.WinExe</TargetType>
+    <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
