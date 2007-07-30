@@ -19,7 +19,7 @@ namespace Reni.Type
         private readonly HWClassLibrary.Helper.DictionaryEx<int, Sequence> _chain = new HWClassLibrary.Helper.DictionaryEx<int, Sequence>();
         private readonly HWClassLibrary.Helper.DictionaryEx<Base, Pair> _pair = new HWClassLibrary.Helper.DictionaryEx<Base, Pair>();
         private readonly HWClassLibrary.Helper.DictionaryEx<RefAlignParam, Ref> _ref = new HWClassLibrary.Helper.DictionaryEx<RefAlignParam, Ref>();
-        private TypeType _typeType;
+        private TypeType _typeTypeCache;
         private static readonly Bit _bit = new Bit();
         private static readonly Void _void = new Void();
 
@@ -147,9 +147,9 @@ namespace Reni.Type
         {
             get
             {
-                if (_typeType == null)
-                    _typeType = new TypeType(this);
-                return _typeType;
+                if (_typeTypeCache == null)
+                    _typeTypeCache = new TypeType(this);
+                return _typeTypeCache;
             }
         }
 
@@ -818,6 +818,28 @@ namespace Reni.Type
         {
             NotImplementedMethod(context);
             return null;
+        }
+
+        /// <summary>
+        /// Creates the property.
+        /// </summary>
+        /// <returns></returns>
+        /// created 26.07.2007 00:04 on HAHOYER-DELL by hh
+        virtual internal Base CreateProperty()
+        {
+            NotImplementedMethod();return null;
+        }
+
+        /// <summary>
+        /// If type is property, execute it.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
+        /// created 30.07.2007 21:28 on HAHOYER-DELL by hh
+        virtual internal Result UnProperty(Result result, Context.Base context)
+        {
+            return result;
         }
     }
 

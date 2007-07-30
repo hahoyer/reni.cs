@@ -30,7 +30,7 @@ namespace Reni
         private List<Container> _functionContainers;
         private Container _mainContainer;
         private string _executedCode;
-        private CompilerParameters _parameters;
+        private readonly CompilerParameters _parameters;
 
 
         /// <summary>

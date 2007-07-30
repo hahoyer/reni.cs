@@ -33,7 +33,6 @@ namespace reni.Generated
         {
             fixed (sbyte* data = new sbyte[2])
             {
-            StartFunction:
                 (*(sbyte*)(data + 1)) = (sbyte)(127); // BitArray                       840
                 (*(Int16*)(data + 0)) = (*(Int16*)(frame - 2)); // TopFrame                       1119
                 (*(sbyte*)(data + 1)) = (*(sbyte*)(data + 0)); // StatementEnd                    926

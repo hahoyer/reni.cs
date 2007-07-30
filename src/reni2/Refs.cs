@@ -22,7 +22,7 @@ namespace Reni
         private Refs()
         {
             _data = new List<Base>();
-            StopByObjectId(441);
+            StopByObjectId(-441);
         }
 
         private Refs(Base e)

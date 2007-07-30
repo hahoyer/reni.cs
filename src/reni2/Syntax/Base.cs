@@ -298,6 +298,10 @@ namespace Reni.Syntax
             _token = token;
         }
 
+        internal Void()
+        {
+        }
+
         /// <summary>
         /// Visitor function, that ensures correct alignment
         /// This function shoud be called by cache elments only

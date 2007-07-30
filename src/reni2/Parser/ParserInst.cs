@@ -107,7 +107,7 @@ namespace Reni.Parser
                  new string[] {"then"},
                  new string[] {"else"}
                 );
-            x += PrioTable.RightAssoc(":", "function", "inherit", "apply_operator", "constructor", "converter");
+            x += PrioTable.RightAssoc(":", "function", "property", "inherit", "apply_operator", "constructor", "converter");
             x += PrioTable.RightAssoc(",");
             x += PrioTable.RightAssoc(";");
             x = x.ParLevel

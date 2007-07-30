@@ -706,6 +706,10 @@ namespace Reni
             return resultAsRef;
         }
 
+        internal Result UnProperty(Context.Base context)
+        {
+            return Type.UnProperty(this,context);
+        }
     }
     /// <summary>
     /// Describes errors, not yet implemented

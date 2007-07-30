@@ -1,4 +1,3 @@
-using System;
 using HWClassLibrary.Debug;
 using Reni.Code;
 
@@ -41,7 +40,7 @@ namespace Reni.Context
         public Type.Base Args { get { return _args; } }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:FunctionInstance"/> class.
+        /// Initializes a new instance of the FunctionInstance class.
         /// </summary>
         /// <param name="index">The index.</param>
         /// <param name="body">The body.</param>
@@ -137,7 +136,7 @@ namespace Reni.Context
             if(IsStopByObjectIdActive)
                 return null;
             Function functionContext = Context.CreateFunction(Args);
-            bool trace = functionContext.ObjectId == 10 && category.HasCode;
+            bool trace = functionContext.ObjectId == -10 && category.HasCode;
             Category categoryEx = category;
             if (!categoryEx.IsEqual(Category.Refs))
                 categoryEx = categoryEx | Category.Type;
@@ -162,6 +161,11 @@ namespace Reni.Context
                 result.Refs = result.Refs.Without(functionContext);
 
             return result;
+        }
+
+        private Type.Base VisitType()
+        {
+            return Visit(Category.Type).Type;
         }
 
         /// <summary>
@@ -198,8 +202,11 @@ namespace Reni.Context
             result += "\n";
             result += "context=" + _context.Dump();
             result += "\n";
+            result += "type=" + VisitType().Dump();
+            result += "\n";
             return result;
         }
+
     }
 
     public class ReplacePrimitiveRecursivity : Code.ReplaceVisitor.Base

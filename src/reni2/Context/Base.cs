@@ -203,6 +203,18 @@ namespace Reni.Context
             return CreateFunctionType(body).CreateResult(c);
         }
         /// <summary>
+        /// Creates the property result.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="body">The body.</param>
+        /// <returns></returns>
+        /// created 25.07.2007 22:52 on HAHOYER-DELL by hh
+        public Result CreatePropertyResult(Category category, Syntax.Base body)
+        {
+            return CreatePropertyType(body).CreateResult(category);
+        }
+
+        /// <summary>
         /// Creates the type of the function.
         /// </summary>
         /// <param name="body">The body.</param>
@@ -211,6 +223,18 @@ namespace Reni.Context
         public Type.Base CreateFunctionType(Syntax.Base body)
         {
             return _cache._functionType.Find(body, delegate { return new Type.Function(this, body); });
+        }
+
+        /// <summary>
+        /// Creates the type of the function.
+        /// </summary>
+        /// <param name="body">The body.</param>
+        /// <returns></returns>
+        /// created 02.01.2007 14:57
+        public Type.Base CreatePropertyType(Syntax.Base body)
+        {
+            Type.Base type = CreateFunctionType(body);
+            return type.CreateProperty();
         }
 
         public class Cache
@@ -227,7 +251,7 @@ namespace Reni.Context
             public Result _topRefResultCache;
         }
 
-        internal Result VisitFirstChainElement(Category category, MemberElem memberElem)
+        private Result VisitFirstChainElement(Category category, MemberElem memberElem)
         {
             if (memberElem.DefineableToken == null)
             {
@@ -255,7 +279,23 @@ namespace Reni.Context
             return null;
         }
 
-        internal virtual Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
+        internal Result VisitFirstChainElementAndPostProcess(Category category, MemberElem memberElem)
+        {
+            return PostProcess(VisitFirstChainElement(category, memberElem));
+        }
+
+        private Result PostProcess(Result formerResult)
+        {
+            Result alignedResult = formerResult.Align(RefAlignParam.AlignBits);
+            return alignedResult.UnProperty(this);
+        }
+
+        internal Result VisitNextChainElementAndPostProcess(Category category, MemberElem memberElem, Result formerResult)
+        {
+            return PostProcess(VisitNextChainElement(category, memberElem, formerResult));
+        }
+
+        private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
             bool trace = ObjectId == -10 && memberElem.ObjectId == 1 && category.HasRefs;
             StartMethodDumpWithBreak(trace,category,memberElem,formerResult);
@@ -292,6 +332,7 @@ namespace Reni.Context
             NotImplementedMethod(struc);
             return null;
         }
+
     }
 
     abstract internal class PrefixSearchResult : ReniObject

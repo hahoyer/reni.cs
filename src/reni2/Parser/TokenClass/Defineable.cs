@@ -1,18 +1,57 @@
 ﻿using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Syntax;
 using Reni.Type;
-using Void=Reni.Syntax.Void;
 
 namespace Reni.Parser.TokenClass
 {
     /// <summary>
     /// Tokens that can used in definitions (not reserved tokens)
     /// </summary>
-    public abstract class Defineable: Base
+    public abstract class Defineable : Base
     {
+        /// <summary>
+        /// Gets the name of token for C# generation.
+        /// </summary>
+        /// <value>The name of the C sharp.</value>
+        /// created 08.01.2007 15:02
+        [DumpData(false)]
+        public virtual string CSharpNameOfDefaultOperation
+        {
+            get
+            {
+                NotImplementedMethod();
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Gets the name of function defined in class data for C# code generation.for odd sized numbers
+        /// </summary>
+        /// <value>The name of the C sharp.</value>
+        /// created 08.01.2007 15:02
+        [DumpData(false)]
+        public string DataFunctionName { get { return GetType().Name; } }
+
+        /// <summary>
+        /// Gets the numeric prefix operation.
+        /// </summary>
+        /// <value>The numeric prefix operation.</value>
+        /// created 02.02.2007 23:03
+        [DumpData(false)]
+        internal virtual PrefixSearchResult NumericPrefixOperation { get { return null; } }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is logical operator.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is logical operator; otherwise, <c>false</c>.
+        /// </value>
+        /// created 03.02.2007 15:22
+        [DumpData(false)]
+        public virtual bool IsCompareOperator { get { return false; } }
+
         /// <summary>
         /// Structs the operation.
         /// </summary>
@@ -44,64 +83,17 @@ namespace Reni.Parser.TokenClass
         }
 
         /// <summary>
-        /// Gets the name of token for C# generation.
-        /// </summary>
-        /// <value>The name of the C sharp.</value>
-        /// created 08.01.2007 15:02
-        [DumpData(false)]
-        virtual public string CSharpNameOfDefaultOperation
-        {
-            get
-            {
-                NotImplementedMethod();
-                return "";
-            }
-        }
-
-        /// <summary>
-        /// Gets the name of function defined in class data for C# code generation.for odd sized numbers
-        /// </summary>
-        /// <value>The name of the C sharp.</value>
-        /// created 08.01.2007 15:02
-        [DumpData(false)]
-        public string DataFunctionName
-        {
-            get
-            {
-                return GetType().Name;
-            }
-        }
-
-        /// <summary>
         /// Gets the type operation.
         /// </summary>
         /// <param name="obj">The obj.</param>
         /// <returns></returns>
         /// <value>The type operation.</value>
         /// created 07.01.2007 16:24
-        virtual public SearchResult DefaultOperation(Type.Base obj)
+        public virtual SearchResult DefaultOperation(Type.Base obj)
         {
             return null;
         }
 
-        /// <summary>
-        /// Gets the numeric prefix operation.
-        /// </summary>
-        /// <value>The numeric prefix operation.</value>
-        /// created 02.02.2007 23:03
-        [DumpData(false)]
-        internal virtual PrefixSearchResult NumericPrefixOperation { get { return null; } }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is logical operator.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is logical operator; otherwise, <c>false</c>.
-        /// </value>
-        /// created 03.02.2007 15:22
-        [DumpData(false)]
-        virtual public bool IsCompareOperator { get { return false; } }
-    
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
         /// </summary>
@@ -109,7 +101,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="argSize">Size of the arg.</param>
         /// <returns></returns>
         /// created 08.01.2007 01:40
-        virtual public Type.Base NumericOperationResultType(int objSize, int argSize)
+        public virtual Type.Base NumericOperationResultType(int objSize, int argSize)
         {
             NotImplementedMethod(objSize, argSize);
             throw new NotImplementedException();
@@ -143,11 +135,6 @@ namespace Reni.Parser.TokenClass
             _token = token;
         }
 
-        public override Result VirtVisit(Context.Base context, Category category)
-        {
-            return DeclarationSyntax.Visit(context, category);
-        }
-
         private Syntax.Base DeclarationSyntax
         {
             get
@@ -156,6 +143,13 @@ namespace Reni.Parser.TokenClass
                     _declarationSyntax = CreateDeclarationSyntax();
                 return _declarationSyntax;
             }
+        }
+
+        public string Name { get { return _token.Name; } }
+
+        public override Result VirtVisit(Context.Base context, Category category)
+        {
+            return DeclarationSyntax.Visit(context, category);
         }
 
         internal override Syntax.Base CreateDefinableSyntax(DefineableToken defineableToken, Syntax.Base right)
@@ -192,15 +186,13 @@ namespace Reni.Parser.TokenClass
         {
             return _token.Name;
         }
-
-        public string Name { get { return _token.Name; } }
     }
 
     internal class DeclarationSyntax : Syntax.Base
     {
         private readonly DefineableToken _defineableToken;
-        private readonly Token _token;
         private readonly Syntax.Base _definition;
+        private readonly Token _token;
 
         public DeclarationSyntax(DefineableToken defineableToken, Token token, Syntax.Base definition)
         {
@@ -223,7 +215,7 @@ namespace Reni.Parser.TokenClass
         internal override Syntax.Base CreateListSyntax(Token token, Syntax.Base right)
         {
             if (right == null)
-                return Reni.Syntax.Struct.Create(this,new Void(token));
+                return Syntax.Struct.Create(this, new Syntax.Void(token));
             return right.CreateListSyntaxReverse(this, token);
         }
 
@@ -244,7 +236,7 @@ namespace Reni.Parser.TokenClass
         /// created 07.05.2007 22:09 on HAHOYER-DELL by hh
         internal override string DumpShort()
         {
-            return DefineableToken.Name + ": "+ Definition.DumpShort();
+            return DefineableToken.Name + ": " + Definition.DumpShort();
         }
 
         /// <summary>
@@ -256,7 +248,5 @@ namespace Reni.Parser.TokenClass
         {
             return CreateListSyntax(this);
         }
-
     }
 }
-

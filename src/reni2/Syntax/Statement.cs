@@ -71,7 +71,7 @@ namespace Reni.Syntax
             Result intermediateResult = Reni.Type.Base.CreateVoidResult(internalCategory);
 
             Result result = context
-                .VisitFirstChainElement(internalCategory, Chain[0])
+                .VisitFirstChainElementAndPostProcess(internalCategory, Chain[0])
                 .Align(context.RefAlignParam.AlignBits);
             for (int i = 1; i < Chain.Count; i++)
             {
@@ -82,7 +82,7 @@ namespace Reni.Syntax
                     return result;
 
                 result = context
-                    .VisitNextChainElement(internalCategory, Chain[i], result)
+                    .VisitNextChainElementAndPostProcess(internalCategory, Chain[i], result)
                     .Align(context.RefAlignParam.AlignBits);
                 if(internalCategory.HasRefs)
                 foreach (Context.Base referencedContext in result.Refs.Data)
