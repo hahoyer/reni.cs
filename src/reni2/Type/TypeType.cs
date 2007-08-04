@@ -11,7 +11,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 30.01.2007 22:57
-        public override Result ConvertToItself(Category category)
+        internal override Result ConvertToItself(Category category)
         {
             return CreateVoidResult(category);
         }
@@ -19,7 +19,7 @@ namespace Reni.Type
         private readonly Base _parent;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:TypeType"/> class.
+        /// Initializes a new instance of the <see cref="TypeType"/> class.
         /// </summary>
         /// <param name="parent">The parent.</param>
         /// created 08.01.2007 18:05

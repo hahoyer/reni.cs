@@ -3,7 +3,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
@@ -77,17 +76,17 @@ namespace Reni.Type
         /// <summary>
         /// Searches the definable token at type
         /// </summary>
-        /// <param name="t">The t.</param>
+        /// <param name="token">The t.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken t)
+        public override SearchResult SearchDefineable(DefineableToken token)
 	    {
-	        SearchResult result = t.TokenClass.RefOperation(this);
+	        SearchResult result = token.TokenClass.RefOperation(this);
             if (result != null)
                 return result;
-            result = Target.SearchDefineable(t);
+            result = Target.SearchDefineable(token);
 	        if(result!=null)
                 return result.FoundFromRef(RefAlignParam);
-	        return base.SearchDefineable(t);
+	        return base.SearchDefineable(token);
 	    }
 
 	    /// <summary>
@@ -95,7 +94,7 @@ namespace Reni.Type
 	    /// </summary>
 	    /// <value>The type of the sequence element.</value>
 	    /// created 13.01.2007 19:46
-	    public override int SequenceCount { get { return Target.SequenceCount; } }
+	    internal override int SequenceCount { get { return Target.SequenceCount; } }
 
 	    /// <summary>
 	    /// Destructors the specified category.
@@ -161,7 +160,7 @@ namespace Reni.Type
 	    /// <param name="dest">The dest.</param>
 	    /// <returns></returns>
 	    /// created 11.01.2007 22:12
-	    public override Result ConvertToVirt(Category category, Base dest)
+	    internal override Result ConvertToVirt(Category category, Base dest)
 	    {
 	        return Target
                 .ConvertTo(category, dest)
@@ -196,7 +195,7 @@ namespace Reni.Type
 	    /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
 	    /// </returns>
 	    /// created 11.01.2007 22:09
-	    public override bool IsConvertableToVirt(Base dest, bool useConverter)
+	    internal override bool IsConvertableToVirt(Base dest, bool useConverter)
 	    {
 	        return Target.IsConvertableTo(dest, useConverter);
 	    }

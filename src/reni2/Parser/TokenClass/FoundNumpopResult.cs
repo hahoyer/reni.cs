@@ -1,4 +1,3 @@
-using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
 
@@ -13,7 +12,7 @@ namespace Reni.Parser.TokenClass
         private readonly Defineable _parent;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:FoundNumpopResult"/> class.
+        /// Initializes a new instance of the FoundNumpopResult class.
         /// </summary>
         /// <param name="parent">The parent.</param>
         /// <param name="obj">The obj.</param>
@@ -29,12 +28,11 @@ namespace Reni.Parser.TokenClass
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="category">The category.</param>
-        /// <param name="obj">The obj.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
         public override Result VisitApply(Context.Base context, Category category, Syntax.Base args)
         {
-            bool trace = ObjectId == -296 && context.ObjectId == 5 && category.HasCode;
+            bool trace = ObjectId == 920 && context.ObjectId == 15 && category.HasType;
             StartMethodDumpWithBreak(trace, context, category, args);
             Type.Base set = DefiningType.SequenceElementType;
             Result objResult = DefiningType.VisitAsSequence(category, set);

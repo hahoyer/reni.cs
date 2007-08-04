@@ -35,13 +35,17 @@ namespace Reni.FeatureTest
         }
 
         /// <summary>
-        /// Compares the operators.
+        /// Apply type operator.
         /// </summary>
         /// created 08.01.2007 00:05
         [Test,Category(Worked)]
         public void ApplyTypeOperator()
         {
-            RunCompiler("ApplyTypeOperator", @"(31 type (100))dump_print", "-28");
+            RunCompiler("ApplyTypeOperator", @"(31 type (28))dump_print", "28");
+
+            //// Should this work?
+            // RunCompiler("ApplyTypeOperator", @"(31 type (100))dump_print", "-28");
+            //// No!
         }
 
     }

@@ -41,7 +41,7 @@ namespace Reni.Context
         /// <returns></returns>
         public virtual Result VisitApplyFromRef(RefAlignParam refAlignParam, Base callContext, Category category, Syntax.Base args)
         {
-            Result argResult = _definingType.CreateRef(refAlignParam).ConvertTo(category,_definingType); 
+            Result argResult = _definingType.CreateRef(refAlignParam).Conversion(category,_definingType); 
             return VisitApply(callContext,category,args).UseWithArg(argResult);
         }
         /// <summary>

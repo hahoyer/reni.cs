@@ -187,12 +187,11 @@ namespace Reni.Type
         /// <summary>
         /// Searches the definable token at type
         /// </summary>
-        /// <param name="t">The t.</param>
-        /// <param name="name">The name.</param>
+        /// <param name="token">The token.</param>
         /// <returns></returns>
-        public virtual SearchResult SearchDefineable(DefineableToken t)
+        public virtual SearchResult SearchDefineable(DefineableToken token)
         {
-            return t.TokenClass.DefaultOperation(this);
+            return token.TokenClass.DefaultOperation(this);
         }
 
         /// <summary>
@@ -209,10 +208,10 @@ namespace Reni.Type
         /// <summary>
         /// Searches the defineable prefix.
         /// </summary>
-        /// <param name="defineable">The defineable.</param>
+        /// <param name="token">The token.</param>
         /// <returns></returns>
         /// created 02.02.2007 21:51
-        internal virtual PrefixSearchResult PrefixSearchDefineable(DefineableToken t)
+        internal virtual PrefixSearchResult PrefixSearchDefineable(DefineableToken token)
         {
             return null;
         }
@@ -220,10 +219,10 @@ namespace Reni.Type
         /// <summary>
         /// Searches the defineable prefix from sequence.
         /// </summary>
-        /// <param name="defineable">The defineable.</param>
+        /// <param name="token">The token.</param>
         /// <returns></returns>
         /// created 02.02.2007 22:09
-        internal virtual PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken t)
+        internal virtual PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken token)
         {
             return null;
         }
@@ -474,7 +473,7 @@ namespace Reni.Type
         /// created 15.05.2007 23:42 on HAHOYER-DELL by hh
         virtual internal Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
-            Result argResult = CreateRef(refAlignParam).ConvertTo(category, this);
+            Result argResult = CreateRef(refAlignParam).Conversion(category, this);
             return DumpPrint(category).UseWithArg(argResult);
         }
         /// <summary>
@@ -523,7 +522,7 @@ namespace Reni.Type
         /// created 10.01.2007 15:45
         virtual public Result ApplyTypeOperator(Result argResult)
         {
-            return argResult.Type.ConvertTo(argResult.Complete, this).UseWithArg(argResult);
+            return argResult.Type.Conversion(argResult.Complete, this).UseWithArg(argResult);
         }
 
         // Conversion
@@ -545,10 +544,10 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Conversions the specified category.
+        /// Main conversion function. Creates the results for conversion of one type into another.
         /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="dest">The dest.</param>
+        /// <param name="category">Categories to obtain.</param>
+        /// <param name="dest">The destination type.</param>
         /// <returns></returns>
         /// created 11.01.2007 21:26
         public Result Conversion(Category category, Base dest)
@@ -564,13 +563,13 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Converts to.
+        /// Internal conversion function. Used only inside of conversion strategy. From outside call <see cref="Base.Conversion"/>.
         /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="dest">The dest.</param>
+        /// <param name="category">Categories to obtain.</param>
+        /// <param name="dest">The destination type.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        public Result ConvertTo(Category category, Base dest)
+        internal Result ConvertTo(Category category, Base dest)
         {
             if (this == dest)
                 return ConvertToItself(category);
@@ -578,12 +577,12 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Converts to itself.
+        /// Internal conversion function. Used only inside of conversion strategy. From outside call <see cref="Base.Conversion"/>.
         /// </summary>
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 30.01.2007 22:57
-        public virtual Result ConvertToItself(Category category)
+        internal virtual Result ConvertToItself(Category category)
         {
             return CreateArgResult(category);
         }
@@ -595,7 +594,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        public virtual Result ConvertToVirt(Category category, Base dest)
+        internal virtual Result ConvertToVirt(Category category, Base dest)
         {
             NotImplementedMethod(category, dest);
             throw new NotImplementedException();
@@ -609,7 +608,7 @@ namespace Reni.Type
         /// </value>
         /// created 11.01.2007 22:43
         [DumpData(false)]
-        virtual public bool HasConverterFromBit
+        internal virtual bool HasConverterFromBit
         {
             get
             {
@@ -624,7 +623,7 @@ namespace Reni.Type
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
         [DumpData(false)]
-        virtual public Base SequenceElementType
+        internal virtual Base SequenceElementType
         {
             get
             {
@@ -639,7 +638,7 @@ namespace Reni.Type
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
         [DumpData(false)]
-        virtual public int SequenceCount
+        internal virtual int SequenceCount
         {
             get
             {
@@ -655,7 +654,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The pending.</value>
         /// created 24.01.2007 22:23
-        public static Base Pending
+        internal static Base Pending
         {
             get
             {
@@ -674,7 +673,7 @@ namespace Reni.Type
         /// </value>
         /// created 09.02.2007 00:26
         [DumpData(false)]
-        virtual public bool IsPending { get { return false; } }
+        internal virtual bool IsPending { get { return false; } }
 
         /// <summary>
         /// Visits as sequence.
@@ -683,11 +682,11 @@ namespace Reni.Type
         /// <param name="elementType">Type of the element.</param>
         /// <returns></returns>
         /// created 13.01.2007 22:20
-        virtual public Result VisitAsSequence(Category category, Base elementType)
+        internal virtual Result VisitAsSequence(Category category, Base elementType)
         {
             int count = SequenceCount;
             Base resultType = elementType.CreateSequence(count);
-            return ConvertTo(category,resultType);
+            return Conversion(category,resultType);
         }
 
         /// <summary>
@@ -699,7 +698,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        public bool IsConvertableTo(Base dest, bool useConverter)
+        internal bool IsConvertableTo(Base dest, bool useConverter)
         {
             if (this == dest)
                 return IsConvertableToItself(useConverter);
@@ -715,7 +714,7 @@ namespace Reni.Type
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        virtual public bool HasConverterTo(Base dest)
+        internal virtual bool HasConverterTo(Base dest)
         {
             return false;
         }
@@ -729,7 +728,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        virtual public bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal virtual bool IsConvertableToVirt(Base dest, bool useConverter)
         {
             NotImplementedMethod(dest, useConverter);
             throw new NotImplementedException();
@@ -743,7 +742,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to itself] [the specified use converter]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 23:02
-        virtual public bool IsConvertableToItself(bool useConverter)
+        internal virtual bool IsConvertableToItself(bool useConverter)
         {
             return true;
         }
@@ -757,7 +756,7 @@ namespace Reni.Type
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:18
-        virtual public Code.Base CreateOperation(Defineable token, Result objResult, Size size, Result argResult)
+        internal virtual Code.Base CreateOperation(Defineable token, Result objResult, Size size, Result argResult)
         {
             NotImplementedMethod(token, objResult, size, argResult.Code);
             return null;
@@ -770,7 +769,7 @@ namespace Reni.Type
         /// <param name="result">The result.</param>
         /// <returns></returns>
         /// created 02.02.2007 23:28
-        virtual public Code.Base CreateOperation(Defineable token, Result result)
+        internal virtual Code.Base CreateOperation(Defineable token, Result result)
         {
             NotImplementedMethod(token, result);
             return null;
@@ -783,7 +782,7 @@ namespace Reni.Type
         /// <param name="argBitCount">The arg bit count.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:43
-        virtual public Base OperationResultType(Defineable token, int objBitCount, int argBitCount)
+        internal virtual Base OperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             NotImplementedMethod(token,objBitCount,argBitCount);
             return null;
@@ -796,7 +795,7 @@ namespace Reni.Type
         /// <param name="condRefs">The cond refs.</param>
         /// <param name="elseOrThenRefs">The else or then refs.</param>
         /// <returns></returns>
-        public Result ThenElseWithPending(Category category, Refs condRefs, Refs elseOrThenRefs)
+        internal Result ThenElseWithPending(Category category, Refs condRefs, Refs elseOrThenRefs)
         {
             Tracer.Assert(!category.HasCode);
 
@@ -846,7 +845,7 @@ namespace Reni.Type
     /// <summary>
     /// 
     /// </summary>
-    public class Pending: Base
+    internal class Pending: Base
     {
         /// <summary>
         /// The size of type
@@ -867,7 +866,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        public override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, Base dest)
         {
             return dest.CreateResult
                 (
@@ -884,7 +883,7 @@ namespace Reni.Type
         /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
         /// </value>
         /// created 09.02.2007 00:26
-        public override bool IsPending { get { return true; } }
+        internal override bool IsPending { get { return true; } }
 
         /// <summary>
         /// Visits as sequence.
@@ -893,7 +892,7 @@ namespace Reni.Type
         /// <param name="elementType">Type of the element.</param>
         /// <returns></returns>
         /// created 13.01.2007 22:20
-        public override Result VisitAsSequence(Category category, Base elementType)
+        internal override Result VisitAsSequence(Category category, Base elementType)
         {
             return CreateResult(category);
         }
@@ -907,7 +906,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        public override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
         {
             return true;
         }

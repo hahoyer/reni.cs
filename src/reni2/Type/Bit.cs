@@ -51,12 +51,12 @@ namespace Reni.Type
         /// <summary>
         /// Searches the defineable prefix from sequence.
         /// </summary>
-        /// <param name="defineable">The defineable.</param>
+        /// <param name="token">The token.</param>
         /// <returns></returns>
         /// created 02.02.2007 22:09
-        internal override PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken t)
+        internal override PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken token)
         {
-            return t.TokenClass.NumericPrefixOperation;
+            return token.TokenClass.NumericPrefixOperation;
         }
 
         /// <summary>
@@ -70,6 +70,13 @@ namespace Reni.Type
         {
             return CreateSequence(count).CreateArgResult(category).DumpPrintBitSequence();
         }
+
+        /// <summary>
+        /// Gets the type of the sequence element.
+        /// </summary>
+        /// <value>The type of the sequence element.</value>
+        /// created 13.01.2007 19:46
+        internal override int SequenceCount { get { return 1; } }
 
         /// <summary>
         /// Dumps the print code from array.
@@ -101,7 +108,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        public override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
         {
             if (useConverter)
                 return dest.HasConverterFromBit;
@@ -118,7 +125,7 @@ namespace Reni.Type
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:18
-        public override Code.Base CreateOperation(Defineable token, Result objResult, Size size, Result argResult)
+        internal override Code.Base CreateOperation(Defineable token, Result objResult, Size size, Result argResult)
         {
             return objResult.Code.CreateNumericOp(token, size, argResult.Code);
         }
@@ -130,7 +137,7 @@ namespace Reni.Type
         /// <param name="result">The result.</param>
         /// <returns></returns>
         /// created 02.02.2007 23:28
-        public override Code.Base CreateOperation(Defineable token, Result result)
+        internal override Code.Base CreateOperation(Defineable token, Result result)
         {
             return result.Code.CreateNumericOp(token);
         }
@@ -143,7 +150,7 @@ namespace Reni.Type
         /// <param name="argBitCount">The arg bit count.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:43
-        public override Base OperationResultType(Defineable token, int objBitCount, int argBitCount)
+        internal override Base OperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             return token.NumericOperationResultType(objBitCount, argBitCount);
         }

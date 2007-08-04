@@ -90,7 +90,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        public override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, Base dest)
         {
             Array destArray = dest as Array;
             if (destArray != null)
@@ -112,7 +112,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        public override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
         {
             Array destArray = dest as Array;
             if (destArray != null)

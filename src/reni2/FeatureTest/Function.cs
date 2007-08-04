@@ -1,6 +1,5 @@
 using HWClassLibrary.Debug;
 using NUnit.Framework;
-using Reni.Context;
 
 namespace Reni.FeatureTest
 {

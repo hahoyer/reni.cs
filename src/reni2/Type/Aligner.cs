@@ -45,15 +45,14 @@ namespace Reni.Type
         /// <summary>
         /// Searches the definable token at type
         /// </summary>
-        /// <param name="t">The t.</param>
-        /// <param name="name">The name.</param>
+        /// <param name="token">The token.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken t)
+        public override SearchResult SearchDefineable(DefineableToken token)
         {
-            SearchResult result = Parent.SearchDefineable(t);
+            SearchResult result = Parent.SearchDefineable(token);
             if(result != null)
                 return result;
-            return base.SearchDefineable(t);
+            return base.SearchDefineable(token);
         }
 
         /// <summary>
@@ -98,7 +97,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        public override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
         {
             return Parent.IsConvertableTo(dest, useConverter);
         }
@@ -109,7 +108,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        public override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, Base dest)
         {
             return Parent
                 .ConvertTo(category, dest)
@@ -130,7 +129,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
-        public override int SequenceCount { get { return Parent.SequenceCount; } }
+        internal override int SequenceCount { get { return Parent.SequenceCount; } }
 
         /// <summary>
         /// Determines whether [has converter to] [the specified dest].
@@ -139,7 +138,7 @@ namespace Reni.Type
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        public override bool HasConverterTo(Base dest)
+        internal override bool HasConverterTo(Base dest)
         {
             return Parent.HasConverterTo(dest);
         }

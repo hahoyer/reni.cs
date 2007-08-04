@@ -1,4 +1,3 @@
-using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
@@ -51,7 +50,7 @@ namespace Reni.Type
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        public override bool HasConverterTo(Base dest)
+        internal override bool HasConverterTo(Base dest)
         {
             return _struc.HasConverterTo(_context, dest);
         }
@@ -65,7 +64,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        public override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
         {
             Void voidDest = dest as Void;
             if (voidDest != null)
@@ -91,12 +90,9 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        public override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, Base dest)
         {
-            Void voidDest = dest as Void;
-            if (voidDest != null)
-                return _struc.ConvertToVoid(_context, category);
-            return base.ConvertToVirt(category, dest);
+            return _struc.ConvertTo(category, _context, dest);
         }
 
         /// <summary>
@@ -110,18 +106,17 @@ namespace Reni.Type
         /// <summary>
         /// Searches the definable token at type
         /// </summary>
-        /// <param name="t">The t.</param>
-        /// <param name="name">The name.</param>
+        /// <param name="token">The token.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken t)
+        public override SearchResult SearchDefineable(DefineableToken token)
         {
             StructSearchResult result = _context
                 .CreateStruct(_struc, _currentCompilePosition)
-                .SearchDefineable(t);
+                .SearchDefineable(token);
             if (result != null)
                 return new FoundResult(result,this);
 
-            return base.SearchDefineable(t);
+            return base.SearchDefineable(token);
         }
 
         /// <summary>
@@ -160,7 +155,7 @@ namespace Reni.Type
         /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
         /// </value>
         /// created 09.02.2007 00:26
-        public override bool IsPending { get { return _struc.IsPendingType(_context); } }
+        internal override bool IsPending { get { return _struc.IsPendingType(_context); } }
 
         /// <summary>
         /// Visits the access to an element. Struct reference is assumed as "arg"

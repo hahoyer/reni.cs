@@ -80,6 +80,8 @@
     <Compile Include="generated.cs" />
     <Compile Include="Intervall.cs" />
     <Compile Include="Parser\Test.cs" />
+    <Compile Include="Parser\TokenClass\DeclarationSyntax.cs" />
+    <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Syntax\MemberElem.cs" />
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="Parser\ParserInst.cs" />
@@ -105,6 +107,8 @@
     <Compile Include="Parser\TokenClass\Symbol\ColonEqual.cs" />
     <Compile Include="Parser\TokenClass\Symbol\Minus.cs" />
     <Compile Include="Syntax\Special.cs" />
+    <Compile Include="Syntax\Struct.cs" />
+    <Compile Include="Syntax\Void.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\Sequence.cs" />
     <Compile Include="Parser\TokenClass\Symbol\Equal.cs" />

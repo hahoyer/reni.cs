@@ -16,7 +16,7 @@ namespace Reni.Type
         private readonly Array _inheritedType;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Sequence"/> class.
+        /// Initializes a new instance of the <see cref="Sequence"/> class.
         /// </summary>
         /// <param name="elementType">Type of the element.</param>
         /// <param name="count">The count.</param>
@@ -57,14 +57,14 @@ namespace Reni.Type
         /// <summary>
         /// Searches the definable token at type
         /// </summary>
-        /// <param name="t">The t.</param>
+        /// <param name="token">The token.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken t)
+        public override SearchResult SearchDefineable(DefineableToken token)
         {
-            SearchResult result = Element.SearchDefineableFromSequence(t,Count);
+            SearchResult result = Element.SearchDefineableFromSequence(token,Count);
             if (result != null)
                 return result;
-            return base.SearchDefineable(t);
+            return base.SearchDefineable(token);
         }
 
         /// <summary>
@@ -85,14 +85,14 @@ namespace Reni.Type
         /// </summary>
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
-        public override Base SequenceElementType { get { return Element; } }
+        internal override Base SequenceElementType { get { return Element; } }
 
         /// <summary>
         /// Gets the type of the sequence element.
         /// </summary>
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
-        public override int SequenceCount { get { return Count; } }
+        internal override int SequenceCount { get { return Count; } }
 
         /// <summary>
         /// Determines whether [is convertable to] [the specified dest].
@@ -103,7 +103,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        public override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
         {
             Pending destPending = dest as Pending;
             if(destPending != null)
@@ -131,7 +131,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        public override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, Base dest)
         {
             Pending destPending = dest as Pending;
             if (destPending != null)

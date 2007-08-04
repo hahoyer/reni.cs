@@ -1,13 +1,13 @@
-using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
 using HWClassLibrary.IO;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Parser.TokenClass;
+using Reni.Syntax;
 using Base=Reni.Syntax.Base;
+using Void=Reni.Type.Void;
 
 namespace Reni
 {
@@ -114,6 +114,15 @@ namespace Reni
             DictionaryEx<string, int> dictionary = new DictionaryEx<string, int>();
             dictionary[left.DefineableToken.Name] = 0;
             return new Struct(list, dictionary);
+        }
+
+        internal static Struct Create(ConverterSyntax left)
+        {
+            List<Base> list = new List<Base>();
+            List<Base> converter  = new List<Base>();
+            converter.Add(left.Body);
+            DictionaryEx<string, int> dictionary = new DictionaryEx<string, int>();
+            return new Struct(list, converter, dictionary);
         }
 
         internal static Struct Create(Base left, Struct right)
@@ -390,7 +399,6 @@ namespace Reni
         /// created 30.01.2007 23:31
         public Result DumpPrintFromRef(Category category, Context.Base context, RefAlignParam refAlignParam)
         {
-            bool trace = ObjectId == 5153 && context.ObjectId == 15 && category.HasRefs;
             Tracer.Assert(refAlignParam.Equals(context.RefAlignParam));
             List<Result> result = DumpPrintFromRef(category, context);
             return ConcatPrintResult(category, result);
@@ -398,7 +406,7 @@ namespace Reni
 
         private static Result ConcatPrintResult(Category category, List<Result> elemResults)
         {
-            Result result = Type.Void.CreateResult(category);
+            Result result = Void.CreateResult(category);
             if (category.HasCode) 
                 result.Code = Code.Base.CreateDumpPrintText("(");
 
@@ -474,9 +482,17 @@ namespace Reni
             return false;
         }
 
-        public Result ConvertToVoid(Context.Base context, Category category)
+        internal Result ConvertTo(Category category, Context.Base context, Type.Base dest)
         {
-            return Type.Base.CreateVoid.CreateArgResult(category);
+            // Special case if dest is Void and size is zero
+            if(dest is Void && VisitSize(context,0,_list.Count).IsZero)
+                return Type.Base.CreateVoid.CreateArgResult(category);
+
+            List<Type.Base> converterTypes = context.CreateStruct(this).VisitType(_converterList);
+
+
+            NotImplementedMethod(category, context, dest, "convertTypes", converterTypes);
+            return null;
         }
 
         /// <summary>
@@ -537,6 +553,7 @@ namespace Reni
             }
             return Type.Base.EmptyHandler(category);
         }
+
     }
 
     internal sealed class StructAccess : StructSearchResult
@@ -555,9 +572,9 @@ namespace Reni
         /// </summary>
         /// <param name="callContext">The callContext.</param>
         /// <param name="category">The category.</param>
-        /// <param name="obj">The obj.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
+        /// created 21.05.2007 23:41 on HAHOYER-DELL by hh
         public override Result VisitApply(Context.Base callContext, Category category, Base args)
         {
             return VisitAccessApply(_position, callContext, category, args);

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Reni.Type
+﻿namespace Reni.Type
 {
     sealed internal class Void : Primitive
     {
@@ -58,7 +56,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        public override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
         {
             return false;
         }

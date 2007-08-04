@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
@@ -121,6 +122,17 @@ namespace Reni.Context
         public Struct CreateStruct(Reni.Struct x, int currentCompilePosition)
         {
             return CreateStructContainer(x).CreateStruct(currentCompilePosition);
+        }
+
+        /// <summary>
+        /// Gets the struct.context
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <returns></returns>
+        /// [created 13.05.2006 18:45]
+        public Struct CreateStruct(Reni.Struct x)
+        {
+            return CreateStruct(x, x.List.Count);
         }
 
         /// <summary>
@@ -333,6 +345,21 @@ namespace Reni.Context
             return null;
         }
 
+        internal List<Result> Visit(Category category, List<Syntax.Base> list)
+        {
+            List<Result> results = new List<Result>();
+            for (int i = 0; i < list.Count; i++)
+                results.Add(list[i].Visit(this,category));
+            return results;
+        }
+
+        internal List<Type.Base> VisitType(List<Syntax.Base> list)
+        {
+            List<Type.Base> results = new List<Type.Base>();
+            for (int i = 0; i < list.Count; i++)
+                results.Add(list[i].VisitType(this));
+            return results;
+        }
     }
 
     abstract internal class PrefixSearchResult : ReniObject

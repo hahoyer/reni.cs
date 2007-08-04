@@ -15,7 +15,8 @@ Integer8: function
 {
     127 type (arg);
     dump_print: property ((_A_T_ 0) dump_print);
-    + : function Integer8(_A_T_ 0 + arg)
+    + : function Integer8(_A_T_ 0 + Integer8(arg) _A_T_ 0);
+    converter _A_T_ 0
 }
 ";
         }
@@ -34,7 +35,7 @@ Integer8: function
         /// <summary>
         /// Integers the class.
         /// </summary>
-        [Test, Category(Worked)]
+        [Test, Explicit, Category(UnderConstruction)]
         public void Plus()
         {
             RunCompiler("Plus"
