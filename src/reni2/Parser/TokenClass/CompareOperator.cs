@@ -9,7 +9,7 @@ namespace Reni.Parser.TokenClass
         /// </summary>
         /// <value>The default sequence operation.</value>
         /// created 13.01.2007 19:37
-        public override SearchResult NumericOperation(Type.Base obj)
+        public override SearchResult SequenceOperation(Type.Base obj)
         {
             return new FoundNumpopResult(this,obj);
         }

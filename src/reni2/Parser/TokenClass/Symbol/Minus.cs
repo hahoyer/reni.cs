@@ -28,7 +28,7 @@ namespace Reni.Parser.TokenClass.Symbol
             _foundNumericPrefixOperationResult = new FoundNumericPrefixOperationResult(this);
         }
 
-        public override SearchResult NumericOperation(Type.Base obj)
+        public override SearchResult SequenceOperation(Type.Base obj)
         {
             return new FoundNumpopResult(this,obj);
         }

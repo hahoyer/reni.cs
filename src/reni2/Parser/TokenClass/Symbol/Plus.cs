@@ -16,7 +16,7 @@ namespace Reni.Parser.TokenClass.Symbol
             return Type.Base.CreateNumber(BitsConst.PlusSize(objSize, argSize));
         }
 
-        public override SearchResult NumericOperation(Type.Base obj)
+        public override SearchResult SequenceOperation(Type.Base obj)
         {
             return new FoundNumpopResult(this,obj);
         }

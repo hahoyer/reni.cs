@@ -81,6 +81,7 @@
     <Compile Include="Intervall.cs" />
     <Compile Include="Parser\Test.cs" />
     <Compile Include="Parser\TokenClass\DeclarationSyntax.cs" />
+    <Compile Include="Parser\TokenClass\Name\Tenable_cutT.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Syntax\MemberElem.cs" />
     <Compile Include="Runtime\OutStream.cs" />

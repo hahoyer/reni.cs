@@ -13,7 +13,7 @@ namespace Reni.Parser.TokenClass.Symbol
         /// created 08.01.2007 15:02
         public override string CSharpNameOfDefaultOperation { get { return "*"; } }
 
-        public override SearchResult NumericOperation(Type.Base obj)
+        public override SearchResult SequenceOperation(Type.Base obj)
         {
             return new FoundNumpopResult(this,obj);
         }

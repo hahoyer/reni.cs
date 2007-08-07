@@ -45,7 +45,7 @@ namespace Reni.Type
         /// created 13.01.2007 19:35
         public override SearchResult SearchDefineableFromSequence(DefineableToken t, int count)
         {
-            return t.TokenClass.NumericOperation(CreateSequence(count));
+            return t.TokenClass.SequenceOperation(CreateSequence(count));
         }
 
         /// <summary>

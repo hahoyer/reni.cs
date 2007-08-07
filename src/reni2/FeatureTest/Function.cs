@@ -118,7 +118,7 @@ f1()dump_print;
             RunCompiler
                 (
                 "RecursiveFunction",
-                @"f: function arg = 1 then arg type(1) else arg * f(arg type(arg-1));f(4)dump_print", 
+                @"f: function arg = 1 then arg type(1) else arg * f(arg type((arg-1)enable_cut));f(4)dump_print", 
                 "24"
                 );
         }

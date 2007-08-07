@@ -65,7 +65,7 @@ namespace Reni.Parser.TokenClass
 
         ///<summary>
         ///</summary>
-        public virtual SearchResult NumericOperation(Type.Base obj)
+        public virtual SearchResult SequenceOperation(Type.Base obj)
         {
             return null;
         }
