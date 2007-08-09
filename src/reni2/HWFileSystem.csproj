@@ -1,0 +1,24 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{EBB73C84-6622-4183-A28F-C0DFF606006B}</ProjectGuid>
+    <AssemblyName>HWFileSystem</AssemblyName>
+    <TargetTypeEx>CSharp.Library.UnitTest</TargetTypeEx>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HWClassLibrary\HWClassLibrary.csproj">
+      <Name>HWClassLibrary</Name>
+      <Project>{0402FAE1-D5D6-490F-BC68-C26C8873C0B2}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataFile.cs" />
+    <Compile Include="Directory.cs" />
+    <Compile Include="File.cs" />
+    <Compile Include="HWFileSystem.cs" />
+    <Compile Include="MSFileSystemSource.cs" />
+    <Compile Include="Source.cs" />
+    <Compile Include="TestSystem.cs" />
+  </ItemGroup>
+  <Import Project="sys.targets" />
+</Project>
