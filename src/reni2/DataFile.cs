@@ -1,15 +1,10 @@
 namespace HWFileSystem
 {
-    internal class DataFile : File
+    sealed internal class DataFile : File
     {
-        private DataFile(string name)
-            : base(name)
+        internal DataFile(Config config)
+            : base(config)
         {
-        }
-
-        static public DataFile CreateMSFileSystem(string rootDirName, string name)
-        {
-            return new DataFile(name);
         }
     }
 }

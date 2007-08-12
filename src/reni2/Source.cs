@@ -1,17 +1,14 @@
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
 namespace HWFileSystem
 {
-    public abstract class Source : Dumpable
+    internal abstract class Source : Dumpable
     {
-        public virtual Set<File> Files
+        internal virtual Files Files(NoCaseStringDictionary<Config> config)
         {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
+            return new Files();
         }
     }
 }

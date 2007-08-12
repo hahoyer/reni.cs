@@ -3,22 +3,29 @@ using HWClassLibrary.Helper;
 
 namespace HWFileSystem
 {
-    public abstract class File : Dumpable
+    internal abstract class File : Dumpable
     {
-        private string _name;
+        private readonly Config _config;
 
-        public File(string name)
+        public File(Config config)
         {
-            _name = name;
+            _config = config;
         }
 
-        public string Name { get { return _name; } }
+        [DumpData(false)]
+        internal Config Config { get { return _config; } }
 
-        protected static Set<Source> CreateMSFileSystemSources(string rootDirName, string name)
+
+        internal protected static Set<Source> CreateMSFileSystemSources(string rootDirName, string name)
         {
             Set<Source> sources = new Set<Source>();
             sources.Add(new MSFileSystemSource(rootDirName + "\\" + name));
             return sources;
+        }
+
+        internal virtual void Add(File otherFile)
+        {
+            Config.Add(otherFile.Config);
         }
     }
 }

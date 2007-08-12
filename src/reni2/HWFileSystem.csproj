@@ -12,12 +12,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="DataFile.cs" />
     <Compile Include="Directory.cs" />
     <Compile Include="File.cs" />
+    <Compile Include="FileMappingSource.cs" />
+    <Compile Include="Files.cs" />
+    <Compile Include="FileSource.cs" />
     <Compile Include="HWFileSystem.cs" />
     <Compile Include="MSFileSystemSource.cs" />
     <Compile Include="Source.cs" />
+    <Compile Include="Sources.cs" />
     <Compile Include="TestSystem.cs" />
   </ItemGroup>
   <Import Project="sys.targets" />
