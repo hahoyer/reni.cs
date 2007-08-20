@@ -3,6 +3,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
@@ -64,6 +65,8 @@ namespace Reni.Type
             SearchResult result = Element.SearchDefineableFromSequence(token,Count);
             if (result != null)
                 return result;
+            if (token.TokenClass.IsSequenceOperation)
+                return new SequenceOperationResult(this, token.TokenClass);
             return base.SearchDefineable(token);
         }
 
@@ -74,7 +77,7 @@ namespace Reni.Type
         /// <returns></returns>
         internal override PrefixSearchResult PrefixSearchDefineable(DefineableToken t)
         {
-            PrefixSearchResult result = Element.PrefixSearchDefineableFromSequence(t);
+            PrefixSearchResult result = Element.PrefixSearchDefineableFromSequence(t,Count);
             if (result != null)
                 return result;
             return base.PrefixSearchDefineable(t);
@@ -242,7 +245,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 02.06.2006 09:47]
-        public override Result DestructorHandler(Category category)
+        internal override Result DestructorHandler(Category category)
         {
             return _inheritedType.DestructorHandler(category);
         }
@@ -253,10 +256,36 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 05.06.2006 16:47]
-        public override Result MoveHandler(Category category)
+        internal override Result MoveHandler(Category category)
         {
             return _inheritedType.MoveHandler(category);
         }
 
+    }
+
+    internal sealed class SequenceOperationResult : SearchResult
+    {
+        [DumpData(true)]
+        private readonly Defineable _defineable;
+        private readonly Sequence _sequence;
+
+        public SequenceOperationResult(Sequence sequence, Defineable defineable)
+            : base(sequence)
+        {
+            _sequence = sequence;
+            _defineable = defineable;
+        }
+
+        /// <summary>
+        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
+        /// </summary>
+        /// <param name="callContext">The call context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <returns></returns>
+        public override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        {
+            return _defineable.VisitSequenceOperationApply(callContext, category, args, _sequence);
+        }
     }
 }

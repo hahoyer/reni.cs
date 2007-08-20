@@ -11,7 +11,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 02.06.2006 09:47]
-        sealed public override Result DestructorHandler(Category category)
+        internal sealed override Result DestructorHandler(Category category)
         {
             return EmptyHandler(category);
         }
@@ -23,7 +23,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// [created 04.06.2006 00:51]
-        sealed public override Result ArrayDestructorHandler(Category category, int count)
+        internal sealed override Result ArrayDestructorHandler(Category category, int count)
         {
             return EmptyHandler(category);
         }
@@ -34,7 +34,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 05.06.2006 16:47]
-        sealed public override Result MoveHandler(Category category)
+        internal sealed override Result MoveHandler(Category category)
         {
             return EmptyHandler(category);
         }
@@ -46,7 +46,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// [created 05.06.2006 16:54]
-        sealed public override Result ArrayMoveHandler(Category category, int count)
+        internal sealed override Result ArrayMoveHandler(Category category, int count)
         {
             return EmptyHandler(category);
         }

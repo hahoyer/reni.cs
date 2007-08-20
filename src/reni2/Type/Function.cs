@@ -1,5 +1,3 @@
-using System;
-
 namespace Reni.Type
 {
     /// <summary>
@@ -104,7 +102,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 02.06.2006 09:47]
-        public override Result DestructorHandler(Category category)
+        internal override Result DestructorHandler(Category category)
         {
             return Parent.DestructorHandler(category);
         }
@@ -115,7 +113,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 05.06.2006 16:47]
-        public override Result MoveHandler(Category category)
+        internal override Result MoveHandler(Category category)
         {
             return Parent.MoveHandler(category);
         }
@@ -127,7 +125,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// [created 04.06.2006 00:51]
-        public override Result ArrayDestructorHandler(Category category, int count)
+        internal override Result ArrayDestructorHandler(Category category, int count)
         {
             return Parent.ArrayDestructorHandler(category, count);
         }
@@ -139,7 +137,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// [created 05.06.2006 16:54]
-        public override Result ArrayMoveHandler(Category category, int count)
+        internal override Result ArrayMoveHandler(Category category, int count)
         {
             return Parent.ArrayMoveHandler(category, count);
         }

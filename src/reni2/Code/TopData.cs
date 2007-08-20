@@ -13,7 +13,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
@@ -30,7 +30,7 @@ namespace Reni.Code
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Top"/> class.
+        /// Initializes a new instance of the <see cref="Top"/> class.
         /// </summary>
         /// <param name="refAlignParam">The ref align param.</param>
         /// <param name="offset">The offset.</param>
@@ -54,7 +54,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
@@ -71,7 +71,7 @@ namespace Reni.Code
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:TopFrame"/> class.
+        /// Initializes a new instance of the <see cref="TopFrame"/> class.
         /// </summary>
         /// <param name="refAlignParam">The ref align param.</param>
         /// <param name="offset">The offset.</param>

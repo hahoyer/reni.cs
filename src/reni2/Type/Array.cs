@@ -43,7 +43,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 02.06.2006 09:47]
-        public override Result DestructorHandler(Category category)
+        internal override Result DestructorHandler(Category category)
         {
             return Element.ArrayDestructorHandler(category,Count);
         }
@@ -58,7 +58,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 05.06.2006 16:47]
-        public override Result MoveHandler(Category category)
+        internal override Result MoveHandler(Category category)
         {
             return Element.ArrayMoveHandler(category, Count);
         }

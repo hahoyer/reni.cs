@@ -129,7 +129,7 @@ namespace Reni.Code
         /// <param name="opToken">The op token.</param>
         /// <param name="size">The size.</param>
         /// <returns></returns>
-        public string BitArrayPrefixOp(Defineable opToken, Size size)
+        internal string BitArrayPrefixOp(Defineable opToken, Size size)
         {
             if (IsBuildInIntType(size))
                 return CreateDataRef(Start, size)
@@ -159,7 +159,7 @@ namespace Reni.Code
         /// <param name="rightSize">Size of the right.</param>
         /// <returns></returns>
         /// created 10.10.2006 00:29
-        public string BitArrayOp(Defineable opToken, Size resultSize, Size leftSize, Size rightSize)
+        internal string BitArrayOp(Defineable opToken, Size resultSize, Size leftSize, Size rightSize)
         {
             if (IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
             {
@@ -196,7 +196,7 @@ namespace Reni.Code
         /// <param name="thenElseObjectId">The then else object id.</param>
         /// <param name="condSize">Size of the cond.</param>
         /// <returns></returns>
-        public string BitArrayOpThen(Defineable opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
+        internal string BitArrayOpThen(Defineable opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
         {
             if (IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
                 return "if(!("

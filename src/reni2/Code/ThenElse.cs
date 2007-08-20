@@ -1,4 +1,3 @@
-using System;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code
@@ -6,7 +5,7 @@ namespace Reni.Code
     /// <summary>
     /// Then-Else construct
     /// </summary>
-    sealed public class  ThenElse : Base
+    internal sealed class  ThenElse : Base
     {
         static int _nextId = 0;
 
@@ -35,7 +34,7 @@ namespace Reni.Code
         public Base ElseCode { get { return _elseCode; } }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:ThenElse"/> class.
+        /// Initializes a new instance of the <see cref="ThenElse"/> class.
         /// </summary>
         /// <param name="condCode">The cond code.</param>
         /// <param name="thenCode">The then code.</param>
@@ -184,7 +183,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.11.2006 19:13
-        public override LeafElement TryToCombineBack(BitCast precedingElement)
+        internal override LeafElement TryToCombineBack(BitCast precedingElement)
         {
             if (precedingElement.Size == _condSize)
                 return new Then(_thenElseObjectId, precedingElement.TargetSize);
@@ -197,7 +196,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:57
-        public override LeafElement TryToCombineBack(BitArrayOp precedingElement)
+        internal override LeafElement TryToCombineBack(BitArrayOp precedingElement)
         {
             if (precedingElement.Size == _condSize)
                 return new BitArrayOpThen(this, precedingElement);

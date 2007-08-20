@@ -1,14 +1,16 @@
-using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
     internal sealed class Tenable_cutT: Defineable
     {
-        ///<summary>
-        ///</summary>
-        public override SearchResult SequenceOperation(Type.Base obj)
+        internal override bool IsDefaultOperation { get { return true; } }
+
+        internal override Result VisitDefaultOperationApply(Context.Base callContext, Category category, Syntax.Base args, Type.Base definingType)
         {
-            return base.SequenceOperation(obj);
+            if(args == null)
+                return definingType.CreateEnableCut().CreateArgResult(category);
+            return base.VisitDefaultOperationApply(callContext, category, args, definingType);
         }
     }
 }

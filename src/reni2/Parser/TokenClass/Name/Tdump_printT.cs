@@ -1,5 +1,6 @@
 using HWClassLibrary.Debug;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
@@ -13,10 +14,13 @@ namespace Reni.Parser.TokenClass.Name
         /// </summary>
         /// <value>The type operation.</value>
         /// created 07.01.2007 16:24
-        public override SearchResult DefaultOperation(Type.Base obj)
-        {
-            return new FoundDumpPrintResult(obj);
-        }
+        internal override bool IsDefaultOperation { get { return true; } }
+        /// <summary>
+        /// Gets the type operation.
+        /// </summary>
+        /// <value>The type operation.</value>
+        /// created 07.01.2007 16:24
+        internal override bool IsRefOperation { get { return true; } }
 
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
@@ -25,7 +29,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="argSize">not used </param>
         /// <returns></returns>
         /// created 08.01.2007 01:40
-        public override Type.Base NumericOperationResultType(int objSize, int argSize)
+        internal override Type.Base BitSequenceOperationResultType(int objSize, int argSize)
         {
             return Type.Base.CreateVoid;
         }
@@ -52,27 +56,27 @@ namespace Reni.Parser.TokenClass.Name
                 return null;
             }
 
-            /// <summary>
-            /// Creates the result for member function searched. Object is provided as reference by use of "Arg" code element
-            /// </summary>
-            /// <param name="refAlignParam">The ref align param.</param>
-            /// <param name="context">The context.</param>
-            /// <param name="category">The category.</param>
-            /// <param name="args">The args.</param>
-            /// <returns></returns>
-            public override Result VisitApplyFromRef(RefAlignParam refAlignParam, Context.Base context, Category category, Syntax.Base args)
-            {
-                if (args != null)
-                    NotImplementedMethod(context, category, args);
-                bool trace = 
-                    ObjectId == 184
-                    && context.ObjectId == 0
-                    && category.ToString() == "Size,Type,Refs,Code"
-                    ;
-                StartMethodDump(trace,context,category,args);
-                Result result = DefiningType.DumpPrintFromRef(category, refAlignParam);
-                return ReturnMethodDumpWithBreak(trace, result);
-            }
+        }
+        /// <summary>
+        /// Creates the result for member function searched. Object is provided as reference by use of "Arg" code element
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <param name="refAlignParam">The ref align param.</param>
+        /// <returns></returns>
+        override internal Result VisitRefOperationApply(Context.Base context, Category category, Syntax.Base args, Ref definingType)
+        {
+            if (args != null)
+                NotImplementedMethod(context, category, args);
+            bool trace =
+                ObjectId == 184
+                && context.ObjectId == 0
+                && category.ToString() == "Size,Type,Refs,Code"
+                ;
+            StartMethodDump(trace, context, category, args);
+            Result result = definingType.Target.DumpPrintFromRef(category, definingType.RefAlignParam);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
     }
 }

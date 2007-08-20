@@ -19,7 +19,7 @@ namespace Reni.Code
         public override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:RefPlus"/> class.
+        /// Initializes a new instance of the <see cref="RefPlus"/> class.
         /// </summary>
         /// <param name="refAlignParam">The ref align param.</param>
         /// <param name="right">The right.</param>
@@ -69,7 +69,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The not other.</param>
         /// <returns></returns>
         /// created 19.10.2006 21:38
-        public override LeafElement TryToCombineBack(TopRef precedingElement)
+        internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
             //return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
@@ -82,7 +82,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The not other.</param>
         /// <returns></returns>
         /// created 19.10.2006 21:38
-        public override LeafElement TryToCombineBack(FrameRef precedingElement)
+        internal override LeafElement TryToCombineBack(FrameRef precedingElement)
         {
             //return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
@@ -95,7 +95,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
@@ -106,7 +106,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 17:55
-        public override LeafElement TryToCombineBack(RefPlus precedingElement)
+        internal override LeafElement TryToCombineBack(RefPlus precedingElement)
         {
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
                 return new RefPlus(RefAlignParam, Right + precedingElement.Right);

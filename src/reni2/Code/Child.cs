@@ -6,7 +6,7 @@ namespace Reni.Code
     /// <summary>
     /// 
     /// </summary>
-    public sealed class Child : Base
+    internal sealed class Child : Base
     {
         private readonly LeafElement _leafElement;
         private readonly Base _parent;

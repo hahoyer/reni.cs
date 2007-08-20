@@ -103,7 +103,7 @@ namespace Reni.Context
         }
 
         [DumpData(false)]
-        public Code.Base BodyCode
+        internal Code.Base BodyCode
         {
              get
              {
@@ -173,7 +173,7 @@ namespace Reni.Context
         /// </summary>
         /// <returns></returns>
         /// created 26.11.2006 16:59
-        public Container Serialize()
+        internal Container Serialize()
         {
             try
             {
@@ -209,7 +209,7 @@ namespace Reni.Context
 
     }
 
-    public class ReplacePrimitiveRecursivity : Code.ReplaceVisitor.Base
+    sealed internal class ReplacePrimitiveRecursivity : Code.ReplaceVisitor.Base
     {
         [DumpData(true)]
         private readonly int _functionIndex;
@@ -221,17 +221,17 @@ namespace Reni.Context
 
         public int FunctionIndex { get { return _functionIndex; } }
 
-        public override Code.Base PairVisit(Pair pair)
+        internal override Code.Base PairVisit(Pair pair)
         {
             return Pair(pair, null, pair.Right.Visit(this));
         }
 
-        public override Code.Base ChildVisit(Code.Child child)
+        internal override Code.Base ChildVisit(Code.Child child)
         {
             return Child(child.Parent,child.LeafElement.Visit(this));
         }
 
-        public override Code.Base ThenElseVisit(Code.ThenElse This)
+        internal override Code.Base ThenElseVisit(Code.ThenElse This)
         {
             return ThenElse(This,null,This.ThenCode.Visit(this),This.ElseCode.Visit(this));
         }

@@ -3,7 +3,7 @@ namespace Reni.Code
     /// <summary>
     /// Context reference, should be replaced
     /// </summary>
-    public sealed class ContextRef<C> : Base where C: Context.Base
+    internal sealed class ContextRef<C> : Base where C: Context.Base
     {
         private readonly C _context;
 

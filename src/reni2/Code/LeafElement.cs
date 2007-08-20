@@ -80,7 +80,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        virtual public LeafElement TryToCombine(LeafElement subsequentElement)
+        internal virtual LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return null;
         }
@@ -91,7 +91,7 @@ namespace Reni.Code
         /// <param name="precedingElement">the preceding element.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:25
-        virtual public LeafElement TryToCombineBack(Dereference precedingElement)
+        internal virtual LeafElement TryToCombineBack(Dereference precedingElement)
         {
             return null;
         }
@@ -102,7 +102,7 @@ namespace Reni.Code
         /// <param name="precedingElement">the preceding element.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:38
-        virtual public LeafElement TryToCombineBack(TopRef precedingElement)
+        internal virtual LeafElement TryToCombineBack(TopRef precedingElement)
         {
             return null;
         }
@@ -113,7 +113,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.11.2006 19:13
-        virtual public LeafElement TryToCombineBack(BitCast precedingElement)
+        internal virtual LeafElement TryToCombineBack(BitCast precedingElement)
         {
             return null;
         }
@@ -124,7 +124,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 03.01.2007 22:43
-        virtual public LeafElement TryToCombineBack(FrameRef precedingElement)
+        internal virtual LeafElement TryToCombineBack(FrameRef precedingElement)
         {
             return null;
         }
@@ -135,7 +135,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 03:50
-        virtual public LeafElement TryToCombineBack(BitArray precedingElement)
+        internal virtual LeafElement TryToCombineBack(BitArray precedingElement)
         {
             return null;
         }
@@ -146,7 +146,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:07
-        virtual public LeafElement TryToCombineBack(TopData precedingElement)
+        internal virtual LeafElement TryToCombineBack(TopData precedingElement)
         {
             return null;
         }
@@ -157,7 +157,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:07
-        virtual public LeafElement TryToCombineBack(TopFrame precedingElement)
+        internal virtual LeafElement TryToCombineBack(TopFrame precedingElement)
         {
             return null;
         }
@@ -168,7 +168,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:57
-        virtual public LeafElement TryToCombineBack(BitArrayOp precedingElement)
+        internal virtual LeafElement TryToCombineBack(BitArrayOp precedingElement)
         {
             return null;
         }
@@ -179,12 +179,12 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 17:55
-        virtual public LeafElement TryToCombineBack(RefPlus precedingElement)
+        internal virtual LeafElement TryToCombineBack(RefPlus precedingElement)
         {
             return null;
         }
 
-        virtual public LeafElement Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity)
+        internal virtual LeafElement Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity)
         {
             return this;
         }

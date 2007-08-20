@@ -3,7 +3,7 @@ namespace Reni.Code.ReplaceVisitor
     /// <summary>
     /// Handle argument replaces of absolute args
     /// </summary>
-    public sealed class ReplaceAbsoluteArg : ReplaceArg
+    internal sealed class ReplaceAbsoluteArg : ReplaceArg
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:ReplaceAbsoluteArg"/> class.

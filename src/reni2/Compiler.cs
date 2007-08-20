@@ -172,7 +172,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-        public Container MainContainer
+        internal Container MainContainer
         {
             get
             {
@@ -183,7 +183,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-        public List<Container> FunctionContainers
+        internal List<Container> FunctionContainers
         {
             get
             {

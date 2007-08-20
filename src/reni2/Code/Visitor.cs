@@ -7,7 +7,7 @@ namespace Reni.Code
     /// General visitor template for code
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class Visitor<T> : ReniObject
+    internal abstract class Visitor<T> : ReniObject
     {
         /// <summary>
         /// Visitor exit when an object of type Arg has been found.
@@ -15,7 +15,7 @@ namespace Reni.Code
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 24.09.2006 20:17
-        virtual public T Arg(Arg visitedObject)
+        internal virtual T Arg(Arg visitedObject)
         {
             NotImplementedMethod(visitedObject);
             throw new NotImplementedException();
@@ -27,7 +27,7 @@ namespace Reni.Code
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 17.10.2006 00:04
-        virtual public T ContextRef<C>(ContextRef<C> visitedObject) where C : Context.Base
+        internal virtual T ContextRef<C>(ContextRef<C> visitedObject) where C : Context.Base
         {
             NotImplementedMethod(visitedObject);
             throw new NotImplementedException();
@@ -40,7 +40,7 @@ namespace Reni.Code
         /// <param name="leafElement">The leaf element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:18
-        virtual public T Child(T parent, LeafElement leafElement)
+        internal virtual T Child(T parent, LeafElement leafElement)
         {
             NotImplementedMethod(parent,leafElement);
             throw new NotImplementedException();
@@ -52,7 +52,7 @@ namespace Reni.Code
         /// <param name="leafElement">The leaf element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:22
-        virtual public T Leaf(LeafElement leafElement)
+        internal virtual T Leaf(LeafElement leafElement)
         {
             NotImplementedMethod(leafElement);
             throw new NotImplementedException();
@@ -66,7 +66,7 @@ namespace Reni.Code
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:58
-        virtual public T Pair(Pair visitedObject, T left, T right)
+        internal virtual T Pair(Pair visitedObject, T left, T right)
         {
             NotImplementedMethod(visitedObject, left, right);
             throw new NotImplementedException();
@@ -81,7 +81,7 @@ namespace Reni.Code
         /// <param name="elseResult">The else result.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:54
-        virtual public T ThenElse(ThenElse visitedObject, T condResult, T thenResult, T elseResult)
+        internal virtual T ThenElse(ThenElse visitedObject, T condResult, T thenResult, T elseResult)
         {
             NotImplementedMethod(visitedObject, condResult,thenResult,elseResult);
             throw new NotImplementedException();
@@ -92,7 +92,7 @@ namespace Reni.Code
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 15.10.2006 18:32
-        virtual public Visitor<T> After(Size size)
+        internal virtual Visitor<T> After(Size size)
         {
             return this;
         }
@@ -103,7 +103,7 @@ namespace Reni.Code
         /// <param name="objectId">The object id.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        virtual public Visitor<T> AfterCond(int objectId)
+        internal virtual Visitor<T> AfterCond(int objectId)
         {
             NotImplementedMethod(objectId);
             throw new NotImplementedException();
@@ -115,7 +115,7 @@ namespace Reni.Code
         /// <param name="theSize">The size.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        virtual public Visitor<T> AfterThen(int objectId, Size theSize)
+        internal virtual Visitor<T> AfterThen(int objectId, Size theSize)
         {
             NotImplementedMethod(objectId, theSize);
             throw new NotImplementedException();
@@ -126,13 +126,13 @@ namespace Reni.Code
         /// <param name="objectId">The object id.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        virtual public Visitor<T> AfterElse(int objectId)
+        internal virtual Visitor<T> AfterElse(int objectId)
         {
             NotImplementedMethod(objectId);
             throw new NotImplementedException();
         }
 
-        virtual public T PairVisit(Pair pair)
+        internal virtual T PairVisit(Pair pair)
         {
             T left = pair.Left.Visit(this);
             Visitor<T> tempActual = After(pair.Left.Size);
@@ -141,14 +141,14 @@ namespace Reni.Code
             return tempActual.Pair(pair, left, right);
         }
 
-        virtual public T ChildVisit(Child child)
+        internal virtual T ChildVisit(Child child)
         {
             T parent = child.Parent.Visit(this);
             Visitor<T> tempActual = After(child.Parent.Size);
             return tempActual.Child(parent, child.LeafElement);
         }
 
-        virtual public T ThenElseVisit(ThenElse This)
+        internal virtual T ThenElseVisit(ThenElse This)
         {
             T condResult = This.CondCode.Visit(this);
             Visitor<T> tempActual = AfterCond(This.ThenElseObjectId);

@@ -41,9 +41,6 @@ namespace Reni.Parser.TokenClass.Name
         /// <returns></returns>
         /// <value>The struct operation.</value>
         /// [created 14.05.2006 22:23]
-        internal override StructSearchResult StructOperation(Context.Struct struc)
-        {
-            return new FoundResult(this,struc);
-        }
+        internal override bool IsStructOperation { get { return true; } }
     }
 }

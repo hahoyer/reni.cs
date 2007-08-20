@@ -138,15 +138,14 @@ namespace Reni.Context
             return Parent.SearchDefineable(t);
         }
 
-        private StructSearchResult SearchDefineable(DefineableToken t, int position)
+        private StructSearchResult SearchDefineable(DefineableToken token, int position)
         {
-            StructSearchResult result = t.TokenClass.StructOperation(this);
-            if (result != null)
-                return result;
+            if(token.TokenClass.IsStructOperation)
+                return new StructOperationResult(this,token,position);
 
-            if (_struct.Dictionary.ContainsKey(t.Name))
+            if (_struct.Dictionary.ContainsKey(token.Name))
             {
-                int resultPosition = _struct.Dictionary[t.Name];
+                int resultPosition = _struct.Dictionary[token.Name];
                 if (resultPosition < position)
                     return new StructAccess(this, resultPosition);
 
@@ -245,6 +244,19 @@ namespace Reni.Context
 
             NotImplementedMethod(index, callContext, category, args);
             return null;
+        }
+    }
+
+    internal sealed class StructOperationResult : StructSearchResult
+    {
+        private readonly DefineableToken _token;
+        private readonly int _position;
+
+        public StructOperationResult(Struct @struct, DefineableToken token, int position)
+            : base(@struct)
+        {
+            _token = token;
+            _position = position;
         }
     }
 }

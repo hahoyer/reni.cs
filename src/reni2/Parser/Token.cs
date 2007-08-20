@@ -129,7 +129,7 @@ namespace Reni.Parser
         /// </summary>
         /// <value>The token class.</value>
         /// created 01.04.2007 23:41 on SAPHIRE by HH
-        public Defineable TokenClass { get { return _tokenClass; } }
+        internal Defineable TokenClass { get { return _tokenClass; } }
 
         /// <summary>
         /// the text of the token

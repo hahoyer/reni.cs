@@ -6,7 +6,7 @@ namespace Reni.Code.ReplaceVisitor
     /// <summary>
     /// Handle argument replaces of relative args
     /// </summary>
-    public sealed class ReplaceRelRefArg : ReplaceArg
+    internal sealed class ReplaceRelRefArg : ReplaceArg
     {
         private readonly RefAlignParam _refAlignParam;
 
@@ -14,7 +14,7 @@ namespace Reni.Code.ReplaceVisitor
         private readonly Size _offset;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:ReplaceRelRefArg"/> class.
+        /// Initializes a new instance of the <see cref="ReplaceRelRefArg"/> class.
         /// </summary>
         /// <param name="actual">The actual.</param>
         /// <param name="refAlignParam">The ref align param.</param>
@@ -29,13 +29,13 @@ namespace Reni.Code.ReplaceVisitor
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:ReplaceRelRefArg"/> class.
+        /// Initializes a new instance of the <see cref="ReplaceRelRefArg"/> class.
         /// </summary>
         /// <param name="actualArg">The actual.</param>
         /// <param name="refAlignParam">The ref align param.</param>
         /// created 28.09.2006 22:52
         /// created 18.10.2006 00:21
-        public ReplaceRelRefArg(Code.Base actualArg, RefAlignParam refAlignParam)
+        internal ReplaceRelRefArg(Code.Base actualArg, RefAlignParam refAlignParam)
             : this(actualArg, refAlignParam, Size.Create(0))
         {
         }
@@ -75,7 +75,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 15.10.2006 18:32
-        public override Visitor<Code.Base> After(Size size)
+        internal override Visitor<Code.Base> After(Size size)
         {
             if (size.IsZero)
                 return this;

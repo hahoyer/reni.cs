@@ -1,16 +1,16 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Type;
 
 namespace Reni.Code
 {
     /// <summary>
     /// base class for all compiled code items
     /// </summary>
-    public sealed class Container : Visitor<int>
+    internal sealed class Container : Visitor<int>
     {
         [DumpData(true)]
         private List<LeafElement> _data = new List<LeafElement>();
@@ -84,7 +84,7 @@ namespace Reni.Code
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 17.10.2006 00:04
-        public override int ContextRef<C>(ContextRef<C> visitedObject)
+        internal override int ContextRef<C>(ContextRef<C> visitedObject)
         {
             throw new UnexpectedContextRefInContainer(this, visitedObject);
         }
@@ -111,7 +111,7 @@ namespace Reni.Code
         /// <param name="leafElement">The leaf element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:18
-        public override int Child(int parent, LeafElement leafElement)
+        internal override int Child(int parent, LeafElement leafElement)
         {
             return parent + Leaf(leafElement);
         }
@@ -122,7 +122,7 @@ namespace Reni.Code
         /// <param name="leafElement">The leaf element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:22
-        public override int Leaf(LeafElement leafElement)
+        internal override int Leaf(LeafElement leafElement)
         {
             DataAdd(leafElement);
             return 1;
@@ -136,7 +136,7 @@ namespace Reni.Code
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 03.10.2006 01:39
-        public override int Pair(Pair visitedObject, int left, int right)
+        internal override int Pair(Pair visitedObject, int left, int right)
         {
             return left + right;
         }
@@ -150,7 +150,7 @@ namespace Reni.Code
         /// <param name="elseResult">The else result.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:54
-        public override int ThenElse(ThenElse visitedObject, int condResult, int thenResult, int elseResult)
+        internal override int ThenElse(ThenElse visitedObject, int condResult, int thenResult, int elseResult)
         {
             return thenResult;
         }
@@ -161,9 +161,9 @@ namespace Reni.Code
         /// <param name="objectId">The object id.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        public override Visitor<int> AfterCond(int objectId)
+        internal override Visitor<int> AfterCond(int objectId)
         {
-            DataAdd(new Then(objectId,Type.Bit.CreateBit.Size));
+            DataAdd(new Then(objectId,Bit.CreateBit.Size));
             return this;
         }
 
@@ -174,7 +174,7 @@ namespace Reni.Code
         /// <param name="thenSize">Size of the then.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        public override Visitor<int> AfterThen(int objectId, Size thenSize)
+        internal override Visitor<int> AfterThen(int objectId, Size thenSize)
         {
             DataAdd(new Else(objectId,thenSize));
             return this;
@@ -186,7 +186,7 @@ namespace Reni.Code
         /// <param name="objectId">The object id.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        public override Visitor<int> AfterElse(int objectId)
+        internal override Visitor<int> AfterElse(int objectId)
         {
             DataAdd(new EndCondional(objectId));
             return this;

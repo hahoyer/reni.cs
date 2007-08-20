@@ -11,10 +11,7 @@ namespace Reni.Parser.TokenClass.Symbol
         /// </summary>
         /// <value>The ref operation.</value>
         /// created 14.02.2007 02:17
-        public override SearchResult RefOperation(Ref obj)
-        {
-            return new FoundAssignementResult(obj);
-        }
+        internal override bool IsRefOperation { get { return true; } }
     }
 
     internal class FoundAssignementResult : SearchResult
@@ -39,7 +36,7 @@ namespace Reni.Parser.TokenClass.Symbol
         public override Result VisitApply(Context.Base context, Category category, Syntax.Base args)
         {
             if(category.HasCode || category.HasRefs)
-                return _obj.AssignementOperator(args.Visit(context,category|Category.Type));
+                return _obj.AssignmentOperator(args.Visit(context,category|Category.Type));
             return Type.Base.CreateVoid.CreateResult(category);
 
         }

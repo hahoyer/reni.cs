@@ -33,7 +33,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">The other.</param>
         /// <returns></returns>
         /// created 19.10.2006 21:18
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
@@ -44,7 +44,7 @@ namespace Reni.Code
     sealed public class FrameRef : RefCode
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:TopRef"/> class.
+        /// Initializes a new instance of the <see cref="TopRef"/> class.
         /// </summary>
         /// <param name="refAlignParam">The ref align param.</param>
         /// <param name="offset">The offset.</param>
@@ -70,7 +70,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">The other.</param>
         /// <returns></returns>
         /// created 19.10.2006 21:18
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }

@@ -41,7 +41,7 @@ namespace Reni.Context
         /// </summary>
         /// <returns></returns>
         /// [created 13.05.2006 18:51]
-        public List<Container> CompileFunctions()
+        internal List<Container> CompileFunctions()
         {
             return _function.Compile();
         }

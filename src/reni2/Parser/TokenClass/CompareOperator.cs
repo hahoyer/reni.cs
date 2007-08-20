@@ -9,10 +9,7 @@ namespace Reni.Parser.TokenClass
         /// </summary>
         /// <value>The default sequence operation.</value>
         /// created 13.01.2007 19:37
-        public override SearchResult SequenceOperation(Type.Base obj)
-        {
-            return new FoundNumpopResult(this,obj);
-        }
+        internal override bool IsBitSequenceOperation { get { return true; } }
 
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
@@ -21,7 +18,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="argSize">not used.</param>
         /// <returns></returns>
         /// created 08.01.2007 01:40
-        public override Type.Base NumericOperationResultType(int objSize, int argSize)
+        internal override Type.Base BitSequenceOperationResultType(int objSize, int argSize)
         {
             return Type.Bit.CreateBit;
         }
@@ -32,6 +29,6 @@ namespace Reni.Parser.TokenClass
         /// 	<c>true</c> if this instance is logical operator; otherwise, <c>false</c>.
         /// </value>
         /// created 03.02.2007 15:22
-        public override bool IsCompareOperator { get { return true; } }
+        internal override bool IsCompareOperator { get { return true; } }
     }
 }

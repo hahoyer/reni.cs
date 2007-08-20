@@ -1,13 +1,9 @@
-using System;
-using Reni.Code;
-using Reni.Context;
-
 namespace Reni.Code.ReplaceVisitor
 {
     /// <summary>
     /// Replace context elements
     /// </summary>
-    abstract public class ReplaceContextRef<CC> : Base where CC : Context.Base
+    internal abstract class ReplaceContextRef<CC> : Base where CC : Context.Base
     {
         /// <summary>
         /// the context
@@ -19,7 +15,7 @@ namespace Reni.Code.ReplaceVisitor
         protected readonly Code.Base _replacement;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:ReplaceStructContextRef"/> class.
+        /// Initializes a new instance of the <see cref="ReplaceContextRef&lt;CC&gt;"/> class.
         /// </summary>
         /// <param name="context">The struct container.</param>
         /// <param name="replacement">The replacement.</param>
@@ -35,7 +31,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 17.10.2006 00:04
-        public override Code.Base ContextRef<C>(ContextRef<C> visitedObject)
+        internal override Code.Base ContextRef<C>(ContextRef<C> visitedObject)
         {
             if (_context != visitedObject.Context)
                 return null;
@@ -47,10 +43,10 @@ namespace Reni.Code.ReplaceVisitor
     /// 
     /// </summary>
     /// <typeparam name="CC"></typeparam>
-    public sealed class ReplaceRelativeContextRef<CC> : ReplaceContextRef<CC> where CC : Context.Base
+    internal sealed class ReplaceRelativeContextRef<CC> : ReplaceContextRef<CC> where CC : Context.Base
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:ReplaceRelativeContextRef&lt;CC&gt;"/> class.
+        /// Initializes a new instance of the <see cref="ReplaceRelativeContextRef&lt;CC&gt;"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
@@ -66,7 +62,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 15.10.2006 18:32
-        public override Visitor<Code.Base> After(Size size)
+        internal override Visitor<Code.Base> After(Size size)
         {
             if (size.IsZero)
                 return this;
@@ -77,10 +73,10 @@ namespace Reni.Code.ReplaceVisitor
     /// 
     /// </summary>
     /// <typeparam name="CC"></typeparam>
-    public sealed class ReplaceAbsoluteContextRef<CC> : ReplaceContextRef<CC> where CC : Context.Base
+    internal sealed class ReplaceAbsoluteContextRef<CC> : ReplaceContextRef<CC> where CC : Context.Base
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:ReplaceRelativeContextRef&lt;CC&gt;"/> class.
+        /// Initializes a new instance of the <see cref="ReplaceRelativeContextRef&lt;CC&gt;"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>

@@ -1,4 +1,3 @@
-using System;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code
@@ -13,7 +12,7 @@ namespace Reni.Code
         private readonly Size _targetSize;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:BitCast"/> class.
+        /// Initializes a new instance of the <see cref="BitCast"/> class.
         /// </summary>
         /// <param name="targetSize">Size of the target.</param>
         /// <param name="size">The size.</param>
@@ -34,7 +33,7 @@ namespace Reni.Code
         /// </returns>
         /// created 19.10.2006 21:18
         /// created 18.11.2006 14:53
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             if (Size == TargetSize && Size == SignificantSize)
                 return subsequentElement;
@@ -48,7 +47,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.11.2006 19:13
-        public override LeafElement TryToCombineBack(BitCast precedingElement)
+        internal override LeafElement TryToCombineBack(BitCast precedingElement)
         {
             if(precedingElement.Size != TargetSize)
                 return null;
@@ -67,7 +66,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 03:50
-        public override LeafElement TryToCombineBack(BitArray precedingElement)
+        internal override LeafElement TryToCombineBack(BitArray precedingElement)
         {
             BitsConst bitsConst = precedingElement.Data;
             if (bitsConst.Size > SignificantSize)
@@ -81,7 +80,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:07
-        public override LeafElement TryToCombineBack(TopData precedingElement)
+        internal override LeafElement TryToCombineBack(TopData precedingElement)
         {
             return new TopData(precedingElement.RefAlignParam,precedingElement.Offset, precedingElement.TargetSize, Size);
         }
@@ -92,7 +91,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:07
-        public override LeafElement TryToCombineBack(TopFrame precedingElement)
+        internal override LeafElement TryToCombineBack(TopFrame precedingElement)
         {
             return new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, precedingElement.TargetSize, Size);
         }
@@ -103,7 +102,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:57
-        public override LeafElement TryToCombineBack(BitArrayOp precedingElement)
+        internal override LeafElement TryToCombineBack(BitArrayOp precedingElement)
         {
             return new BitArrayOp(precedingElement.OpToken,Size, precedingElement.LeftSize,precedingElement.RightSize);
         }
@@ -114,7 +113,7 @@ namespace Reni.Code
         /// <param name="precedingElement">the preceding element.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:25
-        public override LeafElement TryToCombineBack(Dereference precedingElement)
+        internal override LeafElement TryToCombineBack(Dereference precedingElement)
         {
             Tracer.Assert(TargetSize == precedingElement.Size);
             return new Dereference(precedingElement.RefAlignParam,precedingElement.TargetSize,Size);

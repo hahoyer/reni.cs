@@ -72,7 +72,7 @@ namespace Reni.Context
         }
 
         /// <summary>
-        /// Gets the <see cref="T:FunctionInstance"/> with the specified i.
+        /// Gets the <see cref="FunctionInstance"/> with the specified i.
         /// </summary>
         /// <value></value>
         /// created 03.01.2007 20:27
@@ -89,7 +89,7 @@ namespace Reni.Context
         /// </summary>
         /// <returns></returns>
         /// [created 05.06.2006 19:15]
-        public List<Container> Compile()
+        internal List<Container> Compile()
         {
             List<Container> result = new List<Container>();
             for (int i = 0; i < _list.Count; i++)

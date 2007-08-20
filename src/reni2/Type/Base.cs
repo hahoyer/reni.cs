@@ -19,9 +19,12 @@ namespace Reni.Type
         private readonly HWClassLibrary.Helper.DictionaryEx<int, Sequence> _chain = new HWClassLibrary.Helper.DictionaryEx<int, Sequence>();
         private readonly HWClassLibrary.Helper.DictionaryEx<Base, Pair> _pair = new HWClassLibrary.Helper.DictionaryEx<Base, Pair>();
         private readonly HWClassLibrary.Helper.DictionaryEx<RefAlignParam, Ref> _ref = new HWClassLibrary.Helper.DictionaryEx<RefAlignParam, Ref>();
+        private EnableCut _enableCutCache;
         private TypeType _typeTypeCache;
         private static readonly Bit _bit = new Bit();
         private static readonly Void _void = new Void();
+
+        static private Pending _pending = null;
 
         public Base(int objectId)
             : base(objectId)
@@ -98,6 +101,12 @@ namespace Reni.Type
             return _array.Find(count, delegate { return new Array(this, count); });
         }
 
+        internal EnableCut CreateEnableCut()
+        {
+            if (_enableCutCache == null)
+                _enableCutCache = new EnableCut(this);
+            return _enableCutCache;
+        }
         /// <summary>
         /// Creates the number.
         /// </summary>
@@ -191,7 +200,10 @@ namespace Reni.Type
         /// <returns></returns>
         public virtual SearchResult SearchDefineable(DefineableToken token)
         {
-            return token.TokenClass.DefaultOperation(this);
+            if (token.TokenClass.IsDefaultOperation)
+                return new DefaultOperationSearchResult(this, token.TokenClass);
+            return null;
+
         }
 
         /// <summary>
@@ -220,9 +232,10 @@ namespace Reni.Type
         /// Searches the defineable prefix from sequence.
         /// </summary>
         /// <param name="token">The token.</param>
+        /// <param name="count">The count.</param>
         /// <returns></returns>
         /// created 02.02.2007 22:09
-        internal virtual PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken token)
+        internal virtual PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken token, int count)
         {
             return null;
         }
@@ -232,7 +245,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 02.06.2006 09:47]
-        virtual public Result DestructorHandler(Category category)
+        internal virtual Result DestructorHandler(Category category)
         {
             NotImplementedMethod(category);
             throw new NotImplementedException();
@@ -245,7 +258,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// [created 04.06.2006 00:51]
-        virtual public Result ArrayDestructorHandler(Category category, int count)
+        internal virtual Result ArrayDestructorHandler(Category category, int count)
         {
             NotImplementedMethod(category, count);
             throw new NotImplementedException();
@@ -257,7 +270,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 05.06.2006 16:47]
-        virtual public Result MoveHandler(Category category)
+        internal virtual Result MoveHandler(Category category)
         {
             NotImplementedMethod(category);
             throw new NotImplementedException();
@@ -270,7 +283,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// [created 05.06.2006 16:54]
-        virtual public Result ArrayMoveHandler(Category category, int count)
+        internal virtual Result ArrayMoveHandler(Category category, int count)
         {
             NotImplementedMethod(category, count);
             throw new NotImplementedException();
@@ -282,7 +295,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 04.06.2006 01:04]
-        public Result CreateArgResult(Category category)
+        internal Result CreateArgResult(Category category)
         {
             return CreateResult(category, delegate { return CreateArgCode(); });
         }
@@ -292,7 +305,7 @@ namespace Reni.Type
         /// </summary>
         /// <returns></returns>
         /// created 30.01.2007 23:40
-        public Code.Base CreateArgCode()
+        internal Code.Base CreateArgCode()
         {
             return Code.Base.CreateArg(Size);
         }
@@ -303,7 +316,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 08.01.2007 18:11
-        public Result CreateResult(Category category)
+        internal Result CreateResult(Category category)
         {
             return CreateResult(category, delegate { return Code.Base.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)); });
         }
@@ -332,7 +345,7 @@ namespace Reni.Type
         /// <param name="getCode">The get code.</param>
         /// <returns></returns>
         /// created 08.01.2007 14:38
-        public Result CreateResult(Category category, Result.GetCode getCode)
+        internal Result CreateResult(Category category, Result.GetCode getCode)
         {
             return CreateResult(category, getCode, delegate { return Refs.None(); });
         }
@@ -360,7 +373,7 @@ namespace Reni.Type
         /// <param name="getRefs">The get refs.</param>
         /// <returns></returns>
         /// created 08.01.2007 14:38
-        public Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs)
+        internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs)
         {
             Result result = new Result();
             if (category.HasSize) result.Size = Size;
@@ -391,18 +404,17 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <param name="memberElem">The member elem.</param>
         /// <returns></returns>
-        public Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
+        internal virtual Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
         {
-            bool trace = context.ObjectId == -4 && memberElem.ObjectId == 2 && category.HasRefs;
-            StartMethodDumpWithBreak(trace,context,category,memberElem);
-            SearchResult searchResult = SearchDefineable(memberElem.DefineableToken);
-            if (searchResult != null)
-            {
-                Result result = searchResult.VisitApply(context, category, memberElem.Args);
-                Tracer.ConditionalBreak(trace, result.Dump());
-                return ReturnMethodDumpWithBreak(trace, result);
-            }
             NotImplementedMethod(context, category, memberElem);
+            return null;
+        }
+
+        virtual internal Result PostProcess(Ref visitedType, Result result)
+        {
+            if(this == visitedType.Target)
+                return result.UseWithArg(visitedType.CreateDereferencedArgResult(result.Complete));
+            NotImplementedMethod(visitedType, result);
             return null;
         }
 
@@ -647,8 +659,6 @@ namespace Reni.Type
             }
         }
 
-        static private Pending _pending = null;
-
         /// <summary>
         /// Gets the type in case of pending visits
         /// </summary>
@@ -756,7 +766,7 @@ namespace Reni.Type
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:18
-        internal virtual Code.Base CreateOperation(Defineable token, Result objResult, Size size, Result argResult)
+        internal virtual Code.Base CreateSequenceOperation(Defineable token, Result objResult, Size size, Result argResult)
         {
             NotImplementedMethod(token, objResult, size, argResult.Code);
             return null;
@@ -769,7 +779,7 @@ namespace Reni.Type
         /// <param name="result">The result.</param>
         /// <returns></returns>
         /// created 02.02.2007 23:28
-        internal virtual Code.Base CreateOperation(Defineable token, Result result)
+        internal virtual Code.Base CreateSequenceOperation(Defineable token, Result result)
         {
             NotImplementedMethod(token, result);
             return null;
@@ -782,7 +792,7 @@ namespace Reni.Type
         /// <param name="argBitCount">The arg bit count.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:43
-        internal virtual Base OperationResultType(Defineable token, int objBitCount, int argBitCount)
+        internal virtual Base SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             NotImplementedMethod(token,objBitCount,argBitCount);
             return null;
@@ -839,6 +849,41 @@ namespace Reni.Type
         virtual internal Result UnProperty(Result result, Context.Base context)
         {
             return result;
+        }
+
+    }
+
+    sealed internal class EnableCut: TagChild
+    {
+        public EnableCut(Base parent)
+            : base(parent)
+        {
+        }
+
+        protected override string TagTitle { get { return "enable_cut"; } }
+    }
+
+    internal sealed class DefaultOperationSearchResult : SearchResult
+    {
+        [DumpData(true)]
+        private readonly Defineable _defineable;
+
+        public DefaultOperationSearchResult(Base definingType, Defineable defineable)
+            : base(definingType)
+        {
+            _defineable = defineable;
+        }
+
+        /// <summary>
+        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
+        /// </summary>
+        /// <param name="callContext">The call context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <returns></returns>
+        public override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        {
+            return _defineable.VisitDefaultOperationApply(callContext, category, args, DefiningType);
         }
     }
 

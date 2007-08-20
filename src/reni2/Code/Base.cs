@@ -9,7 +9,7 @@ namespace Reni.Code
     /// <summary>
     /// Base class for code element
     /// </summary>
-    public abstract class Base: ReniObject
+    internal abstract class Base: ReniObject
     {
         /// <summary>
         /// Creates the bit array op.
@@ -19,7 +19,7 @@ namespace Reni.Code
         /// <param name="leftSize">Size of the left.</param>
         /// <returns></returns>
         /// created 26.09.2006 22:31
-        public Base CreateNumericOp(Defineable name, Size size, Size leftSize)
+        internal Base CreateBitSequenceOperation(Defineable name, Size size, Size leftSize)
         {
             return CreateChild(new BitArrayOp(name, size, leftSize, Size - leftSize));
         }
@@ -42,14 +42,14 @@ namespace Reni.Code
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 23.09.2006 14:01
-        public Base CreateNumericOp(Defineable name, Size size, Base right)
+        internal Base CreateBitSequenceOperation(Defineable name, Size size, Base right)
         {
             Size alignedSize = Size.ByteAlignedSize;
             Size alignedRightSize = right.Size.ByteAlignedSize;
 
             return CreateBitCast(alignedSize)
                 .CreateSequence(right.CreateBitCast(alignedRightSize))
-                .CreateNumericOp(name, size, alignedSize);
+                .CreateBitSequenceOperation(name, size, alignedSize);
         }
 
         public Base CreateAssign(RefAlignParam refAlignParam, Base source)
@@ -64,7 +64,7 @@ namespace Reni.Code
         /// <param name="name">The name.</param>
         /// <returns></returns>
         /// created 02.02.2007 23:49
-        public Base CreateNumericOp(Defineable name)
+        public Base CreateBitSequenceOperation(Defineable name)
         {
             Size alignedSize = Size.ByteAlignedSize;
 
@@ -522,7 +522,7 @@ namespace Reni.Code
         }
     }
 
-    public class Pending : Base
+    internal class Pending : Base
     {
         /// <summary>
         /// Gets the size.

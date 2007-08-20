@@ -175,7 +175,7 @@ namespace Reni.Context
         /// </summary>
         /// <returns></returns>
         /// [created 01.06.2006 22:56]
-        public Code.Base CreateTopRefCode()
+        internal Code.Base CreateTopRefCode()
         {
             return Code.Base.CreateTopRef(RefAlignParam);
         }
@@ -309,7 +309,7 @@ namespace Reni.Context
 
         private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
-            bool trace = ObjectId == -10 && memberElem.ObjectId == 1 && category.HasRefs;
+            bool trace = ObjectId == -10 && memberElem.ObjectId == 1 && category.HasAll;
             StartMethodDumpWithBreak(trace,category,memberElem,formerResult);
             Result refResult = formerResult.EnsureContextRef(this);
             Result visitedResult = refResult.Type.VisitNextChainElement(this, category, memberElem);
@@ -364,7 +364,7 @@ namespace Reni.Context
 
     abstract internal class PrefixSearchResult : ReniObject
     {
-        public virtual Result VisitApply(Category category, Result argResult)
+        internal virtual Result VisitApply(Category category, Result argResult)
         {
             NotImplementedMethod(category, argResult);
             throw new NotImplementedException();
@@ -373,7 +373,6 @@ namespace Reni.Context
 
     abstract internal class StructSearchResult : ReniObject
     {
-
         readonly Struct _struct;
 
         protected StructSearchResult(Struct @struct)

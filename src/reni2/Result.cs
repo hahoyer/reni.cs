@@ -15,7 +15,7 @@ namespace Reni
         ///<summary>
         /// Delegate that returns code
         ///</summary>
-        public delegate Code.Base GetCode();
+        internal delegate Code.Base GetCode();
 
         ///<summary>
         /// Delegate that returns refs
@@ -102,7 +102,7 @@ namespace Reni
         /// The code-category, can be null
         /// </summary>
         [Node]
-        public Code.Base Code
+        internal Code.Base Code
         {
             get { return _code; }
             set
@@ -523,7 +523,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public Result ReplaceAbsoluteContextRef<C>(C context, Code.Base replacement) where C : Context.Base
+        internal Result ReplaceAbsoluteContextRef<C>(C context, Code.Base replacement) where C : Context.Base
         {
             if (HasRefs && !Refs.Contains(context))
                 return this;
@@ -544,7 +544,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public Result ReplaceRelativeContextRef<C>(C context, Code.Base replacement) where C : Context.Base
+        internal Result ReplaceRelativeContextRef<C>(C context, Code.Base replacement) where C : Context.Base
         {
             if (HasRefs && !Refs.Contains(context))
                 return this;
@@ -566,7 +566,7 @@ namespace Reni
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
         /// created 31.12.2006 14:50
-        public Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, Code.Base replacement)
+        internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, Code.Base replacement)
         {
             if(!HasCode) return this;
             if (Refs.Count == 0) return this;

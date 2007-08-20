@@ -84,6 +84,13 @@ namespace Reni
         public bool HasSize { get { return _size; } }
 
         /// <summary>
+        /// Gets a value indicating whether this instance has all categories set.
+        /// </summary>
+        /// <value><c>true</c> if this instance has all categories set; otherwise, <c>false</c>.</value>
+        /// created 19.08.2007 22:36 on HAHOYER-DELL by hh
+        public bool HasAll { get { return HasCode && HasRefs && HasSize && HasType; } }
+
+        /// <summary>
         /// Some categories are dependent. This function replendishes those categories.
         /// Rules are: type and code results in adding size, code results in adding references
         /// </summary>

@@ -1,4 +1,3 @@
-using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
 
@@ -11,7 +10,7 @@ namespace Reni.Code
         private readonly Size _argsAndRefsSize;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Call"/> class.
+        /// Initializes a new instance of the <see cref="Call"/> class.
         /// </summary>
         /// <param name="functionIndex">Index of the function.</param>
         /// <param name="resultSize">Size of the result.</param>
@@ -62,7 +61,7 @@ namespace Reni.Code
             return start.Call(FunctionIndex,ArgsAndRefsSize);
         }
 
-        public override LeafElement Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity)
+        internal override LeafElement Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity)
         {
             return replacePrimitiveRecursivity.CallVisit(this);
         }
@@ -102,7 +101,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:07
-        public override LeafElement TryToCombineBack(TopFrame precedingElement)
+        internal override LeafElement TryToCombineBack(TopFrame precedingElement)
         {
             if ((DeltaSize + precedingElement.DeltaSize).IsZero 
                 && (precedingElement.Offset + RefsSize).IsZero)

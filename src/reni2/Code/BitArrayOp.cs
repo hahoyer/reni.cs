@@ -1,4 +1,3 @@
-using System;
 using HWClassLibrary.Debug;
 using Reni.Parser.TokenClass;
 
@@ -7,20 +6,20 @@ namespace Reni.Code
     /// <summary>
     /// Bit array operation
     /// </summary>
-    sealed public class BitArrayOp : BinaryOp
+    internal sealed class BitArrayOp : BinaryOp
     {
         private readonly Defineable _opToken;
         private readonly Size _size;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:BitArrayOp"/> class.
+        /// Initializes a new instance of the <see cref="BitArrayOp"/> class.
         /// </summary>
         /// <param name="opToken">The op token.</param>
         /// <param name="size">The size.</param>
         /// <param name="leftSize">Size of the left.</param>
         /// <param name="rightSize">Size of the right.</param>
         /// created 05.10.2006 23:38
-        public BitArrayOp(Defineable opToken, Size size, Size leftSize, Size rightSize) 
+        internal BitArrayOp(Defineable opToken, Size size, Size leftSize, Size rightSize) 
             : base(leftSize,rightSize)
         {
             _opToken = opToken;
@@ -32,7 +31,7 @@ namespace Reni.Code
         /// </summary>
         /// <value>The name.</value>
         /// created 29.09.2006 03:18
-        public Defineable OpToken { get { return _opToken; } }
+        internal Defineable OpToken { get { return _opToken; } }
 
         /// <summary>
         /// Gets the size.
@@ -58,7 +57,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
@@ -67,12 +66,12 @@ namespace Reni.Code
     /// <summary>
     /// Bit array prafix operation
     /// </summary>
-    public class BitArrayPrefixOp : LeafElement
+    sealed internal class BitArrayPrefixOp : LeafElement
     {
         private readonly Defineable _opToken;
         private readonly Size _size;
 
-        public BitArrayPrefixOp(Defineable name, Size size)
+        internal BitArrayPrefixOp(Defineable name, Size size)
         {
             _opToken = name;
             _size = size;
@@ -90,7 +89,7 @@ namespace Reni.Code
         /// </summary>
         /// <value>The size of the delta.</value>
         /// created 10.10.2006 00:21
-        public override Size DeltaSize { get { return Reni.Size.Zero; } }
+        public override Size DeltaSize { get { return Size.Zero; } }
         /// <summary>
         /// Gets the op token.
         /// </summary>
@@ -114,13 +113,13 @@ namespace Reni.Code
     sealed internal class DumpPrint : BinaryOp
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:DumpPrint"/> class.
+        /// Initializes a new instance of the <see cref="DumpPrint"/> class.
         /// </summary>
         /// <param name="leftSize">Size of the left.</param>
         /// <param name="rightSize">Size of the right.</param>
         /// created 08.01.2007 16:57
         /// created 08.01.2007 16:58
-        public DumpPrint(Size leftSize, Size rightSize) : base(leftSize, rightSize)
+        internal DumpPrint(Size leftSize, Size rightSize) : base(leftSize, rightSize)
         {
         }
 
@@ -129,7 +128,7 @@ namespace Reni.Code
         /// </summary>
         /// <value>The size.</value>
         /// created 05.10.2006 23:40
-        public override Size Size { get { return Reni.Size.Zero; } }
+        public override Size Size { get { return Size.Zero; } }
 
         /// <summary>
         /// Formats this instance.
@@ -143,12 +142,12 @@ namespace Reni.Code
 
     }
 
-    internal class DumpPrintText : LeafElement
+    sealed internal class DumpPrintText : LeafElement
     {
         [DumpData(true)]
         private readonly string _dumpPrintText;
 
-        public DumpPrintText(string dumpPrintText)
+        internal DumpPrintText(string dumpPrintText)
         {
             _dumpPrintText = dumpPrintText;
         }

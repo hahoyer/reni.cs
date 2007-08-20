@@ -215,7 +215,7 @@ namespace Reni
         /// Toes the code.
         /// </summary>
         /// created 06.11.2006 22:57
-        public Code.Base ToCode()
+        internal Code.Base ToCode()
         {
             Code.Base result = Code.Base.CreateVoid();
             for (int i = 0; i < _data.Count; i++)
@@ -231,7 +231,7 @@ namespace Reni
         /// <param name="endOfRefsCode">The endOfRefsCode.</param>
         /// <returns></returns>
         /// created 31.12.2006 18:47
-        public Code.Base ReplaceRefsForFunctionBody(Code.Base code, RefAlignParam refAlignParam, Code.Base endOfRefsCode)
+        internal Code.Base ReplaceRefsForFunctionBody(Code.Base code, RefAlignParam refAlignParam, Code.Base endOfRefsCode)
         {
             Code.Base p = endOfRefsCode;
             Code.Base result = code;

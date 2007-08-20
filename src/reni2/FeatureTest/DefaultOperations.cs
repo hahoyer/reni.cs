@@ -42,10 +42,15 @@ namespace Reni.FeatureTest
         public void ApplyTypeOperator()
         {
             RunCompiler("ApplyTypeOperator", @"(31 type (28))dump_print", "28");
-
-            //// Should this work?
-            // RunCompiler("ApplyTypeOperator", @"(31 type (100))dump_print", "-28");
-            //// No!
+        }
+        /// <summary>
+        /// Applies the type operator with cut.
+        /// </summary>
+        /// created 19.08.2007 21:06 on HAHOYER-DELL by hh
+        [Test, Category(Worked)]
+        public void ApplyTypeOperatorWithCut()
+        {
+            RunCompiler("ApplyTypeOperator", @"(31 type (100 enable_cut))dump_print", "-28");
         }
 
     }

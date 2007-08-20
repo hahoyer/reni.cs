@@ -3,7 +3,7 @@ namespace Reni.Code
 	/// <summary>
 	/// Arg is is used as a placeholder.
 	/// </summary>
-	sealed public class Arg: Base
+	internal sealed class Arg: Base
 	{
 	    Size _size;
         /// <summary>

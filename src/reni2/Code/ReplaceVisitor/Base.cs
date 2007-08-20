@@ -5,7 +5,7 @@ namespace Reni.Code.ReplaceVisitor
     /// <summary>
     /// Base class for code replacements
     /// </summary>
-    public abstract class Base : Visitor<Code.Base>
+    internal abstract class Base : Visitor<Code.Base>
     {
         /// <summary>
         /// Bits the array.
@@ -13,7 +13,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 24.09.2006 17:05
-        public Code.Base BitArray(BitArray visitedObject)
+        internal Code.Base BitArray(BitArray visitedObject)
         {
             return null;
         }
@@ -49,7 +49,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 24.09.2006 20:17
-        public override Code.Base Arg(Arg visitedObject)
+        internal override Code.Base Arg(Arg visitedObject)
         {
             return null;
         }
@@ -61,7 +61,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="leafElement">The element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:11
-        sealed public override Code.Base Child(Code.Base parent, LeafElement leafElement)
+        internal sealed override Code.Base Child(Code.Base parent, LeafElement leafElement)
         {
             if (parent == null)
                 return null;
@@ -74,7 +74,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="leafElement">The leaf element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:22
-        sealed public override Code.Base Leaf(LeafElement leafElement)
+        internal sealed override Code.Base Leaf(LeafElement leafElement)
         {
             return null;
         }
@@ -88,7 +88,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <returns></returns>
         /// created 03.10.2006 01:39
         /// created 03.10.2006 01:39
-        public override Code.Base Pair(Pair visitedObject, Code.Base left, Code.Base right)
+        internal override Code.Base Pair(Pair visitedObject, Code.Base left, Code.Base right)
         {
             if (left == null && right == null)
                 return null;
@@ -106,7 +106,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="elseResult">The else result.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:54
-        public override Code.Base ThenElse(ThenElse visitedObject, Code.Base condResult, Code.Base thenResult,
+        internal override Code.Base ThenElse(ThenElse visitedObject, Code.Base condResult, Code.Base thenResult,
                                            Code.Base elseResult)
         {
             if(condResult==null && thenResult == null && elseResult == null)
@@ -122,7 +122,7 @@ namespace Reni.Code.ReplaceVisitor
         /// </summary>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        public override Visitor<Code.Base> AfterCond(int objectId)
+        internal override Visitor<Code.Base> AfterCond(int objectId)
         {
             return this;
         }
@@ -134,7 +134,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="theSize">The size.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        public override Visitor<Code.Base> AfterThen(int objectId, Size theSize)
+        internal override Visitor<Code.Base> AfterThen(int objectId, Size theSize)
         {
             return this;
         }
@@ -144,7 +144,7 @@ namespace Reni.Code.ReplaceVisitor
         /// </summary>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        public override Visitor<Code.Base> AfterElse(int objectId)
+        internal override Visitor<Code.Base> AfterElse(int objectId)
         {
             return this;
         }

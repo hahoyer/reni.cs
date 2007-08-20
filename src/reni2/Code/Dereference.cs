@@ -13,7 +13,7 @@ namespace Reni.Code
         private readonly Size _destinationSize;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Dereference"/> class.
+        /// Initializes a new instance of the <see cref="Dereference"/> class.
         /// </summary>
         /// <param name="refAlignParam">The ref align param.</param>
         /// <param name="targetSize">Size of the target.</param>
@@ -75,7 +75,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">The other.</param>
         /// <returns></returns>
         /// created 19.10.2006 21:18
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
@@ -86,7 +86,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The not other.</param>
         /// <returns></returns>
         /// created 19.10.2006 21:38
-        public override LeafElement TryToCombineBack(TopRef precedingElement)
+        internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopData(RefAlignParam, precedingElement.Offset, TargetSize, Size);
@@ -98,7 +98,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The not other.</param>
         /// <returns></returns>
         /// created 19.10.2006 21:38
-        public override LeafElement TryToCombineBack(FrameRef precedingElement)
+        internal override LeafElement TryToCombineBack(FrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopFrame(RefAlignParam, precedingElement.Offset, TargetSize, Size);

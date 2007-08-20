@@ -9,7 +9,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Tokens that can used in definitions (not reserved tokens)
     /// </summary>
-    public abstract class Defineable : Base
+    internal abstract class Defineable : Base
     {
         /// <summary>
         /// Gets the name of token for C# generation.
@@ -17,7 +17,7 @@ namespace Reni.Parser.TokenClass
         /// <value>The name of the C sharp.</value>
         /// created 08.01.2007 15:02
         [DumpData(false)]
-        public virtual string CSharpNameOfDefaultOperation
+        internal virtual string CSharpNameOfDefaultOperation
         {
             get
             {
@@ -31,16 +31,16 @@ namespace Reni.Parser.TokenClass
         /// </summary>
         /// <value>The name of the C sharp.</value>
         /// created 08.01.2007 15:02
-        [DumpData(false)]
-        public string DataFunctionName { get { return GetType().Name; } }
+        [DumpExcept(false)]
+        internal string DataFunctionName { get { return GetType().Name; } }
 
         /// <summary>
         /// Gets the numeric prefix operation.
         /// </summary>
         /// <value>The numeric prefix operation.</value>
         /// created 02.02.2007 23:03
-        [DumpData(false)]
-        internal virtual PrefixSearchResult NumericPrefixOperation { get { return null; } }
+        [DumpExcept(false)]
+        internal virtual bool IsBitSequencePrefixOperation { get { return false; } }
 
         /// <summary>
         /// Gets a value indicating whether this instance is logical operator.
@@ -49,8 +49,8 @@ namespace Reni.Parser.TokenClass
         /// 	<c>true</c> if this instance is logical operator; otherwise, <c>false</c>.
         /// </value>
         /// created 03.02.2007 15:22
-        [DumpData(false)]
-        public virtual bool IsCompareOperator { get { return false; } }
+        [DumpExcept(false)]
+        internal virtual bool IsCompareOperator { get { return false; } }
 
         /// <summary>
         /// Structs the operation.
@@ -58,18 +58,15 @@ namespace Reni.Parser.TokenClass
         /// <param name="struc">The struc.</param>
         /// <param name="context">The context.</param>
         /// <returns></returns>
-        internal virtual StructSearchResult StructOperation(Context.Struct struc)
-        {
-            return null;
-        }
-
+        [DumpExcept(false)]
+        internal virtual bool IsStructOperation { get { return false; } }
         ///<summary>
         ///</summary>
-        public virtual SearchResult SequenceOperation(Type.Base obj)
-        {
-            return null;
-        }
+        [DumpExcept(false)]
+        internal virtual bool IsBitSequenceOperation { get { return false; } }
 
+        [DumpExcept(false)]
+        internal virtual bool IsSequenceOperation { get { return false; } }
         /// <summary>
         /// Gets the ref operation.
         /// </summary>
@@ -77,10 +74,8 @@ namespace Reni.Parser.TokenClass
         /// <returns></returns>
         /// <value>The ref operation.</value>
         /// created 14.02.2007 02:17
-        public virtual SearchResult RefOperation(Ref obj)
-        {
-            return null;
-        }
+        [DumpExcept(false)]
+        internal virtual bool IsRefOperation { get { return false; } }
 
         /// <summary>
         /// Gets the type operation.
@@ -89,10 +84,8 @@ namespace Reni.Parser.TokenClass
         /// <returns></returns>
         /// <value>The type operation.</value>
         /// created 07.01.2007 16:24
-        public virtual SearchResult DefaultOperation(Type.Base obj)
-        {
-            return null;
-        }
+        [DumpExcept(false)]
+        internal virtual bool IsDefaultOperation { get { return false; } }
 
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
@@ -101,7 +94,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="argSize">Size of the arg.</param>
         /// <returns></returns>
         /// created 08.01.2007 01:40
-        public virtual Type.Base NumericOperationResultType(int objSize, int argSize)
+        internal virtual Type.Base BitSequenceOperationResultType(int objSize, int argSize)
         {
             NotImplementedMethod(objSize, argSize);
             throw new NotImplementedException();
@@ -122,6 +115,24 @@ namespace Reni.Parser.TokenClass
             if (right != null)
                 return new Statement(new MemberElem(new DefineableToken(token), right));
             return new DefinableTokenSyntax(token);
+        }
+
+        virtual internal Result VisitDefaultOperationApply(Context.Base callContext, Category category, Syntax.Base args, Type.Base definingType)
+        {
+            NotImplementedMethod(callContext, category, args, definingType);
+            return null;
+        }
+
+        virtual internal Result VisitRefOperationApply(Context.Base callContext, Category category, Syntax.Base args, Ref definingType)
+        {
+            NotImplementedMethod(callContext, category, args, definingType);
+            return null;
+        }
+
+        virtual internal Result VisitSequenceOperationApply(Context.Base callContext, Category category, Syntax.Base args, Sequence definingType)
+        {
+            NotImplementedMethod(callContext, category, args, definingType);
+            return null;
         }
     }
 

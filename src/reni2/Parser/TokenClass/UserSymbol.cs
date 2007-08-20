@@ -5,7 +5,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Any non reseved token
     /// </summary>
-    sealed public class UserSymbol: Defineable
+    internal sealed class UserSymbol: Defineable
     {
         string _potentialTypeName;
 
@@ -13,7 +13,7 @@ namespace Reni.Parser.TokenClass
         /// ctor
         /// </summary>
         /// <param name="typeName">Suggested type name to turn it into a reseved token</param>
-        public UserSymbol(string typeName)
+        internal UserSymbol(string typeName)
         {
             _potentialTypeName = typeName;
         }
@@ -23,7 +23,7 @@ namespace Reni.Parser.TokenClass
         /// The namespace should be Reni.Parser.TokenClass.Symbol in case of symbols 
         /// and Reni.Parser.TokenClass.Name in case of alphanumeric names
         /// </summary>
-        public string PotentialTypeName{get{return _potentialTypeName;}}
+        internal string PotentialTypeName{get{return _potentialTypeName;}}
 
     }
 }

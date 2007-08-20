@@ -11,7 +11,7 @@ namespace Reni.Type
         private readonly Base _second;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Pair"/> class.
+        /// Initializes a new instance of the <see cref="Pair"/> class.
         /// </summary>
         /// <param name="first">The first.</param>
         /// <param name="second">The second.</param>
@@ -46,7 +46,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 02.06.2006 09:47]
-        public override Result DestructorHandler(Category category)
+        internal override Result DestructorHandler(Category category)
         {
             Result firstHandler = First.DestructorHandler(category);
             Result secondHandler = Second.DestructorHandler(category);

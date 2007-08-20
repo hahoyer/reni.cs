@@ -9,7 +9,7 @@ namespace Reni.Code
         private readonly BitsConst _data;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:BitArray"/> class.
+        /// Initializes a new instance of the <see cref="BitArray"/> class.
         /// </summary>
         /// <param name="size">The size.</param>
         /// <param name="data">The data.</param>
@@ -65,7 +65,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        public override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }

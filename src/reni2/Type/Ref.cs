@@ -3,6 +3,8 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -80,12 +82,11 @@ namespace Reni.Type
         /// <returns></returns>
         public override SearchResult SearchDefineable(DefineableToken token)
 	    {
-	        SearchResult result = token.TokenClass.RefOperation(this);
-            if (result != null)
-                return result;
-            result = Target.SearchDefineable(token);
+	        if(token.TokenClass.IsRefOperation)
+                return new RefOperationSearchResult(this, token.TokenClass);
+            SearchResult result = Target.SearchDefineable(token);
 	        if(result!=null)
-                return result.FoundFromRef(RefAlignParam);
+                return result;
 	        return base.SearchDefineable(token);
 	    }
 
@@ -102,7 +103,7 @@ namespace Reni.Type
 	    /// <param name="category">The category.</param>
 	    /// <returns></returns>
 	    /// [created 02.06.2006 09:47]
-	    public override Result DestructorHandler(Category category)
+	    internal override Result DestructorHandler(Category category)
 	    {
 	        return EmptyHandler(category);
 	    }
@@ -113,12 +114,20 @@ namespace Reni.Type
 	    /// <param name="category">The category.</param>
 	    /// <returns></returns>
 	    /// [created 05.06.2006 16:47]
-	    public override Result MoveHandler(Category category)
+	    internal override Result MoveHandler(Category category)
 	    {
             return EmptyHandler(category);
         }
 
-        /// <summary>
+        internal override Result PostProcess(Ref visitedType, Result result)
+	    {
+            if (this == visitedType)
+                return result;
+            return base.PostProcess(visitedType, result);
+
+	    }
+
+	    /// <summary>
         /// Checks if type is a reference and dereferences instance.
         /// </summary>
         /// <param name="result">The result.</param>
@@ -167,7 +176,7 @@ namespace Reni.Type
                 .UseWithArg(CreateDereferencedArgResult(category));
         }
 
-	    private Result CreateDereferencedArgResult(Category category)
+	    internal Result CreateDereferencedArgResult(Category category)
 	    {
             return Target.CreateResult
                 (
@@ -181,7 +190,7 @@ namespace Reni.Type
         /// </summary>
         /// <returns></returns>
         /// created 01.02.2007 00:04
-	    public Code.Base CreateDereferencedArgCode()
+        internal Code.Base CreateDereferencedArgCode()
 	    {
 	        return Code.Base.CreateArg(Size).CreateDereference(RefAlignParam,Target.Size);
 	    }
@@ -206,7 +215,7 @@ namespace Reni.Type
         /// <param name="value">The value.</param>
         /// <returns></returns>
         /// created 16.02.2007 22:59
-	    public Result AssignementOperator(Result value)
+	    public Result AssignmentOperator(Result value)
 	    {
             Result convertedValue = value.ConvertTo(Target);
             Category category = value.Complete;
@@ -222,6 +231,56 @@ namespace Reni.Type
             NotImplementedMethod(value, "result", result);
 	        throw new NotImplementedException();
 	    }
-	}
+        /// <summary>
+        /// Visits from chain. Object is provided by use of "Arg" code element
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="memberElem">The member elem.</param>
+        /// <returns></returns>
+        internal override Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
+        {
+            bool trace = context.ObjectId == -10 && memberElem.ObjectId == 1 && category.HasAll;
+            StartMethodDumpWithBreak(trace, context, category, memberElem);
+            SearchResult searchResult = SearchDefineable(memberElem.DefineableToken);
+            if (searchResult != null)
+            {
+                Result appliedResult = searchResult.VisitApply(context, category, memberElem.Args);
+                Tracer.ConditionalBreak(trace, appliedResult.Dump());
+                Result result = searchResult.DefiningType.PostProcess(this, appliedResult);
+                return ReturnMethodDumpWithBreak(trace, result);
+            }
+            NotImplementedMethod(context, category, memberElem);
+            return null;
+        }
+    }
+
+    internal sealed class RefOperationSearchResult : SearchResult
+    {
+        [DumpData(true)]
+        private readonly Defineable _defineable;
+        [DumpData(true)]
+        private readonly Ref _refType;
+
+
+        public RefOperationSearchResult(Ref refType, Defineable defineable)
+            : base(refType)
+        {
+            _defineable = defineable;
+            _refType = refType;
+        }
+
+        /// <summary>
+        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
+        /// </summary>
+        /// <param name="callContext">The call context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <returns></returns>
+        public override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        {
+            return _defineable.VisitRefOperationApply(callContext, category, args, _refType);
+        }
+    }
 }
 

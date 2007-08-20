@@ -6,7 +6,7 @@ namespace Reni.Code
     /// <summary>
     /// Pair of code elements, first element can be accessed
     /// </summary>
-    public sealed class Pair : Base
+    internal sealed class Pair : Base
 	{
         private readonly Base _left;
         private readonly Base _right;
@@ -16,7 +16,7 @@ namespace Reni.Code
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-		public Pair(Base left, Base right)
+        internal Pair(Base left, Base right)
         {
             _left = left;
             _right = right;

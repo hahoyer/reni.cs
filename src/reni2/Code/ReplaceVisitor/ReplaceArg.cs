@@ -1,4 +1,3 @@
-using System;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code.ReplaceVisitor
@@ -6,16 +5,16 @@ namespace Reni.Code.ReplaceVisitor
     /// <summary>
     /// Handle argument replaces
     /// </summary>
-    public abstract class ReplaceArg : Base
+    internal abstract class ReplaceArg : Base
     {
         readonly Code.Base _actualArg;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:ReplaceArg"/> class.
+        /// Initializes a new instance of the <see cref="ReplaceArg"/> class.
         /// </summary>
         /// <param name="actualArg">The actual.</param>
         /// created 28.09.2006 22:52
-        public ReplaceArg(Code.Base actualArg)
+        internal ReplaceArg(Code.Base actualArg)
         {
             Tracer.Assert(actualArg != null, "actualArg != null");
             _actualArg = actualArg;
@@ -41,7 +40,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 17.10.2006 00:04
-        public override Code.Base ContextRef<C>(ContextRef<C> visitedObject)
+        internal override Code.Base ContextRef<C>(ContextRef<C> visitedObject)
         {
             return null;
         }
@@ -52,7 +51,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 24.09.2006 20:17
-        public override Code.Base Arg(Arg visitedObject)
+        internal override Code.Base Arg(Arg visitedObject)
         {
             visitedObject.StopByObjectId(363);
             Tracer.Assert(Actual.Size == visitedObject.Size, "Actual=" + Actual.Dump() + "\nvisitedObject=" + visitedObject.Dump());
