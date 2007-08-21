@@ -108,14 +108,14 @@ namespace Reni.Type
         /// Determines whether [is convertable to] [the specified dest].
         /// </summary>
         /// <param name="dest">The dest.</param>
-        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <param name="conversionFeature">The conversion feature.</param>
         /// <returns>
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
-            if (useConverter)
+            if (conversionFeature.IsUseConverter)
                 return dest.HasConverterFromBit;
 
             return false;

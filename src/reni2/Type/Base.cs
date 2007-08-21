@@ -547,9 +547,9 @@ namespace Reni.Type
         /// created 09.01.2007 01:20
         public Base CommonType(Base dest)
         {
-            if(IsConvertableTo(dest,true))
+            if(IsConvertableTo(dest,ConversionFeature.Instance))
                 return dest;
-            if (dest.IsConvertableTo(this, true))
+            if (dest.IsConvertableTo(this, ConversionFeature.Instance))
                 return this;
             NotImplementedMethod(dest);
             throw new NotImplementedException();
@@ -566,7 +566,7 @@ namespace Reni.Type
         {
             if(category.HasCode || category.HasRefs)
             {
-                if (IsConvertableTo(dest, true))
+                if (IsConvertableTo(dest, ConversionFeature.Instance))
                     return ConvertTo(category, dest);
                 NotImplementedMethod(category, dest);
                 throw new NotImplementedException();
@@ -708,13 +708,13 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        internal bool IsConvertableTo(Base dest, bool useConverter)
+        internal bool IsConvertableTo(Base dest, ConversionFeature conversionFeature)
         {
             if (this == dest)
-                return IsConvertableToItself(useConverter);
-            if(useConverter && HasConverterTo(dest))
+                return IsConvertableToItself(conversionFeature);
+            if(conversionFeature.IsUseConverter && HasConverterTo(dest))
                 return true;
-            return IsConvertableToVirt(dest, useConverter);
+            return IsConvertableToVirt(dest, conversionFeature);
         }
 
         /// <summary>
@@ -733,26 +733,26 @@ namespace Reni.Type
         /// Determines whether [is convertable to virt] [the specified dest].
         /// </summary>
         /// <param name="dest">The dest.</param>
-        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <param name="conversionFeature">The conversion feature.</param>
         /// <returns>
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal virtual bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal virtual bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
-            NotImplementedMethod(dest, useConverter);
+            NotImplementedMethod(dest, conversionFeature);
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// Determines whether [is convertable to itself] [the specified use converter].
         /// </summary>
-        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <param name="conversionFeature">The conversion feature.</param>
         /// <returns>
         /// 	<c>true</c> if [is convertable to itself] [the specified use converter]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 23:02
-        internal virtual bool IsConvertableToItself(bool useConverter)
+        internal virtual bool IsConvertableToItself(ConversionFeature conversionFeature)
         {
             return true;
         }
@@ -853,6 +853,43 @@ namespace Reni.Type
 
     }
 
+    internal class ConversionFeature: ReniObject
+    {
+        private static ConversionFeature _instance;
+        private bool _isUseConverter;
+        private bool _isDisableCut;
+
+        private ConversionFeature(bool isUseConverter, bool isDisableCut)
+        {
+            _isUseConverter = isUseConverter;
+            _isDisableCut = isDisableCut;
+        }
+
+        internal ConversionFeature EnableCut()
+        {
+            return new ConversionFeature(IsUseConverter, false);
+        }
+
+        internal ConversionFeature DontUseConverter()
+        {
+            return new ConversionFeature(false, IsDisableCut);
+        }
+
+        internal bool IsDisableCut { get { return _isDisableCut; } }
+        internal bool IsUseConverter { get { return _isUseConverter; } }
+
+        internal static ConversionFeature Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = new ConversionFeature(true,true);
+                return _instance;
+            }
+        }
+
+    }
+
     sealed internal class EnableCut: TagChild
     {
         public EnableCut(Base parent)
@@ -861,6 +898,20 @@ namespace Reni.Type
         }
 
         protected override string TagTitle { get { return "enable_cut"; } }
+
+        /// <summary>
+        /// Determines whether [is convertable to virt] [the specified dest].
+        /// </summary>
+        /// <param name="dest">The dest.</param>
+        /// <param name="conversionFeature">The conversion feature.</param>
+        /// <returns>
+        /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
+        /// </returns>
+        /// created 30.01.2007 22:42
+        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        {
+            return base.IsConvertableToVirt(dest, conversionFeature.EnableCut());
+        }
     }
 
     internal sealed class DefaultOperationSearchResult : SearchResult
@@ -946,12 +997,12 @@ namespace Reni.Type
         /// Determines whether [is convertable to virt] [the specified dest].
         /// </summary>
         /// <param name="dest">The dest.</param>
-        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <param name="conversionFeature">The conversion feature.</param>
         /// <returns>
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
             return true;
         }

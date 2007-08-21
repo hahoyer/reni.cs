@@ -6,6 +6,7 @@ using HWClassLibrary.IO;
 using Reni.Context;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
+using Reni.Type;
 using Base=Reni.Syntax.Base;
 using Void=Reni.Type.Void;
 
@@ -444,10 +445,10 @@ namespace Reni
         {
             for (int i = 0; i < _converterList.Count; i++)
             {
-                if (_converterList[i].VisitType(context).IsConvertableTo(dest, false))
+                if (_converterList[i].VisitType(context).IsConvertableTo(dest, ConversionFeature.Instance.DontUseConverter()))
                 {
                     for (i++; i < _converterList.Count; i++)
-                        Tracer.Assert(!_converterList[i].VisitType(context).IsConvertableTo(dest, false));
+                        Tracer.Assert(!_converterList[i].VisitType(context).IsConvertableTo(dest, ConversionFeature.Instance.DontUseConverter()));
                     return true;
                 }
             }

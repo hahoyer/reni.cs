@@ -101,12 +101,12 @@ namespace Reni.Type
         /// Determines whether [is convertable to] [the specified dest].
         /// </summary>
         /// <param name="dest">The dest.</param>
-        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <param name="conversionFeature">The conversion feature.</param>
         /// <returns>
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
             Pending destPending = dest as Pending;
             if(destPending != null)
@@ -115,16 +115,16 @@ namespace Reni.Type
             Sequence destSequence = dest as Sequence;
             if(destSequence != null)
             {
-                if(Count > destSequence.Count)
+                if(conversionFeature.IsDisableCut && Count > destSequence.Count)
                     return false;
-                return Element.IsConvertableTo(destSequence.Element,false);
+                return Element.IsConvertableTo(destSequence.Element, conversionFeature.DontUseConverter());
             }
 
             Aligner destAligner = dest as Aligner;
             if (destAligner != null)
-                return IsConvertableTo(destAligner.Parent, useConverter);
+                return IsConvertableTo(destAligner.Parent, conversionFeature);
 
-            return base.IsConvertableToVirt(dest, useConverter);
+            return base.IsConvertableToVirt(dest, conversionFeature);
         }
 
         /// <summary>

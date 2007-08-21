@@ -51,12 +51,12 @@
         /// Determines whether [is convertable to virt] [the specified dest].
         /// </summary>
         /// <param name="dest">The dest.</param>
-        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <param name="conversionFeature">The conversion feature.</param>
         /// <returns>
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, bool useConverter)
+        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
             return false;
         }
