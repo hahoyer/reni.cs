@@ -6,11 +6,11 @@ namespace Reni.Syntax
 {
     sealed internal class Special : Base
     {
-        [DumpData(true)]
+        [DumpData(true),DumpExcept(null)]
         private readonly Base _left;
-        [DumpData(true)]
+        [DumpData(true), DumpExcept(null)]
         private readonly Token _token;
-        [DumpData(true)]
+        [DumpData(true), DumpExcept(null)]
         private readonly Base _right;
 
         public Special(Base left, Token token, Base right)
