@@ -95,7 +95,8 @@ namespace Reni.Type
 	    /// </summary>
 	    /// <value>The type of the sequence element.</value>
 	    /// created 13.01.2007 19:46
-	    internal override int SequenceCount { get { return Target.SequenceCount; } }
+        [DumpData(false)]
+        internal override int SequenceCount { get { return Target.SequenceCount; } }
 
 	    /// <summary>
 	    /// Destructors the specified category.
@@ -240,7 +241,7 @@ namespace Reni.Type
         /// <returns></returns>
         internal override Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
         {
-            bool trace = context.ObjectId == -10 && memberElem.ObjectId == 1 && category.HasAll;
+            bool trace = context.ObjectId == 5 && memberElem.ObjectId == 7 && category.HasType;
             StartMethodDumpWithBreak(trace, context, category, memberElem);
             SearchResult searchResult = SearchDefineable(memberElem.DefineableToken);
             if (searchResult != null)

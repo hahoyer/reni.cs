@@ -375,7 +375,7 @@ namespace Reni.Context
     {
         readonly Struct _struct;
 
-        protected StructSearchResult(Struct @struct)
+        protected StructSearchResult(Type.Struct @struct)
         {
             _struct = @struct;
         }

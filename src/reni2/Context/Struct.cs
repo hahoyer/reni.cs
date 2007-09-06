@@ -140,9 +140,6 @@ namespace Reni.Context
 
         private StructSearchResult SearchDefineable(DefineableToken token, int position)
         {
-            if(token.TokenClass.IsStructOperation)
-                return new StructOperationResult(this,token,position);
-
             if (_struct.Dictionary.ContainsKey(token.Name))
             {
                 int resultPosition = _struct.Dictionary[token.Name];
@@ -252,7 +249,7 @@ namespace Reni.Context
         private readonly DefineableToken _token;
         private readonly int _position;
 
-        public StructOperationResult(Struct @struct, DefineableToken token, int position)
+        public StructOperationResult(Type.Struct @struct, DefineableToken token, int position)
             : base(@struct)
         {
             _token = token;

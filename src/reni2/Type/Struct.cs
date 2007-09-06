@@ -110,6 +110,9 @@ namespace Reni.Type
         /// <returns></returns>
         public override SearchResult SearchDefineable(DefineableToken token)
         {
+            if (token.TokenClass.IsStructOperation)
+                return new StructOperationResult(this, token, _currentCompilePosition);
+
             StructSearchResult result = _context
                 .CreateStruct(_struc, _currentCompilePosition)
                 .SearchDefineable(token);
