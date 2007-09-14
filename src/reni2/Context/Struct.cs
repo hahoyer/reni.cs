@@ -246,7 +246,9 @@ namespace Reni.Context
 
     internal sealed class StructOperationResult : StructSearchResult
     {
+        [DumpData(true)]
         private readonly DefineableToken _token;
+        [DumpData(true)]
         private readonly int _position;
 
         public StructOperationResult(Type.Struct @struct, DefineableToken token, int position)
