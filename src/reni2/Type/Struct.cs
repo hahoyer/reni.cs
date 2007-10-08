@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
@@ -113,11 +114,9 @@ namespace Reni.Type
             if (defineableToken.TokenClass.IsStructOperation)
                 return new StructOperationResult(this, defineableToken, _currentCompilePosition);
 
-            if (_struct.Dictionary.ContainsKey(defineableToken.Name))
-            {
-                int resultPosition = _struct.Dictionary[defineableToken.Name];
-                return new StructAccess(_context, _struct, resultPosition);
-            }
+            StructAccess structAccess = _struct.SearchDefineable(defineableToken.Name);
+            if (structAccess != null)
+                return new StructSearchResultFromStruct(_context, structAccess);
 
             return base.SearchDefineable(defineableToken);
         }
@@ -178,4 +177,27 @@ namespace Reni.Type
         }
     }
 
+    internal class StructSearchResultFromStruct : SearchResult
+    {
+        private readonly Context.Base _context;
+        private readonly StructAccess _structAccess;
+
+        public StructSearchResultFromStruct(Context.Base context, StructAccess structAccess) : base(null)
+        {
+            _context = context;
+            _structAccess = structAccess;
+        }
+
+        /// <summary>
+        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
+        /// </summary>
+        /// <param name="callContext">The call context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <returns></returns>
+        public override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

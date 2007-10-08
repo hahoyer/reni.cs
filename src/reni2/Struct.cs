@@ -555,18 +555,24 @@ namespace Reni
             return Type.Base.EmptyHandler(category);
         }
 
+        internal StructAccess SearchDefineable(string name)
+        {
+            if (!Dictionary.ContainsKey(name))
+                return null;
+
+            int resultPosition = Dictionary[name];
+            return new StructAccess(this, resultPosition);
+        }
     }
 
-    internal sealed class StructAccess : StructSearchResult
+    internal sealed class StructAccess : ReniObject
     {
         [DumpData(true)]
         private readonly Struct _struct;
         [DumpData(true)]
-        private readonly Context.Base _context;
-        [DumpData(true)] 
         private readonly int _position;
 
-        public StructAccess(Context.Base context, Struct @struct, int position)
+        public StructAccess(Struct @struct, int position)
         {
             _struct = @struct;
             _position = position;
