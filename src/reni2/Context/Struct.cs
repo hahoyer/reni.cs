@@ -122,33 +122,13 @@ namespace Reni.Context
             return Parent.CreateArgsRefResult(category);
         }
 
-        /// <summary>
-        /// Searches the defineable
-        /// </summary>
-        /// <param name="t">The token to search.</param>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        /// created 30.11.2006 23:37
-        internal override StructSearchResult SearchDefineable(DefineableToken t)
+        internal override StructSearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            StructSearchResult result = SearchDefineable(t, _currentCompilePosition);
-            if (result != null)
-                return result;
+            if (!_struct.Dictionary.ContainsKey(defineableToken.Name))
+                return null;
 
-            return Parent.SearchDefineable(t);
-        }
-
-        private StructSearchResult SearchDefineable(DefineableToken token, int position)
-        {
-            if (_struct.Dictionary.ContainsKey(token.Name))
-            {
-                int resultPosition = _struct.Dictionary[token.Name];
-                if (resultPosition < position)
-                    return new StructAccess(this, resultPosition);
-
-                return new StructAccess(this, resultPosition);
-            }
-            return null;
+            int resultPosition = _struct.Dictionary[defineableToken.Name];
+            return new StructAccess(this, resultPosition);
         }
 
         /// <summary>
@@ -244,18 +224,27 @@ namespace Reni.Context
         }
     }
 
-    internal sealed class StructOperationResult : StructSearchResult
+    internal sealed class StructOperationResult : SearchResult
     {
+        [DumpData(true)]
+        private readonly Type.Struct _struct;
         [DumpData(true)]
         private readonly DefineableToken _token;
         [DumpData(true)]
         private readonly int _position;
 
-        public StructOperationResult(Type.Struct @struct, DefineableToken token, int position)
+        public StructOperationResult(Type.Struct @struct, DefineableToken token, int position) 
             : base(@struct)
         {
+            _struct = @struct;
             _token = token;
             _position = position;
+        }
+
+        public override Result VisitApply(Base callContext, Category category, Syntax.Base args)
+        {
+            NotImplementedMethod(callContext, category, args);
+            return null;
         }
     }
 }

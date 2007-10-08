@@ -194,14 +194,14 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Searches the definable token at type
+        /// Searches the definable defineableToken at type
         /// </summary>
-        /// <param name="token">The token.</param>
+        /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        public virtual SearchResult SearchDefineable(DefineableToken token)
+        public virtual SearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            if (token.TokenClass.IsDefaultOperation)
-                return new DefaultOperationSearchResult(this, token.TokenClass);
+            if (defineableToken.TokenClass.IsDefaultOperation)
+                return new DefaultOperationSearchResult(this, defineableToken.TokenClass);
             return null;
 
         }

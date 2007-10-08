@@ -193,18 +193,6 @@ namespace Reni.Context
         }
 
         /// <summary>
-        /// Searches the defineable
-        /// </summary>
-        /// <param name="t">The token to search.</param>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        /// created 30.11.2006 23:37
-        internal virtual StructSearchResult SearchDefineable(DefineableToken t)
-        {
-            return null;
-        }
-
-        /// <summary>
         /// Create a functional result
         /// </summary>
         /// <param name="c">The c.</param>
@@ -291,6 +279,12 @@ namespace Reni.Context
             return null;
         }
 
+        internal virtual StructSearchResult SearchDefineable(DefineableToken defineableToken)
+        {
+            NotImplementedMethod(defineableToken);
+            return null;
+        }
+
         internal Result VisitFirstChainElementAndPostProcess(Category category, MemberElem memberElem)
         {
             return PostProcess(VisitFirstChainElement(category, memberElem));
@@ -362,6 +356,15 @@ namespace Reni.Context
         }
     }
 
+    internal abstract class StructSearchResult:ReniObject
+    {
+        internal virtual Result VisitApply(Base context, Category category, Syntax.Base args)
+        {
+            NotImplementedMethod(context, category, args);
+            return null;
+        }
+    }
+
     abstract internal class PrefixSearchResult : ReniObject
     {
         internal virtual Result VisitApply(Category category, Result argResult)
@@ -371,11 +374,11 @@ namespace Reni.Context
         }
     }
 
-    abstract internal class StructSearchResult : ReniObject
+    abstract internal class xStructSearchResult : ReniObject
     {
         readonly Struct _struct;
 
-        protected StructSearchResult(Type.Struct @struct)
+        protected xStructSearchResult(Struct @struct)
         {
             _struct = @struct;
         }

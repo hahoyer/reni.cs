@@ -559,26 +559,19 @@ namespace Reni
 
     internal sealed class StructAccess : StructSearchResult
     {
-        [DumpData(true)] private readonly int _position;
+        [DumpData(true)]
+        private readonly Struct _struct;
+        [DumpData(true)]
+        private readonly Context.Base _context;
+        [DumpData(true)] 
+        private readonly int _position;
 
-        public StructAccess(Context.Struct @struct, int position)
-            : base(@struct)
+        public StructAccess(Context.Base context, Struct @struct, int position)
         {
+            _struct = @struct;
             _position = position;
             StopByObjectId(516);
         }
 
-        /// <summary>
-        /// Obtain result
-        /// </summary>
-        /// <param name="callContext">The callContext.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        /// created 21.05.2007 23:41 on HAHOYER-DELL by hh
-        public override Result VisitApply(Context.Base callContext, Category category, Base args)
-        {
-            return VisitAccessApply(_position, callContext, category, args);
-        }
     }
 }

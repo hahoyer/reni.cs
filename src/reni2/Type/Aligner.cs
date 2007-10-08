@@ -43,16 +43,16 @@ namespace Reni.Type
         public override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
 
         /// <summary>
-        /// Searches the definable token at type
+        /// Searches the definable defineableToken at type
         /// </summary>
-        /// <param name="token">The token.</param>
+        /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken token)
+        public override SearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            SearchResult result = Parent.SearchDefineable(token);
+            SearchResult result = Parent.SearchDefineable(defineableToken);
             if(result != null)
                 return result;
-            return base.SearchDefineable(token);
+            return base.SearchDefineable(defineableToken);
         }
 
         /// <summary>

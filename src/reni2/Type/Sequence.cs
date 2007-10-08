@@ -56,18 +56,18 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Searches the definable token at type
+        /// Searches the definable defineableToken at type
         /// </summary>
-        /// <param name="token">The token.</param>
+        /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken token)
+        public override SearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            SearchResult result = Element.SearchDefineableFromSequence(token,Count);
+            SearchResult result = Element.SearchDefineableFromSequence(defineableToken,Count);
             if (result != null)
                 return result;
-            if (token.TokenClass.IsSequenceOperation)
-                return new SequenceOperationResult(this, token.TokenClass);
-            return base.SearchDefineable(token);
+            if (defineableToken.TokenClass.IsSequenceOperation)
+                return new SequenceOperationResult(this, defineableToken.TokenClass);
+            return base.SearchDefineable(defineableToken);
         }
 
         /// <summary>

@@ -33,19 +33,6 @@ namespace Reni.Context
         [DumpData(false)]
         public sealed override Root RootContext { get { return Parent.RootContext; } }
 
-        /// <summary>
-        /// Searches the defineable
-        /// </summary>
-        /// <param name="t">The token to search.</param>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        /// created 30.11.2006 23:37
-        internal override StructSearchResult SearchDefineable(DefineableToken t)
-        {
-            return Parent.SearchDefineable(t);
-
-        }
-
         internal override bool IsChildOf(Base context)
         {
             if(context == Parent)

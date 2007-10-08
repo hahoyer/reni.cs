@@ -76,18 +76,18 @@ namespace Reni.Type
         public override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
 
         /// <summary>
-        /// Searches the definable token at type
+        /// Searches the definable defineableToken at type
         /// </summary>
-        /// <param name="token">The t.</param>
+        /// <param name="defineableToken">The t.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken token)
+        public override SearchResult SearchDefineable(DefineableToken defineableToken)
 	    {
-	        if(token.TokenClass.IsRefOperation)
-                return new RefOperationSearchResult(this, token.TokenClass);
-            SearchResult result = Target.SearchDefineable(token);
+	        if(defineableToken.TokenClass.IsRefOperation)
+                return new RefOperationSearchResult(this, defineableToken.TokenClass);
+            SearchResult result = Target.SearchDefineable(defineableToken);
 	        if(result!=null)
                 return result;
-	        return base.SearchDefineable(token);
+	        return base.SearchDefineable(defineableToken);
 	    }
 
 	    /// <summary>
