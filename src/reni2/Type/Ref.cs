@@ -80,7 +80,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="defineableToken">The t.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken defineableToken)
+        internal override SearchResult SearchDefineable(DefineableToken defineableToken)
 	    {
 	        if(defineableToken.TokenClass.IsRefOperation)
                 return new RefOperationSearchResult(this, defineableToken.TokenClass);

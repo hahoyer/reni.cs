@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Code;
+using Reni.Parser;
 
 namespace Reni.Context
 {
@@ -10,13 +10,7 @@ namespace Reni.Context
     /// </summary>
     public sealed class Root : Base
     {
-        FunctionList _function = new FunctionList();
-        Type.Base _type;
-
-        public Root()
-        {
-            _type = new Type.Root(this).CreateRef(DefaultRefAlignParam);
-        }
+        readonly FunctionList _function = new FunctionList();
 
         /// <summary>
         /// Parameter to describe alignment for references
@@ -30,6 +24,11 @@ namespace Reni.Context
         /// </summary>
         [DumpData(false)]
         public override Root RootContext { get { return this; } }
+
+        internal override StructSearchResult SearchDefineable(DefineableToken defineableToken)
+        {
+            return null;
+        }
 
         internal override bool IsChildOf(Base context)
         {
@@ -74,27 +73,3 @@ namespace Reni.Context
     }
 }
 
-namespace Reni.Type
-{
-    internal class Root: Base
-    {
-        private readonly Context.Root _root;
-
-        public Root(Context.Root root)
-        {
-            _root = root;
-        }
-
-        /// <summary>
-        /// The size of type
-        /// </summary>
-        public override Size Size { get { return Size.Zero; } }
-
-        /// <summary>
-        /// Gets the dump print text.
-        /// </summary>
-        /// <value>The dump print text.</value>
-        /// created 08.01.2007 17:54
-        public override string DumpPrintText { get { return "#(#root#)#"; } }
-    }
-}

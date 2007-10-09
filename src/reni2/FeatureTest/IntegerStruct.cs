@@ -24,7 +24,7 @@ Integer8: function
         /// <summary>
         /// Integers the class.
         /// </summary>
-        [Test, Category(Worked)]
+        [Test, Explicit, Category(Worked)]
         public void DumpPrint()
         {
             RunCompiler("DumpPrint"

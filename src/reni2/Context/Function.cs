@@ -1,3 +1,5 @@
+using Reni.Parser;
+
 namespace Reni.Context
 {
     /// <summary>
@@ -41,6 +43,11 @@ namespace Reni.Context
                 delegate { return Refs.Context(this); }
                 )
             ;
+        }
+
+        internal override StructSearchResult SearchDefineable(DefineableToken defineableToken)
+        {
+            return Parent.SearchDefineable(defineableToken);
         }
     }
 }

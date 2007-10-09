@@ -1,25 +1,25 @@
-using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Type;
 
-namespace Reni.Type
+namespace Reni.Struct
 {
-    public class Struct : Base
+    public class Type : Reni.Type.Base
     {
         private readonly int _currentCompilePosition;
-        private readonly Reni.Struct _struct;
-        private readonly Context.Base _context;
+        private readonly Container _Container;
+        private readonly Reni.Context.Base _context;
 
         [Node]
         public int CurrentCompilePosition { get { return _currentCompilePosition; } }
 
         [Node]
-        public Reni.Struct Struc { get { return _struct; } }
+        public Container Container { get { return _Container; } }
 
         [Node]
-        public Context.Base Context { get { return _context; } }
+        public Reni.Context.Base Context { get { return _context; } }
 
         /// <summary>
         /// Moves the handler.
@@ -29,20 +29,20 @@ namespace Reni.Type
         /// [created 05.06.2006 16:47]
         internal override Result MoveHandler(Category category)
         {
-            return _struct.MoveHandler(category,_context,_currentCompilePosition);
+            return _Container.MoveHandler(category, _context, _currentCompilePosition);
         }
 
-        public Struct(Context.Base context, Reni.Struct struc, int currentCompilePosition)
+        public Type(Reni.Context.Base context, Container struc, int currentCompilePosition)
         {
             _context = context;
-            _struct = struc;
+            _Container = struc;
             _currentCompilePosition = currentCompilePosition;
         }
 
         /// <summary>
         /// The size of type
         /// </summary>
-        public override Size Size { get { return _struct.VisitSize(_context, 0, _currentCompilePosition); } }
+        public override Size Size { get { return _Container.VisitSize(_context, 0, _currentCompilePosition); } }
 
         /// <summary>
         /// Determines whether [has converter to] [the specified dest].
@@ -51,9 +51,9 @@ namespace Reni.Type
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        internal override bool HasConverterTo(Base dest)
+        internal override bool HasConverterTo(Reni.Type.Base dest)
         {
-            return _struct.HasConverterTo(_context, dest);
+            return _Container.HasConverterTo(_context, dest);
         }
 
         /// <summary>
@@ -65,11 +65,11 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(Reni.Type.Base dest, ConversionFeature conversionFeature)
         {
             Void voidDest = dest as Void;
             if (voidDest != null)
-                return _struct.IsConvertableToVoid(_context);
+                return _Container.IsConvertableToVoid(_context);
             return base.IsConvertableToVirt(dest, conversionFeature);
         }
 
@@ -79,7 +79,7 @@ namespace Reni.Type
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 01.07.07 19:16 on HAHOYER-DELL by h
-        internal override Code.Base CreateRefCodeForContext(Context.Base context)
+        internal override Code.Base CreateRefCodeForContext(Reni.Context.Base context)
         {
             return context.CreateRefForStruct(this);
         }
@@ -91,9 +91,9 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, Reni.Type.Base dest)
         {
-            return _struct.ConvertTo(category, _context, dest);
+            return _Container.ConvertTo(category, _context, dest);
         }
 
         /// <summary>
@@ -102,21 +102,21 @@ namespace Reni.Type
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
         [DumpData(false)]
-        public override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _struct.DumpPrintText(_context) + ")"; } }
+        public override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _Container.DumpPrintText(_context) + ")"; } }
 
         /// <summary>
         /// Searches the definable defineableToken at type
         /// </summary>
         /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken defineableToken)
+        internal override SearchResult SearchDefineable(DefineableToken defineableToken)
         {
             if (defineableToken.TokenClass.IsStructOperation)
-                return new StructOperationResult(this, defineableToken, _currentCompilePosition);
+                return new OperationResult(this, _currentCompilePosition);
 
-            StructAccess structAccess = _struct.SearchDefineable(defineableToken.Name);
+            StructAccess structAccess = _Container.SearchDefineable(defineableToken.Name);
             if (structAccess != null)
-                return new StructSearchResultFromStruct(_context, structAccess);
+                return structAccess.ToSearchResult(this);
 
             return base.SearchDefineable(defineableToken);
         }
@@ -129,7 +129,7 @@ namespace Reni.Type
         /// [created 02.06.2006 09:47]
         internal override Result DestructorHandler(Category category)
         {
-            return _struct.DestructorHandler
+            return _Container.DestructorHandler
                 (
                 _context,
                 category,
@@ -147,7 +147,7 @@ namespace Reni.Type
         /// created 08.01.2007 17:29
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
-            return _struct.DumpPrintFromRef(category, _context,refAlignParam);
+            return _Container.DumpPrintFromRef(category, _context, refAlignParam);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Reni.Type
         /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
         /// </value>
         /// created 09.02.2007 00:26
-        internal override bool IsPending { get { return _struct.IsPendingType(_context); } }
+        internal override bool IsPending { get { return _Container.IsPendingType(_context); } }
 
         /// <summary>
         /// Visits the access to an element. Struct reference is assumed as "arg"
@@ -168,36 +168,12 @@ namespace Reni.Type
         /// created 29.10.2006 19:17
         public Result AccessFromArg(Category category, int position)
         {
-            Result result = _struct.VisitElementFromContextRef(_context, category, position);
-            StructContainer structContainer = _context.CreateStructContainer(_struct);
+            Result result = _Container.VisitElementFromContextRef(_context, category, position);
+            ContainerContext containerContext = _context.CreateStructContainer(_Container);
             Code.Base argsRef = Code.Base
                 .CreateArg(_context.RefAlignParam.RefSize)
                 .CreateRefPlus(_context.RefAlignParam, Size);
-            return result.ReplaceRelativeContextRef(structContainer, argsRef);
-        }
-    }
-
-    internal class StructSearchResultFromStruct : SearchResult
-    {
-        private readonly Context.Base _context;
-        private readonly StructAccess _structAccess;
-
-        public StructSearchResultFromStruct(Context.Base context, StructAccess structAccess) : base(null)
-        {
-            _context = context;
-            _structAccess = structAccess;
-        }
-
-        /// <summary>
-        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
-        /// </summary>
-        /// <param name="callContext">The call context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        public override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
-        {
-            throw new NotImplementedException();
+            return result.ReplaceRelativeContextRef(containerContext, argsRef);
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// created 13.01.2007 19:35
-        public override SearchResult SearchDefineableFromSequence(DefineableToken token, int count)
+        internal override SearchResult SearchDefineableFromSequence(DefineableToken token, int count)
         {
             if (token.TokenClass.IsBitSequenceOperation)
                 return new BitSequenceOperationSearchResult(CreateSequence(count), token.TokenClass);

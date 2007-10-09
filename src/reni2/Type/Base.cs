@@ -198,7 +198,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        public virtual SearchResult SearchDefineable(DefineableToken defineableToken)
+        internal virtual SearchResult SearchDefineable(DefineableToken defineableToken)
         {
             if (defineableToken.TokenClass.IsDefaultOperation)
                 return new DefaultOperationSearchResult(this, defineableToken.TokenClass);
@@ -213,7 +213,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// created 13.01.2007 19:35
-        virtual public SearchResult SearchDefineableFromSequence(DefineableToken t, int count)
+        internal virtual SearchResult SearchDefineableFromSequence(DefineableToken t, int count)
         {
             return null;
         }

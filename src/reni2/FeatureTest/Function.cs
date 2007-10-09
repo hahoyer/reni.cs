@@ -101,7 +101,7 @@ f1()dump_print;
                 delegate(Compiler c)
                     {
                         ExpectedCompilationResult x = new ExpectedCompilationResult(c);
-                        Tracer.Assert(x.FunctionCount() == 3);
+                        Tracer.Assert(x.FunctionCount() == 2);
                     },
                 "3"
                 );

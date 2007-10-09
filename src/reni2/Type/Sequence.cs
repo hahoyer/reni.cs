@@ -60,7 +60,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        public override SearchResult SearchDefineable(DefineableToken defineableToken)
+        internal override SearchResult SearchDefineable(DefineableToken defineableToken)
         {
             SearchResult result = Element.SearchDefineableFromSequence(defineableToken,Count);
             if (result != null)

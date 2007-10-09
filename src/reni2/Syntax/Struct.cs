@@ -7,9 +7,9 @@ namespace Reni.Syntax
     internal sealed class Struct : Base
     {
         [DumpData(true)]
-        private Reni.Struct _data;
+        private Reni.Struct.Container _data;
 
-        internal Struct(Reni.Struct data)
+        internal Struct(Reni.Struct.Container data)
         {
             _data = data;
         }
@@ -39,37 +39,37 @@ namespace Reni.Syntax
 
         internal override Base CreateListSyntaxReverse(Base left, Token token)
         {
-            return new Struct(Reni.Struct.Create(left, _data));
+            return new Struct(Reni.Struct.Container.Create(left, _data));
         }
 
         internal override Base CreateListSyntaxReverse(DeclarationSyntax left, Token token)
         {
-            return new Struct(Reni.Struct.Create(left, _data));
+            return new Struct(Reni.Struct.Container.Create(left, _data));
         }
 
         internal static Base Create(Base left)
         {
-            return new Struct(Reni.Struct.Create(left));
+            return new Struct(Reni.Struct.Container.Create(left));
         }
 
         internal static Base Create(Base left, Base right)
         {
-            return new Struct(Reni.Struct.Create(left, right));
+            return new Struct(Reni.Struct.Container.Create(left, right));
         }
 
         internal static Base Create(DeclarationSyntax left)
         {
-            return new Struct(Reni.Struct.Create(left));
+            return new Struct(Reni.Struct.Container.Create(left));
         }
 
         internal static Base Create(ConverterSyntax left)
         {
-            return new Struct(Reni.Struct.Create(left));
+            return new Struct(Reni.Struct.Container.Create(left));
         }
 
         internal static Base Create(DeclarationSyntax left, Base right)
         {
-            return new Struct(Reni.Struct.Create(left, right));
+            return new Struct(Reni.Struct.Container.Create(left, right));
         }
     }
 }

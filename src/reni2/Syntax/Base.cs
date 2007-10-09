@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
-using Reni.Context;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
 
@@ -22,14 +20,14 @@ namespace Reni.Syntax
         /// <returns></returns>
         public override string Dump()
         {
-            bool isInDump = Reni.Struct._isInDump;
-            Reni.Struct._isInDump = false;
+            bool isInDump = Reni.Struct.Container._isInDump;
+            Reni.Struct.Container._isInDump = false;
             string result = isInDump ? DumpShort() : base.Dump();
-            Reni.Struct._isInDump = isInDump;
+            Reni.Struct.Container._isInDump = isInDump;
             return result;
         }
 
-        private HWClassLibrary.Helper.DictionaryEx<Context.Base, CacheItem> _cache =
+        private readonly HWClassLibrary.Helper.DictionaryEx<Context.Base, CacheItem> _cache =
             new HWClassLibrary.Helper.DictionaryEx<Context.Base, CacheItem>();
 
         [Node, DumpData(false)]

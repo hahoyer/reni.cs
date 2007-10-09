@@ -1,12 +1,11 @@
 using System;
-using HWClassLibrary.Debug;
 
 namespace Reni.Context
 {
     /// <summary>
     /// Result of token search.
     /// </summary>
-    public abstract class SearchResult : ReniObject
+    internal abstract class SearchResult : ReniObject
     {
         private Type.Base _definingType;
 
@@ -31,6 +30,24 @@ namespace Reni.Context
         /// <returns></returns>
         public abstract Result VisitApply(Base callContext, Category category, Syntax.Base args);
 
+    }
+
+    internal abstract class StructSearchResult : ReniObject
+    {
+        internal virtual Result VisitApply(Base context, Category category, Syntax.Base args)
+        {
+            NotImplementedMethod(context, category, args);
+            return null;
+        }
+    }
+
+    abstract internal class PrefixSearchResult : ReniObject
+    {
+        internal virtual Result VisitApply(Category category, Result argResult)
+        {
+            NotImplementedMethod(category, argResult);
+            throw new NotImplementedException();
+        }
     }
 
 }

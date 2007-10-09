@@ -4,7 +4,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
+using Reni.Struct;
 using Reni.Syntax;
 
 namespace Reni.Context
@@ -119,7 +119,7 @@ namespace Reni.Context
         /// <param name="currentCompilePosition">The currentCompilePosition.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        public Struct CreateStruct(Reni.Struct x, int currentCompilePosition)
+        public Struct.Context CreateStruct(Reni.Struct.Container x, int currentCompilePosition)
         {
             return CreateStructContainer(x).CreateStruct(currentCompilePosition);
         }
@@ -130,7 +130,7 @@ namespace Reni.Context
         /// <param name="x">The x.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        public Struct CreateStruct(Reni.Struct x)
+        public Struct.Context CreateStruct(Reni.Struct.Container x)
         {
             return CreateStruct(x, x.List.Count);
         }
@@ -141,12 +141,12 @@ namespace Reni.Context
         /// <param name="currentCompilePosition">The currentCompilePosition.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        private Struct CreateStruct(int currentCompilePosition)
+        private Struct.Context CreateStruct(int currentCompilePosition)
         {
             return _cache._structPositionCache.Find
                 (
                 currentCompilePosition,
-                delegate { return new Struct((StructContainer)this, currentCompilePosition); }
+                delegate { return new Struct.Context((ContainerContext)this, currentCompilePosition); }
                 );
         }
 
@@ -156,9 +156,9 @@ namespace Reni.Context
         /// <param name="x">The x.</param>
         /// <returns></returns>
         /// created 16.12.2006 14:45
-        public StructContainer CreateStructContainer(Reni.Struct x)
+        public ContainerContext CreateStructContainer(Reni.Struct.Container x)
         {
-            return _cache._structContainerCache.Find(x, delegate { return new StructContainer(this, x); });
+            return _cache._structContainerCache.Find(x, delegate { return new ContainerContext(this, x); });
         }
         /// <summary>
         /// Gets the function instance.
@@ -240,9 +240,9 @@ namespace Reni.Context
         public class Cache
         {
             [Node]
-            public DictionaryEx<Reni.Struct, StructContainer> _structContainerCache = new DictionaryEx<Reni.Struct, StructContainer>();
+            public DictionaryEx<Reni.Struct.Container, ContainerContext> _structContainerCache = new DictionaryEx<Reni.Struct.Container, ContainerContext>();
             [Node]
-            public DictionaryEx<int, Struct> _structPositionCache = new DictionaryEx<int, Struct>();
+            public DictionaryEx<int, Struct.Context> _structPositionCache = new DictionaryEx<int, Struct.Context>();
             [Node]
             public DictionaryEx<Type.Base, Function> _functionInstanceCache = new DictionaryEx<Type.Base, Function>();
             [Node]
@@ -333,7 +333,7 @@ namespace Reni.Context
             return true;
         }
 
-        internal virtual Code.Base CreateRefForStruct(Type.Struct struc)
+        internal virtual Code.Base CreateRefForStruct(Reni.Struct.Type struc)
         {
             NotImplementedMethod(struc);
             return null;
@@ -356,52 +356,15 @@ namespace Reni.Context
         }
     }
 
-    internal abstract class StructSearchResult:ReniObject
+    abstract class ___xStructSearchResult : ReniObject
     {
-        internal virtual Result VisitApply(Base context, Category category, Syntax.Base args)
-        {
-            NotImplementedMethod(context, category, args);
-            return null;
-        }
-    }
+        readonly Struct.Context _struct;
 
-    abstract internal class PrefixSearchResult : ReniObject
-    {
-        internal virtual Result VisitApply(Category category, Result argResult)
-        {
-            NotImplementedMethod(category, argResult);
-            throw new NotImplementedException();
-        }
-    }
-
-    abstract internal class xStructSearchResult : ReniObject
-    {
-        readonly Struct _struct;
-
-        protected xStructSearchResult(Struct @struct)
+        protected ___xStructSearchResult(Struct.Context @struct)
         {
             _struct = @struct;
         }
 
-        /// <summary>
-        /// Visits the apply.
-        /// </summary>
-        /// <param name="callContext">The call context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        /// created 21.05.2007 23:41 on HAHOYER-DELL by hh
-        virtual public Result VisitApply(Base callContext, Category category, Syntax.Base args)
-        {
-            NotImplementedMethod(callContext, category,args);
-            throw new NotImplementedException();
-        }
-
-        protected Result VisitAccessApply(int position, Base callContext, Category category, Syntax.Base args)
-        {
-            return _struct.VisitAccessApply(position, callContext, category, args);
-        }
-        
         protected Result VisitATApply(Base callContext, Category category, Syntax.Base args)
         {
             BitsConst indexValue = args.VisitAndEvaluate(callContext, _struct.IndexType);
@@ -409,7 +372,7 @@ namespace Reni.Context
             return _struct.VisitAccessApply(index, null, category, null);
         }
 
-        internal Struct Struct { get { return _struct; } }
+        internal Struct.Context Struct { get { return _struct; } }
     }
 }
 
