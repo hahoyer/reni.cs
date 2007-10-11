@@ -7,7 +7,7 @@ namespace Reni.Context
     /// </summary>
     internal abstract class SearchResult : ReniObject
     {
-        private Type.Base _definingType;
+        private readonly Type.Base _definingType;
 
         public SearchResult(Type.Base definingType)
         {
@@ -51,3 +51,4 @@ namespace Reni.Context
     }
 
 }
+
