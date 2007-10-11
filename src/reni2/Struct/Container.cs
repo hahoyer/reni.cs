@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
 using HWClassLibrary.IO;
 using Reni.Context;
+using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
@@ -554,13 +556,24 @@ namespace Reni.Struct
             return Reni.Type.Base.EmptyHandler(category);
         }
 
-        internal StructAccess SearchDefineable(string name)
+        internal StructAccess SearchDefineable(DefineableToken defineableToken)
         {
-            if (!Dictionary.ContainsKey(name))
+            if (defineableToken.TokenClass.IsStructOperation)
+                return new OperationResult(defineableToken);
+
+            if (!Dictionary.ContainsKey(defineableToken.Name))
                 return null;
 
-            int resultPosition = Dictionary[name];
-            return new StructAccess(resultPosition);
+            int resultPosition = Dictionary[defineableToken.Name];
+            return new StructAccess(defineableToken, resultPosition);
+        }
+    }
+
+    internal class OperationResult
+    {
+        public OperationResult(DefineableToken defineableToken)
+        {
+            
         }
     }
 }

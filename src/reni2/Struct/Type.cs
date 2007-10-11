@@ -111,9 +111,6 @@ namespace Reni.Struct
         /// <returns></returns>
         internal override SearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            if (defineableToken.TokenClass.IsStructOperation)
-                return new OperationResult(this, _currentCompilePosition);
-
             StructAccess structAccess = _Container.SearchDefineable(defineableToken.Name);
             if (structAccess != null)
                 return structAccess.ToSearchResult(this);

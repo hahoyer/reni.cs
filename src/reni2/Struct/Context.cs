@@ -226,14 +226,14 @@ namespace Reni.Struct
         }
     }
 
-    internal sealed class OperationResult : SearchResult
+    internal sealed class OperationSearchResult : SearchResult
     {
         [DumpData(true)] private readonly Container _container;
         [DumpData(true)] private readonly int _position;
         [DumpData(true)]
         private readonly Reni.Context.Base _context;
 
-        public OperationResult(Type definingType, int position)
+        public OperationSearchResult(Type definingType, int position)
             : base(definingType)
         {
             _container = definingType.Container;
