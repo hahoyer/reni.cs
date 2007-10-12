@@ -248,30 +248,6 @@ namespace Reni.Struct
         }
 
         /// <summary>
-        /// Visits the apply.
-        /// </summary>
-        /// <param name="structContext">The struct context.</param>
-        /// <param name="position">The position.</param>
-        /// <param name="callContext">The call context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        /// created 13.12.2006 00:43
-        public Result VisitAccessApply(Reni.Context.Base structContext, int position, Reni.Context.Base callContext,
-                                       Category category,
-                                       Base args)
-        {
-            Result functionResult = VisitElementFromContextRef(structContext, category | Category.Type, position);
-            if (args == null)
-                return functionResult;
-            if (functionResult.SmartSize.IsZero)
-                return functionResult.Type.ApplyFunction(callContext, category, args);
-
-            NotImplementedMethod(structContext, position, callContext, category, args, "functionResult", functionResult);
-            return null;
-        }
-
-        /// <summary>
         /// Visits the element at position. Result will be a reference or a function.
         /// </summary>
         /// <param name="context">The context.</param>
@@ -556,7 +532,7 @@ namespace Reni.Struct
             return Reni.Type.Base.EmptyHandler(category);
         }
 
-        internal StructAccess SearchDefineable(DefineableToken defineableToken)
+        internal StructContainerSearchResult SearchDefineable(DefineableToken defineableToken)
         {
             if (defineableToken.TokenClass.IsStructOperation)
                 return new OperationResult(defineableToken);
@@ -567,13 +543,39 @@ namespace Reni.Struct
             int resultPosition = Dictionary[defineableToken.Name];
             return new StructAccess(defineableToken, resultPosition);
         }
+
+        public Result VisitOperationApply(Reni.Context.Base definingParentContext, Reni.Context.Base callContext, Category category, Base args)
+        {
+            BitsConst indexValue = args.VisitAndEvaluate(callContext, IndexType);
+            int index = indexValue.ToInt32();
+            return VisitElementFromContextRef(definingParentContext, category, index);
+        }
+        /// <summary>
+        /// Visits the apply.
+        /// </summary>
+        /// <param name="structContext">The struct context.</param>
+        /// <param name="position">The position.</param>
+        /// <param name="callContext">The call context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <returns></returns>
+        /// created 13.12.2006 00:43
+        internal Result VisitAccessApply(Reni.Context.Base structContext, int position, Reni.Context.Base callContext, Category category, Syntax.Base args)
+        {
+            Category localCategory = category;
+            if (args != null)
+                localCategory = localCategory | Category.Type;
+            Result functionResult = VisitElementFromContextRef(structContext, localCategory, position);
+            if (args == null)
+                return functionResult;
+
+            if (functionResult.IsCodeLess)
+                return functionResult.Type.ApplyFunction(callContext, category, args);
+
+            NotImplementedMethod(position, callContext, category, args);
+            return null;
+        }
+
     }
 
-    internal class OperationResult
-    {
-        public OperationResult(DefineableToken defineableToken)
-        {
-            
-        }
-    }
 }

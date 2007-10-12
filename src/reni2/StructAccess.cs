@@ -1,67 +1,102 @@
 using HWClassLibrary.Debug;
 using Reni.Context;
+using Reni.Parser;
+using Reni.Struct;
 
 namespace Reni
 {
-    internal sealed class StructAccess : ReniObject
+
+    internal abstract class StructContainerSearchResult: ReniObject
     {
         [DumpData(true)]
-        private readonly int _position;
+        private readonly DefineableToken _defineableToken;
 
-        public StructAccess(int position)
+        public StructContainerSearchResult(DefineableToken defineableToken)
         {
-            _position = position;
+            _defineableToken = defineableToken;
         }
 
         internal StructSearchResult ToContextSearchResult(Struct.Context definingContext)
         {
-            return new ContextSearchResult(definingContext,_position);
+            return new ContextSearchResult(this, definingContext);
         }
-
         internal SearchResult ToSearchResult(Reni.Struct.Type definingType)
         {
-            return new TypeSearchResult(definingType, _position);
-        }
-    }
-
-    internal sealed class ContextSearchResult : StructSearchResult
-    {
-        [DumpData(true)]
-        private readonly int _position;
-        [DumpData(true)]
-        private readonly Struct.Context _definingContext;
-
-        internal ContextSearchResult(Struct.Context definingContext, int position)
-        {
-            _position = position;
-            _definingContext = definingContext;
+            return new TypeSearchResult(this, definingType);
         }
 
-        internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
-        {
-            return _definingContext.VisitAccessApply(_position, callContext, category, args);
-        }
+        internal abstract Result Visit(Container definingContainer, Base definingParentContext, Base callContext,
+                                       Category category, Syntax.Base args);
     }
 
     internal sealed class TypeSearchResult : SearchResult
     {
         [DumpData(true)]
-        private readonly int _position;
+        private readonly StructContainerSearchResult _structContainerSearchResult;
         [DumpData(true)]
-        private readonly Reni.Struct.Type _definingType;
+        private readonly Struct.Type _definingType;
 
-        public TypeSearchResult(Reni.Struct.Type definingType, int position)
-            : base(definingType)
+        public TypeSearchResult(StructContainerSearchResult structContainerSearchResult, Struct.Type definingType) : base(definingType)
         {
-            _position = position;
+            _structContainerSearchResult = structContainerSearchResult;
             _definingType = definingType;
         }
 
         public override Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
-            NotImplementedMethod(callContext, category, args);
-            return null;
+            return _structContainerSearchResult.Visit(_definingType.Container, _definingType.Context, callContext, category, args);
         }
     }
+
+    internal class ContextSearchResult : StructSearchResult
+    {
+        [DumpData(true)]
+        private readonly StructContainerSearchResult _structContainerSearchResult;
+        [DumpData(true)]
+        private readonly Struct.Context _definingContext;
+
+        public ContextSearchResult(StructContainerSearchResult structContainerSearchResult, Struct.Context definingContext)
+        {
+            _structContainerSearchResult = structContainerSearchResult;
+            _definingContext = definingContext;
+        }
+
+        internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
+        {
+            return _structContainerSearchResult.Visit(_definingContext.Container, _definingContext.Parent, callContext, category, args);
+        }
+    }
+
+    internal sealed class StructAccess : StructContainerSearchResult
+    {
+        [DumpData(true)]
+        private readonly int _position;
+
+        public StructAccess(DefineableToken defineableToken, int position) : base(defineableToken)
+        {
+            _position = position;
+        }
+
+        internal override Result Visit(Container definingContainer, Base definingParentContext, Base callContext,
+                                       Category category, Syntax.Base args)
+        {
+            return definingContainer.VisitAccessApply(definingParentContext, _position, callContext, category, args);
+        }
+    }
+
+    internal sealed class OperationResult : StructContainerSearchResult
+    {
+        public OperationResult(DefineableToken defineableToken) : base(defineableToken)
+        {
+
+        }
+
+        internal override Result Visit(Container definingContainer, Base definingParentContext, Base callContext,
+                                       Category category, Syntax.Base args)
+        {
+            return definingContainer.VisitOperationApply(definingParentContext, callContext, category, args);
+        }
+    }
+
 
 }

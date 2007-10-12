@@ -333,9 +333,9 @@ namespace Reni.Context
             return true;
         }
 
-        internal virtual Code.Base CreateRefForStruct(Reni.Struct.Type struc)
+        internal virtual Code.Base CreateRefForStruct(Reni.Struct.Type type)
         {
-            NotImplementedMethod(struc);
+            NotImplementedMethod(type);
             return null;
         }
 
@@ -354,25 +354,6 @@ namespace Reni.Context
                 results.Add(list[i].VisitType(this));
             return results;
         }
-    }
-
-    abstract class ___xStructSearchResult : ReniObject
-    {
-        readonly Struct.Context _struct;
-
-        protected ___xStructSearchResult(Struct.Context @struct)
-        {
-            _struct = @struct;
-        }
-
-        protected Result VisitATApply(Base callContext, Category category, Syntax.Base args)
-        {
-            BitsConst indexValue = args.VisitAndEvaluate(callContext, _struct.IndexType);
-            int index = indexValue.ToInt32();
-            return _struct.VisitAccessApply(index, null, category, null);
-        }
-
-        internal Struct.Context Struct { get { return _struct; } }
     }
 }
 

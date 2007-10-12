@@ -1,3 +1,4 @@
+using HWClassLibrary.Debug;
 using System;
 
 namespace Reni.Context
@@ -7,6 +8,7 @@ namespace Reni.Context
     /// </summary>
     internal abstract class SearchResult : ReniObject
     {
+        [DumpData(true)]
         private readonly Type.Base _definingType;
 
         public SearchResult(Type.Base definingType)
@@ -34,9 +36,9 @@ namespace Reni.Context
 
     internal abstract class StructSearchResult : ReniObject
     {
-        internal virtual Result VisitApply(Base context, Category category, Syntax.Base args)
+        internal virtual Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
-            NotImplementedMethod(context, category, args);
+            NotImplementedMethod(callContext, category, args);
             return null;
         }
     }

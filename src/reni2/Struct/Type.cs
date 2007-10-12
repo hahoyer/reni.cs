@@ -9,14 +9,14 @@ namespace Reni.Struct
     public class Type : Reni.Type.Base
     {
         private readonly int _currentCompilePosition;
-        private readonly Container _Container;
+        private readonly Container _container;
         private readonly Reni.Context.Base _context;
 
         [Node]
         public int CurrentCompilePosition { get { return _currentCompilePosition; } }
 
         [Node]
-        public Container Container { get { return _Container; } }
+        public Container Container { get { return _container; } }
 
         [Node]
         public Reni.Context.Base Context { get { return _context; } }
@@ -29,20 +29,20 @@ namespace Reni.Struct
         /// [created 05.06.2006 16:47]
         internal override Result MoveHandler(Category category)
         {
-            return _Container.MoveHandler(category, _context, _currentCompilePosition);
+            return _container.MoveHandler(category, _context, _currentCompilePosition);
         }
 
         public Type(Reni.Context.Base context, Container struc, int currentCompilePosition)
         {
             _context = context;
-            _Container = struc;
+            _container = struc;
             _currentCompilePosition = currentCompilePosition;
         }
 
         /// <summary>
         /// The size of type
         /// </summary>
-        public override Size Size { get { return _Container.VisitSize(_context, 0, _currentCompilePosition); } }
+        public override Size Size { get { return _container.VisitSize(_context, 0, _currentCompilePosition); } }
 
         /// <summary>
         /// Determines whether [has converter to] [the specified dest].
@@ -53,7 +53,7 @@ namespace Reni.Struct
         /// </returns>
         internal override bool HasConverterTo(Reni.Type.Base dest)
         {
-            return _Container.HasConverterTo(_context, dest);
+            return _container.HasConverterTo(_context, dest);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Reni.Struct
         {
             Void voidDest = dest as Void;
             if (voidDest != null)
-                return _Container.IsConvertableToVoid(_context);
+                return _container.IsConvertableToVoid(_context);
             return base.IsConvertableToVirt(dest, conversionFeature);
         }
 
@@ -93,7 +93,7 @@ namespace Reni.Struct
         /// created 11.01.2007 22:12
         internal override Result ConvertToVirt(Category category, Reni.Type.Base dest)
         {
-            return _Container.ConvertTo(category, _context, dest);
+            return _container.ConvertTo(category, _context, dest);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Reni.Struct
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
         [DumpData(false)]
-        public override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _Container.DumpPrintText(_context) + ")"; } }
+        public override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _container.DumpPrintText(_context) + ")"; } }
 
         /// <summary>
         /// Searches the definable defineableToken at type
@@ -111,7 +111,7 @@ namespace Reni.Struct
         /// <returns></returns>
         internal override SearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            StructAccess structAccess = _Container.SearchDefineable(defineableToken.Name);
+            StructContainerSearchResult structAccess = _container.SearchDefineable(defineableToken);
             if (structAccess != null)
                 return structAccess.ToSearchResult(this);
 
@@ -126,7 +126,7 @@ namespace Reni.Struct
         /// [created 02.06.2006 09:47]
         internal override Result DestructorHandler(Category category)
         {
-            return _Container.DestructorHandler
+            return _container.DestructorHandler
                 (
                 _context,
                 category,
@@ -144,7 +144,7 @@ namespace Reni.Struct
         /// created 08.01.2007 17:29
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
-            return _Container.DumpPrintFromRef(category, _context, refAlignParam);
+            return _container.DumpPrintFromRef(category, _context, refAlignParam);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Reni.Struct
         /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
         /// </value>
         /// created 09.02.2007 00:26
-        internal override bool IsPending { get { return _Container.IsPendingType(_context); } }
+        internal override bool IsPending { get { return _container.IsPendingType(_context); } }
 
         /// <summary>
         /// Visits the access to an element. Struct reference is assumed as "arg"
@@ -165,8 +165,8 @@ namespace Reni.Struct
         /// created 29.10.2006 19:17
         public Result AccessFromArg(Category category, int position)
         {
-            Result result = _Container.VisitElementFromContextRef(_context, category, position);
-            ContainerContext containerContext = _context.CreateStructContainer(_Container);
+            Result result = _container.VisitElementFromContextRef(_context, category, position);
+            ContainerContext containerContext = _context.CreateStructContainer(_container);
             Code.Base argsRef = Code.Base
                 .CreateArg(_context.RefAlignParam.RefSize)
                 .CreateRefPlus(_context.RefAlignParam, Size);

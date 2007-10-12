@@ -11,7 +11,7 @@ namespace Reni.Struct
     /// </summary>
     public sealed class ContainerContext : Child
     {
-        private readonly Container _struct;
+        private readonly Container _container;
         private readonly DictionaryEx<int, Base> _type = new DictionaryEx<int, Base>();
         private Code.Base _contextRefCode;
 
@@ -19,12 +19,12 @@ namespace Reni.Struct
         /// Initializes a new instance of the StructContainer class.
         /// </summary>
         /// <param name="parent">The parent.</param>
-        /// <param name="struc">The struc.</param>
+        /// <param name="container">The struc.</param>
         /// created 12.12.2006 21:29
-        public ContainerContext(Reni.Context.Base parent, Container struc)
+        public ContainerContext(Reni.Context.Base parent, Container container)
             : base(parent)
         {
-            _struct = struc;
+            _container = container;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Reni.Struct
         /// <param name="position">Index of the element</param>
         public Base VisitType(int position)
         {
-            return _struct.VisitType(Parent, position);
+            return _container.VisitType(Parent, position);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Reni.Struct
         /// </summary>
         /// <value>The struct.</value>
         /// created 16.12.2006 23:49
-        public Container Struc { get { return _struct; } }
+        public Container Container { get { return _container; } }
 
         /// <summary>
         /// Creates the type of the struct.
@@ -55,7 +55,7 @@ namespace Reni.Struct
                    _type.Find
                        (
                        currentCompilePosition,
-                       delegate { return new Type(Parent, _struct, currentCompilePosition); }
+                       delegate { return new Type(Parent, _container, currentCompilePosition); }
                        );
         }
 
@@ -75,15 +75,15 @@ namespace Reni.Struct
             return Code.Base.CreateContextRef(this);
         }
 
-        internal override Code.Base CreateRefForStruct(Type struc)
+        internal override Code.Base CreateRefForStruct(Type type)
         {
-            if (Parent != struc.Context)
+            if (Parent != type.Context)
                 return null;
-            if (Struc != struc.Container)
+            if (Container != type.Container)
                 return null;
-            if (Struc.List.Count > struc.CurrentCompilePosition)
+            if (Container.List.Count > type.CurrentCompilePosition)
                 return null;
-            return Struc.CreateRef(Parent);
+            return Container.CreateRef(Parent);
         }
     }
 
@@ -92,9 +92,9 @@ namespace Reni.Struct
     /// </summary>
     public sealed class Context : Child
     {
-        [DumpData(true)] private readonly Container _struct;
+        [DumpData(true)] private readonly Container _container;
         [DumpData(true)] private readonly int _currentCompilePosition;
-        private Code.Base _contextRefCode;
+        private Code.Base _contextRefCodeCache;
 
         /// <summary>
         /// ctor
@@ -104,13 +104,13 @@ namespace Reni.Struct
         public Context(ContainerContext parent, int currentCompilePosition)
             : base(parent.Parent)
         {
-            _struct = parent.Struc;
+            _container = parent.Container;
             _currentCompilePosition = currentCompilePosition;
         }
 
         private Base VisitBodyType()
         {
-            return _struct.VisitType(Parent, _currentCompilePosition);
+            return _container.VisitType(Parent, _currentCompilePosition);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Reni.Struct
 
         internal override StructSearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            StructAccess structAccess = _struct.SearchDefineable(defineableToken.Name);
+            StructContainerSearchResult structAccess = _container.SearchDefineable(defineableToken);
             if (structAccess != null)
                 return structAccess.ToContextSearchResult(this);
 
@@ -152,7 +152,7 @@ namespace Reni.Struct
         /// created 15.12.2006 09:22
         public Result VisitElementFromContextRef(Category category, int index)
         {
-            if (_struct[index].VisitSize(this).IsZero)
+            if (_container[index].VisitSize(this).IsZero)
             {
                 Result result = Base.CreateVoidResult(category);
                 if (category.HasType) result.Type = VisitElementType(index);
@@ -177,9 +177,9 @@ namespace Reni.Struct
         {
             get
             {
-                if (_contextRefCode == null)
-                    _contextRefCode = CreateContextRefCode();
-                return _contextRefCode;
+                if (_contextRefCodeCache == null)
+                    _contextRefCodeCache = CreateContextRefCode();
+                return _contextRefCodeCache;
             }
         }
 
@@ -189,63 +189,27 @@ namespace Reni.Struct
         }
 
         [DumpData(false)]
-        private ContainerContext ContextRefForCode { get { return Parent.CreateStructContainer(_struct); } }
+        private ContainerContext ContextRefForCode { get { return Parent.CreateStructContainer(_container); } }
 
         [DumpData(false)]
-        public Base IndexType { get { return _struct.IndexType; } }
+        public Base IndexType { get { return _container.IndexType; } }
+
+        public Container Container { get { return _container; } }
 
         internal Size Offset(int index)
         {
-            return _struct.Offset(Parent, index);
+            return _container.Offset(Parent, index);
         }
 
         internal Size BackOffset(int index)
         {
-            return _struct.BackOffset(Parent, index);
+            return _container.BackOffset(Parent, index);
         }
 
         private Base VisitElementType(int index)
         {
-            return _struct[index].VisitType(this);
+            return _container[index].VisitType(this);
         }
 
-        public Result VisitAccessApply(int index, Reni.Context.Base callContext, Category category, Syntax.Base args)
-        {
-            Category localCategory = category;
-            if (args != null)
-                localCategory = localCategory | Category.Type;
-            Result functionResult = VisitElementFromContextRef(localCategory, index);
-            if (args == null)
-                return functionResult;
-
-            if (functionResult.IsCodeLess)
-                return functionResult.Type.ApplyFunction(callContext, category, args);
-
-            NotImplementedMethod(index, callContext, category, args);
-            return null;
-        }
-    }
-
-    internal sealed class OperationSearchResult : SearchResult
-    {
-        [DumpData(true)] private readonly Container _container;
-        [DumpData(true)] private readonly int _position;
-        [DumpData(true)]
-        private readonly Reni.Context.Base _context;
-
-        public OperationSearchResult(Type definingType, int position)
-            : base(definingType)
-        {
-            _container = definingType.Container;
-            _context = definingType.Context;
-            _position = position;
-        }
-
-        public override Result VisitApply(Reni.Context.Base callContext, Category category, Syntax.Base args)
-        {
-            BitsConst indexValue = args.VisitAndEvaluate(callContext, _container.IndexType);
-            int index = indexValue.ToInt32();
-            return _container.VisitElementFromContextRef(_context, category, index);
-        }
     }
 }
