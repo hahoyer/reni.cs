@@ -239,7 +239,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <param name="memberElem">The member elem.</param>
         /// <returns></returns>
-        internal override Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
+        internal Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
         {
             bool trace = context.ObjectId == 5 && memberElem.ObjectId == 7 && category.HasType;
             StartMethodDumpWithBreak(trace, context, category, memberElem);
@@ -254,6 +254,7 @@ namespace Reni.Type
             NotImplementedMethod(context, category, memberElem);
             return null;
         }
+
     }
 
     internal sealed class RefOperationSearchResult : SearchResult

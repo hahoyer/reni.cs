@@ -4,7 +4,6 @@ using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
-using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -397,19 +396,6 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Visits from chain. Object is provided by use of "Arg" code element
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="memberElem">The member elem.</param>
-        /// <returns></returns>
-        internal virtual Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
-        {
-            NotImplementedMethod(context, category, memberElem);
-            return null;
-        }
-
         virtual internal Result PostProcess(Ref visitedType, Result result)
         {
             if(this == visitedType.Target)
@@ -685,6 +671,9 @@ namespace Reni.Type
         [DumpData(false)]
         internal virtual bool IsPending { get { return false; } }
 
+        [DumpData(false)]
+        internal virtual string DumpPrintTextFromProperty { get { throw new NotImplementedException(); } }
+
         /// <summary>
         /// Visits as sequence.
         /// </summary>
@@ -703,7 +692,7 @@ namespace Reni.Type
         /// Determines whether [is convertable to] [the specified dest].
         /// </summary>
         /// <param name="dest">The dest.</param>
-        /// <param name="useConverter">if set to <c>true</c> [use converter].</param>
+        /// <param name="conversionFeature">The conversion feature.</param>
         /// <returns>
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
@@ -830,25 +819,15 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Creates the property.
-        /// </summary>
-        /// <returns></returns>
-        /// created 26.07.2007 00:04 on HAHOYER-DELL by hh
-        virtual internal Base CreateProperty()
-        {
-            NotImplementedMethod();return null;
-        }
-
-        /// <summary>
         /// If type is property, execute it.
         /// </summary>
-        /// <param name="result">The result.</param>
+        /// <param name="rawResult">The result.</param>
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 30.07.2007 21:28 on HAHOYER-DELL by hh
-        virtual internal Result UnProperty(Result result, Context.Base context)
+        virtual internal Result UnProperty(Result rawResult, Context.Base context)
         {
-            return result;
+            return rawResult;
         }
 
     }
@@ -856,8 +835,8 @@ namespace Reni.Type
     internal class ConversionFeature: ReniObject
     {
         private static ConversionFeature _instance;
-        private bool _isUseConverter;
-        private bool _isDisableCut;
+        private readonly bool _isUseConverter;
+        private readonly bool _isDisableCut;
 
         private ConversionFeature(bool isUseConverter, bool isDisableCut)
         {

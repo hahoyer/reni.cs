@@ -7,7 +7,6 @@ namespace Reni.Type
     {
         private readonly Context.Base _context;
         private readonly Syntax.Base _body;
-        private Property _propertyTypeCache;
 
         /// <summary>
         /// ctor
@@ -26,18 +25,6 @@ namespace Reni.Type
         public Context.Base Context { get { return _context; } }
 
         /// <summary>
-        /// Creates the property.
-        /// </summary>
-        /// <returns></returns>
-        /// created 26.07.2007 00:04 on HAHOYER-DELL by hh
-        internal override Base CreateProperty()
-        {
-            if (_propertyTypeCache == null)
-                _propertyTypeCache = new Property(this);
-            return _propertyTypeCache;
-        }
-
-        /// <summary>
         /// Function bo
         /// </summary>
         public Syntax.Base Body { get { return _body; } }
@@ -54,7 +41,8 @@ namespace Reni.Type
         /// created 08.01.2007 17:54
         public override string DumpPrintText { get { return "#(#context "+ _context.ObjectId +"#)# function("+_body.DumpData()+")"; } }
 
-        public string DumpPrintTextFromProperty { get { return "#(#context " + _context.ObjectId + "#)# property(" + _body.DumpData() + ")"; } }
+        internal override string DumpPrintTextFromProperty { get { return "#(#context " + _context.ObjectId + "#)# property(" + _body.DumpData() + ")"; } }
+
         /// <summary>
         /// Applies the function.
         /// </summary>
@@ -76,12 +64,9 @@ namespace Reni.Type
 
     internal sealed class Property: Child
     {
-        private readonly Function _parent;
-
-        public Property(Function parent)
+        public Property(Base parent)
             : base(parent)
         {
-            _parent = parent;
         }
 
         /// <summary>
@@ -94,7 +79,13 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        public override string DumpPrintText { get { return _parent.DumpPrintTextFromProperty; } }
+        public override string DumpPrintText
+        {
+            get
+            {
+                return Parent.DumpPrintTextFromProperty;
+            }
+        }
 
         /// <summary>
         /// Destructors the specified category.
@@ -145,14 +136,17 @@ namespace Reni.Type
         /// <summary>
         /// If type is property, execute it.
         /// </summary>
-        /// <param name="result">The result.</param>
+        /// <param name="rawResult">The result.</param>
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 30.07.2007 21:28 on HAHOYER-DELL by hh
         /// created 30.07.2007 21:40 on HAHOYER-DELL by hh
-        internal override Result UnProperty(Result result, Context.Base context)
+        internal override Result UnProperty(Result rawResult, Context.Base context)
         {
-            return Parent.ApplyFunction(context, result.Complete, new Syntax.Void());
+            bool trace = true;
+            StartMethodDump(trace, rawResult, context);
+            Result result = Parent.ApplyFunction(context, rawResult.Complete, new Syntax.Void());
+            return ReturnMethodDumpWithBreak(trace, result);
         }
     }
 }

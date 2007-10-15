@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -383,7 +382,7 @@ namespace Reni.Struct
             return ConcatPrintResult(category, result);
         }
 
-        private static Result ConcatPrintResult(Category category, List<Result> elemResults)
+        private static Result ConcatPrintResult(Category category, IList<Result> elemResults)
         {
             Result result = Void.CreateResult(category);
             if (category.HasCode)
@@ -560,7 +559,8 @@ namespace Reni.Struct
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 13.12.2006 00:43
-        internal Result VisitAccessApply(Reni.Context.Base structContext, int position, Reni.Context.Base callContext, Category category, Syntax.Base args)
+        internal Result VisitAccessApply(Reni.Context.Base structContext, int position, Reni.Context.Base callContext, Category category, 
+            Base args)
         {
             Category localCategory = category;
             if (args != null)

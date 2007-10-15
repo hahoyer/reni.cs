@@ -3,7 +3,8 @@ using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
-using Base=Reni.Type.Base;
+using Base=Reni.Code.Base;
+using Void=Reni.Type.Void;
 
 namespace Reni
 {
@@ -15,7 +16,7 @@ namespace Reni
         ///<summary>
         /// Delegate that returns code
         ///</summary>
-        internal delegate Code.Base GetCode();
+        internal delegate Base GetCode();
 
         ///<summary>
         /// Delegate that returns refs
@@ -25,7 +26,7 @@ namespace Reni
         private Category _pending;
         private Size _size;
         private Type.Base _type;
-        private Code.Base _code;
+        private Base _code;
         private Refs _refs;
         private bool _isDirty = false;
 
@@ -102,7 +103,7 @@ namespace Reni
         /// The code-category, can be null
         /// </summary>
         [Node]
-        internal Code.Base Code
+        internal Base Code
         {
             get { return _code; }
             set
@@ -178,7 +179,7 @@ namespace Reni
             {
                 _code = r.Code;
                 if (_code == null)
-                    _code = Reni.Code.Base.Pending;
+                    _code = Base.Pending;
             }
         }
 
@@ -239,8 +240,8 @@ namespace Reni
                 if (HasRefs) r.Refs = Refs;
                 return r;
             }
-            
-            if(size.IsPending)
+
+            if (size.IsPending)
                 return this;
 
             Size alignedSize = size.Align(alignBits);
@@ -282,11 +283,7 @@ namespace Reni
         /// <summary>
         /// Error handling
         /// </summary>
-        public Error Error
-        {
-            get { return null; }
-            set { }
-        }
+        public Error Error { get { return null; } set { } }
 
         private void AssertValid()
         {
@@ -300,7 +297,7 @@ namespace Reni
                 {
                     if (!(Size == size))
                     {
-                        Tracer.AssertionFailed(1,@"Size==size", "Size differs " + Dump());
+                        Tracer.AssertionFailed(1, @"Size==size", "Size differs " + Dump());
                         Debugger.Break();
                     }
                 }
@@ -308,7 +305,7 @@ namespace Reni
                 {
                     if (!(Type.Size == size))
                     {
-                        Tracer.AssertionFailed(1,@"Type.Size==size", "Type size differs " + Dump());
+                        Tracer.AssertionFailed(1, @"Type.Size==size", "Type size differs " + Dump());
                         Debugger.Break();
                     }
                 }
@@ -317,16 +314,16 @@ namespace Reni
                 {
                     if (!(Code.Size == size))
                     {
-                        Tracer.AssertionFailed(1,@"Code.Size==size", "Code size differs " + Dump());
+                        Tracer.AssertionFailed(1, @"Code.Size==size", "Code size differs " + Dump());
                         Debugger.Break();
                     }
                 }
                 ;
             }
 
-            if(HasRefs && HasCode)
+            if (HasRefs && HasCode)
             {
-                if(!Refs.Contains(Code.Refs))
+                if (!Refs.Contains(Code.Refs))
                 {
                     Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
                     Debugger.Break();
@@ -485,7 +482,7 @@ namespace Reni
             Result result = new Result();
             if (category.HasCode)
             {
-                Code.Base codeResult = Reni.Code.Base.CreateArg(Size.Create(sourceBitCount));
+                Base codeResult = Base.CreateArg(Size.Create(sourceBitCount));
                 if (destBitCount != sourceBitCount)
                     codeResult = codeResult.CreateBitCast(Size.Create(destBitCount));
                 result.Code = codeResult;
@@ -502,11 +499,11 @@ namespace Reni
         /// [created 30.05.2006 00:25]
         public Result UseWithArg(Result resultForArg)
         {
-            if(IsPending)
+            if (IsPending)
                 return this;
 
             bool trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
-            StartMethodDump(trace,resultForArg);
+            StartMethodDump(trace, resultForArg);
             Result result = new Result();
             if (HasSize) result.Size = Size;
             if (HasType) result.Type = Type;
@@ -523,7 +520,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<C>(C context, Code.Base replacement) where C : Context.Base
+        internal Result ReplaceAbsoluteContextRef<C>(C context, Base replacement) where C : Context.Base
         {
             if (HasRefs && !Refs.Contains(context))
                 return this;
@@ -544,7 +541,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, Code.Base replacement) where C : Context.Base
+        internal Result ReplaceRelativeContextRef<C>(C context, Base replacement) where C : Context.Base
         {
             if (HasRefs && !Refs.Contains(context))
                 return this;
@@ -566,9 +563,9 @@ namespace Reni
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
         /// created 31.12.2006 14:50
-        internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, Code.Base replacement)
+        internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, Base replacement)
         {
-            if(!HasCode) return this;
+            if (!HasCode) return this;
             if (Refs.Count == 0) return this;
             Result result = Clone();
             result.IsDirty = true;
@@ -635,7 +632,7 @@ namespace Reni
                     .Pair(moveResult.Refs);
             if (category.HasCode)
             {
-                Code.Base resultCode = tempResult.Code.CreateStatementEndFromIntermediateStorage
+                Base resultCode = tempResult.Code.CreateStatementEndFromIntermediateStorage
                     (
                     Code,
                     destructorResult.Code,
@@ -644,7 +641,6 @@ namespace Reni
                 finalResult.Code = resultCode;
             }
             return finalResult;
-
         }
 
         /// <summary>
@@ -656,19 +652,19 @@ namespace Reni
         public static Result CreatePending(Category category)
         {
             Result result = new Result();
-            if (category.HasSize)result.Size = Size.Pending;
-            if (category.HasType)result.Type = Reni.Type.Base.Pending;
-            if (category.HasRefs)result.Refs = Refs.Pending;
-            if (category.HasCode)result.Code = Reni.Code.Base.Pending;
+            if (category.HasSize) result.Size = Size.Pending;
+            if (category.HasType) result.Type = Reni.Type.Base.Pending;
+            if (category.HasRefs) result.Refs = Refs.Pending;
+            if (category.HasCode) result.Code = Base.Pending;
             return result;
         }
 
-        public Result ConvertTo(Base target)
+        public Result ConvertTo(Type.Base target)
         {
-            return Type.ConvertTo(Complete,target).UseWithArg(this);
+            return Type.ConvertTo(Complete, target).UseWithArg(this);
         }
 
-        public Result CreateUnref(Base type, RefAlignParam refAlignParam)
+        public Result CreateUnref(Type.Base type, RefAlignParam refAlignParam)
         {
             return type.CreateResult
                 (
@@ -680,7 +676,7 @@ namespace Reni
 
         public Result DumpPrintBitSequence()
         {
-            return Reni.Type.Void.CreateResult
+            return Void.CreateResult
                 (
                 Complete,
                 delegate { return Code.CreateDumpPrint(); },
@@ -699,18 +695,19 @@ namespace Reni
             if (Type.IsRef)
                 return this;
 
-            Result resultAsRef = 
+            Result resultAsRef =
                 Type
                     .CreateRef(context.RefAlignParam)
-                    .CreateResult(Complete,context.TopRefResult);
+                    .CreateResult(Complete, context.TopRefResult);
             return resultAsRef;
         }
 
         internal Result UnProperty(Context.Base context)
         {
-            return Type.UnProperty(this,context);
+            return Type.UnProperty(this, context);
         }
     }
+
     /// <summary>
     /// Describes errors, not yet implemented
     /// </summary>
@@ -741,13 +738,13 @@ namespace Reni
         /// <param name="e0"></param>
         /// <param name="e1"></param>
         /// <returns></returns>
-        static public Error operator +(Error e0, Error e1)
+        public static Error operator +(Error e0, Error e1)
         {
             if (e0 == null)
                 return e1;
             if (e1 == null)
                 return e0;
-            return new Error(e0,e1);
+            return new Error(e0, e1);
         }
     }
 }

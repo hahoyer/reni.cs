@@ -128,5 +128,32 @@ x4 dump_print;
                         "(1, 3, 3, )"
                 );
         }
+
+        /// <summary>
+        /// Declaration and access to properties
+        /// </summary>
+        /// created 17.11.2006 20:44
+        [Test, Category(UnderConstruction)]
+        public void NativeProperty()
+        {
+            RunCompiler("NativeProperty",
+                        @"(property function 11) dump_print",
+                        "11"
+                );
+        }
+
+        /// <summary>
+        /// Declaration and access to properties
+        /// </summary>
+        /// created 17.11.2006 20:44
+        [Test, Category(UnderConstruction)]
+        public void PropertyVariable()
+        {
+            RunCompiler("PropertyVariable",
+                        @"x: property function 11; x dump_print",
+                        "11"
+                );
+        }
+
     }
 }

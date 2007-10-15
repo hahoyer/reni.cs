@@ -6,6 +6,7 @@ using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.Context
 {
@@ -16,8 +17,7 @@ namespace Reni.Context
     public abstract class Base : ReniObject
     {
         private static int _nextId = 0;
-        [Node]
-        public Cache _cache = new Cache();
+        [Node] public Cache _cache = new Cache();
 
         /// <summary>
         /// Initializes a new instance .
@@ -36,16 +36,19 @@ namespace Reni.Context
         {
             return base.ToString() + " ObjectId=" + ObjectId;
         }
+
         /// <summary>
         /// Parameter to describe alignment for references
         /// </summary>
         [Node, DumpData(false)]
         public abstract RefAlignParam RefAlignParam { get; }
+
         /// <summary>
         /// Provide the number of bits for data alingment. For example 8 for byte alignement
         /// </summary>
         [DumpData(false)]
         public int AlignBits { get { return RefAlignParam.AlignBits; } }
+
         /// <summary>
         /// Provide the size of a reference
         /// </summary>
@@ -102,7 +105,7 @@ namespace Reni.Context
         /// Return the root env
         /// </summary>
         [DumpData(false)]
-        abstract public Root RootContext{get;}
+        public abstract Root RootContext { get; }
 
         /// <summary>
         /// creates the root environment
@@ -119,7 +122,7 @@ namespace Reni.Context
         /// <param name="currentCompilePosition">The currentCompilePosition.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        public Struct.Context CreateStruct(Reni.Struct.Container x, int currentCompilePosition)
+        public Struct.Context CreateStruct(Container x, int currentCompilePosition)
         {
             return CreateStructContainer(x).CreateStruct(currentCompilePosition);
         }
@@ -130,7 +133,7 @@ namespace Reni.Context
         /// <param name="x">The x.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        public Struct.Context CreateStruct(Reni.Struct.Container x)
+        public Struct.Context CreateStruct(Container x)
         {
             return CreateStruct(x, x.List.Count);
         }
@@ -146,7 +149,7 @@ namespace Reni.Context
             return _cache._structPositionCache.Find
                 (
                 currentCompilePosition,
-                delegate { return new Struct.Context((ContainerContext)this, currentCompilePosition); }
+                delegate { return new Struct.Context((ContainerContext) this, currentCompilePosition); }
                 );
         }
 
@@ -156,10 +159,11 @@ namespace Reni.Context
         /// <param name="x">The x.</param>
         /// <returns></returns>
         /// created 16.12.2006 14:45
-        public ContainerContext CreateStructContainer(Reni.Struct.Container x)
+        public ContainerContext CreateStructContainer(Container x)
         {
             return _cache._structContainerCache.Find(x, delegate { return new ContainerContext(this, x); });
         }
+
         /// <summary>
         /// Gets the function instance.
         /// </summary>
@@ -170,6 +174,7 @@ namespace Reni.Context
         {
             return _cache._functionInstanceCache.Find(args, delegate { return new Function(this, args); });
         }
+
         /// <summary>
         /// Creates the top ref code.
         /// </summary>
@@ -186,7 +191,7 @@ namespace Reni.Context
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 03.11.2006 22:00
-        virtual public Result CreateArgsRefResult(Category category)
+        public virtual Result CreateArgsRefResult(Category category)
         {
             NotImplementedMethod(category);
             throw new NotImplementedException();
@@ -202,6 +207,7 @@ namespace Reni.Context
         {
             return CreateFunctionType(body).CreateResult(c);
         }
+
         /// <summary>
         /// Creates the property result.
         /// </summary>
@@ -233,22 +239,24 @@ namespace Reni.Context
         /// created 02.01.2007 14:57
         public Type.Base CreatePropertyType(Syntax.Base body)
         {
-            Type.Base type = CreateFunctionType(body);
-            return type.CreateProperty();
+            return body.VisitType(this).CreateProperty();
         }
 
         public class Cache
         {
-            [Node]
-            public DictionaryEx<Reni.Struct.Container, ContainerContext> _structContainerCache = new DictionaryEx<Reni.Struct.Container, ContainerContext>();
-            [Node]
-            public DictionaryEx<int, Struct.Context> _structPositionCache = new DictionaryEx<int, Struct.Context>();
-            [Node]
-            public DictionaryEx<Type.Base, Function> _functionInstanceCache = new DictionaryEx<Type.Base, Function>();
-            [Node]
-            public DictionaryEx<Syntax.Base, Type.Base> _functionType = new DictionaryEx<Syntax.Base, Type.Base>();
-            [Node]
-            public Result _topRefResultCache;
+            [Node] public DictionaryEx<Container, ContainerContext> _structContainerCache =
+                new DictionaryEx<Container, ContainerContext>();
+
+            [Node] public DictionaryEx<int, Struct.Context> _structPositionCache =
+                new DictionaryEx<int, Struct.Context>();
+
+            [Node] public DictionaryEx<Type.Base, Function> _functionInstanceCache =
+                new DictionaryEx<Type.Base, Function>();
+
+            [Node] public DictionaryEx<Syntax.Base, Type.Base> _functionType =
+                new DictionaryEx<Syntax.Base, Type.Base>();
+
+            [Node] public Result _topRefResultCache;
         }
 
         private Result VisitFirstChainElement(Category category, MemberElem memberElem)
@@ -292,11 +300,11 @@ namespace Reni.Context
 
         private Result PostProcess(Result formerResult)
         {
-            Result alignedResult = formerResult.Align(RefAlignParam.AlignBits);
-            return alignedResult.UnProperty(this);
+            return formerResult.UnProperty(this).Align(RefAlignParam.AlignBits);
         }
 
-        internal Result VisitNextChainElementAndPostProcess(Category category, MemberElem memberElem, Result formerResult)
+        internal Result VisitNextChainElementAndPostProcess(Category category, MemberElem memberElem,
+                                                            Result formerResult)
         {
             return PostProcess(VisitNextChainElement(category, memberElem, formerResult));
         }
@@ -304,9 +312,9 @@ namespace Reni.Context
         private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
             bool trace = ObjectId == -10 && memberElem.ObjectId == 1 && category.HasAll;
-            StartMethodDumpWithBreak(trace,category,memberElem,formerResult);
+            StartMethodDumpWithBreak(trace, category, memberElem, formerResult);
             Result refResult = formerResult.EnsureContextRef(this);
-            Result visitedResult = refResult.Type.VisitNextChainElement(this, category, memberElem);
+            Result visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
             Result arglessResult = visitedResult.UseWithArg(refResult);
             return ReturnMethodDumpWithBreak(trace, arglessResult);
         }
@@ -333,7 +341,7 @@ namespace Reni.Context
             return true;
         }
 
-        internal virtual Code.Base CreateRefForStruct(Reni.Struct.Type type)
+        internal virtual Code.Base CreateRefForStruct(Struct.Type type)
         {
             NotImplementedMethod(type);
             return null;
@@ -343,7 +351,7 @@ namespace Reni.Context
         {
             List<Result> results = new List<Result>();
             for (int i = 0; i < list.Count; i++)
-                results.Add(list[i].Visit(this,category));
+                results.Add(list[i].Visit(this, category));
             return results;
         }
 
@@ -356,5 +364,3 @@ namespace Reni.Context
         }
     }
 }
-
-

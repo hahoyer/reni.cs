@@ -13,8 +13,8 @@ namespace Reni.FeatureTest
             return @"
 Integer8: function
 {
-    127 type (arg);
-    dump_print: property ((_A_T_ 0) dump_print);
+    127 type (arg enable_cut);
+    dump_print: property function ((_A_T_ 0) dump_print);
     + : function Integer8(_A_T_ 0 + Integer8(arg) _A_T_ 0);
     converter _A_T_ 0
 }
