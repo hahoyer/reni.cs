@@ -40,7 +40,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        public override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
+        internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
 
         /// <summary>
         /// Searches the definable defineableToken at type

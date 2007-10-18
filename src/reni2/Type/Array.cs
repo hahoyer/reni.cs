@@ -35,7 +35,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        public override string DumpPrintText { get { return "("+Element.DumpPrintText+")array("+Count+")"; } }
+        internal override string DumpPrintText { get { return "("+Element.DumpPrintText+")array("+Count+")"; } }
 
         /// <summary>
         /// Destructors the specified category.

@@ -73,7 +73,7 @@ namespace Reni.Type
 	    /// <value>The dump print text.</value>
 	    /// created 08.01.2007 17:54
         [DumpData(false)]
-        public override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
+	    internal override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
 
         /// <summary>
         /// Searches the definable defineableToken at type
@@ -241,7 +241,7 @@ namespace Reni.Type
         /// <returns></returns>
         internal Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
         {
-            bool trace = context.ObjectId == 5 && memberElem.ObjectId == 7 && category.HasType;
+            bool trace = context.ObjectId == 3 && memberElem.ObjectId == 1 && category.HasType;
             StartMethodDumpWithBreak(trace, context, category, memberElem);
             SearchResult searchResult = SearchDefineable(memberElem.DefineableToken);
             if (searchResult != null)

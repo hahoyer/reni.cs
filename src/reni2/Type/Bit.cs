@@ -25,7 +25,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        public override string DumpPrintText { get { return "bit"; } }
+        internal override string DumpPrintText { get { return "bit"; } }
 
         /// <summary>
         /// Gets a value indicating whether this instance has empty value.

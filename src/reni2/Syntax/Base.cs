@@ -3,6 +3,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
+using Reni.Parser.TokenClass.Name;
 
 namespace Reni.Syntax
 {
@@ -235,5 +236,6 @@ namespace Reni.Syntax
         {
             return new ConverterSyntax(this, token);
         }
+
     }
 }

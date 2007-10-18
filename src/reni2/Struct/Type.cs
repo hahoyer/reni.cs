@@ -102,7 +102,7 @@ namespace Reni.Struct
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
         [DumpData(false)]
-        public override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _container.DumpPrintText(_context) + ")"; } }
+        internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _container.DumpPrintText(_context) + ")"; } }
 
         /// <summary>
         /// Searches the definable defineableToken at type

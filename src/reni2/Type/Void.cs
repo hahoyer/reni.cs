@@ -34,7 +34,7 @@
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        public override string DumpPrintText { get { return "void"; } }
+        internal override string DumpPrintText { get { return "void"; } }
 
         /// <summary>
         /// Dumps the print code.

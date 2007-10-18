@@ -194,30 +194,28 @@ namespace Reni.Context
         public virtual Result CreateArgsRefResult(Category category)
         {
             NotImplementedMethod(category);
-            throw new NotImplementedException();
+            return null;
         }
 
         /// <summary>
         /// Create a functional result
         /// </summary>
-        /// <param name="c">The c.</param>
+        /// <param name="category">The c.</param>
         /// <param name="body">The body.</param>
         /// <returns></returns>
-        public Result CreateFunctionResult(Category c, Syntax.Base body)
+        internal Result CreateFunctionResult(Category category, Syntax.Base body)
         {
-            return CreateFunctionType(body).CreateResult(c);
+            return CreateFunctionType(body).CreateResult(category);
         }
 
-        /// <summary>
-        /// Creates the property result.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="body">The body.</param>
-        /// <returns></returns>
-        /// created 25.07.2007 22:52 on HAHOYER-DELL by hh
-        public Result CreatePropertyResult(Category category, Syntax.Base body)
+        internal Result CreatePropertyResult(Category category, Syntax.Base body)
         {
             return CreatePropertyType(body).CreateResult(category);
+        }
+
+        public Type.Base CreatePropertyType(Syntax.Base body)
+        {
+            return _cache._propertyType.Find(body, delegate { return new Type.Property(this, body); });
         }
 
         /// <summary>
@@ -229,17 +227,6 @@ namespace Reni.Context
         public Type.Base CreateFunctionType(Syntax.Base body)
         {
             return _cache._functionType.Find(body, delegate { return new Type.Function(this, body); });
-        }
-
-        /// <summary>
-        /// Creates the type of the function.
-        /// </summary>
-        /// <param name="body">The body.</param>
-        /// <returns></returns>
-        /// created 02.01.2007 14:57
-        public Type.Base CreatePropertyType(Syntax.Base body)
-        {
-            return body.VisitType(this).CreateProperty();
         }
 
         public class Cache
@@ -256,7 +243,11 @@ namespace Reni.Context
             [Node] public DictionaryEx<Syntax.Base, Type.Base> _functionType =
                 new DictionaryEx<Syntax.Base, Type.Base>();
 
-            [Node] public Result _topRefResultCache;
+            [Node]
+            public DictionaryEx<Syntax.Base, Type.Base> _propertyType = new DictionaryEx<Syntax.Base, Type.Base>();
+
+            [Node]
+            public Result _topRefResultCache;
         }
 
         private Result VisitFirstChainElement(Category category, MemberElem memberElem)
@@ -362,5 +353,6 @@ namespace Reni.Context
                 results.Add(list[i].VisitType(this));
             return results;
         }
+
     }
 }

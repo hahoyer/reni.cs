@@ -166,7 +166,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        virtual public string DumpPrintText
+        internal virtual string DumpPrintText
         {
             get
             {
@@ -671,9 +671,6 @@ namespace Reni.Type
         [DumpData(false)]
         internal virtual bool IsPending { get { return false; } }
 
-        [DumpData(false)]
-        internal virtual string DumpPrintTextFromProperty { get { throw new NotImplementedException(); } }
-
         /// <summary>
         /// Visits as sequence.
         /// </summary>
@@ -932,7 +929,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        public override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
+        internal override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
 
         /// <summary>
         /// Converts to.

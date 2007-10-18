@@ -1,6 +1,5 @@
 ﻿using System;
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -53,13 +52,15 @@ namespace Reni.Parser.TokenClass
         internal virtual bool IsCompareOperator { get { return false; } }
 
         /// <summary>
-        /// Structs the operation.
+        /// Gets a value indicating whether this instance is struct operation.
         /// </summary>
-        /// <param name="struc">The struc.</param>
-        /// <param name="context">The context.</param>
-        /// <returns></returns>
+        /// <value>
+        /// 	<c>true</c> if this instance is struct operation; otherwise, <c>false</c>.
+        /// </value>
+        /// Created 17.10.07 23:34 by hh on HAHOYER-DELL
         [DumpExcept(false)]
         internal virtual bool IsStructOperation { get { return false; } }
+
         ///<summary>
         ///</summary>
         [DumpExcept(false)]
@@ -67,12 +68,14 @@ namespace Reni.Parser.TokenClass
 
         [DumpExcept(false)]
         internal virtual bool IsSequenceOperation { get { return false; } }
+
         /// <summary>
         /// Gets the ref operation.
         /// </summary>
-        /// <param name="obj">The obj.</param>
+        /// <value>
+        /// 	<c>true</c> if this instance is ref operation; otherwise, <c>false</c>.
+        /// </value>
         /// <returns></returns>
-        /// <value>The ref operation.</value>
         /// created 14.02.2007 02:17
         [DumpExcept(false)]
         internal virtual bool IsRefOperation { get { return false; } }
@@ -80,7 +83,6 @@ namespace Reni.Parser.TokenClass
         /// <summary>
         /// Gets the type operation.
         /// </summary>
-        /// <param name="obj">The obj.</param>
         /// <returns></returns>
         /// <value>The type operation.</value>
         /// created 07.01.2007 16:24
@@ -117,19 +119,22 @@ namespace Reni.Parser.TokenClass
             return new DefinableTokenSyntax(token);
         }
 
-        virtual internal Result VisitDefaultOperationApply(Context.Base callContext, Category category, Syntax.Base args, Type.Base definingType)
+        internal virtual Result VisitDefaultOperationApply(Context.Base callContext, Category category, Syntax.Base args,
+                                                           Type.Base definingType)
         {
             NotImplementedMethod(callContext, category, args, definingType);
             return null;
         }
 
-        virtual internal Result VisitRefOperationApply(Context.Base callContext, Category category, Syntax.Base args, Ref definingType)
+        internal virtual Result VisitRefOperationApply(Context.Base callContext, Category category, Syntax.Base args,
+                                                       Ref definingType)
         {
             NotImplementedMethod(callContext, category, args, definingType);
             return null;
         }
 
-        virtual internal Result VisitSequenceOperationApply(Context.Base callContext, Category category, Syntax.Base args, Sequence definingType)
+        internal virtual Result VisitSequenceOperationApply(Context.Base callContext, Category category,
+                                                            Syntax.Base args, Sequence definingType)
         {
             NotImplementedMethod(callContext, category, args, definingType);
             return null;

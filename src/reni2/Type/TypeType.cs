@@ -38,7 +38,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        public override string DumpPrintText { get { return "("+_parent.DumpPrintText+"()) type"; } }
+        internal override string DumpPrintText { get { return "("+_parent.DumpPrintText+"()) type"; } }
 
         /// <summary>
         /// Dumps the print code.

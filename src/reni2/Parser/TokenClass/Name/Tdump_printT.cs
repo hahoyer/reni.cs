@@ -15,12 +15,6 @@ namespace Reni.Parser.TokenClass.Name
         /// <value>The type operation.</value>
         /// created 07.01.2007 16:24
         internal override bool IsDefaultOperation { get { return true; } }
-        /// <summary>
-        /// Gets the type operation.
-        /// </summary>
-        /// <value>The type operation.</value>
-        /// created 07.01.2007 16:24
-        internal override bool IsRefOperation { get { return true; } }
 
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
