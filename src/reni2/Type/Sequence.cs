@@ -55,20 +55,20 @@ namespace Reni.Type
             return InheritedType.Dump();
         }
 
-        ///// <summary>
-        ///// Searches the definable defineableToken at type
-        ///// </summary>
-        ///// <param name="defineableToken">The token.</param>
-        ///// <returns></returns>
-        //internal override SearchResult SearchDefineable(DefineableToken defineableToken)
-        //{
-        //    SearchResult result = Element.SearchDefineableFromSequence(defineableToken,Count);
-        //    if (result != null)
-        //        return result;
-        //    if (defineableToken.TokenClass.IsSequenceOperation)
-        //        return new SequenceOperationResult(this, defineableToken.TokenClass);
-        //    return base.SearchDefineable(defineableToken);
-        //}
+        /// <summary>
+        /// Searches the definable defineableToken at type
+        /// </summary>
+        /// <param name="defineableToken">The token.</param>
+        /// <returns></returns>
+        internal override SearchResult SearchDefineable(DefineableToken defineableToken)
+        {
+            SearchResult result = Element.SearchDefineableFromSequence(defineableToken, Count);
+            if (result != null)
+                return result;
+            if (defineableToken.TokenClass.IsSequenceOperation)
+                return new SequenceOperationResult(this, defineableToken.TokenClass);
+            return base.SearchDefineable(defineableToken);
+        }
 
         /// <summary>
         /// Searches the definable token at type
@@ -294,7 +294,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        protected override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        protected internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
         {
             NotImplementedMethod(callContext, category, args);
             return null;

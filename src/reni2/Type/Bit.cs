@@ -226,7 +226,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        protected override Result VisitApply(Context.Base context, Category category, Syntax.Base args)
+        protected internal override Result VisitApply(Context.Base context, Category category, Syntax.Base args)
         {
             bool trace = ObjectId == 920 && context.ObjectId == 15 && category.HasType;
             StartMethodDumpWithBreak(trace, context, category, args);

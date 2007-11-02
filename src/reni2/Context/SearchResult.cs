@@ -31,19 +31,29 @@ namespace Reni.Context
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        protected abstract Result VisitApply(Base callContext, Category category, Syntax.Base args);
-
-        internal virtual Result VisitApplyFromRef(Base callContext, Category category, Syntax.Base args, Ref refType)
-        {
-            Result result = VisitApply(callContext, category, args);
-            result = result.UseWithArg(refType.Conversion(category,_definingType));
-            return result;
-        }
+        protected internal abstract Result VisitApply(Base callContext, Category category, Syntax.Base args);
 
         public SearchResultFromRef FromRef()
         {
-            NotImplementedMethod();
-            return null;
+            return new DefaultSearchResultFromRef(this);
+        }
+    }
+
+    internal class DefaultSearchResultFromRef : SearchResultFromRef
+    {
+        private readonly SearchResult _searchResult;
+
+        public DefaultSearchResultFromRef(SearchResult searchResult)
+        {
+            _searchResult = searchResult;
+        }
+
+        internal override Result VisitApply(Base callContext, Category category, Syntax.Base args, Ref definingType)
+        {
+            Result result = _searchResult.VisitApply(callContext, category, args);
+            result = result.UseWithArg(definingType.CreateDereferencedArgResult(category));
+            NotImplementedMethod(callContext, category, args, definingType, "result",result);
+            return result;
         }
     }
 

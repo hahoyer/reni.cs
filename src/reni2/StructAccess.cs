@@ -53,7 +53,7 @@ namespace Reni
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        protected override Result VisitApply(Base callContext, Category category, Syntax.Base args)
+        protected internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
             NotImplementedMethod(callContext, category, args);
             return null;

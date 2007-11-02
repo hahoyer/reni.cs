@@ -921,7 +921,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        protected override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        protected internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
         {
             return _defineable.VisitDefaultOperationApply(callContext, category, args, DefiningType);
         }
