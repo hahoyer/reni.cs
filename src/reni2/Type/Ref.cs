@@ -75,21 +75,6 @@ namespace Reni.Type
         [DumpData(false)]
 	    internal override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
 
-        /// <summary>
-        /// Searches the definable defineableToken at type
-        /// </summary>
-        /// <param name="defineableToken">The t.</param>
-        /// <returns></returns>
-        internal override SearchResult SearchDefineable(DefineableToken defineableToken)
-	    {
-	        if(defineableToken.TokenClass.IsRefOperation)
-                return new RefOperationSearchResult(this, defineableToken.TokenClass);
-            SearchResult result = Target.SearchDefineable(defineableToken);
-	        if(result!=null)
-                return result;
-	        return base.SearchDefineable(defineableToken);
-	    }
-
 	    /// <summary>
 	    /// Gets the type of the sequence element.
 	    /// </summary>
@@ -235,54 +220,45 @@ namespace Reni.Type
         /// <summary>
         /// Visits from chain. Object is provided by use of "Arg" code element
         /// </summary>
-        /// <param name="context">The context.</param>
+        /// <param name="callContext">The context.</param>
         /// <param name="category">The category.</param>
         /// <param name="memberElem">The member elem.</param>
         /// <returns></returns>
-        internal Result VisitNextChainElement(Context.Base context, Category category, MemberElem memberElem)
+        internal Result VisitNextChainElement(Context.Base callContext, Category category, MemberElem memberElem)
         {
-            bool trace = context.ObjectId == 3 && memberElem.ObjectId == 1 && category.HasType;
-            StartMethodDumpWithBreak(trace, context, category, memberElem);
-            SearchResult searchResult = SearchDefineable(memberElem.DefineableToken);
-            if (searchResult != null)
-            {
-                Result appliedResult = searchResult.VisitApply(context, category, memberElem.Args);
-                Tracer.ConditionalBreak(trace, appliedResult.Dump());
-                Result result = searchResult.DefiningType.PostProcess(this, appliedResult);
-                return ReturnMethodDumpWithBreak(trace, result);
-            }
-            NotImplementedMethod(context, category, memberElem);
+            SearchResultFromRef resultFromRef = SearchDefineable(memberElem.DefineableToken);
+
+            if (resultFromRef != null)
+                return resultFromRef.VisitApply(callContext, category, memberElem.Args, this);
+
+            NotImplementedMethod(callContext, category, memberElem);
+            return null;
+        }
+
+	    /// <summary>
+	    /// Searches the definable defineableToken at type
+	    /// </summary>
+	    /// <param name="defineableToken">The token.</param>
+	    /// <returns></returns>
+	    private new SearchResultFromRef SearchDefineable(DefineableToken defineableToken)
+        {
+	        SearchResultFromRef result = defineableToken.TokenClass.SearchResultFromRef;
+            if (result != null)
+                return result;
+            result = Target.SearchDefineableFromRef(defineableToken);
+            if (result != null)
+                return result;
+
+            NotImplementedMethod(defineableToken);
             return null;
         }
 
     }
 
-    internal sealed class RefOperationSearchResult : SearchResult
+    abstract internal class SearchResultFromRef: ReniObject
     {
-        [DumpData(true)]
-        private readonly Defineable _defineable;
-        [DumpData(true)]
-        private readonly Ref _refType;
-
-
-        public RefOperationSearchResult(Ref refType, Defineable defineable)
-            : base(refType)
-        {
-            _defineable = defineable;
-            _refType = refType;
-        }
-
-        /// <summary>
-        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
-        /// </summary>
-        /// <param name="callContext">The call context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        public override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
-        {
-            return _defineable.VisitRefOperationApply(callContext, category, args, _refType);
-        }
+        internal abstract Result VisitApply(Context.Base callContext, Category category, Syntax.Base args,
+                                            Ref definingType);
     }
 }
 

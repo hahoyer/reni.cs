@@ -55,20 +55,20 @@ namespace Reni.Type
             return InheritedType.Dump();
         }
 
-        /// <summary>
-        /// Searches the definable defineableToken at type
-        /// </summary>
-        /// <param name="defineableToken">The token.</param>
-        /// <returns></returns>
-        internal override SearchResult SearchDefineable(DefineableToken defineableToken)
-        {
-            SearchResult result = Element.SearchDefineableFromSequence(defineableToken,Count);
-            if (result != null)
-                return result;
-            if (defineableToken.TokenClass.IsSequenceOperation)
-                return new SequenceOperationResult(this, defineableToken.TokenClass);
-            return base.SearchDefineable(defineableToken);
-        }
+        ///// <summary>
+        ///// Searches the definable defineableToken at type
+        ///// </summary>
+        ///// <param name="defineableToken">The token.</param>
+        ///// <returns></returns>
+        //internal override SearchResult SearchDefineable(DefineableToken defineableToken)
+        //{
+        //    SearchResult result = Element.SearchDefineableFromSequence(defineableToken,Count);
+        //    if (result != null)
+        //        return result;
+        //    if (defineableToken.TokenClass.IsSequenceOperation)
+        //        return new SequenceOperationResult(this, defineableToken.TokenClass);
+        //    return base.SearchDefineable(defineableToken);
+        //}
 
         /// <summary>
         /// Searches the definable token at type
@@ -276,6 +276,17 @@ namespace Reni.Type
             _defineable = defineable;
         }
 
+        ///// <summary>
+        ///// Creates the result for member function searched. Object is provided by use of "Arg" code element
+        ///// </summary>
+        ///// <param name="callContext">The call context.</param>
+        ///// <param name="category">The category.</param>
+        ///// <param name="args">The args.</param>
+        ///// <returns></returns>
+        //public override Result VisitApplyFromRef(Context.Base callContext, Category category, Syntax.Base args)
+        //{
+        //    return _defineable.VisitSequenceOperationApply(callContext, category, args, _sequence);
+        //}
         /// <summary>
         /// Creates the result for member function searched. Object is provided by use of "Arg" code element
         /// </summary>
@@ -283,9 +294,10 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        public override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        protected override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
         {
-            return _defineable.VisitSequenceOperationApply(callContext, category, args, _sequence);
+            NotImplementedMethod(callContext, category, args);
+            return null;
         }
     }
 }

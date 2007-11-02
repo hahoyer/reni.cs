@@ -213,7 +213,7 @@ namespace Reni.Context
             return CreatePropertyType(body).CreateResult(category);
         }
 
-        public Type.Base CreatePropertyType(Syntax.Base body)
+        internal Type.Base CreatePropertyType(Syntax.Base body)
         {
             return _cache._propertyType.Find(body, delegate { return new Type.Property(this, body); });
         }
@@ -306,6 +306,7 @@ namespace Reni.Context
             StartMethodDumpWithBreak(trace, category, memberElem, formerResult);
             Result refResult = formerResult.EnsureContextRef(this);
             Result visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
+            Tracer.Assert(visitedResult != null);
             Result arglessResult = visitedResult.UseWithArg(refResult);
             return ReturnMethodDumpWithBreak(trace, arglessResult);
         }

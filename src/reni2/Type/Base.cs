@@ -827,6 +827,19 @@ namespace Reni.Type
             return rawResult;
         }
 
+        /// <summary>
+        /// Searches the defineable from ref.
+        /// </summary>
+        /// <param name="defineableToken">The defineable token.</param>
+        /// <returns></returns>
+        /// Created 01.11.07 22:50 by hh on HAHOYER-DELL
+        virtual internal SearchResultFromRef SearchDefineableFromRef(DefineableToken defineableToken)
+        {
+            SearchResult result = SearchDefineable(defineableToken);
+            if (result != null)
+                return result.FromRef();
+            return null;
+        }
     }
 
     internal class ConversionFeature: ReniObject
@@ -908,7 +921,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        public override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        protected override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
         {
             return _defineable.VisitDefaultOperationApply(callContext, category, args, DefiningType);
         }

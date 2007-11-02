@@ -42,9 +42,21 @@ namespace Reni
             _definingType = definingType;
         }
 
-        public override Result VisitApply(Base callContext, Category category, Syntax.Base args)
+        //public override Result VisitApplyFromRef(Base callContext, Category category, Syntax.Base args)
+        //{
+        //    return _structContainerSearchResult.Visit(_definingType.Container, _definingType.Context, callContext, category, args);
+        //}
+        /// <summary>
+        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
+        /// </summary>
+        /// <param name="callContext">The call context.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <returns></returns>
+        protected override Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
-            return _structContainerSearchResult.Visit(_definingType.Container, _definingType.Context, callContext, category, args);
+            NotImplementedMethod(callContext, category, args);
+            return null;
         }
     }
 

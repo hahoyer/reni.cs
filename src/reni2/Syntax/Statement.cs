@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Parser;
@@ -50,6 +51,7 @@ namespace Reni.Syntax
         /// <summary>
         /// 
         /// </summary>
+        [DebuggerHidden]
         public List<MemberElem> Chain { get { return _chain; } }
 
         /// <summary>
@@ -60,7 +62,7 @@ namespace Reni.Syntax
         /// <returns></returns>
         override public Result VirtVisit(Context.Base context, Category category)
         {
-            bool trace = ObjectId == -22 && context.ObjectId == 0 && category.HasRefs;
+            bool trace = ObjectId == 24 && context.ObjectId == 0 && category.HasRefs;
             StartMethodDumpWithBreak(trace, context,category);
             if (Chain.Count == 0)
                 NotImplementedMethod(context, category);

@@ -1,5 +1,6 @@
 using HWClassLibrary.Debug;
 using System;
+using Reni.Type;
 
 namespace Reni.Context
 {
@@ -30,8 +31,20 @@ namespace Reni.Context
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        public abstract Result VisitApply(Base callContext, Category category, Syntax.Base args);
+        protected abstract Result VisitApply(Base callContext, Category category, Syntax.Base args);
 
+        internal virtual Result VisitApplyFromRef(Base callContext, Category category, Syntax.Base args, Ref refType)
+        {
+            Result result = VisitApply(callContext, category, args);
+            result = result.UseWithArg(refType.Conversion(category,_definingType));
+            return result;
+        }
+
+        public SearchResultFromRef FromRef()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 
     internal abstract class StructSearchResult : ReniObject

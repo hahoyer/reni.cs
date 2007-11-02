@@ -6,11 +6,11 @@ namespace Reni.Parser.TokenClass.Name
     {
         internal override bool IsDefaultOperation { get { return true; } }
 
-        internal override Result VisitDefaultOperationApply(Context.Base callContext, Category category, Syntax.Base args, Type.Base definingType)
-        {
-            if(args == null)
-                return definingType.CreateEnableCut().CreateArgResult(category);
-            return base.VisitDefaultOperationApply(callContext, category, args, definingType);
-        }
+        //internal override Result VisitDefaultOperationApplyFromRef(Context.Base callContext, Category category, Syntax.Base args, Type.Base definingType)
+        //{
+        //    if(args == null)
+        //        return definingType.CreateEnableCut().CreateArgResult(category);
+        //    return base.VisitDefaultOperationApplyFromRef(callContext, category, args, definingType);
+        //}
     }
 }

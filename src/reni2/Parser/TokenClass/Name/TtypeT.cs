@@ -12,7 +12,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="args">The args.</param>
         /// <param name="definingType">Type of the defining.</param>
         /// <returns></returns>
-        internal override Result VisitDefaultOperationApply(Context.Base context, Category category, Syntax.Base args, Type.Base definingType)
+        internal Result VisitDefaultOperationApplyFromRef(Context.Base context, Category category, Syntax.Base args, Type.Base definingType)
         {
             if (args == null)
                 return definingType.TypeOperator(category);

@@ -33,6 +33,9 @@ namespace Reni.Parser.TokenClass
         [DumpExcept(false)]
         internal string DataFunctionName { get { return GetType().Name; } }
 
+        [DumpExcept(null)]
+        virtual internal SearchResultFromRef SearchResultFromRef { get { return null; } }
+
         /// <summary>
         /// Gets the numeric prefix operation.
         /// </summary>
@@ -68,17 +71,6 @@ namespace Reni.Parser.TokenClass
 
         [DumpExcept(false)]
         internal virtual bool IsSequenceOperation { get { return false; } }
-
-        /// <summary>
-        /// Gets the ref operation.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is ref operation; otherwise, <c>false</c>.
-        /// </value>
-        /// <returns></returns>
-        /// created 14.02.2007 02:17
-        [DumpExcept(false)]
-        internal virtual bool IsRefOperation { get { return false; } }
 
         /// <summary>
         /// Gets the type operation.
@@ -119,26 +111,13 @@ namespace Reni.Parser.TokenClass
             return new DefinableTokenSyntax(token);
         }
 
-        internal virtual Result VisitDefaultOperationApply(Context.Base callContext, Category category, Syntax.Base args,
-                                                           Type.Base definingType)
+        internal virtual Result VisitDefaultOperationApply
+            (Context.Base callContext, Category category, Syntax.Base args, Type.Base definingType)
         {
             NotImplementedMethod(callContext, category, args, definingType);
             return null;
         }
 
-        internal virtual Result VisitRefOperationApply(Context.Base callContext, Category category, Syntax.Base args,
-                                                       Ref definingType)
-        {
-            NotImplementedMethod(callContext, category, args, definingType);
-            return null;
-        }
-
-        internal virtual Result VisitSequenceOperationApply(Context.Base callContext, Category category,
-                                                            Syntax.Base args, Sequence definingType)
-        {
-            NotImplementedMethod(callContext, category, args, definingType);
-            return null;
-        }
     }
 
     internal class DefinableTokenSyntax : Syntax.Base

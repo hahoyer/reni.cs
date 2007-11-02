@@ -99,7 +99,6 @@
     <Compile Include="Parser\TokenClass\FoundNumpopResult.cs" />
     <Compile Include="Parser\TokenClass\Name\TconverterT.cs" />
     <Compile Include="Parser\TokenClass\Name\TelseT.cs" />
-    <Compile Include="Parser\TokenClass\Name\TprintT.cs" />
     <Compile Include="Parser\TokenClass\Name\TthenT.cs" />
     <Compile Include="Parser\TokenClass\Name\TtypeT.cs" />
     <Compile Include="Parser\TokenClass\Name\T_A_T_T.cs" />

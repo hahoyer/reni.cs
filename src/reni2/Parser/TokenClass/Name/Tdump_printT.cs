@@ -36,7 +36,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="args">The args.</param>
         /// <param name="refAlignParam">The ref align param.</param>
         /// <returns></returns>
-        override internal Result VisitRefOperationApply(Context.Base context, Category category, Syntax.Base args, Ref definingType)
+        internal Result VisitRefOperationApply(Context.Base context, Category category, Syntax.Base args, Ref definingType)
         {
             if (args != null)
                 NotImplementedMethod(context, category, args);
