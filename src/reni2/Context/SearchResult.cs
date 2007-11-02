@@ -52,7 +52,6 @@ namespace Reni.Context
         {
             Result result = _searchResult.VisitApply(callContext, category, args);
             result = result.UseWithArg(definingType.CreateDereferencedArgResult(category));
-            NotImplementedMethod(callContext, category, args, definingType, "result",result);
             return result;
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Type;
@@ -28,24 +29,25 @@ namespace Reni.Parser.TokenClass.Name
             return Type.Base.CreateVoid;
         }
 
-        /// <summary>
-        /// Creates the result for member function searched. Object is provided as reference by use of "Arg" code element
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <returns></returns>
-        internal Result VisitRefOperationApply(Context.Base context, Category category, Syntax.Base args, Ref definingType)
+        internal override SearchResultFromRef SearchResultFromRef
+        {
+            get { return new DumpPrintSearchResult(); }
+        }
+
+    }
+
+    internal class DumpPrintSearchResult : SearchResultFromRef
+    {
+        internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args, Ref definingType)
         {
             if (args != null)
-                NotImplementedMethod(context, category, args);
+                NotImplementedMethod(callContext, category, args);
             bool trace =
                 ObjectId == 184
-                && context.ObjectId == 0
+                && callContext.ObjectId == 0
                 && category.ToString() == "Size,Type,Refs,Code"
                 ;
-            StartMethodDump(trace, context, category, args);
+            StartMethodDump(trace, callContext, category, args);
             Result result = definingType.Target.DumpPrintFromRef(category, definingType.RefAlignParam);
             return ReturnMethodDumpWithBreak(trace, result);
         }

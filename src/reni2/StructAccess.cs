@@ -42,10 +42,6 @@ namespace Reni
             _definingType = definingType;
         }
 
-        //public override Result VisitApplyFromRef(Base callContext, Category category, Syntax.Base args)
-        //{
-        //    return _structContainerSearchResult.Visit(_definingType.Container, _definingType.Context, callContext, category, args);
-        //}
         /// <summary>
         /// Creates the result for member function searched. Object is provided by use of "Arg" code element
         /// </summary>
@@ -55,8 +51,7 @@ namespace Reni
         /// <returns></returns>
         protected internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
-            NotImplementedMethod(callContext, category, args);
-            return null;
+            return _structContainerSearchResult.Visit(_definingType.Container, _definingType.Context, callContext, category, args);
         }
     }
 
