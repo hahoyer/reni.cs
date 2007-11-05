@@ -1,3 +1,5 @@
+using HWClassLibrary.Debug;
+
 namespace Reni.Parser.TokenClass.Symbol
 {
     internal class Minus : Defineable
@@ -14,8 +16,6 @@ namespace Reni.Parser.TokenClass.Symbol
             return Type.Base.CreateNumber(BitsConst.PlusSize(objSize, argSize));
         }
 
-        internal override bool IsBitSequenceOperation { get { return true; } }
-
         /// <summary>
         /// Gets the name of token for C# generation.
         /// </summary>
@@ -23,11 +23,9 @@ namespace Reni.Parser.TokenClass.Symbol
         /// created 08.01.2007 15:02
         internal override string CSharpNameOfDefaultOperation { get { return "-"; } }
 
-        /// <summary>
-        /// Gets the numeric prefix operation.
-        /// </summary>
-        /// <value>The numeric prefix operation.</value>
-        /// created 02.02.2007 23:03
-        internal override bool IsBitSequencePrefixOperation { get { return true; } }
+        [DumpExcept(false)]
+        protected internal override bool IsBitSequencePrefixOperation { get { return true; } }
+        [DumpExcept(false)]
+        protected internal override bool IsBitSequenceOperation { get { return true; } }
     }
 }

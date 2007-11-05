@@ -193,30 +193,6 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Searches the definable defineableToken at type
-        /// </summary>
-        /// <param name="defineableToken">The token.</param>
-        /// <returns></returns>
-        internal virtual SearchResult SearchDefineable(DefineableToken defineableToken)
-        {
-            if (defineableToken.TokenClass.IsDefaultOperation)
-                return new DefaultOperationSearchResult(this, defineableToken.TokenClass);
-            return null;
-
-        }
-
-        /// <summary>
-        /// Searches the defineable from sequence.
-        /// </summary>
-        /// <param name="t">The t.</param>
-        /// <param name="count">The count.</param>
-        /// <returns></returns>
-        /// created 13.01.2007 19:35
-        internal virtual SearchResult SearchDefineableFromSequence(DefineableToken t, int count)
-        {
-            return null;
-        }
-        /// <summary>
         /// Searches the defineable prefix.
         /// </summary>
         /// <param name="token">The token.</param>
@@ -828,18 +804,27 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Searches the defineable from ref.
+        /// Searches the specified defineable.
         /// </summary>
-        /// <param name="defineableToken">The defineable token.</param>
+        /// <param name="defineableToken">The defineable.</param>
         /// <returns></returns>
-        /// Created 01.11.07 22:50 by hh on HAHOYER-DELL
-        virtual internal SearchResultFromRef SearchDefineableFromRef(DefineableToken defineableToken)
+        /// Created 04.11.07 17:51 by hh on HAHOYER-DELL
+        virtual internal SearchResult Search(DefineableToken defineableToken)
         {
-            SearchResult result = SearchDefineable(defineableToken);
-            if (result != null)
-                return result.FromRef();
+            NotImplementedMethod(defineableToken);
             return null;
         }
+
+        virtual internal SearchResultFromSequence SearchFromSequence(Defineable defineable)
+        {
+            NotImplementedMethod(defineable);
+            return null;
+        }
+    }
+
+    internal abstract class SearchResultFromSequence: ReniObject
+    {
+        internal abstract SearchResult ToSearchResult(Sequence sequence);
     }
 
     internal class ConversionFeature: ReniObject
@@ -900,30 +885,6 @@ namespace Reni.Type
         internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
             return base.IsConvertableToVirt(dest, conversionFeature.EnableCut());
-        }
-    }
-
-    internal sealed class DefaultOperationSearchResult : SearchResult
-    {
-        [DumpData(true)]
-        private readonly Defineable _defineable;
-
-        public DefaultOperationSearchResult(Base definingType, Defineable defineable)
-            : base(definingType)
-        {
-            _defineable = defineable;
-        }
-
-        /// <summary>
-        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
-        /// </summary>
-        /// <param name="callContext">The call context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        protected internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
-        {
-            return _defineable.VisitDefaultOperationApply(callContext, category, args, DefiningType);
         }
     }
 

@@ -133,7 +133,7 @@ x4 dump_print;
         /// Declaration and access to properties
         /// </summary>
         /// created 17.11.2006 20:44
-        [Test, Category(UnderConstruction)]
+        [Test, Category(UnderConstruction), Explicit]
         public void PropertyVariable()
         {
             RunCompiler("PropertyVariable",

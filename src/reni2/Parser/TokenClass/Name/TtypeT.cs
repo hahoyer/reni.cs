@@ -1,30 +1,24 @@
-using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
     sealed class TtypeT: Defineable
     {
-        /// <summary>
-        /// Obtain result
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <param name="definingType">Type of the defining.</param>
-        /// <returns></returns>
-        internal override Result VisitDefaultOperationApply(Context.Base context, Category category, Syntax.Base args, Type.Base definingType)
+        internal override Type.SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref searchingType)
         {
-            if (args == null)
-                return definingType.TypeOperator(category);
-            Result argResult = args.Visit(context, category | Category.Type);
-            return definingType.ApplyTypeOperator(argResult);
+            return new SearchResultFromRef();
         }
-        /// <summary>
-        /// Gets the type operation.
-        /// </summary>
-        /// <value>The type operation.</value>
-        /// created 07.01.2007 16:24
-        internal override bool IsDefaultOperation { get { return true; } }
+
+        sealed internal class SearchResultFromRef : Type.SearchResultFromRef
+        {
+            internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args, Ref definingType)
+            {
+                if (args == null)
+                    return definingType.Target.TypeOperator(category);
+                Result argResult = args.Visit(callContext, category | Category.Type);
+                return definingType.Target.ApplyTypeOperator(argResult);
+            }
+        }
 
     }
 }

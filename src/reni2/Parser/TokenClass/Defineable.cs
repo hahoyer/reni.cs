@@ -1,5 +1,6 @@
 ﻿using System;
 using HWClassLibrary.Debug;
+using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -33,8 +34,13 @@ namespace Reni.Parser.TokenClass
         [DumpExcept(false)]
         internal string DataFunctionName { get { return GetType().Name; } }
 
-        [DumpExcept(null)]
-        virtual internal SearchResultFromRef SearchResultFromRef { get { return null; } }
+        internal virtual SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref searchingType)
+        {
+            SearchResult result = searchingType.Target.Search(defineableToken);
+            if(result != null)
+                return result.ToSearchResultFromRef();
+            return null;
+        }
 
         /// <summary>
         /// Gets the numeric prefix operation.
@@ -42,8 +48,10 @@ namespace Reni.Parser.TokenClass
         /// <value>The numeric prefix operation.</value>
         /// created 02.02.2007 23:03
         [DumpExcept(false)]
-        internal virtual bool IsBitSequencePrefixOperation { get { return false; } }
+        internal protected virtual bool IsBitSequencePrefixOperation { get { return false; } }
 
+        [DumpExcept(false)]
+        virtual protected internal bool IsBitSequenceOperation { get { return false; } }
         /// <summary>
         /// Gets a value indicating whether this instance is logical operator.
         /// </summary>
@@ -53,33 +61,6 @@ namespace Reni.Parser.TokenClass
         /// created 03.02.2007 15:22
         [DumpExcept(false)]
         internal virtual bool IsCompareOperator { get { return false; } }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is struct operation.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is struct operation; otherwise, <c>false</c>.
-        /// </value>
-        /// Created 17.10.07 23:34 by hh on HAHOYER-DELL
-        [DumpExcept(false)]
-        internal virtual bool IsStructOperation { get { return false; } }
-
-        ///<summary>
-        ///</summary>
-        [DumpExcept(false)]
-        internal virtual bool IsBitSequenceOperation { get { return false; } }
-
-        [DumpExcept(false)]
-        internal virtual bool IsSequenceOperation { get { return false; } }
-
-        /// <summary>
-        /// Gets the type operation.
-        /// </summary>
-        /// <returns></returns>
-        /// <value>The type operation.</value>
-        /// created 07.01.2007 16:24
-        [DumpExcept(false)]
-        internal virtual bool IsDefaultOperation { get { return false; } }
 
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
@@ -111,13 +92,48 @@ namespace Reni.Parser.TokenClass
             return new DefinableTokenSyntax(token);
         }
 
-        internal virtual Result VisitDefaultOperationApply
-            (Context.Base callContext, Category category, Syntax.Base args, Type.Base definingType)
+        internal virtual SearchResult Search(Aligner aligner)
         {
-            NotImplementedMethod(callContext, category, args, definingType);
+            NotImplementedMethod(aligner);
             return null;
         }
 
+        internal virtual SearchResult Search(Sequence sequence)
+        {
+            SearchResultFromSequence result = sequence.Element.SearchFromSequence(this);
+            if(result != null)
+                return result.ToSearchResult(sequence);
+            NotImplementedMethod(sequence);
+            return null;
+        }
+
+        internal SearchResultFromSequence SearchFromBitSequence()
+        {
+            if (IsBitSequenceOperation)
+                return new SearchResultFromBitSequence(this);
+
+            return null;
+        }
+
+        internal virtual StructContainerSearchResult SearchFromStruct()
+        {
+            return null;
+        }
+    }
+
+    internal class SearchResultFromBitSequence : SearchResultFromSequence
+    {
+        private readonly Defineable _defineable;
+
+        public SearchResultFromBitSequence(Defineable defineable)
+        {
+            _defineable = defineable;
+        }
+
+        internal override SearchResult ToSearchResult(Sequence sequence)
+        {
+            return new BitSequenceOperationSearchResult(sequence, _defineable);
+        }
     }
 
     internal class DefinableTokenSyntax : Syntax.Base

@@ -1,15 +1,20 @@
+using Reni.Code;
+
 namespace Reni.Parser.TokenClass.Name
 {
     sealed class T_A_T_T: Defineable
     {
-        /// <summary>
-        /// Gets the struct operation.
-        /// </summary>
-        /// <param name="struc">The struc.</param>
-        /// <param name="context">The context.</param>
-        /// <returns></returns>
-        /// <value>The struct operation.</value>
-        /// [created 14.05.2006 22:23]
-        internal override bool IsStructOperation { get { return true; } }
+        internal override StructContainerSearchResult SearchFromStruct()
+        {
+            return new OperationResult();
+        }
+        internal sealed class OperationResult : StructContainerSearchResult
+        {
+            internal override Result Visit(Struct.Container definingContainer, Context.Base definingParentContext,
+                                           Context.Base callContext, Category category, Syntax.Base args)
+            {
+                return definingContainer.VisitOperationApply(definingParentContext, callContext, category, args);
+            }
+        }
     }
 }

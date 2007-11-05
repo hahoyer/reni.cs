@@ -33,7 +33,7 @@ namespace Reni.Context
         /// <returns></returns>
         protected internal abstract Result VisitApply(Base callContext, Category category, Syntax.Base args);
 
-        public SearchResultFromRef FromRef()
+        public SearchResultFromRef ToSearchResultFromRef()
         {
             return new DefaultSearchResultFromRef(this);
         }

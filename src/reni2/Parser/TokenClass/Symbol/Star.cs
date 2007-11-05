@@ -1,3 +1,4 @@
+using HWClassLibrary.Debug;
 using Reni.Context;
 
 namespace Reni.Parser.TokenClass.Symbol
@@ -12,8 +13,6 @@ namespace Reni.Parser.TokenClass.Symbol
         /// created 08.01.2007 15:02
         internal override string CSharpNameOfDefaultOperation { get { return "*"; } }
 
-        internal override bool IsBitSequenceOperation { get { return true; } }
-
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
         /// </summary>
@@ -25,5 +24,7 @@ namespace Reni.Parser.TokenClass.Symbol
         {
             return Type.Base.CreateNumber(BitsConst.MultiplySize(objSize, argSize));
         }
+        [DumpExcept(false)]
+        protected internal override bool IsBitSequenceOperation { get { return true; } }
     }
 }

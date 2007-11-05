@@ -14,13 +14,14 @@ namespace Reni.Parser.TokenClass.Symbol
             return Type.Base.CreateNumber(BitsConst.PlusSize(objSize, argSize));
         }
 
-        internal override bool IsBitSequenceOperation { get { return true; } }
-
         /// <summary>
         /// Gets the name of token for C# generation.
         /// </summary>
         /// <value>The name of the C sharp.</value>
         /// created 08.01.2007 15:02
         internal override string CSharpNameOfDefaultOperation { get { return "+"; } }
+
+        protected internal override bool IsBitSequencePrefixOperation { get { return true; } }
+        protected internal override bool IsBitSequenceOperation { get { return true; } }
     }
 }

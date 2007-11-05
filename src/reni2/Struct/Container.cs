@@ -531,16 +531,16 @@ namespace Reni.Struct
             return Reni.Type.Base.EmptyHandler(category);
         }
 
-        internal StructContainerSearchResult SearchDefineable(DefineableToken defineableToken)
+        internal StructContainerSearchResult Search(DefineableToken defineableToken)
         {
-            if (defineableToken.TokenClass.IsStructOperation)
-                return new OperationResult(defineableToken);
-
+            StructContainerSearchResult result = defineableToken.TokenClass.SearchFromStruct();
+            if (result != null)
+                return result; // new OperationResult(defineableToken);
+                                                    
             if (!Dictionary.ContainsKey(defineableToken.Name))
                 return null;
 
-            int resultPosition = Dictionary[defineableToken.Name];
-            return new StructAccess(defineableToken, resultPosition);
+            return new StructAccess(Dictionary[defineableToken.Name]);
         }
 
         public Result VisitOperationApply(Reni.Context.Base definingParentContext, Reni.Context.Base callContext, Category category, Base args)

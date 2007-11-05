@@ -8,14 +8,6 @@ namespace Reni
 
     internal abstract class StructContainerSearchResult: ReniObject
     {
-        [DumpData(true)]
-        private readonly DefineableToken _defineableToken;
-
-        public StructContainerSearchResult(DefineableToken defineableToken)
-        {
-            _defineableToken = defineableToken;
-        }
-
         internal StructSearchResult ToContextSearchResult(Struct.Context definingContext)
         {
             return new ContextSearchResult(this, definingContext);
@@ -79,7 +71,7 @@ namespace Reni
         [DumpData(true)]
         private readonly int _position;
 
-        public StructAccess(DefineableToken defineableToken, int position) : base(defineableToken)
+        public StructAccess(int position) 
         {
             _position = position;
         }
@@ -91,19 +83,6 @@ namespace Reni
         }
     }
 
-    internal sealed class OperationResult : StructContainerSearchResult
-    {
-        public OperationResult(DefineableToken defineableToken) : base(defineableToken)
-        {
-
-        }
-
-        internal override Result Visit(Container definingContainer, Base definingParentContext, Base callContext,
-                                       Category category, Syntax.Base args)
-        {
-            return definingContainer.VisitOperationApply(definingParentContext, callContext, category, args);
-        }
-    }
 
 
 }

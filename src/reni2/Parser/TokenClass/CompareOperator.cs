@@ -5,13 +5,6 @@ namespace Reni.Parser.TokenClass
     abstract internal class CompareOperator : Defineable
     {
         /// <summary>
-        /// Gets the default sequence operation.
-        /// </summary>
-        /// <value>The default sequence operation.</value>
-        /// created 13.01.2007 19:37
-        internal override bool IsBitSequenceOperation { get { return true; } }
-
-        /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
         /// </summary>
         /// <param name="objSize">not used.</param>
@@ -30,5 +23,6 @@ namespace Reni.Parser.TokenClass
         /// </value>
         /// created 03.02.2007 15:22
         internal override bool IsCompareOperator { get { return true; } }
+        protected internal override bool IsBitSequenceOperation { get { return true; } }
     }
 }

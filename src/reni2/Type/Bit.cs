@@ -37,20 +37,6 @@ namespace Reni.Type
         public override bool HasEmptyValue { get { return true; } }
 
         /// <summary>
-        /// Searches the defineable from sequence.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <param name="count">The count.</param>
-        /// <returns></returns>
-        /// created 13.01.2007 19:35
-        internal override SearchResult SearchDefineableFromSequence(DefineableToken token, int count)
-        {
-            if (token.TokenClass.IsBitSequenceOperation)
-                return new BitSequenceOperationSearchResult(CreateSequence(count), token.TokenClass);
-            return null;
-        }
-
-        /// <summary>
         /// Searches the defineable prefix from sequence.
         /// </summary>
         /// <param name="token">The token.</param>
@@ -87,7 +73,7 @@ namespace Reni.Type
         /// Dumps the print code from array.
         /// </summary>
         /// <param name="category">The category.</param>
-        /// <returns></returns>
+        /// <returns></returns>               
         /// created 08.01.2007 17:29
         internal override Result DumpPrint(Category category)
         {
@@ -159,6 +145,12 @@ namespace Reni.Type
         {
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
+
+        internal override SearchResultFromSequence SearchFromSequence(Defineable defineable)
+        {
+            return defineable.SearchFromBitSequence();
+        }
+
         /// <summary>
         /// Default dump behaviour
         /// </summary>
@@ -206,7 +198,7 @@ namespace Reni.Type
         [DumpData(true)]
         private readonly Defineable _defineable;
 
-        public BitSequenceOperationSearchResult(Sequence definingType, Defineable defineable)
+        internal BitSequenceOperationSearchResult(Sequence definingType, Defineable defineable)
             : base(definingType)
         {
             _defineable = defineable;

@@ -60,14 +60,9 @@ namespace Reni.Type
         /// </summary>
         /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        internal override SearchResult SearchDefineable(DefineableToken defineableToken)
+        internal override SearchResult Search(DefineableToken defineableToken)
         {
-            SearchResult result = Element.SearchDefineableFromSequence(defineableToken, Count);
-            if (result != null)
-                return result;
-            if (defineableToken.TokenClass.IsSequenceOperation)
-                return new SequenceOperationResult(this, defineableToken.TokenClass);
-            return base.SearchDefineable(defineableToken);
+            return defineableToken.TokenClass.Search(this);
         }
 
         /// <summary>
@@ -220,7 +215,7 @@ namespace Reni.Type
             return result;
         }
 
-        private int Count { get { return _inheritedType.Count; } }
+        internal int Count { get { return _inheritedType.Count; } }
 
         /// <summary>
         /// Gets the element.
