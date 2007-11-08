@@ -242,7 +242,8 @@ namespace Reni.Type
 	    /// <returns></returns>
 	    private SearchResultFromRef SearchDefineable(DefineableToken defineableToken)
         {
-	        SearchResultFromRef result = defineableToken.TokenClass.SearchFromRef(defineableToken, this);
+	        SearchResultFromRef result = 
+                Target.SearchFromRef(defineableToken, this);
             if (result != null)
                 return result;
 

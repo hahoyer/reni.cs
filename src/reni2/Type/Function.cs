@@ -1,5 +1,6 @@
 using HWClassLibrary.Debug;
 using Reni.Context;
+using Reni.Parser;
 
 namespace Reni.Type
 {
@@ -47,17 +48,22 @@ namespace Reni.Type
         /// <summary>
         /// Applies the function.
         /// </summary>
-        /// <param name="context">The context.</param>
+        /// <param name="callContext">The context.</param>
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 29.10.2006 18:24
-        public override Result ApplyFunction(Context.Base context, Category category, Syntax.Base args)
+        internal override Result ApplyFunction(Context.Base callContext, Category category, Syntax.Base args)
         {
             Result argsResult = args
-                .Visit(context, category | Category.Type)
+                .Visit(callContext, category | Category.Type)
                 .Align(Context.RefAlignParam.AlignBits);
-            return context
+            return ApplyNormalFunction(category, argsResult);
+        }
+
+        internal override Result ApplyNormalFunction(Category category, Result argsResult)
+        {
+            return _context
                 .RootContext
                 .CreateFunctionCall(_context, category, Body, argsResult);
         }
@@ -76,6 +82,16 @@ namespace Reni.Type
             _body = body;
         }
 
+        internal override SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
+        {
+            return _body
+                .VisitType(_context)
+                .ApplyNormalFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
+                .Type
+                .Search(defineableToken)
+                .ToSearchResultFromRef();
+        }
+
         /// <summary>
         /// The size of type
         /// </summary>
@@ -83,17 +99,5 @@ namespace Reni.Type
 
         internal override string DumpPrintText{ get { return "#(#context " + _context.ObjectId + "#)# property(" + _body.DumpData() + ")"; } }
 
-        /// <summary>
-        /// Creates the result for DumpPrint-call. Object is provided as reference by use of "Arg" code element
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <returns></returns>
-        /// created 15.05.2007 23:42 on HAHOYER-DELL by hh
-        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(category,refAlignParam);
-            return base.DumpPrintFromRef(category, refAlignParam);
-        }
     }
 }

@@ -361,15 +361,21 @@ namespace Reni.Type
         /// <summary>
         /// Applies the function.
         /// </summary>
-        /// <param name="context">The context.</param>
+        /// <param name="callContext">The context.</param>
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 29.10.2006 18:24
-        virtual public Result ApplyFunction(Context.Base context, Category category, Syntax.Base args)
+        internal virtual Result ApplyFunction(Context.Base callContext, Category category, Syntax.Base args)
         {
-            NotImplementedMethod(context, category, args);
+            NotImplementedMethod(callContext, category, args);
             throw new NotImplementedException();
+        }
+
+        virtual internal Result ApplyNormalFunction(Category category, Result argsResult)
+        {
+            NotImplementedMethod(category, argsResult);
+            return null;
         }
 
         virtual internal Result PostProcess(Ref visitedType, Result result)
@@ -819,6 +825,11 @@ namespace Reni.Type
         {
             NotImplementedMethod(defineable);
             return null;
+        }
+
+        virtual internal SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
+        {
+            return defineableToken.TokenClass.SearchFromRef(defineableToken, definingType);
         }
     }
 
