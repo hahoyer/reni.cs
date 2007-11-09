@@ -229,7 +229,7 @@ namespace Reni.Type
             SearchResultFromRef resultFromRef = SearchDefineable(memberElem.DefineableToken);
 
             if (resultFromRef != null)
-                return resultFromRef.VisitApply(callContext, category, memberElem.Args, this);
+                return resultFromRef.VisitApply(callContext, category, memberElem.Args);
 
             NotImplementedMethod(callContext, category, memberElem);
             return null;
@@ -255,8 +255,7 @@ namespace Reni.Type
 
     abstract internal class SearchResultFromRef: ReniObject
     {
-        internal abstract Result VisitApply(Context.Base callContext, Category category, Syntax.Base args,
-                                            Ref definingType);
+        internal abstract Result VisitApply(Context.Base callContext, Category category, Syntax.Base args);
     }
 }
 

@@ -38,7 +38,7 @@ namespace Reni.Parser.TokenClass
         {
             SearchResult result = searchingType.Target.Search(defineableToken);
             if(result != null)
-                return result.ToSearchResultFromRef();
+                return result.ToSearchResultFromRef(searchingType);
             return null;
         }
 

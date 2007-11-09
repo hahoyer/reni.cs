@@ -84,12 +84,19 @@ namespace Reni.Type
 
         internal override SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
         {
-            return _body
-                .VisitType(_context)
-                .ApplyNormalFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
-                .Type
-                .Search(defineableToken)
-                .ToSearchResultFromRef();
+            Base type = ResolvedType;
+            return type.SearchFromRef(defineableToken, definingType);
+        }
+
+        private Base ResolvedType
+        {
+            get
+            {
+                return _body
+                    .VisitType(_context)
+                    .ApplyNormalFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
+                    .Type;
+            }
         }
 
         /// <summary>

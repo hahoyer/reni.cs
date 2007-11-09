@@ -12,7 +12,7 @@ namespace Reni.Parser.TokenClass.Name
     {
         internal override Type.SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref searchingType)
         {
-            return new SearchResultFromRef();
+            return new SearchResultFromRef(searchingType);
         }
 
         /// <summary>
@@ -29,7 +29,14 @@ namespace Reni.Parser.TokenClass.Name
 
         sealed internal class SearchResultFromRef : Type.SearchResultFromRef
         {
-            internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args, Ref definingType)
+            private readonly Ref _definingType;
+
+            public SearchResultFromRef(Ref definingType)
+            {
+                _definingType = definingType;
+            }
+
+            internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
             {
                 if (args != null)
                     NotImplementedMethod(callContext, category, args);
@@ -39,7 +46,7 @@ namespace Reni.Parser.TokenClass.Name
                     && category.ToString() == "Size,Type,Refs,Code"
                     ;
                 StartMethodDump(trace, callContext, category, args);
-                Result result = definingType.Target.DumpPrintFromRef(category, definingType.RefAlignParam);
+                Result result = _definingType.Target.DumpPrintFromRef(category, _definingType.RefAlignParam);
                 return ReturnMethodDumpWithBreak(trace, result);
             }
         }
