@@ -11,17 +11,14 @@ namespace Reni.Parser.TokenClass.Symbol
 
         sealed internal class SearchResultFromRef : Type.SearchResultFromRef
         {
-            private readonly Ref _definingType;
-
-            public SearchResultFromRef(Ref definingType)
+            public SearchResultFromRef(Ref definingType):base(definingType)
             {
-                _definingType = definingType;
             }
 
             internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
             {
                 if (category.HasCode || category.HasRefs)
-                    return _definingType.AssignmentOperator(args.Visit(callContext, category | Category.Type));
+                    return DefiningType.AssignmentOperator(args.Visit(callContext, category | Category.Type));
                 return Type.Base.CreateVoid.CreateResult(category);
             }
         }

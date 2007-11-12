@@ -42,18 +42,16 @@ namespace Reni.Context
     internal class DefaultSearchResultFromRef : SearchResultFromRef
     {
         private readonly SearchResult _searchResult;
-        private readonly Ref _definingType;
 
-        public DefaultSearchResultFromRef(SearchResult searchResult, Ref definingType)
+        public DefaultSearchResultFromRef(SearchResult searchResult, Ref definingType):base(definingType)
         {
             _searchResult = searchResult;
-            _definingType = definingType;
         }
 
         internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
             Result result = _searchResult.VisitApply(callContext, category, args);
-            result = result.UseWithArg(_definingType.CreateDereferencedArgResult(category));
+            result = result.UseWithArg(DefiningType.CreateDereferencedArgResult(category));
             return result;
         }
     }

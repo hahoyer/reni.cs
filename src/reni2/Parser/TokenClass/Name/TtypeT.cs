@@ -6,16 +6,16 @@ namespace Reni.Parser.TokenClass.Name
     {
         internal override Type.SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref searchingType)
         {
-            return new SearchResultFromRef(searchingType.Target);
+            return new SearchResultFromRef(searchingType);
         }
 
         sealed internal class SearchResultFromRef : Type.SearchResultFromRef
         {
             private readonly Type.Base _definingTargetType;
 
-            public SearchResultFromRef(Type.Base definingTargetType)
+            public SearchResultFromRef(Ref definingType) : base(definingType)
             {
-                _definingTargetType = definingTargetType;
+                _definingTargetType = definingType.Target;
             }
 
             internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)

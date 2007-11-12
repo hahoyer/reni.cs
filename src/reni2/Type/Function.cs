@@ -85,10 +85,10 @@ namespace Reni.Type
         internal override SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
         {
             Base type = ResolvedType;
-            return type.SearchFromRef(defineableToken, definingType);
+            return type.SearchFromRef(defineableToken, definingType).FromProperty(this);
         }
 
-        private Base ResolvedType
+        internal Base ResolvedType
         {
             get
             {
@@ -105,6 +105,5 @@ namespace Reni.Type
         public override Size Size { get { return Size.Create(0); } }
 
         internal override string DumpPrintText{ get { return "#(#context " + _context.ObjectId + "#)# property(" + _body.DumpData() + ")"; } }
-
     }
 }
