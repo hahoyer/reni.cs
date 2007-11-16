@@ -264,31 +264,8 @@ namespace Reni.Type
 
         internal abstract Result VisitApply(Context.Base callContext, Category category, Syntax.Base args);
 
-        internal SearchResultFromRef FromProperty(Property definingType)
-        {
-            return new SearchResultFromProperty(this, definingType);
-        }
-
         internal Ref DefiningType { get { return _definingType; } }
     }
 
-    sealed internal class SearchResultFromProperty : SearchResultFromRef
-    {
-        private readonly SearchResultFromRef _searchResultFromRef;
-        private readonly Property _definingType;
-
-        public SearchResultFromProperty(SearchResultFromRef searchResultFromRef, Property definingType)
-            :base(definingType.ResolvedType.UnProperty())
-        {
-            _searchResultFromRef = searchResultFromRef;
-            _definingType = definingType;
-        }
-
-        internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
-        {
-            NotImplementedMethod(callContext,category,args);
-            return null;
-        }
-    }
 }
 

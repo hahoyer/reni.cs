@@ -690,15 +690,17 @@ namespace Reni
             return Code.Evaluate();
         }
 
-        public Result EnsureContextRef(Context.Base context)
+        internal Result EnsureContextRef(Context.Base context)
         {
             if (Type.IsRef)
                 return this;
 
             Result resultAsRef =
                 Type
+                    .UnProperty(this, context)
                     .CreateRef(context.RefAlignParam)
-                    .CreateResult(Complete, context.TopRefResult);
+                    .CreateResult(Complete, context.TopRefResult)
+                    ;
             return resultAsRef;
         }
 

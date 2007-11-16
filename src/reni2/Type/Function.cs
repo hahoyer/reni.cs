@@ -82,12 +82,6 @@ namespace Reni.Type
             _body = body;
         }
 
-        internal override SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
-        {
-            Base type = ResolvedType;
-            return type.SearchFromRef(defineableToken, definingType).FromProperty(this);
-        }
-
         internal Base ResolvedType
         {
             get

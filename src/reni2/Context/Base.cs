@@ -302,10 +302,10 @@ namespace Reni.Context
 
         private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
-            bool trace = ObjectId == -10 && memberElem.ObjectId == 1 && category.HasAll;
+            bool trace = ObjectId == 3 && memberElem.ObjectId == 1 && category.HasAll;
             StartMethodDumpWithBreak(trace, category, memberElem, formerResult);
             Result refResult = formerResult.EnsureContextRef(this);
-            Result visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
+            Result visitedResult = ((Ref)refResult.Type).VisitNextChainElement(this, category, memberElem);
             Tracer.Assert(visitedResult != null);
             Result arglessResult = visitedResult.UseWithArg(refResult);
             return ReturnMethodDumpWithBreak(trace, arglessResult);
