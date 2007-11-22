@@ -570,7 +570,7 @@ namespace Reni.Struct
                 return functionResult;
 
             if (functionResult.IsCodeLess)
-                return functionResult.Type.ApplyFunction(callContext, category, args);
+                return functionResult.Type.ApplyFunction(category, callContext, args);
 
             NotImplementedMethod(position, callContext, category, args);
             return null;

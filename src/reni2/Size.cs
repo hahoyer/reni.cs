@@ -102,6 +102,7 @@ namespace Reni
             if ((result << alignBits) == _data)
                 return result;
             NotImplementedMethod(alignBits);
+            
             throw new NotAlignableException(this, alignBits);
         }
 

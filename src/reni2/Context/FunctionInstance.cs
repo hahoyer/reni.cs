@@ -144,8 +144,8 @@ namespace Reni.Context
             Result result = Body.Visit(functionContext, categoryEx).Clone();
             if (result.IsPending)
                 return result;
-            if (categoryEx.HasType)
-                result = result.Type.Dereference(result);
+            if (!categoryEx.IsEqual(Category.Refs))
+                result = result.Type.Dereference(result).Align(functionContext.AlignBits);
             if (category.HasCode)
             {
                 RefAlignParam refAlignParam = Context.RefAlignParam;

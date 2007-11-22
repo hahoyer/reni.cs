@@ -697,7 +697,6 @@ namespace Reni
 
             Result resultAsRef =
                 Type
-                    .UnProperty(this, context)
                     .CreateRef(context.RefAlignParam)
                     .CreateResult(Complete, context.TopRefResult)
                     ;

@@ -53,15 +53,15 @@ namespace Reni.Type
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 29.10.2006 18:24
-        internal override Result ApplyFunction(Context.Base callContext, Category category, Syntax.Base args)
+        internal override Result ApplyFunction(Category category, Context.Base callContext, Syntax.Base args)
         {
             Result argsResult = args
                 .Visit(callContext, category | Category.Type)
                 .Align(Context.RefAlignParam.AlignBits);
-            return ApplyNormalFunction(category, argsResult);
+            return ApplyFunction(category, argsResult);
         }
 
-        internal override Result ApplyNormalFunction(Category category, Result argsResult)
+        internal override Result ApplyFunction(Category category, Result argsResult)
         {
             return _context
                 .RootContext
@@ -88,7 +88,7 @@ namespace Reni.Type
             {
                 return _body
                     .VisitType(_context)
-                    .ApplyNormalFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
+                    .ApplyFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
                     .Type;
             }
         }
@@ -99,5 +99,22 @@ namespace Reni.Type
         public override Size Size { get { return Size.Create(0); } }
 
         internal override string DumpPrintText{ get { return "#(#context " + _context.ObjectId + "#)# property(" + _body.DumpData() + ")"; } }
+
+        /// <summary>
+        /// If type is property, execute it.
+        /// </summary>
+        /// <param name="rawResult">The result.</param>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
+        /// created 30.07.2007 21:28 on HAHOYER-DELL by hh
+        internal override Result UnProperty(Result rawResult, Context.Base context)
+        {
+            Tracer.Assert(!rawResult.Complete.HasCode || rawResult.Code.IsEmpty);
+            Tracer.Assert(!rawResult.Complete.HasRefs || rawResult.Refs.IsNone);
+            return _body
+                .VisitType(context)
+                .ApplyFunction(rawResult.Complete, CreateVoid.CreateResult(rawResult.Complete))
+                ;
+        }
     }
 }

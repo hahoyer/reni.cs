@@ -366,13 +366,20 @@ namespace Reni.Type
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 29.10.2006 18:24
-        internal virtual Result ApplyFunction(Context.Base callContext, Category category, Syntax.Base args)
+        internal virtual Result ApplyFunction(Category category, Context.Base callContext, Syntax.Base args)
         {
             NotImplementedMethod(callContext, category, args);
             throw new NotImplementedException();
         }
 
-        virtual internal Result ApplyNormalFunction(Category category, Result argsResult)
+        /// <summary>
+        /// Applies a function.with argumenst evaluated
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="argsResult">The args result.</param>
+        /// <returns></returns>
+        /// Created 18.11.07 15:32 by hh on HAHOYER-DELL
+        virtual internal Result ApplyFunction(Category category, Result argsResult)
         {
             NotImplementedMethod(category, argsResult);
             return null;
