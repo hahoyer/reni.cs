@@ -71,21 +71,18 @@ namespace Reni.Syntax
             if (category.HasCode) 
                 internalCategory |= Category.Refs;
             Result intermediateResult = Reni.Type.Base.CreateVoidResult(internalCategory);
-
-            Result result = context
-                .VisitFirstChainElementAndPostProcess(internalCategory, Chain[0])
-                .Align(context.RefAlignParam.AlignBits);
+            Result result = context.VisitFirstChainElement(internalCategory, Chain[0]);
             for (int i = 1; i < Chain.Count; i++)
             {
-                Tracer.ConditionalBreak(trace, result.Dump());
-                if (!result.Type.IsRef)
-                    intermediateResult = intermediateResult.SafeList(result, internalCategory);
-                if (result.IsPending)
-                    return result;
+                Result newResult = context.PostProcess(result);
 
-                result = context
-                    .VisitNextChainElementAndPostProcess(internalCategory, Chain[i], result)
-                    .Align(context.RefAlignParam.AlignBits);
+                Tracer.ConditionalBreak(trace, newResult.Dump());
+                if (!newResult.Type.IsRef)
+                    intermediateResult = intermediateResult.SafeList(newResult, internalCategory);
+                if (newResult.IsPending)
+                    return newResult;
+
+                result = context.VisitNextChainElement(internalCategory, Chain[i], newResult);
                 if(internalCategory.HasRefs)
                 foreach (Context.Base referencedContext in result.Refs.Data)
                 {
@@ -101,11 +98,8 @@ namespace Reni.Syntax
             if (result.IsPending)
                 return result;
             Tracer.Assert(result != null);
-            Result statementResult = result
-                .Type
-                .Dereference(result)
-                .Align(context.RefAlignParam.AlignBits)
-                .CreateStatement(category, intermediateResult);
+            Result dereferencedResult = context.PostProcess(result.Type.Dereference(result));
+            Result statementResult = dereferencedResult.CreateStatement(category, intermediateResult);
             return ReturnMethodDumpWithBreak(trace, statementResult);
         }
 

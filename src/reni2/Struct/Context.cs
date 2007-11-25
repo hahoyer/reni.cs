@@ -92,8 +92,10 @@ namespace Reni.Struct
     /// </summary>
     public sealed class Context : Child
     {
-        [DumpData(true)] private readonly Container _container;
-        [DumpData(true)] private readonly int _currentCompilePosition;
+        [DumpData(false)] 
+        private readonly Container _container;
+        [DumpData(true)] 
+        private readonly int _currentCompilePosition;
         private Code.Base _contextRefCodeCache;
 
         /// <summary>

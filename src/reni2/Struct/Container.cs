@@ -219,8 +219,8 @@ namespace Reni.Struct
         public Result Visit(Reni.Context.Base context, Category category, int fromPosition, int fromNotPosition)
         {
             bool trace =
-                ObjectId == 109 &&
-                context.ObjectId == 5 &&
+                ObjectId == 4 &&
+                context.ObjectId == 4 &&
                 category.ToString() == "Size,Type,Refs,Code";
             //trace = false;
             StartMethodDumpWithBreak(trace, context, category, fromPosition, fromNotPosition);
@@ -378,8 +378,16 @@ namespace Reni.Struct
         public Result DumpPrintFromRef(Category category, Reni.Context.Base context, RefAlignParam refAlignParam)
         {
             Tracer.Assert(refAlignParam.Equals(context.RefAlignParam));
+            const string dumpPrintName = "dump_print";
+            if(Defines(dumpPrintName))
+                return Visit(context, category, Find(dumpPrintName));
             List<Result> result = DumpPrintFromRef(category, context);
             return ConcatPrintResult(category, result);
+        }
+
+        private Result Visit(Reni.Context.Base context, Category category, int position)
+        {
+            return Visit(context, category, position, position + 1);
         }
 
         private static Result ConcatPrintResult(Category category, IList<Result> elemResults)

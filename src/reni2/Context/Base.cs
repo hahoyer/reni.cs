@@ -250,7 +250,13 @@ namespace Reni.Context
             public Result _topRefResultCache;
         }
 
-        private Result VisitFirstChainElement(Category category, MemberElem memberElem)
+        internal virtual StructSearchResult SearchDefineable(DefineableToken defineableToken)
+        {
+            NotImplementedMethod(defineableToken);
+            return null;
+        }
+
+        internal Result VisitFirstChainElement(Category category, MemberElem memberElem)
         {
             if (memberElem.DefineableToken == null)
             {
@@ -278,38 +284,20 @@ namespace Reni.Context
             return null;
         }
 
-        internal virtual StructSearchResult SearchDefineable(DefineableToken defineableToken)
-        {
-            NotImplementedMethod(defineableToken);
-            return null;
-        }
-
-        internal Result VisitFirstChainElementAndPostProcess(Category category, MemberElem memberElem)
-        {
-            return PostProcess(VisitFirstChainElement(category, memberElem));
-        }
-
-        private Result PostProcess(Result formerResult)
-        {
-            return formerResult.UnProperty(this).Align(RefAlignParam.AlignBits);
-        }
-
-        internal Result VisitNextChainElementAndPostProcess(Category category, MemberElem memberElem,
-                                                            Result formerResult)
-        {
-            return PostProcess(VisitNextChainElement(category, memberElem, formerResult));
-        }
-
-        private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
+        internal Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
             bool trace = ObjectId == -3 && memberElem.ObjectId == 1 && category.HasAll;
             StartMethodDumpWithBreak(trace, category, memberElem, formerResult);
-            Result unpropertyResult = formerResult.UnProperty(this);
-            Result refResult = unpropertyResult.EnsureContextRef(this);
+            Result refResult = formerResult.EnsureContextRef(this);
             Result visitedResult = ((Ref)refResult.Type).VisitNextChainElement(this, category, memberElem);
             Tracer.Assert(visitedResult != null);
             Result arglessResult = visitedResult.UseWithArg(refResult);
             return ReturnMethodDumpWithBreak(trace, arglessResult);
+        }
+
+        internal Result PostProcess(Result formerResult)
+        {
+            return formerResult.UnProperty(this).Align(RefAlignParam.AlignBits);
         }
 
         [DumpData(false)]
