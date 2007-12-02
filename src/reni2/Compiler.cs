@@ -118,7 +118,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-        public ParserInst Parser { get { return _parser; } }
+        internal ParserInst Parser { get { return _parser; } }
 
         [Node, DumpData(false)]
         public string FileName { get { return _fileName; } }
@@ -135,7 +135,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-        public Base Syntax
+        internal Base Syntax
         {
             get
             {
@@ -146,7 +146,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-        public Root RootContext { get { return _rootContext; } }
+        internal Root RootContext { get { return _rootContext; } }
 
         [DumpData(false)]
         public string ExecutedCode
@@ -160,7 +160,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-        public Result Result
+        internal Result Result
         {
             get
             {

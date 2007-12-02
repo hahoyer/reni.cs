@@ -5,7 +5,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Right parenthesis' 
     /// </summary>
-    public class RPar : Base
+    internal sealed class RPar : Base
     {
         private readonly int _level;
 

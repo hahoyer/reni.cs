@@ -3,7 +3,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// List token (comma, semicolon)
     /// </summary>
-    public class List : Base
+    internal class List : Base
     {
         /// <summary>
         /// Creates the syntax.

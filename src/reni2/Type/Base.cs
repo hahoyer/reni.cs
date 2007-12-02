@@ -11,7 +11,7 @@ namespace Reni.Type
     /// Summary description for Base.
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
-    public abstract class Base : ReniObject
+    internal abstract class Base : ReniObject
     {
         private readonly HWClassLibrary.Helper.DictionaryEx<int, Aligner> _aligner = new HWClassLibrary.Helper.DictionaryEx<int, Aligner>();
         private readonly HWClassLibrary.Helper.DictionaryEx<int, Array> _array = new HWClassLibrary.Helper.DictionaryEx<int, Array>();
@@ -166,6 +166,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
+        [DumpData(false)]
         internal virtual string DumpPrintText
         {
             get
@@ -303,7 +304,7 @@ namespace Reni.Type
         /// <param name="codeAndRefs">The code and refs.</param>
         /// <returns></returns>
         /// created 08.01.2007 18:11
-        public Result CreateResult(Category category, Result codeAndRefs)
+        internal Result CreateResult(Category category, Result codeAndRefs)
         {
             Result result = new Result();
             if (category.HasSize) result.Size = Size;
@@ -659,6 +660,15 @@ namespace Reni.Type
         /// created 09.02.2007 00:26
         [DumpData(false)]
         internal virtual bool IsPending { get { return false; } }
+
+        [DumpData(false)]
+        virtual internal protected string DumpPrintTextPair
+        {
+            get
+            {
+                return "\n"+ DumpPrintText;
+            }
+        }
 
         /// <summary>
         /// Visits as sequence.

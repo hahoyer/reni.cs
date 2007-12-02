@@ -5,7 +5,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Error token to singal syntax errors
     /// </summary>
-    public class SyntaxError: Base
+    internal sealed class SyntaxError : Base
     {
         string _message;
         /// <summary>

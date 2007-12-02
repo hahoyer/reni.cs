@@ -6,7 +6,7 @@ namespace Reni.Parser.TokenClass.Name
 	/// <summary>
 	/// Summary description for functionToken.
 	/// </summary>
-	sealed public class TfunctionT: Base
+	internal sealed class TfunctionT: Base
 	{
         /// <summary>
         /// Creates the syntax.
@@ -40,7 +40,7 @@ namespace Reni.Parser.TokenClass.Name
     /// <summary>
     /// Summary description for functionToken.
     /// </summary>
-    sealed public class TpropertyT : Base
+    internal sealed class TpropertyT : Base
     {
         public override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
         {

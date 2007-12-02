@@ -5,8 +5,5 @@ namespace Reni.Parser
     /// <summary>
     /// stack of PushedSyntax items
     /// </summary>
-    public class PushedSyntaxStack: System.Collections.Generic.Stack<PushedSyntax>
-    
-    {
-    }
+    sealed internal class PushedSyntaxStack : System.Collections.Generic.Stack<PushedSyntax>{}
 }

@@ -8,7 +8,7 @@ namespace Reni
     /// <summary>
     /// Then-else structure
     /// </summary>
-    public sealed class ThenElse : Syntax.Base
+    internal sealed class ThenElse : Syntax.Base
     {
         private readonly Syntax.Base _condSyntax;
         private readonly Syntax.Base _thenSyntax;

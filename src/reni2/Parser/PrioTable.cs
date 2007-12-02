@@ -6,7 +6,7 @@ namespace Reni.Parser
     /// <summary>
     /// Priority table used in parsing to create the syntax tree.
     /// </summary>
-    public class PrioTable
+    internal sealed class PrioTable
     {
         string[] _token;
         char[,] _data;

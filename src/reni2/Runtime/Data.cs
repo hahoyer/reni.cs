@@ -11,13 +11,13 @@ namespace Reni.Runtime
         /// Moves the bytes.
         /// </summary>
         /// <param name="count">The count.</param>
-        /// <param name="dest">The dest.</param>
-        /// <param name="destByte">The dest byte.</param>
+        /// <param name="destination">The destination.</param>
+        /// <param name="destByte">The destination byte.</param>
         /// <param name="source">The source.</param>
         /// created 08.10.2006 17:43
-        public static unsafe void MoveBytes(int count, byte[] dest, int destByte, Int64 source)
+        public static unsafe void MoveBytes(int count, byte[] destination, int destByte, Int64 source)
         {
-            fixed (byte* destPtr = &dest[destByte])
+            fixed (byte* destPtr = &destination[destByte])
                 MoveBytes(count, destPtr, (byte*)&source);
         }
 
@@ -25,41 +25,41 @@ namespace Reni.Runtime
         /// Moves the bytes.
         /// </summary>
         /// <param name="count">The count.</param>
-        /// <param name="dest">The dest.</param>
+        /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 08.10.2006 17:43
-        public static unsafe void MoveBytes(int count, byte* dest, byte* source)
+        public static unsafe void MoveBytes(int count, byte* destination, byte* source)
         {
             for (int i = 0; i < count; i++)
-                dest[i] = source[i];
+                destination[i] = source[i];
         }
 
         /// <summary>
         /// Moves the bytes with offset.
         /// </summary>
         /// <param name="count">The count.</param>
-        /// <param name="dest">The dest.</param>
-        /// <param name="destOffset">The dest offset.</param>
+        /// <param name="destination">The destination.</param>
+        /// <param name="destOffset">The destination offset.</param>
         /// <param name="source">The source.</param>
         /// <param name="sourceOffset">The source offset.</param>
         /// created 08.10.2006 20:07
-        public static void MoveBytes(int count, byte[] dest, int destOffset, byte[] source, int sourceOffset)
+        public static void MoveBytes(int count, byte[] destination, int destOffset, byte[] source, int sourceOffset)
         {
             for (int i = 0; i < count; i++)
-                dest[i + destOffset] = source[i + sourceOffset];
+                destination[i + destOffset] = source[i + sourceOffset];
         }
 
         /// <summary>
         /// Moves the bytes.
         /// </summary>
         /// <param name="count">The count.</param>
-        /// <param name="dest">The dest.</param>
+        /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 08.10.2006 20:07
-        public static void MoveBytes(int count, byte[] dest, byte[] source)
+        public static void MoveBytes(int count, byte[] destination, byte[] source)
         {
             for (int i = 0; i < count; i++)
-                dest[i] = source[i];
+                destination[i] = source[i];
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Reni.Runtime
         /// created 11.10.2006 01:12
         public static void DumpPrint(Int64 x)
         {
-            BitsConst.Convert(x).PrintNum();
+            BitsConst.Convert(x).PrintNumber();
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Reni.Runtime
         /// created 11.10.2006 01:12
         public static void DumpPrint(Int32 x)
         {
-            BitsConst.Convert(x).PrintNum();
+            BitsConst.Convert(x).PrintNumber();
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Reni.Runtime
         /// created 11.10.2006 01:12
         public static void DumpPrint(Int16 x)
         {
-            BitsConst.Convert(x).PrintNum();
+            BitsConst.Convert(x).PrintNumber();
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Reni.Runtime
         /// created 11.10.2006 01:12
         public static void DumpPrint(byte x)
         {
-            BitsConst.Convert(x).PrintNum();
+            BitsConst.Convert(x).PrintNumber();
         }
 
         /// <summary>
@@ -116,25 +116,25 @@ namespace Reni.Runtime
         /// Bitses the array.
         /// </summary>
         /// <param name="count">The count.</param>
-        /// <param name="dest">The dest.</param>
+        /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 02.02.2007 01:01
-        unsafe public static void BitsArray(int count, sbyte* dest, params byte[] source)
+        unsafe public static void BitsArray(int count, sbyte* destination, params byte[] source)
         {
             fixed(byte* s = &source[0]) 
-                MoveBytes(count,(byte*)dest,s);
+                MoveBytes(count,(byte*)destination,s);
         }
 
         /// <summary>
         /// Tops the data.
         /// </summary>
         /// <param name="count">The count.</param>
-        /// <param name="dest">The dest.</param>
+        /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 02.02.2007 01:09
-        unsafe public static void MoveBytes(int count, sbyte* dest, sbyte* source)
+        unsafe public static void MoveBytes(int count, sbyte* destination, sbyte* source)
         {
-            MoveBytes(count, (byte*)dest, (byte*)source);
+            MoveBytes(count, (byte*)destination, (byte*)source);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Reni.Runtime
         unsafe public static void DumpPrint(int count, sbyte* source)
         {
             Int64 data = ToInt64(count, source);
-            BitsConst.Convert(data).PrintNum();
+            BitsConst.Convert(data).PrintNumber();
         }
 
         private static unsafe Int64 ToInt64(int count, sbyte* source)

@@ -2,12 +2,12 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
 using Reni.Type;
+using Base=Reni.Type.Base;
 
 namespace Reni.Struct
 {
-    public class Type : Reni.Type.Base
+    internal sealed class Type : Base
     {
         private readonly int _currentCompilePosition;
         private readonly Container _container;
@@ -52,7 +52,7 @@ namespace Reni.Struct
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        internal override bool HasConverterTo(Reni.Type.Base dest)
+        internal override bool HasConverterTo(Base dest)
         {
             return _container.HasConverterTo(_context, dest);
         }
@@ -66,7 +66,7 @@ namespace Reni.Struct
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Reni.Type.Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
             Void voidDest = dest as Void;
             if (voidDest != null)
@@ -92,7 +92,7 @@ namespace Reni.Struct
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Reni.Type.Base dest)
+        internal override Result ConvertToVirt(Category category, Base dest)
         {
             return _container.ConvertTo(category, _context, dest);
         }

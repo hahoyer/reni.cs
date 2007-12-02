@@ -8,12 +8,8 @@ namespace Reni.Type
     /// <summary>
     /// Summary description for Bits.
     /// </summary>
-    public class Bit : Primitive
+    sealed internal class Bit : Primitive
     {
-        internal Bit()
-        {
-        }
-
         /// <summary>
         /// asis
         /// </summary>

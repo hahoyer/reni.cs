@@ -11,7 +11,7 @@ namespace Reni.Type
 	/// <summary>
 	/// Summary description for CreateRef.
 	/// </summary>
-	public class Ref: Child
+    sealed internal class Ref : Child
 	{
 	    static private int _nextObjectId = 0; 
 	    private readonly RefAlignParam _refAlignParam;

@@ -1,5 +1,8 @@
 using System;
+using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Context;
 
 namespace Reni.Type
 {
@@ -16,7 +19,7 @@ namespace Reni.Type
         /// <param name="first">The first.</param>
         /// <param name="second">The second.</param>
         /// created 19.11.2006 22:57
-        public Pair(Base first, Base second) : base(first)
+        internal Pair(Base first, Base second) : base(first)
         {
             _second = second;
         }
@@ -26,14 +29,15 @@ namespace Reni.Type
         /// </summary>
         /// <value>The first.</value>
         /// created 19.11.2006 22:59
-        public Base First { get { return Parent; } }
+        internal Base First { get { return Parent; } }
+
         /// <summary>
         /// Gets the second.
         /// </summary>
         /// <value>The second.</value>
         /// created 19.11.2006 22:59
         [Node]
-        public Base Second { get { return _second; } }
+        internal Base Second { get { return _second; } }
 
         /// <summary>
         /// The size of type
@@ -58,5 +62,16 @@ namespace Reni.Type
             NotImplementedMethod(category);
             throw new NotImplementedException();
         }
+
+        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
+        {
+            return base.DumpPrintFromRef(category, refAlignParam);
+        }
+
+        [DumpData(false)]
+        internal protected override string DumpPrintTextPair { get { return Parent.DumpPrintTextPair + "\n" + _second.DumpPrintText; } }
+
+        [DumpData(false)]
+        internal override string DumpPrintText { get { return "(" + HWString.Indent(DumpPrintTextPair) + ")"; } }
     }
 }

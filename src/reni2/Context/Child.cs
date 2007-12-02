@@ -7,7 +7,7 @@ namespace Reni.Context
     /// <summary>
     /// Environment with parent
     /// </summary>
-    public abstract class Child : Base
+    internal abstract class Child : Base
     {
         readonly Base _parent;
         /// <summary>

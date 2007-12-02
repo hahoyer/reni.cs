@@ -10,7 +10,7 @@ namespace Reni.Type
     /// <summary>
     /// Special array 
     /// </summary>
-    public class Sequence:Base
+    internal sealed class Sequence : Base
     {
         [Node]
         public Array InheritedType { get { return _inheritedType; } }

@@ -5,9 +5,9 @@ namespace Reni.Type
     /// <summary>
     /// Fixed sized array of a type
     /// </summary>
-    public class Array: Child
+    sealed internal class Array : Child
     {
-        int _count;
+        readonly int _count;
         /// <summary>
         /// ctor
         /// </summary>

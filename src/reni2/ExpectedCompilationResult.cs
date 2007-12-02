@@ -6,7 +6,7 @@ namespace Reni
     /// <summary>
     /// Class for additional checks after compilation
     /// </summary>
-    public sealed class ExpectedCompilationResult
+    internal sealed class ExpectedCompilationResult
     {
         private readonly Compiler _compiler;
 

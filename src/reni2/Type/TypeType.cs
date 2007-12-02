@@ -3,7 +3,7 @@ namespace Reni.Type
     /// <summary>
     /// Type of type
     /// </summary>
-    sealed public class TypeType: Primitive
+    internal sealed class TypeType: Primitive
     {
         /// <summary>
         /// Converts to itself.

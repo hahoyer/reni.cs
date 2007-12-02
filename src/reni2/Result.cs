@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
@@ -11,7 +12,7 @@ namespace Reni
     /// <summary>
     /// Result of a visitor request
     /// </summary>
-    public class Result : ReniObject
+    internal sealed class Result : ReniObject
     {
         ///<summary>
         /// Delegate that returns code
@@ -21,7 +22,7 @@ namespace Reni
         ///<summary>
         /// Delegate that returns refs
         ///</summary>
-        public delegate Refs GetRefs();
+        internal delegate Refs GetRefs();
 
         private Category _pending;
         private Size _size;
@@ -374,6 +375,14 @@ namespace Reni
             }
         }
 
+        private bool HasCategory(Category category)
+        {
+            if (category.HasSize && !Complete.HasSize) return false;
+            if (category.HasType && !Complete.HasType) return false;
+            if (category.HasCode && !Complete.HasCode) return false;
+            if (category.HasRefs && !Complete.HasRefs) return false;
+            return true;
+        }
         /// <summary>
         /// Gets a value indicating whether this instance is pending.
         /// </summary>
@@ -400,7 +409,7 @@ namespace Reni
         /// <param name="syntax"></param>
         /// <returns></returns>
         //[DebuggerHidden]
-        public Result Visit(Category category, Context.Base context, Syntax.Base syntax)
+        internal Result Visit(Category category, Context.Base context, Syntax.Base syntax)
         {
             Category OldPending = Pending;
             Category OldComplete = Complete;
@@ -432,16 +441,22 @@ namespace Reni
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public void Add(Result other)
+        internal void Add(Result other)
         {
-            IsDirty = true;
-            if (HasSize) Size += other.Size;
-            if (HasType) Type = Type.CreatePair(other.Type);
-            if (HasCode) Code = Code.CreateSequence(other.Code);
-            if (HasRefs) Refs = Refs.Pair(other.Refs);
-            IsDirty = false;
+            Add(other,Complete);
         }
 
+        internal void Add(Result other, Category category)
+        {
+            Tracer.Assert(other.HasCategory(category));
+            Tracer.Assert(HasCategory(category));
+            IsDirty = true;
+            if (category.HasSize) Size += other.Size;
+            if (category.HasType) Type = Type.CreatePair(other.Type);
+            if (category.HasCode) Code = Code.CreateSequence(other.Code);
+            if (category.HasRefs) Refs = Refs.Pair(other.Refs);
+            IsDirty = false;
+        }
         /// <summary>
         /// Creates the sequence.
         /// </summary>
@@ -449,7 +464,7 @@ namespace Reni
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 19.11.2006 21:50
-        public Result CreateSequence(Result second, Category category)
+        internal Result CreateSequence(Result second, Category category)
         {
             Result result = Clone(category);
             result.Add(second);
@@ -684,7 +699,7 @@ namespace Reni
                 );
         }
 
-        internal virtual BitsConst Evaluate()
+        internal BitsConst Evaluate()
         {
             Tracer.Assert(Refs.IsNone);
             return Code.Evaluate();
@@ -707,12 +722,40 @@ namespace Reni
         {
             return Type.UnProperty(this, context);
         }
+
+        internal Result PostProcess(Context.Base context)
+        {
+            return UnProperty(context)
+                .Align(context.RefAlignParam.AlignBits);
+        }
+
+        internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
+        {
+            Result result = Void.CreateResult(category);
+            if (category.HasCode)
+                result.Code = Reni.Code.Base.CreateDumpPrintText("(");
+
+            for (int i = 0; i < elemResults.Count; i++)
+            {
+                if (category.HasCode)
+                {
+                    if (i > 0)
+                        result.Code = result.Code.CreateSequence(Reni.Code.Base.CreateDumpPrintText(", "));
+                    result.Code = result.Code.CreateSequence(elemResults[i].Code);
+                }
+                if (category.HasRefs)
+                    result.Refs = result.Refs.Pair(elemResults[i].Refs);
+            }
+            if (category.HasCode)
+                result.Code = result.Code.CreateSequence(Reni.Code.Base.CreateDumpPrintText(")"));
+            return result;
+        }
     }
 
     /// <summary>
     /// Describes errors, not yet implemented
     /// </summary>
-    public class Error
+    internal sealed class Error
     {
         private readonly Context.Base _context;
         private readonly Syntax.Base _syntax;
@@ -723,7 +766,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="syntax">The syntax.</param>
         /// created 29.10.2006 18:23
-        public Error(Context.Base context, Syntax.Base syntax)
+        internal Error(Context.Base context, Syntax.Base syntax)
         {
             _context = context;
             _syntax = syntax;

@@ -6,7 +6,7 @@ namespace Reni.Syntax
     /// <summary>
     /// Mamber name and in case of function call an argument list
     /// </summary>
-    public class MemberElem: ReniObject
+    internal sealed class MemberElem: ReniObject
     {
         private readonly DefineableToken _defineableToken;
         private readonly Base _args;

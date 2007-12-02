@@ -1,9 +1,10 @@
 using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 
 namespace Reni.Type
 {
-    public abstract class Child : Base
+    internal abstract class Child : Base
     {
         readonly Base _parent;
 
@@ -17,11 +18,12 @@ namespace Reni.Type
             _parent = parent;
         }
 
-        [Node]
+        [Node, DumpData(false)]
         public Base Parent { get { return _parent; } }
 
     }
-    public abstract class TagChild : Child
+
+    internal abstract class TagChild : Child
     {
         protected TagChild(Base parent)
             : base(parent)

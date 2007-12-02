@@ -5,10 +5,10 @@ namespace Reni.Parser
     /// <summary>
     /// Incomplete syntax tree element 
     /// </summary>
-    public class PushedSyntax : ReniObject
+    sealed internal class PushedSyntax : ReniObject
     {
-        private Base _left;
-        private Token _token;
+        private readonly Base _left;
+        private readonly Token _token;
 
         /// <summary>
         /// ctor

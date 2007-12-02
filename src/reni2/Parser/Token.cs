@@ -3,7 +3,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
-    sealed public class Token : ReniObject
+    internal sealed class Token : ReniObject
     {
         private readonly SourcePosn _source;
         private readonly int _length;
@@ -111,13 +111,13 @@ namespace Reni.Parser
         }
     }
 
-    public sealed class DefineableToken: ReniObject
+    internal sealed class DefineableToken: ReniObject
     {
         private readonly SourcePosn _source;
         private readonly int _length;
         private readonly Defineable _tokenClass;
 
-        public DefineableToken(Token token)
+        internal DefineableToken(Token token)
         {
             _source = token.Source;
             _length = token.Length;
@@ -135,6 +135,6 @@ namespace Reni.Parser
         /// the text of the token
         /// </summary>
         [DumpData(false)]
-        public string Name { get { return _source.SubString(0, _length); } }
+        internal string Name { get { return _source.SubString(0, _length); } }
     }
 }

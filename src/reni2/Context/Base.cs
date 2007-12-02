@@ -14,10 +14,10 @@ namespace Reni.Context
     /// Base class for compiler environments
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
-    public abstract class Base : ReniObject
+    internal abstract class Base : ReniObject
     {
         private static int _nextId = 0;
-        [Node] public Cache _cache = new Cache();
+        [Node] internal Cache _cache = new Cache();
 
         /// <summary>
         /// Initializes a new instance .
@@ -122,7 +122,7 @@ namespace Reni.Context
         /// <param name="currentCompilePosition">The currentCompilePosition.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        public Struct.Context CreateStruct(Container x, int currentCompilePosition)
+        internal Struct.Context CreateStruct(Container x, int currentCompilePosition)
         {
             return CreateStructContainer(x).CreateStruct(currentCompilePosition);
         }
@@ -133,7 +133,7 @@ namespace Reni.Context
         /// <param name="x">The x.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        public Struct.Context CreateStruct(Container x)
+        internal Struct.Context CreateStruct(Container x)
         {
             return CreateStruct(x, x.List.Count);
         }
@@ -159,7 +159,7 @@ namespace Reni.Context
         /// <param name="x">The x.</param>
         /// <returns></returns>
         /// created 16.12.2006 14:45
-        public ContainerContext CreateStructContainer(Container x)
+        internal ContainerContext CreateStructContainer(Container x)
         {
             return _cache._structContainerCache.Find(x, delegate { return new ContainerContext(this, x); });
         }
@@ -215,7 +215,8 @@ namespace Reni.Context
 
         internal Type.Base CreatePropertyType(Syntax.Base body)
         {
-            return _cache._propertyType.Find(body, delegate { return new Type.Property(this, body); });
+            return _cache._propertyType.Find(body, 
+                delegate { return new Property(this, body); });
         }
 
         /// <summary>
@@ -229,25 +230,23 @@ namespace Reni.Context
             return _cache._functionType.Find(body, delegate { return new Type.Function(this, body); });
         }
 
-        public class Cache
+        internal class Cache
         {
-            [Node] public DictionaryEx<Container, ContainerContext> _structContainerCache =
+            [Node] internal DictionaryEx<Container, ContainerContext> _structContainerCache =
                 new DictionaryEx<Container, ContainerContext>();
 
-            [Node] public DictionaryEx<int, Struct.Context> _structPositionCache =
+            [Node] internal DictionaryEx<int, Struct.Context> _structPositionCache =
                 new DictionaryEx<int, Struct.Context>();
 
-            [Node] public DictionaryEx<Type.Base, Function> _functionInstanceCache =
+            [Node] internal DictionaryEx<Type.Base, Function> _functionInstanceCache =
                 new DictionaryEx<Type.Base, Function>();
 
-            [Node] public DictionaryEx<Syntax.Base, Type.Base> _functionType =
+            [Node] internal DictionaryEx<Syntax.Base, Type.Base> _functionType =
                 new DictionaryEx<Syntax.Base, Type.Base>();
 
-            [Node]
-            public DictionaryEx<Syntax.Base, Type.Base> _propertyType = new DictionaryEx<Syntax.Base, Type.Base>();
+            [Node] internal DictionaryEx<Syntax.Base, Type.Base> _propertyType = new DictionaryEx<Syntax.Base, Type.Base>();
 
-            [Node]
-            public Result _topRefResultCache;
+            [Node] internal Result _topRefResultCache;
         }
 
         internal virtual StructSearchResult SearchDefineable(DefineableToken defineableToken)
@@ -293,11 +292,6 @@ namespace Reni.Context
             Tracer.Assert(visitedResult != null);
             Result arglessResult = visitedResult.UseWithArg(refResult);
             return ReturnMethodDumpWithBreak(trace, arglessResult);
-        }
-
-        internal Result PostProcess(Result formerResult)
-        {
-            return formerResult.UnProperty(this).Align(RefAlignParam.AlignBits);
         }
 
         [DumpData(false)]

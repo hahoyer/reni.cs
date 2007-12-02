@@ -8,7 +8,7 @@ namespace Reni.Context
     /// <summary>
     /// Root environment of compilation process
     /// </summary>
-    public sealed class Root : Base
+    internal sealed class Root : Base
     {
         readonly FunctionList _function = new FunctionList();
 

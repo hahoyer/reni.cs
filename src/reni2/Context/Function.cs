@@ -5,7 +5,7 @@ namespace Reni.Context
     /// <summary>
     /// Repesents a function call context
     /// </summary>
-    public sealed class Function : Child
+    internal sealed class Function : Child
     {
         private readonly Type.Base _argsType;
 

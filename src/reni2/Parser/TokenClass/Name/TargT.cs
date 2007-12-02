@@ -5,7 +5,7 @@ namespace Reni.Parser.TokenClass.Name
 	/// <summary>
 	/// Summary description for argToken.
 	/// </summary>
-    public class TargT : Base
+    sealed internal class TargT : Base
 	{
         /// <summary>
         /// Creates the syntax.

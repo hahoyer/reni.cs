@@ -9,7 +9,7 @@ namespace Reni.Struct
     /// <summary>
     /// Context for structure
     /// </summary>
-    public sealed class ContainerContext : Child
+    internal sealed class ContainerContext : Child
     {
         private readonly Container _container;
         private readonly DictionaryEx<int, Base> _type = new DictionaryEx<int, Base>();
@@ -90,7 +90,7 @@ namespace Reni.Struct
     /// <summary>
     /// Context for structure
     /// </summary>
-    public sealed class Context : Child
+    internal sealed class Context : Child
     {
         [DumpData(false)] 
         private readonly Container _container;

@@ -7,7 +7,7 @@ namespace Reni.Type
     /// <summary>
     /// Function type.
     /// </summary>
-    public class Function : Primitive
+    internal sealed class Function : Primitive
     {
         private readonly Context.Base _context;
         private readonly Syntax.Base _body;
@@ -17,7 +17,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="context"></param>
         /// <param name="body"></param>
-        public Function(Context.Base context, Syntax.Base body)
+        internal Function(Context.Base context, Syntax.Base body)
         {
             _context = context;
             _body = body;

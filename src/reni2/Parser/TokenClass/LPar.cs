@@ -7,7 +7,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Left parenthesis' 
     /// </summary>
-    public class LPar : Base
+    internal class LPar : Base
     {
         private int _level;
 

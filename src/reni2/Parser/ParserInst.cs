@@ -6,7 +6,7 @@ namespace Reni.Parser
     /// <summary>
     /// The parser singleton
     /// </summary>
-    public class ParserInst
+    sealed internal class ParserInst
     {
         private PrioTable _prio = StandardPrio();
         private ParserLibrary _parserLibrary = StandardParserLibrary();

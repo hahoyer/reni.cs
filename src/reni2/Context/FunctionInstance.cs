@@ -6,7 +6,7 @@ namespace Reni.Context
     /// <summary>
     /// Instance of a function to compile
     /// </summary>
-    public sealed class FunctionInstance: ReniObject
+    internal sealed class FunctionInstance: ReniObject
     {
         readonly int _index;
         readonly Syntax.Base _body;
@@ -31,7 +31,7 @@ namespace Reni.Context
         /// </summary>
         /// <value>The context.</value>
         /// created 03.01.2007 21:18
-        public Base Context { get { return _context; } }
+        internal Base Context { get { return _context; } }
         /// <summary>
         /// Gets the args.
         /// </summary>
@@ -47,7 +47,7 @@ namespace Reni.Context
         /// <param name="context">The context.</param>
         /// <param name="args">The args.</param>
         /// created 03.01.2007 21:19
-        public FunctionInstance(int index, Syntax.Base body, Base context, Type.Base args)
+        internal FunctionInstance(int index, Syntax.Base body, Base context, Type.Base args)
             : base(index)
         {
             _index = index;

@@ -1,7 +1,5 @@
 ﻿using System;
 using HWClassLibrary.Helper.TreeViewSupport;
-using Reni.Context;
-using Base=Reni.Syntax.Base;
 
 namespace Reni.Syntax
 {
@@ -9,13 +7,15 @@ namespace Reni.Syntax
     /// For each syntax  object, the environment is mapped against the corresponding compilation result.
     /// The mapping for one environment is extended, each time more categories are requested
     /// </summary>
-    public class CacheItem: ReniObject
+    internal sealed class CacheItem : ReniObject
     {
-        readonly Syntax.Base _syntax;
-        readonly Context.Base _context;
-        Result _data = new Result();
+        private readonly Base _syntax;
+        private readonly Context.Base _context;
+        private Result _data = new Result();
+
         [Node]
         public Result Data { get { return _data; } }
+
         /// <summary>
         /// ctor
         /// </summary>
@@ -28,6 +28,7 @@ namespace Reni.Syntax
             _syntax = syntax;
             _context = environment;
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -36,8 +37,7 @@ namespace Reni.Syntax
         //[DebuggerHidden]
         public Result Visit(Category category)
         {
-            return _data.Visit(category,_context,_syntax);
+            return _data.Visit(category, _context, _syntax);
         }
-
     }
 }

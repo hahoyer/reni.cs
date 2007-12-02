@@ -9,7 +9,7 @@ namespace Reni.Parser.TokenClass
     /// Base clas for compiler tokens
     /// </summary>
     [AdditionalNodeInfo("NodeDump")]
-    public abstract class Base : ReniObject
+    internal abstract class Base : ReniObject
     {
         private static int _nextObjectId = 0;
         public Base(): base(_nextObjectId++){}
@@ -26,7 +26,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="e">compilation context</param>
         /// <param name="s">The s.</param>
         /// <returns></returns>
-        public virtual Context.Base Context(Context.Base e, Syntax.Base s)
+        internal virtual Context.Base Context(Context.Base e, Syntax.Base s)
         {
             NotImplementedMethod(e,s);
             throw new NotImplementedException();

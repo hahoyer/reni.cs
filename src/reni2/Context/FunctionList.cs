@@ -6,7 +6,7 @@ namespace Reni.Context
     /// <summary>
     /// List of functions
     /// </summary>
-    public class FunctionList
+    internal sealed class FunctionList
     {
         List<FunctionInstance> _list = new List<FunctionInstance>();
         HWClassLibrary.Helper.DictionaryEx<Syntax.Base, EnvArgsVariant> _data = new HWClassLibrary.Helper.DictionaryEx<Syntax.Base, EnvArgsVariant>();
@@ -19,7 +19,7 @@ namespace Reni.Context
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 03.01.2007 20:26
-        public FunctionInstance Find(Syntax.Base body, Base env, Type.Base args)
+        internal FunctionInstance Find(Syntax.Base body, Base env, Type.Base args)
         {
             EnvArgsVariant eav;
             if (_data.ContainsKey(body))

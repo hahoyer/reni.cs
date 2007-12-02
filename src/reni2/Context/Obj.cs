@@ -5,7 +5,7 @@ namespace Reni.Context
     /// <summary>
     /// Class for object context
     /// </summary>
-    public sealed class Obj : Child
+    internal sealed class Obj : Child
     {
         private readonly Type.Base _type;
 
@@ -30,7 +30,7 @@ namespace Reni.Context
     /// <summary>
     /// Context for structure
     /// </summary>
-    public sealed class ObjMemberElem : Child
+    internal sealed class ObjMemberElem : Child
     {
         private readonly Type.Base _type;
         private readonly MemberElem _memberElem;

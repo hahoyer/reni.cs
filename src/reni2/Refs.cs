@@ -10,7 +10,7 @@ namespace Reni
     /// <summary>
     /// Contains list of references to compiler environemnts.
     /// </summary>
-    public class Refs : ReniObject
+    internal sealed class Refs : ReniObject
     {
         [Node]
         public List<Base> Data { get { return _data; } }

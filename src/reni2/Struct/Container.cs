@@ -16,7 +16,7 @@ namespace Reni.Struct
     /// <summary>
     /// Structured data, context free version
     /// </summary>
-    public class Container : ReniObject
+    internal sealed class Container : ReniObject
     {
         private readonly List<Base> _list;
         private readonly List<Base> _converterList;
@@ -224,24 +224,23 @@ namespace Reni.Struct
                 category.ToString() == "Size,Type,Refs,Code";
             //trace = false;
             StartMethodDumpWithBreak(trace, context, category, fromPosition, fromNotPosition);
-            Result result = Reni.Type.Base.CreateVoidResult(category - Category.Type);
+            Result result = Reni.Type.Base.CreateVoidResult(category);
             Code.Base topRef = context.CreateTopRefCode();
             for (int i = fromPosition; i < fromNotPosition; i++)
             {
                 Reni.Context.Base structContext = context.CreateStruct(this, i);
-                Result iresult = _list[i].Visit(structContext, category).Align(context.RefAlignParam.AlignBits);
+                Result rawResult = _list[i].Visit(structContext, category | Category.Type);
+                Result iresult = rawResult.PostProcess(structContext);
                 if (iresult.IsPending)
                     return ReturnMethodDump(trace, iresult);
                 if (trace) DumpDataWithBreak("", "i", i, "result", result, "iresult", iresult);
                 result.Add(iresult);
             }
-            if (category.HasType)
-                result.Type = CreateStructType(context, fromNotPosition);
             Result resultReplaced = result.ReplaceRelativeContextRef(context.CreateStructContainer(this), topRef);
             return ReturnMethodDump(trace, resultReplaced);
         }
 
-        private Reni.Type.Base CreateStructType(Reni.Context.Base context, int currentCompilePosition)
+        internal Reni.Type.Base CreateStructType(Reni.Context.Base context, int currentCompilePosition)
         {
             return context.CreateStructContainer(this).CreateStructType(currentCompilePosition);
         }
@@ -382,34 +381,12 @@ namespace Reni.Struct
             if(Defines(dumpPrintName))
                 return Visit(context, category, Find(dumpPrintName));
             List<Result> result = DumpPrintFromRef(category, context);
-            return ConcatPrintResult(category, result);
+            return Result.ConcatPrintResult(category, result);
         }
 
         private Result Visit(Reni.Context.Base context, Category category, int position)
         {
             return Visit(context, category, position, position + 1);
-        }
-
-        private static Result ConcatPrintResult(Category category, IList<Result> elemResults)
-        {
-            Result result = Void.CreateResult(category);
-            if (category.HasCode)
-                result.Code = Code.Base.CreateDumpPrintText("(");
-
-            for (int i = 0; i < elemResults.Count; i++)
-            {
-                if (category.HasCode)
-                {
-                    if (i > 0)
-                        result.Code = result.Code.CreateSequence(Code.Base.CreateDumpPrintText(", "));
-                    result.Code = result.Code.CreateSequence(elemResults[i].Code);
-                }
-                if (category.HasRefs)
-                    result.Refs = result.Refs.Pair(elemResults[i].Refs);
-            }
-            if (category.HasCode)
-                result.Code = result.Code.CreateSequence(Code.Base.CreateDumpPrintText(")"));
-            return result;
         }
 
         private List<Result> DumpPrintFromRef(Category category, Reni.Context.Base context)

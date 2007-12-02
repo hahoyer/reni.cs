@@ -1,9 +1,10 @@
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
-using Reni.Parser.TokenClass.Name;
+using Reni.Struct;
 
 namespace Reni.Syntax
 {
@@ -13,7 +14,7 @@ namespace Reni.Syntax
     /// Furthermore it contains if it has been created by match of two tokens
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
-    public abstract class Base : ReniObject
+    internal abstract class Base : ReniObject
     {
         /// <summary>
         /// Default dump behaviour
@@ -21,18 +22,18 @@ namespace Reni.Syntax
         /// <returns></returns>
         public override string Dump()
         {
-            bool isInDump = Reni.Struct.Container._isInDump;
-            Reni.Struct.Container._isInDump = false;
+            bool isInDump = Container._isInDump;
+            Container._isInDump = false;
             string result = isInDump ? DumpShort() : base.Dump();
-            Reni.Struct.Container._isInDump = isInDump;
+            Container._isInDump = isInDump;
             return result;
         }
 
-        private readonly HWClassLibrary.Helper.DictionaryEx<Context.Base, CacheItem> _cache =
-            new HWClassLibrary.Helper.DictionaryEx<Context.Base, CacheItem>();
+        private readonly DictionaryEx<Context.Base, CacheItem> _cache =
+            new DictionaryEx<Context.Base, CacheItem>();
 
         [Node, DumpData(false)]
-        public HWClassLibrary.Helper.DictionaryEx<Context.Base, CacheItem> Cache { get { return _cache; } }
+        public DictionaryEx<Context.Base, CacheItem> Cache { get { return _cache; } }
 
         /// <summary>
         /// Visitor function, that uses a result cache.
@@ -113,7 +114,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <returns></returns>
         /// [created 07.05.2006 18:34]
-        virtual public long GetNumberConstant()
+        public virtual long GetNumberConstant()
         {
             NotImplementedMethod();
             throw new NotImplementedException();
@@ -191,7 +192,7 @@ namespace Reni.Syntax
         /// <param name="token">The token.</param>
         /// <param name="right">The right.</param>
         /// <returns></returns>
-        virtual public Base CreateDeclarationSyntax(Token token, Base right)
+        public virtual Base CreateDeclarationSyntax(Token token, Base right)
         {
             NotImplementedMethod(token, right);
             return null;
@@ -202,7 +203,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <returns></returns>
         /// created 07.05.2007 22:09 on HAHOYER-DELL by hh
-        virtual internal string DumpShort()
+        internal virtual string DumpShort()
         {
             NotImplementedMethod();
             return "";
@@ -227,7 +228,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <returns></returns>
         /// created 19.07.2007 23:20 on HAHOYER-DELL by hh
-        virtual public Base SurroundedByParenthesis()
+        public virtual Base SurroundedByParenthesis()
         {
             return this;
         }
@@ -236,6 +237,5 @@ namespace Reni.Syntax
         {
             return new ConverterSyntax(this, token);
         }
-
     }
 }
