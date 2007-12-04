@@ -75,6 +75,11 @@ namespace Reni.Type
             return Parent.MoveHandler(category);
         }
 
+        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
+        {
+            return Parent.DumpPrintFromRef(category, refAlignParam);
+        }
+
         /// <summary>
         /// Applies the type operator.
         /// </summary>
