@@ -662,11 +662,11 @@ namespace Reni.Type
         internal virtual bool IsPending { get { return false; } }
 
         [DumpData(false)]
-        virtual internal protected string DumpPrintTextPair
+        virtual internal protected Base[] ToList 
         {
             get
             {
-                return "\n"+ DumpPrintText;
+                return new Base[]{this};
             }
         }
 

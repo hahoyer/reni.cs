@@ -9,7 +9,7 @@ namespace Reni.Type
     /// </summary>
     class Aligner : Child
     {
-        int _alignBits;
+        readonly int _alignBits;
         
         public Aligner(Base target, int alignBits) : base(target)
         {

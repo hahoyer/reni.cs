@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
@@ -65,13 +66,47 @@ namespace Reni.Type
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
-            return base.DumpPrintFromRef(category, refAlignParam);
+            List<Result> result = DumpPrintArrayFromRef(category,refAlignParam);
+            return Result.ConcatPrintResult(category, result);
+        }
+
+        private List<Result> DumpPrintArrayFromRef(Category category, RefAlignParam refAlignParam)
+        {
+            List<Result> result = new List<Result>();
+            Base[] list = ToList;
+            for (int i = 0; i < list.Length; i++)
+            {
+                Result iResult = list[i].DumpPrintFromRef(category, refAlignParam);
+                result.Add(iResult);
+            }
+            return result;
         }
 
         [DumpData(false)]
-        internal protected override string DumpPrintTextPair { get { return Parent.DumpPrintTextPair + "\n" + _second.DumpPrintText; } }
+        internal override string DumpPrintText
+        {
+            get
+            {
+                string result = "";
+                Base[] types = ToList;
+                for (int i = 0; i < types.Length; i++)
+                {
+                    result += "\n";
+                    result += types[i];
+                }
+                return "(" + HWString.Indent(result) + "\n)";
+            }
+        }
 
         [DumpData(false)]
-        internal override string DumpPrintText { get { return "(" + HWString.Indent(DumpPrintTextPair) + ")"; } }
+        internal protected override Base[] ToList
+        {
+            get
+            {
+                List<Base> result = new List<Base>(Parent.ToList);
+                result.Add(Second);
+                return result.ToArray();
+            }
+        }
     }
 }
