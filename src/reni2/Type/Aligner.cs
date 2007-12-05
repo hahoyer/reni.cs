@@ -16,6 +16,11 @@ namespace Reni.Type
             _alignBits = alignBits;
         }
 
+        /// <summary>
+        /// Gets the align bits.
+        /// </summary>
+        /// <value>The align bits.</value>
+        /// created 04.12.07 21:54 on HAHOYER-DELL by hh
         public int AlignBits { get { return _alignBits; } }
 
         public override Size Size

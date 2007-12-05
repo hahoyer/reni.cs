@@ -1,8 +1,13 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectGuid>{A639A515-D066-4C12-A4C5-07DA91C19A2C}</ProjectGuid>
     <AssemblyName>ReniTest</AssemblyName>
     <TargetTypeEx>CSharp.WinExe</TargetTypeEx>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
