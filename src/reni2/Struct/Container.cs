@@ -213,31 +213,44 @@ namespace Reni.Struct
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="category">The category.</param>
-        /// <param name="fromPosition">From position.</param>
         /// <param name="fromNotPosition">From not position.</param>
         /// <returns></returns>
-        public Result Visit(Reni.Context.Base context, Category category, int fromPosition, int fromNotPosition)
+        public Result Visit(Reni.Context.Base context, Category category, int fromNotPosition)
         {
             bool trace =
                 ObjectId == 4 &&
                 context.ObjectId == 4 &&
                 category.ToString() == "Size,Type,Refs,Code";
             //trace = false;
-            StartMethodDumpWithBreak(trace, context, category, fromPosition, fromNotPosition);
+            StartMethodDumpWithBreak(trace, context, category, fromNotPosition);
             Result result = Reni.Type.Base.CreateVoidResult(category);
             Code.Base topRef = context.CreateTopRefCode();
-            for (int i = fromPosition; i < fromNotPosition; i++)
+            for (int i = 0; i < fromNotPosition; i++)
             {
                 Reni.Context.Base structContext = context.CreateStruct(this, i);
                 Result rawResult = _list[i].Visit(structContext, category | Category.Type);
-                Result iresult = rawResult.PostProcess(structContext);
+                Result iresult = rawResult.Align(structContext.RefAlignParam.AlignBits);
                 if (iresult.IsPending)
                     return ReturnMethodDump(trace, iresult);
                 if (trace) DumpDataWithBreak("", "i", i, "result", result, "iresult", iresult);
                 result.Add(iresult);
             }
+            if (category.HasType)
+                result.Type = CreateStructType(context, fromNotPosition);
             Result resultReplaced = result.ReplaceRelativeContextRef(context.CreateStructContainer(this), topRef);
             return ReturnMethodDump(trace, resultReplaced);
+        }
+
+        private Result VisitElement(Reni.Context.Base context, Category category, int index)
+        {
+            Code.Base topRef = context.CreateTopRefCode();
+            Reni.Context.Base structContext = context.CreateStruct(this, index);
+            Result rawResult = _list[index].Visit(structContext, category | Category.Type);
+            Result iresult = rawResult.PostProcess(structContext);
+            if (iresult.IsPending)
+                return iresult;
+            Result resultReplaced = iresult.ReplaceRelativeContextRef(context.CreateStructContainer(this), topRef);
+            return resultReplaced;
         }
 
         internal Reni.Type.Base CreateStructType(Reni.Context.Base context, int currentCompilePosition)
@@ -275,7 +288,7 @@ namespace Reni.Struct
         public Result DestructorHandler(Reni.Context.Base context, Category category, Result objRefResult, int accessPosition)
         {
             Result result = Reni.Type.Base.CreateVoidResult(category - Category.Type - Category.Size);
-            Size size = VisitSize(context, 0, accessPosition);
+            Size size = VisitSize(context, accessPosition);
             for (int i = 0; i < accessPosition; i++)
             {
                 Reni.Type.Base iType = VisitElementTypeFromContextRef(context, i);
@@ -313,13 +326,12 @@ namespace Reni.Struct
         /// Visits the size.
         /// </summary>
         /// <param name="context">The context.</param>
-        /// <param name="fromPosition">From position.</param>
         /// <param name="fromNotPosition">From not position.</param>
         /// <returns></returns>
         /// created 09.12.2006 00:33
-        public Size VisitSize(Reni.Context.Base context, int fromPosition, int fromNotPosition)
+        public Size VisitSize(Reni.Context.Base context, int fromNotPosition)
         {
-            return Visit(context, Category.Size, fromPosition, fromNotPosition).Size;
+            return Visit(context, Category.Size, fromNotPosition).Size;
         }
 
         /// <summary>
@@ -331,7 +343,7 @@ namespace Reni.Struct
         /// created 12.12.2006 23:27
         public Reni.Type.Base VisitType(Reni.Context.Base context, int currentCompilePosition)
         {
-            return Visit(context, Category.Type, 0, currentCompilePosition).Type;
+            return Visit(context, Category.Type, currentCompilePosition).Type;
         }
 
         /// <summary>
@@ -343,7 +355,7 @@ namespace Reni.Struct
         /// created 13.12.2006 00:01
         public Result Visit(Reni.Context.Base context, Category category)
         {
-            return Visit(context, category, 0, _list.Count);
+            return Visit(context, category, _list.Count);
         }
 
 
@@ -379,14 +391,9 @@ namespace Reni.Struct
             Tracer.Assert(refAlignParam.Equals(context.RefAlignParam));
             const string dumpPrintName = "dump_print";
             if(Defines(dumpPrintName))
-                return Visit(context, category, Find(dumpPrintName));
+                return VisitElement(context, category, Find(dumpPrintName));
             List<Result> result = DumpPrintFromRef(category, context);
             return Result.ConcatPrintResult(category, result);
-        }
-
-        private Result Visit(Reni.Context.Base context, Category category, int position)
-        {
-            return Visit(context, category, position, position + 1);
         }
 
         private List<Result> DumpPrintFromRef(Category category, Reni.Context.Base context)
@@ -453,7 +460,7 @@ namespace Reni.Struct
         internal Result ConvertTo(Category category, Reni.Context.Base context, Reni.Type.Base dest)
         {
             // Special case if dest is Void and size is zero
-            if (dest is Void && VisitSize(context, 0, _list.Count).IsZero)
+            if (dest is Void && VisitSize(context, _list.Count).IsZero)
                 return Reni.Type.Base.CreateVoid.CreateArgResult(category);
 
             List<Reni.Type.Base> converterTypes = context.CreateStruct(this).VisitType(_converterList);
@@ -471,7 +478,7 @@ namespace Reni.Struct
         /// <returns></returns>
         internal Size BackOffset(Reni.Context.Base context, int index)
         {
-            return VisitSize(context, 0, index + 1)*-1;
+            return VisitSize(context, index + 1)*-1;
         }
 
         /// <summary>
@@ -482,7 +489,7 @@ namespace Reni.Struct
         /// <returns></returns>
         internal Size Offset(Reni.Context.Base context, int index)
         {
-            return VisitSize(context, index, _list.Count);
+            return VisitSize(context, _list.Count) - VisitSize(context, index);
         }
 
 

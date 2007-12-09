@@ -29,7 +29,7 @@ namespace Reni.Type
             {
                 return Parent.Size.Align(AlignBits);
             }
-        }
+         }
 
         /// <summary>
         /// Create a reference to a type

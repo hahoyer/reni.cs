@@ -26,12 +26,34 @@ Integer8: function
         /// <summary>
         /// Integers the class.
         /// </summary>
-        [Test, Explicit, Category(Worked)]
-        public void DumpPrint()
+        [Test, Category(Worked)]
+        public void DumpPrint1()
         {
-            RunCompiler("DumpPrint"
-                        , IntegerDefinition() + "; Integer8(128) dump_print"
-                        , "-128"
+            RunCompiler("DumpPrint1"
+                        , IntegerDefinition() + "; Integer8(1) dump_print"
+                        , "1"
+                );
+        }
+        /// <summary>
+        /// Integers the class.
+        /// </summary>
+        [Test, Explicit, Category(UnderConstruction)]
+        public void DumpPrint2()
+        {
+            RunCompiler("DumpPrint2"
+                        , IntegerDefinition() + "; Integer8(2) dump_print"
+                        , "2"
+                );
+        }
+        /// <summary>
+        /// Integers the class.
+        /// </summary>
+        [Test, Explicit, Category(UnderConstruction)]
+        public void DumpPrint127()
+        {
+            RunCompiler("DumpPrint127"
+                        , IntegerDefinition() + "; Integer8(127) dump_print"
+                        , "127"
                 );
         }
         /// <summary>

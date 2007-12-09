@@ -43,7 +43,7 @@ namespace Reni.Struct
         /// <summary>
         /// The size of type
         /// </summary>
-        public override Size Size { get { return _container.VisitSize(_context, 0, _currentCompilePosition); } }
+        public override Size Size { get { return _container.VisitSize(_context, _currentCompilePosition); } }
 
         /// <summary>
         /// Determines whether [has converter to] [the specified dest].
