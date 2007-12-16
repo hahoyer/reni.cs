@@ -278,7 +278,6 @@ namespace Reni.Context
             if (searchResult != null)
                 return searchResult.VisitApply(category, argResult);
 
-
             NotImplementedMethod(category, memberElem);
             return null;
         }

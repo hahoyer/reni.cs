@@ -243,14 +243,22 @@ namespace Reni.Struct
 
         private Result VisitElement(Reni.Context.Base context, Category category, int index)
         {
-            Code.Base topRef = context.CreateTopRefCode();
+            bool trace = ObjectId == -1;
+            StartMethodDumpWithBreak(trace, context, category, index);
             Reni.Context.Base structContext = context.CreateStruct(this, index);
             Result rawResult = _list[index].Visit(structContext, category | Category.Type);
             Result iresult = rawResult.PostProcess(structContext);
+            if (trace) DumpDataWithBreak("","rawResult", rawResult, "iresult", iresult);
             if (iresult.IsPending)
-                return iresult;
-            Result resultReplaced = iresult.ReplaceRelativeContextRef(context.CreateStructContainer(this), topRef);
-            return resultReplaced;
+                return ReturnMethodDump(trace, iresult);
+            Code.Base topRef = 
+                context
+                .CreateTopRefCode()
+                .CreateRefPlus(context.RefAlignParam,VisitSize(context));
+            Result resultReplaced = 
+                iresult
+                .ReplaceRelativeContextRef(context.CreateStructContainer(this), topRef);
+            return ReturnMethodDump(trace, resultReplaced);
         }
 
         internal Reni.Type.Base CreateStructType(Reni.Context.Base context, int currentCompilePosition)
@@ -332,6 +340,11 @@ namespace Reni.Struct
         public Size VisitSize(Reni.Context.Base context, int fromNotPosition)
         {
             return Visit(context, Category.Size, fromNotPosition).Size;
+        }
+
+        private Size VisitSize(Reni.Context.Base context)
+        {
+            return VisitSize(context, _list.Count);
         }
 
         /// <summary>

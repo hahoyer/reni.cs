@@ -15,7 +15,7 @@ Integer8: function
 {
     _data: 127 type (arg enable_cut);
 
-    create   : function(Interger8(arg));
+    create   : function(Integer8(arg));
     dump_print: property function (_data dump_print);
     +        : function create(_data + create(arg) _data);
     converter _data
@@ -37,7 +37,7 @@ Integer8: function
         /// <summary>
         /// Integers the class.
         /// </summary>
-        [Test, Explicit, Category(UnderConstruction)]
+        [Test, Category(UnderConstruction)]
         public void DumpPrint2()
         {
             RunCompiler("DumpPrint2"
@@ -48,7 +48,7 @@ Integer8: function
         /// <summary>
         /// Integers the class.
         /// </summary>
-        [Test, Explicit, Category(UnderConstruction)]
+        [Test, Category(UnderConstruction)]
         public void DumpPrint127()
         {
             RunCompiler("DumpPrint127"
