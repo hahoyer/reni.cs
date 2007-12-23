@@ -867,15 +867,8 @@ namespace Reni.Type
             _isDisableCut = isDisableCut;
         }
 
-        internal ConversionFeature EnableCut()
-        {
-            return new ConversionFeature(IsUseConverter, false);
-        }
-
-        internal ConversionFeature DontUseConverter()
-        {
-            return new ConversionFeature(false, IsDisableCut);
-        }
+        internal ConversionFeature EnableCut { get { return new ConversionFeature(IsUseConverter, false); } }
+        internal ConversionFeature DontUseConverter { get { return new ConversionFeature(false, IsDisableCut); } }
 
         internal bool IsDisableCut { get { return _isDisableCut; } }
         internal bool IsUseConverter { get { return _isUseConverter; } }
@@ -912,7 +905,7 @@ namespace Reni.Type
         /// created 30.01.2007 22:42
         internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
-            return base.IsConvertableToVirt(dest, conversionFeature.EnableCut());
+            return base.IsConvertableToVirt(dest, conversionFeature.EnableCut);
         }
     }
 

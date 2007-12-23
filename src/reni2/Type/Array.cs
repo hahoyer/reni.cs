@@ -118,7 +118,7 @@ namespace Reni.Type
             if (destArray != null)
             {
                 if (Count == destArray.Count)
-                    return Element.IsConvertableTo(destArray.Element, conversionFeature.DontUseConverter());
+                    return Element.IsConvertableTo(destArray.Element, conversionFeature.DontUseConverter);
                 return false;
             }
             return false;

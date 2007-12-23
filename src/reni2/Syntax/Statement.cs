@@ -62,7 +62,7 @@ namespace Reni.Syntax
         /// <returns></returns>
         override public Result VirtVisit(Context.Base context, Category category)
         {
-            bool trace = ObjectId == 24 && context.ObjectId == 0 && category.HasRefs;
+            bool trace = ObjectId == 1082 && context.ObjectId == 10;
             StartMethodDumpWithBreak(trace, context,category);
             if (Chain.Count == 0)
                 NotImplementedMethod(context, category);

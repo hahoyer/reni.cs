@@ -112,7 +112,7 @@ namespace Reni.Type
             {
                 if(conversionFeature.IsDisableCut && Count > destSequence.Count)
                     return false;
-                return Element.IsConvertableTo(destSequence.Element, conversionFeature.DontUseConverter());
+                return Element.IsConvertableTo(destSequence.Element, conversionFeature.DontUseConverter);
             }
 
             Aligner destAligner = dest as Aligner;
@@ -278,7 +278,7 @@ namespace Reni.Type
         ///// <param name="category">The category.</param>
         ///// <param name="args">The args.</param>
         ///// <returns></returns>
-        //public override Result VisitApplyFromRef(Context.Base callContext, Category category, Syntax.Base args)
+        //public override Result VisitApplyFromRef(ContextAtPosition.Base callContext, Category category, Syntax.Base args)
         //{
         //    return _defineable.VisitSequenceOperationApply(callContext, category, args, _sequence);
         //}

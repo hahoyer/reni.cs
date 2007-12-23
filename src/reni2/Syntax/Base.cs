@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
@@ -42,7 +43,7 @@ namespace Reni.Syntax
         /// <param name="context">Environment</param>
         /// <param name="category">Category (is replendieshed here)</param>
         /// <returns></returns>
-        //[DebuggerHidden]
+        [DebuggerHidden]
         public Result Visit(Context.Base context, Category category)
         {
             bool trace = ObjectId == -25 && category.HasCode && context.ObjectId == 5;

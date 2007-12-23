@@ -167,7 +167,7 @@ namespace Reni.Struct
         public Result AccessFromArg(Category category, int position)
         {
             Result result = _container.VisitElementFromContextRef(_context, category, position);
-            ContainerContext containerContext = _context.CreateStructContainer(_container);
+            Context containerContext = _context.CreateStructContext(_container);
             Code.Base argsRef = Code.Base
                 .CreateArg(_context.RefAlignParam.RefSize)
                 .CreateRefPlus(_context.RefAlignParam, Size);

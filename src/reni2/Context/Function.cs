@@ -45,7 +45,7 @@ namespace Reni.Context
             ;
         }
 
-        internal override StructSearchResult SearchDefineable(DefineableToken defineableToken)
+        internal override ContextSearchResult SearchDefineable(DefineableToken defineableToken)
         {
             return Parent.SearchDefineable(defineableToken);
         }

@@ -118,24 +118,13 @@ namespace Reni.Context
         /// <summary>
         /// Gets the struct.context
         /// </summary>
-        /// <param name="x">The x.</param>
+        /// <param name="container">The x.</param>
         /// <param name="currentCompilePosition">The currentCompilePosition.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        internal Struct.Context CreateStruct(Container x, int currentCompilePosition)
+        internal ContextAtPosition CreateStructAtPosition(Container container, int currentCompilePosition)
         {
-            return CreateStructContainer(x).CreateStruct(currentCompilePosition);
-        }
-
-        /// <summary>
-        /// Gets the struct.context
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <returns></returns>
-        /// [created 13.05.2006 18:45]
-        internal Struct.Context CreateStruct(Container x)
-        {
-            return CreateStruct(x, x.List.Count);
+            return CreateStructContext(container).CreateStructAtPosition(currentCompilePosition);
         }
 
         /// <summary>
@@ -144,24 +133,24 @@ namespace Reni.Context
         /// <param name="currentCompilePosition">The currentCompilePosition.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        private Struct.Context CreateStruct(int currentCompilePosition)
+        private ContextAtPosition CreateStructAtPosition(int currentCompilePosition)
         {
             return _cache._structPositionCache.Find
                 (
                 currentCompilePosition,
-                delegate { return new Struct.Context((ContainerContext) this, currentCompilePosition); }
+                delegate { return new ContextAtPosition((Struct.Context) this, currentCompilePosition); }
                 );
         }
 
         /// <summary>
         /// Creates the struct container.
         /// </summary>
-        /// <param name="x">The x.</param>
+        /// <param name="container">The x.</param>
         /// <returns></returns>
         /// created 16.12.2006 14:45
-        internal ContainerContext CreateStructContainer(Container x)
+        internal Struct.Context CreateStructContext(Container container)
         {
-            return _cache._structContainerCache.Find(x, delegate { return new ContainerContext(this, x); });
+            return _cache._structContainerCache.Find(container, delegate { return new Struct.Context(this, container); });
         }
 
         /// <summary>
@@ -215,8 +204,8 @@ namespace Reni.Context
 
         internal Type.Base CreatePropertyType(Syntax.Base body)
         {
-            return _cache._propertyType.Find(body, 
-                delegate { return new Property(this, body); });
+            return _cache._propertyType.Find(body,
+                                             delegate { return new Property(this, body); });
         }
 
         /// <summary>
@@ -232,11 +221,11 @@ namespace Reni.Context
 
         internal class Cache
         {
-            [Node] internal DictionaryEx<Container, ContainerContext> _structContainerCache =
-                new DictionaryEx<Container, ContainerContext>();
+            [Node] internal DictionaryEx<Container, Struct.Context> _structContainerCache =
+                new DictionaryEx<Container, Struct.Context>();
 
-            [Node] internal DictionaryEx<int, Struct.Context> _structPositionCache =
-                new DictionaryEx<int, Struct.Context>();
+            [Node] internal DictionaryEx<int, ContextAtPosition> _structPositionCache =
+                new DictionaryEx<int, ContextAtPosition>();
 
             [Node] internal DictionaryEx<Type.Base, Function> _functionInstanceCache =
                 new DictionaryEx<Type.Base, Function>();
@@ -244,12 +233,13 @@ namespace Reni.Context
             [Node] internal DictionaryEx<Syntax.Base, Type.Base> _functionType =
                 new DictionaryEx<Syntax.Base, Type.Base>();
 
-            [Node] internal DictionaryEx<Syntax.Base, Type.Base> _propertyType = new DictionaryEx<Syntax.Base, Type.Base>();
+            [Node] internal DictionaryEx<Syntax.Base, Type.Base> _propertyType =
+                new DictionaryEx<Syntax.Base, Type.Base>();
 
             [Node] internal Result _topRefResultCache;
         }
 
-        internal virtual StructSearchResult SearchDefineable(DefineableToken defineableToken)
+        internal virtual ContextSearchResult SearchDefineable(DefineableToken defineableToken)
         {
             NotImplementedMethod(defineableToken);
             return null;
@@ -258,14 +248,11 @@ namespace Reni.Context
         internal Result VisitFirstChainElement(Category category, MemberElem memberElem)
         {
             if (memberElem.DefineableToken == null)
-            {
-                Result visitedResult = memberElem.Args.Visit(this, category);
-                return visitedResult;
-            }
+                return memberElem.Args.Visit(this, category);
 
-            StructSearchResult structSearchResult = SearchDefineable(memberElem.DefineableToken);
-            if (structSearchResult != null)
-                return structSearchResult.VisitApply(this, category, memberElem.Args);
+            ContextSearchResult contextSearchResult = SearchDefineable(memberElem.DefineableToken);
+            if (contextSearchResult != null)
+                return contextSearchResult.VisitApply(this, category, memberElem.Args);
 
             if (memberElem.Args == null)
             {
@@ -287,7 +274,7 @@ namespace Reni.Context
             bool trace = ObjectId == -3 && memberElem.ObjectId == 1 && category.HasAll;
             StartMethodDumpWithBreak(trace, category, memberElem, formerResult);
             Result refResult = formerResult.EnsureContextRef(this);
-            Result visitedResult = ((Ref)refResult.Type).VisitNextChainElement(this, category, memberElem);
+            Result visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
             Tracer.Assert(visitedResult != null);
             Result arglessResult = visitedResult.UseWithArg(refResult);
             return ReturnMethodDumpWithBreak(trace, arglessResult);
@@ -336,6 +323,5 @@ namespace Reni.Context
                 results.Add(list[i].VisitType(this));
             return results;
         }
-
     }
 }

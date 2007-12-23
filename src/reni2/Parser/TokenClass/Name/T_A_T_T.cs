@@ -10,10 +10,10 @@ namespace Reni.Parser.TokenClass.Name
         }
         internal sealed class OperationResult : StructContainerSearchResult
         {
-            internal override Result Visit(Struct.Container definingContainer, Context.Base definingParentContext,
-                                           Context.Base callContext, Category category, Syntax.Base args)
+            internal override Result Visit(Struct.Type definingType, Context.Base callContext, Category category,
+                                           Syntax.Base args)
             {
-                return definingContainer.VisitOperationApply(definingParentContext, callContext, category, args);
+                return definingType.Container.VisitOperationApply(definingType.Context, callContext, category, args);
             }
         }
     }

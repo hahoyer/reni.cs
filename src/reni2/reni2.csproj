@@ -78,6 +78,7 @@
     <Compile Include="Context\Root.cs" />
     <Compile Include="Context\SearchResult.cs" />
     <Compile Include="Struct\Context.cs" />
+    <Compile Include="Struct\ContextAtPosition.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />
     <Compile Include="FeatureTest\Function.cs" />
     <Compile Include="FeatureTest\IntegerStruct.cs" />

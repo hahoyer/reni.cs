@@ -25,7 +25,7 @@ namespace Reni.Context
         [DumpData(false)]
         public override Root RootContext { get { return this; } }
 
-        internal override StructSearchResult SearchDefineable(DefineableToken defineableToken)
+        internal override ContextSearchResult SearchDefineable(DefineableToken defineableToken)
         {
             return null;
         }

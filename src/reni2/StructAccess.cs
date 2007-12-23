@@ -1,23 +1,21 @@
 using HWClassLibrary.Debug;
 using Reni.Context;
-using Reni.Parser;
-using Reni.Struct;
 
 namespace Reni
 {
 
     internal abstract class StructContainerSearchResult: ReniObject
     {
-        internal StructSearchResult ToContextSearchResult(Struct.Context definingContext)
+        internal ContextSearchResult ToContextSearchResult(Struct.Type definingType)
         {
-            return new ContextSearchResult(this, definingContext);
+            return new ContextSearchResult(this, definingType);
         }
         internal SearchResult ToSearchResult(Reni.Struct.Type definingType)
         {
             return new TypeSearchResult(this, definingType);
         }
 
-        internal abstract Result Visit(Container definingContainer, Base definingParentContext, Base callContext,
+        internal abstract Result Visit(Reni.Struct.Type definingType, Base callContext,
                                        Category category, Syntax.Base args);
     }
 
@@ -43,26 +41,26 @@ namespace Reni
         /// <returns></returns>
         protected internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
-            return _structContainerSearchResult.Visit(_definingType.Container, _definingType.Context, callContext, category, args);
+            return _structContainerSearchResult.Visit(_definingType, callContext, category, args);
         }
     }
 
-    internal class ContextSearchResult : StructSearchResult
+    sealed internal class ContextSearchResult : ReniObject
     {
         [DumpData(true)]
         private readonly StructContainerSearchResult _structContainerSearchResult;
-        [DumpData(true)]
-        private readonly Struct.Context _definingContext;
 
-        public ContextSearchResult(StructContainerSearchResult structContainerSearchResult, Struct.Context definingContext)
+        private readonly Struct.Type _definingType;
+
+        public ContextSearchResult(StructContainerSearchResult structContainerSearchResult, Struct.Type definingType)
         {
             _structContainerSearchResult = structContainerSearchResult;
-            _definingContext = definingContext;
+            _definingType = definingType;
         }
 
-        internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
+        internal Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
-            return _structContainerSearchResult.Visit(_definingContext.Container, _definingContext.Parent, callContext, category, args);
+            return _structContainerSearchResult.Visit(_definingType, callContext, category, args);
         }
     }
 
@@ -76,10 +74,10 @@ namespace Reni
             _position = position;
         }
 
-        internal override Result Visit(Container definingContainer, Base definingParentContext, Base callContext,
+        internal override Result Visit(Struct.Type definingType, Base callContext,
                                        Category category, Syntax.Base args)
         {
-            return definingContainer.VisitAccessApply(definingParentContext, _position, callContext, category, args);
+            return definingType.Container.VisitAccessApply(definingType.Context, _position, callContext, category, args);
         }
     }
 

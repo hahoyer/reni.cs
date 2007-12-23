@@ -28,7 +28,7 @@ namespace Reni.Context
     }
 
     /// <summary>
-    /// Context for structure
+    /// ContextAtPosition for structure
     /// </summary>
     internal sealed class ObjMemberElem : Child
     {

@@ -408,7 +408,7 @@ namespace Reni
         /// <param name="context"></param>
         /// <param name="syntax"></param>
         /// <returns></returns>
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result Visit(Category category, Context.Base context, Syntax.Base syntax)
         {
             Category OldPending = Pending;

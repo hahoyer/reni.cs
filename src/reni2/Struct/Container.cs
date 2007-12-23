@@ -227,7 +227,7 @@ namespace Reni.Struct
             Code.Base topRef = context.CreateTopRefCode();
             for (int i = 0; i < fromNotPosition; i++)
             {
-                Reni.Context.Base structContext = context.CreateStruct(this, i);
+                Reni.Context.Base structContext = context.CreateStructAtPosition(this, i);
                 Result rawResult = _list[i].Visit(structContext, category | Category.Type);
                 Result iresult = rawResult.Align(structContext.RefAlignParam.AlignBits);
                 if (iresult.IsPending)
@@ -237,7 +237,7 @@ namespace Reni.Struct
             }
             if (category.HasType)
                 result.Type = CreateStructType(context, fromNotPosition);
-            Result resultReplaced = result.ReplaceRelativeContextRef(context.CreateStructContainer(this), topRef);
+            Result resultReplaced = result.ReplaceRelativeContextRef(CreateContext(context), topRef);
             return ReturnMethodDump(trace, resultReplaced);
         }
 
@@ -245,7 +245,7 @@ namespace Reni.Struct
         {
             bool trace = ObjectId == -1;
             StartMethodDumpWithBreak(trace, context, category, index);
-            Reni.Context.Base structContext = context.CreateStruct(this, index);
+            Reni.Context.Base structContext = context.CreateStructAtPosition(this, index);
             Result rawResult = _list[index].Visit(structContext, category | Category.Type);
             Result iresult = rawResult.PostProcess(structContext);
             if (trace) DumpDataWithBreak("","rawResult", rawResult, "iresult", iresult);
@@ -257,13 +257,18 @@ namespace Reni.Struct
                 .CreateRefPlus(context.RefAlignParam,VisitSize(context));
             Result resultReplaced = 
                 iresult
-                .ReplaceRelativeContextRef(context.CreateStructContainer(this), topRef);
+                .ReplaceRelativeContextRef(CreateContext(context), topRef);
             return ReturnMethodDump(trace, resultReplaced);
         }
 
-        internal Reni.Type.Base CreateStructType(Reni.Context.Base context, int currentCompilePosition)
+        internal Type CreateStructType(Reni.Context.Base context, int currentCompilePosition)
         {
-            return context.CreateStructContainer(this).CreateStructType(currentCompilePosition);
+            return CreateContext(context).CreateStructType(currentCompilePosition);
+        }
+
+        internal Context CreateContext(Reni.Context.Base context)
+        {
+            return context.CreateStructContext(this);
         }
 
         /// <summary>
@@ -280,7 +285,7 @@ namespace Reni.Struct
         public Result VisitElementFromContextRef(Reni.Context.Base context, Category category, int position)
         {
             return context
-                .CreateStruct(this, position)
+                .CreateStructAtPosition(this, position)
                 .VisitElementFromContextRef(category, position);
         }
 
@@ -412,7 +417,7 @@ namespace Reni.Struct
         private List<Result> DumpPrintFromRef(Category category, Reni.Context.Base context)
         {
             List<Result> result = new List<Result>();
-            ContainerContext containerContext = context.CreateStructContainer(this);
+            Context containerContext = CreateContext(context);
             for (int i = 0; i < _list.Count; i++)
             {
                 Result iResult = VisitElementTypeFromContextRef(context, i).DumpPrint(category);
@@ -428,14 +433,15 @@ namespace Reni.Struct
             for (int i = 0; i < _converterList.Count; i++)
             {
                 if (
-                    _converterList[i].VisitType(context).IsConvertableTo(dest,
-                                                                         ConversionFeature.Instance.DontUseConverter()))
+                    _converterList[i]
+                    .VisitType(CreateContext(context))
+                    .IsConvertableTo(dest, ConversionFeature.Instance.DontUseConverter)
+                    )
                 {
                     for (i++; i < _converterList.Count; i++)
                         Tracer.Assert(
                             !_converterList[i].VisitType(context).IsConvertableTo(dest,
-                                                                                  ConversionFeature.Instance.
-                                                                                      DontUseConverter()));
+                                                                                  ConversionFeature.Instance.DontUseConverter));
                     return true;
                 }
             }
@@ -463,7 +469,7 @@ namespace Reni.Struct
         {
             for (int i = 0; i < _list.Count; i++)
             {
-                Reni.Context.Base structContext = context.CreateStruct(this, i);
+                Reni.Context.Base structContext = context.CreateStructAtPosition(this, i);
                 if (_list[i].VisitType(structContext).IsPending)
                     return true;
             }
@@ -476,7 +482,7 @@ namespace Reni.Struct
             if (dest is Void && VisitSize(context, _list.Count).IsZero)
                 return Reni.Type.Base.CreateVoid.CreateArgResult(category);
 
-            List<Reni.Type.Base> converterTypes = context.CreateStruct(this).VisitType(_converterList);
+            List<Reni.Type.Base> converterTypes = context.CreateStructContext(this).VisitType(_converterList);
 
 
             NotImplementedMethod(category, context, dest, "convertTypes", converterTypes);

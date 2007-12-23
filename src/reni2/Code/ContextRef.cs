@@ -1,7 +1,7 @@
 namespace Reni.Code
 {
     /// <summary>
-    /// Context reference, should be replaced
+    /// ContextAtPosition reference, should be replaced
     /// </summary>
     internal sealed class ContextRef<C> : Base where C: Context.Base
     {

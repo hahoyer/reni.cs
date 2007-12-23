@@ -43,7 +43,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        internal override string DumpPrintText { get { return "#(#context "+ _context.ObjectId +"#)# function("+_body.DumpData()+")"; } }
+        internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# function(" + _body.DumpData() + ")"; } }
 
         /// <summary>
         /// Applies the function.

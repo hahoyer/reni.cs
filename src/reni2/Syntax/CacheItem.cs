@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using HWClassLibrary.Helper.TreeViewSupport;
 
 namespace Reni.Syntax
@@ -34,7 +35,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="category"></param>
         /// <returns></returns>
-        //[DebuggerHidden]
+        [DebuggerHidden]
         public Result Visit(Category category)
         {
             return _data.Visit(category, _context, _syntax);

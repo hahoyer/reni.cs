@@ -56,15 +56,6 @@ namespace Reni.Context
         }
     }
 
-    internal abstract class StructSearchResult : ReniObject
-    {
-        internal virtual Result VisitApply(Base callContext, Category category, Syntax.Base args)
-        {
-            NotImplementedMethod(callContext, category, args);
-            return null;
-        }
-    }
-
     abstract internal class PrefixSearchResult : ReniObject
     {
         internal virtual Result VisitApply(Category category, Result argResult)

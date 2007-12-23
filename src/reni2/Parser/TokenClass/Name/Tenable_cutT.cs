@@ -1,4 +1,5 @@
 using Reni.Context;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
@@ -30,6 +31,23 @@ namespace Reni.Parser.TokenClass.Name
         internal override Context.SearchResult Search(Sequence sequence)
         {
             return new SearchResult(sequence);
+        }
+
+        internal override Reni.StructContainerSearchResult SearchFromStruct()
+        {
+            return new StructContainerSearchResult();
+        }
+
+        sealed internal class StructContainerSearchResult : Reni.StructContainerSearchResult
+        {
+            internal override Result Visit(Struct.Type definingType, Context.Base callContext, Category category,
+                                           Syntax.Base args)
+            {
+                if (args == null)
+                    return definingType.CreateArgResult(category);
+                NotImplementedMethod(callContext, category, args);
+                return null;
+            }
         }
     }
 }

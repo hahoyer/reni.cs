@@ -220,7 +220,7 @@ namespace Reni
         {
             Code.Base result = Code.Base.CreateVoid();
             for (int i = 0; i < _data.Count; i++)
-                result = result.CreateSequence(Code.Base.CreateContextRef((ContainerContext) _data[i]));
+                result = result.CreateSequence(Code.Base.CreateContextRef((Struct.Context) _data[i]));
             return result;
         }
 
@@ -244,7 +244,7 @@ namespace Reni
                     // To do; check if this is correct. Can be chaecked if we really have different alignment
                 p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize*-1);
                 Code.Base replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
-                result = result.ReplaceAbsoluteContextRef((ContainerContext) _data[i], replacement);
+                result = result.ReplaceAbsoluteContextRef((Struct.Context) _data[i], replacement);
             }
             return result;
         }
