@@ -5,7 +5,6 @@
     <AssertionMethod MethodName="NUnit.Framework.Assert.IsFalse" Parameter="0" Type="IS_FALSE" />
     <AssertionMethod MethodName="NUnit.Framework.Assert.IsNull" Parameter="0" Type="IS_NULL" />
     <AssertionMethod MethodName="NUnit.Framework.Assert.IsNotNull" Parameter="0" Type="IS_NOT_NULL" />
-    <AssertionMethod MethodName="HWClassLibrary.Debug.Tracer.Assert" Parameter="0" Type="IS_TRUE" />
     <TerminatingMethod MethodName="System.Diagnostics.Debug.Fail" />
     <TerminatingMethod MethodName="System.Environment.Exit" />
     <TerminatingMethod MethodName="NUnit.Framework.Assert.Fail" />

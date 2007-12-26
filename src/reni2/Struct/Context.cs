@@ -1,6 +1,7 @@
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
+using Reni.Parser;
 using Base=Reni.Type.Base;
 
 namespace Reni.Struct
@@ -72,6 +73,11 @@ namespace Reni.Struct
         private Code.Base CreateContextRefCode()
         {
             return Code.Base.CreateContextRef(this);
+        }
+
+        internal override ContextSearchResult SearchDefineable(DefineableToken defineableToken)
+        {
+            return base.SearchDefineable(defineableToken);
         }
 
         internal override Code.Base CreateRefForStruct(Type type)
