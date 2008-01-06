@@ -77,7 +77,7 @@ namespace Reni.Struct
 
         internal override ContextSearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            return base.SearchDefineable(defineableToken);
+            return Container.Search(defineableToken).ToContextSearchResult(CreateStructType(Container.List.Count));
         }
 
         internal override Code.Base CreateRefForStruct(Type type)

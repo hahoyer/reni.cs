@@ -428,24 +428,31 @@ namespace Reni.Struct
             return result;
         }
 
-        public bool HasConverterTo(Reni.Context.Base context, Reni.Type.Base dest)
+        public int? IndexOfConverterTo(Reni.Context.Base context, Reni.Type.Base dest)
         {
+            Context structContext = CreateContext(context);
             for (int i = 0; i < _converterList.Count; i++)
             {
                 if (
                     _converterList[i]
-                    .VisitType(CreateContext(context))
+                    .VisitType(structContext)
                     .IsConvertableTo(dest, ConversionFeature.Instance.DontUseConverter)
                     )
                 {
-                    for (i++; i < _converterList.Count; i++)
+                    for (int ii = i+1; ii < _converterList.Count; ii++)
                         Tracer.Assert(
-                            !_converterList[i].VisitType(context).IsConvertableTo(dest,
-                                                                                  ConversionFeature.Instance.DontUseConverter));
-                    return true;
+                            !_converterList[ii]
+                            .VisitType(structContext)
+                            .IsConvertableTo(dest,ConversionFeature.Instance.DontUseConverter));
+                    return i;
                 }
             }
-            return false;
+            return null;
+        }
+
+        public bool HasConverterTo(Reni.Context.Base context, Reni.Type.Base dest)
+        {
+            return IndexOfConverterTo(context, dest) != null;
         }
 
         /// <summary>
@@ -482,11 +489,8 @@ namespace Reni.Struct
             if (dest is Void && VisitSize(context, _list.Count).IsZero)
                 return Reni.Type.Base.CreateVoid.CreateArgResult(category);
 
-            List<Reni.Type.Base> converterTypes = context.CreateStructContext(this).VisitType(_converterList);
-
-
-            NotImplementedMethod(category, context, dest, "convertTypes", converterTypes);
-            return null;
+            return _converterList[IndexOfConverterTo(CreateContext(context), dest).Value]
+                .Visit(context,category);
         }
 
         /// <summary>
