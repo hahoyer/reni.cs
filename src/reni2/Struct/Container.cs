@@ -489,7 +489,7 @@ namespace Reni.Struct
             if (dest is Void && VisitSize(context, _list.Count).IsZero)
                 return Reni.Type.Base.CreateVoid.CreateArgResult(category);
 
-            return _converterList[IndexOfConverterTo(CreateContext(context), dest).Value]
+            return _converterList[IndexOfConverterTo(context, dest).Value]
                 .Visit(context,category);
         }
 

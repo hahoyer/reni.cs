@@ -25,6 +25,7 @@ namespace Reni.Struct
             : base(parent)
         {
             _container = container;
+            StopByObjectId(21);
         }
 
         /// <summary>

@@ -24,6 +24,7 @@ namespace Reni.Struct
         {
             _container = parent.Container;
             _currentCompilePosition = currentCompilePosition;
+            StopByObjectId(22);
         }
 
         private Reni.Type.Base VisitBodyType()
