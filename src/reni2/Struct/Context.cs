@@ -25,7 +25,7 @@ namespace Reni.Struct
             : base(parent)
         {
             _container = container;
-            StopByObjectId(21);
+            Tracer.ConditionalBreak(Parent is Context && ((Context)Parent).Container == Container, "");
         }
 
         /// <summary>

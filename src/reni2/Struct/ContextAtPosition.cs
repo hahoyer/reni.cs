@@ -24,7 +24,7 @@ namespace Reni.Struct
         {
             _container = parent.Container;
             _currentCompilePosition = currentCompilePosition;
-            StopByObjectId(22);
+            Tracer.ConditionalBreak(Parent is Context && ((Context)Parent).Container == Container, "");
         }
 
         private Reni.Type.Base VisitBodyType()
