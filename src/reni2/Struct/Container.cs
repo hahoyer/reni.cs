@@ -489,17 +489,8 @@ namespace Reni.Struct
             if (dest is Void && VisitSize(context, _list.Count).IsZero)
                 return Reni.Type.Base.CreateVoid.CreateArgResult(category);
 
-            Reni.Context.Base tempContext;
-            if(ObjectId==4 && context.ObjectId == 10 && dest.ObjectId == 277)
-            {
-                tempContext = CreateContext(context);
-            }
-            else 
-            {
-                tempContext = context;
-            }
-            return _converterList[IndexOfConverterTo(tempContext, dest).Value]
-                .Visit(context,category);
+            return _converterList[IndexOfConverterTo(context, dest).Value]
+                .Visit(CreateContext(context), category);
         }
 
         /// <summary>
