@@ -36,7 +36,6 @@ namespace reni.Generated
         private static void reni_0(System.SByte* frame) {
             fixed(sbyte*data=new sbyte[2])
             {
-                StartFunction:                                                               
                 (*(sbyte*) ( data+1)) = (sbyte)(127)       ; // BitArray                       671
                 (*(sbyte*) (data+0)) = (*(sbyte*) (frame-1)); // TopFrame                       877
                 (*(sbyte*) (data+1)) = (*(sbyte*) (data+0)); // StatementEnd                     782
@@ -84,7 +83,6 @@ namespace reni.Generated
         private static void reni_1(System.SByte* frame) {
             fixed(sbyte*data=new sbyte[4])
             {
-                StartFunction:                                                                    
                 (*(Int32*) (            data+0)) = (*(Int32*) (frame-4))           ; // TopFrame    990
                 (*(Int32*) (             data+0)) += -1                             ; // RefPlus     924
                 (*(sbyte*) (              data+3)) = (*(sbyte*) (*(Int32*) (data+0))); // Dereference 935
