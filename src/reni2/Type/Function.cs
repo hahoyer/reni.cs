@@ -82,6 +82,7 @@ namespace Reni.Type
             _body = body;
         }
 
+        [DumpData(false)]
         internal Base ResolvedType
         {
             get

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using HWClassLibrary.IO;
@@ -11,7 +10,6 @@ using Reni.FeatureTest;
 using reni.Generated;
 using Reni.Parser;
 using Reni.Runtime;
-using Base=Reni.Syntax.Base;
 
 namespace Reni
 {
@@ -20,17 +18,17 @@ namespace Reni
     /// </summary>
     public sealed class Compiler
     {
-        private readonly ParserInst _parser = new ParserInst();
         private readonly string _fileName;
+        private readonly CompilerParameters _parameters;
+        private readonly ParserInst _parser = new ParserInst();
         private readonly Root _rootContext = Context.Base.CreateRoot();
+        private string _executedCode;
 
-        private Source _source;
-        private Base _syntax;
-        private Result _result;
         private List<Container> _functionContainers;
         private Container _mainContainer;
-        private string _executedCode;
-        private readonly CompilerParameters _parameters;
+        private Result _result;
+        private Source _source;
+        private Syntax.Base _syntax;
 
 
         /// <summary>
@@ -49,73 +47,11 @@ namespace Reni
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// created 14.07.2007 15:59 on HAHOYER-DELL by hh
-        public Compiler(string fileName): this(new CompilerParameters(), fileName)
+        public Compiler(string fileName) : this(new CompilerParameters(), fileName)
         {
-        }
-
-        /// <summary>
-        /// Performs compilation
-        /// </summary>
-        public OutStream Exec()
-        {
-            if (_parameters.Trace.Source)
-                Tracer.Line(Source.Dump());
-
-            if (_parameters.Trace.Syntax)
-                Tracer.FlaggedLine(Syntax.Dump());
-
-            if (_parameters.Trace.Functions)
-            {
-                Materialize();
-                for (int i = 0; i < RootContext.Functions.Count; i++)
-                    Tracer.FlaggedLine(RootContext.Functions[i].DumpFunction());
-            }
-
-            if (_parameters.Trace.CodeTree)
-            {
-                Tracer.FlaggedLine("main\n" + Result.Code.Dump());
-                for (int i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine("function index="+ i + "\n"+ RootContext.Functions[i].BodyCode.Dump());
-            }
-            if (_parameters.Trace.CodeSequence)
-            {
-                Tracer.FlaggedLine("main\n" + MainContainer.Dump());
-                for (int i = 0; i < FunctionContainers.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + FunctionContainers[i].Dump());
-            }
-
-            if (_parameters.Trace.ExecutedCode)
-                Tracer.FlaggedLine(ExecutedCode);
-
-            return GetOutStream();
         }
 
         internal FunctionList Functions { get { return RootContext.Functions; } }
-
-        internal void Materialize()
-        {
-            Code.Base dummy = Result.Code;
-            for (int i = 0; i < RootContext.Functions.Count; i++)
-                dummy = RootContext.Functions[i].BodyCode;
-            Tracer.Assert(dummy != null);
-        }
-
-        public OutStream GetOutStream()
-        {
-            BitsConst.OutStream = new OutStream();
-            try
-            {
-                Assembly assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false);
-                MethodInfo methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainMethodName);
-                methodInfo.Invoke(null, new object[0]);
-            }
-            catch (CompilerErrorException e)
-            {
-                for (int i = 0; i < e.CompilerErrorCollection.Count; i++)
-                    BitsConst.OutStream.Add(e.CompilerErrorCollection[i].ToString());
-            }
-            return BitsConst.OutStream;
-        }
 
         [Node, DumpData(false)]
         internal ParserInst Parser { get { return _parser; } }
@@ -135,7 +71,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-        internal Base Syntax
+        internal Syntax.Base Syntax
         {
             get
             {
@@ -171,7 +107,7 @@ namespace Reni
             }
         }
 
-        [Node, DumpData(false)]
+        [DumpData(false)]
         internal Container MainContainer
         {
             get
@@ -198,8 +134,8 @@ namespace Reni
         {
             get
             {
-                DateTime n = DateTime.Now;
-                string result = "reni_";
+                var n = DateTime.Now;
+                var result = "reni_";
                 result += n.Year.ToString("0000");
                 result += n.Month.ToString("00");
                 result += n.Day.ToString("00");
@@ -212,6 +148,68 @@ namespace Reni
                 return result;
             }
         }
+
+        /// <summary>
+        /// Performs compilation
+        /// </summary>
+        public OutStream Exec()
+        {
+            if (_parameters.Trace.Source)
+                Tracer.Line(Source.Dump());
+
+            if (_parameters.Trace.Syntax)
+                Tracer.FlaggedLine(Syntax.Dump());
+
+            if (_parameters.Trace.Functions)
+            {
+                Materialize();
+                for (var i = 0; i < RootContext.Functions.Count; i++)
+                    Tracer.FlaggedLine(RootContext.Functions[i].DumpFunction());
+            }
+
+            if (_parameters.Trace.CodeTree)
+            {
+                Tracer.FlaggedLine("main\n" + Result.Code.Dump());
+                for (var i = 0; i < Functions.Count; i++)
+                    Tracer.FlaggedLine("function index=" + i + "\n" + RootContext.Functions[i].BodyCode.Dump());
+            }
+            if (_parameters.Trace.CodeSequence)
+            {
+                Tracer.FlaggedLine("main\n" + MainContainer.Dump());
+                for (var i = 0; i < FunctionContainers.Count; i++)
+                    Tracer.FlaggedLine("function index=" + i + "\n" + FunctionContainers[i].Dump());
+            }
+
+            if (_parameters.Trace.ExecutedCode)
+                Tracer.FlaggedLine(ExecutedCode);
+
+            return GetOutStream();
+        }
+
+        internal void Materialize()
+        {
+            var dummy = Result.Code;
+            for (var i = 0; i < RootContext.Functions.Count; i++)
+                dummy = RootContext.Functions[i].BodyCode;
+            Tracer.Assert(dummy != null);
+        }
+
+        public OutStream GetOutStream()
+        {
+            BitsConst.OutStream = new OutStream();
+            try
+            {
+                var assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false);
+                var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainMethodName);
+                methodInfo.Invoke(null, new object[0]);
+            }
+            catch (CompilerErrorException e)
+            {
+                for (var i = 0; i < e.CompilerErrorCollection.Count; i++)
+                    BitsConst.OutStream.Add(e.CompilerErrorCollection[i].ToString());
+            }
+            return BitsConst.OutStream;
+        }
     }
 
     /// <summary>
@@ -219,40 +217,41 @@ namespace Reni
     /// </summary>
     public class CompilerParameters
     {
+        /// <summary>
+        /// Shows or hides syntax tree
+        /// </summary>
+        [Node, DumpData(true)] public TraceParamters Trace = new TraceParamters();
+
+        #region Nested type: TraceParamters
+
         public class TraceParamters
         {
             /// <summary>
-            /// Shows or hides syntax tree
+            /// Shows or hides serialize code sequence
             /// </summary>
-            [Node, DumpData(true)]
-            public bool Source = false;
-
-            /// <summary>
-            /// Shows or hides syntax tree
-            /// </summary>
-            [Node, DumpData(true)]
-            public bool Syntax = false;
+            [Node, DumpData(true)] public bool CodeSequence;
 
             /// <summary>
             /// Shows or hides code tree
             /// </summary>
-            [Node, DumpData(true)]
-            public bool CodeTree = false;
-
-            /// <summary>
-            /// Shows or hides serialize code sequence
-            /// </summary>
-            [Node, DumpData(true)]
-            public bool CodeSequence = false;
+            [Node, DumpData(true)] public bool CodeTree;
 
             /// <summary>
             /// Shows or hides code code to execute
             /// </summary>
-            [Node, DumpData(true)]
-            public bool ExecutedCode = false;
+            [Node, DumpData(true)] public bool ExecutedCode;
 
-            [Node, DumpData(true)]
-            public bool Functions = false;
+            [Node, DumpData(true)] public bool Functions;
+
+            /// <summary>
+            /// Shows or hides syntax tree
+            /// </summary>
+            [Node, DumpData(true)] public bool Source;
+
+            /// <summary>
+            /// Shows or hides syntax tree
+            /// </summary>
+            [Node, DumpData(true)] public bool Syntax;
 
             public void None()
             {
@@ -273,14 +272,9 @@ namespace Reni
                 ExecutedCode = true;
                 Functions = true;
             }
-          
         }
-        /// <summary>
-        /// Shows or hides syntax tree
-        /// </summary>
-        [Node, DumpData(true)]
-        public TraceParamters Trace = new TraceParamters();
 
+        #endregion
     }
 
 
@@ -291,13 +285,13 @@ namespace Reni
         /// Special test, will not work automatically.
         /// </summary>
         /// created 18.07.2007 01:29 on HAHOYER-DELL by hh
-        [Test,Explicit, Category(CompilerTest.Rare)]
+        [Test, Explicit, Category(CompilerTest.Rare)]
         public void Exec()
         {
-            OutStream os = BitsConst.OutStream;
+            var os = BitsConst.OutStream;
             BitsConst.OutStream = new OutStream();
             reni_Test.reni();
-            OutStream osNew = BitsConst.OutStream;
+            var osNew = BitsConst.OutStream;
             BitsConst.OutStream = os;
         }
     }

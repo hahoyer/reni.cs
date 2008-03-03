@@ -11,7 +11,6 @@ namespace Reni
     {
         private static int _nextObjectId = 0;
         private readonly int _objectId;
-        private bool _isStopByObjectIdActive = false;
 
         /// <summary>
         /// Initializes a new instance of the ReniObject class.
@@ -65,14 +64,14 @@ namespace Reni
         [DebuggerHidden]
         public void StopByObjectId(int objectId)
         {
-            bool isStopByObjectIdActive = _isStopByObjectIdActive;
-            _isStopByObjectIdActive = true;
+            bool isStopByObjectIdActive = IsStopByObjectIdActive;
+            IsStopByObjectIdActive = true;
             Tracer.ConditionalBreak(1, ObjectId == objectId, @"_objectId==" + objectId + "\n" + Dump());
-            _isStopByObjectIdActive = isStopByObjectIdActive;
+            IsStopByObjectIdActive = isStopByObjectIdActive;
         }
 
         [DumpData(false)]
-        internal bool IsStopByObjectIdActive { get { return _isStopByObjectIdActive; } }
+        internal bool IsStopByObjectIdActive { get; private set; }
 
         /// <summary>
         /// Deep compare
@@ -85,7 +84,7 @@ namespace Reni
                 return true;
             if (GetType() != other.GetType())
                 return false;
-            MethodInfo mi = GetType().GetMethod("TypedDeepEqual");
+            var mi = GetType().GetMethod("TypedDeepEqual");
             if (mi != null)
                 return (bool) mi.Invoke(this, new object[] {other});
 

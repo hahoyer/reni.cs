@@ -86,7 +86,6 @@ namespace Reni.Code
         /// <summary>
         /// Creates the dump print.
         /// </summary>
-        /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 08.01.2007 16:33
         public Base CreateDumpPrint()
@@ -155,7 +154,7 @@ namespace Reni.Code
         /// created 23.09.2006 14:05
         public Container Serialize(Size frameSize, string description)
         {
-            Container container = new Container(MaxSize, frameSize,description );
+            var container = new Container(MaxSize, frameSize,description );
             Visit(container);
             return container;
         }
@@ -313,14 +312,8 @@ namespace Reni.Code
         /// created 23.09.2006 14:29
         public Base UseWithArg(Base argCode)
         {
-            Base result;
-            if (argCode.IsRelativeReference)
-                result = Visit(new ReplaceRelRefArg(argCode, argCode.RefAlignParam));
-            else
-                result = Visit(new ReplaceAbsoluteArg(argCode));
-            if (result != null)
-                return result;
-            return this;
+            var result = argCode.IsRelativeReference ? Visit(new ReplaceRelRefArg(argCode, argCode.RefAlignParam)) : Visit(new ReplaceAbsoluteArg(argCode));
+            return result ?? this;
         }
 
         /// <summary>
@@ -450,7 +443,7 @@ namespace Reni.Code
             catch (Container.UnexpectedContextRefInContainer e)
             {
                 DumpMethodWithBreak("UnexpectedContextRefInContainer "+ e.VisitedObject.Dump());
-                throw e;
+                throw;
             }
         }
 
@@ -464,16 +457,13 @@ namespace Reni.Code
             return new RecursiveCallCandidate(refsSize);
         }
 
-        public Code.Base TryReplacePrimitiveRecursivity(int functionIndex)
+        public Base TryReplacePrimitiveRecursivity(int functionIndex)
         {
             if (!Size.IsZero)
                 return this;
 
-            Code.Base newResult = Visit(new ReplacePrimitiveRecursivity(functionIndex));
-            if (newResult == null)
-                return this;
-
-            return newResult;
+            var newResult = Visit(new ReplacePrimitiveRecursivity(functionIndex));
+            return newResult ?? this;
         }
 
         virtual internal BitsConst Evaluate()

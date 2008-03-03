@@ -62,10 +62,9 @@ Integer8: function
         [Test, Explicit, Category(UnderConstruction)]
         public void Plus()
         {
-            RunCompiler("Plus"
-                        , IntegerDefinition() + "; (Integer8(1)+Integer8(2)) dump_print"
-                        , "3"
-                );
+            RunCompiler("Plus", PlusText, "3");
         }
+
+        public static string PlusText { get { return IntegerDefinition() + "; (Integer8(1)+Integer8(2)) dump_print"; } }
     }
 }
