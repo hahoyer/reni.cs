@@ -1,4 +1,5 @@
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
 
@@ -6,7 +7,7 @@ namespace Reni.Syntax
 {
     internal sealed class Struct : Base
     {
-        [DumpData(true)]
+        [Node, DumpData(true)]
         private Reni.Struct.Container _data;
 
         internal Struct(Reni.Struct.Container data)

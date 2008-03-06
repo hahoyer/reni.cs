@@ -71,7 +71,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-        internal Syntax.Base Syntax
+                                            internal Syntax.Base Syntax
         {
             get
             {
