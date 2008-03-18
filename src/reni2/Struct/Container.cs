@@ -25,10 +25,10 @@ namespace Reni.Struct
 
         private readonly DictionaryEx<string, int> _dictionary;
 
-        public static bool _isInDump = false;
-        private static int _nextObjectId = 0;
+        public static bool _isInDump;
+        private static int _nextObjectId;
         private static readonly string _runId = Compiler.FormattedNow + "\n";
-        private static bool _isInsideFileDump = false;
+        private static bool _isInsideFileDump;
 
         [Node]
         public List<Base> List { get { return _list; } }
@@ -85,54 +85,46 @@ namespace Reni.Struct
 
         internal static Container Create(Base left)
         {
-            List<Base> list = new List<Base>();
-            list.Add(left);
+            var list = 
+                new List<Base> {left};
             return new Container(list);
         }
 
         internal static Container Create(Base left, Base right)
         {
-            List<Base> list = new List<Base>();
-            list.Add(left);
-            list.Add(right);
-            return new Container(list);
+            return new Container(new List<Base> {left, right});
         }
 
         internal static Container Create(DeclarationSyntax left, Base right)
         {
-            List<Base> list = new List<Base>();
-            list.Add(left.Definition);
-            list.Add(right);
-            DictionaryEx<string, int> dictionary = new DictionaryEx<string, int>();
+            var list = new List<Base> {left.Definition, right};
+            var dictionary = new DictionaryEx<string, int>();
             dictionary[left.DefineableToken.Name] = 0;
             return new Container(list, dictionary);
         }
 
         internal static Container Create(DeclarationSyntax left)
         {
-            List<Base> list = new List<Base>();
-            list.Add(left.Definition);
-            DictionaryEx<string, int> dictionary = new DictionaryEx<string, int>();
+            var list = new List<Base> {left.Definition};
+            var dictionary = new DictionaryEx<string, int>();
             dictionary[left.DefineableToken.Name] = 0;
             return new Container(list, dictionary);
         }
 
         internal static Container Create(ConverterSyntax left)
         {
-            List<Base> list = new List<Base>();
-            List<Base> converter = new List<Base>();
-            converter.Add(left.Body);
-            DictionaryEx<string, int> dictionary = new DictionaryEx<string, int>();
+            var list = new List<Base>();
+            var converter = new List<Base> {left.Body};
+            var dictionary = new DictionaryEx<string, int>();
             return new Container(list, converter, dictionary);
         }
 
         internal static Container Create(Base left, Container right)
         {
-            List<Base> list = new List<Base>();
-            list.Add(left);
+            var list = new List<Base> {left};
             list.AddRange(right._list);
-            DictionaryEx<string, int> dictionary = new DictionaryEx<string, int>();
-            foreach (KeyValuePair<string, int> pair in right._dictionary)
+            var dictionary = new DictionaryEx<string, int>();
+            foreach (var pair in right._dictionary)
                 dictionary[pair.Key] = pair.Value + 1;
 
             return new Container(list, right._converterList, dictionary);
@@ -140,12 +132,11 @@ namespace Reni.Struct
 
         internal static Container Create(DeclarationSyntax left, Container right)
         {
-            List<Base> list = new List<Base>();
-            list.Add(left.Definition);
+            var list = new List<Base> {left.Definition};
             list.AddRange(right._list);
-            DictionaryEx<string, int> dictionary = new DictionaryEx<string, int>();
+            var dictionary = new DictionaryEx<string, int>();
             dictionary[left.DefineableToken.Name] = 0;
-            foreach (KeyValuePair<string, int> pair in right._dictionary)
+            foreach (var pair in right._dictionary)
                 dictionary[pair.Key] = pair.Value + 1;
 
             return new Container(list, right._converterList, dictionary);
@@ -416,12 +407,12 @@ namespace Reni.Struct
 
         private List<Result> DumpPrintFromRef(Category category, Reni.Context.Base context)
         {
-            List<Result> result = new List<Result>();
-            Context containerContext = CreateContext(context);
-            for (int i = 0; i < _list.Count; i++)
+            var result = new List<Result>();
+            var containerContext = CreateContext(context);
+            for (var i = 0; i < _list.Count; i++)
             {
-                Result iResult = VisitElementTypeFromContextRef(context, i).DumpPrint(category);
-                Result iAccess = containerContext.CreateStructType(_list.Count).AccessFromArg(category, i);
+                var iResult = VisitElementTypeFromContextRef(context, i).DumpPrint(category);
+                var iAccess = containerContext.CreateStructType(_list.Count).AccessFromArg(category, i);
                 iResult = iResult.UseWithArg(iAccess);
                 result.Add(iResult);
             }

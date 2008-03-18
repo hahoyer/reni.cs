@@ -53,7 +53,7 @@ namespace Reni.Syntax
                 _cache.Find
                     (
                     context,
-                    delegate { return new CacheItem(this, context); }
+                    () => new CacheItem(this, context)
                     );
             Result result = cacheElem.Visit(category.Replendish());
             Tracer.Assert
