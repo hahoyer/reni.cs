@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using HWClassLibrary.IO;
@@ -16,7 +17,7 @@ namespace Reni
     /// <summary>
     /// The compiler for language "Reni"
     /// </summary>
-    public sealed class Compiler
+    public sealed class Compiler: ITreeNodeSupport
     {
         private readonly string _fileName;
         private readonly CompilerParameters _parameters;
@@ -209,6 +210,11 @@ namespace Reni
                     BitsConst.OutStream.Add(e.CompilerErrorCollection[i].ToString());
             }
             return BitsConst.OutStream;
+        }
+
+        public TreeNode[] CreateNodes()
+        {
+            throw new NotImplementedException();
         }
     }
 

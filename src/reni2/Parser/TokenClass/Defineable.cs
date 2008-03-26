@@ -119,6 +119,12 @@ namespace Reni.Parser.TokenClass
         {
             return null;
         }
+
+        internal virtual SearchResult Search(Type.Void definingType)
+        {
+            NotImplementedMethod(definingType);
+            return null;
+        }
     }
 
     internal class SearchResultFromBitSequence : SearchResultFromSequence

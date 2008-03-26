@@ -23,9 +23,11 @@ namespace Reni.Syntax
         /// <returns></returns>
         public override string Dump()
         {
-            bool isInDump = Container._isInDump;
+            var isInDump = Container._isInDump;
             Container._isInDump = false;
-            string result = isInDump ? DumpShort() : base.Dump();
+            var result = DumpShort();
+            if(!isInDump)
+                result += "\n" + base.Dump();
             Container._isInDump = isInDump;
             return result;
         }
@@ -46,16 +48,16 @@ namespace Reni.Syntax
         [DebuggerHidden]
         public Result Visit(Context.Base context, Category category)
         {
-            bool trace = ObjectId == -25 && category.HasCode && context.ObjectId == 5;
+            var trace = ObjectId == -25 && category.HasCode && context.ObjectId == 5;
             //trace = false;
             StartMethodDumpWithBreak(trace, context, category);
-            CacheItem cacheElem =
+            var cacheElem =
                 _cache.Find
                     (
                     context,
                     () => new CacheItem(this, context)
                     );
-            Result result = cacheElem.Visit(category.Replendish());
+            var result = cacheElem.Visit(category.Replendish());
             Tracer.Assert
                 (
                 category.Replendish().Dump() == result.Complete.Dump(),

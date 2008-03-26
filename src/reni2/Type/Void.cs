@@ -1,4 +1,7 @@
-﻿namespace Reni.Type
+﻿using Reni.Context;
+using Reni.Parser;
+
+namespace Reni.Type
 {
     sealed internal class Void : Primitive
     {
@@ -59,6 +62,11 @@
         internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
             return false;
+        }
+
+        internal override SearchResult Search(DefineableToken defineableToken)
+        {
+            return defineableToken.TokenClass.Search(this);
         }
 
         /// <summary>

@@ -367,7 +367,10 @@ namespace Reni.Code
         /// created 03.01.2007 22:45
         public string FrameRef(RefAlignParam refAlignParam, Size offset)
         {
-            NotImplementedMethod(refAlignParam);
+            if (refAlignParam.Is_3_32)
+                return CreateFrameRef(Start - destinationSize, offset * -1);
+
+            NotImplementedMethod(refAlignParam, offset);
             throw new NotImplementedException();
         }
 

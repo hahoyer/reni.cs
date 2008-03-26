@@ -38,6 +38,11 @@ namespace Reni.Parser.TokenClass.Name
             return new StructContainerSearchResult();
         }
 
+        internal override Context.SearchResult Search(Void definingType)
+        {
+            return new SearchResult(definingType);
+        }
+
         sealed internal class StructContainerSearchResult : Reni.StructContainerSearchResult
         {
             internal override Result Visit(Struct.Type definingType, Context.Base callContext, Category category,
