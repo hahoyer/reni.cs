@@ -359,22 +359,6 @@ namespace Reni.Code
         }
 
         /// <summary>
-        /// Create a reference to frame.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="offset">The offset.</param>
-        /// <returns></returns>
-        /// created 03.01.2007 22:45
-        public string FrameRef(RefAlignParam refAlignParam, Size offset)
-        {
-            if (refAlignParam.Is_3_32)
-                return CreateFrameRef(Start - destinationSize, offset * -1);
-
-            NotImplementedMethod(refAlignParam, offset);
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Creates a recursive call, i. e. a jump to start of function..
         /// </summary>
         /// <returns></returns>
@@ -479,6 +463,27 @@ namespace Reni.Code
             }
 
             NotImplementedMethod(refAlignParam);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Create a reference to frame.
+        /// </summary>
+        /// <param name="refAlignParam">The ref align param.</param>
+        /// <param name="offset">The offset.</param>
+        /// <returns></returns>
+        /// created 03.01.2007 22:45
+        public string FrameRef(RefAlignParam refAlignParam, Size offset)
+        {
+            if (refAlignParam.Is_3_32)
+            {
+                return CreateDataRef(Start - refAlignParam.RefSize, refAlignParam.RefSize)
+                       + " = "
+                       + CreateIntCast(refAlignParam.RefSize)
+                       + CreateFrameBackPtr(offset*-1);
+            }
+
+            NotImplementedMethod(refAlignParam, offset);
             throw new NotImplementedException();
         }
 

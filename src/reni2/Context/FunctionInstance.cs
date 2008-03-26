@@ -50,6 +50,7 @@ namespace Reni.Context
         internal FunctionInstance(int index, Syntax.Base body, Base context, Type.Base args)
             : base(index)
         {
+            StopByObjectId(2);
             _index = index;
             _body = body;
             _context = context;
@@ -121,6 +122,7 @@ namespace Reni.Context
         {
             if (IsStopByObjectIdActive)
                 return null;
+            Tracer.ConditionalBreak(_index == 2, "");
             Category category = Category.Code.Replendish();
             RefAlignParam refAlignParam = Context.RefAlignParam;
             Code.Base foreignRefsRef = Code.Base.CreateFrameRef(refAlignParam);

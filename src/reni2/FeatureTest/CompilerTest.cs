@@ -1,10 +1,7 @@
-using System;
 using System.Diagnostics;
-using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
 using NUnit.Framework;
-using Reni.Runtime;
 
 namespace Reni.FeatureTest
 {
@@ -13,6 +10,37 @@ namespace Reni.FeatureTest
     /// </summary>
     public abstract class CompilerTest
     {
+        #region Delegates
+
+        public delegate void ExpectedResult(Compiler c);
+
+        #endregion
+
+        /// <summary>
+        /// NUnit category flag for test worked once
+        /// </summary>
+        public const string Damaged = "Damaged";
+
+        /// <summary>
+        /// NUnit category flag for test that are used rarely. Normally special preparations are required too.
+        /// </summary>
+        public const string Rare = "Rare";
+
+        /// <summary>
+        /// NUnit category flag for test that never worked
+        /// </summary>
+        public const string UnderConstruction = "Under Construction";
+
+        /// <summary>
+        /// NUnit category flag for test that never worked
+        /// </summary>
+        public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
+
+        /// <summary>
+        /// NUnit category flag for test worked once
+        /// </summary>
+        public const string Worked = "Worked";
+
         /// <summary>
         /// Compiler parameter
         /// </summary>
@@ -27,6 +55,7 @@ namespace Reni.FeatureTest
         {
             Parameters = new CompilerParameters();
         }
+
         /// <summary>
         /// Runs the compiler.
         /// </summary>
@@ -63,10 +92,11 @@ namespace Reni.FeatureTest
             RunCompiler(1, name, expectedOutput);
         }
 
-        private void RunCompiler(int depth, string name, string text, ExpectedResult expectedResult, string expectedOutput)
+        private void RunCompiler(int depth, string name, string text, ExpectedResult expectedResult,
+            string expectedOutput)
         {
-            string fileName = name + ".reni";
-            File f = File.m(fileName);
+            var fileName = name + ".reni";
+            var f = File.m(fileName);
             f.String = text;
             InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
         }
@@ -86,32 +116,31 @@ namespace Reni.FeatureTest
 
         private void RunCompiler(int depth, string name, string expectedOutput)
         {
-            RunCompiler(depth+1, name, default(ExpectedResult), expectedOutput);
+            RunCompiler(depth + 1, name, default(ExpectedResult), expectedOutput);
         }
 
         private void RunCompiler(int depth, string name, ExpectedResult expectedResult, string expectedOutput)
         {
-            InternalRunCompiler(depth+1, File.SourcePath(1) + "\\" + name + ".reni", expectedResult, expectedOutput);
+            InternalRunCompiler(depth + 1, File.SourcePath(1) + "\\" + name + ".reni", expectedResult, expectedOutput);
         }
 
-        public delegate void ExpectedResult(Compiler c);
-
-        private void InternalRunCompiler(int depth, string fileName, ExpectedResult expectedResult, string expectedOutput)
+        private void InternalRunCompiler(int depth, string fileName, ExpectedResult expectedResult,
+            string expectedOutput)
         {
-            Tracer.FlaggedLine(depth+1, "Position of method tested");
-            if (IsCallerUnderConstruction(1))
+            Tracer.FlaggedLine(depth + 1, "Position of method tested");
+            if(IsCallerUnderConstruction(1))
                 Parameters.Trace.All();
 
-            Compiler c = new Compiler(Parameters, fileName);
-        
+            var c = new Compiler(Parameters, fileName);
+
             if(expectedResult != default(ExpectedResult))
             {
                 c.Materialize();
                 expectedResult(c);
             }
 
-            OutStream os = c.Exec();
-            if (os.Data != expectedOutput)
+            var os = c.Exec();
+            if(os.Data != expectedOutput)
             {
                 os.Exec();
                 Tracer.ThrowAssertionFailed(
@@ -120,18 +149,17 @@ namespace Reni.FeatureTest
             }
         }
 
-
-        static bool IsCallerUnderConstruction(int depth)
+        private static bool IsCallerUnderConstruction(int depth)
         {
-            for (int i = 0; i < 100; i++)
+            for(var i = 0; i < 100; i++)
             {
-                MethodBase x = new StackTrace(true).GetFrame(depth + i).GetMethod();
-                if(x.GetCustomAttributes(typeof (TestAttribute), true).Length > 0)
+                var x = new StackTrace(true).GetFrame(depth + i).GetMethod();
+                if(x.GetCustomAttributes(typeof(TestAttribute), true).Length > 0)
                 {
-                    object[] xx = x.GetCustomAttributes(typeof (CategoryAttribute), true);
-                    for (int ii = 0; ii < xx.Length; ii++)
+                    var xx = x.GetCustomAttributes(typeof(CategoryAttribute), true);
+                    for(var ii = 0; ii < xx.Length; ii++)
                     {
-                        if(((CategoryAttribute)xx[ii]).Name == UnderConstruction)
+                        if(((CategoryAttribute) xx[ii]).Name == UnderConstruction)
                             return true;
                     }
                     return false;
@@ -139,27 +167,5 @@ namespace Reni.FeatureTest
             }
             return false;
         }
-
-        /// <summary>
-        /// NUnit category flag for test that never worked
-        /// </summary>
-        public const string UnderConstruction = "Under Construction";
-        /// <summary>
-        /// NUnit category flag for test that never worked
-        /// </summary>
-        public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
-        /// <summary>
-        /// NUnit category flag for test worked once
-        /// </summary>
-        public const string Worked = "Worked";
-        /// <summary>
-        /// NUnit category flag for test worked once
-        /// </summary>
-        public const string Damaged = "Damaged";
-        /// <summary>
-        /// NUnit category flag for test that are used rarely. Normally special preparations are required too.
-        /// </summary>
-        public const string Rare = "Rare";
-
     }
 }

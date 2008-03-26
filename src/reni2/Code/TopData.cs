@@ -82,7 +82,7 @@ namespace Reni.Code
         public TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
             : base(refAlignParam, offset, targetSize, destinationSize)
         {
-            StopByObjectId(431);
+            StopByObjectId(2268);
         }
     }
 }

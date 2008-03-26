@@ -129,7 +129,7 @@ namespace Reni.Type
 
         protected virtual Base CreateReversePair(Base first)
         {
-            return first._pair.Find(this, delegate { return new Pair(first, this); });
+            return first._pair.Find(this, () => new Pair(first, this));
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Reni.Type
         /// <returns></returns>
         public virtual Ref CreateRef(RefAlignParam refAlignParam)
         {
-            return _ref.Find(refAlignParam, delegate { return new Ref(this, refAlignParam); });
+            return _ref.Find(refAlignParam, () => new Ref(this, refAlignParam));
         }
         /// <summary>
         /// Create chain type
@@ -148,7 +148,7 @@ namespace Reni.Type
         /// <returns></returns>
         public Sequence CreateSequence(int elementCount)
         {
-            return _chain.Find(elementCount, delegate { return new Sequence(this, elementCount); });
+            return _chain.Find(elementCount, () => new Sequence(this, elementCount));
         }
 
         private Base TypeType

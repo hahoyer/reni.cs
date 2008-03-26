@@ -13,12 +13,12 @@ namespace Reni.Type
             _parent = parent;
         }
 
-        public Child(int objectId, Base parent): base(objectId)
+        protected Child(int objectId, Base parent): base(objectId)
         {
             _parent = parent;
         }
 
-        [Node, DumpData(false)]
+        [Node, DumpData(true)]
         public Base Parent { get { return _parent; } }
 
     }
