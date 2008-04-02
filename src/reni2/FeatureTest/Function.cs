@@ -30,7 +30,6 @@ namespace Reni.FeatureTest
         [Test, Category(Worked)]   
         public void FunctionWithNonLocal()
         {
-            Parameters.Trace.CodeTree = true;
             RunCompiler("FunctionWithNonLocal",
                 @"
 x: 100;
