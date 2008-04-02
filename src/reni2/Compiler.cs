@@ -8,7 +8,6 @@ using NUnit.Framework;
 using Reni.Code;
 using Reni.Context;
 using Reni.FeatureTest;
-using reni.Generated;
 using Reni.Parser;
 using Reni.Runtime;
 

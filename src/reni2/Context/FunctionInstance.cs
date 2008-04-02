@@ -6,38 +6,13 @@ namespace Reni.Context
     /// <summary>
     /// Instance of a function to compile
     /// </summary>
-    internal sealed class FunctionInstance: ReniObject
+    internal sealed class FunctionInstance : ReniObject
     {
-        readonly int _index;
-        readonly Syntax.Base _body;
-        readonly Base _context;
-        readonly Type.Base _args;
+        private readonly Type.Base _args;
+        private readonly Syntax.Base _body;
+        private readonly Base _context;
+        private readonly int _index;
         private Code.Base _bodyCodeCache;
-
-        /// <summary>
-        /// Gets the index.that is unique for each function
-        /// </summary>
-        /// <value>The index.</value>
-        /// created 03.01.2007 21:18
-        public int Index { get { return _index; } }
-        /// <summary>
-        /// Gets the body.
-        /// </summary>
-        /// <value>The body.</value>
-        /// created 03.01.2007 21:18
-        public Syntax.Base Body { get { return _body; } }
-        /// <summary>
-        /// Gets the context.the function is defined in
-        /// </summary>
-        /// <value>The context.</value>
-        /// created 03.01.2007 21:18
-        internal Base Context { get { return _context; } }
-        /// <summary>
-        /// Gets the args.
-        /// </summary>
-        /// <value>The args.</value>
-        /// created 03.01.2007 21:19
-        public Type.Base Args { get { return _args; } }
 
         /// <summary>
         /// Initializes a new instance of the FunctionInstance class.
@@ -58,39 +33,32 @@ namespace Reni.Context
         }
 
         /// <summary>
-        /// Creates the call.to this function
+        /// Gets the index.that is unique for each function
         /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
+        /// <value>The index.</value>
+        /// created 03.01.2007 21:18
+        public int Index { get { return _index; } }
+
+        /// <summary>
+        /// Gets the body.
+        /// </summary>
+        /// <value>The body.</value>
+        /// created 03.01.2007 21:18
+        public Syntax.Base Body { get { return _body; } }
+
+        /// <summary>
+        /// Gets the context.the function is defined in
+        /// </summary>
+        /// <value>The context.</value>
+        /// created 03.01.2007 21:18
+        internal Base Context { get { return _context; } }
+
+        /// <summary>
+        /// Gets the args.
+        /// </summary>
+        /// <value>The args.</value>
         /// created 03.01.2007 21:19
-        public Result CreateCall(Category category, Result args)
-        {
-
-            bool trace = ObjectId == -569;
-            StartMethodDump(trace, category, args);
-            Category localCategory = category;
-            if (category.HasCode)
-                localCategory = (localCategory - Category.Code) | Category.Size;
-            Result result = Visit(localCategory).Clone();
-            if (result.IsPending)
-                return result;
-
-            if (category.HasRefs)
-                result.Refs = result.Refs.Pair(args.Refs);
-
-            if (category.HasCode)
-            {
-                Code.Base argsEx = CreateArgsAndRefForFunction(args.Code);
-                result.Code = argsEx.CreateCall(Index, result.Size);
-            }
-            return ReturnMethodDump(trace, result);
-        }
-
-        private Code.Base CreateArgsAndRefForFunction(Code.Base argsCode)
-        {
-            return ForeignRefs.ToCode().CreateSequence(argsCode);
-        }
+        public Type.Base Args { get { return _args; } }
 
         [DumpData(false)]
         private Refs ForeignRefs
@@ -106,29 +74,70 @@ namespace Reni.Context
         [DumpData(false)]
         internal Code.Base BodyCode
         {
-             get
-             {
-                 if (_bodyCodeCache == null)
-                     _bodyCodeCache = CreateBodyCode();
-                 return _bodyCodeCache;
-             }
+            get
+            {
+                if(_bodyCodeCache == null)
+                    _bodyCodeCache = CreateBodyCode();
+                return _bodyCodeCache;
+            }
         }
+
+        [DumpData(false)]
+        private Size FrameSize { get { return Args.Size + ForeignRefs.Size; } }
+
+        [DumpData(false)]
+        private string Description { get { return _body.Dump(); } }
+
+        /// <summary>
+        /// Creates the call.to this function
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <param name="args">The args.</param>
+        /// <returns></returns>
+        /// created 03.01.2007 21:19
+        public Result CreateCall(Category category, Result args)
+        {
+            var trace = ObjectId == -569;
+            StartMethodDump(trace, category, args);
+            var localCategory = category;
+            if(category.HasCode)
+                localCategory = (localCategory - Category.Code) | Category.Size;
+            var result = Visit(localCategory).Clone();
+            if(result.IsPending)
+                return result;
+
+            if(category.HasRefs)
+                result.Refs = result.Refs.Pair(args.Refs);
+
+            if(category.HasCode)
+            {
+                var argsEx = CreateArgsAndRefForFunction(args.Code);
+                result.Code = argsEx.CreateCall(Index, result.Size);
+            }
+            return ReturnMethodDump(trace, result);
+        }
+
+        private Code.Base CreateArgsAndRefForFunction(Code.Base argsCode)
+        {
+            return ForeignRefs.ToCode().CreateSequence(argsCode);
+        }
+
         /// <summary>
         /// Create the code of the body of this function.
         /// </summary>
         /// <returns></returns>
         /// created 31.12.2006 14:09
-        Code.Base CreateBodyCode()
+        private Code.Base CreateBodyCode()
         {
-            if (IsStopByObjectIdActive)
+            if(IsStopByObjectIdActive)
                 return null;
             Tracer.ConditionalBreak(_index == 2, "");
-            Category category = Category.Code.Replendish();
-            RefAlignParam refAlignParam = Context.RefAlignParam;
-            Code.Base foreignRefsRef = Code.Base.CreateFrameRef(refAlignParam);
-            Result result = Visit(category)
-                .ReplaceRefsForFunctionBody(refAlignParam,foreignRefsRef);
-            if (Args.Size.IsZero)
+            var category = Category.Code.Replendish();
+            var refAlignParam = Context.RefAlignParam;
+            var foreignRefsRef = Code.Base.CreateFrameRef(refAlignParam);
+            var result = Visit(category)
+                .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
+            if(Args.Size.IsZero)
                 result.Code = result.Code.TryReplacePrimitiveRecursivity(Index);
             return result.Code;
         }
@@ -137,32 +146,40 @@ namespace Reni.Context
         {
             if(IsStopByObjectIdActive)
                 return null;
-            Function functionContext = Context.CreateFunction(Args);
-            bool trace = functionContext.ObjectId == -10 && category.HasCode;
-            Category categoryEx = category;
-            if (!categoryEx.IsEqual(Category.Refs))
+            
+            var functionContext = Context.CreateFunction(Args);
+            var trace = functionContext.ObjectId == 7 && category.HasCode;
+            var categoryEx = category;
+            if(!categoryEx.IsEqual(Category.Refs))
                 categoryEx = categoryEx | Category.Type;
 
-            Result result = Body.Visit(functionContext, categoryEx).Clone();
-            if (result.IsPending)
+            var result = Body.Visit(functionContext, categoryEx).Clone();
+            
+            Tracer.ConditionalBreak(trace,
+                Dump() + "\nfunctionContext=" + functionContext.Dump() + "\nresult=" + result.Dump());
+            
+            if(result.IsPending)
                 return result;
-            if (!categoryEx.IsEqual(Category.Refs))
+
+            if(result.HasType)
                 result = result.Type.Dereference(result).Align(functionContext.AlignBits);
-            if (category.HasCode)
-            {
-                RefAlignParam refAlignParam = Context.RefAlignParam;
-                Code.Base argsRef =
-                    Code.Base
-                    .CreateFrameRef(refAlignParam)
-                    .CreateRefPlus(refAlignParam, FrameSize * -1);
-                Tracer.ConditionalBreak(trace, Dump() + "\nfunctionContext=" + functionContext.Dump() + "\nresult=" + result.Dump());
-                result = result.ReplaceAbsoluteContextRef(functionContext, argsRef);
-                Tracer.ConditionalBreak(trace, "result=" + result.Dump());
-            }
-            else if (category.HasRefs)
-                result.Refs = result.Refs.Without(functionContext);
+
+            Tracer.ConditionalBreak(trace,
+                Dump() + "\nresult=" + result.Dump());
+            
+            result = result.ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(result.Complete));
+            
+            Tracer.ConditionalBreak(trace, "result=" + result.Dump());
 
             return result;
+        }
+
+        private Result CreateArgsRef(Category category)
+        {
+            var refAlignParam = Context.RefAlignParam;
+            return Args.CreateRef(refAlignParam).CreateResult(category, () => Code.Base
+                .CreateFrameRef(refAlignParam)
+                .CreateRefPlus(refAlignParam, FrameSize*-1));
         }
 
         private Type.Base VisitType()
@@ -181,21 +198,15 @@ namespace Reni.Context
             {
                 return BodyCode.Serialize(FrameSize, Description);
             }
-            catch (UnexpectedVisitOfPending)
+            catch(UnexpectedVisitOfPending)
             {
                 return Container.UnexpectedVisitOfPending;
             }
         }
 
-        [DumpData(false)]
-        private Size FrameSize { get { return Args.Size + ForeignRefs.Size; } }
-
-        [DumpData(false)]
-        private string Description { get { return _body.Dump(); } }
-
         public string DumpFunction()
         {
-            string result = "\n";
+            var result = "\n";
             result += "index=" + _index;
             result += "\n";
             result += "body=" + _body.DumpShort();
@@ -208,10 +219,9 @@ namespace Reni.Context
             result += "\n";
             return result;
         }
-
     }
 
-    sealed internal class ReplacePrimitiveRecursivity : Code.ReplaceVisitor.Base
+    internal sealed class ReplacePrimitiveRecursivity : Code.ReplaceVisitor.Base
     {
         [DumpData(true)]
         private readonly int _functionIndex;
@@ -230,12 +240,12 @@ namespace Reni.Context
 
         internal override Code.Base ChildVisit(Code.Child child)
         {
-            return Child(child.Parent,child.LeafElement.Visit(this));
+            return Child(child.Parent, child.LeafElement.Visit(this));
         }
 
         internal override Code.Base ThenElseVisit(Code.ThenElse This)
         {
-            return ThenElse(This,null,This.ThenCode.Visit(this),This.ElseCode.Visit(this));
+            return ThenElse(This, null, This.ThenCode.Visit(this), This.ElseCode.Visit(this));
         }
 
         public LeafElement CallVisit(Call This)

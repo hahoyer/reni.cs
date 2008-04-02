@@ -115,6 +115,7 @@ namespace Reni.Code
         /// created 19.10.2006 21:25
         internal override LeafElement TryToCombineBack(Dereference precedingElement)
         {
+            return null;
             Tracer.Assert(TargetSize == precedingElement.Size);
             return new Dereference(precedingElement.RefAlignParam,precedingElement.TargetSize,Size);
         }

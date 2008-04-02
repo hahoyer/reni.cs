@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
@@ -13,26 +14,22 @@ namespace Reni.Type
     [AdditionalNodeInfo("DebuggerDumpString")]
     internal abstract class Base : ReniObject
     {
-        private readonly HWClassLibrary.Helper.DictionaryEx<int, Aligner> _aligner = new HWClassLibrary.Helper.DictionaryEx<int, Aligner>();
-        private readonly HWClassLibrary.Helper.DictionaryEx<int, Array> _array = new HWClassLibrary.Helper.DictionaryEx<int, Array>();
-        private readonly HWClassLibrary.Helper.DictionaryEx<int, Sequence> _chain = new HWClassLibrary.Helper.DictionaryEx<int, Sequence>();
-        private readonly HWClassLibrary.Helper.DictionaryEx<Base, Pair> _pair = new HWClassLibrary.Helper.DictionaryEx<Base, Pair>();
-        private readonly HWClassLibrary.Helper.DictionaryEx<RefAlignParam, Ref> _ref = new HWClassLibrary.Helper.DictionaryEx<RefAlignParam, Ref>();
-        private EnableCut _enableCutCache;
-        private TypeType _typeTypeCache;
         private static readonly Bit _bit = new Bit();
         private static readonly Void _void = new Void();
 
-        static private Pending _pending = null;
+        private static Pending _pending;
+        private readonly DictionaryEx<int, Aligner> _aligner = new DictionaryEx<int, Aligner>();
+        private readonly DictionaryEx<int, Array> _array = new DictionaryEx<int, Array>();
+        private readonly DictionaryEx<int, Sequence> _chain = new DictionaryEx<int, Sequence>();
+        private readonly DictionaryEx<Base, Pair> _pair = new DictionaryEx<Base, Pair>();
+        private readonly DictionaryEx<RefAlignParam, Ref> _ref = new DictionaryEx<RefAlignParam, Ref>();
+        private EnableCut _enableCutCache;
+        private TypeType _typeTypeCache;
 
-        public Base(int objectId)
-            : base(objectId)
-        {
-        }
+        protected Base(int objectId)
+            : base(objectId) {}
 
-        public Base()
-        {
-        }
+        protected Base() {}
 
         /// <summary>
         /// The size of type
@@ -46,7 +43,7 @@ namespace Reni.Type
         /// <value><c>true</c> if this instance is ref; otherwise, <c>false</c>.</value>
         /// [created 01.06.2006 22:51]
         [DumpData(false)]
-        virtual public bool IsRef { get { return false; } }
+        public virtual bool IsRef { get { return false; } }
 
         /// <summary>
         /// Gets a value indicating whether this instance is void.
@@ -54,7 +51,7 @@ namespace Reni.Type
         /// <value><c>true</c> if this instance is void; otherwise, <c>false</c>.</value>
         /// [created 05.06.2006 16:27]
         [DumpData(false)]
-        virtual public bool IsVoid { get { return false; } }
+        public virtual bool IsVoid { get { return false; } }
 
         /// <summary>
         /// Gets the size of the unref.
@@ -62,7 +59,7 @@ namespace Reni.Type
         /// <value>The size of the unref.</value>
         /// [created 06.06.2006 00:08]
         [DumpData(false)]
-        virtual public Size UnrefSize { get { return Size; } }
+        public virtual Size UnrefSize { get { return Size; } }
 
         /// <summary>
         /// Creates the void.type instance
@@ -76,86 +73,13 @@ namespace Reni.Type
         /// Creates the bit.type instance
         /// </summary>
         [DumpData(false)]
-        static public Base CreateBit { get { return _bit; } }
-
-        /// <summary>
-        /// Create aligner type
-        /// </summary>
-        /// <param name="alignBits"></param>
-        /// <returns></returns>
-        public Base CreateAlign(int alignBits)
-        {
-            if (Size.Align(alignBits) == Size)
-                return this;
-            return _aligner.Find(alignBits, delegate { return new Aligner(this, alignBits); });
-        }
-
-        /// <summary>
-        /// Creates array type
-        /// </summary>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        public Array CreateArray(int count)
-        {
-            return _array.Find(count, delegate { return new Array(this, count); });
-        }
-
-        internal EnableCut CreateEnableCut()
-        {
-            if (_enableCutCache == null)
-                _enableCutCache = new EnableCut(this);
-            return _enableCutCache;
-        }
-        /// <summary>
-        /// Creates the number.
-        /// </summary>
-        /// <param name="bitCount">The bit count.</param>
-        /// <returns></returns>
-        /// created 13.01.2007 23:45
-        public static Base CreateNumber(int bitCount)
-        {
-            return CreateBit.CreateSequence(bitCount);
-        }
-        /// <summary>
-        /// Creates the pair.
-        /// </summary>
-        /// <param name="second">The second.</param>
-        /// <returns></returns>
-        /// created 19.11.2006 22:56
-        public virtual Base CreatePair(Base second)
-        {
-            return second.CreateReversePair(this);
-        }
-
-        protected virtual Base CreateReversePair(Base first)
-        {
-            return first._pair.Find(this, () => new Pair(first, this));
-        }
-
-        /// <summary>
-        /// Create a reference to a type
-        /// </summary>
-        /// <param name="refAlignParam">Alignment  and size of the reference</param>
-        /// <returns></returns>
-        public virtual Ref CreateRef(RefAlignParam refAlignParam)
-        {
-            return _ref.Find(refAlignParam, () => new Ref(this, refAlignParam));
-        }
-        /// <summary>
-        /// Create chain type
-        /// </summary>
-        /// <param name="elementCount">The elementCount.</param>
-        /// <returns></returns>
-        public Sequence CreateSequence(int elementCount)
-        {
-            return _chain.Find(elementCount, () => new Sequence(this, elementCount));
-        }
+        public static Base CreateBit { get { return _bit; } }
 
         private Base TypeType
         {
             get
             {
-                if (_typeTypeCache == null)
+                if(_typeTypeCache == null)
                     _typeTypeCache = new TypeType(this);
                 return _typeTypeCache;
             }
@@ -184,13 +108,165 @@ namespace Reni.Type
         /// </value>
         /// created 09.01.2007 03:21
         [DumpData(false)]
-        virtual public bool HasEmptyValue
+        public virtual bool HasEmptyValue
         {
             get
             {
                 NotImplementedMethod();
                 throw new NotImplementedException();
             }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has converter from bit.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance has converter from bit; otherwise, <c>false</c>.
+        /// </value>
+        /// created 11.01.2007 22:43
+        [DumpData(false)]
+        internal virtual bool HasConverterFromBit
+        {
+            get
+            {
+                NotImplementedMethod();
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the type of the sequence element.
+        /// </summary>
+        /// <value>The type of the sequence element.</value>
+        /// created 13.01.2007 19:46
+        [DumpData(false)]
+        internal virtual Base SequenceElementType
+        {
+            get
+            {
+                NotImplementedMethod();
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the type of the sequence element.
+        /// </summary>
+        /// <value>The type of the sequence element.</value>
+        /// created 13.01.2007 19:46
+        [DumpData(false)]
+        internal virtual int SequenceCount
+        {
+            get
+            {
+                NotImplementedMethod();
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the type in case of pending visits
+        /// </summary>
+        /// <value>The pending.</value>
+        /// created 24.01.2007 22:23
+        internal static Base Pending
+        {
+            get
+            {
+                if(_pending == null)
+                    _pending = new Pending();
+
+                return _pending;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is pending.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
+        /// </value>
+        /// created 09.02.2007 00:26
+        [DumpData(false)]
+        internal virtual bool IsPending { get { return false; } }
+
+        [DumpData(false)]
+        internal protected virtual Base[] ToList { get { return new[] {this}; } }
+
+        /// <summary>
+        /// Create aligner type
+        /// </summary>
+        /// <param name="alignBits"></param>
+        /// <returns></returns>
+        public Base CreateAlign(int alignBits)
+        {
+            if(Size.Align(alignBits) == Size)
+                return this;
+            return _aligner.Find(alignBits, () => new Aligner(this, alignBits));
+        }
+
+        /// <summary>
+        /// Creates array type
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public Array CreateArray(int count)
+        {
+            return _array.Find(count, () => new Array(this, count));
+        }
+
+        internal EnableCut CreateEnableCut()
+        {
+            if(_enableCutCache == null)
+                _enableCutCache = new EnableCut(this);
+            return _enableCutCache;
+        }
+
+        /// <summary>
+        /// Creates the number.
+        /// </summary>
+        /// <param name="bitCount">The bit count.</param>
+        /// <returns></returns>
+        /// created 13.01.2007 23:45
+        public static Base CreateNumber(int bitCount)
+        {
+            return CreateBit.CreateSequence(bitCount);
+        }
+
+        /// <summary>
+        /// Creates the pair.
+        /// </summary>
+        /// <param name="second">The second.</param>
+        /// <returns></returns>
+        /// created 19.11.2006 22:56
+        public virtual Base CreatePair(Base second)
+        {
+            return second.CreateReversePair(this);
+        }
+
+        protected virtual Base CreateReversePair(Base first)
+        {
+            return first._pair.Find(this, () => new Pair(first, this));
+        }
+
+        /// <summary>
+        /// Create a reference to a type
+        /// </summary>
+        /// <param name="refAlignParam">Alignment  and size of the reference</param>
+        /// <returns></returns>
+        public virtual Ref CreateRef(RefAlignParam refAlignParam)
+        {
+            return _ref.Find(refAlignParam, () => new Ref(this, refAlignParam));
+        }
+
+        /// <summary>
+        /// Create chain type
+        /// </summary>
+        /// <param name="elementCount">The elementCount.</param>
+        /// <returns></returns>
+        public Sequence CreateSequence(int elementCount)
+        {
+            return _chain.Find(elementCount, () => new Sequence(this, elementCount));
         }
 
         /// <summary>
@@ -215,6 +291,7 @@ namespace Reni.Type
         {
             return null;
         }
+
         /// <summary>
         /// Destructors the specified category.
         /// </summary>
@@ -273,7 +350,7 @@ namespace Reni.Type
         /// [created 04.06.2006 01:04]
         internal Result CreateArgResult(Category category)
         {
-            return CreateResult(category, delegate { return CreateArgCode(); });
+            return CreateResult(category, CreateArgCode);
         }
 
         /// <summary>
@@ -294,7 +371,8 @@ namespace Reni.Type
         /// created 08.01.2007 18:11
         internal Result CreateResult(Category category)
         {
-            return CreateResult(category, delegate { return Code.Base.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)); });
+            return CreateResult(category,
+                () => Code.Base.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)));
         }
 
         /// <summary>
@@ -306,11 +384,15 @@ namespace Reni.Type
         /// created 08.01.2007 18:11
         internal Result CreateResult(Category category, Result codeAndRefs)
         {
-            Result result = new Result();
-            if (category.HasSize) result.Size = Size;
-            if (category.HasType) result.Type = this;
-            if (category.HasCode) result.Code = codeAndRefs.Code;
-            if (category.HasRefs) result.Refs = codeAndRefs.Refs;
+            var result = new Result();
+            if(category.HasSize)
+                result.Size = Size;
+            if(category.HasType)
+                result.Type = this;
+            if(category.HasCode)
+                result.Code = codeAndRefs.Code;
+            if(category.HasRefs)
+                result.Refs = codeAndRefs.Refs;
             return result;
         }
 
@@ -323,7 +405,7 @@ namespace Reni.Type
         /// created 08.01.2007 14:38
         internal Result CreateResult(Category category, Result.GetCode getCode)
         {
-            return CreateResult(category, getCode, delegate { return Refs.None(); });
+            return CreateResult(category, getCode, Refs.None);
         }
 
         /// <summary>
@@ -336,9 +418,9 @@ namespace Reni.Type
         public Result CreateContextRefResult<C>(Category category, C context) where C : Context.Base
         {
             return CreateResult(
-                category, 
-                delegate { return Code.Base.CreateContextRef(context); }, 
-                delegate { return Refs.Context(context); });
+                category,
+                () => Code.Base.CreateContextRef(context),
+                () => Refs.Context(context));
         }
 
         /// <summary>
@@ -351,11 +433,15 @@ namespace Reni.Type
         /// created 08.01.2007 14:38
         internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs)
         {
-            Result result = new Result();
-            if (category.HasSize) result.Size = Size;
-            if (category.HasType) result.Type = this;
-            if (category.HasCode) result.Code = getCode();
-            if (category.HasRefs) result.Refs = getRefs();
+            var result = new Result();
+            if(category.HasSize)
+                result.Size = Size;
+            if(category.HasType)
+                result.Type = this;
+            if(category.HasCode)
+                result.Code = getCode();
+            if(category.HasRefs)
+                result.Refs = getRefs();
             return result;
         }
 
@@ -380,13 +466,13 @@ namespace Reni.Type
         /// <param name="argsResult">The args result.</param>
         /// <returns></returns>
         /// Created 18.11.07 15:32 by hh on HAHOYER-DELL
-        virtual internal Result ApplyFunction(Category category, Result argsResult)
+        internal virtual Result ApplyFunction(Category category, Result argsResult)
         {
             NotImplementedMethod(category, argsResult);
             return null;
         }
 
-        virtual internal Result PostProcess(Ref visitedType, Result result)
+        internal virtual Result PostProcess(Ref visitedType, Result result)
         {
             if(this == visitedType.Target)
                 return result.UseWithArg(visitedType.CreateDereferencedArgResult(result.Complete));
@@ -422,7 +508,7 @@ namespace Reni.Type
         /// <param name="result">The result.</param>
         /// <returns></returns>
         /// created 05.01.2007 01:10
-        virtual public Result Dereference(Result result)
+        public virtual Result Dereference(Result result)
         {
             return result;
         }
@@ -435,8 +521,9 @@ namespace Reni.Type
         /// created 07.01.2007 21:14
         public Result TypeOperator(Category category)
         {
-            Result result = CreateVoidResult(category).Clone();
-            if (category.HasType) result.Type = TypeType;
+            var result = CreateVoidResult(category).Clone();
+            if(category.HasType)
+                result.Type = TypeType;
             return result;
         }
 
@@ -459,11 +546,12 @@ namespace Reni.Type
         /// <param name="refAlignParam">The ref align param.</param>
         /// <returns></returns>
         /// created 15.05.2007 23:42 on HAHOYER-DELL by hh
-        virtual internal Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
+        internal virtual Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
-            Result argResult = CreateRef(refAlignParam).Conversion(category, this);
+            var argResult = CreateRef(refAlignParam).Conversion(category, this);
             return DumpPrint(category).UseWithArg(argResult);
         }
+
         /// <summary>
         /// Dumps the print code from array.
         /// </summary>
@@ -471,7 +559,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// created 08.01.2007 17:29
-        virtual public Result ArrayDumpPrint(Category category, int count)
+        public virtual Result ArrayDumpPrint(Category category, int count)
         {
             NotImplementedMethod(category, count);
             throw new NotImplementedException();
@@ -496,7 +584,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// created 08.01.2007 17:33
-        virtual public Base DumpPrintArrayType(int count)
+        public virtual Base DumpPrintArrayType(int count)
         {
             NotImplementedMethod(count);
             throw new NotImplementedException();
@@ -508,13 +596,13 @@ namespace Reni.Type
         /// <param name="argResult">The arg result.</param>
         /// <returns></returns>
         /// created 10.01.2007 15:45
-        virtual public Result ApplyTypeOperator(Result argResult)
+        public virtual Result ApplyTypeOperator(Result argResult)
         {
             return argResult.Type.Conversion(argResult.Complete, this).UseWithArg(argResult);
         }
 
         // Conversion
- 
+
         /// <summary>
         /// Commons the type.
         /// </summary>
@@ -523,9 +611,9 @@ namespace Reni.Type
         /// created 09.01.2007 01:20
         public Base CommonType(Base dest)
         {
-            if(IsConvertableTo(dest,ConversionFeature.Instance))
+            if(IsConvertableTo(dest, ConversionFeature.Instance))
                 return dest;
-            if (dest.IsConvertableTo(this, ConversionFeature.Instance))
+            if(dest.IsConvertableTo(this, ConversionFeature.Instance))
                 return this;
             NotImplementedMethod(dest);
             throw new NotImplementedException();
@@ -542,7 +630,7 @@ namespace Reni.Type
         {
             if(category.HasCode || category.HasRefs)
             {
-                if (IsConvertableTo(dest, ConversionFeature.Instance))
+                if(IsConvertableTo(dest, ConversionFeature.Instance))
                     return ConvertTo(category, dest);
                 NotImplementedMethod(category, dest);
                 throw new NotImplementedException();
@@ -559,7 +647,7 @@ namespace Reni.Type
         /// created 11.01.2007 22:12
         internal Result ConvertTo(Category category, Base dest)
         {
-            if (this == dest)
+            if(this == dest)
                 return ConvertToItself(category);
             return ConvertToVirt(category, dest);
         }
@@ -589,88 +677,6 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Gets a value indicating whether this instance has converter from bit.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance has converter from bit; otherwise, <c>false</c>.
-        /// </value>
-        /// created 11.01.2007 22:43
-        [DumpData(false)]
-        internal virtual bool HasConverterFromBit
-        {
-            get
-            {
-                NotImplementedMethod();
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Gets the type of the sequence element.
-        /// </summary>
-        /// <value>The type of the sequence element.</value>
-        /// created 13.01.2007 19:46
-        [DumpData(false)]
-        internal virtual Base SequenceElementType
-        {
-            get
-            {
-                NotImplementedMethod();
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Gets the type of the sequence element.
-        /// </summary>
-        /// <value>The type of the sequence element.</value>
-        /// created 13.01.2007 19:46
-        [DumpData(false)]
-        internal virtual int SequenceCount
-        {
-            get
-            {
-                NotImplementedMethod(); 
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Gets the type in case of pending visits
-        /// </summary>
-        /// <value>The pending.</value>
-        /// created 24.01.2007 22:23
-        internal static Base Pending
-        {
-            get
-            {
-                if(_pending == null)
-                    _pending = new Pending();
-
-                return _pending;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is pending.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
-        /// </value>
-        /// created 09.02.2007 00:26
-        [DumpData(false)]
-        internal virtual bool IsPending { get { return false; } }
-
-        [DumpData(false)]
-        virtual internal protected Base[] ToList 
-        {
-            get
-            {
-                return new Base[]{this};
-            }
-        }
-
-        /// <summary>
         /// Visits as sequence.
         /// </summary>
         /// <param name="category">The category.</param>
@@ -679,9 +685,9 @@ namespace Reni.Type
         /// created 13.01.2007 22:20
         internal virtual Result VisitAsSequence(Category category, Base elementType)
         {
-            int count = SequenceCount;
+            var count = SequenceCount;
             Base resultType = elementType.CreateSequence(count);
-            return Conversion(category,resultType);
+            return Conversion(category, resultType);
         }
 
         /// <summary>
@@ -695,7 +701,7 @@ namespace Reni.Type
         /// created 11.01.2007 22:09
         internal bool IsConvertableTo(Base dest, ConversionFeature conversionFeature)
         {
-            if (this == dest)
+            if(this == dest)
                 return IsConvertableToItself(conversionFeature);
             if(conversionFeature.IsUseConverter && HasConverterTo(dest))
                 return true;
@@ -751,7 +757,8 @@ namespace Reni.Type
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:18
-        internal virtual Code.Base CreateSequenceOperation(Defineable token, Result objResult, Size size, Result argResult)
+        internal virtual Code.Base CreateSequenceOperation(Defineable token, Result objResult, Size size,
+            Result argResult)
         {
             NotImplementedMethod(token, objResult, size, argResult.Code);
             return null;
@@ -769,6 +776,7 @@ namespace Reni.Type
             NotImplementedMethod(token, result);
             return null;
         }
+
         /// <summary>
         /// Operations the type of the result.
         /// </summary>
@@ -779,7 +787,7 @@ namespace Reni.Type
         /// created 13.01.2007 21:43
         internal virtual Base SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
-            NotImplementedMethod(token,objBitCount,argBitCount);
+            NotImplementedMethod(token, objBitCount, argBitCount);
             return null;
         }
 
@@ -797,8 +805,8 @@ namespace Reni.Type
             return CreateResult
                 (
                 category,
-                delegate { return null; },
-                delegate { return condRefs.Pair(elseOrThenRefs); }
+                () => null,
+                () => condRefs.Pair(elseOrThenRefs)
                 );
         }
 
@@ -821,7 +829,7 @@ namespace Reni.Type
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 30.07.2007 21:28 on HAHOYER-DELL by hh
-        virtual internal Result UnProperty(Result rawResult, Context.Base context)
+        internal virtual Result UnProperty(Result rawResult, Context.Base context)
         {
             return rawResult;
         }
@@ -832,34 +840,34 @@ namespace Reni.Type
         /// <param name="defineableToken">The defineable.</param>
         /// <returns></returns>
         /// Created 04.11.07 17:51 by hh on HAHOYER-DELL
-        virtual internal SearchResult Search(DefineableToken defineableToken)
+        internal virtual SearchResult Search(DefineableToken defineableToken)
         {
             NotImplementedMethod(defineableToken);
             return null;
         }
 
-        virtual internal SearchResultFromSequence SearchFromSequence(Defineable defineable)
+        internal virtual SearchResultFromSequence SearchFromSequence(Defineable defineable)
         {
             NotImplementedMethod(defineable);
             return null;
         }
 
-        virtual internal SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
+        internal virtual SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
         {
             return defineableToken.TokenClass.SearchFromRef(defineableToken, definingType);
         }
     }
 
-    internal abstract class SearchResultFromSequence: ReniObject
+    internal abstract class SearchResultFromSequence : ReniObject
     {
         internal abstract SearchResult ToSearchResult(Sequence sequence);
     }
 
-    internal class ConversionFeature: ReniObject
+    internal class ConversionFeature : ReniObject
     {
         private static ConversionFeature _instance;
-        private readonly bool _isUseConverter;
         private readonly bool _isDisableCut;
+        private readonly bool _isUseConverter;
 
         private ConversionFeature(bool isUseConverter, bool isDisableCut)
         {
@@ -877,20 +885,17 @@ namespace Reni.Type
         {
             get
             {
-                if (_instance == null)
-                    _instance = new ConversionFeature(true,true);
+                if(_instance == null)
+                    _instance = new ConversionFeature(true, true);
                 return _instance;
             }
         }
-
     }
 
-    sealed internal class EnableCut: TagChild
+    internal sealed class EnableCut : TagChild
     {
         public EnableCut(Base parent)
-            : base(parent)
-        {
-        }
+            : base(parent) {}
 
         protected override string TagTitle { get { return "enable_cut"; } }
 
@@ -912,12 +917,12 @@ namespace Reni.Type
     /// <summary>
     /// 
     /// </summary>
-    internal class Pending: Base
+    internal class Pending : Base
     {
         /// <summary>
         /// The size of type
         /// </summary>
-        public override Size Size { get { return Reni.Size.Pending; } }
+        public override Size Size { get { return Size.Pending; } }
 
         /// <summary>
         /// Gets the dump print text.
@@ -925,6 +930,15 @@ namespace Reni.Type
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
         internal override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is pending.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
+        /// </value>
+        /// created 09.02.2007 00:26
+        internal override bool IsPending { get { return true; } }
 
         /// <summary>
         /// Converts to.
@@ -938,19 +952,10 @@ namespace Reni.Type
             return dest.CreateResult
                 (
                 category,
-                delegate { return Code.Base.Pending; },
-                delegate { return Refs.Pending; }
+                () => Code.Base.Pending,
+                () => Refs.Pending
                 );
         }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is pending.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
-        /// </value>
-        /// created 09.02.2007 00:26
-        internal override bool IsPending { get { return true; } }
 
         /// <summary>
         /// Visits as sequence.
@@ -979,4 +984,3 @@ namespace Reni.Type
         }
     }
 }
-

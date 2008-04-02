@@ -53,6 +53,7 @@ namespace Reni.Code
         public FrameRef(RefAlignParam refAlignParam, Size offset)
             : base(refAlignParam, offset)
         {
+            StopByObjectId(547);
         }
 
         /// <summary>

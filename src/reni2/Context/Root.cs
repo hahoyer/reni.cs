@@ -67,7 +67,7 @@ namespace Reni.Context
         /// created 06.11.2006 22:54
         public Result CreateFunctionCall(Base context, Category category, Syntax.Base body, Result argsResult)
         {
-            %return Functions.Find(body, context, argsResult.Type).CreateCall(category, argsResult);
+            return Functions.Find(body, context, argsResult.Type).CreateCall(category, argsResult);
         }
 
     }

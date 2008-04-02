@@ -23,7 +23,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _targetSize = targetSize;
             _destinationSize = destinationSize;
-            StopByObjectId(-302);
+            StopByObjectId(-527);
 	    }
 
         /// <summary>

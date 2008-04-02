@@ -3,7 +3,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
 using Reni.Syntax;
 
 namespace Reni.Type
@@ -13,7 +12,7 @@ namespace Reni.Type
 	/// </summary>
     sealed internal class Ref : Child
 	{
-	    static private int _nextObjectId = 0; 
+	    static private int _nextObjectId; 
 	    private readonly RefAlignParam _refAlignParam;
 
 	    /// <summary>
@@ -167,7 +166,7 @@ namespace Reni.Type
             return Target.CreateResult
                 (
                 category, 
-                delegate { return CreateDereferencedArgCode(); }
+                CreateDereferencedArgCode
                 );
         }
 
@@ -208,8 +207,8 @@ namespace Reni.Type
             Result result = CreateVoid.CreateResult
                 (
                 category,
-                delegate { return Code.Base.CreateArg(Size).CreateAssign(RefAlignParam, convertedValue.Code); },
-                delegate { return convertedValue.Refs; }
+                () => Code.Base.CreateArg(Size).CreateAssign(RefAlignParam, convertedValue.Code),
+                () => convertedValue.Refs
                 );
             if (Target.DestructorHandler(category).IsEmpty && Target.MoveHandler(category).IsEmpty)
                 return result;
