@@ -55,18 +55,6 @@ namespace Reni.Type
 	    public override Size UnrefSize { get { return Target.Size; } }
 
 	    /// <summary>
-	    /// Create a reference to a type
-	    /// </summary>
-	    /// <param name="refAlignParam">Alignment  and size of the reference</param>
-	    /// <returns></returns>
-	    public override Ref CreateRef(RefAlignParam refAlignParam)
-	    {
-	        if(refAlignParam.IsEqual(RefAlignParam) )
-	            return this;
-	        return base.CreateRef(refAlignParam);
-	    }
-
-	    /// <summary>
 	    /// Gets the dump print text.
 	    /// </summary>
 	    /// <value>The dump print text.</value>

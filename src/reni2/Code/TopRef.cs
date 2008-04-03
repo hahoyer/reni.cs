@@ -15,7 +15,7 @@ namespace Reni.Code
         /// created 05.10.2006 23:26
         public TopRef(RefAlignParam refAlignParam, Size offset) : base(refAlignParam,offset)
         {
-            StopByObjectId(459);
+            StopByObjectId(-459);
         }
 
         /// <summary>
