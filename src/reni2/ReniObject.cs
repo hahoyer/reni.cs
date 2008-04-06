@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Reflection;
 using HWClassLibrary.Debug;
 
 namespace Reni
@@ -9,7 +8,7 @@ namespace Reni
     /// </summary>
     public abstract class ReniObject : Dumpable
     {
-        private static int _nextObjectId = 0;
+        private static int _nextObjectId;
         private readonly int _objectId;
 
         /// <summary>
@@ -34,7 +33,10 @@ namespace Reni
         /// <summary>
         /// Object id for 
         /// </summary>
-        public virtual int ObjectId { get { return _objectId; } }
+        public virtual int ObjectId
+        {
+            get { return _objectId; }
+        }
 
         /// <summary>
         /// Returns a <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
@@ -45,7 +47,7 @@ namespace Reni
         /// created 09.02.2007 00:10
         public override string ToString()
         {
-            return base.ToString() + " ObjectId="+ObjectId;
+            return base.ToString() + " ObjectId=" + ObjectId;
         }
 
         /// <summary>
@@ -64,7 +66,7 @@ namespace Reni
         [DebuggerHidden]
         public void StopByObjectId(int objectId)
         {
-            bool isStopByObjectIdActive = IsStopByObjectIdActive;
+            var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
             Tracer.ConditionalBreak(1, ObjectId == objectId, @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;

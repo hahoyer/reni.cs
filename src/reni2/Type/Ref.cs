@@ -204,7 +204,13 @@ namespace Reni.Type
             NotImplementedMethod(value, "result", result);
 	        throw new NotImplementedException();
 	    }
-        /// <summary>
+
+	    internal override SearchResult Search(DefineableToken defineableToken)
+	    {
+	        return SearchDefineable(defineableToken).ToSearchResult();
+	    }
+
+	    /// <summary>
         /// Visits from chain. Object is provided by use of "Arg" code element
         /// </summary>
         /// <param name="callContext">The context.</param>
@@ -252,6 +258,12 @@ namespace Reni.Type
         internal abstract Result VisitApply(Context.Base callContext, Category category, Syntax.Base args);
 
         internal Ref DefiningType { get { return _definingType; } }
+
+        public SearchResult ToSearchResult()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 
 }
