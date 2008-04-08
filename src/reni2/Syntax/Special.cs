@@ -1,21 +1,26 @@
-using System;
 using HWClassLibrary.Debug;
 using Reni.Parser;
 
 namespace Reni.Syntax
 {
-    sealed internal class Special : Base
+    internal sealed class Special : Base
     {
-        [DumpData(true),DumpExcept(null)]
-        private readonly Base _left;
         [DumpData(true), DumpExcept(null)]
-        private readonly Token _token;
+        private readonly Base _left;
+
         [DumpData(true), DumpExcept(null)]
         private readonly Base _right;
 
-        public Special(Base left, Token token, Base right)
+        [DumpData(true), DumpExcept(null)]
+        private readonly Token _token;
+
+        [DumpData(true), DumpExcept(null)]
+        private readonly Feature _feature;
+
+        public Special(Base left, Token token, Base right, Feature feature)
         {
             _left = left;
+            _feature = feature;
             _token = token;
             _right = right;
         }
@@ -27,9 +32,9 @@ namespace Reni.Syntax
         /// <param name="context">Environment used for deeper visit and alignment</param>
         /// <param name="category">Categories</param>
         /// <returns></returns>
-        public override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.Base context, Category category)
         {
-            return _token.Result(context, category, _left, _right);
+            return _feature.Result(context, category, _left, _right);
         }
 
         /// <summary>
@@ -39,14 +44,17 @@ namespace Reni.Syntax
         /// created 07.05.2007 22:09 on HAHOYER-DELL by hh
         internal override string DumpShort()
         {
-            string result = "";
+            var result = "";
             if(_left != null)
                 return base.DumpShort();
             result += _token.Name;
-            if (_right != null)
+            if(_right != null)
                 result += "(" + _right.DumpShort() + ")";
             return result;
         }
     }
-}
 
+    internal abstract class Feature {
+        abstract public Result Result(Context.Base context, Category category, Base left, Base right);
+    }
+}

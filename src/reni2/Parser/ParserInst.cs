@@ -1,4 +1,5 @@
-﻿using HWClassLibrary.Helper.TreeViewSupport;
+﻿using System.Collections.Generic;
+using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Syntax;
 
 namespace Reni.Parser
@@ -6,10 +7,10 @@ namespace Reni.Parser
     /// <summary>
     /// The parser singleton
     /// </summary>
-    sealed internal class ParserInst
+    internal sealed class ParserInst
     {
-        private PrioTable _prio = StandardPrio();
-        private ParserLibrary _parserLibrary = StandardParserLibrary();
+        private readonly ParserLibrary _parserLibrary = StandardParserLibrary();
+        private readonly PrioTable _prio = StandardPrio();
 
         /// <summary>
         /// The priority table to use
@@ -29,38 +30,36 @@ namespace Reni.Parser
         /// <returns></returns>
         public Base Compile(Source source)
         {
-            SourcePosn sp = new SourcePosn(source, 0);
+            var sp = new SourcePosn(source, 0);
             Base start = null;
-            PushedSyntaxStack stack = new PushedSyntaxStack();
+            var stack = new Stack<PushedSyntax>();
             stack.Push(new PushedSyntax(start, sp.CreateStart()));
-            while (Apply(stack, ref start, ParserLibrary.CreateToken(sp)))
+            while(Apply(stack, ref start, ParserLibrary.CreateToken(sp)))
                 start = null;
             return PullAndCall(stack, null);
         }
 
-        private bool Apply(PushedSyntaxStack stack, ref Base o, Token token)
+        private bool Apply(Stack<PushedSyntax> stack, ref Base o, Token token)
         {
-            while (true)
+            while(true)
             {
-                char PrioRel = PrioTable.Op(token, stack.Peek().Token);
-                if (PrioRel != '+')
+                var PrioRel = PrioTable.Op(token, stack.Peek().Token);
+                if(PrioRel != '+')
                     o = PullAndCall(stack, o);
 
-                if (PrioRel != '-')
+                if(PrioRel != '-')
                 {
                     stack.Push(new PushedSyntax(o, token));
                     return !token.TokenClass.IsEnd;
                 }
-                ;
             }
         }
 
-        private static Base PullAndCall(PushedSyntaxStack stack, Base Args)
+        private static Base PullAndCall(Stack<PushedSyntax> stack, Base Args)
         {
-            PushedSyntax x = stack.Pop();
+            var x = stack.Pop();
             return x.CreateSyntax(Args);
         }
-
 
         private static ParserLibrary StandardParserLibrary()
         {
@@ -69,7 +68,7 @@ namespace Reni.Parser
 
         private static PrioTable StandardPrio()
         {
-            PrioTable x = PrioTable.LeftAssoc("<else>", "arg");
+            var x = PrioTable.LeftAssoc("<else>", "arg");
             x += PrioTable.LeftAssoc(
                 "array", "explicit_ref",
                 "at", "content", "_A_T_", "_N_E_X_T_",
@@ -98,27 +97,28 @@ namespace Reni.Parser
             x += PrioTable.RightAssoc(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
 
             x = x.ParLevel
-                (new string[]
-                     {
-                         "+-+",
-                         "+?+",
-                         "?--"
-                     },
-                 new string[] {"then"},
-                 new string[] {"else"}
+                (new[]
+                {
+                    "+-+",
+                    "+?+",
+                    "?--"
+                },
+                    new[] {"then"},
+                    new[] {"else"}
                 );
-            x += PrioTable.RightAssoc(":", "function", "property", "inherit", "apply_operator", "constructor", "converter");
+            x += PrioTable.RightAssoc(":", "function", "property", "inherit", "apply_operator", "constructor",
+                "converter");
             x += PrioTable.RightAssoc(",");
             x += PrioTable.RightAssoc(";");
             x = x.ParLevel
-                (new string[]
-                     {
-                         "++-",
-                         "+?-",
-                         "?--"
-                     },
-                 new string[] {"(", "[", "{", "<frame>"},
-                 new string[] {")", "]", "}", "<end>"}
+                (new[]
+                {
+                    "++-",
+                    "+?-",
+                    "?--"
+                },
+                    new[] {"(", "[", "{", "<frame>"},
+                    new[] {")", "]", "}", "<end>"}
                 );
             //x.Correct("(", "<else>", '-');
             //x.Correct("[", "<else>", '-');

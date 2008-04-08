@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Parser;
 
 namespace Reni.Syntax
@@ -10,7 +8,7 @@ namespace Reni.Syntax
     /// <summary>
     /// Statement inside of a struct, context free version
     /// </summary>
-    sealed internal class Statement : Base
+    internal sealed class Statement : Base
     {
         private readonly List<MemberElem> _chain;
 
@@ -19,7 +17,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="chain">The chain.</param>
         /// <param name="tail">The tail.</param>
-        Statement(List<MemberElem> chain, MemberElem tail)
+        private Statement(List<MemberElem> chain, MemberElem tail)
         {
             _chain = new List<MemberElem>();
             _chain.AddRange(chain);
@@ -60,46 +58,46 @@ namespace Reni.Syntax
         /// <param name="context"></param>
         /// <param name="category"></param>
         /// <returns></returns>
-        override public Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.Base context, Category category)
         {
-            bool trace = ObjectId == 1082 && context.ObjectId == 21;
-            StartMethodDumpWithBreak(trace, context,category);
-            if (Chain.Count == 0)
+            var trace = ObjectId == 1082 && context.ObjectId == 21;
+            StartMethodDumpWithBreak(trace, context, category);
+            if(Chain.Count == 0)
                 NotImplementedMethod(context, category);
 
-            Category internalCategory = category|Category.Type;
-            if (category.HasCode) 
+            var internalCategory = category | Category.Type;
+            if(category.HasCode)
                 internalCategory |= Category.Refs;
-            Result intermediateResult = Reni.Type.Base.CreateVoidResult(internalCategory);
-            Result result = context.VisitFirstChainElement(internalCategory, Chain[0]);
-            for (int i = 1; i < Chain.Count; i++)
+            var intermediateResult = Type.Base.CreateVoidResult(internalCategory);
+            var result = context.VisitFirstChainElement(internalCategory, Chain[0]);
+            for(var i = 1; i < Chain.Count; i++)
             {
-                Result newResult = result.PostProcess(context);
+                var newResult = result.PostProcess(context);
 
                 Tracer.ConditionalBreak(trace, newResult.Dump());
-                if (!newResult.Type.IsRef)
+                if(!newResult.Type.IsRef)
                     intermediateResult = intermediateResult.SafeList(newResult, internalCategory);
-                if (newResult.IsPending)
+                if(newResult.IsPending)
                     return newResult;
 
                 result = context.VisitNextChainElement(internalCategory, Chain[i], newResult);
                 if(internalCategory.HasRefs)
-                foreach (Context.Base referencedContext in result.Refs.Data)
-                {
-                    if (referencedContext.IsChildOf(context))
+                    foreach(var referencedContext in result.Refs.Data)
                     {
-                        Code.Base replaceContextCode = intermediateResult.Type.CreateRefCodeForContext(referencedContext);
-                        Tracer.Assert(replaceContextCode != null);
-                        result = result.ReplaceRelativeContextRef(referencedContext, replaceContextCode);
+                        if(referencedContext.IsChildOf(context))
+                        {
+                            var replaceContextCode = intermediateResult.Type.CreateRefCodeForContext(referencedContext);
+                            Tracer.Assert(replaceContextCode != null);
+                            result = result.ReplaceRelativeContextRef(referencedContext, replaceContextCode);
+                        }
                     }
-                }
             }
 
-            if (result.IsPending)
+            if(result.IsPending)
                 return result;
             Tracer.Assert(result != null);
-            Result dereferencedResult = result.Type.Dereference(result).PostProcess(context);
-            Result statementResult = dereferencedResult.CreateStatement(category, intermediateResult);
+            var dereferencedResult = result.Type.Dereference(result).PostProcess(context);
+            var statementResult = dereferencedResult.CreateStatement(category, intermediateResult);
             return ReturnMethodDumpWithBreak(trace, statementResult);
         }
 
@@ -112,7 +110,7 @@ namespace Reni.Syntax
         /// created 01.04.2007 23:06 on SAPHIRE by HH
         internal override Base CreateDefinableSyntax(DefineableToken defineableToken, Base right)
         {
-            return new Statement(_chain,new MemberElem(defineableToken,right));
+            return new Statement(_chain, new MemberElem(defineableToken, right));
         }
 
         /// <summary>
@@ -123,10 +121,10 @@ namespace Reni.Syntax
         /// created 07.05.2007 22:10 on HAHOYER-DELL by hh
         internal override string DumpShort()
         {
-            string result = "";
-            for (int i = 0; i < _chain.Count; i++)
+            var result = "";
+            for(var i = 0; i < _chain.Count; i++)
             {
-                if(i>0)
+                if(i > 0)
                     result += " ";
                 result += _chain[i].DumpShort();
             }

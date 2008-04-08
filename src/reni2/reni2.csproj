@@ -98,7 +98,6 @@
     <Compile Include="Parser\ParserLibrary.cs" />
     <Compile Include="Parser\PrioTable.cs" />
     <Compile Include="Parser\PushedSyntax.cs" />
-    <Compile Include="Parser\PushedSyntaxStack.cs" />
     <Compile Include="Parser\Source.cs" />
     <Compile Include="Parser\SourcePosn.cs" />
     <Compile Include="Parser\Token.cs" />
@@ -107,7 +106,6 @@
     <Compile Include="Parser\TokenClass\FoundNumpopResult.cs" />
     <Compile Include="Parser\TokenClass\Name\TconverterT.cs" />
     <Compile Include="Parser\TokenClass\Name\TelseT.cs" />
-    <Compile Include="Parser\TokenClass\Name\TthenT.cs" />
     <Compile Include="Parser\TokenClass\Name\TtypeT.cs" />
     <Compile Include="Parser\TokenClass\Name\T_A_T_T.cs" />
     <Compile Include="Parser\TokenClass\Name\TdataT.cs" />

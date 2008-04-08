@@ -33,7 +33,7 @@ namespace Reni.Syntax
         /// <param name="category">Categories</param>
         /// <returns></returns>
         //[DebuggerHidden]
-        public override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.Base context, Category category)
         {
             return _data.Visit(context, category);
         }

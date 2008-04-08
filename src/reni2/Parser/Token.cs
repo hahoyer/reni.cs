@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Parser.TokenClass;
 
@@ -5,11 +6,10 @@ namespace Reni.Parser
 {
     internal sealed class Token : ReniObject
     {
-        private readonly SourcePosn _source;
+        private static int _nextObjectId;
         private readonly int _length;
+        private readonly SourcePosn _source;
         private readonly Base _tokenClass;
-
-        private static int _nextObjectId = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TokenClass"/> class.
@@ -18,7 +18,7 @@ namespace Reni.Parser
         /// <param name="length">The length.</param>
         /// <param name="tokenClass">The tokenClass.</param>
         /// created 31.03.2007 23:27 on SAPHIRE by HH
-        public Token(SourcePosn source, int length, TokenClass.Base tokenClass) : base(_nextObjectId++)
+        public Token(SourcePosn source, int length, Base tokenClass) : base(_nextObjectId++)
         {
             _source = source.Clone();
             _length = length;
@@ -55,15 +55,6 @@ namespace Reni.Parser
         /// is like dump
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
-        {
-            return Source.FilePosn(Name);
-        }
-
-        /// <summary>
-        /// is like dump
-        /// </summary>
-        /// <returns></returns>
         public string NodeDump { get { return ToString(); } }
 
         /// <summary>
@@ -71,6 +62,21 @@ namespace Reni.Parser
         /// </summary>
         /// <returns></returns>
         public string FilePosn { get { return "\n" + Source.FilePosn(Name); } }
+
+        /// <summary>
+        /// Normally Name except for some spacial cases
+        /// </summary>
+        [DumpData(false)]
+        public string PrioTableName { get { return TokenClass.PrioTableName(Name); } }
+
+        /// <summary>
+        /// is like dump
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return Source.FilePosn(Name);
+        }
 
         /// <summary>
         /// Returns just the name of the token
@@ -92,12 +98,6 @@ namespace Reni.Parser
         }
 
         /// <summary>
-        /// Normally Name except for some spacial cases
-        /// </summary>
-        [DumpData(false)]
-        public string PrioTableName { get { return TokenClass.PrioTableName(Name); } }
-
-        /// <summary>
         /// Results the specified context.
         /// </summary>
         /// <param name="context">The context.</param>
@@ -105,16 +105,17 @@ namespace Reni.Parser
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         /// <returns></returns>
+        [Obsolete]
         internal Result Result(Context.Base context, Category category, Syntax.Base left, Syntax.Base right)
         {
-            return TokenClass.Result(left, this, right, context,  category);
+            return TokenClass.Result(left, this, right, context, category);
         }
     }
 
-    internal sealed class DefineableToken: ReniObject
+    internal sealed class DefineableToken : ReniObject
     {
-        private readonly SourcePosn _source;
         private readonly int _length;
+        private readonly SourcePosn _source;
         private readonly Defineable _tokenClass;
 
         internal DefineableToken(Token token)

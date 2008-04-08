@@ -15,6 +15,8 @@ namespace Reni.Syntax
         {
         }
 
+        internal Token Token { get { return _token; } }
+
         /// <summary>
         /// Visitor function, that ensures correct alignment
         /// This function shoud be called by cache elments only
@@ -23,7 +25,7 @@ namespace Reni.Syntax
         /// <param name="category">Categories</param>
         /// <returns></returns>
         //[DebuggerHidden]
-        public override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.Base context, Category category)
         {
             return Type.Void.CreateResult(category);
         }

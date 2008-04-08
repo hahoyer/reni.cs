@@ -75,7 +75,7 @@ namespace Reni.Syntax
         /// <param name="category">Categories</param>
         /// <returns></returns>
         //[DebuggerHidden]
-        public virtual Result VirtVisit(Context.Base context, Category category)
+        internal virtual Result VirtVisit(Context.Base context, Category category)
         {
             NotImplementedMethod(context, category);
             return null;

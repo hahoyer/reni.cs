@@ -83,7 +83,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        public override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
         {
             if (left != null)
                 return left.CreateDefinableSyntax(new DefineableToken(token), right);
@@ -164,7 +164,7 @@ namespace Reni.Parser.TokenClass
 
         public string Name { get { return _token.Name; } }
 
-        public override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.Base context, Category category)
         {
             return DeclarationSyntax.Visit(context, category);
         }

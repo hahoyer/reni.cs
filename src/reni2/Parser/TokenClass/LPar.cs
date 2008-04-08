@@ -35,7 +35,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        public override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
         {
             if (left != null)
                 return base.CreateSyntax(left, token, right);
@@ -47,7 +47,7 @@ namespace Reni.Parser.TokenClass
         /// <summary>
         /// Special name for begin of file
         /// </summary>
-        public override string PrioTableName(string name)
+        internal override string PrioTableName(string name)
         {
             if (_level == 0)
                 return "<frame>";

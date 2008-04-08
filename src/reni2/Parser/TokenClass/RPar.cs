@@ -13,7 +13,7 @@ namespace Reni.Parser.TokenClass
         /// ctor
         /// </summary>
         /// <param name="level">0 for end of file, 1 for "{", 2 for "[" and 3 for "("</param>
-        public RPar(int level)
+        internal RPar(int level)
         {
             _level = level;
         }
@@ -22,7 +22,7 @@ namespace Reni.Parser.TokenClass
         /// True for end of file
         /// </summary>
         /// <returns></returns>
-        public override bool IsEnd { get { return _level == 0; } }
+        internal override bool IsEnd { get { return _level == 0; } }
 
         /// <summary>
         /// Creates the syntax.
@@ -32,11 +32,11 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        public override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
         {
-            if (right != null)
+            if(right != null)
                 return base.CreateSyntax(left, token, right);
-            if (left != null)
+            if(left != null)
                 return left;
             return new Void(token);
         }
@@ -44,13 +44,12 @@ namespace Reni.Parser.TokenClass
         /// <summary>
         /// Special name for end of file
         /// </summary>
-        public override string PrioTableName(string name)
+        internal override string PrioTableName(string name)
         {
-            if (_level == 0)
+            if(_level == 0)
                 return "<end>";
 
             return base.PrioTableName(name);
         }
-
     }
 }
