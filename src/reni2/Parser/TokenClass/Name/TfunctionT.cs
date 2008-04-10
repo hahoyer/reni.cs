@@ -5,7 +5,7 @@ namespace Reni.Parser.TokenClass.Name
     /// <summary>
     /// Summary description for functionToken.
     /// </summary>
-    internal sealed class TfunctionT : Base
+    internal sealed class TfunctionT : Special
     {
         /// <summary>
         /// Creates the syntax.
@@ -30,8 +30,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 25.10.2006 20:14
-        internal override Result Result(Syntax.Base left, Token token, Syntax.Base right, Context.Base context,
-            Category category)
+        internal override Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
         {
             Tracer.Assert(left == null);
             return context.CreateFunctionResult(category, right);
@@ -41,7 +40,7 @@ namespace Reni.Parser.TokenClass.Name
     /// <summary>
     /// Summary description for functionToken.
     /// </summary>
-    internal sealed class TpropertyT : Base
+    internal sealed class TpropertyT : Special
     {
         internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
         {
@@ -57,8 +56,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         /// <returns></returns>
-        internal override Result Result(Syntax.Base left, Token token, Syntax.Base right, Context.Base context,
-            Category category)
+        internal override Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
         {
             Tracer.Assert(left == null);
             return context.CreatePropertyResult(category, right);

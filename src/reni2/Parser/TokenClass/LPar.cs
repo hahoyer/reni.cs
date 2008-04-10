@@ -9,13 +9,22 @@ namespace Reni.Parser.TokenClass
     /// </summary>
     internal class LPar : Base
     {
-        private int _level;
+        private readonly int _level;
 
+        private static readonly Base _parenthesis = new LPar(3);
+        private static readonly Base _bracket = new LPar(2);
+        private static readonly Base _brace = new LPar(1);
+        private static readonly Base _frame = new LPar(0);
+
+        internal static Base Parenthesis { get { return _parenthesis; } }
+        internal static Base Bracket { get { return _bracket; } }
+        internal static Base Brace { get { return _brace; } }
+        internal static Base Frame { get { return _frame; } }
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="level">0 for start of file, 1 for "{", 2 for "[" and 3 for "("</param>
-        public LPar(int level)
+        private LPar(int level)
         {
             _level = level;
         }

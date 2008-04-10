@@ -5,7 +5,7 @@ namespace Reni.Parser.TokenClass.Name
 	/// <summary>
 	/// Summary description for argToken.
 	/// </summary>
-    sealed internal class TargT : Base
+    sealed internal class TargT : Special
 	{
         /// <summary>
         /// Creates the syntax.
@@ -30,7 +30,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// [created 13.05.2006 21:53]
-	    internal override Result Result(Syntax.Base left, Token token, Syntax.Base right, Context.Base context, Category category)
+	    internal override Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
 	    {
             Tracer.Assert(left == null);
             Tracer.Assert(right == null);

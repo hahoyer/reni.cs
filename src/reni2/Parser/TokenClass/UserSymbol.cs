@@ -1,29 +1,23 @@
-﻿using System.Diagnostics;
-
-namespace Reni.Parser.TokenClass
+﻿namespace Reni.Parser.TokenClass
 {
     /// <summary>
     /// Any non reseved token
     /// </summary>
     internal sealed class UserSymbol: Defineable
     {
-        string _potentialTypeName;
+        private static readonly Base _symbolInstance = new UserSymbol(true);
+        private static readonly Base _nonSymbolInstance = new UserSymbol(false);
+        private readonly bool _isSymbol;
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="typeName">Suggested type name to turn it into a reseved token</param>
-        internal UserSymbol(string typeName)
-        {
-            _potentialTypeName = typeName;
+        private UserSymbol(bool isSymbol) {
+            _isSymbol = isSymbol;
         }
 
-        /// <summary>
-        /// Name of the type the parser would map this token to.
-        /// The namespace should be Reni.Parser.TokenClass.Symbol in case of symbols 
-        /// and Reni.Parser.TokenClass.Name in case of alphanumeric names
-        /// </summary>
-        internal string PotentialTypeName{get{return _potentialTypeName;}}
+        internal static Base Instance(bool isSymbol)
+        {
+            return isSymbol ? _symbolInstance : _nonSymbolInstance;
+        }
 
+        internal override bool IsSymbol { get { return _isSymbol; } }
     }
 }

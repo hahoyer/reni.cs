@@ -5,8 +5,10 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// DigitChain token
     /// </summary>
-    internal sealed class Number : Base
+    internal sealed class Number : Special
     {
+        private static readonly Base _instance = new Number();
+
         /// <summary>
         /// Creates the syntax.
         /// </summary>
@@ -30,8 +32,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 04.05.2007 23:25 on HAHOYER-DELL by hh
-        internal override Result Result(Syntax.Base left, Token token, Syntax.Base right, Context.Base context,
-            Category category)
+        internal override Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
         {
             Tracer.Assert(left == null);
             Tracer.Assert(right == null);
@@ -41,5 +42,7 @@ namespace Reni.Parser.TokenClass
                 .CreateSequence(bitsConst.Size.ToInt())
                 .CreateResult(category, delegate { return Code.Base.CreateBitArray(bitsConst); });
         }
+
+        public static Base Instance { get { return _instance; } }
     }
 }

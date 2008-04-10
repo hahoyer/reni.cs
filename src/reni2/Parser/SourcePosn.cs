@@ -26,7 +26,7 @@ namespace Reni.Parser
         /// <returns></returns>
         public Token CreateStart()
         {
-            return new Token(this, 0, new LPar(0));
+            return new Token(this, 0, LPar.Frame);
         }
         /// <summary>
         /// The current character

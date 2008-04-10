@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using HWClassLibrary.Debug;
 using Reni.Parser.TokenClass;
 
@@ -97,18 +98,25 @@ namespace Reni.Parser
             return prioTable.Index(PrioTableName);
         }
 
-        /// <summary>
-        /// Results the specified context.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        [Obsolete]
-        internal Result Result(Context.Base context, Category category, Syntax.Base left, Syntax.Base right)
+        internal string PotentialTypeName
         {
-            return TokenClass.Result(left, this, right, context, category);
+            get
+            {
+                 return Base.TokenToTypeNameEnd(
+                     TokenClass.IsSymbol, Name);
+            }
+        }
+
+        internal static Token CreateToken(bool isSymbol, SourcePosn sp, int i)
+        {
+            var a = Assembly.GetAssembly(typeof(ParserLibrary));
+            var t = a.GetTypes();
+            foreach(var tt in t)
+            {
+                if(Base.IsTokenType(tt.FullName, isSymbol, sp.SubString(0, i)))
+                    return new Token(sp, i, (Base) Activator.CreateInstance(tt, new object[0]));
+            }
+            return new Token(sp, i, UserSymbol.Instance(isSymbol));
         }
     }
 
@@ -137,5 +145,6 @@ namespace Reni.Parser
         /// </summary>
         [DumpData(false)]
         internal string Name { get { return _source.SubString(0, _length); } }
+
     }
 }

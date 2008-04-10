@@ -22,6 +22,8 @@ namespace Reni.Parser.TokenClass
         [DumpData(false)]
         internal virtual bool IsEnd { get { return false; } }
 
+        internal virtual bool IsSymbol { get { return false; } }
+
         /// <summary>
         /// Creates the syntax.
         /// </summary>
@@ -36,13 +38,6 @@ namespace Reni.Parser.TokenClass
             return null;
         }
 
-        internal protected Syntax.Base CreateSpecialSyntax(Syntax.Base left, Token token, Syntax.Base right)
-        {
-            return new Special(left, token, right, Feature);
-        }
-
-        protected abstract Feature Feature { get; }
-
         /// <summary>
         /// The name of the token for lookup in prio table of parser.
         /// </summary>
@@ -54,6 +49,83 @@ namespace Reni.Parser.TokenClass
             return name;
         }
 
+        internal static bool IsTokenType(string typeName, bool isSymbol, string token)
+        {
+            return typeName.EndsWith(TokenToTypeNameEnd(isSymbol, token));
+        }
+
+        internal static string TokenToTypeNameEnd(bool isSymbol, string token)
+        {
+            if(isSymbol)
+                return ".TokenClass.Symbol." + Symbolize(token);
+            return ".TokenClass.Name.T" + token + "T";
+        }
+
+        /// <summary>
+        /// Symbolizes the specified token.
+        /// </summary>
+        /// <param name="token">The token.</param>
+        /// <returns></returns>
+        /// [created 18.07.2006 23:49]
+        internal static string Symbolize(string token)
+        {
+            var name = "";
+            for(var i = 0; i < token.Length; i++)
+                name += SymbolizeChar(token[i]);
+            return name;
+        }
+
+        /// <summary>
+        /// Symbolizes the char.
+        /// </summary>
+        /// <param name="Char">The char.</param>
+        /// <returns></returns>
+        /// [created 18.07.2006 23:38]
+        internal static string SymbolizeChar(char Char)
+        {
+            switch(Char)
+            {
+                case '&':
+                    return "And";
+                case '\\':
+                    return "Backslash";
+                case ':':
+                    return "Colon";
+                case '.':
+                    return "Dot";
+                case '=':
+                    return "Equal";
+                case '>':
+                    return "Greater";
+                case '<':
+                    return "Less";
+                case '-':
+                    return "Minus";
+                case '!':
+                    return "Not";
+                case '|':
+                    return "Or";
+                case '+':
+                    return "Plus";
+                case '/':
+                    return "Slash";
+                case '*':
+                    return "Star";
+                case '~':
+                    return "Tilde";
+                default:
+                    throw new NotImplementedException("Symbolize(" + Char + ")");
+            }
+        }
+    }
+
+    internal abstract class Special: Base
+    {
+        protected Syntax.Base CreateSpecialSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        {
+            return new Syntax.Special(left, token, this, right);
+        }
+
         /// <summary>
         /// Results the specified token.
         /// </summary>
@@ -63,10 +135,9 @@ namespace Reni.Parser.TokenClass
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         /// <returns></returns>
-        internal virtual Result Result(Syntax.Base left, Token token, Syntax.Base right, Context.Base context,
-            Category category)
+        internal virtual Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
         {
-            NotImplementedMethod(left, token, right, context, category);
+            NotImplementedMethod(context, category, left, token, right);
             return null;
         }
     }

@@ -1,10 +1,17 @@
+using Reni.Syntax;
+
 namespace Reni.Parser.TokenClass
 {
     /// <summary>
     /// List token (comma, semicolon)
     /// </summary>
-    internal class List : Base
+    sealed internal class List : Base
     {
+        private List() { }
+        private static readonly List _instance = new List();
+
+        internal static List Instance{get { return _instance; } }
+
         /// <summary>
         /// Creates the syntax.
         /// </summary>
