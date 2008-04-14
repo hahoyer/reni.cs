@@ -52,6 +52,7 @@ namespace Reni.Type
         /// asis
         /// </summary>
         public Base Element { get { return Parent; } }
+
         /// <summary>
         /// Moves the handler.
         /// </summary>

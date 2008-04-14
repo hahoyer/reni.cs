@@ -3,19 +3,8 @@ namespace Reni.Type
     /// <summary>
     /// Type of type
     /// </summary>
-    internal sealed class TypeType: Primitive
+    internal sealed class TypeType : Primitive
     {
-        /// <summary>
-        /// Converts to itself.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// created 30.01.2007 22:57
-        internal override Result ConvertToItself(Category category)
-        {
-            return CreateVoidResult(category);
-        }
-
         private readonly Base _parent;
 
         /// <summary>
@@ -38,7 +27,18 @@ namespace Reni.Type
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        internal override string DumpPrintText { get { return "("+_parent.DumpPrintText+"()) type"; } }
+        internal override string DumpPrintText { get { return "(" + _parent.DumpPrintText + "()) type"; } }
+
+        /// <summary>
+        /// Converts to itself.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// created 30.01.2007 22:57
+        internal override Result ConvertToItself(Category category)
+        {
+            return CreateVoidResult(category);
+        }
 
         /// <summary>
         /// Dumps the print code.
@@ -48,18 +48,15 @@ namespace Reni.Type
         /// created 08.01.2007 17:29
         internal override Result DumpPrint(Category category)
         {
-            return Void.CreateResult
-                (
-                category,
-                delegate { return DumpPrintCode(); }
-                );
+            return Void.CreateResult(category, DumpPrintCode);
         }
+
         /// <summary>
         /// Dumps the print code.
         /// </summary>
         /// <returns></returns>
         /// created 08.01.2007 17:29
-        Code.Base DumpPrintCode()
+        private Code.Base DumpPrintCode()
         {
             return Code.Base.CreateDumpPrintText(_parent.DumpPrintText);
         }

@@ -45,51 +45,14 @@ namespace Reni.Type
         /// </summary>
         public override Size Size { get { return First.Size + Second.Size; } }
 
-        /// <summary>
-        /// Destructors the specified category.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// [created 02.06.2006 09:47]
-        internal override Result DestructorHandler(Category category)
-        {
-            Result firstHandler = First.DestructorHandler(category);
-            Result secondHandler = Second.DestructorHandler(category);
-            if (firstHandler.IsEmpty)
-                return secondHandler;
-            if (secondHandler.IsEmpty)
-                return firstHandler;
-
-            NotImplementedMethod(category);
-            throw new NotImplementedException();
-        }
-
-        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            List<Result> result = DumpPrintArrayFromRef(category,refAlignParam);
-            return Result.ConcatPrintResult(category, result);
-        }
-
-        private List<Result> DumpPrintArrayFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            List<Result> result = new List<Result>();
-            Base[] list = ToList;
-            for (int i = 0; i < list.Length; i++)
-            {
-                Result iResult = list[i].DumpPrintFromRef(category, refAlignParam);
-                result.Add(iResult);
-            }
-            return result;
-        }
-
         [DumpData(false)]
         internal override string DumpPrintText
         {
             get
             {
-                string result = "";
-                Base[] types = ToList;
-                for (int i = 0; i < types.Length; i++)
+                var result = "";
+                var types = ToList;
+                for(var i = 0; i < types.Length; i++)
                 {
                     result += "\n";
                     result += types[i];
@@ -103,10 +66,46 @@ namespace Reni.Type
         {
             get
             {
-                List<Base> result = new List<Base>(Parent.ToList);
-                result.Add(Second);
+                var result = new List<Base>(Parent.ToList) {Second};
                 return result.ToArray();
             }
+        }
+
+        /// <summary>
+        /// Destructors the specified category.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// [created 02.06.2006 09:47]
+        internal override Result DestructorHandler(Category category)
+        {
+            var firstHandler = First.DestructorHandler(category);
+            var secondHandler = Second.DestructorHandler(category);
+            if(firstHandler.IsEmpty)
+                return secondHandler;
+            if(secondHandler.IsEmpty)
+                return firstHandler;
+
+            NotImplementedMethod(category);
+            throw new NotImplementedException();
+        }
+
+        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
+        {
+            var result = DumpPrintArrayFromRef(category, refAlignParam);
+            return Result.ConcatPrintResult(category, result);
+        }
+
+        private List<Result> DumpPrintArrayFromRef(Category category, RefAlignParam refAlignParam)
+        {
+            var result = new List<Result>();
+            var list = ToList;
+            for(var i = 0; i < list.Length; i++)
+            {
+                var iResult = list[i].DumpPrintFromRef(category, refAlignParam);
+                result.Add(iResult);
+            }
+            return result;
         }
     }
 }

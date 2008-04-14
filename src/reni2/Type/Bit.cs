@@ -8,7 +8,7 @@ namespace Reni.Type
     /// <summary>
     /// Summary description for Bits.
     /// </summary>
-    sealed internal class Bit : Primitive
+    internal sealed class Bit : Primitive
     {
         /// <summary>
         /// asis
@@ -33,15 +33,22 @@ namespace Reni.Type
         public override bool HasEmptyValue { get { return true; } }
 
         /// <summary>
+        /// Gets the type of the sequence element.
+        /// </summary>
+        /// <value>The type of the sequence element.</value>
+        /// created 13.01.2007 19:46
+        internal override int SequenceCount { get { return 1; } }
+
+        /// <summary>
         /// Searches the defineable prefix from sequence.
         /// </summary>
         /// <param name="token">The token.</param>
         /// <param name="count"></param>
         /// <returns></returns>
         /// created 02.02.2007 22:09
-        internal override PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken token, int count)
+        PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken token, int count)
         {
-            if (token.TokenClass.IsBitSequencePrefixOperation)
+            if(token.TokenClass.IsBitSequencePrefixOperation)
                 return new BitSequenceOperationPrefixSearchResult(CreateSequence(count), token.TokenClass);
             return null;
         }
@@ -59,13 +66,6 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Gets the type of the sequence element.
-        /// </summary>
-        /// <value>The type of the sequence element.</value>
-        /// created 13.01.2007 19:46
-        internal override int SequenceCount { get { return 1; } }
-
-        /// <summary>
         /// Dumps the print code from array.
         /// </summary>
         /// <param name="category">The category.</param>
@@ -74,16 +74,6 @@ namespace Reni.Type
         internal override Result DumpPrint(Category category)
         {
             return CreateArgResult(category).DumpPrintBitSequence();
-        }
-
-        /// <summary>
-        /// Deep compare
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool TypedDeepEqual(Bit other)
-        {
-            return true;
         }
 
         /// <summary>
@@ -97,7 +87,7 @@ namespace Reni.Type
         /// created 11.01.2007 22:09
         internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
-            if (conversionFeature.IsUseConverter)
+            if(conversionFeature.IsUseConverter)
                 return dest.HasConverterFromBit;
 
             return false;
@@ -112,7 +102,8 @@ namespace Reni.Type
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:18
-        internal override Code.Base CreateSequenceOperation(Defineable token, Result objResult, Size size, Result argResult)
+        internal override Code.Base CreateSequenceOperation(Defineable token, Result objResult, Size size,
+            Result argResult)
         {
             return objResult.Code.CreateBitSequenceOperation(token, size, argResult.Code);
         }
@@ -142,7 +133,7 @@ namespace Reni.Type
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
-        internal override SearchResultFromSequence SearchFromSequence(Defineable defineable)
+        SearchResultFromSequence SearchFromSequence(Defineable defineable)
         {
             return defineable.SearchFromBitSequence();
         }
@@ -156,16 +147,15 @@ namespace Reni.Type
         {
             return GetType().FullName;
         }
-
     }
 
     internal sealed class BitSequenceOperationPrefixSearchResult : PrefixSearchResult
     {
         [DumpData(true)]
-        private readonly Sequence _definingType;
+        private readonly Defineable _defineable;
 
         [DumpData(true)]
-        private readonly Defineable _defineable;
+        private readonly Sequence _definingType;
 
         internal BitSequenceOperationPrefixSearchResult(Sequence definingType, Defineable defineable)
         {
@@ -175,16 +165,20 @@ namespace Reni.Type
 
         internal override Result VisitApply(Category category, Result argResult)
         {
-            Base elementType = argResult.Type.SequenceElementType;
-            Result objResult = argResult.Type.VisitAsSequence(category, elementType).UseWithArg(argResult);
-            Result result = new Result();
-            if (category.HasSize || category.HasType || category.HasCode)
+            var elementType = argResult.Type.SequenceElementType;
+            var objResult = argResult.Type.VisitAsSequence(category, elementType).UseWithArg(argResult);
+            var result = new Result();
+            if(category.HasSize || category.HasType || category.HasCode)
             {
-                if (category.HasSize) result.Size = objResult.Size;
-                if (category.HasType) result.Type = objResult.Type;
-                if (category.HasCode) result.Code = elementType.CreateSequenceOperation(_defineable, objResult);
-            };
-            if (category.HasRefs) result.Refs = objResult.Refs;
+                if(category.HasSize)
+                    result.Size = objResult.Size;
+                if(category.HasType)
+                    result.Type = objResult.Type;
+                if(category.HasCode)
+                    result.Code = elementType.CreateSequenceOperation(_defineable, objResult);
+            }
+            if(category.HasRefs)
+                result.Refs = objResult.Refs;
             return result;
         }
     }
@@ -203,36 +197,36 @@ namespace Reni.Type
         /// <summary>
         /// Creates the result for member function searched. Object is provided by use of "Arg" code element
         /// </summary>
-        /// <param name="callContext">The call context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        /// <summary>
-        /// Obtain result
-        /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        protected internal override Result VisitApply(Context.Base context, Category category, Syntax.Base args)
+        internal protected override Result VisitApply(Context.Base context, Category category, Syntax.Base args)
         {
-            bool trace = ObjectId == 920 && context.ObjectId == 15 && category.HasType;
+            var trace = ObjectId == 920 && context.ObjectId == 15 && category.HasType;
             StartMethodDumpWithBreak(trace, context, category, args);
-            Type.Base elementType = DefiningType.SequenceElementType;
-            Result objResult = DefiningType.VisitAsSequence(category, elementType);
-            Result argResult = args.VisitAsSequence(context, category | Category.Type, elementType);
-            if (trace) DumpMethodWithBreak("", context, category, args, "objResult", objResult, "argResult", argResult);
-            Result result = new Result();
-            if (category.HasSize || category.HasType || category.HasCode)
+            var elementType = DefiningType.SequenceElementType;
+            var objResult = DefiningType.VisitAsSequence(category, elementType);
+            var argResult = args.VisitAsSequence(context, category | Category.Type, elementType);
+            if(trace)
+                DumpMethodWithBreak("", context, category, args, "objResult", objResult, "argResult", argResult);
+            var result = new Result();
+            if(category.HasSize || category.HasType || category.HasCode)
             {
-                int objBitCount = DefiningType.UnrefSize.ToInt();
-                int argBitCount = argResult.Type.UnrefSize.ToInt();
-                Type.Base type = elementType.SequenceOperationResultType(_defineable, objBitCount, argBitCount).CreateAlign(context.RefAlignParam.AlignBits);
-                if (category.HasSize) result.Size = type.Size;
-                if (category.HasType) result.Type = type;
-                if (category.HasCode) result.Code = elementType.CreateSequenceOperation(_defineable, objResult, type.Size, argResult);
-            };
-            if (category.HasRefs) result.Refs = objResult.Refs.Pair(argResult.Refs);
+                var objBitCount = DefiningType.UnrefSize.ToInt();
+                var argBitCount = argResult.Type.UnrefSize.ToInt();
+                var type =
+                    elementType.SequenceOperationResultType(_defineable, objBitCount, argBitCount).CreateAlign(
+                        context.RefAlignParam.AlignBits);
+                if(category.HasSize)
+                    result.Size = type.Size;
+                if(category.HasType)
+                    result.Type = type;
+                if(category.HasCode)
+                    result.Code = elementType.CreateSequenceOperation(_defineable, objResult, type.Size, argResult);
+            }
+            if(category.HasRefs)
+                result.Refs = objResult.Refs.Pair(argResult.Refs);
             return ReturnMethodDumpWithBreak(trace, result);
         }
     }

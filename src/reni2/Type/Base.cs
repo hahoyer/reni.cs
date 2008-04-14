@@ -246,7 +246,8 @@ namespace Reni.Type
 
         protected virtual Base CreateReversePair(Base first)
         {
-            return first._pair.Find(this, () => new Pair(first, this));
+            return first._pair.Find(this, 
+                () => new Pair(first, this));
         }
 
         /// <summary>
@@ -267,29 +268,6 @@ namespace Reni.Type
         public Sequence CreateSequence(int elementCount)
         {
             return _chain.Find(elementCount, () => new Sequence(this, elementCount));
-        }
-
-        /// <summary>
-        /// Searches the defineable prefix.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <returns></returns>
-        /// created 02.02.2007 21:51
-        internal virtual PrefixSearchResult PrefixSearchDefineable(DefineableToken token)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Searches the defineable prefix from sequence.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <param name="count">The count.</param>
-        /// <returns></returns>
-        /// created 02.02.2007 22:09
-        internal virtual PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken token, int count)
-        {
-            return null;
         }
 
         /// <summary>
@@ -835,24 +813,58 @@ namespace Reni.Type
         }
 
         /// <summary>
+        /// Searches the defineable prefix.
+        /// </summary>
+        /// <param name="defineableToken">The token.</param>
+        /// <returns></returns>
+        /// created 02.02.2007 21:51
+        internal PrefixSearchResult PrefixSearchDefineable(DefineableToken defineableToken)
+        {
+            var x = FindDefiningParent;
+            NotImplementedMethod(defineableToken,"x",x);
+            return null;
+        }
+
+        internal protected abstract Base FindDefiningParent { get ; }
+
+        /// <summary>
+        /// Searches the defineable prefix from sequence.
+        /// </summary>
+        /// <param name="defineableToken">The token.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// created 02.02.2007 22:09
+        [Obsolete]
+        internal PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken defineableToken, int count)
+        {
+            var x = FindDefiningParent;
+            NotImplementedMethod(defineableToken, count, "x", x);
+            return null;
+        }
+
+        /// <summary>
         /// Searches the specified defineable.
         /// </summary>
         /// <param name="defineableToken">The defineable.</param>
         /// <returns></returns>
         /// Created 04.11.07 17:51 by hh on HAHOYER-DELL
-        internal virtual SearchResult Search(DefineableToken defineableToken)
+        internal SearchResult Search(DefineableToken defineableToken)
         {
-            NotImplementedMethod(defineableToken);
+            var x = FindDefiningParent;
+            NotImplementedMethod(defineableToken, "x", x);
             return null;
         }
 
-        internal virtual SearchResultFromSequence SearchFromSequence(Defineable defineable)
+        [Obsolete]
+        internal SearchResultFromSequence SearchFromSequence(Defineable defineable)
         {
-            NotImplementedMethod(defineable);
+            var x = FindDefiningParent;
+            NotImplementedMethod(defineable, "x", x);
             return null;
         }
 
-        internal virtual SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
+        [Obsolete]
+        internal SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref definingType)
         {
             return defineableToken.TokenClass.SearchFromRef(defineableToken, definingType);
         }
@@ -861,126 +873,5 @@ namespace Reni.Type
     internal abstract class SearchResultFromSequence : ReniObject
     {
         internal abstract SearchResult ToSearchResult(Sequence sequence);
-    }
-
-    internal class ConversionFeature : ReniObject
-    {
-        private static ConversionFeature _instance;
-        private readonly bool _isDisableCut;
-        private readonly bool _isUseConverter;
-
-        private ConversionFeature(bool isUseConverter, bool isDisableCut)
-        {
-            _isUseConverter = isUseConverter;
-            _isDisableCut = isDisableCut;
-        }
-
-        internal ConversionFeature EnableCut { get { return new ConversionFeature(IsUseConverter, false); } }
-        internal ConversionFeature DontUseConverter { get { return new ConversionFeature(false, IsDisableCut); } }
-
-        internal bool IsDisableCut { get { return _isDisableCut; } }
-        internal bool IsUseConverter { get { return _isUseConverter; } }
-
-        internal static ConversionFeature Instance
-        {
-            get
-            {
-                if(_instance == null)
-                    _instance = new ConversionFeature(true, true);
-                return _instance;
-            }
-        }
-    }
-
-    internal sealed class EnableCut : TagChild
-    {
-        public EnableCut(Base parent)
-            : base(parent) {}
-
-        protected override string TagTitle { get { return "enable_cut"; } }
-
-        /// <summary>
-        /// Determines whether [is convertable to virt] [the specified dest].
-        /// </summary>
-        /// <param name="dest">The dest.</param>
-        /// <param name="conversionFeature">The conversion feature.</param>
-        /// <returns>
-        /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
-        {
-            return base.IsConvertableToVirt(dest, conversionFeature.EnableCut);
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    internal class Pending : Base
-    {
-        /// <summary>
-        /// The size of type
-        /// </summary>
-        public override Size Size { get { return Size.Pending; } }
-
-        /// <summary>
-        /// Gets the dump print text.
-        /// </summary>
-        /// <value>The dump print text.</value>
-        /// created 08.01.2007 17:54
-        internal override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is pending.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
-        /// </value>
-        /// created 09.02.2007 00:26
-        internal override bool IsPending { get { return true; } }
-
-        /// <summary>
-        /// Converts to.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="dest">The dest.</param>
-        /// <returns></returns>
-        /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
-        {
-            return dest.CreateResult
-                (
-                category,
-                () => Code.Base.Pending,
-                () => Refs.Pending
-                );
-        }
-
-        /// <summary>
-        /// Visits as sequence.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="elementType">Type of the element.</param>
-        /// <returns></returns>
-        /// created 13.01.2007 22:20
-        internal override Result VisitAsSequence(Category category, Base elementType)
-        {
-            return CreateResult(category);
-        }
-
-        /// <summary>
-        /// Determines whether [is convertable to virt] [the specified dest].
-        /// </summary>
-        /// <param name="dest">The dest.</param>
-        /// <param name="conversionFeature">The conversion feature.</param>
-        /// <returns>
-        /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
-        {
-            return true;
-        }
     }
 }

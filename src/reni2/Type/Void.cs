@@ -64,7 +64,7 @@ namespace Reni.Type
             return false;
         }
 
-        internal override SearchResult Search(DefineableToken defineableToken)
+        SearchResult Search(DefineableToken defineableToken)
         {
             return defineableToken.TokenClass.Search(this);
         }

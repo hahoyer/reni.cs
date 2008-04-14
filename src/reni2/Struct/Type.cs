@@ -3,15 +3,21 @@ using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Type;
-using Base=Reni.Type.Base;
 
 namespace Reni.Struct
 {
-    internal sealed class Type : Base
+    internal sealed class Type : Reni.Type.Base
     {
-        private readonly int _currentCompilePosition;
         private readonly Container _container;
         private readonly Reni.Context.Base _context;
+        private readonly int _currentCompilePosition;
+
+        public Type(Reni.Context.Base context, Container struc, int currentCompilePosition)
+        {
+            _context = context;
+            _container = struc;
+            _currentCompilePosition = currentCompilePosition;
+        }
 
         [Node]
         public int CurrentCompilePosition { get { return _currentCompilePosition; } }
@@ -21,6 +27,30 @@ namespace Reni.Struct
 
         [Node]
         public Reni.Context.Base Context { get { return _context; } }
+
+        /// <summary>
+        /// The size of type
+        /// </summary>
+        public override Size Size { get { return _container.VisitSize(_context, _currentCompilePosition); } }
+
+        /// <summary>
+        /// Gets the dump print text.
+        /// </summary>
+        /// <value>The dump print text.</value>
+        /// created 08.01.2007 17:54
+        [DumpData(false)]
+        internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _container.DumpPrintText(_context) + ")"; } }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is pending.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
+        /// </value>
+        /// created 09.02.2007 00:26
+        internal override bool IsPending { get { return _container.IsPendingType(_context); } }
+
+        internal protected override Reni.Type.Base FindDefiningParent { get { return this; } }
 
         /// <summary>
         /// Moves the handler.
@@ -33,18 +63,6 @@ namespace Reni.Struct
             return _container.MoveHandler(category, _context, _currentCompilePosition);
         }
 
-        public Type(Reni.Context.Base context, Container struc, int currentCompilePosition)
-        {
-            _context = context;
-            _container = struc;
-            _currentCompilePosition = currentCompilePosition;
-        }
-
-        /// <summary>
-        /// The size of type
-        /// </summary>
-        public override Size Size { get { return _container.VisitSize(_context, _currentCompilePosition); } }
-
         /// <summary>
         /// Determines whether [has converter to] [the specified dest].
         /// </summary>
@@ -52,7 +70,7 @@ namespace Reni.Struct
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        internal override bool HasConverterTo(Base dest)
+        internal override bool HasConverterTo(Reni.Type.Base dest)
         {
             return _container.HasConverterTo(_context, dest);
         }
@@ -66,10 +84,10 @@ namespace Reni.Struct
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(Reni.Type.Base dest, ConversionFeature conversionFeature)
         {
-            Void voidDest = dest as Void;
-            if (voidDest != null)
+            var voidDest = dest as Void;
+            if(voidDest != null)
                 return _container.IsConvertableToVoid(_context);
             return base.IsConvertableToVirt(dest, conversionFeature);
         }
@@ -92,28 +110,20 @@ namespace Reni.Struct
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, Reni.Type.Base dest)
         {
             return _container.ConvertTo(category, _context, dest);
         }
-
-        /// <summary>
-        /// Gets the dump print text.
-        /// </summary>
-        /// <value>The dump print text.</value>
-        /// created 08.01.2007 17:54
-        [DumpData(false)]
-        internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _container.DumpPrintText(_context) + ")"; } }
 
         /// <summary>
         /// Searches the definable defineableToken at type
         /// </summary>
         /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        internal override SearchResult Search(DefineableToken defineableToken)
+        SearchResult Search(DefineableToken defineableToken)
         {
-            StructContainerSearchResult structAccess = _container.Search(defineableToken);
-            if (structAccess != null)
+            var structAccess = _container.Search(defineableToken);
+            if(structAccess != null)
                 return structAccess.ToSearchResult(this);
 
             return null;
@@ -149,15 +159,6 @@ namespace Reni.Struct
         }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is pending.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
-        /// </value>
-        /// created 09.02.2007 00:26
-        internal override bool IsPending { get { return _container.IsPendingType(_context); } }
-
-        /// <summary>
         /// Visits the access to an element. Struct reference is assumed as "arg"
         /// </summary>
         /// <param name="category">The category.</param>
@@ -166,9 +167,9 @@ namespace Reni.Struct
         /// created 29.10.2006 19:17
         public Result AccessFromArg(Category category, int position)
         {
-            Result result = _container.VisitElementFromContextRef(_context, category, position);
-            Context containerContext = _context.CreateStructContext(_container);
-            Code.Base argsRef = Code.Base
+            var result = _container.VisitElementFromContextRef(_context, category, position);
+            var containerContext = _context.CreateStructContext(_container);
+            var argsRef = Code.Base
                 .CreateArg(_context.RefAlignParam.RefSize)
                 .CreateRefPlus(_context.RefAlignParam, Size);
             return result.ReplaceRelativeContextRef(containerContext, argsRef);

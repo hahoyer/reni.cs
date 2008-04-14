@@ -121,7 +121,7 @@ namespace Reni
         /// Returns the size by checking category size, type and code until a result can be found. 
         /// Otherwise an exception is thrown
         /// </summary>
-        public Size SmartSize
+        internal Size SmartSize
         {
             get
             {
@@ -138,9 +138,9 @@ namespace Reni
         /// <summary>
         /// Error handling
         /// </summary>
-        public Error Error { get { return null; } set { } }
+        internal static Error Error { get { return null; } set { } }
 
-        public bool IsDirty
+        internal bool IsDirty
         {
             get { return _isDirty; }
             set
@@ -155,7 +155,7 @@ namespace Reni
         /// </summary>
         /// <value><c>true</c> if this instance is empty; otherwise, <c>false</c>.</value>
         /// [created 05.06.2006 18:06]
-        public bool IsEmpty
+        internal bool IsEmpty
         {
             get
             {
@@ -176,7 +176,7 @@ namespace Reni
         /// </summary>
         /// <value><c>true</c> if this instance is empty; otherwise, <c>false</c>.</value>
         /// [created 05.06.2006 18:06]
-        public bool IsCodeLess
+        internal bool IsCodeLess
         {
             get
             {
@@ -196,7 +196,7 @@ namespace Reni
         /// <value>
         /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
         /// </value>
-        public bool IsPending
+        internal bool IsPending
         {
             get
             {
@@ -264,29 +264,13 @@ namespace Reni
         private void Update(Result r, Category c)
         {
             if(c.HasSize)
-            {
-                _size = r.Size;
-                if(_size == null)
-                    _size = Size.Pending;
-            }
+                _size = r.Size ?? Size.Pending;
             if(c.HasType)
-            {
-                _type = r.Type;
-                if(_type == null)
-                    _type = Reni.Type.Base.Pending;
-            }
+                _type = r.Type ?? Reni.Type.Base.Pending;
             if(c.HasRefs)
-            {
-                _refs = r.Refs;
-                if(_refs == null)
-                    _refs = Refs.Pending;
-            }
+                _refs = r.Refs ?? Refs.Pending;
             if(c.HasCode)
-            {
-                _code = r.Code;
-                if(_code == null)
-                    _code = Reni.Code.Base.Pending;
-            }
+                _code = r.Code ?? Reni.Code.Base.Pending;
         }
 
         private Result Filter(Category category)
@@ -304,7 +288,7 @@ namespace Reni
         /// </summary>
         /// <param name="alignBits">Bits to align result</param>
         /// <returns></returns>
-        public Result Align(int alignBits)
+        internal Result Align(int alignBits)
         {
             var size = FindSize;
             if(size == null)
@@ -338,7 +322,7 @@ namespace Reni
         /// <summary>
         /// Create a flat copy
         /// </summary>
-        public Result Clone(Category category)
+        internal Result Clone(Category category)
         {
             var r = new Result();
             if(category.HasSize)
@@ -357,7 +341,7 @@ namespace Reni
         /// </summary>
         /// <returns></returns>
         /// created 19.11.2006 22:13
-        public Result Clone()
+        internal Result Clone()
         {
             return Clone(Complete);
         }
@@ -386,7 +370,6 @@ namespace Reni
                         Debugger.Break();
                     }
                 }
-                ;
                 if(HasCode)
                 {
                     if(!(Code.Size == size))
@@ -395,7 +378,6 @@ namespace Reni
                         Debugger.Break();
                     }
                 }
-                ;
             }
 
             if(HasRefs && HasCode)
@@ -429,7 +411,8 @@ namespace Reni
         /// <param name="syntax"></param>
         /// <returns></returns>
         [DebuggerHidden]
-        internal Result Visit(Category category, Context.Base context, Syntax.Base syntax)
+        internal Result Visit(Category category, 
+            Base context, Syntax.Base syntax)
         {
             var OldPending = Pending;
             var OldComplete = Complete;
@@ -449,7 +432,6 @@ namespace Reni
                     Tracer.FlaggedLine("CCompilerMsg(*mSyntaxKey->TokenClass, \"aftereffect\").Show()");
                     throw;
                 }
-                ;
 
                 Pending = OldPending;
             }
@@ -502,7 +484,7 @@ namespace Reni
         /// <param name="result"></param>
         /// <param name="topRef"></param>
         /// <returns></returns>
-        public void AddStruct(Result result, Result topRef)
+        internal void AddStruct(Result result, Result topRef)
         {
             Add(result.UseWithArg(topRef));
         }
@@ -515,7 +497,7 @@ namespace Reni
         /// <param name="destBitCount">The dest count.</param>
         /// <returns></returns>
         /// [created 30.05.2006 00:17]
-        public static Result ConvertBitArrayToBitArray(Category category, int sourceBitCount, int destBitCount)
+        internal static Result ConvertBitArrayToBitArray(Category category, int sourceBitCount, int destBitCount)
         {
             if(sourceBitCount == 0 && destBitCount == 0)
                 return Reni.Type.Base.CreateVoidResult(category);
@@ -538,7 +520,7 @@ namespace Reni
         /// <param name="resultForArg">The result to use as replacment.</param>
         /// <returns></returns>
         /// [created 30.05.2006 00:25]
-        public Result UseWithArg(Result resultForArg)
+        internal Result UseWithArg(Result resultForArg)
         {
             if(IsPending)
                 return this;
@@ -565,7 +547,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : Context.Base
+        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : Base
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
@@ -590,7 +572,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, Code.Base replacement) where C : Context.Base
+        internal Result ReplaceRelativeContextRef<C>(C context, Code.Base replacement) where C : Base
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
@@ -637,7 +619,7 @@ namespace Reni
         /// <param name="category">The category.</param>
         /// <returns>Pair of this and other. If type has </returns>
         /// created 19.11.2006 22:04
-        public Result SafeList(Result result, Category category)
+        internal Result SafeList(Result result, Category category)
         {
             var destructorResult = Type.DestructorHandler(category);
             if(destructorResult.IsEmpty)
@@ -655,7 +637,7 @@ namespace Reni
         /// <param name="value">The value.</param>
         /// <returns></returns>
         /// [created 04.06.2006 01:09]
-        public Result CreateRefPlus(Category c, RefAlignParam refAlignParam, Size value)
+        internal Result CreateRefPlus(Category c, RefAlignParam refAlignParam, Size value)
         {
             var result = new Result();
             if(c.HasSize)
@@ -675,7 +657,7 @@ namespace Reni
         /// <param name="category"></param>
         /// <param name="tempResult"></param>
         /// <returns></returns>
-        public Result CreateStatement(Category category, Result tempResult)
+        internal Result CreateStatement(Category category, Result tempResult)
         {
             if(tempResult == null)
                 return this;
@@ -708,7 +690,7 @@ namespace Reni
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 04.02.2007 00:31
-        public static Result CreatePending(Category category)
+        internal static Result CreatePending(Category category)
         {
             var result = new Result();
             if(category.HasSize)
@@ -722,28 +704,28 @@ namespace Reni
             return result;
         }
 
-        public Result ConvertTo(Type.Base target)
+        internal Result ConvertTo(Type.Base target)
         {
             return Type.ConvertTo(Complete, target).UseWithArg(this);
         }
 
-        public Result CreateUnref(Type.Base type, RefAlignParam refAlignParam)
+        internal Result CreateUnref(Type.Base type, RefAlignParam refAlignParam)
         {
             return type.CreateResult
                 (
                 Complete,
-                delegate { return Code.CreateDereference(refAlignParam, type.Size); },
-                delegate { return Refs; }
+                () => Code.CreateDereference(refAlignParam, type.Size),
+                () => Refs
                 );
         }
 
-        public Result DumpPrintBitSequence()
+        internal Result DumpPrintBitSequence()
         {
             return Reni.Type.Void.CreateResult
                 (
                 Complete,
-                delegate { return Code.CreateDumpPrint(); },
-                delegate { return Refs; }
+                () => Code.CreateDumpPrint(),
+                () => Refs
                 );
         }
 
@@ -827,7 +809,7 @@ namespace Reni
         private readonly Syntax.Base _syntax;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Error"/> class.
+        /// Initializes a new instance of the <see cref="Error"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <param name="syntax">The syntax.</param>
@@ -850,9 +832,10 @@ namespace Reni
         {
             if(e0 == null)
                 return e1;
-            if(e1 == null)
-                return e0;
-            return new Error(e0, e1);
+            return e1 == null ? e0 : new Error(e0, e1);
         }
+
+        internal Base Context { get { return _context; } }
+        internal Syntax.Base Syntax { get { return _syntax; } }
     }
 }

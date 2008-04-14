@@ -16,26 +16,17 @@ namespace Reni.Context
     [AdditionalNodeInfo("DebuggerDumpString")]
     internal abstract class Base : ReniObject
     {
-        private static int _nextId = 0;
-        [Node] internal Cache _cache = new Cache();
+        private static int _nextId;
+
+        [Node]
+        internal Cache _cache = new Cache();
 
         /// <summary>
         /// Initializes a new instance .
         /// </summary>
         /// [created 13.05.2006 18:55]
         protected Base()
-            : base(_nextId++)
-        {
-        }
-
-        /// <summary>
-        /// generate dump string to be shown in debug windows
-        /// </summary>
-        /// <returns></returns>
-        public override string DebuggerDump()
-        {
-            return base.ToString() + " ObjectId=" + ObjectId;
-        }
+            : base(_nextId++) {}
 
         /// <summary>
         /// Parameter to describe alignment for references
@@ -56,6 +47,33 @@ namespace Reni.Context
         public Size RefSize { get { return RefAlignParam.RefSize; } }
 
         /// <summary>
+        /// Return the root env
+        /// </summary>
+        [DumpData(false)]
+        public abstract Root RootContext { get; }
+
+        [DumpData(false)]
+        internal Result TopRefResult
+        {
+            get
+            {
+                if(_cache._topRefResultCache == null)
+                    _cache._topRefResultCache = new Result {Code = CreateTopRefCode(), Refs = Refs.None()};
+
+                return _cache._topRefResultCache;
+            }
+        }
+
+        /// <summary>
+        /// generate dump string to be shown in debug windows
+        /// </summary>
+        /// <returns></returns>
+        public override string DebuggerDump()
+        {
+            return base.ToString() + " ObjectId=" + ObjectId;
+        }
+
+        /// <summary>
         /// Convert size into packets by use of align bits. 
         /// </summary>
         /// <param name="size"></param>
@@ -72,8 +90,8 @@ namespace Reni.Context
         /// <returns>-1 if not based on target</returns>
         public int PacketCountDistance(Base target)
         {
-            Size d = Distance(target);
-            if (d == null)
+            var d = Distance(target);
+            if(d == null)
                 return -1;
             return SizeToPacketCount(d);
         }
@@ -85,7 +103,7 @@ namespace Reni.Context
         /// <returns>-1 if not based on target</returns>
         public Size Distance(Base target)
         {
-            if (target == this)
+            if(target == this)
                 return Size.Create(0);
             return VirtDistance(target);
         }
@@ -100,12 +118,6 @@ namespace Reni.Context
             DumpMethodWithBreak("not implemented", target);
             throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// Return the root env
-        /// </summary>
-        [DumpData(false)]
-        public abstract Root RootContext { get; }
 
         /// <summary>
         /// creates the root environment
@@ -138,7 +150,7 @@ namespace Reni.Context
             return _cache._structPositionCache.Find
                 (
                 currentCompilePosition,
-                delegate { return new ContextAtPosition((Struct.Context) this, currentCompilePosition); }
+                () => new ContextAtPosition((Struct.Context) this, currentCompilePosition)
                 );
         }
 
@@ -150,7 +162,8 @@ namespace Reni.Context
         /// created 16.12.2006 14:45
         internal Struct.Context CreateStructContext(Container container)
         {
-            return _cache._structContainerCache.Find(container, delegate { return new Struct.Context(this, container); });
+            return _cache._structContainerCache.Find(container,
+                () => new Struct.Context(this, container));
         }
 
         /// <summary>
@@ -161,7 +174,8 @@ namespace Reni.Context
         /// [created 05.06.2006 19:22]
         public Function CreateFunction(Type.Base args)
         {
-            return _cache._functionInstanceCache.Find(args, delegate { return new Function(this, args); });
+            return _cache._functionInstanceCache.Find(args,
+                () => new Function(this, args));
         }
 
         /// <summary>
@@ -205,7 +219,7 @@ namespace Reni.Context
         internal Type.Base CreatePropertyType(Syntax.Base body)
         {
             return _cache._propertyType.Find(body,
-                                             delegate { return new Property(this, body); });
+                () => new Property(this, body));
         }
 
         /// <summary>
@@ -216,27 +230,8 @@ namespace Reni.Context
         /// created 02.01.2007 14:57
         public Type.Base CreateFunctionType(Syntax.Base body)
         {
-            return _cache._functionType.Find(body, delegate { return new Type.Function(this, body); });
-        }
-
-        internal class Cache
-        {
-            [Node] internal DictionaryEx<Container, Struct.Context> _structContainerCache =
-                new DictionaryEx<Container, Struct.Context>();
-
-            [Node] internal DictionaryEx<int, ContextAtPosition> _structPositionCache =
-                new DictionaryEx<int, ContextAtPosition>();
-
-            [Node] internal DictionaryEx<Type.Base, Function> _functionInstanceCache =
-                new DictionaryEx<Type.Base, Function>();
-
-            [Node] internal DictionaryEx<Syntax.Base, Type.Base> _functionType =
-                new DictionaryEx<Syntax.Base, Type.Base>();
-
-            [Node] internal DictionaryEx<Syntax.Base, Type.Base> _propertyType =
-                new DictionaryEx<Syntax.Base, Type.Base>();
-
-            [Node] internal Result _topRefResultCache;
+            return _cache._functionType.Find(body,
+                () => new Type.Function(this, body));
         }
 
         internal virtual ContextSearchResult SearchDefineable(DefineableToken defineableToken)
@@ -247,22 +242,22 @@ namespace Reni.Context
 
         internal Result VisitFirstChainElement(Category category, MemberElem memberElem)
         {
-            if (memberElem.DefineableToken == null)
+            if(memberElem.DefineableToken == null)
                 return memberElem.Args.Visit(this, category);
 
-            ContextSearchResult contextSearchResult = SearchDefineable(memberElem.DefineableToken);
-            if (contextSearchResult != null)
+            var contextSearchResult = SearchDefineable(memberElem.DefineableToken);
+            if(contextSearchResult != null)
                 return contextSearchResult.VisitApply(this, category, memberElem.Args);
 
-            if (memberElem.Args == null)
+            if(memberElem.Args == null)
             {
                 NotImplementedMethod(category, memberElem);
                 return null;
             }
 
-            Result argResult = memberElem.Args.Visit(this, category | Category.Type);
-            PrefixSearchResult searchResult = argResult.Type.PrefixSearchDefineable(memberElem.DefineableToken);
-            if (searchResult != null)
+            var argResult = memberElem.Args.Visit(this, category | Category.Type);
+            var searchResult = argResult.Type.PrefixSearchDefineable(memberElem.DefineableToken);
+            if(searchResult != null)
                 return searchResult.VisitApply(category, argResult);
 
             NotImplementedMethod(category, memberElem);
@@ -271,29 +266,13 @@ namespace Reni.Context
 
         internal Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
-            bool trace = ObjectId == -3 && memberElem.ObjectId == 1 && category.HasAll;
+            var trace = ObjectId == -3 && memberElem.ObjectId == 1 && category.HasAll;
             StartMethodDumpWithBreak(trace, category, memberElem, formerResult);
-            Result refResult = formerResult.EnsureContextRef(this);
-            Result visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
+            var refResult = formerResult.EnsureContextRef(this);
+            var visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
             Tracer.Assert(visitedResult != null);
-            Result arglessResult = visitedResult.UseWithArg(refResult);
+            var arglessResult = visitedResult.UseWithArg(refResult);
             return ReturnMethodDumpWithBreak(trace, arglessResult);
-        }
-
-        [DumpData(false)]
-        internal Result TopRefResult
-        {
-            get
-            {
-                if (_cache._topRefResultCache == null)
-                {
-                    _cache._topRefResultCache = new Result();
-                    _cache._topRefResultCache.Code = CreateTopRefCode();
-                    _cache._topRefResultCache.Refs = Refs.None();
-                }
-
-                return _cache._topRefResultCache;
-            }
         }
 
         internal virtual bool IsChildOf(Base context)
@@ -310,18 +289,48 @@ namespace Reni.Context
 
         internal List<Result> Visit(Category category, List<Syntax.Base> list)
         {
-            List<Result> results = new List<Result>();
-            for (int i = 0; i < list.Count; i++)
+            var results = new List<Result>();
+            for(var i = 0; i < list.Count; i++)
                 results.Add(list[i].Visit(this, category));
             return results;
         }
 
         internal List<Type.Base> VisitType(List<Syntax.Base> list)
         {
-            List<Type.Base> results = new List<Type.Base>();
-            for (int i = 0; i < list.Count; i++)
+            var results = new List<Type.Base>();
+            for(var i = 0; i < list.Count; i++)
                 results.Add(list[i].VisitType(this));
             return results;
         }
+
+        #region Nested type: Cache
+
+        internal class Cache
+        {
+            [Node]
+            internal DictionaryEx<Type.Base, Function> _functionInstanceCache =
+                new DictionaryEx<Type.Base, Function>();
+
+            [Node]
+            internal DictionaryEx<Syntax.Base, Type.Base> _functionType =
+                new DictionaryEx<Syntax.Base, Type.Base>();
+
+            [Node]
+            internal DictionaryEx<Syntax.Base, Type.Base> _propertyType =
+                new DictionaryEx<Syntax.Base, Type.Base>();
+
+            [Node]
+            internal DictionaryEx<Container, Struct.Context> _structContainerCache =
+                new DictionaryEx<Container, Struct.Context>();
+
+            [Node]
+            internal DictionaryEx<int, ContextAtPosition> _structPositionCache =
+                new DictionaryEx<int, ContextAtPosition>();
+
+            [Node]
+            internal Result _topRefResultCache;
+        }
+
+        #endregion
     }
 }

@@ -50,5 +50,7 @@ namespace Reni.Type
         {
             return EmptyHandler(category);
         }
+
+        internal protected override Base FindDefiningParent { get { return this; } }
     }
 }

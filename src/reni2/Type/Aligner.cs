@@ -1,6 +1,5 @@
 using Reni.Context;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
@@ -53,7 +52,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        internal override SearchResult Search(DefineableToken defineableToken)
+        SearchResult Search(DefineableToken defineableToken)
         {
             return defineableToken.TokenClass.Search(this);
         }
@@ -128,7 +127,7 @@ namespace Reni.Type
             return Parent.CreateResult
                 (
                 category,
-                delegate { return Code.Base.CreateArg(Size).CreateBitCast(Parent.Size); }
+                () => Code.Base.CreateArg(Size).CreateBitCast(Parent.Size)
                 );
         }
 
