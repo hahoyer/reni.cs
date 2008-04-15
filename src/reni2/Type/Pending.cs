@@ -26,7 +26,7 @@ namespace Reni.Type
         /// created 09.02.2007 00:26
         internal override bool IsPending { get { return true; } }
 
-        internal protected override Base FindDefiningParent { get { throw new System.NotImplementedException(); } }
+        internal protected override IDefiningType FindDefiningType { get { throw new System.NotImplementedException(); } }
 
         /// <summary>
         /// Converts to.

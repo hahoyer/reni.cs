@@ -10,7 +10,7 @@ namespace Reni.Type
     /// <summary>
     /// Special array 
     /// </summary>
-    internal sealed class Sequence : Base
+    internal sealed class Sequence : Base, IDefiningType
     {
         private readonly Array _inheritedType;
 
@@ -64,7 +64,7 @@ namespace Reni.Type
         /// created 13.01.2007 19:34
         public Base Element { get { return _inheritedType.Element; } }
 
-        internal protected override Base FindDefiningParent { get { return this; } }
+        internal protected override IDefiningType FindDefiningType { get { return this; } }
 
         /// <summary>
         /// Default dump behaviour
@@ -81,7 +81,8 @@ namespace Reni.Type
         /// </summary>
         /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
-        SearchResult Search(DefineableToken defineableToken)
+        [Obsolete]
+        internal SearchResult Search(DefineableToken defineableToken)
         {
             return defineableToken.TokenClass.Search(this);
         }
@@ -91,7 +92,8 @@ namespace Reni.Type
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        PrefixSearchResult PrefixSearchDefineable(DefineableToken t)
+        [Obsolete]
+        internal PrefixSearchResult PrefixSearchDefineable(DefineableToken t)
         {
             var result = Element.PrefixSearchDefineableFromSequence(t, Count);
             if(result != null)
@@ -194,7 +196,7 @@ namespace Reni.Type
             var result = CreateResult
                 (
                 category,
-                delegate { return Code.Base.CreateArg(oldSize).CreateBitCast(Size); }
+                () => Code.Base.CreateArg(oldSize).CreateBitCast(Size)
                 );
             return result;
         }
@@ -220,7 +222,7 @@ namespace Reni.Type
                 .CreateResult
                 (
                 category,
-                delegate { return Code.Base.CreateArg(Size).CreateBitCast(newType.Size); }
+                () => Code.Base.CreateArg(Size).CreateBitCast(newType.Size)
                 );
             return result;
         }

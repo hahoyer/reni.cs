@@ -3,7 +3,7 @@ namespace Reni.Type
     /// <summary>
     /// Primitive type, no destructor or move handler.
     /// </summary>
-    internal abstract class Primitive : Base
+    internal abstract class Primitive : Base, IDefiningType
     {
         /// <summary>
         /// Destructors the specified category.
@@ -51,6 +51,9 @@ namespace Reni.Type
             return EmptyHandler(category);
         }
 
-        internal protected override Base FindDefiningParent { get { return this; } }
+        internal protected override IDefiningType FindDefiningType
+        {
+             get { return this; }
+        }
     }
 }

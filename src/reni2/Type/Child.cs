@@ -21,7 +21,7 @@ namespace Reni.Type
         [Node, DumpData(true)]
         public Base Parent { get { return _parent; } }
 
-        sealed internal protected override Base FindDefiningParent { get { return Parent; } }
+        sealed internal protected override IDefiningType FindDefiningType { get { return Parent.FindDefiningType; } }
     }
 
     internal abstract class TagChild : Child

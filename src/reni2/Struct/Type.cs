@@ -6,7 +6,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Type : Reni.Type.Base
+    internal sealed class Type : Reni.Type.Base, IDefiningType
     {
         private readonly Container _container;
         private readonly Reni.Context.Base _context;
@@ -50,7 +50,7 @@ namespace Reni.Struct
         /// created 09.02.2007 00:26
         internal override bool IsPending { get { return _container.IsPendingType(_context); } }
 
-        internal protected override Reni.Type.Base FindDefiningParent { get { return this; } }
+        internal protected override IDefiningType FindDefiningType { get { return this; } }
 
         /// <summary>
         /// Moves the handler.

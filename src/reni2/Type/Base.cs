@@ -812,6 +812,8 @@ namespace Reni.Type
             return rawResult;
         }
 
+        internal protected abstract IDefiningType FindDefiningType { get; }
+
         /// <summary>
         /// Searches the defineable prefix.
         /// </summary>
@@ -820,26 +822,7 @@ namespace Reni.Type
         /// created 02.02.2007 21:51
         internal PrefixSearchResult PrefixSearchDefineable(DefineableToken defineableToken)
         {
-            var x = FindDefiningParent;
-            NotImplementedMethod(defineableToken,"x",x);
-            return null;
-        }
-
-        internal protected abstract Base FindDefiningParent { get ; }
-
-        /// <summary>
-        /// Searches the defineable prefix from sequence.
-        /// </summary>
-        /// <param name="defineableToken">The token.</param>
-        /// <param name="count">The count.</param>
-        /// <returns></returns>
-        /// created 02.02.2007 22:09
-        [Obsolete]
-        internal PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken defineableToken, int count)
-        {
-            var x = FindDefiningParent;
-            NotImplementedMethod(defineableToken, count, "x", x);
-            return null;
+            return FindDefiningType.SearchDefinablePrefix(defineableToken,this);
         }
 
         /// <summary>
@@ -850,15 +833,13 @@ namespace Reni.Type
         /// Created 04.11.07 17:51 by hh on HAHOYER-DELL
         internal SearchResult Search(DefineableToken defineableToken)
         {
-            var x = FindDefiningParent;
-            NotImplementedMethod(defineableToken, "x", x);
-            return null;
+            return FindDefiningType.SearchDefinable(defineableToken, this);
         }
 
         [Obsolete]
         internal SearchResultFromSequence SearchFromSequence(Defineable defineable)
         {
-            var x = FindDefiningParent;
+            var x = FindDefiningType;
             NotImplementedMethod(defineable, "x", x);
             return null;
         }
@@ -868,6 +849,26 @@ namespace Reni.Type
         {
             return defineableToken.TokenClass.SearchFromRef(defineableToken, definingType);
         }
+        /// <summary>
+        /// Searches the defineable prefix from sequence.
+        /// </summary>
+        /// <param name="defineableToken">The token.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// created 02.02.2007 22:09
+        [Obsolete]
+        internal PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken defineableToken, int count)
+        {
+            var x = FindDefiningType;
+            NotImplementedMethod(defineableToken, count, "x", x);
+            return null;
+        }
+
+    }
+
+    internal interface IDefiningType {
+        SearchResult SearchDefinable(DefineableToken defineableToken, Base x);
+        PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, Base search);
     }
 
     internal abstract class SearchResultFromSequence : ReniObject
