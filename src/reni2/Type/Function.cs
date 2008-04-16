@@ -67,6 +67,18 @@ namespace Reni.Type
                 .RootContext
                 .CreateFunctionCall(_context, category, Body, argsResult);
         }
+
+        public override SearchResult SearchDefinable(DefineableToken defineableToken, TypePath typePath)
+        {
+            NotImplementedMethod(defineableToken, typePath);
+            return null;
+        }
+
+        public override PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath)
+        {
+            NotImplementedMethod(defineableToken, typePath);
+            return null;
+        }
     }
 
     internal sealed class Property: Primitive
@@ -116,6 +128,18 @@ namespace Reni.Type
                 .VisitType(context)
                 .ApplyFunction(rawResult.Complete, CreateVoid.CreateResult(rawResult.Complete))
                 ;
+        }
+
+        public override SearchResult SearchDefinable(DefineableToken defineableToken, TypePath typePath)
+        {
+            NotImplementedMethod(defineableToken, typePath);
+            return null;
+        }
+
+        public override PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath)
+        {
+            NotImplementedMethod(defineableToken, typePath);
+            return null;
         }
     }
 }

@@ -138,6 +138,8 @@ namespace Reni.Type
         /// created 13.01.2007 19:46
         internal override int SequenceCount { get { return Parent.SequenceCount; } }
 
+        protected override TypePath ChildTypePath { get { return Type.TypePath.AlignerInstance; } }
+
         /// <summary>
         /// Determines whether [has converter to] [the specified dest].
         /// </summary>

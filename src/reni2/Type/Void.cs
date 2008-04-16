@@ -107,5 +107,17 @@ namespace Reni.Type
         {
             return CreateVoid.CreateResult(category, getCode, getRefs);
         }
+
+        public override SearchResult SearchDefinable(DefineableToken defineableToken, TypePath typePath)
+        {
+            NotImplementedMethod(defineableToken, typePath);
+            return null;
+        }
+
+        public override PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath)
+        {
+            NotImplementedMethod(defineableToken, typePath);
+            return null;
+        }
     }
 }

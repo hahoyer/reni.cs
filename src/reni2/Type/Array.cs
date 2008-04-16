@@ -5,9 +5,10 @@ namespace Reni.Type
     /// <summary>
     /// Fixed sized array of a type
     /// </summary>
-    sealed internal class Array : Child
+    internal sealed class Array : Child
     {
-        readonly int _count;
+        private readonly int _count;
+
         /// <summary>
         /// ctor
         /// </summary>
@@ -27,15 +28,21 @@ namespace Reni.Type
         /// <summary>
         /// asis
         /// </summary>
-        public override Size Size { get { return Element.Size * _count; } }
-
+        public override Size Size { get { return Element.Size*_count; } }
 
         /// <summary>
         /// Gets the dump print text.
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 08.01.2007 17:54
-        internal override string DumpPrintText { get { return "("+Element.DumpPrintText+")array("+Count+")"; } }
+        internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
+
+        /// <summary>
+        /// asis
+        /// </summary>
+        public Base Element { get { return Parent; } }
+
+        protected override TypePath ChildTypePath { get { return TypePath.ArrayInstance; } }
 
         /// <summary>
         /// Destructors the specified category.
@@ -45,13 +52,8 @@ namespace Reni.Type
         /// [created 02.06.2006 09:47]
         internal override Result DestructorHandler(Category category)
         {
-            return Element.ArrayDestructorHandler(category,Count);
+            return Element.ArrayDestructorHandler(category, Count);
         }
-
-        /// <summary>
-        /// asis
-        /// </summary>
-        public Base Element { get { return Parent; } }
 
         /// <summary>
         /// Moves the handler.
@@ -81,7 +83,7 @@ namespace Reni.Type
         /// created 07.05.2007 21:18 on HAHOYER-DELL by hh
         public override string Dump()
         {
-            return GetType().FullName + "("+Element.Dump()+", "+Count+")";
+            return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")";
         }
 
         /// <summary>
@@ -93,10 +95,10 @@ namespace Reni.Type
         /// created 11.01.2007 22:12
         internal override Result ConvertToVirt(Category category, Base dest)
         {
-            Array destArray = dest as Array;
-            if (destArray != null)
+            var destArray = dest as Array;
+            if(destArray != null)
             {
-                Result result = Element.ConvertTo(category, destArray.Element);
+                var result = Element.ConvertTo(category, destArray.Element);
                 NotImplementedMethod(category, dest, "result", result);
                 return null;
             }
@@ -115,10 +117,10 @@ namespace Reni.Type
         /// created 11.01.2007 22:09
         internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
         {
-            Array destArray = dest as Array;
-            if (destArray != null)
+            var destArray = dest as Array;
+            if(destArray != null)
             {
-                if (Count == destArray.Count)
+                if(Count == destArray.Count)
                     return Element.IsConvertableTo(destArray.Element, conversionFeature.DontUseConverter);
                 return false;
             }

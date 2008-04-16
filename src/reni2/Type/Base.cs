@@ -193,6 +193,11 @@ namespace Reni.Type
         [DumpData(false)]
         internal protected virtual Base[] ToList { get { return new[] {this}; } }
 
+        internal protected abstract IDefiningType FindDefiningType { get; }
+
+        [DumpData(false)]
+        internal protected virtual TypePath TypePath { get { return null; } }
+
         /// <summary>
         /// Create aligner type
         /// </summary>
@@ -246,7 +251,7 @@ namespace Reni.Type
 
         protected virtual Base CreateReversePair(Base first)
         {
-            return first._pair.Find(this, 
+            return first._pair.Find(this,
                 () => new Pair(first, this));
         }
 
@@ -812,8 +817,6 @@ namespace Reni.Type
             return rawResult;
         }
 
-        internal protected abstract IDefiningType FindDefiningType { get; }
-
         /// <summary>
         /// Searches the defineable prefix.
         /// </summary>
@@ -822,7 +825,7 @@ namespace Reni.Type
         /// created 02.02.2007 21:51
         internal PrefixSearchResult PrefixSearchDefineable(DefineableToken defineableToken)
         {
-            return FindDefiningType.SearchDefinablePrefix(defineableToken,this);
+            return FindDefiningType.SearchDefinablePrefix(defineableToken, TypePath);
         }
 
         /// <summary>
@@ -831,9 +834,9 @@ namespace Reni.Type
         /// <param name="defineableToken">The defineable.</param>
         /// <returns></returns>
         /// Created 04.11.07 17:51 by hh on HAHOYER-DELL
-        internal SearchResult Search(DefineableToken defineableToken)
+        internal SearchResult SearchDefineable(DefineableToken defineableToken)
         {
-            return FindDefiningType.SearchDefinable(defineableToken, this);
+            return FindDefiningType.SearchDefinable(defineableToken, TypePath);
         }
 
         [Obsolete]
@@ -849,6 +852,7 @@ namespace Reni.Type
         {
             return defineableToken.TokenClass.SearchFromRef(defineableToken, definingType);
         }
+
         /// <summary>
         /// Searches the defineable prefix from sequence.
         /// </summary>
@@ -863,12 +867,12 @@ namespace Reni.Type
             NotImplementedMethod(defineableToken, count, "x", x);
             return null;
         }
-
     }
 
-    internal interface IDefiningType {
-        SearchResult SearchDefinable(DefineableToken defineableToken, Base x);
-        PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, Base search);
+    internal interface IDefiningType
+    {
+        SearchResult SearchDefinable(DefineableToken defineableToken, TypePath typePath);
+        PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath);
     }
 
     internal abstract class SearchResultFromSequence : ReniObject

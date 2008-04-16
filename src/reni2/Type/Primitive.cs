@@ -1,3 +1,6 @@
+using Reni.Context;
+using Reni.Parser;
+
 namespace Reni.Type
 {
     /// <summary>
@@ -55,5 +58,8 @@ namespace Reni.Type
         {
              get { return this; }
         }
+
+        public abstract SearchResult SearchDefinable(DefineableToken defineableToken, TypePath typePath);
+        public abstract PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath);
     }
 }

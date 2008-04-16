@@ -10,7 +10,7 @@ namespace Reni.Type
     /// <summary>
     /// Special array 
     /// </summary>
-    internal sealed class Sequence : Base, IDefiningType
+    internal sealed class Sequence : Base
     {
         private readonly Array _inheritedType;
 
@@ -64,7 +64,10 @@ namespace Reni.Type
         /// created 13.01.2007 19:34
         public Base Element { get { return _inheritedType.Element; } }
 
-        internal protected override IDefiningType FindDefiningType { get { return this; } }
+        internal protected override IDefiningType FindDefiningType { get { return InheritedType.FindDefiningType; } }
+
+        internal protected override TypePath TypePath { get { return 
+            InheritedType.TypePath.TurnIntoSequence(); } }
 
         /// <summary>
         /// Default dump behaviour
@@ -259,6 +262,7 @@ namespace Reni.Type
         {
             return _inheritedType.MoveHandler(category);
         }
+
     }
 
     internal sealed class SequenceOperationResult : SearchResult

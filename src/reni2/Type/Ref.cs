@@ -207,11 +207,6 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        SearchResult Search(DefineableToken defineableToken)
-        {
-            return SearchDefineable(defineableToken).ToSearchResult();
-        }
-
         /// <summary>
         /// Visits from chain. Object is provided by use of "Arg" code element
         /// </summary>
@@ -229,25 +224,7 @@ namespace Reni.Type
             return null;
         }
 
-        /// <summary>
-        /// Searches the definable defineableToken at type
-        /// </summary>
-        /// <param name="defineableToken">The token.</param>
-        /// <returns></returns>
-        private SearchResultFromRef SearchDefineable(DefineableToken defineableToken)
-        {
-
-
-
-
-
-            var result = Target.SearchFromRef(defineableToken, this);
-            if(result != null)
-                return result;
-
-            NotImplementedMethod(defineableToken);
-            return null;
-        }
+        protected override TypePath ChildTypePath { get { return Type.TypePath.RefInstance; } }
     }
 
     internal abstract class SearchResultFromRef : ReniObject

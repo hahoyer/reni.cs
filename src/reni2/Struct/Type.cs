@@ -174,5 +174,17 @@ namespace Reni.Struct
                 .CreateRefPlus(_context.RefAlignParam, Size);
             return result.ReplaceRelativeContextRef(containerContext, argsRef);
         }
+
+        SearchResult IDefiningType.SearchDefinable(DefineableToken defineableToken, TypePath typePath)
+        {
+            NotImplementedMethod(defineableToken,typePath);
+            return null;
+        }
+
+        PrefixSearchResult IDefiningType.SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath)
+        {
+            NotImplementedMethod(defineableToken, typePath);
+            return null;
+        }
     }
 }

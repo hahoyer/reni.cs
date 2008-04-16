@@ -36,7 +36,7 @@ namespace Reni.Parser.TokenClass
 
         internal virtual SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref searchingType)
         {
-            SearchResult result = searchingType.Target.Search(defineableToken);
+            SearchResult result = searchingType.Target.SearchDefineable(defineableToken);
             if(result != null)
                 return result.ToSearchResultFromRef(searchingType);
             return null;
