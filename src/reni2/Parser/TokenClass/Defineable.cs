@@ -34,31 +34,9 @@ namespace Reni.Parser.TokenClass
         [DumpExcept(false)]
         internal string DataFunctionName { get { return GetType().Name; } }
 
-        internal virtual SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref searchingType)
-        {
-            SearchResult result = searchingType.Target.SearchDefineable(defineableToken);
-            if(result != null)
-                return result.ToSearchResultFromRef(searchingType);
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the numeric prefix operation.
-        /// </summary>
-        /// <value>The numeric prefix operation.</value>
-        /// created 02.02.2007 23:03
         [DumpExcept(false)]
         internal protected virtual bool IsBitSequencePrefixOperation { get { return false; } }
 
-        [DumpExcept(false)]
-        virtual protected internal bool IsBitSequenceOperation { get { return false; } }
-        /// <summary>
-        /// Gets a value indicating whether this instance is logical operator.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is logical operator; otherwise, <c>false</c>.
-        /// </value>
-        /// created 03.02.2007 15:22
         [DumpExcept(false)]
         internal virtual bool IsCompareOperator { get { return false; } }
 
@@ -85,13 +63,32 @@ namespace Reni.Parser.TokenClass
         /// created 31.03.2007 14:02 on SAPHIRE by HH
         internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
         {
-            if (left != null)
+            if(left != null)
                 return left.CreateDefinableSyntax(new DefineableToken(token), right);
-            if (right != null)
+            if(right != null)
                 return new Statement(new MemberElem(new DefineableToken(token), right));
             return new DefinableTokenSyntax(token);
         }
 
+        internal virtual SearchResult SearchFromSequence()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
+        internal virtual SearchResult SequenceOfBitSearchResult { get { return null; } }
+    }
+
+    abstract internal class SequenceOfBitOperation : Defineable
+    {
+        readonly Bit.SequenceSearchResult _sequenceOfBitSearchResult;
+
+        protected SequenceOfBitOperation()
+        {
+            _sequenceOfBitSearchResult = new Bit.SequenceSearchResult(this);
+        }
+
+        sealed internal override SearchResult SequenceOfBitSearchResult { get { return _sequenceOfBitSearchResult; } }
     }
 
     internal class DefinableTokenSyntax : Syntax.Base
@@ -108,7 +105,7 @@ namespace Reni.Parser.TokenClass
         {
             get
             {
-                if (_declarationSyntax == null)
+                if(_declarationSyntax == null)
                     _declarationSyntax = CreateDeclarationSyntax();
                 return _declarationSyntax;
             }

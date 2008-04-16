@@ -2,7 +2,6 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
 
@@ -65,6 +64,8 @@ namespace Reni.Type
         /// created 08.01.2007 17:54
         [DumpData(false)]
         internal override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
+
+        internal override Base SequenceElementType { get { return Parent.SequenceElementType; } }
 
         /// <summary>
         /// Gets the type of the sequence element.
@@ -185,6 +186,14 @@ namespace Reni.Type
             return Target.IsConvertableTo(dest, conversionFeature);
         }
 
+        internal protected override SearchResult Search(Defineable defineable)
+        {
+            var result = Parent.SearchFromRef(defineable);
+            if(result != null)
+                return result;
+            return Parent.Search(defineable);
+        }
+
         /// <summary>
         /// Assignements the operator.
         /// </summary>
@@ -219,30 +228,11 @@ namespace Reni.Type
         {
             var resultFromRef = SearchDefineable(memberElem.DefineableToken);
             if(resultFromRef != null)
-                return resultFromRef.VisitApply(callContext, category, memberElem.Args);
+                return resultFromRef.VisitApply(callContext, category, memberElem.Args, this);
 
             NotImplementedMethod(callContext, category, memberElem);
             return null;
         }
-
     }
 
-    internal abstract class SearchResultFromRef : ReniObject
-    {
-        private readonly Ref _definingType;
-
-        internal SearchResultFromRef(Ref definingType)
-        {
-            _definingType = definingType;
-        }
-
-        internal Ref DefiningType { get { return _definingType; } }
-        internal abstract Result VisitApply(Context.Base callContext, Category category, Syntax.Base args);
-
-        public SearchResult ToSearchResult()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-    }
 }

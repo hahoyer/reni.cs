@@ -2,7 +2,6 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
-using Reni.Parser;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Type
@@ -102,6 +101,17 @@ namespace Reni.Type
                 return IsConvertableTo(destAligner.Parent, conversionFeature);
 
             return base.IsConvertableToVirt(dest, conversionFeature);
+        }
+
+        internal override SearchResult SearchFromRef(Defineable defineable)
+        {
+            return Element.SearchFromRefToSequence(defineable);
+        }
+
+        internal override protected SearchResult Search(Defineable defineable)
+        {
+            return Element.SearchFromSequence(defineable) 
+                ?? defineable.SearchFromSequence();
         }
 
         /// <summary>
@@ -232,7 +242,6 @@ namespace Reni.Type
         {
             return _inheritedType.MoveHandler(category);
         }
-
     }
 
     internal sealed class SequenceOperationResult : SearchResult
@@ -243,7 +252,6 @@ namespace Reni.Type
         private readonly Sequence _sequence;
 
         public SequenceOperationResult(Sequence sequence, Defineable defineable)
-            : base(sequence)
         {
             _sequence = sequence;
             _defineable = defineable;
@@ -267,7 +275,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        internal protected override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+        internal Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
         {
             NotImplementedMethod(callContext, category, args);
             return null;

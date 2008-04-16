@@ -818,7 +818,7 @@ namespace Reni.Type
         /// <param name="defineableToken">The token.</param>
         /// <returns></returns>
         /// created 02.02.2007 21:51
-        internal PrefixSearchResult SearchDefineablePrefix(DefineableToken defineableToken, )
+        internal PrefixSearchResult SearchDefineablePrefix(DefineableToken defineableToken)
         {
             return SearchPrefix(defineableToken.TokenClass);
         }
@@ -846,6 +846,21 @@ namespace Reni.Type
             return null;
         }
 
+        virtual internal SearchResult SearchFromRef(Defineable defineable)
+        {
+            NotImplementedMethod(defineable);
+            return null;
+        }
+
+        virtual internal SearchResult SearchFromSequence(Defineable defineable)
+        {
+            return null;
+        }
+
+        virtual internal SearchResult SearchFromRefToSequence(Defineable defineable)
+        {
+            return null;
+        }
     }
 
     internal abstract class SearchResultFromSequence : ReniObject

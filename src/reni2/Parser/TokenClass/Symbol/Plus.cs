@@ -1,6 +1,9 @@
+using Reni.Context;
+using Reni.Type;
+
 namespace Reni.Parser.TokenClass.Symbol
 {
-    internal class Plus : Defineable
+    sealed internal class Plus : SequenceOfBitOperation
     {
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
@@ -22,6 +25,5 @@ namespace Reni.Parser.TokenClass.Symbol
         internal override string CSharpNameOfDefaultOperation { get { return "+"; } }
 
         protected internal override bool IsBitSequencePrefixOperation { get { return true; } }
-        protected internal override bool IsBitSequenceOperation { get { return true; } }
     }
 }

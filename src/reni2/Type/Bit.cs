@@ -40,20 +40,6 @@ namespace Reni.Type
         internal override int SequenceCount { get { return 1; } }
 
         /// <summary>
-        /// Searches the defineable prefix from sequence.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        /// created 02.02.2007 22:09
-        PrefixSearchResult PrefixSearchDefineableFromSequence(DefineableToken token, int count)
-        {
-            if(token.TokenClass.IsBitSequencePrefixOperation)
-                return new BitSequenceOperationPrefixSearchResult(CreateSequence(count), token.TokenClass);
-            return null;
-        }
-
-        /// <summary>
         /// Dumps the print code from array.
         /// </summary>
         /// <param name="category">The category.</param>
@@ -133,6 +119,11 @@ namespace Reni.Type
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
+        internal override SearchResult SearchFromSequence(Defineable defineable)
+        {
+            return defineable.SequenceOfBitSearchResult;
+        }
+
         /// <summary>
         /// Default dump behaviour
         /// </summary>
@@ -143,6 +134,44 @@ namespace Reni.Type
             return GetType().FullName;
         }
 
+        internal sealed class SequenceSearchResult: SearchResult
+        {
+            private readonly Defineable _defineable;
+
+            internal SequenceSearchResult(Defineable defineable) {
+                _defineable = defineable;
+            }
+
+            internal override Result VisitApply(Context.Base context, Category category, Syntax.Base args,
+                Ref objectType)
+            {
+                var trace = ObjectId == 920 && context.ObjectId == 15 && category.HasType;
+                StartMethodDumpWithBreak(trace, context, category, args);
+                var elementType = objectType.SequenceElementType;
+                var objResult = objectType.VisitAsSequence(category, elementType);
+                var argResult = args.VisitAsSequence(context, category | Category.Type, elementType);
+                if (trace)
+                    DumpMethodWithBreak("", context, category, args, "objResult", objResult, "argResult", argResult);
+                var result = new Result();
+                if (category.HasSize || category.HasType || category.HasCode)
+                {
+                    var objBitCount = objectType.UnrefSize.ToInt();
+                    var argBitCount = argResult.Type.UnrefSize.ToInt();
+                    var type =
+                        elementType.SequenceOperationResultType(_defineable, objBitCount, argBitCount).CreateAlign(
+                            context.RefAlignParam.AlignBits);
+                    if (category.HasSize)
+                        result.Size = type.Size;
+                    if (category.HasType)
+                        result.Type = type;
+                    if (category.HasCode)
+                        result.Code = elementType.CreateSequenceOperation(_defineable, objResult, type.Size, argResult);
+                }
+                if (category.HasRefs)
+                    result.Refs = objResult.Refs.Pair(argResult.Refs);
+                return ReturnMethodDumpWithBreak(trace, result);
+            }
+        }
     }
 
     internal sealed class BitSequenceOperationPrefixSearchResult : PrefixSearchResult
@@ -181,49 +210,18 @@ namespace Reni.Type
 
     internal sealed class BitSequenceOperationSearchResult : SearchResult
     {
+        private readonly Sequence _definingType;
+
         [DumpData(true)]
         private readonly Defineable _defineable;
 
         internal BitSequenceOperationSearchResult(Sequence definingType, Defineable defineable)
-            : base(definingType)
         {
+            _definingType = definingType;
             _defineable = defineable;
         }
 
-        /// <summary>
-        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        internal protected override Result VisitApply(Context.Base context, Category category, Syntax.Base args)
-        {
-            var trace = ObjectId == 920 && context.ObjectId == 15 && category.HasType;
-            StartMethodDumpWithBreak(trace, context, category, args);
-            var elementType = DefiningType.SequenceElementType;
-            var objResult = DefiningType.VisitAsSequence(category, elementType);
-            var argResult = args.VisitAsSequence(context, category | Category.Type, elementType);
-            if(trace)
-                DumpMethodWithBreak("", context, category, args, "objResult", objResult, "argResult", argResult);
-            var result = new Result();
-            if(category.HasSize || category.HasType || category.HasCode)
-            {
-                var objBitCount = DefiningType.UnrefSize.ToInt();
-                var argBitCount = argResult.Type.UnrefSize.ToInt();
-                var type =
-                    elementType.SequenceOperationResultType(_defineable, objBitCount, argBitCount).CreateAlign(
-                        context.RefAlignParam.AlignBits);
-                if(category.HasSize)
-                    result.Size = type.Size;
-                if(category.HasType)
-                    result.Type = type;
-                if(category.HasCode)
-                    result.Code = elementType.CreateSequenceOperation(_defineable, objResult, type.Size, argResult);
-            }
-            if(category.HasRefs)
-                result.Refs = objResult.Refs.Pair(argResult.Refs);
-            return ReturnMethodDumpWithBreak(trace, result);
-        }
+        public Sequence DefiningType { get { return _definingType; } }
+
     }
 }

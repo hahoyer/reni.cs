@@ -25,7 +25,6 @@ namespace Reni
         [DumpData(true)] private readonly StructContainerSearchResult _structContainerSearchResult;
 
         public TypeSearchResult(StructContainerSearchResult structContainerSearchResult, Struct.Type definingType)
-            : base(definingType)
         {
             _structContainerSearchResult = structContainerSearchResult;
             _definingType = definingType;
@@ -38,7 +37,7 @@ namespace Reni
         /// <param name="category">The category.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        internal protected override Result VisitApply(Base callContext, Category category, Syntax.Base args)
+        internal Result VisitApply(Base callContext, Category category, Syntax.Base args)
         {
             return _structContainerSearchResult.Visit(_definingType, callContext, category, args);
         }

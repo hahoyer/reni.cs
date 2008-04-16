@@ -3,7 +3,7 @@ using Reni.Context;
 
 namespace Reni.Parser.TokenClass.Symbol
 {
-    internal sealed class Star : Defineable
+    internal sealed class Star : SequenceOfBitOperation
     {
 
         /// <summary>
@@ -24,7 +24,5 @@ namespace Reni.Parser.TokenClass.Symbol
         {
             return Type.Base.CreateNumber(BitsConst.MultiplySize(objSize, argSize));
         }
-        [DumpExcept(false)]
-        protected internal override bool IsBitSequenceOperation { get { return true; } }
     }
 }

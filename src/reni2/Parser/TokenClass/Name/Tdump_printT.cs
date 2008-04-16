@@ -10,11 +10,6 @@ namespace Reni.Parser.TokenClass.Name
     /// </summary>
     sealed class Tdump_printT : Defineable
     {
-        internal override Type.SearchResultFromRef SearchFromRef(DefineableToken defineableToken, Ref searchingType)
-        {
-            return new SearchResultFromRef(searchingType);
-        }
-
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
         /// </summary>
@@ -27,25 +22,25 @@ namespace Reni.Parser.TokenClass.Name
             return Type.Base.CreateVoid;
         }
 
-        sealed internal class SearchResultFromRef : Type.SearchResultFromRef
+        sealed internal class SearchResultFromRef 
         {
-            public SearchResultFromRef(Ref definingType) : base(definingType)
+            public SearchResultFromRef(Ref definingType) 
             {
             }
 
-            internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
-            {
-                if (args != null)
-                    NotImplementedMethod(callContext, category, args);
-                bool trace =
-                    ObjectId == 184
-                    && callContext.ObjectId == 0
-                    && category.ToString() == "Size,Type,Refs,Code"
-                    ;
-                StartMethodDump(trace, callContext, category, args);
-                Result result = DefiningType.Target.DumpPrintFromRef(category, DefiningType.RefAlignParam);
-                return ReturnMethodDumpWithBreak(trace, result);
-            }
+            //internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
+            //{
+            //    if (args != null)
+            //        NotImplementedMethod(callContext, category, args);
+            //    bool trace =
+            //        ObjectId == 184
+            //        && callContext.ObjectId == 0
+            //        && category.ToString() == "Size,Type,Refs,Code"
+            //        ;
+            //    StartMethodDump(trace, callContext, category, args);
+            //    Result result = DefiningType.Target.DumpPrintFromRef(category, DefiningType.RefAlignParam);
+            //    return ReturnMethodDumpWithBreak(trace, result);
+            //}
         }
     }
 
