@@ -42,8 +42,6 @@ namespace Reni.Type
         /// </summary>
         public Base Element { get { return Parent; } }
 
-        protected override TypePath ChildTypePath { get { return TypePath.ArrayInstance; } }
-
         /// <summary>
         /// Destructors the specified category.
         /// </summary>

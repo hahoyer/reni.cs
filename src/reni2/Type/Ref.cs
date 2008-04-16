@@ -3,6 +3,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 using Reni.Syntax;
 
 namespace Reni.Type
@@ -224,7 +225,6 @@ namespace Reni.Type
             return null;
         }
 
-        protected override TypePath ChildTypePath { get { return Type.TypePath.RefInstance; } }
     }
 
     internal abstract class SearchResultFromRef : ReniObject

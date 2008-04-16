@@ -20,6 +20,5 @@ namespace Reni.Type
         {
             return base.IsConvertableToVirt(dest, conversionFeature.EnableCut);
         }
-        protected override TypePath ChildTypePath { get { return Type.TypePath.EnableCutInstance; } }
     }
 }

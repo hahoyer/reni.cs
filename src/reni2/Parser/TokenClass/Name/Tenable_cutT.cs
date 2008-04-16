@@ -4,21 +4,6 @@ namespace Reni.Parser.TokenClass.Name
 {
     internal sealed class Tenable_cutT : Defineable
     {
-        internal override Context.SearchResult Search(Sequence sequence)
-        {
-            return new SearchResult(sequence);
-        }
-
-        internal override Reni.StructContainerSearchResult SearchFromStruct()
-        {
-            return new StructContainerSearchResult();
-        }
-
-        internal override Context.SearchResult Search(Void definingType)
-        {
-            return new SearchResult(definingType);
-        }
-
         internal sealed class SearchResult : Context.SearchResult
         {
             public SearchResult(Type.Base definingType) : base(definingType)

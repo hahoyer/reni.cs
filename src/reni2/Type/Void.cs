@@ -1,5 +1,6 @@
 ﻿using Reni.Context;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
@@ -64,11 +65,6 @@ namespace Reni.Type
             return false;
         }
 
-        SearchResult Search(DefineableToken defineableToken)
-        {
-            return defineableToken.TokenClass.Search(this);
-        }
-
         /// <summary>
         /// Creates the result.
         /// </summary>
@@ -108,16 +104,5 @@ namespace Reni.Type
             return CreateVoid.CreateResult(category, getCode, getRefs);
         }
 
-        public override SearchResult SearchDefinable(DefineableToken defineableToken, TypePath typePath)
-        {
-            NotImplementedMethod(defineableToken, typePath);
-            return null;
-        }
-
-        public override PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath)
-        {
-            NotImplementedMethod(defineableToken, typePath);
-            return null;
-        }
     }
 }

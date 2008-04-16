@@ -71,8 +71,6 @@ namespace Reni.Type
             }
         }
 
-        protected override TypePath ChildTypePath { get { NotImplementedMethod();return null; } }
-
         /// <summary>
         /// Destructors the specified category.
         /// </summary>

@@ -133,11 +133,6 @@ namespace Reni.Type
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
-        SearchResultFromSequence SearchFromSequence(Defineable defineable)
-        {
-            return defineable.SearchFromBitSequence();
-        }
-
         /// <summary>
         /// Default dump behaviour
         /// </summary>
@@ -148,17 +143,6 @@ namespace Reni.Type
             return GetType().FullName;
         }
 
-        public override SearchResult SearchDefinable(DefineableToken defineableToken, TypePath typePath)
-        {
-            NotImplementedMethod(defineableToken, typePath);
-            return null;
-        }
-
-        public override PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath)
-        {
-            NotImplementedMethod(defineableToken, typePath);
-            return null;
-        }
     }
 
     internal sealed class BitSequenceOperationPrefixSearchResult : PrefixSearchResult

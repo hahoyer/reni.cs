@@ -1,5 +1,5 @@
 using Reni.Context;
-using Reni.Parser;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
@@ -64,16 +64,5 @@ namespace Reni.Type
             return Code.Base.CreateDumpPrintText(_parent.DumpPrintText);
         }
 
-        public override SearchResult SearchDefinable(DefineableToken defineableToken, TypePath typePath)
-        {
-            NotImplementedMethod(defineableToken, typePath);
-            return null;
-        }
-
-        public override PrefixSearchResult SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath)
-        {
-            NotImplementedMethod(defineableToken, typePath);
-            return null;
-        }
     }
 }

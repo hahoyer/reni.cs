@@ -4,10 +4,6 @@ namespace Reni.Parser.TokenClass.Name
 {
     sealed class T_A_T_T: Defineable
     {
-        internal override StructContainerSearchResult SearchFromStruct()
-        {
-            return new OperationResult();
-        }
         internal sealed class OperationResult : StructContainerSearchResult
         {
             internal override Result Visit(Struct.Type definingType, Context.Base callContext, Category category,

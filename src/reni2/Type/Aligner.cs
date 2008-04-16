@@ -48,16 +48,6 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
 
         /// <summary>
-        /// Searches the definable defineableToken at type
-        /// </summary>
-        /// <param name="defineableToken">The token.</param>
-        /// <returns></returns>
-        SearchResult Search(DefineableToken defineableToken)
-        {
-            return defineableToken.TokenClass.Search(this);
-        }
-
-        /// <summary>
         /// Destructors the specified category.
         /// </summary>
         /// <param name="category">The category.</param>
@@ -137,8 +127,6 @@ namespace Reni.Type
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
         internal override int SequenceCount { get { return Parent.SequenceCount; } }
-
-        protected override TypePath ChildTypePath { get { return Type.TypePath.AlignerInstance; } }
 
         /// <summary>
         /// Determines whether [has converter to] [the specified dest].

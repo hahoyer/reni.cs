@@ -2,11 +2,12 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Type : Reni.Type.Base, IDefiningType
+    internal sealed class Type : Reni.Type.Base
     {
         private readonly Container _container;
         private readonly Reni.Context.Base _context;
@@ -49,8 +50,6 @@ namespace Reni.Struct
         /// </value>
         /// created 09.02.2007 00:26
         internal override bool IsPending { get { return _container.IsPendingType(_context); } }
-
-        internal protected override IDefiningType FindDefiningType { get { return this; } }
 
         /// <summary>
         /// Moves the handler.
@@ -116,20 +115,6 @@ namespace Reni.Struct
         }
 
         /// <summary>
-        /// Searches the definable defineableToken at type
-        /// </summary>
-        /// <param name="defineableToken">The token.</param>
-        /// <returns></returns>
-        SearchResult Search(DefineableToken defineableToken)
-        {
-            var structAccess = _container.Search(defineableToken);
-            if(structAccess != null)
-                return structAccess.ToSearchResult(this);
-
-            return null;
-        }
-
-        /// <summary>
         /// Destructors the specified category.
         /// </summary>
         /// <param name="category">The category.</param>
@@ -175,16 +160,5 @@ namespace Reni.Struct
             return result.ReplaceRelativeContextRef(containerContext, argsRef);
         }
 
-        SearchResult IDefiningType.SearchDefinable(DefineableToken defineableToken, TypePath typePath)
-        {
-            NotImplementedMethod(defineableToken,typePath);
-            return null;
-        }
-
-        PrefixSearchResult IDefiningType.SearchDefinablePrefix(DefineableToken defineableToken, TypePath typePath)
-        {
-            NotImplementedMethod(defineableToken, typePath);
-            return null;
-        }
     }
 }

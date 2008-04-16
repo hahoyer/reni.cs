@@ -1,8 +1,6 @@
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
-using Reni.Parser;
-using Base=Reni.Type.Base;
 
 namespace Reni.Struct
 {
@@ -12,7 +10,7 @@ namespace Reni.Struct
     internal sealed class Context : Child
     {
         private readonly Container _container;
-        private readonly DictionaryEx<int, Base> _type = new DictionaryEx<int, Base>();
+        private readonly DictionaryEx<int, Reni.Type.Base> _type = new DictionaryEx<int, Reni.Type.Base>();
         private Code.Base _contextRefCode;
 
         /// <summary>
@@ -21,18 +19,18 @@ namespace Reni.Struct
         /// <param name="parent">The parent.</param>
         /// <param name="container">The struc.</param>
         /// created 12.12.2006 21:29
-        internal Context(Reni.Context.Base parent, Container container)
+        internal Context(Base parent, Container container)
             : base(parent)
         {
             _container = container;
-            Tracer.ConditionalBreak(Parent is Context && ((Context)Parent).Container == Container, "");
+            Tracer.ConditionalBreak(Parent is Context && ((Context) Parent).Container == Container, "");
         }
 
         /// <summary>
         /// Returns the type of an element
         /// </summary>
         /// <param name="position">Index of the element</param>
-        internal Base VisitType(int position)
+        internal Reni.Type.Base VisitType(int position)
         {
             return _container.VisitType(Parent, position);
         }
@@ -56,7 +54,7 @@ namespace Reni.Struct
                    _type.Find
                        (
                        currentCompilePosition,
-                       delegate { return new Type(Parent, _container, currentCompilePosition); }
+                       () => new Type(Parent, _container, currentCompilePosition)
                        );
         }
 
@@ -74,11 +72,6 @@ namespace Reni.Struct
         private Code.Base CreateContextRefCode()
         {
             return Code.Base.CreateContextRef(this);
-        }
-
-        internal override ContextSearchResult SearchDefineable(DefineableToken defineableToken)
-        {
-            return Container.Search(defineableToken).ToContextSearchResult(CreateStructType(Container.List.Count));
         }
 
         internal override Code.Base CreateRefForStruct(Type type)

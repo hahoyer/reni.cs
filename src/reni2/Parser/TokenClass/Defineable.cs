@@ -92,54 +92,6 @@ namespace Reni.Parser.TokenClass
             return new DefinableTokenSyntax(token);
         }
 
-        internal virtual SearchResult Search(Aligner aligner)
-        {
-            NotImplementedMethod(aligner);
-            return null;
-        }
-
-        internal virtual SearchResult Search(Sequence sequence)
-        {
-            SearchResultFromSequence result = sequence.Element.SearchFromSequence(this);
-            if(result != null)
-                return result.ToSearchResult(sequence);
-            NotImplementedMethod(sequence);
-            return null;
-        }
-
-        internal SearchResultFromSequence SearchFromBitSequence()
-        {
-            if (IsBitSequenceOperation)
-                return new SearchResultFromBitSequence(this);
-
-            return null;
-        }
-
-        internal virtual StructContainerSearchResult SearchFromStruct()
-        {
-            return null;
-        }
-
-        internal virtual SearchResult Search(Type.Void definingType)
-        {
-            NotImplementedMethod(definingType);
-            return null;
-        }
-    }
-
-    internal class SearchResultFromBitSequence : SearchResultFromSequence
-    {
-        private readonly Defineable _defineable;
-
-        public SearchResultFromBitSequence(Defineable defineable)
-        {
-            _defineable = defineable;
-        }
-
-        internal override SearchResult ToSearchResult(Sequence sequence)
-        {
-            return new BitSequenceOperationSearchResult(sequence, _defineable);
-        }
     }
 
     internal class DefinableTokenSyntax : Syntax.Base

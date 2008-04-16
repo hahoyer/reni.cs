@@ -256,7 +256,7 @@ namespace Reni.Context
             }
 
             var argResult = memberElem.Args.Visit(this, category | Category.Type);
-            var searchResult = argResult.Type.PrefixSearchDefineable(memberElem.DefineableToken);
+            var searchResult = argResult.Type.SearchDefineablePrefix(memberElem.DefineableToken);
             if(searchResult != null)
                 return searchResult.VisitApply(category, argResult);
 

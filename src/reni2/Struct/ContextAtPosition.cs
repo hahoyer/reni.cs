@@ -43,19 +43,6 @@ namespace Reni.Struct
             return Parent.CreateArgsRefResult(category);
         }
 
-        internal override ContextSearchResult SearchDefineable(DefineableToken defineableToken)
-        {
-            StructContainerSearchResult structAccess = _container.Search(defineableToken);
-            if (structAccess != null)
-                return
-                    structAccess
-                        .ToContextSearchResult(
-                        _container.CreateStructType(Parent,_currentCompilePosition)
-                        );
-
-            return Parent.SearchDefineable(defineableToken);
-        }
-
         /// <summary>
         /// Creates the ref.
         /// </summary>

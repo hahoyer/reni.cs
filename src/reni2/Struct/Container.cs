@@ -535,18 +535,6 @@ namespace Reni.Struct
             return Reni.Type.Base.EmptyHandler(category);
         }
 
-        internal StructContainerSearchResult Search(DefineableToken defineableToken)
-        {
-            var result = defineableToken.TokenClass.SearchFromStruct();
-            if(result != null)
-                return result; // new OperationResult(defineableToken);
-
-            if(!Dictionary.ContainsKey(defineableToken.Name))
-                return null;
-
-            return new StructAccess(Dictionary[defineableToken.Name]);
-        }
-
         public Result VisitOperationApply(Reni.Context.Base definingParentContext, Reni.Context.Base callContext,
             Category category, Syntax.Base args)
         {

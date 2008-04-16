@@ -64,11 +64,6 @@ namespace Reni.Type
         /// created 13.01.2007 19:34
         public Base Element { get { return _inheritedType.Element; } }
 
-        internal protected override IDefiningType FindDefiningType { get { return InheritedType.FindDefiningType; } }
-
-        internal protected override TypePath TypePath { get { return 
-            InheritedType.TypePath.TurnIntoSequence(); } }
-
         /// <summary>
         /// Default dump behaviour
         /// </summary>
@@ -77,31 +72,6 @@ namespace Reni.Type
         public override string Dump()
         {
             return InheritedType.Dump();
-        }
-
-        /// <summary>
-        /// Searches the definable defineableToken at type
-        /// </summary>
-        /// <param name="defineableToken">The token.</param>
-        /// <returns></returns>
-        [Obsolete]
-        internal SearchResult Search(DefineableToken defineableToken)
-        {
-            return defineableToken.TokenClass.Search(this);
-        }
-
-        /// <summary>
-        /// Searches the definable token at type
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        [Obsolete]
-        internal PrefixSearchResult PrefixSearchDefineable(DefineableToken t)
-        {
-            var result = Element.PrefixSearchDefineableFromSequence(t, Count);
-            if(result != null)
-                return result;
-            return base.PrefixSearchDefineable(t);
         }
 
         /// <summary>

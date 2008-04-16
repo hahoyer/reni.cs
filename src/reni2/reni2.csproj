@@ -161,7 +161,6 @@
     <Compile Include="Type\Primitive.cs" />
     <Compile Include="Type\Ref.cs" />
     <Compile Include="Struct\Type.cs" />
-    <Compile Include="Type\TypePath.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\Void.cs" />
   </ItemGroup>

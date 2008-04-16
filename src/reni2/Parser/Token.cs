@@ -102,8 +102,7 @@ namespace Reni.Parser
         {
             get
             {
-                 return Base.TokenToTypeNameEnd(
-                     TokenClass.IsSymbol, Name);
+                 return Base.TokenToTypeNameEnd(TokenClass.IsSymbol, Name);
             }
         }
 
@@ -116,7 +115,7 @@ namespace Reni.Parser
                 if(Base.IsTokenType(tt.FullName, isSymbol, sp.SubString(0, i)))
                     return new Token(sp, i, (Base) Activator.CreateInstance(tt, new object[0]));
             }
-            return new Token(sp, i, UserSymbol.Instance(isSymbol));
+            return new Token(sp, i, UserSymbol.Instance(isSymbol, sp.SubString(0, i)));
         }
     }
 
