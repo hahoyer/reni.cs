@@ -8,7 +8,7 @@ namespace Reni.Parser.TokenClass.Name
     /// <summary>
     /// Summary description for printnumToken.
     /// </summary>
-    sealed class Tdump_printT : Defineable
+    sealed class Tdump_printT : SequenceOfBitOperation
     {
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
