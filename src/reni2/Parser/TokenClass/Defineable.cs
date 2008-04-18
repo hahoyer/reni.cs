@@ -72,7 +72,6 @@ namespace Reni.Parser.TokenClass
 
         internal virtual SearchResult SearchFromSequence()
         {
-            NotImplementedMethod();
             return null;
         }
 
