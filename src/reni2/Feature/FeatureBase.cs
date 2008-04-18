@@ -2,11 +2,11 @@ using HWClassLibrary.Debug;
 using System;
 using Reni.Type;
 
-namespace Reni.Context
+namespace Reni.Feature
 {
-    internal abstract class SearchResult : ReniObject
+    internal abstract class FeatureBase : ReniObject
     {
-        virtual internal Result VisitApply(Base context, Category category, Syntax.Base args, Ref objectType)
+        virtual internal Result VisitApply(Context.Base context, Category category, Syntax.Base args, Ref objectType)
         {
             NotImplementedMethod(context, category, args, objectType);
             return null;
@@ -15,16 +15,16 @@ namespace Reni.Context
 
     internal class DefaultSearchResultFromRef 
     {
-        private readonly SearchResult _searchResult;
+        private readonly FeatureBase _featureBase;
 
-        public DefaultSearchResultFromRef(SearchResult searchResult, Ref definingType)
+        public DefaultSearchResultFromRef(FeatureBase featureBase, Ref definingType)
         {
-            _searchResult = searchResult;
+            _featureBase = featureBase;
         }
 
         //internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
         //{
-        //    Result result = _searchResult.VisitApply(callContext, category, args);
+        //    Result result = _featureBase.VisitApply(callContext, category, args);
         //    result = result.UseWithArg(DefiningType.CreateDereferencedArgResult(category));
         //    return result;
         //}
@@ -38,6 +38,4 @@ namespace Reni.Context
             throw new NotImplementedException();
         }
     }
-
 }
-

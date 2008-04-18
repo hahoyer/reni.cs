@@ -1,6 +1,6 @@
 ﻿using System;
 using HWClassLibrary.Debug;
-using Reni.Context;
+using Reni.Feature;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -70,12 +70,12 @@ namespace Reni.Parser.TokenClass
             return new DefinableTokenSyntax(token);
         }
 
-        internal virtual SearchResult SearchFromSequence()
+        internal virtual FeatureBase SearchFromSequence()
         {
             return null;
         }
 
-        internal virtual SearchResult SequenceOfBitSearchResult { get { return null; } }
+        internal virtual FeatureBase SequenceOfBitFeatureBase { get { return null; } }
     }
 
     abstract internal class SequenceOfBitOperation : Defineable
@@ -87,7 +87,7 @@ namespace Reni.Parser.TokenClass
             _sequenceOfBitSearchResult = new Bit.SequenceSearchResult(this);
         }
 
-        sealed internal override SearchResult SequenceOfBitSearchResult { get { return _sequenceOfBitSearchResult; } }
+        sealed internal override FeatureBase SequenceOfBitFeatureBase { get { return _sequenceOfBitSearchResult; } }
     }
 
     internal class DefinableTokenSyntax : Syntax.Base

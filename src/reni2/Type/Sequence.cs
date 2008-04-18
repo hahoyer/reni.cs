@@ -1,7 +1,7 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
-using Reni.Context;
+using Reni.Feature;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Type
@@ -103,12 +103,12 @@ namespace Reni.Type
             return base.IsConvertableToVirt(dest, conversionFeature);
         }
 
-        internal override SearchResult SearchFromRef(Defineable defineable)
+        internal override FeatureBase SearchFromRef(Defineable defineable)
         {
             return Element.SearchFromRefToSequence(defineable);
         }
 
-        internal override protected SearchResult Search(Defineable defineable)
+        internal override protected FeatureBase Search(Defineable defineable)
         {
             return Element.SearchFromSequence(defineable) 
                 ?? defineable.SearchFromSequence();
@@ -244,7 +244,7 @@ namespace Reni.Type
         }
     }
 
-    internal sealed class SequenceOperationResult : SearchResult
+    internal sealed class SequenceOperationResult : FeatureBase
     {
         [DumpData(true)]
         private readonly Defineable _defineable;

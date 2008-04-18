@@ -1,5 +1,5 @@
 using HWClassLibrary.Debug;
-using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
 
@@ -119,9 +119,9 @@ namespace Reni.Type
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
-        internal override SearchResult SearchFromSequence(Defineable defineable)
+        internal override FeatureBase SearchFromSequence(Defineable defineable)
         {
-            return defineable.SequenceOfBitSearchResult;
+            return defineable.SequenceOfBitFeatureBase;
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Reni.Type
             return GetType().FullName;
         }
 
-        internal sealed class SequenceSearchResult: SearchResult
+        internal sealed class SequenceSearchResult: FeatureBase
         {
             private readonly Defineable _defineable;
 
@@ -208,7 +208,7 @@ namespace Reni.Type
         }
     }
 
-    internal sealed class BitSequenceOperationSearchResult : SearchResult
+    internal sealed class BitSequenceOperationSearchResult : FeatureBase
     {
         private readonly Sequence _definingType;
 

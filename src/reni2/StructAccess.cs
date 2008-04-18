@@ -1,5 +1,6 @@
 using HWClassLibrary.Debug;
 using Reni.Context;
+using Reni.Feature;
 
 namespace Reni
 {
@@ -10,7 +11,7 @@ namespace Reni
             return new ContextSearchResult(this, definingType);
         }
 
-        internal SearchResult ToSearchResult(Struct.Type definingType)
+        internal FeatureBase ToSearchResult(Struct.Type definingType)
         {
             return new TypeSearchResult(this, definingType);
         }
@@ -19,7 +20,7 @@ namespace Reni
                                        Category category, Syntax.Base args);
     }
 
-    internal sealed class TypeSearchResult : SearchResult
+    internal sealed class TypeSearchResult : FeatureBase
     {
         [DumpData(true)] private readonly Struct.Type _definingType;
         [DumpData(true)] private readonly StructContainerSearchResult _structContainerSearchResult;

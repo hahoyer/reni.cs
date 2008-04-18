@@ -2,6 +2,7 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
 
@@ -186,7 +187,7 @@ namespace Reni.Type
             return Target.IsConvertableTo(dest, conversionFeature);
         }
 
-        internal protected override SearchResult Search(Defineable defineable)
+        internal protected override FeatureBase Search(Defineable defineable)
         {
             var result = Parent.SearchFromRef(defineable);
             if(result != null)

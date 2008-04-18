@@ -4,7 +4,7 @@ namespace Reni.Parser.TokenClass.Name
 {
     internal sealed class Tenable_cutT : Defineable
     {
-        internal sealed class SearchResult : Context.SearchResult
+        internal sealed class SearchResult : Feature.FeatureBase
         {
             public SearchResult(Type.Base definingType)
             {

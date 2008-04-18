@@ -3,6 +3,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
 
@@ -829,7 +830,7 @@ namespace Reni.Type
         /// <param name="defineableToken">The defineable.</param>
         /// <returns></returns>
         /// Created 04.11.07 17:51 by hh on HAHOYER-DELL
-        internal SearchResult SearchDefineable(DefineableToken defineableToken)
+        internal FeatureBase SearchDefineable(DefineableToken defineableToken)
         {
             return Search(defineableToken.TokenClass);
         }
@@ -840,24 +841,24 @@ namespace Reni.Type
             return null;
         }
 
-        virtual internal protected SearchResult Search(Defineable defineable)
+        virtual internal protected FeatureBase Search(Defineable defineable)
         {
             NotImplementedMethod(defineable);
             return null;
         }
 
-        virtual internal SearchResult SearchFromRef(Defineable defineable)
+        virtual internal FeatureBase SearchFromRef(Defineable defineable)
         {
             NotImplementedMethod(defineable);
             return null;
         }
 
-        virtual internal SearchResult SearchFromSequence(Defineable defineable)
+        virtual internal FeatureBase SearchFromSequence(Defineable defineable)
         {
             return null;
         }
 
-        virtual internal SearchResult SearchFromRefToSequence(Defineable defineable)
+        virtual internal FeatureBase SearchFromRefToSequence(Defineable defineable)
         {
             return null;
         }
@@ -865,6 +866,6 @@ namespace Reni.Type
 
     internal abstract class SearchResultFromSequence : ReniObject
     {
-        internal abstract SearchResult ToSearchResult(Sequence sequence);
+        internal abstract FeatureBase ToSearchResult(Sequence sequence);
     }
 }
