@@ -5,7 +5,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Syntax
 {
-    internal sealed class Struct : Base
+    internal sealed class Struct : SyntaxBase
     {
         [Node, DumpData(true)]
         private Reni.Struct.Container _data;
@@ -33,42 +33,42 @@ namespace Reni.Syntax
         /// <param name="category">Categories</param>
         /// <returns></returns>
         //[DebuggerHidden]
-        internal override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.ContextBase context, Category category)
         {
             return _data.Visit(context, category);
         }
 
-        internal override Base CreateListSyntaxReverse(Base left, Token token)
+        internal override SyntaxBase CreateListSyntaxReverse(SyntaxBase left, Token token)
         {
             return new Struct(Reni.Struct.Container.Create(left, _data));
         }
 
-        internal override Base CreateListSyntaxReverse(DeclarationSyntax left, Token token)
+        internal override SyntaxBase CreateListSyntaxReverse(DeclarationSyntax left, Token token)
         {
             return new Struct(Reni.Struct.Container.Create(left, _data));
         }
 
-        internal static Base Create(Base left)
+        internal static SyntaxBase Create(SyntaxBase left)
         {
             return new Struct(Reni.Struct.Container.Create(left));
         }
 
-        internal static Base Create(Base left, Base right)
+        internal static SyntaxBase Create(SyntaxBase left, SyntaxBase right)
         {
             return new Struct(Reni.Struct.Container.Create(left, right));
         }
 
-        internal static Base Create(DeclarationSyntax left)
+        internal static SyntaxBase Create(DeclarationSyntax left)
         {
             return new Struct(Reni.Struct.Container.Create(left));
         }
 
-        internal static Base Create(ConverterSyntax left)
+        internal static SyntaxBase Create(ConverterSyntax left)
         {
             return new Struct(Reni.Struct.Container.Create(left));
         }
 
-        internal static Base Create(DeclarationSyntax left, Base right)
+        internal static SyntaxBase Create(DeclarationSyntax left, SyntaxBase right)
         {
             return new Struct(Reni.Struct.Container.Create(left, right));
         }

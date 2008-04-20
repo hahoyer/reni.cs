@@ -8,14 +8,14 @@ namespace Reni.Type
     /// </summary>
     internal sealed class TypeType : Primitive
     {
-        private readonly Base _parent;
+        private readonly TypeBase _parent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeType"/> class.
         /// </summary>
         /// <param name="parent">The parent.</param>
         /// created 08.01.2007 18:05
-        public TypeType(Base parent)
+        public TypeType(TypeBase parent)
         {
             _parent = parent;
         }

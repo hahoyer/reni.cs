@@ -1,6 +1,8 @@
+using Reni.Type;
+
 namespace Reni.Parser.TokenClass.Symbol
 {
-    internal class Minus : Defineable
+    internal class Minus : SequenceOfBitOperation
     {
         /// <summary>
         /// Gets the name of token for C# generation.
@@ -9,6 +11,8 @@ namespace Reni.Parser.TokenClass.Symbol
         /// created 08.01.2007 15:02
         internal override string CSharpNameOfDefaultOperation { get { return "-"; } }
 
+        internal protected override bool IsBitSequencePrefixOperation { get { return true; } }
+
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
         /// </summary>
@@ -16,9 +20,9 @@ namespace Reni.Parser.TokenClass.Symbol
         /// <param name="argSize">Size of the arg.</param>
         /// <returns></returns>
         /// created 08.01.2007 01:40
-        internal override Type.Base BitSequenceOperationResultType(int objSize, int argSize)
+        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize)
         {
-            return Type.Base.CreateNumber(BitsConst.PlusSize(objSize, argSize));
+            return TypeBase.CreateNumber(BitsConst.PlusSize(objSize, argSize));
         }
     }
 }

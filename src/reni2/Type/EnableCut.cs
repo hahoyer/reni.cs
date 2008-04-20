@@ -2,7 +2,7 @@ namespace Reni.Type
 {
     internal sealed class EnableCut : TagChild
     {
-        public EnableCut(Base parent)
+        public EnableCut(TypeBase parent)
             : base(parent) {}
 
         protected override string TagTitle { get { return "enable_cut"; } }
@@ -16,7 +16,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             return base.IsConvertableToVirt(dest, conversionFeature.EnableCut);
         }

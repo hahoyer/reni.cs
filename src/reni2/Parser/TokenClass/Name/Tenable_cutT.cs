@@ -1,41 +1,31 @@
+using Reni.Context;
+using Reni.Feature;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    internal sealed class Tenable_cutT : Defineable
+    internal sealed class Tenable_cutT : Defineable, IFeature
     {
-        internal sealed class SearchResult : Feature.FeatureBase
+        public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref objectType)
         {
-            public SearchResult(Type.Base definingType)
-            {
-            }
-
-            ///// <summary>
-            ///// Creates the result for member function searched. Object is provided by use of "Arg" code element
-            ///// </summary>
-            ///// <param name="callContext">The call context.</param>
-            ///// <param name="category">The category.</param>
-            ///// <param name="args">The args.</param>
-            ///// <returns></returns>
-            //protected internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
-            //{
-            //    if (args == null)
-            //        return DefiningType.CreateEnableCut().CreateArgResult(category);
-            //    NotImplementedMethod(callContext, category, args);
-            //    return null;
-            //}
+            if(args == null)
+                return objectType.CreateEnableCut().CreateArgResult(category);
+            NotImplementedMethod(callContext, category, args);
+            return null;
         }
 
-        internal sealed class StructContainerSearchResult : Reni.StructContainerSearchResult
+        Result Visit(Struct.Type definingType, ContextBase callContext, Category category,SyntaxBase args)
         {
-            internal override Result Visit(Struct.Type definingType, Context.Base callContext, Category category,
-                                           Syntax.Base args)
-            {
-                if (args == null)
-                    return definingType.CreateArgResult(category);
-                NotImplementedMethod(callContext, category, args);
-                return null;
-            }
+            if(args == null)
+                return definingType.CreateArgResult(category);
+            NotImplementedMethod(callContext, category, args);
+            return null;
+        }
+
+        internal override SearchResult<IFeature> SearchFromSequence()
+        {
+            return SearchResult<IFeature>.Success(this,this);
         }
     }
 }

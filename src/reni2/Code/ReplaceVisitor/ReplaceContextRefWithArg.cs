@@ -3,7 +3,7 @@ namespace Reni.Code.ReplaceVisitor
     /// <summary>
     /// Replace context elements
     /// </summary>
-    internal abstract class ReplaceContextRef<CC> : Base where CC : Context.Base
+    internal abstract class ReplaceContextRef<CC> : Base where CC : Context.ContextBase
     {
         /// <summary>
         /// the context
@@ -43,7 +43,7 @@ namespace Reni.Code.ReplaceVisitor
     /// 
     /// </summary>
     /// <typeparam name="CC"></typeparam>
-    internal sealed class ReplaceRelativeContextRef<CC> : ReplaceContextRef<CC> where CC : Context.Base
+    internal sealed class ReplaceRelativeContextRef<CC> : ReplaceContextRef<CC> where CC : Context.ContextBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReplaceRelativeContextRef&lt;CC&gt;"/> class.
@@ -73,7 +73,7 @@ namespace Reni.Code.ReplaceVisitor
     /// 
     /// </summary>
     /// <typeparam name="CC"></typeparam>
-    internal sealed class ReplaceAbsoluteContextRef<CC> : ReplaceContextRef<CC> where CC : Context.Base
+    internal sealed class ReplaceAbsoluteContextRef<CC> : ReplaceContextRef<CC> where CC : Context.ContextBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReplaceRelativeContextRef&lt;CC&gt;"/> class.

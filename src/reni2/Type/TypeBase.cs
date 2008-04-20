@@ -6,6 +6,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -13,7 +14,7 @@ namespace Reni.Type
     /// Summary description for Base.
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
-    internal abstract class Base : ReniObject
+    internal abstract class TypeBase : ReniObject, IDumpShortProvider
     {
         private static readonly Bit _bit = new Bit();
         private static readonly Void _void = new Void();
@@ -22,15 +23,15 @@ namespace Reni.Type
         private readonly DictionaryEx<int, Aligner> _aligner = new DictionaryEx<int, Aligner>();
         private readonly DictionaryEx<int, Array> _array = new DictionaryEx<int, Array>();
         private readonly DictionaryEx<int, Sequence> _chain = new DictionaryEx<int, Sequence>();
-        private readonly DictionaryEx<Base, Pair> _pair = new DictionaryEx<Base, Pair>();
+        private readonly DictionaryEx<TypeBase, Pair> _pair = new DictionaryEx<TypeBase, Pair>();
         private readonly DictionaryEx<RefAlignParam, Ref> _ref = new DictionaryEx<RefAlignParam, Ref>();
         private EnableCut _enableCutCache;
         private TypeType _typeTypeCache;
 
-        protected Base(int objectId)
+        protected TypeBase(int objectId)
             : base(objectId) {}
 
-        protected Base() {}
+        protected TypeBase() {}
 
         /// <summary>
         /// The size of type
@@ -68,15 +69,15 @@ namespace Reni.Type
         /// <returns></returns>
         /// created 08.01.2007 01:43
         [DumpData(false)]
-        public static Base CreateVoid { get { return _void; } }
+        public static TypeBase CreateVoid { get { return _void; } }
 
         /// <summary>
         /// Creates the bit.type instance
         /// </summary>
         [DumpData(false)]
-        public static Base CreateBit { get { return _bit; } }
+        public static TypeBase CreateBit { get { return _bit; } }
 
-        private Base TypeType
+        private TypeBase TypeType
         {
             get
             {
@@ -141,7 +142,7 @@ namespace Reni.Type
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
         [DumpData(false)]
-        internal virtual Base SequenceElementType
+        internal virtual TypeBase SequenceElementType
         {
             get
             {
@@ -170,7 +171,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The pending.</value>
         /// created 24.01.2007 22:23
-        internal static Base Pending
+        internal static TypeBase Pending
         {
             get
             {
@@ -192,14 +193,23 @@ namespace Reni.Type
         internal virtual bool IsPending { get { return false; } }
 
         [DumpData(false)]
-        internal protected virtual Base[] ToList { get { return new[] {this}; } }
+        internal protected virtual TypeBase[] ToList { get { return new[] {this}; } }
+
+        #region IDumpShortProvider Members
+
+        public string DumpShort()
+        {
+            return DumpPrintText;
+        }
+
+        #endregion
 
         /// <summary>
         /// Create aligner type
         /// </summary>
         /// <param name="alignBits"></param>
         /// <returns></returns>
-        public Base CreateAlign(int alignBits)
+        public TypeBase CreateAlign(int alignBits)
         {
             if(Size.Align(alignBits) == Size)
                 return this;
@@ -229,7 +239,7 @@ namespace Reni.Type
         /// <param name="bitCount">The bit count.</param>
         /// <returns></returns>
         /// created 13.01.2007 23:45
-        public static Base CreateNumber(int bitCount)
+        public static TypeBase CreateNumber(int bitCount)
         {
             return CreateBit.CreateSequence(bitCount);
         }
@@ -240,12 +250,12 @@ namespace Reni.Type
         /// <param name="second">The second.</param>
         /// <returns></returns>
         /// created 19.11.2006 22:56
-        public virtual Base CreatePair(Base second)
+        public virtual TypeBase CreatePair(TypeBase second)
         {
             return second.CreateReversePair(this);
         }
 
-        protected virtual Base CreateReversePair(Base first)
+        protected virtual TypeBase CreateReversePair(TypeBase first)
         {
             return first._pair.Find(this,
                 () => new Pair(first, this));
@@ -394,7 +404,7 @@ namespace Reni.Type
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 08.01.2007 14:38
-        public Result CreateContextRefResult<C>(Category category, C context) where C : Context.Base
+        public Result CreateContextRefResult<C>(Category category, C context) where C : ContextBase
         {
             return CreateResult(
                 category,
@@ -432,7 +442,7 @@ namespace Reni.Type
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 29.10.2006 18:24
-        internal virtual Result ApplyFunction(Category category, Context.Base callContext, Syntax.Base args)
+        internal virtual Result ApplyFunction(Category category, ContextBase callContext, SyntaxBase args)
         {
             NotImplementedMethod(callContext, category, args);
             throw new NotImplementedException();
@@ -563,7 +573,7 @@ namespace Reni.Type
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// created 08.01.2007 17:33
-        public virtual Base DumpPrintArrayType(int count)
+        public virtual TypeBase DumpPrintArrayType(int count)
         {
             NotImplementedMethod(count);
             throw new NotImplementedException();
@@ -588,7 +598,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 09.01.2007 01:20
-        public Base CommonType(Base dest)
+        public TypeBase CommonType(TypeBase dest)
         {
             if(IsConvertableTo(dest, ConversionFeature.Instance))
                 return dest;
@@ -605,7 +615,7 @@ namespace Reni.Type
         /// <param name="dest">The destination type.</param>
         /// <returns></returns>
         /// created 11.01.2007 21:26
-        public Result Conversion(Category category, Base dest)
+        public Result Conversion(Category category, TypeBase dest)
         {
             if(category.HasCode || category.HasRefs)
             {
@@ -618,13 +628,13 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Internal conversion function. Used only inside of conversion strategy. From outside call <see cref="Base.Conversion"/>.
+        /// Internal conversion function. Used only inside of conversion strategy. From outside call <see cref="TypeBase.Conversion"/>.
         /// </summary>
         /// <param name="category">Categories to obtain.</param>
         /// <param name="dest">The destination type.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal Result ConvertTo(Category category, Base dest)
+        internal Result ConvertTo(Category category, TypeBase dest)
         {
             if(this == dest)
                 return ConvertToItself(category);
@@ -632,7 +642,7 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Internal conversion function. Used only inside of conversion strategy. From outside call <see cref="Base.Conversion"/>.
+        /// Internal conversion function. Used only inside of conversion strategy. From outside call <see cref="TypeBase.Conversion"/>.
         /// </summary>
         /// <param name="category">The category.</param>
         /// <returns></returns>
@@ -649,7 +659,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal virtual Result ConvertToVirt(Category category, Base dest)
+        internal virtual Result ConvertToVirt(Category category, TypeBase dest)
         {
             NotImplementedMethod(category, dest);
             throw new NotImplementedException();
@@ -662,10 +672,10 @@ namespace Reni.Type
         /// <param name="elementType">Type of the element.</param>
         /// <returns></returns>
         /// created 13.01.2007 22:20
-        internal virtual Result VisitAsSequence(Category category, Base elementType)
+        internal virtual Result VisitAsSequence(Category category, TypeBase elementType)
         {
             var count = SequenceCount;
-            Base resultType = elementType.CreateSequence(count);
+            TypeBase resultType = elementType.CreateSequence(count);
             return Conversion(category, resultType);
         }
 
@@ -678,7 +688,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        internal bool IsConvertableTo(Base dest, ConversionFeature conversionFeature)
+        internal bool IsConvertableTo(TypeBase dest, ConversionFeature conversionFeature)
         {
             if(this == dest)
                 return IsConvertableToItself(conversionFeature);
@@ -694,7 +704,7 @@ namespace Reni.Type
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        internal virtual bool HasConverterTo(Base dest)
+        internal virtual bool HasConverterTo(TypeBase dest)
         {
             return false;
         }
@@ -708,7 +718,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal virtual bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal virtual bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             NotImplementedMethod(dest, conversionFeature);
             throw new NotImplementedException();
@@ -764,7 +774,7 @@ namespace Reni.Type
         /// <param name="argBitCount">The arg bit count.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:43
-        internal virtual Base SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
+        internal virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             NotImplementedMethod(token, objBitCount, argBitCount);
             return null;
@@ -795,7 +805,7 @@ namespace Reni.Type
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 01.07.07 19:16 on HAHOYER-DELL by h
-        internal virtual Code.Base CreateRefCodeForContext(Context.Base context)
+        internal virtual Code.Base CreateRefCodeForContext(ContextBase context)
         {
             NotImplementedMethod(context);
             return null;
@@ -808,64 +818,47 @@ namespace Reni.Type
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 30.07.2007 21:28 on HAHOYER-DELL by hh
-        internal virtual Result UnProperty(Result rawResult, Context.Base context)
+        internal virtual Result UnProperty(Result rawResult, ContextBase context)
         {
             return rawResult;
         }
 
-        /// <summary>
-        /// Searches the defineable prefix.
-        /// </summary>
-        /// <param name="defineableToken">The token.</param>
-        /// <returns></returns>
-        /// created 02.02.2007 21:51
-        internal PrefixSearchResult SearchDefineablePrefix(DefineableToken defineableToken)
+        internal SearchResult<IFeature> SearchDefineable(DefineableToken defineableToken)
         {
-            return SearchPrefix(defineableToken.TokenClass);
+            return Search(defineableToken.TokenClass).SubTrial(this);
+        }
+        internal SearchResult<IPrefixFeature> SearchDefineablePrefix(DefineableToken defineableToken)
+        {
+            return SearchPrefix(defineableToken.TokenClass).SubTrial(this);
         }
 
-        /// <summary>
-        /// Searches the specified defineable.
-        /// </summary>
-        /// <param name="defineableToken">The defineable.</param>
-        /// <returns></returns>
-        /// Created 04.11.07 17:51 by hh on HAHOYER-DELL
-        internal FeatureBase SearchDefineable(DefineableToken defineableToken)
+        internal protected virtual SearchResult<IFeature> Search(Defineable defineable)
         {
-            return Search(defineableToken.TokenClass);
+            return defineable.Search();
+        }
+        internal protected virtual SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
+        {
+            return defineable.SearchPrefix();
         }
 
-        virtual internal protected PrefixSearchResult SearchPrefix(Defineable defineable)
+        internal virtual SearchResult<IFeature> SearchFromRef(Defineable defineable)
         {
-            NotImplementedMethod(defineable);
-            return null;
+            return SearchResult<IFeature>.Failure(this, defineable);
         }
 
-        virtual internal protected FeatureBase Search(Defineable defineable)
+        internal virtual SearchResult<IFeature> SearchFromSequence(Defineable defineable)
         {
-            NotImplementedMethod(defineable);
-            return null;
+            return SearchResult<IFeature>.Failure(this, defineable);
+        }
+        internal virtual SearchResult<IPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
+        {
+            return SearchResult<IPrefixFeature>.Failure(this, defineable);
         }
 
-        virtual internal FeatureBase SearchFromRef(Defineable defineable)
+        internal virtual SearchResult<IFeature> SearchFromRefToSequence(Defineable defineable)
         {
-            NotImplementedMethod(defineable);
-            return null;
+            return SearchResult<IFeature>.Failure(this, defineable);
         }
 
-        virtual internal FeatureBase SearchFromSequence(Defineable defineable)
-        {
-            return null;
-        }
-
-        virtual internal FeatureBase SearchFromRefToSequence(Defineable defineable)
-        {
-            return null;
-        }
-    }
-
-    internal abstract class SearchResultFromSequence : ReniObject
-    {
-        internal abstract FeatureBase ToSearchResult(Sequence sequence);
     }
 }

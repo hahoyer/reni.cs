@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Feature;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
@@ -14,7 +16,7 @@ namespace Reni.Context
     /// Base class for compiler environments
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
-    internal abstract class Base : ReniObject
+    internal abstract class ContextBase : ReniObject, IDumpShortProvider
     {
         private static int _nextId;
 
@@ -25,7 +27,7 @@ namespace Reni.Context
         /// Initializes a new instance .
         /// </summary>
         /// [created 13.05.2006 18:55]
-        protected Base()
+        protected ContextBase()
             : base(_nextId++) {}
 
         /// <summary>
@@ -64,6 +66,15 @@ namespace Reni.Context
             }
         }
 
+        #region IDumpShortProvider Members
+
+        public string DumpShort()
+        {
+            return DebuggerDump();
+        }
+
+        #endregion
+
         /// <summary>
         /// generate dump string to be shown in debug windows
         /// </summary>
@@ -88,7 +99,7 @@ namespace Reni.Context
         /// </summary>
         /// <param name="target"></param>
         /// <returns>-1 if not based on target</returns>
-        public int PacketCountDistance(Base target)
+        public int PacketCountDistance(ContextBase target)
         {
             var d = Distance(target);
             if(d == null)
@@ -101,7 +112,7 @@ namespace Reni.Context
         /// </summary>
         /// <param name="target"></param>
         /// <returns>-1 if not based on target</returns>
-        public Size Distance(Base target)
+        public Size Distance(ContextBase target)
         {
             if(target == this)
                 return Size.Create(0);
@@ -113,7 +124,7 @@ namespace Reni.Context
         /// </summary>
         /// <param name="target"></param>
         /// <returns>-1 if not based on target</returns>
-        public virtual Size VirtDistance(Base target)
+        public virtual Size VirtDistance(ContextBase target)
         {
             DumpMethodWithBreak("not implemented", target);
             throw new NotImplementedException();
@@ -134,7 +145,7 @@ namespace Reni.Context
         /// <param name="currentCompilePosition">The currentCompilePosition.</param>
         /// <returns></returns>
         /// [created 13.05.2006 18:45]
-        internal ContextAtPosition CreateStructAtPosition(Container container, int currentCompilePosition)
+        internal ContextAtPosition CreateStructAtPosition(Struct.Container container, int currentCompilePosition)
         {
             return CreateStructContext(container).CreateStructAtPosition(currentCompilePosition);
         }
@@ -160,7 +171,7 @@ namespace Reni.Context
         /// <param name="container">The x.</param>
         /// <returns></returns>
         /// created 16.12.2006 14:45
-        internal Struct.Context CreateStructContext(Container container)
+        internal Struct.Context CreateStructContext(Struct.Container container)
         {
             return _cache._structContainerCache.Find(container,
                 () => new Struct.Context(this, container));
@@ -172,7 +183,7 @@ namespace Reni.Context
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// [created 05.06.2006 19:22]
-        public Function CreateFunction(Type.Base args)
+        public Function CreateFunction(TypeBase args)
         {
             return _cache._functionInstanceCache.Find(args,
                 () => new Function(this, args));
@@ -206,17 +217,17 @@ namespace Reni.Context
         /// <param name="category">The c.</param>
         /// <param name="body">The body.</param>
         /// <returns></returns>
-        internal Result CreateFunctionResult(Category category, Syntax.Base body)
+        internal Result CreateFunctionResult(Category category, SyntaxBase body)
         {
             return CreateFunctionType(body).CreateResult(category);
         }
 
-        internal Result CreatePropertyResult(Category category, Syntax.Base body)
+        internal Result CreatePropertyResult(Category category, SyntaxBase body)
         {
             return CreatePropertyType(body).CreateResult(category);
         }
 
-        internal Type.Base CreatePropertyType(Syntax.Base body)
+        internal TypeBase CreatePropertyType(SyntaxBase body)
         {
             return _cache._propertyType.Find(body,
                 () => new Property(this, body));
@@ -228,16 +239,20 @@ namespace Reni.Context
         /// <param name="body">The body.</param>
         /// <returns></returns>
         /// created 02.01.2007 14:57
-        public Type.Base CreateFunctionType(Syntax.Base body)
+        public TypeBase CreateFunctionType(SyntaxBase body)
         {
             return _cache._functionType.Find(body,
                 () => new Type.Function(this, body));
         }
 
-        internal virtual ContextSearchResult SearchDefineable(DefineableToken defineableToken)
+        internal SearchResult<IContextFeature> SearchDefineable(DefineableToken defineableToken)
         {
-            NotImplementedMethod(defineableToken);
-            return null;
+            return Search(defineableToken.TokenClass).SubTrial(this);
+        }
+
+        internal virtual SearchResult<IContextFeature> Search(Defineable defineable)
+        {
+            return defineable.SearchContext();
         }
 
         internal Result VisitFirstChainElement(Category category, MemberElem memberElem)
@@ -246,21 +261,21 @@ namespace Reni.Context
                 return memberElem.Args.Visit(this, category);
 
             var contextSearchResult = SearchDefineable(memberElem.DefineableToken);
-            if(contextSearchResult != null)
-                return contextSearchResult.VisitApply(this, category, memberElem.Args);
+            if(contextSearchResult.IsSuccessFull)
+                return contextSearchResult.Feature.VisitApply(this, category, memberElem.Args);
 
             if(memberElem.Args == null)
             {
-                NotImplementedMethod(category, memberElem);
+                NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult);
                 return null;
             }
 
             var argResult = memberElem.Args.Visit(this, category | Category.Type);
             var searchResult = argResult.Type.SearchDefineablePrefix(memberElem.DefineableToken);
-            if(searchResult != null)
-                return searchResult.VisitApply(category, argResult);
+            if(searchResult.IsSuccessFull)
+                return searchResult.Feature.VisitApply(category, argResult);
 
-            NotImplementedMethod(category, memberElem);
+            NotImplementedMethod(category, memberElem, "searchResult", searchResult);
             return null;
         }
 
@@ -275,7 +290,7 @@ namespace Reni.Context
             return ReturnMethodDumpWithBreak(trace, arglessResult);
         }
 
-        internal virtual bool IsChildOf(Base context)
+        internal virtual bool IsChildOf(ContextBase context)
         {
             NotImplementedMethod(context);
             return true;
@@ -287,7 +302,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal List<Result> Visit(Category category, List<Syntax.Base> list)
+        internal List<Result> Visit(Category category, List<SyntaxBase> list)
         {
             var results = new List<Result>();
             for(var i = 0; i < list.Count; i++)
@@ -295,9 +310,9 @@ namespace Reni.Context
             return results;
         }
 
-        internal List<Type.Base> VisitType(List<Syntax.Base> list)
+        internal List<TypeBase> VisitType(List<SyntaxBase> list)
         {
-            var results = new List<Type.Base>();
+            var results = new List<TypeBase>();
             for(var i = 0; i < list.Count; i++)
                 results.Add(list[i].VisitType(this));
             return results;
@@ -308,16 +323,16 @@ namespace Reni.Context
         internal class Cache
         {
             [Node]
-            internal DictionaryEx<Type.Base, Function> _functionInstanceCache =
-                new DictionaryEx<Type.Base, Function>();
+            internal DictionaryEx<TypeBase, Function> _functionInstanceCache =
+                new DictionaryEx<TypeBase, Function>();
 
             [Node]
-            internal DictionaryEx<Syntax.Base, Type.Base> _functionType =
-                new DictionaryEx<Syntax.Base, Type.Base>();
+            internal DictionaryEx<SyntaxBase, TypeBase> _functionType =
+                new DictionaryEx<SyntaxBase, TypeBase>();
 
             [Node]
-            internal DictionaryEx<Syntax.Base, Type.Base> _propertyType =
-                new DictionaryEx<Syntax.Base, Type.Base>();
+            internal DictionaryEx<SyntaxBase, TypeBase> _propertyType =
+                new DictionaryEx<SyntaxBase, TypeBase>();
 
             [Node]
             internal DictionaryEx<Container, Struct.Context> _structContainerCache =

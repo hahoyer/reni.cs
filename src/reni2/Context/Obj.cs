@@ -7,21 +7,21 @@ namespace Reni.Context
     /// </summary>
     internal sealed class Obj : Child
     {
-        private readonly Type.Base _type;
+        private readonly Type.TypeBase _type;
 
         /// <summary>
         /// Gets the type.
         /// </summary>
         /// <value>The type.</value>
         /// [created 13.05.2006 22:36]
-        public Type.Base Type { get { return _type; } }
+        public Type.TypeBase Type { get { return _type; } }
 
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="parent">The parent.</param>
         /// <param name="type">The type.</param>
-        public Obj(Base parent, Type.Base type) : base(parent)
+        public Obj(ContextBase parent, Type.TypeBase type) : base(parent)
         {
             _type = type;
         }
@@ -32,14 +32,14 @@ namespace Reni.Context
     /// </summary>
     internal sealed class ObjMemberElem : Child
     {
-        private readonly Type.Base _type;
+        private readonly Type.TypeBase _type;
         private readonly MemberElem _memberElem;
 
         /// <summary>
         /// Gets the type.
         /// </summary>
         /// <value>The type.</value>
-        public Type.Base Type { get { return _type; } }
+        public Type.TypeBase Type { get { return _type; } }
         /// <summary>
         /// Gets the member elem.
         /// </summary>

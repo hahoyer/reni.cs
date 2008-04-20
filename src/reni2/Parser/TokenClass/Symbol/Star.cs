@@ -20,9 +20,9 @@ namespace Reni.Parser.TokenClass.Symbol
         /// <param name="argSize">Size of the arg.</param>
         /// <returns></returns>
         /// created 08.01.2007 01:40
-        internal override Type.Base BitSequenceOperationResultType(int objSize, int argSize)
+        internal override Type.TypeBase BitSequenceOperationResultType(int objSize, int argSize)
         {
-            return Type.Base.CreateNumber(BitsConst.MultiplySize(objSize, argSize));
+            return Type.TypeBase.CreateNumber(BitsConst.MultiplySize(objSize, argSize));
         }
     }
 }

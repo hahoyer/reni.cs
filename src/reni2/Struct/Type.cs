@@ -7,13 +7,13 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Type : Reni.Type.Base
+    internal sealed class Type : Reni.Type.TypeBase
     {
         private readonly Container _container;
-        private readonly Reni.Context.Base _context;
+        private readonly Reni.Context.ContextBase _context;
         private readonly int _currentCompilePosition;
 
-        public Type(Reni.Context.Base context, Container struc, int currentCompilePosition)
+        public Type(Reni.Context.ContextBase context, Container struc, int currentCompilePosition)
         {
             _context = context;
             _container = struc;
@@ -27,7 +27,7 @@ namespace Reni.Struct
         public Container Container { get { return _container; } }
 
         [Node]
-        public Reni.Context.Base Context { get { return _context; } }
+        public Reni.Context.ContextBase Context { get { return _context; } }
 
         /// <summary>
         /// The size of type
@@ -69,7 +69,7 @@ namespace Reni.Struct
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        internal override bool HasConverterTo(Reni.Type.Base dest)
+        internal override bool HasConverterTo(Reni.Type.TypeBase dest)
         {
             return _container.HasConverterTo(_context, dest);
         }
@@ -83,7 +83,7 @@ namespace Reni.Struct
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Reni.Type.Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(Reni.Type.TypeBase dest, ConversionFeature conversionFeature)
         {
             var voidDest = dest as Void;
             if(voidDest != null)
@@ -97,7 +97,7 @@ namespace Reni.Struct
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 01.07.07 19:16 on HAHOYER-DELL by h
-        internal override Code.Base CreateRefCodeForContext(Reni.Context.Base context)
+        internal override Code.Base CreateRefCodeForContext(Reni.Context.ContextBase context)
         {
             return context.CreateRefForStruct(this);
         }
@@ -109,7 +109,7 @@ namespace Reni.Struct
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Reni.Type.Base dest)
+        internal override Result ConvertToVirt(Category category, Reni.Type.TypeBase dest)
         {
             return _container.ConvertTo(category, _context, dest);
         }

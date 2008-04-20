@@ -42,7 +42,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             if(right != null)
                 return base.CreateSyntax(left, token, right);

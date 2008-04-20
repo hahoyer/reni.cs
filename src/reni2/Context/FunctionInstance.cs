@@ -8,9 +8,9 @@ namespace Reni.Context
     /// </summary>
     internal sealed class FunctionInstance : ReniObject
     {
-        private readonly Type.Base _args;
-        private readonly Syntax.Base _body;
-        private readonly Base _context;
+        private readonly Type.TypeBase _args;
+        private readonly Syntax.SyntaxBase _body;
+        private readonly ContextBase _context;
         private readonly int _index;
         private Code.Base _bodyCodeCache;
 
@@ -22,7 +22,7 @@ namespace Reni.Context
         /// <param name="context">The context.</param>
         /// <param name="args">The args.</param>
         /// created 03.01.2007 21:19
-        internal FunctionInstance(int index, Syntax.Base body, Base context, Type.Base args)
+        internal FunctionInstance(int index, Syntax.SyntaxBase body, ContextBase context, Type.TypeBase args)
             : base(index)
         {
             StopByObjectId(-2);
@@ -44,21 +44,21 @@ namespace Reni.Context
         /// </summary>
         /// <value>The body.</value>
         /// created 03.01.2007 21:18
-        public Syntax.Base Body { get { return _body; } }
+        public Syntax.SyntaxBase Body { get { return _body; } }
 
         /// <summary>
         /// Gets the context.the function is defined in
         /// </summary>
         /// <value>The context.</value>
         /// created 03.01.2007 21:18
-        internal Base Context { get { return _context; } }
+        internal ContextBase Context { get { return _context; } }
 
         /// <summary>
         /// Gets the args.
         /// </summary>
         /// <value>The args.</value>
         /// created 03.01.2007 21:19
-        public Type.Base Args { get { return _args; } }
+        public Type.TypeBase Args { get { return _args; } }
 
         [DumpData(false)]
         private Refs ForeignRefs
@@ -182,7 +182,7 @@ namespace Reni.Context
                 .CreateRefPlus(refAlignParam, FrameSize*-1));
         }
 
-        private Type.Base VisitType()
+        private Type.TypeBase VisitType()
         {
             return Visit(Category.Type).Type;
         }

@@ -9,8 +9,8 @@ namespace Reni.Context
     /// </summary>
     internal sealed class FunctionList
     {
-        private readonly DictionaryEx<Syntax.Base, EnvArgsVariant> _data =
-            new DictionaryEx<Syntax.Base, EnvArgsVariant>();
+        private readonly DictionaryEx<Syntax.SyntaxBase, EnvArgsVariant> _data =
+            new DictionaryEx<Syntax.SyntaxBase, EnvArgsVariant>();
 
         private readonly List<FunctionInstance> _list = new List<FunctionInstance>();
 
@@ -36,7 +36,7 @@ namespace Reni.Context
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 03.01.2007 20:26
-        internal FunctionInstance Find(Syntax.Base body, Base env, Type.Base args)
+        internal FunctionInstance Find(Syntax.SyntaxBase body, ContextBase env, Type.TypeBase args)
         {
             EnvArgsVariant eav;
             if(_data.ContainsKey(body))
@@ -67,9 +67,9 @@ namespace Reni.Context
 
         private class ArgsVariant
         {
-            private readonly DictionaryEx<Type.Base, int> _data = new DictionaryEx<Type.Base, int>();
+            private readonly DictionaryEx<Type.TypeBase, int> _data = new DictionaryEx<Type.TypeBase, int>();
 
-            public FunctionInstance Find(FunctionList fl, Type.Base args, Syntax.Base body, Base env)
+            public FunctionInstance Find(FunctionList fl, Type.TypeBase args, Syntax.SyntaxBase body, ContextBase env)
             {
                 if(_data.ContainsKey(args))
                     return fl._list[_data[args]];
@@ -89,9 +89,9 @@ namespace Reni.Context
 
         private class EnvArgsVariant : ReniObject
         {
-            private readonly DictionaryEx<Base, ArgsVariant> _data = new DictionaryEx<Base, ArgsVariant>();
+            private readonly DictionaryEx<ContextBase, ArgsVariant> _data = new DictionaryEx<ContextBase, ArgsVariant>();
 
-            public FunctionInstance Find(FunctionList fl, Base env, Type.Base args, Syntax.Base body)
+            public FunctionInstance Find(FunctionList fl, ContextBase env, Type.TypeBase args, Syntax.SyntaxBase body)
             {
                 ArgsVariant av;
                 if(_data.ContainsKey(env))

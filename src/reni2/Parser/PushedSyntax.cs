@@ -7,7 +7,7 @@ namespace Reni.Parser
     /// </summary>
     sealed internal class PushedSyntax : ReniObject
     {
-        private readonly Base _left;
+        private readonly SyntaxBase _left;
         private readonly Token _token;
 
         /// <summary>
@@ -16,7 +16,7 @@ namespace Reni.Parser
         /// 
         /// <param name="left">left syntax element</param>
         /// <param name="token">asis</param>
-        public PushedSyntax(Base left, Token token)
+        public PushedSyntax(SyntaxBase left, Token token)
         {
             _left = left;
             _token = token;
@@ -29,7 +29,7 @@ namespace Reni.Parser
         /// created 31.03.2007 14:21 on SAPHIRE by HH
         public Token Token { get { return _token; } }
 
-        public Base CreateSyntax(Base args)
+        public SyntaxBase CreateSyntax(SyntaxBase args)
         {
             return _token.TokenClass.CreateSyntax(_left, _token, args);
         }

@@ -15,7 +15,7 @@ namespace Reni.Syntax
     /// Furthermore it contains if it has been created by match of two tokens
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
-    internal abstract class Base : ReniObject
+    internal abstract class SyntaxBase : ReniObject
     {
         /// <summary>
         /// Default dump behaviour
@@ -32,11 +32,11 @@ namespace Reni.Syntax
             return result;
         }
 
-        private readonly DictionaryEx<Context.Base, CacheItem> _cache =
-            new DictionaryEx<Context.Base, CacheItem>();
+        private readonly DictionaryEx<Context.ContextBase, CacheItem> _cache =
+            new DictionaryEx<Context.ContextBase, CacheItem>();
 
         [Node, DumpData(false)]
-        public DictionaryEx<Context.Base, CacheItem> Cache { get { return _cache; } }
+        public DictionaryEx<Context.ContextBase, CacheItem> Cache { get { return _cache; } }
 
         /// <summary>
         /// Visitor function, that uses a result cache.
@@ -46,7 +46,7 @@ namespace Reni.Syntax
         /// <param name="category">Category (is replendieshed here)</param>
         /// <returns></returns>
         [DebuggerHidden]
-        public Result Visit(Context.Base context, Category category)
+        public Result Visit(Context.ContextBase context, Category category)
         {
             var trace = ObjectId == -25 && category.HasCode && context.ObjectId == 5;
             //trace = false;
@@ -75,7 +75,7 @@ namespace Reni.Syntax
         /// <param name="category">Categories</param>
         /// <returns></returns>
         //[DebuggerHidden]
-        internal virtual Result VirtVisit(Context.Base context, Category category)
+        internal virtual Result VirtVisit(Context.ContextBase context, Category category)
         {
             NotImplementedMethod(context, category);
             return null;
@@ -87,7 +87,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public Type.Base VisitType(Context.Base context)
+        public Type.TypeBase VisitType(Context.ContextBase context)
         {
             return Visit(context, Category.Type).Type;
         }
@@ -97,7 +97,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public Size VisitSize(Context.Base context)
+        public Size VisitSize(Context.ContextBase context)
         {
             return Visit(context, Category.Size).Size;
         }
@@ -107,7 +107,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        public Result MainVisit(Context.Base e)
+        public Result MainVisit(Context.ContextBase e)
         {
             return Visit(e, Category.Code | Category.Type);
         }
@@ -131,7 +131,7 @@ namespace Reni.Syntax
         /// <param name="elementType">Type of the element.</param>
         /// <returns></returns>
         /// created 13.01.2007 23:02
-        public Result VisitAsSequence(Context.Base context, Category category, Type.Base elementType)
+        public Result VisitAsSequence(Context.ContextBase context, Category category, Type.TypeBase elementType)
         {
             Result rawResult = Visit(context, category | Category.Type);
             Result convResult = rawResult.Type.VisitAsSequence(category, elementType);
@@ -145,7 +145,7 @@ namespace Reni.Syntax
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 01.04.2007 23:06 on SAPHIRE by HH
-        internal virtual Base CreateDefinableSyntax(DefineableToken defineableToken, Base right)
+        internal virtual SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken, SyntaxBase right)
         {
             return CreateDefaultDefinableSyntax(defineableToken, right);
         }
@@ -157,34 +157,34 @@ namespace Reni.Syntax
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 09.04.2007 19:24 on SAPHIRE by HH
-        internal virtual Base CreateListSyntax(Token token, Base right)
+        internal virtual SyntaxBase CreateListSyntax(Token token, SyntaxBase right)
         {
             if (right == null)
                 return Struct.Create(this);
             return right.CreateListSyntaxReverse(this, token);
         }
 
-        internal static Base CreateListSyntax(DeclarationSyntax left)
+        internal static SyntaxBase CreateListSyntax(DeclarationSyntax left)
         {
             return Struct.Create(left);
         }
 
-        internal static Base CreateListSyntax(ConverterSyntax left)
+        internal static SyntaxBase CreateListSyntax(ConverterSyntax left)
         {
             return Struct.Create(left);
         }
 
-        internal virtual Base CreateListSyntaxReverse(Base left, Token token)
+        internal virtual SyntaxBase CreateListSyntaxReverse(SyntaxBase left, Token token)
         {
             return Struct.Create(left, this);
         }
 
-        internal virtual Base CreateListSyntaxReverse(DeclarationSyntax left, Token token)
+        internal virtual SyntaxBase CreateListSyntaxReverse(DeclarationSyntax left, Token token)
         {
             return Struct.Create(left, this);
         }
 
-        public Base CreateDefaultDefinableSyntax(DefineableToken defineableToken, Base right)
+        public SyntaxBase CreateDefaultDefinableSyntax(DefineableToken defineableToken, SyntaxBase right)
         {
             return new Statement(new MemberElem(null, this), new MemberElem(defineableToken, right));
         }
@@ -195,7 +195,7 @@ namespace Reni.Syntax
         /// <param name="token">The token.</param>
         /// <param name="right">The right.</param>
         /// <returns></returns>
-        public virtual Base CreateDeclarationSyntax(Token token, Base right)
+        public virtual SyntaxBase CreateDeclarationSyntax(Token token, SyntaxBase right)
         {
             NotImplementedMethod(token, right);
             return null;
@@ -219,7 +219,7 @@ namespace Reni.Syntax
         /// <param name="resultType">Type of the index.</param>
         /// <returns></returns>
         /// created 20.05.2007 13:39 on HAHOYER-DELL by hh
-        internal BitsConst VisitAndEvaluate(Context.Base context, Type.Base resultType)
+        internal BitsConst VisitAndEvaluate(Context.ContextBase context, Type.TypeBase resultType)
         {
             Result compiledResult = Visit(context, Category.Code | Category.Type | Category.Refs);
             Result convertedResult = compiledResult.ConvertTo(resultType);
@@ -231,12 +231,12 @@ namespace Reni.Syntax
         /// </summary>
         /// <returns></returns>
         /// created 19.07.2007 23:20 on HAHOYER-DELL by hh
-        public virtual Base SurroundedByParenthesis()
+        public virtual SyntaxBase SurroundedByParenthesis()
         {
             return this;
         }
 
-        public Base CreateConverterSyntax(Token token)
+        public SyntaxBase CreateConverterSyntax(Token token)
         {
             return new ConverterSyntax(this, token);
         }

@@ -14,7 +14,7 @@ namespace Reni.Type
         /// </summary>
         /// <param name="element">Type of elements</param>
         /// <param name="count">DigitChain of elements</param>
-        public Array(Base element, int count) : base(element)
+        public Array(TypeBase element, int count) : base(element)
         {
             _count = count;
             Tracer.Assert(count > 0);
@@ -40,7 +40,7 @@ namespace Reni.Type
         /// <summary>
         /// asis
         /// </summary>
-        public Base Element { get { return Parent; } }
+        public TypeBase Element { get { return Parent; } }
 
         /// <summary>
         /// Destructors the specified category.
@@ -91,7 +91,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
             var destArray = dest as Array;
             if(destArray != null)
@@ -113,7 +113,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destArray = dest as Array;
             if(destArray != null)

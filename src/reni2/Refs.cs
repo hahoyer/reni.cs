@@ -13,36 +13,36 @@ namespace Reni
     internal sealed class Refs : ReniObject
     {
         [Node]
-        public List<Base> Data { get { return _data; } }
+        public List<ContextBase> Data { get { return _data; } }
 
-        private readonly List<Base> _data;
+        private readonly List<ContextBase> _data;
         private SizeArray _sizes;
         public bool IsPending { get { return _isPending; } }
         private bool _isPending = false;
 
         private Refs()
         {
-            _data = new List<Base>();
+            _data = new List<ContextBase>();
             StopByObjectId(-441);
         }
 
-        private Refs(Base e)
+        private Refs(ContextBase e)
             : this()
         {
             _data.Add(e);
         }
 
-        private Refs(List<Base> a, List<Base> b)
+        private Refs(List<ContextBase> a, List<ContextBase> b)
             : this(a)
         {
-            foreach (Base e in b)
+            foreach (ContextBase e in b)
             {
                 if (!_data.Contains(e))
                     _data.Add(e);
             }
         }
 
-        private Refs(List<Base> a)
+        private Refs(List<ContextBase> a)
             : this()
         {
             _data.AddRange(a);
@@ -83,7 +83,7 @@ namespace Reni
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        public static Refs Context(Base e)
+        public static Refs Context(ContextBase e)
         {
             return new Refs(e);
         }
@@ -137,7 +137,7 @@ namespace Reni
         /// <summary>
         /// Indexer
         /// </summary>
-        public Base this[int i] { get { return _data[i]; } }
+        public ContextBase this[int i] { get { return _data[i]; } }
 
         private SizeArray CalcSizes()
         {
@@ -152,13 +152,13 @@ namespace Reni
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        public Refs Without(Base e)
+        public Refs Without(ContextBase e)
         {
             if (IsPending)
                 throw new NotSupportedException();
             if (!_data.Contains(e))
                 return this;
-            List<Base> r = new List<Base>(_data);
+            List<ContextBase> r = new List<ContextBase>(_data);
             r.Remove(e);
             return new Refs(r);
         }
@@ -190,7 +190,7 @@ namespace Reni
         /// 	<c>true</c> if [contains] [the specified context]; otherwise, <c>false</c>.
         /// </returns>
         /// created 18.10.2006 00:12
-        public bool Contains(Base context)
+        public bool Contains(ContextBase context)
         {
             return _data.Contains(context);
         }
@@ -205,7 +205,7 @@ namespace Reni
         /// created 18.10.2006 00:12
         public bool Contains(Refs other)
         {
-            foreach (Base context in other._data)
+            foreach (ContextBase context in other._data)
                 if (!Contains(context))
                     return false;
 

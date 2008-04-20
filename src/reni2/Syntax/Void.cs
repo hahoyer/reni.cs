@@ -2,7 +2,7 @@ using Reni.Parser;
 
 namespace Reni.Syntax
 {
-    sealed internal class Void : Base
+    sealed internal class Void : SyntaxBase
     {
         private readonly Token _token;
 
@@ -25,7 +25,7 @@ namespace Reni.Syntax
         /// <param name="category">Categories</param>
         /// <returns></returns>
         //[DebuggerHidden]
-        internal override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.ContextBase context, Category category)
         {
             return Type.Void.CreateResult(category);
         }

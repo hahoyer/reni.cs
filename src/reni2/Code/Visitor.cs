@@ -27,7 +27,7 @@ namespace Reni.Code
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 17.10.2006 00:04
-        internal virtual T ContextRef<C>(ContextRef<C> visitedObject) where C : Context.Base
+        internal virtual T ContextRef<C>(ContextRef<C> visitedObject) where C : Context.ContextBase
         {
             NotImplementedMethod(visitedObject);
             throw new NotImplementedException();

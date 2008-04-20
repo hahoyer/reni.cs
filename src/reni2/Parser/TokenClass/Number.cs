@@ -17,7 +17,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             return CreateSpecialSyntax(left, token, right);
         }
@@ -32,12 +32,12 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 04.05.2007 23:25 on HAHOYER-DELL by hh
-        internal override Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
+        internal override Result Result(Context.ContextBase context, Category category, Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             Tracer.Assert(left == null);
             Tracer.Assert(right == null);
             var bitsConst = BitsConst.Convert(token.Name);
-            return Type.Base
+            return Type.TypeBase
                 .CreateBit
                 .CreateSequence(bitsConst.Size.ToInt())
                 .CreateResult(category, delegate { return Code.Base.CreateBitArray(bitsConst); });

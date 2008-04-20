@@ -7,21 +7,21 @@ namespace Reni.Context
     /// <summary>
     /// Environment with parent
     /// </summary>
-    internal abstract class Child : Base
+    internal abstract class Child : ContextBase
     {
-        readonly Base _parent;
+        readonly ContextBase _parent;
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="parent"></param>
-        public Child(Base parent)
+        public Child(ContextBase parent)
         {
             _parent = parent;
         }
         /// <summary>
         /// asis
         /// </summary>
-        public Base Parent { get { return _parent; } }
+        public ContextBase Parent { get { return _parent; } }
 
         /// <summary>
         /// Parameter to describe alignment for references
@@ -33,7 +33,7 @@ namespace Reni.Context
         [DumpData(false)]
         public sealed override Root RootContext { get { return Parent.RootContext; } }
 
-        internal override bool IsChildOf(Base context)
+        internal override bool IsChildOf(ContextBase context)
         {
             if(context == Parent)
                 return true;

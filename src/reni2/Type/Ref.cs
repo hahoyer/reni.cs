@@ -8,91 +8,42 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
-    /// <summary>
-    /// Summary description for CreateRef.
-    /// </summary>
     internal sealed class Ref : Child
     {
         private static int _nextObjectId;
         private readonly RefAlignParam _refAlignParam;
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="refAlignParam"></param>
-        public Ref(Base target, RefAlignParam refAlignParam) : base(_nextObjectId++, target)
+        public Ref(TypeBase target, RefAlignParam refAlignParam) : base(_nextObjectId++, target)
         {
             _refAlignParam = refAlignParam;
         }
 
-        /// <summary>
-        /// asis
-        /// </summary>
         [Node, DumpData(false)]
         public RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        /// <summary>
-        /// Target of reference
-        /// </summary>
         [DumpData(false)]
-        public Base Target { get { return Parent; } }
+        public TypeBase Target { get { return Parent; } }
 
-        /// <summary>
-        /// The size of type
-        /// </summary>
         public override Size Size { get { return RefAlignParam.RefSize; } }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is ref.
-        /// </summary>
-        /// <value><c>true</c> if this instance is ref; otherwise, <c>false</c>.</value>
-        /// [created 01.06.2006 22:51]
         [DumpData(false)]
         public override bool IsRef { get { return true; } }
 
-        /// <summary>
-        /// Gets the size of the unref.
-        /// </summary>
-        /// <value>The size of the unref.</value>
-        /// [created 06.06.2006 00:08]
         public override Size UnrefSize { get { return Target.Size; } }
 
-        /// <summary>
-        /// Gets the dump print text.
-        /// </summary>
-        /// <value>The dump print text.</value>
-        /// created 08.01.2007 17:54
         [DumpData(false)]
         internal override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
 
-        internal override Base SequenceElementType { get { return Parent.SequenceElementType; } }
+        internal override TypeBase SequenceElementType { get { return Parent.SequenceElementType; } }
 
-        /// <summary>
-        /// Gets the type of the sequence element.
-        /// </summary>
-        /// <value>The type of the sequence element.</value>
-        /// created 13.01.2007 19:46
         [DumpData(false)]
         internal override int SequenceCount { get { return Target.SequenceCount; } }
 
-        /// <summary>
-        /// Destructors the specified category.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// [created 02.06.2006 09:47]
         internal override Result DestructorHandler(Category category)
         {
             return EmptyHandler(category);
         }
 
-        /// <summary>
-        /// Moves the handler.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// [created 05.06.2006 16:47]
         internal override Result MoveHandler(Category category)
         {
             return EmptyHandler(category);
@@ -105,23 +56,11 @@ namespace Reni.Type
             return base.PostProcess(visitedType, result);
         }
 
-        /// <summary>
-        /// Checks if type is a reference and dereferences instance.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <returns></returns>
-        /// created 05.01.2007 01:10
         public override Result Dereference(Result result)
         {
             return CreateDereferencedArgResult(result.Complete).UseWithArg(result);
         }
 
-        /// <summary>
-        /// Dumps the print code.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// created 08.01.2007 17:29
         internal override Result DumpPrint(Category category)
         {
             return Target
@@ -129,25 +68,12 @@ namespace Reni.Type
                 .UseWithArg(CreateDereferencedArgResult(category));
         }
 
-        /// <summary>
-        /// Applies the type operator.
-        /// </summary>
-        /// <param name="argResult">The arg result.</param>
-        /// <returns></returns>
-        /// created 10.01.2007 15:45
         public override Result ApplyTypeOperator(Result argResult)
         {
             return Parent.ApplyTypeOperator(argResult);
         }
 
-        /// <summary>
-        /// Converts to.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="dest">The dest.</param>
-        /// <returns></returns>
-        /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
             return Target
                 .ConvertTo(category, dest)
@@ -163,52 +89,42 @@ namespace Reni.Type
                 );
         }
 
-        /// <summary>
-        /// Creates the dereferenced arg code.
-        /// </summary>
-        /// <returns></returns>
-        /// created 01.02.2007 00:04
         internal Code.Base CreateDereferencedArgCode()
         {
             return Code.Base.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
         }
 
-        /// <summary>
-        /// Determines whether [is convertable to] [the specified dest].
-        /// </summary>
-        /// <param name="dest">The dest.</param>
-        /// <param name="conversionFeature">The conversion feature.</param>
-        /// <returns>
-        /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 11.01.2007 22:09
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             return Target.IsConvertableTo(dest, conversionFeature);
         }
 
-        internal protected override FeatureBase Search(Defineable defineable)
+        internal protected override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var result = Parent.SearchFromRef(defineable);
-            if(result != null)
+            var result = Parent.SearchFromRef(defineable).SubTrial(Parent);
+            if(result.IsSuccessFull)
                 return result;
-            return Parent.Search(defineable);
+            result = Parent.Search(defineable).AlternativeTrial(result);
+            if(result.IsSuccessFull)
+                return result;
+            return base.Search(defineable).AlternativeTrial(result);
         }
 
-        /// <summary>
-        /// Assignements the operator.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns></returns>
-        /// created 16.02.2007 22:59
-        public Result AssignmentOperator(Result value)
+        internal Result AssignmentOperator(Result value)
         {
             var convertedValue = value.ConvertTo(Target);
             var category = value.Complete;
-            var result = CreateVoid.CreateResult
+            var result = CreateVoid
+                .CreateResult
                 (
                 category,
-                () => Code.Base.CreateArg(Size).CreateAssign(RefAlignParam, convertedValue.Code),
+                () => Code.Base
+                    .CreateArg(Size)
+                    .CreateAssign
+                    (
+                    RefAlignParam,
+                    convertedValue.Code
+                    ),
                 () => convertedValue.Refs
                 );
             if(Target.DestructorHandler(category).IsEmpty && Target.MoveHandler(category).IsEmpty)
@@ -218,22 +134,14 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Visits from chain. Object is provided by use of "Arg" code element
-        /// </summary>
-        /// <param name="callContext">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="memberElem">The member elem.</param>
-        /// <returns></returns>
-        internal Result VisitNextChainElement(Context.Base callContext, Category category, MemberElem memberElem)
+        internal Result VisitNextChainElement(ContextBase callContext, Category category, MemberElem memberElem)
         {
             var resultFromRef = SearchDefineable(memberElem.DefineableToken);
-            if(resultFromRef != null)
-                return resultFromRef.VisitApply(callContext, category, memberElem.Args, this);
+            if(resultFromRef.IsSuccessFull)
+                return resultFromRef.Feature.VisitApply(callContext, category, memberElem.Args, this);
 
-            NotImplementedMethod(callContext, category, memberElem);
+            NotImplementedMethod(callContext, category, memberElem, "resultFromRef", resultFromRef);
             return null;
         }
     }
-
 }

@@ -8,7 +8,7 @@ namespace Reni.Syntax
     /// <summary>
     /// Statement inside of a struct, context free version
     /// </summary>
-    internal sealed class Statement : Base
+    internal sealed class Statement : SyntaxBase
     {
         private readonly List<MemberElem> _chain;
 
@@ -58,7 +58,7 @@ namespace Reni.Syntax
         /// <param name="context"></param>
         /// <param name="category"></param>
         /// <returns></returns>
-        internal override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.ContextBase context, Category category)
         {
             var trace = ObjectId == 1082 && context.ObjectId == 21;
             StartMethodDumpWithBreak(trace, context, category);
@@ -68,7 +68,7 @@ namespace Reni.Syntax
             var internalCategory = category | Category.Type;
             if(category.HasCode)
                 internalCategory |= Category.Refs;
-            var intermediateResult = Type.Base.CreateVoidResult(internalCategory);
+            var intermediateResult = Type.TypeBase.CreateVoidResult(internalCategory);
             var result = context.VisitFirstChainElement(internalCategory, Chain[0]);
             for(var i = 1; i < Chain.Count; i++)
             {
@@ -108,7 +108,7 @@ namespace Reni.Syntax
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 01.04.2007 23:06 on SAPHIRE by HH
-        internal override Base CreateDefinableSyntax(DefineableToken defineableToken, Base right)
+        internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken, SyntaxBase right)
         {
             return new Statement(_chain, new MemberElem(defineableToken, right));
         }

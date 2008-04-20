@@ -10,7 +10,7 @@ namespace Reni.Type
     {
         readonly int _alignBits;
         
-        public Aligner(Base target, int alignBits) : base(target)
+        public Aligner(TypeBase target, int alignBits) : base(target)
         {
             _alignBits = alignBits;
         }
@@ -94,7 +94,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             return Parent.IsConvertableTo(dest, conversionFeature);
         }
@@ -105,7 +105,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
             return Parent
                 .ConvertTo(category, dest)
@@ -135,7 +135,7 @@ namespace Reni.Type
         /// <returns>
         /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
-        internal override bool HasConverterTo(Base dest)
+        internal override bool HasConverterTo(TypeBase dest)
         {
             return Parent.HasConverterTo(dest);
         }

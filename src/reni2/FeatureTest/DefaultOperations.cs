@@ -12,7 +12,7 @@ namespace Reni.FeatureTest
         /// Type operator.
         /// </summary>
         /// created 05.01.2007 02:13
-        [Test,Category(Worked)]
+        [Test,Category(Worked),Explicit]
         public void TypeOperator()
         {
             RunCompiler("TypeOperator", @"x: 0; x type dump_print", "(bit)sequence(1)");
@@ -47,7 +47,7 @@ namespace Reni.FeatureTest
         /// Applies the type operator with cut.
         /// </summary>
         /// created 19.08.2007 21:06 on HAHOYER-DELL by hh
-        [Test, Category(Worked)]
+        [Test, Category(Worked), Explicit]
         public void ApplyTypeOperatorWithCut()
         {
             RunCompiler("ApplyTypeOperator", @"(31 type (100 enable_cut))dump_print", "-28");

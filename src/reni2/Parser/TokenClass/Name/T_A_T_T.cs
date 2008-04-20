@@ -1,16 +1,14 @@
-using Reni.Code;
+using Reni.Context;
+using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    sealed class T_A_T_T: Defineable
+    internal sealed class T_A_T_T : Defineable
     {
-        internal sealed class OperationResult : StructContainerSearchResult
+        Result Visit(Struct.Type definingType, ContextBase callContext, Category category,
+            SyntaxBase args)
         {
-            internal override Result Visit(Struct.Type definingType, Context.Base callContext, Category category,
-                                           Syntax.Base args)
-            {
-                return definingType.Container.VisitOperationApply(definingType.Context, callContext, category, args);
-            }
+            return definingType.Container.VisitOperationApply(definingType.Context, callContext, category, args);
         }
     }
 }

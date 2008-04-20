@@ -10,7 +10,7 @@ namespace Reni.Struct
     internal sealed class Context : Child
     {
         private readonly Container _container;
-        private readonly DictionaryEx<int, Reni.Type.Base> _type = new DictionaryEx<int, Reni.Type.Base>();
+        private readonly DictionaryEx<int, Reni.Type.TypeBase> _type = new DictionaryEx<int, Reni.Type.TypeBase>();
         private Code.Base _contextRefCode;
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace Reni.Struct
         /// <param name="parent">The parent.</param>
         /// <param name="container">The struc.</param>
         /// created 12.12.2006 21:29
-        internal Context(Base parent, Container container)
+        internal Context(ContextBase parent, Container container)
             : base(parent)
         {
             _container = container;
@@ -30,7 +30,7 @@ namespace Reni.Struct
         /// Returns the type of an element
         /// </summary>
         /// <param name="position">Index of the element</param>
-        internal Reni.Type.Base VisitType(int position)
+        internal Reni.Type.TypeBase VisitType(int position)
         {
             return _container.VisitType(Parent, position);
         }

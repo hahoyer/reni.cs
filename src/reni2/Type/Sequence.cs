@@ -9,7 +9,7 @@ namespace Reni.Type
     /// <summary>
     /// Special array 
     /// </summary>
-    internal sealed class Sequence : Base
+    internal sealed class Sequence : TypeBase
     {
         private readonly Array _inheritedType;
 
@@ -19,7 +19,7 @@ namespace Reni.Type
         /// <param name="elementType">Type of the element.</param>
         /// <param name="count">The count.</param>
         /// created 13.01.2007 14:59
-        public Sequence(Base elementType, int count)
+        public Sequence(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0);
             _inheritedType = elementType.CreateArray(count);
@@ -45,7 +45,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
-        internal override Base SequenceElementType { get { return Element; } }
+        internal override TypeBase SequenceElementType { get { return Element; } }
 
         /// <summary>
         /// Gets the type of the sequence element.
@@ -61,17 +61,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The element.</value>
         /// created 13.01.2007 19:34
-        public Base Element { get { return _inheritedType.Element; } }
-
-        /// <summary>
-        /// Default dump behaviour
-        /// </summary>
-        /// <returns></returns>
-        /// created 07.05.2007 21:18 on HAHOYER-DELL by hh
-        public override string Dump()
-        {
-            return InheritedType.Dump();
-        }
+        public TypeBase Element { get { return _inheritedType.Element; } }
 
         /// <summary>
         /// Determines whether [is convertable to] [the specified dest].
@@ -82,7 +72,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destPending = dest as Pending;
             if(destPending != null)
@@ -103,16 +93,28 @@ namespace Reni.Type
             return base.IsConvertableToVirt(dest, conversionFeature);
         }
 
-        internal override FeatureBase SearchFromRef(Defineable defineable)
+        internal override SearchResult<IFeature> SearchFromRef(Defineable defineable)
         {
-            return Element.SearchFromRefToSequence(defineable);
+            return Element.SearchFromRefToSequence(defineable).SubTrial(Element);
         }
 
-        internal override protected FeatureBase Search(Defineable defineable)
+        internal override protected SearchResult<IFeature> Search(Defineable defineable)
         {
-            return Element.SearchFromSequence(defineable) 
-                ?? defineable.SearchFromSequence();
+            var result = Element.SearchFromSequence(defineable).SubTrial(Element);
+            if(result.IsSuccessFull)
+                return result;
+
+            return defineable.SearchFromSequence().AlternativeTrial(result);
         }
+        internal override protected SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
+        {
+            var result = Element.SearchPrefixFromSequence(defineable).SubTrial(Element);
+            if (result.IsSuccessFull)
+                return result;
+
+            return defineable.SearchPrefixFromSequence().AlternativeTrial(result);
+        }
+
 
         /// <summary>
         /// Converts to.
@@ -121,7 +123,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
             var destPending = dest as Pending;
             if(destPending != null)
@@ -241,44 +243,6 @@ namespace Reni.Type
         internal override Result MoveHandler(Category category)
         {
             return _inheritedType.MoveHandler(category);
-        }
-    }
-
-    internal sealed class SequenceOperationResult : FeatureBase
-    {
-        [DumpData(true)]
-        private readonly Defineable _defineable;
-
-        private readonly Sequence _sequence;
-
-        public SequenceOperationResult(Sequence sequence, Defineable defineable)
-        {
-            _sequence = sequence;
-            _defineable = defineable;
-        }
-
-        ///// <summary>
-        ///// Creates the result for member function searched. Object is provided by use of "Arg" code element
-        ///// </summary>
-        ///// <param name="callContext">The call context.</param>
-        ///// <param name="category">The category.</param>
-        ///// <param name="args">The args.</param>
-        ///// <returns></returns>
-        //public override Result VisitApplyFromRef(ContextAtPosition.Base callContext, Category category, Syntax.Base args)
-        //{
-        //    return _defineable.VisitSequenceOperationApply(callContext, category, args, _sequence);
-        //}
-        /// <summary>
-        /// Creates the result for member function searched. Object is provided by use of "Arg" code element
-        /// </summary>
-        /// <param name="callContext">The call context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        internal Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
-        {
-            NotImplementedMethod(callContext, category, args);
-            return null;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Reni
         private Category _pending;
         private Refs _refs;
         private Size _size;
-        private Type.Base _type;
+        private Type.TypeBase _type;
 
         /// <summary>
         /// ctor
@@ -61,7 +61,7 @@ namespace Reni
         /// The type-category, can be null
         /// </summary>
         [Node]
-        public Type.Base Type
+        public Type.TypeBase Type
         {
             get { return _type; }
             set
@@ -266,7 +266,7 @@ namespace Reni
             if(c.HasSize)
                 _size = r.Size ?? Size.Pending;
             if(c.HasType)
-                _type = r.Type ?? Reni.Type.Base.Pending;
+                _type = r.Type ?? Reni.Type.TypeBase.Pending;
             if(c.HasRefs)
                 _refs = r.Refs ?? Refs.Pending;
             if(c.HasCode)
@@ -412,7 +412,7 @@ namespace Reni
         /// <returns></returns>
         [DebuggerHidden]
         internal Result Visit(Category category, 
-            Base context, Syntax.Base syntax)
+            ContextBase context, Syntax.SyntaxBase syntax)
         {
             var OldPending = Pending;
             var OldComplete = Complete;
@@ -500,7 +500,7 @@ namespace Reni
         internal static Result ConvertBitArrayToBitArray(Category category, int sourceBitCount, int destBitCount)
         {
             if(sourceBitCount == 0 && destBitCount == 0)
-                return Reni.Type.Base.CreateVoidResult(category);
+                return Reni.Type.TypeBase.CreateVoidResult(category);
             var result = new Result();
             if(category.HasCode)
             {
@@ -547,7 +547,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : Base
+        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : ContextBase
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
@@ -572,7 +572,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, Code.Base replacement) where C : Base
+        internal Result ReplaceRelativeContextRef<C>(C context, Code.Base replacement) where C : ContextBase
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
@@ -696,7 +696,7 @@ namespace Reni
             if(category.HasSize)
                 result.Size = Size.Pending;
             if(category.HasType)
-                result.Type = Reni.Type.Base.Pending;
+                result.Type = Reni.Type.TypeBase.Pending;
             if(category.HasRefs)
                 result.Refs = Refs.Pending;
             if(category.HasCode)
@@ -704,12 +704,12 @@ namespace Reni
             return result;
         }
 
-        internal Result ConvertTo(Type.Base target)
+        internal Result ConvertTo(Type.TypeBase target)
         {
             return Type.ConvertTo(Complete, target).UseWithArg(this);
         }
 
-        internal Result CreateUnref(Type.Base type, RefAlignParam refAlignParam)
+        internal Result CreateUnref(Type.TypeBase type, RefAlignParam refAlignParam)
         {
             return type.CreateResult
                 (
@@ -735,7 +735,7 @@ namespace Reni
             return Code.Evaluate();
         }
 
-        internal Result EnsureContextRef(Base context)
+        internal Result EnsureContextRef(ContextBase context)
         {
             if(Type.IsRef)
                 return this;
@@ -748,12 +748,12 @@ namespace Reni
             return resultAsRef;
         }
 
-        internal Result UnProperty(Base context)
+        internal Result UnProperty(ContextBase context)
         {
             return Type.UnProperty(this, context);
         }
 
-        internal Result PostProcess(Base context)
+        internal Result PostProcess(ContextBase context)
         {
             return UnProperty(context)
                 .Align(context.RefAlignParam.AlignBits);
@@ -805,8 +805,8 @@ namespace Reni
     /// </summary>
     internal sealed class Error
     {
-        private readonly Base _context;
-        private readonly Syntax.Base _syntax;
+        private readonly ContextBase _context;
+        private readonly Syntax.SyntaxBase _syntax;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Error"/> class.
@@ -814,7 +814,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="syntax">The syntax.</param>
         /// created 29.10.2006 18:23
-        internal Error(Base context, Syntax.Base syntax)
+        internal Error(ContextBase context, Syntax.SyntaxBase syntax)
         {
             _context = context;
             _syntax = syntax;
@@ -835,7 +835,7 @@ namespace Reni
             return e1 == null ? e0 : new Error(e0, e1);
         }
 
-        internal Base Context { get { return _context; } }
-        internal Syntax.Base Syntax { get { return _syntax; } }
+        internal ContextBase Context { get { return _context; } }
+        internal Syntax.SyntaxBase Syntax { get { return _syntax; } }
     }
 }

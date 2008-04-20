@@ -23,12 +23,12 @@ namespace Reni.Type
         /// <param name="second">The second.</param>
         /// <returns></returns>
         /// created 19.11.2006 22:56
-        public override Base CreatePair(Base second)
+        public override TypeBase CreatePair(TypeBase second)
         {
             return second;
         }
 
-        protected override Base CreateReversePair(Base first)
+        protected override TypeBase CreateReversePair(TypeBase first)
         {
             return first;
         }
@@ -60,7 +60,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             return false;
         }

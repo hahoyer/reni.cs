@@ -1,47 +1,23 @@
-using System;
-using HWClassLibrary.Debug;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    /// <summary>
-    /// Summary description for printnumToken.
-    /// </summary>
-    sealed class Tdump_printT : Defineable
+    internal sealed class Tdump_printT : Defineable, IFeature
     {
-        /// <summary>
-        /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
-        /// </summary>
-        /// <param name="objSize">not used </param>
-        /// <param name="argSize">not used </param>
-        /// <returns></returns>
-        /// created 08.01.2007 01:40
-        internal override Type.Base BitSequenceOperationResultType(int objSize, int argSize)
+        public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref objectType)
         {
-            return Type.Base.CreateVoid;
+            if(args != null)
+                NotImplementedMethod(callContext, category, args, objectType);
+
+            return objectType.Target.DumpPrintFromRef(category, objectType.RefAlignParam);
         }
 
-        sealed internal class SearchResultFromRef 
+        internal override SearchResult<IFeature> Search()
         {
-            public SearchResultFromRef(Ref definingType) 
-            {
-            }
-
-            //internal override Result VisitApply(Context.Base callContext, Category category, Syntax.Base args)
-            //{
-            //    if (args != null)
-            //        NotImplementedMethod(callContext, category, args);
-            //    bool trace =
-            //        ObjectId == 184
-            //        && callContext.ObjectId == 0
-            //        && category.ToString() == "Size,Type,Refs,Code"
-            //        ;
-            //    StartMethodDump(trace, callContext, category, args);
-            //    Result result = DefiningType.Target.DumpPrintFromRef(category, DefiningType.RefAlignParam);
-            //    return ReturnMethodDumpWithBreak(trace, result);
-            //}
+            return SearchResult<IFeature>.Success(this, this);
         }
     }
-
 }

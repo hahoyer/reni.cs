@@ -1,4 +1,6 @@
+using Reni.Feature;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Context
 {
@@ -7,14 +9,14 @@ namespace Reni.Context
     /// </summary>
     internal sealed class Function : Child
     {
-        private readonly Type.Base _argsType;
+        private readonly Type.TypeBase _argsType;
 
         /// <summary>
         /// Gets the type.
         /// </summary>
         /// <value>The type.</value>
         /// created 03.11.2006 21:54
-        public Type.Base ArgsType { get { return _argsType; } }
+        public Type.TypeBase ArgsType { get { return _argsType; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Function"/> class.
@@ -22,7 +24,7 @@ namespace Reni.Context
         /// <param name="parent">The parent.</param>
         /// <param name="argsType">The type.</param>
         /// created 03.11.2006 21:54
-        public Function(Base parent, Type.Base argsType)
+        public Function(ContextBase parent, Type.TypeBase argsType)
             : base(parent)
         {
             _argsType = argsType;
@@ -45,9 +47,9 @@ namespace Reni.Context
             ;
         }
 
-        internal override ContextSearchResult SearchDefineable(DefineableToken defineableToken)
+        internal override SearchResult<IContextFeature> Search(Defineable defineable)
         {
-            return Parent.SearchDefineable(defineableToken);
+            return Parent.Search(defineable).SubTrial(Parent);
         }
     }
 }

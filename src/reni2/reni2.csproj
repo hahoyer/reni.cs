@@ -69,8 +69,11 @@
     <Compile Include="Context\Obj.cs" />
     <Compile Include="Context\RefAlignParam.cs" />
     <Compile Include="Context\Root.cs" />
-    <Compile Include="Feature\FeatureBase.cs" />
+    <Compile Include="Feature\IFeature.cs" />
     <Compile Include="Parser\TokenClass\Name\TthenT.cs" />
+    <Compile Include="Parser\TokenClass\SequenceOfBitOperation.cs" />
+    <Compile Include="SearchResult.cs" />
+    <Compile Include="SearchTrial.cs" />
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\ContextAtPosition.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />

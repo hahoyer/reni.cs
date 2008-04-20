@@ -4,33 +4,33 @@ using HWClassLibrary.Helper.TreeViewSupport;
 
 namespace Reni.Type
 {
-    internal abstract class Child : Base
+    internal abstract class Child : TypeBase
     {
-        readonly Base _parent;
+        readonly TypeBase _parent;
 
-        protected Child(Base parent)
+        protected Child(TypeBase parent)
         {
             _parent = parent;
         }
 
-        protected Child(int objectId, Base parent): base(objectId)
+        protected Child(int objectId, TypeBase parent): base(objectId)
         {
             _parent = parent;
         }
 
         [Node, DumpData(true)]
-        public Base Parent { get { return _parent; } }
+        public TypeBase Parent { get { return _parent; } }
 
     }
 
     internal abstract class TagChild : Child
     {
-        protected TagChild(Base parent)
+        protected TagChild(TypeBase parent)
             : base(parent)
         {
         }
 
-        public TagChild(int objectId, Base parent)
+        public TagChild(int objectId, TypeBase parent)
             : base(objectId,parent)
         {
         }
@@ -102,7 +102,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
             return Parent.ConvertToVirt(category, dest);
         }
@@ -116,7 +116,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             return Parent.IsConvertableToVirt(dest, conversionFeature);
         }

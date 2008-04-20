@@ -21,14 +21,14 @@ namespace Reni
         private readonly string _fileName;
         private readonly CompilerParameters _parameters;
         private readonly ParserInst _parser = new ParserInst();
-        private readonly Root _rootContext = Context.Base.CreateRoot();
+        private readonly Root _rootContext = Context.ContextBase.CreateRoot();
         private string _executedCode;
 
         private List<Container> _functionContainers;
         private Container _mainContainer;
         private Result _result;
         private Source _source;
-        private Syntax.Base _syntax;
+        private Syntax.SyntaxBase _syntax;
 
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Reni
         }
 
         [Node, DumpData(false)]
-                                            internal Syntax.Base Syntax
+                                            internal Syntax.SyntaxBase Syntax
         {
             get
             {

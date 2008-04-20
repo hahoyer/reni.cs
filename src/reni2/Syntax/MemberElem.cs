@@ -9,7 +9,7 @@ namespace Reni.Syntax
     internal sealed class MemberElem: ReniObject
     {
         private readonly DefineableToken _defineableToken;
-        private readonly Base _args;
+        private readonly SyntaxBase _args;
         private static int _nextObjectId = 0;
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace Reni.Syntax
         /// <param name="defineableToken">The defineable token.</param>
         /// <param name="args">The args.</param>
         /// created 01.04.2007 23:24 on SAPHIRE by HH
-        public MemberElem(DefineableToken defineableToken , Base args): base(_nextObjectId++)
+        public MemberElem(DefineableToken defineableToken , SyntaxBase args): base(_nextObjectId++)
         {
             _defineableToken = defineableToken;
             _args = args;
@@ -34,7 +34,7 @@ namespace Reni.Syntax
         /// <summary>
         /// Optional argument list
         /// </summary>
-        public Base Args { get { return _args; } }
+        public SyntaxBase Args { get { return _args; } }
 
         public string DumpShort()
         {

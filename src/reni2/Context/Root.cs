@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Code;
+using Reni.Feature;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Context
 {
     /// <summary>
     /// Root environment of compilation process
     /// </summary>
-    internal sealed class Root : Base
+    internal sealed class Root : ContextBase
     {
         readonly FunctionList _function = new FunctionList();
 
@@ -25,12 +27,12 @@ namespace Reni.Context
         [DumpData(false)]
         public override Root RootContext { get { return this; } }
 
-        internal override ContextSearchResult SearchDefineable(DefineableToken defineableToken)
+        internal override SearchResult<IContextFeature> Search(Defineable defineable)
         {
-            return null;
+            return SearchResult<IContextFeature>.Failure(this, defineable);
         }
 
-        internal override bool IsChildOf(Base context)
+        internal override bool IsChildOf(ContextBase context)
         {
             return false;
         }
@@ -65,7 +67,7 @@ namespace Reni.Context
         /// <param name="argsResult">The args result.</param>
         /// <returns></returns>
         /// created 06.11.2006 22:54
-        public Result CreateFunctionCall(Base context, Category category, Syntax.Base body, Result argsResult)
+        public Result CreateFunctionCall(ContextBase context, Category category, Syntax.SyntaxBase body, Result argsResult)
         {
             return Functions.Find(body, context, argsResult.Type).CreateCall(category, argsResult);
         }

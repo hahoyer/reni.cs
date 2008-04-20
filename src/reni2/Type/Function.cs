@@ -10,15 +10,15 @@ namespace Reni.Type
     /// </summary>
     internal sealed class Function : Primitive
     {
-        private readonly Context.Base _context;
-        private readonly Syntax.Base _body;
+        private readonly Context.ContextBase _context;
+        private readonly Syntax.SyntaxBase _body;
 
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="context"></param>
         /// <param name="body"></param>
-        internal Function(Context.Base context, Syntax.Base body)
+        internal Function(Context.ContextBase context, Syntax.SyntaxBase body)
         {
             _context = context;
             _body = body;
@@ -27,12 +27,12 @@ namespace Reni.Type
         /// <summary>
         /// Environment where the function was found
         /// </summary>
-        public Context.Base Context { get { return _context; } }
+        public Context.ContextBase Context { get { return _context; } }
 
         /// <summary>
         /// Function bo
         /// </summary>
-        public Syntax.Base Body { get { return _body; } }
+        public Syntax.SyntaxBase Body { get { return _body; } }
 
         /// <summary>
         /// The size of type
@@ -54,7 +54,7 @@ namespace Reni.Type
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 29.10.2006 18:24
-        internal override Result ApplyFunction(Category category, Context.Base callContext, Syntax.Base args)
+        internal override Result ApplyFunction(Category category, Context.ContextBase callContext, Syntax.SyntaxBase args)
         {
             Result argsResult = args
                 .Visit(callContext, category | Category.Type)
@@ -74,18 +74,18 @@ namespace Reni.Type
     internal sealed class Property: Primitive
     {
         [DumpData(true)]
-        private readonly Context.Base _context;
+        private readonly Context.ContextBase _context;
         [DumpData(true)]
-        private readonly Syntax.Base _body;
+        private readonly Syntax.SyntaxBase _body;
 
-        public Property(Context.Base context, Syntax.Base body)
+        public Property(Context.ContextBase context, Syntax.SyntaxBase body)
         {
             _context = context;
             _body = body;
         }
 
         [DumpData(false)]
-        internal Base ResolvedType
+        internal TypeBase ResolvedType
         {
             get
             {
@@ -110,7 +110,7 @@ namespace Reni.Type
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 30.07.2007 21:28 on HAHOYER-DELL by hh
-        internal override Result UnProperty(Result rawResult, Context.Base context)
+        internal override Result UnProperty(Result rawResult, Context.ContextBase context)
         {
             Tracer.Assert(!rawResult.Complete.HasCode || rawResult.Code.IsEmpty);
             Tracer.Assert(!rawResult.Complete.HasRefs || rawResult.Refs.IsNone);

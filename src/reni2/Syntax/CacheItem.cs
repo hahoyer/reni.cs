@@ -10,8 +10,8 @@ namespace Reni.Syntax
     /// </summary>
     internal sealed class CacheItem : ReniObject
     {
-        private readonly Base _syntax;
-        private readonly Context.Base _context;
+        private readonly SyntaxBase _syntax;
+        private readonly Context.ContextBase _context;
         private Result _data = new Result();
 
         [Node]
@@ -22,7 +22,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="syntax"></param>
         /// <param name="environment"></param>
-        public CacheItem(Base syntax, Context.Base environment)
+        public CacheItem(SyntaxBase syntax, Context.ContextBase environment)
         {
             if (syntax == null)
                 throw new NullReferenceException("parameter \"syntax\" must not be null");

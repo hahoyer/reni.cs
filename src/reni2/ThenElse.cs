@@ -6,16 +6,16 @@ namespace Reni
     /// <summary>
     /// Then-else structure
     /// </summary>
-    internal sealed class ThenElse : Base
+    internal sealed class ThenElse : SyntaxBase
     {
-        private readonly Base _condSyntax;
-        private readonly Base _elseSyntax;
+        private readonly SyntaxBase _condSyntax;
+        private readonly SyntaxBase _elseSyntax;
 
         private readonly Token _elseToken;
-        private readonly Base _thenSyntax;
+        private readonly SyntaxBase _thenSyntax;
         private readonly Token _thenToken;
 
-        public ThenElse(Base condSyntax, Token thenToken, Base thenSyntax)
+        public ThenElse(SyntaxBase condSyntax, Token thenToken, SyntaxBase thenSyntax)
         {
             _condSyntax = condSyntax;
             _thenToken = thenToken;
@@ -31,7 +31,7 @@ namespace Reni
         /// <param name="elseToken">The else token.</param>
         /// <param name="elseSyntax">The else syntax.</param>
         /// created 08.01.2007 23:56
-        public ThenElse(Base condSyntax, Token thenToken, Base thenSyntax, Token elseToken, Base elseSyntax)
+        public ThenElse(SyntaxBase condSyntax, Token thenToken, SyntaxBase thenSyntax, Token elseToken, SyntaxBase elseSyntax)
         {
             _condSyntax = condSyntax;
             _thenToken = thenToken;
@@ -40,9 +40,9 @@ namespace Reni
             _elseSyntax = elseSyntax;
         }
 
-        internal Base CondSyntax { get { return _condSyntax; } }
-        internal Base ThenSyntax { get { return _thenSyntax; } }
-        internal Base ElseSyntax { get { return _elseSyntax; } }
+        internal SyntaxBase CondSyntax { get { return _condSyntax; } }
+        internal SyntaxBase ThenSyntax { get { return _thenSyntax; } }
+        internal SyntaxBase ElseSyntax { get { return _elseSyntax; } }
 
         internal Token ThenToken { get { return _thenToken; } }
         internal Token ElseToken { get { return _elseToken; } }
@@ -54,10 +54,10 @@ namespace Reni
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 08.01.2007 23:49
-        internal override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(Context.ContextBase context, Category category)
         {
             var condResult = _condSyntax.Visit(context, category | Category.Type);
-            condResult = condResult.Type.Conversion(category, Type.Base.CreateBit).UseWithArg(condResult);
+            condResult = condResult.Type.Conversion(category, Type.TypeBase.CreateBit).UseWithArg(condResult);
 
             var thenResult = _thenSyntax.Visit(context, category | Category.Type);
             var elseResult = CreateElseResult(context, category);
@@ -80,10 +80,10 @@ namespace Reni
                 );
         }
 
-        private Result CreateElseResult(Context.Base context, Category category)
+        private Result CreateElseResult(Context.ContextBase context, Category category)
         {
             if(_elseSyntax == null)
-                return Type.Base.CreateVoidResult(category | Category.Type);
+                return Type.TypeBase.CreateVoidResult(category | Category.Type);
             return _elseSyntax.Visit(context, category | Category.Type);
         }
 

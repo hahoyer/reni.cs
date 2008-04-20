@@ -71,7 +71,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 11.01.2007 22:09
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             if(conversionFeature.IsUseConverter)
                 return dest.HasConverterFromBit;
@@ -114,14 +114,18 @@ namespace Reni.Type
         /// <param name="argBitCount">The arg bit count.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:43
-        internal override Base SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
+        internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
-        internal override FeatureBase SearchFromSequence(Defineable defineable)
+        internal override SearchResult<IFeature> SearchFromSequence(Defineable defineable)
         {
-            return defineable.SequenceOfBitFeatureBase;
+            return defineable.SearchFromSequenceOfBit();
+        }
+        internal override SearchResult<IPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
+        {
+            return defineable.SearchPrefixFromSequenceOfBit();
         }
 
         /// <summary>
@@ -133,95 +137,6 @@ namespace Reni.Type
         {
             return GetType().FullName;
         }
-
-        internal sealed class SequenceSearchResult: FeatureBase
-        {
-            private readonly Defineable _defineable;
-
-            internal SequenceSearchResult(Defineable defineable) {
-                _defineable = defineable;
-            }
-
-            internal override Result VisitApply(Context.Base context, Category category, Syntax.Base args,
-                Ref objectType)
-            {
-                var trace = ObjectId == 920 && context.ObjectId == 15 && category.HasType;
-                StartMethodDumpWithBreak(trace, context, category, args);
-                var elementType = objectType.SequenceElementType;
-                var objResult = objectType.VisitAsSequence(category, elementType);
-                var argResult = args.VisitAsSequence(context, category | Category.Type, elementType);
-                if (trace)
-                    DumpMethodWithBreak("", context, category, args, "objResult", objResult, "argResult", argResult);
-                var result = new Result();
-                if (category.HasSize || category.HasType || category.HasCode)
-                {
-                    var objBitCount = objectType.UnrefSize.ToInt();
-                    var argBitCount = argResult.Type.UnrefSize.ToInt();
-                    var type =
-                        elementType.SequenceOperationResultType(_defineable, objBitCount, argBitCount).CreateAlign(
-                            context.RefAlignParam.AlignBits);
-                    if (category.HasSize)
-                        result.Size = type.Size;
-                    if (category.HasType)
-                        result.Type = type;
-                    if (category.HasCode)
-                        result.Code = elementType.CreateSequenceOperation(_defineable, objResult, type.Size, argResult);
-                }
-                if (category.HasRefs)
-                    result.Refs = objResult.Refs.Pair(argResult.Refs);
-                return ReturnMethodDumpWithBreak(trace, result);
-            }
-        }
     }
 
-    internal sealed class BitSequenceOperationPrefixSearchResult : PrefixSearchResult
-    {
-        [DumpData(true)]
-        private readonly Defineable _defineable;
-
-        [DumpData(true)]
-        private readonly Sequence _definingType;
-
-        internal BitSequenceOperationPrefixSearchResult(Sequence definingType, Defineable defineable)
-        {
-            _definingType = definingType;
-            _defineable = defineable;
-        }
-
-        internal override Result VisitApply(Category category, Result argResult)
-        {
-            var elementType = argResult.Type.SequenceElementType;
-            var objResult = argResult.Type.VisitAsSequence(category, elementType).UseWithArg(argResult);
-            var result = new Result();
-            if(category.HasSize || category.HasType || category.HasCode)
-            {
-                if(category.HasSize)
-                    result.Size = objResult.Size;
-                if(category.HasType)
-                    result.Type = objResult.Type;
-                if(category.HasCode)
-                    result.Code = elementType.CreateSequenceOperation(_defineable, objResult);
-            }
-            if(category.HasRefs)
-                result.Refs = objResult.Refs;
-            return result;
-        }
-    }
-
-    internal sealed class BitSequenceOperationSearchResult : FeatureBase
-    {
-        private readonly Sequence _definingType;
-
-        [DumpData(true)]
-        private readonly Defineable _defineable;
-
-        internal BitSequenceOperationSearchResult(Sequence definingType, Defineable defineable)
-        {
-            _definingType = definingType;
-            _defineable = defineable;
-        }
-
-        public Sequence DefiningType { get { return _definingType; } }
-
-    }
 }

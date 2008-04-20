@@ -28,10 +28,10 @@ namespace Reni.Parser
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public Base Compile(Source source)
+        public SyntaxBase Compile(Source source)
         {
             var sp = new SourcePosn(source, 0);
-            Base start = null;
+            SyntaxBase start = null;
             var stack = new Stack<PushedSyntax>();
             stack.Push(new PushedSyntax(start, sp.CreateStart()));
             while(Apply(stack, ref start, ParserLibrary.CreateToken(sp)))
@@ -39,7 +39,7 @@ namespace Reni.Parser
             return PullAndCall(stack, null);
         }
 
-        private bool Apply(Stack<PushedSyntax> stack, ref Base o, Token token)
+        private bool Apply(Stack<PushedSyntax> stack, ref SyntaxBase o, Token token)
         {
             while(true)
             {
@@ -55,7 +55,7 @@ namespace Reni.Parser
             }
         }
 
-        private static Base PullAndCall(Stack<PushedSyntax> stack, Base Args)
+        private static SyntaxBase PullAndCall(Stack<PushedSyntax> stack, SyntaxBase Args)
         {
             var x = stack.Pop();
             return x.CreateSyntax(Args);

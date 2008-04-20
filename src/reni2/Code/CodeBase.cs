@@ -314,7 +314,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 16.10.2006 22:15
-        public static Base CreateContextRef<C>(C context) where C : Context.Base
+        public static Base CreateContextRef<C>(C context) where C : Context.ContextBase
         {
             return new ContextRef<C>(context);
         }
@@ -339,7 +339,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public Base ReplaceRelativeContextRef<C>(C context, Base replacement) where C : Context.Base
+        public Base ReplaceRelativeContextRef<C>(C context, Base replacement) where C : Context.ContextBase
         {
             var result = Visit(new ReplaceRelativeContextRef<C>(context, replacement));
             if (result != null)
@@ -353,7 +353,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public Base ReplaceAbsoluteContextRef<C>(C context, Base replacement) where C : Context.Base
+        public Base ReplaceAbsoluteContextRef<C>(C context, Base replacement) where C : Context.ContextBase
         {
             var result = Visit(new ReplaceAbsoluteContextRef<C>(context, replacement));
             if (result != null)

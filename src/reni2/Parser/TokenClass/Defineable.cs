@@ -1,5 +1,6 @@
 ﻿using System;
 using HWClassLibrary.Debug;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Syntax;
 using Reni.Type;
@@ -35,9 +36,6 @@ namespace Reni.Parser.TokenClass
         internal string DataFunctionName { get { return GetType().Name; } }
 
         [DumpExcept(false)]
-        internal protected virtual bool IsBitSequencePrefixOperation { get { return false; } }
-
-        [DumpExcept(false)]
         internal virtual bool IsCompareOperator { get { return false; } }
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="argSize">Size of the arg.</param>
         /// <returns></returns>
         /// created 08.01.2007 01:40
-        internal virtual Type.Base BitSequenceOperationResultType(int objSize, int argSize)
+        internal virtual TypeBase BitSequenceOperationResultType(int objSize, int argSize)
         {
             NotImplementedMethod(objSize, argSize);
             throw new NotImplementedException();
@@ -61,7 +59,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override SyntaxBase CreateSyntax(SyntaxBase left, Token token, SyntaxBase right)
         {
             if(left != null)
                 return left.CreateDefinableSyntax(new DefineableToken(token), right);
@@ -70,37 +68,53 @@ namespace Reni.Parser.TokenClass
             return new DefinableTokenSyntax(token);
         }
 
-        internal virtual FeatureBase SearchFromSequence()
+        internal virtual SearchResult<IFeature> SearchFromSequence()
         {
-            return null;
+            return SearchResult<IFeature>.Failure(this);
         }
 
-        internal virtual FeatureBase SequenceOfBitFeatureBase { get { return null; } }
-    }
-
-    abstract internal class SequenceOfBitOperation : Defineable
-    {
-        readonly Bit.SequenceSearchResult _sequenceOfBitSearchResult;
-
-        protected SequenceOfBitOperation()
+        internal virtual SearchResult<IPrefixFeature> SearchPrefixFromSequence()
         {
-            _sequenceOfBitSearchResult = new Bit.SequenceSearchResult(this);
+            return SearchResult<IPrefixFeature>.Failure(this);
         }
 
-        sealed internal override FeatureBase SequenceOfBitFeatureBase { get { return _sequenceOfBitSearchResult; } }
+        internal virtual SearchResult<IFeature> SearchFromSequenceOfBit()
+        {
+            return SearchResult<IFeature>.Failure(this);
+        }
+
+        internal virtual SearchResult<IPrefixFeature> SearchPrefixFromSequenceOfBit()
+        {
+            return SearchResult<IPrefixFeature>.Failure(this);
+        }
+
+        internal virtual SearchResult<IFeature> Search()
+        {
+            return SearchResult<IFeature>.Failure(this);
+        }
+
+        public SearchResult<IPrefixFeature> SearchPrefix()
+        {
+            return SearchResult<IPrefixFeature>.Failure(this);
+        }
+
+        public SearchResult<IContextFeature> SearchContext()
+        {
+            return SearchResult<IContextFeature>.Failure(this);
+        }
     }
 
-    internal class DefinableTokenSyntax : Syntax.Base
+    internal class DefinableTokenSyntax : SyntaxBase
     {
         private readonly Token _token;
-        private Syntax.Base _declarationSyntax;
+        private SyntaxBase _declarationSyntax;
 
         public DefinableTokenSyntax(Token token)
         {
             _token = token;
         }
 
-        private Syntax.Base DeclarationSyntax
+        private SyntaxBase DeclarationSyntax
         {
             get
             {
@@ -112,22 +126,22 @@ namespace Reni.Parser.TokenClass
 
         public string Name { get { return _token.Name; } }
 
-        internal override Result VirtVisit(Context.Base context, Category category)
+        internal override Result VirtVisit(ContextBase context, Category category)
         {
             return DeclarationSyntax.Visit(context, category);
         }
 
-        internal override Syntax.Base CreateDefinableSyntax(DefineableToken defineableToken, Syntax.Base right)
+        internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken, SyntaxBase right)
         {
             return new Statement(CreateMemberElem(), new MemberElem(defineableToken, right));
         }
 
-        public override Syntax.Base CreateDeclarationSyntax(Token token, Syntax.Base right)
+        public override SyntaxBase CreateDeclarationSyntax(Token token, SyntaxBase right)
         {
             return new DeclarationSyntax(CreateDefineableToken(), token, right);
         }
 
-        private Syntax.Base CreateDeclarationSyntax()
+        private SyntaxBase CreateDeclarationSyntax()
         {
             return new Statement(CreateMemberElem());
         }
@@ -142,11 +156,6 @@ namespace Reni.Parser.TokenClass
             return new DefineableToken(_token);
         }
 
-        /// <summary>
-        /// Dumps the short.
-        /// </summary>
-        /// <returns></returns>
-        /// created 07.05.2007 22:09 on HAHOYER-DELL by hh
         internal override string DumpShort()
         {
             return _token.Name;

@@ -5,7 +5,7 @@ namespace Reni.Parser.TokenClass.Symbol
 	/// </summary>
 	internal sealed class Colon : Base
 	{
-	    internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+	    internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
 	    {
 	        return left.CreateDeclarationSyntax(token, right);
 	    }

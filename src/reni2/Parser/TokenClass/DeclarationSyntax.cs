@@ -1,12 +1,12 @@
 namespace Reni.Parser.TokenClass
 {
-    sealed internal class DeclarationSyntax : Syntax.Base
+    sealed internal class DeclarationSyntax : Syntax.SyntaxBase
     {
         private readonly DefineableToken _defineableToken;
-        private readonly Syntax.Base _definition;
+        private readonly Syntax.SyntaxBase _definition;
         private readonly Token _token;
 
-        internal DeclarationSyntax(DefineableToken defineableToken, Token token, Syntax.Base definition)
+        internal DeclarationSyntax(DefineableToken defineableToken, Token token, Syntax.SyntaxBase definition)
         {
             _defineableToken = defineableToken;
             _token = token;
@@ -16,21 +16,21 @@ namespace Reni.Parser.TokenClass
 
         public DefineableToken DefineableToken { get { return _defineableToken; } }
         public Token Token { get { return _token; } }
-        public Syntax.Base Definition { get { return _definition; } }
+        public Syntax.SyntaxBase Definition { get { return _definition; } }
 
-        internal override Syntax.Base CreateListSyntax(Token token, Syntax.Base right)
+        internal override Syntax.SyntaxBase CreateListSyntax(Token token, Syntax.SyntaxBase right)
         {
             if (right == null)
                 return Syntax.Struct.Create(this, new Syntax.Void(token));
             return right.CreateListSyntaxReverse(this, token);
         }
 
-        internal override Syntax.Base CreateListSyntaxReverse(Syntax.Base left, Token token)
+        internal override Syntax.SyntaxBase CreateListSyntaxReverse(Syntax.SyntaxBase left, Token token)
         {
             return CreateListSyntax(this).CreateListSyntaxReverse(left, token);
         }
 
-        internal override Syntax.Base CreateListSyntaxReverse(DeclarationSyntax left, Token token)
+        internal override Syntax.SyntaxBase CreateListSyntaxReverse(DeclarationSyntax left, Token token)
         {
             return CreateListSyntax(this).CreateListSyntaxReverse(left, token);
         }
@@ -50,7 +50,7 @@ namespace Reni.Parser.TokenClass
         /// </summary>
         /// <returns></returns>
         /// created 19.07.2007 23:20 on HAHOYER-DELL by hh
-        public override Syntax.Base SurroundedByParenthesis()
+        public override Syntax.SyntaxBase SurroundedByParenthesis()
         {
             return CreateListSyntax(this);
         }

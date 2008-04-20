@@ -2,18 +2,18 @@ namespace Reni.Code.ReplaceVisitor
 {
     sealed class ReplaceEnvironment : Base
     {
-        readonly Context.Base _target;
+        readonly Context.ContextBase _target;
 
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="target"></param>
-        public ReplaceEnvironment(Context.Base target)
+        public ReplaceEnvironment(Context.ContextBase target)
         {
             _target = target;
         }
 
-        public Context.Base Target{get { return _target; }}
+        public Context.ContextBase Target{get { return _target; }}
 
     }
 }

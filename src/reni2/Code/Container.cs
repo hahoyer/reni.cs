@@ -160,7 +160,7 @@ namespace Reni.Code
         /// created 09.01.2007 04:52
         internal override Visitor<int> AfterCond(int objectId)
         {
-            DataAdd(new Then(objectId, Type.Base.CreateBit.Size));
+            DataAdd(new Then(objectId, Type.TypeBase.CreateBit.Size));
             return this;
         }
 

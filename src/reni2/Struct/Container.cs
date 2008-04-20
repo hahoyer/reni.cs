@@ -20,15 +20,15 @@ namespace Reni.Struct
         public static bool _isInDump;
         private static bool _isInsideFileDump;
         private static int _nextObjectId;
-        private readonly List<Syntax.Base> _converterList;
+        private readonly List<Syntax.SyntaxBase> _converterList;
         private readonly DictionaryEx<string, int> _dictionary;
-        private readonly List<Syntax.Base> _list;
+        private readonly List<Syntax.SyntaxBase> _list;
         private DictionaryEx<int, string> _rdict;
 
         private Container
             (
-            List<Syntax.Base> list,
-            List<Syntax.Base> converterList,
+            List<Syntax.SyntaxBase> list,
+            List<Syntax.SyntaxBase> converterList,
             DictionaryEx<string, int> dict
             )
             : base(_nextObjectId++)
@@ -41,17 +41,17 @@ namespace Reni.Struct
             _dictionary = dict;
         }
 
-        private Container(List<Syntax.Base> list)
-            : this(list, new List<Syntax.Base>(), new DictionaryEx<string, int>()) {}
+        private Container(List<Syntax.SyntaxBase> list)
+            : this(list, new List<Syntax.SyntaxBase>(), new DictionaryEx<string, int>()) {}
 
-        private Container(List<Syntax.Base> list, DictionaryEx<string, int> dictionary)
-            : this(list, new List<Syntax.Base>(), dictionary) {}
-
-        [Node]
-        public List<Syntax.Base> List { get { return _list; } }
+        private Container(List<Syntax.SyntaxBase> list, DictionaryEx<string, int> dictionary)
+            : this(list, new List<Syntax.SyntaxBase>(), dictionary) {}
 
         [Node]
-        public List<Syntax.Base> ConverterList { get { return _converterList; } }
+        public List<Syntax.SyntaxBase> List { get { return _list; } }
+
+        [Node]
+        public List<Syntax.SyntaxBase> ConverterList { get { return _converterList; } }
 
         [Node, DumpData(false)]
         public DictionaryEx<int, string> Rdict
@@ -72,11 +72,11 @@ namespace Reni.Struct
         /// </summary>
         /// <value></value>
         /// created 15.12.2006 23:55
-        public Syntax.Base this[int index] { get { return _list[index]; } }
+        public Syntax.SyntaxBase this[int index] { get { return _list[index]; } }
 
         [DumpData(false)]
 // ReSharper disable MemberCanBeMadeStatic
-        internal Reni.Type.Base IndexType
+        internal Reni.Type.TypeBase IndexType
 // ReSharper restore MemberCanBeMadeStatic
         {
             get
@@ -86,7 +86,7 @@ namespace Reni.Struct
             }
         }
 
-        internal static Reni.Type.Base MaxIndexType { get { return Reni.Type.Base.CreateNumber(32); } }
+        internal static Reni.Type.TypeBase MaxIndexType { get { return Reni.Type.TypeBase.CreateNumber(32); } }
 
         private void CreateRDict()
         {
@@ -95,21 +95,21 @@ namespace Reni.Struct
                 _rdict[pair.Value] = pair.Key;
         }
 
-        internal static Container Create(Syntax.Base left)
+        internal static Container Create(Syntax.SyntaxBase left)
         {
             var list =
-                new List<Syntax.Base> {left};
+                new List<Syntax.SyntaxBase> {left};
             return new Container(list);
         }
 
-        internal static Container Create(Syntax.Base left, Syntax.Base right)
+        internal static Container Create(Syntax.SyntaxBase left, Syntax.SyntaxBase right)
         {
-            return new Container(new List<Syntax.Base> {left, right});
+            return new Container(new List<Syntax.SyntaxBase> {left, right});
         }
 
-        internal static Container Create(DeclarationSyntax left, Syntax.Base right)
+        internal static Container Create(DeclarationSyntax left, Syntax.SyntaxBase right)
         {
-            var list = new List<Syntax.Base> {left.Definition, right};
+            var list = new List<Syntax.SyntaxBase> {left.Definition, right};
             var dictionary = new DictionaryEx<string, int>();
             dictionary[left.DefineableToken.Name] = 0;
             return new Container(list, dictionary);
@@ -117,7 +117,7 @@ namespace Reni.Struct
 
         internal static Container Create(DeclarationSyntax left)
         {
-            var list = new List<Syntax.Base> {left.Definition};
+            var list = new List<Syntax.SyntaxBase> {left.Definition};
             var dictionary = new DictionaryEx<string, int>();
             dictionary[left.DefineableToken.Name] = 0;
             return new Container(list, dictionary);
@@ -125,15 +125,15 @@ namespace Reni.Struct
 
         internal static Container Create(ConverterSyntax left)
         {
-            var list = new List<Syntax.Base>();
-            var converter = new List<Syntax.Base> {left.Body};
+            var list = new List<Syntax.SyntaxBase>();
+            var converter = new List<Syntax.SyntaxBase> {left.Body};
             var dictionary = new DictionaryEx<string, int>();
             return new Container(list, converter, dictionary);
         }
 
-        internal static Container Create(Syntax.Base left, Container right)
+        internal static Container Create(Syntax.SyntaxBase left, Container right)
         {
-            var list = new List<Syntax.Base> {left};
+            var list = new List<Syntax.SyntaxBase> {left};
             list.AddRange(right._list);
             var dictionary = new DictionaryEx<string, int>();
             foreach(var pair in right._dictionary)
@@ -144,7 +144,7 @@ namespace Reni.Struct
 
         internal static Container Create(DeclarationSyntax left, Container right)
         {
-            var list = new List<Syntax.Base> {left.Definition};
+            var list = new List<Syntax.SyntaxBase> {left.Definition};
             list.AddRange(right._list);
             var dictionary = new DictionaryEx<string, int>();
             dictionary[left.DefineableToken.Name] = 0;
@@ -159,7 +159,7 @@ namespace Reni.Struct
         /// </summary>
         /// <value>The dump print text.</value>
         /// created 14.01.2007 03:23
-        public string DumpPrintText(Reni.Context.Base context)
+        public string DumpPrintText(Reni.Context.ContextBase context)
         {
             var result = "";
             for(var i = 0; i < _list.Count; i++)
@@ -217,7 +217,7 @@ namespace Reni.Struct
         /// <param name="category">The category.</param>
         /// <param name="fromNotPosition">From not position.</param>
         /// <returns></returns>
-        public Result Visit(Reni.Context.Base context, Category category, int fromNotPosition)
+        public Result Visit(Reni.Context.ContextBase context, Category category, int fromNotPosition)
         {
             var trace =
                 ObjectId == 4 &&
@@ -225,11 +225,11 @@ namespace Reni.Struct
                         category.ToString() == "Size,Type,Refs,Code";
             //trace = false;
             StartMethodDumpWithBreak(trace, context, category, fromNotPosition);
-            var result = Reni.Type.Base.CreateVoidResult(category);
+            var result = Reni.Type.TypeBase.CreateVoidResult(category);
             var topRef = context.CreateTopRefCode();
             for(var i = 0; i < fromNotPosition; i++)
             {
-                Reni.Context.Base structContext = 
+                Reni.Context.ContextBase structContext = 
                     context.CreateStructAtPosition(this, i);
                 var rawResult = 
                     _list[i].Visit(structContext, category | Category.Type);
@@ -248,11 +248,11 @@ namespace Reni.Struct
             return ReturnMethodDump(trace, resultReplaced);
         }
 
-        private Result VisitElement(Reni.Context.Base context, Category category, int index)
+        private Result VisitElement(Reni.Context.ContextBase context, Category category, int index)
         {
             var trace = ObjectId == -1;
             StartMethodDumpWithBreak(trace, context, category, index);
-            Reni.Context.Base structContext = context.CreateStructAtPosition(this, index);
+            Reni.Context.ContextBase structContext = context.CreateStructAtPosition(this, index);
             var rawResult = 
                 _list[index].Visit(structContext, category | Category.Type);
             var iresult = rawResult.PostProcess(structContext);
@@ -270,12 +270,12 @@ namespace Reni.Struct
             return ReturnMethodDump(trace, resultReplaced);
         }
 
-        internal Type CreateStructType(Reni.Context.Base context, int currentCompilePosition)
+        internal Type CreateStructType(Reni.Context.ContextBase context, int currentCompilePosition)
         {
             return CreateContext(context).CreateStructType(currentCompilePosition);
         }
 
-        internal Context CreateContext(Reni.Context.Base context)
+        internal Context CreateContext(Reni.Context.ContextBase context)
         {
             return context.CreateStructContext(this);
         }
@@ -291,7 +291,7 @@ namespace Reni.Struct
         /// The context used is bound to compiled position
         /// </remarks>
         /// created 16.12.2006 13:15
-        public Result VisitElementFromContextRef(Reni.Context.Base context, Category category, int position)
+        public Result VisitElementFromContextRef(Reni.Context.ContextBase context, Category category, int position)
         {
             return context
                 .CreateStructAtPosition(this, position)
@@ -307,10 +307,10 @@ namespace Reni.Struct
         /// <param name="accessPosition">The access position.</param>
         /// <returns></returns>
         /// created 10.12.2006 15:34
-        public Result DestructorHandler(Reni.Context.Base context, Category category, Result objRefResult,
+        public Result DestructorHandler(Reni.Context.ContextBase context, Category category, Result objRefResult,
             int accessPosition)
         {
-            var result = Reni.Type.Base.CreateVoidResult(category - Category.Type - Category.Size);
+            var result = Reni.Type.TypeBase.CreateVoidResult(category - Category.Type - Category.Size);
             var size = VisitSize(context, accessPosition);
             for(var i = 0; i < accessPosition; i++)
             {
@@ -352,12 +352,12 @@ namespace Reni.Struct
         /// <param name="fromNotPosition">From not position.</param>
         /// <returns></returns>
         /// created 09.12.2006 00:33
-        public Size VisitSize(Reni.Context.Base context, int fromNotPosition)
+        public Size VisitSize(Reni.Context.ContextBase context, int fromNotPosition)
         {
             return Visit(context, Category.Size, fromNotPosition).Size;
         }
 
-        private Size VisitSize(Reni.Context.Base context)
+        private Size VisitSize(Reni.Context.ContextBase context)
         {
             return VisitSize(context, _list.Count);
         }
@@ -369,7 +369,7 @@ namespace Reni.Struct
         /// <param name="currentCompilePosition">The current compile position.</param>
         /// <returns></returns>
         /// created 12.12.2006 23:27
-        public Reni.Type.Base VisitType(Reni.Context.Base context, int currentCompilePosition)
+        public Reni.Type.TypeBase VisitType(Reni.Context.ContextBase context, int currentCompilePosition)
         {
             return Visit(context, Category.Type, currentCompilePosition).Type;
         }
@@ -381,7 +381,7 @@ namespace Reni.Struct
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 13.12.2006 00:01
-        public Result Visit(Reni.Context.Base context, Category category)
+        public Result Visit(Reni.Context.ContextBase context, Category category)
         {
             return Visit(context, category, _list.Count);
         }
@@ -393,7 +393,7 @@ namespace Reni.Struct
         /// <param name="index">The index.</param>
         /// <returns></returns>
         /// created 15.12.2006 23:49
-        public Reni.Type.Base VisitElementTypeFromContextRef(Reni.Context.Base context, int index)
+        public Reni.Type.TypeBase VisitElementTypeFromContextRef(Reni.Context.ContextBase context, int index)
         {
             return VisitElementFromContextRef(context, Category.Type, index).Type;
         }
@@ -406,7 +406,7 @@ namespace Reni.Struct
         /// <param name="refAlignParam">The ref align param.</param>
         /// <returns></returns>
         /// created 30.01.2007 23:31
-        public Result DumpPrintFromRef(Category category, Reni.Context.Base context, RefAlignParam refAlignParam)
+        public Result DumpPrintFromRef(Category category, Reni.Context.ContextBase context, RefAlignParam refAlignParam)
         {
             Tracer.Assert(refAlignParam.Equals(context.RefAlignParam));
             const string dumpPrintName = "dump_print";
@@ -416,7 +416,7 @@ namespace Reni.Struct
             return Result.ConcatPrintResult(category, result);
         }
 
-        private List<Result> DumpPrintFromRef(Category category, Reni.Context.Base context)
+        private List<Result> DumpPrintFromRef(Category category, Reni.Context.ContextBase context)
         {
             var result = new List<Result>();
             var containerContext = CreateContext(context);
@@ -430,7 +430,7 @@ namespace Reni.Struct
             return result;
         }
 
-        public int? IndexOfConverterTo(Reni.Context.Base context, Reni.Type.Base dest)
+        public int? IndexOfConverterTo(Reni.Context.ContextBase context, Reni.Type.TypeBase dest)
         {
             var structContext = CreateContext(context);
             for(var i = 0; i < _converterList.Count; i++)
@@ -452,7 +452,7 @@ namespace Reni.Struct
             return null;
         }
 
-        public bool HasConverterTo(Reni.Context.Base context, Reni.Type.Base dest)
+        public bool HasConverterTo(Reni.Context.ContextBase context, Reni.Type.TypeBase dest)
         {
             return IndexOfConverterTo(context, dest) != null;
         }
@@ -464,7 +464,7 @@ namespace Reni.Struct
         /// <returns>
         /// 	<c>true</c> if [is convertable to void] [the specified context]; otherwise, <c>false</c>.
         /// </returns>
-        public bool IsConvertableToVoid(Reni.Context.Base context)
+        public bool IsConvertableToVoid(Reni.Context.ContextBase context)
         {
             for(var i = 0; i < _list.Count; i++)
             {
@@ -474,22 +474,22 @@ namespace Reni.Struct
             return true;
         }
 
-        public bool IsPendingType(Reni.Context.Base context)
+        public bool IsPendingType(Reni.Context.ContextBase context)
         {
             for(var i = 0; i < _list.Count; i++)
             {
-                Reni.Context.Base structContext = context.CreateStructAtPosition(this, i);
+                Reni.Context.ContextBase structContext = context.CreateStructAtPosition(this, i);
                 if(_list[i].VisitType(structContext).IsPending)
                     return true;
             }
             return false;
         }
 
-        internal Result ConvertTo(Category category, Reni.Context.Base context, Reni.Type.Base dest)
+        internal Result ConvertTo(Category category, Reni.Context.ContextBase context, Reni.Type.TypeBase dest)
         {
             // Special case if dest is Void and size is zero
             if(dest is Reni.Type.Void && VisitSize(context, _list.Count).IsZero)
-                return Reni.Type.Base.CreateVoid.CreateArgResult(category);
+                return Reni.Type.TypeBase.CreateVoid.CreateArgResult(category);
 
             return _converterList[IndexOfConverterTo(context, dest).Value]
                 .Visit(CreateContext(context), category);
@@ -501,7 +501,7 @@ namespace Reni.Struct
         /// <param name="context">The context.</param>
         /// <param name="index">The index.</param>
         /// <returns></returns>
-        internal Size BackOffset(Reni.Context.Base context, int index)
+        internal Size BackOffset(Reni.Context.ContextBase context, int index)
         {
             return VisitSize(context, index + 1)*-1;
         }
@@ -512,17 +512,17 @@ namespace Reni.Struct
         /// <param name="context">The context.</param>
         /// <param name="index">The index.</param>
         /// <returns></returns>
-        internal Size Offset(Reni.Context.Base context, int index)
+        internal Size Offset(Reni.Context.ContextBase context, int index)
         {
             return VisitSize(context, _list.Count) - VisitSize(context, index);
         }
 
-        internal Code.Base CreateRef(Reni.Context.Base parent)
+        internal Code.Base CreateRef(Reni.Context.ContextBase parent)
         {
             return parent.CreateTopRefCode().CreateRefPlus(parent.RefAlignParam, Offset(parent, 0));
         }
 
-        public Result MoveHandler(Category category, Reni.Context.Base context, int currentCompilePosition)
+        public Result MoveHandler(Category category, Reni.Context.ContextBase context, int currentCompilePosition)
         {
             for(var i = 0; i < _list.Count; i++)
             {
@@ -532,11 +532,11 @@ namespace Reni.Struct
                     NotImplementedMethod(category, context, currentCompilePosition, "i", i, "iResult", iResult);
                 }
             }
-            return Reni.Type.Base.EmptyHandler(category);
+            return Reni.Type.TypeBase.EmptyHandler(category);
         }
 
-        public Result VisitOperationApply(Reni.Context.Base definingParentContext, Reni.Context.Base callContext,
-            Category category, Syntax.Base args)
+        public Result VisitOperationApply(Reni.Context.ContextBase definingParentContext, Reni.Context.ContextBase callContext,
+            Category category, Syntax.SyntaxBase args)
         {
             var indexValue = args.VisitAndEvaluate(callContext, IndexType);
             var index = indexValue.ToInt32();
@@ -553,9 +553,9 @@ namespace Reni.Struct
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 13.12.2006 00:43
-        internal Result VisitAccessApply(Reni.Context.Base structContext, int position, Reni.Context.Base callContext,
+        internal Result VisitAccessApply(Reni.Context.ContextBase structContext, int position, Reni.Context.ContextBase callContext,
             Category category,
-            Syntax.Base args)
+            Syntax.SyntaxBase args)
         {
             var localCategory = category;
             if(args != null)

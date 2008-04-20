@@ -7,7 +7,7 @@ namespace Reni.Type
     /// <summary>
     /// Primitive type, no destructor or move handler.
     /// </summary>
-    internal abstract class Primitive : Base
+    internal abstract class Primitive : TypeBase
     {
         /// <summary>
         /// Destructors the specified category.

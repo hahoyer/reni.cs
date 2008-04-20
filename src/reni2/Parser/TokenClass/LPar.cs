@@ -29,7 +29,7 @@ namespace Reni.Parser.TokenClass
             _level = level;
         }
 
-        private Result ErrorVisit(Context.Base e, Category c, bool match, Syntax.Base left, Syntax.Base right)
+        private Result ErrorVisit(Context.ContextBase e, Category c, bool match, Syntax.SyntaxBase left, Syntax.SyntaxBase right)
         {
             NotImplementedFunction(e, c, match, left, right);
             throw new NotImplementedException();
@@ -44,7 +44,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             if (left != null)
                 return base.CreateSyntax(left, token, right);

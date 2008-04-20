@@ -3,7 +3,7 @@ namespace Reni.Type
     /// <summary>
     /// 
     /// </summary>
-    internal class Pending : Base
+    internal class Pending : TypeBase
     {
         /// <summary>
         /// The size of type
@@ -33,7 +33,7 @@ namespace Reni.Type
         /// <param name="dest">The dest.</param>
         /// <returns></returns>
         /// created 11.01.2007 22:12
-        internal override Result ConvertToVirt(Category category, Base dest)
+        internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
             return dest.CreateResult
                 (
@@ -50,7 +50,7 @@ namespace Reni.Type
         /// <param name="elementType">Type of the element.</param>
         /// <returns></returns>
         /// created 13.01.2007 22:20
-        internal override Result VisitAsSequence(Category category, Base elementType)
+        internal override Result VisitAsSequence(Category category, TypeBase elementType)
         {
             return CreateResult(category);
         }
@@ -64,7 +64,7 @@ namespace Reni.Type
         /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
         /// </returns>
         /// created 30.01.2007 22:42
-        internal override bool IsConvertableToVirt(Base dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             return true;
         }

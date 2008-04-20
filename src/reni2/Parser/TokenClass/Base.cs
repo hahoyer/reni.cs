@@ -32,7 +32,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal virtual Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal virtual Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             NotImplementedMethod(left, token, right);
             return null;
@@ -121,7 +121,7 @@ namespace Reni.Parser.TokenClass
 
     internal abstract class Special: Base
     {
-        protected Syntax.Base CreateSpecialSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        protected Syntax.SyntaxBase CreateSpecialSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             return new Syntax.Special(left, token, this, right);
         }
@@ -135,7 +135,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         /// <returns></returns>
-        internal virtual Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
+        internal virtual Result Result(Context.ContextBase context, Category category, Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             NotImplementedMethod(context, category, left, token, right);
             return null;

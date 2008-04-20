@@ -3,25 +3,25 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Syntax
 {
-    internal sealed class ConverterSyntax : Base
+    internal sealed class ConverterSyntax : SyntaxBase
     {
-        private readonly Base _body;
+        private readonly SyntaxBase _body;
         private readonly Token _token;
 
-        internal ConverterSyntax(Base body, Token token)
+        internal ConverterSyntax(SyntaxBase body, Token token)
         {
             _body = body;
             _token = token;
         }
 
-        internal Base Body { get { return _body; } }
+        internal SyntaxBase Body { get { return _body; } }
 
-        internal override Base CreateListSyntaxReverse(Base left, Token token)
+        internal override SyntaxBase CreateListSyntaxReverse(SyntaxBase left, Token token)
         {
             return CreateListSyntax(this).CreateListSyntaxReverse(left, token);
         }
 
-        internal override Base CreateListSyntaxReverse(DeclarationSyntax left, Token token)
+        internal override SyntaxBase CreateListSyntaxReverse(DeclarationSyntax left, Token token)
         {
             return CreateListSyntax(this).CreateListSyntaxReverse(left, token);
         }

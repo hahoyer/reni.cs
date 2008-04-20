@@ -12,7 +12,7 @@ namespace Reni.Type
     /// </summary>
     internal class Pair : Child
     {
-        private readonly Base _second;
+        private readonly TypeBase _second;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Pair"/> class.
@@ -20,7 +20,7 @@ namespace Reni.Type
         /// <param name="first">The first.</param>
         /// <param name="second">The second.</param>
         /// created 19.11.2006 22:57
-        internal Pair(Base first, Base second) : base(first)
+        internal Pair(TypeBase first, TypeBase second) : base(first)
         {
             _second = second;
         }
@@ -30,7 +30,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The first.</value>
         /// created 19.11.2006 22:59
-        internal Base First { get { return Parent; } }
+        internal TypeBase First { get { return Parent; } }
 
         /// <summary>
         /// Gets the second.
@@ -38,7 +38,7 @@ namespace Reni.Type
         /// <value>The second.</value>
         /// created 19.11.2006 22:59
         [Node]
-        internal Base Second { get { return _second; } }
+        internal TypeBase Second { get { return _second; } }
 
         /// <summary>
         /// The size of type
@@ -62,11 +62,11 @@ namespace Reni.Type
         }
 
         [DumpData(false)]
-        internal protected override Base[] ToList
+        internal protected override TypeBase[] ToList
         {
             get
             {
-                var result = new List<Base>(Parent.ToList) {Second};
+                var result = new List<TypeBase>(Parent.ToList) {Second};
                 return result.ToArray();
             }
         }

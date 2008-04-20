@@ -27,7 +27,7 @@ namespace Reni.Struct
             Tracer.ConditionalBreak(Parent is Context && ((Context)Parent).Container == Container, "");
         }
 
-        private Reni.Type.Base VisitBodyType()
+        private Reni.Type.TypeBase VisitBodyType()
         {
             return _container.VisitType(Parent, _currentCompilePosition);
         }
@@ -48,7 +48,7 @@ namespace Reni.Struct
         /// </summary>
         /// <returns></returns>
         /// created 16.10.2006 22:52
-        public Reni.Type.Base CreateRef()
+        public Reni.Type.TypeBase CreateRef()
         {
             return VisitBodyType().CreateRef(RefAlignParam);
         }
@@ -64,7 +64,7 @@ namespace Reni.Struct
         {
             if (_container[index].VisitSize(this).IsZero)
             {
-                Result result = Reni.Type.Base.CreateVoidResult(category);
+                Result result = Reni.Type.TypeBase.CreateVoidResult(category);
                 if (category.HasType) result.Type = VisitElementType(index);
                 return result;
             }
@@ -102,7 +102,7 @@ namespace Reni.Struct
         private Context ContextRefForCode { get { return Parent.CreateStructContext(_container); } }
 
         [DumpData(false)]
-        public Reni.Type.Base IndexType { get { return _container.IndexType; } }
+        public Reni.Type.TypeBase IndexType { get { return _container.IndexType; } }
 
         public Container Container { get { return _container; } }
 
@@ -116,7 +116,7 @@ namespace Reni.Struct
             return _container.BackOffset(Parent, index);
         }
 
-        private Reni.Type.Base VisitElementType(int index)
+        private Reni.Type.TypeBase VisitElementType(int index)
         {
             return _container[index].VisitType(this);
         }

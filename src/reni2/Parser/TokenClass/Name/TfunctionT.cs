@@ -15,7 +15,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             return CreateSpecialSyntax(left, token, right);
         }
@@ -30,7 +30,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 25.10.2006 20:14
-        internal override Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
+        internal override Result Result(Context.ContextBase context, Category category, Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             Tracer.Assert(left == null);
             return context.CreateFunctionResult(category, right);
@@ -42,7 +42,7 @@ namespace Reni.Parser.TokenClass.Name
     /// </summary>
     internal sealed class TpropertyT : Special
     {
-        internal override Syntax.Base CreateSyntax(Syntax.Base left, Token token, Syntax.Base right)
+        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             return CreateSpecialSyntax(left, token, right);
         }
@@ -56,7 +56,7 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         /// <returns></returns>
-        internal override Result Result(Context.Base context, Category category, Syntax.Base left, Token token, Syntax.Base right)
+        internal override Result Result(Context.ContextBase context, Category category, Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
         {
             Tracer.Assert(left == null);
             return context.CreatePropertyResult(category, right);
