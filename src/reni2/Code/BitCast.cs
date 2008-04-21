@@ -5,7 +5,7 @@ namespace Reni.Code
     /// <summary>
     /// Expression to change size of an expression
     /// </summary>
-    sealed public class BitCast : LeafElement
+    internal sealed class BitCast : LeafElement
     {
         private readonly Size _size;
         private readonly Size _significantSize;

@@ -5,7 +5,7 @@ namespace Reni.Code
     /// <summary>
     /// Reference to top of stack
     /// </summary>
-    sealed public class TopRef : RefCode
+    internal sealed class TopRef : RefCode
     {
         /// <summary>
         /// Initializes a new instance of the TopRef class.
@@ -42,7 +42,7 @@ namespace Reni.Code
     /// <summary>
     /// Reference to the end of argument array
     /// </summary>
-    sealed public class FrameRef : RefCode
+    internal sealed class FrameRef : RefCode
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TopRef"/> class.

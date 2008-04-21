@@ -6,7 +6,7 @@ namespace Reni.Code
     /// <summary>
     /// Reference shift
     /// </summary>
-    sealed public class RefPlus : LeafElement
+    internal sealed class RefPlus : LeafElement
     {
         private readonly RefAlignParam _refAlignParam;
         private readonly Size _right;

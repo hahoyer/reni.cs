@@ -5,7 +5,7 @@ namespace Reni.Code
     /// <summary>
     /// 
     /// </summary>
-    abstract public class Top : LeafElement
+    internal abstract class Top : LeafElement
     {
         private readonly RefAlignParam _refAlignParam;
         private readonly Size _offset;

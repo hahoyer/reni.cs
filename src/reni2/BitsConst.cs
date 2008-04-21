@@ -417,9 +417,9 @@ namespace Reni
                 return result + "0";
 
             if (_size.ToInt() < 8)
-                return result + DumpAsBit();
+                return result + DumpAsBit() + "b";
 
-            return result + ToHexString();
+            return result + ToHexString() + "x";
         }
 
         private string ToHexString()

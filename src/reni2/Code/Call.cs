@@ -3,7 +3,7 @@ using Reni.Context;
 
 namespace Reni.Code
 {
-    public class Call : LeafElement
+    sealed internal class Call : LeafElement
     {
         private readonly int _functionIndex;
         private readonly Size _resultSize;

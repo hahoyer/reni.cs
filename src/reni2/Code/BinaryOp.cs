@@ -3,7 +3,7 @@ namespace Reni.Code
     /// <summary>
     /// Binary operations
     /// </summary>
-    public abstract class BinaryOp : LeafElement
+    internal abstract class BinaryOp : LeafElement
     {
         readonly Size _leftSize;
         readonly Size _rightSize;

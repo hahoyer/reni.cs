@@ -10,7 +10,7 @@ namespace Reni.Code
     /// <summary>
     /// Storage parameters for code generation
     /// </summary>
-    public class StorageDescriptor : ReniObject
+    internal class StorageDescriptor : ReniObject
     {
         private Size _start;
         private readonly Size _dataEndAddr;
@@ -81,7 +81,7 @@ namespace Reni.Code
         /// <param name="data">The data.</param>
         /// <param name="isFunction">if set to <c>true</c> [is function].</param>
         /// <returns></returns>
-        public string GetBody(List<LeafElement> data, bool isFunction)
+        internal string GetBody(List<LeafElement> data, bool isFunction)
         {
             string result = GetStatements(data);
             if (isFunction)

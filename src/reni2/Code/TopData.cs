@@ -5,7 +5,7 @@ namespace Reni.Code
     /// <summary>
     /// Combination of TopRef and Unref
     /// </summary>
-    sealed public class TopData : Top
+    internal sealed class TopData : Top
     {
         /// <summary>
         /// Tries to combine two leaf elements. .
@@ -46,7 +46,7 @@ namespace Reni.Code
     /// <summary>
     /// Combination of FrameRef and Unref
     /// </summary>
-    sealed public class TopFrame : Top
+    internal sealed class TopFrame : Top
     {
         /// <summary>
         /// Tries to combine two leaf elements. .

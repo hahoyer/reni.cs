@@ -6,7 +6,7 @@ namespace Reni.Code
     /// <summary>
     /// Reference to something 
     /// </summary>
-    abstract public class RefCode : LeafElement
+    internal abstract class RefCode : LeafElement
     {
         private readonly RefAlignParam _refAlignParam;
         private readonly Size _offset;

@@ -5,7 +5,7 @@ namespace Reni.Code
     /// <summary>
     /// Code for end of statement
     /// </summary>
-    public sealed class StatementEnd : LeafElement
+    internal sealed class StatementEnd : LeafElement
     {
         private readonly Size _intermediateSize;
         private readonly Size _size;
