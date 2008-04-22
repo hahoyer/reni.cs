@@ -3,7 +3,7 @@ namespace Reni.Code
     /// <summary>
     /// ContextAtPosition reference, should be replaced
     /// </summary>
-    internal sealed class ContextRef<C> : Base where C: Context.ContextBase
+    internal sealed class ContextRef<C> : CodeBase where C: Context.ContextBase
     {
         private readonly C _context;
 

@@ -38,7 +38,7 @@ namespace Reni.Type
             return dest.CreateResult
                 (
                 category,
-                () => Code.Base.Pending,
+                () => Code.CodeBase.Pending,
                 () => Refs.Pending
                 );
         }

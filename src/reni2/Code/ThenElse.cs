@@ -5,33 +5,33 @@ namespace Reni.Code
     /// <summary>
     /// Then-Else construct
     /// </summary>
-    internal sealed class  ThenElse : Base
+    internal sealed class  ThenElse : CodeBase
     {
         static int _nextId = 0;
 
         private readonly int _thenElseObjectId = _nextId++;
-        private readonly Base _condCode;
-        private readonly Base _thenCode;
-        private readonly Base _elseCode;
+        private readonly CodeBase _condCode;
+        private readonly CodeBase _thenCode;
+        private readonly CodeBase _elseCode;
 
         /// <summary>
         /// Gets the code.of condition
         /// </summary>
         /// <value>The cond code.</value>
         /// created 27.01.2007 11:33
-        public Base CondCode { get { return _condCode; } }
+        public CodeBase CondCode { get { return _condCode; } }
         /// <summary>
         /// Gets the code.then-branch
         /// </summary>
         /// <value>The then code.</value>
         /// created 27.01.2007 11:34
-        public Base ThenCode { get { return _thenCode; } }
+        public CodeBase ThenCode { get { return _thenCode; } }
         /// <summary>
         /// Gets the code.of else-branch
         /// </summary>
         /// <value>The else code.</value>
         /// created 27.01.2007 11:34
-        public Base ElseCode { get { return _elseCode; } }
+        public CodeBase ElseCode { get { return _elseCode; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ThenElse"/> class.
@@ -40,7 +40,7 @@ namespace Reni.Code
         /// <param name="thenCode">The then code.</param>
         /// <param name="elseCode">The else code.</param>
         /// created 09.01.2007 04:42
-        public ThenElse(Base condCode, Base thenCode, Base elseCode)
+        public ThenElse(CodeBase condCode, CodeBase thenCode, CodeBase elseCode)
         {
             _condCode = condCode;
             _thenCode = thenCode;

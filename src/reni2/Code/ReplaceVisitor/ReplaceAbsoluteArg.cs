@@ -10,7 +10,7 @@ namespace Reni.Code.ReplaceVisitor
         /// </summary>
         /// <param name="actual">The actual.</param>
         /// created 28.09.2006 22:46
-        public ReplaceAbsoluteArg(Code.Base actual)
+        public ReplaceAbsoluteArg(Code.CodeBase actual)
             : base(actual)
         {
         }
@@ -20,7 +20,7 @@ namespace Reni.Code.ReplaceVisitor
         /// </summary>
         /// <value>The actual.</value>
         /// created 28.09.2006 22:46
-        public override Code.Base Actual { get { return ActualArg; } }
+        public override Code.CodeBase Actual { get { return ActualArg; } }
 
     }
 }

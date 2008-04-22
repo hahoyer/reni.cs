@@ -89,9 +89,9 @@ namespace Reni.Type
                 );
         }
 
-        internal Code.Base CreateDereferencedArgCode()
+        internal Code.CodeBase CreateDereferencedArgCode()
         {
-            return Code.Base.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
+            return Code.CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
         }
 
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
@@ -101,7 +101,8 @@ namespace Reni.Type
 
         internal protected override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var result = Parent.SearchFromRef(defineable).SubTrial(Parent);
+            var resultFromRef = Parent.SearchFromRef(defineable).SubTrial(Parent);
+            var result = resultFromRef.SearchResultDescriptor.Convert(resultFromRef.Feature, this);
             if(result.IsSuccessFull)
                 return result;
             result = Parent.Search(defineable).AlternativeTrial(result);
@@ -118,7 +119,7 @@ namespace Reni.Type
                 .CreateResult
                 (
                 category,
-                () => Code.Base
+                () => Code.CodeBase
                     .CreateArg(Size)
                     .CreateAssign
                     (
@@ -138,7 +139,7 @@ namespace Reni.Type
         {
             var resultFromRef = SearchDefineable(memberElem.DefineableToken);
             if(resultFromRef.IsSuccessFull)
-                return resultFromRef.Feature.VisitApply(callContext, category, memberElem.Args, this);
+                return resultFromRef.Feature.VisitApply(callContext, category, memberElem.Args);
 
             NotImplementedMethod(callContext, category, memberElem, "resultFromRef", resultFromRef);
             return null;

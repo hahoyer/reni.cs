@@ -1,71 +1,44 @@
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass
 {
-    internal abstract class SequenceOfBitOperation : Defineable, IFeature, IPrefixFeature
+    internal abstract class SequenceOfBitOperation : Defineable, ISequenceOfBitFeature, ISequenceOfBitPrefixFeature,
+        ISequenceFeature, ISequencePrefixFeature
     {
         [DumpExcept(false)]
         internal protected virtual bool IsBitSequencePrefixOperation { get { return false; } }
 
-        public Result VisitApply(ContextBase context, Category category, SyntaxBase args, Ref objectType)
+        IFeature ISequenceFeature.Convert(Sequence sequence)
         {
-            var elementType = objectType.SequenceElementType;
-            var objResult = objectType.VisitAsSequence(category, elementType);
-            var argResult = args.VisitAsSequence(context, category | Category.Type, elementType);
-            var result = new Result();
-            if(category.HasSize || category.HasType || category.HasCode)
-            {
-                var objBitCount = objectType.UnrefSize.ToInt();
-                var argBitCount = argResult.Type.UnrefSize.ToInt();
-                var type =
-                    elementType
-                        .SequenceOperationResultType(this, objBitCount, argBitCount)
-                        .CreateAlign(context.RefAlignParam.AlignBits);
-                if(category.HasSize)
-                    result.Size = type.Size;
-                if(category.HasType)
-                    result.Type = type;
-                if(category.HasCode)
-                    result.Code = elementType.CreateSequenceOperation(this, objResult, type.Size,
-                        argResult);
-            }
-            if(category.HasRefs)
-                result.Refs = objResult.Refs.Pair(argResult.Refs);
-            return result;
+            return sequence.BitOperationFeature(this);
         }
 
-        public Result VisitApply(Category category, Result argResult)
+        ISequenceFeature ISequenceOfBitFeature.Convert()
         {
-            var elementType = argResult.Type.SequenceElementType;
-            var objResult = argResult.Type.VisitAsSequence(category, elementType).UseWithArg(argResult);
-            var result = new Result();
-            if(category.HasSize || category.HasType || category.HasCode)
-            {
-                if(category.HasSize)
-                    result.Size = objResult.Size;
-                if(category.HasType)
-                    result.Type = objResult.Type;
-                if(category.HasCode)
-                    result.Code = elementType.CreateSequenceOperation(this, objResult);
-            }
-            if(category.HasRefs)
-                result.Refs = objResult.Refs;
-            return result;
+            return this;
         }
 
-        internal override sealed SearchResult<IFeature> SearchFromSequenceOfBit()
+        ISequencePrefixFeature ISequenceOfBitPrefixFeature.Convert()
         {
-            return SearchResult<IFeature>.Success(this, this);
+            return this;
         }
 
-        internal override sealed SearchResult<IPrefixFeature> SearchPrefixFromSequenceOfBit()
+        IPrefixFeature ISequencePrefixFeature.Convert(Sequence sequence)
+        {
+            return sequence.BitOperationPrefixFeature(this);
+        }
+
+        internal override sealed SearchResult<ISequenceOfBitFeature> SearchFromSequenceOfBit()
+        {
+            return SearchResult<ISequenceOfBitFeature>.Success(this, this);
+        }
+
+        internal override sealed SearchResult<ISequenceOfBitPrefixFeature> SearchPrefixFromSequenceOfBit()
         {
             if(IsBitSequencePrefixOperation)
-                return SearchResult<IPrefixFeature>.Success(this, this);
+                return SearchResult<ISequenceOfBitPrefixFeature>.Success(this, this);
             return base.SearchPrefixFromSequenceOfBit();
         }
     }

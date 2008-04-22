@@ -39,10 +39,5 @@ namespace Reni.Code
             return new BitArray(Size.Create(0),BitsConst.None());
         }
 
-        public override string Dump()
-        {
-            return "BitArray(" + _data.DumpValue() + ")";
-        }
-
     }
 }

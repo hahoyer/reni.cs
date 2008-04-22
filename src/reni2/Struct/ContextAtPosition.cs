@@ -1,18 +1,17 @@
 using HWClassLibrary.Debug;
-using Reni.Context;
+using Reni.Code;
 using Reni.Parser;
-using Base=Reni.Code.Base;
 
 namespace Reni.Struct
 {
     /// <summary>
     /// ContextAtPosition for structure
     /// </summary>
-    internal sealed class ContextAtPosition : Child
+    internal sealed class ContextAtPosition : Reni.Context.Child
     {
         [DumpData(false)] private readonly Container _container;
         [DumpData(true)] private readonly int _currentCompilePosition;
-        private Base _contextRefCodeCache;
+        private CodeBase _contextRefCodeCache;
 
         /// <summary>
         /// ctor
@@ -83,7 +82,7 @@ namespace Reni.Struct
         }
 
         [DumpData(false)]
-        private Base ContextRefCode
+        private CodeBase ContextRefCode
         {
             get
             {
@@ -93,7 +92,7 @@ namespace Reni.Struct
             }
         }
 
-        private Base CreateContextRefCode()
+        private CodeBase CreateContextRefCode()
         {
             return ContextRefForCode.ContextRefCode;
         }

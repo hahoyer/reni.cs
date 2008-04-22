@@ -40,7 +40,7 @@ namespace Reni.Parser.TokenClass
             return Type.TypeBase
                 .CreateBit
                 .CreateSequence(bitsConst.Size.ToInt())
-                .CreateResult(category, delegate { return Code.Base.CreateBitArray(bitsConst); });
+                .CreateResult(category, delegate { return Code.CodeBase.CreateBitArray(bitsConst); });
         }
 
         public static Base Instance { get { return _instance; } }

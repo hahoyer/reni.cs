@@ -6,7 +6,7 @@ namespace Reni.Feature
 {
     internal interface IFeature
     {
-        Result VisitApply(ContextBase context, Category category, SyntaxBase args, Ref objectType);
+        Result VisitApply(ContextBase callContext, Category category, SyntaxBase args);
     }
 
     internal interface IPrefixFeature
@@ -17,6 +17,31 @@ namespace Reni.Feature
     internal interface IContextFeature
     {
         Result VisitApply(ContextBase contextBase, Category category, SyntaxBase args);
+    }
+
+
+    internal interface ISequenceOfBitPrefixFeature {
+        ISequencePrefixFeature Convert();
+    }
+
+    internal interface ISequenceOfBitFeature {
+        ISequenceFeature Convert();
+    }
+
+    internal interface ISequenceFeature {
+        IFeature Convert(Sequence sequence);
+    }
+
+    internal interface ISequencePrefixFeature {
+        IPrefixFeature Convert(Sequence sequence);
+    }
+
+    internal interface IRefToSequenceFeature {
+        IRefFeature Convert(Sequence sequence);
+    }
+
+    internal interface IRefFeature {
+        IFeature Convert(Ref @ref);
     }
 
     internal class DefaultSearchResultFromRef

@@ -1,8 +1,11 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -13,12 +16,6 @@ namespace Reni.Type
     {
         private readonly Array _inheritedType;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Sequence"/> class.
-        /// </summary>
-        /// <param name="elementType">Type of the element.</param>
-        /// <param name="count">The count.</param>
-        /// created 13.01.2007 14:59
         public Sequence(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0);
@@ -27,51 +24,13 @@ namespace Reni.Type
 
         [Node]
         public Array InheritedType { get { return _inheritedType; } }
-
-        /// <summary>
-        /// The size of type
-        /// </summary>
         public override Size Size { get { return _inheritedType.Size; } }
-
-        /// <summary>
-        /// Gets the dump print text.
-        /// </summary>
-        /// <value>The dump print text.</value>
-        /// created 08.01.2007 17:54
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
-
-        /// <summary>
-        /// Gets the type of the sequence element.
-        /// </summary>
-        /// <value>The type of the sequence element.</value>
-        /// created 13.01.2007 19:46
         internal override TypeBase SequenceElementType { get { return Element; } }
-
-        /// <summary>
-        /// Gets the type of the sequence element.
-        /// </summary>
-        /// <value>The type of the sequence element.</value>
-        /// created 13.01.2007 19:46
         internal override int SequenceCount { get { return Count; } }
-
         internal int Count { get { return _inheritedType.Count; } }
-
-        /// <summary>
-        /// Gets the element.
-        /// </summary>
-        /// <value>The element.</value>
-        /// created 13.01.2007 19:34
         public TypeBase Element { get { return _inheritedType.Element; } }
 
-        /// <summary>
-        /// Determines whether [is convertable to] [the specified dest].
-        /// </summary>
-        /// <param name="dest">The dest.</param>
-        /// <param name="conversionFeature">The conversion feature.</param>
-        /// <returns>
-        /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 11.01.2007 22:09
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destPending = dest as Pending;
@@ -93,36 +52,24 @@ namespace Reni.Type
             return base.IsConvertableToVirt(dest, conversionFeature);
         }
 
-        internal override SearchResult<IFeature> SearchFromRef(Defineable defineable)
+        internal override SearchResult<IRefFeature> SearchFromRef(Defineable defineable)
         {
-            return Element.SearchFromRefToSequence(defineable).SubTrial(Element);
+            var subTrial = Element.SearchFromRefToSequence(defineable).SubTrial(Element);
+            return subTrial.SearchResultDescriptor.Convert(subTrial.Feature, this);
         }
 
-        internal override protected SearchResult<IFeature> Search(Defineable defineable)
+        internal protected override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var result = Element.SearchFromSequence(defineable).SubTrial(Element);
-            if(result.IsSuccessFull)
-                return result;
-
-            return defineable.SearchFromSequence().AlternativeTrial(result);
-        }
-        internal override protected SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
-        {
-            var result = Element.SearchPrefixFromSequence(defineable).SubTrial(Element);
-            if (result.IsSuccessFull)
-                return result;
-
-            return defineable.SearchPrefixFromSequence().AlternativeTrial(result);
+            var resultFromSequence = Element.SearchFromSequence(defineable).SubTrial(Element);
+            return resultFromSequence.SearchResultDescriptor.Convert(resultFromSequence.Feature, this);
         }
 
+        internal protected override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
+        {
+            var resultFromSequence = Element.SearchPrefixFromSequence(defineable).SubTrial(Element);
+            return resultFromSequence.SearchResultDescriptor.Convert(resultFromSequence.Feature, this);
+        }
 
-        /// <summary>
-        /// Converts to.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="dest">The dest.</param>
-        /// <returns></returns>
-        /// created 11.01.2007 22:12
         internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
             var destPending = dest as Pending;
@@ -168,31 +115,17 @@ namespace Reni.Type
             return ConvertTo(category, dest.Parent).Align(dest.AlignBits);
         }
 
-        /// <summary>
-        /// Adds the elements at end.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="oldCount">The old count.</param>
-        /// <returns></returns>
-        /// created 15.01.2007 02:25
         private Result ExtendFrom(Category category, int oldCount)
         {
             var oldSize = Element.Size*oldCount;
             var result = CreateResult
                 (
                 category,
-                () => Code.Base.CreateArg(oldSize).CreateBitCast(Size)
+                () => CodeBase.CreateArg(oldSize).CreateBitCast(Size)
                 );
             return result;
         }
 
-        /// <summary>
-        /// Removes the elements at end.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="newCount">The new count.</param>
-        /// <returns></returns>
-        /// created 14.01.2007 16:11
         private Result RemoveElementsAtEnd(Category category, int newCount)
         {
             var destructor = Element.DestructorHandler(category);
@@ -207,42 +140,104 @@ namespace Reni.Type
                 .CreateResult
                 (
                 category,
-                () => Code.Base.CreateArg(Size).CreateBitCast(newType.Size)
+                () => CodeBase.CreateArg(Size).CreateBitCast(newType.Size)
                 );
             return result;
         }
 
-        /// <summary>
-        /// Dumps the print code.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// created 08.01.2007 17:29
         internal override Result DumpPrint(Category category)
         {
             return Element.SequenceDumpPrint(category, Count);
         }
 
-        /// <summary>
-        /// Destructors the specified category.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// [created 02.06.2006 09:47]
         internal override Result DestructorHandler(Category category)
         {
             return _inheritedType.DestructorHandler(category);
         }
 
-        /// <summary>
-        /// Moves the handler.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// [created 05.06.2006 16:47]
         internal override Result MoveHandler(Category category)
         {
             return _inheritedType.MoveHandler(category);
+        }
+
+        public IFeature BitOperationFeature(SequenceOfBitOperation definable)
+        {
+            return new BitOperationFeatureClass(this, definable);
+        }
+
+        public IPrefixFeature BitOperationPrefixFeature(SequenceOfBitOperation definable)
+        {
+            return new BitOperationPrefixFeatureClass(this, definable);
+        }
+
+        internal class BitOperationPrefixFeatureClass : IPrefixFeature
+        {
+            private readonly SequenceOfBitOperation _definable;
+            private readonly Sequence _sequence;
+            public BitOperationPrefixFeatureClass(Sequence sequence, SequenceOfBitOperation definable)
+            {
+                _sequence = sequence;
+                _definable = definable;
+            }
+            public Result VisitApply(Category category, Result argResult)
+            {
+                var elementType = _sequence.SequenceElementType;
+                var objResult = _sequence.VisitAsSequence(category, elementType).UseWithArg(argResult);
+                var result = new Result();
+                if (category.HasSize || category.HasType || category.HasCode)
+                {
+                    if (category.HasSize)
+                        result.Size = objResult.Size;
+                    if (category.HasType)
+                        result.Type = objResult.Type;
+                    if (category.HasCode)
+                        result.Code = elementType.CreateSequenceOperation(_definable, objResult);
+                }
+                if (category.HasRefs)
+                    result.Refs = objResult.Refs;
+                return result;
+            }
+
+        }
+
+        internal class BitOperationFeatureClass : IFeature
+        {
+            private readonly SequenceOfBitOperation _definable;
+            private readonly Sequence _sequence;
+
+            public BitOperationFeatureClass(Sequence sequence, SequenceOfBitOperation
+                definable)
+            {
+                _sequence = sequence;
+                _definable = definable;
+            }
+
+            Result IFeature.VisitApply(ContextBase callContext, Category category, SyntaxBase args)
+            {
+                var elementType = _sequence.SequenceElementType;
+                var objResult = _sequence.VisitAsSequence(category, elementType);
+                var argResult = args.VisitAsSequence(callContext, category | Category.Type, elementType);
+                var result = new Result();
+                if(category.HasSize || category.HasType || category.HasCode)
+                {
+                    var objBitCount = _sequence.UnrefSize.ToInt();
+                    var argBitCount = argResult.Type.UnrefSize.ToInt();
+                    var type =
+                        elementType
+                            .SequenceOperationResultType(_definable, objBitCount, argBitCount)
+                            .CreateAlign(callContext.RefAlignParam.AlignBits);
+                    if(category.HasSize)
+                        result.Size = type.Size;
+                    if(category.HasType)
+                        result.Type = type;
+                    if(category.HasCode)
+                        result.Code = elementType.CreateSequenceOperation(_definable, objResult, type.Size,
+                            argResult);
+                }
+                if(category.HasRefs)
+                    result.Refs = objResult.Refs.Pair(argResult.Refs);
+                return result;
+            }
         }
     }
 }

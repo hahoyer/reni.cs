@@ -5,7 +5,7 @@ namespace Reni.Code
     /// <summary>
     /// Container of a leaf
     /// </summary>
-    internal sealed class Leaf : Base
+    internal sealed class Leaf : CodeBase
     {
         private readonly LeafElement _leafElement;
 
@@ -19,7 +19,7 @@ namespace Reni.Code
         public override bool IsEmpty { get { return LeafElement.IsEmpty; } }
         public override RefAlignParam RefAlignParam { get { return LeafElement.RefAlignParam; } }
 
-        public override Base CreateChild(LeafElement leafElement)
+        public override CodeBase CreateChild(LeafElement leafElement)
         {
             var newLeafElement = LeafElement.TryToCombine(leafElement);
             if(newLeafElement != null)

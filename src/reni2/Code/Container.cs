@@ -280,16 +280,16 @@ namespace Reni.Code
         internal class UnexpectedContextRefInContainer : Exception
         {
             private readonly Container _container;
-            private readonly Base _visitedObject;
+            private readonly CodeBase _visitedObject;
 
-            internal UnexpectedContextRefInContainer(Container container, Base visitedObject)
+            internal UnexpectedContextRefInContainer(Container container, CodeBase visitedObject)
             {
                 _container = container;
                 _visitedObject = visitedObject;
             }
 
             internal Container Container { get { return _container; } }
-            internal Base VisitedObject { get { return _visitedObject; } }
+            internal CodeBase VisitedObject { get { return _visitedObject; } }
         }
 
         #endregion

@@ -6,10 +6,10 @@ namespace Reni.Code
     /// <summary>
     /// 
     /// </summary>
-    internal sealed class Child : Base
+    internal sealed class Child : CodeBase
     {
         private readonly LeafElement _leafElement;
-        private readonly Base _parent;
+        private readonly CodeBase _parent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Child"/> class.
@@ -17,7 +17,7 @@ namespace Reni.Code
         /// <param name="parent">The parent.</param>
         /// <param name="leafElement">The leaf element.</param>
         /// created 29.09.2006 00:14
-        public Child(Base parent, LeafElement leafElement)
+        public Child(CodeBase parent, LeafElement leafElement)
         {
             _parent = parent;
             _leafElement = leafElement;
@@ -36,7 +36,7 @@ namespace Reni.Code
         /// </summary>
         /// <value>The parent.</value>
         /// created 24.09.2006 15:22
-        public Base Parent { get { return _parent; } }
+        public CodeBase Parent { get { return _parent; } }
 
         /// <summary>
         /// Gets the leaf.
@@ -70,7 +70,7 @@ namespace Reni.Code
         /// <param name="leafElement">The leaf element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:20
-        public override Base CreateChild(LeafElement leafElement)
+        public override CodeBase CreateChild(LeafElement leafElement)
         {
             LeafElement newLeafElement = LeafElement.TryToCombine(leafElement);
             if (newLeafElement != null)
@@ -114,7 +114,7 @@ namespace Reni.Code
         /// <param name="parent">The parent.</param>
         /// <returns></returns>
         /// created 05.10.2006 23:37
-        public Base ReCreate(Base parent)
+        public CodeBase ReCreate(CodeBase parent)
         {
             NotImplementedMethod(parent);
             throw new NotImplementedException();

@@ -88,7 +88,7 @@ namespace Reni.Type
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:18
-        internal override Code.Base CreateSequenceOperation(Defineable token, Result objResult, Size size,
+        internal override Code.CodeBase CreateSequenceOperation(Defineable token, Result objResult, Size size,
             Result argResult)
         {
             return objResult.Code.CreateBitSequenceOperation(token, size, argResult.Code);
@@ -101,7 +101,7 @@ namespace Reni.Type
         /// <param name="result">The result.</param>
         /// <returns></returns>
         /// created 02.02.2007 23:28
-        internal override Code.Base CreateSequenceOperation(Defineable token, Result result)
+        internal override Code.CodeBase CreateSequenceOperation(Defineable token, Result result)
         {
             return result.Code.CreateBitSequenceOperation(token);
         }
@@ -119,13 +119,17 @@ namespace Reni.Type
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
-        internal override SearchResult<IFeature> SearchFromSequence(Defineable defineable)
+        internal override SearchResult<ISequenceFeature> SearchFromSequence(Defineable defineable)
         {
-            return defineable.SearchFromSequenceOfBit();
+            var result = defineable.SearchFromSequenceOfBit();
+            return result.SearchResultDescriptor.Convert(result.Feature);
         }
-        internal override SearchResult<IPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
+
+        internal override SearchResult<ISequencePrefixFeature> SearchPrefixFromSequence(Defineable defineable)
         {
-            return defineable.SearchPrefixFromSequenceOfBit();
+            var result = defineable.SearchPrefixFromSequenceOfBit();
+            return result.SearchResultDescriptor.Convert
+                (result.Feature);
         }
 
         /// <summary>

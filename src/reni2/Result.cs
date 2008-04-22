@@ -12,7 +12,7 @@ namespace Reni
     /// </summary>
     internal sealed class Result : ReniObject
     {
-        private Code.Base _code;
+        private Code.CodeBase _code;
         private bool _isDirty;
         private Category _pending;
         private Refs _refs;
@@ -75,7 +75,7 @@ namespace Reni
         /// The code-category, can be null
         /// </summary>
         [Node]
-        internal Code.Base Code
+        internal Code.CodeBase Code
         {
             get { return _code; }
             set
@@ -270,7 +270,7 @@ namespace Reni
             if(c.HasRefs)
                 _refs = r.Refs ?? Refs.Pending;
             if(c.HasCode)
-                _code = r.Code ?? Reni.Code.Base.Pending;
+                _code = r.Code ?? Reni.Code.CodeBase.Pending;
         }
 
         private Result Filter(Category category)
@@ -504,7 +504,7 @@ namespace Reni
             var result = new Result();
             if(category.HasCode)
             {
-                var codeResult = Reni.Code.Base.CreateArg(Size.Create(sourceBitCount));
+                var codeResult = Reni.Code.CodeBase.CreateArg(Size.Create(sourceBitCount));
                 if(destBitCount != sourceBitCount)
                     codeResult = codeResult.CreateBitCast(Size.Create(destBitCount));
                 result.Code = codeResult;
@@ -572,7 +572,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, Code.Base replacement) where C : ContextBase
+        internal Result ReplaceRelativeContextRef<C>(C context, Code.CodeBase replacement) where C : ContextBase
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
@@ -598,7 +598,7 @@ namespace Reni
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
         /// created 31.12.2006 14:50
-        internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, Code.Base replacement)
+        internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, Code.CodeBase replacement)
         {
             if(!HasCode)
                 return this;
@@ -700,7 +700,7 @@ namespace Reni
             if(category.HasRefs)
                 result.Refs = Refs.Pending;
             if(category.HasCode)
-                result.Code = Reni.Code.Base.Pending;
+                result.Code = Reni.Code.CodeBase.Pending;
             return result;
         }
 
@@ -763,21 +763,21 @@ namespace Reni
         {
             var result = Reni.Type.Void.CreateResult(category);
             if(category.HasCode)
-                result.Code = Reni.Code.Base.CreateDumpPrintText("(");
+                result.Code = Reni.Code.CodeBase.CreateDumpPrintText("(");
 
             for(var i = 0; i < elemResults.Count; i++)
             {
                 if(category.HasCode)
                 {
                     if(i > 0)
-                        result.Code = result.Code.CreateSequence(Reni.Code.Base.CreateDumpPrintText(", "));
+                        result.Code = result.Code.CreateSequence(Reni.Code.CodeBase.CreateDumpPrintText(", "));
                     result.Code = result.Code.CreateSequence(elemResults[i].Code);
                 }
                 if(category.HasRefs)
                     result.Refs = result.Refs.Pair(elemResults[i].Refs);
             }
             if(category.HasCode)
-                result.Code = result.Code.CreateSequence(Reni.Code.Base.CreateDumpPrintText(")"));
+                result.Code = result.Code.CreateSequence(Reni.Code.CodeBase.CreateDumpPrintText(")"));
             return result;
         }
 
@@ -786,7 +786,7 @@ namespace Reni
         ///<summary>
         /// Delegate that returns code
         ///</summary>
-        internal delegate Code.Base GetCode();
+        internal delegate Code.CodeBase GetCode();
 
         #endregion
 

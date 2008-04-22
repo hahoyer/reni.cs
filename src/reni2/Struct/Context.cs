@@ -11,7 +11,7 @@ namespace Reni.Struct
     {
         private readonly Container _container;
         private readonly DictionaryEx<int, Reni.Type.TypeBase> _type = new DictionaryEx<int, Reni.Type.TypeBase>();
-        private Code.Base _contextRefCode;
+        private Code.CodeBase _contextRefCode;
 
         /// <summary>
         /// Initializes a new instance of the StructContainer class.
@@ -59,7 +59,7 @@ namespace Reni.Struct
         }
 
         [DumpData(false)]
-        internal Code.Base ContextRefCode
+        internal Code.CodeBase ContextRefCode
         {
             get
             {
@@ -69,12 +69,12 @@ namespace Reni.Struct
             }
         }
 
-        private Code.Base CreateContextRefCode()
+        private Code.CodeBase CreateContextRefCode()
         {
-            return Code.Base.CreateContextRef(this);
+            return Code.CodeBase.CreateContextRef(this);
         }
 
-        internal override Code.Base CreateRefForStruct(Type type)
+        internal override Code.CodeBase CreateRefForStruct(Type type)
         {
             if (Parent != type.Context)
                 return null;

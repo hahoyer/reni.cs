@@ -7,6 +7,11 @@ namespace Reni.Code
     /// </summary>
     internal sealed class TopData : Top
     {
+        public TopData(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
+            : base(refAlignParam, offset, targetSize, destinationSize)
+        {
+            StopByObjectId(-1130);
+        }
         /// <summary>
         /// Tries to combine two leaf elements. .
         /// </summary>
@@ -28,19 +33,6 @@ namespace Reni.Code
         {
             return start.TopData(RefAlignParam,Offset,TargetSize,DestinationSize);
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Top"/> class.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="targetSize">Size of the target.</param>
-        /// <param name="destinationSize">Size of the destination.</param>
-        /// created 19.10.2006 22:02
-        public TopData(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize) : base(refAlignParam, offset, targetSize, destinationSize)
-        {
-            StopByObjectId(-1130);
-        }
     }
 
     /// <summary>
@@ -48,6 +40,11 @@ namespace Reni.Code
     /// </summary>
     internal sealed class TopFrame : Top
     {
+        public TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
+            : base(refAlignParam, offset, targetSize, destinationSize)
+        {
+            StopByObjectId(544);
+        }
         /// <summary>
         /// Tries to combine two leaf elements. .
         /// </summary>
@@ -70,19 +67,5 @@ namespace Reni.Code
             return start.TopFrame(RefAlignParam, Offset, TargetSize, DestinationSize);
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TopFrame"/> class.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="targetSize">Size of the target.</param>
-        /// <param name="destinationSize">Size of the destination.</param>
-        /// created 19.10.2006 22:02
-        /// created 04.01.2007 16:36
-        public TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
-            : base(refAlignParam, offset, targetSize, destinationSize)
-        {
-            StopByObjectId(544);
-        }
     }
 }

@@ -226,13 +226,6 @@ namespace Reni.Type
             return _array.Find(count, () => new Array(this, count));
         }
 
-        internal EnableCut CreateEnableCut()
-        {
-            if(_enableCutCache == null)
-                _enableCutCache = new EnableCut(this);
-            return _enableCutCache;
-        }
-
         /// <summary>
         /// Creates the number.
         /// </summary>
@@ -347,9 +340,9 @@ namespace Reni.Type
         /// </summary>
         /// <returns></returns>
         /// created 30.01.2007 23:40
-        internal Code.Base CreateArgCode()
+        internal Code.CodeBase CreateArgCode()
         {
-            return Code.Base.CreateArg(Size);
+            return Code.CodeBase.CreateArg(Size);
         }
 
         /// <summary>
@@ -361,7 +354,7 @@ namespace Reni.Type
         internal Result CreateResult(Category category)
         {
             return CreateResult(category,
-                () => Code.Base.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)));
+                () => Code.CodeBase.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)));
         }
 
         /// <summary>
@@ -408,7 +401,7 @@ namespace Reni.Type
         {
             return CreateResult(
                 category,
-                () => Code.Base.CreateContextRef(context),
+                () => Code.CodeBase.CreateContextRef(context),
                 () => Refs.Context(context));
         }
 
@@ -746,7 +739,7 @@ namespace Reni.Type
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 13.01.2007 21:18
-        internal virtual Code.Base CreateSequenceOperation(Defineable token, Result objResult, Size size,
+        internal virtual Code.CodeBase CreateSequenceOperation(Defineable token, Result objResult, Size size,
             Result argResult)
         {
             NotImplementedMethod(token, objResult, size, argResult.Code);
@@ -760,7 +753,7 @@ namespace Reni.Type
         /// <param name="result">The result.</param>
         /// <returns></returns>
         /// created 02.02.2007 23:28
-        internal virtual Code.Base CreateSequenceOperation(Defineable token, Result result)
+        internal virtual Code.CodeBase CreateSequenceOperation(Defineable token, Result result)
         {
             NotImplementedMethod(token, result);
             return null;
@@ -805,7 +798,7 @@ namespace Reni.Type
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 01.07.07 19:16 on HAHOYER-DELL by h
-        internal virtual Code.Base CreateRefCodeForContext(ContextBase context)
+        internal virtual Code.CodeBase CreateRefCodeForContext(ContextBase context)
         {
             NotImplementedMethod(context);
             return null;
@@ -841,24 +834,25 @@ namespace Reni.Type
             return defineable.SearchPrefix();
         }
 
-        internal virtual SearchResult<IFeature> SearchFromRef(Defineable defineable)
+        internal virtual SearchResult<IRefFeature> SearchFromRef(Defineable defineable)
         {
-            return SearchResult<IFeature>.Failure(this, defineable);
+            return SearchResult<IRefFeature>.Failure(this, defineable);
         }
 
-        internal virtual SearchResult<IFeature> SearchFromSequence(Defineable defineable)
+        internal virtual SearchResult<ISequenceFeature> SearchFromSequence(Defineable defineable)
         {
-            return SearchResult<IFeature>.Failure(this, defineable);
+            return defineable.SearchFromSequence();
         }
-        internal virtual SearchResult<IPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
+        internal virtual SearchResult<ISequencePrefixFeature> SearchPrefixFromSequence(Defineable defineable)
         {
-            return SearchResult<IPrefixFeature>.Failure(this, defineable);
+            return defineable.SearchPrefixFromSequence();
         }
 
-        internal virtual SearchResult<IFeature> SearchFromRefToSequence(Defineable defineable)
+        internal virtual SearchResult<IRefToSequenceFeature> SearchFromRefToSequence(Defineable defineable)
         {
-            return SearchResult<IFeature>.Failure(this, defineable);
+            return SearchResult<IRefToSequenceFeature>.Failure(this, defineable);
         }
 
     }
+
 }

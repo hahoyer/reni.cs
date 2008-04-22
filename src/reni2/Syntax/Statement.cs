@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using HWClassLibrary.Debug;
+using Reni.Context;
 using Reni.Parser;
+using Reni.Type;
 
 namespace Reni.Syntax
 {
@@ -12,11 +14,6 @@ namespace Reni.Syntax
     {
         private readonly List<MemberElem> _chain;
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="chain">The chain.</param>
-        /// <param name="tail">The tail.</param>
         private Statement(List<MemberElem> chain, MemberElem tail)
         {
             _chain = new List<MemberElem>();
@@ -24,43 +21,22 @@ namespace Reni.Syntax
             _chain.Add(tail);
         }
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="head">The head.</param>
-        /// <param name="tail">The tail.</param>
         public Statement(MemberElem head, MemberElem tail)
         {
-            _chain = new List<MemberElem>();
-            _chain.Add(head);
-            _chain.Add(tail);
+            _chain = new List<MemberElem> {head, tail};
         }
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="head">The head.</param>
         public Statement(MemberElem head)
         {
-            _chain = new List<MemberElem>();
-            _chain.Add(head);
+            _chain = new List<MemberElem> {head};
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [DebuggerHidden]
         public List<MemberElem> Chain { get { return _chain; } }
 
-        /// <summary>
-        /// Visitor function 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="category"></param>
-        /// <returns></returns>
-        internal override Result VirtVisit(Context.ContextBase context, Category category)
+        internal override Result VirtVisit(ContextBase context, Category category)
         {
-            var trace = ObjectId == 1082 && context.ObjectId == 21;
+            var trace = ObjectId == -21 && context.ObjectId == 0;
             StartMethodDumpWithBreak(trace, context, category);
             if(Chain.Count == 0)
                 NotImplementedMethod(context, category);
@@ -68,7 +44,7 @@ namespace Reni.Syntax
             var internalCategory = category | Category.Type;
             if(category.HasCode)
                 internalCategory |= Category.Refs;
-            var intermediateResult = Type.TypeBase.CreateVoidResult(internalCategory);
+            var intermediateResult = TypeBase.CreateVoidResult(internalCategory);
             var result = context.VisitFirstChainElement(internalCategory, Chain[0]);
             for(var i = 1; i < Chain.Count; i++)
             {
@@ -83,14 +59,12 @@ namespace Reni.Syntax
                 result = context.VisitNextChainElement(internalCategory, Chain[i], newResult);
                 if(internalCategory.HasRefs)
                     foreach(var referencedContext in result.Refs.Data)
-                    {
                         if(referencedContext.IsChildOf(context))
                         {
                             var replaceContextCode = intermediateResult.Type.CreateRefCodeForContext(referencedContext);
                             Tracer.Assert(replaceContextCode != null);
                             result = result.ReplaceRelativeContextRef(referencedContext, replaceContextCode);
                         }
-                    }
             }
 
             if(result.IsPending)
@@ -101,24 +75,11 @@ namespace Reni.Syntax
             return ReturnMethodDumpWithBreak(trace, statementResult);
         }
 
-        /// <summary>
-        /// Creates the definable syntax.
-        /// </summary>
-        /// <param name="defineableToken">The defineable token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 01.04.2007 23:06 on SAPHIRE by HH
         internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken, SyntaxBase right)
         {
             return new Statement(_chain, new MemberElem(defineableToken, right));
         }
 
-        /// <summary>
-        /// Dumps the short.
-        /// </summary>
-        /// <returns></returns>
-        /// created 07.05.2007 22:09 on HAHOYER-DELL by hh
-        /// created 07.05.2007 22:10 on HAHOYER-DELL by hh
         internal override string DumpShort()
         {
             var result = "";

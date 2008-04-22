@@ -12,7 +12,7 @@ namespace Reni.Context
         private readonly Syntax.SyntaxBase _body;
         private readonly ContextBase _context;
         private readonly int _index;
-        private Code.Base _bodyCodeCache;
+        private Code.CodeBase _bodyCodeCache;
 
         /// <summary>
         /// Initializes a new instance of the FunctionInstance class.
@@ -72,7 +72,7 @@ namespace Reni.Context
         }
 
         [DumpData(false)]
-        internal Code.Base BodyCode
+        internal Code.CodeBase BodyCode
         {
             get
             {
@@ -117,7 +117,7 @@ namespace Reni.Context
             return ReturnMethodDump(trace, result);
         }
 
-        private Code.Base CreateArgsAndRefForFunction(Code.Base argsCode)
+        private Code.CodeBase CreateArgsAndRefForFunction(Code.CodeBase argsCode)
         {
             return ForeignRefs.ToCode().CreateSequence(argsCode);
         }
@@ -127,14 +127,14 @@ namespace Reni.Context
         /// </summary>
         /// <returns></returns>
         /// created 31.12.2006 14:09
-        private Code.Base CreateBodyCode()
+        private Code.CodeBase CreateBodyCode()
         {
             if(IsStopByObjectIdActive)
                 return null;
             Tracer.ConditionalBreak(_index == 2, "");
             var category = Category.Code.Replendish();
             var refAlignParam = Context.RefAlignParam;
-            var foreignRefsRef = Code.Base.CreateFrameRef(refAlignParam);
+            var foreignRefsRef = Code.CodeBase.CreateFrameRef(refAlignParam);
             var result = Visit(category)
                 .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
             if(Args.Size.IsZero)
@@ -177,7 +177,7 @@ namespace Reni.Context
         private Result CreateArgsRef(Category category)
         {
             var refAlignParam = Context.RefAlignParam;
-            return Args.CreateRef(refAlignParam).CreateResult(category, () => Code.Base
+            return Args.CreateRef(refAlignParam).CreateResult(category, () => Code.CodeBase
                 .CreateFrameRef(refAlignParam)
                 .CreateRefPlus(refAlignParam, FrameSize*-1));
         }
@@ -233,17 +233,17 @@ namespace Reni.Context
 
         public int FunctionIndex { get { return _functionIndex; } }
 
-        internal override Code.Base PairVisit(Pair pair)
+        internal override Code.CodeBase PairVisit(Pair pair)
         {
             return Pair(pair, null, pair.Right.Visit(this));
         }
 
-        internal override Code.Base ChildVisit(Code.Child child)
+        internal override Code.CodeBase ChildVisit(Code.Child child)
         {
             return Child(child.Parent, child.LeafElement.Visit(this));
         }
 
-        internal override Code.Base ThenElseVisit(Code.ThenElse This)
+        internal override Code.CodeBase ThenElseVisit(Code.ThenElse This)
         {
             return ThenElse(This, null, This.ThenCode.Visit(this), This.ElseCode.Visit(this));
         }

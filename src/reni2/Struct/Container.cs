@@ -517,7 +517,7 @@ namespace Reni.Struct
             return VisitSize(context, _list.Count) - VisitSize(context, index);
         }
 
-        internal Code.Base CreateRef(Reni.Context.ContextBase parent)
+        internal Code.CodeBase CreateRef(Reni.Context.ContextBase parent)
         {
             return parent.CreateTopRefCode().CreateRefPlus(parent.RefAlignParam, Offset(parent, 0));
         }

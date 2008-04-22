@@ -59,9 +59,9 @@ namespace Reni.Type
         /// </summary>
         /// <returns></returns>
         /// created 08.01.2007 17:29
-        private Code.Base DumpPrintCode()
+        private Code.CodeBase DumpPrintCode()
         {
-            return Code.Base.CreateDumpPrintText(_parent.DumpPrintText);
+            return Code.CodeBase.CreateDumpPrintText(_parent.DumpPrintText);
         }
 
     }

@@ -6,17 +6,17 @@ namespace Reni.Code
     /// <summary>
     /// Pair of code elements, first element can be accessed
     /// </summary>
-    internal sealed class Pair : Base
+    internal sealed class Pair : CodeBase
 	{
-        private readonly Base _left;
-        private readonly Base _right;
+        private readonly CodeBase _left;
+        private readonly CodeBase _right;
 
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        internal Pair(Base left, Base right)
+        internal Pair(CodeBase left, CodeBase right)
         {
             _left = left;
             _right = right;
@@ -60,13 +60,13 @@ namespace Reni.Code
         /// </summary>
         /// <value>The left.</value>
         /// created 06.10.2006 00:56
-        public Base Left { get { return _left; } }
+        public CodeBase Left { get { return _left; } }
         /// <summary>
         /// Gets the right.
         /// </summary>
         /// <value>The right.</value>
         /// created 06.10.2006 00:56
-        public Base Right { get { return _right; } }
+        public CodeBase Right { get { return _right; } }
 
         /// <summary>
         /// Res the create.
@@ -75,7 +75,7 @@ namespace Reni.Code
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 02.10.2006 20:56
-        public Base ReCreate(Base left, Base right)
+        public CodeBase ReCreate(CodeBase left, CodeBase right)
         {
             return new Pair(left, right);
         }

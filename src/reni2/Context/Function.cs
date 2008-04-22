@@ -41,7 +41,7 @@ namespace Reni.Context
             return ArgsType.CreateRef(RefAlignParam).CreateResult
                 (
                 category,
-                () => Code.Base.CreateContextRef(this),
+                () => Code.CodeBase.CreateContextRef(this),
                 () => Refs.Context(this)
                 )
             ;

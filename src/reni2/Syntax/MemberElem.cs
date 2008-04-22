@@ -22,7 +22,7 @@ namespace Reni.Syntax
         {
             _defineableToken = defineableToken;
             _args = args;
-            StopByObjectId(-10);
+            //StopByObjectId(-10);
         }
 
         /// <summary>

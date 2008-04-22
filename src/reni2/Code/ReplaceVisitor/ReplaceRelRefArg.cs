@@ -20,7 +20,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="refAlignParam">The ref align param.</param>
         /// <param name="offset">The offset.</param>
         /// created 28.09.2006 23:03
-        ReplaceRelRefArg(Code.Base actual, RefAlignParam refAlignParam, Size offset)
+        ReplaceRelRefArg(Code.CodeBase actual, RefAlignParam refAlignParam, Size offset)
             : base(actual)
         {
             _refAlignParam = refAlignParam;
@@ -35,7 +35,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="refAlignParam">The ref align param.</param>
         /// created 28.09.2006 22:52
         /// created 18.10.2006 00:21
-        internal ReplaceRelRefArg(Code.Base actualArg, RefAlignParam refAlignParam)
+        internal ReplaceRelRefArg(Code.CodeBase actualArg, RefAlignParam refAlignParam)
             : this(actualArg, refAlignParam, Size.Create(0))
         {
         }
@@ -52,7 +52,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <value>The actual.</value>
         /// created 28.09.2006 22:46
         /// created 28.09.2006 22:58
-        public override Code.Base Actual
+        public override Code.CodeBase Actual
         {
             get
             {
@@ -75,7 +75,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 15.10.2006 18:32
-        internal override Visitor<Code.Base> After(Size size)
+        internal override Visitor<Code.CodeBase> After(Size size)
         {
             if (size.IsZero)
                 return this;

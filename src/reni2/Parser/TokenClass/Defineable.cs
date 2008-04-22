@@ -68,24 +68,24 @@ namespace Reni.Parser.TokenClass
             return new DefinableTokenSyntax(token);
         }
 
-        internal virtual SearchResult<IFeature> SearchFromSequence()
+        internal virtual SearchResult<ISequenceFeature> SearchFromSequence()
         {
-            return SearchResult<IFeature>.Failure(this);
+            return SearchResult<ISequenceFeature>.Failure(this);
         }
 
-        internal virtual SearchResult<IPrefixFeature> SearchPrefixFromSequence()
+        internal virtual SearchResult<ISequencePrefixFeature> SearchPrefixFromSequence()
         {
-            return SearchResult<IPrefixFeature>.Failure(this);
+            return SearchResult<ISequencePrefixFeature>.Failure(this);
         }
 
-        internal virtual SearchResult<IFeature> SearchFromSequenceOfBit()
+        internal virtual SearchResult<ISequenceOfBitFeature> SearchFromSequenceOfBit()
         {
-            return SearchResult<IFeature>.Failure(this);
+            return SearchResult<ISequenceOfBitFeature>.Failure(this);
         }
 
-        internal virtual SearchResult<IPrefixFeature> SearchPrefixFromSequenceOfBit()
+        internal virtual SearchResult<ISequenceOfBitPrefixFeature> SearchPrefixFromSequenceOfBit()
         {
-            return SearchResult<IPrefixFeature>.Failure(this);
+            return SearchResult<ISequenceOfBitPrefixFeature>.Failure(this);
         }
 
         internal virtual SearchResult<IFeature> Search()

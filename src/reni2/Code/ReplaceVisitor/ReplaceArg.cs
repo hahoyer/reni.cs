@@ -7,54 +7,28 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     internal abstract class ReplaceArg : Base
     {
-        readonly Code.Base _actualArg;
+        private readonly CodeBase _actualArg;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReplaceArg"/> class.
-        /// </summary>
-        /// <param name="actualArg">The actual.</param>
-        /// created 28.09.2006 22:52
-        internal ReplaceArg(Code.Base actualArg)
+        internal ReplaceArg(CodeBase actualArg)
         {
             Tracer.Assert(actualArg != null, "actualArg != null");
             _actualArg = actualArg;
         }
 
-        /// <summary>
-        /// Gets the actual arg.
-        /// </summary>
-        /// <value>The actual arg.</value>
-        /// created 28.09.2006 22:57
         [DumpData(false)]
-        public Code.Base ActualArg { get { return _actualArg; } }
-        /// <summary>
-        /// Gets the actual.
-        /// </summary>
-        /// <value>The actual.</value>
-        /// created 28.09.2006 22:46
-        public abstract Code.Base Actual { get; }
+        public CodeBase ActualArg { get { return _actualArg; } }
+        public abstract CodeBase Actual { get; }
 
-        /// <summary>
-        /// Contexts the ref.
-        /// </summary>
-        /// <param name="visitedObject">The visited object.</param>
-        /// <returns></returns>
-        /// created 17.10.2006 00:04
-        internal override Code.Base ContextRef<C>(ContextRef<C> visitedObject)
+        internal override CodeBase ContextRef<C>(ContextRef<C> visitedObject)
         {
             return null;
         }
 
-        /// <summary>
-        /// Args the specified visited object.
-        /// </summary>
-        /// <param name="visitedObject">The visited object.</param>
-        /// <returns></returns>
-        /// created 24.09.2006 20:17
-        internal override Code.Base Arg(Arg visitedObject)
+        internal override CodeBase Arg(Arg visitedObject)
         {
             visitedObject.StopByObjectId(363);
-            Tracer.Assert(Actual.Size == visitedObject.Size, "Actual=" + Actual.Dump() + "\nvisitedObject=" + visitedObject.Dump());
+            Tracer.Assert(Actual.Size == visitedObject.Size,
+                "Actual=" + Actual.Dump() + "\nvisitedObject=" + visitedObject.Dump());
             return Actual;
         }
     }

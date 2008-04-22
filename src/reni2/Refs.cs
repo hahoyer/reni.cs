@@ -216,11 +216,11 @@ namespace Reni
         /// Toes the code.
         /// </summary>
         /// created 06.11.2006 22:57
-        internal Code.Base ToCode()
+        internal Code.CodeBase ToCode()
         {
-            Code.Base result = Code.Base.CreateVoid();
+            Code.CodeBase result = Code.CodeBase.CreateVoid();
             for (int i = 0; i < _data.Count; i++)
-                result = result.CreateSequence(Code.Base.CreateContextRef((Struct.Context) _data[i]));
+                result = result.CreateSequence(Code.CodeBase.CreateContextRef((Struct.Context) _data[i]));
             return result;
         }
 
@@ -232,10 +232,10 @@ namespace Reni
         /// <param name="endOfRefsCode">The endOfRefsCode.</param>
         /// <returns></returns>
         /// created 31.12.2006 18:47
-        internal Code.Base ReplaceRefsForFunctionBody(Code.Base code, RefAlignParam refAlignParam, Code.Base endOfRefsCode)
+        internal Code.CodeBase ReplaceRefsForFunctionBody(Code.CodeBase code, RefAlignParam refAlignParam, Code.CodeBase endOfRefsCode)
         {
-            Code.Base p = endOfRefsCode;
-            Code.Base result = code;
+            Code.CodeBase p = endOfRefsCode;
+            Code.CodeBase result = code;
             for (int i = 0; i < _data.Count; i++)
             {
                 RefAlignParam unrefAlignment = _data[i].RefAlignParam;
@@ -243,7 +243,7 @@ namespace Reni
                 RefAlignParam unrefPtrAlignment = refAlignParam;
                     // To do; check if this is correct. Can be chaecked if we really have different alignment
                 p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize*-1);
-                Code.Base replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
+                Code.CodeBase replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
                 result = result.ReplaceAbsoluteContextRef((Struct.Context) _data[i], replacement);
             }
             return result;

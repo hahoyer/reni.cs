@@ -12,14 +12,14 @@ namespace Reni.Code.ReplaceVisitor
         /// <summary>
         /// the code to use as replacement
         /// </summary>
-        protected readonly Code.Base _replacement;
+        protected readonly Code.CodeBase _replacement;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReplaceContextRef&lt;CC&gt;"/> class.
         /// </summary>
         /// <param name="context">The struct container.</param>
         /// <param name="replacement">The replacement.</param>
-        protected ReplaceContextRef(CC context, Code.Base replacement)
+        protected ReplaceContextRef(CC context, Code.CodeBase replacement)
         {
             _context = context;
             _replacement = replacement;
@@ -31,7 +31,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 17.10.2006 00:04
-        internal override Code.Base ContextRef<C>(ContextRef<C> visitedObject)
+        internal override Code.CodeBase ContextRef<C>(ContextRef<C> visitedObject)
         {
             if (_context != visitedObject.Context)
                 return null;
@@ -51,7 +51,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// created 04.01.2007 18:18
-        public ReplaceRelativeContextRef(CC context, Code.Base replacement)
+        public ReplaceRelativeContextRef(CC context, Code.CodeBase replacement)
             : base(context, replacement)
         {
         }
@@ -62,7 +62,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="size">The size.</param>
         /// <returns></returns>
         /// created 15.10.2006 18:32
-        internal override Visitor<Code.Base> After(Size size)
+        internal override Visitor<Code.CodeBase> After(Size size)
         {
             if (size.IsZero)
                 return this;
@@ -81,7 +81,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// created 04.01.2007 18:18
-        public ReplaceAbsoluteContextRef(CC context, Code.Base replacement)
+        public ReplaceAbsoluteContextRef(CC context, Code.CodeBase replacement)
             : base(context, replacement)
         {
         }

@@ -97,7 +97,7 @@ namespace Reni.Struct
         /// <param name="context">The context.</param>
         /// <returns></returns>
         /// created 01.07.07 19:16 on HAHOYER-DELL by h
-        internal override Code.Base CreateRefCodeForContext(Reni.Context.ContextBase context)
+        internal override Code.CodeBase CreateRefCodeForContext(Reni.Context.ContextBase context)
         {
             return context.CreateRefForStruct(this);
         }
@@ -154,7 +154,7 @@ namespace Reni.Struct
         {
             var result = _container.VisitElementFromContextRef(_context, category, position);
             var containerContext = _context.CreateStructContext(_container);
-            var argsRef = Code.Base
+            var argsRef = Code.CodeBase
                 .CreateArg(_context.RefAlignParam.RefSize)
                 .CreateRefPlus(_context.RefAlignParam, Size);
             return result.ReplaceRelativeContextRef(containerContext, argsRef);
