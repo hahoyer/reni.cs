@@ -25,7 +25,6 @@ namespace Reni.Type
         private readonly DictionaryEx<int, Sequence> _chain = new DictionaryEx<int, Sequence>();
         private readonly DictionaryEx<TypeBase, Pair> _pair = new DictionaryEx<TypeBase, Pair>();
         private readonly DictionaryEx<RefAlignParam, Ref> _ref = new DictionaryEx<RefAlignParam, Ref>();
-        private EnableCut _enableCutCache;
         private TypeType _typeTypeCache;
 
         protected TypeBase(int objectId)

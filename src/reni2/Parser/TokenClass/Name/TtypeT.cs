@@ -5,15 +5,19 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    internal sealed class TtypeT : Defineable
+    internal sealed class TtypeT : Defineable, IFeature
     {
-        public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref objectType, TypeBase definingType)
+        internal override SearchResult<IFeature> Search()
         {
-            NotImplementedMethod(callContext, category, args, objectType, definingType);
+            return SearchResult<IFeature>.Success(this,this);
+        }
+
+        public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+        {
             if (args == null)
-                return objectType.TypeOperator(category);
+                return callObject.TypeOperator(category);
             var argResult = args.Visit(callContext, category | Category.Type);
-            return objectType.ApplyTypeOperator(argResult);
+            return callObject.ApplyTypeOperator(argResult);
         }
     }
 }

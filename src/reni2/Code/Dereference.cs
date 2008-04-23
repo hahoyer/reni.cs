@@ -88,7 +88,6 @@ namespace Reni.Code
         /// created 19.10.2006 21:38
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
-            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopData(RefAlignParam, precedingElement.Offset, TargetSize, Size);
         }
