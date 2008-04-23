@@ -61,9 +61,7 @@ namespace Reni.Type
 
         internal override Result DumpPrint(Category category)
         {
-            var result = Target.DumpPrintFromRef(category,RefAlignParam);
-            return result
-                .UseWithArg(CreateDereferencedArgResult(category));
+            return Target.DumpPrintFromRef(category,RefAlignParam);
         }
 
         public override Result ApplyTypeOperator(Result argResult)
