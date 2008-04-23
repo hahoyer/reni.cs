@@ -112,51 +112,17 @@ namespace Reni.Syntax
             return Visit(e, Category.Code | Category.Type);
         }
 
-        /// <summary>
-        /// Gets the number constant if possible.
-        /// </summary>
-        /// <returns></returns>
-        /// [created 07.05.2006 18:34]
         public virtual long GetNumberConstant()
         {
             NotImplementedMethod();
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Visits as sequence.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="elementType">Type of the element.</param>
-        /// <returns></returns>
-        /// created 13.01.2007 23:02
-        public Result VisitAsSequence(Context.ContextBase context, Category category, Type.TypeBase elementType)
-        {
-            Result rawResult = Visit(context, category | Category.Type);
-            Result convResult = rawResult.Type.VisitAsSequence(category, elementType);
-            return convResult.UseWithArg(rawResult);
-        }
-
-        /// <summary>
-        /// Creates the definable syntax.
-        /// </summary>
-        /// <param name="defineableToken">The defineable token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 01.04.2007 23:06 on SAPHIRE by HH
         internal virtual SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken, SyntaxBase right)
         {
             return CreateDefaultDefinableSyntax(defineableToken, right);
         }
 
-        /// <summary>
-        /// Creates the list syntax.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 09.04.2007 19:24 on SAPHIRE by HH
         internal virtual SyntaxBase CreateListSyntax(Token token, SyntaxBase right)
         {
             if (right == null)

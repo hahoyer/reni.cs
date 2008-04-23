@@ -182,7 +182,7 @@ namespace Reni.Context
 
         internal Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
-            var trace = ObjectId == -10 && memberElem.ObjectId == 1 && category.HasAll;
+            var trace = ObjectId == -10 && memberElem.ObjectId == 2 && category.HasAll;
             StartMethodDumpWithBreak(trace, category, memberElem, formerResult);
             var refResult = formerResult.EnsureContextRef(this);
             Tracer.ConditionalBreak(trace, refResult.Dump());

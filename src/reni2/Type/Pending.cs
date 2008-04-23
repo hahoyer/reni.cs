@@ -44,18 +44,6 @@ namespace Reni.Type
         }
 
         /// <summary>
-        /// Visits as sequence.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="elementType">Type of the element.</param>
-        /// <returns></returns>
-        /// created 13.01.2007 22:20
-        internal override Result VisitAsSequence(Category category, TypeBase elementType)
-        {
-            return CreateResult(category);
-        }
-
-        /// <summary>
         /// Determines whether [is convertable to virt] [the specified dest].
         /// </summary>
         /// <param name="dest">The dest.</param>

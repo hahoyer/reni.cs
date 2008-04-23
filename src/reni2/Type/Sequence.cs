@@ -26,7 +26,6 @@ namespace Reni.Type
         public Array InheritedType { get { return _inheritedType; } }
         public override Size Size { get { return _inheritedType.Size; } }
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
-        internal override TypeBase SequenceElementType { get { return Element; } }
         internal override int SequenceCount { get { return Count; } }
         internal int Count { get { return _inheritedType.Count; } }
         public TypeBase Element { get { return _inheritedType.Element; } }
@@ -181,8 +180,7 @@ namespace Reni.Type
             }
             public Result VisitApply(Category category, Result argResult)
             {
-                var elementType = _sequence.SequenceElementType;
-                var objResult = _sequence.VisitAsSequence(category, elementType).UseWithArg(argResult);
+                var objResult = argResult.ConvertTo(_sequence);
                 var result = new Result();
                 if (category.HasSize || category.HasType || category.HasCode)
                 {
@@ -191,7 +189,7 @@ namespace Reni.Type
                     if (category.HasType)
                         result.Type = objResult.Type;
                     if (category.HasCode)
-                        result.Code = elementType.CreateSequenceOperation(_definable, objResult);
+                        result.Code = _sequence.Element.CreateSequenceOperation(_definable, objResult);
                 }
                 if (category.HasRefs)
                     result.Refs = objResult.Refs;
@@ -212,18 +210,19 @@ namespace Reni.Type
                 _definable = definable;
             }
 
-            Result IFeature.VisitApply(ContextBase callContext, Category category, SyntaxBase args)
+            Result IFeature.VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
             {
-                var elementType = _sequence.SequenceElementType;
-                var objResult = _sequence.VisitAsSequence(category, elementType);
-                var argResult = args.VisitAsSequence(callContext, category | Category.Type, elementType);
+                var objResult = callObject.ConvertTo(category, _sequence);
+                var rawArgResult = args.Visit(callContext, category | Category.Type);
+                var argType = _sequence.Element.CreateSequence(rawArgResult.Type.SequenceCount);
+                var argResult = rawArgResult.ConvertTo(argType);
                 var result = new Result();
                 if(category.HasSize || category.HasType || category.HasCode)
                 {
                     var objBitCount = _sequence.UnrefSize.ToInt();
                     var argBitCount = argResult.Type.UnrefSize.ToInt();
                     var type =
-                        elementType
+                        _sequence.Element
                             .SequenceOperationResultType(_definable, objBitCount, argBitCount)
                             .CreateAlign(callContext.RefAlignParam.AlignBits);
                     if(category.HasSize)
@@ -231,7 +230,7 @@ namespace Reni.Type
                     if(category.HasType)
                         result.Type = type;
                     if(category.HasCode)
-                        result.Code = elementType.CreateSequenceOperation(_definable, objResult, type.Size,
+                        result.Code = _sequence.Element.CreateSequenceOperation(_definable, objResult, type.Size,
                             argResult);
                 }
                 if(category.HasRefs)

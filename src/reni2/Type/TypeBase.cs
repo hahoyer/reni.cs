@@ -142,21 +142,6 @@ namespace Reni.Type
         /// <value>The type of the sequence element.</value>
         /// created 13.01.2007 19:46
         [DumpData(false)]
-        internal virtual TypeBase SequenceElementType
-        {
-            get
-            {
-                NotImplementedMethod();
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Gets the type of the sequence element.
-        /// </summary>
-        /// <value>The type of the sequence element.</value>
-        /// created 13.01.2007 19:46
-        [DumpData(false)]
         internal virtual int SequenceCount
         {
             get
@@ -658,29 +643,6 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Visits as sequence.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="elementType">Type of the element.</param>
-        /// <returns></returns>
-        /// created 13.01.2007 22:20
-        internal virtual Result VisitAsSequence(Category category, TypeBase elementType)
-        {
-            var count = SequenceCount;
-            TypeBase resultType = elementType.CreateSequence(count);
-            return Conversion(category, resultType);
-        }
-
-        /// <summary>
-        /// Determines whether [is convertable to] [the specified dest].
-        /// </summary>
-        /// <param name="dest">The dest.</param>
-        /// <param name="conversionFeature">The conversion feature.</param>
-        /// <returns>
-        /// 	<c>true</c> if [is convertable to] [the specified dest]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 11.01.2007 22:09
         internal bool IsConvertableTo(TypeBase dest, ConversionFeature conversionFeature)
         {
             if(this == dest)
@@ -690,55 +652,22 @@ namespace Reni.Type
             return IsConvertableToVirt(dest, conversionFeature);
         }
 
-        /// <summary>
-        /// Determines whether [has converter to] [the specified dest].
-        /// </summary>
-        /// <param name="dest">The dest.</param>
-        /// <returns>
-        /// 	<c>true</c> if [has converter to] [the specified dest]; otherwise, <c>false</c>.
-        /// </returns>
         internal virtual bool HasConverterTo(TypeBase dest)
         {
             return false;
         }
 
-        /// <summary>
-        /// Determines whether [is convertable to virt] [the specified dest].
-        /// </summary>
-        /// <param name="dest">The dest.</param>
-        /// <param name="conversionFeature">The conversion feature.</param>
-        /// <returns>
-        /// 	<c>true</c> if [is convertable to virt] [the specified dest]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 30.01.2007 22:42
         internal virtual bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             NotImplementedMethod(dest, conversionFeature);
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Determines whether [is convertable to itself] [the specified use converter].
-        /// </summary>
-        /// <param name="conversionFeature">The conversion feature.</param>
-        /// <returns>
-        /// 	<c>true</c> if [is convertable to itself] [the specified use converter]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 30.01.2007 23:02
         internal virtual bool IsConvertableToItself(ConversionFeature conversionFeature)
         {
             return true;
         }
 
-        /// <summary>
-        /// Creates the operation.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <param name="argResult">The arg result.</param>
-        /// <param name="objResult">The obj result.</param>
-        /// <param name="size">The size.</param>
-        /// <returns></returns>
-        /// created 13.01.2007 21:18
         internal virtual Code.CodeBase CreateSequenceOperation(Defineable token, Result objResult, Size size,
             Result argResult)
         {

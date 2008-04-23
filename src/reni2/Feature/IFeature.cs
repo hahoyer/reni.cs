@@ -6,7 +6,7 @@ namespace Reni.Feature
 {
     internal interface IFeature
     {
-        Result VisitApply(ContextBase callContext, Category category, SyntaxBase args);
+        Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject);
     }
 
     internal interface IPrefixFeature

@@ -15,13 +15,13 @@ namespace Reni
         {
             fixed(sbyte* data = new sbyte[6])
             {
-                (*(data + 5)) = (31); // BitArray 13210
-                (*(data + 4)) = (100); // BitArray 13254
-                (*(Int32*) (data + 0)) = (Int32) (data + 4); // TopRef 13224
-                (*(Int32*) (data + 1)) = (*(Int32*) (data + 0)); // StatementEnd 13306
-                (*(data + 4)) = (*(sbyte*) (*(Int32*) (data + 1))); // Dereference 13357
-                (*(data + 3)) = (*(data + 4)); // TopData 13421
-                Data.DumpPrint((*(data + 3))); // DumpPrint 13407
+                (*(data + 5)) = (2); // BitArray   1351
+                (*(data + 4)) = (*(data + 5)); // TopData    1434
+                (*(data + 3)) = (4); // BitArray   1424
+                (*(data + 4)) = (sbyte) ((*(data + 4)) + (*(data + 3))); // BitArrayOp 1427
+                (*(Int32*) (data + 0)) = (*(Int32*) (data + 4)); // TopData    1525
+                (*(data + 3)) = (*(sbyte*) (*(Int32*) (data + 0))); // Dereference 1510
+                Data.DumpPrint((*(data + 3))); // DumpPrint   1498
             }
             ;
         }

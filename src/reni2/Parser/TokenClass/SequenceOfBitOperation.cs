@@ -4,8 +4,11 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass
 {
-    internal abstract class SequenceOfBitOperation : Defineable, ISequenceOfBitFeature, ISequenceOfBitPrefixFeature,
-        ISequenceFeature, ISequencePrefixFeature
+    internal abstract class SequenceOfBitOperation : Defineable, 
+        ISequenceOfBitFeature, 
+        ISequenceOfBitPrefixFeature,
+        ISequenceFeature, 
+        ISequencePrefixFeature
     {
         [DumpExcept(false)]
         internal protected virtual bool IsBitSequencePrefixOperation { get { return false; } }

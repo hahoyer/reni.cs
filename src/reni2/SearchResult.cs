@@ -5,10 +5,9 @@ using Reni.Type;
 
 namespace Reni
 {
-    internal struct SearchResultDescriptor
+    internal class SearchResultDescriptor: ReniObject
     {
         internal SearchResultDescriptor(Defineable defineable, SearchTrial searchTrial)
-            : this()
         {
             Defineable = defineable;
             SearchTrial = searchTrial;

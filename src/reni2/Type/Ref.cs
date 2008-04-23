@@ -34,8 +34,6 @@ namespace Reni.Type
         [DumpData(false)]
         internal override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
 
-        internal override TypeBase SequenceElementType { get { return Parent.SequenceElementType; } }
-
         [DumpData(false)]
         internal override int SequenceCount { get { return Target.SequenceCount; } }
 
@@ -63,8 +61,8 @@ namespace Reni.Type
 
         internal override Result DumpPrint(Category category)
         {
-            return Target
-                .DumpPrint(category)
+            var result = Target.DumpPrintFromRef(category,RefAlignParam);
+            return result
                 .UseWithArg(CreateDereferencedArgResult(category));
         }
 
@@ -138,8 +136,10 @@ namespace Reni.Type
         internal Result VisitNextChainElement(ContextBase callContext, Category category, MemberElem memberElem)
         {
             var resultFromRef = SearchDefineable(memberElem.DefineableToken);
-            if(resultFromRef.IsSuccessFull)
-                return resultFromRef.Feature.VisitApply(callContext, category, memberElem.Args);
+            if (resultFromRef.IsSuccessFull)
+                return resultFromRef
+                    .Feature
+                    .VisitApply(callContext, category, memberElem.Args,this);
 
             NotImplementedMethod(callContext, category, memberElem, "resultFromRef", resultFromRef);
             return null;

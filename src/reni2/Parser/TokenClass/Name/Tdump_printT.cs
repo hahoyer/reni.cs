@@ -5,16 +5,19 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    internal sealed class Tdump_printT : Defineable
+    internal sealed class Tdump_printT : Defineable, IFeature
     {
-        public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args)
+        internal override SearchResult<IFeature> Search()
         {
-
-            NotImplementedMethod(callContext, category, args);
-            return null;
-
-            //return definingType.DumpPrintFromRef(category, objectType.RefAlignParam).UseWithArg(objectType.CreateArgResult(category));
+            return SearchResult<IFeature>.Success(this, this);
         }
 
+        public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+        {
+            if(args != null)
+                NotImplementedMethod(callContext, category, args,callObject);
+
+            return callObject.DumpPrint(category);
+        }
     }
 }
