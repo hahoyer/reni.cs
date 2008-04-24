@@ -109,13 +109,10 @@ namespace Reni.Type
         /// </value>
         /// created 09.01.2007 03:21
         [DumpData(false)]
-        public virtual bool HasEmptyValue
+        public virtual bool HasEmptyValue()
         {
-            get
-            {
-                NotImplementedMethod();
-                throw new NotImplementedException();
-            }
+            NotImplementedMethod();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -126,13 +123,10 @@ namespace Reni.Type
         /// </value>
         /// created 11.01.2007 22:43
         [DumpData(false)]
-        internal virtual bool HasConverterFromBit
+        internal virtual bool HasConverterFromBit()
         {
-            get
-            {
-                NotImplementedMethod();
-                throw new NotImplementedException();
-            }
+            NotImplementedMethod();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -767,13 +761,13 @@ namespace Reni.Type
             return SearchResult<IRefFeature>.Failure(this, defineable);
         }
 
-        internal virtual SearchResult<ISequenceFeature> SearchFromSequence(Defineable defineable)
+        internal virtual SearchResult<ISequenceElementFeature> SearchFromSequence(Defineable defineable)
         {
-            return defineable.SearchFromSequence();
+            return defineable.SearchFromSequenceElement();
         }
-        internal virtual SearchResult<ISequencePrefixFeature> SearchPrefixFromSequence(Defineable defineable)
+        internal virtual SearchResult<ISequenceElementPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
         {
-            return defineable.SearchPrefixFromSequence();
+            return defineable.SearchPrefixFromSequenceElement();
         }
 
         internal virtual SearchResult<IRefToSequenceFeature> SearchFromRefToSequence(Defineable defineable)

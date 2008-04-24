@@ -1,16 +1,21 @@
 using Reni.Context;
+using Reni.Feature;
 using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    internal sealed class Tenable_cutT : Defineable
+    internal sealed class Tenable_cutT : Defineable, ISequenceFeature
     {
-        public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref objectType,
-            TypeBase definingType)
+        internal override SearchResult<ISequenceFeature> SearchFromSequence()
         {
-            NotImplementedMethod(callContext, category, args, objectType, definingType);
-            return null;
+            return SearchResult<ISequenceFeature>.Success(this, this);
         }
+
+        public IFeature Convert(Sequence sequence)
+        {
+            return sequence.EnableCutFeature();
+        }
+
     }
 }

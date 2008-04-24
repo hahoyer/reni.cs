@@ -14,12 +14,14 @@ namespace Reni.Type
     /// </summary>
     internal sealed class Sequence : TypeBase
     {
+        private readonly EnableFeature _enableCutFeature;
         private readonly Array _inheritedType;
 
         public Sequence(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0);
             _inheritedType = elementType.CreateArray(count);
+            _enableCutFeature = new EnableFeature(this);
         }
 
         [Node]
@@ -59,8 +61,17 @@ namespace Reni.Type
 
         internal protected override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var resultFromSequence = Element.SearchFromSequence(defineable).SubTrial(Element);
-            return resultFromSequence.SearchResultDescriptor.Convert(resultFromSequence.Feature, this);
+            var resultFromSequenceElement = Element.SearchFromSequence(defineable).SubTrial(Element);
+            var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,
+                this);
+            if(result.IsSuccessFull)
+                return result;
+            var resultFromSequence = defineable.SearchFromSequence();
+            result = resultFromSequence
+                .SearchResultDescriptor
+                .Convert(resultFromSequence.Feature, this)
+                .AlternativeTrial(result);
+            return result;
         }
 
         internal protected override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
@@ -75,12 +86,18 @@ namespace Reni.Type
             if(destPending != null)
                 return Result.CreatePending(category);
 
-            var result = ConvertTo(category, dest as Sequence);
+            Result result;
+
+            result = ConvertTo(category, dest as Sequence);
             if(result != null)
                 return result;
 
             result = ConvertTo(category, dest as Aligner);
             if(result != null)
+                return result;
+
+            result = ConvertTo(category, dest as EnableCut);
+            if (result != null)
                 return result;
 
             NotImplementedMethod(category, dest);
@@ -112,6 +129,13 @@ namespace Reni.Type
             if(dest == null)
                 return null;
             return ConvertTo(category, dest.Parent).Align(dest.AlignBits);
+        }
+
+        private Result ConvertTo(Category category, EnableCut dest)
+        {
+            if (dest == null)
+                return null;
+            return ConvertTo(category, dest.Parent);
         }
 
         private Result ExtendFrom(Category category, int oldCount)
@@ -169,33 +193,9 @@ namespace Reni.Type
             return new BitOperationPrefixFeatureClass(this, definable);
         }
 
-        internal class BitOperationPrefixFeatureClass : IPrefixFeature
+        public IFeature EnableCutFeature()
         {
-            private readonly SequenceOfBitOperation _definable;
-            private readonly Sequence _sequence;
-            public BitOperationPrefixFeatureClass(Sequence sequence, SequenceOfBitOperation definable)
-            {
-                _sequence = sequence;
-                _definable = definable;
-            }
-            public Result VisitApply(Category category, Result argResult)
-            {
-                var objResult = argResult.ConvertTo(_sequence);
-                var result = new Result();
-                if (category.HasSize || category.HasType || category.HasCode)
-                {
-                    if (category.HasSize)
-                        result.Size = objResult.Size;
-                    if (category.HasType)
-                        result.Type = objResult.Type;
-                    if (category.HasCode)
-                        result.Code = _sequence.Element.CreateSequenceOperation(_definable, objResult);
-                }
-                if (category.HasRefs)
-                    result.Refs = objResult.Refs;
-                return result;
-            }
-
+            return _enableCutFeature;
         }
 
         internal class BitOperationFeatureClass : IFeature
@@ -236,6 +236,55 @@ namespace Reni.Type
                 if(category.HasRefs)
                     result.Refs = objResult.Refs.Pair(argResult.Refs);
                 return result;
+            }
+        }
+
+        internal class BitOperationPrefixFeatureClass : IPrefixFeature
+        {
+            private readonly SequenceOfBitOperation _definable;
+            private readonly Sequence _sequence;
+
+            public BitOperationPrefixFeatureClass(Sequence sequence, SequenceOfBitOperation definable)
+            {
+                _sequence = sequence;
+                _definable = definable;
+            }
+
+            public Result VisitApply(Category category, Result argResult)
+            {
+                var objResult = argResult.ConvertTo(_sequence);
+                var result = new Result();
+                if(category.HasSize || category.HasType || category.HasCode)
+                {
+                    if(category.HasSize)
+                        result.Size = objResult.Size;
+                    if(category.HasType)
+                        result.Type = objResult.Type;
+                    if(category.HasCode)
+                        result.Code = _sequence.Element.CreateSequenceOperation(_definable, objResult);
+                }
+                if(category.HasRefs)
+                    result.Refs = objResult.Refs;
+                return result;
+            }
+        }
+
+        internal class EnableFeature : ReniObject, IFeature
+        {
+            private readonly Sequence _sequence;
+
+            public EnableFeature(Sequence sequence)
+            {
+                _sequence = sequence;
+            }
+
+            public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+            {
+                if(args == null)
+                    return callObject.ConvertTo(category, new EnableCut(_sequence));
+
+                NotImplementedMethod(callContext, category, args, callObject);
+                return null;
             }
         }
     }

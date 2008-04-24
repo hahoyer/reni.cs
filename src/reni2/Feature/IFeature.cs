@@ -21,22 +21,28 @@ namespace Reni.Feature
 
 
     internal interface ISequenceOfBitPrefixFeature {
-        ISequencePrefixFeature Convert();
+        ISequenceElementPrefixFeature Convert();
     }
 
     internal interface ISequenceOfBitFeature {
-        ISequenceFeature Convert();
+        ISequenceElementFeature Convert();
     }
 
-    internal interface ISequenceFeature {
+    internal interface ISequenceElementFeature {
         IFeature Convert(Sequence sequence);
     }
 
-    internal interface ISequencePrefixFeature {
+    internal interface ISequenceElementPrefixFeature {
         IPrefixFeature Convert(Sequence sequence);
     }
 
-    internal interface IRefToSequenceFeature {
+    internal interface ISequenceFeature
+    {
+        IFeature Convert(Sequence sequence);
+    }
+
+    internal interface IRefToSequenceFeature
+    {
         IRefFeature Convert(Sequence sequence);
     }
 

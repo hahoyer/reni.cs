@@ -16,52 +16,60 @@ namespace Reni
         public Defineable Defineable { get; private set; }
         public SearchTrial SearchTrial { get; private set; }
 
-        public SearchResult<ISequenceFeature> Convert(ISequenceOfBitFeature inFeature)
+        public SearchResult<ISequenceElementFeature> Convert(ISequenceOfBitFeature feature)
         {
-            ISequenceFeature resultFeature = null;
-            if(inFeature != null)
-                resultFeature = inFeature.Convert();
-            return SearchResult<ISequenceFeature>.Create(resultFeature, this);
+            ISequenceElementFeature resultFeature = null;
+            if(feature != null)
+                resultFeature = feature.Convert();
+            return SearchResult<ISequenceElementFeature>.Create(resultFeature, this);
         }
 
-        public SearchResult<ISequencePrefixFeature> Convert(ISequenceOfBitPrefixFeature inFeature)
+        public SearchResult<ISequenceElementPrefixFeature> Convert(ISequenceOfBitPrefixFeature feature)
         {
-            ISequencePrefixFeature resultFeature = null;
-            if (inFeature != null)
-                resultFeature = inFeature.Convert();
-            return SearchResult<ISequencePrefixFeature>.Create(resultFeature, this);
+            ISequenceElementPrefixFeature resultFeature = null;
+            if (feature != null)
+                resultFeature = feature.Convert();
+            return SearchResult<ISequenceElementPrefixFeature>.Create(resultFeature, this);
         }
 
-        public SearchResult<IFeature> Convert(IRefFeature inFeature, Ref @ref)
+        public SearchResult<IFeature> Convert(IRefFeature feature, Ref @ref)
         {
             IFeature resultFeature = null;
-            if (inFeature != null)
-                resultFeature = inFeature.Convert(@ref);
+            if (feature != null)
+                resultFeature = feature.Convert(@ref);
             return SearchResult<IFeature>.Create(resultFeature, this);
         }
 
-        public SearchResult<IRefFeature> Convert(IRefToSequenceFeature inFeature, Sequence sequence)
+        public SearchResult<IRefFeature> Convert(IRefToSequenceFeature feature, Sequence sequence)
         {
             IRefFeature resultFeature = null;
-            if (inFeature != null)
-                resultFeature = inFeature.Convert(sequence);
+            if (feature != null)
+                resultFeature = feature.Convert(sequence);
             return SearchResult<IRefFeature>.Create(resultFeature, this);
         }
 
-        public SearchResult<IFeature> Convert(ISequenceFeature inFeature, Sequence sequence)
+        public SearchResult<IFeature> Convert(ISequenceElementFeature feature, Sequence sequence)
         {
             IFeature resultFeature = null;
-            if (inFeature != null)
-                resultFeature = inFeature.Convert(sequence);
+            if (feature != null)
+                resultFeature = feature.Convert(sequence);
             return SearchResult<IFeature>.Create(resultFeature, this);
         }
 
-        public SearchResult<IPrefixFeature> Convert(ISequencePrefixFeature inFeature, Sequence sequence)
+        public SearchResult<IPrefixFeature> Convert(ISequenceElementPrefixFeature feature, Sequence sequence)
         {
             IPrefixFeature resultFeature = null;
-            if (inFeature != null)
-                resultFeature = inFeature.Convert(sequence);
+            if (feature != null)
+                resultFeature = feature.Convert(sequence);
             return SearchResult<IPrefixFeature>.Create(resultFeature, this);
+        }
+
+        public SearchResult<IFeature> Convert(ISequenceFeature feature, Sequence sequence)
+        {
+            IFeature resultFeature = null;
+            if (feature != null)
+                resultFeature = feature.Convert(sequence);
+            return SearchResult<IFeature>.Create(resultFeature, this);
         }
     }
 

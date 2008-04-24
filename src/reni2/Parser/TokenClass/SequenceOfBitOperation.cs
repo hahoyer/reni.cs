@@ -7,28 +7,28 @@ namespace Reni.Parser.TokenClass
     internal abstract class SequenceOfBitOperation : Defineable, 
         ISequenceOfBitFeature, 
         ISequenceOfBitPrefixFeature,
-        ISequenceFeature, 
-        ISequencePrefixFeature
+        ISequenceElementFeature, 
+        ISequenceElementPrefixFeature
     {
         [DumpExcept(false)]
         internal protected virtual bool IsBitSequencePrefixOperation { get { return false; } }
 
-        IFeature ISequenceFeature.Convert(Sequence sequence)
+        IFeature ISequenceElementFeature.Convert(Sequence sequence)
         {
             return sequence.BitOperationFeature(this);
         }
 
-        ISequenceFeature ISequenceOfBitFeature.Convert()
+        ISequenceElementFeature ISequenceOfBitFeature.Convert()
         {
             return this;
         }
 
-        ISequencePrefixFeature ISequenceOfBitPrefixFeature.Convert()
+        ISequenceElementPrefixFeature ISequenceOfBitPrefixFeature.Convert()
         {
             return this;
         }
 
-        IPrefixFeature ISequencePrefixFeature.Convert(Sequence sequence)
+        IPrefixFeature ISequenceElementPrefixFeature.Convert(Sequence sequence)
         {
             return sequence.BitOperationPrefixFeature(this);
         }

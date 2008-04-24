@@ -30,7 +30,10 @@ namespace Reni.Type
         /// 	<c>true</c> if this instance has empty value; otherwise, <c>false</c>.
         /// </value>
         /// created 09.01.2007 03:21
-        public override bool HasEmptyValue { get { return true; } }
+        public override bool HasEmptyValue()
+        {
+            return true;
+        }
 
         /// <summary>
         /// Gets the type of the sequence element.
@@ -74,7 +77,7 @@ namespace Reni.Type
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             if(conversionFeature.IsUseConverter)
-                return dest.HasConverterFromBit;
+                return dest.HasConverterFromBit();
 
             return false;
         }
@@ -119,13 +122,13 @@ namespace Reni.Type
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
-        internal override SearchResult<ISequenceFeature> SearchFromSequence(Defineable defineable)
+        internal override SearchResult<ISequenceElementFeature> SearchFromSequence(Defineable defineable)
         {
             var result = defineable.SearchFromSequenceOfBit();
             return result.SearchResultDescriptor.Convert(result.Feature);
         }
 
-        internal override SearchResult<ISequencePrefixFeature> SearchPrefixFromSequence(Defineable defineable)
+        internal override SearchResult<ISequenceElementPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
         {
             var result = defineable.SearchPrefixFromSequenceOfBit();
             return result.SearchResultDescriptor.Convert

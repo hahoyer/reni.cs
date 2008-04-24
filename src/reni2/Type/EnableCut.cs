@@ -2,7 +2,7 @@ namespace Reni.Type
 {
     internal sealed class EnableCut : TagChild
     {
-        public EnableCut(TypeBase parent): base(parent) {}
+        internal EnableCut(TypeBase parent): base(parent) {}
 
         protected override string TagTitle { get { return "enable_cut"; } }
 
