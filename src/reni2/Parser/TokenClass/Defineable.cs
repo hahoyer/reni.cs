@@ -37,6 +37,8 @@ namespace Reni.Parser.TokenClass
 
         [DumpExcept(false)]
         internal virtual bool IsCompareOperator { get { return false; } }
+        [DumpExcept(false)]
+        internal abstract string Name { get; }
 
         /// <summary>
         /// Type.of result of numeric operation, i. e. obj and arg are of type bit array

@@ -15,7 +15,7 @@
         }
 
         internal override bool IsSymbol { get { return _isSymbol; } }
-        internal string Name { get { return _name; } }
+        internal override string Name { get { return _name; } }
 
         public static Base Instance(bool isSymbol, string name)
         {

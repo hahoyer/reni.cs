@@ -15,6 +15,7 @@ namespace Reni.FeatureTest
         [Test,Category(Worked)]
         public void TypeOperator()
         {
+            Parameters.Trace.All();
             RunCompiler("TypeOperator", @"x: 0; x type dump_print", "(bit)sequence(1)");
             RunCompiler("TypeOperator", @"31 type dump_print", "(bit)sequence(6)");
         }
@@ -50,7 +51,6 @@ namespace Reni.FeatureTest
         [Test, Category(Worked)]
         public void ApplyTypeOperatorWithCut()
         {
-            Parameters.Trace.All();
             RunCompiler("ApplyTypeOperator", @"(31 type (100 enable_cut))dump_print", "-28");
         }
 

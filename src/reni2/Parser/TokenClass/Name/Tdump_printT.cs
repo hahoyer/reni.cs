@@ -19,5 +19,6 @@ namespace Reni.Parser.TokenClass.Name
 
             return callObject.DumpPrint(category);
         }
+        internal override string Name { get { return "dump_print"; } }
     }
 }

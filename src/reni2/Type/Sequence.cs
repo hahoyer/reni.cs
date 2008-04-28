@@ -14,14 +14,14 @@ namespace Reni.Type
     /// </summary>
     internal sealed class Sequence : TypeBase
     {
-        private readonly EnableFeature _enableCutFeature;
+        private readonly EnableCutFeature _enableCutCutFeature;
         private readonly Array _inheritedType;
 
         public Sequence(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0);
             _inheritedType = elementType.CreateArray(count);
-            _enableCutFeature = new EnableFeature(this);
+            _enableCutCutFeature = new EnableCutFeature(this);
         }
 
         [Node]
@@ -135,7 +135,8 @@ namespace Reni.Type
         {
             if (dest == null)
                 return null;
-            return ConvertTo(category, dest.Parent);
+            var result = ConvertTo(category, dest.Parent);
+            return dest.CreateResult(category, () => result.Code, () => result.Refs);
         }
 
         private Result ExtendFrom(Category category, int oldCount)
@@ -193,9 +194,9 @@ namespace Reni.Type
             return new BitOperationPrefixFeatureClass(this, definable);
         }
 
-        public IFeature EnableCutFeature()
+        public IFeature EnableCutFeatureObject()
         {
-            return _enableCutFeature;
+            return _enableCutCutFeature;
         }
 
         internal class BitOperationFeatureClass : IFeature
@@ -269,11 +270,11 @@ namespace Reni.Type
             }
         }
 
-        internal class EnableFeature : ReniObject, IFeature
+        internal class EnableCutFeature : ReniObject, IFeature
         {
             private readonly Sequence _sequence;
 
-            public EnableFeature(Sequence sequence)
+            public EnableCutFeature(Sequence sequence)
             {
                 _sequence = sequence;
             }

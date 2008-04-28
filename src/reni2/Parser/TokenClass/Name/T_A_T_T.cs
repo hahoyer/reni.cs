@@ -10,5 +10,7 @@ namespace Reni.Parser.TokenClass.Name
         {
             return definingType.Container.VisitOperationApply(definingType.Context, callContext, category, args);
         }
+
+        internal override string Name { get { return "_A_T_"; } }
     }
 }

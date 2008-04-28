@@ -36,7 +36,7 @@ namespace Reni.Syntax
 
         internal override Result VirtVisit(ContextBase context, Category category)
         {
-            var trace = ObjectId == -21 && context.ObjectId == 0;
+            var trace = ObjectId == 21 && context.ObjectId == 0;
             StartMethodDumpWithBreak(trace, context, category);
             if(Chain.Count == 0)
                 NotImplementedMethod(context, category);
@@ -57,7 +57,8 @@ namespace Reni.Syntax
                     return newResult;
 
                 result = context.VisitNextChainElement(internalCategory, Chain[i], newResult);
-                if(internalCategory.HasRefs)
+                Tracer.ConditionalBreak(trace, result .Dump());
+                if (internalCategory.HasRefs)
                     foreach(var referencedContext in result.Refs.Data)
                         if(referencedContext.IsChildOf(context))
                         {

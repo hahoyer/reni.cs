@@ -8,8 +8,8 @@ namespace Reni.Parser
     /// </summary>
     public class Source : ReniObject
     {
-        private File _file;
-        private string _data;
+        private readonly string _data;
+        private readonly File _file;
 
         /// <summary>
         /// ctor from file
@@ -28,7 +28,7 @@ namespace Reni.Parser
         {
             get
             {
-                if (IsEnd(index))
+                if(IsEnd(index))
                     return '\0';
                 return _data[index];
             }
@@ -63,27 +63,25 @@ namespace Reni.Parser
         /// <returns>the "FileName(LineNr,ColNr): flagText: " string</returns>
         public string FilePosn(int i, string flagText)
         {
-            return Tracer.FilePosn(_file.FullName, LineNr(i), ColNr(i), flagText);
+            return Tracer.FilePosn(_file.FullName, LineNr(i), ColNr(i)+1, flagText);
         }
 
         private int LineNr(int iEnd)
         {
-            int result = 0;
-            for (int i = 0; i < iEnd; i++)
-            {
-                if (_data[i] == '\n')
+            var result = 0;
+            for(var i = 0; i < iEnd; i++)
+                if(_data[i] == '\n')
                     result++;
-            }
             return result;
         }
 
         private int ColNr(int iEnd)
         {
-            int result = 0;
-            for (int i = 0; i < iEnd; i++)
+            var result = 0;
+            for(var i = 0; i < iEnd; i++)
             {
                 result++;
-                if (_data[i] == '\n')
+                if(_data[i] == '\n')
                     result = 0;
             }
             return result;

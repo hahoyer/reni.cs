@@ -4,6 +4,7 @@ namespace Reni.Parser.TokenClass.Symbol
 {
     sealed internal class ColonEqual : Defineable
     {
+        internal override string Name { get { return ":="; } }
         sealed internal class SearchResultFromRef 
         {
             public SearchResultFromRef(Ref definingType)

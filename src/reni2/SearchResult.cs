@@ -1,6 +1,7 @@
 using HWClassLibrary.Debug;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni
@@ -70,6 +71,14 @@ namespace Reni
             if (feature != null)
                 resultFeature = feature.Convert(sequence);
             return SearchResult<IFeature>.Create(resultFeature, this);
+        }
+
+        public SearchResult<IContextFeature> Convert(IStructContainerFeature feature, ContextAtPosition contextAtPosition)
+        {
+            IContextFeature resultFeature = null;
+            if (feature != null)
+                resultFeature = feature.Convert(contextAtPosition);
+            return SearchResult<IContextFeature>.Create(resultFeature, this);
         }
     }
 

@@ -41,6 +41,7 @@ Integer8: function
         [Test, Category(Worked)]
         public void DumpPrint2()
         {
+            Parameters.Trace.All();
             RunCompiler("DumpPrint2"
                         , IntegerDefinition() + "; Integer8(2) dump_print"
                         , "2"
