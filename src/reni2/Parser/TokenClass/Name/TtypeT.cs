@@ -20,5 +20,6 @@ namespace Reni.Parser.TokenClass.Name
             return callObject.ApplyTypeOperator(argResult);
         }
         internal override string Name { get { return "type"; } }
+
     }
 }

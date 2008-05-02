@@ -99,5 +99,7 @@ namespace Reni
                 result += "else" + _elseSyntax.DumpShort();
             return result;
         }
+
+        internal protected override string FilePosition { get { return _condSyntax.FilePosition; } }
     }
 }

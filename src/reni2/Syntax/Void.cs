@@ -39,5 +39,7 @@ namespace Reni.Syntax
         {
             return "()";
         }
+
+        internal protected override string FilePosition { get { return _token.FilePosition; } }
     }
 }

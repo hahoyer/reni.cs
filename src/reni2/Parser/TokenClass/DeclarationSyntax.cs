@@ -54,5 +54,7 @@ namespace Reni.Parser.TokenClass
         {
             return CreateListSyntax(this);
         }
+
+        internal protected override string FilePosition { get { return _token.FilePosition; } }
     }
 }

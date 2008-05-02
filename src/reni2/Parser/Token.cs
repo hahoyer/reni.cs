@@ -62,7 +62,7 @@ namespace Reni.Parser
         /// is like dump
         /// </summary>
         /// <returns></returns>
-        public string FilePosn { get { return "\n" + Source.FilePosn(Name); } }
+        public string FilePosition { get { return "\n" + Source.FilePosn(Name); } }
 
         /// <summary>
         /// Normally Name except for some spacial cases
@@ -145,5 +145,7 @@ namespace Reni.Parser
         [DumpData(false)]
         internal string Name { get { return _source.SubString(0, _length); } }
 
+        [DumpData(false)]
+        public string FilePosition { get { return "\n" + _source.FilePosn(Name); } }
     }
 }

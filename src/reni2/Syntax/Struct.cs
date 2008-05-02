@@ -15,6 +15,9 @@ namespace Reni.Syntax
             _data = data;
         }
 
+        internal protected override string FilePosition { get { return _data.
+            FilePosition; } }
+
         /// <summary>
         /// Dumps the short.
         /// </summary>

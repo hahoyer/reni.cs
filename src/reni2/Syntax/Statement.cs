@@ -14,7 +14,7 @@ namespace Reni.Syntax
     {
         private readonly List<MemberElem> _chain;
 
-        private Statement(List<MemberElem> chain, MemberElem tail)
+        private Statement(IEnumerable<MemberElem> chain, MemberElem tail)
         {
             _chain = new List<MemberElem>();
             _chain.AddRange(chain);
@@ -33,6 +33,7 @@ namespace Reni.Syntax
 
         [DebuggerHidden]
         public List<MemberElem> Chain { get { return _chain; } }
+        internal protected override string FilePosition { get { return _chain[0].FilePosition; } }
 
         internal override Result VirtVisit(ContextBase context, Category category)
         {
@@ -57,8 +58,8 @@ namespace Reni.Syntax
                     return newResult;
 
                 result = context.VisitNextChainElement(internalCategory, Chain[i], newResult);
-                Tracer.ConditionalBreak(trace, result .Dump());
-                if (internalCategory.HasRefs)
+                Tracer.ConditionalBreak(trace, result.Dump());
+                if(internalCategory.HasRefs)
                     foreach(var referencedContext in result.Refs.Data)
                         if(referencedContext.IsChildOf(context))
                         {
@@ -76,7 +77,8 @@ namespace Reni.Syntax
             return ReturnMethodDumpWithBreak(trace, statementResult);
         }
 
-        internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken, SyntaxBase right)
+        internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken,
+            SyntaxBase right)
         {
             return new Statement(_chain, new MemberElem(defineableToken, right));
         }

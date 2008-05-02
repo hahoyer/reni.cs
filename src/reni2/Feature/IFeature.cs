@@ -20,27 +20,32 @@ namespace Reni.Feature
         Result VisitApply(ContextBase contextBase, Category category, SyntaxBase args);
     }
 
-    internal interface IStructContainerFeature {
+    internal interface IStructContainerFeature
+    {
         IContextFeature Convert(ContextAtPosition contextAtPosition);
     }
 
-    internal interface ISequenceOfBitPrefixFeature {
+    internal interface ISequenceOfBitPrefixFeature
+    {
         ISequenceElementPrefixFeature Convert();
     }
 
-    internal interface ISequenceOfBitFeature {
+    internal interface ISequenceOfBitFeature
+    {
         ISequenceElementFeature Convert();
     }
 
-    internal interface ISequenceElementFeature {
+    internal interface ISequenceElementFeature
+    {
         IFeature Convert(Sequence sequence);
     }
 
-    internal interface ISequenceElementPrefixFeature {
+    internal interface ISequenceElementPrefixFeature
+    {
         IPrefixFeature Convert(Sequence sequence);
     }
 
-    internal interface ISequenceFeature
+    internal interface IFeatureForSequence
     {
         IFeature Convert(Sequence sequence);
     }
@@ -50,24 +55,8 @@ namespace Reni.Feature
         IRefFeature Convert(Sequence sequence);
     }
 
-    internal interface IRefFeature {
-        IFeature Convert(Ref @ref);
-    }
-
-    internal class DefaultSearchResultFromRef
+    internal interface IRefFeature
     {
-        private readonly IFeature _feature;
-
-        public DefaultSearchResultFromRef(IFeature feature, Ref definingType)
-        {
-            _feature = feature;
-        }
-
-        //internal override Result VisitApply(Base callContext, Category category, Syntax.Base args)
-        //{
-        //    Result result = _featureBase.VisitApply(callContext, category, args);
-        //    result = result.UseWithArg(DefiningType.CreateDereferencedArgResult(category));
-        //    return result;
-        //}
+        IFeature Convert(Ref @ref);
     }
 }

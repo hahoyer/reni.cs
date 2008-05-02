@@ -1,6 +1,7 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -11,11 +12,14 @@ namespace Reni.Type
     internal sealed class Ref : Child
     {
         private static int _nextObjectId;
+        private readonly AssignmentOperatorFeature _assignmentOperatorFeatureObject;
         private readonly RefAlignParam _refAlignParam;
 
         public Ref(TypeBase target, RefAlignParam refAlignParam) : base(_nextObjectId++, target)
         {
             _refAlignParam = refAlignParam;
+            _assignmentOperatorFeatureObject =
+                new AssignmentOperatorFeature(this);
         }
 
         [Node, DumpData(false)]
@@ -61,12 +65,17 @@ namespace Reni.Type
 
         internal override Result DumpPrint(Category category)
         {
-            return Target.DumpPrintFromRef(category,RefAlignParam);
+            return Target.DumpPrintFromRef(category, RefAlignParam);
         }
 
         public override Result ApplyTypeOperator(Result argResult)
         {
-            return Parent.ApplyTypeOperator(argResult);
+            return Target.ApplyTypeOperator(argResult);
+        }
+
+        public override Result TypeOperator(Category category)
+        {
+            return Target.TypeOperator(category);
         }
 
         internal override Result ConvertToVirt(Category category, TypeBase dest)
@@ -85,9 +94,9 @@ namespace Reni.Type
                 );
         }
 
-        internal Code.CodeBase CreateDereferencedArgCode()
+        internal CodeBase CreateDereferencedArgCode()
         {
-            return Code.CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
+            return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
         }
 
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
@@ -104,6 +113,7 @@ namespace Reni.Type
             result = Parent.Search(defineable).AlternativeTrial(result);
             if(result.IsSuccessFull)
                 return result;
+
             return base.Search(defineable).AlternativeTrial(result);
         }
 
@@ -115,7 +125,7 @@ namespace Reni.Type
                 .CreateResult
                 (
                 category,
-                () => Code.CodeBase
+                () => CodeBase
                     .CreateArg(Size)
                     .CreateAssign
                     (
@@ -134,13 +144,36 @@ namespace Reni.Type
         internal Result VisitNextChainElement(ContextBase callContext, Category category, MemberElem memberElem)
         {
             var resultFromRef = SearchDefineable(memberElem.DefineableToken);
-            if (resultFromRef.IsSuccessFull)
+            if(resultFromRef.IsSuccessFull)
                 return resultFromRef
                     .Feature
-                    .VisitApply(callContext, category, memberElem.Args,this);
+                    .VisitApply(callContext, category, memberElem.Args, this);
 
             NotImplementedMethod(callContext, category, memberElem, "resultFromRef", resultFromRef);
             return null;
+        }
+
+        public AssignmentOperatorFeature AssignmentOperatorFeatureObject()
+        {
+            return _assignmentOperatorFeatureObject;
+        }
+
+        internal class AssignmentOperatorFeature : IFeature
+        {
+            private readonly Ref _ref;
+
+            public AssignmentOperatorFeature(Ref @ref)
+            {
+                _ref = @ref;
+            }
+
+            public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+            {
+                Tracer.Assert(callObject == _ref);
+                if(category.HasCode || category.HasRefs)
+                    return _ref.AssignmentOperator(args.Visit(callContext, category | Category.Type));
+                return CreateVoid.CreateResult(category);
+            }
         }
     }
 }

@@ -479,7 +479,7 @@ namespace Reni.Type
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 07.01.2007 21:14
-        public Result TypeOperator(Category category)
+        public virtual Result TypeOperator(Category category)
         {
             var result = CreateVoidResult(category).Clone();
             if(category.HasType)
@@ -758,7 +758,7 @@ namespace Reni.Type
 
         internal virtual SearchResult<IRefFeature> SearchFromRef(Defineable defineable)
         {
-            return SearchResult<IRefFeature>.Failure(this, defineable);
+            return defineable.SearchFromRef();
         }
 
         internal virtual SearchResult<ISequenceElementFeature> SearchFromSequence(Defineable defineable)

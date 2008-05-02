@@ -17,20 +17,28 @@ namespace Reni.Syntax
     [AdditionalNodeInfo("DebuggerDumpString")]
     internal abstract class SyntaxBase : ReniObject
     {
+        static bool _isInDump;
         /// <summary>
         /// Default dump behaviour
         /// </summary>
         /// <returns></returns>
-        public override string Dump()
+        sealed public override string Dump()
         {
-            var isInDump = Container._isInDump;
+            var isInContainerDump = Container._isInDump;
             Container._isInDump = false;
+            var isInDump = _isInDump;
+            _isInDump = true;
             var result = DumpShort();
-            if(!isInDump)
+            if (!isInDump)
+                result += FilePosition;
+            if(!isInContainerDump)
                 result += "\n" + base.Dump();
-            Container._isInDump = isInDump;
+            Container._isInDump = isInContainerDump;
+            _isInDump = isInDump;
             return result;
         }
+
+        internal protected abstract string FilePosition { get; }
 
         private readonly DictionaryEx<Context.ContextBase, CacheItem> _cache =
             new DictionaryEx<Context.ContextBase, CacheItem>();

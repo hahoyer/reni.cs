@@ -103,6 +103,7 @@ namespace Reni.Struct
         }
 
         internal static TypeBase MaxIndexType { get { return TypeBase.CreateNumber(32); } }
+        public string FilePosition { get { return _list[0].FilePosition; } }
 
         private void CreateReverseDictionary()
         {
@@ -197,7 +198,7 @@ namespace Reni.Struct
         {
             var dumpFile = File.m("struct." + ObjectId);
             var oldResult = dumpFile.String;
-            var newResult = _runId + DumpDataToString();
+            var newResult = (_runId + DumpDataToString()).Replace("\n","\r\n");
             if(oldResult == null || !oldResult.StartsWith(_runId))
             {
                 oldResult = newResult;
@@ -481,22 +482,23 @@ namespace Reni.Struct
 
         internal SearchResult<IStructContainerFeature> Search(Defineable defineable)
         {
-            if(!Defined(defineable.Name))
-                return SearchResult<IStructContainerFeature>.Failure(defineable);
-            return SearchResult<IStructContainerFeature>.Success(StructContainerFeatures[Find(defineable.Name)],defineable);
+            if(Defined(defineable.Name))
+                return SearchResult<IStructContainerFeature>.Success(StructContainerFeatures[Find(defineable.Name)],
+                    defineable);
+            return SearchResult<IStructContainerFeature>.Failure(defineable);
         }
         private class StructContainerFeature : IStructContainerFeature
         {
-            private readonly int _i;
+            private readonly int _index;
 
-            public StructContainerFeature(int i)
+            public StructContainerFeature(int index)
             {
-                _i = i;
+                _index = index;
             }
 
             public IContextFeature Convert(ContextAtPosition contextAtPosition)
             {
-                return contextAtPosition.CreateMemberAccess(_i);
+                return contextAtPosition.CreateMemberAccess(_index);
             }
         }
 

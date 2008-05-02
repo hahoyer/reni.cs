@@ -19,6 +19,7 @@ namespace Reni.Struct
         private readonly Container _container;
         [DumpData(true)]
         private readonly int _currentCompilePosition;
+        private IContextFeature[] _contextFeaturesCache;
         private CodeBase _contextRefCodeCache;
 
         /// <summary>
@@ -51,6 +52,16 @@ namespace Reni.Struct
         public TypeBase IndexType { get { return _container.IndexType; } }
 
         public Container Container { get { return _container; } }
+        [Node, DumpData(false)]
+        private IContextFeature[] ContextFeatures
+        {
+            get
+            {
+                if(_contextFeaturesCache == null)
+                    _contextFeaturesCache = CreateContextFeaturesCache();
+                return _contextFeaturesCache;
+            }
+        }
 
         private TypeBase VisitBodyType()
         {
@@ -88,12 +99,12 @@ namespace Reni.Struct
         public Result VisitElementFromContextRef(Category category, int index)
         {
             if(_container[index].VisitSize(this).IsZero)
-            {
+            {            
                 var result = TypeBase.CreateVoidResult(category);
                 if(category.HasType)
                     result.Type = VisitElementType(index);
                 return result;
-            }
+            }                                                                          
             else
             {
                 var result = new Result();
@@ -133,11 +144,11 @@ namespace Reni.Struct
 
         internal override SearchResult<IContextFeature> Search(Defineable defineable)
         {
-            SearchResult<IStructContainerFeature> containerResult = _container.Search(defineable);
-            SearchResult<IContextFeature> result = containerResult.SearchResultDescriptor.
-                Convert(containerResult.Feature, this);
-            return result;
-
+            var containerResult = _container.Search(defineable);
+            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature, this);
+            if(result.IsSuccessFull)
+                return result;
+            return Parent.Search(defineable).AlternativeTrial(result);
         }
 
         public IContextFeature CreateMemberAccess(int i)
@@ -145,22 +156,10 @@ namespace Reni.Struct
             return ContextFeatures[i];
         }
 
-        IContextFeature[] _contextFeaturesCache;
-        [Node, DumpData(false)]
-        private IContextFeature[] ContextFeatures
-        {
-            get
-            {
-                if (_contextFeaturesCache == null)
-                    _contextFeaturesCache = CreateContextFeaturesCache();
-                return _contextFeaturesCache;
-            }
-        }
-
         private IContextFeature[] CreateContextFeaturesCache()
         {
             var result = new List<StructContainerFeature>();
-            for (var i = 0; i < Container.List.Count; i++)
+            for(var i = 0; i < Container.List.Count; i++)
                 result.Add(new StructContainerFeature(this, i));
             return result.ToArray();
         }
@@ -170,20 +169,20 @@ namespace Reni.Struct
             [DumpData(true)]
             private readonly ContextAtPosition _contextAtPosition;
             [DumpData(true)]
-            private readonly int _i;
+            private readonly int _index;
 
-            public StructContainerFeature(ContextAtPosition contextAtPosition, int i)
+            public StructContainerFeature(ContextAtPosition contextAtPosition, int index)
             {
                 _contextAtPosition = contextAtPosition;
-                _i = i;
+                _index = index;
             }
 
             public Result VisitApply(ContextBase contextBase, Category category, SyntaxBase args)
             {
-                Tracer.ConditionalBreak(true, Tracer.Dump(this));
-                return null;
+                return _contextAtPosition
+                    .Container
+                    .VisitAccessApply(_contextAtPosition.Parent,_index, contextBase, category, args);
             }
         }
     }
-
 }

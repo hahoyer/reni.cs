@@ -70,6 +70,16 @@ namespace Reni.Parser.TokenClass
             return new DefinableTokenSyntax(token);
         }
 
+        internal virtual SearchResult<IFeature> Search()
+        {
+            return SearchResult<IFeature>.Failure(this);
+        }
+
+        internal virtual SearchResult<IPrefixFeature> SearchPrefix()
+        {
+            return SearchResult<IPrefixFeature>.Failure(this);
+        }
+
         internal virtual SearchResult<ISequenceElementFeature> SearchFromSequenceElement()
         {
             return SearchResult<ISequenceElementFeature>.Failure(this);
@@ -90,26 +100,21 @@ namespace Reni.Parser.TokenClass
             return SearchResult<ISequenceOfBitPrefixFeature>.Failure(this);
         }
 
-        internal virtual SearchResult<IFeature> Search()
-        {
-            return SearchResult<IFeature>.Failure(this);
-        }
-
-        internal virtual SearchResult<IPrefixFeature> SearchPrefix()
-        {
-            return SearchResult<IPrefixFeature>.Failure(this);
-        }
-
         internal virtual SearchResult<IContextFeature> SearchContext()
         {
             return SearchResult<IContextFeature>.Failure(this);
         }
 
-        internal virtual SearchResult<ISequenceFeature> SearchFromSequence()
+        internal virtual SearchResult<IFeatureForSequence> SearchForSequence()
         {
-            return SearchResult<ISequenceFeature>.Failure(this);
+            return SearchResult<IFeatureForSequence>.Failure(this);
         }
-    }
+
+        internal virtual SearchResult<IRefFeature> SearchFromRef()
+        {
+            return SearchResult<IRefFeature>.Failure(this);
+        }
+   }
 
     internal class DefinableTokenSyntax : SyntaxBase
     {
@@ -167,5 +172,7 @@ namespace Reni.Parser.TokenClass
         {
             return _token.Name;
         }
+
+        internal protected override string FilePosition { get { return _token.FilePosition; } }
     }
 }

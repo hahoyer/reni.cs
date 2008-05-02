@@ -56,21 +56,21 @@ namespace Reni.Type
         internal override SearchResult<IRefFeature> SearchFromRef(Defineable defineable)
         {
             var subTrial = Element.SearchFromRefToSequence(defineable).SubTrial(Element);
-            return subTrial.SearchResultDescriptor.Convert(subTrial.Feature, this);
+            var result = subTrial.SearchResultDescriptor.Convert(subTrial.Feature, this);
+            if(result.IsSuccessFull)
+                return result;
+            return base.SearchFromRef(defineable).AlternativeTrial(result);
         }
 
         internal protected override SearchResult<IFeature> Search(Defineable defineable)
         {
             var resultFromSequenceElement = Element.SearchFromSequence(defineable).SubTrial(Element);
-            var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,
-                this);
+            var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,this);
             if(result.IsSuccessFull)
                 return result;
-            var resultFromSequence = defineable.SearchFromSequence();
-            result = resultFromSequence
-                .SearchResultDescriptor
-                .Convert(resultFromSequence.Feature, this)
-                .AlternativeTrial(result);
+            var resultForSequence = defineable.SearchForSequence();
+            result = resultForSequence.SearchResultDescriptor.Convert(resultForSequence.Feature, this);
+            result = result.AlternativeTrial(result);
             return result;
         }
 
@@ -199,7 +199,7 @@ namespace Reni.Type
             return _enableCutCutFeature;
         }
 
-        internal class BitOperationFeatureClass : IFeature
+        internal class BitOperationFeatureClass : ReniObject, IFeature
         {
             private readonly SequenceOfBitOperation _definable;
             private readonly Sequence _sequence;
@@ -213,6 +213,8 @@ namespace Reni.Type
 
             Result IFeature.VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
             {
+                var trace = ObjectId == 326 && callContext.ObjectId == 4 && args.ObjectId == 84;
+                StartMethodDump(trace, callContext, category, args, callObject);
                 var objResult = callObject.ConvertTo(category, _sequence);
                 var rawArgResult = args.Visit(callContext, category | Category.Type);
                 var argType = _sequence.Element.CreateSequence(rawArgResult.Type.SequenceCount);
@@ -236,7 +238,7 @@ namespace Reni.Type
                 }
                 if(category.HasRefs)
                     result.Refs = objResult.Refs.Pair(argResult.Refs);
-                return result;
+                return ReturnMethodDump(trace, result);
             }
         }
 

@@ -115,7 +115,7 @@ f(2) dump_print;
         /// Recursive function.
         /// </summary>
         /// created 05.01.2007 02:13
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public void FunctionWithRefArg()
         {
             RunCompiler

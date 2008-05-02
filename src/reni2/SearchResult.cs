@@ -65,7 +65,7 @@ namespace Reni
             return SearchResult<IPrefixFeature>.Create(resultFeature, this);
         }
 
-        public SearchResult<IFeature> Convert(ISequenceFeature feature, Sequence sequence)
+        public SearchResult<IFeature> Convert(IFeatureForSequence feature, Sequence sequence)
         {
             IFeature resultFeature = null;
             if (feature != null)
