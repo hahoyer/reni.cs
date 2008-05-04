@@ -4,7 +4,7 @@ namespace Reni.Type
 {
     sealed internal class Pending : TypeBase
     {
-        public override Size Size { get { return Size.Pending; } }
+        internal override Size Size { get { return Size.Pending; } }
         internal override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
         internal override bool IsPending { get { return true; } }
 

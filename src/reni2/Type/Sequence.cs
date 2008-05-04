@@ -25,8 +25,8 @@ namespace Reni.Type
         }
 
         [Node]
-        public Array InheritedType { get { return _inheritedType; } }
-        public override Size Size { get { return _inheritedType.Size; } }
+        internal Array InheritedType { get { return _inheritedType; } }
+        internal override Size Size { get { return _inheritedType.Size; } }
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
         internal override int SequenceCount { get { return Count; } }
         internal int Count { get { return _inheritedType.Count; } }

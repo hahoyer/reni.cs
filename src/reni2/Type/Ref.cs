@@ -23,21 +23,15 @@ namespace Reni.Type
         }
 
         [Node, DumpData(false)]
-        public RefAlignParam RefAlignParam { get { return _refAlignParam; } }
-
+        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
         [DumpData(false)]
-        public TypeBase Target { get { return Parent; } }
-
-        public override Size Size { get { return RefAlignParam.RefSize; } }
-
+        internal TypeBase Target { get { return Parent; } }
+        internal override Size Size { get { return RefAlignParam.RefSize; } }
         [DumpData(false)]
-        public override bool IsRef { get { return true; } }
-
-        public override Size UnrefSize { get { return Target.Size; } }
-
+        internal override bool IsRef { get { return true; } }
+        internal override Size UnrefSize { get { return Target.Size; } }
         [DumpData(false)]
         internal override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
-
         [DumpData(false)]
         internal override int SequenceCount { get { return Target.SequenceCount; } }
 

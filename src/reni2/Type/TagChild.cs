@@ -12,11 +12,9 @@ namespace Reni.Type
         {
         }
 
-        public override Size Size { get { return Parent.Size; } }
-
+        abstract protected string TagTitle { get; }
+        internal override Size Size { get { return Parent.Size; } }
         internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
-
-        abstract protected string TagTitle { get;}
 
         internal override Result DestructorHandler(Category category)
         {

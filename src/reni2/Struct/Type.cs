@@ -20,19 +20,14 @@ namespace Reni.Struct
         }
 
         [Node]
-        public int CurrentCompilePosition { get { return _currentCompilePosition; } }
-
+        internal int CurrentCompilePosition { get { return _currentCompilePosition; } }
         [Node]
-        public Container Container { get { return _container; } }
-
+        internal Container Container { get { return _container; } }
         [Node]
-        public ContextBase Context { get { return _context; } }
-
-        public override Size Size { get { return _container.VisitSize(_context, _currentCompilePosition); } }
-
+        internal ContextBase Context { get { return _context; } }
+        internal override Size Size { get { return _container.VisitSize(_context, _currentCompilePosition); } }
         [DumpData(false)]
         internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _container.DumpPrintText(_context) + ")"; } }
-
         internal override bool IsPending { get { return _container.IsPendingType(_context); } }
 
         internal override Result MoveHandler(Category category)

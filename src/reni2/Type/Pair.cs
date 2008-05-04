@@ -2,48 +2,22 @@ using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 
 namespace Reni.Type
 {
-    /// <summary>
-    /// Pair of types
-    /// </summary>
     internal class Pair : Child
     {
         private readonly TypeBase _second;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Pair"/> class.
-        /// </summary>
-        /// <param name="first">The first.</param>
-        /// <param name="second">The second.</param>
-        /// created 19.11.2006 22:57
         internal Pair(TypeBase first, TypeBase second) : base(first)
         {
             _second = second;
         }
 
-        /// <summary>
-        /// Gets the first.
-        /// </summary>
-        /// <value>The first.</value>
-        /// created 19.11.2006 22:59
         internal TypeBase First { get { return Parent; } }
-
-        /// <summary>
-        /// Gets the second.
-        /// </summary>
-        /// <value>The second.</value>
-        /// created 19.11.2006 22:59
-        [Node]
         internal TypeBase Second { get { return _second; } }
-
-        /// <summary>
-        /// The size of type
-        /// </summary>
-        public override Size Size { get { return First.Size + Second.Size; } }
+        internal override Size Size { get { return First.Size + Second.Size; } }
 
         [DumpData(false)]
         internal override string DumpPrintText
@@ -71,12 +45,6 @@ namespace Reni.Type
             }
         }
 
-        /// <summary>
-        /// Destructors the specified category.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// [created 02.06.2006 09:47]
         internal override Result DestructorHandler(Category category)
         {
             var firstHandler = First.DestructorHandler(category);
