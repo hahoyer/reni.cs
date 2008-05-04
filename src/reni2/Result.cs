@@ -411,8 +411,7 @@ namespace Reni
         /// <param name="syntax"></param>
         /// <returns></returns>
         [DebuggerHidden]
-        internal Result Visit(Category category, 
-            ContextBase context, Syntax.SyntaxBase syntax)
+        internal Result Visit(Category category, ContextBase context, Syntax.SyntaxBase syntax)
         {
             var OldPending = Pending;
             var OldComplete = Complete;
@@ -684,12 +683,6 @@ namespace Reni
             return finalResult;
         }
 
-        /// <summary>
-        /// Creates the pending.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// created 04.02.2007 00:31
         internal static Result CreatePending(Category category)
         {
             var result = new Result();

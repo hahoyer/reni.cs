@@ -178,8 +178,8 @@ namespace Reni.Struct
             {
                 if(i > 0)
                     result += ";";
-                if(_reverseDictionaryCache.ContainsKey(i))
-                    result += _reverseDictionaryCache[i] + ": ";
+                if(ReverseDictionary.ContainsKey(i))
+                    result += ReverseDictionary[i] + ": ";
                 result += _list[i].VisitType(context);
             }
             return result;

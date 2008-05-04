@@ -65,7 +65,8 @@ namespace Reni.Type
         internal protected override SearchResult<IFeature> Search(Defineable defineable)
         {
             var resultFromSequenceElement = Element.SearchFromSequence(defineable).SubTrial(Element);
-            var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,this);
+            var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,
+                this);
             if(result.IsSuccessFull)
                 return result;
             var resultForSequence = defineable.SearchForSequence();
@@ -86,9 +87,7 @@ namespace Reni.Type
             if(destPending != null)
                 return Result.CreatePending(category);
 
-            Result result;
-
-            result = ConvertTo(category, dest as Sequence);
+            var result = ConvertTo(category, dest as Sequence);
             if(result != null)
                 return result;
 
@@ -97,7 +96,7 @@ namespace Reni.Type
                 return result;
 
             result = ConvertTo(category, dest as EnableCut);
-            if (result != null)
+            if(result != null)
                 return result;
 
             NotImplementedMethod(category, dest);
@@ -133,7 +132,7 @@ namespace Reni.Type
 
         private Result ConvertTo(Category category, EnableCut dest)
         {
-            if (dest == null)
+            if(dest == null)
                 return null;
             var result = ConvertTo(category, dest.Parent);
             return dest.CreateResult(category, () => result.Code, () => result.Refs);
@@ -217,6 +216,8 @@ namespace Reni.Type
                 StartMethodDump(trace, callContext, category, args, callObject);
                 var objResult = callObject.ConvertTo(category, _sequence);
                 var rawArgResult = args.Visit(callContext, category | Category.Type);
+                if (rawArgResult.IsPending)
+                    return rawArgResult;
                 var argType = _sequence.Element.CreateSequence(rawArgResult.Type.SequenceCount);
                 var argResult = rawArgResult.ConvertTo(argType);
                 var result = new Result();

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Code;
 using Reni.Context;
-using Reni.Struct;
 
 namespace Reni
 {
@@ -12,13 +12,9 @@ namespace Reni
     /// </summary>
     internal sealed class Refs : ReniObject
     {
-        [Node]
-        public List<ContextBase> Data { get { return _data; } }
-
         private readonly List<ContextBase> _data;
+        private readonly bool _isPending;
         private SizeArray _sizes;
-        public bool IsPending { get { return _isPending; } }
-        private bool _isPending = false;
 
         private Refs()
         {
@@ -32,17 +28,15 @@ namespace Reni
             _data.Add(e);
         }
 
-        private Refs(List<ContextBase> a, List<ContextBase> b)
+        private Refs(IEnumerable<ContextBase> a, IEnumerable<ContextBase> b)
             : this(a)
         {
-            foreach (ContextBase e in b)
-            {
-                if (!_data.Contains(e))
+            foreach(var e in b)
+                if(!_data.Contains(e))
                     _data.Add(e);
-            }
         }
 
-        private Refs(List<ContextBase> a)
+        private Refs(IEnumerable<ContextBase> a)
             : this()
         {
             _data.AddRange(a);
@@ -53,197 +47,125 @@ namespace Reni
             _isPending = isPending;
         }
 
-        /// <summary>
-        /// Creates the empty reference list
-        /// </summary>
-        /// <returns></returns>
-        public static Refs None()
-        {
-            return new Refs();
-        }
+        [Node]
+        public List<ContextBase> Data { get { return _data; } }
+        public bool IsPending { get { return _isPending; } }
 
-        /// <summary>
-        /// Combine two set of refs
-        /// </summary>
-        /// <param name="refs"></param>
-        /// <returns></returns>
-        public Refs Pair(Refs refs)
-        {
-            if (IsPending || refs.IsPending)
-                throw new NotSupportedException("Pair function not allowed for pending refs");
-            if (refs.Count == 0)
-                return this;
-            if (Count == 0)
-                return refs;
-            return new Refs(_data, refs._data);
-        }
-
-        /// <summary>
-        /// Create a simple environment reference
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        public static Refs Context(ContextBase e)
-        {
-            return new Refs(e);
-        }
-
-        /// <summary>
-        /// Gets the size of each ref contained 
-        /// </summary>
         [DumpData(false)]
         private SizeArray Sizes
         {
             get
             {
-                if (_sizes == null)
+                if(_sizes == null)
                     _sizes = CalcSizes();
                 return _sizes;
             }
         }
 
-        /// <summary>
-        /// Default dump of data
-        /// </summary>
-        /// <returns></returns>
+        public int Count
+        {
+            get
+            {
+                if(IsPending)
+                    throw new NotSupportedException();
+                return _data.Count;
+            }
+        }
+
+        public ContextBase this[int i] { get { return _data[i]; } }
+        public Size Size { get { return Sizes.Size; } }
+        public bool IsNone { get { return Count == 0; } }
+        public static Refs Pending { get { return new Refs(true); } }
+
+        public static Refs None()
+        {
+            return new Refs();
+        }
+
+        public Refs Pair(Refs refs)
+        {
+            if(IsPending || refs.IsPending)
+                throw new NotSupportedException("Pair function not allowed for pending refs");
+            if(refs.Count == 0)
+                return this;
+            if(Count == 0)
+                return refs;
+            return new Refs(_data, refs._data);
+        }
+
+        public static Refs Context(ContextBase e)
+        {
+            return new Refs(e);
+        }
+
         public override string DumpData()
         {
-            if (IsPending)
+            if(IsPending)
                 return "<pending>";
 
-            string result = "";
-            for (int i = 0; i < Count; i++)
+            var result = "";
+            for(var i = 0; i < Count; i++)
             {
-                if (i > 0)
+                if(i > 0)
                     result += "\n";
                 result += Tracer.Dump(_data[i]);
             }
             return result;
         }
 
-        /// <summary>
-        /// DigitChain of refs
-        /// </summary>
-        public int Count
-        {
-            get
-            {
-                if (IsPending)
-                    throw new NotSupportedException();
-                return _data.Count;
-            }
-        }
-
-        /// <summary>
-        /// Indexer
-        /// </summary>
-        public ContextBase this[int i] { get { return _data[i]; } }
-
         private SizeArray CalcSizes()
         {
-            SizeArray result = new SizeArray();
-            for (int i = 0, n = Count; i < n; i++)
+            var result = new SizeArray();
+            for(int i = 0, n = Count; i < n; i++)
                 result.Add((this)[i].RefSize);
             return result;
         }
 
-        /// <summary>
-        /// removes parameter from coloection if contained
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
         public Refs Without(ContextBase e)
         {
-            if (IsPending)
+            if(IsPending)
                 throw new NotSupportedException();
-            if (!_data.Contains(e))
+            if(!_data.Contains(e))
                 return this;
-            List<ContextBase> r = new List<ContextBase>(_data);
+            var r = new List<ContextBase>(_data);
             r.Remove(e);
             return new Refs(r);
         }
 
-        /// <summary>
-        /// obtain size
-        /// </summary>
-        public Size Size { get { return Sizes.Size; } }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is none.
-        /// </summary>
-        /// <value><c>true</c> if this instance is none; otherwise, <c>false</c>.</value>
-        /// [created 05.06.2006 16:29]
-        public bool IsNone { get { return Count == 0; } }
-
-        /// <summary>
-        /// Gets the pending.
-        /// </summary>
-        /// <value>The pending.</value>
-        /// created 24.01.2007 22:12
-        public static Refs Pending { get { return new Refs(true); } }
-
-        /// <summary>
-        /// Determines whether [contains] [the specified context].
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <returns>
-        /// 	<c>true</c> if [contains] [the specified context]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 18.10.2006 00:12
         public bool Contains(ContextBase context)
         {
             return _data.Contains(context);
         }
 
-        /// <summary>
-        /// Determines whether [contains] [the specified context].
-        /// </summary>
-        /// <param name="other">The other.</param>
-        /// <returns>
-        /// 	<c>true</c> if [contains] [the specified context]; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 18.10.2006 00:12
         public bool Contains(Refs other)
         {
-            foreach (ContextBase context in other._data)
-                if (!Contains(context))
+            foreach(var context in other._data)
+                if(!Contains(context))
                     return false;
 
             return true;
         }
 
-        /// <summary>
-        /// Toes the code.
-        /// </summary>
-        /// created 06.11.2006 22:57
-        internal Code.CodeBase ToCode()
+        internal CodeBase ToCode()
         {
-            Code.CodeBase result = Code.CodeBase.CreateVoid();
-            for (int i = 0; i < _data.Count; i++)
-                result = result.CreateSequence(Code.CodeBase.CreateContextRef((Struct.Context) _data[i]));
+            var result = CodeBase.CreateVoid();
+            for(var i = 0; i < _data.Count; i++)
+                result = result.CreateSequence(CodeBase.CreateContextRef((Struct.Context) _data[i]));
             return result;
         }
 
-        /// <summary>
-        /// Replaces the refs for function body.
-        /// </summary>
-        /// <param name="code">The code.</param>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="endOfRefsCode">The endOfRefsCode.</param>
-        /// <returns></returns>
-        /// created 31.12.2006 18:47
-        internal Code.CodeBase ReplaceRefsForFunctionBody(Code.CodeBase code, RefAlignParam refAlignParam, Code.CodeBase endOfRefsCode)
+        internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)
         {
-            Code.CodeBase p = endOfRefsCode;
-            Code.CodeBase result = code;
-            for (int i = 0; i < _data.Count; i++)
+            var p = endOfRefsCode;
+            var result = code;
+            for(var i = 0; i < _data.Count; i++)
             {
-                RefAlignParam unrefAlignment = _data[i].RefAlignParam;
+                var unrefAlignment = _data[i].RefAlignParam;
                 Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
-                RefAlignParam unrefPtrAlignment = refAlignParam;
-                    // To do; check if this is correct. Can be chaecked if we really have different alignment
+                var unrefPtrAlignment = refAlignParam;
+                // To do; check if this is correct. Can be chaecked if we really have different alignment
                 p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize*-1);
-                Code.CodeBase replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
+                var replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
                 result = result.ReplaceAbsoluteContextRef((Struct.Context) _data[i], replacement);
             }
             return result;

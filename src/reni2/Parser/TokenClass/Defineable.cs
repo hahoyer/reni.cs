@@ -12,11 +12,6 @@ namespace Reni.Parser.TokenClass
     /// </summary>
     internal abstract class Defineable : Base
     {
-        /// <summary>
-        /// Gets the name of token for C# generation.
-        /// </summary>
-        /// <value>The name of the C sharp.</value>
-        /// created 08.01.2007 15:02
         [DumpData(false)]
         internal virtual string CSharpNameOfDefaultOperation
         {
@@ -27,11 +22,6 @@ namespace Reni.Parser.TokenClass
             }
         }
 
-        /// <summary>
-        /// Gets the name of function defined in class data for C# code generation.for odd sized numbers
-        /// </summary>
-        /// <value>The name of the C sharp.</value>
-        /// created 08.01.2007 15:02
         [DumpExcept(false)]
         internal string DataFunctionName { get { return GetType().Name; } }
 
@@ -40,27 +30,12 @@ namespace Reni.Parser.TokenClass
         [DumpExcept(false)]
         internal abstract string Name { get; }
 
-        /// <summary>
-        /// Type.of result of numeric operation, i. e. obj and arg are of type bit array
-        /// </summary>
-        /// <param name="objSize">Size of the obj.</param>
-        /// <param name="argSize">Size of the arg.</param>
-        /// <returns></returns>
-        /// created 08.01.2007 01:40
         internal virtual TypeBase BitSequenceOperationResultType(int objSize, int argSize)
         {
             NotImplementedMethod(objSize, argSize);
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates the syntax.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="token">The token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 31.03.2007 14:02 on SAPHIRE by HH
         internal override SyntaxBase CreateSyntax(SyntaxBase left, Token token, SyntaxBase right)
         {
             if(left != null)

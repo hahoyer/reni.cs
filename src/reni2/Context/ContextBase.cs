@@ -172,11 +172,11 @@ namespace Reni.Context
             }
 
             var argResult = memberElem.Args.Visit(this, category | Category.Type);
-            var searchResult = argResult.Type.SearchDefineablePrefix(memberElem.DefineableToken);
-            if(searchResult.IsSuccessFull)
-                return searchResult.Feature.VisitApply(category, argResult);
+            var prefixSearchResult = argResult.Type.SearchDefineablePrefix(memberElem.DefineableToken);
+            if(prefixSearchResult.IsSuccessFull)
+                return prefixSearchResult.Feature.VisitApply(category, argResult);
 
-            NotImplementedMethod(category, memberElem, "searchResult", searchResult);
+            NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult, "prefixSearchResult", prefixSearchResult);
             return null;
         }
 

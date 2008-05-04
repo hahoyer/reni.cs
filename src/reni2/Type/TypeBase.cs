@@ -144,11 +144,6 @@ namespace Reni.Type
             }
         }
 
-        /// <summary>
-        /// Gets the type in case of pending visits
-        /// </summary>
-        /// <value>The pending.</value>
-        /// created 24.01.2007 22:23
         internal static TypeBase Pending
         {
             get
@@ -160,13 +155,6 @@ namespace Reni.Type
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is pending.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
-        /// </value>
-        /// created 09.02.2007 00:26
         [DumpData(false)]
         internal virtual bool IsPending { get { return false; } }
 

@@ -156,6 +156,7 @@
     <Compile Include="Type\Primitive.cs" />
     <Compile Include="Type\Ref.cs" />
     <Compile Include="Struct\Type.cs" />
+    <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\Void.cs" />
