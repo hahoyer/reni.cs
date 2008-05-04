@@ -68,5 +68,10 @@ namespace Reni.Type
         {
             return GetType().FullName;
         }
+
+        public override string DumpShort()
+        {
+            return "bit";
+        }
     }
 }

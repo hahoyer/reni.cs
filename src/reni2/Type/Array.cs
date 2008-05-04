@@ -64,5 +64,10 @@ namespace Reni.Type
             }
             return false;
         }
+
+        public override string DumpShort()
+        {
+            return "(" + Element.DumpShort() + ")array(" + Count + ")";
+        }
     }
 }

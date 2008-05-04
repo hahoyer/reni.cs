@@ -45,6 +45,8 @@ namespace Reni.Type
         [DumpData(false)]
         internal protected virtual TypeBase[] ToList { get { return new[] { this }; } }
 
+        public abstract string DumpShort();
+
         private TypeBase TypeType
         {
             get
@@ -89,11 +91,6 @@ namespace Reni.Type
             }
         }
 
-
-        public string DumpShort()
-        {
-            return DumpPrintText;
-        }
 
         public TypeBase CreateAlign(int alignBits)
         {

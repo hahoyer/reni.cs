@@ -83,5 +83,10 @@ namespace Reni.Struct
                 .CreateRefPlus(_context.RefAlignParam, Size);
             return result.ReplaceRelativeContextRef(containerContext, argsRef);
         }
+
+        public override string DumpShort()
+        {
+            return "context." + _context.ObjectId + "(container." + _container.ObjectId + ", context." + ObjectId + ")";
+        }
     }
 }

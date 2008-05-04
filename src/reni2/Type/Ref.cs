@@ -35,6 +35,10 @@ namespace Reni.Type
         [DumpData(false)]
         internal override int SequenceCount { get { return Target.SequenceCount; } }
 
+        public override string DumpShort()
+        {
+            return "ref." + Parent.DumpShort();
+        }
         internal override Result DestructorHandler(Category category)
         {
             return EmptyHandler(category);
@@ -169,5 +173,6 @@ namespace Reni.Type
                 return CreateVoid.CreateResult(category);
             }
         }
+
     }
 }

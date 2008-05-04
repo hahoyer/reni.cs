@@ -1,6 +1,6 @@
 ﻿namespace Reni.Type
 {
-    internal sealed class Void : Primitive
+    internal sealed  class Void : Primitive
     {
         internal override Size Size { get { return Size.Zero; } }
         internal override bool IsVoid { get { return true; } }
@@ -39,6 +39,11 @@
         internal new static Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs)
         {
             return CreateVoid.CreateResult(category, getCode, getRefs);
+        }
+
+        public override string DumpShort()
+        {
+            return "void";
         }
     }
 }

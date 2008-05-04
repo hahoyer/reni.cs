@@ -32,6 +32,11 @@ namespace Reni.Type
         internal int Count { get { return _inheritedType.Count; } }
         public TypeBase Element { get { return _inheritedType.Element; } }
 
+        public override string DumpShort()
+        {
+            return "(" + Element.DumpShort() + ")sequence(" + Count + ")";
+        }
+
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destPending = dest as Pending;
@@ -291,5 +296,6 @@ namespace Reni.Type
                 return null;
             }
         }
+
     }
 }

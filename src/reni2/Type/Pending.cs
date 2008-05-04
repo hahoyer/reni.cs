@@ -22,5 +22,10 @@ namespace Reni.Type
         {
             return true;
         }
+
+        public override string DumpShort()
+        {
+            return "pending";
+        }
     }
 }

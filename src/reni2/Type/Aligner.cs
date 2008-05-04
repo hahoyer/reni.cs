@@ -71,5 +71,10 @@ namespace Reni.Type
         {
             return Parent.HasConverterTo(dest);
         }
+
+        public override string DumpShort()
+        {
+            return "aligner(" + Parent.DumpShort() + ")";
+        }
     }
 }

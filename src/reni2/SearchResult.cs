@@ -105,8 +105,7 @@ namespace Reni
         [DumpExcept(null)]
         public FeatureType Feature { get; private set; }
 
-        public static SearchResult<FeatureType> Failure<Target>
-            (Target target, Defineable defineable)
+        public static SearchResult<FeatureType> Failure<Target>(Target target, Defineable defineable)
             where Target : IDumpShortProvider
         {
             return new SearchResult<FeatureType>(defineable, SearchTrial.

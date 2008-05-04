@@ -28,5 +28,10 @@ namespace Reni.Type
         {
             return CodeBase.CreateDumpPrintText(_parent.DumpPrintText);
         }
+
+        public override string DumpShort()
+        {
+            return "(" + _parent.DumpShort() + ") type"; 
+        }
     }
 }

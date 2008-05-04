@@ -34,6 +34,11 @@ namespace Reni.Type
                 .RootContext
                 .CreateFunctionCall(_context, category, Body, argsResult);
         }
+
+        public override string DumpShort()
+        {
+            return "context."+_context.ObjectId + ".function(" + _body.DumpShort() + ")";
+        }
     }
 
     internal sealed class Property : Primitive
@@ -72,6 +77,11 @@ namespace Reni.Type
                 .VisitType(context)
                 .ApplyFunction(rawResult.Complete, CreateVoid.CreateResult(rawResult.Complete))
                 ;
+        }
+
+        public override string DumpShort()
+        {
+            return "context." + _context.ObjectId + ".property(" + _body.DumpShort() + ")";
         }
     }
 }
