@@ -1,7 +1,11 @@
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Parser.TokenClass;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -11,12 +15,14 @@ namespace Reni.Struct
         private readonly Container _container;
         private readonly ContextBase _context;
         private readonly int _currentCompilePosition;
+        private IFeature[] _featuresCache;
 
         public Type(ContextBase context, Container struc, int currentCompilePosition)
         {
             _context = context;
             _container = struc;
             _currentCompilePosition = currentCompilePosition;
+            _atFeatureObject = new Container.AtFeature(Container, Context);
         }
 
         [Node]
@@ -42,7 +48,7 @@ namespace Reni.Struct
 
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
-            var voidDest = dest as Void;
+            var voidDest = dest as Reni.Type.Void;
             if(voidDest != null)
                 return _container.IsConvertableToVoid(_context);
             return base.IsConvertableToVirt(dest, conversionFeature);
@@ -87,6 +93,63 @@ namespace Reni.Struct
         public override string DumpShort()
         {
             return "context." + _context.ObjectId + "(container." + _container.ObjectId + ", context." + ObjectId + ")";
+        }
+
+        internal override SearchResult<IFeature> Search(Defineable defineable)
+        {
+            var containerResult = _container.Search(defineable);
+            return containerResult.SearchResultDescriptor.Convert(containerResult.Feature, this);
+        }
+
+        [DumpData(false)]
+        private IFeature[] Features
+        {
+            get
+            {
+                if (_featuresCache == null)
+                    _featuresCache = CreateFeaturesCache();
+                return _featuresCache;
+            }
+        }
+
+        public IFeature CreateMemberAccess(int index)
+        {
+            return Features[index];
+        }
+        private IFeature[] CreateFeaturesCache()
+        {
+            var result = new List<StructContainerFeature>();
+            for (var i = 0; i < Container.List.Count; i++)
+                result.Add(new StructContainerFeature(this, i));
+            return result.ToArray();
+        }
+
+        private class StructContainerFeature : IFeature
+        {
+            [DumpData(true)]
+            private readonly Type _type;
+            [DumpData(true)]
+            private readonly int _index;
+
+            public StructContainerFeature(Type type, int index)
+            {
+                _type = type;
+                _index = index;
+            }
+
+            public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+            {
+                return _type
+                    .Container
+                    .VisitAccessApply(_type.Context, _index, callContext, category, args);
+            }
+        }
+
+        private readonly Container.AtFeature _atFeatureObject;
+
+        public IFeature AtFeatureObject()
+        {
+            return _atFeatureObject;
         }
     }
 }

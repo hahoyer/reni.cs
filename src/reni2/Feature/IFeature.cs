@@ -20,9 +20,14 @@ namespace Reni.Feature
         Result VisitApply(ContextBase contextBase, Category category, SyntaxBase args);
     }
 
-    internal interface IStructContainerFeature
+    internal interface IStructFeature
     {
         IContextFeature Convert(ContextAtPosition contextAtPosition);
+        IFeature Convert(Struct.Type type);
+    }
+
+    internal interface IRefToStructFeature
+    {
     }
 
     internal interface ISequenceOfBitPrefixFeature

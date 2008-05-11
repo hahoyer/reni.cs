@@ -89,7 +89,12 @@ namespace Reni.Parser.TokenClass
         {
             return SearchResult<IRefFeature>.Failure(this);
         }
-   }
+
+        internal virtual SearchResult<IStructFeature> SearchFromStruct()
+        {
+            return SearchResult<IStructFeature>.Failure(this);
+        }
+    }
 
     internal class DefinableTokenSyntax : SyntaxBase
     {

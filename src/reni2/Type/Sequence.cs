@@ -67,7 +67,7 @@ namespace Reni.Type
             return base.SearchFromRef(defineable).AlternativeTrial(result);
         }
 
-        internal protected override SearchResult<IFeature> Search(Defineable defineable)
+        internal override SearchResult<IFeature> Search(Defineable defineable)
         {
             var resultFromSequenceElement = Element.SearchFromSequence(defineable).SubTrial(Element);
             var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,

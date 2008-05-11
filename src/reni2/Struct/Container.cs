@@ -15,7 +15,7 @@ namespace Reni.Struct
     /// <summary>
     /// Structured data, context free version
     /// </summary>
-    internal sealed class Container : ReniObject
+    internal sealed class Container : ReniObject, IDumpShortProvider
     {
         private static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool _isInDump;
@@ -25,7 +25,7 @@ namespace Reni.Struct
         private readonly DictionaryEx<string, int> _dictionary;
         private readonly List<SyntaxBase> _list;
         private DictionaryEx<int, string> _reverseDictionaryCache;
-        private IStructContainerFeature[] _structContainerFeaturesCache;
+        private IStructFeature[] _structFeaturesCache;
 
         private Container
             (
@@ -67,22 +67,14 @@ namespace Reni.Struct
         }
 
         [Node, DumpData(false)]
-        private IStructContainerFeature[] StructContainerFeatures
+        private IStructFeature[] StructFeatures
         {
             get
             {
-                if (_structContainerFeaturesCache == null)
-                    _structContainerFeaturesCache = CreateStructContainerFeatures();
-                return _structContainerFeaturesCache;
+                if(_structFeaturesCache == null)
+                    _structFeaturesCache = CreateStructContainerFeatures();
+                return _structFeaturesCache;
             }
-        }
-
-        private IStructContainerFeature[] CreateStructContainerFeatures()
-        {
-            var result = new List<IStructContainerFeature>();
-            for(var i=0; i<_list.Count; i++)
-                result.Add(new StructContainerFeature(i));
-            return result.ToArray();
         }
 
         [Node]
@@ -104,6 +96,19 @@ namespace Reni.Struct
 
         internal static TypeBase MaxIndexType { get { return TypeBase.CreateNumber(32); } }
         public string FilePosition { get { return _list[0].FilePosition; } }
+
+        public string DumpShort()
+        {
+            return "Container." + ObjectId;
+        }
+
+        private IStructFeature[] CreateStructContainerFeatures()
+        {
+            var result = new List<IStructFeature>();
+            for(var i = 0; i < _list.Count; i++)
+                result.Add(new StructFeature(i));
+            return result.ToArray();
+        }
 
         private void CreateReverseDictionary()
         {
@@ -198,7 +203,7 @@ namespace Reni.Struct
         {
             var dumpFile = File.m("struct." + ObjectId);
             var oldResult = dumpFile.String;
-            var newResult = (_runId + DumpDataToString()).Replace("\n","\r\n");
+            var newResult = (_runId + DumpDataToString()).Replace("\n", "\r\n");
             if(oldResult == null || !oldResult.StartsWith(_runId))
             {
                 oldResult = newResult;
@@ -480,18 +485,62 @@ namespace Reni.Struct
             return null;
         }
 
-        internal SearchResult<IStructContainerFeature> Search(Defineable defineable)
+        internal SearchResult<IStructFeature> Search(Defineable defineable)
         {
             if(Defined(defineable.Name))
-                return SearchResult<IStructContainerFeature>.Success(StructContainerFeatures[Find(defineable.Name)],
+                return SearchResult<IStructFeature>.Success(StructFeatures[Find(defineable.Name)],
                     defineable);
-            return SearchResult<IStructContainerFeature>.Failure(defineable);
+            return defineable.SearchFromStruct().SubTrial(this);
         }
-        private class StructContainerFeature : IStructContainerFeature
+
+        internal class AtFeature : IContextFeature, IFeature
+        {
+            private readonly Container _container;
+            private readonly ContextBase _parentContext;
+
+            public AtFeature(Container container, ContextBase parentContext)
+            {
+                _parentContext = parentContext;
+                _container = container;
+            }
+
+            public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args)
+            {
+                return _container.VisitOperationApply(_parentContext, callContext, category, args);
+            }
+
+            public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+            {
+                return _container.VisitOperationApply(_parentContext, callContext, category, args);
+            }
+        }
+
+        internal class ContextFeature : IContextFeature
+        {
+            [DumpData(true)]
+            private readonly Container _container;
+            [DumpData(true)]
+            private readonly int _index;
+            private readonly ContextBase _parentContext;
+
+            public ContextFeature(Container container, ContextBase parentContext, int index)
+            {
+                _parentContext = parentContext;
+                _container = container;
+                _index = index;
+            }
+
+            public Result VisitApply(ContextBase contextBase, Category category, SyntaxBase args)
+            {
+                return _container.VisitAccessApply(_parentContext, _index, contextBase, category, args);
+            }
+        }
+
+        internal class StructFeature : IStructFeature
         {
             private readonly int _index;
 
-            public StructContainerFeature(int index)
+            public StructFeature(int index)
             {
                 _index = index;
             }
@@ -500,7 +549,11 @@ namespace Reni.Struct
             {
                 return contextAtPosition.CreateMemberAccess(_index);
             }
-        }
 
+            public IFeature Convert(Type type)
+            {
+                return type.CreateMemberAccess(_index);
+            }
+        }
     }
 }

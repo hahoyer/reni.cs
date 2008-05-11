@@ -102,7 +102,7 @@ namespace Reni.Type
             return Target.IsConvertableTo(dest, conversionFeature);
         }
 
-        internal protected override SearchResult<IFeature> Search(Defineable defineable)
+        internal override SearchResult<IFeature> Search(Defineable defineable)
         {
             var resultFromRef = Parent.SearchFromRef(defineable).SubTrial(Parent);
             var result = resultFromRef.SearchResultDescriptor.Convert(resultFromRef.Feature, this);

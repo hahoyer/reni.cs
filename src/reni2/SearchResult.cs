@@ -73,12 +73,20 @@ namespace Reni
             return SearchResult<IFeature>.Create(resultFeature, this);
         }
 
-        public SearchResult<IContextFeature> Convert(IStructContainerFeature feature, ContextAtPosition contextAtPosition)
+        public SearchResult<IContextFeature> Convert(IStructFeature feature, ContextAtPosition contextAtPosition)
         {
             IContextFeature resultFeature = null;
             if (feature != null)
                 resultFeature = feature.Convert(contextAtPosition);
             return SearchResult<IContextFeature>.Create(resultFeature, this);
+        }
+
+        public SearchResult<IFeature> Convert(IStructFeature feature, Struct.Type type)
+        {
+            IFeature resultFeature = null;
+            if (feature != null)
+                resultFeature = feature.Convert(type);
+            return SearchResult<IFeature>.Create(resultFeature, this);
         }
     }
 
@@ -140,5 +148,6 @@ namespace Reni
         {
             return new SearchResult<FeatureType>(feature,descriptor);
         }
+
     }
 }

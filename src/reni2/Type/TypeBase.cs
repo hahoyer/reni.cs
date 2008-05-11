@@ -405,27 +405,27 @@ namespace Reni.Type
             return SearchPrefix(defineableToken.TokenClass).SubTrial(this);
         }
 
-        internal protected virtual SearchResult<IFeature> Search(Defineable defineable)
+        internal virtual SearchResult<IFeature> Search(Defineable defineable)
         {
-            return defineable.Search();
+            return defineable.Search().SubTrial(this);
         }
         internal protected virtual SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
         {
-            return defineable.SearchPrefix();
+            return defineable.SearchPrefix().SubTrial(this);
         }
 
         internal virtual SearchResult<IRefFeature> SearchFromRef(Defineable defineable)
         {
-            return defineable.SearchFromRef();
+            return defineable.SearchFromRef().SubTrial(this);
         }
 
         internal virtual SearchResult<ISequenceElementFeature> SearchFromSequence(Defineable defineable)
         {
-            return defineable.SearchFromSequenceElement();
+            return defineable.SearchFromSequenceElement().SubTrial(this);
         }
         internal virtual SearchResult<ISequenceElementPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
         {
-            return defineable.SearchPrefixFromSequenceElement();
+            return defineable.SearchPrefixFromSequenceElement().SubTrial(this);
         }
 
         internal virtual SearchResult<IRefToSequenceFeature> SearchFromRefToSequence(Defineable defineable)

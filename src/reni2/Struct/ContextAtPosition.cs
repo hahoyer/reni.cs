@@ -15,6 +15,7 @@ namespace Reni.Struct
     /// </summary>
     internal sealed class ContextAtPosition : Reni.Context.Child
     {
+        private readonly Container.AtFeature _atFeatureObject;
         [DumpData(false)]
         private readonly Container _container;
         [DumpData(true)]
@@ -33,6 +34,7 @@ namespace Reni.Struct
             _container = parent.Container;
             _currentCompilePosition = currentCompilePosition;
             Tracer.ConditionalBreak(Parent is Context && ((Context) Parent).Container == Container, "");
+            _atFeatureObject = new Container.AtFeature(Container, Context);
         }
 
         [DumpData(false)]
@@ -62,6 +64,7 @@ namespace Reni.Struct
                 return _contextFeaturesCache;
             }
         }
+        public ContextBase Context { get { return Parent; } }
 
         private TypeBase VisitBodyType()
         {
@@ -99,12 +102,12 @@ namespace Reni.Struct
         public Result VisitElementFromContextRef(Category category, int index)
         {
             if(_container[index].VisitSize(this).IsZero)
-            {            
+            {
                 var result = TypeBase.CreateVoidResult(category);
                 if(category.HasType)
                     result.Type = VisitElementType(index);
                 return result;
-            }                                                                          
+            }
             else
             {
                 var result = new Result();
@@ -158,31 +161,16 @@ namespace Reni.Struct
 
         private IContextFeature[] CreateContextFeaturesCache()
         {
-            var result = new List<StructContainerFeature>();
+            var result = new List<Container.ContextFeature>();
             for(var i = 0; i < Container.List.Count; i++)
-                result.Add(new StructContainerFeature(this, i));
+                result.Add(new Container.ContextFeature(Container, Context, i));
             return result.ToArray();
         }
 
-        private class StructContainerFeature : IContextFeature
+        internal IContextFeature AtFeatureObject()
         {
-            [DumpData(true)]
-            private readonly ContextAtPosition _contextAtPosition;
-            [DumpData(true)]
-            private readonly int _index;
-
-            public StructContainerFeature(ContextAtPosition contextAtPosition, int index)
-            {
-                _contextAtPosition = contextAtPosition;
-                _index = index;
-            }
-
-            public Result VisitApply(ContextBase contextBase, Category category, SyntaxBase args)
-            {
-                return _contextAtPosition
-                    .Container
-                    .VisitAccessApply(_contextAtPosition.Parent,_index, contextBase, category, args);
-            }
+            return _atFeatureObject;
         }
+
     }
 }
