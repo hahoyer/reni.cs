@@ -145,7 +145,7 @@ namespace Reni.Parser
         [DumpData(false)]
         internal string Name { get { return _source.SubString(0, _length); } }
 
-        [DumpData(false)]
+        [DumpData(true)]
         public string FilePosition { get { return "\n" + _source.FilePosn(Name); } }
     }
 }

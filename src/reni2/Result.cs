@@ -741,15 +741,15 @@ namespace Reni
             return resultAsRef;
         }
 
-        internal Result UnProperty(ContextBase context)
+        internal Result UnProperty()
         {
-            return Type.UnProperty(this, context);
+            return Type.UnProperty(this);
         }
 
-        internal Result PostProcess(ContextBase context)
+        internal Result PostProcess(RefAlignParam refAlignParam)
         {
-            return UnProperty(context)
-                .Align(context.RefAlignParam.AlignBits);
+            return UnProperty()
+                .Align(refAlignParam.AlignBits);
         }
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)

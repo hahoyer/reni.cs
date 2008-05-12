@@ -261,7 +261,7 @@ namespace Reni.Struct
             ContextBase structContext = context.CreateStructAtPosition(this, index);
             var rawResult =
                 _list[index].Visit(structContext, category | Category.Type);
-            var iresult = rawResult.PostProcess(structContext);
+            var iresult = rawResult.PostProcess(structContext.RefAlignParam);
             if(trace)
                 DumpDataWithBreak("", "rawResult", rawResult, "iresult", iresult);
             if(iresult.IsPending)

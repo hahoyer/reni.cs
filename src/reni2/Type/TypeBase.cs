@@ -391,7 +391,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual Result UnProperty(Result rawResult, ContextBase context)
+        internal virtual Result UnProperty(Result rawResult)
         {
             return rawResult;
         }

@@ -8,8 +8,9 @@ namespace Reni.Type
     {
         private readonly SyntaxBase _body;
         private readonly ContextBase _context;
+        private static int _nextObjectId = 0;
 
-        internal Function(ContextBase context, SyntaxBase body)
+        internal Function(ContextBase context, SyntaxBase body): base(_nextObjectId++)
         {
             _context = context;
             _body = body;
@@ -69,12 +70,12 @@ namespace Reni.Type
             }
         }
 
-        internal override Result UnProperty(Result rawResult, ContextBase context)
+        internal override Result UnProperty(Result rawResult)
         {
             Tracer.Assert(!rawResult.Complete.HasCode || rawResult.Code.IsEmpty);
             Tracer.Assert(!rawResult.Complete.HasRefs || rawResult.Refs.IsNone);
             return _body
-                .VisitType(context)
+                .VisitType(_context)
                 .ApplyFunction(rawResult.Complete, CreateVoid.CreateResult(rawResult.Complete))
                 ;
         }

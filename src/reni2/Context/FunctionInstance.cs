@@ -25,7 +25,7 @@ namespace Reni.Context
         internal FunctionInstance(int index, Syntax.SyntaxBase body, ContextBase context, Type.TypeBase args)
             : base(index)
         {
-            StopByObjectId(-2);
+            StopByObjectId(-1);
             _index = index;
             _body = body;
             _context = context;

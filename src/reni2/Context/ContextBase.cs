@@ -48,12 +48,7 @@ namespace Reni.Context
 
         public string DumpShort()
         {
-            return DebuggerDump();
-        }
-
-        public override string DebuggerDump()
-        {
-            return base.ToString() + " ObjectId=" + ObjectId;
+            return base.ToString();
         }
 
         public int SizeToPacketCount(Size size)

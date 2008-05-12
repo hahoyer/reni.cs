@@ -49,7 +49,7 @@ namespace Reni.Syntax
             var result = context.VisitFirstChainElement(internalCategory, Chain[0]);
             for(var i = 1; i < Chain.Count; i++)
             {
-                var newResult = result.PostProcess(context);
+                var newResult = result.PostProcess(context.RefAlignParam);
 
                 Tracer.ConditionalBreak(trace, newResult.Dump());
                 if(!newResult.Type.IsRef)
@@ -74,7 +74,7 @@ namespace Reni.Syntax
             if(result.IsPending)
                 return result;
             Tracer.Assert(result != null);
-            var dereferencedResult = result.Type.Dereference(result).PostProcess(context);
+            var dereferencedResult = result.Type.Dereference(result).PostProcess(context.RefAlignParam);
             var statementResult = dereferencedResult.CreateStatement(category, intermediateResult);
             return ReturnMethodDumpWithBreak(trace, statementResult);
         }

@@ -5,6 +5,15 @@ namespace Reni.Type
     /// </summary>
     internal abstract class Primitive : TypeBase
     {
+        protected Primitive()
+        {
+        }
+
+        protected Primitive(int objectId)
+            : base(objectId)
+        {
+        }
+
         internal override sealed Result DestructorHandler(Category category)
         {
             return EmptyHandler(category);
