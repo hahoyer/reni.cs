@@ -37,7 +37,7 @@ namespace Reni.Syntax
 
         internal override Result VirtVisit(ContextBase context, Category category)
         {
-            var trace = ObjectId == 86 && context.ObjectId == 4;
+            var trace = ObjectId == 208 && context.ObjectId == 3;
             StartMethodDumpWithBreak(trace, context, category);
             if(Chain.Count == 0)
                 NotImplementedMethod(context, category);

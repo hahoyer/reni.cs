@@ -1,13 +1,10 @@
-using System;
-using HWClassLibrary.Debug;
-
 namespace Reni.Code
 {
     /// <summary>
     /// Pair of code elements, first element can be accessed
     /// </summary>
     internal sealed class Pair : CodeBase
-	{
+    {
         private readonly CodeBase _left;
         private readonly CodeBase _right;
 
@@ -20,7 +17,8 @@ namespace Reni.Code
         {
             _left = left;
             _right = right;
-            int bc = Left.Size.SaveByteCount;
+            var bc = Left.Size.SaveByteCount;
+            StopByObjectId(1900);
         }
 
         /// <summary>
@@ -34,11 +32,17 @@ namespace Reni.Code
         }
 
         /// <summary>
-		/// Size of object
-		/// </summary>
-		public override Size Size { get { return Left.Size + Right.Size; } }
+        /// Size of object
+        /// </summary>
+        public override Size Size
+        {
+            get { return Left.Size + Right.Size; }
+        }
 
-        public override Refs Refs { get { return _left.Refs.Pair(_right.Refs); } }
+        public override Refs Refs
+        {
+            get { return _left.Refs.Pair(_right.Refs); }
+        }
 
         /// <summary>
         /// Gets the max bytes.
@@ -49,8 +53,8 @@ namespace Reni.Code
         {
             get
             {
-                Size lSize = Left.MaxSize;
-                Size rSize = Left.Size + Right.MaxSize;
+                var lSize = Left.MaxSize;
+                var rSize = Left.Size + Right.MaxSize;
                 return lSize.Max(rSize);
             }
         }
@@ -60,13 +64,20 @@ namespace Reni.Code
         /// </summary>
         /// <value>The left.</value>
         /// created 06.10.2006 00:56
-        public CodeBase Left { get { return _left; } }
+        public CodeBase Left
+        {
+            get { return _left; }
+        }
+
         /// <summary>
         /// Gets the right.
         /// </summary>
         /// <value>The right.</value>
         /// created 06.10.2006 00:56
-        public CodeBase Right { get { return _right; } }
+        public CodeBase Right
+        {
+            get { return _right; }
+        }
 
         /// <summary>
         /// Res the create.
@@ -79,5 +90,5 @@ namespace Reni.Code
         {
             return new Pair(left, right);
         }
-	}
+    }
 }

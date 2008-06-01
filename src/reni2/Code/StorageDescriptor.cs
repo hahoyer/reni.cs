@@ -333,7 +333,7 @@ namespace Reni.Code
         /// created 08.01.2007 18:38
         public string DumpPrintText(string text)
         {
-            return "Data.DumpPrint(" + HWString.ToStringLiteral(text) + ")";
+            return "Data.DumpPrint(" + HWString.Quote(text) + ")";
         }
         
         /// <summary>
