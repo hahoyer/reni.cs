@@ -1,5 +1,6 @@
 using Reni.Code;
 using Reni.Context;
+using HWClassLibrary.Debug;
 
 namespace Reni.Type
 {
@@ -17,6 +18,8 @@ namespace Reni.Type
 
         internal int AlignBits { get { return _alignBits; } }
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
+        
+        [DumpData(false)]
         internal override int SequenceCount { get { return Parent.SequenceCount; } }
 
         internal override Size Size { get { return Parent.Size.Align(AlignBits); } }

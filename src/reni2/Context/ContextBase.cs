@@ -151,7 +151,7 @@ namespace Reni.Context
             return defineable.SearchContext();
         }
 
-        internal Result VisitFirstChainElement(Category category, MemberElem memberElem)
+        private Result VisitFirstChainElement(Category category, MemberElem memberElem)
         {
             if(memberElem.DefineableToken == null)
                 return memberElem.Args.Visit(this, category);
@@ -175,17 +175,19 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
+        private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
-            var trace = ObjectId == -10 && memberElem.ObjectId == 2 && category.HasAll;
-            StartMethodDumpWithBreak(trace, category, memberElem, formerResult);
             var refResult = formerResult.EnsureContextRef(this);
-            Tracer.ConditionalBreak(trace, refResult.Dump());
             var visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
-            Tracer.ConditionalBreak(trace, visitedResult.Dump());
-            Tracer.Assert(visitedResult != null);
             var arglessResult = visitedResult.UseWithArg(refResult);
-            return ReturnMethodDumpWithBreak(trace, arglessResult);
+            return arglessResult;
+        }
+
+        internal Result VisitChainElement(Category category, MemberElem memberElem, Result formerResult)
+        {
+            if(formerResult == null)
+                return VisitFirstChainElement(category, memberElem);
+            return VisitNextChainElement(category, memberElem, formerResult);
         }
 
         internal virtual bool IsChildOf(ContextBase context)
@@ -241,5 +243,6 @@ namespace Reni.Context
             [Node]
             internal Result _topRefResultCache;
         }
+
     }
 }

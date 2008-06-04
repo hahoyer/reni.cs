@@ -35,52 +35,107 @@ namespace Reni.Syntax
         public List<MemberElem> Chain { get { return _chain; } }
         internal protected override string FilePosition { get { return _chain[0].FilePosition; } }
 
-        internal override Result VirtVisit(ContextBase context, Category category)
+        internal class VisitStrategy : ReniObject
         {
-            var trace = ObjectId == 208 && context.ObjectId == 3;
-            StartMethodDumpWithBreak(trace, context, category);
-            if(Chain.Count == 0)
-                NotImplementedMethod(context, category);
+            private readonly Category _category;
+            private readonly ContextBase _context;
+            private Result _intermediateResult;
+            private Result _result;
 
-            var internalCategory = category | Category.Type;
-            if(category.HasCode)
-                internalCategory |= Category.Refs;
-            var intermediateResult = TypeBase.CreateVoidResult(internalCategory);
-            var result = context.VisitFirstChainElement(internalCategory, Chain[0]);
-            for(var i = 1; i < Chain.Count; i++)
+            public VisitStrategy(ContextBase contextBase, Category category)
             {
-                var newResult = result.PostProcess(context.RefAlignParam);
-
-                Tracer.ConditionalBreak(trace, newResult.Dump());
-                if(!newResult.Type.IsRef)
-                    intermediateResult = intermediateResult.SafeList(newResult, internalCategory);
-                if(newResult.IsPending)
-                    return newResult;
-
-                result = context.VisitNextChainElement(internalCategory, Chain[i], newResult);
-                if (result.IsPending)
-                    return result;
-                Tracer.ConditionalBreak(trace, result.Dump());
-                if(internalCategory.HasRefs)
-                    foreach(var referencedContext in result.Refs.Data)
-                        if(referencedContext.IsChildOf(context))
-                        {
-                            var replaceContextCode = intermediateResult.Type.CreateRefCodeForContext(referencedContext);
-                            Tracer.Assert(replaceContextCode != null);
-                            result = result.ReplaceRelativeContextRef(referencedContext, replaceContextCode);
-                        }
+                _context = contextBase;
+                _category = category;
+                IsComplete = false;
             }
 
-            if(result.IsPending)
-                return result;
-            Tracer.Assert(result != null);
-            var dereferencedResult = result.Type.Dereference(result).PostProcess(context.RefAlignParam);
-            var statementResult = dereferencedResult.CreateStatement(category, intermediateResult);
-            return ReturnMethodDumpWithBreak(trace, statementResult);
+            private bool IsComplete { get; set; }
+            private bool IsPending { get { return _result != null && _result.IsPending; } }
+            private Category InternalCategory
+            {
+                get
+                {
+                    if (_category.HasCode)
+                        return _category | Category.Type | Category.Refs;
+                    return _category | Category.Type;
+                }
+            }
+
+            public void Execute(MemberElem memberElem, bool isLast)
+            {
+                if (IsComplete)
+                    return;
+                if(IsPending)
+                    return;
+
+                _result = _context.VisitChainElement(InternalCategory, memberElem, _result);
+                if(IsPending)
+                    return;
+
+                if(isLast)
+                    _result = _result.Type.Dereference(_result);
+                if (IsPending)
+                    return;
+                
+                _result = _result.PostProcess(_context.RefAlignParam);
+                if (IsPending)
+                    return;
+
+                if(!isLast)
+                    UpdateIntermediateResult();
+
+                var trace = _context.ObjectId == 3 && memberElem.ObjectId == 16;
+                Tracer.ConditionalBreak(trace, _result.Dump());
+                ReplaceContextRefs();
+
+            }
+
+            private void UpdateIntermediateResult()
+            {
+                if(_result.Type.IsRef)
+                    return;
+                if(_intermediateResult == null)
+                    _intermediateResult = TypeBase.CreateVoidResult(InternalCategory);
+
+                _intermediateResult = _intermediateResult.SafeList(_result, InternalCategory);
+            }
+
+            private void ReplaceContextRefs()
+            {
+                if (IsPending)
+                    return;
+                if (!InternalCategory.HasRefs)
+                    return;
+                
+                foreach(var referencedContext in _result.Refs.Data)
+                    if(referencedContext.IsChildOf(_context))
+                    {
+                        var replaceContextCode = _intermediateResult.Type.CreateRefCodeForContext(referencedContext);
+                        Tracer.Assert(replaceContextCode != null);
+                        _result = _result.ReplaceRelativeContextRef(referencedContext, replaceContextCode);
+                    }
+            }
+
+            public Result FinalizeResult()
+            {
+                if(IsComplete || _result == null)
+                    NotImplementedMethod();
+                IsComplete = true;
+                if(IsPending)
+                    return _result;
+                return _result.CreateStatement(_category, _intermediateResult);
+            }
         }
 
-        internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken,
-            SyntaxBase right)
+        internal override Result VirtVisit(ContextBase context, Category category)
+        {
+            var visitStrategy = new VisitStrategy(context, category);
+            for (var i = 0; i < Chain.Count; i++)
+                visitStrategy.Execute(Chain[i], i == Chain.Count - 1);
+            return visitStrategy.FinalizeResult();
+        }
+
+        internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken,SyntaxBase right)
         {
             return new Statement(_chain, new MemberElem(defineableToken, right));
         }
