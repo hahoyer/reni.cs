@@ -1,5 +1,4 @@
 using Reni.Context;
-using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -22,13 +21,11 @@ namespace Reni.Feature
 
     internal interface IStructFeature
     {
-        IContextFeature Convert(ContextAtPosition contextAtPosition);
+        IContextFeature Convert(Struct.Context context);
         IFeature Convert(Struct.Type type);
     }
 
-    internal interface IRefToStructFeature
-    {
-    }
+    internal interface IRefToStructFeature {}
 
     internal interface ISequenceOfBitPrefixFeature
     {

@@ -32,11 +32,6 @@ namespace Reni.Context
             return SearchResult<IContextFeature>.Failure(this, defineable);
         }
 
-        internal override bool IsChildOf(ContextBase context)
-        {
-            return false;
-        }
-
         /// <summary>
         /// Compiles the functions.
         /// </summary>

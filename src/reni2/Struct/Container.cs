@@ -299,9 +299,7 @@ namespace Reni.Struct
         /// created 16.12.2006 13:15
         public Result VisitElementFromContextRef(ContextBase context, Category category, int position)
         {
-            return context
-                .CreateStructAtPosition(this, position)
-                .VisitElementFromContextRef(category, position);
+            return context.CreateStructContext(this).VisitElementFromContextRef(category, position);
         }
 
         public Result DestructorHandler(ContextBase context, Category category, Result objRefResult,
@@ -545,15 +543,28 @@ namespace Reni.Struct
                 _index = index;
             }
 
-            public IContextFeature Convert(ContextAtPosition contextAtPosition)
+            public IContextFeature Convert(Context context)
             {
-                return contextAtPosition.CreateMemberAccess(_index);
+                return context.CreateMemberAccess(_index);
             }
 
             public IFeature Convert(Type type)
             {
                 return type.CreateMemberAccess(_index);
             }
+        }
+
+        internal AtFeature AtFeatureObject(ContextBase parent)
+        {
+            return new AtFeature(this, parent);
+        }
+
+        internal IContextFeature[] CreateContextFeaturesCache(ContextBase Parent)
+        {
+            var result = new List<ContextFeature>();
+            for(var i = 0; i < List.Count; i++)
+                result.Add(new ContextFeature(this, Parent, i));
+            return result.ToArray();
         }
     }
 }

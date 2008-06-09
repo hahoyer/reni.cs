@@ -92,12 +92,12 @@ namespace Reni.Syntax
 
             private void UpdateIntermediateResult()
             {
-                if(_result.Type.IsRef)
+                if (_result.Type.IsRef)
                     return;
-                if(_intermediateResult == null)
-                    _intermediateResult = TypeBase.CreateVoidResult(InternalCategory);
-
-                _intermediateResult = _intermediateResult.SafeList(_result, InternalCategory);
+                if (_intermediateResult == null)
+                    _intermediateResult = _result;
+                else
+                    _intermediateResult = _intermediateResult.SafeList(_result, InternalCategory);
             }
 
             private void ReplaceContextRefs()
@@ -106,14 +106,20 @@ namespace Reni.Syntax
                     return;
                 if (!InternalCategory.HasRefs)
                     return;
-                
-                foreach(var referencedContext in _result.Refs.Data)
-                    if(referencedContext.IsChildOf(_context))
+
+                var referencedContexts = _result.Refs.Data;
+                foreach(var referencedContext in referencedContexts)
+                {
+                    if (_intermediateResult != null && referencedContext.IsChildOf(_context))
                     {
                         var replaceContextCode = _intermediateResult.Type.CreateRefCodeForContext(referencedContext);
                         Tracer.Assert(replaceContextCode != null);
                         _result = _result.ReplaceRelativeContextRef(referencedContext, replaceContextCode);
                     }
+                }
+
+                foreach(var referencedContext in _result.Refs.Data)
+                    Tracer.Assert(!_context.IsStructParentOf(referencedContext));
             }
 
             public Result FinalizeResult()

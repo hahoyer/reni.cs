@@ -1,6 +1,5 @@
-using Reni.Feature;
-using Reni.Parser;
-using Reni.Parser.TokenClass;
+using Reni.Code;
+using Reni.Type;
 
 namespace Reni.Context
 {
@@ -9,14 +8,14 @@ namespace Reni.Context
     /// </summary>
     internal sealed class Function : Child
     {
-        private readonly Type.TypeBase _argsType;
+        private readonly TypeBase _argsType;
 
         /// <summary>
         /// Gets the type.
         /// </summary>
         /// <value>The type.</value>
         /// created 03.11.2006 21:54
-        public Type.TypeBase ArgsType { get { return _argsType; } }
+        public TypeBase ArgsType { get { return _argsType; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Function"/> class.
@@ -24,7 +23,7 @@ namespace Reni.Context
         /// <param name="parent">The parent.</param>
         /// <param name="argsType">The type.</param>
         /// created 03.11.2006 21:54
-        public Function(ContextBase parent, Type.TypeBase argsType)
+        public Function(ContextBase parent, TypeBase argsType)
             : base(parent)
         {
             _argsType = argsType;
@@ -36,20 +35,15 @@ namespace Reni.Context
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 03.11.2006 22:00
-        public override Result  CreateArgsRefResult(Category category)
+        public override Result CreateArgsRefResult(Category category)
         {
             return ArgsType.CreateRef(RefAlignParam).CreateResult
                 (
                 category,
-                () => Code.CodeBase.CreateContextRef(this),
+                () => CodeBase.CreateContextRef(this),
                 () => Refs.Context(this)
                 )
-            ;
-        }
-
-        internal override SearchResult<IContextFeature> Search(Defineable defineable)
-        {
-            return Parent.Search(defineable).SubTrial(Parent);
+                ;
         }
     }
 }

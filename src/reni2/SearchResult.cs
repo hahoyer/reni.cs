@@ -73,11 +73,11 @@ namespace Reni
             return SearchResult<IFeature>.Create(resultFeature, this);
         }
 
-        public SearchResult<IContextFeature> Convert(IStructFeature feature, ContextAtPosition contextAtPosition)
+        public SearchResult<IContextFeature> Convert(IStructFeature feature, Struct.Context context)
         {
             IContextFeature resultFeature = null;
             if (feature != null)
-                resultFeature = feature.Convert(contextAtPosition);
+                resultFeature = feature.Convert(context);
             return SearchResult<IContextFeature>.Create(resultFeature, this);
         }
 

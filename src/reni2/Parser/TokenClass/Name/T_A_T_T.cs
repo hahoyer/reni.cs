@@ -15,9 +15,9 @@ namespace Reni.Parser.TokenClass.Name
             return SearchResult<IStructFeature>.Success(this, this);
         }
 
-        public IContextFeature Convert(ContextAtPosition contextAtPosition)
+        public IContextFeature Convert(Struct.Context context)
         {
-            return contextAtPosition.AtFeatureObject();
+            return context.AtFeatureObject();
         }
 
         public IFeature Convert(Struct.Type type)

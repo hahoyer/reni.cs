@@ -1,5 +1,6 @@
 using HWClassLibrary.Debug;
-using Reni.Parser;
+using HWClassLibrary.Helper;
+using Reni.Feature;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Context
@@ -9,7 +10,8 @@ namespace Reni.Context
     /// </summary>
     internal abstract class Child : ContextBase
     {
-        readonly ContextBase _parent;
+        private readonly ContextBase _parent;
+
         /// <summary>
         /// ctor
         /// </summary>
@@ -18,6 +20,7 @@ namespace Reni.Context
         {
             _parent = parent;
         }
+
         /// <summary>
         /// asis
         /// </summary>
@@ -26,18 +29,32 @@ namespace Reni.Context
         /// <summary>
         /// Parameter to describe alignment for references
         /// </summary>
-        public sealed override RefAlignParam RefAlignParam{get { return Parent.RefAlignParam; }}
+        public override sealed RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
         /// <summary>
         /// Return the root env
         /// </summary>
         [DumpData(false)]
-        public sealed override Root RootContext { get { return Parent.RootContext; } }
+        public override sealed Root RootContext { get { return Parent.RootContext; } }
 
-        internal override bool IsChildOf(ContextBase context)
+        protected override Sequence<ContextBase> ObtainChildChain()
         {
-            if(context == Parent)
-                return true;
-            return Parent.IsChildOf(context);
+            return Parent.ChildChain + this;
+        }
+
+        /// <summary>
+        /// Creates the args ref result.
+        /// </summary>
+        /// <param name="category">The category.</param>
+        /// <returns></returns>
+        /// created 03.11.2006 22:00
+        public override Result CreateArgsRefResult(Category category)
+        {
+            return Parent.CreateArgsRefResult(category);
+        }
+
+        internal override SearchResult<IContextFeature> Search(Defineable defineable)
+        {
+            return Parent.Search(defineable).SubTrial(Parent);
         }
     }
 }

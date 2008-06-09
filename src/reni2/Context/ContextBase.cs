@@ -19,9 +19,26 @@ namespace Reni.Context
     [AdditionalNodeInfo("DebuggerDumpString")]
     internal abstract class ContextBase : ReniObject, IDumpShortProvider
     {
+        internal class Cache
+        {
+            [Node]
+            internal DictionaryEx<TypeBase, Function> _functionInstanceCache = new DictionaryEx<TypeBase, Function>();
+            [Node]
+            internal DictionaryEx<SyntaxBase, TypeBase> _functionType = new DictionaryEx<SyntaxBase, TypeBase>();
+            [Node]
+            internal DictionaryEx<SyntaxBase, TypeBase> _propertyType = new DictionaryEx<SyntaxBase, TypeBase>();
+            [Node]
+            internal DictionaryEx<Struct.Container, Struct.Context> _structContainerCache = new DictionaryEx<Struct.Container, Struct.Context>();
+            [Node]
+            internal DictionaryEx<int, ContextAtPosition> _structPositionCache = new DictionaryEx<int, ContextAtPosition>();
+            [Node]
+            internal Result _topRefResultCache;
+        }
+
         private static int _nextId;
         [Node]
         internal Cache _cache = new Cache();
+        private Sequence<ContextBase> _childChainCache;
 
         protected ContextBase() : base(_nextId++) {}
 
@@ -44,6 +61,17 @@ namespace Reni.Context
 
                 return _cache._topRefResultCache;
             }
+        }
+        [DumpData(false)]
+        internal Sequence<ContextBase> ChildChain
+        {
+            get { if (_childChainCache == null)
+                _childChainCache = ObtainChildChain();
+            return _childChainCache; } }
+
+        virtual protected Sequence<ContextBase> ObtainChildChain()
+        {
+            return HWString.Sequence(this);
         }
 
         public string DumpShort()
@@ -171,7 +199,8 @@ namespace Reni.Context
             if(prefixSearchResult.IsSuccessFull)
                 return prefixSearchResult.Feature.VisitApply(category, argResult);
 
-            NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult, "prefixSearchResult", prefixSearchResult);
+            NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult, "prefixSearchResult",
+                prefixSearchResult);
             return null;
         }
 
@@ -188,12 +217,6 @@ namespace Reni.Context
             if(formerResult == null)
                 return VisitFirstChainElement(category, memberElem);
             return VisitNextChainElement(category, memberElem, formerResult);
-        }
-
-        internal virtual bool IsChildOf(ContextBase context)
-        {
-            NotImplementedMethod(context);
-            return true;
         }
 
         internal virtual CodeBase CreateRefForStruct(Struct.Type type)
@@ -218,31 +241,17 @@ namespace Reni.Context
             return results;
         }
 
-        internal class Cache
+        internal bool IsChildOf(ContextBase parentCandidate)
         {
-            [Node]
-            internal DictionaryEx<TypeBase, Function> _functionInstanceCache =
-                new DictionaryEx<TypeBase, Function>();
-
-            [Node]
-            internal DictionaryEx<SyntaxBase, TypeBase> _functionType =
-                new DictionaryEx<SyntaxBase, TypeBase>();
-
-            [Node]
-            internal DictionaryEx<SyntaxBase, TypeBase> _propertyType =
-                new DictionaryEx<SyntaxBase, TypeBase>();
-
-            [Node]
-            internal DictionaryEx<Struct.Container, Struct.Context> _structContainerCache =
-                new DictionaryEx<Struct.Container, Struct.Context>();
-
-            [Node]
-            internal DictionaryEx<int, ContextAtPosition> _structPositionCache =
-                new DictionaryEx<int, ContextAtPosition>();
-
-            [Node]
-            internal Result _topRefResultCache;
+            return ChildChain.StartsWith(parentCandidate.ChildChain);
         }
 
+        internal bool IsStructParentOf(ContextBase child)
+        {
+            if(IsChildOf(child))
+                return false;
+            NotImplementedMethod(child);
+            return false;
+        }
     }
 }
