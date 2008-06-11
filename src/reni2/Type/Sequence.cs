@@ -25,11 +25,16 @@ namespace Reni.Type
         }
 
         [Node]
+        [DumpData(false)]
         internal Array InheritedType { get { return _inheritedType; } }
+        [DumpData(false)]
         internal override Size Size { get { return _inheritedType.Size; } }
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
+        [DumpData(false)]
         internal override int SequenceCount { get { return Count; } }
+        [DumpData(false)]
         internal int Count { get { return _inheritedType.Count; } }
+        [DumpData(false)]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
         public override string DumpShort()

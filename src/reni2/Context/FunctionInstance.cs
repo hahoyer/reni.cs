@@ -119,17 +119,20 @@ namespace Reni.Context
         /// created 03.01.2007 21:19
         public Result CreateCall(Category category, Result args)
         {
-            var trace = ObjectId == -569;
+            var trace = ObjectId == 3;
             StartMethodDump(trace, category, args);
             var localCategory = category;
             if (category.HasCode)
                 localCategory = (localCategory - Category.Code) | Category.Size;
             var result = Visit(localCategory).Clone();
             if (result.IsPending)
-                return result;
+                return ReturnMethodDump(trace, result);
+
 
             if (category.HasRefs)
                 result.Refs = result.Refs.Pair(args.Refs);
+
+            if (trace) DumpDataWithBreak("", "result", result);
 
             if (category.HasCode)
             {

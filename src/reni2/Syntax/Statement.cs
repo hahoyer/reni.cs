@@ -84,8 +84,6 @@ namespace Reni.Syntax
                 if(!isLast)
                     UpdateIntermediateResult();
 
-                var trace = _context.ObjectId == 3 && memberElem.ObjectId == 16;
-                Tracer.ConditionalBreak(trace, _result.Dump());
                 ReplaceContextRefs();
 
             }
@@ -118,8 +116,8 @@ namespace Reni.Syntax
                     }
                 }
 
-                foreach(var referencedContext in _result.Refs.Data)
-                    Tracer.Assert(!_context.IsStructParentOf(referencedContext));
+                //foreach(var referencedContext in _result.Refs.Data)
+                //    Tracer.Assert(!_context.IsStructParentOf(referencedContext));
             }
 
             public Result FinalizeResult()
