@@ -14,7 +14,7 @@ namespace Reni.Code
         public ContextRef(C context)
         {
             _context = context;
-            StopByObjectId(1645);
+            StopByObjectId(-589);
         }
 
         /// <summary>

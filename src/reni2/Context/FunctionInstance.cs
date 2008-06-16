@@ -139,6 +139,8 @@ namespace Reni.Context
                 var argsEx = CreateArgsAndRefForFunction(args.Code);
                 result.Code = argsEx.CreateCall(Index, result.Size);
             }
+
+            Context.CreateFunction(Args).AssertCorrectRefs(result);
             return ReturnMethodDump(trace, result);
         }
 
@@ -173,30 +175,25 @@ namespace Reni.Context
                 return null;
 
             var functionContext = Context.CreateFunction(Args);
-            var trace = functionContext.ObjectId == 7 && category.HasCode;
+            var trace = ObjectId == -10 && category.HasRefs;
+            StartMethodDumpWithBreak(trace, category);
             var categoryEx = category;
             if (!categoryEx.IsEqual(Category.Refs))
                 categoryEx = categoryEx | Category.Type;
 
             var result = Body.Visit(functionContext, categoryEx).Clone();
 
-            Tracer.ConditionalBreak(trace,
-                                    Dump() + "\nfunctionContext=" + functionContext.Dump() + "\nresult=" + result.Dump());
+            Tracer.ConditionalBreak(trace, Dump() + "\nfunctionContext=" + functionContext.Dump() + "\nresult=" + result.Dump());
 
             if (result.IsPending)
-                return result;
+                return ReturnMethodDump(trace, result);
 
             if (result.HasType)
                 result = result.Type.Dereference(result).Align(functionContext.AlignBits);
 
-            Tracer.ConditionalBreak(trace,
-                                    Dump() + "\nresult=" + result.Dump());
-
+            Tracer.ConditionalBreak(trace,Dump() + "\nresult=" + result.Dump());
             result = result.ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(result.Complete));
-
-            Tracer.ConditionalBreak(trace, "result=" + result.Dump());
-
-            return result;
+            return ReturnMethodDump(trace, result);
         }
 
         private Result CreateArgsRef(Category category)

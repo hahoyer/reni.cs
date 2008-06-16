@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Context;
 
 namespace Reni.Syntax
 {
@@ -11,8 +12,8 @@ namespace Reni.Syntax
     internal sealed class CacheItem : ReniObject
     {
         private readonly SyntaxBase _syntax;
-        private readonly Context.ContextBase _context;
-        private Result _data = new Result();
+        private readonly ContextBase _context;
+        private readonly Result _data = new Result();
 
         [Node]
         public Result Data { get { return _data; } }
@@ -22,9 +23,9 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="syntax"></param>
         /// <param name="environment"></param>
-        public CacheItem(SyntaxBase syntax, Context.ContextBase environment)
+        public CacheItem(SyntaxBase syntax, ContextBase environment)
         {
-            if (syntax == null)
+            if(syntax == null)
                 throw new NullReferenceException("parameter \"syntax\" must not be null");
             _syntax = syntax;
             _context = environment;

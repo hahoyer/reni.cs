@@ -104,6 +104,8 @@ namespace Reni.Syntax
                     return;
                 if (!InternalCategory.HasRefs)
                     return;
+                if(! (_context is Reni.Struct.Context))
+                    return;
 
                 var referencedContexts = _result.Refs.Data;
                 foreach(var referencedContext in referencedContexts)

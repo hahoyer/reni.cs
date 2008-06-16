@@ -243,7 +243,7 @@ namespace Reni.Context
 
         internal bool IsChildOf(ContextBase parentCandidate)
         {
-            return ChildChain.StartsWith(parentCandidate.ChildChain);
+            return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain);
         }
 
         internal bool IsStructParentOf(ContextBase child)
@@ -252,6 +252,25 @@ namespace Reni.Context
                 return false;
             NotImplementedMethod(child);
             return false;
+        }
+
+        internal void AssertCorrectRefs(Result result)
+        {
+            if(result.HasRefs)
+                AssertCorrectRefs(result.Refs);
+            else
+                Tracer.Assert(!result.HasCode);
+        }
+
+        private void AssertCorrectRefs(Refs refs)
+        {
+            foreach(var contextBase in refs.Data)
+                CheckRef(contextBase);
+        }
+
+        private void CheckRef(ContextBase contextBase)
+        {
+            Tracer.Assert(!contextBase.IsChildOf(this), "context="+Dump() + "\nref="+contextBase.Dump());
         }
     }
 }

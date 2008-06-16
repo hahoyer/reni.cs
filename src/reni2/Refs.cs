@@ -14,7 +14,7 @@ namespace Reni
     {
         private readonly List<ContextBase> _data;
         private readonly bool _isPending;
-        private SizeArray _sizes;
+        private SizeArray _sizesCache;
 
         private Refs()
         {
@@ -22,29 +22,40 @@ namespace Reni
             StopByObjectId(-441);
         }
 
-        private Refs(ContextBase e)
-            : this()
+        private Refs(ContextBase e): this()
         {
-            _data.Add(e);
+            Add(e);
         }
 
-        private Refs(IEnumerable<ContextBase> a, IEnumerable<ContextBase> b)
-            : this(a)
+        private Refs(IEnumerable<ContextBase> a, IEnumerable<ContextBase> b): this()
         {
-            foreach(var e in b)
-                if(!_data.Contains(e))
-                    _data.Add(e);
+            AddRange(a);
+            AddRange(b);
         }
 
-        private Refs(IEnumerable<ContextBase> a)
-            : this()
+        private Refs(IEnumerable<ContextBase> a) : this()
         {
-            _data.AddRange(a);
+            AddRange(a);
         }
 
         private Refs(bool isPending)
         {
             _isPending = isPending;
+        }
+
+        private void AddRange(IEnumerable<ContextBase> a)
+        {
+            foreach (var e in a)
+                Add(e);
+        }
+
+        private void Add(ContextBase e)
+        {
+            var trace = e.ObjectId == 6;
+            StartMethodDumpWithBreak(trace,e);
+            if (!_data.Contains(e))
+                _data.Add(e);
+            ReturnMethodDump(trace);
         }
 
         [Node]
@@ -56,9 +67,9 @@ namespace Reni
         {
             get
             {
-                if(_sizes == null)
-                    _sizes = CalcSizes();
-                return _sizes;
+                if(_sizesCache == null)
+                    _sizesCache = CalcSizes();
+                return _sizesCache;
             }
         }
 

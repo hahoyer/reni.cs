@@ -424,6 +424,7 @@ namespace Reni
                 try
                 {
                     var RSub = syntax.VirtVisit(context, notCompleteCategory);
+                    context.AssertCorrectRefs(this);
                     Update(RSub);
                 }
                 catch
