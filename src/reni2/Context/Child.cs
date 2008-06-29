@@ -5,34 +5,19 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Context
 {
-    /// <summary>
-    /// Environment with parent
-    /// </summary>
     internal abstract class Child : ContextBase
     {
         private readonly ContextBase _parent;
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="parent"></param>
-        public Child(ContextBase parent)
+        protected Child(ContextBase parent)
         {
             _parent = parent;
         }
 
-        /// <summary>
-        /// asis
-        /// </summary>
         public ContextBase Parent { get { return _parent; } }
 
-        /// <summary>
-        /// Parameter to describe alignment for references
-        /// </summary>
         public override sealed RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
-        /// <summary>
-        /// Return the root env
-        /// </summary>
+
         [DumpData(false)]
         public override sealed Root RootContext { get { return Parent.RootContext; } }
 

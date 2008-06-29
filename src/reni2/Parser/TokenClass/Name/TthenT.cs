@@ -1,18 +1,18 @@
+using Reni.Context;
+using Reni.Syntax;
+
 namespace Reni.Parser.TokenClass.Name
 {
-    class TthenT : Special
+    class TthenT : Infix
     {
-        /// <summary>
-        /// Creates the syntax.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="token">The token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+        internal override string DumpShort()
         {
-            return new ThenElse(left, token, right);
+            return "then";
+        }
+
+        internal override Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

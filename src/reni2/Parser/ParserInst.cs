@@ -28,10 +28,10 @@ namespace Reni.Parser
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public SyntaxBase Compile(Source source)
+        public IParsedSyntax Compile(Source source)
         {
             var sp = new SourcePosn(source, 0);
-            SyntaxBase start = null;
+            IParsedSyntax start = null;
             var stack = new Stack<PushedSyntax>();
             stack.Push(new PushedSyntax(start, sp.CreateStart()));
             while(Apply(stack, ref start, ParserLibrary.CreateToken(sp)))
@@ -39,7 +39,7 @@ namespace Reni.Parser
             return PullAndCall(stack, null);
         }
 
-        private bool Apply(Stack<PushedSyntax> stack, ref SyntaxBase o, Token token)
+        private bool Apply(Stack<PushedSyntax> stack, ref IParsedSyntax o, Token token)
         {
             while(true)
             {
@@ -55,10 +55,10 @@ namespace Reni.Parser
             }
         }
 
-        private static SyntaxBase PullAndCall(Stack<PushedSyntax> stack, SyntaxBase Args)
+        private static IParsedSyntax PullAndCall(Stack<PushedSyntax> stack, IParsedSyntax args)
         {
             var x = stack.Pop();
-            return x.CreateSyntax(Args);
+            return x.CreateSyntax(args);
         }
 
         private static ParserLibrary StandardParserLibrary()
@@ -99,9 +99,9 @@ namespace Reni.Parser
             x = x.ParLevel
                 (new[]
                 {
-                    "+-+",
+                    "+--",
                     "+?+",
-                    "?--"
+                    "?-+"
                 },
                     new[] {"then"},
                     new[] {"else"}

@@ -5,20 +5,20 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Right parenthesis' 
     /// </summary>
-    internal sealed class RPar : Base
+    internal sealed class RPar : TokenClassBase
     {
 
         private readonly int _level;
 
-        private static readonly Base _parenthesis = new RPar(3);
-        private static readonly Base _bracket = new RPar(2);
-        private static readonly Base _brace = new RPar(1);
-        private static readonly Base _frame = new RPar(0);
+        private static readonly TokenClassBase _parenthesis = new RPar(3);
+        private static readonly TokenClassBase _bracket = new RPar(2);
+        private static readonly TokenClassBase _brace = new RPar(1);
+        private static readonly TokenClassBase _frame = new RPar(0);
 
-        internal static Base Parenthesis { get { return _parenthesis; } }
-        internal static Base Bracket { get { return _bracket; } }
-        internal static Base Brace { get { return _brace; } }
-        internal static Base Frame { get { return _frame; } }
+        internal static TokenClassBase Parenthesis { get { return _parenthesis; } }
+        internal static TokenClassBase Bracket { get { return _bracket; } }
+        internal static TokenClassBase Brace { get { return _brace; } }
+        internal static TokenClassBase Frame { get { return _frame; } }
         /// <summary>
         /// ctor
         /// </summary>
@@ -42,13 +42,13 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             if(right != null)
                 return base.CreateSyntax(left, token, right);
             if(left != null)
                 return left;
-            return new Void(token);
+            return new EmptyList(token);
         }
 
         /// <summary>

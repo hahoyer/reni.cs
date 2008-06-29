@@ -12,10 +12,10 @@ namespace Reni.Context
     /// </summary>
     internal sealed class FunctionInstance : ReniObject
     {
-        private readonly TypeBase _args;
-        private readonly SyntaxBase _body;
-        private readonly ContextBase _context;
-        private readonly int _index;
+        private readonly TypeBase Args;
+        private readonly ICompileSyntax Body;
+        private readonly ContextBase Context;
+        private readonly int Index;
         private CodeBase _bodyCodeCache;
 
         /// <summary>
@@ -26,54 +26,14 @@ namespace Reni.Context
         /// <param name="context">The context.</param>
         /// <param name="args">The args.</param>
         /// created 03.01.2007 21:19
-        internal FunctionInstance(int index, SyntaxBase body, ContextBase context, TypeBase args)
+        internal FunctionInstance(int index, ICompileSyntax body, ContextBase context, TypeBase args)
             : base(index)
         {
             StopByObjectId(-1);
-            _index = index;
-            _body = body;
-            _context = context;
-            _args = args;
-        }
-
-        /// <summary>
-        /// Gets the index.that is unique for each function
-        /// </summary>
-        /// <value>The index.</value>
-        /// created 03.01.2007 21:18
-        public int Index
-        {
-            get { return _index; }
-        }
-
-        /// <summary>
-        /// Gets the body.
-        /// </summary>
-        /// <value>The body.</value>
-        /// created 03.01.2007 21:18
-        public SyntaxBase Body
-        {
-            get { return _body; }
-        }
-
-        /// <summary>
-        /// Gets the context.the function is defined in
-        /// </summary>
-        /// <value>The context.</value>
-        /// created 03.01.2007 21:18
-        internal ContextBase Context
-        {
-            get { return _context; }
-        }
-
-        /// <summary>
-        /// Gets the args.
-        /// </summary>
-        /// <value>The args.</value>
-        /// created 03.01.2007 21:19
-        public TypeBase Args
-        {
-            get { return _args; }
+            Index = index;
+            Body = body;
+            Context = context;
+            Args = args;
         }
 
         [DumpData(false)]
@@ -107,16 +67,9 @@ namespace Reni.Context
         [DumpData(false)]
         private string Description
         {
-            get { return _body.Dump(); }
+            get { return Body.DumpShort(); }
         }
 
-        /// <summary>
-        /// Creates the call.to this function
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        /// created 03.01.2007 21:19
         public Result CreateCall(Category category, Result args)
         {
             var trace = ObjectId == 3;
@@ -149,11 +102,6 @@ namespace Reni.Context
             return ForeignRefs.ToCode().CreateSequence(argsCode);
         }
 
-        /// <summary>
-        /// Create the code of the body of this function.
-        /// </summary>
-        /// <returns></returns>
-        /// created 31.12.2006 14:09
         private CodeBase CreateBodyCode()
         {
             if (IsStopByObjectIdActive)
@@ -181,7 +129,7 @@ namespace Reni.Context
             if (!categoryEx.IsEqual(Category.Refs))
                 categoryEx = categoryEx | Category.Type;
 
-            var result = Body.Visit(functionContext, categoryEx).Clone();
+            var result = functionContext.Result(categoryEx, Body).Clone();
 
             Tracer.ConditionalBreak(trace, Dump() + "\nfunctionContext=" + functionContext.Dump() + "\nresult=" + result.Dump());
 
@@ -210,11 +158,6 @@ namespace Reni.Context
             return Visit(Category.Type).Type;
         }
 
-        /// <summary>
-        /// Serializes this instance.
-        /// </summary>
-        /// <returns></returns>
-        /// created 26.11.2006 16:59
         internal Container Serialize()
         {
             try
@@ -230,13 +173,13 @@ namespace Reni.Context
         public string DumpFunction()
         {
             var result = "\n";
-            result += "index=" + _index;
+            result += "index=" + Index;
             result += "\n";
-            result += "body=" + _body.DumpShort();
+            result += "body=" + Body.DumpShort();
             result += "\n";
-            result += "args=" + _args.Dump();
+            result += "args=" + Args.Dump();
             result += "\n";
-            result += "context=" + _context.Dump();
+            result += "context=" + Context.Dump();
             result += "\n";
             result += "type=" + VisitType().Dump();
             result += "\n";

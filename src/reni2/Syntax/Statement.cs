@@ -2,15 +2,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using HWClassLibrary.Debug;
 using Reni.Context;
-using Reni.Parser;
-using Reni.Type;
 
 namespace Reni.Syntax
 {
     /// <summary>
     /// Statement inside of a struct, context free version
     /// </summary>
-    internal sealed class Statement : SyntaxBase
+    internal sealed class Statement : ReniObject
     {
         private readonly List<MemberElem> _chain;
 
@@ -33,7 +31,6 @@ namespace Reni.Syntax
 
         [DebuggerHidden]
         public List<MemberElem> Chain { get { return _chain; } }
-        internal protected override string FilePosition { get { return _chain[0].FilePosition; } }
 
         internal class VisitStrategy : ReniObject
         {
@@ -55,7 +52,7 @@ namespace Reni.Syntax
             {
                 get
                 {
-                    if (_category.HasCode)
+                    if(_category.HasCode)
                         return _category | Category.Type | Category.Refs;
                     return _category | Category.Type;
                 }
@@ -63,7 +60,7 @@ namespace Reni.Syntax
 
             public void Execute(MemberElem memberElem, bool isLast)
             {
-                if (IsComplete)
+                if(IsComplete)
                     return;
                 if(IsPending)
                     return;
@@ -74,49 +71,43 @@ namespace Reni.Syntax
 
                 if(isLast)
                     _result = _result.Type.Dereference(_result);
-                if (IsPending)
+                if(IsPending)
                     return;
-                
+
                 _result = _result.PostProcess(_context.RefAlignParam);
-                if (IsPending)
+                if(IsPending)
                     return;
 
                 if(!isLast)
                     UpdateIntermediateResult();
 
                 ReplaceContextRefs();
-
             }
 
             private void UpdateIntermediateResult()
             {
-                if (_result.Type.IsRef)
+                if(_result.Type.IsRef(_context.RefAlignParam))
                     return;
-                if (_intermediateResult == null)
-                    _intermediateResult = _result;
-                else
-                    _intermediateResult = _intermediateResult.SafeList(_result, InternalCategory);
+                _intermediateResult = _intermediateResult == null ? _result : _intermediateResult.SafeList(_result, InternalCategory);
             }
 
             private void ReplaceContextRefs()
             {
-                if (IsPending)
+                if(IsPending)
                     return;
-                if (!InternalCategory.HasRefs)
+                if(!InternalCategory.HasRefs)
                     return;
                 if(! (_context is Reni.Struct.Context))
                     return;
 
                 var referencedContexts = _result.Refs.Data;
                 foreach(var referencedContext in referencedContexts)
-                {
-                    if (_intermediateResult != null && referencedContext.IsChildOf(_context))
+                    if(_intermediateResult != null && referencedContext.IsChildOf(_context))
                     {
                         var replaceContextCode = _intermediateResult.Type.CreateRefCodeForContext(referencedContext);
                         Tracer.Assert(replaceContextCode != null);
                         _result = _result.ReplaceRelativeContextRef(referencedContext, replaceContextCode);
                     }
-                }
 
                 //foreach(var referencedContext in _result.Refs.Data)
                 //    Tracer.Assert(!_context.IsStructParentOf(referencedContext));
@@ -133,20 +124,15 @@ namespace Reni.Syntax
             }
         }
 
-        internal override Result VirtVisit(ContextBase context, Category category)
+        public Result VirtVisit(ContextBase context, Category category)
         {
             var visitStrategy = new VisitStrategy(context, category);
-            for (var i = 0; i < Chain.Count; i++)
+            for(var i = 0; i < Chain.Count; i++)
                 visitStrategy.Execute(Chain[i], i == Chain.Count - 1);
             return visitStrategy.FinalizeResult();
         }
 
-        internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken,SyntaxBase right)
-        {
-            return new Statement(_chain, new MemberElem(defineableToken, right));
-        }
-
-        internal override string DumpShort()
+        internal string DumpShort()
         {
             var result = "";
             for(var i = 0; i < _chain.Count; i++)

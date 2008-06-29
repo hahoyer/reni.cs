@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Code;
 using Reni.Context;
+using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni
 {
@@ -12,12 +15,13 @@ namespace Reni
     /// </summary>
     internal sealed class Result : ReniObject
     {
-        private Code.CodeBase _code;
         private bool _isDirty;
         private Category _pending;
-        private Refs _refs;
         private Size _size;
-        private Type.TypeBase _type;
+        private TypeBase _type;
+        private CodeBase _code;
+        private Refs _refs;
+        private Result _internal;
 
         /// <summary>
         /// ctor
@@ -31,6 +35,7 @@ namespace Reni
         internal bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
+        internal bool HasInternal { get { return Internal != null; } }
 
         /// <summary>
         /// In case of recursion, there may be pending requests
@@ -41,7 +46,7 @@ namespace Reni
         /// <summary>
         /// Obtain the category signature contained
         /// </summary>
-        public Category Complete { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
+        public Category Complete { get { return new Category(HasSize, HasType, HasCode, HasRefs, HasInternal); } }
 
         /// <summary>
         /// The size-category, can be null
@@ -61,7 +66,7 @@ namespace Reni
         /// The type-category, can be null
         /// </summary>
         [Node]
-        public Type.TypeBase Type
+        public TypeBase Type
         {
             get { return _type; }
             set
@@ -75,7 +80,7 @@ namespace Reni
         /// The code-category, can be null
         /// </summary>
         [Node]
-        internal Code.CodeBase Code
+        internal CodeBase Code
         {
             get { return _code; }
             set
@@ -95,6 +100,17 @@ namespace Reni
             set
             {
                 _refs = value;
+                AssertValid();
+            }
+        }
+
+        [Node]
+        public Result Internal
+        {
+            get { return _internal; }
+            set
+            {
+                _internal = value;
                 AssertValid();
             }
         }
@@ -208,6 +224,9 @@ namespace Reni
                     return Code.IsPending;
                 if(Complete.HasRefs)
                     return Refs.IsPending;
+                if (Complete.HasInternal)
+                    return Internal.IsPending;
+
                 return false;
             }
         }
@@ -230,6 +249,8 @@ namespace Reni
                 result += "\nRefs=" + Tracer.Dump(_refs);
             if(HasCode)
                 result += "\nCode=" + Tracer.Dump(_code);
+            if (HasInternal)
+                result += "\nInternal=" + Tracer.Dump(_internal);
             return result;
         }
 
@@ -259,6 +280,9 @@ namespace Reni
 
             if(r.HasCode && !r.Code.IsPending)
                 _code = r.Code;
+
+            if (r.HasInternal && !r.Internal.IsPending)
+                _internal = r.Internal;
         }
 
         private void Update(Result r, Category c)
@@ -266,11 +290,13 @@ namespace Reni
             if(c.HasSize)
                 _size = r.Size ?? Size.Pending;
             if(c.HasType)
-                _type = r.Type ?? Reni.Type.TypeBase.Pending;
+                _type = r.Type ?? TypeBase.Pending;
             if(c.HasRefs)
                 _refs = r.Refs ?? Refs.Pending;
             if(c.HasCode)
-                _code = r.Code ?? Reni.Code.CodeBase.Pending;
+                _code = r.Code ?? CodeBase.Pending;
+            if (c.HasInternal)
+                _internal = r.Internal ?? CreatePending(Category.ForInternal);
         }
 
         private Result Filter(Category category)
@@ -333,6 +359,8 @@ namespace Reni
                 r.Code = Code;
             if(category.HasRefs)
                 r.Refs = Refs;
+            if (category.HasInternal)
+                r.Internal = Internal.Clone();
             return r;
         }
 
@@ -355,38 +383,36 @@ namespace Reni
             if(size != null)
             {
                 if(HasSize)
-                {
                     if(!(Size == size))
                     {
                         Tracer.AssertionFailed(1, @"Size==size", "Size differs " + Dump());
                         Debugger.Break();
                     }
-                }
                 if(HasType)
-                {
                     if(!(Type.Size == size))
                     {
                         Tracer.AssertionFailed(1, @"Type.Size==size", "Type size differs " + Dump());
                         Debugger.Break();
                     }
-                }
                 if(HasCode)
-                {
                     if(!(Code.Size == size))
                     {
                         Tracer.AssertionFailed(1, @"Code.Size==size", "Code size differs " + Dump());
                         Debugger.Break();
                     }
-                }
             }
 
             if(HasRefs && HasCode)
-            {
                 if(!Refs.Contains(Code.Refs))
                 {
                     Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
                     Debugger.Break();
                 }
+
+            if(HasInternal && _internal.HasInternal)
+            {
+                Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "nested internals " + Dump());
+                Debugger.Break();
             }
         }
 
@@ -400,6 +426,8 @@ namespace Reni
                 return false;
             if(category.HasRefs && !Complete.HasRefs)
                 return false;
+            if(category.HasInternal && !Complete.HasInternal)
+                return false;
             return true;
         }
 
@@ -410,8 +438,8 @@ namespace Reni
         /// <param name="context"></param>
         /// <param name="syntax"></param>
         /// <returns></returns>
-        [DebuggerHidden]
-        internal Result Visit(Category category, ContextBase context, Syntax.SyntaxBase syntax)
+        //[DebuggerHidden]
+        internal Result AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
         {
             var OldPending = Pending;
             var OldComplete = Complete;
@@ -423,9 +451,10 @@ namespace Reni
 
                 try
                 {
-                    var RSub = syntax.VirtVisit(context, notCompleteCategory);
+                    var result = syntax.Result(context, notCompleteCategory);
                     context.AssertCorrectRefs(this);
-                    Update(RSub);
+                    Tracer.Assert(result.Complete == notCompleteCategory, string.Format("syntax={2}\ncategory={0}\nResult={1}", notCompleteCategory, result.Dump(), syntax.DumpShort()));
+                    Update(result);
                 }
                 catch
                 {
@@ -435,7 +464,9 @@ namespace Reni
 
                 Pending = OldPending;
             }
-            return Filter(category);
+            var filteredResult = Filter(category);
+            Tracer.Assert(filteredResult.Complete == category, string.Format("syntax={2}\ncategory={0}\nResult={1}", category, filteredResult.Dump(), syntax.DumpShort()));
+            return filteredResult;
         }
 
         /// <summary>
@@ -461,6 +492,8 @@ namespace Reni
                 Code = Code.CreateSequence(other.Code);
             if(category.HasRefs)
                 Refs = Refs.Pair(other.Refs);
+            if(category.HasInternal)
+                Internal = Internal.CreateSequence(other.Internal);
             IsDirty = false;
         }
 
@@ -474,6 +507,13 @@ namespace Reni
         internal Result CreateSequence(Result second, Category category)
         {
             var result = Clone(category);
+            result.Add(second);
+            return result;
+        }
+
+        internal Result CreateSequence(Result second)
+        {
+            var result = Clone();
             result.Add(second);
             return result;
         }
@@ -500,11 +540,11 @@ namespace Reni
         internal static Result ConvertBitArrayToBitArray(Category category, int sourceBitCount, int destBitCount)
         {
             if(sourceBitCount == 0 && destBitCount == 0)
-                return Reni.Type.TypeBase.CreateVoidResult(category);
+                return TypeBase.CreateVoidResult(category);
             var result = new Result();
             if(category.HasCode)
             {
-                var codeResult = Reni.Code.CodeBase.CreateArg(Size.Create(sourceBitCount));
+                var codeResult = CodeBase.CreateArg(Size.Create(sourceBitCount));
                 if(destBitCount != sourceBitCount)
                     codeResult = codeResult.CreateBitCast(Size.Create(destBitCount));
                 result.Code = codeResult;
@@ -527,17 +567,11 @@ namespace Reni
 
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
             StartMethodDump(trace, resultForArg);
-            var result = new Result();
-            if(HasSize)
-                result.Size = Size;
-            if(HasType)
-                result.Type = Type;
-            result.IsDirty = true;
+            var result = new Result {Size = Size, Type = Type, Internal = Internal};
             if(HasCode && resultForArg.HasCode)
                 result.Code = Code.UseWithArg(resultForArg.Code);
             if(HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.Pair(resultForArg.Refs);
-            result.IsDirty = false;
             return ReturnMethodDump(trace, result);
         }
 
@@ -552,12 +586,7 @@ namespace Reni
             if(HasRefs && !Refs.Contains(context))
                 return this;
 
-            var result = new Result();
-            if(HasSize)
-                result.Size = Size;
-            if(HasType)
-                result.Type = Type;
-            result.IsDirty = true;
+            var result = new Result {Size = Size, Type = Type, Internal = Internal, IsDirty = true};
             if(HasCode)
                 result.Code = Code.ReplaceAbsoluteContextRef(context, replacement.Code);
             if(HasRefs)
@@ -572,22 +601,16 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, Code.CodeBase replacement) where C : ContextBase
+        internal Result ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : ContextBase
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
 
-            var result = new Result();
-            if(HasSize)
-                result.Size = Size;
-            if(HasType)
-                result.Type = Type;
-            result.IsDirty = true;
+            var result = new Result { Size = Size, Type = Type, Internal = Internal};
             if(HasCode)
                 result.Code = Code.ReplaceRelativeContextRef(context, replacement);
             if(HasRefs)
                 result.Refs = Refs.Without(context);
-            result.IsDirty = false;
             return result;
         }
 
@@ -598,7 +621,7 @@ namespace Reni
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
         /// created 31.12.2006 14:50
-        internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, Code.CodeBase replacement)
+        internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, CodeBase replacement)
         {
             if(!HasCode)
                 return this;
@@ -639,15 +662,9 @@ namespace Reni
         /// [created 04.06.2006 01:09]
         internal Result CreateRefPlus(Category c, RefAlignParam refAlignParam, Size value)
         {
-            var result = new Result();
-            if(c.HasSize)
-                result.Size = Size;
-            if(c.HasType)
-                result.Type = Type;
+            var result = Clone();
             if(c.HasCode)
                 result.Code = Code.CreateRefPlus(refAlignParam, value);
-            if(c.HasRefs)
-                result.Refs = Refs;
             return result;
         }
 
@@ -690,20 +707,22 @@ namespace Reni
             if(category.HasSize)
                 result.Size = Size.Pending;
             if(category.HasType)
-                result.Type = Reni.Type.TypeBase.Pending;
+                result.Type = TypeBase.Pending;
             if(category.HasRefs)
                 result.Refs = Refs.Pending;
             if(category.HasCode)
-                result.Code = Reni.Code.CodeBase.Pending;
+                result.Code = CodeBase.Pending;
+            if (category.HasInternal)
+                result.Internal= CreatePending(Category.ForInternal);
             return result;
         }
 
-        internal Result ConvertTo(Type.TypeBase target)
+        internal Result ConvertTo(TypeBase target)
         {
             return Type.ConvertTo(Complete, target).UseWithArg(this);
         }
 
-        internal Result CreateUnref(Type.TypeBase type, RefAlignParam refAlignParam)
+        internal Result CreateUnref(TypeBase type, RefAlignParam refAlignParam)
         {
             return type.CreateResult
                 (
@@ -731,7 +750,7 @@ namespace Reni
 
         internal Result EnsureContextRef(ContextBase context)
         {
-            if(Type.IsRef)
+            if(Type.IsRef(context.RefAlignParam))
                 return this;
 
             var resultAsRef =
@@ -757,41 +776,28 @@ namespace Reni
         {
             var result = Reni.Type.Void.CreateResult(category);
             if(category.HasCode)
-                result.Code = Reni.Code.CodeBase.CreateDumpPrintText("(");
+                result.Code = CodeBase.CreateDumpPrintText("(");
 
             for(var i = 0; i < elemResults.Count; i++)
             {
                 if(category.HasCode)
                 {
                     if(i > 0)
-                        result.Code = result.Code.CreateSequence(Reni.Code.CodeBase.CreateDumpPrintText(", "));
+                        result.Code = result.Code.CreateSequence(CodeBase.CreateDumpPrintText(", "));
                     result.Code = result.Code.CreateSequence(elemResults[i].Code);
                 }
                 if(category.HasRefs)
                     result.Refs = result.Refs.Pair(elemResults[i].Refs);
             }
             if(category.HasCode)
-                result.Code = result.Code.CreateSequence(Reni.Code.CodeBase.CreateDumpPrintText(")"));
+                result.Code = result.Code.CreateSequence(CodeBase.CreateDumpPrintText(")"));
             return result;
         }
 
-        #region Nested type: GetCode
-
-        ///<summary>
-        /// Delegate that returns code
-        ///</summary>
-        internal delegate Code.CodeBase GetCode();
-
-        #endregion
-
-        #region Nested type: GetRefs
-
-        ///<summary>
-        /// Delegate that returns refs
-        ///</summary>
+        internal delegate CodeBase GetCode();
         internal delegate Refs GetRefs();
-
-        #endregion
+        internal delegate Result GetResult();
+        internal delegate Result GetResultFromType(TypeBase objectType);
     }
 
     /// <summary>
@@ -800,7 +806,7 @@ namespace Reni
     internal sealed class Error
     {
         private readonly ContextBase _context;
-        private readonly Syntax.SyntaxBase _syntax;
+        private readonly SyntaxBase _syntax;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Error"/> class.
@@ -808,7 +814,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="syntax">The syntax.</param>
         /// created 29.10.2006 18:23
-        internal Error(ContextBase context, Syntax.SyntaxBase syntax)
+        internal Error(ContextBase context, SyntaxBase syntax)
         {
             _context = context;
             _syntax = syntax;
@@ -830,6 +836,6 @@ namespace Reni
         }
 
         internal ContextBase Context { get { return _context; } }
-        internal Syntax.SyntaxBase Syntax { get { return _syntax; } }
+        internal SyntaxBase Syntax { get { return _syntax; } }
     }
 }

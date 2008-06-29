@@ -51,7 +51,7 @@ namespace Reni
 
         private void Add(ContextBase e)
         {
-            var trace = e.ObjectId == 6;
+            var trace = e.ObjectId == -6;
             StartMethodDumpWithBreak(trace,e);
             if (!_data.Contains(e))
                 _data.Add(e);

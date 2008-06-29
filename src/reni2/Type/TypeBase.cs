@@ -2,6 +2,7 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
@@ -34,8 +35,12 @@ namespace Reni.Type
 
         [Node]
         internal abstract Size Size { get; }
-        [DumpData(false)]
-        internal virtual bool IsRef { get { return false; } }
+
+        internal virtual bool IsRef(RefAlignParam refAlignParam)
+        {
+            return false;
+        }
+
         [DumpData(false)]
         internal virtual bool IsVoid { get { return false; } }
         [DumpData(false)]
@@ -43,7 +48,7 @@ namespace Reni.Type
         [DumpData(false)]
         internal virtual bool IsPending { get { return false; } }
         [DumpData(false)]
-        internal protected virtual TypeBase[] ToList { get { return new[] { this }; } }
+        internal protected virtual TypeBase[] ToList { get { return new[] {this}; } }
 
         public abstract string DumpShort();
 
@@ -91,7 +96,6 @@ namespace Reni.Type
             }
         }
 
-
         public TypeBase CreateAlign(int alignBits)
         {
             if(Size.Align(alignBits) == Size)
@@ -123,6 +127,13 @@ namespace Reni.Type
         public virtual Ref CreateRef(RefAlignParam refAlignParam)
         {
             return _ref.Find(refAlignParam, () => new Ref(this, refAlignParam));
+        }
+
+        public Ref EnsureRef(RefAlignParam refAlignParam)
+        {
+            if(IsRef(refAlignParam))
+                return (Ref) this;
+            return CreateRef(refAlignParam);
         }
 
         public Sequence CreateSequence(int elementCount)
@@ -159,15 +170,15 @@ namespace Reni.Type
             return CreateResult(category, CreateArgCode);
         }
 
-        internal Code.CodeBase CreateArgCode()
+        internal CodeBase CreateArgCode()
         {
-            return Code.CodeBase.CreateArg(Size);
+            return CodeBase.CreateArg(Size);
         }
 
         internal Result CreateResult(Category category)
         {
             return CreateResult(category,
-                () => Code.CodeBase.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)));
+                () => CodeBase.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)));
         }
 
         internal Result CreateResult(Category category, Result codeAndRefs)
@@ -181,23 +192,39 @@ namespace Reni.Type
                 result.Code = codeAndRefs.Code;
             if(category.HasRefs)
                 result.Refs = codeAndRefs.Refs;
+            if(category.HasInternal)
+                result.Internal = codeAndRefs.Internal;
             return result;
         }
 
         internal Result CreateResult(Category category, Result.GetCode getCode)
         {
-            return CreateResult(category, getCode, Refs.None);
+            return CreateResult(category, getCode, Refs.None, EmptyInternal);
+        }
+
+        internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetResult getInternal)
+        {
+            return CreateResult(category, getCode, Refs.None, getInternal);
         }
 
         public Result CreateContextRefResult<C>(Category category, C context) where C : ContextBase
         {
             return CreateResult(
                 category,
-                () => Code.CodeBase.CreateContextRef(context),
+                () => CodeBase.CreateContextRef(context),
                 () => Refs.Context(context));
         }
-
         internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs)
+        {
+            return CreateResult(category,getCode,getRefs,EmptyInternal);
+        }
+
+        private static Result EmptyInternal()
+        {
+            return Void.CreateResult(Category.ForInternal);
+        }
+
+        internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs, Result.GetResult getInternal)
         {
             var result = new Result();
             if(category.HasSize)
@@ -208,10 +235,12 @@ namespace Reni.Type
                 result.Code = getCode();
             if(category.HasRefs)
                 result.Refs = getRefs();
+            if(category.HasInternal)
+                result.Internal = getInternal();
             return result;
         }
 
-        internal virtual Result ApplyFunction(Category category, ContextBase callContext, SyntaxBase args)
+        internal virtual Result ApplyFunction(Category category, ContextBase callContext, ICompileSyntax args)
         {
             NotImplementedMethod(callContext, category, args);
             throw new NotImplementedException();
@@ -354,14 +383,14 @@ namespace Reni.Type
             return true;
         }
 
-        internal virtual Code.CodeBase CreateSequenceOperation(Defineable token, Result objResult, Size size,
+        internal virtual CodeBase CreateSequenceOperation(Defineable token, Result objResult, Size size,
             Result argResult)
         {
             NotImplementedMethod(token, objResult, size, argResult.Code);
             return null;
         }
 
-        internal virtual Code.CodeBase CreateSequenceOperation(Defineable token, Result result)
+        internal virtual CodeBase CreateSequenceOperation(Defineable token, Result result)
         {
             NotImplementedMethod(token, result);
             return null;
@@ -385,7 +414,7 @@ namespace Reni.Type
                 );
         }
 
-        internal virtual Code.CodeBase CreateRefCodeForContext(ContextBase context)
+        internal virtual CodeBase CreateRefCodeForContext(ContextBase context)
         {
             NotImplementedMethod(context);
             return null;
@@ -400,6 +429,7 @@ namespace Reni.Type
         {
             return Search(defineableToken.TokenClass).SubTrial(this);
         }
+
         internal SearchResult<IPrefixFeature> SearchDefineablePrefix(DefineableToken defineableToken)
         {
             return SearchPrefix(defineableToken.TokenClass).SubTrial(this);
@@ -409,6 +439,7 @@ namespace Reni.Type
         {
             return defineable.Search().SubTrial(this);
         }
+
         internal protected virtual SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
         {
             return defineable.SearchPrefix().SubTrial(this);
@@ -423,6 +454,7 @@ namespace Reni.Type
         {
             return defineable.SearchFromSequenceElement().SubTrial(this);
         }
+
         internal virtual SearchResult<ISequenceElementPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
         {
             return defineable.SearchPrefixFromSequenceElement().SubTrial(this);
@@ -433,6 +465,10 @@ namespace Reni.Type
             return SearchResult<IRefToSequenceFeature>.Failure(this, defineable);
         }
 
+        internal Result ConvertToSequence(ContextBase callContext, Category category, ICompileSyntax args)
+        {
+            var result = callContext.Result(category | Category.Type, args);
+            return result.ConvertTo(CreateSequence(result.Type.SequenceCount));
+        }
     }
-
 }

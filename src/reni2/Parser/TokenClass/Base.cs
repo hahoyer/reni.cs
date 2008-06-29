@@ -1,6 +1,7 @@
 ﻿using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
+using Reni.Context;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
@@ -9,11 +10,11 @@ namespace Reni.Parser.TokenClass
     /// Base clas for compiler tokens
     /// </summary>
     [AdditionalNodeInfo("NodeDump")]
-    internal abstract class Base : ReniObject
+    internal abstract class TokenClassBase : ReniObject
     {
         private static int _nextObjectId;
 
-        protected Base() : base(_nextObjectId++) {}
+        protected TokenClassBase() : base(_nextObjectId++) {}
 
         /// <summary>
         /// true only for end token
@@ -32,7 +33,7 @@ namespace Reni.Parser.TokenClass
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal virtual Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+        internal virtual IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
@@ -119,26 +120,43 @@ namespace Reni.Parser.TokenClass
         }
     }
 
-    internal abstract class Special: Base
+    internal abstract class Special : TokenClassBase
     {
-        protected Syntax.SyntaxBase CreateSpecialSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
-        {
-            return new Syntax.Special(left, token, this, right);
-        }
+        internal abstract string DumpShort();
+    }
 
-        /// <summary>
-        /// Results the specified token.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        internal virtual Result Result(Context.ContextBase context, Category category, Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+    internal abstract class Terminal : Special
+    {
+        internal abstract Result Result(ContextBase context, Category category, Token token);
+
+        protected IParsedSyntax CreateTerminalSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            NotImplementedMethod(context, category, left, token, right);
-            return null;
+            ParsedSyntax.IsNull(left);
+            ParsedSyntax.IsNull(right);
+            return new TerminalSyntax(token, this);
         }
     }
+
+    internal abstract class Prefix : Special
+    {
+        internal abstract Result Result(ContextBase context, Category category, Token token, ICompileSyntax right);
+
+        protected IParsedSyntax CreateTerminalSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        {
+            ParsedSyntax.IsNull(left);
+            return new PrefixSyntax(token, this, ParsedSyntax.ToCompiledSyntax(right));
+        }
+    }
+
+
+    internal abstract class Infix : Special
+    {
+        internal abstract Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right);
+
+        protected IParsedSyntax CreateTerminalSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        {
+            return new InfixSyntax(token, ParsedSyntax.ToCompiledSyntax(left), this, ParsedSyntax.ToCompiledSyntax(right));
+        }
+    }
+
 }

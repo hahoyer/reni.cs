@@ -19,25 +19,9 @@ namespace Reni.Context
     [AdditionalNodeInfo("DebuggerDumpString")]
     internal abstract class ContextBase : ReniObject, IDumpShortProvider
     {
-        internal class Cache
-        {
-            [Node]
-            internal DictionaryEx<TypeBase, Function> _functionInstanceCache = new DictionaryEx<TypeBase, Function>();
-            [Node]
-            internal DictionaryEx<SyntaxBase, TypeBase> _functionType = new DictionaryEx<SyntaxBase, TypeBase>();
-            [Node]
-            internal DictionaryEx<SyntaxBase, TypeBase> _propertyType = new DictionaryEx<SyntaxBase, TypeBase>();
-            [Node]
-            internal DictionaryEx<Struct.Container, Struct.Context> _structContainerCache = new DictionaryEx<Struct.Container, Struct.Context>();
-            [Node]
-            internal DictionaryEx<int, ContextAtPosition> _structPositionCache = new DictionaryEx<int, ContextAtPosition>();
-            [Node]
-            internal Result _topRefResultCache;
-        }
-
         private static int _nextId;
-        [Node]
-        internal Cache _cache = new Cache();
+        [Node, DumpData(false)]
+        internal Cache Cache = new Cache();
         private Sequence<ContextBase> _childChainCache;
 
         protected ContextBase() : base(_nextId++) {}
@@ -56,20 +40,24 @@ namespace Reni.Context
         {
             get
             {
-                if(_cache._topRefResultCache == null)
-                    _cache._topRefResultCache = new Result {Code = CreateTopRefCode(), Refs = Refs.None()};
+                if(Cache._topRefResultCache == null)
+                    Cache._topRefResultCache = new Result {Code = CreateTopRefCode(), Refs = Refs.None()};
 
-                return _cache._topRefResultCache;
+                return Cache._topRefResultCache;
             }
         }
         [DumpData(false)]
         internal Sequence<ContextBase> ChildChain
         {
-            get { if (_childChainCache == null)
-                _childChainCache = ObtainChildChain();
-            return _childChainCache; } }
+            get
+            {
+                if(_childChainCache == null)
+                    _childChainCache = ObtainChildChain();
+                return _childChainCache;
+            }
+        }
 
-        virtual protected Sequence<ContextBase> ObtainChildChain()
+        protected virtual Sequence<ContextBase> ObtainChildChain()
         {
             return HWString.Sequence(this);
         }
@@ -95,7 +83,7 @@ namespace Reni.Context
         public Size Distance(ContextBase target)
         {
             if(target == this)
-                return Size.Create(0);
+                return Reni.Size.Create(0);
             return VirtDistance(target);
         }
 
@@ -117,7 +105,7 @@ namespace Reni.Context
 
         private ContextAtPosition CreateStructAtPosition(int currentCompilePosition)
         {
-            return _cache._structPositionCache.Find
+            return Cache._structPositionCache.Find
                 (
                 currentCompilePosition,
                 () => new ContextAtPosition((Struct.Context) this, currentCompilePosition)
@@ -126,13 +114,13 @@ namespace Reni.Context
 
         internal Struct.Context CreateStructContext(Struct.Container container)
         {
-            return _cache._structContainerCache.Find(container,
+            return Cache._structContainerCache.Find(container,
                 () => new Struct.Context(this, container));
         }
 
         public Function CreateFunction(TypeBase args)
         {
-            return _cache._functionInstanceCache.Find(args,
+            return Cache._functionInstanceCache.Find(args,
                 () => new Function(this, args));
         }
 
@@ -147,26 +135,24 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result CreateFunctionResult(Category category, SyntaxBase body)
+        internal Result CreateFunctionResult(Category category, ICompileSyntax body)
         {
             return CreateFunctionType(body).CreateResult(category);
         }
 
-        internal Result CreatePropertyResult(Category category, SyntaxBase body)
+        internal Result CreatePropertyResult(Category category, ICompileSyntax body)
         {
             return CreatePropertyType(body).CreateResult(category);
         }
 
-        internal TypeBase CreatePropertyType(SyntaxBase body)
+        internal TypeBase CreatePropertyType(ICompileSyntax body)
         {
-            return _cache._propertyType.Find(body,
-                () => new Property(this, body));
+            return Cache._propertyType.Find(body,() => new Property(this, body));
         }
 
-        public TypeBase CreateFunctionType(SyntaxBase body)
+        public TypeBase CreateFunctionType(ICompileSyntax body)
         {
-            return _cache._functionType.Find(body,
-                () => new Type.Function(this, body));
+            return Cache._functionType.Find(body,() => new Type.Function(this, body));
         }
 
         internal SearchResult<IContextFeature> SearchDefineable(DefineableToken defineableToken)
@@ -182,7 +168,7 @@ namespace Reni.Context
         private Result VisitFirstChainElement(Category category, MemberElem memberElem)
         {
             if(memberElem.DefineableToken == null)
-                return memberElem.Args.Visit(this, category);
+                return Result(category,memberElem.Args);
 
             var contextSearchResult = SearchDefineable(memberElem.DefineableToken);
             if(contextSearchResult.IsSuccessFull)
@@ -194,10 +180,10 @@ namespace Reni.Context
                 return null;
             }
 
-            var argResult = memberElem.Args.Visit(this, category | Category.Type);
+            var argResult = Result(category | Category.Type,memberElem.Args);
             var prefixSearchResult = argResult.Type.SearchDefineablePrefix(memberElem.DefineableToken);
             if(prefixSearchResult.IsSuccessFull)
-                return prefixSearchResult.Feature.VisitApply(category, argResult);
+                return prefixSearchResult.Feature.Result(category, argResult);
 
             NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult, "prefixSearchResult",
                 prefixSearchResult);
@@ -225,20 +211,40 @@ namespace Reni.Context
             return null;
         }
 
-        internal List<Result> Visit(Category category, List<SyntaxBase> list)
+        internal Size Size(ICompileSyntax syntax)
         {
-            var results = new List<Result>();
-            for(var i = 0; i < list.Count; i++)
-                results.Add(list[i].Visit(this, category));
+            return Result(Category.Size, syntax).Size;
+        }
+
+        internal List<TypeBase> Type(List<ICompileSyntax> list)
+        {
+            var results = new List<TypeBase>();
+            for (var i = 0; i < list.Count; i++)
+                results.Add(Type(list[i]));
             return results;
         }
 
-        internal List<TypeBase> VisitType(List<SyntaxBase> list)
+        internal TypeBase Type(ICompileSyntax syntax)
         {
-            var results = new List<TypeBase>();
+            return Result(Category.Type, syntax).Type;
+        }
+
+        internal List<Result> Result(Category category, List<ICompileSyntax> list)
+        {
+            var results = new List<Result>();
             for(var i = 0; i < list.Count; i++)
-                results.Add(list[i].VisitType(this));
+                results.Add(Result(category, list[i]));
             return results;
+        }
+
+        internal Result Result(Category category, ICompileSyntax syntax)
+        {
+            var cacheElem = Cache._resultCache.Find
+                    (
+                    syntax,
+                    () => new CacheItem(syntax, this)
+                    );
+            return cacheElem.Result(category.Replendish());
         }
 
         internal bool IsChildOf(ContextBase parentCandidate)
@@ -264,13 +270,61 @@ namespace Reni.Context
 
         private void AssertCorrectRefs(Refs refs)
         {
-            foreach(var contextBase in refs.Data)
-                CheckRef(contextBase);
+            foreach(var @ref in refs.Data)
+                CheckRef(@ref);
         }
 
-        private void CheckRef(ContextBase contextBase)
+        private void CheckRef(ContextBase @ref)
         {
-            Tracer.Assert(!contextBase.IsChildOf(this), "context="+Dump() + "\nref="+contextBase.Dump());
+            Tracer.Assert(!@ref.IsChildOf(this), "context=" + Dump() + "\nref=" + @ref.Dump());
         }
+
+        internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
+        {
+            var compiledResult = Result(Category.Code | Category.Type | Category.Refs, syntax);
+            var convertedResult = compiledResult.ConvertTo(resultType);
+            return convertedResult.Evaluate();
+        }
+
+        internal CodeBase Code(ICompileSyntax syntax)
+        {
+            return Result(Category.Code, syntax).Code;
+        }
+
+        internal Result ApplyResult(Category category, ICompileSyntax @object, Result.GetResultFromType apply)
+        {
+            var objectType = Type(@object);
+            if (objectType.IsRef(RefAlignParam))
+                return apply(objectType).UseWithArg(Result(category, @object));
+
+            Tracer.Assert(category.HasInternal);
+            var objectRefType = objectType.CreateRef(RefAlignParam);
+            var objectRefResult = objectRefType
+                .CreateResult(
+                category, 
+                () => CodeBase.CreateTopRef(RefAlignParam), 
+                () => Result(Category.ForInternal, @object)
+                );
+            return apply(objectRefType).UseWithArg(objectRefResult);
+        }
+    }
+
+    internal class Cache
+    {
+        [Node]
+        internal readonly DictionaryEx<TypeBase, Function> _functionInstanceCache = new DictionaryEx<TypeBase, Function>();
+        [Node]
+        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _functionType = new DictionaryEx<ICompileSyntax, TypeBase>();
+        [Node]
+        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _propertyType = new DictionaryEx<ICompileSyntax, TypeBase>();
+        [Node]
+        internal readonly DictionaryEx<Struct.Container, Struct.Context> _structContainerCache = new DictionaryEx<Struct.Container, Struct.Context>();
+        [Node]
+        internal readonly DictionaryEx<int, ContextAtPosition> _structPositionCache = new DictionaryEx<int, ContextAtPosition>();
+        [Node]
+        internal Result _topRefResultCache;
+        [Node]
+        internal readonly DictionaryEx<ICompileSyntax, CacheItem> _resultCache = new DictionaryEx<ICompileSyntax, CacheItem>();
+
     }
 }

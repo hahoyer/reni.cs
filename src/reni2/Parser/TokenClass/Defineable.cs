@@ -10,7 +10,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Tokens that can used in definitions (not reserved tokens)
     /// </summary>
-    internal abstract class Defineable : Base
+    internal abstract class Defineable : TokenClassBase
     {
         [DumpData(false)]
         internal virtual string CSharpNameOfDefaultOperation
@@ -36,13 +36,11 @@ namespace Reni.Parser.TokenClass
             throw new NotImplementedException();
         }
 
-        internal override SyntaxBase CreateSyntax(SyntaxBase left, Token token, SyntaxBase right)
+        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            if(left != null)
-                return left.CreateDefinableSyntax(new DefineableToken(token), right);
-            if(right != null)
-                return new Statement(new MemberElem(new DefineableToken(token), right));
-            return new DefinableTokenSyntax(token);
+            if(left == null && right == null)
+                return new DefinableTokenSyntax(token);
+            return new ExpressionSyntax(ParsedSyntax.ToCompiledSyntaxOrNull(left), token, ParsedSyntax.ToCompiledSyntaxOrNull(right));
         }
 
         internal virtual SearchResult<IFeature> Search()
@@ -96,63 +94,10 @@ namespace Reni.Parser.TokenClass
         }
     }
 
-    internal class DefinableTokenSyntax : SyntaxBase
+    sealed internal class DefinableTokenSyntax : ParsedSyntax
     {
-        private readonly Token _token;
-        private SyntaxBase _declarationSyntax;
-
-        public DefinableTokenSyntax(Token token)
+        public DefinableTokenSyntax(Token token):base(token)
         {
-            _token = token;
         }
-
-        private SyntaxBase DeclarationSyntax
-        {
-            get
-            {
-                if(_declarationSyntax == null)
-                    _declarationSyntax = CreateDeclarationSyntax();
-                return _declarationSyntax;
-            }
-        }
-
-        public string Name { get { return _token.Name; } }
-
-        internal override Result VirtVisit(ContextBase context, Category category)
-        {
-            return DeclarationSyntax.Visit(context, category);
-        }
-
-        internal override SyntaxBase CreateDefinableSyntax(DefineableToken defineableToken, SyntaxBase right)
-        {
-            return new Statement(CreateMemberElem(), new MemberElem(defineableToken, right));
-        }
-
-        public override SyntaxBase CreateDeclarationSyntax(Token token, SyntaxBase right)
-        {
-            return new DeclarationSyntax(CreateDefineableToken(), token, right);
-        }
-
-        private SyntaxBase CreateDeclarationSyntax()
-        {
-            return new Statement(CreateMemberElem());
-        }
-
-        private MemberElem CreateMemberElem()
-        {
-            return new MemberElem(CreateDefineableToken(), null);
-        }
-
-        private DefineableToken CreateDefineableToken()
-        {
-            return new DefineableToken(_token);
-        }
-
-        internal override string DumpShort()
-        {
-            return _token.Name;
-        }
-
-        internal protected override string FilePosition { get { return _token.FilePosition; } }
     }
 }

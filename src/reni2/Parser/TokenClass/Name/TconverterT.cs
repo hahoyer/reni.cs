@@ -1,6 +1,8 @@
+using Reni.Syntax;
+
 namespace Reni.Parser.TokenClass.Name
 {
-    class TconverterT: Base
+    internal class TconverterT : TokenClassBase
     {
         /// <summary>
         /// Creates the syntax.
@@ -10,11 +12,10 @@ namespace Reni.Parser.TokenClass.Name
         /// <param name="right">The right.</param>
         /// <returns></returns>
         /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
-        {
-            if (left == null)
-                return right.CreateConverterSyntax(token);
-            return base.CreateSyntax(left, token, right);
+        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        {   
+            ParsedSyntax.IsNull(left);
+            return new ConverterSyntax(token, ParsedSyntax.ToCompiledSyntax(right));
         }
     }
 }

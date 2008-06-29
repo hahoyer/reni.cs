@@ -1,40 +1,30 @@
 using HWClassLibrary.Debug;
+using Reni.Context;
+using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass.Name
 {
 	/// <summary>
 	/// Summary description for argToken.
 	/// </summary>
-    sealed internal class TargT : Special
+    sealed internal class TargT : Terminal
 	{
-        /// <summary>
-        /// Creates the syntax.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="token">The token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
-        {
-            return CreateSpecialSyntax(left, token, right);
-        }
-
         /// <summary>
         /// Visits the specified context.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="token">The token.</param>
-        /// <param name="right">The right.</param>
         /// <param name="context">The context.</param>
         /// <param name="category">The category.</param>
+        /// <param name="token">The token.</param>
         /// <returns></returns>
         /// [created 13.05.2006 21:53]
-	    internal override Result Result(Context.ContextBase context, Category category, Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+	    internal override Result Result(ContextBase context, Category category, Token token)
 	    {
-            Tracer.Assert(left == null);
-            Tracer.Assert(right == null);
             return context.CreateArgsRefResult(category);
         }
+
+	    internal override string DumpShort()
+	    {
+	        return "arg";
+	    }
 	}
 }

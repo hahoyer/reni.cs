@@ -116,11 +116,13 @@ namespace Reni.Struct
         /// created 15.12.2006 09:22
         internal Result VisitElementFromContextRef(Category category, int index)
         {
-            if(_container[index].VisitSize(this).IsZero)
+            if(Size(_container[index]).IsZero)
             {
                 var result = TypeBase.CreateVoidResult(category);
                 if(category.HasType)
-                    result.Type = VisitElementType(index);
+                {
+                    result.Type = Type(_container[index]);
+                }
                 return result;
             }
             else
@@ -129,7 +131,7 @@ namespace Reni.Struct
                 if(category.HasSize)
                     result.Size = RefAlignParam.RefSize;
                 if(category.HasType)
-                    result.Type = VisitElementType(index).CreateRef(RefAlignParam);
+                    result.Type = Type(_container[index]).CreateRef(RefAlignParam);
                 if(category.HasCode)
                     result.Code
                         = ContextRefCode
@@ -138,11 +140,6 @@ namespace Reni.Struct
                     result.Refs = Refs.Context(ContextRefForCode);
                 return result;
             }
-        }
-
-        private TypeBase VisitElementType(int index)
-        {
-            return _container[index].VisitType(this);
         }
 
         internal Size Offset(int index)

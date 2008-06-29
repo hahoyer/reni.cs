@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Parser.TokenClass;
+using Reni.Syntax;
 
 namespace Reni.Context
 {
@@ -12,14 +12,14 @@ namespace Reni.Context
     /// </summary>
     internal sealed class Root : ContextBase
     {
-        readonly FunctionList _function = new FunctionList();
+        private readonly FunctionList _function = new FunctionList();
 
         /// <summary>
         /// Parameter to describe alignment for references
         /// </summary>
-        public override RefAlignParam RefAlignParam{get { return DefaultRefAlignParam; }}
+        public override RefAlignParam RefAlignParam { get { return DefaultRefAlignParam; } }
 
-        private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(3, Size.Create(32)); } }
+        private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(3, Reni.Size.Create(32)); } }
 
         /// <summary>
         /// Return the root env
@@ -48,10 +48,7 @@ namespace Reni.Context
         /// <value>The function.</value>
         /// created 03.01.2007 20:23
         [DumpData(false)]
-        public FunctionList Functions
-        {
-            get { return _function; }
-        }
+        public FunctionList Functions { get { return _function; } }
 
         /// <summary>
         /// Creates the function call.
@@ -62,11 +59,9 @@ namespace Reni.Context
         /// <param name="argsResult">The args result.</param>
         /// <returns></returns>
         /// created 06.11.2006 22:54
-        public Result CreateFunctionCall(ContextBase context, Category category, Syntax.SyntaxBase body, Result argsResult)
+        public Result CreateFunctionCall(ContextBase context, Category category, ICompileSyntax body, Result argsResult)
         {
             return Functions.Find(body, context, argsResult.Type).CreateCall(category, argsResult);
         }
-
     }
 }
-

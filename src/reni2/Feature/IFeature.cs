@@ -6,17 +6,17 @@ namespace Reni.Feature
 {
     internal interface IFeature
     {
-        Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject);
+        Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args);
     }
 
     internal interface IPrefixFeature
     {
-        Result VisitApply(Category category, Result argResult);
+        Result Result(Category category, Result argResult);
     }
 
     internal interface IContextFeature
     {
-        Result VisitApply(ContextBase contextBase, Category category, SyntaxBase args);
+        Result VisitApply(ContextBase contextBase, Category category, ICompileSyntax args);
     }
 
     internal interface IStructFeature

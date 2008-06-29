@@ -1,41 +1,19 @@
 using Reni.Parser;
-using Reni.Parser.TokenClass;
 
 namespace Reni.Syntax
 {
-    internal sealed class ConverterSyntax : SyntaxBase
+    internal sealed class ConverterSyntax : ParsedSyntax
     {
-        private readonly SyntaxBase _body;
-        private readonly Token _token;
+        internal readonly ICompileSyntax Body;
 
-        internal ConverterSyntax(SyntaxBase body, Token token)
+        internal ConverterSyntax(Token token, ICompileSyntax body) : base(token)
         {
-            _body = body;
-            _token = token;
+            Body = body;
         }
 
-        internal SyntaxBase Body { get { return _body; } }
-
-        internal override SyntaxBase CreateListSyntaxReverse(SyntaxBase left, Token token)
+        internal protected override string DumpShort()
         {
-            return CreateListSyntax(this).CreateListSyntaxReverse(left, token);
+            return "converter (" + Body.DumpShort() + ")";
         }
-
-        internal override SyntaxBase CreateListSyntaxReverse(DeclarationSyntax left, Token token)
-        {
-            return CreateListSyntax(this).CreateListSyntaxReverse(left, token);
-        }
-
-        /// <summary>
-        /// Dumps the short.
-        /// </summary>
-        /// <returns></returns>
-        /// created 07.05.2007 22:09 on HAHOYER-DELL by hh
-        internal override string DumpShort()
-        {
-            return "converter (" + _body.DumpShort() + ")";
-        }
-
-        internal protected override string FilePosition { get { return _token.FilePosition; } }
     }
 }

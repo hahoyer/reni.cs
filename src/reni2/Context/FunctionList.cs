@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using HWClassLibrary.Helper;
 using Reni.Code;
+using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.Context
 {
@@ -9,8 +11,8 @@ namespace Reni.Context
     /// </summary>
     internal sealed class FunctionList
     {
-        private readonly DictionaryEx<Syntax.SyntaxBase, EnvArgsVariant> _data =
-            new DictionaryEx<Syntax.SyntaxBase, EnvArgsVariant>();
+        private readonly DictionaryEx<ICompileSyntax, ContextArgsVariant> _data =
+            new DictionaryEx<ICompileSyntax, ContextArgsVariant>();
 
         private readonly List<FunctionInstance> _list = new List<FunctionInstance>();
 
@@ -36,14 +38,14 @@ namespace Reni.Context
         /// <param name="args">The args.</param>
         /// <returns></returns>
         /// created 03.01.2007 20:26
-        internal FunctionInstance Find(Syntax.SyntaxBase body, ContextBase env, Type.TypeBase args)
+        internal FunctionInstance Find(ICompileSyntax body, ContextBase env, TypeBase args)
         {
-            EnvArgsVariant eav;
+            ContextArgsVariant eav;
             if(_data.ContainsKey(body))
                 eav = _data[body];
             else
             {
-                eav = new EnvArgsVariant();
+                eav = new ContextArgsVariant();
                 _data.Add(body, eav);
             }
 
@@ -63,19 +65,17 @@ namespace Reni.Context
             return result;
         }
 
-        #region Nested type: ArgsVariant
-
         private class ArgsVariant
         {
-            private readonly DictionaryEx<Type.TypeBase, int> _data = new DictionaryEx<Type.TypeBase, int>();
+            private readonly DictionaryEx<TypeBase, int> _data = new DictionaryEx<TypeBase, int>();
 
-            public FunctionInstance Find(FunctionList fl, Type.TypeBase args, Syntax.SyntaxBase body, ContextBase env)
+            public FunctionInstance Find(FunctionList fl, TypeBase args, ICompileSyntax body, ContextBase context)
             {
                 if(_data.ContainsKey(args))
                     return fl._list[_data[args]];
 
                 var index = fl._list.Count;
-                var f = new FunctionInstance(index, body, env, args);
+                var f = new FunctionInstance(index, body, context, args);
                 _data.Add(args, index);
                 fl._list.Add(f);
 
@@ -83,29 +83,23 @@ namespace Reni.Context
             }
         }
 
-        #endregion
-
-        #region Nested type: EnvArgsVariant
-
-        private class EnvArgsVariant : ReniObject
+        private class ContextArgsVariant : ReniObject
         {
             private readonly DictionaryEx<ContextBase, ArgsVariant> _data = new DictionaryEx<ContextBase, ArgsVariant>();
 
-            public FunctionInstance Find(FunctionList fl, ContextBase env, Type.TypeBase args, Syntax.SyntaxBase body)
+            public FunctionInstance Find(FunctionList fl, ContextBase context, TypeBase args, ICompileSyntax body)
             {
                 ArgsVariant av;
-                if(_data.ContainsKey(env))
-                    av = _data[env];
+                if(_data.ContainsKey(context))
+                    av = _data[context];
                 else
                 {
                     av = new ArgsVariant();
-                    _data.Add(env, av);
+                    _data.Add(context, av);
                 }
 
-                return av.Find(fl, args, body, env);
+                return av.Find(fl, args, body, context);
             }
         }
-
-        #endregion
     }
 }

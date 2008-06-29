@@ -11,7 +11,7 @@ namespace Reni.Syntax
     /// </summary>
     internal sealed class CacheItem : ReniObject
     {
-        private readonly SyntaxBase _syntax;
+        private readonly ICompileSyntax _syntax;
         private readonly ContextBase _context;
         private readonly Result _data = new Result();
 
@@ -23,7 +23,7 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="syntax"></param>
         /// <param name="environment"></param>
-        public CacheItem(SyntaxBase syntax, ContextBase environment)
+        public CacheItem(ICompileSyntax syntax, ContextBase environment)
         {
             if(syntax == null)
                 throw new NullReferenceException("parameter \"syntax\" must not be null");
@@ -36,10 +36,10 @@ namespace Reni.Syntax
         /// </summary>
         /// <param name="category"></param>
         /// <returns></returns>
-        [DebuggerHidden]
-        public Result Visit(Category category)
+        //[DebuggerHidden]
+        public Result Result(Category category)
         {
-            return _data.Visit(category, _context, _syntax);
+            return _data.AddCategories(category, _context, _syntax);
         }
     }
 }

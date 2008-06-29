@@ -24,8 +24,8 @@ namespace Reni.Type
             _enableCutCutFeature = new EnableCutFeature(this);
         }
 
-        [Node]
-        [DumpData(false)]
+        [Node, DumpData(false)]
+        
         internal Array InheritedType { get { return _inheritedType; } }
         [DumpData(false)]
         internal override Size Size { get { return _inheritedType.Size; } }
@@ -220,36 +220,36 @@ namespace Reni.Type
                 _definable = definable;
             }
 
-            Result IFeature.VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+            Result IFeature.Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
             {
-                var trace = ObjectId == 326 && callContext.ObjectId == 4 && args.ObjectId == 84;
-                StartMethodDump(trace, callContext, category, args, callObject);
                 var objResult = callObject.ConvertTo(category, _sequence);
-                var rawArgResult = args.Visit(callContext, category | Category.Type);
-                if (rawArgResult.IsPending)
-                    return rawArgResult;
-                var argType = _sequence.Element.CreateSequence(rawArgResult.Type.SequenceCount);
-                var argResult = rawArgResult.ConvertTo(argType);
-                var result = new Result();
+                if(objResult.IsPending)
+                    return objResult;
+                var argResult = _sequence.Element.ConvertToSequence(callContext, category, args);
+                if(argResult.IsPending)
+                    return argResult;
+                return Result(callContext, category, objResult, argResult);
+            }
+
+            private Result Result(ContextBase callContext, Category category, Result objResult, Result argResult)
+            {
+                Result result;
                 if(category.HasSize || category.HasType || category.HasCode)
                 {
-                    var objBitCount = _sequence.UnrefSize.ToInt();
+                    var objBitCount = objResult.Type.UnrefSize.ToInt();
                     var argBitCount = argResult.Type.UnrefSize.ToInt();
                     var type =
                         _sequence.Element
                             .SequenceOperationResultType(_definable, objBitCount, argBitCount)
                             .CreateAlign(callContext.RefAlignParam.AlignBits);
-                    if(category.HasSize)
-                        result.Size = type.Size;
-                    if(category.HasType)
-                        result.Type = type;
-                    if(category.HasCode)
-                        result.Code = _sequence.Element.CreateSequenceOperation(_definable, objResult, type.Size,
-                            argResult);
+                    var result1 = type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objResult, type.Size, argResult));
+                    result = result1;
                 }
+                else
+                    result = new Result();
                 if(category.HasRefs)
                     result.Refs = objResult.Refs.Pair(argResult.Refs);
-                return ReturnMethodDump(trace, result);
+                return (result);
             }
         }
 
@@ -264,20 +264,15 @@ namespace Reni.Type
                 _definable = definable;
             }
 
-            public Result VisitApply(Category category, Result argResult)
+            public Result Result(Category category, Result argResult)
             {
                 var objResult = argResult.ConvertTo(_sequence);
-                var result = new Result();
+                Result result;
                 if(category.HasSize || category.HasType || category.HasCode)
-                {
-                    if(category.HasSize)
-                        result.Size = objResult.Size;
-                    if(category.HasType)
-                        result.Type = objResult.Type;
-                    if(category.HasCode)
-                        result.Code = _sequence.Element.CreateSequenceOperation(_definable, objResult);
-                }
-                if(category.HasRefs)
+                    result = objResult.Type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objResult));
+                else
+                    result = new Result();
+                if (category.HasRefs)
                     result.Refs = objResult.Refs;
                 return result;
             }
@@ -292,7 +287,7 @@ namespace Reni.Type
                 _sequence = sequence;
             }
 
-            public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+            public Result Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
             {
                 if(args == null)
                     return callObject.ConvertTo(category, new EnableCut(_sequence));
@@ -301,6 +296,5 @@ namespace Reni.Type
                 return null;
             }
         }
-
     }
 }

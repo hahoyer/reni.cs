@@ -27,8 +27,13 @@ namespace Reni.Type
         [DumpData(false)]
         internal TypeBase Target { get { return Parent; } }
         internal override Size Size { get { return RefAlignParam.RefSize; } }
+
         [DumpData(false)]
-        internal override bool IsRef { get { return true; } }
+        internal override bool IsRef(RefAlignParam refAlignParam)
+        {
+            return RefAlignParam == refAlignParam;
+        }
+
         internal override Size UnrefSize { get { return Target.Size; } }
         [DumpData(false)]
         internal override string DumpPrintText { get { return "#(#ref#)# " + Parent.DumpPrintText; } }
@@ -39,6 +44,13 @@ namespace Reni.Type
         {
             return "ref." + Parent.DumpShort();
         }
+
+        public override Ref CreateRef(RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(refAlignParam);
+            return null;
+        }
+
         internal override Result DestructorHandler(Category category)
         {
             return EmptyHandler(category);
@@ -64,6 +76,12 @@ namespace Reni.Type
         internal override Result DumpPrint(Category category)
         {
             return Target.DumpPrintFromRef(category, RefAlignParam);
+        }
+
+        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
+        {
+            Tracer.Assert(refAlignParam == RefAlignParam);
+            return DumpPrint(category);
         }
 
         public override Result ApplyTypeOperator(Result argResult)
@@ -145,7 +163,7 @@ namespace Reni.Type
             if(resultFromRef.IsSuccessFull)
                 return resultFromRef
                     .Feature
-                    .VisitApply(callContext, category, memberElem.Args, this);
+                    .ApplyResult(callContext, category, memberElem.Args, this);
 
             NotImplementedMethod(callContext, category, memberElem, "resultFromRef", resultFromRef);
             return null;
@@ -165,11 +183,11 @@ namespace Reni.Type
                 _ref = @ref;
             }
 
-            public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+            public Result Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
             {
                 Tracer.Assert(callObject == _ref);
                 if(category.HasCode || category.HasRefs)
-                    return _ref.AssignmentOperator(args.Visit(callContext, category | Category.Type));
+                    return _ref.AssignmentOperator(callContext.Result(category | Category.Type,args));
                 return CreateVoid.CreateResult(category);
             }
         }

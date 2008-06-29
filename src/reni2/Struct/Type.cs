@@ -31,7 +31,7 @@ namespace Reni.Struct
         internal Container Container { get { return _container; } }
         [Node]
         internal ContextBase Context { get { return _context; } }
-        internal override Size Size { get { return _container.VisitSize(_context, _currentCompilePosition); } }
+        internal override Size Size { get { return _container.PartialSize(_context, _currentCompilePosition); } }
         [DumpData(false)]
         internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# (" + _container.DumpPrintText(_context) + ")"; } }
         internal override bool IsPending { get { return _container.IsPendingType(_context); } }
@@ -137,7 +137,7 @@ namespace Reni.Struct
                 _index = index;
             }
 
-            public Result VisitApply(ContextBase callContext, Category category, SyntaxBase args, Ref callObject)
+            public Result Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
             {
                 return _type
                     .Container

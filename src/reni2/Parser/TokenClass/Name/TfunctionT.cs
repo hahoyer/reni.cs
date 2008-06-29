@@ -1,65 +1,37 @@
-using HWClassLibrary.Debug;
+using Reni.Context;
+using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass.Name
 {
     /// <summary>
     /// Summary description for functionToken.
     /// </summary>
-    internal sealed class TfunctionT : Special
+    internal sealed class TfunctionT : Prefix
     {
-        /// <summary>
-        /// Creates the syntax.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="token">The token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 31.03.2007 14:02 on SAPHIRE by HH
-        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+        internal override Result Result(ContextBase context, Category category, Token token, ICompileSyntax right)
         {
-            return CreateSpecialSyntax(left, token, right);
+            return context.CreateFunctionResult(category, right);
         }
 
-        /// <summary>
-        /// Visits the specified context.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 25.10.2006 20:14
-        internal override Result Result(Context.ContextBase context, Category category, Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+        internal override string DumpShort()
         {
-            Tracer.Assert(left == null);
-            return context.CreateFunctionResult(category, right);
+            return "function";
         }
     }
 
     /// <summary>
     /// Summary description for functionToken.
     /// </summary>
-    internal sealed class TpropertyT : Special
+    internal sealed class TpropertyT : Prefix
     {
-        internal override Syntax.SyntaxBase CreateSyntax(Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+        internal override Result Result(ContextBase context, Category category, Token token, ICompileSyntax right)
         {
-            return CreateSpecialSyntax(left, token, right);
+            return context.CreatePropertyResult(category, right);
         }
 
-        /// <summary>
-        /// Results the specified token.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <param name="context">The context.</param>
-        /// <param name="category">The category.</param>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        internal override Result Result(Context.ContextBase context, Category category, Syntax.SyntaxBase left, Token token, Syntax.SyntaxBase right)
+        internal override string DumpShort()
         {
-            Tracer.Assert(left == null);
-            return context.CreatePropertyResult(category, right);
+            return "property";
         }
     }
 }

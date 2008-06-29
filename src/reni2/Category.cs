@@ -9,85 +9,40 @@ namespace Reni
     /// Categories are: <see cref="Size"/>Size, <see cref="Type"/>Type, <see cref="Refs"/>References and <see cref="Container"/>Code
     /// </summary>
     [dump("Dump")]
-    public class Category
+    internal class Category : IEquatable<Category>
     {
         private readonly bool _code;
         private readonly bool _type;
         private readonly bool _refs;
         private readonly bool _size;
+        private readonly bool _internal;
 
-        /// <summary>
-        /// constructor, that chosses not category
-        /// </summary>
         public Category()
         {
         }
 
-        /// <summary>
-        /// constructor, that chooses a combination of categories
-        /// </summary>
-        /// <param name="size">choose size</param>
-        /// <param name="type">choose type</param>
-        /// <param name="code">choose code</param>
-        /// <param name="refs">choose references</param>
-        public Category(bool size, bool type, bool code, bool refs)
+        internal Category(bool size, bool type, bool code, bool refs, bool @internal)
         {
             _code = code;
+            _internal = @internal;
             _type = type;
             _refs = refs;
             _size = size;
         }
 
-        /// <summary>
-        /// constructor, that chooses size only
-        /// </summary>
-        public static Category Size { get { return new Category(true, false, false, false); } }
+        public static Category Size { get { return new Category(true, false, false, false,false); } }
+        public static Category Type { get { return new Category(false, true, false, false, false); } }
+        public static Category Code { get { return new Category(false, false, true, false, false); } }
+        public static Category Refs { get { return new Category(false, false, false, true, false); } }
+        public static Category Internal { get { return new Category(false, false, false, false, true); } }
+        public static Category ForInternal { get { return new Category(true, true, true, true, false); } }
 
-        /// <summary>
-        /// constructor, that chooses type only
-        /// </summary>
-        public static Category Type { get { return new Category(false, true, false, false); } }
-
-        /// <summary>
-        /// constructor, that chooses code only
-        /// </summary>
-        public static Category Code { get { return new Category(false, false, true, false); } }
-
-        /// <summary>
-        /// constructor, that chooses references only
-        /// </summary>
-        public static Category Refs { get { return new Category(false, false, false, true); } }
-
-        /// <summary>
-        /// true if no category is selected
-        /// </summary>
-        public bool IsNull { get { return !(_code || _type || _refs || _size); } }
-
-        /// <summary>
-        /// true if code is selected
-        /// </summary>
+        public bool IsNull { get { return !(_code || _type || _refs || _size || _internal); } }
         public bool HasCode { get { return _code; } }
-
-        /// <summary>
-        /// true if type is selected
-        /// </summary>
         public bool HasType { get { return _type; } }
-
-        /// <summary>
-        /// true if references are selected
-        /// </summary>
         public bool HasRefs { get { return _refs; } }
-
-        /// <summary>
-        /// true if size is selected
-        /// </summary>
         public bool HasSize { get { return _size; } }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance has all categories set.
-        /// </summary>
-        /// <value><c>true</c> if this instance has all categories set; otherwise, <c>false</c>.</value>
-        /// created 19.08.2007 22:36 on HAHOYER-DELL by hh
+        public bool HasInternal { get { return _internal; } }
         public bool HasAll { get { return HasCode && HasRefs && HasSize && HasType; } }
 
         /// <summary>
@@ -117,7 +72,9 @@ namespace Reni
                 x.HasSize || y.HasSize,
                 x.HasType || y.HasType,
                 x.HasCode || y.HasCode,
-                x.HasRefs || y.HasRefs);
+                x.HasRefs || y.HasRefs,
+                x.HasInternal || y.HasInternal
+                );
         }
 
         /// <summary>
@@ -132,7 +89,8 @@ namespace Reni
                 x.HasSize && y.HasSize,
                 x.HasType && y.HasType,
                 x.HasCode && y.HasCode,
-                x.HasRefs && y.HasRefs);
+                x.HasRefs && y.HasRefs,
+                x.HasInternal && y.HasInternal);
         }
 
         /// <summary>
@@ -141,7 +99,15 @@ namespace Reni
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return (HasSize ? 0 : 1) + 2 * (HasType ? 0 : 1) + 4 * (HasCode ? 0 : 1) + 8 * (HasRefs ? 0 : 1);
+            unchecked
+            {
+                int result = _code.GetHashCode();
+                result = (result*397) ^ _type.GetHashCode();
+                result = (result*397) ^ _refs.GetHashCode();
+                result = (result*397) ^ _size.GetHashCode();
+                result = (result*397) ^ _internal.GetHashCode();
+                return result;
+            }
         }
 
         /// <summary>
@@ -159,6 +125,7 @@ namespace Reni
                 && HasRefs == x.HasRefs
                 && HasSize == x.HasSize
                 && HasType == x.HasType
+                && HasInternal == x.HasInternal
                 ;
         }
         /// <summary>
@@ -173,7 +140,8 @@ namespace Reni
                 x.HasSize && !y.HasSize,
                 x.HasType && !y.HasType,
                 x.HasCode && !y.HasCode,
-                x.HasRefs && !y.HasRefs);
+                x.HasRefs && !y.HasRefs,
+                x.HasInternal && !y.HasInternal);
         }
 
         /// <summary>
@@ -187,24 +155,44 @@ namespace Reni
             if(HasType) result += ".Type.";
             if(HasRefs) result += ".Refs.";
             if(HasCode) result += ".Code.";
-            result = result.Replace("..",",").Replace(".","");
+            if (HasInternal) result += ".Internal.";
+            result = result.Replace("..", ",").Replace(".", "");
             if (result == "")
                 return "none";
             return result;
 
         }
 
-        ///<summary>
-        ///Returns a <see cref="T:System.Sequence"></see> that represents the current <see cref="T:System.Object"></see>.
-        ///</summary>
-        ///
-        ///<returns>
-        ///A <see cref="T:System.Sequence"></see> that represents the current <see cref="T:System.Object"></see>.
-        ///</returns>
-        ///<filterpriority>2</filterpriority>
         public override string ToString(){return Dump();}
 
-        private string DebuggerDumpString { get { return Dump(); } }
+        public bool Equals(Category obj)
+        {
+            if(ReferenceEquals(null, obj))
+                return false;
+            if(ReferenceEquals(this, obj))
+                return true;
+            return obj._code.Equals(_code) && obj._type.Equals(_type) && obj._refs.Equals(_refs) && obj._size.Equals(_size) && obj._internal.Equals(_internal);
+        }
 
+        public override bool Equals(object obj)
+        {
+            if(ReferenceEquals(null, obj))
+                return false;
+            if(ReferenceEquals(this, obj))
+                return true;
+            if(obj.GetType() != typeof(Category))
+                return false;
+            return Equals((Category) obj);
+        }
+
+        public static bool operator ==(Category left, Category right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Category left, Category right)
+        {
+            return !Equals(left, right);
+        }
     }
 }

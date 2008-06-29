@@ -3,6 +3,7 @@ using Reni.Syntax;
 
 namespace Reni
 {
+#if false
     /// <summary>
     /// Then-else structure
     /// </summary>
@@ -54,12 +55,12 @@ namespace Reni
         /// <param name="category">The category.</param>
         /// <returns></returns>
         /// created 08.01.2007 23:49
-        internal override Result VirtVisit(Context.ContextBase context, Category category)
+        public Result VirtVisit(Context.ContextBase context, Category category)
         {
-            var condResult = _condSyntax.Visit(context, category | Category.Type);
+            var condResult = _condSyntax.Result(context, category | Category.Type);
             condResult = condResult.Type.Conversion(category, Type.TypeBase.CreateBit).UseWithArg(condResult);
 
-            var thenResult = _thenSyntax.Visit(context, category | Category.Type);
+            var thenResult = _thenSyntax.Result(context, category | Category.Type);
             var elseResult = CreateElseResult(context, category);
 
             if(thenResult.Type.IsPending)
@@ -84,7 +85,7 @@ namespace Reni
         {
             if(_elseSyntax == null)
                 return Type.TypeBase.CreateVoidResult(category | Category.Type);
-            return _elseSyntax.Visit(context, category | Category.Type);
+            return _elseSyntax.Result(context, category | Category.Type);
         }
 
         /// <summary>
@@ -100,6 +101,6 @@ namespace Reni
             return result;
         }
 
-        internal protected override string FilePosition { get { return _condSyntax.FilePosition; } }
     }
+#endif
 }

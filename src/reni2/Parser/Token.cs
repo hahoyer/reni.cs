@@ -10,7 +10,7 @@ namespace Reni.Parser
         private static int _nextObjectId;
         private readonly int _length;
         private readonly SourcePosn _source;
-        private readonly Base _tokenClass;
+        private readonly TokenClassBase _tokenClass;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TokenClass"/> class.
@@ -19,7 +19,7 @@ namespace Reni.Parser
         /// <param name="length">The length.</param>
         /// <param name="tokenClass">The tokenClass.</param>
         /// created 31.03.2007 23:27 on SAPHIRE by HH
-        public Token(SourcePosn source, int length, Base tokenClass) : base(_nextObjectId++)
+        public Token(SourcePosn source, int length, TokenClassBase tokenClass) : base(_nextObjectId++)
         {
             _source = source.Clone();
             _length = length;
@@ -32,7 +32,7 @@ namespace Reni.Parser
         /// </summary>
         /// <value>The token.</value>
         /// created 31.03.2007 23:28 on SAPHIRE by HH
-        public Base TokenClass { get { return _tokenClass; } }
+        public TokenClassBase TokenClass { get { return _tokenClass; } }
 
         /// <summary>
         /// the source position the token starts
@@ -98,54 +98,16 @@ namespace Reni.Parser
             return prioTable.Index(PrioTableName);
         }
 
-        internal string PotentialTypeName
-        {
-            get
-            {
-                 return Base.TokenToTypeNameEnd(TokenClass.IsSymbol, Name);
-            }
-        }
+        internal string PotentialTypeName { get { return TokenClassBase.TokenToTypeNameEnd(TokenClass.IsSymbol, Name); } }
 
         internal static Token CreateToken(bool isSymbol, SourcePosn sp, int i)
         {
             var a = Assembly.GetAssembly(typeof(ParserLibrary));
             var t = a.GetTypes();
             foreach(var tt in t)
-            {
-                if(Base.IsTokenType(tt.FullName, isSymbol, sp.SubString(0, i)))
-                    return new Token(sp, i, (Base) Activator.CreateInstance(tt, new object[0]));
-            }
+                if(TokenClassBase.IsTokenType(tt.FullName, isSymbol, sp.SubString(0, i)))
+                    return new Token(sp, i, (TokenClassBase) Activator.CreateInstance(tt, new object[0]));
             return new Token(sp, i, UserSymbol.Instance(isSymbol, sp.SubString(0, i)));
         }
-    }
-
-    internal sealed class DefineableToken : ReniObject
-    {
-        private readonly int _length;
-        private readonly SourcePosn _source;
-        private readonly Defineable _tokenClass;
-
-        internal DefineableToken(Token token)
-        {
-            _source = token.Source;
-            _length = token.Length;
-            _tokenClass = (Defineable) token.TokenClass;
-        }
-
-        /// <summary>
-        /// Gets the token class.
-        /// </summary>
-        /// <value>The token class.</value>
-        /// created 01.04.2007 23:41 on SAPHIRE by HH
-        internal Defineable TokenClass { get { return _tokenClass; } }
-
-        /// <summary>
-        /// the text of the token
-        /// </summary>
-        [DumpData(false)]
-        internal string Name { get { return _source.SubString(0, _length); } }
-
-        [DumpData(true)]
-        public string FilePosition { get { return "\n" + _source.FilePosn(Name); } }
     }
 }

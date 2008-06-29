@@ -1,52 +1,101 @@
-using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Syntax
 {
-    internal sealed class Special : SyntaxBase
+    internal class CompileSyntax : ParsedSyntax, ICompileSyntax
     {
-        [DumpData(true), DumpExcept(null)]
-        private readonly SyntaxBase _left;
+        internal CompileSyntax(Token token)
+            : base(token) {}
 
-        [DumpData(true), DumpExcept(null)]
-        private readonly SyntaxBase _right;
-
-        private readonly Parser.TokenClass.Special _Special;
-        [DumpData(true), DumpExcept(null)]
-        private readonly Token _token;
-
-        public Special(SyntaxBase left, Token token, Parser.TokenClass.Special special, SyntaxBase right)
+        string ICompileSyntax.DumpShort()
         {
-            _left = left;
-            _token = token;
-            _Special = special;
-            _right = right;
+            return DumpShort();
         }
 
-        internal protected override string FilePosition
+        string ICompileSyntax.FilePosition()
         {
-            get
-            {
-                if(_left != null)
-                    return _left.FilePosition;
-                return _token.FilePosition;
-            }
+            return FilePosition();
         }
 
-        internal override Result VirtVisit(ContextBase context, Category category)
+        Result ICompileSyntax.Result(ContextBase context, Category category)
         {
-            return _Special.Result(context, category, _left, _token, _right);
+            if(category.HasInternal || !(category.HasCode || category.HasRefs))
+                return Result(context, category);
+            var result = Result(context, category | Category.Internal | Category.Type);
+            return result.CreateStatement(category, result.Internal);
         }
 
-        internal override string DumpShort()
+        internal protected virtual Result Result(ContextBase context, Category category)
         {
-            if(_left != null)
-                return base.DumpShort();
-            var result = _token.Name;
-            if(_right != null)
-                result += "(" + _right.DumpShort() + ")";
-            return result;
+            NotImplementedMethod(context, category);
+            return null;
+        }
+
+        internal protected override IParsedSyntax SurroundedByParenthesis(Token token)
+        {
+            return this;
+        }
+
+    }
+
+    internal abstract class SpecialSyntax : CompileSyntax
+    {
+        protected SpecialSyntax(Token token)
+            : base(token) {}
+    }
+
+    internal sealed class TerminalSyntax : SpecialSyntax
+    {
+        internal readonly Terminal Terminal;
+
+        public TerminalSyntax(Token token, Terminal terminal)
+            : base(token)
+        {
+            Terminal = terminal;
+        }
+
+        internal protected override Result Result(ContextBase context, Category category)
+        {
+            return Terminal.Result(context, category, Token);
+        }
+    }
+
+    internal sealed class PrefixSyntax : SpecialSyntax
+    {
+        internal readonly Prefix Prefix;
+        internal readonly ICompileSyntax Right;
+
+        public PrefixSyntax(Token token, Prefix prefix, ICompileSyntax right)
+            : base(token)
+        {
+            Prefix = prefix;
+            Right = right;
+        }
+
+        internal protected override Result Result(ContextBase context, Category category)
+        {
+            return Prefix.Result(context, category, Token, Right);
+        }
+    }
+
+    internal sealed class InfixSyntax : SpecialSyntax
+    {
+        internal readonly ICompileSyntax Left;
+        internal readonly Infix Infix;
+        internal readonly ICompileSyntax Right;
+
+        public InfixSyntax(Token token, ICompileSyntax left, Infix infix, ICompileSyntax right) : base(token)
+        {
+            Left = left;
+            Infix = infix;
+            Right = right;
+        }
+
+        internal protected override Result Result(ContextBase context, Category category)
+        {
+            return Infix.Result(context, category, Left, Token, Right);
         }
     }
 }
