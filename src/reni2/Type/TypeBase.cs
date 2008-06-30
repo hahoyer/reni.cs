@@ -275,7 +275,7 @@ namespace Reni.Type
             return result;
         }
 
-        public virtual Result TypeOperator(Category category)
+        public virtual Result TypeOperator(Category category, TypeBase targetType)
         {
             var result = CreateVoidResult(category).Clone();
             if(category.HasType)
@@ -311,6 +311,11 @@ namespace Reni.Type
         {
             NotImplementedMethod(count);
             throw new NotImplementedException();
+        }
+
+        internal Result ApplyTypeOperator(Category category, TypeBase targetType)
+        {
+            return targetType.Conversion(category, this);
         }
 
         public virtual Result ApplyTypeOperator(Result argResult)
@@ -470,5 +475,6 @@ namespace Reni.Type
             var result = callContext.Result(category | Category.Type, args);
             return result.ConvertTo(CreateSequence(result.Type.SequenceCount));
         }
+
     }
 }

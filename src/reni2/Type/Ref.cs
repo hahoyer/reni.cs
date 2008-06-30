@@ -89,9 +89,9 @@ namespace Reni.Type
             return Target.ApplyTypeOperator(argResult);
         }
 
-        public override Result TypeOperator(Category category)
+        public override Result TypeOperator(Category category, TypeBase targetType)
         {
-            return Target.TypeOperator(category);
+            return Target.TypeOperator(category, targetType);
         }
 
         internal override Result ConvertToVirt(Category category, TypeBase dest)

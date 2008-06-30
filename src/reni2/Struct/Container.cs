@@ -427,6 +427,12 @@ namespace Reni.Struct
             return VisitElementFromContextRef(definingParentContext, category, index);
         }
 
+        internal Result ApplyAtFeature(ContextBase context, ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            var index = callContext.Evaluate(args, IndexType).ToInt32();
+            return AccessApplyResult(context, index, callContext, category, @object);
+        }
+
         internal Result VisitAccessApply(ContextBase structContext, int position, ContextBase callContext, Category category, ICompileSyntax args)
         {
             var localCategory = category;
@@ -443,34 +449,24 @@ namespace Reni.Struct
             return null;
         }
 
+        internal Result AccessApplyResult(ContextBase context, int index, ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            NotImplementedMethod(context,index,callContext,category,@object,args);
+            return null;
+        }
+
+        internal Result AccessApplyResult(ContextBase context, int index, ContextBase callContext, Category category, ICompileSyntax @object)
+        {
+            NotImplementedMethod(context, index, callContext, category, @object);
+            return null;
+        }
+
         internal SearchResult<IStructFeature> Search(Defineable defineable)
         {
             if(Defined(defineable.Name))
                 return SearchResult<IStructFeature>.Success(StructFeatures[Find(defineable.Name)],
                     defineable);
             return defineable.SearchFromStruct().SubTrial(this);
-        }
-
-        internal class AtFeature : IContextFeature, IFeature
-        {
-            private readonly Container _container;
-            private readonly ContextBase _parentContext;
-
-            public AtFeature(Container container, ContextBase parentContext)
-            {
-                _parentContext = parentContext;
-                _container = container;
-            }
-
-            public Result VisitApply(ContextBase callContext, Category category, ICompileSyntax args)
-            {
-                return _container.VisitOperationApply(_parentContext, callContext, category, args);
-            }
-
-            public Result Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
-            {
-                return _container.VisitOperationApply(_parentContext, callContext, category, args);
-            }
         }
 
         internal class ContextFeature : IContextFeature

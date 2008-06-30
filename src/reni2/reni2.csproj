@@ -77,6 +77,7 @@
     <Compile Include="Parser\TokenClass\SequenceOfBitOperation.cs" />
     <Compile Include="SearchResult.cs" />
     <Compile Include="SearchTrial.cs" />
+    <Compile Include="Struct\AtFeature.cs" />
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\ContextAtPosition.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />

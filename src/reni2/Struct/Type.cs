@@ -22,7 +22,7 @@ namespace Reni.Struct
             _context = context;
             _container = struc;
             _currentCompilePosition = currentCompilePosition;
-            _atFeatureObject = new Container.AtFeature(Container, Context);
+            _atFeatureObject = new AtFeature(Container, Context);
         }
 
         [Node]
@@ -124,7 +124,7 @@ namespace Reni.Struct
             return result.ToArray();
         }
 
-        private class StructContainerFeature : IFeature
+        sealed private class StructContainerFeature : IFeature
         {
             [DumpData(true)]
             private readonly Type _type;
@@ -143,9 +143,16 @@ namespace Reni.Struct
                     .Container
                     .VisitAccessApply(_type.Context, _index, callContext, category, args);
             }
+
+            public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+            {
+                return _type
+                    .Container
+                    .AccessApplyResult(_type.Context, _index, callContext, category, @object, args);
+            }
         }
 
-        private readonly Container.AtFeature _atFeatureObject;
+        private readonly AtFeature _atFeatureObject;
 
         public IFeature AtFeatureObject()
         {
