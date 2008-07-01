@@ -308,6 +308,13 @@ namespace Reni.Context
                 );
             return apply(objectRefType).UseWithArg(objectRefResult);
         }
+
+        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType, Result.GetSize argsOffset)
+        {
+            return Result(category,syntax)
+                .EnsureRef(RefAlignParam, argsOffset)
+                .ConvertTo(elementType.CreateSequence(Type(syntax).SequenceCount));
+        }
     }
 
     internal class Cache

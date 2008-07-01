@@ -31,7 +31,8 @@ namespace Reni.Type
         [DumpData(false)]
         internal override bool IsRef(RefAlignParam refAlignParam)
         {
-            return RefAlignParam == refAlignParam;
+            Tracer.Assert(RefAlignParam == refAlignParam);
+            return true;
         }
 
         internal override Size UnrefSize { get { return Target.Size; } }

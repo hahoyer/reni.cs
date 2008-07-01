@@ -82,7 +82,12 @@ namespace Reni.Code
 
         public static CodeBase CreateTopRef(RefAlignParam refAlignParam)
         {
-            return CreateLeaf(new TopRef(refAlignParam, Size.Create(0)));
+            return CreateLeaf(new TopRef(refAlignParam, Size.Zero));
+        }
+
+        public static CodeBase CreateTopRef(RefAlignParam refAlignParam, Size offset)
+        {
+            return CreateLeaf(new TopRef(refAlignParam, offset));
         }
 
         public static CodeBase CreateFrameRef(RefAlignParam refAlignParam)

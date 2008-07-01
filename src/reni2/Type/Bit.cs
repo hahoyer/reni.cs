@@ -35,7 +35,7 @@ namespace Reni.Type
             return false;
         }
 
-        internal override CodeBase CreateSequenceOperation(Defineable token, Size size, Size objSize, Size argsSize)
+        internal override CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize, Size argsSize)
         {
             return CreateSequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
                 .CreateArgCode()

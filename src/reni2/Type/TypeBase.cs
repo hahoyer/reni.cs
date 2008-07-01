@@ -388,18 +388,9 @@ namespace Reni.Type
             return true;
         }
 
-        internal CodeBase CreateSequenceOperation(Defineable token, CodeBase objCode, Size size, CodeBase argsCode)
+        internal virtual CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize, Size argsSize)
         {
-            var objSize = objCode.Size;
-            var argsSize = argsCode.Size;
-            CodeBase commonResult = CreateSequenceOperation(token, size, objSize, argsSize);
-            var allArgsCode = objCode.Align().CreateSequence(argsCode.Align());
-            return commonResult.UseWithArg(allArgsCode);
-        }
-
-        internal virtual CodeBase CreateSequenceOperation(Defineable token, Size size, Size objSize, Size argsSize)
-        {
-            NotImplementedMethod(token, objSize, size, argsSize);
+            NotImplementedMethod(size, token, objSize, argsSize);
             return null;
         }
 
@@ -484,13 +475,11 @@ namespace Reni.Type
             return result.ConvertTo(CreateSequence(result.Type.SequenceCount));
         }
 
-        internal Result SequenceOperationResult(Defineable definable, ContextBase callContext, Category category, Size objSize, Size argsSize)
+        internal Result SequenceOperationResult(Category category, Defineable definable, Size objSize, Size argsSize)
         {
-            var type =
-                SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt())
-                    .CreateAlign(callContext.RefAlignParam.AlignBits);
+            var type = SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt());
             return type
-                .CreateResult(category, () => CreateSequenceOperation(definable, objSize, type.Size, argsSize));
+                .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize, argsSize));
         }
     }
 }

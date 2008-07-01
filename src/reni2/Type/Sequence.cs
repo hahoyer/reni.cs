@@ -231,24 +231,23 @@ namespace Reni.Type
                 return result;
             }
         }
+    }
 
-        internal class EnableCutFeature : ReniObject, IFeature
+    internal class EnableCutFeature : ReniObject, IFeature
+    {
+        private readonly Sequence _sequence;
+
+        public EnableCutFeature(Sequence sequence)
         {
-            private readonly Sequence _sequence;
+            _sequence = sequence;
+        }
 
-            public EnableCutFeature(Sequence sequence)
-            {
-                _sequence = sequence;
-            }
+        public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            if (args != null)
+                NotImplementedMethod(callContext, category, @object, args);
 
-            public Result Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
-            {
-                if(args == null)
-                    return callObject.ConvertTo(category, new EnableCut(_sequence));
-
-                NotImplementedMethod(callContext, category, args, callObject);
-                return null;
-            }
+            return callContext.ApplyResult(category, @object, ot => ot.ConvertTo(category, new EnableCut(_sequence)));
         }
     }
 
@@ -266,20 +265,17 @@ namespace Reni.Type
 
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            var objectType = callContext.Type(@object);
-            var argsType = callContext.Type(args);
-            if(objectType.IsPending || argsType.IsPending)
+            var argsResult = callContext.ConvertToSequenceViaRef(category, args, _sequence.Element, () => Size.Zero);
+            if (argsResult.IsPending)
+                return Result.CreatePending(category);
+            var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element, ()=>argsResult.Internal.Size);
+            if (objectResult.IsPending)
                 return Result.CreatePending(category);
 
-            Result objResult = callObject.ConvertTo(category, _sequence);
-            if(objResult.IsPending)
-                return objResult;
-            var argResult = _sequence.Element.ConvertToSequence(callContext, category, args);
-            if(argResult.IsPending)
-                return argResult;
-
-            var result = _sequence.Element.SequenceOperationResult(_definable, callContext, category, objectType.UnrefSize, argsType.UnrefSize);
-            return result.UseWithArg(objResult.CreateSequence(argResult));
+            return _sequence
+                .Element
+                .SequenceOperationResult(category, _definable, objectResult.Size, argsResult.Size)
+                .UseWithArg(objectResult.CreateSequence(argsResult));
         }
     }
 }

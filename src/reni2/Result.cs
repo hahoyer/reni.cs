@@ -748,16 +748,15 @@ namespace Reni
             return Code.Evaluate();
         }
 
-        internal Result EnsureContextRef(ContextBase context)
+        internal Result EnsureRef(RefAlignParam refAlignParam, GetSize offset)
         {
-            if(Type.IsRef(context.RefAlignParam))
+            if(Type.IsRef(refAlignParam))
                 return this;
 
             var resultAsRef =
                 Type
-                    .CreateRef(context.RefAlignParam)
-                    .CreateResult(Complete, context.TopRefResult)
-                ;
+                    .CreateRef(refAlignParam)
+                    .CreateResult(Complete, ()=>CodeBase.CreateTopRef(refAlignParam, offset()), () => Internal);
             return resultAsRef;
         }
 
@@ -795,6 +794,7 @@ namespace Reni
         }
 
         internal delegate CodeBase GetCode();
+        internal delegate Size GetSize();
         internal delegate Refs GetRefs();
         internal delegate Result GetResult();
         internal delegate Result GetResultFromType(TypeBase objectType);
