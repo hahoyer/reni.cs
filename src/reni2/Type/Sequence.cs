@@ -269,56 +269,17 @@ namespace Reni.Type
             var objectType = callContext.Type(@object);
             var argsType = callContext.Type(args);
             if(objectType.IsPending || argsType.IsPending)
-                return Reni.Result.CreatePending(category);
+                return Result.CreatePending(category);
 
-            var objResult = callObject.ConvertTo(category, _sequence);
+            Result objResult = callObject.ConvertTo(category, _sequence);
             if(objResult.IsPending)
                 return objResult;
             var argResult = _sequence.Element.ConvertToSequence(callContext, category, args);
             if(argResult.IsPending)
                 return argResult;
-            return Result(callContext, category, objResult, argResult);
-        }
 
-        private Result ApplyResult(ContextBase callContext, Category category, TypeBase objType, TypeBase argType)
-        {
-            Result result;
-            if (category.HasSize || category.HasType || category.HasCode)
-            {
-                var objBitCount = objType.UnrefSize.ToInt();
-                var argBitCount = argType.UnrefSize.ToInt();
-                var type =
-                    _sequence.Element
-                        .SequenceOperationResultType(_definable, objBitCount, argBitCount)
-                        .CreateAlign(callContext.RefAlignParam.AlignBits);
-                var result1 = type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation((Defineable) _definable, (CodeBase) objResult, type.Size, argResult));
-                result = result1;
-            }
-            else
-                result = new Result();
-            if (category.HasRefs)
-                result.Refs = objResult.Refs.Pair(argResult.Refs);
-            return (result);
-        }
-        private Result Result(ContextBase callContext, Category category, Result objResult, Result argResult)
-        {
-            Result result;
-            if (category.HasSize || category.HasType || category.HasCode)
-            {
-                var objBitCount = objResult.Type.UnrefSize.ToInt();
-                var argBitCount = argResult.Type.UnrefSize.ToInt();
-                var type =
-                    _sequence.Element
-                        .SequenceOperationResultType(_definable, objBitCount, argBitCount)
-                        .CreateAlign(callContext.RefAlignParam.AlignBits);
-                var result1 = type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objResult.Code, type.Size, argResult.Code));
-                result = result1;
-            }
-            else
-                result = new Result();
-            if (category.HasRefs)
-                result.Refs = objResult.Refs.Pair(argResult.Refs);
-            return (result);
+            var result = _sequence.Element.SequenceOperationResult(_definable, callContext, category, objectType.UnrefSize, argsType.UnrefSize);
+            return result.UseWithArg(objResult.CreateSequence(argResult));
         }
     }
 }

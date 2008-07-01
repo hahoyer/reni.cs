@@ -409,7 +409,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
+        internal protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             NotImplementedMethod(token, objBitCount, argBitCount);
             return null;
@@ -484,5 +484,13 @@ namespace Reni.Type
             return result.ConvertTo(CreateSequence(result.Type.SequenceCount));
         }
 
+        internal Result SequenceOperationResult(Defineable definable, ContextBase callContext, Category category, Size objSize, Size argsSize)
+        {
+            var type =
+                SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt())
+                    .CreateAlign(callContext.RefAlignParam.AlignBits);
+            return type
+                .CreateResult(category, () => CreateSequenceOperation(definable, objSize, type.Size, argsSize));
+        }
     }
 }

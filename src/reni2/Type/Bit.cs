@@ -47,7 +47,7 @@ namespace Reni.Type
             return result.Code.CreateBitSequenceOperation(token);
         }
 
-        internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
+        protected internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
