@@ -46,16 +46,6 @@ namespace Reni.Code
             return CreateChild(new DumpPrint(leftSize, Size - leftSize));
         }
 
-        internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, CodeBase right)
-        {
-            var alignedSize = Size.ByteAlignedSize;
-            var alignedRightSize = right.Size.ByteAlignedSize;
-
-            return CreateBitCast(alignedSize)
-                .CreateSequence(right.CreateBitCast(alignedRightSize))
-                .CreateBitSequenceOperation(name, size, alignedSize);
-        }
-
         public CodeBase CreateAssign(RefAlignParam refAlignParam, CodeBase source)
         {
             var alignedSize = source.Size.ByteAlignedSize;
@@ -262,6 +252,11 @@ namespace Reni.Code
         {
             NotImplementedMethod();
             return null;
+        }
+
+        internal CodeBase Align()
+        {
+            return CreateBitCast(Size.ByteAlignedSize);
         }
     }
 

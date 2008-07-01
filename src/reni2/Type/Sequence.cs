@@ -25,7 +25,6 @@ namespace Reni.Type
         }
 
         [Node, DumpData(false)]
-        
         internal Array InheritedType { get { return _inheritedType; } }
         [DumpData(false)]
         internal override Size Size { get { return _inheritedType.Size; } }
@@ -208,51 +207,6 @@ namespace Reni.Type
             return _enableCutCutFeature;
         }
 
-        internal class BitOperationFeatureClass : ReniObject, IFeature
-        {
-            private readonly SequenceOfBitOperation _definable;
-            private readonly Sequence _sequence;
-
-            public BitOperationFeatureClass(Sequence sequence, SequenceOfBitOperation
-                definable)
-            {
-                _sequence = sequence;
-                _definable = definable;
-            }
-
-            Result IFeature.Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
-            {
-                var objResult = callObject.ConvertTo(category, _sequence);
-                if(objResult.IsPending)
-                    return objResult;
-                var argResult = _sequence.Element.ConvertToSequence(callContext, category, args);
-                if(argResult.IsPending)
-                    return argResult;
-                return Result(callContext, category, objResult, argResult);
-            }
-
-            private Result Result(ContextBase callContext, Category category, Result objResult, Result argResult)
-            {
-                Result result;
-                if(category.HasSize || category.HasType || category.HasCode)
-                {
-                    var objBitCount = objResult.Type.UnrefSize.ToInt();
-                    var argBitCount = argResult.Type.UnrefSize.ToInt();
-                    var type =
-                        _sequence.Element
-                            .SequenceOperationResultType(_definable, objBitCount, argBitCount)
-                            .CreateAlign(callContext.RefAlignParam.AlignBits);
-                    var result1 = type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objResult, type.Size, argResult));
-                    result = result1;
-                }
-                else
-                    result = new Result();
-                if(category.HasRefs)
-                    result.Refs = objResult.Refs.Pair(argResult.Refs);
-                return (result);
-            }
-        }
-
         internal class BitOperationPrefixFeatureClass : IPrefixFeature
         {
             private readonly SequenceOfBitOperation _definable;
@@ -272,7 +226,7 @@ namespace Reni.Type
                     result = objResult.Type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objResult));
                 else
                     result = new Result();
-                if (category.HasRefs)
+                if(category.HasRefs)
                     result.Refs = objResult.Refs;
                 return result;
             }
@@ -295,6 +249,76 @@ namespace Reni.Type
                 NotImplementedMethod(callContext, category, args, callObject);
                 return null;
             }
+        }
+    }
+
+    internal class BitOperationFeatureClass : ReniObject, IFeature
+    {
+        private readonly SequenceOfBitOperation _definable;
+        private readonly Sequence _sequence;
+
+        public BitOperationFeatureClass(Sequence sequence, SequenceOfBitOperation
+            definable)
+        {
+            _sequence = sequence;
+            _definable = definable;
+        }
+
+        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            var objectType = callContext.Type(@object);
+            var argsType = callContext.Type(args);
+            if(objectType.IsPending || argsType.IsPending)
+                return Reni.Result.CreatePending(category);
+
+            var objResult = callObject.ConvertTo(category, _sequence);
+            if(objResult.IsPending)
+                return objResult;
+            var argResult = _sequence.Element.ConvertToSequence(callContext, category, args);
+            if(argResult.IsPending)
+                return argResult;
+            return Result(callContext, category, objResult, argResult);
+        }
+
+        private Result ApplyResult(ContextBase callContext, Category category, TypeBase objType, TypeBase argType)
+        {
+            Result result;
+            if (category.HasSize || category.HasType || category.HasCode)
+            {
+                var objBitCount = objType.UnrefSize.ToInt();
+                var argBitCount = argType.UnrefSize.ToInt();
+                var type =
+                    _sequence.Element
+                        .SequenceOperationResultType(_definable, objBitCount, argBitCount)
+                        .CreateAlign(callContext.RefAlignParam.AlignBits);
+                var result1 = type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation((Defineable) _definable, (CodeBase) objResult, type.Size, argResult));
+                result = result1;
+            }
+            else
+                result = new Result();
+            if (category.HasRefs)
+                result.Refs = objResult.Refs.Pair(argResult.Refs);
+            return (result);
+        }
+        private Result Result(ContextBase callContext, Category category, Result objResult, Result argResult)
+        {
+            Result result;
+            if (category.HasSize || category.HasType || category.HasCode)
+            {
+                var objBitCount = objResult.Type.UnrefSize.ToInt();
+                var argBitCount = argResult.Type.UnrefSize.ToInt();
+                var type =
+                    _sequence.Element
+                        .SequenceOperationResultType(_definable, objBitCount, argBitCount)
+                        .CreateAlign(callContext.RefAlignParam.AlignBits);
+                var result1 = type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objResult.Code, type.Size, argResult.Code));
+                result = result1;
+            }
+            else
+                result = new Result();
+            if (category.HasRefs)
+                result.Refs = objResult.Refs.Pair(argResult.Refs);
+            return (result);
         }
     }
 }

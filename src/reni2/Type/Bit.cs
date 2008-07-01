@@ -35,10 +35,11 @@ namespace Reni.Type
             return false;
         }
 
-        internal override CodeBase CreateSequenceOperation(Defineable token, Result objResult, Size size,
-            Result argResult)
+        internal override CodeBase CreateSequenceOperation(Defineable token, Size size, Size objSize, Size argsSize)
         {
-            return objResult.Code.CreateBitSequenceOperation(token, size, argResult.Code);
+            return CreateSequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
+                .CreateArgCode()
+                .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
         internal override CodeBase CreateSequenceOperation(Defineable token, Result result)

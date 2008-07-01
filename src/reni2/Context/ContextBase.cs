@@ -192,10 +192,11 @@ namespace Reni.Context
 
         private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
         {
-            var refResult = formerResult.EnsureContextRef(this);
-            var visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
-            var arglessResult = visitedResult.UseWithArg(refResult);
-            return arglessResult;
+            //var refResult = formerResult.EnsureContextRef(this);
+            //var visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
+            //var arglessResult = visitedResult.UseWithArg(refResult);
+            //return arglessResult;
+            return null;
         }
 
         internal Result VisitChainElement(Category category, MemberElem memberElem, Result formerResult)

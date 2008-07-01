@@ -157,40 +157,36 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        internal Result VisitNextChainElement(ContextBase callContext, Category category, MemberElem memberElem)
-        {
-            var resultFromRef = SearchDefineable(memberElem.DefineableToken);
-            if(resultFromRef.IsSuccessFull)
-                return resultFromRef
-                    .Feature
-                    .ApplyResult(callContext, category, memberElem.Args, this);
-
-            NotImplementedMethod(callContext, category, memberElem, "resultFromRef", resultFromRef);
-            return null;
-        }
-
-        public AssignmentOperatorFeature AssignmentOperatorFeatureObject()
+      public AssignmentOperatorFeature AssignmentOperatorFeature()
         {
             return _assignmentOperatorFeatureObject;
         }
+    }
 
-        internal class AssignmentOperatorFeature : IFeature
+    internal class AssignmentOperatorFeature : ReniObject, IFeature
+    {
+        private readonly Ref _ref;
+
+        public AssignmentOperatorFeature(Ref @ref)
         {
-            private readonly Ref _ref;
-
-            public AssignmentOperatorFeature(Ref @ref)
-            {
-                _ref = @ref;
-            }
-
-            public Result Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
-            {
-                Tracer.Assert(callObject == _ref);
-                if(category.HasCode || category.HasRefs)
-                    return _ref.AssignmentOperator(callContext.Result(category | Category.Type,args));
-                return CreateVoid.CreateResult(category);
-            }
+            _ref = @ref;
         }
 
+        public Result Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
+        {
+            Tracer.Assert(callObject == _ref);
+            if(category.HasCode || category.HasRefs)
+                return _ref.AssignmentOperator(callContext.Result(category | Category.Type,args));
+            return TypeBase.CreateVoid.CreateResult(category);
+        }
+
+        public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            if(!category.HasCode && !category.HasRefs && !category.HasInternal)
+                return TypeBase.CreateVoid.CreateResult(category);
+
+            NotImplementedMethod(callContext, category, @object, args);
+            return _ref.AssignmentOperator(callContext.Result(category | Category.Type, args));
+        }
     }
 }

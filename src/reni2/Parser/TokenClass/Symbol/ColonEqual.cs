@@ -14,7 +14,7 @@ namespace Reni.Parser.TokenClass.Symbol
 
         public IFeature Convert(Ref @ref)
         {
-            return @ref.AssignmentOperatorFeatureObject();
+            return @ref.AssignmentOperatorFeature();
         }
     }
 }

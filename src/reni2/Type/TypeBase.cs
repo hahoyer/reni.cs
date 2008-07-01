@@ -388,10 +388,18 @@ namespace Reni.Type
             return true;
         }
 
-        internal virtual CodeBase CreateSequenceOperation(Defineable token, Result objResult, Size size,
-            Result argResult)
+        internal CodeBase CreateSequenceOperation(Defineable token, CodeBase objCode, Size size, CodeBase argsCode)
         {
-            NotImplementedMethod(token, objResult, size, argResult.Code);
+            var objSize = objCode.Size;
+            var argsSize = argsCode.Size;
+            CodeBase commonResult = CreateSequenceOperation(token, size, objSize, argsSize);
+            var allArgsCode = objCode.Align().CreateSequence(argsCode.Align());
+            return commonResult.UseWithArg(allArgsCode);
+        }
+
+        internal virtual CodeBase CreateSequenceOperation(Defineable token, Size size, Size objSize, Size argsSize)
+        {
+            NotImplementedMethod(token, objSize, size, argsSize);
             return null;
         }
 
