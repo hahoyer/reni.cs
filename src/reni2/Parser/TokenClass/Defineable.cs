@@ -93,11 +93,4 @@ namespace Reni.Parser.TokenClass
             return SearchResult<IStructFeature>.Failure(this);
         }
     }
-
-    sealed internal class DefinableTokenSyntax : ParsedSyntax
-    {
-        public DefinableTokenSyntax(Token token):base(token)
-        {
-        }
-    }
 }
