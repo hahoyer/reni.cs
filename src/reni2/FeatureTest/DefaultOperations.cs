@@ -41,7 +41,6 @@ namespace Reni.FeatureTest
         [Test,Category(Worked)]
         public void ApplyTypeOperator()
         {
-            Parameters.Trace.All();
             RunCompiler("ApplyTypeOperator", @"(31 type (28))dump_print", "28");
         }
         /// <summary>
