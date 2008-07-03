@@ -74,14 +74,14 @@ namespace Reni.Type
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
             var resultFromSequenceElement = Element.SearchFromSequence(defineable).SubTrial(Element);
-            var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,
-                this);
+            var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,this);
             if(result.IsSuccessFull)
                 return result;
             var resultForSequence = defineable.SearchForSequence();
-            result = resultForSequence.SearchResultDescriptor.Convert(resultForSequence.Feature, this);
-            result = result.AlternativeTrial(result);
-            return result;
+            result = resultForSequence.SearchResultDescriptor.Convert(resultForSequence.Feature, this).AlternativeTrial(result);
+            if (result.IsSuccessFull)
+                return result;
+            return base.Search(defineable).AlternativeTrial(result);
         }
 
         internal protected override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
@@ -274,7 +274,7 @@ namespace Reni.Type
 
             return _sequence
                 .Element
-                .SequenceOperationResult(category, _definable, objectResult.Size, argsResult.Size)
+                .SequenceOperationResult(category, _definable, callContext.Type(@object).UnrefSize, callContext.Type(args).UnrefSize)
                 .UseWithArg(objectResult.CreateSequence(argsResult));
         }
     }

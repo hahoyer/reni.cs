@@ -340,6 +340,8 @@ namespace Reni
                     r.Code = Code.CreateBitCast(alignedSize);
                 if(HasRefs)
                     r.Refs = Refs;
+                if (HasInternal)
+                    r.Internal = Internal.Clone();
                 return r;
             }
             return this;
@@ -572,6 +574,8 @@ namespace Reni
                 result.Code = Code.UseWithArg(resultForArg.Code);
             if(HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.Pair(resultForArg.Refs);
+            if (HasInternal && resultForArg.HasInternal)
+                result.Internal = Internal.CreateSequence(resultForArg.Internal);
             return ReturnMethodDump(trace, result);
         }
 
@@ -756,7 +760,11 @@ namespace Reni
             var resultAsRef =
                 Type
                     .CreateRef(refAlignParam)
-                    .CreateResult(Complete, ()=>CodeBase.CreateTopRef(refAlignParam, offset()), () => Internal);
+                    .CreateResult(
+                    Complete, 
+                    ()=>CodeBase.CreateTopRef(refAlignParam, offset()), 
+                    () => Clone(Category.ForInternal).Align(refAlignParam.AlignBits)
+                    );
             return resultAsRef;
         }
 

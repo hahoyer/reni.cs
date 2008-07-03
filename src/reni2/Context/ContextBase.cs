@@ -309,11 +309,19 @@ namespace Reni.Context
             return apply(objectRefType).UseWithArg(objectRefResult);
         }
 
-        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType, Result.GetSize argsOffset)
+        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType,
+                                                Result.GetSize argsOffset)
         {
-            return Result(category,syntax)
-                .EnsureRef(RefAlignParam, argsOffset)
+            var localCategory = category | Category.Type;
+            if (category.HasInternal)
+                localCategory = localCategory | Category.ForInternal;
+            var result = Result(localCategory, syntax);
+            var ensureRef = result
+                .EnsureRef(RefAlignParam, argsOffset);
+            var convertTo = ensureRef
                 .ConvertTo(elementType.CreateSequence(Type(syntax).SequenceCount));
+            return convertTo
+                .Align(AlignBits);
         }
     }
 
