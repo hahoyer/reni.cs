@@ -294,34 +294,24 @@ namespace Reni.Context
 
         internal Result ApplyResult(Category category, ICompileSyntax @object, Result.GetResultFromType apply)
         {
-            var objectType = Type(@object);
-            if (objectType.IsRef(RefAlignParam))
-                return apply(objectType).UseWithArg(Result(category, @object));
-
-            Tracer.Assert(category.HasInternal);
-            var objectRefType = objectType.CreateRef(RefAlignParam);
-            var objectRefResult = objectRefType
-                .CreateResult(
-                category, 
-                () => CodeBase.CreateTopRef(RefAlignParam), 
-                () => Result(Category.ForInternal, @object).Align(AlignBits)
-                );
-            return apply(objectRefType).UseWithArg(objectRefResult);
+            var objectResult = ApplyToRef(category, @object, ()=>Reni.Size.Zero);
+            return apply(objectResult.Type).UseWithArg(objectResult);
         }
 
-        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType,
-                                                Result.GetSize argsOffset)
+        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType, Result.GetSize argsOffset)
+        {
+            return ApplyToRef(category, syntax, argsOffset)
+                .ConvertTo(elementType.CreateSequence(Type(syntax).SequenceCount))
+                .Align(AlignBits);
+        }
+
+        internal Result ApplyToRef(Category category, ICompileSyntax syntax, Result.GetSize argsOffset)
         {
             var localCategory = category | Category.Type;
             if (category.HasInternal)
                 localCategory = localCategory | Category.ForInternal;
-            var result = Result(localCategory, syntax);
-            var ensureRef = result
-                .EnsureRef(RefAlignParam, argsOffset);
-            var convertTo = ensureRef
-                .ConvertTo(elementType.CreateSequence(Type(syntax).SequenceCount));
-            return convertTo
-                .Align(AlignBits);
+            return Result(localCategory, syntax)
+                .EnsureRef(category | Category.Type, RefAlignParam, argsOffset);
         }
     }
 

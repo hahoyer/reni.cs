@@ -416,6 +416,12 @@ namespace Reni
                 Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "nested internals " + Dump());
                 Debugger.Break();
             }
+
+            if (HasInternal && _internal.Complete != Category.ForInternal)
+            {
+                Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "incomplete internals " + Dump());
+                Debugger.Break();
+            }
         }
 
         private bool HasCategory(Category category)
@@ -752,7 +758,7 @@ namespace Reni
             return Code.Evaluate();
         }
 
-        internal Result EnsureRef(RefAlignParam refAlignParam, GetSize offset)
+        internal Result EnsureRef(Category category, RefAlignParam refAlignParam, GetSize offset)
         {
             if(Type.IsRef(refAlignParam))
                 return this;
@@ -761,11 +767,20 @@ namespace Reni
                 Type
                     .CreateRef(refAlignParam)
                     .CreateResult(
-                    Complete, 
-                    ()=>CodeBase.CreateTopRef(refAlignParam, offset()), 
-                    () => Clone(Category.ForInternal).Align(refAlignParam.AlignBits)
+                    category,
+                    () => CodeBase.CreateTopRef(refAlignParam, offset()),
+                    () => ForInternal().Align(refAlignParam.AlignBits)
                     );
             return resultAsRef;
+        }
+
+        private Result ForInternal()
+        {
+            Result result = Clone(Category.ForInternal);
+            if (HasInternal)
+                result = Internal.CreateSequence(result);
+            Tracer.Assert(result.Complete == Category.ForInternal);
+            return result;
         }
 
         internal Result UnProperty()

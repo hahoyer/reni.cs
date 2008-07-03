@@ -98,7 +98,10 @@ namespace Reni.Struct
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
             var containerResult = _container.Search(defineable);
-            return containerResult.SearchResultDescriptor.Convert(containerResult.Feature, this);
+            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature, this);
+            if(result.IsSuccessFull)
+                return result;
+            return base.Search(defineable).SubTrial(this);
         }
 
         [DumpData(false)]
