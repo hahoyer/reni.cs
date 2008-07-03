@@ -10,83 +10,31 @@ namespace Reni.FeatureTest
     /// </summary>
     public abstract class CompilerTest
     {
-        #region Delegates
-
         public delegate void ExpectedResult(Compiler c);
 
-        #endregion
-
-        /// <summary>
-        /// NUnit category flag for test worked once
-        /// </summary>
         public const string Damaged = "Damaged";
-
-        /// <summary>
-        /// NUnit category flag for test that are used rarely. Normally special preparations are required too.
-        /// </summary>
         public const string Rare = "Rare";
-
-        /// <summary>
-        /// NUnit category flag for test that never worked
-        /// </summary>
         public const string UnderConstruction = "Under Construction";
-
-        /// <summary>
-        /// NUnit category flag for test that never worked
-        /// </summary>
         public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
-
-        /// <summary>
-        /// NUnit category flag for test worked once
-        /// </summary>
         public const string Worked = "Worked";
-
-        /// <summary>
-        /// Compiler parameter
-        /// </summary>
         public CompilerParameters Parameters;
 
-        /// <summary>
-        /// Starts this instance.
-        /// </summary>
-        /// created 10.01.2007 04:32
         [SetUp]
         public void Start()
         {
             Parameters = new CompilerParameters();
         }
 
-        /// <summary>
-        /// Runs the compiler.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="text">The text.</param>
-        /// <param name="expectedOutput">The expeced output.</param>
-        /// created 17.11.2006 20:38
         protected void RunCompiler(string name, string text, string expectedOutput)
         {
             RunCompiler(1, name, text, expectedOutput);
         }
 
-        /// <summary>
-        /// Runs the compiler.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="text">The text.</param>
-        /// <param name="expectedResult">The expected result.</param>
-        /// <param name="expectedOutput">The expected output.</param>
-        /// created 15.07.2007 23:47 on HAHOYER-DELL by hh
         protected void RunCompiler(string name, string text, ExpectedResult expectedResult, string expectedOutput)
         {
             RunCompiler(1, name, text, expectedResult, expectedOutput);
         }
 
-        /// <summary>
-        /// Runs the compiler.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="expectedOutput">The expected output.</param>
-        /// created 15.07.2007 23:47 on HAHOYER-DELL by hh
         protected void RunCompiler(string name, string expectedOutput)
         {
             RunCompiler(1, name, expectedOutput);
@@ -101,14 +49,6 @@ namespace Reni.FeatureTest
             InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
         }
 
-        /// <summary>
-        /// Runs the compiler.
-        /// </summary>
-        /// <param name="depth">The depth.</param>
-        /// <param name="name">The name.</param>
-        /// <param name="text">The text.</param>
-        /// <param name="expectedOutput">The expected output.</param>
-        /// created 14.07.2007 14:34 on HAHOYER-DELL by hh
         private void RunCompiler(int depth, string name, string text, string expectedOutput)
         {
             RunCompiler(depth + 1, name, text, default(ExpectedResult), expectedOutput);

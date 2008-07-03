@@ -1,9 +1,5 @@
-using System;
-using HWClassLibrary.Debug;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.Parser
 {
@@ -41,10 +37,10 @@ namespace Reni.Parser
         private Result PrefixResult(ContextBase context, Category category)
         {
             var contextSearchResult = context.SearchDefineable(DefineableToken);
-            if (contextSearchResult.IsSuccessFull)
+            if(contextSearchResult.IsSuccessFull)
                 return contextSearchResult.Feature.VisitApply(context, category, Right);
 
-            if (Right == null)
+            if(Right == null)
             {
                 NotImplementedMethod(context, category, "contextSearchResult", contextSearchResult);
                 return null;
@@ -52,18 +48,18 @@ namespace Reni.Parser
 
             var argResult = context.Result(category | Category.Type, Right);
             var prefixSearchResult = argResult.Type.SearchDefineablePrefix(DefineableToken);
-            if (prefixSearchResult.IsSuccessFull)
+            if(prefixSearchResult.IsSuccessFull)
                 return prefixSearchResult.Feature.Result(category, argResult);
 
             NotImplementedMethod(context, category, "contextSearchResult", contextSearchResult, "prefixSearchResult", prefixSearchResult);
             return null;
         }
 
-        private Result InfixResult(ContextBase context, Category category) 
+        private Result InfixResult(ContextBase context, Category category)
         {
             var leftType = context.Type(Left);
             var searchResult = leftType.SearchDefineable(DefineableToken);
-            if (searchResult.IsSuccessFull)
+            if(searchResult.IsSuccessFull)
                 return searchResult.Feature.ApplyResult(context, category, Left, Right);
             NotImplementedMethod(context, category, "leftType", leftType, "searchResult", searchResult);
             return null;
