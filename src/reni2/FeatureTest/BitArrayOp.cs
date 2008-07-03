@@ -15,6 +15,7 @@ namespace Reni.FeatureTest
         [Test,Category(Worked)]
         public void Add2Numbers()
         {
+            Parameters.Trace.All();
             RunCompiler("Add2Numbers",
                         @"(2+4) dump_print"
                         , "6"

@@ -304,7 +304,7 @@ namespace Reni.Context
                 .CreateResult(
                 category, 
                 () => CodeBase.CreateTopRef(RefAlignParam), 
-                () => Result(Category.ForInternal, @object)
+                () => Result(Category.ForInternal, @object).Align(AlignBits)
                 );
             return apply(objectRefType).UseWithArg(objectRefResult);
         }
