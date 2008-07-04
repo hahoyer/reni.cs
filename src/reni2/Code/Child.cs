@@ -1,4 +1,5 @@
 using System;
+using HWClassLibrary.Debug;
 using Reni.Context;
 
 namespace Reni.Code
@@ -19,8 +20,10 @@ namespace Reni.Code
         /// created 29.09.2006 00:14
         public Child(CodeBase parent, LeafElement leafElement)
         {
+            Tracer.Assert(leafElement != null);
             _parent = parent;
             _leafElement = leafElement;
+            StopByObjectId(211);
         }
 
 
@@ -72,9 +75,9 @@ namespace Reni.Code
         /// created 06.10.2006 00:20
         public override CodeBase CreateChild(LeafElement leafElement)
         {
-            LeafElement newLeafElement = LeafElement.TryToCombine(leafElement);
+            LeafElement[] newLeafElement = LeafElement.TryToCombineN(leafElement);
             if (newLeafElement != null)
-                return Parent.CreateChild(newLeafElement);
+                return Parent.CreateChilds(newLeafElement);
 
             return base.CreateChild(leafElement);
         }

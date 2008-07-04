@@ -22,7 +22,7 @@ namespace Reni.Syntax
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
-            var trace = ObjectId >= 0;
+            var trace = ObjectId < 0;
             StartMethodDump(trace, context,category);
             if(category.HasInternal || !(category.HasCode || category.HasRefs))
                 return ReturnMethodDump(trace, Result(context, category));

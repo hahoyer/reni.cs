@@ -62,20 +62,26 @@ namespace Reni.Code
         /// created 03.10.2006 21:09
         private void DataAdd(LeafElement leafElement)
         {
-            var count = _data.Count;
-            while(count > 0)
+            var toAdd = new List<LeafElement>();
+            toAdd.Add(leafElement);
+            while(toAdd.Count > 0)
             {
-                count--;
-                var newElement = _data[count].TryToCombine(leafElement);
-                if(newElement == null)
-                    count = 0;
+                var next = toAdd[0];
+                toAdd.RemoveAt(0);
+
+                LeafElement[] newCorrectedElements = null;
+                
+                if(_data.Count > 0)
+                    newCorrectedElements = _data[_data.Count - 1].TryToCombineN(next);
+
+                if (newCorrectedElements == null)
+                    _data.Add(next);
                 else
                 {
-                    leafElement = newElement;
-                    _data.RemoveAt(count);
+                    _data.RemoveAt(_data.Count - 1);
+                    toAdd.InsertRange(0, newCorrectedElements);
                 }
             }
-            _data.Add(leafElement);
         }
 
         /// <summary>

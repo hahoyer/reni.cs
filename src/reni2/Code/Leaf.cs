@@ -1,3 +1,4 @@
+using HWClassLibrary.Debug;
 using Reni.Context;
 
 namespace Reni.Code
@@ -21,11 +22,14 @@ namespace Reni.Code
 
         public override CodeBase CreateChild(LeafElement leafElement)
         {
-            var newLeafElement = LeafElement.TryToCombine(leafElement);
-            if(newLeafElement != null)
-                return new Leaf(newLeafElement);
+            var newLeafElements = LeafElement.TryToCombineN(leafElement);
+            if (newLeafElements == null)
+                return base.CreateChild(leafElement);
 
-            return base.CreateChild(leafElement);
+            CodeBase result = new Leaf(newLeafElements[0]);
+            for (var i = 1; i < newLeafElements.Length; i++ )
+                result = result.CreateChild(newLeafElements[i]);
+            return result;
         }
 
         public override Result VirtVisit<Result>(Visitor<Result> actual)

@@ -80,10 +80,14 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:07
-        internal override LeafElement TryToCombineBack(TopData precedingElement)
+        internal override LeafElement[] TryToCombineBack(TopData precedingElement)
         {
-            if (precedingElement.Size == TargetSize && Size >= SignificantSize)
-                return new TopData(precedingElement.RefAlignParam, precedingElement.Offset, precedingElement.TargetSize, Size);
+            if (precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
+                return new LeafElement[]
+                           {
+                               new TopData(precedingElement.RefAlignParam, precedingElement.Offset, Size),
+                               new BitCast(Size, Size, SignificantSize)
+                           };
             return null;
         }
 
@@ -96,7 +100,10 @@ namespace Reni.Code
         internal override LeafElement TryToCombineBack(TopFrame precedingElement)
         {
             if (precedingElement.Size == TargetSize)
-                return new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, precedingElement.TargetSize, Size);
+            {
+                Tracer.Assert(precedingElement.Size == Size);
+                return precedingElement;
+            }
             return null;
         }
 
@@ -121,8 +128,12 @@ namespace Reni.Code
         /// created 19.10.2006 21:25
         internal override LeafElement TryToCombineBack(Dereference precedingElement)
         {
-            Tracer.Assert(TargetSize == precedingElement.Size);
-            return new Dereference(precedingElement.RefAlignParam, precedingElement.TargetSize, Size);
+            if (Size == TargetSize)
+            {
+                Tracer.Assert(TargetSize == precedingElement.Size);
+                return precedingElement;
+            }
+            return null;
         }
 
         /// <summary>

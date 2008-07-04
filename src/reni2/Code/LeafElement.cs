@@ -35,6 +35,14 @@ namespace Reni.Code
             return null;
         }
 
+        internal virtual LeafElement[] TryToCombineN(LeafElement subsequentElement)
+        {
+            var result = TryToCombine(subsequentElement);
+            if (result == null)
+                return null;
+            return new[]{result};
+        }
+
         internal virtual LeafElement TryToCombineBack(Dereference precedingElement)
         {
             return null;
@@ -60,7 +68,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual LeafElement TryToCombineBack(TopData precedingElement)
+        internal virtual LeafElement[] TryToCombineBack(TopData precedingElement)
         {
             return null;
         }

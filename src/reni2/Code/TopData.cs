@@ -7,8 +7,8 @@ namespace Reni.Code
     /// </summary>
     internal sealed class TopData : Top
     {
-        public TopData(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
-            : base(refAlignParam, offset, targetSize, destinationSize)
+        public TopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
+            : base(refAlignParam, offset, targetSize)
         {
             StopByObjectId(411);
         }
@@ -18,7 +18,7 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        internal override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
@@ -31,7 +31,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.TopData(RefAlignParam,Offset,TargetSize,DestinationSize);
+            return start.TopData(RefAlignParam,Offset,Size);
         }
     }
 
@@ -40,8 +40,8 @@ namespace Reni.Code
     /// </summary>
     internal sealed class TopFrame : Top
     {
-        public TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
-            : base(refAlignParam, offset, targetSize, destinationSize)
+        public TopFrame(RefAlignParam refAlignParam, Size offset, Size size)
+            : base(refAlignParam, offset, size)
         {
             StopByObjectId(544);
         }
@@ -64,7 +64,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.TopFrame(RefAlignParam, Offset, TargetSize, DestinationSize);
+            return start.TopFrame(RefAlignParam, Offset, Size);
         }
 
     }

@@ -395,12 +395,12 @@ namespace Reni.Code
         /// <param name="destinationSize">Size of the destination.</param>
         /// <returns></returns>
         /// created 04.01.2007 16:38
-        public string TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
+        public string TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize)
         {
             if(refAlignParam.Is_3_32)
-                return CreateMoveBytesFromFrame(targetSize, Start - destinationSize, offset*-1);
+                return CreateMoveBytesFromFrame(targetSize, Start - targetSize, offset * -1);
 
-            NotImplementedFunction(this, refAlignParam, offset, targetSize, destinationSize);
+            NotImplementedFunction(this, refAlignParam, offset, targetSize, targetSize);
             throw new NotImplementedException();
         }
 
@@ -437,13 +437,12 @@ namespace Reni.Code
         /// <param name="destinationSize">Size of the destination.</param>
         /// <returns></returns>
         /// created 19.10.2006 22:27
-        public string TopData(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
+        public string TopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
         {
-            Tracer.Assert(targetSize == destinationSize);
             if(refAlignParam.Is_3_32)
-                return CreateMoveBytes(targetSize, Start - destinationSize, Start + offset);
+                return CreateMoveBytes(targetSize, Start - targetSize, Start + offset);
 
-            NotImplementedFunction(this, refAlignParam, offset, targetSize, destinationSize);
+            NotImplementedFunction(this, refAlignParam, offset, targetSize);
             throw new NotImplementedException();
         }
 
@@ -493,23 +492,23 @@ namespace Reni.Code
         /// <param name="destinationSize">Size of the destination.</param>
         /// <returns></returns>
         /// created 10.10.2006 00:24
-        public string Unref(RefAlignParam refAlignParam, Size targetSize, Size destinationSize)
+        public string Unref(RefAlignParam refAlignParam, Size targetSize)
         {
             if(refAlignParam.Is_3_32)
             {
                 if(IsBuildInIntType(targetSize))
-                    return CreateDataRef(Start + refAlignParam.RefSize - destinationSize, targetSize)
+                    return CreateDataRef(Start + refAlignParam.RefSize - targetSize, targetSize)
                         + " = "
                             + CreateCastToIntRef(targetSize, CreateDataRef(Start, refAlignParam.RefSize));
                 return "Data.MoveBytes("
                     + targetSize.ByteCount
                         + ", "
-                            + CreateDataPtr(Start + refAlignParam.RefSize - destinationSize)
+                            + CreateDataPtr(Start + refAlignParam.RefSize - targetSize)
                                 + ", "
                                     + CreateCastToIntPtr(Size.Byte, CreateDataRef(Start, refAlignParam.RefSize))
                                         + ")";
             }
-            NotImplementedMethod(refAlignParam, targetSize, destinationSize);
+            NotImplementedMethod(refAlignParam, targetSize);
             throw new NotImplementedException();
         }
 

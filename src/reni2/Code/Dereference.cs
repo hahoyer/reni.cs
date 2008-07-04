@@ -8,9 +8,8 @@ namespace Reni.Code
     /// </summary>
     internal sealed class Dereference : LeafElement
     {
-        private readonly Size _destinationSize;
         private readonly RefAlignParam _refAlignParam;
-        private readonly Size _targetSize;
+        private readonly Size _size;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dereference"/> class.
@@ -18,11 +17,10 @@ namespace Reni.Code
         /// <param name="refAlignParam">The ref align param.</param>
         /// <param name="targetSize">Size of the target.</param>
         /// <param name="destinationSize">Size of the destination.</param>
-        public Dereference(RefAlignParam refAlignParam, Size targetSize, Size destinationSize)
+        public Dereference(RefAlignParam refAlignParam, Size size)
         {
             _refAlignParam = refAlignParam;
-            _targetSize = targetSize;
-            _destinationSize = destinationSize;
+            _size = size;
             StopByObjectId(399);
         }
 
@@ -34,16 +32,11 @@ namespace Reni.Code
         public override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         /// <summary>
-        /// Size of target
-        /// </summary>
-        public Size TargetSize { get { return _targetSize; } }
-
-        /// <summary>
         /// Gets the size.
         /// </summary>
         /// <value>The size.</value>
         /// created 05.10.2006 23:40
-        public override Size Size { get { return _destinationSize; } }
+        public override Size Size { get { return _size; } }
 
         /// <summary>
         /// Gets the size of the delta.
@@ -53,20 +46,13 @@ namespace Reni.Code
         public override Size DeltaSize { get { return RefAlignParam.RefSize - Size; } }
 
         /// <summary>
-        /// Gets the size of the destination, normally the aligned target size
-        /// </summary>
-        /// <value>The size of the destination.</value>
-        /// created 08.01.2007 02:39
-        public Size DestinationSize { get { return _destinationSize; } }
-
-        /// <summary>
         /// Formats this instance.
         /// </summary>
         /// <returns></returns>
         /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.Unref(RefAlignParam, _targetSize, _destinationSize);
+            return start.Unref(RefAlignParam, _size);
         }
 
         /// <summary>
@@ -89,7 +75,7 @@ namespace Reni.Code
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopData(RefAlignParam, precedingElement.Offset, TargetSize, Size);
+            return new TopData(RefAlignParam, precedingElement.Offset, Size);
         }
 
         /// <summary>
@@ -101,7 +87,7 @@ namespace Reni.Code
         internal override LeafElement TryToCombineBack(FrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopFrame(RefAlignParam, precedingElement.Offset, TargetSize, Size);
+            return new TopFrame(RefAlignParam, precedingElement.Offset, Size);
         }
     }
 }
