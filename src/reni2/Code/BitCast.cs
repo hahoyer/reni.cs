@@ -24,6 +24,7 @@ namespace Reni.Code
             _significantSize = significantSize;
             _targetSize = targetSize;
         }
+
         /// <summary>
         /// Tries to combine two leaf elements. .
         /// </summary>
@@ -35,11 +36,10 @@ namespace Reni.Code
         /// created 18.11.2006 14:53
         internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
-            if (Size == TargetSize && Size == SignificantSize)
+            if(Size == TargetSize && Size == SignificantSize)
                 return subsequentElement;
             return subsequentElement.TryToCombineBack(this);
         }
-
 
         /// <summary>
         /// Tries to combine a leaf element with a preceding <see cref="BitCast"/> element.
@@ -51,11 +51,11 @@ namespace Reni.Code
         {
             if(precedingElement.Size != TargetSize)
                 return null;
-            
+
             return new BitCast
                 (
                 precedingElement.TargetSize,
-                Size, 
+                Size,
                 _significantSize.Min(precedingElement.SignificantSize)
                 );
         }
@@ -68,8 +68,8 @@ namespace Reni.Code
         /// created 04.01.2007 03:50
         internal override LeafElement TryToCombineBack(BitArray precedingElement)
         {
-            BitsConst bitsConst = precedingElement.Data;
-            if (bitsConst.Size > SignificantSize)
+            var bitsConst = precedingElement.Data;
+            if(bitsConst.Size > SignificantSize)
                 bitsConst = bitsConst.Resize(SignificantSize);
             return new BitArray(Size, bitsConst);
         }
@@ -82,7 +82,9 @@ namespace Reni.Code
         /// created 04.01.2007 15:07
         internal override LeafElement TryToCombineBack(TopData precedingElement)
         {
-            return new TopData(precedingElement.RefAlignParam,precedingElement.Offset, precedingElement.TargetSize, Size);
+            if (precedingElement.Size == TargetSize && Size >= SignificantSize)
+                return new TopData(precedingElement.RefAlignParam, precedingElement.Offset, precedingElement.TargetSize, Size);
+            return null;
         }
 
         /// <summary>
@@ -93,7 +95,9 @@ namespace Reni.Code
         /// created 04.01.2007 15:07
         internal override LeafElement TryToCombineBack(TopFrame precedingElement)
         {
-            return new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, precedingElement.TargetSize, Size);
+            if (precedingElement.Size == TargetSize)
+                return new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, precedingElement.TargetSize, Size);
+            return null;
         }
 
         /// <summary>
@@ -104,7 +108,9 @@ namespace Reni.Code
         /// created 04.01.2007 15:57
         internal override LeafElement TryToCombineBack(BitArrayOp precedingElement)
         {
-            return new BitArrayOp(precedingElement.OpToken,Size, precedingElement.LeftSize,precedingElement.RightSize);
+            if (precedingElement.Size == TargetSize)
+                return new BitArrayOp(precedingElement.OpToken, Size, precedingElement.LeftSize, precedingElement.RightSize);
+            return null;
         }
 
         /// <summary>
@@ -116,9 +122,9 @@ namespace Reni.Code
         internal override LeafElement TryToCombineBack(Dereference precedingElement)
         {
             Tracer.Assert(TargetSize == precedingElement.Size);
-            return new Dereference(precedingElement.RefAlignParam,precedingElement.TargetSize,Size);
+            return new Dereference(precedingElement.RefAlignParam, precedingElement.TargetSize, Size);
         }
-      
+
         /// <summary>
         /// Gets the size.
         /// </summary>
@@ -138,6 +144,7 @@ namespace Reni.Code
         /// Significant size 
         /// </summary>
         public Size SignificantSize { get { return _significantSize; } }
+
         /// <summary>
         /// Formats this instance.
         /// </summary>
@@ -145,7 +152,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.BitCast(TargetSize,Size,SignificantSize);
+            return start.BitCast(TargetSize, Size, SignificantSize);
         }
 
         /// <summary>
@@ -154,6 +161,5 @@ namespace Reni.Code
         /// <value>The size of the target.</value>
         /// created 05.10.2006 23:24
         public Size TargetSize { get { return _targetSize; } }
-
     }
 }

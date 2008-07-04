@@ -38,11 +38,11 @@ namespace Reni.Code
         /// created 26.11.2006 13:17
         public StorageDescriptor(Size dataEndAddr, Size frameSize)
         {
-            if (dataEndAddr == null)
+            if(dataEndAddr == null)
                 throw new ArgumentNullException("dataEndAddr");
-            if (frameSize == null)
+            if(frameSize == null)
                 throw new ArgumentNullException("frameSize");
-            
+
             _dataEndAddr = dataEndAddr;
             _frameSize = frameSize;
             _start = dataEndAddr;
@@ -57,6 +57,7 @@ namespace Reni.Code
         {
             _start += deltaSize;
         }
+
         /// <summary>
         /// Generates the function return.
         /// </summary>
@@ -67,8 +68,8 @@ namespace Reni.Code
         {
             get
             {
-                Size resultSize = DataEndAddr - Start;
-                if (_frameSize.IsZero && resultSize.IsZero)
+                var resultSize = DataEndAddr - Start;
+                if(_frameSize.IsZero && resultSize.IsZero)
                     return "";
                 return CreateMoveBytesToFrame(resultSize, resultSize, Start)
                     + "; // StorageDescriptor.FunctionReturn";
@@ -83,12 +84,12 @@ namespace Reni.Code
         /// <returns></returns>
         internal string GetBody(List<LeafElement> data, bool isFunction)
         {
-            string result = GetStatements(data);
-            if (isFunction)
+            var result = GetStatements(data);
+            if(isFunction)
                 result =
                     "StartFunction:\n"
-                    + result
-                    + FunctionReturn;
+                        + result
+                            + FunctionReturn;
             return result;
         }
 
@@ -100,23 +101,23 @@ namespace Reni.Code
         /// <returns></returns>
         public string Assign(RefAlignParam refAlignParam, Size size)
         {
-            if (refAlignParam.Is_3_32)
+            if(refAlignParam.Is_3_32)
             {
-                string dest = CreateDataRef(Start+size, refAlignParam.RefSize);
-                if (IsBuildInIntType(size))
-                    return "*(" 
-                        + CreateIntPtrCast(size) 
-                        + dest 
-                        + ") = " 
-                        + CreateDataRef(Start, size);
+                var dest = CreateDataRef(Start + size, refAlignParam.RefSize);
+                if(IsBuildInIntType(size))
+                    return "*("
+                        + CreateIntPtrCast(size)
+                            + dest
+                                + ") = "
+                                    + CreateDataRef(Start, size);
 
                 return "Data.MoveBytes("
-                   + size.ByteCount
-                   + ", "
-                   + "(sbyte*)" + dest
-                   + ", "
-                   + CreateDataPtr(Start)
-                   + ")";
+                    + size.ByteCount
+                        + ", "
+                            + "(sbyte*)" + dest
+                                + ", "
+                                    + CreateDataPtr(Start)
+                                        + ")";
             }
 
             NotImplementedFunction(this, refAlignParam, size);
@@ -131,23 +132,23 @@ namespace Reni.Code
         /// <returns></returns>
         internal string BitArrayPrefixOp(Defineable opToken, Size size)
         {
-            if (IsBuildInIntType(size))
+            if(IsBuildInIntType(size))
                 return CreateDataRef(Start, size)
-                       + " = "
-                       + CreateIntCast(size)
-                       + "("
-                       + opToken.CSharpNameOfDefaultOperation
-                       + " "
-                       + CreateDataRef(Start, size)
-                       + ")";
+                    + " = "
+                        + CreateIntCast(size)
+                            + "("
+                                + opToken.CSharpNameOfDefaultOperation
+                                    + " "
+                                        + CreateDataRef(Start, size)
+                                            + ")";
 
             return "Data."
                 + opToken.DataFunctionName
-                + "("
-                + size.ByteCount
-                + ", "
-                + CreateDataPtr(Start)
-                + ")";
+                    + "("
+                        + size.ByteCount
+                            + ", "
+                                + CreateDataPtr(Start)
+                                    + ")";
         }
 
         /// <summary>
@@ -161,9 +162,9 @@ namespace Reni.Code
         /// created 10.10.2006 00:29
         internal string BitArrayOp(Defineable opToken, Size resultSize, Size leftSize, Size rightSize)
         {
-            if (IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
+            if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
             {
-                string value = GetValueForBuiltInIntType(leftSize, opToken, rightSize);
+                var value = GetValueForBuiltInIntType(leftSize, opToken, rightSize);
                 if(opToken.IsCompareOperator)
                     value = "(" + value + "? -1:0" + ")";
                 return GetFrameForBuiltInIntType(resultSize, leftSize + rightSize) + value;
@@ -171,20 +172,19 @@ namespace Reni.Code
 
             return "Data."
                 + opToken.DataFunctionName
-                + "("
-                + resultSize.ByteCount
-                + ", "
-                + CreateDataPtr(Start+leftSize+rightSize-resultSize)
-                + ", "
-                + leftSize.ByteCount
-                + ", "
-                + CreateDataPtr(Start+rightSize)
-                + ", "
-                + rightSize.ByteCount
-                + ", "
-                + CreateDataPtr(Start)
-                + ")";
-
+                    + "("
+                        + resultSize.ByteCount
+                            + ", "
+                                + CreateDataPtr(Start + leftSize + rightSize - resultSize)
+                                    + ", "
+                                        + leftSize.ByteCount
+                                            + ", "
+                                                + CreateDataPtr(Start + rightSize)
+                                                    + ", "
+                                                        + rightSize.ByteCount
+                                                            + ", "
+                                                                + CreateDataPtr(Start)
+                                                                    + ")";
         }
 
         /// <summary>
@@ -198,25 +198,25 @@ namespace Reni.Code
         /// <returns></returns>
         internal string BitArrayOpThen(Defineable opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
         {
-            if (IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
+            if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
                 return "if(!("
-                   + CreateDataRef(Start + rightSize, leftSize)
-                   + " "
-                   + opToken.CSharpNameOfDefaultOperation
-                   + " "
-                   + CreateDataRef(Start, rightSize)
-                   + ")) goto Else" + thenElseObjectId;
+                    + CreateDataRef(Start + rightSize, leftSize)
+                        + " "
+                            + opToken.CSharpNameOfDefaultOperation
+                                + " "
+                                    + CreateDataRef(Start, rightSize)
+                                        + ")) goto Else" + thenElseObjectId;
             return "if(!Data."
                 + opToken.DataFunctionName
-                + "("
-                + leftSize.ByteCount
-                + ", "
-                + CreateDataPtr(Start + rightSize)
-                + ", "
-                + rightSize.ByteCount
-                + ", "
-                + CreateDataPtr(Start)
-                + ")) goto Else" + thenElseObjectId;
+                    + "("
+                        + leftSize.ByteCount
+                            + ", "
+                                + CreateDataPtr(Start + rightSize)
+                                    + ", "
+                                        + rightSize.ByteCount
+                                            + ", "
+                                                + CreateDataPtr(Start)
+                                                    + ")) goto Else" + thenElseObjectId;
         }
 
         /// <summary>
@@ -229,35 +229,36 @@ namespace Reni.Code
         /// created 10.10.2006 00:24
         public string BitCast(Size targetSize, Size size, Size significantSize)
         {
-            int targetBytes = targetSize.ByteCount;
-            int bytes = size.ByteCount;
-            if (targetBytes == bytes)
+            var targetBytes = targetSize.ByteCount;
+            var bytes = size.ByteCount;
+            if(targetBytes == bytes)
             {
-                if (significantSize == Size.Byte * bytes)
+                if(significantSize == Size.Byte*bytes)
                     return "";
-                int bits = (size - significantSize).ToInt();
-                if (IsBuildInIntType(size))
+                var bits = (size - significantSize).ToInt();
+                var oldStart = Start;
+                if(IsBuildInIntType(size))
                 {
-                    string result =
-                        CreateDataRef(Start, size)
-                        + " = "
-                        + CreateIntCast(size)
-                        + "("
-                        + CreateIntCast(size)
-                        + "("
-                        + CreateDataRef(Start, size) + " << " + bits
-                        + ") >> "
-                        + bits
-                        + ")";
+                    var result =
+                        CreateDataRef(oldStart, size)
+                            + " = "
+                                + CreateIntCast(size)
+                                    + "("
+                                        + CreateIntCast(size)
+                                            + "("
+                                                + CreateDataRef(oldStart, size) + " << " + bits
+                                                    + ") >> "
+                                                        + bits
+                                                            + ")";
                     return result;
                 }
                 return "Data.BitCast("
-                   + size.ByteCount
-                   + ", "
-                   + CreateDataPtr(Start)
-                   + ", "
-                   + bits
-                   + ")";
+                    + size.ByteCount
+                        + ", "
+                            + CreateDataPtr(oldStart)
+                                + ", "
+                                    + bits
+                                        + ")";
             }
 
             NotImplementedFunction(this, targetSize, size);
@@ -273,28 +274,28 @@ namespace Reni.Code
         /// created 10.10.2006 00:27
         public string BitsArray(Size size, BitsConst data)
         {
-            if (IsBuildInIntType(size))
+            if(IsBuildInIntType(size))
                 return
                     CreateDataRef(Start - size, size)
-                    + " = "
-                    + CreateIntCast(size)
-                    + "("
-                    + data.CodeDump()
-                    + ")";
+                        + " = "
+                            + CreateIntCast(size)
+                                + "("
+                                    + data.CodeDump()
+                                        + ")";
 
-            string result = "";
-            for (int i = 0; i < size.ByteCount; i++)
+            var result = "";
+            for(var i = 0; i < size.ByteCount; i++)
             {
                 result += ", ";
                 result += data.Byte(i);
             }
 
             return "Data.BitsArray("
-                       + size.ByteCount
-                       + ", "
-                       + CreateDataPtr(Start - size)
-                       + result
-                       + ")";
+                + size.ByteCount
+                    + ", "
+                        + CreateDataPtr(Start - size)
+                            + result
+                                + ")";
         }
 
         /// <summary>
@@ -309,7 +310,6 @@ namespace Reni.Code
             return Generator.FunctionMethodName(index) + "(" + CreateDataPtr(Start + frameSize) + ")";
         }
 
-
         /// <summary>
         /// Creates the code for dumping numbers.
         /// </summary>
@@ -319,7 +319,7 @@ namespace Reni.Code
         /// created 08.01.2007 16:39
         public string DumpPrint(Size leftSize, Size rightSize)
         {
-            if (rightSize.IsZero)
+            if(rightSize.IsZero)
                 return BitArrayDumpPrint(leftSize);
             NotImplementedMethod(leftSize, rightSize);
             throw new NotImplementedException();
@@ -335,7 +335,7 @@ namespace Reni.Code
         {
             return "Data.DumpPrint(" + HWString.Quote(text) + ")";
         }
-        
+
         /// <summary>
         /// Creates the code for else construct.
         /// </summary>
@@ -366,6 +366,7 @@ namespace Reni.Code
         {
             return "goto StartFunction";
         }
+
         /// <summary>
         /// Creates the code for incrementing a reference.
         /// </summary>
@@ -375,10 +376,10 @@ namespace Reni.Code
         /// created 21.10.2006 02:10
         public string RefPlus(Size size, int right)
         {
-            if (right == 0)
+            if(right == 0)
                 return "";
 
-            if (size.ToInt() == 32)
+            if(size.ToInt() == 32)
                 return CreateDataRef(Start, size) + " += " + right;
 
             NotImplementedFunction(this, size, right);
@@ -396,12 +397,13 @@ namespace Reni.Code
         /// created 04.01.2007 16:38
         public string TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
         {
-            if (refAlignParam.Is_3_32)
+            if(refAlignParam.Is_3_32)
                 return CreateMoveBytesFromFrame(targetSize, Start - destinationSize, offset*-1);
 
             NotImplementedFunction(this, refAlignParam, offset, targetSize, destinationSize);
             throw new NotImplementedException();
         }
+
         /// <summary>
         /// Creates the code for end of statement cleanup.
         /// </summary>
@@ -412,7 +414,6 @@ namespace Reni.Code
         public string StatementEnd(Size size, Size bodySize)
         {
             return CreateMoveBytes(size, Start + bodySize, Start);
-
         }
 
         /// <summary>
@@ -438,7 +439,8 @@ namespace Reni.Code
         /// created 19.10.2006 22:27
         public string TopData(RefAlignParam refAlignParam, Size offset, Size targetSize, Size destinationSize)
         {
-            if (refAlignParam.Is_3_32)
+            Tracer.Assert(targetSize == destinationSize);
+            if(refAlignParam.Is_3_32)
                 return CreateMoveBytes(targetSize, Start - destinationSize, Start + offset);
 
             NotImplementedFunction(this, refAlignParam, offset, targetSize, destinationSize);
@@ -454,13 +456,11 @@ namespace Reni.Code
         /// created 21.10.2006 02:10
         public string TopRef(RefAlignParam refAlignParam, Size offset)
         {
-            if (refAlignParam.Is_3_32)
-            {
+            if(refAlignParam.Is_3_32)
                 return CreateDataRef(Start - refAlignParam.RefSize, refAlignParam.RefSize)
-                       + " = "
-                       + CreateIntCast(refAlignParam.RefSize)
-                       + CreateDataPtr(Start + offset);
-            }
+                    + " = "
+                        + CreateIntCast(refAlignParam.RefSize)
+                            + CreateDataPtr(Start + offset);
 
             NotImplementedMethod(refAlignParam);
             throw new NotImplementedException();
@@ -475,13 +475,11 @@ namespace Reni.Code
         /// created 03.01.2007 22:45
         public string FrameRef(RefAlignParam refAlignParam, Size offset)
         {
-            if (refAlignParam.Is_3_32)
-            {
+            if(refAlignParam.Is_3_32)
                 return CreateDataRef(Start - refAlignParam.RefSize, refAlignParam.RefSize)
-                       + " = "
-                       + CreateIntCast(refAlignParam.RefSize)
-                       + CreateFrameBackPtr(offset*-1);
-            }
+                    + " = "
+                        + CreateIntCast(refAlignParam.RefSize)
+                            + CreateFrameBackPtr(offset*-1);
 
             NotImplementedMethod(refAlignParam, offset);
             throw new NotImplementedException();
@@ -497,19 +495,19 @@ namespace Reni.Code
         /// created 10.10.2006 00:24
         public string Unref(RefAlignParam refAlignParam, Size targetSize, Size destinationSize)
         {
-            if (refAlignParam.Is_3_32)
+            if(refAlignParam.Is_3_32)
             {
-                if (IsBuildInIntType(targetSize))
+                if(IsBuildInIntType(targetSize))
                     return CreateDataRef(Start + refAlignParam.RefSize - destinationSize, targetSize)
-                       + " = "
-                       + CreateCastToIntRef(targetSize, CreateDataRef(Start, refAlignParam.RefSize));
+                        + " = "
+                            + CreateCastToIntRef(targetSize, CreateDataRef(Start, refAlignParam.RefSize));
                 return "Data.MoveBytes("
-                   + targetSize.ByteCount
-                   + ", "
-                   + CreateDataPtr(Start + refAlignParam.RefSize - destinationSize)
-                   + ", "
-                   + CreateCastToIntPtr(Size.Byte, CreateDataRef(Start, refAlignParam.RefSize))
-                   + ")";
+                    + targetSize.ByteCount
+                        + ", "
+                            + CreateDataPtr(Start + refAlignParam.RefSize - destinationSize)
+                                + ", "
+                                    + CreateCastToIntPtr(Size.Byte, CreateDataRef(Start, refAlignParam.RefSize))
+                                        + ")";
             }
             NotImplementedMethod(refAlignParam, targetSize, destinationSize);
             throw new NotImplementedException();
@@ -517,7 +515,7 @@ namespace Reni.Code
 
         private string BitArrayDumpPrint(Size size)
         {
-            if (IsBuildInIntType(size))
+            if(IsBuildInIntType(size))
                 return "Data.DumpPrint(" + CreateDataRef(Start, size) + ")";
             return "Data.DumpPrint(" + size.ByteCount + ", " + CreateDataPtr(Start) + ")";
         }
@@ -525,19 +523,19 @@ namespace Reni.Code
         private string GetFrameForBuiltInIntType(Size resultSize, Size argsSize)
         {
             return CreateDataRef(Start + argsSize - resultSize, resultSize)
-                   + " = "
-                   + CreateIntCast(resultSize);
+                + " = "
+                    + CreateIntCast(resultSize);
         }
 
         private string GetValueForBuiltInIntType(Size leftSize, Defineable opToken, Size rightSize)
         {
             return "("
-                   + CreateDataRef(Start + rightSize, leftSize)
-                   + " "
-                   + opToken.CSharpNameOfDefaultOperation
-                   + " "
-                   + CreateDataRef(Start, rightSize)
-                   + ")";
+                + CreateDataRef(Start + rightSize, leftSize)
+                    + " "
+                        + opToken.CSharpNameOfDefaultOperation
+                            + " "
+                                + CreateDataRef(Start, rightSize)
+                                    + ")";
         }
 
         private static string CreateCastToIntPtr(Size size, string result)
@@ -572,8 +570,8 @@ namespace Reni.Code
 
         private static string CreateIntCast(Size size)
         {
-            int bits = size.ByteCount * 8;
-            switch (bits)
+            var bits = size.ByteCount*8;
+            switch(bits)
             {
                 case 8:
                 case 16:
@@ -592,8 +590,8 @@ namespace Reni.Code
 
         private static string CreateIntType(Size size)
         {
-            int bits = size.ByteCount * 8;
-            switch (bits)
+            var bits = size.ByteCount*8;
+            switch(bits)
             {
                 case 8:
                     return "sbyte";
@@ -608,67 +606,62 @@ namespace Reni.Code
 
         private static string CreateMoveBytes(Size size, Size destStart, Size sourceStart)
         {
-            if (size.IsZero)
-                return "";
-            if (destStart == sourceStart)
-                return "";
-
-            if (IsBuildInIntType(size))
+            if(IsBuildInIntType(size))
                 return CreateDataRef(destStart, size)
-                   + " = "
-                   + CreateDataRef(sourceStart, size)
-                ;
+                    + " = "
+                        + CreateDataRef(sourceStart, size)
+                    ;
             return "Data.MoveBytes("
-               + size.ByteCount
-               + ", "
-               + CreateDataPtr(destStart)
-               + ", "
-               + CreateDataPtr(sourceStart)
-               + ")";
+                + size.ByteCount
+                    + ", "
+                        + CreateDataPtr(destStart)
+                            + ", "
+                                + CreateDataPtr(sourceStart)
+                                    + ")";
         }
 
         private static string CreateMoveBytesFromFrame(Size size, Size destStart, Size sourceStart)
         {
-            if (size.IsZero)
+            if(size.IsZero)
                 return "";
 
-            if (IsBuildInIntType(size))
+            if(IsBuildInIntType(size))
                 return CreateDataRef(destStart, size)
-                   + " = "
-                   + CreateFrameBackRef(sourceStart, size)
-                ;
+                    + " = "
+                        + CreateFrameBackRef(sourceStart, size)
+                    ;
             return "Data.MoveBytes("
-               + size.ByteCount
-               + ", "
-               + CreateDataPtr(destStart)
-               + ", "
-               + CreateFrameBackPtr(sourceStart)
-               + ")";
+                + size.ByteCount
+                    + ", "
+                        + CreateDataPtr(destStart)
+                            + ", "
+                                + CreateFrameBackPtr(sourceStart)
+                                    + ")";
         }
 
         private static string CreateMoveBytesToFrame(Size size, Size destStart, Size sourceStart)
         {
-            if (size.IsZero)
+            if(size.IsZero)
                 return "";
 
-            if (IsBuildInIntType(size))
+            if(IsBuildInIntType(size))
                 return CreateFrameBackRef(destStart, size)
-                   + " = "
-                   + CreateDataRef(sourceStart, size)
-                ;
+                    + " = "
+                        + CreateDataRef(sourceStart, size)
+                    ;
             return "Data.MoveBytes("
-               + size.ByteCount
-               + ", "
-               + CreateFrameBackPtr(destStart)
-               + ", "
-               + CreateDataPtr(sourceStart)
-               + ")";
+                + size.ByteCount
+                    + ", "
+                        + CreateFrameBackPtr(destStart)
+                            + ", "
+                                + CreateDataPtr(sourceStart)
+                                    + ")";
         }
-        
+
         private static bool IsBuildInIntType(Size size)
         {
-            int bits = size.ByteCount * 8;
-            switch (bits)
+            var bits = size.ByteCount*8;
+            switch(bits)
             {
                 case 8:
                 case 16:
@@ -681,8 +674,8 @@ namespace Reni.Code
 
         private string GetStatements(List<LeafElement> data)
         {
-            string statements = "";
-            for (int i = 0; i < data.Count; i++)
+            var statements = "";
+            for(var i = 0; i < data.Count; i++)
             {
                 statements += data[i].Statements(this);
                 ShiftStartAddress(data[i].DeltaSize);

@@ -295,7 +295,9 @@ namespace Reni.Context
         internal Result ApplyResult(Category category, ICompileSyntax @object, Result.GetResultFromType apply)
         {
             var objectResult = ApplyToRef(category, @object, ()=>Reni.Size.Zero);
-            return apply(objectResult.Type).UseWithArg(objectResult);
+            return apply(objectResult.Type)
+                .UseWithArg(objectResult)
+                .Align(AlignBits);
         }
 
         internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType, Result.GetSize argsOffset)

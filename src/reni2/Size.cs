@@ -12,7 +12,7 @@ namespace Reni
     /// Compiler visitor category that contains the size of any sytax element
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
-    public class Size : ReniObject
+    internal class Size : ReniObject
     {
         private static readonly Hashtable _values = new Hashtable();
         private readonly int _data;
@@ -98,7 +98,6 @@ namespace Reni
                 result = new Size(x);
                 _values[x] = result;
             }
-            ;
             return result;
         }
 
@@ -200,6 +199,16 @@ namespace Reni
         public static bool operator >(Size x, Size y)
         {
             return y.LessThan(x);
+        }
+
+        public static bool operator <=(Size x, Size y)
+        {
+            return !(x > y);
+        }
+
+        public static bool operator >=(Size x, Size y)
+        {
+            return !(x < y);
         }
 
         /// <summary>
@@ -431,8 +440,7 @@ namespace Reni
         {
             if(_data > x._data)
                 return this;
-            else
-                return x;
+            return x;
         }
 
         /// <summary>
@@ -444,8 +452,7 @@ namespace Reni
         {
             if(_data < x._data)
                 return this;
-            else
-                return x;
+            return x;
         }
 
         /// <summary>
@@ -468,23 +475,12 @@ namespace Reni
             return ByteCount.ToString();
         }
 
-        ///<summary>
-        ///Returns a <see cref="T:System.Sequence"></see> that represents the current <see cref="T:System.Object"></see>.
-        ///</summary>
-        ///
-        ///<returns>
-        ///A <see cref="T:System.Sequence"></see> that represents the current <see cref="T:System.Object"></see>.
-        ///</returns>
-        ///<filterpriority>2</filterpriority>
         public override string ToString()
         {
             return ToInt().ToString();
         }
 
-        #region Nested type: Tests
-
         [TestFixture, Category(CompilerTest.Worked)]
-        
         private class Tests
         {
             private static void TestNextPacketSize(int x, int b)
@@ -494,7 +490,6 @@ namespace Reni
             }
 
             [Test, Category(CompilerTest.Worked)]
-            
             public void NextPacketSize()
             {
                 TestNextPacketSize(0, 0);
@@ -510,27 +505,25 @@ namespace Reni
                 TestNextPacketSize(17, 24);
             }
         }
-
-        #endregion
     }
 
     internal class NotAlignableException : Exception
     {
-        private readonly int _bits;
-        private readonly Size _size;
+        internal readonly int Bits;
+        internal readonly Size Size;
 
         public NotAlignableException(Size size, int bits)
             : base(size.Dump() + " cannot be aligned to " + bits + " bits.")
         {
-            _size = size;
-            _bits = bits;
+            Size = size;
+            Bits = bits;
         }
     }
 
     /// <summary>
     /// Array of size objects
     /// </summary>
-    public sealed class SizeArray : List<Size>
+    internal sealed class SizeArray : List<Size>
     {
         /// <summary>
         /// obtain size

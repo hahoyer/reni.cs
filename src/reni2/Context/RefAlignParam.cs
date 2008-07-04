@@ -7,7 +7,7 @@ namespace Reni.Context
     /// Parameter to describe alignment for references
     /// </summary>
    [dump("Dump")]
-    public class RefAlignParam
+    internal class RefAlignParam
     {
         private readonly int _alignBits;
         private readonly Size _refSize;

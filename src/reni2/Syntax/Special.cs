@@ -22,10 +22,13 @@ namespace Reni.Syntax
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
+            var trace = ObjectId >= 0;
+            StartMethodDump(trace, context,category);
             if(category.HasInternal || !(category.HasCode || category.HasRefs))
-                return Result(context, category);
+                return ReturnMethodDump(trace, Result(context, category));
             var result = Result(context, category | Category.Internal | Category.Type);
-            return result.CreateStatement(category, result.Internal);
+            Dump(trace, "result", result);
+            return ReturnMethodDump(trace, result.CreateStatement(category, result.Internal));
         }
 
         internal protected virtual Result Result(ContextBase context, Category category)

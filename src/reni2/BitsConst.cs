@@ -11,7 +11,7 @@ namespace Reni
     /// Size and content are known at runtime
     /// </summary>
     [dumpToString]
-    public class BitsConst : ReniObject
+    internal class BitsConst : ReniObject
     {
         private const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private const int SegmentAlignBits = 3;
