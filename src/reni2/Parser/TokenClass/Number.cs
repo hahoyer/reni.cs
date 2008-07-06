@@ -13,11 +13,6 @@ namespace Reni.Parser.TokenClass
     {
         internal static readonly TokenClassBase Instance = new Number();
 
-        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
-        {
-            return CreateTerminalSyntax(left, token, right);
-        }
-
         internal override string DumpShort()
         {
             return "<number>";

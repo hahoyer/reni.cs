@@ -136,8 +136,7 @@ namespace Reni.Context
             if (result.IsPending)
                 return ReturnMethodDump(trace, result);
 
-            if (result.HasType)
-                result = result.Type.Dereference(result).Align(functionContext.AlignBits);
+            result = result.PostProcess(functionContext.AlignBits);
 
             Tracer.ConditionalBreak(trace,Dump() + "\nresult=" + result.Dump());
             result = result.ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(result.Complete));

@@ -1,30 +1,16 @@
-using HWClassLibrary.Debug;
-using Reni.Type;
+using Reni.Context;
 
 namespace Reni.Struct
 {
-    internal sealed class ContextAtPosition : Reni.Context.Child
+    internal sealed class ContextAtPosition : Child
     {
-        [DumpData(false)]
-        private readonly Context _parent;
-        [DumpData(true)]
-        private readonly int _currentCompilePosition;
+        internal readonly Context Context;
+        internal readonly int Position;
 
-        internal ContextAtPosition(Context parent, int currentCompilePosition)
-            : base(parent)
+        public ContextAtPosition(Context context, int position): base(context)
         {
-            _parent = parent;
-            _currentCompilePosition = currentCompilePosition;
-        }
-
-        private TypeBase VisitBodyType()
-        {
-            return _parent.VisitType(_currentCompilePosition);
-        }
-
-        internal TypeBase CreateRef()
-        {
-            return VisitBodyType().CreateRef(RefAlignParam);
+            Context = context;
+            Position = position;
         }
     }
 }

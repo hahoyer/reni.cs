@@ -41,7 +41,7 @@
             return CreateVoid.CreateResult(category, getCode, getRefs);
         }
 
-        public override string DumpShort()
+        internal override string DumpShort()
         {
             return "void";
         }

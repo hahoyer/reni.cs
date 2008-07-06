@@ -14,7 +14,7 @@ namespace Reni.Parser.TokenClass.Name
             return SearchResult<IFeature>.Success(this, this);
         }
 
-        public Result Result(ContextBase callContext, Category category, ICompileSyntax args, Ref callObject)
+        public Result Result(ContextBase callContext, Category category, ICompileSyntax args, AutomaticRef callObject)
         {
             if(args != null)
                 NotImplementedMethod(callContext, category, args, callObject);

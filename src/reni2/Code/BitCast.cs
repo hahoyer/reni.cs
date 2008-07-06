@@ -80,7 +80,7 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:07
-        internal override LeafElement[] TryToCombineBack(TopData precedingElement)
+        internal override LeafElement[] TryToCombineBackN(TopData precedingElement)
         {
             if (precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
                 return new LeafElement[]
@@ -97,13 +97,14 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:07
-        internal override LeafElement TryToCombineBack(TopFrame precedingElement)
+        internal override LeafElement[] TryToCombineBackN(TopFrame precedingElement)
         {
-            if (precedingElement.Size == TargetSize)
-            {
-                Tracer.Assert(precedingElement.Size == Size);
-                return precedingElement;
-            }
+            if (precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
+                return new LeafElement[]
+                           {
+                               new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, Size),
+                               new BitCast(Size, Size, SignificantSize)
+                           };
             return null;
         }
 

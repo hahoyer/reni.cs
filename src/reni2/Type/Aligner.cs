@@ -24,7 +24,7 @@ namespace Reni.Type
 
         internal override Size Size { get { return Parent.Size.Align(AlignBits); } }
 
-        public override Ref CreateRef(RefAlignParam refAlignParam)
+        public override AutomaticRef CreateRef(RefAlignParam refAlignParam)
         {
             return Parent.CreateRef(refAlignParam.Align(AlignBits));
         }
@@ -44,7 +44,7 @@ namespace Reni.Type
             return Parent.DumpPrintFromRef(category, refAlignParam);
         }
 
-        public override Result ApplyTypeOperator(Result argResult)
+        internal override Result ApplyTypeOperator(Result argResult)
         {
             return Parent.ApplyTypeOperator(argResult);
         }
@@ -75,7 +75,7 @@ namespace Reni.Type
             return Parent.HasConverterTo(dest);
         }
 
-        public override string DumpShort()
+        internal override string DumpShort()
         {
             return "aligner(" + Parent.DumpShort() + ")";
         }

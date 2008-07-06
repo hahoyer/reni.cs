@@ -4,6 +4,12 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
+
+    internal interface IConverter<OutType, InType>
+    {
+        OutType Convert(InType inObject);
+    }
+
     internal interface IFeature
     {
         Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args);
@@ -16,49 +22,11 @@ namespace Reni.Feature
 
     internal interface IContextFeature
     {
-        Result VisitApply(ContextBase contextBase, Category category, ICompileSyntax args);
-    }
-
-    internal interface IStructFeature
-    {
-        IContextFeature Convert(Struct.Context context);
-        IFeature Convert(Struct.Type type);
+        Result ApplyResult(ContextBase contextBase, Category category, ICompileSyntax args);
     }
 
     internal interface IRefToStructFeature {}
-
-    internal interface ISequenceOfBitPrefixFeature
-    {
-        ISequenceElementPrefixFeature Convert();
-    }
-
-    internal interface ISequenceOfBitFeature
-    {
-        ISequenceElementFeature Convert();
-    }
-
-    internal interface ISequenceElementFeature
-    {
-        IFeature Convert(Sequence sequence);
-    }
-
-    internal interface ISequenceElementPrefixFeature
-    {
-        IPrefixFeature Convert(Sequence sequence);
-    }
-
-    internal interface IFeatureForSequence
-    {
-        IFeature Convert(Sequence sequence);
-    }
-
-    internal interface IRefToSequenceFeature
-    {
-        IRefFeature Convert(Sequence sequence);
-    }
-
-    internal interface IRefFeature
-    {
-        IFeature Convert(Ref @ref);
-    }
+    internal interface IFeatureForSequence: IConverter<IFeature, Sequence>{}
+    internal interface IRefToSequenceFeature: IConverter<IRefFeature, Sequence>{}
+    internal interface IRefFeature: IConverter<IFeature, AssignableRef >{}
 }

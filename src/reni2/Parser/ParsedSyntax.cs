@@ -55,7 +55,27 @@ namespace Reni.Parser
         }
 
         [DumpData(false)]
-        ICompileSyntax IParsedSyntax.CompileSyntax { get { return (ICompileSyntax) this; } }
+        ICompileSyntax IParsedSyntax.ToCompileSyntax { get { return ToCompileSyntax; } }
+
+        [DumpData(false)]
+        internal virtual protected ICompileSyntax ToCompileSyntax
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+        
+        IParsedSyntax IParsedSyntax.CreateThenSyntax(Token token, ICompileSyntax condition)
+        {
+            return CreateThenSyntax(token, condition);
+        }
+
+        internal virtual protected IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition)
+        {
+            return new ThenElse(condition, token, ToCompileSyntax);
+        }
 
         internal protected virtual string DumpShort()
         {
@@ -88,7 +108,7 @@ namespace Reni.Parser
         internal static ICompileSyntax ToCompiledSyntax(IParsedSyntax parsedSyntax)
         {
             Tracer.Assert(parsedSyntax != null);
-            return parsedSyntax.CompileSyntax;
+            return parsedSyntax.ToCompileSyntax;
         }
 
         internal static void IsNull(IParsedSyntax parsedSyntax)
@@ -96,11 +116,16 @@ namespace Reni.Parser
             Tracer.Assert(parsedSyntax == null);
         }
 
+        internal static void IsNotNull(IParsedSyntax parsedSyntax)
+        {
+            Tracer.Assert(parsedSyntax != null);
+        }
+
         internal static ICompileSyntax ToCompiledSyntaxOrNull(IParsedSyntax parsedSyntax)
         {
             if(parsedSyntax == null)
                 return null;
-            return parsedSyntax.CompileSyntax;
+            return parsedSyntax.ToCompileSyntax;
         }
     }
 }

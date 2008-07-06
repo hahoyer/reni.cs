@@ -68,11 +68,12 @@ namespace Reni.Code
             return CreateChild(new DumpPrint(leftSize, Size - leftSize));
         }
 
-        public CodeBase CreateAssign(RefAlignParam refAlignParam, CodeBase source)
+        public CodeBase CreateAssignment(RefAlignParam refAlignParam, CodeBase sourceRef)
         {
-            var alignedSize = source.Size.ByteAlignedSize;
-            return CreateSequence(source.CreateBitCast(alignedSize))
-                .CreateAssign(refAlignParam, alignedSize);
+            NotImplementedMethod(refAlignParam,sourceRef);
+            var alignedSize = sourceRef.Size.ByteAlignedSize;
+            return CreateSequence(sourceRef.CreateBitCast(alignedSize))
+                .CreateAssignment(refAlignParam, alignedSize);
         }
 
         public CodeBase CreateBitSequenceOperation(Defineable name)
@@ -264,7 +265,7 @@ namespace Reni.Code
             }
         }
 
-        private CodeBase CreateAssign(RefAlignParam refAlignParam, Size size)
+        private CodeBase CreateAssignment(RefAlignParam refAlignParam, Size size)
         {
             return CreateChild(new Assign(refAlignParam, size));
         }

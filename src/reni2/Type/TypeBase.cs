@@ -21,8 +21,10 @@ namespace Reni.Type
         private readonly DictionaryEx<int, Array> _array = new DictionaryEx<int, Array>();
         private readonly DictionaryEx<int, Sequence> _chain = new DictionaryEx<int, Sequence>();
         private readonly DictionaryEx<TypeBase, Pair> _pair = new DictionaryEx<TypeBase, Pair>();
-        private readonly DictionaryEx<RefAlignParam, Ref> _ref = new DictionaryEx<RefAlignParam, Ref>();
-        private TypeType _typeTypeCache;
+        private readonly DictionaryEx<RefAlignParam, AutomaticRef> _ref = new DictionaryEx<RefAlignParam, AutomaticRef>();
+        private readonly DictionaryEx<RefAlignParam, AssignableRef> _assignableRef = new DictionaryEx<RefAlignParam, AssignableRef>();
+
+        private readonly SimpleCache<TypeType> _typeTypeCache = new SimpleCache<TypeType>();
 
         protected TypeBase(int objectId)
             : base(objectId) {}
@@ -50,17 +52,14 @@ namespace Reni.Type
         [DumpData(false)]
         internal protected virtual TypeBase[] ToList { get { return new[] {this}; } }
 
-        public abstract string DumpShort();
-
-        private TypeBase TypeType
+        string IDumpShortProvider.DumpShort()
         {
-            get
-            {
-                if(_typeTypeCache == null)
-                    _typeTypeCache = new TypeType(this);
-                return _typeTypeCache;
-            }
+            return DumpShort();
         }
+
+        internal abstract string DumpShort();
+
+        private TypeBase TypeType { get { return _typeTypeCache.Find(() => new TypeType(this)); } }
 
         [DumpData(false)]
         internal virtual string DumpPrintText
@@ -124,15 +123,20 @@ namespace Reni.Type
                 () => new Pair(first, this));
         }
 
-        public virtual Ref CreateRef(RefAlignParam refAlignParam)
+        public virtual AutomaticRef CreateRef(RefAlignParam refAlignParam)
         {
-            return _ref.Find(refAlignParam, () => new Ref(this, refAlignParam));
+            return _ref.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam));
         }
 
-        public Ref EnsureRef(RefAlignParam refAlignParam)
+        public virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
+        {
+            return _assignableRef.Find(refAlignParam, () => new AssignableRef(this, refAlignParam));
+        }
+
+        public AutomaticRef EnsureRef(RefAlignParam refAlignParam)
         {
             if(IsRef(refAlignParam))
-                return (Ref) this;
+                return (AutomaticRef) this;
             return CreateRef(refAlignParam);
         }
 
@@ -199,7 +203,7 @@ namespace Reni.Type
 
         internal Result CreateResult(Category category, Result.GetCode getCode)
         {
-            return CreateResult(category, getCode, Refs.None, EmptyInternal);
+            return CreateResult(category, getCode, Refs.None, Result.EmptyInternal);
         }
 
         internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetResult getInternal)
@@ -214,14 +218,10 @@ namespace Reni.Type
                 () => CodeBase.CreateContextRef(context),
                 () => Refs.Context(context));
         }
+
         internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs)
         {
-            return CreateResult(category,getCode,getRefs,EmptyInternal);
-        }
-
-        private static Result EmptyInternal()
-        {
-            return Void.CreateResult(Category.ForInternal);
+            return CreateResult(category, getCode, getRefs, Result.EmptyInternal);
         }
 
         internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs, Result.GetResult getInternal)
@@ -252,7 +252,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual Result PostProcess(Ref visitedType, Result result)
+        internal virtual Result PostProcess(AutomaticRef visitedType, Result result)
         {
             if(this == visitedType.Target)
                 return result.UseWithArg(visitedType.CreateDereferencedArgResult(result.Complete));
@@ -270,12 +270,17 @@ namespace Reni.Type
             return CreateVoid.CreateResult(category);
         }
 
-        public virtual Result Dereference(Result result)
+        internal virtual Result Dereference(Result result)
         {
             return result;
         }
 
-        public virtual Result TypeOperator(Category category, TypeBase targetType)
+        internal virtual TypeBase Dereference()
+        {
+            return this;
+        }
+
+        internal virtual Result TypeOperator(Category category)
         {
             var result = CreateVoidResult(category).Clone();
             if(category.HasType)
@@ -318,7 +323,7 @@ namespace Reni.Type
             return targetType.Conversion(category, this);
         }
 
-        public virtual Result ApplyTypeOperator(Result argResult)
+        internal virtual Result ApplyTypeOperator(Result argResult)
         {
             return argResult.Type.Conversion(argResult.Complete, this).UseWithArg(argResult);
         }
@@ -429,6 +434,11 @@ namespace Reni.Type
             return rawResult;
         }
 
+        internal virtual TypeBase UnProperty()
+        {
+            return this;
+        }
+
         internal SearchResult<IFeature> SearchDefineable(DefineableToken defineableToken)
         {
             return Search(defineableToken.TokenClass).SubTrial(this);
@@ -454,12 +464,12 @@ namespace Reni.Type
             return defineable.SearchFromRef().SubTrial(this);
         }
 
-        internal virtual SearchResult<ISequenceElementFeature> SearchFromSequence(Defineable defineable)
+        internal virtual SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable)
         {
             return defineable.SearchFromSequenceElement().SubTrial(this);
         }
 
-        internal virtual SearchResult<ISequenceElementPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
+        internal virtual SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable)
         {
             return defineable.SearchPrefixFromSequenceElement().SubTrial(this);
         }

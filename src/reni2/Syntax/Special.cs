@@ -1,53 +1,14 @@
-using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Syntax
 {
-    internal class CompileSyntax : ParsedSyntax, ICompileSyntax
-    {
-        internal CompileSyntax(Token token)
-            : base(token) {}
-
-        string ICompileSyntax.DumpShort()
-        {
-            return DumpShort();
-        }
-
-        string ICompileSyntax.FilePosition()
-        {
-            return FilePosition();
-        }
-
-        Result ICompileSyntax.Result(ContextBase context, Category category)
-        {
-            var trace = ObjectId < 0;
-            StartMethodDump(trace, context,category);
-            if(category.HasInternal || !(category.HasCode || category.HasRefs))
-                return ReturnMethodDump(trace, Result(context, category));
-            var result = Result(context, category | Category.Internal | Category.Type);
-            Dump(trace, "result", result);
-            return ReturnMethodDump(trace, result.CreateStatement(category, result.Internal));
-        }
-
-        internal protected virtual Result Result(ContextBase context, Category category)
-        {
-            NotImplementedMethod(context, category);
-            return null;
-        }
-
-        internal protected override IParsedSyntax SurroundedByParenthesis(Token token)
-        {
-            return this;
-        }
-
-    }
-
     internal abstract class SpecialSyntax : CompileSyntax
     {
         protected SpecialSyntax(Token token)
             : base(token) {}
+
     }
 
     internal sealed class TerminalSyntax : SpecialSyntax

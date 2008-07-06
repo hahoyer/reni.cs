@@ -1,177 +1,70 @@
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Parser.TokenClass;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    /// <summary>
-    /// ContextAtPosition for structure
-    /// </summary>
     internal sealed class Context : Reni.Context.Child
     {
-        private readonly Container _container;
-        private readonly DictionaryEx<int, TypeBase> _type = new DictionaryEx<int, TypeBase>();
-        private CodeBase _contextRefCode;
-        private IContextFeature[] _contextFeaturesCache;
+        private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
+        private readonly SimpleCache<Type> _typeCache = new SimpleCache<Type>();
+        internal readonly Container Container;
 
-        /// <summary>
-        /// Initializes a new instance of the StructContainer class.
-        /// </summary>
-        /// <param name="parent">The parent.</param>
-        /// <param name="container">The struc.</param>
-        /// created 12.12.2006 21:29
-        internal Context(ContextBase parent, Container container)
-            : base(parent)
+        internal Context(ContextBase contextBase, Container container) : base(contextBase)
         {
-            _container = container;
-            Tracer.ConditionalBreak(Parent is Context && ((Context) Parent).Container == Container, "");
+            Container = container;
         }
 
-        [Node, DumpData(false)]
-        private IContextFeature[] ContextFeatures
+        internal List<ICompileSyntax> StatementList { get { return Container.List; } }
+
+        internal ContextAtPosition CreatePosition(int position)
         {
-            get
-            {
-                if(_contextFeaturesCache == null)
-                    _contextFeaturesCache = CreateContextFeaturesCache();
-                return _contextFeaturesCache;
-            }
+            return _contextAtPositionCache.Find(position, () => new ContextAtPosition(this, position));
         }
 
-        /// <summary>
-        /// Returns the type of an element
-        /// </summary>
-        /// <param name="position">Index of the element</param>
-        internal TypeBase VisitType(int position)
+        internal Type CreateType()
         {
-            return _container.VisitType(Parent, position);
+            return _typeCache.Find(() => new Type(this));
         }
 
-        /// <summary>
-        /// Gets the struct.
-        /// </summary>
-        /// <value>The struct.</value>
-        /// created 16.12.2006 23:49
-        internal Container Container { get { return _container; } }
-
-        /// <summary>
-        /// Creates the type of the struct.
-        /// </summary>
-        /// <param name="currentCompilePosition">The current compile position.</param>
-        /// <returns></returns>
-        /// created 02.01.2007 15:34
-        public Type CreateStructType(int currentCompilePosition)
+        internal Result InternalResult(Category category)
         {
-            return (Type)
-                _type.Find
-                    (
-                    currentCompilePosition,
-                    () => new Type(Parent, _container, currentCompilePosition)
-                    );
+            var result = Void.CreateResult(category);
+            for (var i = 0; i < StatementList.Count; i++)
+                result = result.Align(AlignBits).CreateSequence(InternalResult(category, i));
+            return result.Align(AlignBits);
         }
 
-        [DumpData(false)]
-        internal CodeBase ContextRefCode
+        internal Result InternalResult(Category category, int position)
         {
-            get
-            {
-                if(_contextRefCode == null)
-                    _contextRefCode = CreateContextRefCode();
-                return _contextRefCode;
-            }
+            return CreatePosition(position).Result(category | Category.Type, StatementList[position]).Dereference();
         }
 
-        private CodeBase CreateContextRefCode()
+        private Size InternalSize(int position)
         {
-            return CodeBase.CreateContextRef(this);
+            return InternalResult(Category.Size,position).Size;
         }
 
-        internal override CodeBase CreateRefForStruct(Type type)
+        internal Result AccessResult(Category category, int position)
         {
-            if(Parent != type.Context)
-                return null;
-            if(Container != type.Container)
-                return null;
-            if(Container.List.Count > type.CurrentCompilePosition)
-                return null;
-            return Container.CreateRef(Parent);
+            return Type(StatementList[position])
+                .Dereference()
+                .UnProperty()
+                .CreateAssignableRef(RefAlignParam)
+                .CreateResult(category, ()=>AccessCode(position));
         }
 
-        internal IContextFeature AtFeatureObject()
+        private CodeBase AccessCode(int position)
         {
-            return Container.AtFeatureObject(Parent);
+            var offset = Reni.Size.Zero;
+            for (var i = position+1; i < StatementList.Count; i++)
+                offset += InternalSize(i);
+            return new Arg(RefSize).CreateRefPlus(RefAlignParam, offset);
         }
 
-        /// <summary>
-        /// Visits the element at a given position.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
-        /// created 15.12.2006 09:22
-        internal Result VisitElementFromContextRef(Category category, int index)
-        {
-            if(Size(_container[index]).IsZero)
-            {
-                var result = TypeBase.CreateVoidResult(category);
-                if(category.HasType)
-                {
-                    result.Type = Type(_container[index]);
-                }
-                return result;
-            }
-            else
-            {
-                var result = new Result();
-                if(category.HasSize)
-                    result.Size = RefAlignParam.RefSize;
-                if(category.HasType)
-                    result.Type = Type(_container[index]).CreateRef(RefAlignParam);
-                if(category.HasCode)
-                    result.Code
-                        = ContextRefCode
-                            .CreateRefPlus(RefAlignParam, BackOffset(index));
-                if(category.HasRefs)
-                    result.Refs = Refs.Context(ContextRefForCode);
-                return result;
-            }
-        }
-
-        internal Size Offset(int index)
-        {
-            return _container.Offset(Parent, index);
-        }
-
-        internal Size BackOffset(int index)
-        {
-            return _container.BackOffset(Parent, index);
-        }
-
-        [DumpData(false)]
-        private Context ContextRefForCode { get { return Parent.CreateStructContext(_container); } }
-
-        public IContextFeature[] CreateContextFeaturesCache()
-        {
-            return Container.CreateContextFeaturesCache(Parent);
-        }
-        
-        internal override SearchResult<IContextFeature> Search(Defineable defineable)
-        {
-            var containerResult = _container.Search(defineable);
-            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature, this);
-            if (result.IsSuccessFull)
-                return result;
-            return Parent.Search(defineable).AlternativeTrial(result);
-        }
-
-        public IContextFeature CreateMemberAccess(int i)
-        {
-            return ContextFeatures[i];
-        }
     }
 }

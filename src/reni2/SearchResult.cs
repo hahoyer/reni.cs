@@ -1,103 +1,36 @@
 using HWClassLibrary.Debug;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
-using Reni.Struct;
-using Reni.Type;
 
 namespace Reni
 {
-    internal class SearchResultDescriptor: ReniObject
+    internal class SearchResultDescriptor : ReniObject
     {
         internal SearchResultDescriptor(Defineable defineable, SearchTrial searchTrial)
         {
             Defineable = defineable;
             SearchTrial = searchTrial;
         }
-        
+
         public Defineable Defineable { get; private set; }
         public SearchTrial SearchTrial { get; private set; }
 
-        public SearchResult<ISequenceElementFeature> Convert(ISequenceOfBitFeature feature)
+        public SearchResult<FeatureType> Convert<FeatureType, TargetType>(IConverter<FeatureType,TargetType> feature, TargetType target)
+            where FeatureType : class
         {
-            ISequenceElementFeature resultFeature = null;
+            FeatureType resultFeature = null;
             if(feature != null)
-                resultFeature = feature.Convert();
-            return SearchResult<ISequenceElementFeature>.Create(resultFeature, this);
-        }
-
-        public SearchResult<ISequenceElementPrefixFeature> Convert(ISequenceOfBitPrefixFeature feature)
-        {
-            ISequenceElementPrefixFeature resultFeature = null;
-            if (feature != null)
-                resultFeature = feature.Convert();
-            return SearchResult<ISequenceElementPrefixFeature>.Create(resultFeature, this);
-        }
-
-        public SearchResult<IFeature> Convert(IRefFeature feature, Ref @ref)
-        {
-            IFeature resultFeature = null;
-            if (feature != null)
-                resultFeature = feature.Convert(@ref);
-            return SearchResult<IFeature>.Create(resultFeature, this);
-        }
-
-        public SearchResult<IRefFeature> Convert(IRefToSequenceFeature feature, Sequence sequence)
-        {
-            IRefFeature resultFeature = null;
-            if (feature != null)
-                resultFeature = feature.Convert(sequence);
-            return SearchResult<IRefFeature>.Create(resultFeature, this);
-        }
-
-        public SearchResult<IFeature> Convert(ISequenceElementFeature feature, Sequence sequence)
-        {
-            IFeature resultFeature = null;
-            if (feature != null)
-                resultFeature = feature.Convert(sequence);
-            return SearchResult<IFeature>.Create(resultFeature, this);
-        }
-
-        public SearchResult<IPrefixFeature> Convert(ISequenceElementPrefixFeature feature, Sequence sequence)
-        {
-            IPrefixFeature resultFeature = null;
-            if (feature != null)
-                resultFeature = feature.Convert(sequence);
-            return SearchResult<IPrefixFeature>.Create(resultFeature, this);
-        }
-
-        public SearchResult<IFeature> Convert(IFeatureForSequence feature, Sequence sequence)
-        {
-            IFeature resultFeature = null;
-            if (feature != null)
-                resultFeature = feature.Convert(sequence);
-            return SearchResult<IFeature>.Create(resultFeature, this);
-        }
-
-        public SearchResult<IContextFeature> Convert(IStructFeature feature, Struct.Context context)
-        {
-            IContextFeature resultFeature = null;
-            if (feature != null)
-                resultFeature = feature.Convert(context);
-            return SearchResult<IContextFeature>.Create(resultFeature, this);
-        }
-
-        public SearchResult<IFeature> Convert(IStructFeature feature, Struct.Type type)
-        {
-            IFeature resultFeature = null;
-            if (feature != null)
-                resultFeature = feature.Convert(type);
-            return SearchResult<IFeature>.Create(resultFeature, this);
+                resultFeature = feature.Convert(target);
+            return SearchResult<FeatureType>.Create(resultFeature, this);
         }
     }
 
     internal struct SearchResult<FeatureType> where FeatureType : class
     {
         private SearchResult(FeatureType feature, Defineable defineable, SearchTrial searchTrial)
-            : this(feature, new SearchResultDescriptor(defineable, searchTrial))
-        {
-        }
+            : this(feature, new SearchResultDescriptor(defineable, searchTrial)) {}
 
-        private SearchResult(FeatureType feature, SearchResultDescriptor  searchResultDescriptor)
+        private SearchResult(FeatureType feature, SearchResultDescriptor searchResultDescriptor)
             : this()
         {
             Feature = feature;
@@ -146,8 +79,7 @@ namespace Reni
 
         public static SearchResult<FeatureType> Create(FeatureType feature, SearchResultDescriptor descriptor)
         {
-            return new SearchResult<FeatureType>(feature,descriptor);
+            return new SearchResult<FeatureType>(feature, descriptor);
         }
-
     }
 }

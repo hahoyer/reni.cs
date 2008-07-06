@@ -1,8 +1,8 @@
-﻿using System;
-using HWClassLibrary.Debug;
+﻿using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Syntax;
+using System;
 
 namespace Reni.Parser.TokenClass
 {
@@ -16,35 +16,17 @@ namespace Reni.Parser.TokenClass
 
         protected TokenClassBase() : base(_nextObjectId++) {}
 
-        /// <summary>
-        /// true only for end token
-        /// </summary>
-        /// <returns></returns>
         [DumpData(false)]
         internal virtual bool IsEnd { get { return false; } }
 
         internal virtual bool IsSymbol { get { return false; } }
 
-        /// <summary>
-        /// Creates the syntax.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="token">The token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 31.03.2007 14:02 on SAPHIRE by HH
         internal virtual IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             NotImplementedMethod(left, token, right);
             return null;
         }
 
-        /// <summary>
-        /// The name of the token for lookup in prio table of parser.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        /// created 31.03.2007 23:36 on SAPHIRE by HH
         internal virtual string PrioTableName(string name)
         {
             return name;
@@ -62,12 +44,6 @@ namespace Reni.Parser.TokenClass
             return ".TokenClass.Name.T" + token + "T";
         }
 
-        /// <summary>
-        /// Symbolizes the specified token.
-        /// </summary>
-        /// <param name="token">The token.</param>
-        /// <returns></returns>
-        /// [created 18.07.2006 23:49]
         internal static string Symbolize(string token)
         {
             var name = "";
@@ -76,12 +52,6 @@ namespace Reni.Parser.TokenClass
             return name;
         }
 
-        /// <summary>
-        /// Symbolizes the char.
-        /// </summary>
-        /// <param name="Char">The char.</param>
-        /// <returns></returns>
-        /// [created 18.07.2006 23:38]
         internal static string SymbolizeChar(char Char)
         {
             switch(Char)
@@ -129,7 +99,7 @@ namespace Reni.Parser.TokenClass
     {
         internal abstract Result Result(ContextBase context, Category category, Token token);
 
-        protected IParsedSyntax CreateTerminalSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        sealed internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             ParsedSyntax.IsNull(left);
             ParsedSyntax.IsNull(right);
@@ -141,7 +111,7 @@ namespace Reni.Parser.TokenClass
     {
         internal abstract Result Result(ContextBase context, Category category, Token token, ICompileSyntax right);
 
-        protected IParsedSyntax CreateTerminalSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        sealed internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             ParsedSyntax.IsNull(left);
             return new PrefixSyntax(token, this, ParsedSyntax.ToCompiledSyntax(right));
@@ -153,7 +123,7 @@ namespace Reni.Parser.TokenClass
     {
         internal abstract Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right);
 
-        protected IParsedSyntax CreateTerminalSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        sealed internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             return new InfixSyntax(token, ParsedSyntax.ToCompiledSyntax(left), this, ParsedSyntax.ToCompiledSyntax(right));
         }

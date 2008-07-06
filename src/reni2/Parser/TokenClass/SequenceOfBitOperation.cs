@@ -4,44 +4,44 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass
 {
-    internal abstract class SequenceOfBitOperation : Defineable, 
-        ISequenceOfBitFeature, 
-        ISequenceOfBitPrefixFeature,
-        ISequenceElementFeature, 
-        ISequenceElementPrefixFeature
+    internal abstract class SequenceOfBitOperation : Defineable,
+        IConverter<IConverter<IFeature, Sequence>,Bit>,
+        IConverter<IConverter<IPrefixFeature, Sequence>, Bit>,
+        IConverter<IFeature, Sequence>,
+        IConverter<IPrefixFeature, Sequence>
     {
         [DumpExcept(false)]
         internal protected virtual bool IsBitSequencePrefixOperation { get { return false; } }
 
-        IFeature ISequenceElementFeature.Convert(Sequence sequence)
+        IFeature IConverter<IFeature, Sequence>.Convert(Sequence sequence)
         {
             return sequence.BitOperationFeature(this);
         }
 
-        ISequenceElementFeature ISequenceOfBitFeature.Convert()
+        IConverter<IFeature, Sequence> IConverter<IConverter<IFeature, Sequence>,Bit>.Convert(Bit x)
         {
             return this;
         }
 
-        ISequenceElementPrefixFeature ISequenceOfBitPrefixFeature.Convert()
+        IConverter<IPrefixFeature, Sequence> IConverter<IConverter<IPrefixFeature, Sequence>, Bit>.Convert(Bit x)
         {
             return this;
         }
 
-        IPrefixFeature ISequenceElementPrefixFeature.Convert(Sequence sequence)
+        IPrefixFeature IConverter<IPrefixFeature, Sequence>.Convert(Sequence sequence)
         {
             return sequence.BitOperationPrefixFeature(this);
         }
 
-        internal override sealed SearchResult<ISequenceOfBitFeature> SearchFromSequenceOfBit()
+        internal override sealed SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>> SearchFromSequenceOfBit()
         {
-            return SearchResult<ISequenceOfBitFeature>.Success(this, this);
+            return SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>>.Success(this, this);
         }
 
-        internal override sealed SearchResult<ISequenceOfBitPrefixFeature> SearchPrefixFromSequenceOfBit()
+        internal override sealed SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>> SearchPrefixFromSequenceOfBit()
         {
             if(IsBitSequencePrefixOperation)
-                return SearchResult<ISequenceOfBitPrefixFeature>.Success(this, this);
+                return SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>>.Success(this, this);
             return base.SearchPrefixFromSequenceOfBit();
         }
     }

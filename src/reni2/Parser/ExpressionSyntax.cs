@@ -38,7 +38,7 @@ namespace Reni.Parser
         {
             var contextSearchResult = context.SearchDefineable(DefineableToken);
             if(contextSearchResult.IsSuccessFull)
-                return contextSearchResult.Feature.VisitApply(context, category, Right);
+                return contextSearchResult.Feature.ApplyResult(context, category, Right);
 
             if(Right == null)
             {

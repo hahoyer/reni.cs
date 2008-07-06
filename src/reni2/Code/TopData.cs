@@ -10,7 +10,8 @@ namespace Reni.Code
         public TopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
             : base(refAlignParam, offset, targetSize)
         {
-            StopByObjectId(411);
+            StopByObjectId(148);
+            StopByObjectId(350);
         }
         /// <summary>
         /// Tries to combine two leaf elements. .
@@ -20,7 +21,7 @@ namespace Reni.Code
         /// created 19.10.2006 21:18
         internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
         {
-            return subsequentElement.TryToCombineBack(this);
+            return subsequentElement.TryToCombineBackN(this);
         }
 
         /// <summary>
@@ -51,9 +52,9 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        internal override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
         {
-            return subsequentElement.TryToCombineBack(this);
+            return subsequentElement.TryToCombineBackN(this);
         }
 
         /// <summary>

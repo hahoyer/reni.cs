@@ -1,9 +1,10 @@
+using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
 {
-    internal sealed class DefinableTokenSyntax : ParsedSyntax, ICompileSyntax
+    internal sealed class DefinableTokenSyntax : CompileSyntax
     {
         private readonly DefineableToken _defineableToken;
 
@@ -12,25 +13,22 @@ namespace Reni.Parser.TokenClass
             _defineableToken = new DefineableToken(token);
         }
 
-        protected internal override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
+        internal protected override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
         {
             return new DeclarationSyntax(_defineableToken, token, right);
         }
 
-        Result ICompileSyntax.Result(ContextBase context, Category category)
+        [DumpData(false)]
+        internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
+
+        internal protected override Result Result(ContextBase context, Category category)
         {
-            NotImplementedMethod(context,category);
+            var contextSearchResult = context.SearchDefineable(_defineableToken);
+            if(contextSearchResult.IsSuccessFull)
+                return contextSearchResult.Feature.ApplyResult(context, category, null);
+
+            NotImplementedMethod(context, category, "contextSearchResult", contextSearchResult);
             return null;
-        }
-
-        string ICompileSyntax.DumpShort()
-        {
-            return DumpShort();
-        }
-
-        string ICompileSyntax.FilePosition()
-        {
-            return FilePosition();
         }
     }
 }

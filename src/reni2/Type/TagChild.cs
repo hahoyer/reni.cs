@@ -15,7 +15,7 @@ namespace Reni.Type
         abstract protected string TagTitle { get; }
         internal override Size Size { get { return Parent.Size; } }
 
-        public override string DumpShort()
+        internal override string DumpShort()
         {
             return Parent.DumpShort() + "[" + TagTitle + "]";
         }

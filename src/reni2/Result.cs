@@ -299,7 +299,7 @@ namespace Reni
                 _internal = r.Internal ?? CreatePending(Category.ForInternal);
         }
 
-        private Result Filter(Category category)
+        internal Result Filter(Category category)
         {
             if(category == Complete)
                 return this;
@@ -317,34 +317,25 @@ namespace Reni
         internal Result Align(int alignBits)
         {
             var size = FindSize;
-            if(size == null)
-            {
-                var r = new Result();
-                if(HasRefs)
-                    r.Refs = Refs;
-                return r;
-            }
-
-            if(size.IsPending)
+            if (size == null || size.IsPending)
                 return this;
 
             var alignedSize = size.Align(alignBits);
-            if(alignedSize != size)
-            {
-                var r = new Result();
-                if(HasSize)
-                    r.Size = alignedSize;
-                if(HasType)
-                    r.Type = Type.CreateAlign(alignBits);
-                if(HasCode)
-                    r.Code = Code.CreateBitCast(alignedSize);
-                if(HasRefs)
-                    r.Refs = Refs;
-                if (HasInternal)
-                    r.Internal = Internal.Clone();
-                return r;
-            }
-            return this;
+            if(alignedSize == size)
+                return this;
+            
+            var r = new Result();
+            if(HasSize)
+                r.Size = alignedSize;
+            if(HasType)
+                r.Type = Type.CreateAlign(alignBits);
+            if(HasCode)
+                r.Code = Code.CreateBitCast(alignedSize);
+            if(HasRefs)
+                r.Refs = Refs;
+            if (HasInternal)
+                r.Internal = Internal.Clone();
+            return r;
         }
 
         /// <summary>
@@ -461,7 +452,7 @@ namespace Reni
                 {
                     var result = syntax.Result(context, notCompleteCategory);
                     context.AssertCorrectRefs(this);
-                    Tracer.Assert(result.Complete == notCompleteCategory, string.Format("syntax={2}\ncategory={0}\nResult={1}", notCompleteCategory, result.Dump(), syntax.DumpShort()));
+                    result.AssertComplete(notCompleteCategory, syntax);
                     Update(result);
                 }
                 catch
@@ -475,6 +466,16 @@ namespace Reni
             var filteredResult = Filter(category);
             Tracer.Assert(filteredResult.Complete == category, string.Format("syntax={2}\ncategory={0}\nResult={1}", category, filteredResult.Dump(), syntax.DumpShort()));
             return filteredResult;
+        }
+
+        internal void AssertComplete(Category category, ICompileSyntax syntaxForDump)
+        {
+            Tracer.Assert(1, HasCategory(category), string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort()));
+        }
+
+        internal void AssertComplete(Category category)
+        {
+            Tracer.Assert(1, HasCategory(category), string.Format("category={0}\nResult={1}", category, Dump()));
         }
 
         /// <summary>
@@ -788,10 +789,19 @@ namespace Reni
             return Type.UnProperty(this);
         }
 
-        internal Result PostProcess(RefAlignParam refAlignParam)
+        internal Result Dereference()
         {
-            return UnProperty()
-                .Align(refAlignParam.AlignBits);
+            return Type.Dereference(this);
+        }
+
+        internal Result PostProcess(int alignBits)
+        {
+            return PostProcess().Align(alignBits);
+        }
+
+        internal Result PostProcess()
+        {
+            return UnProperty().Dereference();
         }
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
@@ -821,6 +831,33 @@ namespace Reni
         internal delegate Refs GetRefs();
         internal delegate Result GetResult();
         internal delegate Result GetResultFromType(TypeBase objectType);
+
+        internal static Result EmptyInternal()
+        {
+            return Reni.Type.Void.CreateResult(Category.ForInternal);
+        }
+
+        internal Result CreateAssignment(AssignableRef assignableRef, Result value)
+        {
+            Tracer.Assert(!HasType || Type == assignableRef);
+            var category = value.Complete;
+            var convertedValue = value.ConvertTo(assignableRef);
+            var result = TypeBase.CreateVoid
+                .CreateResult
+                (
+                category,
+                () => Code.CreateAssignment(assignableRef.RefAlignParam, convertedValue.Code),
+                () => Refs.Pair(convertedValue.Refs),
+                () => Internal.CreateSequence(convertedValue.Internal)
+
+                );
+            if (assignableRef.Target.DestructorHandler(category).IsEmpty && assignableRef.Target.MoveHandler(category).IsEmpty)
+                return result;
+
+            NotImplementedMethod(value, "result", result);
+            throw new NotImplementedException();
+        }
+
     }
 
     /// <summary>

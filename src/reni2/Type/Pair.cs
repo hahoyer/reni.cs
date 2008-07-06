@@ -76,7 +76,7 @@ namespace Reni.Type
             return result;
         }
 
-        public override string DumpShort()
+        internal override string DumpShort()
         {
             return "pair." + ObjectId;
         }

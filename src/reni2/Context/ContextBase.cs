@@ -27,23 +27,20 @@ namespace Reni.Context
         protected ContextBase() : base(_nextId++) {}
 
         [Node, DumpData(false)]
-        public abstract RefAlignParam RefAlignParam { get; }
+        internal abstract RefAlignParam RefAlignParam { get; }
         [DumpData(false)]
         public int AlignBits { get { return RefAlignParam.AlignBits; } }
         [DumpData(false)]
         public Size RefSize { get { return RefAlignParam.RefSize; } }
         [DumpData(false)]
-        public abstract Root RootContext { get; }
+        internal abstract Root RootContext { get; }
 
         [DumpData(false)]
         internal Result TopRefResult
         {
             get
             {
-                if(Cache._topRefResultCache == null)
-                    Cache._topRefResultCache = new Result {Code = CreateTopRefCode(), Refs = Refs.None()};
-
-                return Cache._topRefResultCache;
+                return Cache._topRefResultCache.Find(() => new Result {Code = CreateTopRefCode(), Refs = Refs.None()});
             }
         }
         [DumpData(false)]
@@ -57,7 +54,7 @@ namespace Reni.Context
             }
         }
 
-        protected virtual Sequence<ContextBase> ObtainChildChain()
+        internal protected virtual Sequence<ContextBase> ObtainChildChain()
         {
             return HWString.Sequence(this);
         }
@@ -67,61 +64,26 @@ namespace Reni.Context
             return base.ToString();
         }
 
-        public int SizeToPacketCount(Size size)
+        internal int SizeToPacketCount(Size size)
         {
             return size.SizeToPacketCount(RefAlignParam.AlignBits);
         }
 
-        public int PacketCountDistance(ContextBase target)
-        {
-            var d = Distance(target);
-            if(d == null)
-                return -1;
-            return SizeToPacketCount(d);
-        }
-
-        public Size Distance(ContextBase target)
-        {
-            if(target == this)
-                return Reni.Size.Create(0);
-            return VirtDistance(target);
-        }
-
-        public virtual Size VirtDistance(ContextBase target)
-        {
-            DumpMethodWithBreak("not implemented", target);
-            throw new NotImplementedException();
-        }
-
-        public static Root CreateRoot()
+        internal static Root CreateRoot()
         {
             return new Root();
         }
 
-        internal ContextAtPosition CreateStructAtPosition(Struct.Container container, int currentCompilePosition)
-        {
-            return CreateStructContext(container).CreateStructAtPosition(currentCompilePosition);
-        }
-
-        private ContextAtPosition CreateStructAtPosition(int currentCompilePosition)
-        {
-            return Cache._structPositionCache.Find
-                (
-                currentCompilePosition,
-                () => new ContextAtPosition((Struct.Context) this, currentCompilePosition)
-                );
-        }
-
-        internal Struct.Context CreateStructContext(Struct.Container container)
-        {
-            return Cache._structContainerCache.Find(container,
-                () => new Struct.Context(this, container));
-        }
-
-        public Function CreateFunction(TypeBase args)
+        internal Function CreateFunction(TypeBase args)
         {
             return Cache._functionInstanceCache.Find(args,
                 () => new Function(this, args));
+        }
+
+        internal Struct.Context CreateStruct(Struct.Container container)
+        {
+            return Cache._structContainerCache.Find(container,
+                () => new Struct.Context(this, container));
         }
 
         internal CodeBase CreateTopRefCode()
@@ -129,7 +91,7 @@ namespace Reni.Context
             return CodeBase.CreateTopRef(RefAlignParam);
         }
 
-        public virtual Result CreateArgsRefResult(Category category)
+        internal virtual Result CreateArgsRefResult(Category category)
         {
             NotImplementedMethod(category);
             return null;
@@ -165,52 +127,52 @@ namespace Reni.Context
             return defineable.SearchContext();
         }
 
-        private Result VisitFirstChainElement(Category category, MemberElem memberElem)
-        {
-            if(memberElem.DefineableToken == null)
-                return Result(category,memberElem.Args);
+        //private Result VisitFirstChainElement(Category category, MemberElem memberElem)
+        //{
+        //    if(memberElem.DefineableToken == null)
+        //        return Result(category,memberElem.Args);
 
-            var contextSearchResult = SearchDefineable(memberElem.DefineableToken);
-            if(contextSearchResult.IsSuccessFull)
-                return contextSearchResult.Feature.VisitApply(this, category, memberElem.Args);
+        //    var contextSearchResult = SearchDefineable(memberElem.DefineableToken);
+        //    if(contextSearchResult.IsSuccessFull)
+        //        return contextSearchResult.Feature.ApplyResult(this, category, memberElem.Args);
 
-            if(memberElem.Args == null)
-            {
-                NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult);
-                return null;
-            }
+        //    if(memberElem.Args == null)
+        //    {
+        //        NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult);
+        //        return null;
+        //    }
 
-            var argResult = Result(category | Category.Type,memberElem.Args);
-            var prefixSearchResult = argResult.Type.SearchDefineablePrefix(memberElem.DefineableToken);
-            if(prefixSearchResult.IsSuccessFull)
-                return prefixSearchResult.Feature.Result(category, argResult);
+        //    var argResult = Result(category | Category.Type,memberElem.Args);
+        //    var prefixSearchResult = argResult.Type.SearchDefineablePrefix(memberElem.DefineableToken);
+        //    if(prefixSearchResult.IsSuccessFull)
+        //        return prefixSearchResult.Feature.Result(category, argResult);
 
-            NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult, "prefixSearchResult",
-                prefixSearchResult);
-            return null;
-        }
+        //    NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult, "prefixSearchResult",
+        //        prefixSearchResult);
+        //    return null;
+        //}
 
-        private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
-        {
-            //var refResult = formerResult.EnsureContextRef(this);
-            //var visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
-            //var arglessResult = visitedResult.UseWithArg(refResult);
-            //return arglessResult;
-            return null;
-        }
+        //private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
+        //{
+        //    //var refResult = formerResult.EnsureContextRef(this);
+        //    //var visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
+        //    //var arglessResult = visitedResult.UseWithArg(refResult);
+        //    //return arglessResult;
+        //    return null;
+        //}
 
-        internal Result VisitChainElement(Category category, MemberElem memberElem, Result formerResult)
-        {
-            if(formerResult == null)
-                return VisitFirstChainElement(category, memberElem);
-            return VisitNextChainElement(category, memberElem, formerResult);
-        }
+        //internal Result VisitChainElement(Category category, MemberElem memberElem, Result formerResult)
+        //{
+        //    if(formerResult == null)
+        //        return VisitFirstChainElement(category, memberElem);
+        //    return VisitNextChainElement(category, memberElem, formerResult);
+        //}
 
-        internal virtual CodeBase CreateRefForStruct(Struct.Type type)
-        {
-            NotImplementedMethod(type);
-            return null;
-        }
+        //internal virtual CodeBase CreateRefForStruct(Struct.PartialType partialType)
+        //{
+        //    NotImplementedMethod(partialType);
+        //    return null;
+        //}
 
         internal Size Size(ICompileSyntax syntax)
         {
@@ -294,7 +256,7 @@ namespace Reni.Context
 
         internal Result ApplyResult(Category category, ICompileSyntax @object, Result.GetResultFromType apply)
         {
-            var objectResult = ApplyToRef(category, @object, ()=>Reni.Size.Zero);
+            var objectResult = ResultAsRef(category|Category.Type, @object);
             return apply(objectResult.Type)
                 .UseWithArg(objectResult)
                 .Align(AlignBits);
@@ -302,19 +264,30 @@ namespace Reni.Context
 
         internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType, Result.GetSize argsOffset)
         {
-            return ApplyToRef(category, syntax, argsOffset)
-                .ConvertTo(elementType.CreateSequence(Type(syntax).SequenceCount))
-                .Align(AlignBits);
+            var applyToRef = ResultAsRef(category|Category.Type, syntax, argsOffset);
+            applyToRef.AssertComplete(category | Category.Type, syntax);
+            var convertTo = applyToRef.ConvertTo(elementType.CreateSequence(Type(syntax).SequenceCount)).Filter(category);
+            convertTo.AssertComplete(category);
+            var result = convertTo.Align(AlignBits);
+            result.AssertComplete(category);
+            return result;
         }
 
-        internal Result ApplyToRef(Category category, ICompileSyntax syntax, Result.GetSize argsOffset)
+        internal Result ResultAsRef(Category category, ICompileSyntax syntax, Result.GetSize argsOffset)
         {
             var localCategory = category | Category.Type;
             if (category.HasInternal)
                 localCategory = localCategory | Category.ForInternal;
             return Result(localCategory, syntax)
-                .EnsureRef(category | Category.Type, RefAlignParam, argsOffset);
+                .EnsureRef(category | Category.Type, RefAlignParam, argsOffset)
+                .Filter(category);
         }
+
+        internal Result ResultAsRef(Category category, ICompileSyntax syntax)
+        {
+            return ResultAsRef(category, syntax, () => Reni.Size.Zero);
+        }
+
     }
 
     internal class Cache
@@ -328,11 +301,10 @@ namespace Reni.Context
         [Node]
         internal readonly DictionaryEx<Struct.Container, Struct.Context> _structContainerCache = new DictionaryEx<Struct.Container, Struct.Context>();
         [Node]
-        internal readonly DictionaryEx<int, ContextAtPosition> _structPositionCache = new DictionaryEx<int, ContextAtPosition>();
-        [Node]
-        internal Result _topRefResultCache;
+        internal readonly SimpleCache<Result> _topRefResultCache = new SimpleCache<Result>();
         [Node]
         internal readonly DictionaryEx<ICompileSyntax, CacheItem> _resultCache = new DictionaryEx<ICompileSyntax, CacheItem>();
 
     }
+
 }

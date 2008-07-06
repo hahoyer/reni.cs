@@ -99,7 +99,7 @@ namespace Reni
             get
             {
                 if(_code == null)
-                    _code = RootContext.Code(Syntax.CompileSyntax);
+                    _code = RootContext.Code(Syntax.ToCompileSyntax);
 
                 return _code;
             }

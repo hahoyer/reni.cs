@@ -50,7 +50,6 @@ namespace Reni.FeatureTest
         [Test, Category(Worked)]
         public void ApplyTypeOperatorWithCut()
         {
-            Parameters.Trace.All();
             RunCompiler("ApplyTypeOperator", @"(31 type (100 enable_cut))dump_print", "-28");
         }
 

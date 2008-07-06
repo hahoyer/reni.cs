@@ -159,10 +159,8 @@ namespace Reni
 
         internal CodeBase ToCode()
         {
-            var result = CodeBase.CreateVoid();
-            for(var i = 0; i < _data.Count; i++)
-                result = result.CreateSequence(CodeBase.CreateContextRef((Struct.Context) _data[i]));
-            return result;
+            NotImplementedMethod();
+            return null;
         }
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)
@@ -174,10 +172,9 @@ namespace Reni
                 var unrefAlignment = _data[i].RefAlignParam;
                 Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
                 var unrefPtrAlignment = refAlignParam;
-                // To do; check if this is correct. Can be chaecked if we really have different alignment
                 p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize*-1);
                 var replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
-                result = result.ReplaceAbsoluteContextRef((Struct.Context) _data[i], replacement);
+                result = result.ReplaceAbsoluteContextRef(_data[i], replacement);
             }
             return result;
         }

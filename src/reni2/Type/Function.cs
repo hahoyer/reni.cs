@@ -36,7 +36,7 @@ namespace Reni.Type
                 .CreateFunctionCall(_context, category, Body, argsResult);
         }
 
-        public override string DumpShort()
+        internal override string DumpShort()
         {
             return "context." + _context.ObjectId + ".function(" + _body.DumpShort() + ")";
         }
@@ -80,7 +80,16 @@ namespace Reni.Type
                 ;
         }
 
-        public override string DumpShort()
+        internal override TypeBase UnProperty()
+        {
+            return _context
+                .Type(_body)
+                .ApplyFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
+                .Type
+                ;
+        }
+
+        internal override string DumpShort()
         {
             return "context." + _context.ObjectId + ".property(" + _body.DumpShort() + ")";
         }

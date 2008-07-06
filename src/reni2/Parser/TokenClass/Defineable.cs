@@ -53,24 +53,24 @@ namespace Reni.Parser.TokenClass
             return SearchResult<IPrefixFeature>.Failure(this);
         }
 
-        internal virtual SearchResult<ISequenceElementFeature> SearchFromSequenceElement()
+        internal virtual SearchResult<IConverter<IFeature, Sequence>> SearchFromSequenceElement()
         {
-            return SearchResult<ISequenceElementFeature>.Failure(this);
+            return SearchResult<IConverter<IFeature, Sequence>>.Failure(this);
         }
 
-        internal virtual SearchResult<ISequenceElementPrefixFeature> SearchPrefixFromSequenceElement()
+        internal virtual SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequenceElement()
         {
-            return SearchResult<ISequenceElementPrefixFeature>.Failure(this);
+            return SearchResult<IConverter<IPrefixFeature, Sequence>>.Failure(this);
         }
 
-        internal virtual SearchResult<ISequenceOfBitFeature> SearchFromSequenceOfBit()
+        internal virtual SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>> SearchFromSequenceOfBit()
         {
-            return SearchResult<ISequenceOfBitFeature>.Failure(this);
+            return SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>>.Failure(this);
         }
 
-        internal virtual SearchResult<ISequenceOfBitPrefixFeature> SearchPrefixFromSequenceOfBit()
+        internal virtual SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>> SearchPrefixFromSequenceOfBit()
         {
-            return SearchResult<ISequenceOfBitPrefixFeature>.Failure(this);
+            return SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>>.Failure(this);
         }
 
         internal virtual SearchResult<IContextFeature> SearchContext()
@@ -86,11 +86,6 @@ namespace Reni.Parser.TokenClass
         internal virtual SearchResult<IRefFeature> SearchFromRef()
         {
             return SearchResult<IRefFeature>.Failure(this);
-        }
-
-        internal virtual SearchResult<IStructFeature> SearchFromStruct()
-        {
-            return SearchResult<IStructFeature>.Failure(this);
         }
     }
 }

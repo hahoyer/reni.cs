@@ -1,18 +1,16 @@
-using Reni.Context;
-using Reni.Syntax;
-
 namespace Reni.Parser.TokenClass.Name
 {
-    class TthenT : Infix
+    internal sealed class TthenT : TokenClassBase
     {
-        internal override string DumpShort()
+        internal static string DumpShort()
         {
             return "then";
         }
 
-        internal override Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right)
+        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            throw new System.NotImplementedException();
+            ParsedSyntax.IsNotNull(right);
+            return right.CreateThenSyntax(token, ParsedSyntax.ToCompiledSyntax(left));
         }
     }
 }

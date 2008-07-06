@@ -18,11 +18,6 @@ namespace Reni.Syntax
     [AdditionalNodeInfo("DebuggerDumpString")]
     internal abstract class SyntaxBase : ReniObject
     {
-        /// <summary>
-        /// Dumps the short.
-        /// </summary>
-        /// <returns></returns>
-        /// created 07.05.2007 22:09 on HAHOYER-DELL by hh
         internal virtual string DumpShort()
         {
             NotImplementedMethod();

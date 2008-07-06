@@ -36,7 +36,7 @@ namespace Reni.Type
         [DumpData(false)]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
-        public override string DumpShort()
+        internal override string DumpShort()
         {
             return "(" + Element.DumpShort() + ")sequence(" + Count + ")";
         }

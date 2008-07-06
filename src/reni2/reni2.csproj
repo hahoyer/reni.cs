@@ -93,6 +93,8 @@
     <Compile Include="Parser\TokenClass\DeclarationSyntax.cs" />
     <Compile Include="Parser\TokenClass\Name\Tenable_cutT.cs" />
     <Compile Include="StructAccess.cs" />
+    <Compile Include="Struct\Type.cs" />
+    <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Syntax\MemberElem.cs" />
     <Compile Include="Runtime\OutStream.cs" />
@@ -117,7 +119,9 @@
     <Compile Include="Parser\TokenClass\Symbol\Minus.cs" />
     <Compile Include="Syntax\Special.cs" />
     <Compile Include="Syntax\SyntaxBase.cs" />
-    <Compile Include="Syntax\Void.cs" />
+    <Compile Include="Syntax\EmptyList.cs" />
+    <Compile Include="Syntax\VisitStrategy.cs" />
+    <Compile Include="Type\AssignableRef.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
     <Compile Include="Type\EnableCut.cs" />
@@ -147,7 +151,6 @@
     <Compile Include="Result.cs" />
     <Compile Include="Runtime\Data.cs" />
     <Compile Include="Size.cs" />
-    <Compile Include="Syntax\Statement.cs" />
     <Compile Include="Struct\Container.cs" />
     <Compile Include="Syntax\CacheItem.cs" />
     <Compile Include="ThenElse.cs" />
@@ -159,13 +162,14 @@
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\Primitive.cs" />
     <Compile Include="Type\Ref.cs" />
-    <Compile Include="Struct\Type.cs" />
+    <Compile Include="Struct\PartialType.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\Void.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="sys.targets" />
   </ItemGroup>
   <Import Project="sys.targets" />

@@ -10,6 +10,7 @@ namespace Reni.Parser
         IParsedSyntax SurroundedByParenthesis(Token token);
         IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right);
         [DumpData(false)]
-        ICompileSyntax CompileSyntax { get; }
+        ICompileSyntax ToCompileSyntax { get; }
+        IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition);
     }
 }

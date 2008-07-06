@@ -52,17 +52,16 @@ namespace Reni.Type
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
-        internal override SearchResult<ISequenceElementFeature> SearchFromSequence(Defineable defineable)
+        internal override SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable)
         {
             var result = defineable.SearchFromSequenceOfBit();
-            return result.SearchResultDescriptor.Convert(result.Feature);
+            return result.SearchResultDescriptor.Convert(result.Feature, this);
         }
 
-        internal override SearchResult<ISequenceElementPrefixFeature> SearchPrefixFromSequence(Defineable defineable)
+        internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable)
         {
             var result = defineable.SearchPrefixFromSequenceOfBit();
-            return result.SearchResultDescriptor.Convert
-                (result.Feature);
+            return result.SearchResultDescriptor.Convert(result.Feature, this);
         }
 
         public override string Dump()
@@ -70,7 +69,7 @@ namespace Reni.Type
             return GetType().FullName;
         }
 
-        public override string DumpShort()
+        internal override string DumpShort()
         {
             return "bit";
         }

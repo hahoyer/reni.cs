@@ -12,9 +12,9 @@ namespace Reni.Parser.TokenClass.Symbol
             return SearchResult < IRefFeature >.Success(this,this);
         }
 
-        public IFeature Convert(Ref @ref)
+        public IFeature Convert(AssignableRef assignableRef)
         {
-            return @ref.AssignmentOperatorFeature();
+            return assignableRef.AssignmentFeature;
         }
     }
 }

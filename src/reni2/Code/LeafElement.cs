@@ -6,7 +6,6 @@ namespace Reni.Code
 {
     internal abstract class LeafElement : ReniObject
     {
-        [DumpData(false)]
         public abstract Size Size { get; }
         [DumpData(false)]
         public virtual bool IsEmpty { get { return false; } }
@@ -43,6 +42,22 @@ namespace Reni.Code
             return new[]{result};
         }
 
+        internal virtual LeafElement[] TryToCombineBackN(TopData precedingElement)
+        {
+            var result = TryToCombineBack(precedingElement);
+            if (result == null)
+                return null;
+            return new[] { result };
+        }
+
+        internal virtual LeafElement[] TryToCombineBackN(TopFrame precedingElement)
+        {
+            var result = TryToCombineBack(precedingElement);
+            if (result == null)
+                return null;
+            return new[] { result };
+        }
+
         internal virtual LeafElement TryToCombineBack(Dereference precedingElement)
         {
             return null;
@@ -68,7 +83,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual LeafElement[] TryToCombineBack(TopData precedingElement)
+        internal virtual LeafElement TryToCombineBack(TopData precedingElement)
         {
             return null;
         }

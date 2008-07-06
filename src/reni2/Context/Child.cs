@@ -14,25 +14,19 @@ namespace Reni.Context
             _parent = parent;
         }
 
-        public ContextBase Parent { get { return _parent; } }
+        internal ContextBase Parent { get { return _parent; } }
 
-        public override sealed RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
+        internal override sealed RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
 
         [DumpData(false)]
-        public override sealed Root RootContext { get { return Parent.RootContext; } }
+        internal override sealed Root RootContext { get { return Parent.RootContext; } }
 
-        protected override Sequence<ContextBase> ObtainChildChain()
+        sealed internal protected override Sequence<ContextBase> ObtainChildChain()
         {
             return Parent.ChildChain + this;
         }
 
-        /// <summary>
-        /// Creates the args ref result.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// created 03.11.2006 22:00
-        public override Result CreateArgsRefResult(Category category)
+        internal override Result CreateArgsRefResult(Category category)
         {
             return Parent.CreateArgsRefResult(category);
         }
