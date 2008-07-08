@@ -35,7 +35,7 @@ namespace Reni.Type
             return EmptyHandler(category);
         }
 
-        internal override sealed Result Dereference(Result result)
+        internal override sealed Result AutomaticDereference(Result result)
         {
             return CreateDereferencedArgResult(result.Complete).UseWithArg(result);
         }
@@ -54,9 +54,9 @@ namespace Reni.Type
             return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
         }
 
-        internal override sealed TypeBase Dereference()
+        internal override sealed TypeBase AutomaticDereference()
         {
-            Tracer.Assert(Target == Target.Dereference());
+            Tracer.Assert(Target == Target.AutomaticDereference());
             return Target;
         }
 
@@ -107,9 +107,7 @@ namespace Reni.Type
 
         internal override Result AccessResult(Category category, int index)
         {
-            var result = Target.AccessResult(category, index);
-            NotImplementedMethod(category,index,"result",result);
-            return null;
+            return Target.AccessResultFromRef(category, index,RefAlignParam);
         }
     }
 

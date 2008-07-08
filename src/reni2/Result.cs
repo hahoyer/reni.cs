@@ -789,9 +789,9 @@ namespace Reni
             return Type.UnProperty(this);
         }
 
-        internal Result Dereference()
+        internal Result AutomaticDereference()
         {
-            return Type.Dereference(this);
+            return Type.AutomaticDereference(this);
         }
 
         internal Result PostProcess(int alignBits)
@@ -801,7 +801,7 @@ namespace Reni
 
         internal Result PostProcess()
         {
-            return UnProperty().Dereference();
+            return UnProperty().AutomaticDereference();
         }
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)

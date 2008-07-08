@@ -5,7 +5,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
-    internal sealed class Bit : Primitive
+    internal sealed class Bit : TypeBase
     {
         [DumpData(false)]
         internal override Size Size { get { return Size.Create(1); } }

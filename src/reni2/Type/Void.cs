@@ -1,6 +1,6 @@
 ﻿namespace Reni.Type
 {
-    internal sealed  class Void : Primitive
+    internal sealed  class Void : TypeBase
     {
         internal override Size Size { get { return Size.Zero; } }
         internal override bool IsVoid { get { return true; } }

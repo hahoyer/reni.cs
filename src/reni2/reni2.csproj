@@ -160,7 +160,6 @@
     <Compile Include="Type\Function.cs" />
     <Compile Include="Type\List.cs" />
     <Compile Include="Type\Pair.cs" />
-    <Compile Include="Type\Primitive.cs" />
     <Compile Include="Type\Ref.cs" />
     <Compile Include="Struct\PartialType.cs" />
     <Compile Include="Type\TagChild.cs" />

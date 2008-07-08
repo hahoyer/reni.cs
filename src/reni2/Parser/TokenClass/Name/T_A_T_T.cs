@@ -12,9 +12,9 @@ namespace Reni.Parser.TokenClass.Name
 
         internal override Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right)
         {
-            var index = context.Evaluate(right, context.Type(left).IndexType).ToInt32();
             var objectResult = context.ResultAsRef(category|Category.Type, left);
-            return objectResult.Type.AccessResult(category, index);
+            var index = context.Evaluate(right, context.Type(left).IndexType).ToInt32();
+            return objectResult.Type.AccessResult(category, index).UseWithArg(objectResult);
         }
     }
 }

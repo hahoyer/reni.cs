@@ -4,7 +4,7 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
-    internal sealed class Function : Primitive
+    internal sealed class Function : TypeBase
     {
         private readonly ICompileSyntax _body;
         private readonly ContextBase _context;
@@ -42,7 +42,7 @@ namespace Reni.Type
         }
     }
 
-    internal sealed class Property : Primitive
+    internal sealed class Property : TypeBase
     {
         [DumpData(true)]
         private readonly ICompileSyntax _body;

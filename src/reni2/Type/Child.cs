@@ -20,6 +20,5 @@ namespace Reni.Type
 
         [Node, DumpData(true)]
         public TypeBase Parent { get { return _parent; } }
-
     }
 }

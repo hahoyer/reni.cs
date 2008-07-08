@@ -38,7 +38,7 @@ namespace Reni.Struct
             var result = new List<Result>();
             for (var i = 0; i < StatementList.Count; i++)
             {
-                var accessResult = AccessResult(category | Category.Type, i);
+                var accessResult = AccessResultFromRef(category | Category.Type, i, refAlignParam);
                 result.Add(accessResult.Type.DumpPrint(category).UseWithArg(accessResult));
             }
             return Result.ConcatPrintResult(category, result);
@@ -51,9 +51,9 @@ namespace Reni.Struct
             return Context.InternalResult(category);
         }
 
-        internal Result AccessResult(Category category, int i)
+        internal override Result AccessResultFromRef(Category category, int i, RefAlignParam refAlignParam)
         {
-            return Context.AccessResult(category, i);
+            return Context.AccessResultFromRef(category, i, refAlignParam);
         }
     }
 }

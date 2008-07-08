@@ -38,13 +38,16 @@ namespace Reni.Struct
         {
             var result = Void.CreateResult(category);
             for (var i = 0; i < StatementList.Count; i++)
-                result = result.Align(AlignBits).CreateSequence(InternalResult(category, i));
-            return result.Align(AlignBits);
+                result = result.CreateSequence(InternalResult(category, i));
+            return result;
         }
 
-        internal Result InternalResult(Category category, int position)
+        private Result InternalResult(Category category, int position)
         {
-            return CreatePosition(position).Result(category | Category.Type, StatementList[position]).Dereference();
+            return CreatePosition(position)
+                .Result(category | Category.Type, StatementList[position])
+                .AutomaticDereference()
+                .Align(AlignBits);
         }
 
         private Size InternalSize(int position)
@@ -52,21 +55,21 @@ namespace Reni.Struct
             return InternalResult(Category.Size,position).Size;
         }
 
-        internal Result AccessResult(Category category, int position)
+        internal Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
             return Type(StatementList[position])
-                .Dereference()
+                .AutomaticDereference()
                 .UnProperty()
-                .CreateAssignableRef(RefAlignParam)
-                .CreateResult(category, ()=>AccessCode(position));
+                .CreateAssignableRef(refAlignParam)
+                .CreateResult(category, ()=>AccessCode(position,refAlignParam));
         }
 
-        private CodeBase AccessCode(int position)
+        private CodeBase AccessCode(int position, RefAlignParam refAlignParam)
         {
             var offset = Reni.Size.Zero;
-            for (var i = position+1; i < StatementList.Count; i++)
-                offset += InternalSize(i);
-            return new Arg(RefSize).CreateRefPlus(RefAlignParam, offset);
+            for (var i = position + 1; i < StatementList.Count; i++)
+                offset += offset + InternalSize(i);
+            return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
         }
 
     }

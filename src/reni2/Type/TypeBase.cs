@@ -166,26 +166,22 @@ namespace Reni.Type
 
         internal virtual Result DestructorHandler(Category category)
         {
-            NotImplementedMethod(category);
-            throw new NotImplementedException();
+            return EmptyHandler(category);
         }
 
         internal virtual Result ArrayDestructorHandler(Category category, int count)
         {
-            NotImplementedMethod(category, count);
-            throw new NotImplementedException();
+            return EmptyHandler(category);
         }
 
         internal virtual Result MoveHandler(Category category)
         {
-            NotImplementedMethod(category);
-            throw new NotImplementedException();
+            return EmptyHandler(category);
         }
 
         internal virtual Result ArrayMoveHandler(Category category, int count)
         {
-            NotImplementedMethod(category, count);
-            throw new NotImplementedException();
+            return EmptyHandler(category);
         }
 
         internal Result CreateArgResult(Category category)
@@ -289,12 +285,12 @@ namespace Reni.Type
             return CreateVoid.CreateResult(category);
         }
 
-        internal virtual Result Dereference(Result result)
+        internal virtual Result AutomaticDereference(Result result)
         {
             return result;
         }
 
-        internal virtual TypeBase Dereference()
+        internal virtual TypeBase AutomaticDereference()
         {
             return this;
         }
@@ -511,9 +507,14 @@ namespace Reni.Type
                 .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize, argsSize));
         }
 
+        internal virtual Result AccessResultFromRef(Category category, int index, RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(category, index, refAlignParam);
+            return null;
+        }
         internal virtual Result AccessResult(Category category, int index)
         {
-            NotImplementedMethod(category,index);
+            NotImplementedMethod(category, index);
             return null;
         }
     }

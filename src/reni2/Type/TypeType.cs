@@ -2,7 +2,7 @@ using Reni.Code;
 
 namespace Reni.Type
 {
-    internal sealed class TypeType : Primitive
+    internal sealed class TypeType : TypeBase
     {
         private readonly TypeBase _parent;
 
