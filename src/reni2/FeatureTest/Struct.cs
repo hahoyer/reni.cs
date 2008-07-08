@@ -76,8 +76,8 @@ namespace Reni.FeatureTest
  1;
  4;
 2050;
- (_A_T_ 0) + (_A_T_ 1) + (_A_T_ 2);
-(_A_T_ 3) dump_print;
+ (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);
+(this _A_T_ 3) dump_print;
 "
                         , "2055"
                 );
@@ -124,7 +124,7 @@ x4 dump_print;
         public void Assignment()
         {
             RunCompiler("Assignment",
-                        @"(1, 11, 3, (_A_T_ 1) := 3) dump_print",
+                        @"(1, 11, 3, (this _A_T_ 1) := 3) dump_print",
                         "(1, 3, 3, )"
                 );
         }

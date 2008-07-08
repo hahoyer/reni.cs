@@ -1,8 +1,6 @@
 ﻿using System;
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass

@@ -91,7 +91,26 @@ namespace Reni.Type
             get
             {
                 NotImplementedMethod();
-                throw new NotImplementedException();
+                return 0;
+            }
+        }
+
+        [DumpData(false)]
+        internal TypeBase IndexType
+        {
+            get
+            {
+                return CreateNumber(IndexSize);
+            }
+        }
+
+        [DumpData(false)]
+        internal protected virtual int IndexSize
+        {
+            get
+            {
+                NotImplementedMethod();
+                return 0;
             }
         }
 
@@ -490,6 +509,12 @@ namespace Reni.Type
             var type = SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt());
             return type
                 .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize, argsSize));
+        }
+
+        internal virtual Result AccessResult(Category category, int index)
+        {
+            NotImplementedMethod(category,index);
+            return null;
         }
     }
 }

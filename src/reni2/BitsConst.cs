@@ -27,7 +27,7 @@ namespace Reni
         }
 
         private BitsConst(Int64 value)
-            : this(AutoSize(value))
+            : this(Size.Create(AutoSize(value)))
         {
             Data.MoveBytes(DataSize(_size), _data, 0, value);
         }
@@ -234,13 +234,13 @@ namespace Reni
             return Math.Max(0, left - right) + 2;
         }
 
-        private static Size AutoSize(Int64 value)
+        internal static int AutoSize(long value)
         {
             var size = 1;
             var xn = value >= 0 ? value : -value;
-            for (Int64 upper = 1; xn >= upper; size++, upper *= 2)
+            for(Int64 upper = 1; xn >= upper; size++, upper *= 2)
                 continue;
-            return Size.Create(size);
+            return size;
         }
 
         /// <summary>

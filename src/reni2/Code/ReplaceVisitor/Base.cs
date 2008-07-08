@@ -1,11 +1,12 @@
-using Reni.Code;
+using System;
+using HWClassLibrary.Debug;
 
 namespace Reni.Code.ReplaceVisitor
 {
     /// <summary>
     /// Base class for code replacements
     /// </summary>
-    internal abstract class Base : Visitor<Code.CodeBase>
+    internal abstract class Base : Visitor<CodeBase>
     {
         /// <summary>
         /// Bits the array.
@@ -13,7 +14,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 24.09.2006 17:05
-        internal Code.CodeBase BitArray(BitArray visitedObject)
+        internal static CodeBase BitArray(BitArray visitedObject)
         {
             return null;
         }
@@ -24,7 +25,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 02.10.2006 20:42
-        public Code.CodeBase TopRef(TopRef visitedObject)
+        public CodeBase TopRef(TopRef visitedObject)
         {
             return null;
         }
@@ -36,9 +37,9 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="parent">The parent.</param>
         /// <returns></returns>
         /// created 03.10.2006 02:50
-        public Code.CodeBase Child(Child visitedObject, Code.CodeBase parent)
+        public CodeBase Child(Child visitedObject, CodeBase parent)
         {
-            if (parent == null)
+            if(parent == null)
                 return null;
             return visitedObject.ReCreate(parent);
         }
@@ -49,7 +50,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="visitedObject">The visited object.</param>
         /// <returns></returns>
         /// created 24.09.2006 20:17
-        internal override Code.CodeBase Arg(Arg visitedObject)
+        internal override CodeBase Arg(Arg visitedObject)
         {
             return null;
         }
@@ -61,9 +62,9 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="leafElement">The element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:11
-        internal sealed override Code.CodeBase Child(Code.CodeBase parent, LeafElement leafElement)
+        internal override sealed CodeBase Child(CodeBase parent, LeafElement leafElement)
         {
-            if (parent == null)
+            if(parent == null)
                 return null;
             return parent.CreateChild(leafElement);
         }
@@ -74,7 +75,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="leafElement">The leaf element.</param>
         /// <returns></returns>
         /// created 06.10.2006 00:22
-        internal sealed override Code.CodeBase Leaf(LeafElement leafElement)
+        internal override sealed CodeBase Leaf(LeafElement leafElement)
         {
             return null;
         }
@@ -88,12 +89,14 @@ namespace Reni.Code.ReplaceVisitor
         /// <returns></returns>
         /// created 03.10.2006 01:39
         /// created 03.10.2006 01:39
-        internal override Code.CodeBase Pair(Pair visitedObject, Code.CodeBase left, Code.CodeBase right)
+        internal override CodeBase Pair(Pair visitedObject, CodeBase left, CodeBase right)
         {
-            if (left == null && right == null)
+            if(left == null && right == null)
                 return null;
-            if (left == null) left = visitedObject.Left;
-            if (right == null) right = visitedObject.Right;
+            if(left == null)
+                left = visitedObject.Left;
+            if(right == null)
+                right = visitedObject.Right;
             return left.CreateSequence(right);
         }
 
@@ -106,14 +109,17 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="elseResult">The else result.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:54
-        internal override Code.CodeBase ThenElse(ThenElse visitedObject, Code.CodeBase condResult, Code.CodeBase thenResult,
-                                           Code.CodeBase elseResult)
+        internal override CodeBase ThenElse(ThenElse visitedObject, CodeBase condResult, CodeBase thenResult,
+            CodeBase elseResult)
         {
-            if(condResult==null && thenResult == null && elseResult == null)
+            if(condResult == null && thenResult == null && elseResult == null)
                 return null;
-            if (condResult == null) condResult = visitedObject.CondCode;
-            if (thenResult == null) thenResult = visitedObject.ThenCode;
-            if (elseResult == null) elseResult = visitedObject.ElseCode;
+            if(condResult == null)
+                condResult = visitedObject.CondCode;
+            if(thenResult == null)
+                thenResult = visitedObject.ThenCode;
+            if(elseResult == null)
+                elseResult = visitedObject.ElseCode;
             return condResult.CreateThenElse(thenResult, elseResult);
         }
 
@@ -122,7 +128,7 @@ namespace Reni.Code.ReplaceVisitor
         /// </summary>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        internal override Visitor<Code.CodeBase> AfterCond(int objectId)
+        internal override Visitor<CodeBase> AfterCond(int objectId)
         {
             return this;
         }
@@ -134,7 +140,7 @@ namespace Reni.Code.ReplaceVisitor
         /// <param name="theSize">The size.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        internal override Visitor<Code.CodeBase> AfterThen(int objectId, Size theSize)
+        internal override Visitor<CodeBase> AfterThen(int objectId, Size theSize)
         {
             return this;
         }
@@ -144,10 +150,9 @@ namespace Reni.Code.ReplaceVisitor
         /// </summary>
         /// <returns></returns>
         /// created 09.01.2007 04:52
-        internal override Visitor<Code.CodeBase> AfterElse(int objectId)
+        internal override Visitor<CodeBase> AfterElse(int objectId)
         {
             return this;
         }
-
     }
 }

@@ -38,6 +38,7 @@ namespace Reni.Struct
             }
         }
 
+        [DumpData(false)]
         internal ICompileSyntax this[int index] { get { return List[index]; } }
 
         public Result Result(ContextBase context, Category category)
@@ -50,7 +51,10 @@ namespace Reni.Struct
             return DumpShort();
         }
 
+        [DumpData(false)]
         internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
+        [DumpData(false)]
+        internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
 
         string ICompileSyntax.FilePosition()
         {

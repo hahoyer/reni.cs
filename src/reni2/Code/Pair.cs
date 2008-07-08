@@ -79,14 +79,7 @@ namespace Reni.Code
             get { return _right; }
         }
 
-        /// <summary>
-        /// Res the create.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 02.10.2006 20:56
-        public CodeBase ReCreate(CodeBase left, CodeBase right)
+        public static CodeBase ReCreate(CodeBase left, CodeBase right)
         {
             return new Pair(left, right);
         }

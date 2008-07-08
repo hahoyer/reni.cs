@@ -1,41 +1,41 @@
+using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Code;
 using Reni.Context;
 
 namespace Reni.Type
 {
-    internal abstract class Ref : Child 
+    internal abstract class Ref : Child
     {
-        static int _nextObjectId;
+        private static int _nextObjectId;
         internal RefAlignParam RefAlignParam;
 
-        protected Ref(TypeBase target, RefAlignParam refAlignParam) : base(_nextObjectId, target)
+        protected Ref(TypeBase target, RefAlignParam refAlignParam) : base(_nextObjectId++, target)
         {
             RefAlignParam = refAlignParam;
         }
 
         [DumpData(false)]
         internal TypeBase Target { get { return Parent; } }
-        sealed internal override Size Size { get { return RefAlignParam.RefSize; } }
+        internal override sealed Size Size { get { return RefAlignParam.RefSize; } }
         [DumpData(false)]
-        sealed internal override string DumpPrintText { get { return "#(#" + ShortName + "#)# " + Parent.DumpPrintText; } }
+        internal override sealed string DumpPrintText { get { return "#(#" + ShortName + "#)# " + Parent.DumpPrintText; } }
         [DumpData(false)]
-        abstract protected string ShortName { get; }
+        protected abstract string ShortName { get; }
         [DumpData(false)]
-        sealed internal override int SequenceCount { get { return Target.SequenceCount; } }
+        internal override sealed int SequenceCount { get { return Target.SequenceCount; } }
 
-        sealed internal override Result DestructorHandler(Category category)
+        internal override sealed Result DestructorHandler(Category category)
         {
             return EmptyHandler(category);
         }
 
-        sealed internal override Result MoveHandler(Category category)
+        internal override sealed Result MoveHandler(Category category)
         {
             return EmptyHandler(category);
         }
 
-        sealed internal override Result Dereference(Result result)
+        internal override sealed Result Dereference(Result result)
         {
             return CreateDereferencedArgResult(result.Complete).UseWithArg(result);
         }
@@ -54,63 +54,68 @@ namespace Reni.Type
             return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
         }
 
-        sealed internal override TypeBase Dereference()
+        internal override sealed TypeBase Dereference()
         {
             Tracer.Assert(Target == Target.Dereference());
             return Target;
         }
 
-        sealed internal override Result DumpPrint(Category category)
+        internal override sealed Result DumpPrint(Category category)
         {
             return Target.DumpPrintFromRef(category, RefAlignParam);
         }
 
-        sealed internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
+        internal override sealed Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
             Tracer.Assert(refAlignParam == RefAlignParam);
             return DumpPrint(category);
         }
+
         [DumpData(false)]
-        sealed internal override bool IsRef(RefAlignParam refAlignParam)
+        internal override sealed bool IsRef(RefAlignParam refAlignParam)
         {
             Tracer.Assert(RefAlignParam == refAlignParam);
             return true;
         }
 
-        sealed internal override string DumpShort()
+        internal override sealed string DumpShort()
         {
             return ShortName + "." + Parent.DumpShort();
         }
 
-        sealed internal override Result ConvertToVirt(Category category, TypeBase dest)
+        internal override sealed Result ConvertToVirt(Category category, TypeBase dest)
         {
             return Target
                 .ConvertTo(category, dest)
                 .UseWithArg(CreateDereferencedArgResult(category));
         }
 
-        sealed internal override Result ApplyTypeOperator(Result argResult)
+        internal override sealed Result ApplyTypeOperator(Result argResult)
         {
             return Target.ApplyTypeOperator(argResult);
         }
 
-        sealed internal override Result TypeOperator(Category category)
+        internal override sealed Result TypeOperator(Category category)
         {
             return Target.TypeOperator(category);
         }
 
-        sealed internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override sealed bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
             return Target.IsConvertableTo(dest, conversionFeature);
         }
 
+        internal override Result AccessResult(Category category, int index)
+        {
+            var result = Target.AccessResult(category, index);
+            NotImplementedMethod(category,index,"result",result);
+            return null;
+        }
     }
 
     internal sealed class AutomaticRef : Ref
     {
-        internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam) : base(target,refAlignParam)
-        {
-        }
+        internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam) : base(target, refAlignParam) {}
 
         public override AutomaticRef CreateRef(RefAlignParam refAlignParam)
         {

@@ -19,7 +19,10 @@ namespace Reni.Struct
             Container = container;
         }
 
+        [DumpData(false)]
         internal List<ICompileSyntax> StatementList { get { return Container.List; } }
+        [DumpData(false)]
+        internal int IndexSize { get { return Container.IndexSize; } }
 
         internal ContextAtPosition CreatePosition(int position)
         {

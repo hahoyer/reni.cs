@@ -1,7 +1,20 @@
+using Reni.Context;
+using Reni.Syntax;
+
 namespace Reni.Parser.TokenClass.Name
 {
-    internal sealed class T_A_T_T : Defineable
+    internal sealed class T_A_T_T : Infix
     {
-        internal override string Name { get { return "_A_T_"; } }
+        internal override string DumpShort()
+        {
+            return "_A_T_";
+        }
+
+        internal override Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right)
+        {
+            var index = context.Evaluate(right, context.Type(left).IndexType).ToInt32();
+            var objectResult = context.ResultAsRef(category|Category.Type, left);
+            return objectResult.Type.AccessResult(category, index);
+        }
     }
 }

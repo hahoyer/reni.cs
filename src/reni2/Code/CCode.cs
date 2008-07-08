@@ -65,14 +65,7 @@ namespace Reni.Code
             return DataGet(BaseAddr, byteCount);
         }
 
-        /// <summary>
-        /// Toes the C code sequence.
-        /// </summary>
-        /// <param name="baseAddr">The base addr.</param>
-        /// <param name="byteCount">The byte count.</param>
-        /// <returns></returns>
-        /// [created 18.07.2006 23:07]
-        string DataGet(int baseAddr, int byteCount)
+        static string DataGet(int baseAddr, int byteCount)
         {
             if (byteCount == 0)
                 return "";

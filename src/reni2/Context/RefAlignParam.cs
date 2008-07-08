@@ -31,7 +31,7 @@ namespace Reni.Context
             return new RefAlignParam(newAlignBits, RefSize);
         }
 
-        public Size Offset(SizeArray list, int index)
+        public static Size Offset(SizeArray list, int index)
         {
             var result = Size.Create(0);
             for(var i = index + 1; i < list.Count; i++)
