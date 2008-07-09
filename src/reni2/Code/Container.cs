@@ -281,8 +281,6 @@ namespace Reni.Code
             return aligner.Format(statements);
         }
 
-        #region Nested type: UnexpectedContextRefInContainer
-
         internal class UnexpectedContextRefInContainer : Exception
         {
             private readonly Container _container;
@@ -298,7 +296,14 @@ namespace Reni.Code
             internal CodeBase VisitedObject { get { return _visitedObject; } }
         }
 
-        #endregion
+        internal BitsConst Evaluate()
+        {
+            if (_data.Count == 1)
+                return _data[0].Evaluate();
+
+            NotImplementedMethod();
+            return null;
+        }
     }
 
     /// <summary>

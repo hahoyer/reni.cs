@@ -756,7 +756,7 @@ namespace Reni
         internal BitsConst Evaluate()
         {
             Tracer.Assert(Refs.IsNone);
-            return Code.Evaluate();
+            return Code.Serialize().Evaluate();
         }
 
         internal Result EnsureRef(Category category, RefAlignParam refAlignParam, GetSize offset)

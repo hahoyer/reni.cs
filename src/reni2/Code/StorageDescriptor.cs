@@ -671,7 +671,7 @@ namespace Reni.Code
             return false;
         }
 
-        private string GetStatements(List<LeafElement> data)
+        private string GetStatements(IList<LeafElement> data)
         {
             var statements = "";
             for(var i = 0; i < data.Count; i++)

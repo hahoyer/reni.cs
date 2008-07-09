@@ -9,6 +9,7 @@ namespace Reni.Code
     internal sealed class Leaf : CodeBase
     {
         private readonly LeafElement _leafElement;
+        internal static bool TryToCombine;
 
         public Leaf(LeafElement leafElement)
         {
@@ -22,6 +23,9 @@ namespace Reni.Code
 
         public override CodeBase CreateChild(LeafElement leafElement)
         {
+            if (!TryToCombine)
+                return base.CreateChild(leafElement);
+
             var newLeafElements = LeafElement.TryToCombineN(leafElement);
             if (newLeafElements == null)
                 return base.CreateChild(leafElement);
