@@ -52,6 +52,7 @@ namespace Reni.FeatureTest
         [Category(Worked)]
         public void Access()
         {
+            Parameters.Trace.All();
             RunCompiler("Access",
                         @"
 ((0;1;2;300;) _A_T_ 0) dump_print;

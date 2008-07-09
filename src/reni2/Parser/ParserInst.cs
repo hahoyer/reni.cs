@@ -90,9 +90,9 @@ namespace Reni.Parser
             x += PrioTable.LeftAssoc("<", ">", "<=", ">=");
             x += PrioTable.LeftAssoc("=", "<>");
 
-            x += PrioTable.LeftAssoc("not");
-            x += PrioTable.LeftAssoc("and");
-            x += PrioTable.LeftAssoc("or");
+            x += PrioTable.LeftAssoc("!~");
+            x += PrioTable.LeftAssoc("!&!");
+            x += PrioTable.LeftAssoc("!|!");
 
             x += PrioTable.RightAssoc(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
 
@@ -106,6 +106,7 @@ namespace Reni.Parser
                     new[] {"then"},
                     new[] {"else"}
                 );
+            x += PrioTable.RightAssoc("!");
             x += PrioTable.RightAssoc(":", "function", "property", "inherit", "apply_operator", "constructor",
                 "converter");
             x += PrioTable.RightAssoc(",");

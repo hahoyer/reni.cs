@@ -152,10 +152,10 @@ namespace Reni.Type
             return _assignableRef.Find(refAlignParam, () => new AssignableRef(this, refAlignParam));
         }
 
-        public AutomaticRef EnsureRef(RefAlignParam refAlignParam)
+        public Ref EnsureRef(RefAlignParam refAlignParam)
         {
             if(IsRef(refAlignParam))
-                return (AutomaticRef) this;
+                return (Ref) this;
             return CreateRef(refAlignParam);
         }
 
