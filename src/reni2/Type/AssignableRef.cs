@@ -21,14 +21,10 @@ namespace Reni.Type
 
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var resultFromRef = Parent.SearchFromRef(defineable).SubTrial(Parent);
-            var result = resultFromRef.SearchResultDescriptor.Convert(resultFromRef.Feature, this);
-            if(result.IsSuccessFull)
+            var assignableResult = defineable.SearchFromAssignableRef().SubTrial(this);
+            var result = assignableResult.SearchResultDescriptor.Convert(assignableResult.Feature, this);
+            if (result.IsSuccessFull)
                 return result;
-            result = Parent.Search(defineable).AlternativeTrial(result);
-            if(result.IsSuccessFull)
-                return result;
-
             return base.Search(defineable).AlternativeTrial(result);
         }
     }

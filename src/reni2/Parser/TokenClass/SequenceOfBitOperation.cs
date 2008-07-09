@@ -13,24 +13,24 @@ namespace Reni.Parser.TokenClass
         [DumpExcept(false)]
         internal protected virtual bool IsBitSequencePrefixOperation { get { return false; } }
 
-        IFeature IConverter<IFeature, Sequence>.Convert(Sequence sequence)
+        IFeature IConverter<IFeature, Sequence>.Convert(Sequence type)
         {
-            return sequence.BitOperationFeature(this);
+            return type.BitOperationFeature(this);
         }
 
-        IConverter<IFeature, Sequence> IConverter<IConverter<IFeature, Sequence>,Bit>.Convert(Bit x)
+        IConverter<IFeature, Sequence> IConverter<IConverter<IFeature, Sequence>,Bit>.Convert(Bit type)
         {
             return this;
         }
 
-        IConverter<IPrefixFeature, Sequence> IConverter<IConverter<IPrefixFeature, Sequence>, Bit>.Convert(Bit x)
+        IConverter<IPrefixFeature, Sequence> IConverter<IConverter<IPrefixFeature, Sequence>, Bit>.Convert(Bit type)
         {
             return this;
         }
 
-        IPrefixFeature IConverter<IPrefixFeature, Sequence>.Convert(Sequence sequence)
+        IPrefixFeature IConverter<IPrefixFeature, Sequence>.Convert(Sequence type)
         {
-            return sequence.BitOperationPrefixFeature(this);
+            return type.BitOperationPrefixFeature(this);
         }
 
         internal override sealed SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>> SearchFromSequenceOfBit()

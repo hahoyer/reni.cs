@@ -5,9 +5,9 @@ namespace Reni.Parser.TokenClass.Name
 {
     internal sealed class Tenable_cutT : Defineable, IFeatureForSequence
     {
-        public IFeature Convert(Sequence sequence)
+        public IFeature Convert(Sequence type)
         {
-            return sequence.EnableCutFeatureObject();
+            return type.EnableCutFeatureObject();
         }
 
         internal override SearchResult<IFeatureForSequence> SearchForSequence()

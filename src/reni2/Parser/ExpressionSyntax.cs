@@ -1,3 +1,4 @@
+using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Syntax;
 
@@ -46,10 +47,10 @@ namespace Reni.Parser
                 return null;
             }
 
-            var argResult = context.Result(category | Category.Type, Right);
-            var prefixSearchResult = argResult.Type.SearchDefineablePrefix(DefineableToken);
+            var argType = context.Type(Right);
+            var prefixSearchResult = argType.SearchDefineablePrefix(DefineableToken);
             if(prefixSearchResult.IsSuccessFull)
-                return prefixSearchResult.Feature.Result(category, argResult);
+                return prefixSearchResult.Feature.ApplyResult(context,category, Right);
 
             NotImplementedMethod(context, category, "contextSearchResult", contextSearchResult, "prefixSearchResult", prefixSearchResult);
             return null;
@@ -57,7 +58,7 @@ namespace Reni.Parser
 
         private Result InfixResult(ContextBase context, Category category)
         {
-            var leftType = context.Type(Left);
+            var leftType = context.Type(Left).EnsureRef(context.RefAlignParam);
             var searchResult = leftType.SearchDefineable(DefineableToken);
             if(searchResult.IsSuccessFull)
                 return searchResult.Feature.ApplyResult(context, category, Left, Right);

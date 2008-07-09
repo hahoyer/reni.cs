@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -10,6 +13,7 @@ namespace Reni.Struct
     internal sealed class Type : TypeBase
     {
         internal readonly Context Context;
+        private readonly SimpleCache<IConverter<IFeature, Ref>[]> _featuresCache = new SimpleCache<IConverter<IFeature, Ref>[]>();
 
         public Type(Context context)
         {
@@ -23,9 +27,10 @@ namespace Reni.Struct
 
         [DumpData(false)]
         internal protected override int IndexSize { get { return Context.IndexSize; } }
-
         [DumpData(false)]
         internal override Size Size { get { return InternalResult(Category.Size).Size; } }
+        [DumpData(false)]
+        internal IConverter<IFeature, Ref>[] Features { get { return _featuresCache.Find(CreateFeaturesCache); } }
 
         internal Result ConstructorResult(Category category)
         {
@@ -51,9 +56,56 @@ namespace Reni.Struct
             return Context.InternalResult(category);
         }
 
+        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
+        {
+            var containerResult = Context.Container.SearchFromRef(defineable);
+            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature, this);
+            if (result.IsSuccessFull)
+                return result;
+            return base.SearchFromRef(defineable).SubTrial(this);
+        }
+
         internal override Result AccessResultFromRef(Category category, int i, RefAlignParam refAlignParam)
         {
             return Context.AccessResultFromRef(category, i, refAlignParam);
         }
-    }
+
+        private IConverter<IFeature, Ref>[] CreateFeaturesCache()
+        {
+            var result = new List<Feature>();
+            for (var i = 0; i < StatementList.Count; i++)
+                result.Add(new Feature(this, i));
+            return result.ToArray();
+        }
+
+        sealed private class Feature : ReniObject, IConverter<IFeature,Ref>, IFeature
+        {
+            [DumpData(true)]
+            private readonly Type _type;
+            [DumpData(true)]
+            private readonly int _index;
+
+            public Feature(Type type, int index)
+            {
+                _type = type;
+                _index = index;
+            }
+
+            public IFeature Convert(Ref type)
+            {
+                Tracer.Assert(type.RefAlignParam == _type.Context.RefAlignParam);
+                return this;
+            }
+
+            public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+            {
+                var objectResult = callContext.ResultAsRef(category | Category.Type, @object);
+                var accessResult = objectResult.Type.AccessResult(category, _index).UseWithArg(objectResult);
+                if (args == null)
+                    return accessResult;
+                NotImplementedMethod(callContext, category, @object, args, "objectResult", objectResult, "accessResult", accessResult);
+                return null;
+            }
+        }
+}
 }

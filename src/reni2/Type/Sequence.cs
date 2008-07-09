@@ -62,7 +62,7 @@ namespace Reni.Type
             return base.IsConvertableToVirt(dest, conversionFeature);
         }
 
-        internal override SearchResult<IRefFeature> SearchFromRef(Defineable defineable)
+        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
         {
             var subTrial = Element.SearchFromRefToSequence(defineable).SubTrial(Element);
             var result = subTrial.SearchResultDescriptor.Convert(subTrial.Feature, this);
@@ -218,7 +218,7 @@ namespace Reni.Type
                 _definable = definable;
             }
 
-            public Result Result(Category category, Result argResult)
+            public Result ApplyResult(Category category, Result argResult)
             {
                 var objResult = argResult.ConvertTo(_sequence);
                 Result result;
@@ -228,6 +228,19 @@ namespace Reni.Type
                     result = new Result();
                 if(category.HasRefs)
                     result.Refs = objResult.Refs;
+                return result;
+            }
+
+            public Result ApplyResult(ContextBase contextBase, Category category, ICompileSyntax @object)
+            {
+                var objectResult = contextBase.Result(category|Category.Type,@object).ConvertTo(_sequence);
+                Result result;
+                if (category.HasSize || category.HasType || category.HasCode)
+                    result = objectResult.Type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objectResult));
+                else
+                    result = new Result();
+                if (category.HasRefs)
+                    result.Refs = objectResult.Refs;
                 return result;
             }
         }

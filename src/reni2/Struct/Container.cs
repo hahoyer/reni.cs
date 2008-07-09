@@ -4,9 +4,11 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.Helper.TreeViewSupport;
 using HWClassLibrary.IO;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -24,6 +26,7 @@ namespace Reni.Struct
         internal readonly List<ICompileSyntax> ConverterList = new List<ICompileSyntax>();
         internal readonly DictionaryEx<string, int> Dictionary = new DictionaryEx<string, int>();
         internal readonly List<ICompileSyntax> List = new List<ICompileSyntax>();
+        private readonly SimpleCache<IConverter<IConverter<IFeature, Ref>, Type>[]> _structFeaturesCache = new SimpleCache<IConverter<IConverter<IFeature, Ref>, Type>[]>();
 
         private Container(Token token) : base(token, _nextObjectId++) {}
 
@@ -35,6 +38,15 @@ namespace Reni.Struct
                 if(_reverseDictionaryCache == null)
                     CreateReverseDictionary();
                 return _reverseDictionaryCache;
+            }
+        }
+
+        [Node, DumpData(false)]
+        private IConverter<IConverter<IFeature, Ref>, Type>[] StructFeatures
+        {
+            get
+            {
+                return _structFeaturesCache.Find(CreateStructContainerFeatures);
             }
         }
 
@@ -64,6 +76,14 @@ namespace Reni.Struct
         internal protected override string DumpShort()
         {
             return "container." + ObjectId;
+        }
+
+        private IConverter<IConverter<IFeature, Ref>, Type>[] CreateStructContainerFeatures()
+        {
+            var result = new List<IConverter<IConverter<IFeature, Ref>, Type>>();
+            for(var i = 0; i < List.Count; i++)
+                result.Add(new StructFeature(i));
+            return result.ToArray();
         }
 
         private void CreateReverseDictionary()
@@ -152,6 +172,39 @@ namespace Reni.Struct
         string IDumpShortProvider.DumpShort()
         {
             return DumpShort();
+        }
+            
+        private int Find(string name)
+        {
+            return Dictionary[name];
+        }
+
+        private bool Defined(string name)
+        {
+            return Dictionary.ContainsKey(name);
+        }
+
+        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRef(Defineable defineable)
+        {
+            if(Defined(defineable.Name))
+                return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Success(StructFeatures[Find(defineable.Name)],
+                    defineable);
+            return defineable.SearchFromRefToStruct().SubTrial(this);
+        }
+    }
+
+    internal class StructFeature : IConverter<IConverter<IFeature, Ref>, Type>
+    {
+        private readonly int _index;
+
+        public StructFeature(int index)
+        {
+            _index = index;
+        }
+
+        public IConverter<IFeature, Ref> Convert(Type type)
+        {
+            return type.Features[_index];
         }
     }
 }

@@ -2,6 +2,8 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
@@ -108,6 +110,19 @@ namespace Reni.Type
         internal override Result AccessResult(Category category, int index)
         {
             return Target.AccessResultFromRef(category, index,RefAlignParam);
+        }
+
+        internal override SearchResult<IFeature> Search(Defineable defineable)
+        {
+            var resultFromRef = Parent.SearchFromRef(defineable).SubTrial(Parent);
+            var result = resultFromRef.SearchResultDescriptor.Convert(resultFromRef.Feature, this);
+            if(result.IsSuccessFull)
+                return result;
+            result = Parent.Search(defineable).AlternativeTrial(result);
+            if(result.IsSuccessFull)
+                return result;
+
+            return base.Search(defineable).AlternativeTrial(result);
         }
     }
 

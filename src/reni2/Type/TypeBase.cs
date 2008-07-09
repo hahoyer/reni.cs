@@ -474,7 +474,7 @@ namespace Reni.Type
             return defineable.SearchPrefix().SubTrial(this);
         }
 
-        internal virtual SearchResult<IRefFeature> SearchFromRef(Defineable defineable)
+        internal virtual SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
         {
             return defineable.SearchFromRef().SubTrial(this);
         }
@@ -489,9 +489,9 @@ namespace Reni.Type
             return defineable.SearchPrefixFromSequenceElement().SubTrial(this);
         }
 
-        internal virtual SearchResult<IRefToSequenceFeature> SearchFromRefToSequence(Defineable defineable)
+        internal virtual SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable)
         {
-            return SearchResult<IRefToSequenceFeature>.Failure(this, defineable);
+            return SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>>.Failure(this, defineable);
         }
 
         internal Result ConvertToSequence(ContextBase callContext, Category category, ICompileSyntax args)

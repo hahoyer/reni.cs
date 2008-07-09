@@ -3,18 +3,18 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Symbol
 {
-    sealed internal class ColonEqual : Defineable, IRefFeature
+    sealed internal class ColonEqual : Defineable, IConverter<IFeature, AssignableRef>
     {
         internal override string Name { get { return ":="; } }
 
-        internal override SearchResult<IRefFeature> SearchFromRef()
+        internal override SearchResult<IConverter<IFeature, AssignableRef>> SearchFromAssignableRef()
         {
-            return SearchResult < IRefFeature >.Success(this,this);
+            return SearchResult<IConverter<IFeature, AssignableRef>>.Success(this, this);
         }
 
-        public IFeature Convert(AssignableRef assignableRef)
+        public IFeature Convert(AssignableRef type)
         {
-            return assignableRef.AssignmentFeature;
+            return type.AssignmentFeature;
         }
     }
 }

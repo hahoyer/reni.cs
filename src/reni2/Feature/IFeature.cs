@@ -7,7 +7,7 @@ namespace Reni.Feature
 
     internal interface IConverter<OutType, InType>
     {
-        OutType Convert(InType inObject);
+        OutType Convert(InType type);
     }
 
     internal interface IFeature
@@ -17,7 +17,7 @@ namespace Reni.Feature
 
     internal interface IPrefixFeature
     {
-        Result Result(Category category, Result argResult);
+        Result ApplyResult(ContextBase contextBase, Category category, ICompileSyntax @object);
     }
 
     internal interface IContextFeature
@@ -25,8 +25,5 @@ namespace Reni.Feature
         Result ApplyResult(ContextBase contextBase, Category category, ICompileSyntax args);
     }
 
-    internal interface IRefToStructFeature {}
     internal interface IFeatureForSequence: IConverter<IFeature, Sequence>{}
-    internal interface IRefToSequenceFeature: IConverter<IRefFeature, Sequence>{}
-    internal interface IRefFeature: IConverter<IFeature, AssignableRef >{}
 }

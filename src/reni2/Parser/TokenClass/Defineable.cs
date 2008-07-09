@@ -81,9 +81,20 @@ namespace Reni.Parser.TokenClass
             return SearchResult<IFeatureForSequence>.Failure(this);
         }
 
-        internal virtual SearchResult<IRefFeature> SearchFromRef()
+        internal virtual SearchResult<IConverter<IFeature, Ref>> SearchFromRef()
         {
-            return SearchResult<IRefFeature>.Failure(this);
+            return SearchResult<IConverter<IFeature, Ref>>.Failure(this);
         }
+
+        internal virtual SearchResult<IConverter<IFeature, AssignableRef>> SearchFromAssignableRef()
+        {
+            return SearchResult<IConverter<IFeature, AssignableRef>>.Failure(this);
+        }
+
+        internal virtual SearchResult<IConverter<IConverter<IFeature, Ref>, Struct.Type>> SearchFromRefToStruct()
+        {
+            return SearchResult<IConverter<IConverter<IFeature, Ref>, Struct.Type>>.Failure(this);
+        }
+
     }
 }
