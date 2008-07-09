@@ -80,6 +80,11 @@ namespace Reni.Type
             return true;
         }
 
+        internal override Size UnrefSize
+        {
+            get { return Target.UnrefSize; }
+        }
+
         internal override sealed string DumpShort()
         {
             return ShortName + "." + Parent.DumpShort();

@@ -75,6 +75,7 @@
     <Compile Include="Parser\ParsedSyntax.cs" />
     <Compile Include="Parser\TokenClass\DefinableTokenSyntax.cs" />
     <Compile Include="Parser\TokenClass\Name\TthenT.cs" />
+    <Compile Include="Parser\TokenClass\Name\TthisT.cs" />
     <Compile Include="Parser\TokenClass\SequenceOfBitOperation.cs" />
     <Compile Include="SearchResult.cs" />
     <Compile Include="SearchTrial.cs" />

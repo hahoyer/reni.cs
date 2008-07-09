@@ -20,5 +20,10 @@ namespace Reni.Type
 
         [Node, DumpData(true)]
         public TypeBase Parent { get { return _parent; } }
+
+        protected internal override int IndexSize
+        {
+            get { return Parent.IndexSize; }
+        }
     }
 }

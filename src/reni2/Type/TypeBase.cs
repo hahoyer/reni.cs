@@ -98,20 +98,13 @@ namespace Reni.Type
         [DumpData(false)]
         internal TypeBase IndexType
         {
-            get
-            {
-                return CreateNumber(IndexSize);
-            }
+            get { return CreateNumber(IndexSize); }
         }
 
         [DumpData(false)]
-        internal protected virtual int IndexSize
+        protected internal virtual int IndexSize
         {
-            get
-            {
-                NotImplementedMethod();
-                return 0;
-            }
+            get { return 0; }
         }
 
         public TypeBase CreateAlign(int alignBits)

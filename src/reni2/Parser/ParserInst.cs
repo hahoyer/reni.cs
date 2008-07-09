@@ -68,7 +68,7 @@ namespace Reni.Parser
 
         private static PrioTable StandardPrio()
         {
-            var x = PrioTable.LeftAssoc("<else>", "arg");
+            var x = PrioTable.LeftAssoc("<else>");
             x += PrioTable.LeftAssoc(
                 "array", "explicit_ref",
                 "at", "content", "_A_T_", "_N_E_X_T_",

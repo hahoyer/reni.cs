@@ -68,9 +68,15 @@ namespace Reni.Struct
         {
             var offset = Reni.Size.Zero;
             for (var i = position + 1; i < StatementList.Count; i++)
-                offset += offset + InternalSize(i);
+                offset += InternalSize(i);
             return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
         }
 
+        internal override Result CreateThisRefResult(Category category)
+        {
+            return CreateType()
+                .CreateRef(RefAlignParam)
+                .CreateResult(category,() => CodeBase.CreateTopRef(RefAlignParam));
+        }
     }
 }

@@ -288,6 +288,11 @@ namespace Reni.Context
             return ResultAsRef(category, syntax, () => Reni.Size.Zero);
         }
 
+        virtual internal Result CreateThisRefResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
     }
 
     internal class Cache

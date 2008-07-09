@@ -43,6 +43,11 @@ namespace Reni.Syntax
         {
             return Prefix.Result(context, category, Token, Right);
         }
+
+        protected internal override string DumpShort()
+        {
+            return base.DumpShort() + "(" + Right.DumpShort() + ")";
+        }
     }
 
     internal sealed class InfixSyntax : SpecialSyntax
@@ -61,6 +66,11 @@ namespace Reni.Syntax
         internal protected override Result Result(ContextBase context, Category category)
         {
             return Infix.Result(context, category, Left, Token, Right);
+        }
+
+        protected internal override string DumpShort()
+        {
+            return "("+Left.DumpShort() + ")"+base.DumpShort()+"("+Right.DumpShort()+")";
         }
     }
 }
