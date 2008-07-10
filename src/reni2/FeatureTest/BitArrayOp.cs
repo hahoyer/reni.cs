@@ -21,7 +21,6 @@ namespace Reni.FeatureTest
         [Test]
         public void PositiveNumbers2()
         {
-            Parameters.Trace.All();
             RunCompiler("Numbers",@"(1, 12)dump_print","(1, 12)");
         }
 
@@ -32,7 +31,6 @@ namespace Reni.FeatureTest
         [Test, Category(Worked)]
         public void PositiveNumbers()
         {
-            Parameters.Trace.All();
             RunCompiler("Numbers of different Size", 
             @"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print", 
             "(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)");
@@ -74,7 +72,6 @@ namespace Reni.FeatureTest
         [Test, Category(Worked)]
         public void NegativeNumbers()
         {
-            Parameters.Trace.All();
             RunCompiler("Numbers of different Size",
             @"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print",
             "(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)");

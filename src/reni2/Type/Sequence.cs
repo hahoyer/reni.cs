@@ -297,8 +297,7 @@ namespace Reni.Type
                 ;
             Dump(trace, "result", result);
 
-            return ReturnMethodDump(trace, result.UseWithArg(objectResult.CreateSequence(argsResult))
-                .Align(callContext.AlignBits));
+            return ReturnMethodDump(trace, result.UseWithArg(objectResult.CreateSequence(argsResult)));
         }
     }
 }

@@ -60,19 +60,19 @@ namespace Reni.Struct
             return InternalResult(Category.Size,position).Size;
         }
 
-        internal Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
+        internal Result AccessResultFromRef(Category category, int position, int currentPosition, RefAlignParam refAlignParam)
         {
             return Type(StatementList[position])
                 .AutomaticDereference()
                 .UnProperty()
                 .CreateAssignableRef(refAlignParam)
-                .CreateResult(category, ()=>AccessCode(position,refAlignParam));
+                .CreateResult(category, () => AccessCode(position, currentPosition, refAlignParam));
         }
 
-        private CodeBase AccessCode(int position, RefAlignParam refAlignParam)
+        private CodeBase AccessCode(int position, int currentPosition, RefAlignParam refAlignParam)
         {
             var offset = Reni.Size.Zero;
-            for (var i = position + 1; i < StatementList.Count; i++)
+            for (var i = position + 1; i < currentPosition; i++)
                 offset += InternalSize(i);
             return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
         }
@@ -89,5 +89,9 @@ namespace Reni.Struct
                 .CreateResult(category,() => CodeBase.CreateTopRef(RefAlignParam));
         }
 
+        internal Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
+        {
+            return AccessResultFromRef(category, position, StatementList.Count, refAlignParam);
+        }
     }
 }

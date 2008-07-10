@@ -14,6 +14,7 @@ namespace Reni.Type
         public Aligner(TypeBase target, int alignBits) : base(target)
         {
             _alignBits = alignBits;
+            StopByObjectId(1117);
         }
 
         internal int AlignBits { get { return _alignBits; } }

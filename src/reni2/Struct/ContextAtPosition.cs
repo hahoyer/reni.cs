@@ -2,15 +2,14 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
+using Reni.Context;
 using Reni.Type;
 
 namespace Reni.Struct
 {
     internal sealed class ContextAtPosition : Reni.Context.Child
     {
-        [DumpData(false)]
         internal readonly Context Context;
-        [DumpData(false)]
         internal readonly int Position;
         private readonly SimpleCache<TypeAtPosition> _typeCache = new SimpleCache<TypeAtPosition>();
 
@@ -43,6 +42,11 @@ namespace Reni.Struct
         {
             return Context.InternalResult(category, 0, Position);
         }
+
+        internal Result AccessResultFromRef(Category category, int i, RefAlignParam refAlignParam)
+        {
+            return Context.AccessResultFromRef(category, Position, Position, refAlignParam);
+        }
     }
 
     internal sealed class TypeAtPosition : TypeBase
@@ -62,5 +66,11 @@ namespace Reni.Struct
         }
 
         internal protected override int IndexSize { get { return Context.IndexSize; } }
+
+        internal override Result AccessResultFromRef(Category category, int i, RefAlignParam refAlignParam)
+        {
+            return Context.AccessResultFromRef(category, i, refAlignParam);
+        }
+
     }
 }

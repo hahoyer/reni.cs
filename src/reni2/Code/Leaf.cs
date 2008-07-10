@@ -9,7 +9,9 @@ namespace Reni.Code
     internal sealed class Leaf : CodeBase
     {
         private readonly LeafElement _leafElement;
-        public static bool TryToCombine;
+// ReSharper disable RedundantDefaultFieldInitializer
+        public static bool TryToCombine = false;
+// ReSharper restore RedundantDefaultFieldInitializer
 
         public Leaf(LeafElement leafElement)
         {

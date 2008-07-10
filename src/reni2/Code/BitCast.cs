@@ -114,10 +114,19 @@ namespace Reni.Code
         /// <param name="precedingElement">The preceding element.</param>
         /// <returns></returns>
         /// created 04.01.2007 15:57
-        internal override LeafElement TryToCombineBack(BitArrayOp precedingElement)
+        internal override LeafElement[] TryToCombineBackN(BitArrayOp precedingElement)
         {
-            if (precedingElement.Size == TargetSize)
-                return new BitArrayOp(precedingElement.OpToken, Size, precedingElement.LeftSize, precedingElement.RightSize);
+            if (TargetSize == Size && TargetSize == SignificantSize)
+                return new LeafElement[]{precedingElement};
+            if (TargetSize != Size)
+            {
+                return new LeafElement[]
+                           {
+                               new BitArrayOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize,
+                                              precedingElement.LeftSize, precedingElement.RightSize),
+                               new BitCast(Size, Size, SignificantSize)
+                           };
+            }
             return null;
         }
 

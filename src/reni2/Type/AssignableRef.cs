@@ -14,6 +14,7 @@ namespace Reni.Type
         internal AssignableRef(TypeBase target, RefAlignParam refAlignParam)
             : base(target, refAlignParam)
         {
+            Tracer.Assert(!(target is Aligner) );
             AssignmentFeature = new AssignmentFeature(this);
         }
 

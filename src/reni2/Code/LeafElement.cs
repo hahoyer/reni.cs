@@ -58,6 +58,15 @@ namespace Reni.Code
             return new[] { result };
         }
 
+
+        internal virtual LeafElement[] TryToCombineBackN(BitArrayOp precedingElement)
+        {
+            var result = TryToCombineBack(precedingElement);
+            if (result == null)
+                return null;
+            return new[] { result };
+        }
+
         internal virtual LeafElement TryToCombineBack(Dereference precedingElement)
         {
             return null;
