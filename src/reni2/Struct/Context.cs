@@ -36,8 +36,13 @@ namespace Reni.Struct
 
         internal Result InternalResult(Category category)
         {
+            return InternalResult(category, 0, StatementList.Count);
+        }
+
+        internal Result InternalResult(Category category, int fromPosition, int fromNotPosition)
+        {
             var result = Void.CreateResult(category);
-            for (var i = 0; i < StatementList.Count; i++)
+            for (var i = fromPosition; i < fromNotPosition; i++)
                 result = result.CreateSequence(InternalResult(category, i));
             return result;
         }
@@ -72,11 +77,17 @@ namespace Reni.Struct
             return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
         }
 
+        internal override string DumpShort()
+        {
+            return "context."+ObjectId + "("+ Container.DumpShort()+")";
+        }
+
         internal override Result CreateThisRefResult(Category category)
         {
             return CreateType()
                 .CreateRef(RefAlignParam)
                 .CreateResult(category,() => CodeBase.CreateTopRef(RefAlignParam));
         }
+
     }
 }

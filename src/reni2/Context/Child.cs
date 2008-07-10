@@ -35,10 +35,5 @@ namespace Reni.Context
         {
             return Parent.Search(defineable).SubTrial(Parent);
         }
-
-        internal override Result CreateThisRefResult(Category category)
-        {
-            return Parent.CreateThisRefResult(category);
-        }
     }
 }

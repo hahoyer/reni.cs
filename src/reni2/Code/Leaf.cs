@@ -9,7 +9,7 @@ namespace Reni.Code
     internal sealed class Leaf : CodeBase
     {
         private readonly LeafElement _leafElement;
-        internal static bool TryToCombine;
+        public static bool TryToCombine;
 
         public Leaf(LeafElement leafElement)
         {

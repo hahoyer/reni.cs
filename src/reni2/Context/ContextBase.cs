@@ -59,7 +59,7 @@ namespace Reni.Context
             return HWString.Sequence(this);
         }
 
-        public string DumpShort()
+        internal virtual string DumpShort()
         {
             return base.ToString();
         }
@@ -292,6 +292,11 @@ namespace Reni.Context
         {
             NotImplementedMethod(category);
             return null;
+        }
+
+        string IDumpShortProvider.DumpShort()
+        {
+            return DumpShort();
         }
     }
 
