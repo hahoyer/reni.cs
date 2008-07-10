@@ -119,14 +119,12 @@ namespace Reni.Code
             if (TargetSize == Size && TargetSize == SignificantSize)
                 return new LeafElement[]{precedingElement};
             if (TargetSize != Size)
-            {
                 return new LeafElement[]
                            {
                                new BitArrayOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize,
                                               precedingElement.LeftSize, precedingElement.RightSize),
                                new BitCast(Size, Size, SignificantSize)
                            };
-            }
             return null;
         }
 
