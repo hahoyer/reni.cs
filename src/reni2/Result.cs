@@ -22,12 +22,14 @@ namespace Reni
         private CodeBase _code;
         private Refs _refs;
         private Result _internal;
+        internal PostProcessorForResult PostProcessor;
 
         /// <summary>
         /// ctor
         /// </summary>
         public Result()
         {
+            PostProcessor = new PostProcessorForResult(this);
             _pending = new Category();
         }
 

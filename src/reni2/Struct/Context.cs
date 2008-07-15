@@ -54,7 +54,9 @@ namespace Reni.Struct
 
         private Result InternalResult(Category category, int position)
         {
-            return PostProcessStrategy.InternalResult(CreatePosition(position).Result(category | Category.Type, StatementList[position]), AlignBits);
+            return CreatePosition(position).Result(category | Category.Type, StatementList[position])
+                .PostProcessor
+                .InternalResultForStruct(AlignBits);
         }
 
         private Size InternalSize(int position)
@@ -64,12 +66,9 @@ namespace Reni.Struct
 
         internal Result AccessResultFromRef(Category category, int position, int currentPosition, RefAlignParam refAlignParam)
         {
-            return PostProcessStrategy
-                .AccessResultFromRef(
-                category,
-                Type(StatementList[position]),
-                refAlignParam,
-                () => AccessCode(position, currentPosition, refAlignParam));
+            return Type(StatementList[position])
+                .PostProcessor
+                .AccessResultForStruct(category,refAlignParam,() => AccessCode(position, currentPosition, refAlignParam));
         }
 
         private CodeBase AccessCode(int position, int currentPosition, RefAlignParam refAlignParam)
@@ -112,19 +111,6 @@ namespace Reni.Struct
             for(var i = 0; i < StatementList.Count; i++)
                 result.Add(new PositionFeature(this, i));
             return result.ToArray();
-        }
-    }
-
-    internal static class PostProcessStrategy
-    {
-        public static Result AccessResultFromRef(Category category, TypeBase typeBase, RefAlignParam refAlignParam, Result.GetCode getCode)
-        {
-            return typeBase.AutomaticDereference().CreateAssignableRefResult(category, refAlignParam, getCode);
-        }
-
-        public static Result InternalResult(Result result, int AlignBits)
-        {
-            return result.AutomaticDereference().Align(AlignBits);
         }
     }
 }

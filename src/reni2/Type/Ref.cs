@@ -141,13 +141,6 @@ namespace Reni.Type
             return null;
         }
 
-        internal override Result PostProcess(AutomaticRef visitedType, Result result)
-        {
-            if(this == visitedType)
-                return result;
-            return base.PostProcess(visitedType, result);
-        }
-
         protected override string ShortName { get { return "automatic_ref"; } }
     }
 }

@@ -43,11 +43,11 @@ namespace Reni.Parser
         {
             while(true)
             {
-                var PrioRel = PrioTable.Op(token, stack.Peek().Token);
-                if(PrioRel != '+')
+                var relation = PrioTable.GetRelation(token, stack.Peek().Token);
+                if(relation != '+')
                     o = PullAndCall(stack, o);
 
-                if(PrioRel != '-')
+                if(relation != '-')
                 {
                     stack.Push(new PushedSyntax(o, token));
                     return !token.TokenClass.IsEnd;

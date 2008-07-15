@@ -8,30 +8,20 @@ namespace Reni.Parser
     internal sealed class PushedSyntax : ReniObject
     {
         private readonly IParsedSyntax _left;
-        private readonly Token _token;
+        internal readonly Token Token;
+        internal readonly PrioTable PrioTable;
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// 
-        /// <param name="left">left syntax element</param>
-        /// <param name="token">asis</param>
-        public PushedSyntax(IParsedSyntax left, Token token)
+        internal PushedSyntax(IParsedSyntax left, Token token, PrioTable prioTable)
         {
             _left = left;
-            _token = token;
+            PrioTable = prioTable;
+            Token = token;
         }
 
-        /// <summary>
-        /// Gets the token.
-        /// </summary>
-        /// <value>The token.</value>
-        /// created 31.03.2007 14:21 on SAPHIRE by HH
-        public Token Token { get { return _token; } }
 
         public IParsedSyntax CreateSyntax(IParsedSyntax args)
         {
-            return _token.TokenClass.CreateSyntax(_left, _token, args);
+            return Token.TokenClass.CreateSyntax(_left, Token, args);
         }
 
         /// <summary>
@@ -44,8 +34,8 @@ namespace Reni.Parser
         public override string ToString()
         {
             if(_left == null)
-                return "null " + _token.PrioTableName;
-            return _left.DumpShort() + " " + _token.PrioTableName;
+                return "null " + Token.PrioTableName;
+            return _left.DumpShort() + " " + Token.PrioTableName;
         }
     }
 }

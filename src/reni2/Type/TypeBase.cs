@@ -25,6 +25,7 @@ namespace Reni.Type
         private readonly DictionaryEx<RefAlignParam, AssignableRef> _assignableRef = new DictionaryEx<RefAlignParam, AssignableRef>();
 
         private readonly SimpleCache<TypeType> _typeTypeCache = new SimpleCache<TypeType>();
+        private readonly SimpleCache<PostProcessorForType> _postProcessor = new SimpleCache<PostProcessorForType>();
 
         protected TypeBase(int objectId)
             : base(objectId) {}
@@ -105,6 +106,11 @@ namespace Reni.Type
         protected internal virtual int IndexSize
         {
             get { return 0; }
+        }
+
+        public PostProcessorForType PostProcessor
+        {
+            get { return _postProcessor.Find(() => new PostProcessorForType(this)); }
         }
 
         public TypeBase CreateAlign(int alignBits)
@@ -257,14 +263,6 @@ namespace Reni.Type
         internal virtual Result ApplyFunction(Category category, Result argsResult)
         {
             NotImplementedMethod(category, argsResult);
-            return null;
-        }
-
-        internal virtual Result PostProcess(AutomaticRef visitedType, Result result)
-        {
-            if(this == visitedType.Target)
-                return result.UseWithArg(visitedType.CreateDereferencedArgResult(result.Complete));
-            NotImplementedMethod(visitedType, result);
             return null;
         }
 
@@ -516,4 +514,5 @@ namespace Reni.Type
             return CreateAssignableRef(refAlignParam).CreateResult(category, getCode);
         }
     }
+
 }
