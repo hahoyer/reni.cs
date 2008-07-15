@@ -1,6 +1,7 @@
 ﻿using System;
 using HWClassLibrary.Debug;
 using Reni.Feature;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass
@@ -91,9 +92,9 @@ namespace Reni.Parser.TokenClass
             return SearchResult<IConverter<IFeature, AssignableRef>>.Failure(this);
         }
 
-        internal virtual SearchResult<IConverter<IConverter<IFeature, Ref>, Struct.Type>> SearchFromRefToStruct()
+        internal virtual SearchResult<StructFeature> SearchFromStruct()
         {
-            return SearchResult<IConverter<IConverter<IFeature, Ref>, Struct.Type>>.Failure(this);
+            return SearchResult<StructFeature>.Failure(this);
         }
 
     }

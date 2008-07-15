@@ -510,5 +510,10 @@ namespace Reni.Type
             NotImplementedMethod(category, index);
             return null;
         }
+
+        internal virtual Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Result.GetCode getCode)
+        {
+            return CreateAssignableRef(refAlignParam).CreateResult(category, getCode);
+        }
     }
 }

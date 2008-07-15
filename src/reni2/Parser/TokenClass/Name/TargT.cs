@@ -6,7 +6,6 @@ namespace Reni.Parser.TokenClass.Name
     {
         internal override Result Result(ContextBase context, Category category, Token token)
         {
-            NotImplementedMethod(context, category, token);
             return context.CreateArgsRefResult(category);
         }
 

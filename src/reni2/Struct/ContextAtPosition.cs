@@ -35,7 +35,7 @@ namespace Reni.Struct
 
         internal override string DumpShort()
         {
-            return Context.DumpShort() + "@"+Position;
+            return Context.DumpShort() + "@" + Position;
         }
 
         internal Result InternalResult(Category category)
@@ -58,7 +58,7 @@ namespace Reni.Struct
             Context = context;
         }
 
-        internal override Size Size { get { return Context.InternalResult(Category.Size).Size;} }
+        internal override Size Size { get { return Context.InternalResult(Category.Size).Size; } }
 
         internal override string DumpShort()
         {
@@ -71,6 +71,5 @@ namespace Reni.Struct
         {
             return Context.AccessResultFromRef(category, i, refAlignParam);
         }
-
     }
 }

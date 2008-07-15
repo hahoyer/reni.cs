@@ -94,6 +94,7 @@
     <Compile Include="Parser\TokenClass\DeclarationSyntax.cs" />
     <Compile Include="Parser\TokenClass\Name\Tenable_cutT.cs" />
     <Compile Include="StructAccess.cs" />
+    <Compile Include="Struct\PositionFeature.cs" />
     <Compile Include="Struct\Type.cs" />
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />

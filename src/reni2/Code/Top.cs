@@ -13,7 +13,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _offset = offset;
             _size = size;
-            StopByObjectId(945);
+            StopByObjectId(-945);
         }
 
         public override Size Size { get { return _size; } }

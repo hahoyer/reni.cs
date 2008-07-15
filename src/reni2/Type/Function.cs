@@ -21,6 +21,18 @@ namespace Reni.Type
         internal override Size Size { get { return Size.Create(0); } }
         internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# function(" + _body.DumpShort() + ")"; } }
 
+        public override AutomaticRef CreateRef(RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(refAlignParam);
+            return base.CreateRef(refAlignParam);
+        }
+
+        public override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(refAlignParam);
+            return base.CreateAssignableRef(refAlignParam);
+        }
+
         internal override Result ApplyFunction(Category category, ContextBase callContext, ICompileSyntax args)
         {
             var argsResult = callContext
@@ -34,6 +46,11 @@ namespace Reni.Type
             return _context
                 .RootContext
                 .CreateFunctionCall(_context, category, Body, argsResult);
+        }
+
+        internal override Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Result.GetCode getCode)
+        {
+            return CreateResult(category);
         }
 
         internal override string DumpShort()

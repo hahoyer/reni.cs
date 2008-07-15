@@ -81,5 +81,10 @@ namespace Reni
         {
             return new SearchResult<FeatureType>(feature, descriptor);
         }
+
+        public static SearchResult<FeatureType> Create<FeatureType2>(SearchResult<FeatureType2> result) where FeatureType2 : class, FeatureType
+        {
+            return new SearchResult<FeatureType>(result.Feature, result.SearchResultDescriptor);
+        }
     }
 }

@@ -179,14 +179,6 @@ namespace Reni.Context
             return Result(Category.Size, syntax).Size;
         }
 
-        internal List<TypeBase> Type(List<ICompileSyntax> list)
-        {
-            var results = new List<TypeBase>();
-            for (var i = 0; i < list.Count; i++)
-                results.Add(Type(list[i]));
-            return results;
-        }
-
         internal TypeBase Type(ICompileSyntax syntax)
         {
             return Result(Category.Type, syntax).Type;
