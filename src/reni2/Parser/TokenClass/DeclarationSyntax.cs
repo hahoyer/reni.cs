@@ -1,35 +1,37 @@
+using System;
+using HWClassLibrary.Debug;
+using Reni.Parser.TokenClass.Symbol;
 using Reni.Struct;
 
 namespace Reni.Parser.TokenClass
 {
     internal sealed class DeclarationSyntax : ParsedSyntax
     {
+        internal readonly DeclarationExtensionSyntax ExtensionSyntax;
         internal readonly DefineableToken Name;
         internal readonly IParsedSyntax Definition;
 
-        internal DeclarationSyntax(DefineableToken name, Token token, IParsedSyntax definition) : base(token)
+        internal DeclarationSyntax(DefineableToken name, Token token, IParsedSyntax definition)
+            : this(null, name, token, definition)
         {
+        }
+
+        internal DeclarationSyntax(DeclarationExtensionSyntax extensionSyntax, DefineableToken name, Token token,
+                                   IParsedSyntax definition)
+            : base(token)
+        {
+            ExtensionSyntax = extensionSyntax;
             Name = name;
             Definition = definition;
             StopByObjectId(-876);
         }
 
-        /// <summary>
-        /// Dumps the short.
-        /// </summary>
-        /// <returns></returns>
-        /// created 07.05.2007 22:09 on HAHOYER-DELL by hh
-        internal protected override string DumpShort()
+        protected internal override string DumpShort()
         {
             return Name.Name + ": " + Definition.DumpShort();
         }
 
-        /// <summary>
-        /// What to when syntax element is surrounded by parenthesis?
-        /// </summary>
-        /// <returns></returns>
-        /// created 19.07.2007 23:20 on HAHOYER-DELL by hh
-        internal protected override IParsedSyntax SurroundedByParenthesis(Token token)
+        protected internal override IParsedSyntax SurroundedByParenthesis(Token token)
         {
             return Container.Create(token, this);
         }

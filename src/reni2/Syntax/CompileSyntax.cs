@@ -43,5 +43,11 @@ namespace Reni.Syntax
 
         [DumpData(false)]
         internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
+
+        protected internal override IParsedSyntax CreateSyntax(Token token,IParsedSyntax right)
+        {
+            return new ExpressionSyntax(this, token, ToCompiledSyntaxOrNull(right));
+        }
+
     }
 }

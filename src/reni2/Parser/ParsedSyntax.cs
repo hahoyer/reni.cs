@@ -1,4 +1,5 @@
 using HWClassLibrary.Debug;
+using Reni.Parser.TokenClass.Symbol;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -72,6 +73,11 @@ namespace Reni.Parser
             return CreateThenSyntax(token, condition);
         }
 
+        IParsedSyntax IParsedSyntax.CreateSyntax(Token token, IParsedSyntax right)
+        {
+            return CreateSyntax(token, right);
+        }
+
         internal virtual protected IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition)
         {
             return new ThenElse(condition, token, ToCompileSyntax);
@@ -97,6 +103,12 @@ namespace Reni.Parser
         internal protected virtual IParsedSyntax SurroundedByParenthesis(Token token)
         {
             NotImplementedMethod(token);
+            return null;
+        }
+
+        internal virtual protected IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
+        {
+            NotImplementedMethod(token,right);
             return null;
         }
 
@@ -127,5 +139,6 @@ namespace Reni.Parser
                 return null;
             return parsedSyntax.ToCompileSyntax;
         }
+
     }
 }

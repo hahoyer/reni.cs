@@ -1,5 +1,5 @@
+using System;
 using HWClassLibrary.Debug;
-using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass.Symbol
 {
@@ -11,17 +11,34 @@ namespace Reni.Parser.TokenClass.Symbol
             return left.CreateDeclarationSyntax(token, right);
         }
     }
+
     [Token("!")]
     internal sealed class Exclamation : TokenClassBase
     {
-        static private readonly TokenFactory _tokenFactory = new TokenFactory<DeclarationTokenAttribute>();
+        private static readonly TokenFactory _tokenFactory = new TokenFactory<DeclarationTokenAttribute>();
+
         [DumpData(false)]
-        internal override TokenFactory NewTokenFactory { get { return _tokenFactory; } }
+        internal override TokenFactory NewTokenFactory
+        {
+            get { return _tokenFactory; }
+        }
+
+        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        {
+            ParsedSyntax.IsNull(left);
+            ParsedSyntax.IsNull(right);
+            return new DeclarationExtensionSyntax(token);
+        }
     }
 
     [DeclarationToken("property")]
     internal sealed class Property : TokenClassBase
     {
+        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        {
+            ParsedSyntax.IsNull(right);
+            return ((DeclarationExtensionSyntax) left).ExtendByProperty(token);
+        }
     }
 
     [DeclarationToken("converter")]
@@ -29,9 +46,11 @@ namespace Reni.Parser.TokenClass.Symbol
     {
     }
 
-    internal class DeclarationTokenAttribute : TokenAttributeBase
+    internal sealed class DeclarationTokenAttribute : TokenAttributeBase
     {
-        public DeclarationTokenAttribute(string token) : base(token) {}
+        public DeclarationTokenAttribute(string token) : base(token)
+        {
+        }
 
         public DeclarationTokenAttribute() : base(null)
         {
@@ -42,17 +61,43 @@ namespace Reni.Parser.TokenClass.Symbol
             var x = PrioTable.LeftAssoc("!");
             x += PrioTable.LeftAssoc("property", "converter");
             x = x.ParLevel
-                   (new[]
-                {
-                    "++-",
-                    "+?-",
-                    "?--"
-                },
-                       new[] { "(", "[", "{", "<frame>" },
-                       new[] { ")", "]", "}", "<end>" }
-                   );
+                (new[]
+                     {
+                         "++-",
+                         "+?-",
+                         "?--"
+                     },
+                 new[] {"(", "[", "{", "<frame>"},
+                 new[] {")", "]", "}", "<end>"}
+                );
             x += PrioTable.LeftAssoc("<else>");
             return x;
+        }
+    }
+
+    internal sealed class DeclarationExtensionSyntax : ParsedSyntax
+    {
+        internal readonly Token PropertyToken;
+
+        public DeclarationExtensionSyntax(Token token) : base(token)
+        {
+        }
+
+        private DeclarationExtensionSyntax(Token token, Token propertyToken) : base(token)
+        {
+            PropertyToken = propertyToken;
+        }
+
+        internal IParsedSyntax ExtendByProperty(Token token)
+        {
+            Tracer.Assert(PropertyToken == null);
+            return new DeclarationExtensionSyntax(Token, token);
+        }
+
+        protected internal override IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
+        {
+            Tracer.Assert(right == null);
+            return token.TokenClass.CreateDeclarationPartSyntax(this,token);
         }
     }
 }

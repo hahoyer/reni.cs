@@ -2,6 +2,7 @@
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
+using Reni.Parser.TokenClass.Symbol;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
@@ -100,6 +101,12 @@ namespace Reni.Parser.TokenClass
             return null;
         }
 
+        internal virtual IParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, Token token)
+        {
+            NotImplementedMethod(extensionSyntax, token);
+            return null;
+        }
+
         internal virtual string PrioTableName(string name)
         {
             return name;
@@ -161,6 +168,7 @@ namespace Reni.Parser.TokenClass
                     throw new NotImplementedException("Symbolize(" + Char + ")");
             }
         }
+
     }
 
     internal abstract class Special : TokenClassBase

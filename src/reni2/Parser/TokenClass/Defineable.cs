@@ -1,6 +1,7 @@
 ﻿using System;
 using HWClassLibrary.Debug;
 using Reni.Feature;
+using Reni.Parser.TokenClass.Symbol;
 using Reni.Struct;
 using Reni.Type;
 
@@ -39,7 +40,14 @@ namespace Reni.Parser.TokenClass
         {
             if(left == null && right == null)
                 return new DefinableTokenSyntax(token);
-            return new ExpressionSyntax(ParsedSyntax.ToCompiledSyntaxOrNull(left), token, ParsedSyntax.ToCompiledSyntaxOrNull(right));
+            if(left == null)
+                return new ExpressionSyntax(null, token, ParsedSyntax.ToCompiledSyntaxOrNull(right));
+            return left.CreateSyntax(token, right);
+        }
+
+        internal override IParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, Token token)
+        {
+            return new DeclarationPartSyntax(extensionSyntax, token);
         }
 
         internal virtual SearchResult<IFeature> Search()
@@ -97,5 +105,22 @@ namespace Reni.Parser.TokenClass
             return SearchResult<StructFeature>.Failure(this);
         }
 
+    }
+
+    sealed internal class DeclarationPartSyntax : ParsedSyntax
+    {
+        private readonly DefineableToken _defineableToken;
+        private readonly DeclarationExtensionSyntax _extensionSyntax;
+
+        internal DeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, Token token) : base(token)
+        {
+            _defineableToken = new DefineableToken(token);
+            _extensionSyntax = extensionSyntax;
+        }
+
+        protected internal override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
+        {
+            return new DeclarationSyntax(_extensionSyntax, _defineableToken, token, right);
+        }
     }
 }

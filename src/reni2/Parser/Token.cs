@@ -1,6 +1,7 @@
 using System;
 using HWClassLibrary.Debug;
 using Reni.Parser.TokenClass;
+using Reni.Parser.TokenClass.Symbol;
 
 namespace Reni.Parser
 {
@@ -68,8 +69,8 @@ namespace Reni.Parser
             return prioTable.Index(PrioTableName);
         }
 
-        internal string PotentialTypeName { get { return TokenClassBase.TokenToTypeNameEnd(TokenClass.IsSymbol, Name); } }
         [DumpData(false)]
         internal TokenFactory NewTokenFactory { get { return TokenClass.NewTokenFactory; } }
+
     }
 }

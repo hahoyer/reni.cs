@@ -25,7 +25,7 @@ namespace Reni.FeatureTest
         {
             var syntaxPrototype = s.Expression(s.Expression(s.Number(2), "+", s.Number(4)), "dump_print");
             Parameters.ParseOnly = true;
-            RunCompiler("UseAlternativePrioTable", @"! property x", c => syntaxPrototype.AssertLike(c.Syntax));
+            RunCompiler("UseAlternativePrioTable", @"!property x: 3", c => syntaxPrototype.AssertLike(c.Syntax));
         }
     }
 
