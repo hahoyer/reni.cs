@@ -8,20 +8,24 @@ namespace Reni.Parser
     internal sealed class PushedSyntax : ReniObject
     {
         private readonly IParsedSyntax _left;
-        internal readonly Token Token;
-        internal readonly PrioTable PrioTable;
+        private readonly Token _token;
+        internal readonly TokenFactory TokenFactory;
 
-        internal PushedSyntax(IParsedSyntax left, Token token, PrioTable prioTable)
+        internal PushedSyntax(IParsedSyntax left, Token token, TokenFactory tokenFactory)
         {
             _left = left;
-            PrioTable = prioTable;
-            Token = token;
+            _token = token;
+            TokenFactory = tokenFactory;
         }
 
+        internal char Relation(Token token)
+        {
+            return TokenFactory.Relation(token, _token);
+        }
 
         public IParsedSyntax CreateSyntax(IParsedSyntax args)
         {
-            return Token.TokenClass.CreateSyntax(_left, Token, args);
+            return _token.TokenClass.CreateSyntax(_left, _token, args);
         }
 
         /// <summary>
@@ -34,8 +38,9 @@ namespace Reni.Parser
         public override string ToString()
         {
             if(_left == null)
-                return "null " + Token.PrioTableName;
-            return _left.DumpShort() + " " + Token.PrioTableName;
+                return "null " + _token.PrioTableName;
+            return _left.DumpShort() + " " + _token.PrioTableName + " " + TokenFactory;
         }
+
     }
 }

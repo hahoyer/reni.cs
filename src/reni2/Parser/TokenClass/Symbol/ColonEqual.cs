@@ -3,6 +3,7 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Symbol
 {
+    [Token(":=")]
     sealed internal class ColonEqual : Defineable, IConverter<IFeature, AssignableRef>
     {
         internal override string Name { get { return ":="; } }

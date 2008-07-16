@@ -3,6 +3,7 @@ using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass.Name
 {
+    [Token("_A_T_")]
     internal sealed class T_A_T_T : Infix
     {
         internal override string DumpShort()

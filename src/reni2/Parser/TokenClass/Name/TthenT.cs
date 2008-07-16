@@ -1,5 +1,6 @@
 namespace Reni.Parser.TokenClass.Name
 {
+    [Token("then")]
     internal sealed class TthenT : TokenClassBase
     {
         internal static string DumpShort()

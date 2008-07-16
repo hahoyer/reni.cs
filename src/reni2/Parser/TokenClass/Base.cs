@@ -1,11 +1,82 @@
-﻿using HWClassLibrary.Debug;
+﻿using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Context;
 using Reni.Syntax;
-using System;
 
 namespace Reni.Parser.TokenClass
 {
+    internal sealed class TokenAttribute : TokenAttributeBase
+    {
+        internal override PrioTable CreatePrioTable()
+        {
+            var x = PrioTable.LeftAssoc("<else>");
+            x += PrioTable.LeftAssoc(
+                "array", "explicit_ref",
+                "at", "content", "_A_T_", "_N_E_X_T_",
+                "raw_convert", "construct", "bit_cast", "bit_expand",
+                "stable_ref", "consider_as",
+                "size",
+                "bit_address", "bit_align"
+                );
+
+            x += PrioTable.LeftAssoc(".");
+
+            x += PrioTable.LeftAssoc("~");
+            x += PrioTable.LeftAssoc("&");
+            x += PrioTable.LeftAssoc("|");
+
+            x += PrioTable.LeftAssoc("*", "/", "\\");
+            x += PrioTable.LeftAssoc("+", "-");
+
+            x += PrioTable.LeftAssoc("<", ">", "<=", ">=");
+            x += PrioTable.LeftAssoc("=", "<>");
+
+            x += PrioTable.LeftAssoc("!~");
+            x += PrioTable.LeftAssoc("!&!");
+            x += PrioTable.LeftAssoc("!|!");
+
+            x += PrioTable.RightAssoc(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
+
+            x = x.ParLevel
+                (new[]
+                {
+                    "+--",
+                    "+?+",
+                    "?-+"
+                },
+                    new[] {"then"},
+                    new[] {"else"}
+                );
+            x += PrioTable.RightAssoc("!");
+            x += PrioTable.RightAssoc(":", "function");
+            x += PrioTable.RightAssoc(",");
+            x += PrioTable.RightAssoc(";");
+            x = x.ParLevel
+                (new[]
+                {
+                    "++-",
+                    "+?-",
+                    "?--"
+                },
+                    new[] {"(", "[", "{", "<frame>"},
+                    new[] {")", "]", "}", "<end>"}
+                );
+            //x.Correct("(", "<else>", '-');
+            //x.Correct("[", "<else>", '-');
+            //x.Correct("{", "<else>", '-');
+
+            //Tracer.FlaggedLine("\n"+x.ToString());
+            return x;
+        }
+
+        internal TokenAttribute(string token) : base(token) {}
+
+        public TokenAttribute() : base(null)
+        {
+        }
+    }
+
     /// <summary>
     /// Base clas for compiler tokens
     /// </summary>
@@ -20,6 +91,8 @@ namespace Reni.Parser.TokenClass
         internal virtual bool IsEnd { get { return false; } }
 
         internal virtual bool IsSymbol { get { return false; } }
+        [DumpData(false)]
+        internal virtual TokenFactory NewTokenFactory { get { return null; } }
 
         internal virtual IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
@@ -99,7 +172,7 @@ namespace Reni.Parser.TokenClass
     {
         internal abstract Result Result(ContextBase context, Category category, Token token);
 
-        sealed internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             ParsedSyntax.IsNull(left);
             ParsedSyntax.IsNull(right);
@@ -111,22 +184,20 @@ namespace Reni.Parser.TokenClass
     {
         internal abstract Result Result(ContextBase context, Category category, Token token, ICompileSyntax right);
 
-        sealed internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             ParsedSyntax.IsNull(left);
             return new PrefixSyntax(token, this, ParsedSyntax.ToCompiledSyntax(right));
         }
     }
 
-
     internal abstract class Infix : Special
     {
         internal abstract Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right);
 
-        sealed internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             return new InfixSyntax(token, ParsedSyntax.ToCompiledSyntax(left), this, ParsedSyntax.ToCompiledSyntax(right));
         }
     }
-
 }

@@ -7,6 +7,7 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
+    [Token("dump_print")]
     internal sealed class Tdump_printT : Defineable, IFeature
     {
         internal override SearchResult<IFeature> Search()

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using HWClassLibrary.Helper.TreeViewSupport;
-using Reni.Syntax;
+﻿using System;
+using System.Collections.Generic;
+using HWClassLibrary.Debug;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
@@ -9,19 +10,8 @@ namespace Reni.Parser
     /// </summary>
     internal sealed class ParserInst
     {
-        private readonly ParserLibrary _parserLibrary = StandardParserLibrary();
-        private readonly PrioTable _prio = StandardPrio();
-
-        /// <summary>
-        /// The priority table to use
-        /// </summary>
-        [Node]
-        public PrioTable PrioTable { get { return _prio; } }
-
-        /// <summary>
-        /// The parser library to use
-        /// </summary>
-        public ParserLibrary ParserLibrary { get { return _parserLibrary; } }
+        private readonly Scanner _scanner = new Scanner();
+        private readonly TokenFactory _tokenFactory = new TokenFactory<TokenAttribute>();
 
         /// <summary>
         /// Scans and parses source and creates the syntax tree
@@ -30,103 +20,51 @@ namespace Reni.Parser
         /// <returns></returns>
         public IParsedSyntax Compile(Source source)
         {
-            var sp = new SourcePosn(source, 0);
+            var sourcePosn = new SourcePosn(source, 0);
             IParsedSyntax start = null;
-            var stack = new Stack<PushedSyntax>();
-            stack.Push(new PushedSyntax(start, sp.CreateStart()));
-            while(Apply(stack, ref start, ParserLibrary.CreateToken(sp)))
+            var stack = new PushedSyntaxStack(sourcePosn, _tokenFactory);
+            while(stack.Apply(ref start, _scanner.CreateToken(sourcePosn, stack.TokenFactory)))
                 start = null;
-            return PullAndCall(stack, null);
+            return start;
         }
 
-        private bool Apply(Stack<PushedSyntax> stack, ref IParsedSyntax o, Token token)
+    }
+
+    internal sealed class PushedSyntaxStack
+    {
+        private readonly Stack<PushedSyntax> _data = new Stack<PushedSyntax>();
+
+        public PushedSyntaxStack(SourcePosn sourcePosn, TokenFactory tokenFactory)
+        {
+            _data.Push(new PushedSyntax(null, sourcePosn.CreateStart(), tokenFactory));
+        }
+
+        internal TokenFactory TokenFactory { get { return _data.Peek().TokenFactory; } }
+
+        internal bool Apply(ref IParsedSyntax syntax, Token token)
         {
             while(true)
             {
-                var relation = PrioTable.GetRelation(token, stack.Peek().Token);
+                var relation = _data.Peek().Relation(token);
                 if(relation != '+')
-                    o = PullAndCall(stack, o);
+                    syntax = PullAndCall(syntax);
 
                 if(relation != '-')
                 {
-                    stack.Push(new PushedSyntax(o, token));
-                    return !token.TokenClass.IsEnd;
+                    if (token.TokenClass.IsEnd)
+                        return false;
+                    var tokenFactory = token.NewTokenFactory ?? _data.Peek().TokenFactory;
+                    _data.Push(new PushedSyntax(syntax, token, tokenFactory));
+                    return true;
                 }
             }
         }
 
-        private static IParsedSyntax PullAndCall(Stack<PushedSyntax> stack, IParsedSyntax args)
+        private IParsedSyntax PullAndCall(IParsedSyntax args)
         {
-            var x = stack.Pop();
+            var x = _data.Pop();
             return x.CreateSyntax(args);
         }
 
-        private static ParserLibrary StandardParserLibrary()
-        {
-            return new ParserLibrary();
-        }
-
-        private static PrioTable StandardPrio()
-        {
-            var x = PrioTable.LeftAssoc("<else>");
-            x += PrioTable.LeftAssoc(
-                "array", "explicit_ref",
-                "at", "content", "_A_T_", "_N_E_X_T_",
-                "raw_convert", "construct", "bit_cast", "bit_expand",
-                "stable_ref", "consider_as",
-                "size",
-                "bit_address", "bit_align"
-                );
-
-            x += PrioTable.LeftAssoc(".");
-
-            x += PrioTable.LeftAssoc("~");
-            x += PrioTable.LeftAssoc("&");
-            x += PrioTable.LeftAssoc("|");
-
-            x += PrioTable.LeftAssoc("*", "/", "\\");
-            x += PrioTable.LeftAssoc("+", "-");
-
-            x += PrioTable.LeftAssoc("<", ">", "<=", ">=");
-            x += PrioTable.LeftAssoc("=", "<>");
-
-            x += PrioTable.LeftAssoc("!~");
-            x += PrioTable.LeftAssoc("!&!");
-            x += PrioTable.LeftAssoc("!|!");
-
-            x += PrioTable.RightAssoc(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
-
-            x = x.ParLevel
-                (new[]
-                {
-                    "+--",
-                    "+?+",
-                    "?-+"
-                },
-                    new[] {"then"},
-                    new[] {"else"}
-                );
-            x += PrioTable.RightAssoc("!");
-            x += PrioTable.RightAssoc(":", "function", "property", "inherit", "apply_operator", "constructor",
-                "converter");
-            x += PrioTable.RightAssoc(",");
-            x += PrioTable.RightAssoc(";");
-            x = x.ParLevel
-                (new[]
-                {
-                    "++-",
-                    "+?-",
-                    "?--"
-                },
-                    new[] {"(", "[", "{", "<frame>"},
-                    new[] {")", "]", "}", "<end>"}
-                );
-            //x.Correct("(", "<else>", '-');
-            //x.Correct("[", "<else>", '-');
-            //x.Correct("{", "<else>", '-');
-
-            //Tracer.FlaggedLine("\n"+x.ToString());
-            return x;
-        }
     }
 }

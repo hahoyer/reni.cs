@@ -20,10 +20,7 @@ namespace Reni.Parser
             _posn = posn;
             _text = text;
         }
-        /// <summary>
-        /// Creates the start token. It will be considered as left parenthesis
-        /// </summary>
-        /// <returns></returns>
+
         public Token CreateStart()
         {
             return new Token(this, 0, LPar.Frame);

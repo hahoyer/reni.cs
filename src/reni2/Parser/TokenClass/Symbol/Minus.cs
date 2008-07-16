@@ -2,6 +2,7 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Symbol
 {
+    [Token("-")]
     internal class Minus : SequenceOfBitOperation
     {
         internal override string Name { get { return "-"; } }

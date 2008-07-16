@@ -3,6 +3,7 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Name
 {
+    [Token("enable_cut")]
     internal sealed class Tenable_cutT : Defineable, IFeatureForSequence
     {
         public IFeature Convert(Sequence type)

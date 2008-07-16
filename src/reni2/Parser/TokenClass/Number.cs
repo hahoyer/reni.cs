@@ -1,4 +1,5 @@
-﻿using HWClassLibrary.Debug;
+﻿using System;
+using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
@@ -25,6 +26,11 @@ namespace Reni.Parser.TokenClass
                 .CreateBit
                 .CreateSequence(bitsConst.Size.ToInt())
                 .CreateResult(category, () => CodeBase.CreateBitArray(bitsConst));
+        }
+
+        public static Int64 ToInt64(Token token)
+        {
+            return BitsConst.Convert(token.Name).ToInt64();
         }
     }
 }

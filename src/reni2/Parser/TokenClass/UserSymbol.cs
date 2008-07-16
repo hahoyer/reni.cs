@@ -5,21 +5,18 @@
     /// </summary>
     internal sealed class UserSymbol: Defineable
     {
-        private readonly bool _isSymbol;
         private readonly string _name;
 
-        private UserSymbol(bool isSymbol, string name)
+        private UserSymbol(string name)
         {
-            _isSymbol = isSymbol;
             _name = name;
         }
 
-        internal override bool IsSymbol { get { return _isSymbol; } }
         internal override string Name { get { return _name; } }
 
-        public static TokenClassBase Instance(bool isSymbol, string name)
+        public static TokenClassBase Instance(string name)
         {
-            return new UserSymbol(isSymbol, name);
+            return new UserSymbol(name);
         }
     }
 }

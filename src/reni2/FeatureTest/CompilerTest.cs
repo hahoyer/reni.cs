@@ -35,6 +35,11 @@ namespace Reni.FeatureTest
             RunCompiler(1, name, text, expectedResult, expectedOutput);
         }
 
+        protected void RunCompiler(string name, string text, ExpectedResult expectedResult)
+        {
+            RunCompiler(1, name, text, expectedResult, "");
+        }
+
         protected void RunCompiler(string name, string expectedOutput)
         {
             RunCompiler(1, name, expectedOutput);
@@ -80,7 +85,7 @@ namespace Reni.FeatureTest
             }
 
             var os = c.Exec();
-            if(os.Data != expectedOutput)
+            if(os != null && os.Data != expectedOutput)
             {
                 os.Exec();
                 Tracer.ThrowAssertionFailed(

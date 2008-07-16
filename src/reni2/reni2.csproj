@@ -61,6 +61,7 @@
     <Compile Include="Context\FunctionList.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
+    <Compile Include="FeatureTest\ComilerBasics.cs" />
     <Compile Include="FeatureTest\CompilerTest.cs" />
     <Compile Include="Context\Child.cs" />
     <Compile Include="Context\ContextCache.cs" />
@@ -115,7 +116,6 @@
     <Compile Include="Parser\TokenClass\Name\TelseT.cs" />
     <Compile Include="Parser\TokenClass\Name\TtypeT.cs" />
     <Compile Include="Parser\TokenClass\Name\T_A_T_T.cs" />
-    <Compile Include="Parser\TokenClass\Name\TdataT.cs" />
     <Compile Include="Parser\TokenClass\Numop.cs" />
     <Compile Include="Parser\TokenClass\CompareOperator.cs" />
     <Compile Include="Parser\TokenClass\Symbol\ColonEqual.cs" />

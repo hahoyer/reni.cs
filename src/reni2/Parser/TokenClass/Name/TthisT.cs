@@ -2,6 +2,7 @@ using Reni.Context;
 
 namespace Reni.Parser.TokenClass.Name
 {
+    [Token("this")]
     internal sealed class TthisT : Terminal
     {
         internal override string DumpShort()

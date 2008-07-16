@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using HWClassLibrary.Debug;
 using Reni.Parser.TokenClass;
 
@@ -12,14 +11,7 @@ namespace Reni.Parser
         private readonly SourcePosn _source;
         private readonly TokenClassBase _tokenClass;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TokenClass"/> class.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="length">The length.</param>
-        /// <param name="tokenClass">The tokenClass.</param>
-        /// created 31.03.2007 23:27 on SAPHIRE by HH
-        public Token(SourcePosn source, int length, TokenClassBase tokenClass) : base(_nextObjectId++)
+        internal Token(SourcePosn source, int length, TokenClassBase tokenClass) : base(_nextObjectId++)
         {
             _source = source.Clone();
             _length = length;
@@ -27,11 +19,6 @@ namespace Reni.Parser
             _tokenClass = tokenClass;
         }
 
-        /// <summary>
-        /// Gets the token.
-        /// </summary>
-        /// <value>The token.</value>
-        /// created 31.03.2007 23:28 on SAPHIRE by HH
         public TokenClassBase TokenClass { get { return _tokenClass; } }
 
         /// <summary>
@@ -52,16 +39,8 @@ namespace Reni.Parser
         [DumpData(false)]
         public string Name { get { return _source.SubString(0, _length); } }
 
-        /// <summary>
-        /// is like dump
-        /// </summary>
-        /// <returns></returns>
         public string NodeDump { get { return ToString(); } }
 
-        /// <summary>
-        /// is like dump
-        /// </summary>
-        /// <returns></returns>
         public string FilePosition { get { return "\n" + Source.FilePosn(Name); } }
 
         /// <summary>
@@ -70,10 +49,6 @@ namespace Reni.Parser
         [DumpData(false)]
         public string PrioTableName { get { return TokenClass.PrioTableName(Name); } }
 
-        /// <summary>
-        /// is like dump
-        /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             return Source.FilePosn(Name);
@@ -88,26 +63,13 @@ namespace Reni.Parser
             return Name;
         }
 
-        /// <summary>
-        /// Index in priotable. Handles some spacial cases
-        /// </summary>
-        /// <param name="prioTable"></param>
-        /// <returns></returns>
         public int Index(PrioTable prioTable)
         {
             return prioTable.Index(PrioTableName);
         }
 
         internal string PotentialTypeName { get { return TokenClassBase.TokenToTypeNameEnd(TokenClass.IsSymbol, Name); } }
-
-        internal static Token CreateToken(bool isSymbol, SourcePosn sp, int i)
-        {
-            var a = Assembly.GetAssembly(typeof(ParserLibrary));
-            var t = a.GetTypes();
-            foreach(var tt in t)
-                if(TokenClassBase.IsTokenType(tt.FullName, isSymbol, sp.SubString(0, i)))
-                    return new Token(sp, i, (TokenClassBase) Activator.CreateInstance(tt, new object[0]));
-            return new Token(sp, i, UserSymbol.Instance(isSymbol, sp.SubString(0, i)));
-        }
+        [DumpData(false)]
+        internal TokenFactory NewTokenFactory { get { return TokenClass.NewTokenFactory; } }
     }
 }

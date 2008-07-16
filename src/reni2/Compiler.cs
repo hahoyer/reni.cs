@@ -171,6 +171,9 @@ namespace Reni
             if (_parameters.Trace.Syntax)
                 Tracer.FlaggedLine(Syntax.Dump());
 
+            if(_parameters.ParseOnly)
+                return null;
+
             if (_parameters.Trace.Functions)
             {
                 Materialize();
@@ -199,6 +202,8 @@ namespace Reni
 
         internal void Materialize()
         {
+            if (_parameters.ParseOnly)
+                return;
             var dummy = Code;
             for (var i = 0; i < RootContext.Functions.Count; i++)
                 dummy = RootContext.Functions[i].BodyCode;
@@ -237,6 +242,7 @@ namespace Reni
         /// Shows or hides syntax tree
         /// </summary>
         [Node, DumpData(true)] public TraceParamters Trace = new TraceParamters();
+        public bool ParseOnly = false;
 
         #region Nested type: TraceParamters
 

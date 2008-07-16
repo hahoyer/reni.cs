@@ -1,20 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+using HWClassLibrary.Debug;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
-    /// <summary>
-    /// Class to scan and create tokens
-    /// </summary>
-    public class ParserLibrary : ReniObject
+    internal class Scanner : ReniObject
     {
         private readonly char[] _charType = new char[256];
 
         /// <summary>
         /// ctor
         /// </summary>
-        public ParserLibrary()
+        public Scanner()
         {
             InitCharType();
         }
@@ -56,11 +55,12 @@ namespace Reni.Parser
         }
 
         /// <summary>
-        /// Scans source for begin of next token, advances and returns the new token. 
+        /// Scans source for begin of next token, advances and returns the new token.
         /// </summary>
         /// <param name="sp">Source position, is advanced during create token</param>
+        /// <param name="tokenFactory">The token factory.</param>
         /// <returns>the next token</returns>
-        internal Token CreateToken(SourcePosn sp)
+        internal Token CreateToken(SourcePosn sp, TokenFactory tokenFactory)
         {
             for(;;)
             {
@@ -71,9 +71,9 @@ namespace Reni.Parser
                 if(IsDigit(sp.Current))
                     return CreateNumberToken(sp);
                 if(IsAlpha(sp.Current))
-                    return CreateNameToken(sp);
+                    return CreateNameToken(sp, tokenFactory);
                 if(IsSymbol(sp.Current))
-                    return CreateSymbolToken(sp);
+                    return CreateSymbolToken(sp, tokenFactory);
 
                 switch(sp.Current)
                 {
@@ -130,20 +130,20 @@ namespace Reni.Parser
             return new Token(sp, i, Number.Instance);
         }
 
-        private Token CreateNameToken(SourcePosn sp)
+        private Token CreateNameToken(SourcePosn sp, TokenFactory tokenFactory)
         {
             var i = 1;
             while(IsAlphaNum(sp[i]))
                 i++;
-            return Token.CreateToken(false, sp, i);
+            return tokenFactory.CreateToken(sp, i);
         }
 
-        private Token CreateSymbolToken(SourcePosn sp)
+        private Token CreateSymbolToken(SourcePosn sp, TokenFactory tokenFactory)
         {
             var i = 1;
             while(IsSymbol(sp[i]))
                 i++;
-            return Token.CreateToken(true, sp, i);
+            return tokenFactory.CreateToken(sp, i);
         }
 
         private static Token JumpComment(SourcePosn sp)
@@ -179,6 +179,68 @@ namespace Reni.Parser
         {
             for(var i = 0; i < Chars.Length; i++)
                 _charType[Chars[i]] = Type;
+        }
+    }
+
+    internal abstract class TokenAttributeBase : Attribute
+    {
+        internal readonly string Token;
+
+        protected TokenAttributeBase(string token)
+        {
+            Token = token;
+        }
+
+        internal abstract PrioTable CreatePrioTable();
+    }
+
+    internal abstract class TokenFactory
+    {
+        private readonly PrioTable _prioTable;
+        private readonly Dictionary<string, TokenClassBase> _tokenClasses;
+
+        protected TokenFactory(Dictionary<string, TokenClassBase> tokenClasses, PrioTable prioTable)
+        {
+            _tokenClasses = tokenClasses;
+            _prioTable = prioTable;
+        }
+
+        internal Token CreateToken(SourcePosn sourcePosn, int length)
+        {
+            return new Token(sourcePosn, length, Find(sourcePosn.SubString(0, length)));
+        }
+
+        private TokenClassBase Find(string name)
+        {
+            TokenClassBase result;
+            if(_tokenClasses.TryGetValue(name, out result))
+                return result;
+            return UserSymbol.Instance(name);
+        }
+
+        public char Relation(Token newToken, Token topToken)
+        {
+            return _prioTable.Relation(newToken, topToken);
+        }
+    }
+
+    internal sealed class TokenFactory<TokenAttribute> : TokenFactory where TokenAttribute : TokenAttributeBase, new()
+    {
+        internal TokenFactory()
+            : base(CreateTokenClasses(), new TokenAttribute().CreatePrioTable()) {}
+
+        private static Dictionary<string, TokenClassBase> CreateTokenClasses()
+        {
+            var result = new Dictionary<string, TokenClassBase>();
+            var assembly = Assembly.GetAssembly(typeof(TokenAttribute));
+            var types = assembly.GetTypes();
+            foreach(var type in types)
+            {
+                var attributes = type.GetCustomAttributes(typeof(TokenAttribute), true);
+                foreach(TokenAttribute attribute in attributes)
+                    result.Add(attribute.Token, (TokenClassBase) Activator.CreateInstance(type, new object[0]));
+            }
+            return result;
         }
     }
 }

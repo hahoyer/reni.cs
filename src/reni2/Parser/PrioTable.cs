@@ -1,4 +1,5 @@
 ﻿using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper.TreeViewSupport;
 
 namespace Reni.Parser
@@ -317,14 +318,16 @@ namespace Reni.Parser
         /// <param name="New"></param>
         /// <param name="Top"></param>
         /// <returns></returns>
-        public char GetRelation(Token New, Token Top)
+        public char Relation(Token New, Token Top)
         {
             //Tracer.FlaggedLine("\"" + _token[New] + "\" on \"" + _token[Top] + "\" --> \"" + _data[New, Top] + "\"");
             return _data[New.Index(this), Top.Index(this)];
         }
 
+        //For debug only
         [Node]
         public string[] Token { get { return _token; } }
+        //For debug only
         [Node]
         public string[] Data
         {
