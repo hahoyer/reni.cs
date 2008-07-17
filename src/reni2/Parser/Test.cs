@@ -22,8 +22,10 @@ namespace Reni.Parser
         [Test, Explicit]
         public void SimpleFunction()
         {
+            var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
             Parameters.Trace.Source = true;
-            RunCompiler("SimpleFunction", @"f()", "3");
+            Parameters.ParseOnly = true;
+            RunCompiler("SimpleFunction", @"f()", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test, Category(Worked)]
@@ -41,7 +43,7 @@ namespace Reni.Parser
             var syntaxPrototype = LikeSyntax.Struct(
                 new[] {LikeSyntax.Number(3)},
                 new[] {LikeSyntax.Declaration("x", 0)},
-                new int[0],
+                new int[] {},
                 new[] {"x"}
                 );
             Parameters.ParseOnly = true;
@@ -54,7 +56,7 @@ namespace Reni.Parser
             var syntaxPrototype = LikeSyntax.Struct(
                 new[] {LikeSyntax.Number(3)},
                 new[] {LikeSyntax.Declaration("property", 0)},
-                new int[0],
+                new int[] {},
                 new[] {"property"}
                 );
             Parameters.ParseOnly = true;
@@ -66,9 +68,9 @@ namespace Reni.Parser
         {
             var syntaxPrototype = LikeSyntax.Struct(
                 new[] {LikeSyntax.Number(3)},
-                new Declaration[0],
+                new Declaration[] {},
                 new[] {0},
-                new string[0]
+                new string[] {}
                 );
             Parameters.ParseOnly = true;
             RunCompiler("UseAlternativePrioTable", @"!converter: 3", c => syntaxPrototype.AssertLike(c.Syntax));
@@ -78,13 +80,14 @@ namespace Reni.Parser
         public void AlternativePrioTableConverterAndProperty()
         {
             var syntaxPrototype = LikeSyntax.Struct(
-                new[] { LikeSyntax.Number(3), LikeSyntax.Number(4) },
-                new[] { LikeSyntax.Declaration("x", 1) },
-                new[] { 0 },
-                new[] { "x" }
+                new[] {LikeSyntax.Number(3), LikeSyntax.Number(4)},
+                new[] {LikeSyntax.Declaration("x", 1)},
+                new[] {0},
+                new[] {"x"}
                 );
             Parameters.ParseOnly = true;
-            RunCompiler("UseAlternativePrioTable", @"!converter: 3; !property x: 4", c => syntaxPrototype.AssertLike(c.Syntax));
+            RunCompiler("UseAlternativePrioTable", @"!converter: 3; !property x: 4",
+                        c => syntaxPrototype.AssertLike(c.Syntax));
         }
     }
 }

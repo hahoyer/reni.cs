@@ -19,6 +19,11 @@ namespace Reni.FeatureTest.Structure
             return new Expression(this, s2, s3);
         }
 
+        static public LikeSyntax Expression(LikeSyntax s1, string s2, LikeSyntax s3)
+        {
+            return new Expression(s1, s2, s3);
+        }
+
         public LikeSyntax Expression(string s2)
         {
             return new Expression(this, s2, null);
@@ -40,11 +45,29 @@ namespace Reni.FeatureTest.Structure
             get { return Expression("dump_print"); }
         }
 
+        public static LikeSyntax Null
+        {
+            get { return new Empty(); }
+        }
+
         public static Declaration Declaration(string name, int position)
         {
             return new Declaration(name,position);
         }
 
+        public static LikeSyntax Symbol(string s)
+        {
+            return new Expression(null, s, null);
+        }
+
+    }
+
+    internal class Empty : LikeSyntax
+    {
+        public override void AssertLike(IParsedSyntax syntax)
+        {
+            Tracer.Assert(syntax is EmptyList);
+        }
     }
 
     internal class Declaration
