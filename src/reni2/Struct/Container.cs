@@ -23,7 +23,8 @@ namespace Reni.Struct
         private static int _nextObjectId;
         private DictionaryEx<int, string> _reverseDictionaryCache;
 
-        internal readonly List<ICompileSyntax> ConverterList = new List<ICompileSyntax>();
+        internal readonly List<int> Converters = new List<int>();
+        internal readonly List<string> Properties = new List<string>();
         internal readonly DictionaryEx<string, int> Dictionary = new DictionaryEx<string, int>();
         internal readonly List<ICompileSyntax> List = new List<ICompileSyntax>();
         private readonly SimpleCache<StructFeature[]> _structFeaturesCache = new SimpleCache<StructFeature[]>();
@@ -115,11 +116,18 @@ namespace Reni.Struct
                 var d = (DeclarationSyntax) parsedSyntax;
                 Dictionary.Add(d.Name.Name, List.Count);
                 parsedSyntax = d.Definition;
+                if(d.IsProperty)
+                    Properties.Add(d.Name.Name);
             }
+            
             if(parsedSyntax is ConverterSyntax)
-                ConverterList.Add(((ConverterSyntax) parsedSyntax).Body);
-            else
-                List.Add(parsedSyntax.ToCompileSyntax);
+            {
+                ICompileSyntax body = ((ConverterSyntax)parsedSyntax).Body;
+                parsedSyntax = (IParsedSyntax) body;
+                Converters.Add(List.Count);
+            }
+
+            List.Add(parsedSyntax.ToCompileSyntax);
         }
 
         public string DumpPrintText(ContextBase context)

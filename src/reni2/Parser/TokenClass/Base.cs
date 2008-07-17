@@ -91,7 +91,6 @@ namespace Reni.Parser.TokenClass
         [DumpData(false)]
         internal virtual bool IsEnd { get { return false; } }
 
-        internal virtual bool IsSymbol { get { return false; } }
         [DumpData(false)]
         internal virtual TokenFactory NewTokenFactory { get { return null; } }
 
@@ -110,18 +109,6 @@ namespace Reni.Parser.TokenClass
         internal virtual string PrioTableName(string name)
         {
             return name;
-        }
-
-        internal static bool IsTokenType(string typeName, bool isSymbol, string token)
-        {
-            return typeName.EndsWith(TokenToTypeNameEnd(isSymbol, token));
-        }
-
-        internal static string TokenToTypeNameEnd(bool isSymbol, string token)
-        {
-            if(isSymbol)
-                return ".TokenClass.Symbol." + Symbolize(token);
-            return ".TokenClass.Name.T" + token + "T";
         }
 
         internal static string Symbolize(string token)

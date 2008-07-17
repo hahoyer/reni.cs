@@ -3,7 +3,7 @@
   <Class Name="Reni.Parser.TokenClass.TokenClassBase" Collapsed="true">
     <Position X="16.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAEAAAAAAAAABAKEBAAAAAAAAAAAAAABIgAAAI=</HashCode>
+      <HashCode>AAAAAAAEAAAAAAAAABACEBAAAAAAAAAAAAAABIAAAAI=</HashCode>
       <FileName>Parser\TokenClass\Base.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -98,13 +98,6 @@
       <FileName>Parser\TokenClass\LPar.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Reni.Parser.TokenClass.Name.TconverterT" Collapsed="true">
-    <Position X="21.75" Y="2" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
-      <FileName>Parser\TokenClass\Name\TconverterT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Reni.Parser.TokenClass.RPar" Collapsed="true">
     <Position X="26.25" Y="2" Width="1.5" />
     <TypeIdentifier>
@@ -151,7 +144,7 @@
   <Class Name="Reni.Parser.TokenClass.DeclarationSyntax" Collapsed="true">
     <Position X="0.75" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABACAAAAAAAAAQAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <HashCode>AgAAAAAAAABACAAAAAAAAAQAAAIAAAAAACAAAAAAAAA=</HashCode>
       <FileName>Parser\TokenClass\DeclarationSyntax.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -172,7 +165,7 @@
   <Class Name="Reni.Struct.Container" Collapsed="true">
     <Position X="5.25" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IEZEACAAAgIA2AAACBRIAAQQAgAIBEAAAGAAIAAiAAI=</HashCode>
+      <HashCode>IEbEACAAAgIA0AAACBRIAAQQAgAIBEAAAGAAIAAiAAI=</HashCode>
       <FileName>Struct\Container.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />

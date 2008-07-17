@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass.Symbol
 {
@@ -27,7 +28,7 @@ namespace Reni.Parser.TokenClass.Symbol
         {
             ParsedSyntax.IsNull(left);
             ParsedSyntax.IsNull(right);
-            return new DeclarationExtensionSyntax(token);
+            return new ExclamationSyntax(token);
         }
     }
 
@@ -44,6 +45,11 @@ namespace Reni.Parser.TokenClass.Symbol
     [DeclarationToken("converter")]
     internal sealed class Converter : TokenClassBase
     {
+        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        {
+            ParsedSyntax.IsNull(right);
+            return ((DeclarationExtensionSyntax) left).ExtendByConverter(token);
+        }
     }
 
     internal sealed class DeclarationTokenAttribute : TokenAttributeBase
@@ -75,29 +81,83 @@ namespace Reni.Parser.TokenClass.Symbol
         }
     }
 
-    internal sealed class DeclarationExtensionSyntax : ParsedSyntax
+    internal abstract class DeclarationExtensionSyntax : ParsedSyntax
     {
-        internal readonly Token PropertyToken;
-
-        public DeclarationExtensionSyntax(Token token) : base(token)
+        protected DeclarationExtensionSyntax(Token token) : base(token)
         {
         }
 
-        private DeclarationExtensionSyntax(Token token, Token propertyToken) : base(token)
+        internal virtual bool IsProperty
         {
-            PropertyToken = propertyToken;
+            get { return false; }
         }
 
-        internal IParsedSyntax ExtendByProperty(Token token)
+        internal virtual IParsedSyntax ExtendByProperty(Token token)
         {
-            Tracer.Assert(PropertyToken == null);
-            return new DeclarationExtensionSyntax(Token, token);
+            NotImplementedMethod(token);
+            return null;
+        }
+
+        internal virtual IParsedSyntax ExtendByConverter(Token token)
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
+    }
+
+    internal sealed class PropertyDeclarationSyntax : DeclarationExtensionSyntax
+    {
+        internal new Token Token;
+
+        internal PropertyDeclarationSyntax(Token token, Token otherToken)
+            : base(token)
+        {
+            Token = otherToken;
+        }
+
+        internal override bool IsProperty
+        {
+            get { return true; }
         }
 
         protected internal override IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
         {
-            Tracer.Assert(right == null);
-            return token.TokenClass.CreateDeclarationPartSyntax(this,token);
+            IsNull(right);
+            return token.TokenClass.CreateDeclarationPartSyntax(this, token);
+        }
+    }
+
+    internal sealed class ConverterDeclarationSyntax : DeclarationExtensionSyntax
+    {
+        internal new Token Token;
+
+        internal ConverterDeclarationSyntax(Token token, Token otherToken)
+            : base(token)
+        {
+            Token = otherToken;
+        }
+
+        protected internal override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
+        {
+            return new ConverterSyntax(Token, ToCompiledSyntax(right));
+        }
+    }
+
+    internal sealed class ExclamationSyntax : DeclarationExtensionSyntax
+    {
+        internal ExclamationSyntax(Token token)
+            : base(token)
+        {
+        }
+
+        internal override IParsedSyntax ExtendByProperty(Token token)
+        {
+            return new PropertyDeclarationSyntax(Token, token);
+        }
+
+        internal override IParsedSyntax ExtendByConverter(Token token)
+        {
+            return new ConverterDeclarationSyntax(Token, token);
         }
     }
 }

@@ -61,7 +61,6 @@
     <Compile Include="Context\FunctionList.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
-    <Compile Include="FeatureTest\ComilerBasics.cs" />
     <Compile Include="FeatureTest\CompilerTest.cs" />
     <Compile Include="Context\Child.cs" />
     <Compile Include="Context\ContextCache.cs" />
@@ -69,7 +68,7 @@
     <Compile Include="Context\Number.cs" />
     <Compile Include="Context\RefAlignParam.cs" />
     <Compile Include="Context\Root.cs" />
-    <Compile Include="FeatureTest\Structure\Syntax.cs" />
+    <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
     <Compile Include="Feature\IFeature.cs" />
     <Compile Include="Parser\DefineableToken.cs" />
     <Compile Include="Parser\ExpressionSyntax.cs" />
@@ -113,7 +112,6 @@
     <Compile Include="Parser\TokenClass\Base.cs" />
     <Compile Include="Parser\TokenClass\Defineable.cs" />
     <Compile Include="Parser\TokenClass\FoundNumpopResult.cs" />
-    <Compile Include="Parser\TokenClass\Name\TconverterT.cs" />
     <Compile Include="Parser\TokenClass\Name\TelseT.cs" />
     <Compile Include="Parser\TokenClass\Name\TtypeT.cs" />
     <Compile Include="Parser\TokenClass\Name\T_A_T_T.cs" />

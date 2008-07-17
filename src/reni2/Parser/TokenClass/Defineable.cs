@@ -15,18 +15,21 @@ namespace Reni.Parser.TokenClass
         [DumpData(false)]
         internal virtual string CSharpNameOfDefaultOperation
         {
-            get
-            {
-                NotImplementedMethod();
-                return "";
-            }
+            get { return Name; }
         }
 
         [DumpExcept(false)]
-        internal string DataFunctionName { get { return GetType().Name; } }
+        internal string DataFunctionName
+        {
+            get { return GetType().Name; }
+        }
 
         [DumpExcept(false)]
-        internal virtual bool IsCompareOperator { get { return false; } }
+        internal virtual bool IsCompareOperator
+        {
+            get { return false; }
+        }
+
         [DumpExcept(false)]
         internal abstract string Name { get; }
 
@@ -38,14 +41,15 @@ namespace Reni.Parser.TokenClass
 
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            if(left == null && right == null)
+            if (left == null && right == null)
                 return new DefinableTokenSyntax(token);
-            if(left == null)
+            if (left == null)
                 return new ExpressionSyntax(null, token, ParsedSyntax.ToCompiledSyntaxOrNull(right));
             return left.CreateSyntax(token, right);
         }
 
-        internal override IParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, Token token)
+        internal override IParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax,
+                                                                    Token token)
         {
             return new DeclarationPartSyntax(extensionSyntax, token);
         }
@@ -75,7 +79,8 @@ namespace Reni.Parser.TokenClass
             return SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>>.Failure(this);
         }
 
-        internal virtual SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>> SearchPrefixFromSequenceOfBit()
+        internal virtual SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>>
+            SearchPrefixFromSequenceOfBit()
         {
             return SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>>.Failure(this);
         }
@@ -104,10 +109,9 @@ namespace Reni.Parser.TokenClass
         {
             return SearchResult<StructFeature>.Failure(this);
         }
-
     }
 
-    sealed internal class DeclarationPartSyntax : ParsedSyntax
+    internal sealed class DeclarationPartSyntax : ParsedSyntax
     {
         private readonly DefineableToken _defineableToken;
         private readonly DeclarationExtensionSyntax _extensionSyntax;

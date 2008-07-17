@@ -1,4 +1,5 @@
 using Reni.Parser;
+using Reni.Struct;
 
 namespace Reni.Syntax
 {
@@ -14,6 +15,11 @@ namespace Reni.Syntax
         internal protected override string DumpShort()
         {
             return "converter (" + Body.DumpShort() + ")";
+        }
+
+        protected internal override IParsedSyntax SurroundedByParenthesis(Token token)
+        {
+            return Container.Create(token, this);
         }
     }
 }

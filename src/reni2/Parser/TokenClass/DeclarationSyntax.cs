@@ -26,6 +26,11 @@ namespace Reni.Parser.TokenClass
             StopByObjectId(-876);
         }
 
+        internal bool IsProperty
+        {
+            get { return ExtensionSyntax != null && ExtensionSyntax.IsProperty; }
+        }
+
         protected internal override string DumpShort()
         {
             return Name.Name + ": " + Definition.DumpShort();
