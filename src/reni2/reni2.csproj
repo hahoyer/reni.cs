@@ -69,6 +69,7 @@
     <Compile Include="Context\Number.cs" />
     <Compile Include="Context\RefAlignParam.cs" />
     <Compile Include="Context\Root.cs" />
+    <Compile Include="FeatureTest\Structure\Syntax.cs" />
     <Compile Include="Feature\IFeature.cs" />
     <Compile Include="Parser\DefineableToken.cs" />
     <Compile Include="Parser\ExpressionSyntax.cs" />
