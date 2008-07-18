@@ -1,3 +1,6 @@
+using System;
+using HWClassLibrary.Debug;
+using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Syntax;
@@ -5,40 +8,23 @@ using Reni.Type;
 
 namespace Reni
 {
-    internal sealed class ThenElse : CompileSyntax
+    internal abstract class CondSyntax : CompileSyntax
     {
-        private readonly ICompileSyntax _condSyntax;
-        private readonly ICompileSyntax _thenSyntax;
-        private readonly Token _elseToken;
-        private readonly ICompileSyntax _elseSyntax;
+        protected readonly ICompileSyntax Cond;
+        protected readonly ICompileSyntax Then;
 
-        public ThenElse(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(thenToken)
+        protected CondSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(thenToken)
         {
-            _condSyntax = condSyntax;
-            _thenSyntax = thenSyntax;
+            Cond = condSyntax;
+            Then = thenSyntax;
         }
-
-        public ThenElse(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, Token elseToken, ICompileSyntax elseSyntax)
-            : base(thenToken)
-        {
-            _condSyntax = condSyntax;
-            _thenSyntax = thenSyntax;
-            _elseToken = elseToken;
-            _elseSyntax = elseSyntax;
-        }
-
-        internal ICompileSyntax CondSyntax { get { return _condSyntax; } }
-        internal ICompileSyntax ThenSyntax { get { return _thenSyntax; } }
-        internal ICompileSyntax ElseSyntax { get { return _elseSyntax; } }
-
-        internal Token ElseToken { get { return _elseToken; } }
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            var condResult = _condSyntax.Result(context, category | Category.Type);
+            var condResult = Cond.Result(context, category | Category.Type);
             condResult = condResult.Type.Conversion(category, TypeBase.CreateBit).UseWithArg(condResult);
 
-            var thenResult = _thenSyntax.Result(context, category | Category.Type);
+            var thenResult = Then.Result(context, category | Category.Type);
             var elseResult = CreateElseResult(context, category);
 
             if(thenResult.Type.IsPending)
@@ -59,19 +45,49 @@ namespace Reni
                 );
         }
 
-        private Result CreateElseResult(ContextBase context, Category category)
+        protected abstract Result CreateElseResult(ContextBase context, Category category);
+
+        internal protected override string DumpShort()
         {
-            if(_elseSyntax == null)
-                return TypeBase.CreateVoidResult(category | Category.Type);
-            return _elseSyntax.Result(context, category | Category.Type);
+            return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")";
+        }
+    }
+
+    internal sealed class ThenSyntax : CondSyntax
+    {
+        internal ThenSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(condSyntax, thenToken, thenSyntax) {}
+
+        protected override Result CreateElseResult(ContextBase context, Category category)
+        {
+            return TypeBase.CreateVoidResult(category | Category.Type);
+        }
+
+        internal protected override IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
+        {
+            return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax);
+        }
+    }
+
+    internal sealed class ThenElseSyntax : CondSyntax
+    {
+        private readonly Token ElseToken;
+        private readonly ICompileSyntax Else;
+
+        public ThenElseSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, Token elseToken, ICompileSyntax elseSyntax)
+            : base(condSyntax, thenToken, thenSyntax)
+        {
+            ElseToken = elseToken;
+            Else = elseSyntax;
+        }
+
+        protected override Result CreateElseResult(ContextBase context, Category category)
+        {
+            return Else.Result(context, category | Category.Type);
         }
 
         internal protected override string DumpShort()
         {
-            var result = _condSyntax.DumpShort() + "then" + _thenSyntax.DumpShort();
-            if(_elseSyntax != null)
-                result += "else" + _elseSyntax.DumpShort();
-            return result;
+            return base.DumpShort() + "else(" + Else.DumpShort() + ")";
         }
     }
 }

@@ -9,10 +9,7 @@ namespace Reni.Code
     internal abstract class CodeBase : ReniObject
     {
         [DumpData(false)]
-        public virtual Size MaxSize
-        {
-            get { return Size; }
-        }
+        public virtual Size MaxSize { get { return Size; } }
 
         public virtual Size Size
         {
@@ -24,39 +21,21 @@ namespace Reni.Code
         }
 
         [DumpData(false)]
-        public virtual bool IsEmpty
-        {
-            get { return false; }
-        }
+        public virtual bool IsEmpty { get { return false; } }
 
         [DumpExcept(false)]
-        public bool IsRelativeReference
-        {
-            get { return RefAlignParam != null; }
-        }
+        public bool IsRelativeReference { get { return RefAlignParam != null; } }
 
         [DumpData(false)]
-        public virtual RefAlignParam RefAlignParam
-        {
-            get { return null; }
-        }
+        public virtual RefAlignParam RefAlignParam { get { return null; } }
 
-        public static CodeBase Pending
-        {
-            get { return new Pending(); }
-        }
+        public static CodeBase Pending { get { return new Pending(); } }
 
         [DumpExcept(false)]
-        public virtual bool IsPending
-        {
-            get { return false; }
-        }
+        public virtual bool IsPending { get { return false; } }
 
         [DumpData(false)]
-        public virtual Refs Refs
-        {
-            get { return Refs.None(); }
-        }
+        public virtual Refs Refs { get { return Refs.None(); } }
 
         internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, Size leftSize)
         {
@@ -70,7 +49,7 @@ namespace Reni.Code
 
         public CodeBase CreateAssignment(RefAlignParam refAlignParam, CodeBase sourceRef)
         {
-            NotImplementedMethod(refAlignParam,sourceRef);
+            NotImplementedMethod(refAlignParam, sourceRef);
             var alignedSize = sourceRef.Size.ByteAlignedSize;
             return CreateSequence(sourceRef.CreateBitCast(alignedSize))
                 .CreateAssignment(refAlignParam, alignedSize);
@@ -131,7 +110,7 @@ namespace Reni.Code
         public CodeBase CreateChilds(LeafElement[] leafElements)
         {
             var result = this;
-            for (var i = 0; i < leafElements.Length; i++)
+            for(var i = 0; i < leafElements.Length; i++)
                 result = CreateChild(leafElements[i]);
             return result;
         }
@@ -155,16 +134,16 @@ namespace Reni.Code
 
         public CodeBase CreateBitCast(Size size)
         {
-            if (Size == size)
+            if(Size == size)
                 return this;
             return CreateChild(new BitCast(Size, size, Size));
         }
 
         public CodeBase CreateSequence(CodeBase right)
         {
-            if (IsEmpty)
+            if(IsEmpty)
                 return right;
-            if (right.IsEmpty)
+            if(right.IsEmpty)
                 return this;
             return new Pair(this, right);
         }
@@ -197,15 +176,15 @@ namespace Reni.Code
         public CodeBase UseWithArg(CodeBase argCode)
         {
             var result = argCode.IsRelativeReference
-                             ? Visit(new ReplaceRelRefArg(argCode, argCode.RefAlignParam))
-                             : Visit(new ReplaceAbsoluteArg(argCode));
+                ? Visit(new ReplaceRelRefArg(argCode, argCode.RefAlignParam))
+                : Visit(new ReplaceAbsoluteArg(argCode));
             return result ?? this;
         }
 
         public CodeBase ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : ContextBase
         {
             var result = Visit(new ReplaceRelativeContextRef<C>(context, replacement));
-            if (result != null)
+            if(result != null)
                 return result;
             return this;
         }
@@ -213,7 +192,7 @@ namespace Reni.Code
         public CodeBase ReplaceAbsoluteContextRef<C>(C context, CodeBase replacement) where C : ContextBase
         {
             var result = Visit(new ReplaceAbsoluteContextRef<C>(context, replacement));
-            if (result != null)
+            if(result != null)
                 return result;
             return this;
         }
@@ -230,11 +209,11 @@ namespace Reni.Code
         }
 
         public CodeBase CreateStatementEndFromIntermediateStorage(CodeBase finalResult, CodeBase destructor,
-                                                                  CodeBase mover)
+            CodeBase mover)
         {
-            if (destructor.IsEmpty && mover.IsEmpty)
+            if(destructor.IsEmpty && mover.IsEmpty)
             {
-                if (Size.IsZero) // No temp storage 
+                if(Size.IsZero) // No temp storage 
                     return finalResult; // Just return final result
 
                 var alignedSize = Size.ByteAlignedSize;
@@ -258,7 +237,7 @@ namespace Reni.Code
             {
                 return Serialize(Size.Create(0), "");
             }
-            catch (Container.UnexpectedContextRefInContainer e)
+            catch(Container.UnexpectedContextRefInContainer e)
             {
                 DumpMethodWithBreak("UnexpectedContextRefInContainer " + e.VisitedObject.Dump());
                 throw;
@@ -277,7 +256,7 @@ namespace Reni.Code
 
         public CodeBase TryReplacePrimitiveRecursivity(int functionIndex)
         {
-            if (!Size.IsZero)
+            if(!Size.IsZero)
                 return this;
 
             var newResult = Visit(new ReplacePrimitiveRecursivity(functionIndex));
@@ -298,8 +277,10 @@ namespace Reni.Code
 
     internal class Assign : LeafElement
     {
-        [DumpData(true)] private readonly RefAlignParam _refAlignParam;
-        [DumpData(true)] private readonly Size _size;
+        [DumpData(true)]
+        private readonly RefAlignParam _refAlignParam;
+        [DumpData(true)]
+        private readonly Size _size;
 
         public Assign(RefAlignParam refAlignParam, Size size)
         {
@@ -307,15 +288,9 @@ namespace Reni.Code
             _size = size;
         }
 
-        public override Size Size
-        {
-            get { return Size.Zero; }
-        }
+        public override Size Size { get { return Size.Zero; } }
 
-        public override Size DeltaSize
-        {
-            get { return _refAlignParam.RefSize + _size; }
-        }
+        public override Size DeltaSize { get { return _refAlignParam.RefSize + _size; } }
 
         protected override string Format(StorageDescriptor start)
         {
@@ -325,15 +300,14 @@ namespace Reni.Code
 
     internal class Pending : CodeBase
     {
-        public override Size Size
+        public Pending()
         {
-            get { return Size.Pending; }
+            StopByObjectId(711);
         }
 
-        public override bool IsPending
-        {
-            get { return true; }
-        }
+        public override Size Size { get { return Size.Pending; } }
+
+        public override bool IsPending { get { return true; } }
 
         public override Result VirtVisit<Result>(Visitor<Result> actual)
         {
@@ -341,7 +315,5 @@ namespace Reni.Code
         }
     }
 
-    internal class UnexpectedVisitOfPending : Exception
-    {
-    }
+    internal class UnexpectedVisitOfPending : Exception {}
 }

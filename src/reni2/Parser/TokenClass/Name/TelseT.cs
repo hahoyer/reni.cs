@@ -7,5 +7,12 @@ namespace Reni.Parser.TokenClass.Name
         {
             return "else";
         }
+
+        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        {
+            ParsedSyntax.IsNotNull(left);
+            ParsedSyntax.IsNotNull(right);
+            return left.CreateElseSyntax(token, ParsedSyntax.ToCompiledSyntax(right));
+        }
     }
 }

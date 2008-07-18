@@ -793,6 +793,8 @@ namespace Reni
 
         internal Result AutomaticDereference()
         {
+            if (IsPending)
+                return this;
             return Type.AutomaticDereference(this);
         }
 

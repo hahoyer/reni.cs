@@ -78,9 +78,20 @@ namespace Reni.Parser
             return CreateSyntax(token, right);
         }
 
+        IParsedSyntax IParsedSyntax.CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
+        {
+            return CreateElseSyntax(token, elseSyntax);
+        }
+
         internal virtual protected IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition)
         {
-            return new ThenElse(condition, token, ToCompileSyntax);
+            return new ThenSyntax(condition, token, ToCompileSyntax);
+        }
+
+        internal virtual protected IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
+        {
+            NotImplementedMethod(token, elseSyntax);
+            return null;
         }
 
         internal protected virtual string DumpShort()

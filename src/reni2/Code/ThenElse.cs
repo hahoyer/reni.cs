@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code
@@ -5,9 +6,9 @@ namespace Reni.Code
     /// <summary>
     /// Then-Else construct
     /// </summary>
-    internal sealed class  ThenElse : CodeBase
+    internal sealed class ThenElse : CodeBase
     {
-        static int _nextId = 0;
+        private static int _nextId;
 
         private readonly int _thenElseObjectId = _nextId++;
         private readonly CodeBase _condCode;
@@ -75,14 +76,15 @@ namespace Reni.Code
         {
             get
             {
-                Size cSize = _condCode.MaxSize;
-                Size tSize = _thenCode.MaxSize;
-                Size eSize = _elseCode.MaxSize;
+                var cSize = _condCode.MaxSize;
+                var tSize = _thenCode.MaxSize;
+                var eSize = _elseCode.MaxSize;
                 return cSize.Max(tSize).Max(eSize);
             }
         }
     }
-    sealed internal class EndCondional : LeafElement
+
+    internal sealed class EndCondional : LeafElement
     {
         [DumpData(true)]
         private readonly int _thenElseObjectId;
@@ -159,80 +161,36 @@ namespace Reni.Code
 
     internal sealed class Then : LeafElement
     {
-        [DumpData(true)]
-        private readonly int _thenElseObjectId;
-        [DumpData(true)]
-        private readonly Size _condSize;
+        internal readonly int ThenElseObjectId;
+        internal readonly Size CondSize;
 
         public Then(int thenElseObjectId, Size condSize)
         {
-            _thenElseObjectId = thenElseObjectId;
-            _condSize = condSize;
+            ThenElseObjectId = thenElseObjectId;
+            CondSize = condSize;
         }
 
-        /// <summary>
-        /// Gets the size of the delta.
-        /// </summary>
-        /// <value>The size of the delta.</value>
-        /// created 10.10.2006 00:21
-        public override Size DeltaSize { get { return _condSize; } }
+        public override Size DeltaSize { get { return CondSize; } }
+        public override Size Size { get { return Size.Zero; } }
 
-        /// <summary>
-        /// Tries to combine a leaf element with a preceding <see cref="BitCast"/> element.
-        /// </summary>
-        /// <param name="precedingElement">The preceding element.</param>
-        /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
-        /// created 19.11.2006 19:13
         internal override LeafElement TryToCombineBack(BitCast precedingElement)
         {
-            if (precedingElement.Size == _condSize)
-                return new Then(_thenElseObjectId, precedingElement.TargetSize);
+            if(precedingElement.Size == CondSize)
+                return new Then(ThenElseObjectId, precedingElement.TargetSize);
             return null;
         }
 
-        /// <summary>
-        /// Tries to combine back.
-        /// </summary>
-        /// <param name="precedingElement">The preceding element.</param>
-        /// <returns></returns>
-        /// created 04.01.2007 15:57
         internal override LeafElement TryToCombineBack(BitArrayOp precedingElement)
         {
-            if (precedingElement.Size == _condSize)
+            if(precedingElement.Size == CondSize)
                 return new BitArrayOpThen(this, precedingElement);
             return null;
         }
 
-        /// <summary>
-        /// Gets the size.
-        /// </summary>
-        /// <value>The size.</value>
-        /// created 05.10.2006 23:40
-        public override Size Size { get { return Size.Zero; } }
-        /// <summary>
-        /// Formats this instance.
-        /// </summary>
-        /// <param name="start">The start.</param>
-        /// <returns></returns>
-        /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.Then(_thenElseObjectId, _condSize);
+            return start.Then(ThenElseObjectId, CondSize);
         }
-
-        /// <summary>
-        /// Gets the then else object id.
-        /// </summary>
-        /// <value>The then else object id.</value>
-        /// created 29.01.2007 00:03
-        public int ThenElseObjectId { get { return _thenElseObjectId; } }
-
-        /// <summary>
-        /// Gets the size of the cond.
-        /// </summary>
-        /// <value>The size of the cond.</value>
-        /// created 29.01.2007 00:11
-        public Size CondSize { get { return _condSize; } }
     }
 
     internal class BitArrayOpThen : LeafElement
@@ -248,24 +206,9 @@ namespace Reni.Code
             _bitArrayOp = bitArrayOp;
         }
 
-        /// <summary>
-        /// Gets the size.
-        /// </summary>
-        /// <value>The size.</value>
-        /// created 05.10.2006 23:40
         public override Size Size { get { return _bitArrayOp.DeltaSize; } }
-        /// <summary>
-        /// Gets the size of the delta.
-        /// </summary>
-        /// <value>The size of the delta.</value>
-        /// created 10.10.2006 00:21
         public override Size DeltaSize { get { return _thenCode.DeltaSize + _bitArrayOp.DeltaSize; } }
-        /// <summary>
-        /// Formats this instance.
-        /// </summary>
-        /// <param name="start">The start.</param>
-        /// <returns></returns>
-        /// created 07.10.2006 21:11
+
         protected override string Format(StorageDescriptor start)
         {
             return start.BitArrayOpThen(_bitArrayOp.OpToken, _bitArrayOp.LeftSize, _bitArrayOp.RightSize, _thenCode.ThenElseObjectId, _thenCode.CondSize);

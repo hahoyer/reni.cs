@@ -72,7 +72,7 @@ namespace Reni.FeatureTest
         public void AccessEx()
         {
             Parameters.Trace.All();
-            RunCompiler("SomeVariables",
+            RunCompiler("AccessEx",
                         @"
  1;
  4;

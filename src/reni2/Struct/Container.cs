@@ -15,7 +15,7 @@ namespace Reni.Struct
     /// <summary>
     /// Structured data, context free version
     /// </summary>
-    internal sealed class Container : ParsedSyntax, IDumpShortProvider, ICompileSyntax
+    internal sealed class Container : CompileSyntax, IDumpShortProvider
     {
         private static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool _isInDump;
@@ -54,25 +54,15 @@ namespace Reni.Struct
         [DumpData(false)]
         internal ICompileSyntax this[int index] { get { return List[index]; } }
 
-        public Result Result(ContextBase context, Category category)
+        internal protected override Result Result(ContextBase context, Category category)
         {
             return context.CreateStruct(this).NaturalType.ConstructorResult(category);
-        }
-
-        string ICompileSyntax.DumpShort()
-        {
-            return DumpShort();
         }
 
         [DumpData(false)]
         internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
         [DumpData(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
-
-        string ICompileSyntax.FilePosition()
-        {
-            return FilePosition();
-        }
 
         internal protected override string DumpShort()
         {

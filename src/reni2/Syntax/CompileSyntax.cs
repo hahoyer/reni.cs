@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Parser;
@@ -8,6 +9,9 @@ namespace Reni.Syntax
     {
         internal CompileSyntax(Token token)
             : base(token) {}
+
+        internal CompileSyntax(Token token, int objectId)
+            : base(token, objectId) {}
 
         string ICompileSyntax.DumpShort()
         {
@@ -22,7 +26,7 @@ namespace Reni.Syntax
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
             var trace = ObjectId < 0;
-            StartMethodDump(trace, context,category);
+            StartMethodDump(trace, context, category);
             if(category.HasInternal || !(category.HasCode || category.HasRefs))
                 return ReturnMethodDump(trace, Result(context, category));
             var result = Result(context, category | Category.Internal | Category.Type);
@@ -44,10 +48,9 @@ namespace Reni.Syntax
         [DumpData(false)]
         internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
 
-        protected internal override IParsedSyntax CreateSyntax(Token token,IParsedSyntax right)
+        internal protected override IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
         {
             return new ExpressionSyntax(this, token, ToCompiledSyntaxOrNull(right));
         }
-
     }
 }

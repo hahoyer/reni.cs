@@ -13,7 +13,7 @@ namespace Reni.FeatureTest
         /// </summary>
         /// created 05.01.2007 02:13
         [Test]
-        [Category(Worked)]
+        [Category(UnderConstruction)]
         public void Simple()
         {
             RunCompiler("Simple", @"x: 1=0 then 1 else 100;x dump_print;", "100");

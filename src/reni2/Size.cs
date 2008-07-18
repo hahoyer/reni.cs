@@ -26,70 +26,15 @@ namespace Reni
         /// asis
         /// </summary>
         public bool IsZero { get { return _data == 0; } }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is pending.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
-        /// </value>
-        /// created 25.01.2007 23:19
-        public bool IsPending { get { return _data == -1; } }
-
-        /// <summary>
-        /// Converts object to byte count, throws an expetion if not aligned .
-        /// </summary>
-        /// <value>The save byte count.</value>
-        /// created 10.10.2006 01:13
+    public bool IsPending { get { return _data == -1; } }
         public int SaveByteCount { get { return SaveSizeToPacketCount(3); } }
-
-        /// <summary>
-        /// Return the zero size
-        /// </summary>
         public static Size Zero { get { return Create(0); } }
-
-        /// <summary>
-        /// Gets the byte size.
-        /// </summary>
-        /// <value>The byte.</value>
-        /// created 17.01.2007 21:32
         public static Size Byte { get { return Create(1).ByteAlignedSize; } }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is positive.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is positive; otherwise, <c>false</c>.
-        /// </value>
-        /// [created 09.07.2006 14:22]
         public bool IsPositive { get { return _data > 0; } }
-
-        /// <summary>
-        /// Sizes to byte count.
-        /// </summary>
-        /// <returns></returns>
-        /// [created 06.06.2006 01:15]
         public int ByteCount { get { return SizeToPacketCount(3); } }
-
-        /// <summary>
-        /// Special bytes that are required for this size.
-        /// </summary>
-        /// <value>The size of the byte aligned.</value>
-        /// created 15.10.2006 13:26
         public Size ByteAlignedSize { get { return NextPacketSize(3); } }
-
-        /// <summary>
-        /// Gets the pseudo size for pending.requests
-        /// </summary>
-        /// <value>The pending.</value>
-        /// created 24.01.2007 21:43
         public static Size Pending { get { return Create(-1); } }
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
         public static Size Create(int x)
         {
             var result = (Size) _values[x];
@@ -101,20 +46,11 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Sequence representation of value
-        /// </summary>
-        /// <returns></returns>
         public override string Dump()
         {
             return _data.ToString();
         }
 
-        /// <summary>
-        /// Aligns the object to alignBis bits
-        /// </summary>
-        /// <param name="alignBits"></param>
-        /// <returns></returns>
         public Size Align(int alignBits)
         {
             var result = SizeToPacketCount(alignBits) << alignBits;
@@ -123,11 +59,6 @@ namespace Reni
             return Create(result);
         }
 
-        /// <summary>
-        /// Convert size into packets by use of align bits. 
-        /// </summary>
-        /// <param name="alignBits"></param>
-        /// <returns></returns>
         public int SizeToPacketCount(int alignBits)
         {
             Tracer.Assert(!IsPending);

@@ -16,5 +16,6 @@ namespace Reni.Parser
         IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right);
         IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition);
         IParsedSyntax CreateSyntax(Token token, IParsedSyntax right);
+        IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax);
     }
 }
