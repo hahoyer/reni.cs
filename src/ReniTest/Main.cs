@@ -15,7 +15,7 @@ namespace ReniTest
         {
             InitializeComponent();
             CreateCompiler(IntegerStruct.PlusText);
-            Service.Connect(treeView1, _compiler);
+            Service.Connect(treeView1, "Compiler", _compiler);
         }
 
         private void CreateCompiler(string text)
