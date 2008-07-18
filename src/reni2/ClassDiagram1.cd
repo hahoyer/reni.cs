@@ -73,7 +73,7 @@
   <Class Name="Reni.Parser.TokenClass.Name.TelseT" Collapsed="true">
     <Position X="1.5" Y="2" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAI=</HashCode>
       <FileName>Parser\TokenClass\Name\TelseT.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -119,13 +119,6 @@
       <FileName>Parser\TokenClass\SyntaxError.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Reni.ThenElse" Collapsed="true">
-    <Position X="12.25" Y="9.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAIAABQAAAAABAAAAAAQAAAwAACEAADAAAAAAAAA=</HashCode>
-      <FileName>ThenElse.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Reni.Syntax.SyntaxBase" Collapsed="true">
     <Position X="33.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
@@ -136,7 +129,7 @@
   <Class Name="Reni.Parser.ParsedSyntax" Collapsed="true">
     <Position X="7.75" Y="6.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgAAAAABAgAACAEBBgCAAAgAAQAAIACAAEAABJEI=</HashCode>
+      <HashCode>AAAAgAAAAABAgAACAEBBgCAAAgAAQAAKACAAEAABJEI=</HashCode>
       <FileName>Parser\ParsedSyntax.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -165,7 +158,7 @@
   <Class Name="Reni.Struct.Container" Collapsed="true">
     <Position X="5.25" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IEbEACAAAgIA0AAACBRIAAQQAgAIBEAAAGAAIAAiAAI=</HashCode>
+      <HashCode>IEbAACAAAgIA0AAACBRIAAQQAgAIBEAAAGAAIAAiAAI=</HashCode>
       <FileName>Struct\Container.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -173,7 +166,7 @@
   <Class Name="Reni.Syntax.ConverterSyntax" Collapsed="true">
     <Position X="7.5" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAABAAAAAAAABAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
       <FileName>Syntax\ConverterSyntax.cs</FileName>
     </TypeIdentifier>
   </Class>
