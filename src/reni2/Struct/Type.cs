@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -11,7 +12,12 @@ namespace Reni.Struct
 {
     internal sealed class Type : TypeBase
     {
+        [Node]
         internal readonly Context Context;
+        [Node]
+        private Result _internalResult = new Result();
+        [Node]
+        private Result _constructorResult = new Result();
 
         public Type(Context context)
         {
@@ -30,7 +36,11 @@ namespace Reni.Struct
 
         internal Result ConstructorResult(Category category)
         {
-            return CreateResult(category, InternalResult(category - Category.Type));
+            var internalResult = InternalResult(category - Category.Type);
+            _internalResult.Update(internalResult);
+            var constructorResult = CreateResult(category, internalResult);
+            _constructorResult.Update(constructorResult);
+            return constructorResult;
         }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)

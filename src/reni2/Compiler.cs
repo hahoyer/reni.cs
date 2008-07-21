@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper.TreeViewSupport;
+using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using NUnit.Framework;
 using Reni.Code;
@@ -13,10 +13,7 @@ using Reni.Runtime;
 
 namespace Reni
 {
-    /// <summary>
-    /// The compiler for language "Reni"
-    /// </summary>
-    public sealed class Compiler : ITreeNodeSupport
+    public sealed class Compiler : ReniObject
     {
         private readonly string _fileName;
         private readonly CompilerParameters _parameters;
@@ -46,33 +43,22 @@ namespace Reni
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// created 14.07.2007 15:59 on HAHOYER-DELL by hh
-        public Compiler(string fileName) : this(new CompilerParameters(), fileName)
-        {
-        }
+        public Compiler(string fileName) : this(new CompilerParameters(), fileName) {}
 
-        internal FunctionList Functions
-        {
-            get { return RootContext.Functions; }
-        }
+        internal FunctionList Functions { get { return RootContext.Functions; } }
 
-        [Node, DumpData(false)]
-        internal ParserInst Parser
-        {
-            get { return _parser; }
-        }
+        [DumpData(false)]
+        internal ParserInst Parser { get { return _parser; } }
 
-        [Node, DumpData(false)]
-        public string FileName
-        {
-            get { return _fileName; }
-        }
+        [DumpData(false)]
+        public string FileName { get { return _fileName; } }
 
-        [Node, DumpData(false)]
+        [DumpData(false)]
         public Source Source
         {
             get
             {
-                if (_source == null)
+                if(_source == null)
                     _source = new Source(File.m(_fileName));
                 return _source;
             }
@@ -83,24 +69,21 @@ namespace Reni
         {
             get
             {
-                if (_syntax == null)
+                if(_syntax == null)
                     _syntax = _parser.Compile(Source);
                 return _syntax;
             }
         }
 
         [Node, DumpData(false)]
-        internal Root RootContext
-        {
-            get { return _rootContext; }
-        }
+        internal Root RootContext { get { return _rootContext; } }
 
         [DumpData(false)]
         public string ExecutedCode
         {
             get
             {
-                if (_executedCode == null)
+                if(_executedCode == null)
                     _executedCode = Generator.CreateCSharpString(MainContainer, FunctionContainers, true);
                 return _executedCode;
             }
@@ -111,7 +94,7 @@ namespace Reni
         {
             get
             {
-                if (_code == null)
+                if(_code == null)
                     _code = RootContext.Code(Syntax.ToCompileSyntax);
 
                 return _code;
@@ -123,7 +106,7 @@ namespace Reni
         {
             get
             {
-                if (_mainContainer == null)
+                if(_mainContainer == null)
                     _mainContainer = Code.Serialize();
                 return _mainContainer;
             }
@@ -134,7 +117,7 @@ namespace Reni
         {
             get
             {
-                if (_functionContainers == null)
+                if(_functionContainers == null)
                     _functionContainers = RootContext.CompileFunctions();
 
                 return _functionContainers;
@@ -165,36 +148,36 @@ namespace Reni
         /// </summary>
         public OutStream Exec()
         {
-            if (_parameters.Trace.Source)
+            if(_parameters.Trace.Source)
                 Tracer.Line(Source.Dump());
 
-            if (_parameters.Trace.Syntax)
+            if(_parameters.Trace.Syntax)
                 Tracer.FlaggedLine(Syntax.Dump());
 
             if(_parameters.ParseOnly)
                 return null;
 
-            if (_parameters.Trace.Functions)
+            if(_parameters.Trace.Functions)
             {
                 Materialize();
-                for (var i = 0; i < RootContext.Functions.Count; i++)
+                for(var i = 0; i < RootContext.Functions.Count; i++)
                     Tracer.FlaggedLine(RootContext.Functions[i].DumpFunction());
             }
 
-            if (_parameters.Trace.CodeTree)
+            if(_parameters.Trace.CodeTree)
             {
                 Tracer.FlaggedLine("main\n" + Code.Dump());
-                for (var i = 0; i < Functions.Count; i++)
+                for(var i = 0; i < Functions.Count; i++)
                     Tracer.FlaggedLine("function index=" + i + "\n" + RootContext.Functions[i].BodyCode.Dump());
             }
-            if (_parameters.Trace.CodeSequence)
+            if(_parameters.Trace.CodeSequence)
             {
                 Tracer.FlaggedLine("main\n" + MainContainer.Dump());
-                for (var i = 0; i < FunctionContainers.Count; i++)
+                for(var i = 0; i < FunctionContainers.Count; i++)
                     Tracer.FlaggedLine("function index=" + i + "\n" + FunctionContainers[i].Dump());
             }
 
-            if (_parameters.Trace.ExecutedCode)
+            if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(ExecutedCode);
 
             return GetOutStream();
@@ -202,10 +185,10 @@ namespace Reni
 
         internal void Materialize()
         {
-            if (_parameters.ParseOnly)
+            if(_parameters.ParseOnly)
                 return;
             var dummy = Code;
-            for (var i = 0; i < RootContext.Functions.Count; i++)
+            for(var i = 0; i < RootContext.Functions.Count; i++)
                 dummy = RootContext.Functions[i].BodyCode;
             Tracer.Assert(dummy != null);
         }
@@ -219,18 +202,14 @@ namespace Reni
                 var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainMethodName);
                 methodInfo.Invoke(null, new object[0]);
             }
-            catch (CompilerErrorException e)
+            catch(CompilerErrorException e)
             {
-                for (var i = 0; i < e.CompilerErrorCollection.Count; i++)
+                for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
                     BitsConst.OutStream.Add(e.CompilerErrorCollection[i].ToString());
             }
             return BitsConst.OutStream;
         }
 
-        public TreeNode[] CreateNodes()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     /// <summary>
@@ -241,8 +220,9 @@ namespace Reni
         /// <summary>
         /// Shows or hides syntax tree
         /// </summary>
-        [Node, DumpData(true)] public TraceParamters Trace = new TraceParamters();
-        public bool ParseOnly = false;
+        [Node, DumpData(true)]
+        public TraceParamters Trace = new TraceParamters();
+        public bool ParseOnly;
 
         #region Nested type: TraceParamters
 
@@ -251,29 +231,35 @@ namespace Reni
             /// <summary>
             /// Shows or hides serialize code sequence
             /// </summary>
-            [Node, DumpData(true)] public bool CodeSequence;
+            [Node, DumpData(true)]
+            public bool CodeSequence;
 
             /// <summary>
             /// Shows or hides code tree
             /// </summary>
-            [Node, DumpData(true)] public bool CodeTree;
+            [Node, DumpData(true)]
+            public bool CodeTree;
 
             /// <summary>
             /// Shows or hides code code to execute
             /// </summary>
-            [Node, DumpData(true)] public bool ExecutedCode;
+            [Node, DumpData(true)]
+            public bool ExecutedCode;
 
-            [Node, DumpData(true)] public bool Functions;
-
-            /// <summary>
-            /// Shows or hides syntax tree
-            /// </summary>
-            [Node, DumpData(true)] public bool Source;
+            [Node, DumpData(true)]
+            public bool Functions;
 
             /// <summary>
             /// Shows or hides syntax tree
             /// </summary>
-            [Node, DumpData(true)] public bool Syntax;
+            [Node, DumpData(true)]
+            public bool Source;
+
+            /// <summary>
+            /// Shows or hides syntax tree
+            /// </summary>
+            [Node, DumpData(true)]
+            public bool Syntax;
 
             public void None()
             {

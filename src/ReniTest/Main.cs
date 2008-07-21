@@ -1,6 +1,7 @@
-using System.Drawing;
+using System;
 using System.Windows.Forms;
-using HWClassLibrary.Helper.TreeViewSupport;
+using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using Reni;
 using Reni.FeatureTest;
@@ -14,8 +15,8 @@ namespace ReniTest
         public Main()
         {
             InitializeComponent();
-            CreateCompiler(IntegerStruct.PlusText);
-            Service.Connect(treeView1, "Compiler", _compiler);
+            CreateCompiler(Struct.AccessEx1Text);
+            Service.Connect(treeView1, _compiler);
         }
 
         private void CreateCompiler(string text)

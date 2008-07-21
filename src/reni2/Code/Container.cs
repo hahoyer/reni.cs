@@ -20,16 +20,9 @@ namespace Reni.Code
         [DumpData(true)]
         private readonly Size _maxSize;
 
-        [DumpData(true)]
+        [Node, DumpData(true)]
         private List<LeafElement> _data = new List<LeafElement>();
 
-        /// <summary>
-        /// Initializes a new instance of the Container class.
-        /// </summary>
-        /// <param name="maxSize">Size of the max.</param>
-        /// <param name="frameSize">Size of the args.</param>
-        /// <param name="description">The description.</param>
-        /// created 26.11.2006 17:05
         public Container(Size maxSize, Size frameSize, string description)
         {
             _maxSize = maxSize;
@@ -42,28 +35,19 @@ namespace Reni.Code
             _description = errorText;
         }
 
-        private string Description { get { return _description; } }
-        private bool IsError { get { return _frameSize == null; } }
+        [Node, DumpData(true)]
+        internal string Description { get { return _description; } }
+        [Node, DumpData(false)]
+        internal bool IsError { get { return _frameSize == null; } }
 
-        /// <summary>
-        /// Gets the max count.
-        /// </summary>
-        /// <value>The max count.</value>
-        /// created 08.10.2006 00:41
+        [Node, DumpData(false)]
         public Size MaxSize { get { return _maxSize; } }
-
+        [Node, DumpData(false)]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
 
-        /// <summary>
-        /// Gets the data.
-        /// </summary>
-        /// <param name="leafElement">The leaf element.</param>
-        /// <value>The data.</value>
-        /// created 03.10.2006 21:09
         private void DataAdd(LeafElement leafElement)
         {
-            var toAdd = new List<LeafElement>();
-            toAdd.Add(leafElement);
+            var toAdd = new List<LeafElement> {leafElement};
             while(toAdd.Count > 0)
             {
                 var next = toAdd[0];
@@ -84,12 +68,6 @@ namespace Reni.Code
             }
         }
 
-        /// <summary>
-        /// Evals the container by use specified functions.
-        /// </summary>
-        /// <param name="functions">The functions.</param>
-        /// <returns></returns>
-        /// created 03.10.2006 00:43
         public BitsConst Eval(List<Container> functions)
         {
             NotImplementedMethod(functions);

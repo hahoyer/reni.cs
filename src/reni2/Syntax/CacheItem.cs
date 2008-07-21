@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
-using HWClassLibrary.Helper.TreeViewSupport;
+using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Syntax
@@ -9,7 +9,7 @@ namespace Reni.Syntax
     /// For each syntax  object, the environment is mapped against the corresponding compilation result.
     /// The mapping for one environment is extended, each time more categories are requested
     /// </summary>
-    internal sealed class CacheItem : ReniObject
+    internal sealed class CacheItem : ReniObject, IIconKeyProvider
     {
         private readonly ICompileSyntax _syntax;
         private readonly ContextBase _context;
@@ -18,28 +18,23 @@ namespace Reni.Syntax
         [Node]
         public Result Data { get { return _data; } }
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="syntax"></param>
-        /// <param name="environment"></param>
-        public CacheItem(ICompileSyntax syntax, ContextBase environment)
+        public CacheItem(ICompileSyntax syntax, ContextBase context)
         {
             if(syntax == null)
                 throw new NullReferenceException("parameter \"syntax\" must not be null");
             _syntax = syntax;
-            _context = environment;
+            _context = context;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="category"></param>
-        /// <returns></returns>
-        //[DebuggerHidden]
         public Result Result(Category category)
         {
             return _data.AddCategories(category, _context, _syntax);
         }
+
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        public string IconKey { get { return "Cache"; } }
     }
 }

@@ -4,6 +4,7 @@ using HWClassLibrary.Helper;
 
 namespace Reni
 {
+    [AdditionalNodeInfo("NodeDump")]
     public abstract class ReniObject : Dumpable
     {
         private static int _nextObjectId;
@@ -20,11 +21,13 @@ namespace Reni
         [DumpData(false)]
         public virtual int ObjectId { get { return _objectId; } }
         [DumpData(false)]
+        public virtual string NodeDump { get { return GetType().FullName + "." + ObjectId; } }
+        [DumpData(false)]
         internal bool IsStopByObjectIdActive { get; private set; }
 
         public override string Dump()
         {
-            return GetType().FullName + "." + ObjectId + HWString.Surround("{", DumpData(), "}");
+            return NodeDump + HWString.Surround("{", DumpData(), "}");
         }
 
         public override string ToString()

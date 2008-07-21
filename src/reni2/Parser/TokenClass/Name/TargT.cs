@@ -1,3 +1,5 @@
+using System;
+using HWClassLibrary.Debug;
 using Reni.Context;
 
 namespace Reni.Parser.TokenClass.Name
@@ -8,11 +10,6 @@ namespace Reni.Parser.TokenClass.Name
         internal override Result Result(ContextBase context, Category category, Token token)
         {
             return context.CreateArgsRefResult(category);
-        }
-
-        internal override string DumpShort()
-        {
-            return "arg";
         }
     }
 }

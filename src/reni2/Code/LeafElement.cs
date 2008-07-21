@@ -1,21 +1,26 @@
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Code
 {
-    internal abstract class LeafElement : ReniObject
+    internal abstract class LeafElement : ReniObject, IIconKeyProvider
     {
-        public abstract Size Size { get; }
+        [Node, DumpData(false)]
+        internal Size DeltaSize { get { return GetDeltaSize(); } }
         [DumpData(false)]
-        public virtual bool IsEmpty { get { return false; } }
-        [DumpData(false)]
-        public abstract Size DeltaSize { get; }
+        internal virtual bool IsEmpty { get { return false; } }
+        [Node]
+        internal Size Size { get { return GetSize(); } }
         private string CommentDump { get { return GetType().Name + " " + ObjectId; } }
         [DumpData(false)]
-        public virtual RefAlignParam RefAlignParam { get { return null; } }
+        internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
-        public string Statements(StorageDescriptor start)
+        protected abstract Size GetSize();
+        protected abstract Size GetDeltaSize();
+
+        internal string Statements(StorageDescriptor start)
         {
             var result = Format(start);
             if(result != "")
@@ -122,5 +127,12 @@ namespace Reni.Code
             NotImplementedMethod();
             return null;
         }
+
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        string IIconKeyProvider.IconKey { get { return "Code"; } }
+        public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
     }
 }

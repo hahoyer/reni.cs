@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.Helper.TreeViewSupport;
 using HWClassLibrary.IO;
 using Reni.Context;
 using Reni.Feature;
@@ -23,15 +23,19 @@ namespace Reni.Struct
         private static int _nextObjectId;
         private DictionaryEx<int, string> _reverseDictionaryCache;
 
-        internal readonly List<int> Converters = new List<int>();
-        internal readonly List<string> Properties = new List<string>();
-        internal readonly DictionaryEx<string, int> Dictionary = new DictionaryEx<string, int>();
+        [Node]
         internal readonly List<ICompileSyntax> List = new List<ICompileSyntax>();
+        [Node, SmartNode]
+        internal readonly DictionaryEx<string, int> Dictionary = new DictionaryEx<string, int>();
+        [Node, SmartNode]
+        internal readonly List<int> Converters = new List<int>();
+        [Node, SmartNode]
+        internal readonly List<string> Properties = new List<string>();
+
         private readonly SimpleCache<StructFeature[]> _structFeaturesCache = new SimpleCache<StructFeature[]>();
 
         private Container(Token token) : base(token, _nextObjectId++) {}
 
-        [Node, DumpData(false)]
         internal DictionaryEx<int, string> ReverseDictionary
         {
             get
@@ -42,14 +46,7 @@ namespace Reni.Struct
             }
         }
 
-        [Node, DumpData(false)]
-        private StructFeature[] StructFeatures
-        {
-            get
-            {
-                return _structFeaturesCache.Find(CreateStructContainerFeatures);
-            }
-        }
+        private StructFeature[] StructFeatures { get { return _structFeaturesCache.Find(CreateStructContainerFeatures); } }
 
         [DumpData(false)]
         internal ICompileSyntax this[int index] { get { return List[index]; } }
@@ -109,10 +106,10 @@ namespace Reni.Struct
                 if(d.IsProperty)
                     Properties.Add(d.Name.Name);
             }
-            
+
             if(parsedSyntax is ConverterSyntax)
             {
-                ICompileSyntax body = ((ConverterSyntax)parsedSyntax).Body;
+                var body = ((ConverterSyntax) parsedSyntax).Body;
                 parsedSyntax = (IParsedSyntax) body;
                 Converters.Add(List.Count);
             }
@@ -171,7 +168,7 @@ namespace Reni.Struct
         {
             return DumpShort();
         }
-            
+
         private int Find(string name)
         {
             return Dictionary[name];
@@ -194,12 +191,11 @@ namespace Reni.Struct
 
         private SearchResult<StructFeature> Search(Defineable defineable)
         {
-            if (Defined(defineable.Name))
+            if(Defined(defineable.Name))
                 return SearchResult<StructFeature>.Success(StructFeatures[Find(defineable.Name)],
                     defineable);
             return defineable.SearchFromStruct().SubTrial(this);
         }
-
     }
 
     internal class StructFeature : ReniObject, IConverter<IConverter<IFeature, Ref>, Type>, IConverter<IContextFeature, Context>

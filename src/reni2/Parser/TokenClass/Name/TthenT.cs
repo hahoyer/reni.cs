@@ -1,13 +1,11 @@
+using System;
+using HWClassLibrary.Debug;
+
 namespace Reni.Parser.TokenClass.Name
 {
     [Token("then")]
     internal sealed class TthenT : TokenClassBase
     {
-        internal static string DumpShort()
-        {
-            return "then";
-        }
-
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             ParsedSyntax.IsNotNull(right);

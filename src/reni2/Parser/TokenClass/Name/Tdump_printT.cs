@@ -23,8 +23,6 @@ namespace Reni.Parser.TokenClass.Name
             return callObject.DumpPrint(category);
         }
 
-        internal override string Name { get { return "dump_print"; } }
-
         public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             if(args != null)

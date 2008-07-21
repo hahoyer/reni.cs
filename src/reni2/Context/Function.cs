@@ -1,3 +1,4 @@
+using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Type;
 
@@ -5,14 +6,13 @@ namespace Reni.Context
 {
     internal sealed class Function : Child
     {
-        private readonly TypeBase _argsType;
+        [Node]
+        internal readonly TypeBase ArgsType;
 
-        public TypeBase ArgsType { get { return _argsType; } }
-
-        public Function(ContextBase parent, TypeBase argsType)
+        internal Function(ContextBase parent, TypeBase argsType)
             : base(parent)
         {
-            _argsType = argsType;
+            ArgsType = argsType;
         }
 
         internal override Result CreateArgsRefResult(Category category)

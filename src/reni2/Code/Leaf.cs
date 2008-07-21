@@ -1,4 +1,5 @@
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Code
@@ -13,15 +14,16 @@ namespace Reni.Code
         public static bool TryToCombine = false;
 // ReSharper restore RedundantDefaultFieldInitializer
 
-        public Leaf(LeafElement leafElement)
+        internal Leaf(LeafElement leafElement)
         {
             _leafElement = leafElement;
         }
 
-        public override Size Size { get { return LeafElement.Size; } }
-        public LeafElement LeafElement { get { return _leafElement; } }
-        public override bool IsEmpty { get { return LeafElement.IsEmpty; } }
-        public override RefAlignParam RefAlignParam { get { return LeafElement.RefAlignParam; } }
+        internal protected override Size GetSize (){ return LeafElement.Size; } 
+        [Node]
+        internal LeafElement LeafElement { get { return _leafElement; } }
+        internal override bool IsEmpty { get { return LeafElement.IsEmpty; } }
+        internal override RefAlignParam RefAlignParam { get { return LeafElement.RefAlignParam; } }
 
         public override CodeBase CreateChild(LeafElement leafElement)
         {

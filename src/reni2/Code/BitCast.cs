@@ -1,4 +1,5 @@
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 
 namespace Reni.Code
 {
@@ -8,135 +9,97 @@ namespace Reni.Code
     internal sealed class BitCast : LeafElement
     {
         private readonly Size _size;
-        private readonly Size _significantSize;
-        private readonly Size _targetSize;
+        [Node]
+        private readonly Size SignificantSize;
+        [Node]
+        internal readonly Size TargetSize;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BitCast"/> class.
-        /// </summary>
-        /// <param name="targetSize">Size of the target.</param>
-        /// <param name="size">The size.</param>
-        /// <param name="significantSize">Size of the min.</param>
-        /// created 23.09.2006 18:06
-        public BitCast(Size targetSize, Size size, Size significantSize)
+        internal BitCast(Size targetSize, Size size, Size significantSize)
         {
             _size = size;
-            _significantSize = significantSize;
-            _targetSize = targetSize;
+            SignificantSize = significantSize;
+            TargetSize = targetSize;
         }
 
-        /// <summary>
-        /// Tries to combine two leaf elements. .
-        /// </summary>
-        /// <param name="subsequentElement">the element that follows.</param>
-        /// <returns>
-        /// null if no combination possible (default) or a leaf element that contains the combination of both
-        /// </returns>
-        /// created 19.10.2006 21:18
-        /// created 18.11.2006 14:53
+        protected override Size GetSize()
+        {
+            return _size;
+        }
+
+        protected override Size GetDeltaSize()
+        {
+            return TargetSize - GetSize();
+        }
+
         internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
-            if(Size == TargetSize && Size == SignificantSize)
+            if(GetSize() == TargetSize && GetSize() == SignificantSize)
                 return subsequentElement;
             return subsequentElement.TryToCombineBack(this);
         }
 
-        /// <summary>
-        /// Tries to combine a leaf element with a preceding <see cref="BitCast"/> element.
-        /// </summary>
-        /// <param name="precedingElement">The preceding element.</param>
-        /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
-        /// created 19.11.2006 19:13
         internal override LeafElement TryToCombineBack(BitCast precedingElement)
         {
-            if(precedingElement.Size != TargetSize)
+            if(precedingElement.GetSize() != TargetSize)
                 return null;
 
             return new BitCast
                 (
                 precedingElement.TargetSize,
-                Size,
-                _significantSize.Min(precedingElement.SignificantSize)
+                GetSize(),
+                SignificantSize.Min(precedingElement.SignificantSize)
                 );
         }
 
-        /// <summary>
-        /// Tries to combine back.
-        /// </summary>
-        /// <param name="precedingElement">The preceding element.</param>
-        /// <returns></returns>
-        /// created 04.01.2007 03:50
         internal override LeafElement TryToCombineBack(BitArray precedingElement)
         {
             var bitsConst = precedingElement.Data;
             if(bitsConst.Size > SignificantSize)
                 bitsConst = bitsConst.Resize(SignificantSize);
-            return new BitArray(Size, bitsConst);
+            return new BitArray(GetSize(), bitsConst);
         }
 
-        /// <summary>
-        /// Tries to combine back.
-        /// </summary>
-        /// <param name="precedingElement">The preceding element.</param>
-        /// <returns></returns>
-        /// created 04.01.2007 15:07
+        public override string NodeDump { get { return base.NodeDump + "TargetSize="+TargetSize+" SignificantSize="+SignificantSize; } }
+
         internal override LeafElement[] TryToCombineBackN(TopData precedingElement)
         {
-            if (precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
+            if (precedingElement.Size == TargetSize && GetSize() >= SignificantSize && GetSize() > TargetSize)
                 return new LeafElement[]
                            {
-                               new TopData(precedingElement.RefAlignParam, precedingElement.Offset, Size),
-                               new BitCast(Size, Size, SignificantSize)
+                               new TopData(precedingElement.RefAlignParam, precedingElement.Offset, GetSize()),
+                               new BitCast(GetSize(), GetSize(), SignificantSize)
                            };
             return null;
         }
 
-        /// <summary>
-        /// Tries to combine back.
-        /// </summary>
-        /// <param name="precedingElement">The preceding element.</param>
-        /// <returns></returns>
-        /// created 04.01.2007 15:07
         internal override LeafElement[] TryToCombineBackN(TopFrame precedingElement)
         {
-            if (precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
+            if (precedingElement.Size == TargetSize && GetSize() >= SignificantSize && GetSize() > TargetSize)
                 return new LeafElement[]
                            {
-                               new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, Size),
-                               new BitCast(Size, Size, SignificantSize)
+                               new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, GetSize()),
+                               new BitCast(GetSize(), GetSize(), SignificantSize)
                            };
             return null;
         }
 
-        /// <summary>
-        /// Tries to combine back.
-        /// </summary>
-        /// <param name="precedingElement">The preceding element.</param>
-        /// <returns></returns>
-        /// created 04.01.2007 15:57
         internal override LeafElement[] TryToCombineBackN(BitArrayOp precedingElement)
         {
-            if (TargetSize == Size && TargetSize == SignificantSize)
+            if (TargetSize == GetSize() && TargetSize == SignificantSize)
                 return new LeafElement[]{precedingElement};
-            if (TargetSize != Size)
+            if (TargetSize != GetSize())
                 return new LeafElement[]
                            {
-                               new BitArrayOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize,
+                               new BitArrayOp(precedingElement.OpToken, precedingElement.Size + GetSize() - TargetSize,
                                               precedingElement.LeftSize, precedingElement.RightSize),
-                               new BitCast(Size, Size, SignificantSize)
+                               new BitCast(GetSize(), GetSize(), SignificantSize)
                            };
             return null;
         }
 
-        /// <summary>
-        /// Tries to combine a leaf element with a preceding <see cref="Dereference"/> element.
-        /// </summary>
-        /// <param name="precedingElement">the preceding element.</param>
-        /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
-        /// created 19.10.2006 21:25
         internal override LeafElement TryToCombineBack(Dereference precedingElement)
         {
-            if (Size == TargetSize)
+            if (GetSize() == TargetSize)
             {
                 Tracer.Assert(TargetSize == precedingElement.Size);
                 return precedingElement;
@@ -144,41 +107,9 @@ namespace Reni.Code
             return null;
         }
 
-        /// <summary>
-        /// Gets the size.
-        /// </summary>
-        /// <value>The size.</value>
-        /// created 23.09.2006 14:15
-        /// created 23.09.2006 18:06
-        public override Size Size { get { return _size; } }
-
-        /// <summary>
-        /// Gets the size of the delta.
-        /// </summary>
-        /// <value>The size of the delta.</value>
-        /// created 10.10.2006 00:21
-        public override Size DeltaSize { get { return TargetSize - Size; } }
-
-        /// <summary>
-        /// Significant size 
-        /// </summary>
-        public Size SignificantSize { get { return _significantSize; } }
-
-        /// <summary>
-        /// Formats this instance.
-        /// </summary>
-        /// <returns></returns>
-        /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.BitCast(TargetSize, Size, SignificantSize);
+            return start.BitCast(TargetSize, GetSize(), SignificantSize);
         }
-
-        /// <summary>
-        /// Gets the size of the target.
-        /// </summary>
-        /// <value>The size of the target.</value>
-        /// created 05.10.2006 23:24
-        public Size TargetSize { get { return _targetSize; } }
     }
 }

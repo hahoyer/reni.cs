@@ -1,6 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper.TreeViewSupport;
+using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -24,16 +24,16 @@ namespace Reni.Type
             _enableCutCutFeature = new EnableCutFeature(this);
         }
 
-        [Node, DumpData(false)]
+        [DumpData(false)]
         internal Array InheritedType { get { return _inheritedType; } }
         [DumpData(false)]
         internal override Size Size { get { return _inheritedType.Size; } }
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
-        [DumpData(false)]
+        [Node, DumpData(false)]
         internal override int SequenceCount { get { return Count; } }
         [DumpData(false)]
         internal int Count { get { return _inheritedType.Count; } }
-        [DumpData(false)]
+        [Node, DumpData(false)]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
         internal override string DumpShort()

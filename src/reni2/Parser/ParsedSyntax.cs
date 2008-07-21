@@ -1,5 +1,6 @@
+using System;
 using HWClassLibrary.Debug;
-using Reni.Parser.TokenClass.Symbol;
+using HWClassLibrary.Helper;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -20,10 +21,9 @@ namespace Reni.Parser
             Token = token;
         }
 
-        /// <summary>
-        /// Default dump behaviour
-        /// </summary>
-        /// <returns></returns>
+        [DumpData(false)]
+        public new string NodeDump { get { return base.NodeDump + " " + DumpShort(); } }
+
         public override sealed string Dump()
         {
             var isInContainerDump = Container._isInDump;
@@ -59,7 +59,7 @@ namespace Reni.Parser
         ICompileSyntax IParsedSyntax.ToCompileSyntax { get { return ToCompileSyntax; } }
 
         [DumpData(false)]
-        internal virtual protected ICompileSyntax ToCompileSyntax
+        internal protected virtual ICompileSyntax ToCompileSyntax
         {
             get
             {
@@ -67,7 +67,7 @@ namespace Reni.Parser
                 return null;
             }
         }
-        
+
         IParsedSyntax IParsedSyntax.CreateThenSyntax(Token token, ICompileSyntax condition)
         {
             return CreateThenSyntax(token, condition);
@@ -83,12 +83,12 @@ namespace Reni.Parser
             return CreateElseSyntax(token, elseSyntax);
         }
 
-        internal virtual protected IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition)
+        internal protected virtual IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition)
         {
             return new ThenSyntax(condition, token, ToCompileSyntax);
         }
 
-        internal virtual protected IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
+        internal protected virtual IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
         {
             NotImplementedMethod(token, elseSyntax);
             return null;
@@ -117,9 +117,9 @@ namespace Reni.Parser
             return null;
         }
 
-        internal virtual protected IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
+        internal protected virtual IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
         {
-            NotImplementedMethod(token,right);
+            NotImplementedMethod(token, right);
             return null;
         }
 
@@ -151,5 +151,10 @@ namespace Reni.Parser
             return parsedSyntax.ToCompileSyntax;
         }
 
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        string IIconKeyProvider.IconKey { get { return "Syntax"; } }
     }
 }

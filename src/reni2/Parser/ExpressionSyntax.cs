@@ -1,4 +1,5 @@
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Syntax;
 
@@ -6,9 +7,12 @@ namespace Reni.Parser
 {
     internal class ExpressionSyntax : CompileSyntax
     {
+        [Node]
         internal readonly ICompileSyntax Left;
-        internal readonly ICompileSyntax Right;
+        [Node]
         private readonly DefineableToken DefineableToken;
+        [Node]
+        internal readonly ICompileSyntax Right;
 
         internal ExpressionSyntax(ICompileSyntax left, Token token, ICompileSyntax right)
             : base(token)

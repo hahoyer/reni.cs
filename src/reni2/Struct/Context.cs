@@ -17,10 +17,13 @@ namespace Reni.Struct
         private readonly SimpleCache<Type> _naturalTypeCache = new SimpleCache<Type>();
         internal readonly Container Container;
         private readonly SimpleCache<PositionFeature[]> _featuresCache = new SimpleCache<PositionFeature[]>();
+        [Node]
+        internal readonly Result[] _internalResult;
 
         internal Context(ContextBase contextBase, Container container) : base(contextBase)
         {
             Container = container;
+            _internalResult = new Result[StatementList.Count];
         }
 
         [DumpData(false)]
@@ -29,7 +32,7 @@ namespace Reni.Struct
         internal int IndexSize { get { return Container.IndexSize; } }
         [DumpData(false)]
         internal PositionFeature[] Features { get { return _featuresCache.Find(CreateFeaturesCache); } }
-        [DumpData(false)]
+        [Node, DumpData(false)]
         internal Type NaturalType { get { return _naturalTypeCache.Find(() => new Type(this)); } }
         [DumpData(false)]
         internal Ref NaturalRefType { get { return NaturalType.CreateRef(RefAlignParam); } }
@@ -54,9 +57,11 @@ namespace Reni.Struct
 
         private Result InternalResult(Category category, int position)
         {
-            return CreatePosition(position).Result(category | Category.Type, StatementList[position])
-                .PostProcessor
-                .InternalResultForStruct(AlignBits);
+            var result = CreatePosition(position).Result(category | Category.Type, StatementList[position]);
+            if(_internalResult[position]== null)
+                _internalResult[position] = new Result();
+            _internalResult[position].Update(result);
+            return result.PostProcessor.InternalResultForStruct(AlignBits);
         }
 
         private Size InternalSize(int position)
@@ -68,7 +73,7 @@ namespace Reni.Struct
         {
             return Type(StatementList[position])
                 .PostProcessor
-                .AccessResultForStruct(category,refAlignParam,() => AccessCode(position, currentPosition, refAlignParam));
+                .AccessResultForStruct(category, refAlignParam, () => AccessCode(position, currentPosition, refAlignParam));
         }
 
         private CodeBase AccessCode(int position, int currentPosition, RefAlignParam refAlignParam)
@@ -77,7 +82,7 @@ namespace Reni.Struct
             for(var i = position + 1; i < currentPosition; i++)
             {
                 var internalSize = InternalSize(i);
-                if (internalSize.IsPending)
+                if(internalSize.IsPending)
                     return CodeBase.Pending;
                 offset += internalSize;
             }

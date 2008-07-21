@@ -1,27 +1,37 @@
+using HWClassLibrary.Helper;
+
 namespace Reni.Code
 {
     internal class BitArray : LeafElement
     {
         private readonly Size _size;
-        private readonly BitsConst _data;
+        [Node]
+        internal readonly BitsConst Data;
 
         public BitArray(Size size, BitsConst data)
         {
             _size = size;
-            _data = data;
+            Data = data;
             StopByObjectId(-1095);
         }
 
-        public BitsConst Data { get { return _data; } }
-        public override Size Size { get { return _size; } }
-        public override bool IsEmpty { get { return Data.IsEmpty; } }
-        public override Size DeltaSize { get { return Size*(-1); } }
+        protected override Size GetSize()
+        {
+            return _size;
+        }
+
+        internal override bool IsEmpty { get { return Data.IsEmpty; } }
+
+        protected override Size GetDeltaSize()
+        {
+            return GetSize()*(-1);
+        }
 
         protected override string Format(StorageDescriptor start)
         {
-            if (Size.IsZero)
+            if (GetSize().IsZero)
                 return "";
-            return start.BitsArray(Size, Data);
+            return start.BitsArray(GetSize(), Data);
         }
 
         internal override LeafElement TryToCombine(LeafElement subsequentElement)
@@ -31,8 +41,10 @@ namespace Reni.Code
 
         internal override BitsConst Evaluate()
         {
-            return _data.Resize(_size);
+            return Data.Resize(_size);
         }
+
+        public override string NodeDump { get { return base.NodeDump + " Data="+Data; } }
 
         public static BitArray CreateVoid()
         {

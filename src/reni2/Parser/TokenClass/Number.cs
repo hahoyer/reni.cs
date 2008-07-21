@@ -2,7 +2,6 @@
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass
@@ -13,11 +12,7 @@ namespace Reni.Parser.TokenClass
     internal sealed class Number : Terminal
     {
         internal static readonly TokenClassBase Instance = new Number();
-
-        internal override string DumpShort()
-        {
-            return "<number>";
-        }
+        internal override string Name { get { return "<number>"; } }
 
         internal override Result Result(ContextBase context, Category category, Token token)
         {

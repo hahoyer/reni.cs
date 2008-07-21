@@ -1,6 +1,6 @@
 ﻿using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper.TreeViewSupport;
+using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Parser.TokenClass.Symbol;
 using Reni.Syntax;
@@ -73,24 +73,40 @@ namespace Reni.Parser.TokenClass
 
         internal TokenAttribute(string token) : base(token) {}
 
-        public TokenAttribute() : base(null)
-        {
-        }
+        public TokenAttribute() : base(null) {}
     }
 
     /// <summary>
     /// Base clas for compiler tokens
     /// </summary>
-    [AdditionalNodeInfo("NodeDump")]
-    internal abstract class TokenClassBase : ReniObject
+    internal abstract class TokenClassBase : ReniObject, IIconKeyProvider
     {
         private static int _nextObjectId;
+        private string _tokenCache;
 
         protected TokenClassBase() : base(_nextObjectId++) {}
 
+        [Node]
+        internal virtual string Name
+        {
+            get
+            {
+                if(_tokenCache == null)
+                {
+                    _tokenCache = "";
+                    var attributes = GetType().GetCustomAttributes(typeof(TokenAttribute), true);
+                    if(attributes.Length == 1)
+                        _tokenCache = ((TokenAttribute) (attributes[0])).Token;
+
+                }
+                return _tokenCache;
+            }
+        }
         [DumpData(false)]
         internal virtual bool IsEnd { get { return false; } }
 
+        [DumpData(false)]
+        public override string NodeDump { get { return Name; } }
         [DumpData(false)]
         internal virtual TokenFactory NewTokenFactory { get { return null; } }
 
@@ -156,11 +172,19 @@ namespace Reni.Parser.TokenClass
             }
         }
 
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        string IIconKeyProvider.IconKey { get { return "Symbol"; } }
     }
 
     internal abstract class Special : TokenClassBase
     {
-        internal abstract string DumpShort();
+        internal string DumpShort()
+        {
+            return Name;
+        }
     }
 
     internal abstract class Terminal : Special

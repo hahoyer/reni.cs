@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
-using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -16,8 +14,7 @@ namespace Reni.Context
     /// <summary>
     /// Base class for compiler environments
     /// </summary>
-    [AdditionalNodeInfo("DebuggerDumpString")]
-    internal abstract class ContextBase : ReniObject, IDumpShortProvider
+    internal abstract class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         private static int _nextId;
         [Node, DumpData(false)]
@@ -36,13 +33,7 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DumpData(false)]
-        internal Result TopRefResult
-        {
-            get
-            {
-                return Cache._topRefResultCache.Find(() => new Result {Code = CreateTopRefCode(), Refs = Refs.None()});
-            }
-        }
+        internal Result TopRefResult { get { return Cache._topRefResultCache.Find(() => new Result {Code = CreateTopRefCode(), Refs = Refs.None()}); } }
         [DumpData(false)]
         internal Sequence<ContextBase> ChildChain
         {
@@ -109,12 +100,12 @@ namespace Reni.Context
 
         internal TypeBase CreatePropertyType(ICompileSyntax body)
         {
-            return Cache._propertyType.Find(body,() => new Property(this, body));
+            return Cache._propertyType.Find(body, () => new Property(this, body));
         }
 
         public TypeBase CreateFunctionType(ICompileSyntax body)
         {
-            return Cache._functionType.Find(body,() => new Type.Function(this, body));
+            return Cache._functionType.Find(body, () => new Type.Function(this, body));
         }
 
         internal SearchResult<IContextFeature> SearchDefineable(DefineableToken defineableToken)
@@ -195,11 +186,18 @@ namespace Reni.Context
         internal Result Result(Category category, ICompileSyntax syntax)
         {
             var cacheElem = Cache._resultCache.Find
-                    (
-                    syntax,
-                    () => new CacheItem(syntax, this)
-                    );
+                (
+                syntax,
+                () => CreateCacheElement(syntax)
+                );
             return cacheElem.Result(category.Replendish());
+        }
+
+        private CacheItem CreateCacheElement(ICompileSyntax syntax)
+        {
+            var result = new CacheItem(syntax, this);
+            syntax.AddToCache(this, result);
+            return result;
         }
 
         internal bool IsChildOf(ContextBase parentCandidate)
@@ -248,7 +246,7 @@ namespace Reni.Context
 
         internal Result ApplyResult(Category category, ICompileSyntax @object, Result.GetResultFromType apply)
         {
-            var objectResult = ResultAsRef(category|Category.Type, @object);
+            var objectResult = ResultAsRef(category | Category.Type, @object);
             return apply(objectResult.Type)
                 .UseWithArg(objectResult)
                 .Align(AlignBits);
@@ -256,7 +254,7 @@ namespace Reni.Context
 
         internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType, Result.GetSize argsOffset)
         {
-            var applyToRef = ResultAsRef(category|Category.Type, syntax, argsOffset);
+            var applyToRef = ResultAsRef(category | Category.Type, syntax, argsOffset);
             applyToRef.AssertComplete(category | Category.Type, syntax);
             var convertTo = applyToRef.ConvertTo(elementType.CreateSequence(Type(syntax).SequenceCount)).Filter(category);
             convertTo.AssertComplete(category);
@@ -268,7 +266,7 @@ namespace Reni.Context
         internal Result ResultAsRef(Category category, ICompileSyntax syntax, Result.GetSize argsOffset)
         {
             var localCategory = category | Category.Type;
-            if (category.HasInternal)
+            if(category.HasInternal)
                 localCategory = localCategory | Category.ForInternal;
             return Result(localCategory, syntax)
                 .EnsureRef(category | Category.Type, RefAlignParam, argsOffset)
@@ -280,7 +278,7 @@ namespace Reni.Context
             return ResultAsRef(category, syntax, () => Reni.Size.Zero);
         }
 
-        virtual internal Result CreateThisRefResult(Category category)
+        internal virtual Result CreateThisRefResult(Category category)
         {
             NotImplementedMethod(category);
             return null;
@@ -290,23 +288,34 @@ namespace Reni.Context
         {
             return DumpShort();
         }
+
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        string IIconKeyProvider.IconKey { get { return "Context"; } }
     }
 
-    internal class Cache
+    internal class Cache : IIconKeyProvider
     {
-        [Node]
+        [Node, SmartNode]
         internal readonly DictionaryEx<TypeBase, Function> _functionInstanceCache = new DictionaryEx<TypeBase, Function>();
-        [Node]
+        [Node, SmartNode]
         internal readonly DictionaryEx<ICompileSyntax, TypeBase> _functionType = new DictionaryEx<ICompileSyntax, TypeBase>();
-        [Node]
+        [Node, SmartNode]
         internal readonly DictionaryEx<ICompileSyntax, TypeBase> _propertyType = new DictionaryEx<ICompileSyntax, TypeBase>();
-        [Node]
+        [Node, SmartNode]
         internal readonly DictionaryEx<Struct.Container, Struct.Context> _structContainerCache = new DictionaryEx<Struct.Container, Struct.Context>();
-        [Node]
+        [Node, SmartNode]
         internal readonly SimpleCache<Result> _topRefResultCache = new SimpleCache<Result>();
-        [Node]
+        [Node, SmartNode]
         internal readonly DictionaryEx<ICompileSyntax, CacheItem> _resultCache = new DictionaryEx<ICompileSyntax, CacheItem>();
 
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        [DumpData(false)]
+        public string IconKey { get { return "Cache"; } }
     }
-
 }

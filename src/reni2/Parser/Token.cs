@@ -1,7 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
 using Reni.Parser.TokenClass;
-using Reni.Parser.TokenClass.Symbol;
 
 namespace Reni.Parser
 {
@@ -40,7 +39,7 @@ namespace Reni.Parser
         [DumpData(false)]
         public string Name { get { return _source.SubString(0, _length); } }
 
-        public string NodeDump { get { return ToString(); } }
+        public new string NodeDump { get { return ToString(); } }
 
         public string FilePosition { get { return "\n" + Source.FilePosn(Name); } }
 
@@ -71,6 +70,5 @@ namespace Reni.Parser
 
         [DumpData(false)]
         internal TokenFactory NewTokenFactory { get { return TokenClass.NewTokenFactory; } }
-
     }
 }

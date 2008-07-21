@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;

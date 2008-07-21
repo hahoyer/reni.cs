@@ -14,8 +14,6 @@ namespace Reni.Parser.TokenClass.Name
             return SearchResult<IFeature>.Success(this, this);
         }
 
-        internal override string Name { get { return "type"; } }
-
         public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             var objectType = callContext.Type(@object);

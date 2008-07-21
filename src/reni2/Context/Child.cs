@@ -14,6 +14,7 @@ namespace Reni.Context
             _parent = parent;
         }
 
+        [Node]
         internal ContextBase Parent { get { return _parent; } }
 
         internal override sealed RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }

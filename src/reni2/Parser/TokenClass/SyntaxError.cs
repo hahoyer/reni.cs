@@ -17,5 +17,6 @@ namespace Reni.Parser.TokenClass
             _message = message;
         }
 
+        internal override string Name { get { return "<error>"; } }
     }
 }

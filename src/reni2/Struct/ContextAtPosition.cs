@@ -7,18 +7,26 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class ContextAtPosition : Reni.Context.Child
+    internal sealed class ContextAtPosition : ContextBase
     {
         internal readonly Context Context;
+        [Node]
         internal readonly int Position;
         private readonly SimpleCache<TypeAtPosition> _typeCache = new SimpleCache<TypeAtPosition>();
 
-        internal ContextAtPosition(Context context, int position) : base(context)
+
+        internal ContextAtPosition(Context context, int position) 
         {
             Context = context;
             Position = position;
         }
 
+        internal override RefAlignParam RefAlignParam { get { return Context.RefAlignParam; } }
+        internal override Root RootContext { get { return Context.RootContext; } }
+        internal Container Container { get { return Context.Container; } }
+        [Node]
+        internal ContextBase Parent { get { return Context.Parent; } }
+        [Node]
         internal int IndexSize { get { return Context.IndexSize; } }
 
         internal override Result CreateThisRefResult(Category category)

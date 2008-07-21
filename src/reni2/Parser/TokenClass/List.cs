@@ -14,6 +14,8 @@ namespace Reni.Parser.TokenClass
 
         internal static List Instance{get { return _instance; } }
 
+        internal override string Name { get { return ","; } }
+
         /// <summary>
         /// Creates the syntax.
         /// </summary>

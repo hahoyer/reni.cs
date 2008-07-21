@@ -1,41 +1,49 @@
 using System;
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Code
 {
-    internal abstract class CodeBase : ReniObject
+    internal abstract class CodeBase : ReniObject, IIconKeyProvider
     {
+        [Node]
+        internal Size Size { get { return GetSize(); } }
+        [Node, DumpData(false)]
+        internal Size MaxSize { get { return GetMaxSize(); } }
+        [Node, DumpData(false), SmartNode]
+        internal List<ContextBase> Refs { get { return GetRefs().Data; } }
         [DumpData(false)]
-        public virtual Size MaxSize { get { return Size; } }
+        internal virtual bool IsEmpty { get { return false; } }
+        [DumpExcept(false)]
+        internal bool IsRelativeReference { get { return RefAlignParam != null; } }
+        [DumpData(false)]
+        internal virtual RefAlignParam RefAlignParam { get { return null; } }
+        [DumpExcept(false)]
+        internal virtual bool IsPending { get { return false; } }
+        [Node, DumpData(false)]
+        internal Container Serial { get { return Serialize(); } }
 
-        public virtual Size Size
+        internal static CodeBase Pending { get { return new Pending(); } }
+
+        internal protected virtual Size GetMaxSize()
         {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
+            return Size;
         }
 
-        [DumpData(false)]
-        public virtual bool IsEmpty { get { return false; } }
+        internal protected virtual Size GetSize()
+        {
+            NotImplementedMethod();
+            return null;
+        }
 
-        [DumpExcept(false)]
-        public bool IsRelativeReference { get { return RefAlignParam != null; } }
-
-        [DumpData(false)]
-        public virtual RefAlignParam RefAlignParam { get { return null; } }
-
-        public static CodeBase Pending { get { return new Pending(); } }
-
-        [DumpExcept(false)]
-        public virtual bool IsPending { get { return false; } }
-
-        [DumpData(false)]
-        public virtual Refs Refs { get { return Refs.None(); } }
+        internal virtual Refs GetRefs()
+        {
+            return Reni.Refs.None();
+        }
 
         internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, Size leftSize)
         {
@@ -231,7 +239,7 @@ namespace Reni.Code
             return CreateChild(new Call(index, resultSize, Size));
         }
 
-        public Container Serialize()
+        internal Container Serialize()
         {
             try
             {
@@ -273,6 +281,12 @@ namespace Reni.Code
         {
             return CreateBitCast(Size.ByteAlignedSize);
         }
+
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        string IIconKeyProvider.IconKey { get { return "Code"; } }
     }
 
     internal class Assign : LeafElement
@@ -288,9 +302,15 @@ namespace Reni.Code
             _size = size;
         }
 
-        public override Size Size { get { return Size.Zero; } }
+        protected override Size GetSize()
+        {
+            return Size.Zero;
+        }
 
-        public override Size DeltaSize { get { return _refAlignParam.RefSize + _size; } }
+        protected override Size GetDeltaSize()
+        {
+            return _refAlignParam.RefSize + _size;
+        }
 
         protected override string Format(StorageDescriptor start)
         {
@@ -298,21 +318,26 @@ namespace Reni.Code
         }
     }
 
-    internal class Pending : CodeBase
+    internal class Pending : CodeBase, IIconKeyProvider
     {
-        public Pending()
+        internal Pending()
         {
             StopByObjectId(711);
         }
 
-        public override Size Size { get { return Size.Pending; } }
-
-        public override bool IsPending { get { return true; } }
+        internal protected override Size GetSize() { return Size.Pending; } 
+        internal override bool IsPending { get { return true; } }
 
         public override Result VirtVisit<Result>(Visitor<Result> actual)
         {
             throw new UnexpectedVisitOfPending();
         }
+
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        public string IconKey { get { return "Pending"; } }
     }
 
     internal class UnexpectedVisitOfPending : Exception {}

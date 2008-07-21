@@ -1,7 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.Helper.TreeViewSupport;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -11,8 +10,7 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
-    [AdditionalNodeInfo("DebuggerDumpString")]
-    internal abstract class TypeBase : ReniObject, IDumpShortProvider
+    internal abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         private static readonly Bit _bit = new Bit();
         private static readonly Void _void = new Void();
@@ -23,7 +21,6 @@ namespace Reni.Type
         private readonly DictionaryEx<TypeBase, Pair> _pair = new DictionaryEx<TypeBase, Pair>();
         private readonly DictionaryEx<RefAlignParam, AutomaticRef> _ref = new DictionaryEx<RefAlignParam, AutomaticRef>();
         private readonly DictionaryEx<RefAlignParam, AssignableRef> _assignableRef = new DictionaryEx<RefAlignParam, AssignableRef>();
-
         private readonly SimpleCache<TypeType> _typeTypeCache = new SimpleCache<TypeType>();
         private readonly SimpleCache<PostProcessorForType> _postProcessor = new SimpleCache<PostProcessorForType>();
 
@@ -513,6 +510,12 @@ namespace Reni.Type
         {
             return CreateAssignableRef(refAlignParam).CreateResult(category, getCode);
         }
+
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        string IIconKeyProvider.IconKey { get { return "Type"; } }
     }
 
 }

@@ -1,10 +1,11 @@
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Syntax;
 
 namespace Reni.Parser
 {
-    internal interface IParsedSyntax
+    internal interface IParsedSyntax : IIconKeyProvider
     {
         string Dump();
         string DumpShort();

@@ -21,29 +21,13 @@ namespace Reni.Parser.TokenClass
         internal static TokenClassBase Brace { get { return _brace; } }
         internal static TokenClassBase Frame { get { return _frame; } }
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="level">0 for start of file, 1 for "{", 2 for "[" and 3 for "("</param>
+        internal override string Name { get { return "<left "+_level+">"; } }
+
         private LPar(int level)
         {
             _level = level;
         }
 
-        private Result ErrorVisit(ContextBase e, Category c, bool match, SyntaxBase left, SyntaxBase right)
-        {
-            NotImplementedFunction(e, c, match, left, right);
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Creates the syntax.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="token">The token.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 31.03.2007 14:02 on SAPHIRE by HH
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             ParsedSyntax.IsNull(left);
@@ -52,9 +36,6 @@ namespace Reni.Parser.TokenClass
             return right.SurroundedByParenthesis(token);
         }
 
-        /// <summary>
-        /// Special name for begin of file
-        /// </summary>
         internal override string PrioTableName(string name)
         {
             if(_level == 0)

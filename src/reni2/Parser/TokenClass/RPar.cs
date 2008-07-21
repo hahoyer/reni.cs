@@ -19,10 +19,8 @@ namespace Reni.Parser.TokenClass
         internal static TokenClassBase Bracket { get { return _bracket; } }
         internal static TokenClassBase Brace { get { return _brace; } }
         internal static TokenClassBase Frame { get { return _frame; } }
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="level">0 for end of file, 1 for "{", 2 for "[" and 3 for "("</param>
+        internal override string Name { get { return "<right " + _level + ">"; } }
+
         private RPar(int level)
         {
             _level = level;

@@ -1,4 +1,5 @@
 ﻿using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 
 namespace Reni.Type
 {
@@ -15,10 +16,12 @@ namespace Reni.Type
             Tracer.Assert(count > 0);
         }
 
+        [Node]
         internal int Count { get { return _count; } }
-        internal override Size Size { get { return Element.Size*_count; } }
-        internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
+        [Node]
         internal TypeBase Element { get { return Parent; } }
+        internal override Size Size { get { return Element.Size * _count; } }
+        internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
 
         internal override Result DestructorHandler(Category category)
         {

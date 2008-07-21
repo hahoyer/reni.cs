@@ -5,8 +5,6 @@ namespace Reni.Parser.TokenClass.Symbol
     [Token("-")]
     internal class Minus : SequenceOfBitOperation
     {
-        internal override string Name { get { return "-"; } }
-
         internal protected override bool IsBitSequencePrefixOperation { get { return true; } }
 
         internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize)

@@ -15,6 +15,5 @@ namespace Reni.Parser.TokenClass.Name
         {
             return SearchResult<IFeatureForSequence>.Success(this, this);
         }
-        internal override string Name { get { return "enable_cut"; } }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Code
@@ -12,111 +13,65 @@ namespace Reni.Code
         private readonly LeafElement _leafElement;
         private readonly CodeBase _parent;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:Child"/> class.
-        /// </summary>
-        /// <param name="parent">The parent.</param>
-        /// <param name="leafElement">The leaf element.</param>
-        /// created 29.09.2006 00:14
-        public Child(CodeBase parent, LeafElement leafElement)
+        internal Child(CodeBase parent, LeafElement leafElement)
         {
             Tracer.Assert(leafElement != null);
             _parent = parent;
             _leafElement = leafElement;
-            StopByObjectId(-211);
+            StopByObjectId(3727);
         }
 
+        [Node]
+        internal CodeBase Parent { get { return _parent; } }
+        [Node]
+        internal LeafElement LeafElement { get { return _leafElement; } }
 
-        /// <summary>
-        /// Gets the size.
-        /// </summary>
-        /// <value>The size.</value>
-        /// created 23.09.2006 14:15
-        public override Size Size { get { return LeafElement.Size; } }
+        internal protected override Size GetSize()
+        {
+            return LeafElement.Size;
+        }
 
-        /// <summary>
-        /// Gets the parent.
-        /// </summary>
-        /// <value>The parent.</value>
-        /// created 24.09.2006 15:22
-        public CodeBase Parent { get { return _parent; } }
+        internal protected override Size GetMaxSize()
+        {
+            return Parent.MaxSize.Max(LeafElement.Size);
+        }
 
-        /// <summary>
-        /// Gets the leaf.
-        /// </summary>
-        /// <value>The leaf.</value>
-        /// created 05.10.2006 23:21
-        public LeafElement LeafElement { get { return _leafElement; } }
+        internal override Refs GetRefs()
+        {
+            return _parent.GetRefs();
+        }
 
-        /// <summary>
-        /// Gets the ref align param.
-        /// </summary>
-        /// <value>The ref align param.</value>
-        /// created 19.10.2006 19:46
-        /// created 19.10.2006 19:46
-        public override RefAlignParam RefAlignParam
+        internal override RefAlignParam RefAlignParam
         {
             get
             {
-                RefAlignParam result = LeafElement.RefAlignParam;
-                if (result != null)
+                var result = LeafElement.RefAlignParam;
+                if(result != null)
                     return result;
                 return Parent.RefAlignParam;
             }
         }
 
-        public override Refs Refs { get { return _parent.Refs; } }
-
-        /// <summary>
-        /// Creates the child.
-        /// </summary>
-        /// <param name="leafElement">The leaf element.</param>
-        /// <returns></returns>
-        /// created 06.10.2006 00:20
         public override CodeBase CreateChild(LeafElement leafElement)
         {
-            LeafElement[] newLeafElement = LeafElement.TryToCombineN(leafElement);
-            if (newLeafElement != null)
+            var newLeafElement = LeafElement.TryToCombineN(leafElement);
+            if(newLeafElement != null)
                 return Parent.CreateChilds(newLeafElement);
 
             return base.CreateChild(leafElement);
         }
 
-        /// <summary>
-        /// Gets the size of the max.
-        /// </summary>
-        /// <value>The size of the max.</value>
-        /// created 23.09.2006 14:13
-        public override Size MaxSize { get { return Parent.MaxSize.Max(LeafElement.Size); } }
-
-        /// <summary>
-        /// Visitor to replace parts of code, overridable version.
-        /// </summary>
-        /// <param name="actual">The actual.</param>
-        /// <returns></returns>
         public override T VirtVisit<T>(Visitor<T> actual)
         {
             return actual.ChildVisit(this);
         }
 
-        /// <summary>
-        /// Adds to.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <returns></returns>
-        /// created 05.10.2006 23:37
         public int AddTo(Container container)
         {
             NotImplementedMethod(container);
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Res the create.
-        /// </summary>
-        /// <param name="parent">The parent.</param>
-        /// <returns></returns>
-        /// created 05.10.2006 23:37
         public CodeBase ReCreate(CodeBase parent)
         {
             NotImplementedMethod(parent);

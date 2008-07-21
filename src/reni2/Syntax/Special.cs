@@ -1,3 +1,4 @@
+using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
@@ -13,6 +14,7 @@ namespace Reni.Syntax
 
     internal sealed class TerminalSyntax : SpecialSyntax
     {
+        [Node]
         internal readonly Terminal Terminal;
 
         public TerminalSyntax(Token token, Terminal terminal)
@@ -29,7 +31,9 @@ namespace Reni.Syntax
 
     internal sealed class PrefixSyntax : SpecialSyntax
     {
+        [Node]
         internal readonly Prefix Prefix;
+        [Node]
         internal readonly ICompileSyntax Right;
 
         public PrefixSyntax(Token token, Prefix prefix, ICompileSyntax right)
@@ -52,8 +56,11 @@ namespace Reni.Syntax
 
     internal sealed class InfixSyntax : SpecialSyntax
     {
+        [Node]
         internal readonly ICompileSyntax Left;
+        [Node]
         internal readonly Infix Infix;
+        [Node]
         internal readonly ICompileSyntax Right;
 
         public InfixSyntax(Token token, ICompileSyntax left, Infix infix, ICompileSyntax right) : base(token)

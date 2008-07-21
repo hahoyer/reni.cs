@@ -8,6 +8,15 @@ namespace Reni.FeatureTest
     [TestFixture]
     public class Struct : CompilerTest
     {
+        public const string AccessExText = @"
+ 1;
+ 4;
+2050;
+ (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);
+(this _A_T_ 3) dump_print;
+";
+        public const string AccessEx1Text = "5, (this _A_T_ 0)dump_print";
+
         /// <summary>
         /// Access to elements of a structure.
         /// </summary>
@@ -64,6 +73,17 @@ namespace Reni.FeatureTest
         }
 
         /// <summary>
+        /// Access to elements of a structure inside the structure.
+        /// </summary>
+        [Test]
+        [Category(UnderConstruction)]
+        public void AccessEx1()
+        {
+            Parameters.Trace.All();
+            RunCompiler("AccessEx1",AccessEx1Text, "5");
+        }
+
+        /// <summary>
         /// Access to elementas of a structure inside the structure.
         /// </summary>
         /// created 17.11.2006 20:44
@@ -72,18 +92,8 @@ namespace Reni.FeatureTest
         public void AccessEx()
         {
             Parameters.Trace.All();
-            RunCompiler("AccessEx",
-                        @"
- 1;
- 4;
-2050;
- (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);
-(this _A_T_ 3) dump_print;
-"
-                        , "2055"
-                );
+            RunCompiler("AccessEx", AccessExText, "2055");
         }
-
         /// <summary>
         /// Declaration and access to variables
         /// </summary>

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper.TreeViewSupport;
+using HWClassLibrary.Helper;
 using NUnit.Framework;
 using Reni.FeatureTest;
 
@@ -12,7 +12,7 @@ namespace Reni
     /// Compiler visitor category that contains the size of any sytax element
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
-    internal class Size : ReniObject
+    internal class Size : ReniObject, IIconKeyProvider
     {
         private static readonly Hashtable _values = new Hashtable();
         private readonly int _data;
@@ -436,6 +436,17 @@ namespace Reni
                 TestNextPacketSize(17, 24);
             }
         }
+
+        internal string FormatForView()
+        {
+            return ToString() + " " + ToCCodeByteType();
+        }
+
+        /// <summary>
+        /// Gets the icon key.
+        /// </summary>
+        /// <value>The icon key.</value>
+        string IIconKeyProvider.IconKey { get { return "Size"; } }
     }
 
     internal class NotAlignableException : Exception
