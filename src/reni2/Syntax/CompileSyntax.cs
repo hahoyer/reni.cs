@@ -36,10 +36,10 @@ namespace Reni.Syntax
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
-            var trace = ObjectId >= 0 && this is Container;
-            StartMethodDump(trace, context, category);
+            var trace = ObjectId == 27 && context is ContextAtPosition && category.HasCode;
+            StartMethodDumpWithBreak(trace, context, category);
             if(category.HasInternal || !(category.HasCode || category.HasRefs))
-                return ReturnMethodDump(trace, Result(context, category));
+                return ReturnMethodDumpWithBreak(trace, Result(context, category));
             var result = Result(context, category | Category.Internal | Category.Type);
             DumpWithBreak(trace, "result", result);
             return ReturnMethodDumpWithBreak(trace, result.CreateStatement(category, result.Internal));

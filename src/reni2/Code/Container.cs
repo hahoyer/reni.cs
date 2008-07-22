@@ -20,8 +20,9 @@ namespace Reni.Code
         [DumpData(true)]
         private readonly Size _maxSize;
 
-        [Node, DumpData(true)]
+        [DumpData(false)]
         private List<LeafElement> _data = new List<LeafElement>();
+
 
         public Container(Size maxSize, Size frameSize, string description)
         {
@@ -34,6 +35,9 @@ namespace Reni.Code
         {
             _description = errorText;
         }
+
+        [Node, DumpData(true)]
+        internal List<LeafElement> Data {get{ return _data;}}
 
         [Node, DumpData(true)]
         internal string Description { get { return _description; } }

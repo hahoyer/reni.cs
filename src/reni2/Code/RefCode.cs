@@ -29,6 +29,8 @@ namespace Reni.Code
             return GetSize()*-1;
         }
 
+        public override string NodeDump { get { return base.NodeDump + " Offset="+Offset; } }
+
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
     }
 }

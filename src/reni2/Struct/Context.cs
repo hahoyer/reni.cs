@@ -17,7 +17,7 @@ namespace Reni.Struct
         private readonly SimpleCache<Type> _naturalTypeCache = new SimpleCache<Type>();
         internal readonly Container Container;
         private readonly SimpleCache<PositionFeature[]> _featuresCache = new SimpleCache<PositionFeature[]>();
-        [Node]
+        [Node, DumpData(false)]
         internal readonly Result[] _internalResult;
 
         internal Context(ContextBase contextBase, Container container) : base(contextBase)

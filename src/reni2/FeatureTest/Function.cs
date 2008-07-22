@@ -6,7 +6,7 @@ namespace Reni.FeatureTest
     /// <summary>
     /// Functions
     /// </summary>
-    [TestFixture]
+    [TestFixture, Description("ssssss")]
     public class Function : CompilerTest
     {
         #region Setup/Teardown
@@ -27,7 +27,7 @@ namespace Reni.FeatureTest
         /// Two functions.
         /// </summary>
         /// created 08.10.2006 16:33
-        [Test, Category(Worked)]   
+        [Test, Description("ssssss"), Category(Worked)]   
         public void FunctionWithNonLocal()
         {
             RunCompiler("FunctionWithNonLocal",

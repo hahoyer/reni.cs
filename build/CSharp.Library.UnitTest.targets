@@ -19,7 +19,7 @@
 
     <PropertyGroup>
         <StartAction>Program</StartAction>
-        <StartProgram>$(BinDir)\nunit\nunit-gui.exe</StartProgram>
+        <StartProgram>$(BinDir)nunit\nunit.exe</StartProgram>
         <StartArguments>$(TargetFileName)</StartArguments>
     </PropertyGroup>
 

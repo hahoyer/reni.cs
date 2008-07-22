@@ -25,7 +25,7 @@ namespace Reni.Code
         [DumpExcept(false)]
         internal virtual bool IsPending { get { return false; } }
         [Node, DumpData(false)]
-        internal Container Serial { get { return Serialize(); } }
+        internal List<LeafElement> Serial { get { return Serialize().Data; } }
 
         internal static CodeBase Pending { get { return new Pending(); } }
 
