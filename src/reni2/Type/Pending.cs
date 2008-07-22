@@ -6,7 +6,11 @@ namespace Reni.Type
     sealed internal class Pending : TypeBase, IIconKeyProvider
 
     {
-        internal override Size Size { get { return Size.Pending; } }
+        protected override Size GetSize()
+        {
+            return Size.Pending;
+        }
+
         internal override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
         internal override bool IsPending { get { return true; } }
 

@@ -2,7 +2,11 @@
 {
     internal sealed  class Void : TypeBase
     {
-        internal override Size Size { get { return Size.Zero; } }
+        protected override Size GetSize()
+        {
+            return Size.Zero;
+        }
+
         internal override bool IsVoid { get { return true; } }
         internal override string DumpPrintText { get { return "void"; } }
 

@@ -76,11 +76,22 @@ namespace Reni.FeatureTest
         /// Access to elements of a structure inside the structure.
         /// </summary>
         [Test]
-        [Category(UnderConstruction)]
+        [Category(Worked)]
         public void AccessEx1()
         {
-            Parameters.Trace.All();
             RunCompiler("AccessEx1",AccessEx1Text, "5");
+        }
+
+        public const string AccessEx2Text = "5,6, (this _A_T_ 0)dump_print";
+        /// <summary>
+        /// Access to elements of a structure inside the structure.
+        /// </summary>
+        [Test]
+        [Category(UnderConstruction)]
+        public void AccessEx2()
+        {
+            Parameters.Trace.All();
+            RunCompiler("AccessEx2", AccessEx2Text, "5");
         }
 
         /// <summary>

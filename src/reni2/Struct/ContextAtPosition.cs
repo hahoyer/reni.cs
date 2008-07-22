@@ -9,6 +9,7 @@ namespace Reni.Struct
 {
     internal sealed class ContextAtPosition : ContextBase
     {
+        [Node]
         internal readonly Context Context;
         [Node]
         internal readonly int Position;
@@ -51,14 +52,15 @@ namespace Reni.Struct
             return Context.InternalResult(category, 0, Position);
         }
 
-        internal Result AccessResultFromRef(Category category, int i, RefAlignParam refAlignParam)
+        internal Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
-            return Context.AccessResultFromRef(category, Position, Position, refAlignParam);
+            return Context.AccessResultFromRef(category, position, Position, refAlignParam);
         }
     }
 
     internal sealed class TypeAtPosition : TypeBase
     {
+        [Node]
         internal readonly ContextAtPosition Context;
 
         public TypeAtPosition(ContextAtPosition context)
@@ -66,7 +68,10 @@ namespace Reni.Struct
             Context = context;
         }
 
-        internal override Size Size { get { return Context.InternalResult(Category.Size).Size; } }
+        protected override Size GetSize()
+        {
+            return Context.InternalResult(Category.Size).Size;
+        }
 
         internal override string DumpShort()
         {
@@ -75,9 +80,9 @@ namespace Reni.Struct
 
         internal protected override int IndexSize { get { return Context.IndexSize; } }
 
-        internal override Result AccessResultFromRef(Category category, int i, RefAlignParam refAlignParam)
+        internal override Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
-            return Context.AccessResultFromRef(category, i, refAlignParam);
+            return Context.AccessResultFromRef(category, position, refAlignParam);
         }
     }
 }

@@ -15,6 +15,7 @@ namespace Reni.Type
             : base(target, refAlignParam)
         {
             Tracer.Assert(!(target is Aligner) );
+            Tracer.Assert(!(target is Void));
             AssignmentFeature = new AssignmentFeature(this);
         }
 

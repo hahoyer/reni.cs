@@ -11,7 +11,11 @@ namespace Reni.Type
             _parent = parent;
         }
 
-        internal override Size Size { get { return Size.Zero; } }
+        protected override Size GetSize()
+        {
+            return Size.Zero;
+        }
+
         internal override string DumpPrintText { get { return "(" + _parent.DumpPrintText + "()) type"; } }
 
         internal override Result ConvertToItself(Category category)

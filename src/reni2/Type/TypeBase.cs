@@ -34,7 +34,9 @@ namespace Reni.Type
         internal static TypeBase Pending { get { return _pending; } }
 
         [Node]
-        internal abstract Size Size { get; }
+        internal Size Size { get{ return GetSize();} }
+
+        protected abstract Size GetSize();
 
         internal virtual bool IsRef(RefAlignParam refAlignParam)
         {
@@ -69,14 +71,6 @@ namespace Reni.Type
             }
         }
 
-        [DumpData(false)]
-        public virtual bool HasEmptyValue()
-        {
-            NotImplementedMethod();
-            throw new NotImplementedException();
-        }
-
-        [DumpData(false)]
         internal virtual bool HasConverterFromBit()
         {
             NotImplementedMethod();
@@ -495,14 +489,14 @@ namespace Reni.Type
                 .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize, argsSize));
         }
 
-        internal virtual Result AccessResultFromRef(Category category, int index, RefAlignParam refAlignParam)
+        internal virtual Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
-            NotImplementedMethod(category, index, refAlignParam);
+            NotImplementedMethod(category, position, refAlignParam);
             return null;
         }
-        internal virtual Result AccessResult(Category category, int index)
+        internal virtual Result AccessResult(Category category, int position)
         {
-            NotImplementedMethod(category, index);
+            NotImplementedMethod(category, position);
             return null;
         }
 

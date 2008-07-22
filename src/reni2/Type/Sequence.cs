@@ -26,8 +26,12 @@ namespace Reni.Type
 
         [DumpData(false)]
         internal Array InheritedType { get { return _inheritedType; } }
-        [DumpData(false)]
-        internal override Size Size { get { return _inheritedType.Size; } }
+
+        protected override Size GetSize()
+        {
+            return _inheritedType.Size;
+        }
+
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
         [Node, DumpData(false)]
         internal override int SequenceCount { get { return Count; } }
@@ -153,7 +157,7 @@ namespace Reni.Type
             var result = CreateResult
                 (
                 category,
-                () => CodeBase.CreateArg(oldSize).CreateBitCast(Size)
+                () => CodeBase.CreateArg(oldSize).CreateBitCast(GetSize())
                 );
             return result;
         }
@@ -172,7 +176,7 @@ namespace Reni.Type
                 .CreateResult
                 (
                 category,
-                () => CodeBase.CreateArg(Size).CreateBitCast(newType.Size)
+                () => CodeBase.CreateArg(GetSize()).CreateBitCast(newType.GetSize())
                 );
             return result;
         }

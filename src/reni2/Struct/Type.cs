@@ -31,8 +31,11 @@ namespace Reni.Struct
 
         [DumpData(false)]
         internal protected override int IndexSize { get { return Context.IndexSize; } }
-        [DumpData(false)]
-        internal override Size Size { get { return InternalResult(Category.Size).Size; } }
+
+        protected override Size GetSize()
+        {
+            return InternalResult(Category.Size).Size;
+        }
 
         internal Result ConstructorResult(Category category)
         {
@@ -71,9 +74,9 @@ namespace Reni.Struct
             return base.SearchFromRef(defineable).SubTrial(this);
         }
 
-        internal override Result AccessResultFromRef(Category category, int i, RefAlignParam refAlignParam)
+        internal override Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
-            return Context.AccessResultFromRef(category, i, refAlignParam);
+            return Context.AccessResultFromRef(category, position, refAlignParam);
         }
 
         internal sealed class Feature : ReniObject, IConverter<IFeature, Ref>, IFeature

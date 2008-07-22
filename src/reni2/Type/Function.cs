@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Syntax;
@@ -16,10 +17,25 @@ namespace Reni.Type
             _body = body;
         }
 
-        internal ContextBase Context { get { return _context; } }
-        internal ICompileSyntax Body { get { return _body; } }
-        internal override Size Size { get { return Size.Create(0); } }
-        internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# function(" + _body.DumpShort() + ")"; } }
+        internal ContextBase Context
+        {
+            get { return _context; }
+        }
+
+        internal ICompileSyntax Body
+        {
+            get { return _body; }
+        }
+
+        protected override Size GetSize()
+        {
+            return Size.Create(0);
+        }
+
+        internal override string DumpPrintText
+        {
+            get { return "#(#context " + _context.ObjectId + "#)# function(" + _body.DumpShort() + ")"; }
+        }
 
         public override AutomaticRef CreateRef(RefAlignParam refAlignParam)
         {
@@ -48,7 +64,8 @@ namespace Reni.Type
                 .CreateFunctionCall(_context, category, Body, argsResult);
         }
 
-        internal override Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Result.GetCode getCode)
+        internal override Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam,
+                                                           Result.GetCode getCode)
         {
             return CreateResult(category);
         }
@@ -61,10 +78,8 @@ namespace Reni.Type
 
     internal sealed class Property : TypeBase
     {
-        [DumpData(true)]
-        private readonly ICompileSyntax _body;
-        [DumpData(true)]
-        private readonly ContextBase _context;
+        [DumpData(true)] private readonly ICompileSyntax _body;
+        [DumpData(true)] private readonly ContextBase _context;
 
         public Property(ContextBase context, ICompileSyntax body)
         {
@@ -72,8 +87,15 @@ namespace Reni.Type
             _body = body;
         }
 
-        internal override Size Size { get { return Size.Create(0); } }
-        internal override string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# property(" + _body.DumpShort() + ")"; } }
+        protected override Size GetSize()
+        {
+            return Size.Create(0);
+        }
+
+        internal override string DumpPrintText
+        {
+            get { return "#(#context " + _context.ObjectId + "#)# property(" + _body.DumpShort() + ")"; }
+        }
 
         [DumpData(false)]
         internal TypeBase ResolvedType

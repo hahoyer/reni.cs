@@ -9,6 +9,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <ProductVersion>9.0.21022</ProductVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\HWClassLibrary\HWClassLibrary.csproj">
@@ -172,6 +173,11 @@
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
     <None Include="sys.targets" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <Import Project="sys.targets" />
 </Project>

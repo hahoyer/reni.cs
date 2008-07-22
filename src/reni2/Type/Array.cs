@@ -20,7 +20,12 @@ namespace Reni.Type
         internal int Count { get { return _count; } }
         [Node]
         internal TypeBase Element { get { return Parent; } }
-        internal override Size Size { get { return Element.Size * _count; } }
+
+        protected override Size GetSize()
+        {
+            return Element.Size*_count;
+        }
+
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
 
         internal override Result DestructorHandler(Category category)

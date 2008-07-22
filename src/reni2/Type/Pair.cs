@@ -17,7 +17,11 @@ namespace Reni.Type
 
         internal TypeBase First { get { return Parent; } }
         internal TypeBase Second { get { return _second; } }
-        internal override Size Size { get { return First.Size + Second.Size; } }
+
+        protected override Size GetSize()
+        {
+            return First.Size + Second.Size;
+        }
 
         [DumpData(false)]
         internal override string DumpPrintText

@@ -7,15 +7,13 @@ namespace Reni.Type
 {
     internal sealed class Bit : TypeBase
     {
-        [DumpData(false)]
-        internal override Size Size { get { return Size.Create(1); } }
+        protected override Size GetSize()
+        {
+            return Size.Create(1);
+        }
+
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount { get { return 1; } }
-
-        public override bool HasEmptyValue()
-        {
-            return true;
-        }
 
         internal override Result SequenceDumpPrint(Category category, int count)
         {

@@ -19,7 +19,12 @@ namespace Reni.Type
 
         [DumpData(false)]
         internal TypeBase Target { get { return Parent; } }
-        internal override sealed Size Size { get { return RefAlignParam.RefSize; } }
+
+        protected override sealed Size GetSize()
+        {
+            return RefAlignParam.RefSize;
+        }
+
         [DumpData(false)]
         internal override sealed string DumpPrintText { get { return "#(#" + ShortName + "#)# " + Parent.DumpPrintText; } }
         [DumpData(false)]
@@ -53,7 +58,7 @@ namespace Reni.Type
 
         private CodeBase CreateDereferencedArgCode()
         {
-            return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
+            return CodeBase.CreateArg(GetSize()).CreateDereference(RefAlignParam, Target.Size);
         }
 
         internal override sealed TypeBase AutomaticDereference()
@@ -73,7 +78,6 @@ namespace Reni.Type
             return DumpPrint(category);
         }
 
-        [DumpData(false)]
         internal override sealed bool IsRef(RefAlignParam refAlignParam)
         {
             Tracer.Assert(RefAlignParam == refAlignParam);
@@ -112,9 +116,9 @@ namespace Reni.Type
             return Target.IsConvertableTo(dest, conversionFeature);
         }
 
-        internal override Result AccessResult(Category category, int index)
+        internal override Result AccessResult(Category category, int position)
         {
-            return Target.AccessResultFromRef(category, index,RefAlignParam);
+            return Target.AccessResultFromRef(category, position,RefAlignParam);
         }
 
         internal override SearchResult<IFeature> Search(Defineable defineable)

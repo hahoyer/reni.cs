@@ -23,7 +23,10 @@ namespace Reni.Type
         [DumpData(false)]
         internal override int SequenceCount { get { return Parent.SequenceCount; } }
 
-        internal override Size Size { get { return Parent.Size.Align(AlignBits); } }
+        protected override Size GetSize()
+        {
+            return Parent.Size.Align(AlignBits);
+        }
 
         public override AutomaticRef CreateRef(RefAlignParam refAlignParam)
         {
@@ -67,7 +70,7 @@ namespace Reni.Type
             return Parent.CreateResult
                 (
                 category,
-                () => CodeBase.CreateArg(Size).CreateBitCast(Parent.Size)
+                () => CodeBase.CreateArg(GetSize()).CreateBitCast(Parent.Size)
                 );
         }
 
