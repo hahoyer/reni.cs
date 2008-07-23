@@ -15,7 +15,7 @@ namespace ReniTest
         public Main()
         {
             InitializeComponent();
-            CreateCompiler(Struct.AccessEx1Text);
+            CreateCompiler(Struct.AccessEx4Text);
             Service.Connect(treeView1, _compiler);
         }
 

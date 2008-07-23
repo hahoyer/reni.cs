@@ -8,7 +8,7 @@ namespace Reni.FeatureTest
     [TestFixture]
     public class Struct : CompilerTest
     {
-        public const string AccessExText = @"
+        public const string AccessEx5Text = @"
  1;
  4;
 2050;
@@ -94,16 +94,40 @@ namespace Reni.FeatureTest
             RunCompiler("AccessEx2", AccessEx2Text, "5");
         }
 
+        public const string AccessEx3Text = "5,6, (this _A_T_ 1)dump_print";
+        /// <summary>
+        /// Access to elements of a structure inside the structure.
+        /// </summary>
+        [Test]
+        [Category(UnderConstruction)]
+        public void AccessEx3()
+        {
+            Parameters.Trace.All();
+            RunCompiler("AccessEx3", AccessEx3Text, "6");
+        }
+
+        public const string AccessEx4Text = "5, (this _A_T_ 0 + this _A_T_ 0)dump_print";
+        /// <summary>
+        /// Access to elements of a structure inside the structure.
+        /// </summary>
+        [Test]
+        [Category(UnderConstruction)]
+        public void AccessEx4()
+        {
+            Parameters.Trace.All();
+            RunCompiler("AccessEx4", AccessEx4Text, "10");
+        }
+
         /// <summary>
         /// Access to elementas of a structure inside the structure.
         /// </summary>
         /// created 17.11.2006 20:44
         [Test]
         [Category(Worked)]
-        public void AccessEx()
+        public void AccessEx5()
         {
             Parameters.Trace.All();
-            RunCompiler("AccessEx", AccessExText, "2055");
+            RunCompiler("AccessEx5", AccessEx5Text, "2055");
         }
         /// <summary>
         /// Declaration and access to variables
