@@ -1,4 +1,6 @@
+using System;
 using System.Diagnostics;
+using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
 using NUnit.Framework;
@@ -112,5 +114,53 @@ namespace Reni.FeatureTest
             }
             return false;
         }
+
+        private static MethodBase GetTestMethod(int depth)
+        {
+            for (var i = 0; i < 100; i++)
+            {
+                var result = new StackTrace(true).GetFrame(depth + i).GetMethod();
+                if (result.GetCustomAttributes(typeof(TestAttribute), true).Length > 0)
+                    return result;
+            }
+            return null;
+        }
+
+        protected void GenericRun()
+        {
+            GenericRun(0);
+            
+        }
+
+        private void GenericRun(int depth)
+        {
+            var m = GetTestMethod(depth+1);
+            var n = m.Name + "Class";
+            var type = FindNestedType(n);
+            var testObject = (CompilerTestClass) Activator.CreateInstance(type);
+            testObject.Start();
+            testObject.Run();
+        }
+        private System.Type FindNestedType(string name)
+        {
+            var types = GetType().GetNestedTypes();
+            foreach (var type in types)
+            {
+                if(type.Name == name)
+                    return type;
+            }
+            return null;
+        }
+    }
+
+    public abstract class CompilerTestClass: CompilerTest
+    {
+        public virtual void Run()
+        {
+            RunCompiler(GetType().Name, Target, Output);
+        }
+
+        public abstract string Output { get; }
+        public abstract string Target { get; }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using HWClassLibrary.Debug;
 using NUnit.Framework;
 
 namespace Reni.FeatureTest
@@ -8,13 +10,15 @@ namespace Reni.FeatureTest
     [TestFixture]
     public class Struct : CompilerTest
     {
-        public const string AccessEx5Text = @"
+        public const string AccessEx5Text =
+            @"
  1;
  4;
 2050;
  (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);
 (this _A_T_ 3) dump_print;
 ";
+
         public const string AccessEx1Text = "5, (this _A_T_ 0)dump_print";
 
         /// <summary>
@@ -23,10 +27,7 @@ namespace Reni.FeatureTest
         /// created 17.11.2006 20:43
         [Test]
         [Category(Worked)]
-        public void AccessSimple()
-        {
-            RunCompiler("AccessSimple", @"((0, 1) _A_T_ 0) dump_print;", "0");
-        }
+        public void AccessSimple() { RunCompiler("AccessSimple", @"((0, 1) _A_T_ 0) dump_print;", "0"); }
 
         /// <summary>
         /// Access to elements of a structure.
@@ -34,10 +35,7 @@ namespace Reni.FeatureTest
         /// created 17.11.2006 20:43
         [Test]
         [Category(Worked)]
-        public void AccessSimpleAdditionalColon()
-        {
-            RunCompiler("AccessSimpleAdditionalColon", @"((0, 1,) _A_T_ 0) dump_print;", "0");
-        }
+        public void AccessSimpleAdditionalColon() { RunCompiler("AccessSimpleAdditionalColon", @"((0, 1,) _A_T_ 0) dump_print;", "0"); }
 
         /// <summary>
         /// Access to elements of a structure.
@@ -77,12 +75,10 @@ namespace Reni.FeatureTest
         /// </summary>
         [Test]
         [Category(Worked)]
-        public void AccessEx1()
-        {
-            RunCompiler("AccessEx1",AccessEx1Text, "5");
-        }
+        public void AccessEx1() { RunCompiler("AccessEx1", AccessEx1Text, "5"); }
 
         public const string AccessEx2Text = "5,6, (this _A_T_ 0)dump_print";
+
         /// <summary>
         /// Access to elements of a structure inside the structure.
         /// </summary>
@@ -95,6 +91,7 @@ namespace Reni.FeatureTest
         }
 
         public const string AccessEx3Text = "5,6, (this _A_T_ 1)dump_print";
+
         /// <summary>
         /// Access to elements of a structure inside the structure.
         /// </summary>
@@ -106,16 +103,23 @@ namespace Reni.FeatureTest
             RunCompiler("AccessEx3", AccessEx3Text, "6");
         }
 
-        public const string AccessEx4Text = "5, (this _A_T_ 0 + this _A_T_ 0)dump_print";
         /// <summary>
         /// Access to elements of a structure inside the structure.
         /// </summary>
         [Test]
         [Category(UnderConstruction)]
-        public void AccessEx4()
+        public void AccessAndAdd() { GenericRun(); }
+
+        public class AccessAndAddClass : CompilerTestClass
         {
-            Parameters.Trace.All();
-            RunCompiler("AccessEx4", AccessEx4Text, "10");
+            public override string Target { get { return "5, (this _A_T_ 0 + this _A_T_ 0)dump_print"; } }
+            public override string Output { get { return "10"; } }
+
+            public override void Run()
+            {
+                Parameters.Trace.All();
+                base.Run();
+            }
         }
 
         /// <summary>
@@ -129,6 +133,7 @@ namespace Reni.FeatureTest
             Parameters.Trace.All();
             RunCompiler("AccessEx5", AccessEx5Text, "2055");
         }
+
         /// <summary>
         /// Declaration and access to variables
         /// </summary>
@@ -187,6 +192,5 @@ x4 dump_print;
                         "11"
                 );
         }
-
     }
 }
