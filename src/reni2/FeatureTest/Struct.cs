@@ -108,9 +108,9 @@ namespace Reni.FeatureTest
         /// </summary>
         [Test]
         [Category(UnderConstruction)]
-        public void AccessAndAdd() { GenericRun(); }
+        public void _000_AccessAndAdd() { GenericRun(); }
 
-        public class AccessAndAddClass : CompilerTestClass
+        public class AccessAndAdd : CompilerTestClass
         {
             public override string Target { get { return "5, (this _A_T_ 0 + this _A_T_ 0)dump_print"; } }
             public override string Output { get { return "10"; } }

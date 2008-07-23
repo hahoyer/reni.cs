@@ -135,7 +135,7 @@ namespace Reni.FeatureTest
         private void GenericRun(int depth)
         {
             var m = GetTestMethod(depth+1);
-            var n = m.Name + "Class";
+            var n = m.Name.Split('_')[2];
             var type = FindNestedType(n);
             var testObject = (CompilerTestClass) Activator.CreateInstance(type);
             testObject.Start();
