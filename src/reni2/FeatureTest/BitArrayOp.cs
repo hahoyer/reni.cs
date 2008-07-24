@@ -88,5 +88,7 @@ namespace Reni.FeatureTest
             RunCompiler("1st", @"(40000 - 43210)dump_print", "-3210");
             RunCompiler("1st", @"( 400 - 43210)dump_print", "-42810");
         }
+
+        public override void Run() {  }
     }
 }

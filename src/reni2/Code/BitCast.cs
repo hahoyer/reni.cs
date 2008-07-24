@@ -59,7 +59,7 @@ namespace Reni.Code
             return new BitArray(GetSize(), bitsConst);
         }
 
-        public override string NodeDump { get { return base.NodeDump + "TargetSize="+TargetSize+" SignificantSize="+SignificantSize; } }
+        public override string NodeDump { get { return base.NodeDump + " TargetSize="+TargetSize+" SignificantSize="+SignificantSize; } }
 
         internal override LeafElement[] TryToCombineBackN(TopData precedingElement)
         {

@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
 using NUnit.Framework;
@@ -20,32 +20,18 @@ namespace Reni.FeatureTest
         public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
         public const string Worked = "Worked";
         public CompilerParameters Parameters;
+        private Dictionary<System.Type, CompilerTest> _cache;
 
         [SetUp]
-        public void Start()
-        {
-            Parameters = new CompilerParameters();
-        }
+        public void Start() { Parameters = new CompilerParameters(); }
 
-        protected void RunCompiler(string name, string text, string expectedOutput)
-        {
-            RunCompiler(1, name, text, expectedOutput);
-        }
+        protected void RunCompiler(string name, string text, string expectedOutput) { RunCompiler(1, name, text, expectedOutput); }
 
-        protected void RunCompiler(string name, string text, ExpectedResult expectedResult, string expectedOutput)
-        {
-            RunCompiler(1, name, text, expectedResult, expectedOutput);
-        }
+        protected void RunCompiler(string name, string text, ExpectedResult expectedResult, string expectedOutput) { RunCompiler(1, name, text, expectedResult, expectedOutput); }
 
-        protected void RunCompiler(string name, string text, ExpectedResult expectedResult)
-        {
-            RunCompiler(1, name, text, expectedResult, "");
-        }
+        protected void RunCompiler(string name, string text, ExpectedResult expectedResult) { RunCompiler(1, name, text, expectedResult, ""); }
 
-        protected void RunCompiler(string name, string expectedOutput)
-        {
-            RunCompiler(1, name, expectedOutput);
-        }
+        protected void RunCompiler(string name, string expectedOutput) { RunCompiler(1, name, expectedOutput); }
 
         private void RunCompiler(int depth, string name, string text, ExpectedResult expectedResult,
             string expectedOutput)
@@ -56,20 +42,11 @@ namespace Reni.FeatureTest
             InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
         }
 
-        private void RunCompiler(int depth, string name, string text, string expectedOutput)
-        {
-            RunCompiler(depth + 1, name, text, default(ExpectedResult), expectedOutput);
-        }
+        internal void RunCompiler(int depth, string name, string text, string expectedOutput) { RunCompiler(depth + 1, name, text, default(ExpectedResult), expectedOutput); }
 
-        private void RunCompiler(int depth, string name, string expectedOutput)
-        {
-            RunCompiler(depth + 1, name, default(ExpectedResult), expectedOutput);
-        }
+        private void RunCompiler(int depth, string name, string expectedOutput) { RunCompiler(depth + 1, name, default(ExpectedResult), expectedOutput); }
 
-        private void RunCompiler(int depth, string name, ExpectedResult expectedResult, string expectedOutput)
-        {
-            InternalRunCompiler(depth + 1, File.SourcePath(1) + "\\" + name + ".reni", expectedResult, expectedOutput);
-        }
+        private void RunCompiler(int depth, string name, ExpectedResult expectedResult, string expectedOutput) { InternalRunCompiler(depth + 1, File.SourcePath(1) + "\\" + name + ".reni", expectedResult, expectedOutput); }
 
         private void InternalRunCompiler(int depth, string fileName, ExpectedResult expectedResult,
             string expectedOutput)
@@ -105,62 +82,45 @@ namespace Reni.FeatureTest
                 {
                     var xx = x.GetCustomAttributes(typeof(CategoryAttribute), true);
                     for(var ii = 0; ii < xx.Length; ii++)
-                    {
                         if(((CategoryAttribute) xx[ii]).Name == UnderConstruction)
                             return true;
-                    }
                     return false;
                 }
             }
             return false;
         }
 
-        private static MethodBase GetTestMethod(int depth)
+        private void RunDependant(Dictionary<System.Type, CompilerTest> cache)
         {
-            for (var i = 0; i < 100; i++)
+            _cache = cache;
+            RunDependants();
+            Start();
+            Run();
+        }
+
+        public abstract void Run();
+
+        protected void BaseRun()
+        {
+            if(_cache == null)
             {
-                var result = new StackTrace(true).GetFrame(depth + i).GetMethod();
-                if (result.GetCustomAttributes(typeof(TestAttribute), true).Length > 0)
-                    return result;
+                _cache = new Dictionary<System.Type, CompilerTest>();
+                RunDependants();
             }
-            return null;
+
+            RunCompiler(1, GetType().Name, Target, Output);
         }
 
-        protected void GenericRun()
+        private void RunDependants()
         {
-            GenericRun(0);
-            
+            _cache.Add(GetType(), this);
+            foreach(var dependsOnType in DependsOn)
+                if(!_cache.ContainsKey(dependsOnType))
+                    ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant(_cache);
         }
 
-        private void GenericRun(int depth)
-        {
-            var m = GetTestMethod(depth+1);
-            var n = m.Name.Split('_')[2];
-            var type = FindNestedType(n);
-            var testObject = (CompilerTestClass) Activator.CreateInstance(type);
-            testObject.Start();
-            testObject.Run();
-        }
-        private System.Type FindNestedType(string name)
-        {
-            var types = GetType().GetNestedTypes();
-            foreach (var type in types)
-            {
-                if(type.Name == name)
-                    return type;
-            }
-            return null;
-        }
-    }
-
-    public abstract class CompilerTestClass: CompilerTest
-    {
-        public virtual void Run()
-        {
-            RunCompiler(GetType().Name, Target, Output);
-        }
-
-        public abstract string Output { get; }
-        public abstract string Target { get; }
+        public virtual string Output { get { return ""; } }
+        public virtual string Target { get { return ""; } }
+        public virtual System.Type[] DependsOn { get { return new System.Type[0]; } }
     }
 }

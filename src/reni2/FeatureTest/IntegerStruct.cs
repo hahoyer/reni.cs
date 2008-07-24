@@ -98,5 +98,6 @@ Integer8: function
                       + "; (Integer8(1)+Integer8(2)) dump_print";
              }
         }
+        public override void Run() {  }
     }
 }

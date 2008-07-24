@@ -21,6 +21,8 @@ namespace Reni.Code
             StopByObjectId(717);
         }
 
+        public override string NodeDump { get { return base.NodeDump + " Right="+Right; } }
+
         protected override Size GetSize()
         {
             return RefAlignParam.RefSize;

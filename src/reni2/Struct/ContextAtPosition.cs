@@ -32,9 +32,7 @@ namespace Reni.Struct
 
         internal override Result CreateThisRefResult(Category category)
         {
-            return CreateType()
-                .CreateRef(RefAlignParam)
-                .CreateResult(category, () => CodeBase.CreateTopRef(RefAlignParam));
+            return CreateType().CreateContextRefResult(category,this);
         }
 
         internal TypeAtPosition CreateType()

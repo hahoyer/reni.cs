@@ -1,6 +1,7 @@
 using NUnit.Framework;
+using Reni.FeatureTest.Struct;
 
-namespace Reni.FeatureTest
+namespace Reni.FeatureTest.DefaultOperations
 {
     /// <summary>
     /// Default operators
@@ -8,17 +9,24 @@ namespace Reni.FeatureTest
     [TestFixture]
     public class DefaultOperations: CompilerTest
     {
-        /// <summary>
-        /// Type operator.
-        /// </summary>
-        /// created 05.01.2007 02:13
-        [Test,Category(Worked)]
+        public override string Target { get { return @"x: 0; x type dump_print"; } }
+        public override string Output { get { return "(bit)sequence(1)"; } }
+        public override System.Type[] DependsOn { get { return new[] { typeof(SomeVariables) }; } }
+
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+    /// <summary>
+    /// Default operators
+    /// </summary>
+    [TestFixture]
+    public class OldStyle : CompilerTest
+    {
+        [Test, Category(Worked)]
         public void TypeOperator()
         {
-            RunCompiler("TypeOperator", @"x: 0; x type dump_print", "(bit)sequence(1)");
             RunCompiler("TypeOperator", @"31 type dump_print", "(bit)sequence(6)");
         }
-
         /// <summary>
         /// Compares the operators.
         /// </summary>
@@ -38,7 +46,7 @@ namespace Reni.FeatureTest
         /// Apply type operator.
         /// </summary>
         /// created 08.01.2007 00:05
-        [Test,Category(Worked)]
+        [Test, Category(Worked)]
         public void ApplyTypeOperator()
         {
             RunCompiler("ApplyTypeOperator", @"(31 type (28))dump_print", "28");
@@ -53,5 +61,9 @@ namespace Reni.FeatureTest
             RunCompiler("ApplyTypeOperator", @"(31 type (100 enable_cut))dump_print", "-28");
         }
 
+        public override void Run()
+        {
+        }
     }
 }
+

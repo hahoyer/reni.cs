@@ -216,9 +216,10 @@ namespace Reni.Type
             return CreateResult(category, getCode, Refs.None, getInternal);
         }
 
-        public Result CreateContextRefResult<C>(Category category, C context) where C : ContextBase
+        internal Result CreateContextRefResult<C>(Category category, C context) where C : ContextBase
         {
-            return CreateResult(
+            return CreateRef(context.RefAlignParam)
+                .CreateResult(
                 category,
                 () => CodeBase.CreateContextRef(context),
                 () => Refs.Context(context));

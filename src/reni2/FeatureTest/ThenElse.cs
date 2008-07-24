@@ -20,5 +20,6 @@ namespace Reni.FeatureTest
             RunCompiler("Simple", @"x: 1=1 then 1 else 100;x dump_print;", "1");
         }
 
+        public override void Run() {  }
     }
 }

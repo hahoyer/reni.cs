@@ -21,6 +21,8 @@ namespace Reni.FeatureTest
             base.Start();
         }
 
+        public override void Run() {  }
+
         #endregion
 
         /// <summary>

@@ -15,6 +15,9 @@ namespace Reni.Parser
             base.Start();
         }
 
+        public override void Run() { 
+        }
+
         /// <summary>
         /// Special test, will not work automatically.
         /// </summary>
