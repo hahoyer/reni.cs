@@ -3,7 +3,7 @@ using Reni.Type;
 namespace Reni.Parser.TokenClass.Symbol
 {
     [Token("-")]
-    internal class Minus : SequenceOfBitOperation
+    sealed internal class Minus : SequenceOfBitOperation
     {
         internal protected override bool IsBitSequencePrefixOperation { get { return true; } }
 

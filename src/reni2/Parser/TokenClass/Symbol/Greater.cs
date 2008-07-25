@@ -1,7 +1,7 @@
 namespace Reni.Parser.TokenClass.Symbol
 {
     [Token(">")]
-    class Greater : CompareOperator
+    sealed class Greater : CompareOperator
     {
     }
 }

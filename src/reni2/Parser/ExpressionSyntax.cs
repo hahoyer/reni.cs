@@ -5,7 +5,7 @@ using Reni.Syntax;
 
 namespace Reni.Parser
 {
-    internal class ExpressionSyntax : CompileSyntax
+    sealed internal class ExpressionSyntax : CompileSyntax
     {
         [Node]
         internal readonly ICompileSyntax Left;
