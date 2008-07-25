@@ -15,7 +15,7 @@ namespace Reni
 
         internal Result InternalResultForStruct(int AlignBits)
         {
-            return _result.AutomaticDereference().Align(AlignBits);
+            return _result.AutomaticDereference().Align(AlignBits).CreateStatement();
         }
     }
 

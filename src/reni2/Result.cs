@@ -688,12 +688,6 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Creates the results for a statement, i. e. respecting temporary results
-        /// </summary>
-        /// <param name="category"></param>
-        /// <param name="tempResult"></param>
-        /// <returns></returns>
         internal Result CreateStatement(Category category, Result tempResult)
         {
             if(tempResult == null)
@@ -719,6 +713,11 @@ namespace Reni
                 finalResult.Code = resultCode;
             }
             return finalResult;
+        }
+
+        internal Result CreateStatement()
+        {
+            return CreateStatement(Complete, Internal);
         }
 
         internal static Result CreatePending(Category category)
@@ -765,7 +764,7 @@ namespace Reni
         internal BitsConst Evaluate()
         {
             Tracer.Assert(Refs.IsNone);
-            return Code.Serialize().Evaluate();
+            return Code.Serialize(false).Evaluate();
         }
 
         internal Result EnsureRef(Category category, RefAlignParam refAlignParam, GetSize offset)

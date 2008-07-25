@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -14,6 +15,11 @@ namespace Reni.Code
         private static readonly Container _unexpectedVisitOfPending = new Container("UnexpectedVisitOfPending");
         private readonly string _description;
 
+        /// <summary>
+        /// When set, some exceptions for unserialisable elements are not thrown. 
+        /// </summary>
+        internal readonly bool IsInternal;
+
         [DumpData(true)]
         private readonly Size _frameSize;
 
@@ -23,10 +29,10 @@ namespace Reni.Code
         [DumpData(false)]
         private List<LeafElement> _data = new List<LeafElement>();
 
-
-        public Container(Size maxSize, Size frameSize, string description)
+        public Container(Size maxSize, Size frameSize, string description, bool isInternal)
         {
             _maxSize = maxSize;
+            IsInternal = isInternal;
             _frameSize = frameSize;
             _description = description;
         }
@@ -34,10 +40,11 @@ namespace Reni.Code
         private Container(string errorText)
         {
             _description = errorText;
+            IsInternal = false;
         }
 
         [Node, DumpData(true)]
-        internal List<LeafElement> Data {get{ return _data;}}
+        internal List<LeafElement> Data { get { return _data; } }
 
         [Node, DumpData(true)]
         internal string Description { get { return _description; } }
@@ -58,11 +65,11 @@ namespace Reni.Code
                 toAdd.RemoveAt(0);
 
                 LeafElement[] newCorrectedElements = null;
-                
+
                 if(_data.Count > 0)
                     newCorrectedElements = _data[_data.Count - 1].TryToCombineN(next);
 
-                if (newCorrectedElements == null)
+                if(newCorrectedElements == null)
                     _data.Add(next);
                 else
                 {
@@ -78,125 +85,46 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Contexts the ref.
-        /// </summary>
-        /// <param name="visitedObject">The visited object.</param>
-        /// <returns></returns>
-        /// created 17.10.2006 00:04
         internal override int ContextRef<C>(ContextRef<C> visitedObject)
         {
-            throw new UnexpectedContextRefInContainer(this, visitedObject);
+            if(!IsInternal)
+                throw new UnexpectedContextRefInContainer(this, visitedObject);
+            DataAdd(new ErrorElement(visitedObject.Dump()));
+            return 1;
         }
 
-        /// <summary>
-        /// Childs the specified parent.
-        /// </summary>
-        /// <param name="parent">The parent.</param>
-        /// <param name="leafElement">The leaf element.</param>
-        /// <returns></returns>
-        /// created 06.10.2006 00:18
-        internal override int Child(int parent, LeafElement leafElement)
-        {
-            return parent + Leaf(leafElement);
-        }
+        internal override int Child(int parent, LeafElement leafElement) { return parent + Leaf(leafElement); }
 
-        /// <summary>
-        /// Leafs the specified leaf element.
-        /// </summary>
-        /// <param name="leafElement">The leaf element.</param>
-        /// <returns></returns>
-        /// created 06.10.2006 00:22
         internal override int Leaf(LeafElement leafElement)
         {
             DataAdd(leafElement);
             return 1;
         }
 
-        /// <summary>
-        /// Sequences the specified visited object.
-        /// </summary>
-        /// <param name="visitedObject">The visited object.</param>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 03.10.2006 01:39
-        internal override int Pair(Pair visitedObject, int left, int right)
-        {
-            return left + right;
-        }
+        internal override int Pair(Pair visitedObject, int left, int right) { return left + right; }
 
-        /// <summary>
-        /// Thens the else.
-        /// </summary>
-        /// <param name="visitedObject">The visited object.</param>
-        /// <param name="condResult">The cond result.</param>
-        /// <param name="thenResult">The then result.</param>
-        /// <param name="elseResult">The else result.</param>
-        /// <returns></returns>
-        /// created 09.01.2007 04:54
-        internal override int ThenElse(ThenElse visitedObject, int condResult, int thenResult, int elseResult)
-        {
-            return thenResult;
-        }
+        internal override int ThenElse(ThenElse visitedObject, int condResult, int thenResult, int elseResult) { return thenResult; }
 
-        /// <summary>
-        /// Afters the cond.
-        /// </summary>
-        /// <param name="objectId">The object id.</param>
-        /// <returns></returns>
-        /// created 09.01.2007 04:52
         internal override Visitor<int> AfterCond(int objectId)
         {
-            DataAdd(new Then(objectId, Type.TypeBase.CreateBit.Size));
+            DataAdd(new Then(objectId, TypeBase.CreateBit.Size));
             return this;
         }
 
-        /// <summary>
-        /// Afters the cond.
-        /// </summary>
-        /// <param name="objectId">The object id.</param>
-        /// <param name="thenSize">Size of the then.</param>
-        /// <returns></returns>
-        /// created 09.01.2007 04:52
         internal override Visitor<int> AfterThen(int objectId, Size thenSize)
         {
             DataAdd(new Else(objectId, thenSize));
             return this;
         }
 
-        /// <summary>
-        /// Afters the cond.
-        /// </summary>
-        /// <param name="objectId">The object id.</param>
-        /// <returns></returns>
-        /// created 09.01.2007 04:52
         internal override Visitor<int> AfterElse(int objectId)
         {
             DataAdd(new EndCondional(objectId));
             return this;
         }
 
-        /// <summary>
-        /// Childs the specified visited object.
-        /// </summary>
-        /// <param name="visitedObject">The visited object.</param>
-        /// <param name="parent">The parent.</param>
-        /// <returns></returns>
-        /// created 03.10.2006 02:50
-        public int Child(Child visitedObject, int parent)
-        {
-            return parent + visitedObject.AddTo(this);
-        }
+        public int Child(Child visitedObject, int parent) { return parent + visitedObject.AddTo(this); }
 
-        /// <summary>
-        /// Formats the specified functions.
-        /// </summary>
-        /// <param name="functions">The functions.</param>
-        /// <param name="name">The name.</param>
-        /// <param name="align">if set to <c>true</c> [align].</param>
-        /// <returns></returns>
-        /// created 07.10.2006 20:54
         public CodeTypeDeclaration GetCSharpTypeCode(List<Container> functions, string name, bool align)
         {
             var result = new CodeTypeDeclaration(name);
@@ -207,14 +135,6 @@ namespace Reni.Code
             return result;
         }
 
-        /// <summary>
-        /// Formats this instance.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="isFunction">if set to <c>true</c> [is function].</param>
-        /// <param name="useStatementAligner">if set to <c>true</c> [useStatementAligner].</param>
-        /// <returns></returns>
-        /// created 07.10.2006 21:10
         public CodeMemberMethod GetCSharpFunctionCode(string name, bool isFunction, bool useStatementAligner)
         {
             var result = new CodeMemberMethod();
@@ -280,12 +200,20 @@ namespace Reni.Code
 
         internal BitsConst Evaluate()
         {
-            if (_data.Count == 1)
+            if(_data.Count == 1)
                 return _data[0].Evaluate();
 
             NotImplementedMethod();
             return null;
         }
+    }
+
+    internal class ErrorElement : LeafElement
+    {
+        private readonly string _text;
+        public ErrorElement(string text) { _text = text; }
+        protected override Size GetSize() { return Size.Zero; }
+        protected override Size GetDeltaSize() { return Size.Zero; }
     }
 
     /// <summary>

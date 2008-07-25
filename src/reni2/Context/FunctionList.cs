@@ -61,7 +61,7 @@ namespace Reni.Context
         {
             var result = new List<Container>();
             for(var i = 0; i < _list.Count; i++)
-                result.Add(this[i].Serialize());
+                result.Add(this[i].Serialize(false));
             return result;
         }
 

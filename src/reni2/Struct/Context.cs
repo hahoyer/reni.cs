@@ -51,17 +51,20 @@ namespace Reni.Struct
         {
             var result = Reni.Type.Void.CreateResult(category);
             for(var i = fromPosition; i < fromNotPosition; i++)
-                result = result.CreateSequence(InternalResult(category, i));
+            {
+                var internalResult = InternalResult(category, i);
+                result = result.CreateSequence(internalResult);
+            }
             return result;
         }
 
         private Result InternalResult(Category category, int position)
         {
-            var result = CreatePosition(position).Result(category | Category.Type, StatementList[position]);
-            if(_internalResult[position]== null)
+            Result result = CreatePosition(position).Result(category | Category.Type, StatementList[position]).PostProcessor.InternalResultForStruct(AlignBits);
+            if (_internalResult[position] == null)
                 _internalResult[position] = new Result();
             _internalResult[position].Update(result);
-            return result.PostProcessor.InternalResultForStruct(AlignBits);
+            return result;
         }
 
         private Size InternalSize(int position)

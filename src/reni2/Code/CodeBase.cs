@@ -25,7 +25,7 @@ namespace Reni.Code
         [DumpExcept(false)]
         internal virtual bool IsPending { get { return false; } }
         [Node, DumpData(false)]
-        internal List<LeafElement> Serial { get { return Serialize().Data; } }
+        internal List<LeafElement> Serial { get { return Serialize(true).Data; } }
 
         internal static CodeBase Pending { get { return new Pending(); } }
 
@@ -123,9 +123,9 @@ namespace Reni.Code
             return result;
         }
 
-        public Container Serialize(Size frameSize, string description)
+        public Container Serialize(Size frameSize, string description, bool isInternal)
         {
-            var container = new Container(MaxSize, frameSize, description);
+            var container = new Container(MaxSize, frameSize, description, isInternal);
             Visit(container);
             return container;
         }
@@ -239,11 +239,11 @@ namespace Reni.Code
             return CreateChild(new Call(index, resultSize, Size));
         }
 
-        internal Container Serialize()
+        internal Container Serialize(bool isInternal)
         {
             try
             {
-                return Serialize(Size.Create(0), "");
+                return Serialize(Size.Create(0), "", isInternal);
             }
             catch(Container.UnexpectedContextRefInContainer e)
             {

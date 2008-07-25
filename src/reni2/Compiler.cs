@@ -107,7 +107,7 @@ namespace Reni
             get
             {
                 if(_mainContainer == null)
-                    _mainContainer = Code.Serialize();
+                    _mainContainer = Code.Serialize(false);
                 return _mainContainer;
             }
         }

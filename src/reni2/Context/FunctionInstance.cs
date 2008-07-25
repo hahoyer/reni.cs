@@ -157,11 +157,11 @@ namespace Reni.Context
             return Visit(Category.Type).Type;
         }
 
-        internal Container Serialize()
+        internal Container Serialize(bool isInternal)
         {
             try
             {
-                return BodyCode.Serialize(FrameSize, Description);
+                return BodyCode.Serialize(FrameSize, Description, isInternal);
             }
             catch (UnexpectedVisitOfPending)
             {
