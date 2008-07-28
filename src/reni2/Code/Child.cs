@@ -18,7 +18,7 @@ namespace Reni.Code
             Tracer.Assert(leafElement != null);
             _parent = parent;
             _leafElement = leafElement;
-            StopByObjectId(-3727);
+            StopByObjectId(-977);
         }
 
         [Node]
@@ -56,7 +56,7 @@ namespace Reni.Code
         {
             var newLeafElement = LeafElement.TryToCombineN(leafElement);
             if(newLeafElement != null)
-                return Parent.CreateChilds(newLeafElement);
+                return Parent.CreateChildren(newLeafElement);
 
             return base.CreateChild(leafElement);
         }

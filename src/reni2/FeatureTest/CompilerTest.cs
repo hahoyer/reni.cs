@@ -108,7 +108,7 @@ namespace Reni.FeatureTest
                 RunDependants();
             }
 
-            RunCompiler(1, GetType().Name, Target, Output);
+            RunCompiler(1, GetType().Name, Target, AssertValid, Output);
         }
 
         private void RunDependants()
@@ -122,5 +122,6 @@ namespace Reni.FeatureTest
         public virtual string Output { get { return ""; } }
         public virtual string Target { get { return ""; } }
         public virtual System.Type[] DependsOn { get { return new System.Type[0]; } }
+        public virtual void AssertValid(Compiler c) {}
     }
 }

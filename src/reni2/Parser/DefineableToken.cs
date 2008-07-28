@@ -26,7 +26,7 @@ namespace Reni.Parser
         public string FilePosition { get { return "\n" + _source.FilePosn(Name); } }
         [DumpData(false)]
         public string IconKey { get { return "Symbol"; } }
-
-        public override string NodeDump { get { return Name; } }
+        [DumpData(false)]
+        public override string NodeDump { get { return Name.Quote() + "." + ObjectId; } }
     }
 }

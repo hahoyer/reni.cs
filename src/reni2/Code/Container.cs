@@ -85,11 +85,11 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal override int ContextRef<C>(ContextRef<C> visitedObject)
+        internal override int ContextRef(ContextRefCode visitedObject)
         {
             if(!IsInternal)
                 throw new UnexpectedContextRefInContainer(this, visitedObject);
-            DataAdd(new ErrorElement(visitedObject.Dump()));
+            DataAdd(visitedObject.ToLeafElement);
             return 1;
         }
 
@@ -210,10 +210,12 @@ namespace Reni.Code
 
     internal class ErrorElement : LeafElement
     {
-        private readonly string _text;
-        public ErrorElement(string text) { _text = text; }
+        [Node]
+        internal readonly CodeBase CodeBase;
+        public ErrorElement(CodeBase codeBase) { CodeBase = codeBase; }
         protected override Size GetSize() { return Size.Zero; }
         protected override Size GetDeltaSize() { return Size.Zero; }
+        protected override bool IsError { get { return true; } }
     }
 
     /// <summary>

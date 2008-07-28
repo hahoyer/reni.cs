@@ -121,7 +121,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.ParsedSyntax" Collapsed="true">
-    <Position X="12.75" Y="7.75" Width="1.5" />
+    <Position X="11.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAgAAAAABAgAACAEBBgCAAIgAAQAAKgCAAEAABJEI=</HashCode>
       <FileName>Parser\ParsedSyntax.cs</FileName>
@@ -129,28 +129,28 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Reni.Parser.TokenClass.DeclarationSyntax" Collapsed="true">
-    <Position X="7" Y="9.25" Width="1.5" />
+    <Position X="8.25" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AgAAAAAAAABACAAAAAAAAAQAAAIAAAAAACAAAAAAAAA=</HashCode>
       <FileName>Parser\TokenClass\DeclarationSyntax.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.DefinableTokenSyntax" Collapsed="true">
-    <Position X="13.5" Y="10.5" Width="1.75" />
+    <Position X="10.5" Y="10.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAgAAAAAABAAQAAAAAAgAAAAAAAAAAAAA=</HashCode>
       <FileName>Parser\TokenClass\DefinableTokenSyntax.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.ListSyntax" Collapsed="true">
-    <Position X="16" Y="9.25" Width="1.5" />
+    <Position X="14.75" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAQgAACAAAAAAAAA=</HashCode>
       <FileName>Parser\TokenClass\List.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Struct.Container" Collapsed="true">
-    <Position X="24.25" Y="10.5" Width="1.5" />
+    <Position X="20.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>IEbAACAAAgIA0AAACBRIAAQQAgAIBEAAAGAAIAAiAAI=</HashCode>
       <FileName>Struct\Container.cs</FileName>
@@ -158,21 +158,21 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Reni.Syntax.ConverterSyntax" Collapsed="true">
-    <Position X="13.75" Y="9.25" Width="1.5" />
+    <Position X="12.75" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAABAAAAAAAABAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
       <FileName>Syntax\ConverterSyntax.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Syntax.EmptyList" Collapsed="true">
-    <Position X="17.75" Y="10.5" Width="1.5" />
+    <Position X="14.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAACAAAAAAAAA=</HashCode>
       <FileName>Syntax\EmptyList.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Syntax.CompileSyntax" Collapsed="true">
-    <Position X="18.75" Y="9.25" Width="1.5" />
+    <Position X="16.75" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAEAAAAAABAwAAAAAAAAAQAAAAAgAAAAAAAIAAAAAo=</HashCode>
       <FileName>Syntax\CompileSyntax.cs</FileName>
@@ -180,35 +180,35 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Reni.Parser.TokenClass.DeclarationPartSyntax" Collapsed="true">
-    <Position X="11.5" Y="9.25" Width="1.5" />
+    <Position X="18.75" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAEAABAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
       <FileName>Parser\TokenClass\Defineable.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.Symbol.DeclarationExtensionSyntax" Collapsed="true">
-    <Position X="9.25" Y="9.25" Width="1.5" />
+    <Position X="6" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAIAAAAAAAAAAAAAABA=</HashCode>
       <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.Symbol.PropertyDeclarationSyntax" Collapsed="true">
-    <Position X="9.25" Y="10.5" Width="1.5" />
+    <Position X="6" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAABAAI=</HashCode>
       <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.Symbol.ConverterDeclarationSyntax" Collapsed="true">
-    <Position X="11.5" Y="10.5" Width="1.5" />
+    <Position X="8.25" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
       <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.Symbol.ExclamationSyntax" Collapsed="true">
-    <Position X="7" Y="10.5" Width="1.5" />
+    <Position X="3.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABA=</HashCode>
       <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
@@ -339,56 +339,56 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.ExpressionSyntax" Collapsed="true">
-    <Position X="20" Y="10.5" Width="1.5" />
+    <Position X="16.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAEAAAAAAAAAAAQAAAAAAAEACCCAAAAAAAI=</HashCode>
       <FileName>Parser\ExpressionSyntax.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Syntax.SpecialSyntax" Collapsed="true">
-    <Position X="15.75" Y="10.5" Width="1.5" />
+    <Position X="12.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Syntax\Special.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.CondSyntax" Collapsed="true">
-    <Position X="22" Y="10.5" Width="1.5" />
+    <Position X="18.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAABAQAQAAQAAAAAAAAAACAAAAAAAAA=</HashCode>
       <FileName>ThenElse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.ThenSyntax" Collapsed="true">
-    <Position X="22" Y="12" Width="1.5" />
+    <Position X="17.75" Y="11.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
       <FileName>ThenElse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.ThenElseSyntax" Collapsed="true">
-    <Position X="24.25" Y="12" Width="1.5" />
+    <Position X="19.75" Y="11.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAABAAAAAAAABAAAAAAAAAAQAAAAAACAAAAAAAAA=</HashCode>
       <FileName>ThenElse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Syntax.TerminalSyntax" Collapsed="true">
-    <Position X="13.75" Y="12" Width="1.5" />
+    <Position X="10.75" Y="11.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Syntax\Special.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Syntax.PrefixSyntax" Collapsed="true">
-    <Position X="15.75" Y="12" Width="1.5" />
+    <Position X="12.75" Y="11.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQCAAAAAAAAACCAAAAAAAA=</HashCode>
       <FileName>Syntax\Special.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Syntax.InfixSyntax" Collapsed="true">
-    <Position X="17.75" Y="12" Width="1.5" />
+    <Position X="14.75" Y="11.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAGCCAAAAAAAA=</HashCode>
       <FileName>Syntax\Special.cs</FileName>

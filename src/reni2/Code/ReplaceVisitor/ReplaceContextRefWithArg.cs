@@ -1,6 +1,5 @@
 using System;
 using HWClassLibrary.Debug;
-using Reni.Context;
 
 namespace Reni.Code.ReplaceVisitor
 {
@@ -8,7 +7,7 @@ namespace Reni.Code.ReplaceVisitor
     /// Replace context elements
     /// </summary>
     internal abstract class ReplaceContextRef<Context> : Base
-        where Context : ContextBase
+        where Context : IContextRefInCode
     {
         protected readonly Context _context;
 
@@ -20,11 +19,11 @@ namespace Reni.Code.ReplaceVisitor
             _replacement = replacement;
         }
 
-        internal override CodeBase ContextRef<C>(ContextRef<C> visitedObject)
+        internal override CodeBase ContextRef(ContextRefCode visitedObject)
         {
-            if(_context != visitedObject.Context)
-                return null;
-            return _replacement;
+            if(visitedObject.Context == (IContextRefInCode) _context)
+                return _replacement;
+            return null;
         }
     }
 
@@ -32,8 +31,9 @@ namespace Reni.Code.ReplaceVisitor
     /// 
     /// </summary>
     /// <typeparam name="Context"></typeparam>
-    internal sealed class ReplaceRelativeContextRef<Context> : ReplaceContextRef<Context>
-        where Context : ContextBase
+    internal sealed class ReplaceRelativeContextRef<Context>
+        : ReplaceContextRef<Context>
+        where Context : IContextRefInCode
     {
         public ReplaceRelativeContextRef(Context context, CodeBase replacement)
             : base(context, replacement) { }
@@ -42,7 +42,8 @@ namespace Reni.Code.ReplaceVisitor
         {
             if(size.IsZero)
                 return this;
-            return new ReplaceRelativeContextRef<Context>(_context, _replacement.CreateRefPlus(_context.RefAlignParam, size));
+            return new ReplaceRelativeContextRef<Context>(_context,
+                _replacement.CreateRefPlus(_context.RefAlignParam, size));
         }
     }
 
@@ -50,8 +51,9 @@ namespace Reni.Code.ReplaceVisitor
     /// 
     /// </summary>
     /// <typeparam name="Context"></typeparam>
-    internal sealed class ReplaceAbsoluteContextRef<Context> : ReplaceContextRef<Context>
-        where Context : ContextBase
+    internal sealed class ReplaceAbsoluteContextRef<Context>
+        : ReplaceContextRef<Context>
+        where Context : IContextRefInCode
     {
         public ReplaceAbsoluteContextRef(Context context, CodeBase replacement)
             : base(context, replacement) { }

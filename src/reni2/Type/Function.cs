@@ -64,12 +64,6 @@ namespace Reni.Type
                 .CreateFunctionCall(_context, category, Body, argsResult);
         }
 
-        internal override Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam,
-                                                           Result.GetCode getCode)
-        {
-            return CreateResult(category);
-        }
-
         internal override string DumpShort()
         {
             return "context." + _context.ObjectId + ".function(" + _body.DumpShort() + ")";

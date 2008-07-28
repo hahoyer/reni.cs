@@ -16,7 +16,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal virtual T ContextRef<C>(ContextRef<C> visitedObject) where C : ContextBase
+        internal virtual T ContextRef(ContextRefCode visitedObject) 
         {
             NotImplementedMethod(visitedObject);
             throw new NotImplementedException();

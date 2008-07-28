@@ -53,10 +53,7 @@ namespace Reni.Code
         /// </summary>
         /// <param name="deltaSize">Size of the delta.</param>
         /// created 26.11.2006 13:18
-        public void ShiftStartAddress(Size deltaSize)
-        {
-            _start += deltaSize;
-        }
+        public void ShiftStartAddress(Size deltaSize) { _start += deltaSize; }
 
         /// <summary>
         /// Generates the function return.
@@ -103,20 +100,23 @@ namespace Reni.Code
         {
             if(refAlignParam.Is_3_32)
             {
-                var dest = CreateDataRef(Start + size, refAlignParam.RefSize);
+                var dest = CreateDataRef(Start + refAlignParam.RefSize, refAlignParam.RefSize);
+                var source = CreateDataRef(Start, refAlignParam.RefSize);
                 if(IsBuildInIntType(size))
                     return "*("
                         + CreateIntPtrCast(size)
                             + dest
-                                + ") = "
-                                    + CreateDataRef(Start, size);
+                                + ") = *("
+                                    + CreateIntPtrCast(size) 
+                                    + source 
+                                    + ")";
 
                 return "Data.MoveBytes("
                     + size.ByteCount
                         + ", "
                             + "(sbyte*)" + dest
                                 + ", "
-                                    + CreateDataPtr(Start)
+                                    + "(sbyte*)" + source
                                         + ")";
             }
 
@@ -305,10 +305,7 @@ namespace Reni.Code
         /// <param name="frameSize">Size of the args and refs.</param>
         /// <returns></returns>
         /// created 15.11.2006 21:41
-        public string Call(int index, Size frameSize)
-        {
-            return Generator.FunctionMethodName(index) + "(" + CreateDataPtr(Start + frameSize) + ")";
-        }
+        public string Call(int index, Size frameSize) { return Generator.FunctionMethodName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
 
         /// <summary>
         /// Creates the code for dumping numbers.
@@ -331,10 +328,7 @@ namespace Reni.Code
         /// <param name="text">The text.</param>
         /// <returns></returns>
         /// created 08.01.2007 18:38
-        public string DumpPrintText(string text)
-        {
-            return "Data.DumpPrint(" + HWString.Quote(text) + ")";
-        }
+        public string DumpPrintText(string text) { return "Data.DumpPrint(" + text.Quote() + ")"; }
 
         /// <summary>
         /// Creates the code for else construct.
@@ -342,10 +336,7 @@ namespace Reni.Code
         /// <param name="objectId">The object id.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:12
-        public string Else(int objectId)
-        {
-            return "goto EndCondition" + objectId + "; Else" + objectId + ":";
-        }
+        public string Else(int objectId) { return "goto EndCondition" + objectId + "; Else" + objectId + ":"; }
 
         /// <summary>
         /// Creates the endig code of a then-else construct.
@@ -353,19 +344,13 @@ namespace Reni.Code
         /// <param name="objectId">The object id.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:09
-        public string EndCondional(int objectId)
-        {
-            return "EndCondition" + objectId + ":";
-        }
+        public string EndCondional(int objectId) { return "EndCondition" + objectId + ":"; }
 
         /// <summary>
         /// Creates a recursive call, i. e. a jump to start of function..
         /// </summary>
         /// <returns></returns>
-        public string RecursiveCall()
-        {
-            return "goto StartFunction";
-        }
+        public string RecursiveCall() { return "goto StartFunction"; }
 
         /// <summary>
         /// Creates the code for incrementing a reference.
@@ -398,7 +383,7 @@ namespace Reni.Code
         public string TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize)
         {
             if(refAlignParam.Is_3_32)
-                return CreateMoveBytesFromFrame(targetSize, Start - targetSize, offset * -1);
+                return CreateMoveBytesFromFrame(targetSize, Start - targetSize, offset*-1);
 
             NotImplementedFunction(this, refAlignParam, offset, targetSize, targetSize);
             throw new NotImplementedException();
@@ -411,10 +396,7 @@ namespace Reni.Code
         /// <param name="bodySize">The body.</param>
         /// <returns></returns>
         /// created 10.10.2006 00:25
-        public string StatementEnd(Size size, Size bodySize)
-        {
-            return CreateMoveBytes(size, Start + bodySize, Start);
-        }
+        public string StatementEnd(Size size, Size bodySize) { return CreateMoveBytes(size, Start + bodySize, Start); }
 
         /// <summary>
         /// Creates a conditional operation that is used as header of then-else construction
@@ -423,10 +405,7 @@ namespace Reni.Code
         /// <param name="condSize">Size of the cond.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:15
-        public string Then(int objectId, Size condSize)
-        {
-            return "if(" + CreateDataRef(Start, condSize) + "==0) goto Else" + objectId;
-        }
+        public string Then(int objectId, Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "==0) goto Else" + objectId; }
 
         /// <summary>
         /// Creates the code for copying things from data area to top of data area.
@@ -537,35 +516,17 @@ namespace Reni.Code
                                     + ")";
         }
 
-        private static string CreateCastToIntPtr(Size size, string result)
-        {
-            return "(" + CreateIntPtrCast(size) + " " + result + ")";
-        }
+        private static string CreateCastToIntPtr(Size size, string result) { return "(" + CreateIntPtrCast(size) + " " + result + ")"; }
 
-        private static string CreateCastToIntRef(Size size, string result)
-        {
-            return "(*" + CreateIntPtrCast(size) + " " + result + ")";
-        }
+        private static string CreateCastToIntRef(Size size, string result) { return "(*" + CreateIntPtrCast(size) + " " + result + ")"; }
 
-        private static string CreateDataPtr(Size start)
-        {
-            return "(data+" + start.SaveByteCount + ")";
-        }
+        private static string CreateDataPtr(Size start) { return "(data+" + start.SaveByteCount + ")"; }
 
-        private static string CreateDataRef(Size start, Size size)
-        {
-            return CreateCastToIntRef(size, CreateDataPtr(start));
-        }
+        private static string CreateDataRef(Size start, Size size) { return CreateCastToIntRef(size, CreateDataPtr(start)); }
 
-        private static string CreateFrameBackPtr(Size start)
-        {
-            return "(frame-" + start.SaveByteCount + ")";
-        }
+        private static string CreateFrameBackPtr(Size start) { return "(frame-" + start.SaveByteCount + ")"; }
 
-        private static string CreateFrameBackRef(Size start, Size size)
-        {
-            return CreateCastToIntRef(size, CreateFrameBackPtr(start));
-        }
+        private static string CreateFrameBackRef(Size start, Size size) { return CreateCastToIntRef(size, CreateFrameBackPtr(start)); }
 
         private static string CreateIntCast(Size size)
         {
@@ -582,10 +543,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        private static string CreateIntPtrCast(Size size)
-        {
-            return "(" + CreateIntType(size) + "*)";
-        }
+        private static string CreateIntPtrCast(Size size) { return "(" + CreateIntType(size) + "*)"; }
 
         private static string CreateIntType(Size size)
         {

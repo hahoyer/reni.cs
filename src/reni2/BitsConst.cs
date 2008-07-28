@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using NUnit.Framework;
 using Reni.FeatureTest;
 using Reni.Runtime;
@@ -410,16 +411,13 @@ namespace Reni
         /// <returns></returns>
         public string DumpValue()
         {
-            var result = "[";
-            result += _size.Dump();
-            result += "bits]";
             if (_size.IsZero)
-                return result + "0";
-
-            if (_size.ToInt() < 8)
-                return result + DumpAsBit() + "b";
-
-            return result + ToHexString() + "x";
+                return "0[0]";
+            var digits = _size.ToInt() < 8 ? ToBitString() : ToHexString();
+            var result = digits.Quote()+"[";
+            result += _size.Dump();
+            result += "]";
+            return result;
         }
 
         private string ToHexString()
@@ -443,7 +441,7 @@ namespace Reni
             return result;
         }
 
-        private string DumpAsBit()
+        private string ToBitString()
         {
             var result = "";
             for (var i = Size.Create(0); i < _size; i += 1)
@@ -643,8 +641,6 @@ namespace Reni
             return ToInt64().ToString();
         }
 
-        #region Nested type: Test
-
         /// <summary>
         /// NUnit test class of BitsConst
         /// </summary>
@@ -711,7 +707,5 @@ namespace Reni
                               Convert("-4095").Resize(Size.Create(32)).ToString(10));
             }
         }
-
-        #endregion
     }
 }

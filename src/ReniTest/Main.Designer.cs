@@ -39,7 +39,7 @@ namespace ReniTest
             this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeView1.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.treeView1.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeView1.ImageIndex = 0;
             this.treeView1.ImageList = this.imageList1;
             this.treeView1.Location = new System.Drawing.Point(13, 13);
@@ -73,6 +73,7 @@ namespace ReniTest
             this.imageList1.Images.SetKeyName(18, "Key");
             this.imageList1.Images.SetKeyName(19, "Bool");
             this.imageList1.Images.SetKeyName(20, "Size");
+            this.imageList1.Images.SetKeyName(21, "CodeError");
             // 
             // Main
             // 

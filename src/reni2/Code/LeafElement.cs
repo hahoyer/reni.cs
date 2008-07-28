@@ -132,7 +132,8 @@ namespace Reni.Code
         /// Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
-        string IIconKeyProvider.IconKey { get { return "Code"; } }
+        string IIconKeyProvider.IconKey { get { return IsError? "CodeError": "Code"; } }
+        protected virtual bool IsError { get { return false; } }
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
     }
 }

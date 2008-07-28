@@ -4,6 +4,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
+using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -133,6 +134,14 @@ namespace Reni.Type
 
             return base.Search(defineable).AlternativeTrial(result);
         }
+
+        internal Result CreateContextResult(IContextRefInCode context, Category category)
+        {
+            return CreateResult(
+                category,
+                () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Target.Size * -1),
+                () => Refs.Context(context));
+        }
     }
 
     internal sealed class AutomaticRef : Ref
@@ -146,5 +155,6 @@ namespace Reni.Type
         }
 
         protected override string ShortName { get { return "automatic_ref"; } }
+
     }
 }

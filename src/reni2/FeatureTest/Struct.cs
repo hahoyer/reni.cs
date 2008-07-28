@@ -68,33 +68,28 @@ namespace Reni.FeatureTest.Struct
                 );
         }
 
-        /// <summary>
-        /// Declaration and access to variables
-        /// </summary>
-        /// created 17.11.2006 20:44
-        [Test, Category(Worked)]
-        public void Assignment()
-        {
-            RunCompiler("Assignment",
-                @"(1, 11, 3, (this _A_T_ 1) := 3) dump_print",
-                "(1, 3, 3, )"
-                );
-        }
-
-        /// <summary>
-        /// Declaration and access to properties
-        /// </summary>
-        /// created 17.11.2006 20:44
-        [Test, Category(Worked)]
-        public void PropertyVariable()
-        {
-            RunCompiler("PropertyVariable",
-                @"x: property function 11; x dump_print",
-                "11"
-                );
-        }
-
         public override void Run() { }
+    }
+
+    [TestFixture]
+    public class PropertyVariable: CompilerTest{
+        public override string Target { get { return @"x: property function 11; x dump_print"; } }
+        public override string Output { get { return "11"; } }
+        public override System.Type[] DependsOn { get { return new[] { typeof(InnerAccessTheOnlyOne) }; } }
+
+        [Test, Category(UnderConstruction)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    public class Assignment : CompilerTest
+    {
+        public override string Target { get { return @"(1, 11, 3, (this _A_T_ 1) := 3) dump_print"; } }
+        public override string Output { get { return "(1, 3, 3, )"; } }
+        public override System.Type[] DependsOn { get { return new[] { typeof(InnerAccessSecondOfTwo) }; } }
+
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
@@ -115,7 +110,7 @@ namespace Reni.FeatureTest.Struct
         public override string Output { get { return "10"; } }
         public override System.Type[] DependsOn { get { return new[] {typeof(InnerAccessTheOnlyOne)}; } }
 
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -123,8 +118,8 @@ namespace Reni.FeatureTest.Struct
     public class InnerAccessSecondOfTwo : CompilerTest
     {
         public override string Target { get { return "5,6, (this _A_T_ 1) dump_print"; } }
-        public override string Output { get { return "5"; } }
-        public override System.Type[] DependsOn { get { return new System.Type[] {}; } }
+        public override string Output { get { return "6"; } }
+        public override System.Type[] DependsOn { get { return new System.Type[] { typeof(InnerAccessTheOnlyOne) }; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -144,7 +139,7 @@ namespace Reni.FeatureTest.Struct
     [TestFixture]
     public class AccessAndAddMultiple : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
 
         public override string Target { get { return @" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;"; } }

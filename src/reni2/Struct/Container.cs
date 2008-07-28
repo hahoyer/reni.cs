@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
@@ -32,9 +33,11 @@ namespace Reni.Struct
         [Node, SmartNode]
         internal readonly List<string> Properties = new List<string>();
 
-        private readonly SimpleCache<StructFeature[]> _structFeaturesCache = new SimpleCache<StructFeature[]>();
+        private readonly SimpleCache<StructFeature[]> _structFeaturesCache =
+            new SimpleCache<StructFeature[]>();
 
-        private Container(Token token) : base(token, _nextObjectId++) {}
+        private Container(Token token)
+            : base(token, _nextObjectId++) { }
 
         internal DictionaryEx<int, string> ReverseDictionary
         {
@@ -53,7 +56,7 @@ namespace Reni.Struct
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            return context.CreateStruct(this).NaturalType.ConstructorResult(category);
+            return context.CreateStruct(this).ConstructorResult(category);
         }
 
         [DumpData(false)]
@@ -61,10 +64,7 @@ namespace Reni.Struct
         [DumpData(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
 
-        internal protected override string DumpShort()
-        {
-            return "container." + ObjectId;
-        }
+        internal protected override string DumpShort() { return "container." + ObjectId; }
 
         private StructFeature[] CreateStructContainerFeatures()
         {
@@ -164,30 +164,21 @@ namespace Reni.Struct
             return result;
         }
 
-        string IDumpShortProvider.DumpShort()
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
+
+        private int Find(string name) { return Dictionary[name]; }
+
+        private bool Defined(string name) { return Dictionary.ContainsKey(name); }
+
+        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(
+            Defineable defineable)
         {
-            return DumpShort();
+            return
+                SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable));
         }
 
-        private int Find(string name)
-        {
-            return Dictionary[name];
-        }
-
-        private bool Defined(string name)
-        {
-            return Dictionary.ContainsKey(name);
-        }
-
-        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(Defineable defineable)
-        {
-            return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable));
-        }
-
-        internal SearchResult<IConverter<IContextFeature, Context>> SearchFromStructContext(Defineable defineable)
-        {
-            return SearchResult<IConverter<IContextFeature, Context>>.Create(Search(defineable));
-        }
+        internal SearchResult<IConverter<IContextFeature, Context>> SearchFromStructContext(
+            Defineable defineable) { return SearchResult<IConverter<IContextFeature, Context>>.Create(Search(defineable)); }
 
         private SearchResult<StructFeature> Search(Defineable defineable)
         {
@@ -196,25 +187,33 @@ namespace Reni.Struct
                     defineable);
             return defineable.SearchFromStruct().SubTrial(this);
         }
+
+        internal SearchResult<IConverter<IContextFeature, ContextAtPosition>>
+            SearchFromStructContextAtPosition(Defineable defineable)
+        {
+            return
+                SearchResult<IConverter<IContextFeature, ContextAtPosition>>.Create(
+                    Search(defineable));
+        }
     }
 
-    internal class StructFeature : ReniObject, IConverter<IConverter<IFeature, Ref>, Type>, IConverter<IContextFeature, Context>
+    internal class StructFeature
+        : ReniObject
+            , IConverter<IConverter<IFeature, Ref>, Type>
+            , IConverter<IContextFeature, Context>
+            , IConverter<IContextFeature, ContextAtPosition>
     {
         private readonly int _index;
 
-        public StructFeature(int index)
-        {
-            _index = index;
-        }
+        public StructFeature(int index) { _index = index; }
 
-        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type)
-        {
-            return type.Context.Features[_index];
-        }
+        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type) { return type.Context.Features[_index]; }
 
-        IContextFeature IConverter<IContextFeature, Context>.Convert(Context context)
+        IContextFeature IConverter<IContextFeature, Context>.Convert(Context context) { return context.Features[_index]; }
+
+        IContextFeature IConverter<IContextFeature, ContextAtPosition>.Convert(ContextAtPosition contextAtPosition)
         {
-            return context.Features[_index];
+            return contextAtPosition.Features[_index];
         }
     }
 }

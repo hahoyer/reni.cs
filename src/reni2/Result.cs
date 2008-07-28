@@ -601,7 +601,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : ContextBase
+        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : IContextRefInCode
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
@@ -621,7 +621,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : ContextBase
+        internal Result ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : IContextRefInCode
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
@@ -688,23 +688,23 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateStatement(Category category, Result tempResult)
+        internal Result CreateStatement(Category category)
         {
-            if(tempResult == null)
+            if (!HasInternal)
                 return this;
-
-            var destructorResult = tempResult.Type.DestructorHandler(category);
-            var finalResult = Clone(category);
+            var destructorResult = Internal.Type.DestructorHandler(category);
+            var finalResult = Clone(category - Category.Internal);
+            finalResult.Internal = EmptyInternal();
             var moveResult = Type.MoveHandler(category);
 
             if(category.HasRefs)
-                finalResult.Refs = tempResult.Refs
+                finalResult.Refs = Internal.Refs
                     .Pair(finalResult.Refs)
                     .Pair(destructorResult.Refs)
                     .Pair(moveResult.Refs);
             if(category.HasCode)
             {
-                var resultCode = tempResult.Code.CreateStatementEndFromIntermediateStorage
+                var resultCode = Internal.Code.CreateStatementEndFromIntermediateStorage
                     (
                     Code,
                     destructorResult.Code,
@@ -717,7 +717,7 @@ namespace Reni
 
         internal Result CreateStatement()
         {
-            return CreateStatement(Complete, Internal);
+            return CreateStatement(Complete);
         }
 
         internal static Result CreatePending(Category category)
@@ -850,27 +850,6 @@ namespace Reni
         {
             return Reni.Type.Void.CreateResult(Category.ForInternal);
         }
-
-        internal Result CreateAssignment(AssignableRef assignableRef, Result value)
-        {
-            Tracer.Assert(!HasType || Type == assignableRef);
-            var category = value.Complete;
-            var convertedValue = value.ConvertTo(assignableRef);
-            var result = TypeBase.CreateVoid
-                .CreateResult
-                (
-                category,
-                () => Code.CreateAssignment(assignableRef.RefAlignParam, convertedValue.Code),
-                () => Refs.Pair(convertedValue.Refs),
-                () => Internal.CreateSequence(convertedValue.Internal)
-                );
-            if(assignableRef.Target.DestructorHandler(category).IsEmpty && assignableRef.Target.MoveHandler(category).IsEmpty)
-                return result;
-
-            NotImplementedMethod(value, "result", result);
-            throw new NotImplementedException();
-        }
-
     }
 
     /// <summary>

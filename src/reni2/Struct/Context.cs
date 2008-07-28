@@ -11,7 +11,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Context : Reni.Context.Child
+    internal sealed class Context : Reni.Context.Child, IStructContext, IContextRefInCode
     {
         private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
         private readonly SimpleCache<Type> _naturalTypeCache = new SimpleCache<Type>();
@@ -19,6 +19,11 @@ namespace Reni.Struct
         private readonly SimpleCache<PositionFeature[]> _featuresCache = new SimpleCache<PositionFeature[]>();
         [Node, DumpData(false)]
         internal readonly Result[] _internalResult;
+        [Node]
+        private readonly Result _internalConstructorResult = new Result();
+        [Node]
+        private readonly Result _constructorResult = new Result();
+
 
         internal Context(ContextBase contextBase, Container container) : base(contextBase)
         {
@@ -26,6 +31,9 @@ namespace Reni.Struct
             _internalResult = new Result[StatementList.Count];
         }
 
+        bool IContextRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
+        [DumpData(false)]
+        Ref IStructContext.NaturalRefType { get { return NaturalType.CreateRef(RefAlignParam); } }
         [DumpData(false)]
         internal List<ICompileSyntax> StatementList { get { return Container.List; } }
         [DumpData(false)]
@@ -33,9 +41,9 @@ namespace Reni.Struct
         [DumpData(false)]
         internal PositionFeature[] Features { get { return _featuresCache.Find(CreateFeaturesCache); } }
         [Node, DumpData(false)]
-        internal Type NaturalType { get { return _naturalTypeCache.Find(() => new Type(this)); } }
+        public TypeBase NaturalType { get { return _naturalTypeCache.Find(() => new Type(this)); } }
         [DumpData(false)]
-        internal Ref NaturalRefType { get { return NaturalType.CreateRef(RefAlignParam); } }
+        IContextRefInCode IStructContext.ForCode { get { return this; } }
 
         internal ContextAtPosition CreatePosition(int position)
         {
@@ -60,7 +68,11 @@ namespace Reni.Struct
 
         private Result InternalResult(Category category, int position)
         {
-            Result result = CreatePosition(position).Result(category | Category.Type, StatementList[position]).PostProcessor.InternalResultForStruct(AlignBits);
+            Result result = 
+                CreatePosition(position)
+                .Result(category | Category.Type, StatementList[position])
+                .PostProcessor
+                .InternalResultForStruct(AlignBits);
             if (_internalResult[position] == null)
                 _internalResult[position] = new Result();
             _internalResult[position].Update(result);
@@ -98,13 +110,6 @@ namespace Reni.Struct
             return "context." + ObjectId + "(" + Container.DumpShort() + ")";
         }
 
-        internal override Result CreateThisRefResult(Category category)
-        {
-            return NaturalType
-                .CreateRef(RefAlignParam)
-                .CreateResult(category, () => CodeBase.CreateTopRef(RefAlignParam));
-        }
-
         internal Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
             return AccessResultFromRef(category, position, StatementList.Count, refAlignParam);
@@ -126,5 +131,17 @@ namespace Reni.Struct
                 result.Add(new PositionFeature(this, i));
             return result.ToArray();
         }
+
+        internal Result ConstructorResult(Category category)
+        {
+            var internalResult = InternalResult(category - Category.Type);
+            _internalConstructorResult.Update(internalResult);
+            var constructorResult = NaturalType.CreateResult(category, internalResult)
+                .ReplaceRelativeContextRef(this, CodeBase.CreateTopRef(RefAlignParam));
+            _constructorResult.Update(constructorResult);
+            return constructorResult;
+        }
+
+        RefAlignParam IContextRefInCode.RefAlignParam { get { return RefAlignParam; } }
     }
 }

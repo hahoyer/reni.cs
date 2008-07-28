@@ -12,28 +12,30 @@ namespace Reni
     /// </summary>
     internal sealed class Refs : ReniObject
     {
-        private readonly List<ContextBase> _data;
+        private readonly List<IContextRefInCode> _data;
         private readonly bool _isPending;
         private SizeArray _sizesCache;
 
         private Refs()
         {
-            _data = new List<ContextBase>();
+            _data = new List<IContextRefInCode>();
             StopByObjectId(-441);
         }
 
-        private Refs(ContextBase e): this()
+        private Refs(IContextRefInCode context): this()
         {
-            Add(e);
+            Add(context);
         }
 
-        private Refs(IEnumerable<ContextBase> a, IEnumerable<ContextBase> b): this()
+        private Refs(IEnumerable<IContextRefInCode> a, IEnumerable<IContextRefInCode> b)
+            : this()
         {
             AddRange(a);
             AddRange(b);
         }
 
-        private Refs(IEnumerable<ContextBase> a) : this()
+        private Refs(IEnumerable<IContextRefInCode> a)
+            : this()
         {
             AddRange(a);
         }
@@ -43,23 +45,20 @@ namespace Reni
             _isPending = isPending;
         }
 
-        private void AddRange(IEnumerable<ContextBase> a)
+        private void AddRange(IEnumerable<IContextRefInCode> a)
         {
             foreach (var e in a)
                 Add(e);
         }
 
-        private void Add(ContextBase e)
+        private void Add(IContextRefInCode e)
         {
-            var trace = e.ObjectId == -6;
-            StartMethodDumpWithBreak(trace,e);
             if (!_data.Contains(e))
                 _data.Add(e);
-            ReturnMethodDump(trace);
         }
 
         [Node]
-        public List<ContextBase> Data { get { return _data; } }
+        public List<IContextRefInCode> Data { get { return _data; } }
         public bool IsPending { get { return _isPending; } }
 
         [DumpData(false)]
@@ -83,7 +82,7 @@ namespace Reni
             }
         }
 
-        public ContextBase this[int i] { get { return _data[i]; } }
+        public IContextRefInCode this[int i] { get { return _data[i]; } }
         public Size Size { get { return Sizes.Size; } }
         public bool IsNone { get { return Count == 0; } }
         public static Refs Pending { get { return new Refs(true); } }
@@ -104,9 +103,9 @@ namespace Reni
             return new Refs(_data, refs._data);
         }
 
-        public static Refs Context(ContextBase e)
+        public static Refs Context(IContextRefInCode context)
         {
-            return new Refs(e);
+            return new Refs(context);
         }
 
         public override string DumpData()
@@ -132,18 +131,18 @@ namespace Reni
             return result;
         }
 
-        public Refs Without(ContextBase e)
+        public Refs Without(IContextRefInCode e)
         {
             if(IsPending)
                 throw new NotSupportedException();
             if(!_data.Contains(e))
                 return this;
-            var r = new List<ContextBase>(_data);
+            var r = new List<IContextRefInCode>(_data);
             r.Remove(e);
             return new Refs(r);
         }
 
-        public bool Contains(ContextBase context)
+        public bool Contains(IContextRefInCode context)
         {
             return _data.Contains(context);
         }

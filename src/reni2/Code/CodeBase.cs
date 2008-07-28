@@ -15,7 +15,7 @@ namespace Reni.Code
         [Node, DumpData(false)]
         internal Size MaxSize { get { return GetMaxSize(); } }
         [Node, DumpData(false), SmartNode]
-        internal List<ContextBase> Refs { get { return GetRefs().Data; } }
+        internal List<IContextRefInCode> Refs { get { return GetRefs().Data; } }
         [DumpData(false)]
         internal virtual bool IsEmpty { get { return false; } }
         [DumpExcept(false)]
@@ -55,11 +55,10 @@ namespace Reni.Code
             return CreateChild(new DumpPrint(leftSize, Size - leftSize));
         }
 
-        public CodeBase CreateAssignment(RefAlignParam refAlignParam, CodeBase sourceRef)
+        public CodeBase CreateAssignment(RefAlignParam refAlignParam, CodeBase sourceRef, Size size)
         {
-            NotImplementedMethod(refAlignParam, sourceRef);
-            var alignedSize = sourceRef.Size.ByteAlignedSize;
-            return CreateSequence(sourceRef.CreateBitCast(alignedSize))
+            var alignedSize = size.ByteAlignedSize;
+            return CreateSequence(sourceRef)
                 .CreateAssignment(refAlignParam, alignedSize);
         }
 
@@ -115,11 +114,11 @@ namespace Reni.Code
             return new Child(this, leafElement);
         }
 
-        public CodeBase CreateChilds(LeafElement[] leafElements)
+        public CodeBase CreateChildren(LeafElement[] leafElements)
         {
             var result = this;
             for(var i = 0; i < leafElements.Length; i++)
-                result = CreateChild(leafElements[i]);
+                result = result.CreateChild(leafElements[i]);
             return result;
         }
 
@@ -176,9 +175,9 @@ namespace Reni.Code
             return new Arg(size);
         }
 
-        public static CodeBase CreateContextRef<C>(C context) where C : ContextBase
+        public static CodeBase CreateContextRef(IContextRefInCode context) 
         {
-            return new ContextRef<C>(context);
+            return new ContextRefCode(context);
         }
 
         public CodeBase UseWithArg(CodeBase argCode)
@@ -189,7 +188,7 @@ namespace Reni.Code
             return result ?? this;
         }
 
-        public CodeBase ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : ContextBase
+        public CodeBase ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : IContextRefInCode
         {
             var result = Visit(new ReplaceRelativeContextRef<C>(context, replacement));
             if(result != null)
@@ -197,7 +196,7 @@ namespace Reni.Code
             return this;
         }
 
-        public CodeBase ReplaceAbsoluteContextRef<C>(C context, CodeBase replacement) where C : ContextBase
+        public CodeBase ReplaceAbsoluteContextRef<C>(C context, CodeBase replacement) where C : IContextRefInCode
         {
             var result = Visit(new ReplaceAbsoluteContextRef<C>(context, replacement));
             if(result != null)
@@ -247,7 +246,7 @@ namespace Reni.Code
             }
             catch(Container.UnexpectedContextRefInContainer e)
             {
-                DumpMethodWithBreak("UnexpectedContextRefInContainer " + e.VisitedObject.Dump());
+                DumpMethodWithBreak("UnexpectedContextRefInContainer " + e.VisitedObject.Dump(),isInternal);
                 throw;
             }
         }
@@ -289,6 +288,13 @@ namespace Reni.Code
         string IIconKeyProvider.IconKey { get { return "Code"; } }
     }
 
+    internal interface IContextRefInCode {
+        Size RefSize { get; }
+        RefAlignParam RefAlignParam { get; }
+        bool IsChildOf(ContextBase contextBase);
+        string Dump();
+    }
+
     internal class Assign : LeafElement
     {
         [DumpData(true)]
@@ -309,7 +315,7 @@ namespace Reni.Code
 
         protected override Size GetDeltaSize()
         {
-            return _refAlignParam.RefSize + _size;
+            return _refAlignParam.RefSize * 2;
         }
 
         protected override string Format(StorageDescriptor start)

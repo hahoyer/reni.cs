@@ -106,7 +106,7 @@ namespace Reni.Parser.TokenClass
         internal virtual bool IsEnd { get { return false; } }
 
         [DumpData(false)]
-        public override string NodeDump { get { return Name; } }
+        public override string NodeDump { get { return Name.Quote()+"."+ObjectId; } }
         [DumpData(false)]
         internal virtual TokenFactory NewTokenFactory { get { return null; } }
 

@@ -42,7 +42,7 @@ namespace Reni.Syntax
                 return ReturnMethodDumpWithBreak(trace, Result(context, category));
             var result = Result(context, category | Category.Internal | Category.Type);
             DumpWithBreak(trace, "result", result);
-            return ReturnMethodDumpWithBreak(trace, result.CreateStatement(category, result.Internal));
+            return ReturnMethodDumpWithBreak(trace, result.CreateStatement(category));
         }
 
         internal protected virtual Result Result(ContextBase context, Category category)

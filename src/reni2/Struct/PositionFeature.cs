@@ -1,5 +1,6 @@
 using HWClassLibrary.Debug;
 using System;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Syntax;
@@ -9,45 +10,54 @@ namespace Reni.Struct
 {
     internal sealed class PositionFeature : ReniObject, IContextFeature, IConverter<IFeature, Ref>, IFeature
     {
-        [DumpData(true)]
-        private readonly Context _context;
+        private readonly IStructContext _structContext;
         [DumpData(true)]
         private readonly int _index;
 
-        public PositionFeature(Context context, int index)
+        [DumpData(false)]
+        internal Ref NaturalRefType { get { return _structContext.NaturalRefType; } }
+
+        internal PositionFeature(IStructContext structContext, int index)
         {
-            _context = context;
             _index = index;
+            _structContext = structContext;
         }
 
         IFeature IConverter<IFeature, Ref>.Convert(Ref type)
         {
-            Tracer.Assert(type.RefAlignParam == _context.RefAlignParam);
+            Tracer.Assert(type.RefAlignParam == _structContext.ForCode.RefAlignParam);
             return this;
         }
 
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            var objectResult = callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(_context.NaturalRefType);
+            var objectResult = callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(NaturalRefType);
             return ApplyResult(callContext, category, objectResult, args);
         }
 
         Result IContextFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax args)
         {
-            var objectResult = _context.CreateThisRefResult(category | Category.Type);
+            var objectResult = NaturalRefType.CreateContextResult(_structContext.ForCode, category | Category.Type);
             return ApplyResult(callContext, category, objectResult, args);
         }
 
         Result ApplyResult(ContextBase callContext, Category category, Result objectResult, ICompileSyntax args)
         {
-            var trace = false; // category.HasCode | category.HasRefs | category.HasInternal;
+            var trace = ObjectId<0; // category.HasCode | category.HasRefs | category.HasInternal;
             StartMethodDump(trace,callContext,category,objectResult,args);
-            var accessResult = _context.NaturalRefType.AccessResult(category|Category.Type, _index).UseWithArg(objectResult);
+            var accessResult = NaturalRefType.AccessResult(category|Category.Type, _index).UseWithArg(objectResult);
             if (args == null)
                 return ReturnMethodDump(trace,accessResult);
             Dump(trace, "accessResult", accessResult);
             var result = accessResult.Type.ApplyFunction(category, callContext, args);
             return ReturnMethodDumpWithBreak(trace,result);
         }
+    }
+
+    internal interface IStructContext
+    {
+        Ref NaturalRefType { get; }
+        TypeBase NaturalType { get; }
+        IContextRefInCode ForCode { get; }
     }
 }

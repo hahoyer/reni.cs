@@ -9,7 +9,9 @@ namespace Reni.Parser.TokenClass.Name
     {
         internal override Result Result(ContextBase context, Category category, Token token)
         {
-            return context.CreateThisRefResult(category);
+            var structContext = context.FindStruct();
+            return structContext.NaturalRefType
+                .CreateContextResult(structContext.ForCode, category);
         }
     }
 }

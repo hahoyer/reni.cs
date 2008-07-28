@@ -1,7 +1,9 @@
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
+using Reni.Struct;
 
 namespace Reni.Context
 {
@@ -9,10 +11,7 @@ namespace Reni.Context
     {
         private readonly ContextBase _parent;
 
-        protected Child(ContextBase parent)
-        {
-            _parent = parent;
-        }
+        protected Child(ContextBase parent) { _parent = parent; }
 
         [Node]
         internal ContextBase Parent { get { return _parent; } }
@@ -22,19 +21,17 @@ namespace Reni.Context
         [DumpData(false)]
         internal override sealed Root RootContext { get { return Parent.RootContext; } }
 
-        sealed internal protected override Sequence<ContextBase> ObtainChildChain()
-        {
-            return Parent.ChildChain + this;
-        }
+        internal protected override sealed Sequence<ContextBase> ObtainChildChain() { return Parent.ChildChain + this; }
 
-        internal override Result CreateArgsRefResult(Category category)
-        {
-            return Parent.CreateArgsRefResult(category);
-        }
+        internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
 
-        internal override SearchResult<IContextFeature> Search(Defineable defineable)
+        internal override SearchResult<IContextFeature> Search(Defineable defineable) { return Parent.Search(defineable).SubTrial(Parent); }
+
+        internal override IStructContext FindStruct()
         {
-            return Parent.Search(defineable).SubTrial(Parent);
+            if(this is IStructContext)
+                return (IStructContext) this;
+            return Parent.FindStruct();
         }
     }
 }

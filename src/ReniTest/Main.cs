@@ -4,6 +4,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using Reni;
+using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Struct;
 
 namespace ReniTest
@@ -15,7 +16,7 @@ namespace ReniTest
         public Main()
         {
             InitializeComponent();
-            CreateCompiler(new AccessAndAdd().Target);
+            CreateCompiler(new FunctionWithNonLocal().Target);
             Service.Connect(treeView1, _compiler);
         }
 

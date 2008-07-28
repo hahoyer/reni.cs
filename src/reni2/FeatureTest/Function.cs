@@ -1,158 +1,152 @@
+using System;
 using HWClassLibrary.Debug;
 using NUnit.Framework;
+using Reni.FeatureTest.Struct;
 
-namespace Reni.FeatureTest
+namespace Reni.FeatureTest.Function
 {
-    /// <summary>
-    /// Functions
-    /// </summary>
-    [TestFixture, Description("ssssss")]
-    public class Function : CompilerTest
+    [TestFixture]
+    public class FunctionWithNonLocal : CompilerTest
     {
-        #region Setup/Teardown
-
-        /// <summary>
-        /// Starts this instance.
-        /// </summary>
-        /// created 10.01.2007 04:32
-        [SetUp]
-        public new void Start()
+        public override string Target
         {
-            base.Start();
-        }
-
-        public override void Run() {  }
-
-        #endregion
-
-        /// <summary>
-        /// Two functions.
-        /// </summary>
-        /// created 08.10.2006 16:33
-        [Test, Description("ssssss"), Category(Worked)]   
-        public void FunctionWithNonLocal()
-        {
-            RunCompiler("FunctionWithNonLocal",
-                @"
+            get
+            {
+                return @"
 x: 100;
 f: function arg+x;
 f(2) dump_print;
-"
-                , "102"
-                );
+";
+            }
+        }
+        public override string Output { get { return "102"; } }
+        public override System.Type[] DependsOn
+        {
+            get
+            {
+                return new[]
+                {
+                    typeof(InnerAccessTheOnlyOne), 
+                    typeof(BitArrayOp),
+                };
+            }
         }
 
-        /// <summary>
-        /// Recursive function that will result in a stack overflow, except when compiled as a loop
-        /// </summary>
+
         [Test, Category(Worked)]
-        public void PrimitiveRecursiveFunctionByteWithDump()
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    public class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
+    {
+        public override string Target { get { return @"i: 10; f: function i > 0 then (i := i - 1; i dump_print; f());f()"; } }
+        public override string Output { get { return "9876543210"; } }
+        public override System.Type[] DependsOn
         {
-            RunCompiler
-                (
-                "PrimitiveRecursiveFunctionByteWithDump",
-                @"i: 10; f: function i > 0 then (i := i - 1; i dump_print; f());f()",
-                "9876543210"
-                );
+            get
+            {
+                return new[]
+                {
+                    typeof(InnerAccessTheOnlyOne), 
+                    typeof(BitArrayOp),
+                    typeof(ThenElse),
+                    typeof(Assignment),
+                };
+            }
         }
 
-        /// <summary>
-        /// Recursive function that will result in a stack overflow, except when compiled as a loop
-        /// </summary>
         [Test, Category(Worked)]
-        public void PrimitiveRecursiveFunctionHuge()
-        {
-            RunCompiler
-                (
-                "PrimitiveRecursiveFunctionHuge",
-                @"i: 400000; f: function i > 0 then (i := i - 1; f());f()",
-                ""
-                );
-        }
+        public override void Run() { BaseRun(); }
+    }
 
-        /// <summary>
-        /// Recursive function that will result in a stack overflow, except when compiled as a loop
-        /// </summary>
+
+    [TestFixture]
+    public class PrimitiveRecursiveFunctionHuge : CompilerTest
+    {
+        public override string Target { get { return @"i: 400000; f: function i > 0 then (i := i - 1; f());f()"; } }
+        public override string Output { get { return ""; } }
+        public override System.Type[] DependsOn { get { return new[] { typeof(PrimitiveRecursiveFunctionSmall) }; } }
+
         [Test, Category(Worked)]
-        public void PrimitiveRecursiveFunctionSmall()
-        {
-            RunCompiler
-                (
-                "PrimitiveRecursiveFunctionSmall",
-                @"i: 400000 type(400); f: function i > 0 then (i := i - 1; f());f()",
-                ""
-                );
-        }
+        public override void Run() { BaseRun(); }
+    }
 
-        /// <summary>
-        /// Recursive function that will result in a stack overflow, except when compiled as a loop
-        /// </summary>
+    /// <summary>
+    /// Recursive function that will result in a stack overflow, except when compiled as a loop
+    /// </summary>
+    [TestFixture]
+    public class PrimitiveRecursiveFunctionSmall : CompilerTest
+    {
+        public override string Target { get { return @"i: 400000 type(400); f: function i > 0 then (i := i - 1; f());f()"; } }
+        public override string Output { get { return ""; } }
+        public override System.Type[] DependsOn { get { return new[] { typeof(PrimitiveRecursiveFunctionByteWithDump) }; } }
+
         [Test, Category(Worked)]
-        public void PrimitiveRecursiveFunctionWithDump()
-        {
-            RunCompiler
-                (
-                "PrimitiveRecursiveFunctionSmall",
-                @"i: 400000 type(10); f: function i > 0 then (i := i - 1; i dump_print; f());f()",
-                "9876543210"
-                );
-        }
+        public override void Run() { BaseRun(); }
+    }
 
-        /// <summary>
-        /// Recursive function.
-        /// </summary>
-        /// created 05.01.2007 02:13
+    [TestFixture]
+    public class PrimitiveRecursiveFunctionWithDump : CompilerTest
+    {
+        public override string Target { get { return @"i: 400000 type(10); f: function i > 0 then (i := i - 1; i dump_print; f());f()"; } }
+        public override string Output { get { return "9876543210"; } }
+        public override System.Type[] DependsOn { get { return new[] { typeof(PrimitiveRecursiveFunctionByteWithDump) }; } }
+
         [Test, Category(Worked)]
-        public void RecursiveFunction()
+        public override void Run() { BaseRun(); }
+    }
+    [TestFixture]
+    public class RecursiveFunction : CompilerTest
+    {
+        public override string Target { get { return @"f: function arg = 1 then arg type(1) else arg * f(arg type((arg-1)enable_cut));f(4)dump_print"; } }
+        public override string Output { get { return "24"; } }
+        public override System.Type[] DependsOn
         {
-            RunCompiler
-                (
-                "RecursiveFunction",
-                @"f: function arg = 1 then arg type(1) else arg * f(arg type((arg-1)enable_cut));f(4)dump_print",
-                "24"
-                );
+            get
+            {
+                return new[]
+                {
+                    typeof(InnerAccessTheOnlyOne), 
+                    typeof(BitArrayOp),
+                    typeof(ThenElse),
+                    typeof(DefaultOperations.ApplyTypeOperator),
+                    typeof(DefaultOperations.ApplyCompareOperator),
+                    typeof(DefaultOperations.ApplyTypeOperatorWithCut),
+                };
+            }
         }
 
-        /// <summary>
-        /// Recursive function.
-        /// </summary>
-        /// created 05.01.2007 02:13
         [Test, Category(Worked)]
-        public void FunctionWithRefArg()
-        {
-            RunCompiler
-                (
-                "FunctionWithRefArg",
-                @"f: function arg;g: function f(arg);x:4; g(x)dump_print",
-                "4"
-                );
-        }
+        public override void Run() { BaseRun(); }
+    }
+    [TestFixture]
+    public class FunctionWithRefArg : CompilerTest
+    {
+        public override string Target { get { return @"f: function arg;g: function f(arg);x:4; g(x)dump_print"; } }
+        public override string Output { get { return "4"; } }
 
-        /// <summary>
-        /// Simples the function.
-        /// </summary>
-        /// created 08.10.2006 16:33
-        [Test, Category(Worked)]   
-        public void SimpleFunction()
-        {
-            RunCompiler("SimpleFunction",
-                @"
-f: function arg+1;
-f(2) dump_print;
-"
-                , "3"
-                );
-        }
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+    [TestFixture]
+    public class SimpleFunction : CompilerTest
+    {
+        public override string Target { get { return @"f: function arg+1;f(2) dump_print;"; } }
+        public override string Output { get { return "3"; } }
 
-        /// <summary>
-        /// Two functions.
-        /// </summary>
-        /// created 08.10.2006 16:33
-        [Test, Category(Worked)]   
-        public void TwoFunctions()
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    public class TwoFunctions : CompilerTest
+    {
+        public override string Target
         {
-            RunCompiler("TwoFunctions",
-                @"
+            get
+            {
+                return @"
 x: 100;
 f1: function 
 ((
@@ -162,22 +156,22 @@ f1: function
 ) _A_T_ 2);
 
 f1()dump_print;
-"
-                , "106"
-                );
+";
+            }
         }
+        public override string Output { get { return "106"; } }
 
-        /// <summary>
-        /// Two functions.
-        /// </summary>
-        /// created 08.10.2006 16:33
-        [Test, Category(Worked)]   
-        public void TwoFunctions1()
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+    [TestFixture]
+    public class TwoFunctions1 : CompilerTest
+    {
+        public override string Target
         {
-            RunCompiler
-                (
-                "TwoFunctions1",
-                @"
+            get
+            {
+                return @"
 f1: function 
 ((
   y: 3;
@@ -186,14 +180,17 @@ f1: function
 ) _A_T_ 2);
 
 f1()dump_print;
-",
-                delegate(Compiler c)
-                {
-                    var x = new ExpectedCompilationResult(c);
-                    Tracer.Assert(x.FunctionCount() == 2);
-                },
-                "3"
-                );
+";
+            }
         }
+        public override string Output { get { return "3"; } }
+        public override void AssertValid(Compiler c)
+        {
+            var x = new ExpectedCompilationResult(c);
+            Tracer.Assert(x.FunctionCount() == 2);
+        }
+
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
     }
 }

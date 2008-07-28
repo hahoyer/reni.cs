@@ -282,26 +282,20 @@ namespace Reni.Type
 
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            var trace = ObjectId == 1027 && category.HasCode;
-            StartMethodDumpWithBreak(trace, callContext,category,@object,args);
             var objectSize = callContext.Type(@object).UnrefSize;
-            Dump(trace, "objectSize", objectSize);
             var argsResult = callContext.ConvertToSequenceViaRef(category, args, _sequence.Element, () => objectSize.ByteAlignedSize);
             if (argsResult.IsPending)
                 return Result.CreatePending(category);
-            Dump(trace, "argsResult", argsResult);
             var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element, () => argsResult.Internal.Size);
             if (objectResult.IsPending)
                 return Result.CreatePending(category);
-            Dump(trace, "objectResult", objectResult);
 
             var result = _sequence
                 .Element
                 .SequenceOperationResult(category, _definable, objectSize, callContext.Type(args).UnrefSize)
                 ;
-            Dump(trace, "result", result);
 
-            return ReturnMethodDump(trace, result.UseWithArg(objectResult.CreateSequence(argsResult)));
+            return result.UseWithArg(objectResult.CreateSequence(argsResult));
         }
     }
 }
