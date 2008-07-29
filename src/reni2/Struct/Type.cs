@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -14,25 +13,18 @@ namespace Reni.Struct
     internal sealed class Type : TypeBase
     {
         [Node]
-        internal readonly Context Context;
+        internal readonly StructContextBase Context;
 
-        public Type(Context context)
-        {
-            Context = context;
-        }
+        internal Type(StructContextBase context) { Context = context; }
 
-        internal override string DumpShort()
-        {
-            return "type." + ObjectId + "(context." + Context.ObjectId + ")";
-        }
-
-        [DumpData(false)]
+        protected override Size GetSize() { return Context.InternalSize(); }
+        internal override string DumpShort() { return "type." + ObjectId + "(context." + Context.DumpShort() + ")"; }
         internal protected override int IndexSize { get { return Context.IndexSize; } }
 
-        protected override Size GetSize()
-        {
-            return InternalResult(Category.Size).Size;
-        }
+        private List<ICompileSyntax> StatementList { get { return Context.StatementList; } }
+
+        internal override Result AccessResultFromRef(Category category, int position,
+            RefAlignParam refAlignParam) { return Context.AccessResultFromRef(category, position, refAlignParam); }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
@@ -46,55 +38,15 @@ namespace Reni.Struct
             return Result.ConcatPrintResult(category, result);
         }
 
-        private List<ICompileSyntax> StatementList { get { return Context.StatementList; } }
-
-        private Result InternalResult(Category category)
-        {
-            return Context.InternalResult(category);
-        }
-
-        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
+        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(
+            Defineable defineable)
         {
             var containerResult = Context.Container.SearchFromRefToStruct(defineable);
-            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature, this);
+            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature,
+                this);
             if(result.IsSuccessFull)
                 return result;
             return base.SearchFromRef(defineable).SubTrial(this);
-        }
-
-        internal override Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
-        {
-            return Context.AccessResultFromRef(category, position, refAlignParam);
-        }
-
-        internal sealed class Feature : ReniObject, IConverter<IFeature, Ref>, IFeature
-        {
-            [DumpData(true)]
-            private readonly Type _type;
-            [DumpData(true)]
-            private readonly int _index;
-
-            public Feature(Type type, int index)
-            {
-                _type = type;
-                _index = index;
-            }
-
-            public IFeature Convert(Ref type)
-            {
-                Tracer.Assert(type.RefAlignParam == _type.Context.RefAlignParam);
-                return this;
-            }
-
-            public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
-            {
-                var objectResult = callContext.ResultAsRef(category | Category.Type, @object);
-                var accessResult = objectResult.Type.AccessResult(category, _index).UseWithArg(objectResult);
-                if(args == null)
-                    return accessResult;
-                NotImplementedMethod(callContext, category, @object, args, "objectResult", objectResult, "accessResult", accessResult);
-                return null;
-            }
         }
     }
 }

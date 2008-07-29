@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
@@ -69,10 +70,10 @@ namespace Reni.Context
                 () => new Function(this, args));
         }
 
-        internal Struct.Context CreateStruct(Struct.Container container)
+        internal Struct.FullContext CreateStruct(Struct.Container container)
         {
             return Cache._structContainerCache.Find(container,
-                () => new Struct.Context(this, container));
+                () => new Struct.FullContext(this, container));
         }
 
         internal CodeBase CreateTopRefCode() { return CodeBase.CreateTopRef(RefAlignParam); }
@@ -84,66 +85,12 @@ namespace Reni.Context
         }
 
         internal Result CreateFunctionResult(Category category, ICompileSyntax body) { return CreateFunctionType(body).CreateResult(category); }
-
         internal Result CreatePropertyResult(Category category, ICompileSyntax body) { return CreatePropertyType(body).CreateResult(category); }
-
         internal TypeBase CreatePropertyType(ICompileSyntax body) { return Cache._propertyType.Find(body, () => new Property(this, body)); }
-
-        public TypeBase CreateFunctionType(ICompileSyntax body) { return Cache._functionType.Find(body, () => new Type.Function(this, body)); }
-
+        internal TypeBase CreateFunctionType(ICompileSyntax body) { return Cache._functionType.Find(body, () => new Type.Function(this, body)); }
         internal SearchResult<IContextFeature> SearchDefineable(DefineableToken defineableToken) { return Search(defineableToken.TokenClass).SubTrial(this); }
-
         internal virtual SearchResult<IContextFeature> Search(Defineable defineable) { return defineable.SearchContext(); }
-
-        //private Result VisitFirstChainElement(Category category, MemberElem memberElem)
-        //{
-        //    if(memberElem.DefineableToken == null)
-        //        return Result(category,memberElem.Args);
-
-        //    var contextSearchResult = SearchDefineable(memberElem.DefineableToken);
-        //    if(contextSearchResult.IsSuccessFull)
-        //        return contextSearchResult.Feature.ApplyResult(this, category, memberElem.Args);
-
-        //    if(memberElem.Args == null)
-        //    {
-        //        NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult);
-        //        return null;
-        //    }
-
-        //    var argResult = Result(category | Category.Type,memberElem.Args);
-        //    var prefixSearchResult = argResult.Type.SearchDefineablePrefix(memberElem.DefineableToken);
-        //    if(prefixSearchResult.IsSuccessFull)
-        //        return prefixSearchResult.Feature.Result(category, argResult);
-
-        //    NotImplementedMethod(category, memberElem, "contextSearchResult", contextSearchResult, "prefixSearchResult",
-        //        prefixSearchResult);
-        //    return null;
-        //}
-
-        //private Result VisitNextChainElement(Category category, MemberElem memberElem, Result formerResult)
-        //{
-        //    //var refResult = formerResult.EnsureContextRef(this);
-        //    //var visitedResult = ((Ref) refResult.Type).VisitNextChainElement(this, category, memberElem);
-        //    //var arglessResult = visitedResult.UseWithArg(refResult);
-        //    //return arglessResult;
-        //    return null;
-        //}
-
-        //internal Result VisitChainElement(Category category, MemberElem memberElem, Result formerResult)
-        //{
-        //    if(formerResult == null)
-        //        return VisitFirstChainElement(category, memberElem);
-        //    return VisitNextChainElement(category, memberElem, formerResult);
-        //}
-
-        //internal virtual CodeBase CreateRefForStruct(Struct.PartialType partialType)
-        //{
-        //    NotImplementedMethod(partialType);
-        //    return null;
-        //}
-
         internal Size Size(ICompileSyntax syntax) { return Result(Category.Size, syntax).Size; }
-
         internal TypeBase Type(ICompileSyntax syntax) { return Result(Category.Type, syntax).Type; }
 
         internal List<Result> Result(Category category, List<ICompileSyntax> list)
@@ -154,6 +101,7 @@ namespace Reni.Context
             return results;
         }
 
+        [DebuggerHidden]
         internal Result Result(Category category, ICompileSyntax syntax)
         {
             var cacheElem = Cache._resultCache.Find
@@ -271,8 +219,8 @@ namespace Reni.Context
         internal readonly DictionaryEx<ICompileSyntax, TypeBase> _propertyType =
             new DictionaryEx<ICompileSyntax, TypeBase>();
         [Node, SmartNode]
-        internal readonly DictionaryEx<Struct.Container, Struct.Context> _structContainerCache =
-            new DictionaryEx<Struct.Container, Struct.Context>();
+        internal readonly DictionaryEx<Struct.Container, Struct.FullContext> _structContainerCache =
+            new DictionaryEx<Struct.Container, Struct.FullContext>();
         [Node, SmartNode]
         internal readonly SimpleCache<Result> _topRefResultCache = new SimpleCache<Result>();
         [Node, SmartNode]

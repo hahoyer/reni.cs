@@ -43,7 +43,7 @@ namespace Reni.Context
             {
                 if (IsStopByObjectIdActive)
                     return null;
-                return Visit(Category.Refs).Refs;
+                return Result(Category.Refs).Refs;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Reni.Context
             var localCategory = category;
             if (category.HasCode)
                 localCategory = (localCategory - Category.Code) | Category.Size;
-            var result = Visit(localCategory).Clone();
+            var result = Result(localCategory).Clone();
             if (result.IsPending)
                 return ReturnMethodDump(trace, result);
 
@@ -109,7 +109,7 @@ namespace Reni.Context
             var category = Category.Code.Replendish();
             var refAlignParam = Context.RefAlignParam;
             var foreignRefsRef = CodeBase.CreateFrameRef(refAlignParam);
-            var visitResult = Visit(category);
+            var visitResult = Result(category);
             var result = visitResult
                 .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
             if (Args.Size.IsZero)
@@ -117,7 +117,7 @@ namespace Reni.Context
             return result.Code;
         }
 
-        private Result Visit(Category category)
+        private Result Result(Category category)
         {
             if (IsStopByObjectIdActive)
                 return null;
@@ -136,11 +136,11 @@ namespace Reni.Context
             if (result.IsPending)
                 return ReturnMethodDump(trace, result);
 
-            result = result.PostProcess(functionContext.AlignBits);
+            var postProcessedResult = result.PostProcessor.FunctionResult(functionContext.AlignBits);
 
-            Tracer.ConditionalBreak(trace,Dump() + "\nresult=" + result.Dump());
-            result = result.ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(result.Complete));
-            return ReturnMethodDump(trace, result);
+            Tracer.ConditionalBreak(trace, Dump() + "\npostProcessedResult=" + postProcessedResult.Dump());
+            var finalResult = postProcessedResult.ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(postProcessedResult.Complete));
+            return ReturnMethodDump(trace, finalResult);
         }
 
         private Result CreateArgsRef(Category category)
@@ -152,9 +152,9 @@ namespace Reni.Context
                                                                                                  FrameSize*-1));
         }
 
-        private TypeBase VisitType()
+        private TypeBase Type()
         {
-            return Visit(Category.Type).Type;
+            return Result(Category.Type).Type;
         }
 
         internal Container Serialize(bool isInternal)
@@ -180,7 +180,7 @@ namespace Reni.Context
             result += "\n";
             result += "context=" + Context.Dump();
             result += "\n";
-            result += "type=" + VisitType().Dump();
+            result += "type=" + Type().Dump();
             result += "\n";
             return result;
         }

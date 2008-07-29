@@ -177,8 +177,8 @@ namespace Reni.Struct
                 SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable));
         }
 
-        internal SearchResult<IConverter<IContextFeature, Context>> SearchFromStructContext(
-            Defineable defineable) { return SearchResult<IConverter<IContextFeature, Context>>.Create(Search(defineable)); }
+        internal SearchResult<IConverter<IContextFeature, FullContext>> SearchFromStructContext(
+            Defineable defineable) { return SearchResult<IConverter<IContextFeature, FullContext>>.Create(Search(defineable)); }
 
         private SearchResult<StructFeature> Search(Defineable defineable)
         {
@@ -200,7 +200,7 @@ namespace Reni.Struct
     internal class StructFeature
         : ReniObject
             , IConverter<IConverter<IFeature, Ref>, Type>
-            , IConverter<IContextFeature, Context>
+            , IConverter<IContextFeature, FullContext>
             , IConverter<IContextFeature, ContextAtPosition>
     {
         private readonly int _index;
@@ -209,7 +209,7 @@ namespace Reni.Struct
 
         IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type) { return type.Context.Features[_index]; }
 
-        IContextFeature IConverter<IContextFeature, Context>.Convert(Context context) { return context.Features[_index]; }
+        IContextFeature IConverter<IContextFeature, FullContext>.Convert(FullContext context) { return context.Features[_index]; }
 
         IContextFeature IConverter<IContextFeature, ContextAtPosition>.Convert(ContextAtPosition contextAtPosition)
         {

@@ -43,8 +43,8 @@ namespace Reni.Struct
 
         Result ApplyResult(ContextBase callContext, Category category, Result objectResult, ICompileSyntax args)
         {
-            var trace = ObjectId<0; // category.HasCode | category.HasRefs | category.HasInternal;
-            StartMethodDump(trace,callContext,category,objectResult,args);
+            var trace = ObjectId==-277 && category.HasCode && category.HasRefs && category.HasInternal;
+            StartMethodDumpWithBreak(trace,callContext,category,objectResult,args);
             var accessResult = NaturalRefType.AccessResult(category|Category.Type, _index).UseWithArg(objectResult);
             if (args == null)
                 return ReturnMethodDump(trace,accessResult);

@@ -158,8 +158,10 @@ namespace Reni
 
         internal CodeBase ToCode()
         {
-            NotImplementedMethod();
-            return null;
+            var result = CodeBase.CreateVoid();
+            for (var i = 0; i < _data.Count; i++)
+                result = result.CreateSequence(CodeBase.CreateContextRef(_data[i]));
+            return result;
         }
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)

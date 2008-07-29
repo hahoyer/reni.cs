@@ -446,7 +446,7 @@ namespace Reni
         /// <param name="context"></param>
         /// <param name="syntax"></param>
         /// <returns></returns>
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
         {
             var OldPending = Pending;
@@ -799,8 +799,9 @@ namespace Reni
 
         internal Result AutomaticDereference()
         {
-            if(IsPending)
+            if(IsPending || Complete == Category.Refs)
                 return this;
+
             return Type.AutomaticDereference(this);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using HWClassLibrary.Debug;
 using Reni.Code;
 
@@ -30,11 +31,17 @@ namespace Reni
             _size = size;
         }
 
-        public static Category Size { get { return new Category(true, false, false, false,false); } }
+        [DebuggerHidden]
+        public static Category Size { get { return new Category(true, false, false, false, false); } }
+        [DebuggerHidden]
         public static Category Type { get { return new Category(false, true, false, false, false); } }
+        [DebuggerHidden]
         public static Category Code { get { return new Category(false, false, true, false, false); } }
+        [DebuggerHidden]
         public static Category Refs { get { return new Category(false, false, false, true, false); } }
+        [DebuggerHidden]
         public static Category Internal { get { return new Category(false, false, false, false, true); } }
+        [DebuggerHidden]
         public static Category ForInternal { get { return new Category(true, true, true, true, false); } }
 
         public bool IsNull { get { return !(_code || _type || _refs || _size || _internal); } }
@@ -66,6 +73,7 @@ namespace Reni
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
+        [DebuggerHidden]
         public static Category operator |(Category x, Category y)
         {
             return new Category(
