@@ -81,13 +81,9 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
+    [TestFixture, InnerAccessSecondOfTwo, Target(@"(1, 11, 3, (this _A_T_ 1) := 3) dump_print"), Output("(1, 3, 3, )")]
     public class Assignment : CompilerTest
     {
-        public override string Target { get { return @"(1, 11, 3, (this _A_T_ 1) := 3) dump_print"; } }
-        public override string Output { get { return "(1, 3, 3, )"; } }
-        public override System.Type[] DependsOn { get { return new[] { typeof(InnerAccessSecondOfTwo) }; } }
-
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }

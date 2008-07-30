@@ -1,6 +1,7 @@
 using System;
 using HWClassLibrary.Debug;
 using NUnit.Framework;
+using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.Struct;
 
 namespace Reni.FeatureTest.DefaultOperations
@@ -9,7 +10,7 @@ namespace Reni.FeatureTest.DefaultOperations
     public class TypeOperator : CompilerTest
     {
         public override string Target { get { return @"31 type dump_print"; } }
-        public override string Output { get { return "(bit)sequence(6)"; } }
+        public override string Output { get { return "#(#align3#)# (bit)sequence(6)"; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -55,7 +56,7 @@ namespace Reni.FeatureTest.DefaultOperations
         internal abstract string Operator { get; }
         internal abstract bool Result { get; }
         public override string Output { get { return Result ? "-1" : "0"; } }
-        public override System.Type[] DependsOn { get { return new[] { typeof(BitArrayOp) }; } }
+        public override System.Type[] DependsOn { get { return new[] { typeof(Add2Numbers) }; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }

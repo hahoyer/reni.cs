@@ -28,9 +28,14 @@ namespace Reni.Type
             return Parent.Size.Align(AlignBits);
         }
 
-        public override AutomaticRef CreateRef(RefAlignParam refAlignParam)
+        internal override AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
         {
-            return Parent.CreateRef(refAlignParam.Align(AlignBits));
+            return Parent.CreateAutomaticRef(refAlignParam.Align(AlignBits));
+        }
+
+        internal override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
+        {
+            return Parent.CreateAssignableRef(refAlignParam.Align(AlignBits));
         }
 
         internal override Result DestructorHandler(Category category)

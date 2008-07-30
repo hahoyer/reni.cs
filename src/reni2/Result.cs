@@ -446,7 +446,7 @@ namespace Reni
         /// <param name="context"></param>
         /// <param name="syntax"></param>
         /// <returns></returns>
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
         {
             var OldPending = Pending;
@@ -774,18 +774,18 @@ namespace Reni
 
             var resultAsRef =
                 Type
-                    .CreateRef(refAlignParam)
+                    .CreateAutomaticRef(refAlignParam)
                     .CreateResult(
                     category,
                     () => CodeBase.CreateTopRef(refAlignParam, offset()),
-                    () => ForInternal().Align(refAlignParam.AlignBits)
+                    () => ForInternal(refAlignParam.AlignBits)
                     );
             return resultAsRef;
         }
 
-        private Result ForInternal()
+        private Result ForInternal(int alignBits)
         {
-            var result = Clone(Category.ForInternal);
+            var result = Clone(Category.ForInternal).Align(alignBits);
             if(HasInternal)
                 result = Internal.CreateSequence(result);
             Tracer.Assert(result.Complete == Category.ForInternal);

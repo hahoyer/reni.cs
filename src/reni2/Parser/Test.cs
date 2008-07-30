@@ -7,7 +7,7 @@ using Reni.FeatureTest.Structure;
 namespace Reni.Parser
 {
     [TestFixture]
-    public class Test : CompilerTest
+    public class ParserTest : CompilerTest
     {
         [SetUp]
         public new void Start()

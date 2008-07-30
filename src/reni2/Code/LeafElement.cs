@@ -72,6 +72,15 @@ namespace Reni.Code
             return new[] { result };
         }
 
+        internal virtual LeafElement[] TryToCombineBackN(Dereference precedingElement)
+        {
+            var result = TryToCombineBack(precedingElement);
+            if (result == null)
+                return null;
+            return new[] { result };
+        }
+
+
         internal virtual LeafElement TryToCombineBack(Dereference precedingElement)
         {
             return null;
@@ -133,6 +142,7 @@ namespace Reni.Code
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return IsError? "CodeError": "Code"; } }
+        [DumpExcept(false)]
         protected virtual bool IsError { get { return false; } }
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
     }

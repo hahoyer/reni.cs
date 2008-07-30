@@ -24,8 +24,8 @@ namespace Reni
             var condResult = Cond.Result(context, category | Category.Type);
             condResult = condResult.Type.Conversion(category, TypeBase.CreateBit).UseWithArg(condResult);
 
-            var thenResult = Then.Result(context, category | Category.Type);
-            var elseResult = CreateElseResult(context, category);
+            var thenResult = Then.Result(context, category | Category.Type).AutomaticDereference();
+            var elseResult = CreateElseResult(context, category).AutomaticDereference();
 
             if(thenResult.Type.IsPending)
                 return elseResult.Type.ThenElseWithPending(category, condResult.Refs, elseResult.Refs);

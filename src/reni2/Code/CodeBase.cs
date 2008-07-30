@@ -223,10 +223,9 @@ namespace Reni.Code
                 if(Size.IsZero) // No temp storage 
                     return finalResult; // Just return final result
 
-                var alignedSize = Size.ByteAlignedSize;
-                var alignedThis = CreateBitCast(alignedSize);
+                var alignedThis = CreateBitCast(Size.ByteAlignedSize);
                 var sequencedResult = alignedThis.CreateSequence(finalResult);
-                var result = sequencedResult.CreateChild(new StatementEnd(finalResult.Size, alignedSize));
+                var result = sequencedResult.CreateChild(new StatementEnd(finalResult.Size, Size.ByteAlignedSize));
                 return result;
             }
             NotImplementedMethod(finalResult, destructor, mover);

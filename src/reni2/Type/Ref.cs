@@ -15,6 +15,7 @@ namespace Reni.Type
 
         protected Ref(TypeBase target, RefAlignParam refAlignParam) : base(_nextObjectId++, target)
         {
+            Tracer.Assert(!(target is Aligner));
             RefAlignParam = refAlignParam;
         }
 
@@ -45,7 +46,7 @@ namespace Reni.Type
 
         internal override sealed Result AutomaticDereference(Result result)
         {
-            return CreateDereferencedArgResult(result.Complete).UseWithArg(result);
+            return Target.AutomaticDereference(CreateDereferencedArgResult(result.Complete).UseWithArg(result));
         }
 
         internal Result CreateDereferencedArgResult(Category category)
@@ -64,8 +65,7 @@ namespace Reni.Type
 
         internal override sealed TypeBase AutomaticDereference()
         {
-            Tracer.Assert(Target == Target.AutomaticDereference());
-            return Target;
+            return Target.AutomaticDereference();
         }
 
         internal override sealed Result DumpPrint(Category category)
@@ -85,6 +85,7 @@ namespace Reni.Type
             return true;
         }
 
+        [DumpData(false)]
         internal override Size UnrefSize
         {
             get { return Target.UnrefSize; }
@@ -147,13 +148,6 @@ namespace Reni.Type
     internal sealed class AutomaticRef : Ref
     {
         internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam) : base(target, refAlignParam) {}
-
-        public override AutomaticRef CreateRef(RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(refAlignParam);
-            return null;
-        }
-
         protected override string ShortName { get { return "automatic_ref"; } }
 
     }

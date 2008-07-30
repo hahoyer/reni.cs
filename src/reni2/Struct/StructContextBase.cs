@@ -16,7 +16,7 @@ namespace Reni.Struct
         private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
         [Node]
         internal readonly ContextBase Parent;
-        [Node]
+        [Node, DumpData(false)]
         internal readonly Container Container;
         [Node, DumpData(false)]
         internal readonly Result[] _internalResult;
@@ -33,7 +33,7 @@ namespace Reni.Struct
         [DumpData(false)]
         internal override Root RootContext { get { return Parent.RootContext; } }
         [DumpData(false)]
-        Ref IStructContext.NaturalRefType { get { return NaturalType.CreateRef(RefAlignParam); } }
+        Ref IStructContext.NaturalRefType { get { return NaturalType.CreateAutomaticRef(RefAlignParam); } }
         [DumpData(false)]
         public TypeBase NaturalType { get { return _typeCache.Find(() => new Type(this)); } }
         [DumpData(false)]
@@ -66,6 +66,8 @@ namespace Reni.Struct
         {
             return "context." + ObjectId + "(" + Container.DumpShort() + ")";
         }
+
+        internal override IStructContext FindStruct() { return this; }
 
         internal Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
         {

@@ -37,13 +37,13 @@ namespace Reni.Type
             get { return "#(#context " + _context.ObjectId + "#)# function(" + _body.DumpShort() + ")"; }
         }
 
-        public override AutomaticRef CreateRef(RefAlignParam refAlignParam)
+        internal override AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
         {
             NotImplementedMethod(refAlignParam);
-            return base.CreateRef(refAlignParam);
+            return base.CreateAutomaticRef(refAlignParam);
         }
 
-        public override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
+        internal override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
         {
             NotImplementedMethod(refAlignParam);
             return base.CreateAssignableRef(refAlignParam);

@@ -146,7 +146,7 @@ namespace Reni.Context
         private Result CreateArgsRef(Category category)
         {
             var refAlignParam = Context.RefAlignParam;
-            return Args.CreateRef(refAlignParam).CreateResult(category, () => CodeBase
+            return Args.CreateAutomaticRef(refAlignParam).CreateResult(category, () => CodeBase
                                                                                   .CreateFrameRef(refAlignParam)
                                                                                   .CreateRefPlus(refAlignParam,
                                                                                                  FrameSize*-1));

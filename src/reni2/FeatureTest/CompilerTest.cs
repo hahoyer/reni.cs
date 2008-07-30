@@ -10,7 +10,8 @@ namespace Reni.FeatureTest
     /// <summary>
     /// Helper class for unittests, that compile something
     /// </summary>
-    public abstract class CompilerTest
+    [AttributeUsage(AttributeTargets.Class)]
+    public abstract class CompilerTest : Attribute
     {
         public delegate void ExpectedResult(Compiler c);
 
@@ -20,18 +21,31 @@ namespace Reni.FeatureTest
         public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
         public const string Worked = "Worked";
         public CompilerParameters Parameters;
-        private Dictionary<System.Type, CompilerTest> _cache;
+        static private Dictionary<System.Type, CompilerTest> _cache;
+        private bool _needToRunDependants = true;
 
         [SetUp]
         public void Start() { Parameters = new CompilerParameters(); }
 
         protected void RunCompiler(string name, string text, string expectedOutput) { RunCompiler(1, name, text, expectedOutput); }
 
-        protected void RunCompiler(string name, string text, ExpectedResult expectedResult, string expectedOutput) { RunCompiler(1, name, text, expectedResult, expectedOutput); }
+        protected void RunCompiler(string name, string text, ExpectedResult expectedResult,
+            string expectedOutput) { RunCompiler(1, name, text, expectedResult, expectedOutput); }
 
         protected void RunCompiler(string name, string text, ExpectedResult expectedResult) { RunCompiler(1, name, text, expectedResult, ""); }
 
         protected void RunCompiler(string name, string expectedOutput) { RunCompiler(1, name, expectedOutput); }
+
+        internal void RunCompiler(int depth, string name, string text, string expectedOutput) { RunCompiler(depth + 1, name, text, default(ExpectedResult), expectedOutput); }
+
+        private void RunCompiler(int depth, string name, string expectedOutput) { RunCompiler(depth + 1, name, default(ExpectedResult), expectedOutput); }
+
+        private void RunCompiler(int depth, string name, ExpectedResult expectedResult,
+            string expectedOutput)
+        {
+            InternalRunCompiler(depth + 1, File.SourcePath(1) + "\\" + name + ".reni",
+                expectedResult, expectedOutput);
+        }
 
         private void RunCompiler(int depth, string name, string text, ExpectedResult expectedResult,
             string expectedOutput)
@@ -41,12 +55,6 @@ namespace Reni.FeatureTest
             f.String = text;
             InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
         }
-
-        internal void RunCompiler(int depth, string name, string text, string expectedOutput) { RunCompiler(depth + 1, name, text, default(ExpectedResult), expectedOutput); }
-
-        private void RunCompiler(int depth, string name, string expectedOutput) { RunCompiler(depth + 1, name, default(ExpectedResult), expectedOutput); }
-
-        private void RunCompiler(int depth, string name, ExpectedResult expectedResult, string expectedOutput) { InternalRunCompiler(depth + 1, File.SourcePath(1) + "\\" + name + ".reni", expectedResult, expectedOutput); }
 
         private void InternalRunCompiler(int depth, string fileName, ExpectedResult expectedResult,
             string expectedOutput)
@@ -90,9 +98,8 @@ namespace Reni.FeatureTest
             return false;
         }
 
-        private void RunDependant(Dictionary<System.Type, CompilerTest> cache)
+        private void RunDependant()
         {
-            _cache = cache;
             RunDependants();
             Start();
             Run();
@@ -103,25 +110,70 @@ namespace Reni.FeatureTest
         protected void BaseRun()
         {
             if(_cache == null)
-            {
                 _cache = new Dictionary<System.Type, CompilerTest>();
-                RunDependants();
-            }
+            
+            RunDependants();
 
             RunCompiler(1, GetType().Name, Target, AssertValid, Output);
         }
 
         private void RunDependants()
         {
+            if (!_needToRunDependants)
+                return;
+            
+            _needToRunDependants = false;
+
+            if (_cache.ContainsKey(GetType()))
+                return;
+
             _cache.Add(GetType(), this);
+
             foreach(var dependsOnType in DependsOn)
                 if(!_cache.ContainsKey(dependsOnType))
-                    ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant(_cache);
+                    ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
         }
 
-        public virtual string Output { get { return ""; } }
-        public virtual string Target { get { return ""; } }
-        public virtual System.Type[] DependsOn { get { return new System.Type[0]; } }
-        public virtual void AssertValid(Compiler c) {}
+        public virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
+        public virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
+        public virtual System.Type[] DependsOn { get { return ToTypes(GetType().GetCustomAttributes(typeof(CompilerTest), true)); } }
+
+        private static System.Type[] ToTypes(object[] objects)
+        {
+            var result = new List<System.Type>();
+            foreach(var o in objects)
+                result.Add(o.GetType());
+            return result.ToArray();
+        }
+
+        private string GetStringAttribute<T>() where T : StringAttribute
+        {
+            var attrs = GetType().GetCustomAttributes(typeof(T), true);
+            if (attrs.Length == 1)
+                return ((T)attrs[0]).Value;
+            return "";
+        }
+
+        public virtual void AssertValid(Compiler c) { }
+    }
+
+    internal abstract class StringAttribute : Attribute
+    {
+        internal string Value;
+        protected StringAttribute(string value) { Value = value; }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    internal sealed class OutputAttribute : StringAttribute
+    {
+        internal OutputAttribute(string value)
+            : base(value) { }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    internal sealed class TargetAttribute : StringAttribute
+    {
+        internal TargetAttribute(string value)
+            : base(value) { }
     }
 }

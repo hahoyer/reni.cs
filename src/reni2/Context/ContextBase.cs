@@ -132,14 +132,14 @@ namespace Reni.Context
         internal void AssertCorrectRefs(Result result)
         {
             if(result.HasRefs)
-                AssertCorrectRefs(result.Refs);
-            else
-                Tracer.Assert(!result.HasCode);
+                AssertCorrectRefs(result.Refs.Data);
+            else if(result.HasCode)
+                AssertCorrectRefs(result.Code.Refs);
         }
 
-        private void AssertCorrectRefs(Refs refs)
+        private void AssertCorrectRefs(IEnumerable<IContextRefInCode> refs)
         {
-            foreach(var @ref in refs.Data)
+            foreach(var @ref in refs)
                 CheckRef(@ref);
         }
 

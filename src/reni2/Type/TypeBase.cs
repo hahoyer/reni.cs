@@ -87,20 +87,21 @@ namespace Reni.Type
         [DumpData(false)]
         internal protected virtual int IndexSize { get { return 0; } }
 
-        public PostProcessorForType PostProcessor { get { return _postProcessor.Find(() => new PostProcessorForType(this)); } }
+        [DumpData(false)]
+        internal PostProcessorForType PostProcessor { get { return _postProcessor.Find(() => new PostProcessorForType(this)); } }
 
-        public TypeBase CreateAlign(int alignBits)
+        internal TypeBase CreateAlign(int alignBits)
         {
             if(Size.Align(alignBits) == Size)
                 return this;
             return _aligner.Find(alignBits, () => new Aligner(this, alignBits));
         }
 
-        public Array CreateArray(int count) { return _array.Find(count, () => new Array(this, count)); }
+        internal Array CreateArray(int count) { return _array.Find(count, () => new Array(this, count)); }
 
-        public static TypeBase CreateNumber(int bitCount) { return CreateBit.CreateSequence(bitCount); }
+        internal static TypeBase CreateNumber(int bitCount) { return CreateBit.CreateSequence(bitCount); }
 
-        public virtual TypeBase CreatePair(TypeBase second) { return second.CreateReversePair(this); }
+        internal virtual TypeBase CreatePair(TypeBase second) { return second.CreateReversePair(this); }
 
         protected virtual TypeBase CreateReversePair(TypeBase first)
         {
@@ -108,18 +109,18 @@ namespace Reni.Type
                 () => new Pair(first, this));
         }
 
-        public virtual AutomaticRef CreateRef(RefAlignParam refAlignParam) { return _ref.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam)); }
+        internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam) { return _ref.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam)); }
 
-        public virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return _assignableRef.Find(refAlignParam, () => new AssignableRef(this, refAlignParam)); }
+        internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return _assignableRef.Find(refAlignParam, () => new AssignableRef(this, refAlignParam)); }
 
-        public Ref EnsureRef(RefAlignParam refAlignParam)
+        internal Ref EnsureRef(RefAlignParam refAlignParam)
         {
             if(IsRef(refAlignParam))
                 return (Ref) this;
-            return CreateRef(refAlignParam);
+            return CreateAutomaticRef(refAlignParam);
         }
 
-        public Sequence CreateSequence(int elementCount) { return _chain.Find(elementCount, () => new Sequence(this, elementCount)); }
+        internal Sequence CreateSequence(int elementCount) { return _chain.Find(elementCount, () => new Sequence(this, elementCount)); }
 
         internal virtual Result DestructorHandler(Category category) { return EmptyHandler(category); }
 
@@ -187,9 +188,9 @@ namespace Reni.Type
             return null;
         }
 
-        public static Result EmptyHandler(Category category) { return CreateVoidResult(category - Category.Type - Category.Size); }
+        internal static Result EmptyHandler(Category category) { return CreateVoidResult(category - Category.Type - Category.Size); }
 
-        public static Result CreateVoidResult(Category category) { return CreateVoid.CreateResult(category); }
+        internal static Result CreateVoidResult(Category category) { return CreateVoid.CreateResult(category); }
 
         internal virtual Result AutomaticDereference(Result result) { return result; }
 
@@ -211,11 +212,11 @@ namespace Reni.Type
 
         internal virtual Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
-            var argResult = CreateRef(refAlignParam).Conversion(category, this);
+            var argResult = CreateAutomaticRef(refAlignParam).Conversion(category, this);
             return DumpPrint(category).UseWithArg(argResult);
         }
 
-        public virtual Result ArrayDumpPrint(Category category, int count)
+        internal virtual Result ArrayDumpPrint(Category category, int count)
         {
             NotImplementedMethod(category, count);
             throw new NotImplementedException();
@@ -227,7 +228,7 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        public virtual TypeBase DumpPrintArrayType(int count)
+        internal virtual TypeBase DumpPrintArrayType(int count)
         {
             NotImplementedMethod(count);
             throw new NotImplementedException();
@@ -237,7 +238,7 @@ namespace Reni.Type
 
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.Complete, this).UseWithArg(argResult); }
 
-        public TypeBase CommonType(TypeBase dest)
+        internal TypeBase CommonType(TypeBase dest)
         {
             if(IsConvertableTo(dest, ConversionFeature.Instance))
                 return dest;
@@ -247,7 +248,7 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        public Result Conversion(Category category, TypeBase dest)
+        internal Result Conversion(Category category, TypeBase dest)
         {
             if(category.HasCode || category.HasRefs)
             {

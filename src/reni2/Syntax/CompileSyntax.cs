@@ -39,8 +39,8 @@ namespace Reni.Syntax
             var trace = ObjectId == -27 && context is ContextAtPosition && category.HasCode;
             StartMethodDumpWithBreak(trace, context, category);
             if(category.HasInternal || !(category.HasCode || category.HasRefs))
-                return ReturnMethodDumpWithBreak(trace, Result(context, category));
-            var result = Result(context, category | Category.Internal | Category.Type);
+                return ReturnMethodDumpWithBreak(trace, Result(context, category).Align(context.AlignBits));
+            var result = Result(context, category | Category.Internal | Category.Type).Align(context.AlignBits);
             DumpWithBreak(trace, "result", result);
             return ReturnMethodDumpWithBreak(trace, result.CreateStatement(category));
         }

@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace Reni.FeatureTest
+namespace Reni.FeatureTest.BitArrayOp 
 {
     /// <summary>
     /// Operations on bitarrays
@@ -8,16 +8,6 @@ namespace Reni.FeatureTest
     [TestFixture]
     public class BitArrayOp : CompilerTest
     {
-        /// <summary>
-        /// add two numbers.
-        /// </summary>
-        /// created 17.11.2006 20:43
-        [Test,Category(Worked)]
-        public void Add2Numbers()
-        {
-            RunCompiler("Add2Numbers",@"(2+4) dump_print", "6");
-        }
-
         [Test]
         public void PositiveNumbers2()
         {
@@ -89,6 +79,20 @@ namespace Reni.FeatureTest
             RunCompiler("1st", @"( 400 - 43210)dump_print", "-42810");
         }
 
-        public override void Run() {  }
+        public override void Run()
+        {
+        }
+
     }
+
+    [TestFixture]
+    public class Add2Numbers : CompilerTest
+    {
+        public override string Target { get { return @"(2+4) dump_print"; } }
+        public override string Output { get { return "6"; } }
+
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
 }

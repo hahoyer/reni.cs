@@ -10,7 +10,7 @@
         internal override bool IsVoid { get { return true; } }
         internal override string DumpPrintText { get { return "void"; } }
 
-        public override TypeBase CreatePair(TypeBase second)
+        internal override TypeBase CreatePair(TypeBase second)
         {
             return second;
         }

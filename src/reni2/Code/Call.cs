@@ -7,11 +7,11 @@ namespace Reni.Code
     sealed internal class Call : LeafElement
     {
         [Node]
-        private readonly int FunctionIndex;
+        internal readonly int FunctionIndex;
         [Node]
         private readonly Size ResultSize;
         [Node]
-        private readonly Size ArgsAndRefsSize;
+        internal readonly Size ArgsAndRefsSize;
 
         internal Call(int functionIndex, Size resultSize, Size argsAndRefsSize)
         {
@@ -39,6 +39,8 @@ namespace Reni.Code
         {
             return replacePrimitiveRecursivity.CallVisit(this);
         }
+
+        public override string NodeDump { get { return base.NodeDump + " FunctionIndex="+FunctionIndex+" ArgsAndRefsSize="+ArgsAndRefsSize;  } }
 
         public LeafElement TryConvertToRecursiveCall(int functionIndex)
         {

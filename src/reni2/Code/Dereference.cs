@@ -35,9 +35,9 @@ namespace Reni.Code
             return start.Unref(RefAlignParam, _size);
         }
 
-        internal override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
         {
-            return subsequentElement.TryToCombineBack(this);
+            return subsequentElement.TryToCombineBackN(this);
         }
 
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
