@@ -16,7 +16,7 @@ namespace Reni.Parser.TokenClass.Name
 
         public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            var objectType = callContext.Type(@object);
+            var objectType = callContext.Type(@object).AutomaticDereference();
             if(args == null)
                 return objectType.TypeOperator(category);
             return callContext.ApplyResult(category, args, argsType => argsType.Conversion(category, objectType));

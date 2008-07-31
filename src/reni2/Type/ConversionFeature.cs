@@ -1,3 +1,6 @@
+using System;
+using HWClassLibrary.Debug;
+
 namespace Reni.Type
 {
     internal class ConversionFeature : ReniObject
@@ -12,7 +15,9 @@ namespace Reni.Type
             _isDisableCut = isDisableCut;
         }
 
+        [DumpData(false)]
         internal ConversionFeature EnableCut { get { return new ConversionFeature(IsUseConverter, false); } }
+        [DumpData(false)]
         internal ConversionFeature DontUseConverter { get { return new ConversionFeature(false, IsDisableCut); } }
 
         internal bool IsDisableCut { get { return _isDisableCut; } }

@@ -89,7 +89,7 @@ f(2) dump_print;
     [Output("24")]
     public class RecursiveFunction : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 

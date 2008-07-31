@@ -53,7 +53,7 @@ namespace Reni.Type
         {
             var argsResult = callContext
                 .Result(category | Category.Type, args)
-                .Align(Context.RefAlignParam.AlignBits);
+                .PostProcessor.ArgsResult(Context.AlignBits);
             return ApplyFunction(category, argsResult);
         }
 

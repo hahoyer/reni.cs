@@ -292,6 +292,7 @@ namespace Reni
 
             if(r.HasInternal && !r.Internal.IsPending)
                 _internal = r.Internal;
+            AssertValid();
         }
 
         private void Update(Result r, Category c)
@@ -306,6 +307,7 @@ namespace Reni
                 _code = r.Code ?? CodeBase.Pending;
             if(c.HasInternal)
                 _internal = r.Internal ?? CreatePending(Category.ForInternal);
+            AssertValid();
         }
 
         internal Result Filter(Category category)
@@ -420,6 +422,11 @@ namespace Reni
             if(HasInternal && _internal.Complete != Category.ForInternal)
             {
                 Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "incomplete internals " + Dump());
+                Debugger.Break();
+            }
+            if (HasInternal && _internal.IsPending)
+            {
+                Tracer.AssertionFailed(1, @"HasInternal && _internal.IsPending", "pending internals " + Dump());
                 Debugger.Break();
             }
         }
@@ -603,6 +610,9 @@ namespace Reni
         /// <returns></returns>
         internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : IContextRefInCode
         {
+            if (IsPending)
+                return this;
+
             if(HasRefs && !Refs.Contains(context))
                 return this;
 

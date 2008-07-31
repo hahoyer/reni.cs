@@ -13,13 +13,12 @@ namespace Reni
     internal sealed class Refs : ReniObject
     {
         private readonly List<IContextRefInCode> _data;
-        private readonly bool _isPending;
         private SizeArray _sizesCache;
 
         private Refs()
         {
             _data = new List<IContextRefInCode>();
-            StopByObjectId(-441);
+            //StopByObjectId(5128);
         }
 
         private Refs(IContextRefInCode context): this()
@@ -42,7 +41,8 @@ namespace Reni
 
         private Refs(bool isPending)
         {
-            _isPending = isPending;
+            if(isPending)
+                _data = new List<IContextRefInCode>();
         }
 
         private void AddRange(IEnumerable<IContextRefInCode> a)
@@ -59,7 +59,7 @@ namespace Reni
 
         [Node]
         public List<IContextRefInCode> Data { get { return _data; } }
-        public bool IsPending { get { return _isPending; } }
+        public bool IsPending { get { return _data == null; } }
 
         [DumpData(false)]
         private SizeArray Sizes

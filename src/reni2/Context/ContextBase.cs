@@ -169,9 +169,14 @@ namespace Reni.Context
             TypeBase elementType, Result.GetSize argsOffset)
         {
             var applyToRef = ResultAsRef(category | Category.Type, syntax, argsOffset);
+            if (applyToRef.IsPending)
+                return Reni.Result.CreatePending(category);
             applyToRef.AssertComplete(category | Category.Type, syntax);
+            var type = Type(syntax);
+            if (type.IsPending)
+                return Reni.Result.CreatePending(category);
             var convertTo =
-                applyToRef.ConvertTo(elementType.CreateSequence(Type(syntax).SequenceCount)).Filter(
+                applyToRef.ConvertTo(elementType.CreateSequence(type.SequenceCount)).Filter(
                     category);
             convertTo.AssertComplete(category);
             var result = convertTo.Align(AlignBits);
