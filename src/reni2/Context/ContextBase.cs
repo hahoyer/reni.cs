@@ -70,10 +70,10 @@ namespace Reni.Context
                 () => new Function(this, args));
         }
 
-        internal Struct.FullContext CreateStruct(Struct.Container container)
+        internal FullContext CreateStruct(Struct.Container container)
         {
             return Cache._structContainerCache.Find(container,
-                () => new Struct.FullContext(this, container));
+                () => new FullContext(this, container));
         }
 
         internal CodeBase CreateTopRefCode() { return CodeBase.CreateTopRef(RefAlignParam); }
@@ -143,9 +143,12 @@ namespace Reni.Context
                 CheckRef(@ref);
         }
 
-        private void CheckRef(IContextRefInCode @ref) { Tracer.Assert(!@ref
-            .IsChildOf(this), "context=" + Dump() + "\nref=" 
-            + @ref.Dump()); }
+        private void CheckRef(IContextRefInCode @ref)
+        {
+            Tracer.Assert(!@ref
+                .IsChildOf(this), "context=" + Dump() + "\nref="
+                    + @ref.Dump());
+        }
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
         {
@@ -156,8 +159,7 @@ namespace Reni.Context
 
         internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
 
-        internal Result ApplyResult(Category category, ICompileSyntax @object,
-            Result.GetResultFromType apply)
+        internal Result ApplyResult(Category category, ICompileSyntax @object, Func<TypeBase, Result> apply)
         {
             var objectResult = ResultAsRef(category | Category.Type, @object);
             return apply(objectResult.Type)
@@ -166,14 +168,14 @@ namespace Reni.Context
         }
 
         internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax,
-            TypeBase elementType, Result.GetSize argsOffset)
+            TypeBase elementType, Func<Size> argsOffset)
         {
             var applyToRef = ResultAsRef(category | Category.Type, syntax, argsOffset);
-            if (applyToRef.IsPending)
+            if(applyToRef.IsPending)
                 return Reni.Result.CreatePending(category);
             applyToRef.AssertComplete(category | Category.Type, syntax);
             var type = Type(syntax);
-            if (type.IsPending)
+            if(type.IsPending)
                 return Reni.Result.CreatePending(category);
             var convertTo =
                 applyToRef.ConvertTo(elementType.CreateSequence(type.SequenceCount)).Filter(
@@ -185,7 +187,7 @@ namespace Reni.Context
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax,
-            Result.GetSize argsOffset)
+            Func<Size> argsOffset)
         {
             var localCategory = category | Category.Type;
             if(category.HasInternal)
@@ -210,27 +212,60 @@ namespace Reni.Context
             NotImplementedMethod();
             return null;
         }
+
+        internal Result PrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
+        {
+            var contextSearchResult = SearchDefineable(defineableToken);
+            if(contextSearchResult.IsSuccessFull)
+                return contextSearchResult.Feature.ApplyResult(this, category, right);
+
+            if(right == null)
+            {
+                NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult);
+                return null;
+            }
+
+            var argType = Type(right);
+            var prefixSearchResult = argType.SearchDefineablePrefix(defineableToken);
+            if(prefixSearchResult.IsSuccessFull)
+                return prefixSearchResult.Feature.ApplyResult(this, category, right);
+
+            NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult, "prefixSearchResult", prefixSearchResult);
+            return null;
+        }
+
+        internal Result InfixResult(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
+        {
+            var leftType = Type(left).EnsureRef(RefAlignParam);
+            var searchResult = leftType.SearchDefineable(defineableToken);
+            if(searchResult.IsSuccessFull)
+                return searchResult.Feature.ApplyResult(this, category, left, right);
+            NotImplementedMethod(category, left, defineableToken, right, "leftType", leftType, "searchResult", searchResult);
+            return null;
+        }
+
+        internal Result Result(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
+        {
+            if(left == null)
+                return PrefixResult(category, defineableToken, right);
+            return InfixResult(category, left, defineableToken, right);
+        }
     }
 
-    internal class Cache : IIconKeyProvider
+    internal class Cache : ReniObject, IIconKeyProvider
     {
         [Node, SmartNode]
-        internal readonly DictionaryEx<TypeBase, Function> _functionInstanceCache =
-            new DictionaryEx<TypeBase, Function>();
+        internal readonly DictionaryEx<TypeBase, Function> _functionInstanceCache = new DictionaryEx<TypeBase, Function>();
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _functionType =
-            new DictionaryEx<ICompileSyntax, TypeBase>();
+        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _functionType = new DictionaryEx<ICompileSyntax, TypeBase>();
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _propertyType =
-            new DictionaryEx<ICompileSyntax, TypeBase>();
+        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _propertyType = new DictionaryEx<ICompileSyntax, TypeBase>();
         [Node, SmartNode]
-        internal readonly DictionaryEx<Struct.Container, Struct.FullContext> _structContainerCache =
-            new DictionaryEx<Struct.Container, Struct.FullContext>();
+        internal readonly DictionaryEx<Struct.Container, FullContext> _structContainerCache = new DictionaryEx<Struct.Container, FullContext>();
         [Node, SmartNode]
         internal readonly SimpleCache<Result> _topRefResultCache = new SimpleCache<Result>();
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, CacheItem> _resultCache =
-            new DictionaryEx<ICompileSyntax, CacheItem>();
+        internal readonly DictionaryEx<ICompileSyntax, CacheItem> _resultCache = new DictionaryEx<ICompileSyntax, CacheItem>();
 
         /// <summary>
         /// Gets the icon key.

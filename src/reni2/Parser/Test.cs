@@ -28,7 +28,7 @@ namespace Reni.Parser
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
             Parameters.Trace.Source = true;
             Parameters.ParseOnly = true;
-            RunCompiler("SimpleFunction", @"f()", c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler("SimpleFunction", @"f()", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test, Category(Worked)]
@@ -37,7 +37,7 @@ namespace Reni.Parser
             var syntaxPrototype =
                 (LikeSyntax.Number(2) + LikeSyntax.Number(4)).dump_print;
             Parameters.ParseOnly = true;
-            RunCompiler("Add2Numbers", @"(2+4) dump_print", c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler("Add2Numbers", @"(2+4) dump_print", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test, Category(Worked)]
@@ -50,7 +50,7 @@ namespace Reni.Parser
                 new[] {"x"}
                 );
             Parameters.ParseOnly = true;
-            RunCompiler("UseAlternativePrioTable", @"!property x: 3", c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!property x: 3", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test, Category(Worked)]
@@ -63,7 +63,7 @@ namespace Reni.Parser
                 new[] {"property"}
                 );
             Parameters.ParseOnly = true;
-            RunCompiler("UseAlternativePrioTable", @"!property property: 3", c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!property property: 3", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test, Category(Worked)]
@@ -76,7 +76,7 @@ namespace Reni.Parser
                 new string[] {}
                 );
             Parameters.ParseOnly = true;
-            RunCompiler("UseAlternativePrioTable", @"!converter: 3", c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test, Category(Worked)]
@@ -89,7 +89,7 @@ namespace Reni.Parser
                 new[] {"x"}
                 );
             Parameters.ParseOnly = true;
-            RunCompiler("UseAlternativePrioTable", @"!converter: 3; !property x: 4",
+            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3; !property x: 4",
                         c => syntaxPrototype.AssertLike(c.Syntax));
         }
     }

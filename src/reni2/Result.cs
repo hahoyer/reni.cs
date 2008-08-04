@@ -110,17 +110,17 @@ namespace Reni
         {
             var result = new List<TreeNode>();
             if(!Pending.IsNull)
-                result.Add(Service.CreateNode("Pending", "Pending", Dump()));
+                result.Add(Service.CreateNamedNode("Pending", "Pending", Dump()));
             if(HasSize)
-                result.Add(Service.CreateNode("Size","Number",Size.FormatForView()));
+                result.Add(Service.CreateNamedNode("Size", "Number", Size.FormatForView()));
             if (HasType)
-                result.Add(Service.CreateNode("Type", "Type", Type));
+                result.Add(Service.CreateNamedNode("Type", "Type", Type));
             if (HasCode)
-                result.Add(Service.CreateNode("Code", "Code", Code));
+                result.Add(Service.CreateNamedNode("Code", "Code", Code));
             if (HasRefs)
-                result.Add(Service.CreateNode("Refs", "Refs", Refs.Data));
+                result.Add(Service.CreateNamedNode("Refs", "Refs", Refs.Data));
             if (HasInternal)
-                result.Add(Service.CreateNode("Internal", "Code", Internal));
+                result.Add(Service.CreateNamedNode("Internal", "Code", Internal));
             return result.ToArray();
 
         }
@@ -163,7 +163,7 @@ namespace Reni
         /// <summary>
         /// Error handling
         /// </summary>
-        internal static Error Error { get { return null; } set { } }
+        internal static Error Error { get { return null; } }
 
         internal bool IsDirty
         {
@@ -777,7 +777,7 @@ namespace Reni
             return Code.Serialize(false).Evaluate();
         }
 
-        internal Result EnsureRef(Category category, RefAlignParam refAlignParam, GetSize offset)
+        internal Result EnsureRef(Category category, RefAlignParam refAlignParam, Func<Size> offset)
         {
             if(Type.IsRef(refAlignParam))
                 return this;
@@ -846,16 +846,6 @@ namespace Reni
                 result.Code = result.Code.CreateSequence(CodeBase.CreateDumpPrintText(")"));
             return result;
         }
-
-        internal delegate CodeBase GetCode();
-
-        internal delegate Size GetSize();
-
-        internal delegate Refs GetRefs();
-
-        internal delegate Result GetResult();
-
-        internal delegate Result GetResultFromType(TypeBase objectType);
 
         internal static Result EmptyInternal()
         {

@@ -15,14 +15,14 @@ namespace Reni.FeatureTest.Struct
         /// </summary>
         /// created 17.11.2006 20:43
         [Test, Category(Worked)]
-        public void AccessSimple() { RunCompiler("AccessSimple", @"((0, 1) _A_T_ 0) dump_print;", "0"); }
+        public void AccessSimple() { CreateFileAndRunCompiler("AccessSimple", @"((0, 1) _A_T_ 0) dump_print;", "0"); }
 
         /// <summary>
         /// Access to elements of a structure.
         /// </summary>
         /// created 17.11.2006 20:43
         [Test, Category(Worked)]
-        public void AccessSimpleAdditionalColon() { RunCompiler("AccessSimpleAdditionalColon", @"((0, 1,) _A_T_ 0) dump_print;", "0"); }
+        public void AccessSimpleAdditionalColon() { CreateFileAndRunCompiler("AccessSimpleAdditionalColon", @"((0, 1,) _A_T_ 0) dump_print;", "0"); }
 
         /// <summary>
         /// Access to elements of a structure.
@@ -31,10 +31,10 @@ namespace Reni.FeatureTest.Struct
         [Test, Category(Worked)]
         public void StrangeStructs()
         {
-            RunCompiler("AccessVarAdditionalColon", @"((one: 1) one) dump_print;", "1");
-            RunCompiler("AccessVarAdditionalColon", @"((one: 1,) one) dump_print;", "1");
-            RunCompiler("AccessVarAdditionalColon", @"((0,one: 1) one) dump_print;", "1");
-            RunCompiler("AccessVarAdditionalColon", @"((0,one: 1,) one) dump_print;", "1");
+            CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((one: 1) one) dump_print;", "1");
+            CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((one: 1,) one) dump_print;", "1");
+            CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((0,one: 1) one) dump_print;", "1");
+            CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((0,one: 1,) one) dump_print;", "1");
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Reni.FeatureTest.Struct
         [Test, Category(Worked)]
         public void Access()
         {
-            RunCompiler("Access",
+            CreateFileAndRunCompiler("Access",
                 @"
 ((0;1;2;300;) _A_T_ 0) dump_print;
 ((0;1;2;300;) _A_T_ 1) dump_print;
@@ -62,7 +62,7 @@ namespace Reni.FeatureTest.Struct
         [Test, Category(Worked)]
         public void DumpPrint()
         {
-            RunCompiler("DumpPrint",
+            CreateFileAndRunCompiler("DumpPrint",
                 @"(1, 2, 3, 4, 5, 6) dump_print",
                 "(1, 2, 3, 4, 5, 6)"
                 );

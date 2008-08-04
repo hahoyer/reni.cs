@@ -156,11 +156,11 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result CreateResult(Category category, Result.GetCode getCode) { return CreateResult(category, getCode, Refs.None, Result.EmptyInternal); }
-        internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetResult getInternal) { return CreateResult(category, getCode, Refs.None, getInternal); }
-        internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs) { return CreateResult(category, getCode, getRefs, Result.EmptyInternal); }
+        internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None, Result.EmptyInternal); }
+        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Result> getInternal) { return CreateResult(category, getCode, Refs.None, getInternal); }
+        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs) { return CreateResult(category, getCode, getRefs, Result.EmptyInternal); }
 
-        internal Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs, Result.GetResult getInternal)
+        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs, Func<Result> getInternal)
         {
             var result = new Result();
             if(category.HasSize)
@@ -375,7 +375,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Result.GetCode getCode)
+        internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode)
         {
             if(Size.IsZero)
                 return CreateResult(category);

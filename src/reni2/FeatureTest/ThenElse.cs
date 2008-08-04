@@ -16,8 +16,8 @@ namespace Reni.FeatureTest
         [Category(UnderConstruction)]
         public void Simple()
         {
-            RunCompiler("Simple", @"x: 1=0 then 1 else 100;x dump_print;", "100");
-            RunCompiler("Simple", @"x: 1=1 then 1 else 100;x dump_print;", "1");
+            CreateFileAndRunCompiler("Simple", @"x: 1=0 then 1 else 100;x dump_print;", "100");
+            CreateFileAndRunCompiler("Simple", @"x: 1=1 then 1 else 100;x dump_print;", "1");
         }
 
         public override void Run() {  }

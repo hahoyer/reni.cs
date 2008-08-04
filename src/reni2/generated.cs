@@ -14,33 +14,48 @@ namespace Reni
         /// </summary>
         public static void reni()
         {
-            fixed(sbyte* data = new sbyte[12])
+            fixed(sbyte* data = new sbyte[7])
             {
-                (*(data + 11)) = (1); // BitArray      4046
-                (*(data + 10)) = (11); // BitArray      4047
-                (*(data + 9)) = (3); // BitArray      4048
-                (*(data + 8)) = (3); // BitArray      4049
-                (*(Int32*) (data + 4)) = (Int32) (data + 10); // TopRef        4050
-                (*(Int32*) (data + 0)) = (Int32) (data + 8); // TopRef        1916
-                *((sbyte*) (*(Int32*) (data + 4))) = *((sbyte*)(*(Int32*) (data + 0))); // Assign        2495
-                Data.MoveBytes(0, (data + 9), (data + 8)); // StatementEnd  2728
-                Data.DumpPrint("("); // DumpPrintText 3812
-                (*(data + 8)) = (*(data + 11)); // TopData     4053
-                (*(data + 8)) = (sbyte) ((sbyte) ((*(data + 8)) << 6) >> 6); // BitCast   4054
-                Data.DumpPrint((*(data + 8))); // DumpPrint   3154
-                Data.DumpPrint(",                "); // DumpPrintText 3820
-                (*(data + 8)) = (*(data + 10)); // TopData     4057
-                (*(data + 8)) = (sbyte) ((sbyte) ((*(data + 8)) << 3) >> 3); // BitCast   4058
-                Data.DumpPrint((*(data + 8))); // DumpPrint   3273
-                Data.DumpPrint(",                "); // DumpPrintText 3835
-                (*(data + 8)) = (*(data + 9)); // TopData     4061
-                (*(data + 8)) = (sbyte) ((sbyte) ((*(data + 8)) << 5) >> 5); // BitCast   4062
-                Data.DumpPrint((*(data + 8))); // DumpPrint   3395
-                Data.DumpPrint(",                "); // DumpPrintText 3856
-                Data.DumpPrint("               )"); // DumpPrintText 3880
-                Data.MoveBytes(0, (data + 12), (data + 9)); // StatementEnd  4025
+                (*(data + 6)) = (3); // BitArray 3427
+                (*(Int32*) (data + 2)) = (Int32) (data + 7); // TopRef   3428
+                (*(data + 1)) = (2); // BitArray 3429
+                reni_1((data + 6)); // Call     1115
+                reni_0((data + 5)); // Call     1804
+                (*(data + 3)) = (*(data + 4)); // TopData  3430
+                (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 5) >> 5); // BitCast  2013
+                Data.DumpPrint((*(data + 3))); // DumpPrint  1996
+                Data.MoveBytes(0, (data + 7), (data + 4)); // StatementEnd 2234
             }
-            ;
+        }
+
+        // (container.0)_A_T_(2)
+        private static void reni_0(SByte* frame)
+        {
+            fixed(sbyte* data = new sbyte[6])
+            {
+                (*(data + 5)) = (3); // BitArray                       3439
+                (*(Int32*) (data + 1)) = (Int32) (data + 6); // TopRef                         3440
+                (*(data + 0)) = (2); // BitArray                       3441
+                reni_1((data + 5)); // Call                           1115
+                (*(Int32*) (data + 0)) = (Int32) (data + 4); // TopRef                         3442
+                (*(Int32*) (data + 2)) = (*(Int32*) (data + 0)); // StatementEnd                   3024
+                (*(data + 5)) = (*(sbyte*) (*(Int32*) (data + 2))); // Dereference                    3060
+                (*(data + 5)) = (sbyte) ((sbyte) ((*(data + 5)) << 5) >> 5); // BitCast                        3061
+                (*(frame - 1)) = (*(data + 5)); // StorageDescriptor.FunctionReturn
+            }
+        }
+
+        // y
+        private static void reni_1(SByte* frame)
+        {
+            fixed(sbyte* data = new sbyte[4])
+            {
+                (*(Int32*) (data + 0)) = (*(Int32*) (frame - 4)); // TopFrame                       3452
+                (*(Int32*) (data + 0)) += -1; // RefPlus                        3132
+                (*(data + 3)) = (*(sbyte*) (*(Int32*) (data + 0))); // Dereference                    3183
+                (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 5) >> 5); // BitCast                        3184
+                (*(frame - 1)) = (*(data + 3)); // StorageDescriptor.FunctionReturn
+            }
         }
     }
 }

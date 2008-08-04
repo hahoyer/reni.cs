@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
 
@@ -20,9 +21,7 @@ namespace Reni
             return _compiler.Functions.Count;
         }
 
-        public delegate bool HasProperties(FunctionInstance f);
-
-        public int FunctionCount(HasProperties fd)
+        public int FunctionCount(Func<FunctionInstance,bool> fd)
         {
             int result = 0;
             for (int i = 0; i < _compiler.Functions.Count; i++)

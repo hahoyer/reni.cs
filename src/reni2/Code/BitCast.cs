@@ -32,22 +32,19 @@ namespace Reni.Code
             return TargetSize - Size;
         }
 
-        internal override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
         {
-            return subsequentElement.TryToCombineBack(this);
+            return subsequentElement.TryToCombineBackN(this);
         }
 
-        internal override LeafElement TryToCombineBack(BitCast precedingElement)
+        internal override LeafElement[] TryToCombineBackN(BitCast precedingElement)
         {
             if(precedingElement.Size != TargetSize)
                 return null;
-
-            return new BitCast
-                (
-                precedingElement.TargetSize,
-                Size,
-                SignificantSize.Min(precedingElement.SignificantSize)
-                );
+            var significantSize = SignificantSize.Min(precedingElement.SignificantSize);
+            if(TargetSize == Size && TargetSize == significantSize)
+                return new LeafElement[0];
+            return new[] {new BitCast(TargetSize, Size, significantSize)};
         }
 
         internal override LeafElement TryToCombineBack(BitArray precedingElement)

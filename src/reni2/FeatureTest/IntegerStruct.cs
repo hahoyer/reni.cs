@@ -30,7 +30,7 @@ Integer8: function
         [Test, Category(Worked)]
         public void DumpPrint1()
         {
-            RunCompiler("DumpPrint1"
+            CreateFileAndRunCompiler("DumpPrint1"
                         , IntegerDefinition() + "; Integer8(1) dump_print"
                         , "1"
                 );
@@ -42,7 +42,7 @@ Integer8: function
         public void DumpPrint2()
         {
             Parameters.Trace.All();
-            RunCompiler("DumpPrint2"
+            CreateFileAndRunCompiler("DumpPrint2"
                         , IntegerDefinition() + "; Integer8(2) dump_print"
                         , "2"
                 );
@@ -53,7 +53,7 @@ Integer8: function
         [Test, Category(Worked)]
         public void DumpPrint127()
         {
-            RunCompiler("DumpPrint127"
+            CreateFileAndRunCompiler("DumpPrint127"
                         , IntegerDefinition() + "; Integer8(127) dump_print"
                         , "127"
                 );
@@ -64,7 +64,7 @@ Integer8: function
         [Test, Explicit, Category(UnderConstruction)]
         public void Create()
         {
-            RunCompiler("Create"
+            CreateFileAndRunCompiler("Create"
                         , IntegerDefinition() + "; Integer8(0) create(23) dump_print"
                         , "23"
                 );
@@ -75,7 +75,7 @@ Integer8: function
         [Test, Explicit, Category(UnderConstruction)]
         public void Clone()
         {
-            RunCompiler("Clone"
+            CreateFileAndRunCompiler("Clone"
                         , IntegerDefinition() + "; Integer8(23) clone() dump_print"
                         , "23"
                 );
@@ -87,7 +87,7 @@ Integer8: function
         [Test, Explicit, Category(UnderConstruction)]
         public void Plus()
         {
-            RunCompiler("Plus", PlusText, "3");
+            CreateFileAndRunCompiler("Plus", PlusText, "3");
         }
 
         public static string PlusText

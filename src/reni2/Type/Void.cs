@@ -1,4 +1,7 @@
-﻿namespace Reni.Type
+﻿using System;
+using Reni.Code;
+
+namespace Reni.Type
 {
     internal sealed  class Void : TypeBase
     {
@@ -35,12 +38,12 @@
             return CreateVoid.CreateResult(category);
         }
 
-        internal new static Result CreateResult(Category category, Result.GetCode getCode)
+        internal new static Result CreateResult(Category category, Func<CodeBase> getCode)
         {
             return CreateVoid.CreateResult(category, getCode);
         }
 
-        internal new static Result CreateResult(Category category, Result.GetCode getCode, Result.GetRefs getRefs)
+        internal new static Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
             return CreateVoid.CreateResult(category, getCode, getRefs);
         }

@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using Reni.Code;
 using Reni.Context;
 using Reni.Type;
 
@@ -40,8 +41,7 @@ namespace Reni
 
         internal PostProcessorForType(TypeBase typeBase) { _typeBase = typeBase; }
 
-        internal Result AccessResultForStruct(Category category, RefAlignParam refAlignParam,
-            Result.GetCode getCode)
+        internal Result AccessResultForStruct(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode)
         {
             return _typeBase
                 .AutomaticDereference()

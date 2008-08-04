@@ -135,15 +135,7 @@ f1()dump_print;
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
-    public class TwoFunctions1 : CompilerTest
-    {
-        public override string Target
-        {
-            get
-            {
-                return
-                    @"
+    [TestFixture, Target(@"
 f1: function 
 ((
   y: 3;
@@ -152,18 +144,16 @@ f1: function
 ) _A_T_ 2);
 
 f1()dump_print;
-";
-            }
-        }
-        public override string Output { get { return "3"; } }
-
+"), Output("3")]
+    public class TwoFunctions1 : CompilerTest
+    {
         public override void AssertValid(Compiler c)
         {
             var x = new ExpectedCompilationResult(c);
-            Tracer.Assert(x.FunctionCount() == 2);
+            Tracer.Assert(x.FunctionCount() == 3);
         }
 
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 }

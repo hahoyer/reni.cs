@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.BitArrayOp
         [Test]
         public void PositiveNumbers2()
         {
-            RunCompiler("Numbers",@"(1, 12)dump_print","(1, 12)");
+            CreateFileAndRunCompiler("Numbers",@"(1, 12)dump_print","(1, 12)");
         }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Reni.FeatureTest.BitArrayOp
         [Test, Category(Worked)]
         public void PositiveNumbers()
         {
-            RunCompiler("Numbers of different Size", 
+            CreateFileAndRunCompiler("Numbers of different Size", 
             @"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print", 
             "(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)");
         }
@@ -33,16 +33,16 @@ namespace Reni.FeatureTest.BitArrayOp
         [Test, Category(Worked)]
         public void NegativeNumber()
         {
-            RunCompiler("Negative number", @"(-1)dump_print", "-1");
-            RunCompiler("Negative number", @"(-12)dump_print", "-12");
-            RunCompiler("Negative number", @"(-123)dump_print", "-123");
-            RunCompiler("Negative number", @"(-1234)dump_print", "-1234");
-            RunCompiler("Negative number", @"(-12345)dump_print", "-12345");
-            RunCompiler("Negative number", @"(-123456)dump_print", "-123456");
-            RunCompiler("Negative number", @"(-1234567)dump_print", "-1234567");
-            RunCompiler("Negative number", @"(-12345678)dump_print", "-12345678");
-            RunCompiler("Negative number", @"(-123456789)dump_print", "-123456789");
-            RunCompiler("Negative number", @"(-1234567890)dump_print", "-1234567890");
+            CreateFileAndRunCompiler("Negative number", @"(-1)dump_print", "-1");
+            CreateFileAndRunCompiler("Negative number", @"(-12)dump_print", "-12");
+            CreateFileAndRunCompiler("Negative number", @"(-123)dump_print", "-123");
+            CreateFileAndRunCompiler("Negative number", @"(-1234)dump_print", "-1234");
+            CreateFileAndRunCompiler("Negative number", @"(-12345)dump_print", "-12345");
+            CreateFileAndRunCompiler("Negative number", @"(-123456)dump_print", "-123456");
+            CreateFileAndRunCompiler("Negative number", @"(-1234567)dump_print", "-1234567");
+            CreateFileAndRunCompiler("Negative number", @"(-12345678)dump_print", "-12345678");
+            CreateFileAndRunCompiler("Negative number", @"(-123456789)dump_print", "-123456789");
+            CreateFileAndRunCompiler("Negative number", @"(-1234567890)dump_print", "-1234567890");
         }
         /// <summary>
         /// Compares the operators.
@@ -51,7 +51,7 @@ namespace Reni.FeatureTest.BitArrayOp
         [Test, Category(Worked)]
         public void NegativeNumbers2()
         {
-            RunCompiler("Numbers of different Size",
+            CreateFileAndRunCompiler("Numbers of different Size",
             @"(-1, -12)dump_print",
             "(-1, -12)");
         }
@@ -62,7 +62,7 @@ namespace Reni.FeatureTest.BitArrayOp
         [Test, Category(Worked)]
         public void NegativeNumbers()
         {
-            RunCompiler("Numbers of different Size",
+            CreateFileAndRunCompiler("Numbers of different Size",
             @"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print",
             "(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)");
         }
@@ -73,10 +73,10 @@ namespace Reni.FeatureTest.BitArrayOp
         [Test, Category(Worked)]
         public void AddOddSizedNumber()
         {
-            RunCompiler("1st", @"(40000 - 1  )dump_print", "39999");
-            RunCompiler("1st", @"(40000 + 1   )dump_print", "40001");
-            RunCompiler("1st", @"(40000 - 43210)dump_print", "-3210");
-            RunCompiler("1st", @"( 400 - 43210)dump_print", "-42810");
+            CreateFileAndRunCompiler("1st", @"(40000 - 1  )dump_print", "39999");
+            CreateFileAndRunCompiler("1st", @"(40000 + 1   )dump_print", "40001");
+            CreateFileAndRunCompiler("1st", @"(40000 - 43210)dump_print", "-3210");
+            CreateFileAndRunCompiler("1st", @"( 400 - 43210)dump_print", "-42810");
         }
 
         public override void Run()

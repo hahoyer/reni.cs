@@ -13,8 +13,6 @@ namespace Reni.FeatureTest
     [AttributeUsage(AttributeTargets.Class)]
     public abstract class CompilerTest : Attribute
     {
-        public delegate void ExpectedResult(Compiler c);
-
         public const string Damaged = "Damaged";
         public const string Rare = "Rare";
         public const string UnderConstruction = "Under Construction";
@@ -27,28 +25,19 @@ namespace Reni.FeatureTest
         [SetUp]
         public void Start() { Parameters = new CompilerParameters(); }
 
-        protected void RunCompiler(string name, string text, string expectedOutput) { RunCompiler(1, name, text, expectedOutput); }
+        protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput){CreateFileAndRunCompiler(1, name, text, null, expectedOutput);}
+        protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
+        protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
+        
+        protected void RunCompiler(string name, string expectedOutput) { RunCompiler(1, name, null, expectedOutput); }
+        protected void RunCompiler(int depth, string name, string expectedOutput) { RunCompiler(depth + 1, name, null, expectedOutput); }
 
-        protected void RunCompiler(string name, string text, ExpectedResult expectedResult,
-            string expectedOutput) { RunCompiler(1, name, text, expectedResult, expectedOutput); }
-
-        protected void RunCompiler(string name, string text, ExpectedResult expectedResult) { RunCompiler(1, name, text, expectedResult, ""); }
-
-        protected void RunCompiler(string name, string expectedOutput) { RunCompiler(1, name, expectedOutput); }
-
-        internal void RunCompiler(int depth, string name, string text, string expectedOutput) { RunCompiler(depth + 1, name, text, default(ExpectedResult), expectedOutput); }
-
-        private void RunCompiler(int depth, string name, string expectedOutput) { RunCompiler(depth + 1, name, default(ExpectedResult), expectedOutput); }
-
-        private void RunCompiler(int depth, string name, ExpectedResult expectedResult,
-            string expectedOutput)
+        private void RunCompiler(int depth, string name, Action<Compiler> expectedResult, string expectedOutput)
         {
-            InternalRunCompiler(depth + 1, File.SourcePath(1) + "\\" + name + ".reni",
-                expectedResult, expectedOutput);
+            InternalRunCompiler(depth + 1, File.SourcePath(1) + "\\" + name + ".reni", expectedResult, expectedOutput);
         }
 
-        private void RunCompiler(int depth, string name, string text, ExpectedResult expectedResult,
-            string expectedOutput)
+        private void CreateFileAndRunCompiler(int depth, string name, string text, Action<Compiler> expectedResult, string expectedOutput)
         {
             var fileName = name + ".reni";
             var f = File.m(fileName);
@@ -56,8 +45,7 @@ namespace Reni.FeatureTest
             InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
         }
 
-        private void InternalRunCompiler(int depth, string fileName, ExpectedResult expectedResult,
-            string expectedOutput)
+        private void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
             Tracer.FlaggedLine(depth + 1, "Position of method tested");
             if(IsCallerUnderConstruction(1))
@@ -65,7 +53,7 @@ namespace Reni.FeatureTest
 
             var c = new Compiler(Parameters, fileName);
 
-            if(expectedResult != default(ExpectedResult))
+            if(expectedResult != null)
             {
                 c.Materialize();
                 expectedResult(c);
@@ -114,7 +102,7 @@ namespace Reni.FeatureTest
             
             RunDependants();
 
-            RunCompiler(1, GetType().Name, Target, AssertValid, Output);
+            CreateFileAndRunCompiler(1, GetType().Name, Target, AssertValid, Output);
         }
 
         private void RunDependants()
