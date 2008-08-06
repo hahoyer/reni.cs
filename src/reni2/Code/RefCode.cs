@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
@@ -7,6 +8,7 @@ namespace Reni.Code
     /// <summary>
     /// Reference to something 
     /// </summary>
+    [Serializable]
     internal abstract class RefCode : LeafElement
     {
         private readonly RefAlignParam _refAlignParam;

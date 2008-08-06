@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
@@ -6,6 +7,7 @@ namespace Reni.Code
     /// <summary>
     /// Code for end of statement
     /// </summary>
+    [Serializable]
     internal sealed class StatementEnd : LeafElement
     {
         [Node]

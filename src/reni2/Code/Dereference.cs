@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
 
@@ -6,6 +7,7 @@ namespace Reni.Code
     /// <summary>
     /// Dereferencing operation
     /// </summary>
+    [Serializable]
     internal sealed class Dereference : LeafElement
     {
         private readonly RefAlignParam _refAlignParam;

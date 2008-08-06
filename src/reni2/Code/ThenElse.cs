@@ -47,6 +47,7 @@ namespace Reni.Code
         }
     }
 
+    [Serializable]
     internal sealed class EndCondional : LeafElement
     {
         [Node, DumpData(true)]
@@ -72,6 +73,7 @@ namespace Reni.Code
             return start.EndCondional(_thenElseObjectId);
         }
     }
+    [Serializable]
 
     internal sealed class Else : LeafElement
     {
@@ -102,6 +104,7 @@ namespace Reni.Code
         }
     }
 
+    [Serializable]
     internal sealed class Then : LeafElement
     {
         [Node]
@@ -145,6 +148,7 @@ namespace Reni.Code
         }
     }
 
+    [Serializable]
     internal class BitArrayOpThen : LeafElement
     {
         [Node, DumpData(true)]

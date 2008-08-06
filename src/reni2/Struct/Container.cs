@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
@@ -16,6 +15,7 @@ namespace Reni.Struct
     /// <summary>
     /// Structured data, context free version
     /// </summary>
+    [Serializable]
     internal sealed class Container : CompileSyntax, IDumpShortProvider
     {
         private static readonly string _runId = Compiler.FormattedNow + "\n";
@@ -26,10 +26,13 @@ namespace Reni.Struct
 
         [Node]
         internal readonly List<ICompileSyntax> List = new List<ICompileSyntax>();
+
         [Node, SmartNode]
         internal readonly DictionaryEx<string, int> Dictionary = new DictionaryEx<string, int>();
+
         [Node, SmartNode]
         internal readonly List<int> Converters = new List<int>();
+
         [Node, SmartNode]
         internal readonly List<string> Properties = new List<string>();
 
@@ -43,7 +46,7 @@ namespace Reni.Struct
         {
             get
             {
-                if(_reverseDictionaryCache == null)
+                if (_reverseDictionaryCache == null)
                     CreateReverseDictionary();
                 return _reverseDictionaryCache;
             }
@@ -54,22 +57,20 @@ namespace Reni.Struct
         [DumpData(false)]
         internal ICompileSyntax this[int index] { get { return List[index]; } }
 
-        internal protected override Result Result(ContextBase context, Category category)
-        {
-            return context.CreateStruct(this).ConstructorResult(category);
-        }
+        protected internal override Result Result(ContextBase context, Category category) { return context.CreateStruct(this).ConstructorResult(category); }
 
         [DumpData(false)]
-        internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
+        protected internal override ICompileSyntax ToCompileSyntax { get { return this; } }
+
         [DumpData(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
 
-        internal protected override string DumpShort() { return "container." + ObjectId; }
+        protected internal override string DumpShort() { return "container." + ObjectId; }
 
         private StructFeature[] CreateStructContainerFeatures()
         {
             var result = new List<StructFeature>();
-            for(var i = 0; i < List.Count; i++)
+            for (var i = 0; i < List.Count; i++)
                 result.Add(new StructFeature(i));
             return result.ToArray();
         }
@@ -77,14 +78,14 @@ namespace Reni.Struct
         private void CreateReverseDictionary()
         {
             _reverseDictionaryCache = new DictionaryEx<int, string>();
-            foreach(var pair in Dictionary)
+            foreach (var pair in Dictionary)
                 _reverseDictionaryCache[pair.Value] = pair.Key;
         }
 
         internal static IParsedSyntax Create(Token token, List<IParsedSyntax> parsed)
         {
             var result = new Container(token);
-            foreach(var parsedSyntax in parsed)
+            foreach (var parsedSyntax in parsed)
                 result.Add(parsedSyntax);
             return result;
         }
@@ -98,16 +99,16 @@ namespace Reni.Struct
 
         private void Add(IParsedSyntax parsedSyntax)
         {
-            while(parsedSyntax is DeclarationSyntax)
+            while (parsedSyntax is DeclarationSyntax)
             {
                 var d = (DeclarationSyntax) parsedSyntax;
                 Dictionary.Add(d.Name.Name, List.Count);
                 parsedSyntax = d.Definition;
-                if(d.IsProperty)
+                if (d.IsProperty)
                     Properties.Add(d.Name.Name);
             }
 
-            if(parsedSyntax is ConverterSyntax)
+            if (parsedSyntax is ConverterSyntax)
             {
                 var body = ((ConverterSyntax) parsedSyntax).Body;
                 parsedSyntax = (IParsedSyntax) body;
@@ -120,11 +121,11 @@ namespace Reni.Struct
         public string DumpPrintText(ContextBase context)
         {
             var result = "";
-            for(var i = 0; i < List.Count; i++)
+            for (var i = 0; i < List.Count; i++)
             {
-                if(i > 0)
+                if (i > 0)
                     result += ";";
-                if(ReverseDictionary.ContainsKey(i))
+                if (ReverseDictionary.ContainsKey(i))
                     result += ReverseDictionary[i] + ": ";
                 result += context.Type(List[i]);
             }
@@ -145,7 +146,7 @@ namespace Reni.Struct
             var dumpFile = File.m("struct." + ObjectId);
             var oldResult = dumpFile.String;
             var newResult = (_runId + DumpDataToString()).Replace("\n", "\r\n");
-            if(oldResult == null || !oldResult.StartsWith(_runId))
+            if (oldResult == null || !oldResult.StartsWith(_runId))
             {
                 oldResult = newResult;
                 dumpFile.String = oldResult;
@@ -182,9 +183,9 @@ namespace Reni.Struct
 
         private SearchResult<StructFeature> Search(Defineable defineable)
         {
-            if(Defined(defineable.Name))
+            if (Defined(defineable.Name))
                 return SearchResult<StructFeature>.Success(StructFeatures[Find(defineable.Name)],
-                    defineable);
+                                                           defineable);
             return defineable.SearchFromStruct().SubTrial(this);
         }
 
@@ -197,11 +198,12 @@ namespace Reni.Struct
         }
     }
 
+    [Serializable]
     internal class StructFeature
         : ReniObject
-            , IConverter<IConverter<IFeature, Ref>, Type>
-            , IConverter<IContextFeature, FullContext>
-            , IConverter<IContextFeature, ContextAtPosition>
+          , IConverter<IConverter<IFeature, Ref>, Type>
+          , IConverter<IContextFeature, FullContext>
+          , IConverter<IContextFeature, ContextAtPosition>
     {
         private readonly int _index;
 
@@ -211,9 +213,6 @@ namespace Reni.Struct
 
         IContextFeature IConverter<IContextFeature, FullContext>.Convert(FullContext context) { return context.Features[_index]; }
 
-        IContextFeature IConverter<IContextFeature, ContextAtPosition>.Convert(ContextAtPosition contextAtPosition)
-        {
-            return contextAtPosition.Features[_index];
-        }
+        IContextFeature IConverter<IContextFeature, ContextAtPosition>.Convert(ContextAtPosition contextAtPosition) { return contextAtPosition.Features[_index]; }
     }
 }

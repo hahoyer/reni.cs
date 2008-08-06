@@ -8,6 +8,7 @@ namespace Reni.Code
     /// <summary>
     /// Bit array operation
     /// </summary>
+    [Serializable]
     internal sealed class BitArrayOp : BinaryOp
     {
         [Node]
@@ -42,6 +43,7 @@ namespace Reni.Code
     /// <summary>
     /// Bit array prafix operation
     /// </summary>
+    [Serializable]
     internal sealed class BitArrayPrefixOp : LeafElement
     {
         private readonly Defineable OpToken;
@@ -74,6 +76,7 @@ namespace Reni.Code
     /// <summary>
     /// Dump and print
     /// </summary>
+    [Serializable]
     internal sealed class DumpPrint : BinaryOp
     {
         internal DumpPrint(Size leftSize, Size rightSize) : base(leftSize, rightSize) {}
@@ -89,6 +92,7 @@ namespace Reni.Code
         }
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
     }
+    [Serializable]
 
     internal sealed class DumpPrintText : LeafElement
     {

@@ -8,6 +8,7 @@ using Reni.Type;
 
 namespace Reni
 {
+    [Serializable]
     internal abstract class CondSyntax : CompileSyntax
     {
         protected readonly ICompileSyntax Cond;
@@ -53,6 +54,7 @@ namespace Reni
         }
     }
 
+    [Serializable]
     internal sealed class ThenSyntax : CondSyntax
     {
         internal ThenSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(condSyntax, thenToken, thenSyntax) {}
@@ -68,6 +70,7 @@ namespace Reni
         }
     }
 
+    [Serializable]
     internal sealed class ThenElseSyntax : CondSyntax
     {
         private readonly Token ElseToken;

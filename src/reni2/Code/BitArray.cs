@@ -1,7 +1,9 @@
+using System;
 using HWClassLibrary.Helper;
 
 namespace Reni.Code
 {
+    [Serializable]
     internal class BitArray : LeafElement
     {
         private readonly Size _size;

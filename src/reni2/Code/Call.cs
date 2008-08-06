@@ -1,9 +1,12 @@
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Code
 {
+    [Serializable]
+
     sealed internal class Call : LeafElement
     {
         [Node]
@@ -58,6 +61,7 @@ namespace Reni.Code
     /// It must not have any argument and should return nothing. 
     /// It will be assembled as a jump to begin of function.
     /// </summary>
+    [Serializable]
     internal class RecursiveCallCandidate : LeafElement
     {
         [Node]
@@ -88,6 +92,7 @@ namespace Reni.Code
 
     }
 
+    [Serializable]
     internal class RecursiveCall : LeafElement
     {
         protected override Size GetSize()

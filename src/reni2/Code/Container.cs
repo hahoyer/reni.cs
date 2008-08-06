@@ -209,6 +209,7 @@ namespace Reni.Code
         }
     }
 
+    [Serializable]
     internal class ErrorElement : LeafElement
     {
         [Node]

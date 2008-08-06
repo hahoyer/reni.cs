@@ -1,3 +1,4 @@
+using System;
 using Reni.Context;
 
 namespace Reni.Code
@@ -5,6 +6,7 @@ namespace Reni.Code
     /// <summary>
     /// Reference to top of stack
     /// </summary>
+    [Serializable]
     internal sealed class TopRef : RefCode
     {
         /// <summary>
@@ -42,6 +44,7 @@ namespace Reni.Code
     /// <summary>
     /// Reference to the end of argument array
     /// </summary>
+    [Serializable]
     internal sealed class FrameRef : RefCode
     {
         /// <summary>

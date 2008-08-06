@@ -1,3 +1,4 @@
+using System;
 using Reni.Context;
 
 namespace Reni.Code
@@ -5,6 +6,7 @@ namespace Reni.Code
     /// <summary>
     /// Combination of TopRef and Unref
     /// </summary>
+    [Serializable]
     internal sealed class TopData : Top
     {
         public TopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
@@ -38,6 +40,7 @@ namespace Reni.Code
     /// <summary>
     /// Combination of FrameRef and Unref
     /// </summary>
+    [Serializable]
     internal sealed class TopFrame : Top
     {
         public TopFrame(RefAlignParam refAlignParam, Size offset, Size size)

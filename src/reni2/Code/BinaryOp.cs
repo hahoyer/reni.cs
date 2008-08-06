@@ -1,8 +1,11 @@
+using System;
+
 namespace Reni.Code
 {
     /// <summary>
     /// Binary operations
     /// </summary>
+    [Serializable]
     internal abstract class BinaryOp : LeafElement
     {
         internal protected readonly Size LeftSize;

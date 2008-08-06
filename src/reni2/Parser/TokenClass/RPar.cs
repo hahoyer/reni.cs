@@ -1,10 +1,12 @@
-﻿using Reni.Syntax;
+﻿using System;
+using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
 {
     /// <summary>
     /// Right parenthesis' 
     /// </summary>
+    [Serializable]
     internal sealed class RPar : TokenClassBase
     {
 

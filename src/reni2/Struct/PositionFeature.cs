@@ -8,6 +8,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
+    [Serializable]
     internal sealed class PositionFeature : ReniObject, IContextFeature, IConverter<IFeature, Ref>, IFeature
     {
         private readonly IStructContext _structContext;

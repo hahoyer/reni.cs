@@ -295,6 +295,7 @@ namespace Reni.Code
         string Dump();
     }
 
+    [Serializable]
     internal class Assign : LeafElement
     {
         [DumpData(true)]

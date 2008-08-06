@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
@@ -6,6 +7,7 @@ namespace Reni.Code
     /// <summary>
     /// Expression to change size of an expression
     /// </summary>
+    [Serializable]
     internal sealed class BitCast : LeafElement
     {
         private readonly Size _size;

@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
@@ -7,6 +8,7 @@ namespace Reni.Code
     /// <summary>
     /// Container of a leaf
     /// </summary>
+    [Serializable]
     internal sealed class Leaf : CodeBase
     {
         private readonly LeafElement _leafElement;

@@ -1,8 +1,10 @@
+using System;
 using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Code
 {
+    [Serializable]
     internal abstract class Top : LeafElement
     {
         [Node]

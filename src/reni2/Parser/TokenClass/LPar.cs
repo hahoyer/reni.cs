@@ -7,6 +7,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Left parenthesis' 
     /// </summary>
+    [Serializable]
     internal sealed class LPar : TokenClassBase
     {
         private readonly int _level;
