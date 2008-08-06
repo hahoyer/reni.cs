@@ -336,19 +336,13 @@ namespace Reni.Type
         internal virtual TypeBase UnProperty() { return this; }
 
         internal SearchResult<IFeature> SearchDefineable(DefineableToken defineableToken) { return Search(defineableToken.TokenClass).SubTrial(this); }
-
         internal SearchResult<IPrefixFeature> SearchDefineablePrefix(DefineableToken defineableToken) { return SearchPrefix(defineableToken.TokenClass).SubTrial(this); }
 
         internal virtual SearchResult<IFeature> Search(Defineable defineable) { return defineable.Search().SubTrial(this); }
-
-        internal protected virtual SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable) { return defineable.SearchPrefix().SubTrial(this); }
-
+        internal virtual SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable) { return defineable.SearchPrefix().SubTrial(this); }
         internal virtual SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable) { return defineable.SearchFromRef().SubTrial(this); }
-
         internal virtual SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable) { return defineable.SearchFromSequenceElement().SubTrial(this); }
-
         internal virtual SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable) { return defineable.SearchPrefixFromSequenceElement().SubTrial(this); }
-
         internal virtual SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable) { return SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>>.Failure(this, defineable); }
 
         internal Result ConvertToSequence(ContextBase callContext, Category category, ICompileSyntax args)

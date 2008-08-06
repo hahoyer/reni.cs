@@ -89,7 +89,7 @@ namespace Reni.Type
             return base.Search(defineable).AlternativeTrial(result);
         }
 
-        internal protected override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
+        internal override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
         {
             var resultFromSequence = Element.SearchPrefixFromSequence(defineable).SubTrial(Element);
             return resultFromSequence.SearchResultDescriptor.Convert(resultFromSequence.Feature, this);

@@ -2,6 +2,8 @@ using System;
 using Reni.Code;
 using Reni.Context;
 using HWClassLibrary.Debug;
+using Reni.Feature;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
@@ -64,6 +66,13 @@ namespace Reni.Type
         {
             return Parent.IsConvertableTo(dest, conversionFeature);
         }
+
+        internal override SearchResult<IFeature> Search(Defineable defineable) { return Parent.Search(defineable); }
+        internal override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable) { return Parent.SearchPrefix(defineable); }
+        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable) { return Parent.SearchFromRef(defineable); }
+        internal override SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable) { return Parent.SearchFromSequence(defineable); }
+        internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable) { return Parent.SearchPrefixFromSequence(defineable); }
+        internal override SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable) { return Parent.SearchFromRefToSequence(defineable); }
 
         internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
