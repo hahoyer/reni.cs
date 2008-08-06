@@ -1,10 +1,11 @@
+using System;
 using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
 namespace Reni
 {
-    [AdditionalNodeInfo("NodeDump")]
+    [AdditionalNodeInfo("NodeDump"),Serializable]
     public abstract class ReniObject : Dumpable
     {
         private static int _nextObjectId;
@@ -27,7 +28,7 @@ namespace Reni
 
         public override string Dump()
         {
-            return NodeDump + HWString.Surround("{", DumpData(), "}");
+            return NodeDump + HWString.Surround(DumpData(), "{", "}");
         }
 
         public override string ToString()

@@ -8,6 +8,7 @@ namespace Reni.Parser
     /// <summary>
     /// The parser singleton
     /// </summary>
+    [Serializable]
     internal sealed class ParserInst
     {
         private readonly Scanner _scanner = new Scanner();

@@ -167,7 +167,7 @@ namespace Reni.Code
             var statements = new StorageDescriptor(MaxSize.ByteAlignedSize, _frameSize).GetBody(_data, isFunction);
             if(useStatementAligner)
                 statements = StatementAligner(statements);
-            statements = HWString.Surround("{", statements, "}");
+            statements = HWString.Surround(statements, "{", "}");
             statements = "fixed(sbyte*data=new sbyte[" + _maxSize.ByteCount + "])" + statements;
             statements = HWString.Indent(statements, 3);
             return statements;

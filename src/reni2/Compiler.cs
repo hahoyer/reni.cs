@@ -13,6 +13,7 @@ using Reni.Runtime;
 
 namespace Reni
 {
+    [Serializable]
     public sealed class Compiler : ReniObject
     {
         private readonly string _fileName;
@@ -215,6 +216,7 @@ namespace Reni
     /// <summary>
     /// Parameters for compilation
     /// </summary>
+    [Serializable]
     public class CompilerParameters
     {
         /// <summary>
