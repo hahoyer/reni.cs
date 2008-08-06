@@ -1,6 +1,5 @@
 using System;
 using HWClassLibrary.Debug;
-using Reni.Context;
 
 namespace Reni.Code
 {
@@ -8,6 +7,7 @@ namespace Reni.Code
     /// General visitor template for code
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Serializable]
     internal abstract class Visitor<T> : ReniObject
     {
         internal virtual T Arg(Arg visitedObject)
@@ -16,7 +16,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal virtual T ContextRef(ContextRefCode visitedObject) 
+        internal virtual T ContextRef(ContextRefCode visitedObject)
         {
             NotImplementedMethod(visitedObject);
             throw new NotImplementedException();

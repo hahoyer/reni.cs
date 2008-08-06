@@ -228,6 +228,7 @@ namespace Reni
 
         #region Nested type: TraceParamters
 
+        [Serializable]
         public class TraceParamters
         {
             /// <summary>

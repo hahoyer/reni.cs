@@ -10,6 +10,7 @@ namespace Reni
     /// Categories are: <see cref="Size"/>Size, <see cref="Type"/>Type, <see cref="Refs"/>References and <see cref="Container"/>Code
     /// </summary>
     [dump("Dump")]
+    [Serializable]
     internal class Category : IEquatable<Category>
     {
         private readonly bool _code;

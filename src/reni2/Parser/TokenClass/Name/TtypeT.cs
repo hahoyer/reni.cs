@@ -7,6 +7,8 @@ using Reni.Syntax;
 namespace Reni.Parser.TokenClass.Name
 {
     [Token("type")]
+    [Serializable]
+
     internal sealed class TtypeT : Defineable, IFeature
     {
         internal override SearchResult<IFeature> Search()

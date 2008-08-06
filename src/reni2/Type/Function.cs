@@ -5,6 +5,7 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal sealed class Function : TypeBase
     {
         private readonly ICompileSyntax _body;
@@ -70,6 +71,7 @@ namespace Reni.Type
         }
     }
 
+    [Serializable]
     internal sealed class Property : TypeBase
     {
         [DumpData(true)] private readonly ICompileSyntax _body;

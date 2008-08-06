@@ -6,6 +6,7 @@ using Reni.Syntax;
 
 namespace Reni.Parser
 {
+    [Serializable]
     sealed internal class ExpressionSyntax : CompileSyntax
     {
         [Node]

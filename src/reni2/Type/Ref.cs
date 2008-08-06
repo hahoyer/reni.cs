@@ -8,6 +8,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal abstract class Ref : Child
     {
         private static int _nextObjectId;
@@ -145,6 +146,7 @@ namespace Reni.Type
         }
     }
 
+    [Serializable]
     internal sealed class AutomaticRef : Ref
     {
         internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam) : base(target, refAlignParam) {}

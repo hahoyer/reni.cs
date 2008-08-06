@@ -1,7 +1,9 @@
+using System;
 using Reni.Code;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal sealed class TypeType : TypeBase
     {
         private readonly TypeBase _parent;

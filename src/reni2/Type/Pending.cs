@@ -5,6 +5,7 @@ using Reni.Code;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal sealed class Pending : TypeBase, IIconKeyProvider
     {
         protected override Size GetSize() { return Size.Pending; }

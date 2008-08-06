@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Code;
@@ -10,6 +11,7 @@ namespace Reni.Context
     /// <summary>
     /// Root environment of compilation process
     /// </summary>
+    [Serializable]
     internal sealed class Root : ContextBase
     {
         private readonly FunctionList _function = new FunctionList();

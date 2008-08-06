@@ -4,6 +4,7 @@ using HWClassLibrary.Helper;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal abstract class Child : TypeBase
     {
         readonly TypeBase _parent;

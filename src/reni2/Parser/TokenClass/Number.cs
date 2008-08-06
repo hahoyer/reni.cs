@@ -9,6 +9,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// DigitChain token
     /// </summary>
+    [Serializable]
     internal sealed class Number : Terminal
     {
         internal static readonly TokenClassBase Instance = new Number();

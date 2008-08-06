@@ -79,6 +79,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Base clas for compiler tokens
     /// </summary>
+    [Serializable]
     internal abstract class TokenClassBase : ReniObject, IIconKeyProvider
     {
         private static int _nextObjectId;
@@ -179,6 +180,7 @@ namespace Reni.Parser.TokenClass
         string IIconKeyProvider.IconKey { get { return "Symbol"; } }
     }
 
+    [Serializable]
     internal abstract class Special : TokenClassBase
     {
         internal string DumpShort()
@@ -187,6 +189,7 @@ namespace Reni.Parser.TokenClass
         }
     }
 
+    [Serializable]
     internal abstract class Terminal : Special
     {
         internal abstract Result Result(ContextBase context, Category category, Token token);
@@ -199,6 +202,7 @@ namespace Reni.Parser.TokenClass
         }
     }
 
+    [Serializable]
     internal abstract class Prefix : Special
     {
         internal abstract Result Result(ContextBase context, Category category, Token token, ICompileSyntax right);
@@ -210,6 +214,7 @@ namespace Reni.Parser.TokenClass
         }
     }
 
+    [Serializable]
     internal abstract class Infix : Special
     {
         internal abstract Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right);

@@ -5,6 +5,7 @@ using Reni.Context;
 namespace Reni.Parser.TokenClass.Name
 {
     [Token("this")]
+    [Serializable]
     internal sealed class TthisT : Terminal
     {
         internal override Result Result(ContextBase context, Category category, Token token)

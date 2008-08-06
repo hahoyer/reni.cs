@@ -1,3 +1,4 @@
+using System;
 using Reni.Code;
 using Reni.Context;
 using HWClassLibrary.Debug;
@@ -7,6 +8,7 @@ namespace Reni.Type
     /// <summary>
     /// Performs alignement by extending the number of bytes a type uses.
     /// </summary>
+    [Serializable]
     internal class Aligner : Child
     {
         private readonly int _alignBits;

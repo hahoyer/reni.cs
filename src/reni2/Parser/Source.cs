@@ -1,4 +1,5 @@
-﻿using HWClassLibrary.Debug;
+﻿using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
 
 namespace Reni.Parser
@@ -6,6 +7,7 @@ namespace Reni.Parser
     /// <summary>
     /// Source for compilation. Can be a file or only a string
     /// </summary>
+    [Serializable]
     public class Source : ReniObject
     {
         private readonly string _data;

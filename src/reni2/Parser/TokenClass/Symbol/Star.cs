@@ -5,6 +5,7 @@ using Reni.Type;
 namespace Reni.Parser.TokenClass.Symbol
 {
     [Token("*")]
+    [Serializable]
     internal sealed class Star : SequenceOfBitOperation
     {
         internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize)

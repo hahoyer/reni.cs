@@ -10,6 +10,7 @@ namespace Reni
     /// <summary>
     /// Contains list of references to compiler environemnts.
     /// </summary>
+    [Serializable]
     internal sealed class Refs : ReniObject
     {
         private readonly List<IContextRefInCode> _data;

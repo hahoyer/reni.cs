@@ -1,9 +1,12 @@
-﻿namespace Reni.Parser.TokenClass
+﻿using System;
+
+namespace Reni.Parser.TokenClass
 {
     /// <summary>
     /// Any non reseved token
     /// </summary>
-    internal sealed class UserSymbol: Defineable
+    [Serializable]
+    internal sealed class UserSymbol : Defineable
     {
         private readonly string _name;
 

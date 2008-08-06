@@ -12,6 +12,7 @@ namespace Reni.Type
     /// <summary>
     /// Special array 
     /// </summary>
+    [Serializable]
     internal sealed class Sequence : TypeBase
     {
         private readonly EnableCutFeature _enableCutCutFeature;
@@ -250,6 +251,7 @@ namespace Reni.Type
         }
     }
 
+    [Serializable]
     internal class EnableCutFeature : ReniObject, IFeature
     {
         private readonly Sequence _sequence;
@@ -268,6 +270,7 @@ namespace Reni.Type
         }
     }
 
+    [Serializable]
     internal class BitOperationFeatureClass : ReniObject, IFeature
     {
         private readonly SequenceOfBitOperation _definable;

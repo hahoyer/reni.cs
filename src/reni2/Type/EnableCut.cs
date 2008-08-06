@@ -1,5 +1,8 @@
+using System;
+
 namespace Reni.Type
 {
+    [Serializable]
     internal sealed class EnableCut : TagChild
     {
         internal EnableCut(TypeBase parent): base(parent) {}

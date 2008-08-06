@@ -9,6 +9,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
+    [Serializable]
     internal abstract class StructContextBase : ContextBase, IStructContext
     {
         private readonly SimpleCache<Type> _typeCache = new SimpleCache<Type>();

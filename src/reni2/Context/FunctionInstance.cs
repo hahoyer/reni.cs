@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Code.ReplaceVisitor;
@@ -10,6 +11,7 @@ namespace Reni.Context
     /// <summary>
     /// Instance of a function to compile
     /// </summary>
+    [Serializable]
     internal sealed class FunctionInstance : ReniObject
     {
         private readonly TypeBase Args;

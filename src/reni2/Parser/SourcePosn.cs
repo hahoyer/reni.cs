@@ -6,6 +6,7 @@ namespace Reni.Parser
     /// <summary>
     /// Source and position for compilation process
     /// </summary>
+    [Serializable]
     internal sealed class SourcePosn : ReniObject
     {
         readonly Source _text;

@@ -1,9 +1,11 @@
+using System;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Context
 {
+    [Serializable]
     internal sealed class Function : Child, IContextRefInCode
     {
         [Node]

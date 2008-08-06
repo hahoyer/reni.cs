@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Feature;
@@ -5,6 +6,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal sealed class Bit : TypeBase
     {
         protected override Size GetSize()

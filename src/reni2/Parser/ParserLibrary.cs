@@ -6,6 +6,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
+    [Serializable]
     internal class Scanner : ReniObject
     {
         private readonly char[] _charType = new char[256];
@@ -194,6 +195,7 @@ namespace Reni.Parser
         internal abstract PrioTable CreatePrioTable();
     }
 
+    [Serializable]
     internal abstract class TokenFactory
     {
         private readonly PrioTable _prioTable;
@@ -224,6 +226,7 @@ namespace Reni.Parser
         }
     }
 
+    [Serializable]
     internal sealed class TokenFactory<TokenAttribute> : TokenFactory where TokenAttribute : TokenAttributeBase, new()
     {
         internal TokenFactory()

@@ -5,6 +5,7 @@ using Reni.Syntax;
 namespace Reni.Parser.TokenClass.Symbol
 {
     [Token(":")]
+    [Serializable]
     internal sealed class Colon : TokenClassBase
     {
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
@@ -14,6 +15,7 @@ namespace Reni.Parser.TokenClass.Symbol
     }
 
     [Token("!")]
+    [Serializable]
     internal sealed class Exclamation : TokenClassBase
     {
         private static readonly TokenFactory _tokenFactory = new TokenFactory<DeclarationTokenAttribute>();
@@ -33,6 +35,7 @@ namespace Reni.Parser.TokenClass.Symbol
     }
 
     [DeclarationToken("property")]
+    [Serializable]
     internal sealed class Property : TokenClassBase
     {
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
@@ -43,6 +46,7 @@ namespace Reni.Parser.TokenClass.Symbol
     }
 
     [DeclarationToken("converter")]
+    [Serializable]
     internal sealed class Converter : TokenClassBase
     {
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)

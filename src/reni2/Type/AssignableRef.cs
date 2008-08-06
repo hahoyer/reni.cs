@@ -7,6 +7,7 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal sealed class AssignableRef : Ref
     {
         internal readonly AssignmentFeature AssignmentFeature;
@@ -27,6 +28,7 @@ namespace Reni.Type
         }
     }
 
+    [Serializable]
     internal class AssignmentFeature : ReniObject, IFeature
     {
         private readonly AssignableRef _assignableRef;

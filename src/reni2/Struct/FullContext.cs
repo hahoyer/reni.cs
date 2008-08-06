@@ -8,6 +8,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Struct
 {
+    [Serializable]
     internal sealed class FullContext : StructContextBase, IContextRefInCode
     {
         [Node]

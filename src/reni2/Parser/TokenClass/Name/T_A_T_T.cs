@@ -6,6 +6,7 @@ using Reni.Syntax;
 namespace Reni.Parser.TokenClass.Name
 {
     [Token("_A_T_")]
+    [Serializable]
     internal sealed class T_A_T_T : Infix
     {
         internal override Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right)

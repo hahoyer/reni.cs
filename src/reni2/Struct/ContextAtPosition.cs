@@ -7,6 +7,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Struct
 {
+    [Serializable]
     internal sealed class ContextAtPosition : StructContextBase
     {
         internal readonly int _position;

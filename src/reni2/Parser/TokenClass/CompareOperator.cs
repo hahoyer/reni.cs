@@ -1,7 +1,9 @@
+using System;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass
 {
+    [Serializable]
     internal abstract class CompareOperator : SequenceOfBitOperation
     {
         internal override bool IsCompareOperator { get { return true; } }

@@ -7,6 +7,7 @@ using Reni.Struct;
 
 namespace Reni.Context
 {
+    [Serializable]
     internal abstract class Child : ContextBase
     {
         private readonly ContextBase _parent;

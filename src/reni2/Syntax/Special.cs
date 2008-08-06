@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Parser;
@@ -5,6 +6,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Syntax
 {
+    [Serializable]
     internal abstract class SpecialSyntax : CompileSyntax
     {
         protected SpecialSyntax(Token token)
@@ -12,6 +14,7 @@ namespace Reni.Syntax
 
     }
 
+    [Serializable]
     internal sealed class TerminalSyntax : SpecialSyntax
     {
         [Node]
@@ -29,6 +32,7 @@ namespace Reni.Syntax
         }
     }
 
+    [Serializable]
     internal sealed class PrefixSyntax : SpecialSyntax
     {
         [Node]
@@ -54,6 +58,7 @@ namespace Reni.Syntax
         }
     }
 
+    [Serializable]
     internal sealed class InfixSyntax : SpecialSyntax
     {
         [Node]

@@ -10,6 +10,7 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         private static readonly Bit _bit = new Bit();

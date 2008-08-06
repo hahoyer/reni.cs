@@ -14,6 +14,7 @@ namespace Reni
     /// <summary>
     /// Result of a visitor request
     /// </summary>
+    [Serializable]
     internal sealed class Result : ReniObject, ITreeNodeSupport
     {
         private bool _isDirty;

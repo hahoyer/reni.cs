@@ -1,4 +1,5 @@
-﻿using HWClassLibrary.Debug;
+﻿using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
 namespace Reni.Type
@@ -6,6 +7,7 @@ namespace Reni.Type
     /// <summary>
     /// Fixed sized array of a type
     /// </summary>
+    [Serializable]
     internal sealed class Array : Child
     {
         private readonly int _count;

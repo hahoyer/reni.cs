@@ -16,6 +16,7 @@ namespace Reni.Context
     /// <summary>
     /// Base class for compiler environments
     /// </summary>
+    [Serializable]
     internal abstract class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         private static int _nextId;
@@ -252,6 +253,7 @@ namespace Reni.Context
         }
     }
 
+    [Serializable]
     internal class Cache : ReniObject, IIconKeyProvider
     {
         [Node, SmartNode]

@@ -4,6 +4,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
+    [Serializable]
     internal sealed class Token : ReniObject
     {
         private static int _nextObjectId;

@@ -1,8 +1,10 @@
+using System;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass.Symbol
 {
     [Token("-")]
+    [Serializable]
     sealed internal class Minus : SequenceOfBitOperation
     {
         internal protected override bool IsBitSequencePrefixOperation { get { return true; } }

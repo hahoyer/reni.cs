@@ -6,6 +6,7 @@ using Reni.Type;
 
 namespace Reni
 {
+    [Serializable]
     internal class PostProcessorForResult : ReniObject
     {
         private readonly Result _result;
@@ -35,6 +36,7 @@ namespace Reni
         }
     }
 
+    [Serializable]
     internal class PostProcessorForType : ReniObject
     {
         private readonly TypeBase _typeBase;

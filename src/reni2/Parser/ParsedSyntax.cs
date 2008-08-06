@@ -6,6 +6,7 @@ using Reni.Syntax;
 
 namespace Reni.Parser
 {
+    [Serializable]
     internal abstract class ParsedSyntax : ReniObject, IParsedSyntax
     {
         private static bool _isInDump;

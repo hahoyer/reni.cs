@@ -12,6 +12,7 @@ namespace Reni
     /// Compiler visitor category that contains the size of any sytax element
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
+    [Serializable]
     internal class Size : ReniObject, IIconKeyProvider
     {
         private static readonly Hashtable _values = new Hashtable();

@@ -1,9 +1,11 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
 {
+    [Serializable]
     internal sealed class DefinableTokenSyntax : CompileSyntax
     {
         private readonly DefineableToken _defineableToken;

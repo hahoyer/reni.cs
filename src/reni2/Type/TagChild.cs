@@ -1,5 +1,8 @@
+using System;
+
 namespace Reni.Type
 {
+    [Serializable]
     internal abstract class TagChild : Child
     {
         protected TagChild(TypeBase parent)

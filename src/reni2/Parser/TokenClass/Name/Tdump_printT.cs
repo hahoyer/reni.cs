@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
@@ -8,6 +9,7 @@ using Reni.Type;
 namespace Reni.Parser.TokenClass.Name
 {
     [Token("dump_print")]
+    [Serializable]
     internal sealed class Tdump_printT : Defineable, IFeature
     {
         internal override SearchResult<IFeature> Search()
@@ -28,7 +30,7 @@ namespace Reni.Parser.TokenClass.Name
             if(args != null)
                 NotImplementedMethod(callContext, category, @object, args);
             if (!category.HasInternal && !category.HasCode && !category.HasRefs)
-                return Void.CreateResult(category);
+                return Type.Void.CreateResult(category);
             return callContext.ApplyResult(category, @object, ot => ot.DumpPrint(category));
         }
     }

@@ -1,9 +1,11 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Feature;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass
 {
+    [Serializable]
     internal abstract class SequenceOfBitOperation : Defineable,
         IConverter<IConverter<IFeature, Sequence>,Bit>,
         IConverter<IConverter<IPrefixFeature, Sequence>, Bit>,

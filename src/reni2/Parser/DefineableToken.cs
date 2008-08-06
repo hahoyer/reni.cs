@@ -5,6 +5,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
+    [Serializable]
     internal sealed class DefineableToken : ReniObject, IIconKeyProvider
     {
         private readonly int _length;

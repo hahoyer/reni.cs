@@ -11,6 +11,7 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// Tokens that can used in definitions (not reserved tokens)
     /// </summary>
+    [Serializable]
     internal abstract class Defineable : TokenClassBase
     {
         [Node, DumpData(false)]

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using HWClassLibrary.Helper;
 using Reni.Code;
@@ -9,7 +10,8 @@ namespace Reni.Context
     /// <summary>
     /// List of functions
     /// </summary>
-    internal sealed class FunctionList
+    [Serializable]
+    internal sealed class FunctionList: ReniObject
     {
         private readonly DictionaryEx<ICompileSyntax, ContextArgsVariant> _data =
             new DictionaryEx<ICompileSyntax, ContextArgsVariant>();
@@ -65,6 +67,7 @@ namespace Reni.Context
             return result;
         }
 
+        [Serializable]
         private class ArgsVariant
         {
             private readonly DictionaryEx<TypeBase, int> _data = new DictionaryEx<TypeBase, int>();
@@ -83,6 +86,7 @@ namespace Reni.Context
             }
         }
 
+        [Serializable]
         private class ContextArgsVariant : ReniObject
         {
             private readonly DictionaryEx<ContextBase, ArgsVariant> _data = new DictionaryEx<ContextBase, ArgsVariant>();

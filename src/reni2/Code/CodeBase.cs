@@ -8,6 +8,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Code
 {
+    [Serializable]
     internal abstract class CodeBase : ReniObject, IIconKeyProvider
     {
         [Node]

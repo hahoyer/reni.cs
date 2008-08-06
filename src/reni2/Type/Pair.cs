@@ -6,6 +6,7 @@ using Reni.Context;
 
 namespace Reni.Type
 {
+    [Serializable]
     internal class Pair : Child
     {
         private readonly TypeBase _second;

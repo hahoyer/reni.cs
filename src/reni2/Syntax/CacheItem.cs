@@ -10,6 +10,7 @@ namespace Reni.Syntax
     /// For each syntax  object, the environment is mapped against the corresponding compilation result.
     /// The mapping for one environment is extended, each time more categories are requested
     /// </summary>
+    [Serializable]
     internal sealed class CacheItem : ReniObject, IIconKeyProvider
     {
         private readonly ICompileSyntax _syntax;

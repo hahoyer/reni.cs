@@ -10,6 +10,7 @@ namespace Reni.Code
     /// <summary>
     /// base class for all compiled code items
     /// </summary>
+    [Serializable]
     internal sealed class Container : Visitor<int>
     {
         private static readonly Container _unexpectedVisitOfPending = new Container("UnexpectedVisitOfPending");

@@ -3,7 +3,8 @@ using Reni.Code;
 
 namespace Reni.Type
 {
-    internal sealed  class Void : TypeBase
+    [Serializable]
+    internal sealed class Void : TypeBase
     {
         protected override Size GetSize()
         {

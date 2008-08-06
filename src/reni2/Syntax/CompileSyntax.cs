@@ -7,6 +7,7 @@ using Reni.Struct;
 
 namespace Reni.Syntax
 {
+    [Serializable]
     abstract internal class CompileSyntax : ParsedSyntax, ICompileSyntax
     {
         // Used for debug only

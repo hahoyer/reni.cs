@@ -10,6 +10,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
+    [Serializable]
     internal sealed class Type : TypeBase
     {
         [Node]
