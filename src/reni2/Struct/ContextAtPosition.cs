@@ -10,7 +10,7 @@ namespace Reni.Struct
     [Serializable]
     internal sealed class ContextAtPosition : StructContextBase
     {
-        internal readonly int _position;
+        private readonly int _position;
         private readonly FullContext _context;
 
         internal ContextAtPosition(FullContext context, int position)

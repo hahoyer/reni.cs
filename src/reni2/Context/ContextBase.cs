@@ -193,9 +193,9 @@ namespace Reni.Context
             var localCategory = category | Category.Type;
             if(category.HasInternal)
                 localCategory = localCategory | Category.ForInternal;
-            return Result(localCategory, syntax)
-                .EnsureRef(category | Category.Type, RefAlignParam, argsOffset)
-                .Filter(category);
+            var result = Result(localCategory, syntax);
+            var refResult = result.EnsureRef(category | Category.Type, RefAlignParam, argsOffset);
+            return refResult.Filter(category);
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax) { return ResultAsRef(category, syntax, () => Reni.Size.Zero); }

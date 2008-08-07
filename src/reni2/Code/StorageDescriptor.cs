@@ -129,8 +129,9 @@ namespace Reni.Code
         /// </summary>
         /// <param name="opToken">The op token.</param>
         /// <param name="size">The size.</param>
+        /// <param name="argSize">Size of the arg.</param>
         /// <returns></returns>
-        internal string BitArrayPrefixOp(Defineable opToken, Size size)
+        internal string BitArrayPrefixOp(Defineable opToken, Size size, Size argSize)
         {
             if(IsBuildInIntType(size))
                 return CreateDataRef(Start, size)
@@ -139,7 +140,7 @@ namespace Reni.Code
                             + "("
                                 + opToken.CSharpNameOfDefaultOperation
                                     + " "
-                                        + CreateDataRef(Start, size)
+                                        + CreateDataRef(Start, argSize)
                                             + ")";
 
             return "Data."
@@ -148,7 +149,9 @@ namespace Reni.Code
                         + size.ByteCount
                             + ", "
                                 + CreateDataPtr(Start)
-                                    + ")";
+                                    + ", "
+                                        + argSize.ByteCount
+                                            + ")";
         }
 
         /// <summary>

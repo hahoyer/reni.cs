@@ -25,9 +25,9 @@ namespace Reni.Code
             return _size;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
-            return GetSize()*(-1);
+            return Size.Zero;
         }
 
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }

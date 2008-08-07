@@ -16,28 +16,20 @@ namespace Reni.Code
         [Node]
         internal readonly Size TargetSize;
 
-        internal BitCast(Size targetSize, Size size, Size significantSize)
+        internal BitCast(Size size, Size targetSize, Size significantSize)
         {
             _size = size;
             SignificantSize = significantSize;
             TargetSize = targetSize;
             Tracer.Assert(targetSize != size || targetSize != significantSize);
+            StopByObjectId(-1141);
         }
 
-        protected override Size GetSize()
-        {
-            return _size;
-        }
+        protected override Size GetSize() { return _size; }
 
-        protected override Size GetDeltaSize()
-        {
-            return TargetSize - Size;
-        }
+        protected override Size GetInputSize() { return TargetSize; }
 
-        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
-        {
-            return subsequentElement.TryToCombineBackN(this);
-        }
+        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement) { return subsequentElement.TryToCombineBackN(this); }
 
         internal override LeafElement[] TryToCombineBackN(BitCast precedingElement)
         {
@@ -46,7 +38,7 @@ namespace Reni.Code
             var significantSize = SignificantSize.Min(precedingElement.SignificantSize);
             if(TargetSize == Size && TargetSize == significantSize)
                 return new LeafElement[0];
-            return new[] {new BitCast(TargetSize, Size, significantSize)};
+            return new[] {new BitCast(Size, precedingElement.TargetSize, significantSize)};
         }
 
         internal override LeafElement TryToCombineBack(BitArray precedingElement)
@@ -57,58 +49,55 @@ namespace Reni.Code
             return new BitArray(Size, bitsConst);
         }
 
-        public override string NodeDump { get { return base.NodeDump + " TargetSize="+TargetSize+" SignificantSize="+SignificantSize; } }
+        public override string NodeDump { get { return base.NodeDump + " TargetSize=" + TargetSize + " SignificantSize=" + SignificantSize; } }
 
         internal override LeafElement[] TryToCombineBackN(TopData precedingElement)
         {
-            if (precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
+            if(precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
                 return new LeafElement[]
-                           {
-                               new TopData(precedingElement.RefAlignParam, precedingElement.Offset, Size),
-                               new BitCast(Size, Size, SignificantSize)
-                           };
+                {
+                    new TopData(precedingElement.RefAlignParam, precedingElement.Offset, Size),
+                    new BitCast(Size, Size, SignificantSize)
+                };
             return null;
         }
 
         internal override LeafElement[] TryToCombineBackN(TopFrame precedingElement)
         {
-            if (precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
+            if(precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
                 return new LeafElement[]
-                           {
-                               new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, Size),
-                               new BitCast(Size, Size, SignificantSize)
-                           };
+                {
+                    new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, Size),
+                    new BitCast(Size, Size, SignificantSize)
+                };
             return null;
         }
 
         internal override LeafElement[] TryToCombineBackN(BitArrayOp precedingElement)
         {
-            if (TargetSize != Size)
-                return new LeafElement[]
-                           {
-                               new BitArrayOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize,
-                                              precedingElement.LeftSize, precedingElement.RightSize),
-                               new BitCast(Size, Size, SignificantSize)
-                           };
-            return null;
+            if(TargetSize == Size)
+                return null;
+
+            var bitArrayOp = new BitArrayOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize,
+                precedingElement.LeftSize, precedingElement.RightSize);
+
+            if(SignificantSize == Size)
+                return new LeafElement[] {bitArrayOp};
+
+            return new LeafElement[] {bitArrayOp, new BitCast(Size, Size, SignificantSize)};
         }
 
         internal override LeafElement[] TryToCombineBackN(Dereference precedingElement)
         {
             if(precedingElement.Size == TargetSize && TargetSize != Size)
-            {
                 return new LeafElement[]
-                           {
-                               new Dereference(precedingElement.RefAlignParam, Size),
-                               new BitCast(Size, Size, SignificantSize)
-                           };
-            }
+                {
+                    new Dereference(precedingElement.RefAlignParam, Size),
+                    new BitCast(Size, Size, SignificantSize)
+                };
             return null;
         }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.BitCast(TargetSize, Size, SignificantSize);
-        }
+        protected override string Format(StorageDescriptor start) { return start.BitCast(TargetSize, Size, SignificantSize); }
     }
 }

@@ -48,11 +48,13 @@ namespace Reni.Code
     {
         private readonly Defineable OpToken;
         private readonly Size _size;
+        private readonly Size _argSize;
 
-        internal BitArrayPrefixOp(Defineable name, Size size)
+        internal BitArrayPrefixOp(Defineable name, Size size, Size argSize)
         {
             OpToken = name;
             _size = size;
+            _argSize = argSize;
         }
 
         protected override Size GetSize()
@@ -60,17 +62,18 @@ namespace Reni.Code
             return _size;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
-            return Size.Zero;
+            return _argSize;
         }
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.BitArrayPrefixOp(OpToken, GetSize());
+            return start.BitArrayPrefixOp(OpToken, GetSize(), _argSize);
         }
-
-        public override string NodeDump { get { return base.NodeDump + " " + OpToken.Name; } }
+        [Node]
+        internal Size ArgSize { get { return _argSize; } }
+        public override string NodeDump { get { return base.NodeDump + " " + OpToken.Name + " " + ArgSize; } }
     }
 
     /// <summary>
@@ -109,7 +112,7 @@ namespace Reni.Code
             return Size.Zero;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
             return Size.Zero;
         }

@@ -30,9 +30,9 @@ namespace Reni.Code
             return RefAlignParam.RefSize;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
-            return Size.Create(0);
+            return RefAlignParam.RefSize;
         }
 
         protected override string Format(StorageDescriptor start)

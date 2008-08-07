@@ -387,49 +387,24 @@ namespace Reni
             var size = FindSize;
             if(size != null)
             {
-                if(HasSize)
-                    if(!(Size == size))
-                    {
-                        Tracer.AssertionFailed(1, @"Size==size", "Size differs " + Dump());
-                        Debugger.Break();
-                    }
-                if(HasType)
-                    if(!(Type.Size == size))
-                    {
-                        Tracer.AssertionFailed(1, @"Type.Size==size", "Type size differs " + Dump());
-                        Debugger.Break();
-                    }
-                if(HasCode)
-                    if(!(Code.Size == size))
-                    {
-                        Tracer.AssertionFailed(1, @"Code.Size==size", "Code size differs " + Dump());
-                        Debugger.Break();
-                    }
+                if(HasSize && !(Size == size))
+                    Tracer.AssertionFailed(1, @"Size==size", "Size differs " + Dump());
+                if(HasType && !(Type.Size == size))
+                    Tracer.AssertionFailed(1, @"Type.Size==size", "Type size differs " + Dump());
+                if(HasCode && !(Code.Size == size))
+                    Tracer.AssertionFailed(1, @"Code.Size==size", "Code size differs " + Dump());
             }
 
-            if(HasRefs && HasCode)
-                if(!Refs.Contains(Code.GetRefs()))
-                {
-                    Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
-                    Debugger.Break();
-                }
+            if(HasRefs && HasCode && !Refs.Contains(Code.GetRefs()))
+                Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
 
             if(HasInternal && _internal.HasInternal)
-            {
                 Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "nested internals " + Dump());
-                Debugger.Break();
-            }
 
             if(HasInternal && _internal.Complete != Category.ForInternal)
-            {
                 Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "incomplete internals " + Dump());
-                Debugger.Break();
-            }
-            if (HasInternal && _internal.IsPending)
-            {
+            if(HasInternal && _internal.IsPending)
                 Tracer.AssertionFailed(1, @"HasInternal && _internal.IsPending", "pending internals " + Dump());
-                Debugger.Break();
-            }
         }
 
         private bool HasCategory(Category category)

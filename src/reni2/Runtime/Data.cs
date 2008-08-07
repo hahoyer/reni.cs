@@ -1,4 +1,5 @@
 using System;
+using HWClassLibrary.Debug;
 
 namespace Reni.Runtime
 {
@@ -17,8 +18,8 @@ namespace Reni.Runtime
         /// created 08.10.2006 17:43
         public static unsafe void MoveBytes(int count, byte[] destination, int destByte, Int64 source)
         {
-            fixed (byte* destPtr = &destination[destByte])
-                MoveBytes(count, destPtr, (byte*)&source);
+            fixed(byte* destPtr = &destination[destByte])
+                MoveBytes(count, destPtr, (byte*) &source);
         }
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace Reni.Runtime
         /// created 08.10.2006 17:43
         public static unsafe void MoveBytes(int count, byte* destination, byte* source)
         {
-            for (int i = 0; i < count; i++)
+            for(var i = 0; i < count; i++)
                 destination[i] = source[i];
         }
 
@@ -45,7 +46,7 @@ namespace Reni.Runtime
         /// created 08.10.2006 20:07
         public static void MoveBytes(int count, byte[] destination, int destOffset, byte[] source, int sourceOffset)
         {
-            for (int i = 0; i < count; i++)
+            for(var i = 0; i < count; i++)
                 destination[i + destOffset] = source[i + sourceOffset];
         }
 
@@ -58,7 +59,7 @@ namespace Reni.Runtime
         /// created 08.10.2006 20:07
         public static void MoveBytes(int count, byte[] destination, byte[] source)
         {
-            for (int i = 0; i < count; i++)
+            for(var i = 0; i < count; i++)
                 destination[i] = source[i];
         }
 
@@ -67,50 +68,35 @@ namespace Reni.Runtime
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        public static void DumpPrint(Int64 x)
-        {
-            BitsConst.Convert(x).PrintNumber();
-        }
+        public static void DumpPrint(Int64 x) { BitsConst.Convert(x).PrintNumber(); }
 
         /// <summary>
         /// Bits the array op_printnum.
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        public static void DumpPrint(Int32 x)
-        {
-            BitsConst.Convert(x).PrintNumber();
-        }
+        public static void DumpPrint(Int32 x) { BitsConst.Convert(x).PrintNumber(); }
 
         /// <summary>
         /// Bits the array op_printnum.
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        public static void DumpPrint(Int16 x)
-        {
-            BitsConst.Convert(x).PrintNumber();
-        }
+        public static void DumpPrint(Int16 x) { BitsConst.Convert(x).PrintNumber(); }
 
         /// <summary>
         /// Bits the array op_printnum.
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        public static void DumpPrint(byte x)
-        {
-            BitsConst.Convert(x).PrintNumber();
-        }
+        public static void DumpPrint(byte x) { BitsConst.Convert(x).PrintNumber(); }
 
         /// <summary>
         /// Dumps the print.
         /// </summary>
         /// <param name="s">The s.</param>
         /// created 08.01.2007 18:42
-        public static void DumpPrint(string s)
-        {
-            BitsConst.OutStream.Add(s);
-        }
+        public static void DumpPrint(string s) { BitsConst.OutStream.Add(s); }
 
         /// <summary>
         /// Bitses the array.
@@ -119,10 +105,10 @@ namespace Reni.Runtime
         /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 02.02.2007 01:01
-        unsafe public static void BitsArray(int count, sbyte* destination, params byte[] source)
+        public static unsafe void BitsArray(int count, sbyte* destination, params byte[] source)
         {
-            fixed(byte* s = &source[0]) 
-                MoveBytes(count,(byte*)destination,s);
+            fixed(byte* s = &source[0])
+                MoveBytes(count, (byte*) destination, s);
         }
 
         /// <summary>
@@ -132,10 +118,7 @@ namespace Reni.Runtime
         /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 02.02.2007 01:09
-        unsafe public static void MoveBytes(int count, sbyte* destination, sbyte* source)
-        {
-            MoveBytes(count, (byte*)destination, (byte*)source);
-        }
+        public static unsafe void MoveBytes(int count, sbyte* destination, sbyte* source) { MoveBytes(count, (byte*) destination, (byte*) source); }
 
         /// <summary>
         /// Dumps the print.
@@ -143,16 +126,16 @@ namespace Reni.Runtime
         /// <param name="count">The count.</param>
         /// <param name="source">The source.</param>
         /// created 02.02.2007 01:10
-        unsafe public static void DumpPrint(int count, sbyte* source)
+        public static unsafe void DumpPrint(int count, sbyte* source)
         {
-            Int64 data = ToInt64(count, source);
+            var data = ToInt64(count, source);
             BitsConst.Convert(data).PrintNumber();
         }
 
         private static unsafe Int64 ToInt64(int count, sbyte* source)
         {
             Int64 data = source[count - 1] < 0 ? -1 : 0;
-            MoveBytes(count, (byte*)&data, (byte*)source);
+            MoveBytes(count, (byte*) &data, (byte*) source);
             return data;
         }
 
@@ -165,7 +148,7 @@ namespace Reni.Runtime
         /// created 03.02.2007 01:39
         public static unsafe void BitCast(int count, sbyte* x, int bits)
         {
-            bool isNegative = x[count - 1] < 0;
+            var isNegative = x[count - 1] < 0;
             while(bits >= 8)
             {
                 count--;
@@ -175,7 +158,7 @@ namespace Reni.Runtime
             if(bits > 0)
             {
                 count--;
-                x[count] = (sbyte)((sbyte)(x[count] << bits) >> bits);
+                x[count] = (sbyte) ((sbyte) (x[count] << bits) >> bits);
             }
             if(bits < 0)
             {
@@ -187,16 +170,23 @@ namespace Reni.Runtime
         /// <summary>
         /// Changes the sign of data.
         /// </summary>
-        /// <param name="count">The count.</param>
+        /// <param name="countResult">The count result.</param>
         /// <param name="data">The data.</param>
+        /// <param name="countData">The count data.</param>
         /// created 03.02.2007 01:32
-        public static unsafe void Minus(int count, sbyte* data)
+        public static unsafe void Minus(int countResult, sbyte* data, int countData)
         {
-            int carry = 1;
-            for (int i = 0; i < count; i++)
+            var carry = 1;
+            for(var i = 0; i < countData; i++)
             {
-                data[i] = (sbyte)((sbyte)(~data[i]) + carry);
+                data[i] = (sbyte) ((sbyte) (~data[i]) + carry);
                 carry = data[i] == 0 ? 1 : 0;
+            }
+
+            if (countResult != countData)
+            {
+                NotImplementedFunction(countResult, data[0], countData);
+                throw new NotImplementedException();
             }
         }
 
@@ -212,13 +202,14 @@ namespace Reni.Runtime
         /// created 03.02.2007 20:48
         public static unsafe void Minus(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
-            fixed(sbyte*m = new sbyte[count2nd])
+            fixed(sbyte* m = new sbyte[count2nd])
             {
-                MoveBytes(count2nd,m,data2nd);
-                Minus(count2nd,m);
-                Plus(countResult,dataResult,count1st,data1st,count2nd,m);
+                MoveBytes(count2nd, m, data2nd);
+                Minus(count2nd, m, count2nd);
+                Plus(countResult, dataResult, count1st, data1st, count2nd, m);
             }
         }
+
         /// <summary>
         /// Pluses the specified count result.
         /// </summary>
@@ -231,71 +222,76 @@ namespace Reni.Runtime
         /// created 03.02.2007 20:48
         public static unsafe void Plus(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
-            int d = 0;
-            int carry = 0;
-            for (int i = 0; i < countResult; i++)
+            var d = 0;
+            var carry = 0;
+            for(var i = 0; i < countResult; i++)
             {
-                if (i < count1st)
+                if(i < count1st)
                     carry += (data1st[i] & 0xff);
-                if (i < count2nd)
+                if(i < count2nd)
                 {
                     d = data2nd[i];
                     carry += (d & 0xff);
                 }
-                else if (d < 0)
+                else if(d < 0)
                     carry += 0xff;
 
-                dataResult[i] = (sbyte)(carry & 0xff);
+                dataResult[i] = (sbyte) (carry & 0xff);
                 carry >>= 8;
             }
         }
-        public static unsafe bool  Equal(int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
+
+        public static unsafe bool Equal(int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
-            int d = 0;
-            int i = 0;
-            for (; i < count1st && i < count2nd; i++)
+            var d = 0;
+            var i = 0;
+            for(; i < count1st && i < count2nd; i++)
             {
                 d = data1st[i];
                 if(d != data2nd[i])
                     return false;
             }
-            for (; i < count1st; i++)
+            for(; i < count1st; i++)
             {
-                if (d < 0 && data1st[i] != -1) return false;
-                if (d >= 0 && data1st[i] != 0) return false;
+                if(d < 0 && data1st[i] != -1)
+                    return false;
+                if(d >= 0 && data1st[i] != 0)
+                    return false;
             }
-            for (; i < count2nd; i++)
+            for(; i < count2nd; i++)
             {
-                if (d < 0 && data2nd[i] != -1) return false;
-                if (d >= 0 && data2nd[i] != 0) return false;
+                if(d < 0 && data2nd[i] != -1)
+                    return false;
+                if(d >= 0 && data2nd[i] != 0)
+                    return false;
             }
             return true;
         }
 
         public static unsafe bool Greater(int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
-            bool isNegative1st = data1st[count1st - 1] < 0;
-            bool isNegative2nd = data2nd[count2nd - 1] < 0;
+            var isNegative1st = data1st[count1st - 1] < 0;
+            var isNegative2nd = data2nd[count2nd - 1] < 0;
             if(isNegative1st != isNegative2nd)
                 return isNegative2nd;
 
-            for(int i = Math.Max(count1st, count2nd) - 1;i >= 0; i--)
+            for(var i = Math.Max(count1st, count2nd) - 1; i >= 0; i--)
             {
-                sbyte x1st = (sbyte) (isNegative1st ? -1 : 0);
-                sbyte x2nd = (sbyte) (isNegative2nd ? -1 : 0);
-                if (i < count1st) x1st = data1st[i];
-                if (i < count2nd) x2nd = data2nd[i];
-                if (x1st < x2nd) return false;
-                if (x1st > x2nd) return true;
+                var x1st = (sbyte) (isNegative1st ? -1 : 0);
+                var x2nd = (sbyte) (isNegative2nd ? -1 : 0);
+                if(i < count1st)
+                    x1st = data1st[i];
+                if(i < count2nd)
+                    x2nd = data2nd[i];
+                if(x1st < x2nd)
+                    return false;
+                if(x1st > x2nd)
+                    return true;
             }
 
             return false;
         }
 
-        public static unsafe bool Less(int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
-        {
-            return Greater(count2nd, data2nd, count1st, data1st);
-        }
+        public static unsafe bool Less(int count1st, sbyte* data1st, int count2nd, sbyte* data2nd) { return Greater(count2nd, data2nd, count1st, data1st); }
     }
 }
-                              

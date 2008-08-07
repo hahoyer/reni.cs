@@ -63,13 +63,9 @@ namespace Reni.Code
                 .CreateAssignment(refAlignParam, alignedSize);
         }
 
-        public CodeBase CreateBitSequenceOperation(Defineable name)
+        public CodeBase CreateBitSequenceOperation(Defineable name, Size size)
         {
-            var alignedSize = Size.ByteAlignedSize;
-
-            return CreateBitCast(alignedSize)
-                .CreateChild(new BitArrayPrefixOp(name, alignedSize))
-                .CreateBitCast(Size);
+            return CreateChild(new BitArrayPrefixOp(name, size, Size));
         }
 
         public static CodeBase CreateDumpPrintText(string dumpPrintText)
@@ -144,7 +140,7 @@ namespace Reni.Code
         {
             if(Size == size)
                 return this;
-            return CreateChild(new BitCast(Size, size, Size));
+            return CreateChild(new BitCast(size, Size, Size));
         }
 
         public CodeBase CreateSequence(CodeBase right)
@@ -314,7 +310,7 @@ namespace Reni.Code
             return Size.Zero;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
             return _refAlignParam.RefSize * 2;
         }

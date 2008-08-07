@@ -197,57 +197,14 @@ namespace Reni.Type
             return _inheritedType.MoveHandler(category);
         }
 
-        public IFeature BitOperationFeature(SequenceOfBitOperation definable)
+        public BitOperationFeatureClass BitOperationFeature(SequenceOfBitOperation definable)
         {
             return new BitOperationFeatureClass(this, definable);
-        }
-
-        public IPrefixFeature BitOperationPrefixFeature(SequenceOfBitOperation definable)
-        {
-            return new BitOperationPrefixFeatureClass(this, definable);
         }
 
         public IFeature EnableCutFeatureObject()
         {
             return _enableCutCutFeature;
-        }
-
-        internal class BitOperationPrefixFeatureClass : IPrefixFeature
-        {
-            private readonly SequenceOfBitOperation _definable;
-            private readonly Sequence _sequence;
-
-            public BitOperationPrefixFeatureClass(Sequence sequence, SequenceOfBitOperation definable)
-            {
-                _sequence = sequence;
-                _definable = definable;
-            }
-
-            public Result ApplyResult(Category category, Result argResult)
-            {
-                var objResult = argResult.ConvertTo(_sequence);
-                Result result;
-                if(category.HasSize || category.HasType || category.HasCode)
-                    result = objResult.Type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objResult));
-                else
-                    result = new Result();
-                if(category.HasRefs)
-                    result.Refs = objResult.Refs;
-                return result;
-            }
-
-            public Result ApplyResult(ContextBase contextBase, Category category, ICompileSyntax @object)
-            {
-                var objectResult = contextBase.Result(category|Category.Type,@object).ConvertTo(_sequence);
-                Result result;
-                if (category.HasSize || category.HasType || category.HasCode)
-                    result = objectResult.Type.CreateResult(category, () => _sequence.Element.CreateSequenceOperation(_definable, objectResult));
-                else
-                    result = new Result();
-                if (category.HasRefs)
-                    result.Refs = objectResult.Refs;
-                return result;
-            }
         }
     }
 
@@ -271,16 +228,29 @@ namespace Reni.Type
     }
 
     [Serializable]
-    internal class BitOperationFeatureClass : ReniObject, IFeature
+    internal class BitOperationFeatureClass : ReniObject, IFeature, IPrefixFeature
     {
         private readonly SequenceOfBitOperation _definable;
         private readonly Sequence _sequence;
 
-        public BitOperationFeatureClass(Sequence sequence, SequenceOfBitOperation
-            definable)
+        public BitOperationFeatureClass(Sequence sequence, SequenceOfBitOperation definable)
         {
             _sequence = sequence;
             _definable = definable;
+        }
+
+        Result IPrefixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object)
+        {
+            var objectSize = callContext.Type(@object).UnrefSize;
+            var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element, () => Size.Zero);
+            if (objectResult.IsPending)
+                return Result.CreatePending(category);
+
+            var result = _sequence
+                .Element
+                .SequenceOperationResult(category, _definable, objectSize);
+
+            return result.UseWithArg(objectResult);
         }
 
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
@@ -295,8 +265,7 @@ namespace Reni.Type
 
             var result = _sequence
                 .Element
-                .SequenceOperationResult(category, _definable, objectSize, callContext.Type(args).UnrefSize)
-                ;
+                .SequenceOperationResult(category, _definable, objectSize, callContext.Type(args).UnrefSize);
 
             return result.UseWithArg(objectResult.CreateSequence(argsResult));
         }

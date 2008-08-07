@@ -8,7 +8,7 @@ namespace Reni.Code
     internal abstract class LeafElement : ReniObject, IIconKeyProvider
     {
         [Node, DumpData(false)]
-        internal Size DeltaSize { get { return GetDeltaSize(); } }
+        internal Size DeltaSize { get { return GetInputSize() - GetSize(); } }
         [DumpData(false)]
         internal virtual bool IsEmpty { get { return false; } }
         [Node]
@@ -18,7 +18,7 @@ namespace Reni.Code
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
         protected abstract Size GetSize();
-        protected abstract Size GetDeltaSize();
+        protected abstract Size GetInputSize();
 
         internal string Statements(StorageDescriptor start)
         {

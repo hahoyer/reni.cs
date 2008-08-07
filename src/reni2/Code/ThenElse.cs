@@ -58,7 +58,7 @@ namespace Reni.Code
             _thenElseObjectId = thenElseObjectId;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
             return Size.Zero;
         }
@@ -93,7 +93,7 @@ namespace Reni.Code
             return Size.Zero;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
             return _thenSize;
         }
@@ -118,7 +118,7 @@ namespace Reni.Code
             CondSize = condSize;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
             return CondSize;
         }
@@ -167,9 +167,9 @@ namespace Reni.Code
             return _bitArrayOp.DeltaSize;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
-            return _thenCode.DeltaSize + _bitArrayOp.DeltaSize;
+            return _thenCode.DeltaSize;
         }
 
         protected override string Format(StorageDescriptor start)

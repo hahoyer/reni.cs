@@ -42,14 +42,21 @@ namespace Reni.Type
                 .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
-        internal override CodeBase CreateSequenceOperation(Defineable token, Result result)
+        internal override CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize)
         {
-            return result.Code.CreateBitSequenceOperation(token);
+            return CreateSequence((objSize.ByteAlignedSize).ToInt())
+                .CreateArgCode()
+                .CreateBitSequenceOperation(token, size);
         }
 
         protected internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
+        }
+
+        protected internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount)
+        {
+            return token.BitSequenceOperationResultType(objBitCount);
         }
 
         internal override SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable)

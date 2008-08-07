@@ -27,6 +27,12 @@ namespace Reni.Parser.TokenClass
             throw new NotImplementedException();
         }
 
+        internal virtual TypeBase BitSequenceOperationResultType(int objSize)
+        {
+            NotImplementedMethod(objSize);
+            throw new NotImplementedException();
+        }
+
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             if(left == null && right == null)

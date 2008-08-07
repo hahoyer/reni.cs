@@ -8,26 +8,11 @@ using Reni.FeatureTest.Struct;
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
+    [Target(@"x: 100;f: function arg+x;f(2) dump_print;")]
+    [Output("102")]
+    [InnerAccessTheOnlyOne, Add2Numbers]
     public class FunctionWithNonLocal : CompilerTest
     {
-        public override string Target { get { return @"
-x: 100;
-f: function arg+x;
-f(2) dump_print;
-"; } }
-        public override string Output { get { return "102"; } }
-        public override System.Type[] DependsOn
-        {
-            get
-            {
-                return new[]
-                {
-                    typeof(InnerAccessTheOnlyOne),
-                    typeof(Add2Numbers),
-                };
-            }
-        }
-
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
@@ -42,12 +27,11 @@ f(2) dump_print;
     }
 
     [TestFixture]
+    [Target(@"i: 400000; f: function i > 0 then (i := i - 1; f());f()")]
+    [Output("")]
+    [PrimitiveRecursiveFunctionSmall]
     public class PrimitiveRecursiveFunctionHuge : CompilerTest
     {
-        public override string Target { get { return @"i: 400000; f: function i > 0 then (i := i - 1; f());f()"; } }
-        public override string Output { get { return ""; } }
-        public override System.Type[] DependsOn { get { return new[] {typeof(PrimitiveRecursiveFunctionSmall)}; } }
-
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
@@ -56,35 +40,26 @@ f(2) dump_print;
     /// Recursive function that will result in a stack overflow, except when compiled as a loop
     /// </summary>
     [TestFixture]
+    [Target(@"i: 400000 type(400); f: function i > 0 then (i := i - 1; f());f()")]
+    [Output("")]
+    [PrimitiveRecursiveFunctionByteWithDump]
     public class PrimitiveRecursiveFunctionSmall : CompilerTest
     {
-        public override string Target { get { return @"i: 400000 type(400); f: function i > 0 then (i := i - 1; f());f()"; } }
-        public override string Output { get { return ""; } }
-        public override System.Type[] DependsOn { get { return new[] {typeof(PrimitiveRecursiveFunctionByteWithDump)}; } }
-
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
+    [Target(@"i: 400000 type(10); f: function i > 0 then (i := i - 1; i dump_print; f());f()")]
+    [Output("9876543210")]
+    [PrimitiveRecursiveFunctionByteWithDump]
     public class PrimitiveRecursiveFunctionWithDump : CompilerTest
     {
-        public override string Target
-        {
-            get
-            {
-                return
-                    @"i: 400000 type(10); f: function i > 0 then (i := i - 1; i dump_print; f());f()";
-            }
-        }
-        public override string Output { get { return "9876543210"; } }
-        public override System.Type[] DependsOn { get { return new[] {typeof(PrimitiveRecursiveFunctionByteWithDump)}; } }
-
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, ThenElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut]
+    [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, ThenElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction]
     [Target(@"f: function arg = 1 then arg type(1) else arg * f(arg type((arg-1)enable_cut));f(4)dump_print")]
     [Output("24")]
     public class RecursiveFunction : CompilerTest
@@ -100,8 +75,9 @@ f(2) dump_print;
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"f: function arg+1;f(2) dump_print;"), Output("3"), InnerAccessTheOnlyOne,
-     Add2Numbers] 
+    [TestFixture, 
+    Target(@"f: function arg+1;f(2) dump_print;"), Output("3"), 
+    InnerAccessTheOnlyOne, Add2Numbers] 
     public class SimpleFunction : CompilerTest
     {
         [Test, Category(Worked)]

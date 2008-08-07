@@ -17,7 +17,7 @@ namespace Reni.Struct
         private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
         [Node]
         internal readonly ContextBase Parent;
-        [Node, DumpData(false)]
+        [Node]
         internal readonly Container Container;
         [Node, DumpData(false)]
         internal readonly Result[] _internalResult;

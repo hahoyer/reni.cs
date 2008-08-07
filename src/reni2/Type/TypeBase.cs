@@ -301,15 +301,21 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual CodeBase CreateSequenceOperation(Defineable token, Result result)
+        internal virtual CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize)
         {
-            NotImplementedMethod(token, result);
+            NotImplementedMethod(size, token, objSize);
             return null;
         }
 
         internal protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             NotImplementedMethod(token, objBitCount, argBitCount);
+            return null;
+        }
+
+        internal protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount)
+        {
+            NotImplementedMethod(token, objBitCount);
             return null;
         }
 
@@ -356,6 +362,13 @@ namespace Reni.Type
             var type = SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt());
             return type
                 .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize, argsSize));
+        }
+
+        internal Result SequenceOperationResult(Category category, Defineable definable, Size objSize)
+        {
+            var type = SequenceOperationResultType(definable, objSize.ToInt());
+            return type
+                .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize));
         }
 
         internal virtual Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)

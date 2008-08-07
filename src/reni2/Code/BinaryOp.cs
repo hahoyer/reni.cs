@@ -17,9 +17,9 @@ namespace Reni.Code
             RightSize = rightSize;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
-            return LeftSize + RightSize - GetSize();
+            return LeftSize + RightSize;
         }
     }
 }

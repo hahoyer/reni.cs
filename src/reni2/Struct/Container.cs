@@ -171,39 +171,32 @@ namespace Reni.Struct
 
         private bool Defined(string name) { return Dictionary.ContainsKey(name); }
 
-        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(
-            Defineable defineable)
+        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(Defineable defineable)
         {
-            return
-                SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable));
+            return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable));
         }
 
-        internal SearchResult<IConverter<IContextFeature, FullContext>> SearchFromStructContext(
-            Defineable defineable) { return SearchResult<IConverter<IContextFeature, FullContext>>.Create(Search(defineable)); }
+        internal SearchResult<IConverter<IContextFeature, FullContext>> SearchFromStructContext(Defineable defineable) { return SearchResult<IConverter<IContextFeature, FullContext>>.Create(Search(defineable)); }
 
         private SearchResult<StructFeature> Search(Defineable defineable)
         {
             if (Defined(defineable.Name))
-                return SearchResult<StructFeature>.Success(StructFeatures[Find(defineable.Name)],
-                                                           defineable);
+                return SearchResult<StructFeature>.Success(StructFeatures[Find(defineable.Name)],defineable);
             return defineable.SearchFromStruct().SubTrial(this);
         }
 
-        internal SearchResult<IConverter<IContextFeature, ContextAtPosition>>
-            SearchFromStructContextAtPosition(Defineable defineable)
+        internal SearchResult<IConverter<IContextFeature, ContextAtPosition>> SearchFromStructContextAtPosition(Defineable defineable)
         {
-            return
-                SearchResult<IConverter<IContextFeature, ContextAtPosition>>.Create(
-                    Search(defineable));
+            return SearchResult<IConverter<IContextFeature, ContextAtPosition>>.Create(Search(defineable));
         }
     }
 
     [Serializable]
     internal class StructFeature
         : ReniObject
-          , IConverter<IConverter<IFeature, Ref>, Type>
-          , IConverter<IContextFeature, FullContext>
-          , IConverter<IContextFeature, ContextAtPosition>
+            , IConverter<IConverter<IFeature, Ref>, Type>
+            , IConverter<IContextFeature, FullContext>
+            , IConverter<IContextFeature, ContextAtPosition>
     {
         private readonly int _index;
 
@@ -214,5 +207,5 @@ namespace Reni.Struct
         IContextFeature IConverter<IContextFeature, FullContext>.Convert(FullContext context) { return context.Features[_index]; }
 
         IContextFeature IConverter<IContextFeature, ContextAtPosition>.Convert(ContextAtPosition contextAtPosition) { return contextAtPosition.Features[_index]; }
-    }
+        }
 }

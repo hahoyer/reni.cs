@@ -26,9 +26,9 @@ namespace Reni.Code
             return _refAlignParam.RefSize;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
-            return GetSize()*-1;
+            return Size.Zero;
         }
 
         public override string NodeDump { get { return base.NodeDump + " Offset="+Offset; } }

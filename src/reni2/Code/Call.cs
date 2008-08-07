@@ -28,9 +28,9 @@ namespace Reni.Code
             return ResultSize;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
-            return ArgsAndRefsSize - ResultSize;
+            return ArgsAndRefsSize;
         }
 
         protected override string Format(StorageDescriptor start)
@@ -72,14 +72,14 @@ namespace Reni.Code
             return Size.Zero;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
             return RefsSize;
         }
 
         internal override LeafElement TryToCombineBack(TopFrame precedingElement)
         {
-            if ((GetDeltaSize() + precedingElement.DeltaSize).IsZero 
+            if ((DeltaSize + precedingElement.DeltaSize).IsZero 
                 && (precedingElement.Offset + RefsSize).IsZero)
                 return new RecursiveCall();
             return base.TryToCombineBack(precedingElement);
@@ -100,7 +100,7 @@ namespace Reni.Code
             return Size.Zero;
         }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
             return Size.Zero;
         }

@@ -24,9 +24,9 @@ namespace Reni.Code
 
         internal override bool IsEmpty { get { return Data.IsEmpty; } }
 
-        protected override Size GetDeltaSize()
+        protected override Size GetInputSize()
         {
-            return GetSize()*(-1);
+            return Size.Zero;
         }
 
         protected override string Format(StorageDescriptor start)
