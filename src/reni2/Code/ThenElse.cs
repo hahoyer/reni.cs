@@ -164,12 +164,12 @@ namespace Reni.Code
 
         protected override Size GetSize()
         {
-            return _bitArrayOp.DeltaSize;
+            return _thenCode.Size;
         }
 
         protected override Size GetInputSize()
         {
-            return _thenCode.DeltaSize;
+            return _bitArrayOp.DeltaSize + _bitArrayOp.Size;
         }
 
         protected override string Format(StorageDescriptor start)

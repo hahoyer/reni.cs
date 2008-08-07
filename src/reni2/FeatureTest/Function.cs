@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.DefaultOperations;
 using Reni.FeatureTest.Struct;
+using Reni.FeatureTest.ThenElse;
 
 namespace Reni.FeatureTest.Function
 {
@@ -17,7 +18,7 @@ namespace Reni.FeatureTest.Function
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, ThenElse, Assignment, SimpleFunction, RecursiveFunction]
+    [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, UseThen, UseElse, Assignment, SimpleFunction, RecursiveFunction]
     [Target(@"i: 10; f: function i > 0 then (i := i - 1; i dump_print; f());f()")]
     [Output("9876543210")]
     public class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
@@ -52,23 +53,23 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [Target(@"i: 400000 type(10); f: function i > 0 then (i := i - 1; i dump_print; f());f()")]
     [Output("9876543210")]
-    [PrimitiveRecursiveFunctionByteWithDump]
+    [PrimitiveRecursiveFunctionByteWithDump, UseThen, UseElse]
     public class PrimitiveRecursiveFunctionWithDump : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, ThenElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction]
-    [Target(@"f: function arg = 1 then arg type(1) else arg * f(arg type((arg-1)enable_cut));f(4)dump_print")]
+    [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, UseThen, UseElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction]
+    [Target(@"f: function arg = 1 then 1000 type(1) else arg * f(arg type((arg-1)enable_cut));f(4)dump_print")]
     [Output("24")]
     public class RecursiveFunction : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"f: function arg;g: function f(arg);x:4; g(x)dump_print"), Output("4"), SimpleFunction]
+    [TestFixture, Target(@"f: function arg;g: function f(arg);x:4; g(x)dump_print"), Output("4"), UseThen, UseElse, SimpleFunction]
     public class FunctionWithRefArg : CompilerTest
     {
         [Test, Category(Worked)]

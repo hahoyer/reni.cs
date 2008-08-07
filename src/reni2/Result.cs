@@ -397,10 +397,8 @@ namespace Reni
 
             if(HasRefs && HasCode && !Refs.Contains(Code.GetRefs()))
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
-
             if(HasInternal && _internal.HasInternal)
                 Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "nested internals " + Dump());
-
             if(HasInternal && _internal.Complete != Category.ForInternal)
                 Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "incomplete internals " + Dump());
             if(HasInternal && _internal.IsPending)

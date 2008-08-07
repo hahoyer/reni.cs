@@ -1,25 +1,20 @@
+using System;
+using HWClassLibrary.Debug;
 using NUnit.Framework;
 
-namespace Reni.FeatureTest
+namespace Reni.FeatureTest.ThenElse
 {
-    /// <summary>
-    /// Conditional expression
-    /// </summary>
-    [TestFixture]
-    public class ThenElse: CompilerTest
+    [TestFixture, Target(@"x: 1=1 then 1 else 100;x dump_print;"), Output("1")]
+    public class UseThen : CompilerTest
     {
-        /// <summary>
-        /// Simple condition.
-        /// </summary>
-        /// created 05.01.2007 02:13
-        [Test]
-        [Category(UnderConstruction)]
-        public void Simple()
-        {
-            CreateFileAndRunCompiler("Simple", @"x: 1=0 then 1 else 100;x dump_print;", "100");
-            CreateFileAndRunCompiler("Simple", @"x: 1=1 then 1 else 100;x dump_print;", "1");
-        }
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
 
-        public override void Run() {  }
+    [TestFixture, Target(@"x: 1=0 then 1 else 100;x dump_print;"), Output("100")]
+    public class UseElse : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
     }
 }

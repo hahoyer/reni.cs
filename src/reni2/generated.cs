@@ -14,48 +14,64 @@ namespace Reni
         /// </summary>
         public static void reni()
         {
-            fixed(sbyte* data = new sbyte[7])
+            fixed(sbyte* data = new sbyte[5])
             {
-                (*(data + 6)) = (3); // BitArray 3427
-                (*(Int32*) (data + 2)) = (Int32) (data + 7); // TopRef   3428
-                (*(data + 1)) = (2); // BitArray 3429
-                reni_1((data + 6)); // Call     1115
-                reni_0((data + 5)); // Call     1804
-                (*(data + 3)) = (*(data + 4)); // TopData  3430
-                (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 5) >> 5); // BitCast  2013
-                Data.DumpPrint((*(data + 3))); // DumpPrint  1996
-                Data.MoveBytes(0, (data + 7), (data + 4)); // StatementEnd 2234
+                (*(data + 4)) = (4); // BitArray 15258
+                reni_0((data + 5)); // Call     14062
+                (*(data + 3)) = (*(data + 4)); // TopData  15259
+                (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 4) >> 4); // BitCast  14158
+                Data.DumpPrint((*(data + 3))); // DumpPrint  14141
+                Data.MoveBytes(0, (data + 5), (data + 4)); // StatementEnd 14233
             }
+            ;
         }
 
-        // (container.0)_A_T_(2)
+        // ((arg)=(1))then((arg)type(1))else((arg)*(f((arg)type(((arg)-(1))enable_cut))))
         private static void reni_0(SByte* frame)
         {
-            fixed(sbyte* data = new sbyte[6])
+            fixed(sbyte* data = new sbyte[10])
             {
-                (*(data + 5)) = (3); // BitArray                       3439
-                (*(Int32*) (data + 1)) = (Int32) (data + 6); // TopRef                         3440
-                (*(data + 0)) = (2); // BitArray                       3441
-                reni_1((data + 5)); // Call                           1115
-                (*(Int32*) (data + 0)) = (Int32) (data + 4); // TopRef                         3442
-                (*(Int32*) (data + 2)) = (*(Int32*) (data + 0)); // StatementEnd                   3024
-                (*(data + 5)) = (*(sbyte*) (*(Int32*) (data + 2))); // Dereference                    3060
-                (*(data + 5)) = (sbyte) ((sbyte) ((*(data + 5)) << 5) >> 5); // BitCast                        3061
-                (*(frame - 1)) = (*(data + 5)); // StorageDescriptor.FunctionReturn
+                (*(data + 9)) = (1); // BitArray     15273
+                (*(data + 8)) = (*(frame - 1)); // TopFrame     15275
+                (*(data + 8)) = (sbyte) ((sbyte) ((*(data + 8)) << 4) >> 4); // BitCast      14522
+                (*(data + 7)) = (*(data + 9)); // TopData      15276
+                (*(data + 7)) = (sbyte) ((sbyte) ((*(data + 7)) << 6) >> 6); // BitCast      14469
+                if((*(data + 8)) == (*(data + 7)))
+                {
+                    ; // BitArrayOpThen 15278
+                    (*(data + 8)) = (1); // BitArray       15279
+                    (*(data + 7)) = (*(data + 8)); // TopData        15280
+                    (*(data + 7)) = (sbyte) ((sbyte) ((*(data + 7)) << 6) >> 6); // BitCast      15013
+                    (*(data + 8)) = (*(data + 7)); // StatementEnd 15058
+                }
+                else
+                {
+                    ; // Else         15281
+                    (*(data + 8)) = (1); // BitArray    15282
+                    (*(data + 7)) = (*(frame - 1)); // TopFrame    15284
+                    (*(data + 7)) = (sbyte) ((sbyte) ((*(data + 7)) << 4) >> 4); // BitCast     13332
+                    (*(data + 6)) = (*(data + 8)); // TopData     15285
+                    (*(data + 6)) = (sbyte) ((sbyte) ((*(data + 6)) << 6) >> 6); // BitCast     13247
+                    (*(data + 7)) = (sbyte) ((*(data + 7)) - (*(data + 6))); // BitArrayOp  13387
+                    (*(data + 7)) = (sbyte) ((sbyte) ((*(data + 7)) << 3) >> 3); // BitCast       13388
+                    (*(data + 6)) = (*(data + 7)); // TopData         15286
+                    (*(data + 6)) = (sbyte) ((sbyte) ((*(data + 6)) << 3) >> 3); // BitCast           13488
+                    (*(data + 5)) = (*(data + 6)); // TopData             15287
+                    (*(data + 5)) = (sbyte) ((sbyte) ((*(data + 5)) << 4) >> 4); // BitCast              13620
+                    reni_0((data + 6)); // Call                   13653
+                    (*(data + 4)) = (*(frame - 1)); // TopFrame               15289
+                    (*(data + 4)) = (sbyte) ((sbyte) ((*(data + 4)) << 4) >> 4); // BitCast                14884
+                    (*(data + 3)) = (*(data + 5)); // TopData                15290
+                    (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 4) >> 4); // BitCast                14827
+                    (*(data + 4)) = (sbyte) ((*(data + 4))*(*(data + 3))); // BitArrayOp             14934
+                    (*(data + 4)) = (sbyte) ((sbyte) ((*(data + 4)) << 1) >> 1); // BitCast                  14935
+                    (*(data + 8)) = (*(data + 4)); // StatementEnd               15163
+                }
+                ; //                                                                                      EndCondional 15291
+                (*(data + 9)) = (*(data + 8)); // StatementEnd                   15191
+                (*(frame - 1)) = (*(data + 9)); // StorageDescriptor.FunctionReturn
             }
-        }
-
-        // y
-        private static void reni_1(SByte* frame)
-        {
-            fixed(sbyte* data = new sbyte[4])
-            {
-                (*(Int32*) (data + 0)) = (*(Int32*) (frame - 4)); // TopFrame                       3452
-                (*(Int32*) (data + 0)) += -1; // RefPlus                        3132
-                (*(data + 3)) = (*(sbyte*) (*(Int32*) (data + 0))); // Dereference                    3183
-                (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 5) >> 5); // BitCast                        3184
-                (*(frame - 1)) = (*(data + 3)); // StorageDescriptor.FunctionReturn
-            }
+            ;
         }
     }
 }

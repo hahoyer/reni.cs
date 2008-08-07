@@ -1,7 +1,7 @@
 using System;
+using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
-using HWClassLibrary.Debug;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
 
@@ -15,7 +15,8 @@ namespace Reni.Type
     {
         private readonly int _alignBits;
 
-        public Aligner(TypeBase target, int alignBits) : base(target)
+        public Aligner(TypeBase target, int alignBits)
+            : base(target)
         {
             _alignBits = alignBits;
             StopByObjectId(1117);
@@ -23,49 +24,18 @@ namespace Reni.Type
 
         internal int AlignBits { get { return _alignBits; } }
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
-        
+
         [DumpData(false)]
         internal override int SequenceCount { get { return Parent.SequenceCount; } }
-
-        protected override Size GetSize()
-        {
-            return Parent.Size.Align(AlignBits);
-        }
-
-        internal override AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
-        {
-            return Parent.CreateAutomaticRef(refAlignParam.Align(AlignBits));
-        }
-
-        internal override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
-        {
-            return Parent.CreateAssignableRef(refAlignParam.Align(AlignBits));
-        }
-
-        internal override Result DestructorHandler(Category category)
-        {
-            return Parent.DestructorHandler(category);
-        }
-
-        internal override Result MoveHandler(Category category)
-        {
-            return Parent.MoveHandler(category);
-        }
-
-        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            return Parent.DumpPrintFromRef(category, refAlignParam);
-        }
-
-        internal override Result ApplyTypeOperator(Result argResult)
-        {
-            return Parent.ApplyTypeOperator(argResult);
-        }
-
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
-        {
-            return Parent.IsConvertableTo(dest, conversionFeature);
-        }
+        protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
+        internal override Size UnrefSize { get { return Parent.UnrefSize; } }
+        internal override AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam) { return Parent.CreateAutomaticRef(refAlignParam.Align(AlignBits)); }
+        internal override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return Parent.CreateAssignableRef(refAlignParam.Align(AlignBits)); }
+        internal override Result DestructorHandler(Category category) { return Parent.DestructorHandler(category); }
+        internal override Result MoveHandler(Category category) { return Parent.MoveHandler(category); }
+        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam) { return Parent.DumpPrintFromRef(category, refAlignParam); }
+        internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature) { return Parent.IsConvertableTo(dest, conversionFeature); }
 
         internal override SearchResult<IFeature> Search(Defineable defineable) { return Parent.Search(defineable); }
         internal override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable) { return Parent.SearchPrefix(defineable); }
@@ -90,14 +60,8 @@ namespace Reni.Type
                 );
         }
 
-        internal override bool HasConverterTo(TypeBase dest)
-        {
-            return Parent.HasConverterTo(dest);
-        }
+        internal override bool HasConverterTo(TypeBase dest) { return Parent.HasConverterTo(dest); }
 
-        internal override string DumpShort()
-        {
-            return "aligner(" + Parent.DumpShort() + ")";
-        }
+        internal override string DumpShort() { return "aligner(" + Parent.DumpShort() + ")"; }
     }
 }

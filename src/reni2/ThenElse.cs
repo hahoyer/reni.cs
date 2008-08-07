@@ -23,7 +23,8 @@ namespace Reni
         internal protected override Result Result(ContextBase context, Category category)
         {
             var condResult = Cond.Result(context, category | Category.Type);
-            condResult = condResult.Type.Conversion(category, TypeBase.CreateBit).UseWithArg(condResult);
+            condResult = condResult.Type.Conversion(category, TypeBase.CreateBit)
+                .UseWithArg(condResult);
 
             var thenResult = Then.Result(context, category | Category.Type).AutomaticDereference();
             var elseResult = CreateElseResult(context, category).AutomaticDereference();
@@ -35,14 +36,15 @@ namespace Reni
 
             var commonType = thenResult.Type.CommonType(elseResult.Type);
 
-            thenResult = thenResult.Type.Conversion(category, commonType).UseWithArg(thenResult);
-            elseResult = elseResult.Type.Conversion(category, commonType).UseWithArg(elseResult);
+            thenResult = thenResult.Type.Conversion(category, commonType).UseWithArg(thenResult).CreateStatement();
+            elseResult = elseResult.Type.Conversion(category, commonType).UseWithArg(elseResult).CreateStatement();
 
             return commonType.CreateResult
                 (
                 category,
                 () => condResult.Code.CreateThenElse(thenResult.Code, elseResult.Code),
-                () => condResult.Refs.Pair(thenResult.Refs).Pair(elseResult.Refs)
+                () => condResult.Refs.Pair(thenResult.Refs).Pair(elseResult.Refs),
+                () => condResult.Internal
                 );
         }
 

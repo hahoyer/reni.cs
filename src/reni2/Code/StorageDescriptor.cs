@@ -202,14 +202,14 @@ namespace Reni.Code
         internal string BitArrayOpThen(Defineable opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
         {
             if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
-                return "if(!("
+                return "if("
                     + CreateDataRef(Start + rightSize, leftSize)
                         + " "
                             + opToken.CSharpNameOfDefaultOperation
                                 + " "
                                     + CreateDataRef(Start, rightSize)
-                                        + ")) goto Else" + thenElseObjectId;
-            return "if(!Data."
+                                        + ") {";
+            return "if(Data."
                 + opToken.DataFunctionName
                     + "("
                         + leftSize.ByteCount
@@ -219,7 +219,7 @@ namespace Reni.Code
                                         + rightSize.ByteCount
                                             + ", "
                                                 + CreateDataPtr(Start)
-                                                    + ")) goto Else" + thenElseObjectId;
+                                                    + ") {" ;
         }
 
         /// <summary>
@@ -339,7 +339,7 @@ namespace Reni.Code
         /// <param name="objectId">The object id.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:12
-        public string Else(int objectId) { return "goto EndCondition" + objectId + "; Else" + objectId + ":"; }
+        public string Else(int objectId) { return "} else {" ; }
 
         /// <summary>
         /// Creates the endig code of a then-else construct.
@@ -347,7 +347,7 @@ namespace Reni.Code
         /// <param name="objectId">The object id.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:09
-        public string EndCondional(int objectId) { return "EndCondition" + objectId + ":"; }
+        public string EndCondional(int objectId) { return "}"; }
 
         /// <summary>
         /// Creates a recursive call, i. e. a jump to start of function..
