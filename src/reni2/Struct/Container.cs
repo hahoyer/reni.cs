@@ -176,8 +176,6 @@ namespace Reni.Struct
             return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable));
         }
 
-        internal SearchResult<IConverter<IContextFeature, FullContext>> SearchFromStructContext(Defineable defineable) { return SearchResult<IConverter<IContextFeature, FullContext>>.Create(Search(defineable)); }
-
         private SearchResult<StructFeature> Search(Defineable defineable)
         {
             if (Defined(defineable.Name))
@@ -185,9 +183,9 @@ namespace Reni.Struct
             return defineable.SearchFromStruct().SubTrial(this);
         }
 
-        internal SearchResult<IConverter<IContextFeature, ContextAtPosition>> SearchFromStructContextAtPosition(Defineable defineable)
+        internal SearchResult<IConverter<IContextFeature, StructContextBase>> SearchFromStructContext(Defineable defineable)
         {
-            return SearchResult<IConverter<IContextFeature, ContextAtPosition>>.Create(Search(defineable));
+            return SearchResult<IConverter<IContextFeature, StructContextBase>>.Create(Search(defineable));
         }
     }
 
@@ -195,8 +193,7 @@ namespace Reni.Struct
     internal class StructFeature
         : ReniObject
             , IConverter<IConverter<IFeature, Ref>, Type>
-            , IConverter<IContextFeature, FullContext>
-            , IConverter<IContextFeature, ContextAtPosition>
+            , IConverter<IContextFeature, StructContextBase>
     {
         private readonly int _index;
 
@@ -204,8 +201,6 @@ namespace Reni.Struct
 
         IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type) { return type.Context.Features[_index]; }
 
-        IContextFeature IConverter<IContextFeature, FullContext>.Convert(FullContext context) { return context.Features[_index]; }
-
-        IContextFeature IConverter<IContextFeature, ContextAtPosition>.Convert(ContextAtPosition contextAtPosition) { return contextAtPosition.Features[_index]; }
-        }
+        IContextFeature IConverter<IContextFeature, StructContextBase>.Convert(StructContextBase context) { return context.Features[_index]; }
+    }
 }

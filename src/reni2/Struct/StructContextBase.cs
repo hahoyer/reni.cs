@@ -4,6 +4,8 @@ using System;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -126,6 +128,17 @@ namespace Reni.Struct
             return result;
         }
 
+        sealed internal override SearchResult<IContextFeature> Search(Defineable defineable)
+        {
+            var containerResult = Container.SearchFromStructContext(defineable);
+            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature,this);
+            if(result.IsSuccessFull)
+                return result;
+            result = Parent.Search(defineable).SubTrial(Parent);
+            if (result.IsSuccessFull)
+                return result;
 
+            return base.Search(defineable).AlternativeTrial(result);
+        }
     }
 }

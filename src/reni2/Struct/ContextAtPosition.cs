@@ -2,8 +2,6 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
-using Reni.Feature;
-using Reni.Parser.TokenClass;
 
 namespace Reni.Struct
 {
@@ -28,15 +26,5 @@ namespace Reni.Struct
         internal override FullContext Context { get { return _context; } }
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }
         internal override IStructContext FindStruct() { return this; }
-
-        internal override SearchResult<IContextFeature> Search(Defineable defineable)
-        {
-            var containerResult = Container.SearchFromStructContextAtPosition(defineable);
-            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature,
-                this);
-            if(result.IsSuccessFull)
-                return result;
-            return base.Search(defineable).AlternativeTrial(result);
-        }
     }
 }
