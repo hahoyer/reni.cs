@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -33,7 +34,7 @@ namespace Reni.Context
             return _function.Compile();
         }
 
-        [DumpData(false)]
+        [Node, DumpData(false)]
         public FunctionList Functions { get { return _function; } }
 
         public Result CreateFunctionCall(ContextBase context, Category category, ICompileSyntax body, Result argsResult)

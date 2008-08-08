@@ -13,33 +13,16 @@ namespace Reni.Context
     [Serializable]
     internal sealed class FunctionList: ReniObject
     {
+        [Node]
         private readonly DictionaryEx<ICompileSyntax, ContextArgsVariant> _data =
             new DictionaryEx<ICompileSyntax, ContextArgsVariant>();
 
+        [Node]
         private readonly List<FunctionInstance> _list = new List<FunctionInstance>();
 
-        /// <summary>
-        /// Gets the <see cref="FunctionInstance"/> with the specified i.
-        /// </summary>
-        /// <value></value>
-        /// created 03.01.2007 20:27
-        public FunctionInstance this[int i] { get { return _list[i]; } }
+        internal FunctionInstance this[int i] { get { return _list[i]; } }
+        internal int Count { get { return _list.Count; } }
 
-        /// <summary>
-        /// Gets the count.
-        /// </summary>
-        /// <value>The count.</value>
-        /// created 03.01.2007 20:28
-        public int Count { get { return _list.Count; } }
-
-        /// <summary>
-        /// Finds the specified body.
-        /// </summary>
-        /// <param name="body">The body.</param>
-        /// <param name="env">The env.</param>
-        /// <param name="args">The args.</param>
-        /// <returns></returns>
-        /// created 03.01.2007 20:26
         internal FunctionInstance Find(ICompileSyntax body, ContextBase env, TypeBase args)
         {
             ContextArgsVariant eav;
@@ -54,11 +37,6 @@ namespace Reni.Context
             return eav.Find(this, env, args, body);
         }
 
-        /// <summary>
-        /// Compiles this instance.
-        /// </summary>
-        /// <returns></returns>
-        /// [created 05.06.2006 19:15]
         internal List<Container> Compile()
         {
             var result = new List<Container>();
@@ -68,8 +46,9 @@ namespace Reni.Context
         }
 
         [Serializable]
-        private class ArgsVariant
+        private class ArgsVariant : ReniObject
         {
+            [Node]
             private readonly DictionaryEx<TypeBase, int> _data = new DictionaryEx<TypeBase, int>();
 
             public FunctionInstance Find(FunctionList fl, TypeBase args, ICompileSyntax body, ContextBase context)
@@ -89,6 +68,7 @@ namespace Reni.Context
         [Serializable]
         private class ContextArgsVariant : ReniObject
         {
+            [Node]
             private readonly DictionaryEx<ContextBase, ArgsVariant> _data = new DictionaryEx<ContextBase, ArgsVariant>();
 
             public FunctionInstance Find(FunctionList fl, ContextBase context, TypeBase args, ICompileSyntax body)

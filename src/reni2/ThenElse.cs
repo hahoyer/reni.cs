@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
@@ -11,7 +12,9 @@ namespace Reni
     [Serializable]
     internal abstract class CondSyntax : CompileSyntax
     {
+        [Node]
         protected readonly ICompileSyntax Cond;
+        [Node]
         protected readonly ICompileSyntax Then;
 
         protected CondSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(thenToken)
@@ -22,11 +25,11 @@ namespace Reni
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            var condResult = Cond.Result(context, category | Category.Type);
+            var condResult = context.Result(category | Category.Type, Cond);
             condResult = condResult.Type.Conversion(category, TypeBase.CreateBit)
                 .UseWithArg(condResult);
 
-            var thenResult = Then.Result(context, category | Category.Type).AutomaticDereference();
+            var thenResult = context.Result(category | Category.Type, Then).AutomaticDereference();
             var elseResult = CreateElseResult(context, category).AutomaticDereference();
 
             if(thenResult.Type.IsPending)
@@ -75,7 +78,9 @@ namespace Reni
     [Serializable]
     internal sealed class ThenElseSyntax : CondSyntax
     {
+        [Node]
         private readonly Token ElseToken;
+        [Node]
         private readonly ICompileSyntax Else;
 
         public ThenElseSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, Token elseToken, ICompileSyntax elseSyntax)
@@ -87,7 +92,7 @@ namespace Reni
 
         protected override Result CreateElseResult(ContextBase context, Category category)
         {
-            return Else.Result(context, category | Category.Type);
+            return context.Result(category | Category.Type, Else);
         }
 
         internal protected override string DumpShort()

@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Code.ReplaceVisitor;
 using Reni.Syntax;
@@ -13,10 +14,14 @@ namespace Reni.Context
     [Serializable]
     internal sealed class FunctionInstance : ReniObject
     {
+        [Node]
         private readonly TypeBase Args;
+        [Node]
         private readonly ICompileSyntax Body;
+        [Node]
         private readonly ContextBase Context;
         private readonly int Index;
+        [Node]
         private CodeBase _bodyCodeCache;
 
         /// <summary>
@@ -59,9 +64,11 @@ namespace Reni.Context
             }
         }
 
+        [Node]
         [DumpData(false)]
         private Size FrameSize { get { return Args.Size + ForeignRefs.Size; } }
 
+        [Node]
         [DumpData(false)]
         private string Description { get { return Body.DumpShort(); } }
 
