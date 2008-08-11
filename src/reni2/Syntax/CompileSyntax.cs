@@ -12,7 +12,7 @@ namespace Reni.Syntax
     {
         // Used for debug only
         [Node("Cache")]
-        internal readonly DictionaryEx<ContextBase, CacheItem> ResultCache = new DictionaryEx<ContextBase, CacheItem>();
+        internal readonly DictionaryEx<ContextBase, IResultProvider> ResultCache = new DictionaryEx<ContextBase, IResultProvider>();
 
         internal CompileSyntax(Token token)
             : base(token) {}
@@ -30,7 +30,7 @@ namespace Reni.Syntax
             return FilePosition();
         }
 
-        void ICompileSyntax.AddToCache(ContextBase context, CacheItem cacheItem)
+        void ICompileSyntax.AddToCache(ContextBase context, IResultProvider cacheItem)
         {
             ResultCache.Add(context,cacheItem);
         }

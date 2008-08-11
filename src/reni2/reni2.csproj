@@ -102,6 +102,7 @@
     <Compile Include="Struct\Type.cs" />
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
+    <Compile Include="Syntax\IResultProvider.cs" />
     <Compile Include="Syntax\MemberElem.cs" />
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="Parser\ParserInst.cs" />

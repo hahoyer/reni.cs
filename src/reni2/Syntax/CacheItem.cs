@@ -11,7 +11,7 @@ namespace Reni.Syntax
     /// The mapping for one environment is extended, each time more categories are requested
     /// </summary>
     [Serializable]
-    internal sealed class CacheItem : ReniObject, IIconKeyProvider
+    internal sealed class CacheItem : ReniObject, IIconKeyProvider, IResultProvider
     {
         private readonly ICompileSyntax _syntax;
         private readonly ContextBase _context;
@@ -29,7 +29,7 @@ namespace Reni.Syntax
         }
 
         [DebuggerHidden]
-        public Result Result(Category category)
+        Result IResultProvider.Result(Category category)
         {
             return _data.AddCategories(category, _context, _syntax);
         }

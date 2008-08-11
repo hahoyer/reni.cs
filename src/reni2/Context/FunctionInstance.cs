@@ -90,7 +90,7 @@ namespace Reni.Context
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(Index, result.Size);
 
             if(category.HasInternal)
-                result.Internal = args.Internal.Clone();
+                result.Internal = args.Internal;
 
             if(trace)
                 DumpDataWithBreak("", "result", result);

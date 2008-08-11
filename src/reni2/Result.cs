@@ -23,7 +23,7 @@ namespace Reni
         private TypeBase _type;
         private CodeBase _code;
         private Refs _refs;
-        private Result _internal;
+        private IResultProvider _internal;
         internal PostProcessorForResult PostProcessor;
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Reni
         }
 
         [Node]
-        public Result Internal
+        public IResultProvider Internal
         {
             get { return _internal; }
             set
@@ -234,8 +234,6 @@ namespace Reni
                     return Code.IsPending;
                 if(Complete.HasRefs)
                     return Refs.IsPending;
-                if(Complete.HasInternal)
-                    return Internal.IsPending;
 
                 return false;
             }
@@ -291,8 +289,6 @@ namespace Reni
             if(r.HasCode && !r.Code.IsPending)
                 _code = r.Code;
 
-            if(r.HasInternal && !r.Internal.IsPending)
-                _internal = r.Internal;
             AssertValid();
         }
 
@@ -307,7 +303,10 @@ namespace Reni
             if(c.HasCode)
                 _code = r.Code ?? CodeBase.Pending;
             if(c.HasInternal)
-                _internal = r.Internal ?? CreatePending(Category.ForInternal);
+            {
+                Tracer.Assert(r.HasInternal);
+                _internal = r.Internal;
+            }
             AssertValid();
         }
 
@@ -346,7 +345,7 @@ namespace Reni
             if(HasRefs)
                 r.Refs = Refs;
             if(HasInternal)
-                r.Internal = Internal.Clone();
+                r.Internal = Internal;
             return r;
         }
 
@@ -365,7 +364,7 @@ namespace Reni
             if(category.HasRefs)
                 r.Refs = Refs;
             if(category.HasInternal)
-                r.Internal = Internal.Clone();
+                r.Internal = Internal;
             return r;
         }
 
@@ -397,12 +396,6 @@ namespace Reni
 
             if(HasRefs && HasCode && !Refs.Contains(Code.GetRefs()))
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
-            if(HasInternal && _internal.HasInternal)
-                Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "nested internals " + Dump());
-            if(HasInternal && _internal.Complete != Category.ForInternal)
-                Tracer.AssertionFailed(1, @"HasInternal && _internal.HasInternal", "incomplete internals " + Dump());
-            if(HasInternal && _internal.IsPending)
-                Tracer.AssertionFailed(1, @"HasInternal && _internal.IsPending", "pending internals " + Dump());
         }
 
         private bool HasCategory(Category category)
@@ -716,7 +709,7 @@ namespace Reni
             if(category.HasCode)
                 result.Code = CodeBase.Pending;
             if(category.HasInternal)
-                result.Internal = CreatePending(Category.ForInternal);
+                result.Internal = PendingInternal;
             return result;
         }
 

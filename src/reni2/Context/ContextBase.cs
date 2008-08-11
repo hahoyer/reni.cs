@@ -113,7 +113,7 @@ namespace Reni.Context
             return cacheElem.Result(category.Replendish());
         }
 
-        private CacheItem CreateCacheElement(ICompileSyntax syntax)
+        private IResultProvider CreateCacheElement(ICompileSyntax syntax)
         {
             var result = new CacheItem(syntax, this);
             syntax.AddToCache(this, result);
@@ -267,7 +267,7 @@ namespace Reni.Context
         [Node, SmartNode]
         internal readonly SimpleCache<Result> _topRefResultCache = new SimpleCache<Result>();
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, CacheItem> _resultCache = new DictionaryEx<ICompileSyntax, CacheItem>();
+        internal readonly DictionaryEx<ICompileSyntax, IResultProvider> _resultCache = new DictionaryEx<ICompileSyntax, IResultProvider>();
 
         /// <summary>
         /// Gets the icon key.
