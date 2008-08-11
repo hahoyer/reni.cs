@@ -23,7 +23,7 @@ namespace Reni.FeatureTest.Function
     [Output("9876543210")]
     public class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 

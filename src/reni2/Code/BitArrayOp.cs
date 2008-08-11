@@ -46,15 +46,17 @@ namespace Reni.Code
     [Serializable]
     internal sealed class BitArrayPrefixOp : LeafElement
     {
-        private readonly Defineable OpToken;
+        [Node]
+        internal readonly Defineable OpToken;
         private readonly Size _size;
-        private readonly Size _argSize;
+        [Node]
+        internal readonly Size ArgSize;
 
         internal BitArrayPrefixOp(Defineable name, Size size, Size argSize)
         {
             OpToken = name;
             _size = size;
-            _argSize = argSize;
+            ArgSize = argSize;
         }
 
         protected override Size GetSize()
@@ -64,15 +66,18 @@ namespace Reni.Code
 
         protected override Size GetInputSize()
         {
-            return _argSize;
+            return ArgSize;
         }
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.BitArrayPrefixOp(OpToken, GetSize(), _argSize);
+            return start.BitArrayPrefixOp(OpToken, GetSize(), ArgSize);
         }
-        [Node]
-        internal Size ArgSize { get { return _argSize; } }
+        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
+        {
+            return subsequentElement.TryToCombineBackN(this);
+        }
+
         public override string NodeDump { get { return base.NodeDump + " " + OpToken.Name + " " + ArgSize; } }
     }
 

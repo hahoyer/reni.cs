@@ -87,6 +87,19 @@ namespace Reni.Code
             return new LeafElement[] {bitArrayOp, new BitCast(Size, Size, SignificantSize)};
         }
 
+        internal override LeafElement[] TryToCombineBackN(BitArrayPrefixOp precedingElement)
+        {
+            if (TargetSize == Size)
+                return null;
+
+            var bitArrayOp = new BitArrayPrefixOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize, precedingElement.ArgSize);
+
+            if (SignificantSize == Size)
+                return new LeafElement[] { bitArrayOp };
+
+            return new LeafElement[] { bitArrayOp, new BitCast(Size, Size, SignificantSize) };
+        }
+
         internal override LeafElement[] TryToCombineBackN(Dereference precedingElement)
         {
             if(precedingElement.Size == TargetSize && TargetSize != Size)

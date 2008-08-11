@@ -408,7 +408,7 @@ namespace Reni.Code
         /// <param name="condSize">Size of the cond.</param>
         /// <returns></returns>
         /// created 09.01.2007 04:15
-        public string Then(int objectId, Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "==0) goto Else" + objectId; }
+        public string Then(int objectId, Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
 
         /// <summary>
         /// Creates the code for copying things from data area to top of data area.

@@ -71,13 +71,12 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { }
     }
 
-    [TestFixture]
+    [TestFixture, InnerAccessTheOnlyOne]
     public class PropertyVariable: CompilerTest{
-        public override string Target { get { return @"x: property function 11; x dump_print"; } }
+        public override string Target { get { return @"! property x: function 11; x dump_print"; } }
         public override string Output { get { return "11"; } }
-        public override System.Type[] DependsOn { get { return new[] { typeof(InnerAccessTheOnlyOne) }; } }
-
-        [Test, Category(UnderConstruction)]
+    
+        [Test, Explicit, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 
@@ -93,29 +92,26 @@ namespace Reni.FeatureTest.Struct
     {
         public override string Target { get { return "5, (this _A_T_ 0) dump_print"; } }
         public override string Output { get { return "5"; } }
-        public override System.Type[] DependsOn { get { return new System.Type[] {}; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
+    [TestFixture, InnerAccessTheOnlyOne]
     public class AccessAndAdd : CompilerTest
     {
         public override string Target { get { return "5, (this _A_T_ 0 + this _A_T_ 0)dump_print"; } }
         public override string Output { get { return "10"; } }
-        public override System.Type[] DependsOn { get { return new[] {typeof(InnerAccessTheOnlyOne)}; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
+    [TestFixture, InnerAccessTheOnlyOne]
     public class InnerAccessSecondOfTwo : CompilerTest
     {
         public override string Target { get { return "5,6, (this _A_T_ 1) dump_print"; } }
         public override string Output { get { return "6"; } }
-        public override System.Type[] DependsOn { get { return new System.Type[] { typeof(InnerAccessTheOnlyOne) }; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -126,7 +122,6 @@ namespace Reni.FeatureTest.Struct
     {
         public override string Target { get { return "5,6, (this _A_T_ 0) dump_print"; } }
         public override string Output { get { return "5"; } }
-        public override System.Type[] DependsOn { get { return new System.Type[] {}; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
