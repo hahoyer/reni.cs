@@ -31,9 +31,10 @@ namespace Reni.Syntax
         [DebuggerHidden]
         Result IResultProvider.Result(Category category) { return _data.AddCategories(category, _context, _syntax); }
 
-        IInternalResultProvider IInternalResultProvider.CreateSequence(IResultProvider resultProvider)
+        IInternalResultProvider IInternalResultProvider.CreateSequence(IInternalResultProvider resultProvider)
         {
-            throw new NotImplementedException();
+            NotImplementedMethod(resultProvider);
+            return null;
         }
 
         /// <summary>

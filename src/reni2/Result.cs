@@ -469,8 +469,7 @@ namespace Reni
                 Code = Code.CreateSequence(other.Code);
             if(category.HasRefs)
                 Refs = Refs.Pair(other.Refs);
-            if(category.HasInternal)
-                Internal = Internal.CreateSequence(other.Internal);
+            Tracer.Assert(!category.HasInternal);
             IsDirty = false;
         }
 
