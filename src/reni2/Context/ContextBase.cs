@@ -187,15 +187,19 @@ namespace Reni.Context
             return result;
         }
 
-        internal Result ResultAsRef(Category category, ICompileSyntax syntax,
-            Func<Size> argsOffset)
+        internal Result ResultAsRef(Category category, ICompileSyntax syntax, Func<Size> argsOffset)
         {
-            var localCategory = category | Category.Type;
-            if(category.HasInternal)
-                localCategory = localCategory | Category.ForInternal;
-            var result = Result(localCategory, syntax);
-            var refResult = result.EnsureRef(category | Category.Type, RefAlignParam, argsOffset);
-            return refResult.Filter(category);
+            var type = Type(syntax);
+            if (type.IsRef(RefAlignParam))
+                return Result(category, syntax);
+
+            return type
+                .CreateAutomaticRef(RefAlignParam)
+                .CreateResult(
+                category,
+                () => CodeBase.CreateTopRef(RefAlignParam, argsOffset()),
+                () => new CacheItem(syntax,this)
+                );
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax) { return ResultAsRef(category, syntax, () => Reni.Size.Zero); }

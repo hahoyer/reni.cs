@@ -23,7 +23,7 @@ namespace Reni
         private TypeBase _type;
         private CodeBase _code;
         private Refs _refs;
-        private IResultProvider _internal;
+        private IInternalResultProvider _internal;
         internal PostProcessorForResult PostProcessor;
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Reni
         }
 
         [Node]
-        public IResultProvider Internal
+        public IInternalResultProvider Internal
         {
             get { return _internal; }
             set
@@ -114,17 +114,17 @@ namespace Reni
                 result.Add(Service.CreateNamedNode("Pending", "Pending", Dump()));
             if(HasSize)
                 result.Add(Service.CreateNamedNode("Size", "Number", Size.FormatForView()));
-            if (HasType)
+            if(HasType)
                 result.Add(Service.CreateNamedNode("Type", "Type", Type));
-            if (HasCode)
+            if(HasCode)
                 result.Add(Service.CreateNamedNode("Code", "Code", Code));
-            if (HasRefs)
+            if(HasRefs)
                 result.Add(Service.CreateNamedNode("Refs", "Refs", Refs.Data));
-            if (HasInternal)
+            if(HasInternal)
                 result.Add(Service.CreateNamedNode("Internal", "Code", Internal));
             return result.ToArray();
-
         }
+
         /// <summary>
         /// Returns the size by checking category size, type and code until a result can be found. 
         /// Otherwise null is returned
@@ -266,10 +266,7 @@ namespace Reni
         /// Adds categories to pending requests
         /// </summary>
         /// <param name="frEff"></param>
-        private void AddPending(Category frEff)
-        {
-            _pending |= frEff;
-        }
+        private void AddPending(Category frEff) { _pending |= frEff; }
 
         /// <summary>
         /// Add categories
@@ -373,10 +370,7 @@ namespace Reni
         /// </summary>
         /// <returns></returns>
         /// created 19.11.2006 22:13
-        internal Result Clone()
-        {
-            return Clone(Complete);
-        }
+        internal Result Clone() { return Clone(Complete); }
 
         private void AssertValid()
         {
@@ -451,25 +445,16 @@ namespace Reni
             return filteredResult;
         }
 
-        internal void AssertComplete(Category category, ICompileSyntax syntaxForDump)
-        {
-            Tracer.Assert(1, HasCategory(category), string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort()));
-        }
+        internal void AssertComplete(Category category, ICompileSyntax syntaxForDump) { Tracer.Assert(1, HasCategory(category), string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort())); }
 
-        internal void AssertComplete(Category category)
-        {
-            Tracer.Assert(1, HasCategory(category), string.Format("category={0}\nResult={1}", category, Dump()));
-        }
+        internal void AssertComplete(Category category) { Tracer.Assert(1, HasCategory(category), string.Format("category={0}\nResult={1}", category, Dump())); }
 
         /// <summary>
         /// Append two results together, categories are determined by first 
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        internal void Add(Result other)
-        {
-            Add(other, Complete);
-        }
+        internal void Add(Result other) { Add(other, Complete); }
 
         internal void Add(Result other, Category category)
         {
@@ -516,10 +501,7 @@ namespace Reni
         /// <param name="result"></param>
         /// <param name="topRef"></param>
         /// <returns></returns>
-        internal void AddStruct(Result result, Result topRef)
-        {
-            Add(result.UseWithArg(topRef));
-        }
+        internal void AddStruct(Result result, Result topRef) { Add(result.UseWithArg(topRef)); }
 
         /// <summary>
         /// Converts the bit array to bit array.
@@ -577,7 +559,7 @@ namespace Reni
         /// <returns></returns>
         internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : IContextRefInCode
         {
-            if (IsPending)
+            if(IsPending)
                 return this;
 
             if(HasRefs && !Refs.Contains(context))
@@ -667,21 +649,21 @@ namespace Reni
 
         internal Result CreateStatement(Category category)
         {
-            if (!HasInternal)
+            if(!HasInternal)
                 return this;
-            var destructorResult = Internal.Type.DestructorHandler(category);
+            var destructorResult = ResultProvider.Type(Internal).DestructorHandler(category);
             var finalResult = Clone(category - Category.Internal);
             finalResult.Internal = EmptyInternal();
             var moveResult = Type.MoveHandler(category);
 
             if(category.HasRefs)
-                finalResult.Refs = Internal.Refs
+                finalResult.Refs = ResultProvider.Refs(Internal)
                     .Pair(finalResult.Refs)
                     .Pair(destructorResult.Refs)
                     .Pair(moveResult.Refs);
             if(category.HasCode)
             {
-                var resultCode = Internal.Code.CreateStatementEndFromIntermediateStorage
+                var resultCode = ResultProvider.Code(Internal).CreateStatementEndFromIntermediateStorage
                     (
                     Code,
                     destructorResult.Code,
@@ -692,10 +674,7 @@ namespace Reni
             return finalResult;
         }
 
-        internal Result CreateStatement()
-        {
-            return CreateStatement(Complete);
-        }
+        internal Result CreateStatement() { return CreateStatement(Complete); }
 
         internal static Result CreatePending(Category category)
         {
@@ -708,15 +687,10 @@ namespace Reni
                 result.Refs = Refs.Pending;
             if(category.HasCode)
                 result.Code = CodeBase.Pending;
-            if(category.HasInternal)
-                result.Internal = PendingInternal;
             return result;
         }
 
-        internal Result ConvertTo(TypeBase target)
-        {
-            return Type.ConvertTo(Complete, target).UseWithArg(this);
-        }
+        internal Result ConvertTo(TypeBase target) { return Type.ConvertTo(Complete, target).UseWithArg(this); }
 
         internal Result CreateUnref(TypeBase type, RefAlignParam refAlignParam)
         {
@@ -769,10 +743,7 @@ namespace Reni
             return result;
         }
 
-        internal Result UnProperty()
-        {
-            return Type.UnProperty(this);
-        }
+        internal Result UnProperty() { return Type.UnProperty(this); }
 
         internal Result AutomaticDereference()
         {
@@ -782,15 +753,9 @@ namespace Reni
             return Type.AutomaticDereference(this);
         }
 
-        internal Result PostProcess(int alignBits)
-        {
-            return PostProcess().Align(alignBits);
-        }
+        internal Result PostProcess(int alignBits) { return PostProcess().Align(alignBits); }
 
-        internal Result PostProcess()
-        {
-            return UnProperty().AutomaticDereference();
-        }
+        internal Result PostProcess() { return UnProperty().AutomaticDereference(); }
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
         {
@@ -814,10 +779,18 @@ namespace Reni
             return result;
         }
 
-        internal static Result EmptyInternal()
-        {
-            return Reni.Type.Void.CreateResult(Category.ForInternal);
-        }
+        internal static IInternalResultProvider EmptyInternal = new EmptyInternalInstance();
+    }
+
+    internal class EmptyInternalInstance : IInternalResultProvider
+    {
+        public Result Result(Category category) { return TypeBase.CreateVoidResult(category); }
+        public IInternalResultProvider CreateSequence(IInternalResultProvider other) { return other; }
+    }
+
+    internal interface IInternalResultProvider : IResultProvider
+    {
+        IInternalResultProvider CreateSequence(IInternalResultProvider resultProvider);
     }
 
     /// <summary>
@@ -840,7 +813,7 @@ namespace Reni
             _syntax = syntax;
         }
 
-        private Error(Error e0, Error e1) {}
+        private Error(Error e0, Error e1) { }
 
         /// <summary>
         /// asis

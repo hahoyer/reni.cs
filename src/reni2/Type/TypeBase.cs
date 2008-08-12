@@ -158,10 +158,10 @@ namespace Reni.Type
         }
 
         internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None, Result.EmptyInternal); }
-        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Result> getInternal) { return CreateResult(category, getCode, Refs.None, getInternal); }
+        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<IInternalResultProvider> getInternal) { return CreateResult(category, getCode, Refs.None, getInternal); }
         internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs) { return CreateResult(category, getCode, getRefs, Result.EmptyInternal); }
 
-        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs, Func<Result> getInternal)
+        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs, Func<IInternalResultProvider> getInternal)
         {
             var result = new Result();
             if(category.HasSize)
