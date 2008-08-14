@@ -259,7 +259,7 @@ namespace Reni.Type
             var argsResult = callContext.ConvertToSequenceViaRef(category, args, _sequence.Element, () => objectSize.ByteAlignedSize);
             if (argsResult.IsPending)
                 return Result.CreatePending(category);
-            var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element, () => argsResult.Internal.Size);
+            var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element, () => ResultProvider.Size(argsResult.Internal));
             if (objectResult.IsPending)
                 return Result.CreatePending(category);
 

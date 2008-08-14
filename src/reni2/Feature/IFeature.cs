@@ -1,10 +1,10 @@
+using System;
+using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.Feature
 {
-
     internal interface IConverter<OutType, InType>
     {
         OutType Convert(InType type);
@@ -24,6 +24,4 @@ namespace Reni.Feature
     {
         Result ApplyResult(ContextBase contextBase, Category category, ICompileSyntax args);
     }
-
-    internal interface IFeatureForSequence: IConverter<IFeature, Sequence>{}
 }

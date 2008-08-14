@@ -35,15 +35,14 @@ namespace Reni.Type
 
         public AssignmentFeature(AssignableRef assignableRef) { _assignableRef = assignableRef; }
 
-        Result IFeature.ApplyResult(ContextBase callContext, Category category,
-            ICompileSyntax @object, ICompileSyntax args)
+        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             if(!category.HasCode && !category.HasRefs && !category.HasInternal)
                 return TypeBase.CreateVoid.CreateResult(category);
 
-            var valueResult = callContext
-                .Result(category | Category.Type, args)
-                .ConvertTo(_assignableRef.Target)
+            var convertTo = callContext.ResultAsRef(category, args, () => callContext.Size(@object).ByteAlignedSize)
+                .ConvertTo(_assignableRef.Target);
+            var valueResult = convertTo
                 .EnsureRef(category, _assignableRef.RefAlignParam,
                     () => callContext.Size(@object).ByteAlignedSize);
             if(valueResult.IsPending)

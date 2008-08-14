@@ -717,31 +717,6 @@ namespace Reni
             return Code.Serialize(false).Evaluate();
         }
 
-        internal Result EnsureRef(Category category, RefAlignParam refAlignParam, Func<Size> offset)
-        {
-            if(Type.IsRef(refAlignParam))
-                return this;
-
-            var resultAsRef =
-                Type
-                    .CreateAutomaticRef(refAlignParam)
-                    .CreateResult(
-                    category,
-                    () => CodeBase.CreateTopRef(refAlignParam, offset()),
-                    () => ForInternal(refAlignParam.AlignBits)
-                    );
-            return resultAsRef;
-        }
-
-        private Result ForInternal(int alignBits)
-        {
-            var result = Clone(Category.ForInternal).Align(alignBits);
-            if(HasInternal)
-                result = Internal.CreateSequence(result);
-            Tracer.Assert(result.Complete == Category.ForInternal);
-            return result;
-        }
-
         internal Result UnProperty() { return Type.UnProperty(this); }
 
         internal Result AutomaticDereference()
