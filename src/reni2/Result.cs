@@ -286,6 +286,9 @@ namespace Reni
             if(r.HasCode && !r.Code.IsPending)
                 _code = r.Code;
 
+            if (r.HasInternal)
+                _internal = r.Internal;
+
             AssertValid();
         }
 
@@ -652,7 +655,7 @@ namespace Reni
                 return this;
             var destructorResult = ResultProvider.Type(Internal).DestructorHandler(category);
             var finalResult = Clone(category - Category.Internal);
-            finalResult.Internal = EmptyInternal();
+            finalResult.Internal = EmptyInternal;
             var moveResult = Type.MoveHandler(category);
 
             if(category.HasRefs)

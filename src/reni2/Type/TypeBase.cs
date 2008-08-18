@@ -157,9 +157,9 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None, Result.EmptyInternal); }
+        internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None, ()=>Result.EmptyInternal); }
         internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<IInternalResultProvider> getInternal) { return CreateResult(category, getCode, Refs.None, getInternal); }
-        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs) { return CreateResult(category, getCode, getRefs, Result.EmptyInternal); }
+        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs) { return CreateResult(category, getCode, getRefs, () => Result.EmptyInternal); }
 
         internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs, Func<IInternalResultProvider> getInternal)
         {
@@ -383,6 +383,12 @@ namespace Reni.Type
             return null;
         }
 
+        internal virtual Result AssignmentFeatureResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+        
         internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode)
         {
             if(Size.IsZero)

@@ -31,6 +31,7 @@ namespace Reni.Type
     [Serializable]
     internal class AssignmentFeature : ReniObject, IFeature
     {
+        [DumpData(true)]
         private readonly AssignableRef _assignableRef;
 
         public AssignmentFeature(AssignableRef assignableRef) { _assignableRef = assignableRef; }
@@ -40,34 +41,9 @@ namespace Reni.Type
             if(!category.HasCode && !category.HasRefs && !category.HasInternal)
                 return TypeBase.CreateVoid.CreateResult(category);
 
-            var convertTo = callContext.ResultAsRef(category, args, () => callContext.Size(@object).ByteAlignedSize)
-                .ConvertTo(_assignableRef.Target);
-            var valueResult = convertTo
-                .EnsureRef(category, _assignableRef.RefAlignParam,
-                    () => callContext.Size(@object).ByteAlignedSize);
-            if(valueResult.IsPending)
-                return Result.CreatePending(category);
-            var destination = callContext.ResultAsRef(category, @object,
-                () => valueResult.Internal.Size);
-            if(destination.IsPending)
-                return Result.CreatePending(category);
+            var assignmentFeatureResult = callContext.Type(@object).AssignmentFeatureResult(category);
 
-            Tracer.Assert(!destination.HasType || destination.Type == _assignableRef);
-            var result = TypeBase.CreateVoid
-                .CreateResult
-                (
-                category,
-                () =>
-                    destination.Code.CreateAssignment(_assignableRef.RefAlignParam, valueResult.Code,
-                        _assignableRef.Target.Size),
-                () => destination.Refs.Pair(valueResult.Refs),
-                () => destination.Internal.CreateSequence(valueResult.Internal)
-                );
-            if(_assignableRef.Target.DestructorHandler(valueResult.Complete).IsEmpty &&
-                _assignableRef.Target.MoveHandler(valueResult.Complete).IsEmpty)
-                return (result);
-
-            NotImplementedMethod(callContext, category, @object, args);
+            NotImplementedMethod(callContext, category, @object, args, "assignmentFeatureResult", assignmentFeatureResult);
             throw new NotImplementedException();
         }
     }
