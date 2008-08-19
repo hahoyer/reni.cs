@@ -10,6 +10,7 @@ namespace Reni.Type
     [Serializable]
     internal sealed class AssignableRef : Ref
     {
+        [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
 
         internal AssignableRef(TypeBase target, RefAlignParam refAlignParam)
