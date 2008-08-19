@@ -472,7 +472,7 @@ namespace Reni
                 Code = Code.CreateSequence(other.Code);
             if(category.HasRefs)
                 Refs = Refs.Pair(other.Refs);
-            Tracer.Assert(!category.HasInternal);
+            Tracer.Assert(!category.HasInternal, "this="+Dump()+"\nother="+other.Dump());
             IsDirty = false;
         }
 

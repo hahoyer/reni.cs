@@ -11,7 +11,7 @@ namespace Reni.Syntax
     abstract internal class CompileSyntax : ParsedSyntax, ICompileSyntax
     {
         // Used for debug only
-        [Node("Cache")]
+        [DumpData(false), Node("Cache")]
         internal readonly DictionaryEx<ContextBase, IResultProvider> ResultCache = new DictionaryEx<ContextBase, IResultProvider>();
 
         internal CompileSyntax(Token token)
