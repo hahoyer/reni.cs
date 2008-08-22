@@ -37,7 +37,7 @@ namespace Reni.Syntax
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
-            var trace = ObjectId == -27 && context is ContextAtPosition && category.HasCode;
+            var trace = ObjectId == 7856 && context is Function && category.HasRefs;
             StartMethodDumpWithBreak(trace, context, category);
             if(category.HasInternal || !(category.HasCode || category.HasRefs))
                 return ReturnMethodDumpWithBreak(trace, Result(context, category).Align(context.AlignBits));

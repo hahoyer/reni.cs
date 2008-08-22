@@ -472,7 +472,8 @@ namespace Reni
                 Code = Code.CreateSequence(other.Code);
             if(category.HasRefs)
                 Refs = Refs.Pair(other.Refs);
-            Tracer.Assert(!category.HasInternal, "this="+Dump()+"\nother="+other.Dump());
+            if (category.HasInternal)
+                Internal = Internal.CreateSequence(other.Internal);
             IsDirty = false;
         }
 
@@ -762,12 +763,14 @@ namespace Reni
     internal class EmptyInternalInstance : IInternalResultProvider
     {
         public Result Result(Category category) { return TypeBase.CreateVoidResult(category); }
-        public IInternalResultProvider CreateSequence(IInternalResultProvider other) { return other; }
+        public IInternalResultProvider CreateSequence(IInternalResultProvider secondElement) { return secondElement; }
+        public IInternalResultProvider CreateReverseSequence(IInternalResultProvider firstElement) { return firstElement; }
     }
 
     internal interface IInternalResultProvider : IResultProvider
     {
-        IInternalResultProvider CreateSequence(IInternalResultProvider resultProvider);
+        IInternalResultProvider CreateSequence(IInternalResultProvider secondElement);
+        IInternalResultProvider CreateReverseSequence(IInternalResultProvider firstElement);
     }
 
     /// <summary>

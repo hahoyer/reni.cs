@@ -10,7 +10,10 @@ namespace Reni.Parser.TokenClass.Name
     {
         internal override Result Result(ContextBase context, Category category, Token token)
         {
-            return context.CreateArgsRefResult(category);
+            var trace = token.ObjectId == 119 && category.HasRefs;
+            StartMethodDump(trace, context,category,token);
+            var result = context.CreateArgsRefResult(category);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
     }
 }
