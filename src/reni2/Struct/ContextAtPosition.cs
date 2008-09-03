@@ -22,7 +22,7 @@ namespace Reni.Struct
         public override IContextRefInCode ForCode { get { return _context; } }
         [Node]
         internal override int Position { get { return _position; } }
-        [DumpData(false)]
+        [DumpData(false),Node]
         internal override FullContext Context { get { return _context; } }
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }
         internal override IStructContext FindStruct() { return this; }
