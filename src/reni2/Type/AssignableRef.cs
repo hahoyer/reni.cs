@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -39,13 +40,30 @@ namespace Reni.Type
 
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            if(!category.HasCode && !category.HasRefs && !category.HasInternal)
-                return TypeBase.CreateVoid.CreateResult(category);
+            var destinationType = (AssignableRef)callContext.Type(@object);
 
-            var assignmentFeatureResult = callContext.Type(@object).AssignmentFeatureResult(category);
+            var result = TypeBase.CreateVoid.CreateResult(
+                category,
+                () => CodeBase.CreateArg(destinationType.Size*2).CreateAssignment(callContext.RefAlignParam,destinationType.Target.Size)
+                );
 
-            NotImplementedMethod(callContext, category, @object, args, "assignmentFeatureResult", assignmentFeatureResult);
-            throw new NotImplementedException();
+            if (!category.HasCode && !category.HasRefs && !category.HasInternal)
+                return result;
+
+            var sourceResult = callContext.ConvertedRefResult
+                (
+                category, 
+                args, 
+                destinationType.Target.CreateAutomaticRef(destinationType.RefAlignParam), 
+                () => destinationType.Size.ByteAlignedSize
+                );
+            if (sourceResult.IsPending)
+                return Result.CreatePending(category);
+            var objectResult = callContext.Result(category, @object);
+            if (objectResult.IsPending)
+                return Result.CreatePending(category);
+
+            return result.UseWithArg(objectResult.CreateSequence(sourceResult));
         }
     }
 }

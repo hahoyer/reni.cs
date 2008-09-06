@@ -110,7 +110,7 @@ namespace Reni.Context
                 syntax,
                 () => CreateCacheElement(syntax)
                 );
-            return cacheElem.Result(category.Replendish());
+            return cacheElem.Result(category.Replendish()).Filter(category);
         }
 
         private IResultProvider CreateCacheElement(ICompileSyntax syntax)
@@ -168,26 +168,26 @@ namespace Reni.Context
                 .Align(AlignBits);
         }
 
-        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax,
-            TypeBase elementType, Func<Size> argsOffset)
+        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType, Func<Size> offset)
         {
-            var applyToRef = ResultAsRef(category | Category.Type, syntax, argsOffset);
-            if(applyToRef.IsPending)
+            var type = Type(syntax);
+            if (type.IsPending)
+                return Reni.Result.CreatePending(category);
+
+            var target = elementType.CreateSequence(type.SequenceCount);
+
+            var applyToRef = ResultAsRef(category | Category.Type, syntax, offset);
+            if (applyToRef.IsPending)
                 return Reni.Result.CreatePending(category);
             applyToRef.AssertComplete(category | Category.Type, syntax);
-            var type = Type(syntax);
-            if(type.IsPending)
-                return Reni.Result.CreatePending(category);
-            var convertTo =
-                applyToRef.ConvertTo(elementType.CreateSequence(type.SequenceCount)).Filter(
-                    category);
+            var convertTo = applyToRef.ConvertTo(target).Filter(category);
             convertTo.AssertComplete(category);
             var result = convertTo.Align(AlignBits);
             result.AssertComplete(category);
             return result;
         }
 
-        internal Result ResultAsRef(Category category, ICompileSyntax syntax, Func<Size> argsOffset)
+        internal Result ResultAsRef(Category category, ICompileSyntax syntax, Func<Size> offset)
         {
             var type = Type(syntax);
             if (type.IsRef(RefAlignParam))
@@ -197,9 +197,25 @@ namespace Reni.Context
                 .CreateAutomaticRef(RefAlignParam)
                 .CreateResult(
                 category,
-                () => CodeBase.CreateTopRef(RefAlignParam, argsOffset()),
+                () => CodeBase.CreateTopRef(RefAlignParam, offset()),
                 () => new CacheItem(syntax,this)
                 );
+        }
+
+        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target, Func<Size> offset)
+        {
+            var type = Type(syntax);
+
+            
+            var applyToRef = ResultAsRef(category | Category.Type, syntax, offset);
+            if (applyToRef.IsPending)
+                return Reni.Result.CreatePending(category);
+            applyToRef.AssertComplete(category | Category.Type, syntax);
+            var convertTo = applyToRef.ConvertTo(target).Filter(category);
+            convertTo.AssertComplete(category);
+            var result = convertTo.Align(AlignBits);
+            result.AssertComplete(category);
+            return result;
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax) { return ResultAsRef(category, syntax, () => Reni.Size.Zero); }
@@ -255,6 +271,7 @@ namespace Reni.Context
                 return PrefixResult(category, defineableToken, right);
             return InfixResult(category, left, defineableToken, right);
         }
+
     }
 
     [Serializable]

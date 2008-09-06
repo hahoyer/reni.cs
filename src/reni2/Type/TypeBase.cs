@@ -251,7 +251,7 @@ namespace Reni.Type
 
         internal Result Conversion(Category category, TypeBase dest)
         {
-            if(category.HasCode || category.HasRefs)
+            if(category > (Category.Size | Category.Type))
             {
                 if(IsConvertableTo(dest, ConversionFeature.Instance))
                     return ConvertTo(category, dest);

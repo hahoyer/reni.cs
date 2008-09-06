@@ -110,7 +110,7 @@ namespace Reni.Type
                 return result;
 
             result = ConvertTo(category, dest as EnableCut);
-            if(result != null)
+            if (result != null)
                 return result;
 
             NotImplementedMethod(category, dest);

@@ -42,8 +42,6 @@ namespace Reni
         public static Category Refs { get { return new Category(false, false, false, true, false); } }
         [DebuggerHidden]
         public static Category Internal { get { return new Category(false, false, false, false, true); } }
-        [DebuggerHidden]
-        public static Category ForInternal { get { return new Category(true, true, true, true, false); } }
 
         public bool IsNull { get { return !(_code || _type || _refs || _size || _internal); } }
         public bool HasCode { get { return _code; } }
@@ -51,7 +49,6 @@ namespace Reni
         public bool HasRefs { get { return _refs; } }
         public bool HasSize { get { return _size; } }
         public bool HasInternal { get { return _internal; } }
-        public bool HasAll { get { return HasCode && HasRefs && HasSize && HasType; } }
 
         /// <summary>
         /// Some categories are dependent. This function replendishes those categories.
@@ -137,6 +134,16 @@ namespace Reni
                 && HasInternal == x.HasInternal
                 ;
         }
+        private bool IsLessThan(Category x)
+        {
+            return
+                (!HasCode && x.HasCode)
+                || (!HasRefs && x.HasRefs)
+                || (!HasSize && x.HasSize)
+                || (!HasType && x.HasType)
+                || (!HasInternal && x.HasInternal)
+                ;
+        }
         /// <summary>
         /// asis
         /// </summary>
@@ -194,6 +201,26 @@ namespace Reni
             return Equals((Category) obj);
         }
 
+        public static bool operator <(Category left, Category right)
+        {
+            return left.IsLessThan(right);
+        }
+
+        public static bool operator <=(Category left, Category right)
+        {
+            return left < right || left == right;
+        }
+
+        public static bool operator >=(Category left, Category right)
+        {
+            return right <= left;
+        }
+
+        public static bool operator >(Category left, Category right)
+        {
+            return right < left;
+        }
+
         public static bool operator ==(Category left, Category right)
         {
             return Equals(left, right);
@@ -203,5 +230,6 @@ namespace Reni
         {
             return !Equals(left, right);
         }
+
     }
 }

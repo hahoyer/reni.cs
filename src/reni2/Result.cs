@@ -693,7 +693,7 @@ namespace Reni
             return result;
         }
 
-        internal Result ConvertTo(TypeBase target) { return Type.ConvertTo(Complete, target).UseWithArg(this); }
+        internal Result ConvertTo(TypeBase target) { return Type.Conversion(Complete, target).UseWithArg(this); }
 
         internal Result CreateUnref(TypeBase type, RefAlignParam refAlignParam)
         {

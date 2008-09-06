@@ -56,11 +56,10 @@ namespace Reni.Code
             return CreateChild(new DumpPrint(leftSize, Size - leftSize));
         }
 
-        public CodeBase CreateAssignment(RefAlignParam refAlignParam, CodeBase sourceRef, Size size)
+        public CodeBase CreateAssignment(RefAlignParam refAlignParam, Size size)
         {
             var alignedSize = size.ByteAlignedSize;
-            return CreateSequence(sourceRef)
-                .CreateAssignment(refAlignParam, alignedSize);
+            return CreateChild(new Assign(refAlignParam, alignedSize));
         }
 
         public CodeBase CreateBitSequenceOperation(Defineable name, Size size)
@@ -245,11 +244,6 @@ namespace Reni.Code
                 DumpMethodWithBreak("UnexpectedContextRefInContainer " + e.VisitedObject.Dump(),isInternal);
                 throw;
             }
-        }
-
-        private CodeBase CreateAssignment(RefAlignParam refAlignParam, Size size)
-        {
-            return CreateChild(new Assign(refAlignParam, size));
         }
 
         public static LeafElement CreateRecursiveCall(Size refsSize)
