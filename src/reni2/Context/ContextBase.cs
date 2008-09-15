@@ -205,6 +205,10 @@ namespace Reni.Context
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target, Func<Size> offset)
         {
             var type = Type(syntax);
+            var rawResult = type.Conversion(category, target);
+
+
+
 
             
             var applyToRef = ResultAsRef(category | Category.Type, syntax, offset);
