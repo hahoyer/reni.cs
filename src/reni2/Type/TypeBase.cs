@@ -402,5 +402,7 @@ namespace Reni.Type
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
+
+        internal virtual bool IsRefLike(Ref target) { return false; }
     }
 }

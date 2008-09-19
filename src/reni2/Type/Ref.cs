@@ -124,6 +124,8 @@ namespace Reni.Type
             return Target.AccessResultFromRef(category, position,RefAlignParam);
         }
 
+        internal override bool IsRefLike(Ref target) { return Target == target.Target && RefAlignParam == target.RefAlignParam; }
+
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
             var resultFromRef = Parent.SearchFromRef(defineable).SubTrial(Parent);

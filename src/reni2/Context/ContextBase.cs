@@ -205,21 +205,19 @@ namespace Reni.Context
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target, Func<Size> offset)
         {
             var type = Type(syntax);
-            var rawResult = type.Conversion(category, target);
+            if (type.IsRefLike(target))
+                return target.CreateResult(category, Result(category & (Category.Code | Category.Refs | Category.Internal), syntax));
 
+            if(type.IsRef(RefAlignParam))
+            {
+                var result = type.Conversion(category, target.Target).UseWithArg(Result(category, syntax));
+                NotImplementedMethod(category, syntax, target, offset, "type", type, "result", result);
+                return result;
+            }
 
-
-
-            
-            var applyToRef = ResultAsRef(category | Category.Type, syntax, offset);
-            if (applyToRef.IsPending)
-                return Reni.Result.CreatePending(category);
-            applyToRef.AssertComplete(category | Category.Type, syntax);
-            var convertTo = applyToRef.ConvertTo(target).Filter(category);
-            convertTo.AssertComplete(category);
-            var result = convertTo.Align(AlignBits);
-            result.AssertComplete(category);
-            return result;
+            var rawResult = type.Conversion(category, target.Target);
+            NotImplementedMethod(category, syntax, target, offset, "type", type, "rawResult", rawResult);
+            return null;
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax) { return ResultAsRef(category, syntax, () => Reni.Size.Zero); }
