@@ -3,6 +3,7 @@ using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Syntax
 {
@@ -70,6 +71,25 @@ namespace Reni.Syntax
         protected override Result Result(Category category)
         {
             return FirstElement.Result(category).CreateSequence(SecondElement.Result(category));
+        }
+    }
+
+    internal class ConversionResultProvider: InternalResultProvider
+    {
+        internal readonly ICompileSyntax Syntax;
+        internal readonly ContextBase ContextBase;
+        internal readonly TypeBase Target;
+
+        public ConversionResultProvider(ICompileSyntax syntax, ContextBase contextBase, TypeBase target)
+        {
+            Syntax = syntax;
+            ContextBase = contextBase;
+            Target = target;
+        }
+
+        protected override Result Result(Category category)
+        {
+            return  ContextBase.Result(category | Category.Type, Syntax).ConvertTo(Target);
         }
     }
 }

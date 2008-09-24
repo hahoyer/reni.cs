@@ -215,9 +215,11 @@ namespace Reni.Context
                 return result;
             }
 
-            var rawResult = type.Conversion(category, target.Target);
-            NotImplementedMethod(category, syntax, target, offset, "type", type, "rawResult", rawResult);
-            return null;
+            return target.CreateResult(
+                category, 
+                () => CodeBase.CreateTopRef(target.RefAlignParam, offset()),
+                () => new ConversionResultProvider(syntax,this,target.Target)
+                );
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax) { return ResultAsRef(category, syntax, () => Reni.Size.Zero); }
