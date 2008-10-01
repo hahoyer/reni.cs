@@ -655,13 +655,13 @@ namespace Reni
             if(!HasInternal)
                 return this;
             var destructorResult = ResultProvider.Type(Internal).DestructorHandler(category);
-            var finalResult = Clone(category - Category.Internal);
-            finalResult.Internal = EmptyInternal;
+            var result = Clone(category - Category.Internal);
+            result.Internal = EmptyInternal;
             var moveResult = Type.MoveHandler(category);
 
             if(category.HasRefs)
-                finalResult.Refs = ResultProvider.Refs(Internal)
-                    .Pair(finalResult.Refs)
+                result.Refs = ResultProvider.Refs(Internal)
+                    .Pair(result.Refs)
                     .Pair(destructorResult.Refs)
                     .Pair(moveResult.Refs);
             if(category.HasCode)
@@ -672,9 +672,10 @@ namespace Reni
                     destructorResult.Code,
                     moveResult.Code
                     );
-                finalResult.Code = resultCode;
+                result.Code = resultCode;
             }
-            return finalResult;
+            result.AssertValid();
+            return result;
         }
 
         internal Result CreateStatement() { return CreateStatement(Complete); }

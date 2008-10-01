@@ -11,6 +11,7 @@ namespace Reni.Parser
     {
         private static bool _isInDump;
         internal readonly Token Token;
+        internal static bool IsDetailedDumpRequired = false;
 
         protected ParsedSyntax(Token token)
         {
@@ -32,6 +33,8 @@ namespace Reni.Parser
             var isInDump = _isInDump;
             _isInDump = true;
             var result = DumpShort();
+            if(!IsDetailedDumpRequired)
+            return result;
             if(!isInDump)
                 result += FilePosition();
             if(!isInContainerDump)

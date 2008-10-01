@@ -36,7 +36,12 @@ namespace Reni.Parser
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            return context.Result(category, Left, DefineableToken, Right);
+            var trace = ObjectId == -82;
+            if (ObjectId == -82 && category.HasRefs)
+                category |= Category.Code;
+            StartMethodDump(trace, context, category);
+            var result = context.Result(category, Left, DefineableToken, Right);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
     }
 }

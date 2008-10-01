@@ -52,10 +52,12 @@ namespace Reni.Type
 
         internal override Result ApplyFunction(Category category, ContextBase callContext, ICompileSyntax args)
         {
-            var trace = ObjectId == -4 && callContext.ObjectId == 33 && category.HasRefs;
+            var trace = ObjectId == -1 && callContext.ObjectId == 4 && (category.HasRefs || category.HasCode);
             StartMethodDumpWithBreak(trace, category,callContext,args);
-            var argsResult = callContext
-                .Result(category | Category.Type, args)
+            var rawResult = callContext
+                .Result(category | Category.Type, args);
+            DumpWithBreak(trace, "rawResult",rawResult);
+            var argsResult = rawResult
                 .PostProcessor.ArgsResult(Context.AlignBits);
             return ReturnMethodDumpWithBreak(trace, ApplyFunction(category, argsResult));
         }
