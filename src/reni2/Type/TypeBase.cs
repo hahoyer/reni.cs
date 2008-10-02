@@ -336,7 +336,7 @@ namespace Reni.Type
                 (
                 category,
                 () => null,
-                () => condRefs.Pair(elseOrThenRefs)
+                () => condRefs.CreateSequence(elseOrThenRefs)
                 );
         }
 

@@ -9,7 +9,7 @@ using Reni.Parser.TokenClass;
 namespace Reni.Code
 {
     [Serializable]
-    internal abstract class CodeBase : ReniObject, IIconKeyProvider
+    internal abstract class CodeBase : ReniObject, IIconKeyProvider, Sequence<CodeBase>.ICombiner<CodeBase>
     {
         [Node]
         internal Size Size { get { return GetSize(); } }

@@ -15,7 +15,7 @@ namespace Reni
     /// Result of a visitor request
     /// </summary>
     [Serializable]
-    internal sealed class Result : ReniObject, ITreeNodeSupport
+    internal sealed class Result : ReniObject, ITreeNodeSupport, Sequence<Result>.ICombiner<Result>
     {
         private bool _isDirty;
         private Category _pending;
@@ -471,7 +471,7 @@ namespace Reni
             if(category.HasCode)
                 Code = Code.CreateSequence(other.Code);
             if(category.HasRefs)
-                Refs = Refs.Pair(other.Refs);
+                Refs = Refs.CreateSequence(other.Refs);
             if(category.HasInternal)
                 Internal = Internal + other.Internal;
             IsDirty = false;
@@ -491,7 +491,7 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateSequence(Result second)
+        public Result CreateSequence(Result second)
         {
             var result = Clone();
             result.Add(second);
@@ -548,7 +548,7 @@ namespace Reni
             if(HasCode && resultForArg.HasCode)
                 result.Code = Code.UseWithArg(resultForArg.Code);
             if(HasRefs && resultForArg.HasRefs)
-                result.Refs = Refs.Pair(resultForArg.Refs);
+                result.Refs = Refs.CreateSequence(resultForArg.Refs);
             if(HasInternal && resultForArg.HasInternal)
                 result.Internal = Internal +resultForArg.Internal;
             return ReturnMethodDump(trace, result);
@@ -572,7 +572,7 @@ namespace Reni
             if(HasCode)
                 result.Code = Code.ReplaceAbsoluteContextRef(context, replacement.Code);
             if(HasRefs)
-                result.Refs = Refs.Without(context).Pair(replacement.Refs);
+                result.Refs = Refs.Without(context).CreateSequence(replacement.Refs);
             result.IsDirty = false;
             return result;
         }
@@ -655,24 +655,25 @@ namespace Reni
             if(!HasInternal)
                 return this;
             Tracer.Assert(!category.HasInternal);
-            var internalResult = Internal.Apply(x => x.Result(category),(Result a, Result b) => a.CreateSequence(b));
+            Sequence<Result> internalResults = Internal.Apply(x => x.Result(category));
+            var internalResult = internalResults.Serialize<Result>();
 
-            var destructorResult = ResultProvider.Type(Internal).DestructorHandler(category);
+            var destructorResults = internalResults.Apply(x => x.Type.DestructorHandler(category));
             var result = Clone(category - Category.Internal);
             result.Internal = EmptyInternal;
             var moveResult = Type.MoveHandler(category);
 
             if(category.HasRefs)
-                result.Refs = ResultProvider.Refs(Internal)
-                    .Pair(result.Refs)
-                    .Pair(destructorResult.Refs)
-                    .Pair(moveResult.Refs);
+                result.Refs = internalResult.Refs
+                    .CreateSequence(result.Refs)
+                    .CreateSequence(destructorResults.Apply(x=>x.Refs).Serialize<Refs>())
+                    .CreateSequence(moveResult.Refs);
             if(category.HasCode)
             {
-                var resultCode = ResultProvider.Code(Internal).CreateStatementEndFromIntermediateStorage
+                var resultCode = internalResult.Code.CreateStatementEndFromIntermediateStorage
                     (
                     Code,
-                    destructorResult.Code,
+                    destructorResults.Apply(x=>x.Code).Serialize(CodeBase.CreateVoid()),
                     moveResult.Code
                     );
                 result.Code = resultCode;
@@ -754,7 +755,7 @@ namespace Reni
                     result.Code = result.Code.CreateSequence(elemResults[i].Code);
                 }
                 if(category.HasRefs)
-                    result.Refs = result.Refs.Pair(elemResults[i].Refs);
+                    result.Refs = result.Refs.CreateSequence(elemResults[i].Refs);
             }
             if(category.HasCode)
                 result.Code = result.Code.CreateSequence(CodeBase.CreateDumpPrintText(")"));

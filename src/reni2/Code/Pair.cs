@@ -32,7 +32,7 @@ namespace Reni.Code
 
         internal override Refs GetRefs()
         {
-            return _left.GetRefs().Pair(_right.GetRefs());
+            return _left.GetRefs().CreateSequence(_right.GetRefs());
         }
 
         public override T VirtVisit<T>(Visitor<T> actual)

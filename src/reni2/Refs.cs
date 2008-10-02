@@ -11,7 +11,7 @@ namespace Reni
     /// Contains list of references to compiler environemnts.
     /// </summary>
     [Serializable]
-    internal sealed class Refs : ReniObject
+    internal sealed class Refs : ReniObject, Sequence<Refs>.ICombiner<Refs>
     {
         private readonly List<IContextRefInCode> _data;
         private SizeArray _sizesCache;
@@ -93,10 +93,10 @@ namespace Reni
             return new Refs();
         }
 
-        public Refs Pair(Refs refs)
+        public Refs CreateSequence(Refs refs)
         {
             if(IsPending || refs.IsPending)
-                throw new NotSupportedException("Pair function not allowed for pending refs");
+                throw new NotSupportedException("CreateSequence function not allowed for pending refs");
             if(refs.Count == 0)
                 return this;
             if(Count == 0)
@@ -180,5 +180,6 @@ namespace Reni
             }
             return result;
         }
+
     }
 }

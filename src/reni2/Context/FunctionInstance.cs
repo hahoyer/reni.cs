@@ -84,7 +84,7 @@ namespace Reni.Context
                 return ReturnMethodDump(trace, result);
 
             if(category.HasRefs)
-                result.Refs = result.Refs.Pair(args.Refs);
+                result.Refs = result.Refs.CreateSequence(args.Refs);
 
             if(category.HasCode)
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(Index, result.Size);

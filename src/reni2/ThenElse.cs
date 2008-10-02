@@ -46,7 +46,7 @@ namespace Reni
                 (
                 category,
                 () => condResult.Code.CreateThenElse(thenResult.Code, elseResult.Code),
-                () => condResult.Refs.Pair(thenResult.Refs).Pair(elseResult.Refs),
+                () => condResult.Refs.CreateSequence(thenResult.Refs).CreateSequence(elseResult.Refs),
                 () => condResult.Internal
                 );
         }
