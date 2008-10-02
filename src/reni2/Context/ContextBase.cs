@@ -102,7 +102,7 @@ namespace Reni.Context
             return results;
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result Result(Category category, ICompileSyntax syntax)
         {
             var cacheElem = Cache._resultCache.Find

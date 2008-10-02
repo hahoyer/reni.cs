@@ -19,6 +19,7 @@ namespace Reni.Syntax
             return new ResultProviderPair(firstElement,this);
         }
 
+        [DebuggerHidden]
         Result IResultProvider.Result(Category category) { return Result(category); }
         protected abstract Result Result(Category category);
     }
@@ -45,7 +46,7 @@ namespace Reni.Syntax
             _context = context;
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         protected override Result Result(Category category) { return _data.AddCategories(category, _context, _syntax); }
 
         /// <summary>

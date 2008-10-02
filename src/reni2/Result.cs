@@ -23,7 +23,7 @@ namespace Reni
         private TypeBase _type;
         private CodeBase _code;
         private Refs _refs;
-        private IInternalResultProvider _internal;
+        private Sequence<IInternalResultProvider> _internal;
         internal PostProcessorForResult PostProcessor;
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Reni
         }
 
         [Node]
-        public IInternalResultProvider Internal
+        public Sequence<IInternalResultProvider> Internal
         {
             get { return _internal; }
             set
@@ -286,7 +286,7 @@ namespace Reni
             if(r.HasCode && !r.Code.IsPending)
                 _code = r.Code;
 
-            if (r.HasInternal)
+            if(r.HasInternal)
                 _internal = r.Internal;
 
             AssertValid();
@@ -417,7 +417,7 @@ namespace Reni
         /// <param name="context"></param>
         /// <param name="syntax"></param>
         /// <returns></returns>
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
         {
             var OldPending = Pending;
@@ -472,8 +472,8 @@ namespace Reni
                 Code = Code.CreateSequence(other.Code);
             if(category.HasRefs)
                 Refs = Refs.Pair(other.Refs);
-            if (category.HasInternal)
-                Internal = Internal.CreateSequence(other.Internal);
+            if(category.HasInternal)
+                Internal = Internal + other.Internal;
             IsDirty = false;
         }
 
@@ -550,7 +550,7 @@ namespace Reni
             if(HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.Pair(resultForArg.Refs);
             if(HasInternal && resultForArg.HasInternal)
-                result.Internal = Internal.CreateSequence(resultForArg.Internal);
+                result.Internal = Internal +resultForArg.Internal;
             return ReturnMethodDump(trace, result);
         }
 
@@ -654,6 +654,9 @@ namespace Reni
         {
             if(!HasInternal)
                 return this;
+            Tracer.Assert(!category.HasInternal);
+            var internalResult = Internal.Apply(x => x.Result(category),(Result a, Result b) => a.CreateSequence(b));
+
             var destructorResult = ResultProvider.Type(Internal).DestructorHandler(category);
             var result = Clone(category - Category.Internal);
             result.Internal = EmptyInternal;
@@ -758,14 +761,7 @@ namespace Reni
             return result;
         }
 
-        internal static IInternalResultProvider EmptyInternal = new EmptyInternalInstance();
-    }
-
-    internal class EmptyInternalInstance : IInternalResultProvider
-    {
-        public Result Result(Category category) { return TypeBase.CreateVoidResult(category); }
-        public IInternalResultProvider CreateSequence(IInternalResultProvider secondElement) { return secondElement; }
-        public IInternalResultProvider CreateReverseSequence(IInternalResultProvider firstElement) { return firstElement; }
+        internal static Sequence<IInternalResultProvider> EmptyInternal = HWString.Sequence<IInternalResultProvider>() ;
     }
 
     internal interface IInternalResultProvider : IResultProvider

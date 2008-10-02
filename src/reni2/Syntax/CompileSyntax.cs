@@ -40,7 +40,7 @@ namespace Reni.Syntax
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
-            var trace = ObjectId == -82 && context is Function && category.HasRefs;
+            var trace = ObjectId == 82 && context is Function && category.HasRefs;
             StartMethodDumpWithBreak(trace, context, category);
             if (category.HasInternal || !(category.HasCode || category.HasRefs))
                 return ReturnMethodDumpWithBreak(trace, Result(context, category).Align(context.AlignBits));
