@@ -94,6 +94,14 @@ namespace Reni.Code
             return 1;
         }
 
+        internal override int InternalRef(InternalRef visitedObject)
+        {
+            if(!IsInternal)
+                throw new UnexpectedInternalRefInContainer(this, visitedObject);
+            DataAdd(visitedObject.ToLeafElement);
+            return 1;
+        }
+
         internal override int Child(int parent, LeafElement leafElement) { return parent + Leaf(leafElement); }
 
         internal override int Leaf(LeafElement leafElement)
@@ -168,7 +176,7 @@ namespace Reni.Code
             var statements = new StorageDescriptor(MaxSize.ByteAlignedSize, _frameSize).GetBody(_data, isFunction);
             if(useStatementAligner)
                 statements = StatementAligner(statements);
-            statements = HWString.Surround(statements, "{", "}");
+            statements = statements.Surround("{", "}");
             statements = "fixed(sbyte*data=new sbyte[" + _maxSize.ByteCount + "])" + statements;
             statements = HWString.Indent(statements, 3);
             return statements;
@@ -184,19 +192,10 @@ namespace Reni.Code
             return aligner.Format(statements);
         }
 
-        internal class UnexpectedContextRefInContainer : Exception
+        internal sealed class UnexpectedContextRefInContainer : CodeBaseException
         {
-            private readonly Container _container;
-            private readonly CodeBase _visitedObject;
-
             internal UnexpectedContextRefInContainer(Container container, CodeBase visitedObject)
-            {
-                _container = container;
-                _visitedObject = visitedObject;
-            }
-
-            internal Container Container { get { return _container; } }
-            internal CodeBase VisitedObject { get { return _visitedObject; } }
+                : base(container, visitedObject) { }
         }
 
         internal BitsConst Evaluate()
@@ -206,6 +205,29 @@ namespace Reni.Code
 
             NotImplementedMethod();
             return null;
+        }
+
+        internal abstract class CodeBaseException : Exception
+        {
+            private readonly Container _container;
+            private readonly CodeBase _visitedObject;
+
+            protected CodeBaseException(Container container,
+                CodeBase visitedObject)
+            {
+                _container = container;
+                _visitedObject = visitedObject;
+            }
+
+            internal Container Container { get { return _container; } }
+            internal CodeBase VisitedObject { get { return _visitedObject; } }
+        }
+
+        internal sealed class UnexpectedInternalRefInContainer : CodeBaseException
+        {
+            public UnexpectedInternalRefInContainer(Container container,
+                CodeBase visitedObject)
+                : base(container, visitedObject) { }
         }
     }
 

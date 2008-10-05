@@ -19,29 +19,31 @@ namespace Reni.Code
 
         internal protected override Size GetSize() { return _size; }
 
-        public override Result VirtVisit<Result>(Visitor<Result> actual)
-        {
-            return actual.Arg(this);
-        }
+        public override Result VirtVisit<Result>(Visitor<Result> actual) { return actual.Arg(this); }
     }
 
-    internal class InternalRef : CodeBase
+    internal class InternalRef : CodeBase, IContextRefInCode
     {
         private readonly RefAlignParam _refAlignParam;
-        private readonly IInternalResultProvider _internalProvider;
+        internal readonly IInternalResultProvider InternalProvider;
 
         public InternalRef(RefAlignParam refAlignParam, IInternalResultProvider internalProvider)
         {
             _refAlignParam = refAlignParam;
-            _internalProvider = internalProvider;
+            InternalProvider = internalProvider;
         }
+
+        [DumpData(false)]
+        public LeafElement ToLeafElement { get { return new ContextRef(this); } }
 
         internal protected override Size GetSize() { return _refAlignParam.RefSize; }
 
-        public override Result VirtVisit<Result>(Visitor<Result> actual)
-        {
-            return actual.InternalRef(this);
-        }
-    }
+        public override Result VirtVisit<Result>(Visitor<Result> actual) { return actual.InternalRef(this); }
+        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
+        Size IContextRefInCode.RefSize { get { return RefAlignParam.RefSize; } }
+        RefAlignParam IContextRefInCode.RefAlignParam { get { return RefAlignParam; } }
+        bool IContextRefInCode.IsChildOf(ContextBase contextBase) { return false; }
+
+    }
 }

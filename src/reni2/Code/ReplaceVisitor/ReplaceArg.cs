@@ -19,11 +19,6 @@ namespace Reni.Code.ReplaceVisitor
         public CodeBase ActualArg { get { return _actualArg; } }
         public abstract CodeBase Actual { get; }
 
-        internal override CodeBase ContextRef(ContextRefCode visitedObject)
-        {
-            return null;
-        }
-
         internal override CodeBase Arg(Arg visitedObject)
         {
             visitedObject.StopByObjectId(363);

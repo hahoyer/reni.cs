@@ -27,13 +27,7 @@ namespace Reni.Syntax
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
-            var trace = ObjectId == -82 && context is Function && category.HasRefs;
-            StartMethodDumpWithBreak(trace, context, category);
-            if(category.HasInternal || !(category.HasCode || category.HasRefs))
-                return ReturnMethodDumpWithBreak(trace, Result(context, category).Align(context.AlignBits));
-            var result = Result(context, category | Category.Internal | Category.Type).Align(context.AlignBits);
-            DumpWithBreak(trace, "result", result);
-            return ReturnMethodDumpWithBreak(trace, result.CreateStatement(category));
+            return Result(context, category).Align(context.AlignBits);
         }
 
         internal protected virtual Result Result(ContextBase context, Category category)
