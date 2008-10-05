@@ -242,7 +242,7 @@ namespace Reni.Type
         Result IPrefixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object)
         {
             var objectSize = callContext.Type(@object).UnrefSize;
-            var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element, () => Size.Zero);
+            var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element);
             if (objectResult.IsPending)
                 return Result.CreatePending(category);
 
@@ -256,10 +256,10 @@ namespace Reni.Type
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             var objectSize = callContext.Type(@object).UnrefSize;
-            var argsResult = callContext.ConvertToSequenceViaRef(category, args, _sequence.Element, () => objectSize.ByteAlignedSize);
+            var argsResult = callContext.ConvertToSequenceViaRef(category, args, _sequence.Element);
             if (argsResult.IsPending)
                 return Result.CreatePending(category);
-            var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element, () => ResultProvider.Size(argsResult.Internal));
+            var objectResult = callContext.ConvertToSequenceViaRef(category, @object, _sequence.Element);
             if (objectResult.IsPending)
                 return Result.CreatePending(category);
 

@@ -22,6 +22,11 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
+        internal virtual T InternalRef(InternalRef visitedObject)
+        {
+            NotImplementedMethod(visitedObject);
+            throw new NotImplementedException();
+        }
         internal virtual T Child(T parent, LeafElement leafElement)
         {
             NotImplementedMethod(parent, leafElement);
@@ -92,5 +97,6 @@ namespace Reni.Code
             tempActual = tempActual.AfterElse(This.ThenElseObjectId);
             return tempActual.ThenElse(This, condResult, thenResult, elseResult);
         }
+
     }
 }

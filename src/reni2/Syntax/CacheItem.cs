@@ -9,27 +9,18 @@ namespace Reni.Syntax
 {
     internal abstract class InternalResultProvider : ReniObject, IInternalResultProvider
     {
-        IInternalResultProvider IInternalResultProvider.CreateSequence(IInternalResultProvider secondElement)
-        {
-            return secondElement.CreateReverseSequence(this);
-        }
-
-        IInternalResultProvider IInternalResultProvider.CreateReverseSequence(IInternalResultProvider firstElement)
-        {
-            return new ResultProviderPair(firstElement,this);
-        }
-
         [DebuggerHidden]
         Result IResultProvider.Result(Category category) { return Result(category); }
         protected abstract Result Result(Category category);
     }
 
-    /// <summary>
-    /// For each syntax  object, the environment is mapped against the corresponding compilation result.
-    /// The mapping for one environment is extended, each time more categories are requested
-    /// </summary>
+    internal interface IResultCacheItem
+    {
+        Result Result(Category category);
+    }
+
     [Serializable]
-    internal sealed class CacheItem : InternalResultProvider, IIconKeyProvider
+    internal sealed class CacheItem : ReniObject, IIconKeyProvider, IResultCacheItem
     {
         private readonly ICompileSyntax _syntax;
         private readonly ContextBase _context;
@@ -47,7 +38,7 @@ namespace Reni.Syntax
         }
 
         [DebuggerHidden]
-        protected override Result Result(Category category) { return _data.AddCategories(category, _context, _syntax); }
+        Result IResultCacheItem.Result(Category category) { return _data.AddCategories(category, _context, _syntax); }
 
         /// <summary>
         /// Gets the icon key.
@@ -56,26 +47,7 @@ namespace Reni.Syntax
         public string IconKey { get { return "Cache"; } }
     }
 
-    internal class ResultProviderPair : InternalResultProvider
-    {
-        [Node]
-        internal readonly IInternalResultProvider FirstElement;
-        [Node]
-        internal readonly IInternalResultProvider SecondElement;
-
-        public ResultProviderPair(IInternalResultProvider firstElement, IInternalResultProvider secondElement)
-        {
-            FirstElement = firstElement;
-            SecondElement = secondElement;
-        }
-
-        protected override Result Result(Category category)
-        {
-            return FirstElement.Result(category).CreateSequence(SecondElement.Result(category));
-        }
-    }
-
-    internal class ConversionResultProvider: InternalResultProvider
+    sealed internal class ConversionResultProvider: InternalResultProvider
     {
         internal readonly ICompileSyntax Syntax;
         internal readonly ContextBase ContextBase;
@@ -91,6 +63,23 @@ namespace Reni.Syntax
         protected override Result Result(Category category)
         {
             return  ContextBase.Result(category | Category.Type, Syntax).ConvertTo(Target);
+        }
+    }
+
+    sealed internal class ResultProvider : InternalResultProvider
+    {
+        internal readonly ICompileSyntax Syntax;
+        internal readonly ContextBase ContextBase;
+        
+        public ResultProvider(ICompileSyntax syntax, ContextBase contextBase)
+        {
+            Syntax = syntax;
+            ContextBase = contextBase;
+        }
+
+        protected override Result Result(Category category)
+        {
+            return ContextBase.Result(category | Category.Type, Syntax);
         }
     }
 }

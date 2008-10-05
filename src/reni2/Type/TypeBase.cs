@@ -157,18 +157,35 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None, ()=>Result.EmptyInternal); }
-        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<IInternalResultProvider> getInternal)
+        internal Result CreateResult(Category category, Func<CodeBase> getCode)
         {
             return CreateResult(
                 category, 
                 getCode, 
                 Refs.None, 
-                ()=> HWString.Sequence(getInternal())
+                ()=>Result.EmptyInternal
                 );
         }
-        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Sequence<IInternalResultProvider>> getInternal) { return CreateResult(category, getCode, Refs.None, getInternal); }
-        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs) { return CreateResult(category, getCode, getRefs, () => Result.EmptyInternal); }
+        
+        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
+        {
+            return CreateResult(
+                category, 
+                getCode, 
+                getRefs, 
+                () => Result.EmptyInternal
+                );
+        }
+
+        internal Result CreateResult(Category category, RefAlignParam refAlignParam, IInternalResultProvider internalProvider)
+        {
+            return CreateResult(
+                category,
+                () => CodeBase.CreateInternalRef(refAlignParam, internalProvider),
+                Refs.None,
+                () => HWString.Sequence(internalProvider)
+                );
+        }
 
         internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs, Func<Sequence<IInternalResultProvider>> getInternal)
         {

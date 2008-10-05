@@ -54,8 +54,7 @@ namespace Reni.Type
                 (
                 category, 
                 args, 
-                destinationType.Target.CreateAutomaticRef(destinationType.RefAlignParam), 
-                () => destinationType.Size.ByteAlignedSize
+                destinationType.Target.CreateAutomaticRef(destinationType.RefAlignParam)
                 );
             if (sourceResult.IsPending)
                 return Result.CreatePending(category);

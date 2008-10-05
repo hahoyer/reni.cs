@@ -113,10 +113,10 @@ namespace Reni.Context
             return cacheElem.Result(category.Replendish()).Filter(category);
         }
 
-        private IResultProvider CreateCacheElement(ICompileSyntax syntax)
+        private IResultCacheItem CreateCacheElement(ICompileSyntax syntax)
         {
             var result = new CacheItem(syntax, this);
-            syntax.AddToCache(this, result);
+            syntax.AddToCacheForDebug(this, result);
             return result;
         }
 
@@ -168,7 +168,7 @@ namespace Reni.Context
                 .Align(AlignBits);
         }
 
-        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType, Func<Size> offset)
+        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType)
         {
             var type = Type(syntax);
             if (type.IsPending)
@@ -176,7 +176,7 @@ namespace Reni.Context
 
             var target = elementType.CreateSequence(type.SequenceCount);
 
-            var applyToRef = ResultAsRef(category | Category.Type, syntax, offset);
+            var applyToRef = ResultAsRef(category | Category.Type, syntax);
             if (applyToRef.IsPending)
                 return Reni.Result.CreatePending(category);
             applyToRef.AssertComplete(category | Category.Type, syntax);
@@ -187,7 +187,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal Result ResultAsRef(Category category, ICompileSyntax syntax, Func<Size> offset)
+        internal Result ResultAsRef(Category category, ICompileSyntax syntax)
         {
             var type = Type(syntax);
             if (type.IsRef(RefAlignParam))
@@ -195,14 +195,10 @@ namespace Reni.Context
 
             return type
                 .CreateAutomaticRef(RefAlignParam)
-                .CreateResult(
-                category,
-                () => CodeBase.CreateTopRef(RefAlignParam, offset()),
-                () => new CacheItem(syntax,this)
-                );
+                .CreateResult(category,RefAlignParam,new ResultProvider(syntax,this));
         }
 
-        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target, Func<Size> offset)
+        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target)
         {
             var type = Type(syntax);
             if (type.IsRefLike(target))
@@ -211,18 +207,12 @@ namespace Reni.Context
             if(type.IsRef(RefAlignParam))
             {
                 var result = type.Conversion(category, target.Target).UseWithArg(Result(category, syntax));
-                NotImplementedMethod(category, syntax, target, offset, "type", type, "result", result);
+                NotImplementedMethod(category, syntax, target, "type", type, "result", result);
                 return result;
             }
 
-            return target.CreateResult(
-                category, 
-                () => CodeBase.CreateTopRef(target.RefAlignParam, offset()),
-                () => new ConversionResultProvider(syntax,this,target.Target)
-                );
+            return target.CreateResult(category,RefAlignParam,new ConversionResultProvider(syntax, this, target.Target));
         }
-
-        internal Result ResultAsRef(Category category, ICompileSyntax syntax) { return ResultAsRef(category, syntax, () => Reni.Size.Zero); }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
@@ -292,7 +282,7 @@ namespace Reni.Context
         [Node, SmartNode]
         internal readonly SimpleCache<Result> _topRefResultCache = new SimpleCache<Result>();
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, IResultProvider> _resultCache = new DictionaryEx<ICompileSyntax, IResultProvider>();
+        internal readonly DictionaryEx<ICompileSyntax, IResultCacheItem> _resultCache = new DictionaryEx<ICompileSyntax, IResultCacheItem>();
 
         /// <summary>
         /// Gets the icon key.

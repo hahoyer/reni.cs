@@ -655,8 +655,8 @@ namespace Reni
             if(!HasInternal)
                 return this;
             Tracer.Assert(!category.HasInternal);
-            Sequence<Result> internalResults = Internal.Apply(x => x.Result(category));
-            var internalResult = internalResults.Serialize<Result>();
+            Sequence<Result> internalResults = Internal.Apply(x => x.Result(category|Category.Type));
+            var internalResult = internalResults.Serialize(TypeBase.CreateVoid.CreateResult(category));
 
             var destructorResults = internalResults.Apply(x => x.Type.DestructorHandler(category));
             var result = Clone(category - Category.Internal);
@@ -666,7 +666,7 @@ namespace Reni
             if(category.HasRefs)
                 result.Refs = internalResult.Refs
                     .CreateSequence(result.Refs)
-                    .CreateSequence(destructorResults.Apply(x=>x.Refs).Serialize<Refs>())
+                    .CreateSequence(destructorResults.Apply(x=>x.Refs).Serialize(Refs.None()))
                     .CreateSequence(moveResult.Refs);
             if(category.HasCode)
             {
@@ -682,7 +682,7 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateStatement() { return CreateStatement(Complete); }
+        internal Result CreateStatement() { return CreateStatement(Complete - Category.Internal); }
 
         internal static Result CreatePending(Category category)
         {
@@ -767,8 +767,6 @@ namespace Reni
 
     internal interface IInternalResultProvider : IResultProvider
     {
-        IInternalResultProvider CreateSequence(IInternalResultProvider secondElement);
-        IInternalResultProvider CreateReverseSequence(IInternalResultProvider firstElement);
     }
 
     /// <summary>

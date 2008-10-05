@@ -90,6 +90,12 @@ namespace Reni.Code
             return CreateLeaf(new TopRef(refAlignParam, Size.Zero));
         }
 
+        internal static CodeBase CreateInternalRef(RefAlignParam refAlignParam, IInternalResultProvider internalProvider)
+        {
+            return new InternalRef(refAlignParam, internalProvider);
+
+        }
+
         public static CodeBase CreateTopRef(RefAlignParam refAlignParam, Size offset)
         {
             return CreateLeaf(new TopRef(refAlignParam, offset));
@@ -276,6 +282,7 @@ namespace Reni.Code
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
+
     }
 
     internal interface IContextRefInCode {

@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using Reni.Context;
 
 namespace Reni.Code
 {
@@ -23,4 +24,24 @@ namespace Reni.Code
             return actual.Arg(this);
         }
     }
+
+    internal class InternalRef : CodeBase
+    {
+        private readonly RefAlignParam _refAlignParam;
+        private readonly IInternalResultProvider _internalProvider;
+
+        public InternalRef(RefAlignParam refAlignParam, IInternalResultProvider internalProvider)
+        {
+            _refAlignParam = refAlignParam;
+            _internalProvider = internalProvider;
+        }
+
+        internal protected override Size GetSize() { return _refAlignParam.RefSize; }
+
+        public override Result VirtVisit<Result>(Visitor<Result> actual)
+        {
+            return actual.InternalRef(this);
+        }
+    }
+
 }
