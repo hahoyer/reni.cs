@@ -26,27 +26,28 @@ namespace Reni
         internal protected override Result Result(ContextBase context, Category category)
         {
             var condResult = context.Result(category | Category.Type, Cond);
-            condResult = condResult.Type.Conversion(category, TypeBase.CreateBit)
-                .UseWithArg(condResult);
+            condResult = condResult.Type.Conversion(category, TypeBase.CreateBit).UseWithArg(condResult);
 
-            var thenResult = context.Result(category | Category.Type, Then).AutomaticDereference();
-            var elseResult = CreateElseResult(context, category).AutomaticDereference();
+
+            var branchCategory = category | Category.Internal;
+            var thenResult = context.Result(branchCategory | Category.Type, Then).AutomaticDereference();
+            var elseResult = CreateElseResult(context, branchCategory).AutomaticDereference();
 
             if(thenResult.Type.IsPending)
-                return elseResult.Type.ThenElseWithPending(category, condResult.Refs, elseResult.Refs);
+                return elseResult.Type.ThenElseWithPending(branchCategory, condResult.Refs, elseResult.Refs);
             if(elseResult.Type.IsPending)
-                return thenResult.Type.ThenElseWithPending(category, condResult.Refs, thenResult.Refs);
+                return thenResult.Type.ThenElseWithPending(branchCategory, condResult.Refs, thenResult.Refs);
 
             var commonType = thenResult.Type.CommonType(elseResult.Type);
 
-            thenResult = thenResult.Type.Conversion(category, commonType).UseWithArg(thenResult).CreateStatement();
-            elseResult = elseResult.Type.Conversion(category, commonType).UseWithArg(elseResult).CreateStatement();
+            thenResult = thenResult.Type.Conversion(branchCategory, commonType).UseWithArg(thenResult).CreateStatement();
+            elseResult = elseResult.Type.Conversion(branchCategory, commonType).UseWithArg(elseResult).CreateStatement();
 
             return commonType.CreateResult
                 (
                 category,
                 () => condResult.Code.CreateThenElse(thenResult.Code, elseResult.Code),
-                () => condResult.Refs.CreateSequence(thenResult.Refs).CreateSequence(elseResult.Refs),
+                () => condResult.Refs.CreateSequence(thenResult.Refs).CreateSequence(elseResult.Refs),                                                  
                 () => condResult.Internal
                 );
         }
