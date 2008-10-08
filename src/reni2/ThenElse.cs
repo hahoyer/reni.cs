@@ -25,13 +25,14 @@ namespace Reni
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            var condResult = context.Result(category | Category.Type, Cond);
-            condResult = condResult.Type.Conversion(category, TypeBase.CreateBit).UseWithArg(condResult);
+            if (category <= (Category.Type | Category.Size))
+                return context.Type(Then).CommonType(ElseResult(context, Category.Type).Type).CreateResult(category);
 
-
+            var condResult = context.ConvertToSequence(category | Category.Type, Cond, TypeBase.CreateBit,1);
+            
             var branchCategory = category | Category.Internal;
             var thenResult = context.Result(branchCategory | Category.Type, Then).AutomaticDereference();
-            var elseResult = CreateElseResult(context, branchCategory).AutomaticDereference();
+            var elseResult = ElseResult(context, branchCategory).AutomaticDereference();
 
             if(thenResult.Type.IsPending)
                 return elseResult.Type.ThenElseWithPending(branchCategory, condResult.Refs, elseResult.Refs);
@@ -52,7 +53,7 @@ namespace Reni
                 );
         }
 
-        protected abstract Result CreateElseResult(ContextBase context, Category category);
+        protected abstract Result ElseResult(ContextBase context, Category category);
 
         internal protected override string DumpShort()
         {
@@ -60,12 +61,12 @@ namespace Reni
         }
     }
 
-    [Serializable]
+    [Serializable]                               -
     internal sealed class ThenSyntax : CondSyntax
     {
         internal ThenSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(condSyntax, thenToken, thenSyntax) {}
 
-        protected override Result CreateElseResult(ContextBase context, Category category)
+        protected override Result ElseResult(ContextBase context, Category category)
         {
             return TypeBase.CreateVoidResult(category | Category.Type);
         }
@@ -91,7 +92,7 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        protected override Result CreateElseResult(ContextBase context, Category category)
+        protected override Result ElseResult(ContextBase context, Category category)
         {
             return context.Result(category | Category.Type, Else);
         }

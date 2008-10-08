@@ -168,16 +168,21 @@ namespace Reni.Context
                 .Align(AlignBits);
         }
 
-        internal Result ConvertToSequenceViaRef(Category category, ICompileSyntax syntax, TypeBase elementType)
+        internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType)
         {
             var type = Type(syntax);
-            if (type.IsPending)
+            if(type.IsPending)
                 return Reni.Result.CreatePending(category);
 
-            var target = elementType.CreateSequence(type.SequenceCount);
+            return ConvertToSequence(category, syntax, elementType, type.SequenceCount);
+        }
+
+        internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType, int sequenceCount)
+        {
+            var target = elementType.CreateSequence(sequenceCount);
 
             var applyToRef = ResultAsRef(category | Category.Type, syntax);
-            if (applyToRef.IsPending)
+            if(applyToRef.IsPending)
                 return Reni.Result.CreatePending(category);
             applyToRef.AssertComplete(category | Category.Type, syntax);
             var convertTo = applyToRef.ConvertTo(target).Filter(category);
@@ -190,18 +195,18 @@ namespace Reni.Context
         internal Result ResultAsRef(Category category, ICompileSyntax syntax)
         {
             var type = Type(syntax);
-            if (type.IsRef(RefAlignParam))
+            if(type.IsRef(RefAlignParam))
                 return Result(category, syntax);
 
             return type
                 .CreateAutomaticRef(RefAlignParam)
-                .CreateResult(category,RefAlignParam,new ResultProvider(syntax,this));
+                .CreateResult(category, RefAlignParam, new ResultProvider(syntax, this));
         }
 
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target)
         {
             var type = Type(syntax);
-            if (type.IsRefLike(target))
+            if(type.IsRefLike(target))
                 return target.CreateResult(category, Result(category & (Category.Code | Category.Refs | Category.Internal), syntax));
 
             if(type.IsRef(RefAlignParam))
@@ -211,7 +216,7 @@ namespace Reni.Context
                 return result;
             }
 
-            return target.CreateResult(category,RefAlignParam,new ConversionResultProvider(syntax, this, target.Target));
+            return target.CreateResult(category, RefAlignParam, new ConversionResultProvider(syntax, this, target.Target));
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
@@ -265,7 +270,6 @@ namespace Reni.Context
                 return PrefixResult(category, defineableToken, right);
             return InfixResult(category, left, defineableToken, right);
         }
-
     }
 
     [Serializable]
