@@ -25,24 +25,25 @@ namespace Reni
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            if (category <= (Category.Type | Category.Size))
-                return context.Type(Then).CommonType(ElseResult(context, Category.Type).Type).CreateResult(category);
+            var thenType = context.Type(Then).AutomaticDereference();
+            var elseType = ElseResult(context, Category.Type).Type.AutomaticDereference();
+            var commonType = thenType.CommonType(elseType);
+            if(category <= (Category.Type | Category.Size))
+                return commonType.CreateResult(category);
 
             var condResult = context.ConvertToSequence(category | Category.Type, Cond, TypeBase.CreateBit,1);
-            
-            var branchCategory = category | Category.Internal;
-            var thenResult = context.Result(branchCategory | Category.Type, Then).AutomaticDereference();
+
+            var branchCategory = category | Category.Internal | Category.Type;
+            var thenResult = context.Result(branchCategory, Then).AutomaticDereference();
             var elseResult = ElseResult(context, branchCategory).AutomaticDereference();
 
-            if(thenResult.Type.IsPending)
-                return elseResult.Type.ThenElseWithPending(branchCategory, condResult.Refs, elseResult.Refs);
-            if(elseResult.Type.IsPending)
-                return thenResult.Type.ThenElseWithPending(branchCategory, condResult.Refs, thenResult.Refs);
+            if(thenType.IsPending)
+                return elseType.ThenElseWithPending(branchCategory, condResult.Refs, elseResult.Refs);
+            if(elseType.IsPending)
+                return thenType.ThenElseWithPending(branchCategory, condResult.Refs, thenResult.Refs);
 
-            var commonType = thenResult.Type.CommonType(elseResult.Type);
-
-            thenResult = thenResult.Type.Conversion(branchCategory, commonType).UseWithArg(thenResult).CreateStatement();
-            elseResult = elseResult.Type.Conversion(branchCategory, commonType).UseWithArg(elseResult).CreateStatement();
+            thenResult = thenType.Conversion(branchCategory, commonType).UseWithArg(thenResult).CreateStatement(category);
+            elseResult = elseType.Conversion(branchCategory, commonType).UseWithArg(elseResult).CreateStatement(category);
 
             return commonType.CreateResult
                 (
@@ -61,7 +62,7 @@ namespace Reni
         }
     }
 
-    [Serializable]                               -
+    [Serializable]                               
     internal sealed class ThenSyntax : CondSyntax
     {
         internal ThenSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(condSyntax, thenToken, thenSyntax) {}

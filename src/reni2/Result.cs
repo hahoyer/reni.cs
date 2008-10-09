@@ -652,10 +652,9 @@ namespace Reni
 
         internal Result CreateStatement(Category category)
         {
-            if(!HasInternal)
-                return this;
-            Tracer.Assert(!category.HasInternal);
-            Sequence<Result> internalResults = Internal.Apply(x => x.Result(category|Category.Type));
+            if (!HasInternal)
+                return Filter(category);
+            Sequence<Result> internalResults = CollectInternalResults(category);
             var internalResult = internalResults.Serialize(TypeBase.CreateVoid.CreateResult(category));
 
             var destructorResults = internalResults.Apply(x => x.Type.DestructorHandler(category));
@@ -682,7 +681,14 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateStatement() { return CreateStatement(Complete - Category.Internal); }
+        private Sequence<Result> CollectInternalResults(Category category)
+        {
+            return Internal.Apply<Result>(x =>
+            {
+                var last = x.Result(category | Category.Type | Category.Internal);
+                return last.CollectInternalResults(category) + last;
+            });
+        }
 
         internal static Result CreatePending(Category category)
         {

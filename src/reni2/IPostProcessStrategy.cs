@@ -13,12 +13,12 @@ namespace Reni
 
         internal PostProcessorForResult(Result result) { _result = result; }
 
-        internal Result InternalResultForStruct(int alignBits)
+        internal Result InternalResultForStruct(Category category, int alignBits)
         {
             return _result
                 .AutomaticDereference()
                 .Align(alignBits)
-                .CreateStatement();
+                .CreateStatement(category);
         }
 
         internal Result FunctionResult(int alignBits)

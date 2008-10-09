@@ -105,10 +105,13 @@ namespace Reni.Struct
 
         private Result InternalResult(Category category, int position)
         {
+            var localCategory = category | Category.Type;
+            if (category.HasCode || category.HasRefs)
+                localCategory |= Category.Internal;
             Result result = CreatePosition(position)
-                .Result(category | Category.Type, StatementList[position])
+                .Result(localCategory, StatementList[position])
                 .PostProcessor
-                .InternalResultForStruct(AlignBits);
+                .InternalResultForStruct(category, AlignBits);
             if (_internalResult[position] == null)
                 _internalResult[position] = new Result();
             _internalResult[position].Update(result);
