@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -654,10 +655,10 @@ namespace Reni
         {
             if (!HasInternal)
                 return Filter(category);
-            Sequence<Result> internalResults = CollectInternalResults(category);
-            var internalResult = internalResults.Serialize(TypeBase.CreateVoid.CreateResult(category));
+            var internalResults = CollectInternalResults(category);
 
-            var destructorResults = internalResults.Apply(x => x.Type.DestructorHandler(category));
+            var internalResult = internalResults.Serialize(TypeBase.CreateVoid.CreateResult(category));
+            var destructorResults =  from x in internalResults where !x.IsEmpty select internalResult; //.Apply1(x => x.Type.DestructorHandler(category));
             var result = Clone(category - Category.Internal);
             result.Internal = EmptyInternal;
             var moveResult = Type.MoveHandler(category);
@@ -683,7 +684,7 @@ namespace Reni
 
         private Sequence<Result> CollectInternalResults(Category category)
         {
-            return Internal.Apply<Result>(x =>
+            return Internal.Apply(x =>
             {
                 var last = x.Result(category | Category.Type | Category.Internal);
                 return last.CollectInternalResults(category) + last;
