@@ -655,10 +655,16 @@ namespace Reni
         {
             if (!HasInternal)
                 return Filter(category);
-            var internalResults = CollectInternalResults(category);
+            if (Internal.IsEmpty)
+                return this;
 
+            NotImplementedMethod(category);
+            return null;
+            /*
+            var internalResults = CollectInternalResults(category);
             var internalResult = internalResults.Serialize(TypeBase.CreateVoid.CreateResult(category));
-            var destructorResults =  from x in internalResults where !x.IsEmpty select internalResult; //.Apply1(x => x.Type.DestructorHandler(category));
+
+            var destructorResults = internalResults.Apply1(x => x.Type.DestructorHandler(category));
             var result = Clone(category - Category.Internal);
             result.Internal = EmptyInternal;
             var moveResult = Type.MoveHandler(category);
@@ -680,6 +686,7 @@ namespace Reni
             }
             result.AssertValid();
             return result;
+             */
         }
 
         private Sequence<Result> CollectInternalResults(Category category)
