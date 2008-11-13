@@ -24,7 +24,6 @@ namespace Reni
         private TypeBase _type;
         private CodeBase _code;
         private Refs _refs;
-        private Sequence<IInternalResultProvider> _internal;
         internal PostProcessorForResult PostProcessor;
 
         /// <summary>
@@ -40,7 +39,6 @@ namespace Reni
         internal bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
-        internal bool HasInternal { get { return Internal != null; } }
 
         /// <summary>
         /// In case of recursion, there may be pending requests

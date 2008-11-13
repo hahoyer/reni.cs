@@ -17,38 +17,33 @@ namespace Reni
         private readonly bool _type;
         private readonly bool _refs;
         private readonly bool _size;
-        private readonly bool _internal;
 
         public Category()
         {
         }
 
-        internal Category(bool size, bool type, bool code, bool refs, bool @internal)
+        internal Category(bool size, bool type, bool code, bool refs)
         {
             _code = code;
-            _internal = @internal;
             _type = type;
             _refs = refs;
             _size = size;
         }
 
         [DebuggerHidden]
-        public static Category Size { get { return new Category(true, false, false, false, false); } }
+        public static Category Size { get { return new Category(true, false, false, false); } }
         [DebuggerHidden]
-        public static Category Type { get { return new Category(false, true, false, false, false); } }
+        public static Category Type { get { return new Category(false, true, false, false); } }
         [DebuggerHidden]
-        public static Category Code { get { return new Category(false, false, true, false, false); } }
+        public static Category Code { get { return new Category(false, false, true, false); } }
         [DebuggerHidden]
-        public static Category Refs { get { return new Category(false, false, false, true, false); } }
-        [DebuggerHidden]
-        public static Category Internal { get { return new Category(false, false, false, false, true); } }
+        public static Category Refs { get { return new Category(false, false, false, true); } }
 
-        public bool IsNull { get { return !(_code || _type || _refs || _size || _internal); } }
+        public bool IsNull { get { return !(_code || _type || _refs || _size); } }
         public bool HasCode { get { return _code; } }
         public bool HasType { get { return _type; } }
         public bool HasRefs { get { return _refs; } }
         public bool HasSize { get { return _size; } }
-        public bool HasInternal { get { return _internal; } }
 
         /// <summary>
         /// Some categories are dependent. This function replendishes those categories.
@@ -78,8 +73,7 @@ namespace Reni
                 x.HasSize || y.HasSize,
                 x.HasType || y.HasType,
                 x.HasCode || y.HasCode,
-                x.HasRefs || y.HasRefs,
-                x.HasInternal || y.HasInternal
+                x.HasRefs || y.HasRefs
                 );
         }
 
@@ -95,8 +89,7 @@ namespace Reni
                 x.HasSize && y.HasSize,
                 x.HasType && y.HasType,
                 x.HasCode && y.HasCode,
-                x.HasRefs && y.HasRefs,
-                x.HasInternal && y.HasInternal);
+                x.HasRefs && y.HasRefs);
         }
 
         /// <summary>
@@ -111,7 +104,6 @@ namespace Reni
                 result = (result*397) ^ _type.GetHashCode();
                 result = (result*397) ^ _refs.GetHashCode();
                 result = (result*397) ^ _size.GetHashCode();
-                result = (result*397) ^ _internal.GetHashCode();
                 return result;
             }
         }
@@ -131,7 +123,6 @@ namespace Reni
                 && HasRefs == x.HasRefs
                 && HasSize == x.HasSize
                 && HasType == x.HasType
-                && HasInternal == x.HasInternal
                 ;
         }
         private bool IsLessThan(Category x)
@@ -141,7 +132,6 @@ namespace Reni
                 || (!HasRefs && x.HasRefs)
                 || (!HasSize && x.HasSize)
                 || (!HasType && x.HasType)
-                || (!HasInternal && x.HasInternal)
                 ;
         }
         /// <summary>
@@ -156,8 +146,7 @@ namespace Reni
                 x.HasSize && !y.HasSize,
                 x.HasType && !y.HasType,
                 x.HasCode && !y.HasCode,
-                x.HasRefs && !y.HasRefs,
-                x.HasInternal && !y.HasInternal);
+                x.HasRefs && !y.HasRefs);
         }
 
         /// <summary>
@@ -171,7 +160,6 @@ namespace Reni
             if(HasType) result += ".Type.";
             if(HasRefs) result += ".Refs.";
             if(HasCode) result += ".Code.";
-            if (HasInternal) result += ".Internal.";
             result = result.Replace("..", ",").Replace(".", "");
             if (result == "")
                 return "none";
@@ -187,7 +175,7 @@ namespace Reni
                 return false;
             if(ReferenceEquals(this, obj))
                 return true;
-            return obj._code.Equals(_code) && obj._type.Equals(_type) && obj._refs.Equals(_refs) && obj._size.Equals(_size) && obj._internal.Equals(_internal);
+            return obj._code.Equals(_code) && obj._type.Equals(_type) && obj._refs.Equals(_refs) && obj._size.Equals(_size);
         }
 
         public override bool Equals(object obj)
