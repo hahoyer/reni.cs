@@ -47,7 +47,7 @@ namespace Reni.Type
                 () => CodeBase.CreateArg(destinationType.Size*2).CreateAssignment(callContext.RefAlignParam,destinationType.Target.Size)
                 );
 
-            if (!category.HasCode && !category.HasRefs && !category.HasInternal)
+            if (!category.HasCode && !category.HasRefs)
                 return result;
 
             var sourceResult = callContext.ConvertedRefResult

@@ -27,7 +27,7 @@ namespace Reni.Struct
 
         internal Result ConstructorResult(Category category)
         {
-            var internalResult = InternalResult(category - Category.Type - Category.Internal);
+            var internalResult = InternalResult(category - Category.Type);
             _internalConstructorResult.Update(internalResult);
             var constructorResult = NaturalType.CreateResult(category, internalResult)
                 .ReplaceRelativeContextRef(this, CodeBase.CreateTopRef(RefAlignParam));

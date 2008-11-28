@@ -25,9 +25,9 @@ namespace Reni.Parser.TokenClass.Name
         {
             if(args != null)
                 NotImplementedMethod(callContext, category, @object, args);
-            if(!category.HasInternal && !category.HasCode && !category.HasRefs)
-                return Type.Void.CreateResult(category);
-            return callContext.ApplyResult(category, @object, ot => ot.DumpPrint(category));
+            if(category.HasCode || category.HasRefs)
+                return callContext.ApplyResult(category, @object, ot => ot.DumpPrint(category));
+            return Type.Void.CreateResult(category);
         }
     }
 }

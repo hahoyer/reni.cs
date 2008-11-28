@@ -33,7 +33,7 @@ namespace Reni
 
             var condResult = context.ConvertToSequence(category | Category.Type, Cond, TypeBase.CreateBit,1);
 
-            var branchCategory = category | Category.Internal | Category.Type;
+            var branchCategory = category | Category.Type;
             var thenResult = context.Result(branchCategory, Then).AutomaticDereference();
             var elseResult = ElseResult(context, branchCategory).AutomaticDereference();
 
@@ -49,8 +49,7 @@ namespace Reni
                 (
                 category,
                 () => condResult.Code.CreateThenElse(thenResult.Code, elseResult.Code),
-                () => condResult.Refs.CreateSequence(thenResult.Refs).CreateSequence(elseResult.Refs),                                                  
-                () => condResult.Internal
+                () => condResult.Refs.CreateSequence(thenResult.Refs).CreateSequence(elseResult.Refs)
                 );
         }
 

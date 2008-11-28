@@ -49,7 +49,7 @@ namespace Reni
         /// <summary>
         /// Obtain the category signature contained
         /// </summary>
-        public Category Complete { get { return new Category(HasSize, HasType, HasCode, HasRefs, HasInternal); } }
+        public Category Complete { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
 
         [Node]
         public Size Size
@@ -95,17 +95,6 @@ namespace Reni
             }
         }
 
-        [Node]
-        public Sequence<IInternalResultProvider> Internal
-        {
-            get { return _internal; }
-            set
-            {
-                _internal = value;
-                AssertValid();
-            }
-        }
-
         TreeNode[] ITreeNodeSupport.CreateNodes()
         {
             var result = new List<TreeNode>();
@@ -119,8 +108,6 @@ namespace Reni
                 result.Add(Service.CreateNamedNode("Code", "Code", Code));
             if(HasRefs)
                 result.Add(Service.CreateNamedNode("Refs", "Refs", Refs.Data));
-            if(HasInternal)
-                result.Add(Service.CreateNamedNode("Internal", "Code", Internal));
             return result.ToArray();
         }
 
@@ -256,8 +243,6 @@ namespace Reni
                 result += "\nRefs=" + Tracer.Dump(_refs);
             if(HasCode)
                 result += "\nCode=" + Tracer.Dump(_code);
-            if(HasInternal)
-                result += "\nInternal=" + Tracer.Dump(_internal);
             return result;
         }
 
@@ -285,9 +270,6 @@ namespace Reni
             if(r.HasCode && !r.Code.IsPending)
                 _code = r.Code;
 
-            if(r.HasInternal)
-                _internal = r.Internal;
-
             AssertValid();
         }
 
@@ -301,11 +283,6 @@ namespace Reni
                 _refs = r.Refs ?? Refs.Pending;
             if(c.HasCode)
                 _code = r.Code ?? CodeBase.Pending;
-            if(c.HasInternal)
-            {
-                Tracer.Assert(r.HasInternal);
-                _internal = r.Internal;
-            }
             AssertValid();
         }
 
@@ -343,8 +320,6 @@ namespace Reni
                 r.Code = Code.CreateBitCast(alignedSize);
             if(HasRefs)
                 r.Refs = Refs;
-            if(HasInternal)
-                r.Internal = Internal;
             return r;
         }
 
@@ -362,8 +337,6 @@ namespace Reni
                 r.Code = Code;
             if(category.HasRefs)
                 r.Refs = Refs;
-            if(category.HasInternal)
-                r.Internal = Internal;
             return r;
         }
 
@@ -403,8 +376,6 @@ namespace Reni
             if(category.HasCode && !Complete.HasCode)
                 return false;
             if(category.HasRefs && !Complete.HasRefs)
-                return false;
-            if(category.HasInternal && !Complete.HasInternal)
                 return false;
             return true;
         }
@@ -471,8 +442,6 @@ namespace Reni
                 Code = Code.CreateSequence(other.Code);
             if(category.HasRefs)
                 Refs = Refs.CreateSequence(other.Refs);
-            if(category.HasInternal)
-                Internal = Internal + other.Internal;
             IsDirty = false;
         }
 
@@ -543,13 +512,11 @@ namespace Reni
 
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
             StartMethodDump(trace, resultForArg);
-            var result = new Result {Size = Size, Type = Type, Internal = Internal};
+            var result = new Result {Size = Size, Type = Type};
             if(HasCode && resultForArg.HasCode)
                 result.Code = Code.UseWithArg(resultForArg.Code);
             if(HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.CreateSequence(resultForArg.Refs);
-            if(HasInternal && resultForArg.HasInternal)
-                result.Internal = Internal +resultForArg.Internal;
             return ReturnMethodDump(trace, result);
         }
 
@@ -567,7 +534,7 @@ namespace Reni
             if(HasRefs && !Refs.Contains(context))
                 return this;
 
-            var result = new Result {Size = Size, Type = Type, Internal = Internal, IsDirty = true};
+            var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
                 result.Code = Code.ReplaceAbsoluteContextRef(context, replacement.Code);
             if(HasRefs)
@@ -587,7 +554,7 @@ namespace Reni
             if(HasRefs && !Refs.Contains(context))
                 return this;
 
-            var result = new Result {Size = Size, Type = Type, Internal = Internal};
+            var result = new Result {Size = Size, Type = Type};
             if(HasCode)
                 result.Code = Code.ReplaceRelativeContextRef(context, replacement);
             if(HasRefs)
@@ -651,49 +618,12 @@ namespace Reni
 
         internal Result CreateStatement(Category category)
         {
-            if (!HasInternal)
-                return Filter(category);
-            if (Internal.IsEmpty)
+            if (!category.HasCode)
                 return this;
 
-            NotImplementedMethod(category);
-            return null;
-            /*
-            var internalResults = CollectInternalResults(category);
-            var internalResult = internalResults.Serialize(TypeBase.CreateVoid.CreateResult(category));
-
-            var destructorResults = internalResults.Apply1(x => x.Type.DestructorHandler(category));
-            var result = Clone(category - Category.Internal);
-            result.Internal = EmptyInternal;
-            var moveResult = Type.MoveHandler(category);
-
-            if(category.HasRefs)
-                result.Refs = internalResult.Refs
-                    .CreateSequence(result.Refs)
-                    .CreateSequence(destructorResults.Apply(x=>x.Refs).Serialize(Refs.None()))
-                    .CreateSequence(moveResult.Refs);
-            if(category.HasCode)
-            {
-                var resultCode = internalResult.Code.CreateStatementEndFromIntermediateStorage
-                    (
-                    Code,
-                    destructorResults.Apply(x=>x.Code).Serialize(CodeBase.CreateVoid()),
-                    moveResult.Code
-                    );
-                result.Code = resultCode;
-            }
-            result.AssertValid();
+            var result = Clone(category);
+            result.Code = result.Code.CreateStatement();
             return result;
-             */
-        }
-
-        private Sequence<Result> CollectInternalResults(Category category)
-        {
-            return Internal.Apply(x =>
-            {
-                var last = x.Result(category | Category.Type | Category.Internal);
-                return last.CollectInternalResults(category) + last;
-            });
         }
 
         internal static Result CreatePending(Category category)

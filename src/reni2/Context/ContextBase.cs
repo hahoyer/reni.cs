@@ -207,7 +207,7 @@ namespace Reni.Context
         {
             var type = Type(syntax);
             if(type.IsRefLike(target))
-                return target.CreateResult(category, Result(category & (Category.Code | Category.Refs | Category.Internal), syntax));
+                return target.CreateResult(category, Result(category & (Category.Code | Category.Refs), syntax));
 
             if(type.IsRef(RefAlignParam))
             {

@@ -74,14 +74,12 @@ namespace Reni.Context
 
         public Result CreateCall(Category category, Result args)
         {
-            var trace = ObjectId == -3 && category.HasInternal;
-            StartMethodDump(trace, category, args);
-            var localCategory = category - Category.Internal;
+            var localCategory = category;
             if(category.HasCode)
                 localCategory = (localCategory - Category.Code) | Category.Size;
             var result = Result(localCategory).Clone();
             if(result.IsPending)
-                return ReturnMethodDump(trace, result);
+                return result;
 
             if(category.HasRefs)
                 result.Refs = result.Refs.CreateSequence(args.Refs);
@@ -89,14 +87,8 @@ namespace Reni.Context
             if(category.HasCode)
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(Index, result.Size);
 
-            if(category.HasInternal)
-                result.Internal = args.Internal;
-
-            if(trace)
-                DumpDataWithBreak("", "result", result);
-
             Context.CreateFunction(Args).AssertCorrectRefs(result);
-            return ReturnMethodDump(trace, result);
+            return result;
         }
 
         private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return ForeignRefs.ToCode().CreateSequence(argsCode); }

@@ -45,5 +45,10 @@ namespace Reni.Code
         RefAlignParam IContextRefInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IContextRefInCode.IsChildOf(ContextBase contextBase) { return false; }
 
+        override internal CodeBase CreateStatement()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 }

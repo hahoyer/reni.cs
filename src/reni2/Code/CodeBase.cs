@@ -283,6 +283,10 @@ namespace Reni.Code
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
 
+        internal virtual CodeBase CreateStatement()
+        {
+            return this;
+        }
     }
 
     internal interface IContextRefInCode {

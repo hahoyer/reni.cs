@@ -152,42 +152,24 @@ namespace Reni.Type
                 result.Code = codeAndRefs.Code;
             if(category.HasRefs)
                 result.Refs = codeAndRefs.Refs;
-            if(category.HasInternal)
-                result.Internal = codeAndRefs.Internal;
             return result;
         }
 
         internal Result CreateResult(Category category, Func<CodeBase> getCode)
         {
-            return CreateResult(
-                category, 
-                getCode, 
-                Refs.None, 
-                ()=>Result.EmptyInternal
-                );
+            return CreateResult(category, getCode, Refs.None);
         }
         
-        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
-        {
-            return CreateResult(
-                category, 
-                getCode, 
-                getRefs, 
-                () => Result.EmptyInternal
-                );
-        }
-
         internal Result CreateResult(Category category, RefAlignParam refAlignParam, IInternalResultProvider internalProvider)
         {
             return CreateResult(
                 category,
                 () => CodeBase.CreateInternalRef(refAlignParam, internalProvider),
-                Refs.None,
-                () => HWString.Sequence(internalProvider)
+                () => internalProvider.Result(Category.Refs).Refs
                 );
         }
 
-        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs, Func<Sequence<IInternalResultProvider>> getInternal)
+        internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
             var result = new Result();
             if(category.HasSize)
@@ -198,8 +180,6 @@ namespace Reni.Type
                 result.Code = getCode();
             if(category.HasRefs)
                 result.Refs = getRefs();
-            if(category.HasInternal)
-                result.Internal = getInternal();
             return result;
         }
 
