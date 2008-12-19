@@ -68,7 +68,9 @@ namespace Reni.Syntax
 
     sealed internal class ResultProvider : InternalResultProvider
     {
+        [Node]
         internal readonly ICompileSyntax Syntax;
+        [Node]
         internal readonly ContextBase ContextBase;
         
         public ResultProvider(ICompileSyntax syntax, ContextBase contextBase)

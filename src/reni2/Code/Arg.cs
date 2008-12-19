@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Code
@@ -25,6 +26,7 @@ namespace Reni.Code
     internal class InternalRef : CodeBase, IContextRefInCode
     {
         private readonly RefAlignParam _refAlignParam;
+        [Node]
         internal readonly IInternalResultProvider InternalProvider;
 
         public InternalRef(RefAlignParam refAlignParam, IInternalResultProvider internalProvider)

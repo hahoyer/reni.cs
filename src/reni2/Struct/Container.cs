@@ -82,7 +82,7 @@ namespace Reni.Struct
                 _reverseDictionaryCache[pair.Value] = pair.Key;
         }
 
-        internal static IParsedSyntax Create(Token token, List<IParsedSyntax> parsed)
+        internal static Container Create(Token token, List<IParsedSyntax> parsed)
         {
             var result = new Container(token);
             foreach (var parsedSyntax in parsed)
@@ -90,7 +90,7 @@ namespace Reni.Struct
             return result;
         }
 
-        internal static IParsedSyntax Create(Token token, IParsedSyntax parsedSyntax)
+        internal static Container Create(Token token, IParsedSyntax parsedSyntax)
         {
             var result = new Container(token);
             result.Add(parsedSyntax);

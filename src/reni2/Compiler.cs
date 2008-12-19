@@ -96,7 +96,7 @@ namespace Reni
             get
             {
                 if(_code == null)
-                    _code = RootContext.Code(Syntax.ToCompileSyntax);
+                    _code = Struct.Container.Create(Syntax.Token, Syntax).Result(RootContext,Category.Code).Code;
 
                 return _code;
             }

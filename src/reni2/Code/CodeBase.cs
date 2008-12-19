@@ -285,7 +285,25 @@ namespace Reni.Code
 
         internal virtual CodeBase CreateStatement()
         {
+            var internalRefCollection = new InternalRefCollection();
+            Visit(internalRefCollection);
+            var internalCode = internalRefCollection.Code;
+            NotImplementedMethod("internalRefCollection",internalRefCollection);
             return this;
+        }
+    }
+
+    internal class InternalRefCollection : Base
+    {
+        [Node]
+        private Sequence<IInternalResultProvider> _data = new Sequence<IInternalResultProvider>();
+
+        public Sequence<CodeBase> Code { get { return _data.Apply1() } }
+
+        internal override CodeBase InternalRef(InternalRef visitedObject)
+        {
+            _data.Add(visitedObject.InternalProvider);
+            return base.InternalRef(visitedObject);
         }
     }
 

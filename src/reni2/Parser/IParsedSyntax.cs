@@ -11,6 +11,8 @@ namespace Reni.Parser
         string DumpShort();
 
         [DumpData(false)]
+        Token Token { get; }
+        [DumpData(false)]
         ICompileSyntax ToCompileSyntax { get; }
 
         IParsedSyntax SurroundedByParenthesis(Token token);

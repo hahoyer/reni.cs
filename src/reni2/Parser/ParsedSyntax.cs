@@ -11,14 +11,15 @@ namespace Reni.Parser
     {
         private static bool _isInDump;
         internal readonly Token Token;
-        internal static bool IsDetailedDumpRequired = false;
+        internal static bool IsDetailedDumpRequired;
 
         protected ParsedSyntax(Token token)
         {
             Token = token;
         }
 
-        protected ParsedSyntax(Token token, int nextObjectId) : base(nextObjectId)
+        protected ParsedSyntax(Token token, int nextObjectId)
+            : base(nextObjectId)
         {
             Token = token;
         }
@@ -34,7 +35,7 @@ namespace Reni.Parser
             _isInDump = true;
             var result = DumpShort();
             if(!IsDetailedDumpRequired)
-            return result;
+                return result;
             if(!isInDump)
                 result += FilePosition();
             if(!isInContainerDump)
@@ -48,6 +49,8 @@ namespace Reni.Parser
         {
             return DumpShort();
         }
+
+        Token IParsedSyntax.Token { get { return Token; } }
 
         IParsedSyntax IParsedSyntax.SurroundedByParenthesis(Token token)
         {
