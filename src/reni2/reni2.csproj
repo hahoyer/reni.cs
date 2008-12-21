@@ -3,6 +3,7 @@
     <ProjectGuid>{EBB73C84-6622-4183-A28F-B0DFF606006B}</ProjectGuid>
     <AssemblyName>Reni</AssemblyName>
     <TargetTypeEx>CSharp.Library.UnitTest</TargetTypeEx>
+    <ProductVersion>9.0.30729</ProductVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\HWClassLibrary\HWClassLibrary.csproj">
@@ -28,16 +29,16 @@
     <Compile Include="Code\ContextRef.cs" />
     <Compile Include="Code\Environment.cs" />
     <Compile Include="Code\Generator.cs" />
+    <Compile Include="Code\InternalRef.cs" />
     <Compile Include="Code\Leaf.cs" />
     <Compile Include="Code\LeafElement.cs" />
     <Compile Include="Code\Multiplyop.cs" />
     <Compile Include="Code\Op.cs" />
-    <Compile Include="Code\RefCode.cs" />
+    <Compile Include="Code\RefLeafElement.cs" />
     <Compile Include="Code\RefPlus.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceAbsoluteArg.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceArg.cs" />
     <Compile Include="Code\ReplaceVisitor\Base.cs" />
-    <Compile Include="Code\ReplaceVisitor\ReplaceEnvironment.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceRelRefArg.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceContextRefWithArg.cs" />
     <Compile Include="Code\Pair.cs" />

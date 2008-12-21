@@ -165,7 +165,7 @@ namespace Reni.Type
 
         private Result RemoveElementsAtEnd(Category category, int newCount)
         {
-            var destructor = Element.DestructorHandler(category);
+            var destructor = Element.Destructor(category);
             if(!destructor.IsEmpty)
             {
                 NotImplementedMethod(category, newCount, "destructor", destructor);
@@ -187,14 +187,14 @@ namespace Reni.Type
             return Element.SequenceDumpPrint(category, Count);
         }
 
-        internal override Result DestructorHandler(Category category)
+        internal override Result Destructor(Category category)
         {
-            return _inheritedType.DestructorHandler(category);
+            return _inheritedType.Destructor(category);
         }
 
-        internal override Result MoveHandler(Category category)
+        internal override Result Copier(Category category)
         {
-            return _inheritedType.MoveHandler(category);
+            return _inheritedType.Copier(category);
         }
 
         public BitOperationFeatureClass BitOperationFeature(SequenceOfBitOperation definable)

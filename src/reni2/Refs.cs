@@ -13,28 +13,28 @@ namespace Reni
     [Serializable]
     internal sealed class Refs : ReniObject, Sequence<Refs>.ICombiner<Refs>
     {
-        private readonly List<IContextRefInCode> _data;
+        private readonly List<IRefInCode> _data;
         private SizeArray _sizesCache;
 
         private Refs()
         {
-            _data = new List<IContextRefInCode>();
+            _data = new List<IRefInCode>();
             //StopByObjectId(5128);
         }
 
-        private Refs(IContextRefInCode context): this()
+        private Refs(IRefInCode context): this()
         {
             Add(context);
         }
 
-        private Refs(IEnumerable<IContextRefInCode> a, IEnumerable<IContextRefInCode> b)
+        private Refs(IEnumerable<IRefInCode> a, IEnumerable<IRefInCode> b)
             : this()
         {
             AddRange(a);
             AddRange(b);
         }
 
-        private Refs(IEnumerable<IContextRefInCode> a)
+        private Refs(IEnumerable<IRefInCode> a)
             : this()
         {
             AddRange(a);
@@ -43,23 +43,23 @@ namespace Reni
         private Refs(bool isPending)
         {
             if(isPending)
-                _data = new List<IContextRefInCode>();
+                _data = new List<IRefInCode>();
         }
 
-        private void AddRange(IEnumerable<IContextRefInCode> a)
+        private void AddRange(IEnumerable<IRefInCode> a)
         {
             foreach (var e in a)
                 Add(e);
         }
 
-        private void Add(IContextRefInCode e)
+        private void Add(IRefInCode e)
         {
             if (!_data.Contains(e))
                 _data.Add(e);
         }
 
         [Node]
-        public List<IContextRefInCode> Data { get { return _data; } }
+        public List<IRefInCode> Data { get { return _data; } }
         public bool IsPending { get { return _data == null; } }
 
         [DumpData(false)]
@@ -83,7 +83,7 @@ namespace Reni
             }
         }
 
-        public IContextRefInCode this[int i] { get { return _data[i]; } }
+        public IRefInCode this[int i] { get { return _data[i]; } }
         public Size Size { get { return Sizes.Size; } }
         public bool IsNone { get { return Count == 0; } }
         public static Refs Pending { get { return new Refs(true); } }
@@ -104,7 +104,7 @@ namespace Reni
             return new Refs(_data, refs._data);
         }
 
-        public static Refs Context(IContextRefInCode context)
+        public static Refs Context(IRefInCode context)
         {
             return new Refs(context);
         }
@@ -132,18 +132,18 @@ namespace Reni
             return result;
         }
 
-        public Refs Without(IContextRefInCode e)
+        public Refs Without(IRefInCode e)
         {
             if(IsPending)
                 throw new NotSupportedException();
             if(!_data.Contains(e))
                 return this;
-            var r = new List<IContextRefInCode>(_data);
+            var r = new List<IRefInCode>(_data);
             r.Remove(e);
             return new Refs(r);
         }
 
-        public bool Contains(IContextRefInCode context)
+        public bool Contains(IRefInCode context)
         {
             return _data.Contains(context);
         }
@@ -181,5 +181,9 @@ namespace Reni
             return result;
         }
 
+        public static Refs operator +(Refs x, Refs y)
+        {
+            return x.CreateSequence(y);
+        }
     }
 }

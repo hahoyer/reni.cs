@@ -30,14 +30,14 @@ namespace Reni.Type
 
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
 
-        internal override Result DestructorHandler(Category category)
+        internal override Result Destructor(Category category)
         {
-            return Element.ArrayDestructorHandler(category, Count);
+            return Element.ArrayDestructor(category, Count);
         }
 
-        internal override Result MoveHandler(Category category)
+        internal override Result Copier(Category category)
         {
-            return Element.ArrayMoveHandler(category, Count);
+            return Element.ArrayCopier(category, Count);
         }
 
         internal override Result DumpPrint(Category category)

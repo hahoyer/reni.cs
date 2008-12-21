@@ -1,31 +1,32 @@
 using HWClassLibrary.Debug;
 using System;
+using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Code
 {
-    internal class InternalRef : CodeBase, IContextRefInCode
+    internal class InternalRef : CodeBase, IRefInCode
     {
         private readonly RefAlignParam _refAlignParam;
-        internal readonly IInternalResultProvider InternalProvider;
+        internal readonly CodeBase Code;
+        internal readonly CodeBase DestructorCode;
 
-        public InternalRef(RefAlignParam refAlignParam, IInternalResultProvider internalProvider)
+        public InternalRef(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
         {
             _refAlignParam = refAlignParam;
-            InternalProvider = internalProvider;
+            Code = code;
+            DestructorCode = destructorCode;
         }
 
         [DumpData(false)]
         public LeafElement ToLeafElement { get { return new ContextRef(this); } }
 
         internal protected override Size GetSize() { return _refAlignParam.RefSize; }
-
         public override Result VirtVisit<Result>(Visitor<Result> actual) { return actual.InternalRef(this); }
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        Size IContextRefInCode.RefSize { get { return RefAlignParam.RefSize; } }
-        RefAlignParam IContextRefInCode.RefAlignParam { get { return RefAlignParam; } }
-        bool IContextRefInCode.IsChildOf(ContextBase contextBase) { return false; }
-
+        Size IRefInCode.RefSize { get { return RefAlignParam.RefSize; } }
+        RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
+        bool IRefInCode.IsChildOf(ContextBase contextBase) { return false; }
     }
 }

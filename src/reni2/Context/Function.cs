@@ -6,7 +6,7 @@ using Reni.Type;
 namespace Reni.Context
 {
     [Serializable]
-    internal sealed class Function : Child, IContextRefInCode
+    internal sealed class Function : Child, IRefInCode
     {
         [Node]
         internal readonly TypeBase ArgsType;
@@ -28,7 +28,7 @@ namespace Reni.Context
                 ;
         }
 
-        RefAlignParam IContextRefInCode.RefAlignParam { get { return RefAlignParam; } }
-        bool IContextRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
+        RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
+        bool IRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
     }
 }

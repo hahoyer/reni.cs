@@ -4,7 +4,7 @@ using Reni.Context;
 namespace Reni.Code
 {
     [Serializable]
-    internal sealed class TopRef : RefCode
+    internal sealed class TopRef : RefLeafElement
     {
         public TopRef(RefAlignParam refAlignParam, Size offset) : base(refAlignParam,offset)
         {
@@ -23,7 +23,7 @@ namespace Reni.Code
     }
 
     [Serializable]
-    internal sealed class FrameRef : RefCode
+    internal sealed class FrameRef : RefLeafElement
     {
         public FrameRef(RefAlignParam refAlignParam, Size offset)
             : base(refAlignParam, offset)

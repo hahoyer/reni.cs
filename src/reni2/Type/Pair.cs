@@ -50,10 +50,10 @@ namespace Reni.Type
             }
         }
 
-        internal override Result DestructorHandler(Category category)
+        internal override Result Destructor(Category category)
         {
-            var firstHandler = First.DestructorHandler(category);
-            var secondHandler = Second.DestructorHandler(category);
+            var firstHandler = First.Destructor(category);
+            var secondHandler = Second.Destructor(category);
             if(firstHandler.IsEmpty)
                 return secondHandler;
             if(secondHandler.IsEmpty)

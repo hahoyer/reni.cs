@@ -31,8 +31,8 @@ namespace Reni.Type
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }
         internal override AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam) { return Parent.CreateAutomaticRef(refAlignParam.Align(AlignBits)); }
         internal override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return Parent.CreateAssignableRef(refAlignParam.Align(AlignBits)); }
-        internal override Result DestructorHandler(Category category) { return Parent.DestructorHandler(category); }
-        internal override Result MoveHandler(Category category) { return Parent.MoveHandler(category); }
+        internal override Result Destructor(Category category) { return Parent.Destructor(category); }
+        internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam) { return Parent.DumpPrintFromRef(category, refAlignParam); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature) { return Parent.IsConvertableTo(dest, conversionFeature); }

@@ -138,13 +138,13 @@ namespace Reni.Context
                 AssertCorrectRefs(result.Code.Refs);
         }
 
-        private void AssertCorrectRefs(IEnumerable<IContextRefInCode> refs)
+        private void AssertCorrectRefs(IEnumerable<IRefInCode> refs)
         {
             foreach(var @ref in refs)
                 CheckRef(@ref);
         }
 
-        private void CheckRef(IContextRefInCode @ref)
+        private void CheckRef(IRefInCode @ref)
         {
             Tracer.Assert(!@ref
                 .IsChildOf(this), "context=" + Dump() + "\nref="
@@ -194,29 +194,33 @@ namespace Reni.Context
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax)
         {
-            var type = Type(syntax);
-            if(type.IsRef(RefAlignParam))
+            var result = Result(category | Category.Type, syntax);
+            if(result.Type.IsRef(RefAlignParam))
                 return Result(category, syntax);
 
-            return type
-                .CreateAutomaticRef(RefAlignParam)
-                .CreateResult(category, RefAlignParam, new ResultProvider(syntax, this));
+            AutomaticRef automaticRef = result.Type.CreateAutomaticRef(RefAlignParam);
+            return automaticRef.CreateResult(
+                category,
+                () => CodeBase.CreateInternalRef(RefAlignParam, result.Code, result.Type.Destructor(Category.Code).Code),
+                () => result.Refs + result.Type.Destructor(Category.Refs).Refs
+                );
         }
 
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target)
         {
-            var type = Type(syntax);
-            if(type.IsRefLike(target))
+            var result = Result(category | Category.Type, syntax);
+            if(result.Type.IsRefLike(target))
                 return target.CreateResult(category, Result(category & (Category.Code | Category.Refs), syntax));
 
-            if(type.IsRef(RefAlignParam))
+            if(result.Type.IsRef(RefAlignParam))
             {
-                var result = type.Conversion(category, target.Target).UseWithArg(Result(category, syntax));
-                NotImplementedMethod(category, syntax, target, "type", type, "result", result);
+                var convertedResult = result.ConvertTo(target.Target);
+                NotImplementedMethod(category, syntax, target, "type", result.Type, "result", result, "convertedResult", convertedResult);
                 return result;
             }
 
-            return target.CreateResult(category, RefAlignParam, new ConversionResultProvider(syntax, this, target.Target));
+            NotImplementedMethod(category, syntax, target, "type", result.Type, "result", result);
+            return null;
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }

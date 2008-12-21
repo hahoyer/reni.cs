@@ -86,7 +86,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal override int ContextRef(ContextRefCode visitedObject)
+        internal override int ContextRef(RefCode visitedObject)
         {
             if(!IsInternal)
                 throw new UnexpectedContextRefInContainer(this, visitedObject);
@@ -225,8 +225,7 @@ namespace Reni.Code
 
         internal sealed class UnexpectedInternalRefInContainer : CodeBaseException
         {
-            public UnexpectedInternalRefInContainer(Container container,
-                CodeBase visitedObject)
+            public UnexpectedInternalRefInContainer(Container container, CodeBase visitedObject)
                 : base(container, visitedObject) { }
         }
     }

@@ -123,13 +123,13 @@ namespace Reni.Type
 
         internal Sequence CreateSequence(int elementCount) { return _chain.Find(elementCount, () => new Sequence(this, elementCount)); }
 
-        internal virtual Result DestructorHandler(Category category) { return EmptyHandler(category); }
+        internal virtual Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 
-        internal virtual Result ArrayDestructorHandler(Category category, int count) { return EmptyHandler(category); }
+        internal virtual Result ArrayDestructor(Category category, int count) { return CreateVoidCodeAndRefs(category); }
 
-        internal virtual Result MoveHandler(Category category) { return EmptyHandler(category); }
+        internal virtual Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
 
-        internal virtual Result ArrayMoveHandler(Category category, int count) { return EmptyHandler(category); }
+        internal virtual Result ArrayCopier(Category category, int count) { return CreateVoidCodeAndRefs(category); }
 
         internal Result CreateArgResult(Category category) { return CreateResult(category, CreateArgCode); }
 
@@ -160,15 +160,6 @@ namespace Reni.Type
             return CreateResult(category, getCode, Refs.None);
         }
         
-        internal Result CreateResult(Category category, RefAlignParam refAlignParam, IInternalResultProvider internalProvider)
-        {
-            return CreateResult(
-                category,
-                () => CodeBase.CreateInternalRef(refAlignParam, internalProvider),
-                () => internalProvider.Result(Category.Refs).Refs
-                );
-        }
-
         internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
             var result = new Result();
@@ -195,7 +186,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal static Result EmptyHandler(Category category) { return CreateVoidResult(category - Category.Type - Category.Size); }
+        internal static Result CreateVoidCodeAndRefs(Category category) { return CreateVoidResult(category & (Category.Code | Category.Refs)); }
 
         internal static Result CreateVoidResult(Category category) { return CreateVoid.CreateResult(category); }
 

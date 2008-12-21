@@ -7,18 +7,18 @@ namespace Reni.Code
     /// <summary>
     /// ContextAtPosition reference, should be replaced
     /// </summary>
-    internal sealed class ContextRefCode : CodeBase
+    internal sealed class RefCode : CodeBase
     {
         private readonly ContextRef _leafElement;
 
-        internal ContextRefCode(IContextRefInCode context)
+        internal RefCode(IRefInCode context)
         {
             _leafElement = new ContextRef(context);
             StopByObjectId(-363);
         }
 
         [Node]
-        internal IContextRefInCode Context { get { return _leafElement.Context; } }
+        internal IRefInCode Context { get { return _leafElement.Context; } }
 
         [DumpData(false)]
         internal LeafElement ToLeafElement { get { return _leafElement; } }
@@ -32,9 +32,9 @@ namespace Reni.Code
     internal class ContextRef : LeafElement
     {
         [Node]
-        internal readonly IContextRefInCode Context;
+        internal readonly IRefInCode Context;
 
-        public ContextRef(IContextRefInCode context) { Context = context; }
+        public ContextRef(IRefInCode context) { Context = context; }
         protected override Size GetSize() { return Context.RefSize; }
         protected override Size GetInputSize() { return Size.Zero; }
         internal Refs GetRefs() { return Refs.Context(Context); }

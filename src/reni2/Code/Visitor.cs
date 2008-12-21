@@ -16,7 +16,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal virtual T ContextRef(ContextRefCode visitedObject)
+        internal virtual T ContextRef(RefCode visitedObject)
         {
             NotImplementedMethod(visitedObject);
             throw new NotImplementedException();
@@ -51,6 +51,13 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
+        internal Visitor<T> AfterAny(Size size)
+        {
+            if (size.IsZero)
+                return this;
+            return After(size);
+        }
+
         internal virtual Visitor<T> After(Size size) { return this; }
 
         internal virtual Visitor<T> AfterCond(int objectId)
@@ -74,16 +81,16 @@ namespace Reni.Code
         internal virtual T PairVisit(Pair pair)
         {
             var left = pair.Left.Visit(this);
-            var tempActual = After(pair.Left.Size);
+            var tempActual = AfterAny(pair.Left.Size);
             var right = pair.Right.Visit(tempActual);
-            tempActual = tempActual.After(pair.Right.Size);
+            tempActual = tempActual.AfterAny(pair.Right.Size);
             return tempActual.Pair(pair, left, right);
         }
 
         internal virtual T ChildVisit(Child child)
         {
             var parent = child.Parent.Visit(this);
-            var tempActual = After(child.Parent.Size);
+            var tempActual = AfterAny(child.Parent.Size);
             return tempActual.Child(parent, child.LeafElement);
         }
 

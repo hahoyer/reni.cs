@@ -40,7 +40,7 @@ namespace Reni.Struct
         [DumpData(false)]
         public TypeBase NaturalType { get { return _typeCache.Find(() => new Type(this)); } }
         [DumpData(false)]
-        public abstract IContextRefInCode ForCode { get; }
+        public abstract IRefInCode ForCode { get; }
         [DumpData(false)]
         internal PositionFeature[] Features { get { return _featuresCache.Find(CreateFeaturesCache); } }
         [DumpData(false)]

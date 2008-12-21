@@ -19,7 +19,7 @@ namespace Reni.Struct
         }
 
         [DumpData(false)]
-        public override IContextRefInCode ForCode { get { return _context; } }
+        public override IRefInCode ForCode { get { return _context; } }
         [Node]
         internal override int Position { get { return _position; } }
         [DumpData(false),Node]

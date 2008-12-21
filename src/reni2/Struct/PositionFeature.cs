@@ -59,6 +59,6 @@ namespace Reni.Struct
     {
         Ref NaturalRefType { get; }
         TypeBase NaturalType { get; }
-        IContextRefInCode ForCode { get; }
+        IRefInCode ForCode { get; }
     }
 }

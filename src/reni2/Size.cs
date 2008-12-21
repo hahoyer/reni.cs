@@ -27,7 +27,7 @@ namespace Reni
         /// asis
         /// </summary>
         public bool IsZero { get { return _data == 0; } }
-    public bool IsPending { get { return _data == -1; } }
+        public bool IsPending { get { return _data == -1; } }
         public int SaveByteCount { get { return SaveSizeToPacketCount(3); } }
         public static Size Zero { get { return Create(0); } }
         public static Size Byte { get { return Create(1).ByteAlignedSize; } }

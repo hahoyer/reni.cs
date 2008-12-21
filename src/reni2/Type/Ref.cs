@@ -35,14 +35,14 @@ namespace Reni.Type
         [DumpData(false)]
         internal override sealed int SequenceCount { get { return Target.SequenceCount; } }
 
-        internal override sealed Result DestructorHandler(Category category)
+        internal override sealed Result Destructor(Category category)
         {
-            return EmptyHandler(category);
+            return CreateVoidCodeAndRefs(category);
         }
 
-        internal override sealed Result MoveHandler(Category category)
+        internal override sealed Result Copier(Category category)
         {
-            return EmptyHandler(category);
+            return CreateVoidCodeAndRefs(category);
         }
 
         internal override sealed Result AutomaticDereference(Result result)
@@ -139,7 +139,7 @@ namespace Reni.Type
             return base.Search(defineable).AlternativeTrial(result);
         }
 
-        internal Result CreateContextResult(IContextRefInCode context, Category category)
+        internal Result CreateContextResult(IRefInCode context, Category category)
         {
             return CreateResult(
                 category,

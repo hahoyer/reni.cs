@@ -29,24 +29,24 @@ namespace Reni.Type
 
         internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
 
-        internal override Result DestructorHandler(Category category)
+        internal override Result Destructor(Category category)
         {
-            return Parent.DestructorHandler(category);
+            return Parent.Destructor(category);
         }
 
-        internal override Result ArrayDestructorHandler(Category category, int count)
+        internal override Result ArrayDestructor(Category category, int count)
         {
-            return Parent.ArrayDestructorHandler(category, count);
+            return Parent.ArrayDestructor(category, count);
         }
 
-        internal override Result MoveHandler(Category category)
+        internal override Result Copier(Category category)
         {
-            return Parent.MoveHandler(category);
+            return Parent.Copier(category);
         }
 
-        internal override Result ArrayMoveHandler(Category category, int count)
+        internal override Result ArrayCopier(Category category, int count)
         {
-            return Parent.ArrayMoveHandler(category, count);
+            return Parent.ArrayCopier(category, count);
         }
 
         internal override Result ConvertToVirt(Category category, TypeBase dest)

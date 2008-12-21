@@ -12,9 +12,6 @@ using Reni.Type;
 
 namespace Reni
 {
-    /// <summary>
-    /// Result of a visitor request
-    /// </summary>
     [Serializable]
     internal sealed class Result : ReniObject, ITreeNodeSupport, Sequence<Result>.ICombiner<Result>
     {
@@ -26,9 +23,6 @@ namespace Reni
         private Refs _refs;
         internal PostProcessorForResult PostProcessor;
 
-        /// <summary>
-        /// ctor
-        /// </summary>
         public Result()
         {
             PostProcessor = new PostProcessorForResult(this);
@@ -40,15 +34,9 @@ namespace Reni
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
 
-        /// <summary>
-        /// In case of recursion, there may be pending requests
-        /// </summary>
         [Node]
         private Category Pending { get { return _pending; } set { _pending = value; } }
 
-        /// <summary>
-        /// Obtain the category signature contained
-        /// </summary>
         public Category Complete { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
 
         [Node]
@@ -111,10 +99,6 @@ namespace Reni
             return result.ToArray();
         }
 
-        /// <summary>
-        /// Returns the size by checking category size, type and code until a result can be found. 
-        /// Otherwise null is returned
-        /// </summary>
         public Size FindSize
         {
             get
@@ -129,10 +113,6 @@ namespace Reni
             }
         }
 
-        /// <summary>
-        /// Returns the size by checking category size, type and code until a result can be found. 
-        /// Otherwise an exception is thrown
-        /// </summary>
         internal Size SmartSize
         {
             get
@@ -147,9 +127,6 @@ namespace Reni
             }
         }
 
-        /// <summary>
-        /// Error handling
-        /// </summary>
         internal static Error Error { get { return null; } }
 
         internal bool IsDirty
@@ -162,11 +139,6 @@ namespace Reni
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is empty.
-        /// </summary>
-        /// <value><c>true</c> if this instance is empty; otherwise, <c>false</c>.</value>
-        /// [created 05.06.2006 18:06]
         internal bool IsEmpty
         {
             get
@@ -183,11 +155,6 @@ namespace Reni
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is has no code to execute.
-        /// </summary>
-        /// <value><c>true</c> if this instance is empty; otherwise, <c>false</c>.</value>
-        /// [created 05.06.2006 18:06]
         internal bool IsCodeLess
         {
             get
@@ -202,12 +169,6 @@ namespace Reni
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is pending.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance is pending; otherwise, <c>false</c>.
-        /// </value>
         internal bool IsPending
         {
             get
@@ -225,10 +186,6 @@ namespace Reni
             }
         }
 
-        /// <summary>
-        /// asis
-        /// </summary>
-        /// <returns></returns>
         public override string DumpData()
         {
             var result = "";
@@ -246,16 +203,8 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Adds categories to pending requests
-        /// </summary>
-        /// <param name="frEff"></param>
         private void AddPending(Category frEff) { _pending |= frEff; }
 
-        /// <summary>
-        /// Add categories
-        /// </summary>
-        /// <param name="r"></param>
         internal void Update(Result r)
         {
             if(r.HasSize && !r.Size.IsPending)
@@ -296,11 +245,6 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Aligns the result to number of bits provided
-        /// </summary>
-        /// <param name="alignBits">Bits to align result</param>
-        /// <returns></returns>
         internal Result Align(int alignBits)
         {
             var size = FindSize;
@@ -323,9 +267,6 @@ namespace Reni
             return r;
         }
 
-        /// <summary>
-        /// Create a flat copy
-        /// </summary>
         internal Result Clone(Category category)
         {
             var r = new Result();
@@ -340,11 +281,6 @@ namespace Reni
             return r;
         }
 
-        /// <summary>
-        /// Clones this instance.
-        /// </summary>
-        /// <returns></returns>
-        /// created 19.11.2006 22:13
         internal Result Clone() { return Clone(Complete); }
 
         private void AssertValid()
@@ -380,13 +316,6 @@ namespace Reni
             return true;
         }
 
-        /// <summary>
-        /// Visitor function
-        /// </summary>
-        /// <param name="category"></param>
-        /// <param name="context"></param>
-        /// <param name="syntax"></param>
-        /// <returns></returns>
         [DebuggerHidden]
         internal Result AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
         {
@@ -422,11 +351,6 @@ namespace Reni
 
         internal void AssertComplete(Category category) { Tracer.Assert(1, HasCategory(category), string.Format("category={0}\nResult={1}", category, Dump())); }
 
-        /// <summary>
-        /// Append two results together, categories are determined by first 
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
         internal void Add(Result other) { Add(other, Complete); }
 
         internal void Add(Result other, Category category)
@@ -445,13 +369,6 @@ namespace Reni
             IsDirty = false;
         }
 
-        /// <summary>
-        /// Creates the sequence.
-        /// </summary>
-        /// <param name="second">The second.</param>
-        /// <param name="category">The category.</param>
-        /// <returns></returns>
-        /// created 19.11.2006 21:50
         internal Result CreateSequence(Result second, Category category)
         {
             var result = Clone(category);
@@ -466,22 +383,6 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Append two results together, categories are determined by first, replaces arg 
-        /// </summary>
-        /// <param name="result"></param>
-        /// <param name="topRef"></param>
-        /// <returns></returns>
-        internal void AddStruct(Result result, Result topRef) { Add(result.UseWithArg(topRef)); }
-
-        /// <summary>
-        /// Converts the bit array to bit array.
-        /// </summary>
-        /// <param name="category">The category.</param>
-        /// <param name="sourceBitCount">The source count.</param>
-        /// <param name="destBitCount">The dest count.</param>
-        /// <returns></returns>
-        /// [created 30.05.2006 00:17]
         internal static Result ConvertBitArrayToBitArray(Category category, int sourceBitCount, int destBitCount)
         {
             if(sourceBitCount == 0 && destBitCount == 0)
@@ -499,12 +400,6 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Uses the with arg.
-        /// </summary>
-        /// <param name="resultForArg">The result to use as replacment.</param>
-        /// <returns></returns>
-        /// [created 30.05.2006 00:25]
         internal Result UseWithArg(Result resultForArg)
         {
             if(IsPending)
@@ -520,13 +415,7 @@ namespace Reni
             return ReturnMethodDump(trace, result);
         }
 
-        /// <summary>
-        /// Replaces the context ref.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="replacement">The replacement.</param>
-        /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : IContextRefInCode
+        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : IRefInCode
         {
             if(IsPending)
                 return this;
@@ -543,13 +432,7 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Replaces the context ref.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="replacement">The replacement.</param>
-        /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : IContextRefInCode
+        internal Result ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : IRefInCode
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;
@@ -562,13 +445,6 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Replaces the refs.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="replacement">The replacement.</param>
-        /// <returns></returns>
-        /// created 31.12.2006 14:50
         internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, CodeBase replacement)
         {
             if(!HasCode)
@@ -583,16 +459,9 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        /// Combines two results .
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <param name="category">The category.</param>
-        /// <returns>Pair of this and other. If type has </returns>
-        /// created 19.11.2006 22:04
         internal Result SafeList(Result result, Category category)
         {
-            var destructorResult = Type.DestructorHandler(category);
+            var destructorResult = Type.Destructor(category);
             if(destructorResult.IsEmpty)
                 return CreateSequence(result, category);
 
@@ -600,14 +469,6 @@ namespace Reni
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates the plus op.
-        /// </summary>
-        /// <param name="c">The c.</param>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="value">The value.</param>
-        /// <returns></returns>
-        /// [created 04.06.2006 01:09]
         internal Result CreateRefPlus(Category c, RefAlignParam refAlignParam, Size value)
         {
             var result = Clone();
@@ -703,28 +564,13 @@ namespace Reni
                 result.Code = result.Code.CreateSequence(CodeBase.CreateDumpPrintText(")"));
             return result;
         }
-
-        internal static Sequence<IInternalResultProvider> EmptyInternal = HWString.Sequence<IInternalResultProvider>() ;
     }
 
-    internal interface IInternalResultProvider : IResultProvider
-    {
-    }
-
-    /// <summary>
-    /// Describes errors, not yet implemented
-    /// </summary>
     internal sealed class Error
     {
         private readonly ContextBase _context;
         private readonly ICompileSyntax _syntax;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Error"/> class.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="syntax">The syntax.</param>
-        /// created 29.10.2006 18:23
         internal Error(ContextBase context, ICompileSyntax syntax)
         {
             _context = context;
@@ -733,12 +579,6 @@ namespace Reni
 
         private Error(Error e0, Error e1) { }
 
-        /// <summary>
-        /// asis
-        /// </summary>
-        /// <param name="e0"></param>
-        /// <param name="e1"></param>
-        /// <returns></returns>
         public static Error operator +(Error e0, Error e1)
         {
             if(e0 == null)

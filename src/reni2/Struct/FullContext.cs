@@ -7,7 +7,7 @@ using Reni.Context;
 namespace Reni.Struct
 {
     [Serializable]
-    internal sealed class FullContext : StructContextBase, IContextRefInCode
+    internal sealed class FullContext : StructContextBase, IRefInCode
     {
         [Node]
         private readonly Result _internalConstructorResult = new Result();
@@ -17,10 +17,10 @@ namespace Reni.Struct
         internal FullContext(ContextBase contextBase, Container container)
             : base(contextBase, container) { }
 
-        RefAlignParam IContextRefInCode.RefAlignParam { get { return RefAlignParam; } }
-        bool IContextRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
+        RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
+        bool IRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
         [DumpData(false)]
-        public override IContextRefInCode ForCode { get { return this; } }
+        public override IRefInCode ForCode { get { return this; } }
         [DumpData(false)]
         internal override FullContext Context { get { return this; } }
         internal override int Position { get { return StatementList.Count; } }

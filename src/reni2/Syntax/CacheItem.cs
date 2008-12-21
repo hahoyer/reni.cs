@@ -7,13 +7,6 @@ using Reni.Type;
 
 namespace Reni.Syntax
 {
-    internal abstract class InternalResultProvider : ReniObject, IInternalResultProvider
-    {
-        [DebuggerHidden]
-        Result IResultProvider.Result(Category category) { return Result(category); }
-        protected abstract Result Result(Category category);
-    }
-
     internal interface IResultCacheItem
     {
         Result Result(Category category);
@@ -45,43 +38,5 @@ namespace Reni.Syntax
         /// </summary>
         /// <value>The icon key.</value>
         public string IconKey { get { return "Cache"; } }
-    }
-
-    sealed internal class ConversionResultProvider: InternalResultProvider
-    {
-        internal readonly ICompileSyntax Syntax;
-        internal readonly ContextBase ContextBase;
-        internal readonly TypeBase Target;
-
-        public ConversionResultProvider(ICompileSyntax syntax, ContextBase contextBase, TypeBase target)
-        {
-            Syntax = syntax;
-            ContextBase = contextBase;
-            Target = target;
-        }
-
-        protected override Result Result(Category category)
-        {
-            return  ContextBase.Result(category | Category.Type, Syntax).ConvertTo(Target);
-        }
-    }
-
-    sealed internal class ResultProvider : InternalResultProvider
-    {
-        [Node]
-        internal readonly ICompileSyntax Syntax;
-        [Node]
-        internal readonly ContextBase ContextBase;
-        
-        public ResultProvider(ICompileSyntax syntax, ContextBase contextBase)
-        {
-            Syntax = syntax;
-            ContextBase = contextBase;
-        }
-
-        protected override Result Result(Category category)
-        {
-            return ContextBase.Result(category | Category.Type, Syntax);
-        }
     }
 }
