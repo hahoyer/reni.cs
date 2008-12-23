@@ -200,9 +200,24 @@ namespace Reni.Code
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
 
-        internal CodeBase CreateStatement(CodeBase copier)
+        internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam)
         {
-            return new InternalRefSequenceVisitor().CreateStatement(this, copier);
+            return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam);
+        }
+
+        internal CodeBase CreateStatementEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
+        {
+            var intermediateSize = Size - resultSize;
+            if (intermediateSize.IsZero) 
+                return this;
+
+            var result = this;
+            if (!resultSize.IsZero)
+                result = result
+                    .CreateChild(new StatementEnd(resultSize,intermediateSize))
+                    .CreateSequence(copier.UseWithArg(InternalRefSequenceVisitor.InternalRefCode(refAlignParam, resultSize)));
+
+            return result.CreateChild(new Drop(intermediateSize));
         }
     }
 
@@ -231,8 +246,6 @@ namespace Reni.Code
             }
         }
 
-        public RefAlignParam RefAligmParam { get { return _data.ToArray()[0].RefAlignParam; } }
-
         internal override CodeBase InternalRef(InternalRef visitedObject)
         {
             var newVisitedObject = visitedObject;
@@ -244,42 +257,41 @@ namespace Reni.Code
             return InternalRefCode(newVisitedObject.RefAlignParam, Code.Size);
         }
 
-        private static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size)
+        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size)
         {
             return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1));
         }
 
-        internal CodeBase CreateStatement(CodeBase body, CodeBase copier)
+        internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             var newBody = body.Visit(this);
             if(newBody == null)
                 newBody = body;
             var alignedBody = newBody.Align();
+            var resultSize = alignedBody.Size;
             var alignedInternal = Code.Align();
             // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
             var gap = CodeBase.CreateVoid();
-            if (!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < alignedBody.Size)
-                gap = CodeBase.CreateBitArray(alignedBody.Size - alignedInternal.Size, BitsConst.None());
+            if (!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
+                gap = CodeBase.CreateBitArray(resultSize - alignedInternal.Size, BitsConst.None());
             var result = alignedInternal
                 .CreateSequence(gap)
                 .CreateSequence(alignedBody)
                 .CreateSequence(DestructorCode)
-                .CreateChild(new StatementEnd(alignedBody.Size,alignedInternal.Size+gap.Size))
-                .CreateSequence(copier)
-                .CreateChild(new Drop(alignedInternal.Size + gap.Size))
-                .UseWithArg(CodeBase.CreateTopRef(RefAligmParam));
-
-            NotImplementedMethod("result", result);
-            return body;
+                .CreateStatementEnd(copier, refAlignParam, resultSize)
+                .UseWithArg(CodeBase.CreateTopRef(refAlignParam));
+            return result;
         }
     }
 
     internal class Drop : LeafElement
     {
-        private readonly Size _size;
-        public Drop(Size size) { _size = size; }
-        protected override Size GetSize() { return _size*-1; }
-        protected override Size GetInputSize() { return _size; }
+        [Node]
+        internal readonly Size DropSize;
+        public Drop(Size size) { DropSize = size; }
+        protected override Size GetSize() { return Size.Zero; }
+        protected override Size GetInputSize() { return DropSize; }
+        protected override string Format(StorageDescriptor start) { return ""; }
     }
 
     internal class InternalRefCode : CodeBase

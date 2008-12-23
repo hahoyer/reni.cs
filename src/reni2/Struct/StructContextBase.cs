@@ -108,7 +108,7 @@ namespace Reni.Struct
             Result result = CreatePosition(position)
                 .Result(category | Category.Type, StatementList[position])
                 .PostProcessor
-                .InternalResultForStruct(category, AlignBits);
+                .InternalResultForStruct(category,RefAlignParam);
             if (_internalResult[position] == null)
                 _internalResult[position] = new Result();
             _internalResult[position].Update(result);

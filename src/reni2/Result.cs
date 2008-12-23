@@ -477,15 +477,15 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateStatement(Category category)
+        internal Result CreateStatement(Category category, RefAlignParam refAlignParam)
         {
             if (!category.HasCode && !category.HasRefs)
                 return this;
 
             var result = Clone(category);
-            var copier = result.Type.Copier(category);
+            var copier = Type.Copier(category);
             if(category.HasCode)
-                result.Code = result.Code.CreateStatement(copier.Code);
+                result.Code = result.Code.CreateStatement(copier.Code,refAlignParam);
             if (category.HasRefs)
                 result.Refs = result.Refs.CreateSequence(copier.Refs);
             return result;

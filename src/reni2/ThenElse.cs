@@ -33,17 +33,22 @@ namespace Reni
 
             var condResult = context.ConvertToSequence(category | Category.Type, Cond, TypeBase.CreateBit,1);
 
-            var branchCategory = category | Category.Type;
-            var thenResult = context.Result(branchCategory, Then).AutomaticDereference();
-            var elseResult = ElseResult(context, branchCategory).AutomaticDereference();
+            var thenResult = context.Result(category | Category.Type, Then).AutomaticDereference();
+            var elseResult = ElseResult(context, category | Category.Type).AutomaticDereference();
 
             if(thenType.IsPending)
-                return elseType.ThenElseWithPending(branchCategory, condResult.Refs, elseResult.Refs);
+                return elseType.ThenElseWithPending(category | Category.Type, condResult.Refs, elseResult.Refs);
             if(elseType.IsPending)
-                return thenType.ThenElseWithPending(branchCategory, condResult.Refs, thenResult.Refs);
+                return thenType.ThenElseWithPending(category | Category.Type, condResult.Refs, thenResult.Refs);
 
-            thenResult = thenType.Conversion(branchCategory, commonType).UseWithArg(thenResult).CreateStatement(category);
-            elseResult = elseType.Conversion(branchCategory, commonType).UseWithArg(elseResult).CreateStatement(category);
+            thenResult = thenType
+                .Conversion(category | Category.Type, commonType)
+                .UseWithArg(thenResult)
+                .CreateStatement(category, context.RefAlignParam);
+            elseResult = elseType
+                .Conversion(category | Category.Type, commonType)
+                .UseWithArg(elseResult)
+                .CreateStatement(category, context.RefAlignParam);
 
             return commonType.CreateResult
                 (
