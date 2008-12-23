@@ -37,7 +37,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.RefPlus(GetSize(), Right.SizeToPacketCount(RefAlignParam.AlignBits));
+            return start.CreateRefPlus(GetSize(), Right.SizeToPacketCount(RefAlignParam.AlignBits));
         }
 
         internal override LeafElement TryToCombineBack(TopRef precedingElement)

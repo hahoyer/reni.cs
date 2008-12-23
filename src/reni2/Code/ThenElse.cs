@@ -70,7 +70,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.EndCondional(_thenElseObjectId);
+            return StorageDescriptor.CreateEndCondional(_thenElseObjectId);
         }
     }
     [Serializable]
@@ -100,7 +100,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.Else(_thenElseObjectId);
+            return StorageDescriptor.CreateElse(_thenElseObjectId);
         }
     }
 
@@ -144,7 +144,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.Then(ThenElseObjectId, CondSize);
+            return start.CreateThen(ThenElseObjectId, CondSize);
         }
     }
 
@@ -174,7 +174,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.BitArrayOpThen(_bitArrayOp.OpToken, _bitArrayOp.LeftSize, _bitArrayOp.RightSize, _thenCode.ThenElseObjectId, _thenCode.CondSize);
+            return start.CreateBitArrayOpThen(_bitArrayOp.OpToken, _bitArrayOp.LeftSize, _bitArrayOp.RightSize, _thenCode.ThenElseObjectId, _thenCode.CondSize);
         }
     }
 }

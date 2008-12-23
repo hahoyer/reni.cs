@@ -13,7 +13,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.TopRef(RefAlignParam, Offset);
+            return start.CreateTopRef(RefAlignParam, Offset);
         }
 
         internal override LeafElement TryToCombine(LeafElement subsequentElement)
@@ -33,7 +33,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.FrameRef(RefAlignParam, Offset);
+            return start.CreateFrameRef(RefAlignParam, Offset);
         }
 
         internal override LeafElement TryToCombine(LeafElement subsequentElement)

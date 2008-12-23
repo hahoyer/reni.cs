@@ -35,7 +35,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.Call(FunctionIndex,ArgsAndRefsSize);
+            return start.CreateCall(FunctionIndex,ArgsAndRefsSize);
         }
 
         internal override LeafElement Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity)
@@ -107,7 +107,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.RecursiveCall();
+            return StorageDescriptor.CreateRecursiveCall();
         }
     }
 }

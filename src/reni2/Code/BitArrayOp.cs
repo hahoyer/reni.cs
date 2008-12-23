@@ -29,7 +29,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.BitArrayOp(OpToken, GetSize(), LeftSize, RightSize);
+            return start.CreateBitArrayOp(OpToken, GetSize(), LeftSize, RightSize);
         }
 
         internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
@@ -71,7 +71,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.BitArrayPrefixOp(OpToken, GetSize(), ArgSize);
+            return start.CreateBitArrayPrefixOp(OpToken, GetSize(), ArgSize);
         }
         internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
         {
@@ -96,7 +96,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.DumpPrint(LeftSize, RightSize);
+            return start.CreateDumpPrint(LeftSize, RightSize);
         }
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
     }
@@ -124,7 +124,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.DumpPrintText(_dumpPrintText);
+            return StorageDescriptor.CreateDumpPrintText(_dumpPrintText);
         }
 
         public override string NodeDump { get { return base.NodeDump + " dump_print " + HWString.Quote(_dumpPrintText); } }

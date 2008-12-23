@@ -11,7 +11,10 @@ namespace Reni.Parser
     {
         private static bool _isInDump;
         internal readonly Token Token;
+#pragma warning disable 649
+        // Warnind disabled, since it is used for debugging purposes
         internal static bool IsDetailedDumpRequired;
+#pragma warning restore 649
 
         protected ParsedSyntax(Token token)
         {

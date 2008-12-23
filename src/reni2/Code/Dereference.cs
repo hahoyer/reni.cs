@@ -34,7 +34,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.Unref(RefAlignParam, _size);
+            return start.CreateUnref(RefAlignParam, _size);
         }
 
         internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)

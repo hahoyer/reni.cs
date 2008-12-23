@@ -173,7 +173,7 @@ namespace Reni.Code
             if(IsError)
                 return "throw new Exception(" + Description.Replace("\"", "\"\"") + ")";
 
-            var statements = new StorageDescriptor(MaxSize.ByteAlignedSize, _frameSize).GetBody(_data, isFunction);
+            var statements = new StorageDescriptor(MaxSize.ByteAlignedSize, _frameSize).CreateFunctionBody(_data, isFunction);
             if(useStatementAligner)
                 statements = StatementAligner(statements);
             statements = statements.Surround("{", "}");

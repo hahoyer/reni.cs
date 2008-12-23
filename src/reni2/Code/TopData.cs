@@ -33,7 +33,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.TopData(RefAlignParam,Offset,GetSize());
+            return start.CreateTopData(RefAlignParam,Offset,GetSize());
         }
     }
 
@@ -67,7 +67,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.TopFrame(RefAlignParam, Offset, GetSize());
+            return start.CreateTopFrame(RefAlignParam, Offset, GetSize());
         }
 
     }

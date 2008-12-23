@@ -33,7 +33,7 @@ namespace Reni.Code
         {
             if (GetSize().IsZero)
                 return "";
-            return start.BitsArray(GetSize(), Data);
+            return start.CreateBitsArray(GetSize(), Data);
         }
 
         internal override LeafElement TryToCombine(LeafElement subsequentElement)

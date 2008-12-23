@@ -479,11 +479,15 @@ namespace Reni
 
         internal Result CreateStatement(Category category)
         {
-            if (!category.HasCode)
+            if (!category.HasCode && !category.HasRefs)
                 return this;
 
             var result = Clone(category);
-            result.Code = result.Code.CreateStatement();
+            var copier = result.Type.Copier(category);
+            if(category.HasCode)
+                result.Code = result.Code.CreateStatement(copier.Code);
+            if (category.HasRefs)
+                result.Refs = result.Refs.CreateSequence(copier.Refs);
             return result;
         }
 

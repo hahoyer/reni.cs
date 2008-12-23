@@ -25,17 +25,17 @@ namespace Reni.Code
 
         protected override Size GetSize()
         {
-            return _size;
+            return IntermediateSize + _size;
         }
 
         protected override Size GetInputSize()
         {
-            return IntermediateSize + GetSize();
+            return IntermediateSize + _size;
         }
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.StatementEnd(GetSize(), IntermediateSize);
+            return start.CreateStatementEnd(_size, IntermediateSize);
         }
 
     }

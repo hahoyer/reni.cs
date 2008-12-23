@@ -160,23 +160,6 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        public CodeBase CreateStatementEndFromIntermediateStorage(CodeBase finalResult, CodeBase destructor,
-                                                                  CodeBase mover)
-        {
-            if(destructor.IsEmpty && mover.IsEmpty)
-            {
-                if(Size.IsZero) // No temp storage 
-                    return finalResult; // Just return final result
-
-                var alignedThis = CreateBitCast(Size.ByteAlignedSize);
-                var sequencedResult = alignedThis.CreateSequence(finalResult);
-                var result = sequencedResult.CreateChild(new StatementEnd(finalResult.Size, Size.ByteAlignedSize));
-                return result;
-            }
-            NotImplementedMethod(finalResult, destructor, mover);
-            throw new NotImplementedException();
-        }
-
         public CodeBase CreateCall(int index, Size resultSize) { return CreateChild(new Call(index, resultSize, Size)); }
 
         internal Container Serialize(bool isInternal)
@@ -217,24 +200,9 @@ namespace Reni.Code
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
 
-        internal virtual CodeBase CreateStatement()
+        internal CodeBase CreateStatement(CodeBase copier)
         {
-            var internalRefSequenceVisitor = new InternalRefSequenceVisitor();
-            var newCode = Visit(internalRefSequenceVisitor);
-            if(newCode == null)
-                newCode = this;
-            // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
-            var gap = CreateVoid();
-            if (internalRefSequenceVisitor.Code.Size > Size.Zero && internalRefSequenceVisitor.Code.Size < Size)
-                gap = CreateBitArray(Size - internalRefSequenceVisitor.Code.Size, BitsConst.None());
-            var result = internalRefSequenceVisitor.Code
-                .CreateSequence(gap)
-                .CreateSequence(newCode)
-                .CreateSequence(internalRefSequenceVisitor.DestructorCode)
-                .UseWithArg(CreateTopRef(internalRefSequenceVisitor.RefAligmParam));
-
-            NotImplementedMethod("result", result);
-            return this;
+            return new InternalRefSequenceVisitor().CreateStatement(this, copier);
         }
     }
 
@@ -280,6 +248,38 @@ namespace Reni.Code
         {
             return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1));
         }
+
+        internal CodeBase CreateStatement(CodeBase body, CodeBase copier)
+        {
+            var newBody = body.Visit(this);
+            if(newBody == null)
+                newBody = body;
+            var alignedBody = newBody.Align();
+            var alignedInternal = Code.Align();
+            // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
+            var gap = CodeBase.CreateVoid();
+            if (!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < alignedBody.Size)
+                gap = CodeBase.CreateBitArray(alignedBody.Size - alignedInternal.Size, BitsConst.None());
+            var result = alignedInternal
+                .CreateSequence(gap)
+                .CreateSequence(alignedBody)
+                .CreateSequence(DestructorCode)
+                .CreateChild(new StatementEnd(alignedBody.Size,alignedInternal.Size+gap.Size))
+                .CreateSequence(copier)
+                .CreateChild(new Drop(alignedInternal.Size + gap.Size))
+                .UseWithArg(CodeBase.CreateTopRef(RefAligmParam));
+
+            NotImplementedMethod("result", result);
+            return body;
+        }
+    }
+
+    internal class Drop : LeafElement
+    {
+        private readonly Size _size;
+        public Drop(Size size) { _size = size; }
+        protected override Size GetSize() { return _size*-1; }
+        protected override Size GetInputSize() { return _size; }
     }
 
     internal class InternalRefCode : CodeBase
@@ -316,7 +316,7 @@ namespace Reni.Code
 
         protected override Size GetSize() { return Size.Zero; }
         protected override Size GetInputSize() { return _refAlignParam.RefSize*2; }
-        protected override string Format(StorageDescriptor start) { return start.Assign(_refAlignParam, _size); }
+        protected override string Format(StorageDescriptor start) { return start.CreateAssignment(_refAlignParam, _size); }
     }
 
     internal class Pending : CodeBase, IIconKeyProvider

@@ -111,6 +111,6 @@ namespace Reni.Code
             return null;
         }
 
-        protected override string Format(StorageDescriptor start) { return start.BitCast(TargetSize, Size, SignificantSize); }
+        protected override string Format(StorageDescriptor start) { return start.CreateBitCast(TargetSize, Size, SignificantSize); }
     }
 }

@@ -7,35 +7,12 @@ using Reni.Parser.TokenClass;
 
 namespace Reni.Code
 {
-    /// <summary>
-    /// Storage parameters for code generation
-    /// </summary>
     internal class StorageDescriptor : ReniObject
     {
         private Size _start;
         private readonly Size _dataEndAddr;
         private readonly Size _frameSize;
 
-        /// <summary>
-        /// Current start address.
-        /// </summary>
-        /// <value>The start.</value>
-        /// created 26.11.2006 13:17
-        public Size Start { get { return _start; } }
-
-        /// <summary>
-        /// Gets the data end addr.
-        /// </summary>
-        /// <value>The data end addr.</value>
-        /// created 26.11.2006 15:08
-        public Size DataEndAddr { get { return _dataEndAddr; } }
-
-        /// <summary>
-        /// Initializes a new instance of the StorageDescriptor class.
-        /// </summary>
-        /// <param name="dataEndAddr">The data end addr.</param>
-        /// <param name="frameSize">Size of the args.</param>
-        /// created 26.11.2006 13:17
         public StorageDescriptor(Size dataEndAddr, Size frameSize)
         {
             if(dataEndAddr == null)
@@ -48,55 +25,31 @@ namespace Reni.Code
             _start = dataEndAddr;
         }
 
-        /// <summary>
-        /// Shifts the start address.
-        /// </summary>
-        /// <param name="deltaSize">Size of the delta.</param>
-        /// created 26.11.2006 13:18
+        public Size Start { get { return _start; } }
+        public Size DataEndAddr { get { return _dataEndAddr; } }
         public void ShiftStartAddress(Size deltaSize) { _start += deltaSize; }
 
-        /// <summary>
-        /// Generates the function return.
-        /// </summary>
-        /// <value>The function return.</value>
-        /// created 26.11.2006 23:22
-        [DumpData(false)]
-        private string FunctionReturn
+        private string CreateFunctionReturn()
         {
-            get
-            {
-                var resultSize = DataEndAddr - Start;
-                if(_frameSize.IsZero && resultSize.IsZero)
-                    return "";
-                return CreateMoveBytesToFrame(resultSize, resultSize, Start)
-                    + "; // StorageDescriptor.FunctionReturn";
-            }
+            var resultSize = DataEndAddr - Start;
+            if(_frameSize.IsZero && resultSize.IsZero)
+                return "";
+            return CreateMoveBytesToFrame(resultSize, resultSize, Start)
+                   + "; // StorageDescriptor.CreateFunctionReturn";
         }
 
-        /// <summary>
-        /// Gets the body.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="isFunction">if set to <c>true</c> [is function].</param>
-        /// <returns></returns>
-        internal string GetBody(List<LeafElement> data, bool isFunction)
+        internal string CreateFunctionBody(List<LeafElement> data, bool isFunction)
         {
             var result = GetStatements(data);
             if(isFunction)
                 result =
                     "StartFunction:\n"
                         + result
-                            + FunctionReturn;
+                            + CreateFunctionReturn();
             return result;
         }
 
-        /// <summary>
-        /// Assigns the specified ref align param.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="size">The size.</param>
-        /// <returns></returns>
-        public string Assign(RefAlignParam refAlignParam, Size size)
+        internal string CreateAssignment(RefAlignParam refAlignParam, Size size)
         {
             if(refAlignParam.Is_3_32)
             {
@@ -124,14 +77,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates a prefix operation.
-        /// </summary>
-        /// <param name="opToken">The op token.</param>
-        /// <param name="size">The size.</param>
-        /// <param name="argSize">Size of the arg.</param>
-        /// <returns></returns>
-        internal string BitArrayPrefixOp(Defineable opToken, Size size, Size argSize)
+        internal string CreateBitArrayPrefixOp(Defineable opToken, Size size, Size argSize)
         {
             if(IsBuildInIntType(size))
                 return CreateDataRef(Start, size)
@@ -154,23 +100,14 @@ namespace Reni.Code
                                             + ")";
         }
 
-        /// <summary>
-        /// Bits the array op.
-        /// </summary>
-        /// <param name="opToken">The op token.</param>
-        /// <param name="resultSize">The resultSize.</param>
-        /// <param name="leftSize">Size of the left.</param>
-        /// <param name="rightSize">Size of the right.</param>
-        /// <returns></returns>
-        /// created 10.10.2006 00:29
-        internal string BitArrayOp(Defineable opToken, Size resultSize, Size leftSize, Size rightSize)
+        internal string CreateBitArrayOp(Defineable opToken, Size resultSize, Size leftSize, Size rightSize)
         {
             if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
             {
-                var value = GetValueForBuiltInIntType(leftSize, opToken, rightSize);
+                var value = CreateBinaryOperation(leftSize, opToken, rightSize);
                 if(opToken.IsCompareOperator)
                     value = "(" + value + "? -1:0" + ")";
-                return GetFrameForBuiltInIntType(resultSize, leftSize + rightSize) + value;
+                return CreateStoreResult(resultSize, leftSize + rightSize) + value;
             }
 
             return "Data."
@@ -190,16 +127,7 @@ namespace Reni.Code
                                                                     + ")";
         }
 
-        /// <summary>
-        /// Creates a conditional operation that is used as header of then-else construction
-        /// </summary>
-        /// <param name="opToken">The op token.</param>
-        /// <param name="leftSize">Size of the left.</param>
-        /// <param name="rightSize">Size of the right.</param>
-        /// <param name="thenElseObjectId">The then else object id.</param>
-        /// <param name="condSize">Size of the cond.</param>
-        /// <returns></returns>
-        internal string BitArrayOpThen(Defineable opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
+        internal string CreateBitArrayOpThen(Defineable opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
         {
             if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
                 return "if("
@@ -222,15 +150,7 @@ namespace Reni.Code
                                                     + ") {" ;
         }
 
-        /// <summary>
-        /// Bits the cast.
-        /// </summary>
-        /// <param name="targetSize">Size of the target.</param>
-        /// <param name="size">The size.</param>
-        /// <param name="significantSize">Size of the significant.</param>
-        /// <returns></returns>
-        /// created 10.10.2006 00:24
-        public string BitCast(Size targetSize, Size size, Size significantSize)
+        internal string CreateBitCast(Size targetSize, Size size, Size significantSize)
         {
             var targetBytes = targetSize.ByteCount;
             var bytes = size.ByteCount;
@@ -268,14 +188,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates the code for a bitsarray.
-        /// </summary>
-        /// <param name="size">The size.</param>
-        /// <param name="data">The data.</param>
-        /// <returns></returns>
-        /// created 10.10.2006 00:27
-        public string BitsArray(Size size, BitsConst data)
+        internal string CreateBitsArray(Size size, BitsConst data)
         {
             if(IsBuildInIntType(size))
                 return
@@ -301,68 +214,25 @@ namespace Reni.Code
                                 + ")";
         }
 
-        /// <summary>
-        /// Creates the code for a call.
-        /// </summary>
-        /// <param name="index">The index.</param>
-        /// <param name="frameSize">Size of the args and refs.</param>
-        /// <returns></returns>
-        /// created 15.11.2006 21:41
-        public string Call(int index, Size frameSize) { return Generator.FunctionMethodName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
+        internal string CreateCall(int index, Size frameSize) { return Generator.FunctionMethodName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
 
-        /// <summary>
-        /// Creates the code for dumping numbers.
-        /// </summary>
-        /// <param name="leftSize">Size of the left.</param>
-        /// <param name="rightSize">Size of the right.</param>
-        /// <returns></returns>
-        /// created 08.01.2007 16:39
-        public string DumpPrint(Size leftSize, Size rightSize)
+        internal string CreateDumpPrint(Size leftSize, Size rightSize)
         {
             if(rightSize.IsZero)
-                return BitArrayDumpPrint(leftSize);
+                return CreateDumpPrintOperation(leftSize);
             NotImplementedMethod(leftSize, rightSize);
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates the code for dumping text.
-        /// </summary>
-        /// <param name="text">The text.</param>
-        /// <returns></returns>
-        /// created 08.01.2007 18:38
-        public string DumpPrintText(string text) { return "Data.DumpPrint(" + text.Quote() + ")"; }
+        internal static string CreateDumpPrintText(string text) { return "Data.DumpPrint(" + text.Quote() + ")"; }
 
-        /// <summary>
-        /// Creates the code for else construct.
-        /// </summary>
-        /// <param name="objectId">The object id.</param>
-        /// <returns></returns>
-        /// created 09.01.2007 04:12
-        public string Else(int objectId) { return "} else {" ; }
+        internal static string CreateElse(int objectId) { return "} else {" ; }
 
-        /// <summary>
-        /// Creates the endig code of a then-else construct.
-        /// </summary>
-        /// <param name="objectId">The object id.</param>
-        /// <returns></returns>
-        /// created 09.01.2007 04:09
-        public string EndCondional(int objectId) { return "}"; }
+        internal static string CreateEndCondional(int objectId) { return "}"; }
 
-        /// <summary>
-        /// Creates a recursive call, i. e. a jump to start of function..
-        /// </summary>
-        /// <returns></returns>
-        public string RecursiveCall() { return "goto StartFunction"; }
+        internal static string CreateRecursiveCall() { return "goto StartFunction"; }
 
-        /// <summary>
-        /// Creates the code for incrementing a reference.
-        /// </summary>
-        /// <param name="size">The size.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        /// created 21.10.2006 02:10
-        public string RefPlus(Size size, int right)
+        internal string CreateRefPlus(Size size, int right)
         {
             if(right == 0)
                 return "";
@@ -374,16 +244,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates the code for copying things from frame to top of data area.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="targetSize">Size of the target.</param>
-        /// <param name="destinationSize">Size of the destination.</param>
-        /// <returns></returns>
-        /// created 04.01.2007 16:38
-        public string TopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize)
+        internal string CreateTopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize)
         {
             if(refAlignParam.Is_3_32)
                 return CreateMoveBytesFromFrame(targetSize, Start - targetSize, offset*-1);
@@ -392,34 +253,11 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates the code for end of statement cleanup.
-        /// </summary>
-        /// <param name="size">The size.</param>
-        /// <param name="bodySize">The body.</param>
-        /// <returns></returns>
-        /// created 10.10.2006 00:25
-        public string StatementEnd(Size size, Size bodySize) { return CreateMoveBytes(size, Start + bodySize, Start); }
+        internal string CreateStatementEnd(Size size, Size bodySize) { return CreateMoveBytes(size, Start + bodySize, Start); }
 
-        /// <summary>
-        /// Creates a conditional operation that is used as header of then-else construction
-        /// </summary>
-        /// <param name="objectId">The object id.</param>
-        /// <param name="condSize">Size of the cond.</param>
-        /// <returns></returns>
-        /// created 09.01.2007 04:15
-        public string Then(int objectId, Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
+        internal string CreateThen(int objectId, Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
 
-        /// <summary>
-        /// Creates the code for copying things from data area to top of data area.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="targetSize">Size of the target.</param>
-        /// <param name="destinationSize">Size of the destination.</param>
-        /// <returns></returns>
-        /// created 19.10.2006 22:27
-        public string TopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
+        internal string CreateTopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
         {
             if(refAlignParam.Is_3_32)
                 return CreateMoveBytes(targetSize, Start - targetSize, Start + offset);
@@ -428,14 +266,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates the code for a referenece to top of data area.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="offset">The offset.</param>
-        /// <returns></returns>
-        /// created 21.10.2006 02:10
-        public string TopRef(RefAlignParam refAlignParam, Size offset)
+        internal string CreateTopRef(RefAlignParam refAlignParam, Size offset)
         {
             if(refAlignParam.Is_3_32)
                 return CreateDataRef(Start - refAlignParam.RefSize, refAlignParam.RefSize)
@@ -447,14 +278,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Create a reference to frame.
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="offset">The offset.</param>
-        /// <returns></returns>
-        /// created 03.01.2007 22:45
-        public string FrameRef(RefAlignParam refAlignParam, Size offset)
+        internal string CreateFrameRef(RefAlignParam refAlignParam, Size offset)
         {
             if(refAlignParam.Is_3_32)
                 return CreateDataRef(Start - refAlignParam.RefSize, refAlignParam.RefSize)
@@ -466,15 +290,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Creates the code copy the content of a reference to to of data area
-        /// </summary>
-        /// <param name="refAlignParam">The ref align param.</param>
-        /// <param name="targetSize">Size of the target.</param>
-        /// <param name="destinationSize">Size of the destination.</param>
-        /// <returns></returns>
-        /// created 10.10.2006 00:24
-        public string Unref(RefAlignParam refAlignParam, Size targetSize)
+        internal string CreateUnref(RefAlignParam refAlignParam, Size targetSize)
         {
             if(refAlignParam.Is_3_32)
             {
@@ -494,21 +310,21 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        private string BitArrayDumpPrint(Size size)
+        internal string CreateDumpPrintOperation(Size size)
         {
             if(IsBuildInIntType(size))
                 return "Data.DumpPrint(" + CreateDataRef(Start, size) + ")";
             return "Data.DumpPrint(" + size.ByteCount + ", " + CreateDataPtr(Start) + ")";
         }
 
-        private string GetFrameForBuiltInIntType(Size resultSize, Size argsSize)
+        private string CreateStoreResult(Size resultSize, Size argsSize)
         {
             return CreateDataRef(Start + argsSize - resultSize, resultSize)
                 + " = "
                     + CreateIntCast(resultSize);
         }
 
-        private string GetValueForBuiltInIntType(Size leftSize, Defineable opToken, Size rightSize)
+        private string CreateBinaryOperation(Size leftSize, Defineable opToken, Size rightSize)
         {
             return "("
                 + CreateDataRef(Start + rightSize, leftSize)
