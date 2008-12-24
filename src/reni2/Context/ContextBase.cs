@@ -179,12 +179,11 @@ namespace Reni.Context
 
         internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType, int sequenceCount)
         {
-            var target = elementType.CreateSequence(sequenceCount);
-
             var applyToRef = ResultAsRef(category | Category.Type, syntax);
             if(applyToRef.IsPending)
                 return Reni.Result.CreatePending(category);
             applyToRef.AssertComplete(category | Category.Type, syntax);
+            var target = elementType.CreateSequence(sequenceCount);
             var convertTo = applyToRef.ConvertTo(target).Filter(category);
             convertTo.AssertComplete(category);
             var result = convertTo.Align(AlignBits);
@@ -198,12 +197,7 @@ namespace Reni.Context
             if(result.Type.IsRef(RefAlignParam))
                 return Result(category, syntax);
 
-            AutomaticRef automaticRef = result.Type.CreateAutomaticRef(RefAlignParam);
-            return automaticRef.CreateResult(
-                category,
-                () => CodeBase.CreateInternalRef(RefAlignParam, result.Code, result.Type.Destructor(Category.Code).Code),
-                () => result.Refs + result.Type.Destructor(Category.Refs).Refs
-                );
+            return result.CreateAutomaticRefResult(category, result.Type.CreateAutomaticRef(RefAlignParam));
         }
 
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target)
@@ -218,9 +212,7 @@ namespace Reni.Context
                 NotImplementedMethod(category, syntax, target, "type", result.Type, "result", result, "convertedResult", convertedResult);
                 return result;
             }
-
-            NotImplementedMethod(category, syntax, target, "type", result.Type, "result", result);
-            return null;
+            return result.ConvertTo(target.Target).CreateAutomaticRefResult(category, target);
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }

@@ -485,7 +485,7 @@ namespace Reni
             var result = Clone(category);
             var copier = Type.Copier(category);
             if(category.HasCode)
-                result.Code = result.Code.CreateStatement(copier.Code,refAlignParam);
+                result.Code = Code.CreateStatement(copier.Code,refAlignParam);
             if (category.HasRefs)
                 result.Refs = result.Refs.CreateSequence(copier.Refs);
             return result;
@@ -567,6 +567,16 @@ namespace Reni
             if(category.HasCode)
                 result.Code = result.Code.CreateSequence(CodeBase.CreateDumpPrintText(")"));
             return result;
+        }
+
+        internal Result CreateAutomaticRefResult(Category category, AutomaticRef target)
+        {
+            var destructor = Type.Destructor(category);
+            return target.CreateResult(
+                category,
+                () => CodeBase.CreateInternalRef(target.RefAlignParam, Code, destructor.Code),
+                () => Refs + destructor.Refs
+                );
         }
     }
 

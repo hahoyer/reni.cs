@@ -21,11 +21,12 @@ namespace Reni
                 .CreateStatement(category, refAlignParam);
         }
 
-        internal Result FunctionResult(int alignBits)
+        internal Result FunctionResult(Category category, RefAlignParam refAlignParam)
         {
             return _result
                 .AutomaticDereference()
-                .Align(alignBits);
+                .Align(refAlignParam.AlignBits)
+                .CreateStatement(category, refAlignParam);
         }
 
         internal Result ArgsResult(int alignBits)

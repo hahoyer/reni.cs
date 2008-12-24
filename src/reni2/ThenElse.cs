@@ -31,7 +31,9 @@ namespace Reni
             if(category <= (Category.Type | Category.Size))
                 return commonType.CreateResult(category);
 
-            var condResult = context.ConvertToSequence(category | Category.Type, Cond, TypeBase.CreateBit,1);
+            var condResult = context
+                .Result(category | Category.Type, Cond)
+                .ConvertTo(TypeBase.CreateBit);
 
             var thenResult = context.Result(category | Category.Type, Then).AutomaticDereference();
             var elseResult = ElseResult(context, category | Category.Type).AutomaticDereference();

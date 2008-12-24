@@ -217,7 +217,7 @@ namespace Reni.Code
                     .CreateChild(new StatementEnd(resultSize,intermediateSize))
                     .CreateSequence(copier.UseWithArg(InternalRefSequenceVisitor.InternalRefCode(refAlignParam, resultSize)));
 
-            return result.CreateChild(new Drop(intermediateSize));
+            return result.CreateChild(new Drop(Size, resultSize));
         }
     }
 
@@ -286,11 +286,18 @@ namespace Reni.Code
 
     internal class Drop : LeafElement
     {
-        [Node]
-        internal readonly Size DropSize;
-        public Drop(Size size) { DropSize = size; }
-        protected override Size GetSize() { return Size.Zero; }
-        protected override Size GetInputSize() { return DropSize; }
+        private readonly Size _beforeSize;
+        private readonly Size _afterSize;
+
+        public Drop(Size beforeSize, Size afterSize)
+        {
+            _beforeSize = beforeSize;
+            _afterSize = afterSize;
+            ;
+        }
+
+        protected override Size GetSize() { return _afterSize; }
+        protected override Size GetInputSize() { return _beforeSize; }
         protected override string Format(StorageDescriptor start) { return ""; }
     }
 
