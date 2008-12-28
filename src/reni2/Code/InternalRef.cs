@@ -16,6 +16,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             Code = code;
             DestructorCode = destructorCode;
+            StopByObjectId(-1100);
         }
 
         [DumpData(false)]

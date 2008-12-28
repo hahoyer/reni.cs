@@ -21,7 +21,7 @@ namespace Reni.Code.ReplaceVisitor
 
         internal override CodeBase Arg(Arg visitedObject)
         {
-            visitedObject.StopByObjectId(363);
+            visitedObject.StopByObjectId(-363);
             Tracer.Assert(Actual.Size == visitedObject.Size,
                 "Actual=" + Actual.Dump() + "\nvisitedObject=" + visitedObject.Dump());
             return Actual;

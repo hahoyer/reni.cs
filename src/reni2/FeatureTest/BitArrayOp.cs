@@ -8,24 +8,6 @@ namespace Reni.FeatureTest.BitArrayOp
     [TestFixture]
     public class BitArrayOp : CompilerTest
     {
-        [Test]
-        public void PositiveNumbers2()
-        {
-            CreateFileAndRunCompiler("Numbers",@"(1, 12)dump_print","(1, 12)");
-        }
-
-        /// <summary>
-        /// Compares the operators.
-        /// </summary>
-        /// created 08.01.2007 00:05
-        [Test, Category(Worked)]
-        public void PositiveNumbers()
-        {
-            CreateFileAndRunCompiler("Numbers of different Size", 
-            @"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print", 
-            "(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)");
-        }
-
         /// <summary>
         /// Compares the operators.
         /// </summary>
@@ -44,53 +26,79 @@ namespace Reni.FeatureTest.BitArrayOp
             CreateFileAndRunCompiler("Negative number", @"(-123456789)dump_print", "-123456789");
             CreateFileAndRunCompiler("Negative number", @"(-1234567890)dump_print", "-1234567890");
         }
-        /// <summary>
-        /// Compares the operators.
-        /// </summary>
-        /// created 08.01.2007 00:05
-        [Test, Category(Worked)]
-        public void NegativeNumbers2()
-        {
-            CreateFileAndRunCompiler("Numbers of different Size",
-            @"(-1, -12)dump_print",
-            "(-1, -12)");
-        }
-        /// <summary>
-        /// Compares the operators.
-        /// </summary>
-        /// created 08.01.2007 00:05
-        [Test, Category(Worked)]
-        public void NegativeNumbers()
-        {
-            CreateFileAndRunCompiler("Numbers of different Size",
-            @"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print",
-            "(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)");
-        }
-        /// <summary>
-        /// Compares the operators.
-        /// </summary>
-        /// created 08.01.2007 00:05
-        [Test, Category(Worked)]
-        public void AddOddSizedNumber()
-        {
-            CreateFileAndRunCompiler("1st", @"(40000 - 1  )dump_print", "39999");
-            CreateFileAndRunCompiler("1st", @"(40000 + 1   )dump_print", "40001");
-            CreateFileAndRunCompiler("1st", @"(40000 - 43210)dump_print", "-3210");
-            CreateFileAndRunCompiler("1st", @"( 400 - 43210)dump_print", "-42810");
-        }
-
         public override void Run()
         {
         }
 
     }
 
-    [TestFixture]
+    [TestFixture,
+    Target(@"(1, 12)dump_print"),
+    Output("(1, 12)")]
+    public class TwoPositiveNumbers : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture, TwoPositiveNumbers,
+    Target(@"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print"),
+    Output("(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)")]
+    public class PositiveNumbers : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture, TwoPositiveNumbers,
+    Target(@"(-1, -12)dump_print"),
+    Output("(-1, -12)")]
+    public class TwoNegativeNumbers : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture, TwoNegativeNumbers,
+    Target(@"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print"),
+    Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
+    public class NegativeNumbers : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture, Target(@"(2+4) dump_print"), Output("6")]
     public class Add2Numbers : CompilerTest
     {
-        public override string Target { get { return @"(2+4) dump_print"; } }
-        public override string Output { get { return "6"; } }
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
 
+    [TestFixture, Target(@"(40000 - 1  )dump_print"), Output("39999")]
+    public class SubtractOddSizedNumber : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture, Target(@"(40000 + 1  )dump_print"), Output("40001")]
+    public class AddOddSizedNumber : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture, Target(@"(40000 - 43210)dump_print"), Output("-3210")]
+    public class SubtractLargeEqualSizedNumber : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture, Target(@"(400 - 43210)dump_print"), Output("-42810")]
+    public class SubtractLargerSizedNumber : CompilerTest
+    {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }

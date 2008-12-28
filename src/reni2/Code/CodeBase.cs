@@ -225,24 +225,28 @@ namespace Reni.Code
     {
         private readonly SimpleCache<CodeBase> _codeCache = new SimpleCache<CodeBase>();
         [Node, DumpData(true)]
-        private Sequence<InternalRef> _data = HWString.Sequence<InternalRef>();
+        private List<InternalRef> _data = new List<InternalRef>();
 
         [DumpData(false)]
-        public CodeBase Code { get { return _codeCache.Find(()=>_data.Apply1(x => x.Code).Serialize(CodeBase.CreateVoid())); } }
+        public CodeBase Code { get
+        {
+            return _codeCache.Find(() => HWString.Sequence<InternalRef>(_data).Apply1(x => x.Code).Serialize(CodeBase.CreateVoid()));
+        } }
 
         public CodeBase DestructorCode
         {
             get
             {
                 var size = Size.Zero;
-                return _data.Apply1
+                return HWString.Sequence<InternalRef>(_data).Apply1
                 (
                     delegate(InternalRef x)
                     {
                         size += x.Code.Size;
                         return x.DestructorCode.UseWithArg(InternalRefCode(x.RefAlignParam, size));
                     }
-                ).Serialize(CodeBase.CreateVoid());
+                )
+                .Serialize(CodeBase.CreateVoid());
             }
         }
 
@@ -252,9 +256,20 @@ namespace Reni.Code
             var newCode = visitedObject.Code.Visit(this);
             if(newCode != null)
                 newVisitedObject = new InternalRef(visitedObject.RefAlignParam, newCode, visitedObject.DestructorCode);
-            _data += newVisitedObject;
+            Size offset = Find(newVisitedObject);
             _codeCache.Value = null;
-            return InternalRefCode(newVisitedObject.RefAlignParam, Code.Size);
+            return InternalRefCode(newVisitedObject.RefAlignParam, offset);
+        }
+
+        private Size Find(InternalRef internalRef)
+        {
+            var result = Size.Zero;
+            var i = 0;
+            for(; i < _data.Count && _data[i] != internalRef; i++)
+                result += _data[i].Code.Size;
+            if(i == _data.Count)
+                _data.Add(internalRef);
+            return result + internalRef.Code.Size;
         }
 
         internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size)
@@ -264,6 +279,8 @@ namespace Reni.Code
 
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
+            var trace = body.ObjectId == -1658;
+            StartMethodDumpWithBreak(trace,body,copier,refAlignParam);
             var newBody = body.Visit(this);
             if(newBody == null)
                 newBody = body;
@@ -280,7 +297,7 @@ namespace Reni.Code
                 .CreateSequence(DestructorCode)
                 .CreateStatementEnd(copier, refAlignParam, resultSize)
                 .UseWithArg(CodeBase.CreateTopRef(refAlignParam));
-            return result;
+            return ReturnMethodDump(trace,result);
         }
     }
 
@@ -295,6 +312,8 @@ namespace Reni.Code
             _afterSize = afterSize;
             ;
         }
+
+        public override string NodeDump { get { return base.NodeDump + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; } }
 
         protected override Size GetSize() { return _afterSize; }
         protected override Size GetInputSize() { return _beforeSize; }
@@ -324,18 +343,18 @@ namespace Reni.Code
         [DumpData(true)]
         private readonly RefAlignParam _refAlignParam;
 
-        [DumpData(true)]
-        private readonly Size _size;
+        [DumpData(true),Node]
+        private readonly Size _targetSize;
 
-        public Assign(RefAlignParam refAlignParam, Size size)
+        public Assign(RefAlignParam refAlignParam, Size targetSize)
         {
             _refAlignParam = refAlignParam;
-            _size = size;
+            _targetSize = targetSize;
         }
 
         protected override Size GetSize() { return Size.Zero; }
         protected override Size GetInputSize() { return _refAlignParam.RefSize*2; }
-        protected override string Format(StorageDescriptor start) { return start.CreateAssignment(_refAlignParam, _size); }
+        protected override string Format(StorageDescriptor start) { return start.CreateAssignment(_refAlignParam, _targetSize); }
     }
 
     internal class Pending : CodeBase, IIconKeyProvider
