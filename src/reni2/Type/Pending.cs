@@ -1,7 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Code;
 
 namespace Reni.Type
 {
@@ -13,18 +12,8 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
         internal override bool IsPending { get { return true; } }
 
-        internal override Result ConvertToVirt(Category category, TypeBase dest)
-        {
-            return dest.CreateResult
-                (
-                category,
-                () => CodeBase.Pending,
-                () => Refs.Pending
-                );
-        }
-
         internal override bool IsConvertableToVirt(TypeBase dest,
-            ConversionFeature conversionFeature) { return true; }
+                                                   ConversionFeature conversionFeature) { return true; }
 
         internal override string DumpShort() { return "pending"; }
 

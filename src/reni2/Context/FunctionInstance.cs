@@ -114,7 +114,7 @@ namespace Reni.Context
                 return null;
 
             var functionContext = Context.CreateFunction(Args);
-            var trace = ObjectId == -10 && category.HasRefs;
+            var trace = ObjectId == -10 && category.HasCode;
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category| Category.Type;
             var result = functionContext.Result(categoryEx, Body).Clone();
@@ -127,7 +127,7 @@ namespace Reni.Context
             var postProcessedResult = result.PostProcessor.FunctionResult(category, functionContext.RefAlignParam);
 
             Tracer.ConditionalBreak(trace, Dump() + "\npostProcessedResult=" + postProcessedResult.Dump());
-            var finalResult = postProcessedResult.ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(postProcessedResult.Complete));
+            var finalResult = postProcessedResult.ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(postProcessedResult.CompleteCategory));
             return ReturnMethodDump(trace, finalResult);
         }
 

@@ -20,11 +20,18 @@ namespace Reni.Struct
 
         [DumpData(false)]
         public override IRefInCode ForCode { get { return _context; } }
+
         [Node]
         internal override int Position { get { return _position; } }
-        [DumpData(false),Node]
+
+        [DumpData(false), Node]
         internal override FullContext Context { get { return _context; } }
+
+        internal override ContextAtPosition CreatePosition(int position) { return _context.CreatePosition(position); }
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }
         internal override IStructContext FindStruct() { return this; }
+
+        [DumpData(false)]
+        public override string NodeDump { get { return base.NodeDump + ": " + _context.NodeDump + "@" + _position; } }
     }
 }

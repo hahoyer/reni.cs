@@ -47,7 +47,7 @@ namespace Reni.Type
 
         internal override sealed Result AutomaticDereference(Result result)
         {
-            return Target.AutomaticDereference(CreateDereferencedArgResult(result.Complete).UseWithArg(result));
+            return Target.AutomaticDereference(CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result));
         }
 
         internal Result CreateDereferencedArgResult(Category category)

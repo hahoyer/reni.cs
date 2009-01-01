@@ -29,13 +29,8 @@ namespace Reni.Code
         [DumpData(false)]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
-        [DumpExcept(false)]
-        internal virtual bool IsPending { get { return false; } }
-
         [Node, DumpData(false)]
         internal List<LeafElement> Serial { get { return Serialize(true).Data; } }
-
-        internal static CodeBase Pending { get { return new Pending(); } }
 
         internal protected virtual Size GetMaxSize() { return Size; }
 
@@ -200,22 +195,22 @@ namespace Reni.Code
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
 
-        internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam)
-        {
-            return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam);
-        }
+        internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam) { return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam); }
 
         internal CodeBase CreateStatementEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
         {
             var intermediateSize = Size - resultSize;
-            if (intermediateSize.IsZero) 
+            if(intermediateSize.IsZero)
                 return this;
 
             var result = this;
-            if (!resultSize.IsZero)
+            if(!resultSize.IsZero)
+            {
                 result = result
-                    .CreateChild(new StatementEnd(resultSize,intermediateSize))
-                    .CreateSequence(copier.UseWithArg(InternalRefSequenceVisitor.InternalRefCode(refAlignParam, resultSize)));
+                    .CreateChild(new StatementEnd(resultSize, intermediateSize))
+                    .CreateSequence(
+                    copier.UseWithArg(InternalRefSequenceVisitor.InternalRefCode(refAlignParam, resultSize)));
+            }
 
             return result.CreateChild(new Drop(Size, resultSize));
         }
@@ -224,14 +219,20 @@ namespace Reni.Code
     internal class InternalRefSequenceVisitor : Base
     {
         private readonly SimpleCache<CodeBase> _codeCache = new SimpleCache<CodeBase>();
+
         [Node, DumpData(true)]
         private List<InternalRef> _data = new List<InternalRef>();
 
         [DumpData(false)]
-        public CodeBase Code { get
+        public CodeBase Code
         {
-            return _codeCache.Find(() => HWString.Sequence<InternalRef>(_data).Apply1(x => x.Code).Serialize(CodeBase.CreateVoid()));
-        } }
+            get
+            {
+                return
+                    _codeCache.Find(
+                        () => HWString.Sequence<InternalRef>(_data).Apply1(x => x.Code).Serialize(CodeBase.CreateVoid()));
+            }
+        }
 
         public CodeBase DestructorCode
         {
@@ -239,14 +240,14 @@ namespace Reni.Code
             {
                 var size = Size.Zero;
                 return HWString.Sequence<InternalRef>(_data).Apply1
-                (
+                    (
                     delegate(InternalRef x)
                     {
                         size += x.Code.Size;
                         return x.DestructorCode.UseWithArg(InternalRefCode(x.RefAlignParam, size));
                     }
-                )
-                .Serialize(CodeBase.CreateVoid());
+                    )
+                    .Serialize(CodeBase.CreateVoid());
             }
         }
 
@@ -256,7 +257,7 @@ namespace Reni.Code
             var newCode = visitedObject.Code.Visit(this);
             if(newCode != null)
                 newVisitedObject = new InternalRef(visitedObject.RefAlignParam, newCode, visitedObject.DestructorCode);
-            Size offset = Find(newVisitedObject);
+            var offset = Find(newVisitedObject);
             _codeCache.Value = null;
             return InternalRefCode(newVisitedObject.RefAlignParam, offset);
         }
@@ -272,15 +273,12 @@ namespace Reni.Code
             return result + internalRef.Code.Size;
         }
 
-        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size)
-        {
-            return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1));
-        }
+        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size) { return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1)); }
 
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             var trace = body.ObjectId == -1658;
-            StartMethodDumpWithBreak(trace,body,copier,refAlignParam);
+            StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this);
             if(newBody == null)
                 newBody = body;
@@ -289,7 +287,7 @@ namespace Reni.Code
             var alignedInternal = Code.Align();
             // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
             var gap = CodeBase.CreateVoid();
-            if (!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
+            if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                 gap = CodeBase.CreateBitArray(resultSize - alignedInternal.Size, BitsConst.None());
             var result = alignedInternal
                 .CreateSequence(gap)
@@ -297,7 +295,7 @@ namespace Reni.Code
                 .CreateSequence(DestructorCode)
                 .CreateStatementEnd(copier, refAlignParam, resultSize)
                 .UseWithArg(CodeBase.CreateTopRef(refAlignParam));
-            return ReturnMethodDump(trace,result);
+            return ReturnMethodDump(trace, result);
         }
     }
 
@@ -310,7 +308,6 @@ namespace Reni.Code
         {
             _beforeSize = beforeSize;
             _afterSize = afterSize;
-            ;
         }
 
         public override string NodeDump { get { return base.NodeDump + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; } }
@@ -343,7 +340,7 @@ namespace Reni.Code
         [DumpData(true)]
         private readonly RefAlignParam _refAlignParam;
 
-        [DumpData(true),Node]
+        [DumpData(true), Node]
         private readonly Size _targetSize;
 
         public Assign(RefAlignParam refAlignParam, Size targetSize)
@@ -362,7 +359,6 @@ namespace Reni.Code
         internal Pending() { StopByObjectId(711); }
 
         internal protected override Size GetSize() { return Size.Pending; }
-        internal override bool IsPending { get { return true; } }
 
         public override Result VirtVisit<Result>(Visitor<Result> actual) { throw new UnexpectedVisitOfPending(); }
 

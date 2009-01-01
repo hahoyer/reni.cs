@@ -16,7 +16,7 @@ namespace Reni
     internal sealed class Result : ReniObject, ITreeNodeSupport, Sequence<Result>.ICombiner<Result>
     {
         private bool _isDirty;
-        private Category _pending;
+        private Category _pendingCategory;
         private Size _size;
         private TypeBase _type;
         private CodeBase _code;
@@ -26,7 +26,7 @@ namespace Reni
         public Result()
         {
             PostProcessor = new PostProcessorForResult(this);
-            _pending = new Category();
+            _pendingCategory = new Category();
         }
 
         private bool HasSize { get { return Size != null; } }
@@ -35,9 +35,9 @@ namespace Reni
         internal bool HasRefs { get { return Refs != null; } }
 
         [Node]
-        private Category Pending { get { return _pending; } set { _pending = value; } }
+        private Category PendingCategory { get { return _pendingCategory; } set { _pendingCategory = value; } }
 
-        public Category Complete { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
+        public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
 
         [Node]
         public Size Size
@@ -86,7 +86,7 @@ namespace Reni
         TreeNode[] ITreeNodeSupport.CreateNodes()
         {
             var result = new List<TreeNode>();
-            if(!Pending.IsNull)
+            if(!PendingCategory.IsNull)
                 result.Add(Service.CreateNamedNode("Pending", "Pending", Dump()));
             if(HasSize)
                 result.Add(Service.CreateNamedNode("Size", "Number", Size.FormatForView()));
@@ -143,13 +143,13 @@ namespace Reni
         {
             get
             {
-                if(Complete.HasSize && !Size.IsZero)
+                if(CompleteCategory.HasSize && !Size.IsZero)
                     return false;
-                if(Complete.HasType && !Type.IsVoid)
+                if(CompleteCategory.HasType && !Type.IsVoid)
                     return false;
-                if(Complete.HasCode && !Code.IsEmpty)
+                if(CompleteCategory.HasCode && !Code.IsEmpty)
                     return false;
-                if(Complete.HasRefs && !Refs.IsNone)
+                if(CompleteCategory.HasRefs && !Refs.IsNone)
                     return false;
                 return true;
             }
@@ -159,11 +159,11 @@ namespace Reni
         {
             get
             {
-                if(Complete.HasSize && !Size.IsZero)
+                if(CompleteCategory.HasSize && !Size.IsZero)
                     return false;
-                if(Complete.HasCode && !Code.IsEmpty)
+                if(CompleteCategory.HasCode && !Code.IsEmpty)
                     return false;
-                if(Complete.HasRefs && !Refs.IsNone)
+                if(CompleteCategory.HasRefs && !Refs.IsNone)
                     return false;
                 return true;
             }
@@ -173,14 +173,10 @@ namespace Reni
         {
             get
             {
-                if(Complete.HasSize)
+                if(CompleteCategory.HasSize)
                     return Size.IsPending;
-                if(Complete.HasType)
+                if(CompleteCategory.HasType)
                     return Type.IsPending;
-                if(Complete.HasCode)
-                    return Code.IsPending;
-                if(Complete.HasRefs)
-                    return Refs.IsPending;
 
                 return false;
             }
@@ -189,9 +185,9 @@ namespace Reni
         public override string DumpData()
         {
             var result = "";
-            result += "Pending=" + _pending.Dump();
+            result += "PendingCategory=" + PendingCategory.Dump();
             result += "\n";
-            result += "Complete=" + Complete.Dump();
+            result += "CompleteCategory=" + CompleteCategory.Dump();
             if(HasSize)
                 result += "\nSize=" + Tracer.Dump(_size);
             if(HasType)
@@ -203,41 +199,41 @@ namespace Reni
             return result;
         }
 
-        private void AddPending(Category frEff) { _pending |= frEff; }
+        private void AddPendingCategory(Category category) { _pendingCategory |= category; }
 
-        internal void Update(Result r)
+        internal void Update(Result result)
         {
-            if(r.HasSize && !r.Size.IsPending)
-                _size = r.Size;
+            if(result.HasSize && !result.Size.IsPending)
+                _size = result.Size;
 
-            if(r.HasType && !r.Type.IsPending)
-                _type = r.Type;
+            if(result.HasType && !result.Type.IsPending)
+                _type = result.Type;
 
-            if(r.HasRefs && !r.Refs.IsPending)
-                _refs = r.Refs;
+            if(result.HasRefs)
+                _refs = result.Refs;
 
-            if(r.HasCode && !r.Code.IsPending)
-                _code = r.Code;
+            if(result.HasCode)
+                _code = result.Code;
 
             AssertValid();
         }
 
-        private void Update(Result r, Category c)
+        private void Update(Result result, Category category)
         {
-            if(c.HasSize)
-                _size = r.Size ?? Size.Pending;
-            if(c.HasType)
-                _type = r.Type ?? TypeBase.Pending;
-            if(c.HasRefs)
-                _refs = r.Refs ?? Refs.Pending;
-            if(c.HasCode)
-                _code = r.Code ?? CodeBase.Pending;
+            if(category.HasSize)
+                _size = result.Size ?? Size.Pending;
+            if(category.HasType)
+                _type = result.Type ?? TypeBase.Pending;
+            if(category.HasRefs)
+                _refs = result.Refs ?? Refs.None();
+            if(category.HasCode)
+                _code = result.Code;
             AssertValid();
         }
 
         internal Result Filter(Category category)
         {
-            if(category == Complete)
+            if(category == CompleteCategory)
                 return this;
 
             var result = new Result();
@@ -281,7 +277,7 @@ namespace Reni
             return r;
         }
 
-        internal Result Clone() { return Clone(Complete); }
+        internal Result Clone() { return Clone(CompleteCategory); }
 
         private void AssertValid()
         {
@@ -305,27 +301,27 @@ namespace Reni
 
         private bool HasCategory(Category category)
         {
-            if(category.HasSize && !Complete.HasSize)
+            if(category.HasSize && !CompleteCategory.HasSize)
                 return false;
-            if(category.HasType && !Complete.HasType)
+            if(category.HasType && !CompleteCategory.HasType)
                 return false;
-            if(category.HasCode && !Complete.HasCode)
+            if(category.HasCode && !CompleteCategory.HasCode)
                 return false;
-            if(category.HasRefs && !Complete.HasRefs)
+            if(category.HasRefs && !CompleteCategory.HasRefs)
                 return false;
             return true;
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
         {
-            var OldPending = Pending;
-            var OldComplete = Complete;
-            var notPendingCategory = category - OldPending;
-            var notCompleteCategory = notPendingCategory - OldComplete;
+            var oldPendingCategory = PendingCategory;
+            var notPendingCategory = category - oldPendingCategory;
+            var oldCompleteCategory = CompleteCategory;
+            var notCompleteCategory = notPendingCategory - oldCompleteCategory;
             if(!notCompleteCategory.IsNull)
             {
-                AddPending(notCompleteCategory);
+                AddPendingCategory(notCompleteCategory);
 
                 try
                 {
@@ -340,10 +336,10 @@ namespace Reni
                     throw;
                 }
 
-                Pending = OldPending;
+                PendingCategory = oldPendingCategory;
             }
             var filteredResult = Filter(category);
-            Tracer.Assert(filteredResult.Complete == category, string.Format("syntax={2}\ncategory={0}\nResult={1}", category, filteredResult.Dump(), syntax.DumpShort()));
+            Tracer.Assert(filteredResult.CompleteCategory == category, string.Format("syntax={2}\ncategory={0}\nResult={1}", category, filteredResult.Dump(), syntax.DumpShort()));
             return filteredResult;
         }
 
@@ -351,7 +347,7 @@ namespace Reni
 
         internal void AssertComplete(Category category) { Tracer.Assert(1, HasCategory(category), string.Format("category={0}\nResult={1}", category, Dump())); }
 
-        internal void Add(Result other) { Add(other, Complete); }
+        internal void Add(Result other) { Add(other, CompleteCategory); }
 
         internal void Add(Result other, Category category)
         {
@@ -499,19 +495,18 @@ namespace Reni
             if(category.HasType)
                 result.Type = TypeBase.Pending;
             if(category.HasRefs)
-                result.Refs = Refs.Pending;
-            if(category.HasCode)
-                result.Code = CodeBase.Pending;
+                result.Refs = Refs.None();
+            Tracer.Assert(!category.HasCode);
             return result;
         }
 
-        internal Result ConvertTo(TypeBase target) { return Type.Conversion(Complete, target).UseWithArg(this); }
+        internal Result ConvertTo(TypeBase target) { return Type.Conversion(CompleteCategory, target).UseWithArg(this); }
 
         internal Result CreateUnref(TypeBase type, RefAlignParam refAlignParam)
         {
             return type.CreateResult
                 (
-                Complete,
+                CompleteCategory,
                 () => Code.CreateDereference(refAlignParam, type.Size),
                 () => Refs
                 );
@@ -521,7 +516,7 @@ namespace Reni
         {
             return Reni.Type.Void.CreateResult
                 (
-                Complete,
+                CompleteCategory,
                 () => Code.CreateDumpPrint(),
                 () => Refs
                 );
@@ -537,7 +532,7 @@ namespace Reni
 
         internal Result AutomaticDereference()
         {
-            if(IsPending || Complete == Category.Refs)
+            if(IsPending || CompleteCategory == Category.Refs)
                 return this;
 
             return Type.AutomaticDereference(this);

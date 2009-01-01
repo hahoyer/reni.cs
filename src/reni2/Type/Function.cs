@@ -110,11 +110,11 @@ namespace Reni.Type
 
         internal override Result UnProperty(Result rawResult)
         {
-            Tracer.Assert(!rawResult.Complete.HasCode || rawResult.Code.IsEmpty);
-            Tracer.Assert(!rawResult.Complete.HasRefs || rawResult.Refs.IsNone);
+            Tracer.Assert(!rawResult.CompleteCategory.HasCode || rawResult.Code.IsEmpty);
+            Tracer.Assert(!rawResult.CompleteCategory.HasRefs || rawResult.Refs.IsNone);
             return _context
                 .Type(_body)
-                .ApplyFunction(rawResult.Complete, CreateVoid.CreateResult(rawResult.Complete))
+                .ApplyFunction(rawResult.CompleteCategory, CreateVoid.CreateResult(rawResult.CompleteCategory))
                 ;
         }
 

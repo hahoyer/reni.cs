@@ -77,12 +77,6 @@ namespace Reni
                 );
         }
 
-        /// <summary>
-        /// asis
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Category operator &(Category x, Category y)
         {
             return new Category(
@@ -92,10 +86,6 @@ namespace Reni
                 x.HasRefs && y.HasRefs);
         }
 
-        /// <summary>
-        /// bit combination
-        /// </summary>
-        /// <returns></returns>
         public override int GetHashCode()
         {
             unchecked
@@ -108,14 +98,6 @@ namespace Reni
             }
         }
 
-        /// <summary>
-        /// Determines whether instance are equal by value
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <returns>
-        /// 	<c>true</c> if the specified x is equal; otherwise, <c>false</c>.
-        /// </returns>
-        /// created 05.01.2007 01:38
         public bool IsEqual(Category x)
         {
             return
@@ -125,6 +107,7 @@ namespace Reni
                 && HasType == x.HasType
                 ;
         }
+
         private bool IsLessThan(Category x)
         {
             return
@@ -134,12 +117,20 @@ namespace Reni
                 || (!HasType && x.HasType)
                 ;
         }
-        /// <summary>
-        /// asis
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
+
+        private bool IsLessThanOrEqual(Category x)
+        {
+            if (HasCode && !x.HasCode)
+                return false;
+            if (HasRefs && !x.HasRefs)
+                return false;
+            if (HasSize && !x.HasSize)
+                return false;
+            if (HasType && !x.HasType)
+                return false;
+            return true;
+        }
+
         public static Category operator -(Category x, Category y)
         {
             return new Category(
@@ -191,12 +182,14 @@ namespace Reni
 
         public static bool operator <(Category left, Category right)
         {
-            return left.IsLessThan(right);
+            //return left.IsLessThan(right);
+            return left != right && left <= right;
         }
 
         public static bool operator <=(Category left, Category right)
         {
-            return left < right || left == right;
+            //return left < right || left == right;
+            return left.IsLessThanOrEqual(right);
         }
 
         public static bool operator >=(Category left, Category right)

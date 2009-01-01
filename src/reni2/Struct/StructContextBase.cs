@@ -16,7 +16,6 @@ namespace Reni.Struct
     {
         private readonly SimpleCache<Type> _typeCache = new SimpleCache<Type>();
         private readonly SimpleCache<PositionFeature[]> _featuresCache = new SimpleCache<PositionFeature[]>();
-        private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
         [Node]
         internal readonly ContextBase Parent;
         [Node]
@@ -60,10 +59,7 @@ namespace Reni.Struct
             return result.ToArray();
         }
 
-        internal ContextAtPosition CreatePosition(int position)
-        {
-            return _contextAtPositionCache.Find(position, () => new ContextAtPosition(Context, position));
-        }
+        internal abstract ContextAtPosition CreatePosition(int position);
 
         internal override string DumpShort()
         {
@@ -88,8 +84,7 @@ namespace Reni.Struct
             for (var i = position + 1; i < currentPosition; i++)
             {
                 var internalSize = InternalSize(i);
-                if (internalSize.IsPending)
-                    return CodeBase.Pending;
+                Tracer.Assert(!internalSize.IsPending);
                 offset += internalSize;
             }
 

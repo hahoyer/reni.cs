@@ -40,12 +40,6 @@ namespace Reni
             AddRange(a);
         }
 
-        private Refs(bool isPending)
-        {
-            if(isPending)
-                _data = new List<IRefInCode>();
-        }
-
         private void AddRange(IEnumerable<IRefInCode> a)
         {
             foreach (var e in a)
@@ -60,7 +54,6 @@ namespace Reni
 
         [Node]
         public List<IRefInCode> Data { get { return _data; } }
-        public bool IsPending { get { return _data == null; } }
 
         [DumpData(false)]
         private SizeArray Sizes
@@ -77,8 +70,6 @@ namespace Reni
         {
             get
             {
-                if(IsPending)
-                    throw new NotSupportedException();
                 return _data.Count;
             }
         }
@@ -86,7 +77,6 @@ namespace Reni
         public IRefInCode this[int i] { get { return _data[i]; } }
         public Size Size { get { return Sizes.Size; } }
         public bool IsNone { get { return Count == 0; } }
-        public static Refs Pending { get { return new Refs(true); } }
 
         public static Refs None()
         {
@@ -95,8 +85,6 @@ namespace Reni
 
         public Refs CreateSequence(Refs refs)
         {
-            if(IsPending || refs.IsPending)
-                throw new NotSupportedException("CreateSequence function not allowed for pending refs");
             if(refs.Count == 0)
                 return this;
             if(Count == 0)
@@ -111,9 +99,6 @@ namespace Reni
 
         public override string DumpData()
         {
-            if(IsPending)
-                return "<pending>";
-
             var result = "";
             for(var i = 0; i < Count; i++)
             {
@@ -134,8 +119,6 @@ namespace Reni
 
         public Refs Without(IRefInCode e)
         {
-            if(IsPending)
-                throw new NotSupportedException();
             if(!_data.Contains(e))
                 return this;
             var r = new List<IRefInCode>(_data);

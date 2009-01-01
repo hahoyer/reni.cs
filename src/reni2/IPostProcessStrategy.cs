@@ -55,7 +55,7 @@ namespace Reni
         internal Result PostProcess_old(AutomaticRef visitedType, Result result)
         {
             if(_typeBase == visitedType.Target)
-                return result.UseWithArg(visitedType.CreateDereferencedArgResult(result.Complete));
+                return result.UseWithArg(visitedType.CreateDereferencedArgResult(result.CompleteCategory));
             NotImplementedMethod(visitedType, result);
             return null;
         }

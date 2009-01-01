@@ -13,6 +13,7 @@ namespace Reni.Struct
         private readonly Result _internalConstructorResult = new Result();
         [Node]
         private readonly Result _constructorResult = new Result();
+        private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
 
         internal FullContext(ContextBase contextBase, Container container)
             : base(contextBase, container) { }
@@ -33,6 +34,11 @@ namespace Reni.Struct
                 .ReplaceRelativeContextRef(this, CodeBase.CreateTopRef(RefAlignParam));
             _constructorResult.Update(constructorResult);
             return constructorResult;
+        }
+
+        internal override ContextAtPosition CreatePosition(int position)
+        {
+            return _contextAtPositionCache.Find(position, () => new ContextAtPosition(Context, position));
         }
     }
 }

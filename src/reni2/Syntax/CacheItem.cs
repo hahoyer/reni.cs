@@ -30,7 +30,7 @@ namespace Reni.Syntax
             _context = context;
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         Result IResultCacheItem.Result(Category category) { return _data.AddCategories(category, _context, _syntax); }
 
         /// <summary>

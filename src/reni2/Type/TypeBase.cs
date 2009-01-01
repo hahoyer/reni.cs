@@ -234,7 +234,7 @@ namespace Reni.Type
 
         internal Result ApplyTypeOperator(Category category, TypeBase targetType) { return targetType.Conversion(category, this); }
 
-        internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.Complete, this).UseWithArg(argResult); }
+        internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult); }
 
         internal TypeBase CommonType(TypeBase dest)
         {
@@ -248,14 +248,12 @@ namespace Reni.Type
 
         internal Result Conversion(Category category, TypeBase dest)
         {
-            if(category > (Category.Size | Category.Type))
-            {
-                if(IsConvertableTo(dest, ConversionFeature.Instance))
-                    return ConvertTo(category, dest);
-                NotImplementedMethod(category, dest);
-                throw new NotImplementedException();
-            }
-            return dest.CreateResult(category);
+            if(category <= (Category.Size | Category.Type)) 
+                return dest.CreateResult(category);
+            if(IsConvertableTo(dest, ConversionFeature.Instance))
+                return ConvertTo(category, dest);
+            NotImplementedMethod(category, dest);
+            throw new NotImplementedException();
         }
 
         internal Result ConvertTo(Category category, TypeBase dest)
