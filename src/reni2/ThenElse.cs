@@ -1,7 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Syntax;
@@ -14,20 +13,26 @@ namespace Reni
     {
         [Node]
         protected readonly ICompileSyntax Cond;
+
         [Node]
         protected readonly ICompileSyntax Then;
 
-        protected CondSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(thenToken)
+        protected readonly ICompileSyntax Else;
+
+        protected CondSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, ICompileSyntax elseSyntax)
+            : base(thenToken)
         {
             Cond = condSyntax;
             Then = thenSyntax;
+            Else = elseSyntax;
         }
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            var thenType = context.Type(Then).AutomaticDereference();
-            var elseType = ElseResult(context, Category.Type).Type.AutomaticDereference();
-            var commonType = thenType.CommonType(elseType);
+            var elseType = context.CondBranchType(Else);
+            var thenType = context.CondBranchType(Then);
+
+            var commonType = TypeBase.CommonType(thenType, elseType);
             if(category <= (Category.Type | Category.Size))
                 return commonType.CreateResult(category);
 
@@ -35,21 +40,21 @@ namespace Reni
                 .Result(category | Category.Type, Cond)
                 .ConvertTo(TypeBase.CreateBit);
 
-            var thenResult = context.Result(category | Category.Type, Then).AutomaticDereference();
-            var elseResult = ElseResult(context, category | Category.Type).AutomaticDereference();
-
             if(thenType.IsPending)
-                return elseType.ThenElseWithPending(category | Category.Type, condResult.Refs, elseResult.Refs);
-            if(elseType.IsPending)
-                return thenType.ThenElseWithPending(category | Category.Type, condResult.Refs, thenResult.Refs);
+                return context.CondBranchResult(condResult.Refs, category, Else);
+            if (elseType.IsPending)
+                return context.CondBranchResult(condResult.Refs, category, Then);
+            
+            var thenRawResult = context.Result(category | Category.Type, Then).AutomaticDereference();
+            var elseRawResult = context.Result(category | Category.Type, Else).AutomaticDereference();
 
-            thenResult = thenType
+            var thenResult = thenType
                 .Conversion(category | Category.Type, commonType)
-                .UseWithArg(thenResult)
+                .UseWithArg(thenRawResult)
                 .CreateStatement(category, context.RefAlignParam);
-            elseResult = elseType
+            var elseResult = elseType
                 .Conversion(category | Category.Type, commonType)
-                .UseWithArg(elseResult)
+                .UseWithArg(elseRawResult)
                 .CreateStatement(category, context.RefAlignParam);
 
             return commonType.CreateResult
@@ -60,28 +65,16 @@ namespace Reni
                 );
         }
 
-        protected abstract Result ElseResult(ContextBase context, Category category);
-
-        internal protected override string DumpShort()
-        {
-            return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")";
-        }
+        internal protected override string DumpShort() { return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")"; }
     }
 
-    [Serializable]                               
+    [Serializable]
     internal sealed class ThenSyntax : CondSyntax
     {
-        internal ThenSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax) : base(condSyntax, thenToken, thenSyntax) {}
+        internal ThenSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax)
+            : base(condSyntax, thenToken, thenSyntax, null) { }
 
-        protected override Result ElseResult(ContextBase context, Category category)
-        {
-            return TypeBase.CreateVoidResult(category | Category.Type);
-        }
-
-        internal protected override IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
-        {
-            return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax);
-        }
+        internal protected override IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
     }
 
     [Serializable]
@@ -89,24 +82,14 @@ namespace Reni
     {
         [Node]
         private readonly Token ElseToken;
-        [Node]
-        private readonly ICompileSyntax Else;
 
         public ThenElseSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, Token elseToken, ICompileSyntax elseSyntax)
-            : base(condSyntax, thenToken, thenSyntax)
+            : base(condSyntax, thenToken, thenSyntax, elseSyntax)
         {
             ElseToken = elseToken;
-            Else = elseSyntax;
         }
 
-        protected override Result ElseResult(ContextBase context, Category category)
-        {
-            return context.Result(category | Category.Type, Else);
-        }
-
-        internal protected override string DumpShort()
-        {
-            return base.DumpShort() + "else(" + Else.DumpShort() + ")";
-        }
+        internal protected override string DumpShort() { return base.DumpShort() + "else(" + 
+            Else.DumpShort() + ")"; }
     }
 }

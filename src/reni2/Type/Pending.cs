@@ -7,13 +7,17 @@ namespace Reni.Type
     [Serializable]
     internal sealed class Pending : TypeBase, IIconKeyProvider
     {
-        protected override Size GetSize() { return Size.Pending; }
-
         internal override string DumpPrintText { get { return "#(# Prendig type #)#"; } }
-        internal override bool IsPending { get { return true; } }
 
         internal override bool IsConvertableToVirt(TypeBase dest,
                                                    ConversionFeature conversionFeature) { return true; }
+
+        public override bool IsPending { get { return true; } }
+
+        protected override Size GetSize()
+        {
+            return null;
+        }
 
         internal override string DumpShort() { return "pending"; }
 

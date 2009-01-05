@@ -22,7 +22,7 @@ namespace Reni.Code
             SignificantSize = significantSize;
             TargetSize = targetSize;
             Tracer.Assert(targetSize != size || targetSize != significantSize);
-            StopByObjectId(-1141);
+            StopByObjectId(614);
         }
 
         protected override Size GetSize() { return _size; }

@@ -56,13 +56,8 @@ namespace Reni.Type
                 args, 
                 destinationType.Target.CreateAutomaticRef(destinationType.RefAlignParam)
                 );
-            if (sourceResult.IsPending)
-                return Result.CreatePending(category);
-            var objectResult = callContext.Result(category, @object);
-            if (objectResult.IsPending)
-                return Result.CreatePending(category);
-
-            return result.UseWithArg(objectResult.CreateSequence(sourceResult));
+            var objectAndSourceRefs = callContext.Result(category, @object).CreateSequence(sourceResult);
+            return result.UseWithArg(objectAndSourceRefs);
         }
     }
 }

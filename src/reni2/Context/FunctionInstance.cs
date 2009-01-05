@@ -78,9 +78,6 @@ namespace Reni.Context
             if(category.HasCode)
                 localCategory = (localCategory - Category.Code) | Category.Size;
             var result = Result(localCategory).Clone();
-            if(result.IsPending)
-                return result;
-
             if(category.HasRefs)
                 result.Refs = result.Refs.CreateSequence(args.Refs);
 
@@ -114,15 +111,15 @@ namespace Reni.Context
                 return null;
 
             var functionContext = Context.CreateFunction(Args);
-            var trace = ObjectId == -10 && category.HasCode;
+            var trace = ObjectId == -10 && category.HasType;
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category| Category.Type;
             var result = functionContext.Result(categoryEx, Body).Clone();
 
             Tracer.ConditionalBreak(trace, Dump() + "\nfunctionContext=" + functionContext.Dump() + "\nresult=" + result.Dump());
 
-            if(result.IsPending)
-                return ReturnMethodDump(trace, result);
+            if (result.HasPendingType)
+                throw new PendingTypeException();
 
             var postProcessedResult = result.PostProcessor.FunctionResult(category, functionContext.RefAlignParam);
 
@@ -170,6 +167,8 @@ namespace Reni.Context
             return result;
         }
     }
+
+    internal class PendingTypeException : Exception {}
 
     internal sealed class ReplacePrimitiveRecursivity : Base
     {

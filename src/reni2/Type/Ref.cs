@@ -61,7 +61,7 @@ namespace Reni.Type
 
         private CodeBase CreateDereferencedArgCode()
         {
-            return CodeBase.CreateArg(GetSize()).CreateDereference(RefAlignParam, Target.Size);
+            return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
         }
 
         internal override sealed TypeBase AutomaticDereference()
@@ -91,6 +91,8 @@ namespace Reni.Type
         {
             get { return Target.UnrefSize; }
         }
+
+        internal TypeBase AlignedTarget { get { return Target.CreateAlign(RefAlignParam.AlignBits); } }
 
         internal override sealed string DumpShort()
         {
@@ -153,6 +155,5 @@ namespace Reni.Type
     {
         internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam) : base(target, refAlignParam) {}
         protected override string ShortName { get { return "automatic_ref"; } }
-
     }
 }

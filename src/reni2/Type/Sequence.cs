@@ -48,10 +48,6 @@ namespace Reni.Type
 
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {
-            var destPending = dest as Pending;
-            if(destPending != null)
-                return true;
-
             var destSequence = dest as Sequence;
             if(destSequence != null)
             {
@@ -97,10 +93,6 @@ namespace Reni.Type
 
         internal override Result ConvertToVirt(Category category, TypeBase dest)
         {
-            var destPending = dest as Pending;
-            if(destPending != null)
-                return Result.CreatePending(category);
-
             var result = ConvertTo(category, dest as Sequence);
             if(result != null)
                 return result;
@@ -158,7 +150,7 @@ namespace Reni.Type
             var result = CreateResult
                 (
                 category,
-                () => CodeBase.CreateArg(oldSize).CreateBitCast(GetSize())
+                () => CodeBase.CreateArg(oldSize).CreateBitCast(Size)
                 );
             return result;
         }
@@ -177,7 +169,7 @@ namespace Reni.Type
                 .CreateResult
                 (
                 category,
-                () => CodeBase.CreateArg(GetSize()).CreateBitCast(newType.GetSize())
+                () => CodeBase.CreateArg(Size).CreateBitCast(newType.Size)
                 );
             return result;
         }
@@ -197,9 +189,9 @@ namespace Reni.Type
             return _inheritedType.Copier(category);
         }
 
-        public BitOperationFeatureClass BitOperationFeature(SequenceOfBitOperation definable)
+        public SequenceOperationFeatureClass BitOperationFeature(SequenceOfBitOperation definable)
         {
-            return new BitOperationFeatureClass(this, definable);
+            return new SequenceOperationFeatureClass(this, definable);
         }
 
         public IFeature EnableCutFeatureObject()
@@ -228,12 +220,12 @@ namespace Reni.Type
     }
 
     [Serializable]
-    internal class BitOperationFeatureClass : ReniObject, IFeature, IPrefixFeature
+    internal class SequenceOperationFeatureClass : ReniObject, IFeature, IPrefixFeature
     {
         private readonly SequenceOfBitOperation _definable;
         private readonly Sequence _sequence;
 
-        public BitOperationFeatureClass(Sequence sequence, SequenceOfBitOperation definable)
+        public SequenceOperationFeatureClass(Sequence sequence, SequenceOfBitOperation definable)
         {
             _sequence = sequence;
             _definable = definable;
@@ -241,33 +233,12 @@ namespace Reni.Type
 
         Result IPrefixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object)
         {
-            var objectSize = callContext.Type(@object).UnrefSize;
-            var objectResult = callContext.ConvertToSequence(category, @object, _sequence.Element);
-            if (objectResult.IsPending)
-                return Result.CreatePending(category);
-
-            var result = _sequence
-                .Element
-                .SequenceOperationResult(category, _definable, objectSize);
-
-            return result.UseWithArg(objectResult);
+            return _sequence.Element.ApplySequenceOperation(_definable, callContext, category, @object);
         }
 
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            var objectSize = callContext.Type(@object).UnrefSize;
-            var argsResult = callContext.ConvertToSequence(category, args, _sequence.Element);
-            if (argsResult.IsPending)
-                return Result.CreatePending(category);
-            var objectResult = callContext.ConvertToSequence(category, @object, _sequence.Element);
-            if (objectResult.IsPending)
-                return Result.CreatePending(category);
-
-            var result = _sequence
-                .Element
-                .SequenceOperationResult(category, _definable, objectSize, callContext.Type(args).UnrefSize);
-
-            return result.UseWithArg(objectResult.CreateSequence(argsResult));
+            return _sequence.Element.ApplySequenceOperation(_definable, callContext, category, @object, args);
         }
     }
 }

@@ -15,7 +15,6 @@ namespace Reni.Type
     {
         private static readonly Bit _bit = new Bit();
         private static readonly Void _void = new Void();
-        private static readonly Pending _pending = new Pending();
         private readonly DictionaryEx<int, Aligner> _aligner = new DictionaryEx<int, Aligner>();
         private readonly DictionaryEx<int, Array> _array = new DictionaryEx<int, Array>();
         private readonly DictionaryEx<int, Sequence> _chain = new DictionaryEx<int, Sequence>();
@@ -32,7 +31,6 @@ namespace Reni.Type
 
         internal static TypeBase CreateVoid { get { return _void; } }
         internal static TypeBase CreateBit { get { return _bit; } }
-        internal static TypeBase Pending { get { return _pending; } }
 
         [Node]
         internal Size Size { get { return GetSize(); } }
@@ -45,8 +43,6 @@ namespace Reni.Type
         internal virtual bool IsVoid { get { return false; } }
         [DumpData(false)]
         internal virtual Size UnrefSize { get { return Size; } }
-        [DumpData(false)]
-        internal virtual bool IsPending { get { return false; } }
         [DumpData(false)]
         internal protected virtual TypeBase[] ToList { get { return new[] {this}; } }
 
@@ -236,13 +232,13 @@ namespace Reni.Type
 
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult); }
 
-        internal TypeBase CommonType(TypeBase dest)
+        internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
         {
-            if(IsConvertableTo(dest, ConversionFeature.Instance))
-                return dest;
-            if(dest.IsConvertableTo(this, ConversionFeature.Instance))
-                return this;
-            NotImplementedMethod(dest);
+            if(thenType == null || thenType.IsConvertableTo(elseType, ConversionFeature.Instance))
+                return elseType;
+            if(elseType == null || elseType.IsConvertableTo(thenType, ConversionFeature.Instance))
+                return thenType;
+            thenType.NotImplementedMethod(elseType);
             throw new NotImplementedException();
         }
 
@@ -398,6 +394,40 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
+        virtual public bool IsPending { get { return false; } }
+
         internal virtual bool IsRefLike(Ref target) { return false; }
+
+        internal Result ApplySequenceOperation(SequenceOfBitOperation definable, ContextBase callContext, Category category, ICompileSyntax @object) {
+            var result = SequenceOperationResult
+                (
+                category, 
+                definable, 
+                callContext.Type(@object).UnrefSize
+                );
+
+            var objectResult = callContext.ConvertToSequence(category, @object, this);
+            
+            return result.UseWithArg(objectResult);
+        }
+
+        internal Result ApplySequenceOperation(SequenceOfBitOperation definable, ContextBase callContext,
+                                               Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            var result = SequenceOperationResult
+                (
+                category,
+                definable,
+                callContext.Type(@object).UnrefSize,
+                callContext.Type(args).UnrefSize
+                );
+
+            var argsResult = callContext.ConvertToSequence(category, args, this);
+            var objectResult = callContext.ConvertToSequence(category, @object, this);
+
+            return result.UseWithArg(objectResult.CreateSequence(argsResult));
+        }
+
+        virtual internal TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(SequenceCount); }
     }
 }

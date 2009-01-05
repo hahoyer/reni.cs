@@ -27,14 +27,12 @@ namespace Reni
         /// asis
         /// </summary>
         public bool IsZero { get { return _data == 0; } }
-        public bool IsPending { get { return _data == -1; } }
         public int SaveByteCount { get { return SaveSizeToPacketCount(3); } }
         public static Size Zero { get { return Create(0); } }
         public static Size Byte { get { return Create(1).ByteAlignedSize; } }
         public bool IsPositive { get { return _data > 0; } }
         public int ByteCount { get { return SizeToPacketCount(3); } }
         public Size ByteAlignedSize { get { return NextPacketSize(3); } }
-        public static Size Pending { get { return Create(-1); } }
 
         public static Size Create(int x)
         {
@@ -62,7 +60,6 @@ namespace Reni
 
         public int SizeToPacketCount(int alignBits)
         {
-            Tracer.Assert(!IsPending);
             return ((_data - 1) >> alignBits) + 1;
         }
 

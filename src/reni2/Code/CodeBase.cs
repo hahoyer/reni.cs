@@ -354,20 +354,5 @@ namespace Reni.Code
         protected override string Format(StorageDescriptor start) { return start.CreateAssignment(_refAlignParam, _targetSize); }
     }
 
-    internal class Pending : CodeBase, IIconKeyProvider
-    {
-        internal Pending() { StopByObjectId(711); }
-
-        internal protected override Size GetSize() { return Size.Pending; }
-
-        public override Result VirtVisit<Result>(Visitor<Result> actual) { throw new UnexpectedVisitOfPending(); }
-
-        /// <summary>
-        /// Gets the icon key.
-        /// </summary>
-        /// <value>The icon key.</value>
-        public string IconKey { get { return "Pending"; } }
-    }
-
     internal class UnexpectedVisitOfPending : Exception {}
 }

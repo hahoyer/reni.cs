@@ -20,7 +20,8 @@ namespace Reni.Code
         {
             _refAlignParam = refAlignParam;
             Right = right;
-            StopByObjectId(-584);
+            StopByObjectId(802);
+            StopByObjectId(839);
         }
 
         public override string NodeDump { get { return base.NodeDump + " Right="+Right; } }

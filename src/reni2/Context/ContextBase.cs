@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
@@ -10,6 +9,7 @@ using Reni.Parser.TokenClass;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
+using Container=Reni.Struct.Container;
 
 namespace Reni.Context
 {
@@ -20,8 +20,10 @@ namespace Reni.Context
     internal abstract class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         private static int _nextId;
+
         [Node, DumpData(false)]
         internal Cache Cache = new Cache();
+
         private Sequence<ContextBase> _childChainCache;
 
         protected ContextBase()
@@ -29,10 +31,13 @@ namespace Reni.Context
 
         [Node, DumpData(false)]
         internal abstract RefAlignParam RefAlignParam { get; }
+
         [DumpData(false)]
         public int AlignBits { get { return RefAlignParam.AlignBits; } }
+
         [DumpData(false)]
         public Size RefSize { get { return RefAlignParam.RefSize; } }
+
         [DumpData(false)]
         internal abstract Root RootContext { get; }
 
@@ -46,6 +51,7 @@ namespace Reni.Context
                         () => new Result {Code = CreateTopRefCode(), Refs = Refs.None()});
             }
         }
+
         [DumpData(false)]
         internal Sequence<ContextBase> ChildChain
         {
@@ -68,13 +74,13 @@ namespace Reni.Context
         internal Function CreateFunction(TypeBase args)
         {
             return Cache._functionInstanceCache.Find(args,
-                () => new Function(this, args));
+                                                     () => new Function(this, args));
         }
 
-        internal FullContext CreateStruct(Struct.Container container)
+        internal FullContext CreateStruct(Container container)
         {
             return Cache._structContainerCache.Find(container,
-                () => new FullContext(this, container));
+                                                    () => new FullContext(this, container));
         }
 
         internal CodeBase CreateTopRefCode() { return CodeBase.CreateTopRef(RefAlignParam); }
@@ -147,8 +153,8 @@ namespace Reni.Context
         private void CheckRef(IRefInCode @ref)
         {
             Tracer.Assert(!@ref
-                .IsChildOf(this), "context=" + Dump() + "\nref="
-                    + @ref.Dump());
+                               .IsChildOf(this), "context=" + Dump() + "\nref="
+                                                 + @ref.Dump());
         }
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
@@ -164,31 +170,18 @@ namespace Reni.Context
         {
             var objectResult = ResultAsRef(category | Category.Type, @object);
             return apply(objectResult.Type)
-                .UseWithArg(objectResult)
+                .Align(AlignBits)
+                .UseWithArg(objectResult);
+        }
+
+        internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType) { return ConvertToViaRef(category, syntax, Type(syntax).CreateSequenceType(elementType)); }
+
+        private Result ConvertToViaRef(Category category, ICompileSyntax syntax, TypeBase target)
+        {
+            return ResultAsRef(category | Category.Type, syntax)
+                .ConvertTo(target)
+                .Filter(category)
                 .Align(AlignBits);
-        }
-
-        internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType)
-        {
-            var type = Type(syntax);
-            if(type.IsPending)
-                return Reni.Result.CreatePending(category);
-
-            return ConvertToSequence(category, syntax, elementType, type.SequenceCount);
-        }
-
-        internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType, int sequenceCount)
-        {
-            var applyToRef = ResultAsRef(category | Category.Type, syntax);
-            if(applyToRef.IsPending)
-                return Reni.Result.CreatePending(category);
-            applyToRef.AssertComplete(category | Category.Type, syntax);
-            var target = elementType.CreateSequence(sequenceCount);
-            var convertTo = applyToRef.ConvertTo(target).Filter(category);
-            convertTo.AssertComplete(category);
-            var result = convertTo.Align(AlignBits);
-            result.AssertComplete(category);
-            return result;
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax)
@@ -209,10 +202,11 @@ namespace Reni.Context
             if(result.Type.IsRef(RefAlignParam))
             {
                 var convertedResult = result.ConvertTo(target.Target);
-                NotImplementedMethod(category, syntax, target, "type", result.Type, "result", result, "convertedResult", convertedResult);
+                NotImplementedMethod(category, syntax, target, "type", result.Type, "result", result, "convertedResult",
+                                     convertedResult);
                 return result;
             }
-            return result.ConvertTo(target.Target).CreateAutomaticRefResult(category, target);
+            return result.ConvertTo(target.AlignedTarget).CreateAutomaticRefResult(category, target);
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
@@ -246,25 +240,59 @@ namespace Reni.Context
             if(prefixSearchResult.IsSuccessFull)
                 return prefixSearchResult.Feature.ApplyResult(this, category, right);
 
-            NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult, "prefixSearchResult", prefixSearchResult);
+            NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult,
+                                 "prefixSearchResult", prefixSearchResult);
             return null;
         }
 
-        internal Result InfixResult(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
+        internal Result InfixResult(Category category, ICompileSyntax left, DefineableToken defineableToken,
+                                    ICompileSyntax right)
         {
             var leftType = Type(left).EnsureRef(RefAlignParam);
             var searchResult = leftType.SearchDefineable(defineableToken);
             if(searchResult.IsSuccessFull)
                 return searchResult.Feature.ApplyResult(this, category, left, right);
-            NotImplementedMethod(category, left, defineableToken, right, "leftType", leftType, "searchResult", searchResult);
+            NotImplementedMethod(category, left, defineableToken, right, "leftType", leftType, "searchResult",
+                                 searchResult);
             return null;
         }
 
-        internal Result Result(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
+        internal Result Result(Category category, ICompileSyntax left, DefineableToken defineableToken,
+                               ICompileSyntax right)
         {
             if(left == null)
                 return PrefixResult(category, defineableToken, right);
             return InfixResult(category, left, defineableToken, right);
+        }
+
+        internal TypeBase CondBranchType(ICompileSyntax syntax)
+        {
+            if(syntax == null)
+                return TypeBase.CreateVoid;
+
+            try
+            {
+                return Type(syntax).AutomaticDereference();
+            }
+            catch(PendingTypeException)
+            {
+                return null;
+            }
+        }
+
+        public Result CondBranchResult(Refs condRefs, Category category, ICompileSyntax syntax)
+        {
+            Tracer.Assert(!category.HasCode);
+
+            if(syntax == null)
+                return TypeBase.CreateVoid.CreateResult(category);
+
+            var result = Result(category, syntax).AutomaticDereference().Clone();
+            if (category.HasRefs && !condRefs.IsNone)
+                result.Refs += condRefs;
+            
+            return result;
+
         }
     }
 
@@ -272,17 +300,27 @@ namespace Reni.Context
     internal class Cache : ReniObject, IIconKeyProvider
     {
         [Node, SmartNode]
-        internal readonly DictionaryEx<TypeBase, Function> _functionInstanceCache = new DictionaryEx<TypeBase, Function>();
+        internal readonly DictionaryEx<TypeBase, Function> _functionInstanceCache =
+            new DictionaryEx<TypeBase, Function>();
+
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _functionType = new DictionaryEx<ICompileSyntax, TypeBase>();
+        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _functionType =
+            new DictionaryEx<ICompileSyntax, TypeBase>();
+
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _propertyType = new DictionaryEx<ICompileSyntax, TypeBase>();
+        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _propertyType =
+            new DictionaryEx<ICompileSyntax, TypeBase>();
+
         [Node, SmartNode]
-        internal readonly DictionaryEx<Struct.Container, FullContext> _structContainerCache = new DictionaryEx<Struct.Container, FullContext>();
+        internal readonly DictionaryEx<Container, FullContext> _structContainerCache =
+            new DictionaryEx<Container, FullContext>();
+
         [Node, SmartNode]
         internal readonly SimpleCache<Result> _topRefResultCache = new SimpleCache<Result>();
+
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, IResultCacheItem> _resultCache = new DictionaryEx<ICompileSyntax, IResultCacheItem>();
+        internal readonly DictionaryEx<ICompileSyntax, IResultCacheItem> _resultCache =
+            new DictionaryEx<ICompileSyntax, IResultCacheItem>();
 
         /// <summary>
         /// Gets the icon key.

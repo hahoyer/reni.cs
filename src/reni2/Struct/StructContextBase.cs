@@ -81,12 +81,8 @@ namespace Reni.Struct
         private CodeBase AccessCode(int position, int currentPosition, RefAlignParam refAlignParam)
         {
             var offset = Reni.Size.Zero;
-            for (var i = position + 1; i < currentPosition; i++)
-            {
-                var internalSize = InternalSize(i);
-                Tracer.Assert(!internalSize.IsPending);
-                offset += internalSize;
-            }
+            for(var i = position + 1; i < currentPosition; i++)
+                offset += InternalSize(i);
 
             return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
         }

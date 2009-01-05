@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -9,6 +8,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
+using Void=Reni.Type.Void;
 
 namespace Reni
 {
@@ -103,11 +103,11 @@ namespace Reni
         {
             get
             {
-                if(HasSize)
+                if (HasSize)
                     return Size;
-                if(HasType)
+                if (HasType)
                     return Type.Size;
-                if(HasCode)
+                if (HasCode)
                     return Code.Size;
                 return null;
             }
@@ -169,18 +169,7 @@ namespace Reni
             }
         }
 
-        internal bool IsPending
-        {
-            get
-            {
-                if(CompleteCategory.HasSize)
-                    return Size.IsPending;
-                if(CompleteCategory.HasType)
-                    return Type.IsPending;
-
-                return false;
-            }
-        }
+        internal bool HasPendingType { get { return PendingCategory.HasType; } }
 
         public override string DumpData()
         {
@@ -203,48 +192,44 @@ namespace Reni
 
         internal void Update(Result result)
         {
-            if(result.HasSize && !result.Size.IsPending)
+            if(result.HasSize && !result.PendingCategory.HasSize)
                 _size = result.Size;
 
-            if(result.HasType && !result.Type.IsPending)
+            if(result.HasType && !result.PendingCategory.HasType)
                 _type = result.Type;
 
-            if(result.HasRefs)
+            if(result.HasRefs && !result.PendingCategory.HasRefs)
                 _refs = result.Refs;
 
-            if(result.HasCode)
+            if(result.HasCode && !result.PendingCategory.HasCode)
                 _code = result.Code;
 
-            AssertValid();
-        }
-
-        private void Update(Result result, Category category)
-        {
-            if(category.HasSize)
-                _size = result.Size ?? Size.Pending;
-            if(category.HasType)
-                _type = result.Type ?? TypeBase.Pending;
-            if(category.HasRefs)
-                _refs = result.Refs ?? Refs.None();
-            if(category.HasCode)
-                _code = result.Code;
             AssertValid();
         }
 
         internal Result Filter(Category category)
         {
-            if(category == CompleteCategory)
-                return this;
+            var result = new Result
+                         {
+                             PendingCategory = PendingCategory & category
+                         };
 
-            var result = new Result();
-            result.Update(this, category);
+            if(category.HasSize)
+                result._size = Size;
+            if(category.HasType)
+                result._type = Type;
+            if(category.HasRefs)
+                result._refs = Refs;
+            if(category.HasCode)
+                result._code = Code;
+            result.AssertValid();
             return result;
         }
 
         internal Result Align(int alignBits)
         {
             var size = FindSize;
-            if(size == null || size.IsPending)
+            if(size == null)
                 return this;
 
             var alignedSize = size.Align(alignBits);
@@ -265,7 +250,7 @@ namespace Reni
 
         internal Result Clone(Category category)
         {
-            var r = new Result();
+            var r = new Result {PendingCategory = PendingCategory & category};
             if(category.HasSize)
                 r.Size = Size;
             if(category.HasType)
@@ -277,11 +262,17 @@ namespace Reni
             return r;
         }
 
-        internal Result Clone() { return Clone(CompleteCategory); }
+        internal Result Clone()
+        {
+            return new Result {PendingCategory = PendingCategory, Size = Size, Type = Type, Code = Code, Refs = Refs};
+        }
 
         private void AssertValid()
         {
             if(IsDirty)
+                return;
+
+            if (HasType && Type.IsPending)
                 return;
 
             var size = FindSize;
@@ -297,19 +288,6 @@ namespace Reni
 
             if(HasRefs && HasCode && !Refs.Contains(Code.GetRefs()))
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
-        }
-
-        private bool HasCategory(Category category)
-        {
-            if(category.HasSize && !CompleteCategory.HasSize)
-                return false;
-            if(category.HasType && !CompleteCategory.HasType)
-                return false;
-            if(category.HasCode && !CompleteCategory.HasCode)
-                return false;
-            if(category.HasRefs && !CompleteCategory.HasRefs)
-                return false;
-            return true;
         }
 
         //[DebuggerHidden]
@@ -339,20 +317,28 @@ namespace Reni
                 PendingCategory = oldPendingCategory;
             }
             var filteredResult = Filter(category);
-            Tracer.Assert(filteredResult.CompleteCategory == category, string.Format("syntax={2}\ncategory={0}\nResult={1}", category, filteredResult.Dump(), syntax.DumpShort()));
+            Tracer.Assert(category == (filteredResult.CompleteCategory | filteredResult.PendingCategory),
+                          string.Format("syntax={2}\ncategory={0}\nResult={1}", category, filteredResult.Dump(),
+                                        syntax.DumpShort()));
             return filteredResult;
         }
 
-        internal void AssertComplete(Category category, ICompileSyntax syntaxForDump) { Tracer.Assert(1, HasCategory(category), string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort())); }
-
-        internal void AssertComplete(Category category) { Tracer.Assert(1, HasCategory(category), string.Format("category={0}\nResult={1}", category, Dump())); }
+        private void AssertComplete(Category category, ICompileSyntax syntaxForDump)
+        {
+            Tracer.Assert
+            (
+                1, 
+                category <= (CompleteCategory | PendingCategory),
+                string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(),syntaxForDump.DumpShort())
+            );
+        }
 
         internal void Add(Result other) { Add(other, CompleteCategory); }
 
         internal void Add(Result other, Category category)
         {
-            Tracer.Assert(other.HasCategory(category));
-            Tracer.Assert(HasCategory(category));
+            Tracer.Assert(category <= other.CompleteCategory);
+            Tracer.Assert(category <= CompleteCategory);
             IsDirty = true;
             if(category.HasSize)
                 Size += other.Size;
@@ -398,9 +384,6 @@ namespace Reni
 
         internal Result UseWithArg(Result resultForArg)
         {
-            if(IsPending)
-                return this;
-
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
             StartMethodDump(trace, resultForArg);
             var result = new Result {Size = Size, Type = Type};
@@ -413,9 +396,6 @@ namespace Reni
 
         internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : IRefInCode
         {
-            if(IsPending)
-                return this;
-
             if(HasRefs && !Refs.Contains(context))
                 return this;
 
@@ -475,28 +455,15 @@ namespace Reni
 
         internal Result CreateStatement(Category category, RefAlignParam refAlignParam)
         {
-            if (!category.HasCode && !category.HasRefs)
+            if(!category.HasCode && !category.HasRefs)
                 return this;
 
             var result = Clone(category);
             var copier = Type.Copier(category);
             if(category.HasCode)
-                result.Code = Code.CreateStatement(copier.Code,refAlignParam);
-            if (category.HasRefs)
-                result.Refs = result.Refs.CreateSequence(copier.Refs);
-            return result;
-        }
-
-        internal static Result CreatePending(Category category)
-        {
-            var result = new Result();
-            if(category.HasSize)
-                result.Size = Size.Pending;
-            if(category.HasType)
-                result.Type = TypeBase.Pending;
+                result.Code = Code.CreateStatement(copier.Code, refAlignParam);
             if(category.HasRefs)
-                result.Refs = Refs.None();
-            Tracer.Assert(!category.HasCode);
+                result.Refs = result.Refs.CreateSequence(copier.Refs);
             return result;
         }
 
@@ -514,7 +481,7 @@ namespace Reni
 
         internal Result DumpPrintBitSequence()
         {
-            return Reni.Type.Void.CreateResult
+            return Void.CreateResult
                 (
                 CompleteCategory,
                 () => Code.CreateDumpPrint(),
@@ -532,7 +499,7 @@ namespace Reni
 
         internal Result AutomaticDereference()
         {
-            if(IsPending || CompleteCategory == Category.Refs)
+            if(CompleteCategory == Category.Refs)
                 return this;
 
             return Type.AutomaticDereference(this);
@@ -544,7 +511,7 @@ namespace Reni
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
         {
-            var result = Reni.Type.Void.CreateResult(category);
+            var result = Void.CreateResult(category);
             if(category.HasCode)
                 result.Code = CodeBase.CreateDumpPrintText("(");
 
@@ -572,6 +539,13 @@ namespace Reni
                 () => CodeBase.CreateInternalRef(target.RefAlignParam, Code, destructor.Code),
                 () => Refs + destructor.Refs
                 );
+        }
+
+        public Result CreatePendingType() 
+        { 
+            Tracer.Assert(PendingCategory == Category.Type);
+            var result = new Result {Code = Code, Size = Size, Refs = Refs, Type = new Pending()};
+            return result;
         }
     }
 

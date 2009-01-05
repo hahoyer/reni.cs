@@ -21,7 +21,7 @@ namespace Reni.Code
         internal Leaf(LeafElement leafElement)
         {
             _leafElement = leafElement;
-            StopByObjectId(526);
+            StopByObjectId(-526);
         }
 
         internal protected override Size GetSize (){ return LeafElement.Size; } 

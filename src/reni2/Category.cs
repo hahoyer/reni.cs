@@ -53,10 +53,8 @@ namespace Reni
         public Category Replendish()
         {
             Category Return = this;
-            if (HasType || HasCode)
-                Return |= Size;
             if (HasCode)
-                Return |= Refs;
+                Return |= (Size & Refs);
             return Return;
         }
 
