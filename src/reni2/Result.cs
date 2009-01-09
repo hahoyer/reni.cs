@@ -35,7 +35,7 @@ namespace Reni
         internal bool HasRefs { get { return Refs != null; } }
 
         [Node]
-        private Category PendingCategory { get { return _pendingCategory; } set { _pendingCategory = value; } }
+        internal Category PendingCategory { get { return _pendingCategory; } set { _pendingCategory = value; } }
 
         public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
 
@@ -281,18 +281,32 @@ namespace Reni
         }
 
         //[DebuggerHidden]
-        internal void AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
+        internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
-            var unknownCategory = category - CompleteCategory - PendingCategory;
-            if(unknownCategory.IsNull)
+            InternalAddCategories(context, category - CompleteCategory - PendingCategory, syntax);
+            TreatPendingCategories(context, category - CompleteCategory, syntax);
+        }
+
+        private void TreatPendingCategories(ContextBase context, Category category, ICompileSyntax syntax)
+        {
+            if(category.IsNull)
+                return;
+
+            var result = context.PendingResult(category, syntax);
+            Update(result);
+        }
+
+        private void InternalAddCategories(ContextBase context, Category category, ICompileSyntax syntax)
+        {
+            if(category.IsNull)
                 return;
 
             var oldPendingCategory = PendingCategory;
-            PendingCategory |= unknownCategory;
+            PendingCategory |= category;
 
-            var result = syntax.Result(context, unknownCategory);
+            var result = syntax.Result(context, category);
             context.AssertCorrectRefs(this);
-            result.AssertComplete(unknownCategory, syntax);
+            result.AssertComplete(category, syntax);
             Update(result);
             PendingCategory = oldPendingCategory;
         }
@@ -524,7 +538,6 @@ namespace Reni
             result.Update(bResult);
             return result;
         }
-
     }
 
     internal sealed class Error

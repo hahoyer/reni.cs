@@ -1,6 +1,7 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.Syntax;
@@ -12,12 +13,13 @@ namespace Reni
     internal abstract class CondSyntax : CompileSyntax
     {
         [Node]
-        protected readonly ICompileSyntax Cond;
+        internal readonly ICompileSyntax Cond;
 
         [Node]
-        protected readonly ICompileSyntax Then;
+        internal readonly ICompileSyntax Then;
 
-        protected readonly ICompileSyntax Else;
+        [Node]
+        internal readonly ICompileSyntax Else;
 
         protected CondSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax,
                              ICompileSyntax elseSyntax)
@@ -30,41 +32,75 @@ namespace Reni
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            var trace = true;
+            var trace = false;
             StartMethodDump(trace, context, category);
-            return ReturnMethodDump(trace, ResultInternal(context, category));
+            return ReturnMethodDump(trace, InternalResult(context, category));
         }
 
-        private Result ResultInternal(ContextBase context, Category category)
-        {
-            var elseType = context.CondBranchType(Else);
-            var thenType = context.CondBranchType(Then);
+        internal Result CondResult(ContextBase context, Category category) { return context.Result(category | Category.Type, Cond).ConvertTo(TypeBase.CreateBit) & category; }
 
-            var commonType = TypeBase.CommonType(thenType, elseType);
+        private Result ElseResult(ContextBase context, Category category)
+        {
+            if (Else == null)
+                return TypeBase.CreateVoid.CreateResult(category);
+            return CondBranchResult(context,category, Else);
+        }
+
+        private Result ThenResult(ContextBase context, Category category) { return CondBranchResult(context, category, Then); }
+
+        private Result CondBranchResult(ContextBase context, Category category, ICompileSyntax syntax)
+        {
+            var branchResult = context.Result(category | Category.Type, syntax).AutomaticDereference();
+            if ((category - Category.Type).IsNull)
+                return branchResult;
+
+            var commonType = context.CommonType(this);
+            return branchResult.Type
+                .Conversion(category | Category.Type, commonType)
+                .UseWithArg(branchResult)
+                .CreateStatement(category, context.RefAlignParam);
+        }
+
+        private Result InternalResult(ContextBase context, Category category)
+        {
+            var commonType = context.CommonType(this);
             if(category <= (Category.Type | Category.Size))
                 return commonType.CreateResult(category);
 
-            var condResult = context
-                .Result(category | Category.Type, Cond)
-                .ConvertTo(TypeBase.CreateBit);
-
-            if(thenType == null)
-                return context.AsymetricCondBranchResult(condResult.Refs, category, Else);
-            if(elseType == null)
-                return context.AsymetricCondBranchResult(condResult.Refs, category, Then);
-
-            var thenResult = context.CondBranchResult(category, Then, commonType);
-            var elseResult = context.CondBranchResult(category, Else, commonType);
-
+            var condResult = CondResult(context, category);
             return commonType.CreateResult
                 (
                 category,
-                () => condResult.Code.CreateThenElse(thenResult.Code, elseResult.Code),
-                () => condResult.Refs.CreateSequence(thenResult.Refs).CreateSequence(elseResult.Refs)
+                () => condResult.Code.CreateThenElse(ThenResult(context, Category.Code).Code, ElseResult(context, Category.Code).Code),
+                () => condResult.Refs + context.CommonRefs(this)
                 );
         }
 
+        internal Result CommonResult(ContextBase context, Category category, bool thenIsPending, bool elseIsPending)
+        {
+            if(!thenIsPending)
+                return ThenResult(context,category);
+            if(!elseIsPending)
+                return ElseResult(context,category);
+            NotImplementedMethod(context,thenIsPending,elseIsPending);
+            return null;                   
+        }
+
+        internal Result CommonResult(ContextBase context, Category category)
+        {
+            Tracer.Assert(category <= (Category.Type|Category.Refs));
+            var thenResult = ThenResult(context, category);
+            var elseResult = ElseResult(context, category);
+            var result = new Result();
+            if (category.HasType)
+                result.Type = TypeBase.CommonType(thenResult.Type,elseResult.Type);
+            if (category.HasRefs)
+                result.Refs = thenResult.Refs + elseResult.Refs;
+            return result;
+        }
+
         internal protected override string DumpShort() { return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")"; }
+
     }
 
     [Serializable]

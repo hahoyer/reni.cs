@@ -26,13 +26,9 @@ namespace Reni.Syntax
         //[DebuggerHidden]
         public Result Result(Category category)
         {
-            _data.AddCategories(category, _context, _syntax);
-
-            var stillPendingCategory = category - _data.CompleteCategory;
-            if(stillPendingCategory.IsNull)
-                return Data & category;
-            
-            throw new PendingResultException(_context.PendingResult(stillPendingCategory, _syntax));
+            _data.AddCategories(_context, category, _syntax);
+            Tracer.Assert(category <= Data.CompleteCategory);
+            return Data & category;
         }
 
         /// <summary>
@@ -40,11 +36,5 @@ namespace Reni.Syntax
         /// </summary>
         /// <value>The icon key.</value>
         public string IconKey { get { return "Cache"; } }
-    }
-
-    internal class PendingResultException : Exception
-    {
-        private readonly Result _result;
-        public PendingResultException(Result result) { _result = result; }
     }
 }

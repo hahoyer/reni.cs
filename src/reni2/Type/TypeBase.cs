@@ -234,10 +234,6 @@ namespace Reni.Type
 
         internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
         {
-            if(thenType == null)
-                return elseType;
-            if(elseType == null)
-                return thenType;
             if (thenType.IsConvertableTo(elseType, ConversionFeature.Instance))
                 return elseType;
             if (elseType.IsConvertableTo(thenType, ConversionFeature.Instance))
