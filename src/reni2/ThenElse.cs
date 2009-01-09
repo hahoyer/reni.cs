@@ -19,7 +19,8 @@ namespace Reni
 
         protected readonly ICompileSyntax Else;
 
-        protected CondSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, ICompileSyntax elseSyntax)
+        protected CondSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax,
+                             ICompileSyntax elseSyntax)
             : base(thenToken)
         {
             Cond = condSyntax;
@@ -28,6 +29,13 @@ namespace Reni
         }
 
         internal protected override Result Result(ContextBase context, Category category)
+        {
+            var trace = true;
+            StartMethodDump(trace, context, category);
+            return ReturnMethodDump(trace, ResultInternal(context, category));
+        }
+
+        private Result ResultInternal(ContextBase context, Category category)
         {
             var elseType = context.CondBranchType(Else);
             var thenType = context.CondBranchType(Then);
@@ -40,22 +48,13 @@ namespace Reni
                 .Result(category | Category.Type, Cond)
                 .ConvertTo(TypeBase.CreateBit);
 
-            if(thenType.IsPending)
-                return context.CondBranchResult(condResult.Refs, category, Else);
-            if (elseType.IsPending)
-                return context.CondBranchResult(condResult.Refs, category, Then);
-            
-            var thenRawResult = context.Result(category | Category.Type, Then).AutomaticDereference();
-            var elseRawResult = context.Result(category | Category.Type, Else).AutomaticDereference();
+            if(thenType == null)
+                return context.AsymetricCondBranchResult(condResult.Refs, category, Else);
+            if(elseType == null)
+                return context.AsymetricCondBranchResult(condResult.Refs, category, Then);
 
-            var thenResult = thenType
-                .Conversion(category | Category.Type, commonType)
-                .UseWithArg(thenRawResult)
-                .CreateStatement(category, context.RefAlignParam);
-            var elseResult = elseType
-                .Conversion(category | Category.Type, commonType)
-                .UseWithArg(elseRawResult)
-                .CreateStatement(category, context.RefAlignParam);
+            var thenResult = context.CondBranchResult(category, Then, commonType);
+            var elseResult = context.CondBranchResult(category, Else, commonType);
 
             return commonType.CreateResult
                 (
@@ -83,13 +82,14 @@ namespace Reni
         [Node]
         private readonly Token ElseToken;
 
-        public ThenElseSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, Token elseToken, ICompileSyntax elseSyntax)
-            : base(condSyntax, thenToken, thenSyntax, elseSyntax)
-        {
-            ElseToken = elseToken;
-        }
+        public ThenElseSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, Token elseToken,
+                              ICompileSyntax elseSyntax)
+            : base(condSyntax, thenToken, thenSyntax, elseSyntax) { ElseToken = elseToken; }
 
-        internal protected override string DumpShort() { return base.DumpShort() + "else(" + 
-            Else.DumpShort() + ")"; }
+        internal protected override string DumpShort()
+        {
+            return base.DumpShort() + "else(" +
+                   Else.DumpShort() + ")";
+        }
     }
 }

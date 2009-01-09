@@ -103,11 +103,11 @@ namespace Reni
         {
             get
             {
-                if (HasSize)
+                if(HasSize)
                     return Size;
-                if (HasType)
+                if(HasType)
                     return Type.Size;
-                if (HasCode)
+                if(HasCode)
                     return Code.Size;
                 return null;
             }
@@ -169,8 +169,6 @@ namespace Reni
             }
         }
 
-        internal bool HasPendingType { get { return PendingCategory.HasType; } }
-
         public override string DumpData()
         {
             var result = "";
@@ -187,8 +185,6 @@ namespace Reni
                 result += "\nCode=" + Tracer.Dump(_code);
             return result;
         }
-
-        private void AddPendingCategory(Category category) { _pendingCategory |= category; }
 
         internal void Update(Result result)
         {
@@ -207,7 +203,7 @@ namespace Reni
             AssertValid();
         }
 
-        internal Result Filter(Category category)
+        private Result Filter(Category category)
         {
             var result = new Result
                          {
@@ -262,17 +258,11 @@ namespace Reni
             return r;
         }
 
-        internal Result Clone()
-        {
-            return new Result {PendingCategory = PendingCategory, Size = Size, Type = Type, Code = Code, Refs = Refs};
-        }
+        internal Result Clone() { return new Result {PendingCategory = PendingCategory, Size = Size, Type = Type, Code = Code, Refs = Refs}; }
 
         private void AssertValid()
         {
             if(IsDirty)
-                return;
-
-            if (HasType && Type.IsPending)
                 return;
 
             var size = FindSize;
@@ -291,46 +281,30 @@ namespace Reni
         }
 
         //[DebuggerHidden]
-        internal Result AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
+        internal void AddCategories(Category category, ContextBase context, ICompileSyntax syntax)
         {
+            var unknownCategory = category - CompleteCategory - PendingCategory;
+            if(unknownCategory.IsNull)
+                return;
+
             var oldPendingCategory = PendingCategory;
-            var notPendingCategory = category - oldPendingCategory;
-            var oldCompleteCategory = CompleteCategory;
-            var notCompleteCategory = notPendingCategory - oldCompleteCategory;
-            if(!notCompleteCategory.IsNull)
-            {
-                AddPendingCategory(notCompleteCategory);
+            PendingCategory |= unknownCategory;
 
-                try
-                {
-                    var result = syntax.Result(context, notCompleteCategory);
-                    context.AssertCorrectRefs(this);
-                    result.AssertComplete(notCompleteCategory, syntax);
-                    Update(result);
-                }
-                catch
-                {
-                    Tracer.FlaggedLine("CCompilerMsg(*mSyntaxKey->TokenClass, \"aftereffect\").Show()");
-                    throw;
-                }
-
-                PendingCategory = oldPendingCategory;
-            }
-            var filteredResult = Filter(category);
-            Tracer.Assert(category == (filteredResult.CompleteCategory | filteredResult.PendingCategory),
-                          string.Format("syntax={2}\ncategory={0}\nResult={1}", category, filteredResult.Dump(),
-                                        syntax.DumpShort()));
-            return filteredResult;
+            var result = syntax.Result(context, unknownCategory);
+            context.AssertCorrectRefs(this);
+            result.AssertComplete(unknownCategory, syntax);
+            Update(result);
+            PendingCategory = oldPendingCategory;
         }
 
         private void AssertComplete(Category category, ICompileSyntax syntaxForDump)
         {
             Tracer.Assert
-            (
-                1, 
+                (
+                1,
                 category <= (CompleteCategory | PendingCategory),
-                string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(),syntaxForDump.DumpShort())
-            );
+                string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort())
+                );
         }
 
         internal void Add(Result other) { Add(other, CompleteCategory); }
@@ -541,12 +515,16 @@ namespace Reni
                 );
         }
 
-        public Result CreatePendingType() 
-        { 
-            Tracer.Assert(PendingCategory == Category.Type);
-            var result = new Result {Code = Code, Size = Size, Refs = Refs, Type = new Pending()};
+        public static Result operator &(Result result, Category category) { return result.Filter(category); }
+
+        public static Result operator |(Result aResult, Result bResult)
+        {
+            Tracer.Assert((aResult.CompleteCategory & bResult.CompleteCategory).IsNull);
+            var result = aResult.Clone();
+            result.Update(bResult);
             return result;
         }
+
     }
 
     internal sealed class Error

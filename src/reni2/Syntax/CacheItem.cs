@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
-using Reni.Type;
 
 namespace Reni.Syntax
 {
-    internal interface IResultCacheItem
-    {
-        Result Result(Category category);
-    }
-
     [Serializable]
-    internal sealed class CacheItem : ReniObject, IIconKeyProvider, IResultCacheItem
+    internal sealed class CacheItem : ReniObject, IIconKeyProvider
     {
         private readonly ICompileSyntax _syntax;
         private readonly ContextBase _context;
@@ -31,12 +24,27 @@ namespace Reni.Syntax
         }
 
         //[DebuggerHidden]
-        Result IResultCacheItem.Result(Category category) { return _data.AddCategories(category, _context, _syntax); }
+        public Result Result(Category category)
+        {
+            _data.AddCategories(category, _context, _syntax);
+
+            var stillPendingCategory = category - _data.CompleteCategory;
+            if(stillPendingCategory.IsNull)
+                return Data & category;
+            
+            throw new PendingResultException(_context.PendingResult(stillPendingCategory, _syntax));
+        }
 
         /// <summary>
         /// Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
         public string IconKey { get { return "Cache"; } }
+    }
+
+    internal class PendingResultException : Exception
+    {
+        private readonly Result _result;
+        public PendingResultException(Result result) { _result = result; }
     }
 }

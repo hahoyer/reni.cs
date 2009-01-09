@@ -46,19 +46,6 @@ namespace Reni
         public bool HasSize { get { return _size; } }
 
         /// <summary>
-        /// Some categories are dependent. This function replendishes those categories.
-        /// Rules are: type and code results in adding size, code results in adding references
-        /// </summary>
-        /// <returns></returns>
-        public Category Replendish()
-        {
-            Category Return = this;
-            if (HasCode)
-                Return |= (Size & Refs);
-            return Return;
-        }
-
-        /// <summary>
         /// asis
         /// </summary>
         /// <param name="x"></param>

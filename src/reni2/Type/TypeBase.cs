@@ -234,9 +234,13 @@ namespace Reni.Type
 
         internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
         {
-            if(thenType == null || thenType.IsConvertableTo(elseType, ConversionFeature.Instance))
+            if(thenType == null)
                 return elseType;
-            if(elseType == null || elseType.IsConvertableTo(thenType, ConversionFeature.Instance))
+            if(elseType == null)
+                return thenType;
+            if (thenType.IsConvertableTo(elseType, ConversionFeature.Instance))
+                return elseType;
+            if (elseType.IsConvertableTo(thenType, ConversionFeature.Instance))
                 return thenType;
             thenType.NotImplementedMethod(elseType);
             throw new NotImplementedException();
@@ -393,8 +397,6 @@ namespace Reni.Type
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
-
-        virtual public bool IsPending { get { return false; } }
 
         internal virtual bool IsRefLike(Ref target) { return false; }
 
