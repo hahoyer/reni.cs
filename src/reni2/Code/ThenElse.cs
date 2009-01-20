@@ -26,14 +26,14 @@ namespace Reni.Code
             ElseCode = elseCode;
         }
 
-        internal protected override Size GetSize()
+        protected override Size GetSize()
         {
             return ThenCode.Size;
         }
 
         internal int ThenElseObjectId { get { return _thenElseObjectId; } }
 
-        internal protected override Size GetMaxSize()
+        protected override Size GetMaxSize()
         {
             var cSize = CondCode.MaxSize;
             var tSize = ThenCode.MaxSize;

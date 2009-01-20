@@ -24,13 +24,13 @@ namespace Reni.Code
             StopByObjectId(-526);
         }
 
-        internal protected override Size GetSize (){ return LeafElement.Size; } 
+        protected override Size GetSize (){ return LeafElement.Size; } 
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
         internal override bool IsEmpty { get { return LeafElement.IsEmpty; } }
         internal override RefAlignParam RefAlignParam { get { return LeafElement.RefAlignParam; } }
 
-        public override CodeBase CreateChild(LeafElement leafElement)
+        internal override CodeBase CreateChild(LeafElement leafElement)
         {
             if (!TryToCombine)
                 return base.CreateChild(leafElement);

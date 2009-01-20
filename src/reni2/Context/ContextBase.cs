@@ -153,7 +153,7 @@ namespace Reni.Context
             if(result.HasRefs)
                 AssertCorrectRefs(result.Refs.Data);
             else if(result.HasCode)
-                AssertCorrectRefs(result.Code.Refs);
+                AssertCorrectRefs(result.Code.RefsData);
         }
 
         private void AssertCorrectRefs(IEnumerable<IRefInCode> refs)

@@ -99,7 +99,7 @@ namespace Reni
             return result.ToArray();
         }
 
-        public Size FindSize
+        internal Size FindSize
         {
             get
             {
@@ -119,6 +119,32 @@ namespace Reni
             {
                 var result = FindSize;
                 if(result == null)
+                {
+                    DumpMethodWithBreak("No approriate result property defined");
+                    Debugger.Break();
+                }
+                return result;
+            }
+        }
+
+        internal Refs FindRefs
+        {
+            get
+            {
+                if (HasRefs)
+                    return Refs;
+                if (HasCode)
+                    return Code.Refs;
+                return null;
+            }
+        }
+
+        internal Refs SmartRefs
+        {
+            get
+            {
+                Refs result = FindRefs;
+                if (result == null)
                 {
                     DumpMethodWithBreak("No approriate result property defined");
                     Debugger.Break();
@@ -413,11 +439,11 @@ namespace Reni
         {
             if(!HasCode)
                 return this;
-            if(Refs.Count == 0)
+            if(SmartRefs.Count == 0)
                 return this;
             var result = Clone();
             result.IsDirty = true;
-            result.Code = Refs.ReplaceRefsForFunctionBody(Code, refAlignParam, replacement);
+            result.Code = SmartRefs.ReplaceRefsForFunctionBody(Code, refAlignParam, replacement);
             result.Refs = Refs.None();
             result.IsDirty = false;
             return result;

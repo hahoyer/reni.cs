@@ -25,7 +25,7 @@ namespace Reni.Code
         [Node]
         internal CodeBase Right { get { return _right; } }
 
-        internal protected override Size GetSize()
+        protected override Size GetSize()
         {
             return Left.Size + Right.Size;
         }
@@ -40,16 +40,12 @@ namespace Reni.Code
             return actual.PairVisit(this);
         }
 
-        internal protected override Size GetMaxSize()
+
+        protected override Size GetMaxSize()
         {
             var lSize = Left.MaxSize;
             var rSize = Left.Size + Right.MaxSize;
             return lSize.Max(rSize);
-        }
-
-        public static CodeBase ReCreate(CodeBase left, CodeBase right)
-        {
-            return new Pair(left, right);
         }
     }
 }

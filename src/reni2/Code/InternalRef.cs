@@ -22,7 +22,7 @@ namespace Reni.Code
         [DumpData(false)]
         public LeafElement ToLeafElement { get { return new ContextRef(this); } }
 
-        internal protected override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
         public override Result VirtVisit<Result>(Visitor<Result> actual) { return actual.InternalRef(this); }
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 

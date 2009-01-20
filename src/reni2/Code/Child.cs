@@ -26,12 +26,12 @@ namespace Reni.Code
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
 
-        internal protected override Size GetSize()
+        protected override Size GetSize()
         {
             return LeafElement.Size;
         }
 
-        internal protected override Size GetMaxSize()
+        protected override Size GetMaxSize()
         {
             return Parent.MaxSize.Max(LeafElement.Size);
         }
@@ -52,7 +52,7 @@ namespace Reni.Code
             }
         }
 
-        public override CodeBase CreateChild(LeafElement leafElement)
+        internal override CodeBase CreateChild(LeafElement leafElement)
         {
             var newLeafElement = LeafElement.TryToCombineN(leafElement);
             if(newLeafElement != null)

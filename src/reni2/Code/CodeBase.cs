@@ -18,7 +18,10 @@ namespace Reni.Code
         internal Size MaxSize { get { return GetMaxSize(); } }
 
         [Node, DumpData(false), SmartNode]
-        internal List<IRefInCode> Refs { get { return GetRefs().Data; } }
+        internal List<IRefInCode> RefsData { get { return Refs.Data; } }
+
+        [DumpData(false)]
+        internal Refs Refs { get { return GetRefs(); } }
 
         [DumpData(false)]
         internal virtual bool IsEmpty { get { return false; } }
@@ -32,19 +35,19 @@ namespace Reni.Code
         [Node, DumpData(false)]
         internal List<LeafElement> Serial { get { return Serialize(true).Data; } }
 
-        internal protected virtual Size GetMaxSize() { return Size; }
+        protected virtual Size GetMaxSize() { return Size; }
 
-        internal protected virtual Size GetSize()
+        protected virtual Size GetSize()
         {
             NotImplementedMethod();
             return null;
         }
 
-        internal virtual Refs GetRefs() { return Reni.Refs.None(); }
+        internal virtual Refs GetRefs() { return Refs.None(); }
 
         internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, Size leftSize) { return CreateChild(new BitArrayOp(name, size, leftSize, Size - leftSize)); }
 
-        public CodeBase CreateDumpPrint(Size leftSize) { return CreateChild(new DumpPrint(leftSize, Size - leftSize)); }
+        private CodeBase CreateDumpPrint(Size leftSize) { return CreateChild(new DumpPrint(leftSize, Size - leftSize)); }
 
         public CodeBase CreateAssignment(RefAlignParam refAlignParam, Size size)
         {
@@ -66,17 +69,17 @@ namespace Reni.Code
 
         public CodeBase CreateThenElse(CodeBase thenCode, CodeBase elseCode) { return new ThenElse(this, thenCode, elseCode); }
 
-        public static CodeBase CreateTopRef(RefAlignParam refAlignParam) { return CreateLeaf(new TopRef(refAlignParam, Size.Zero)); }
+        internal static CodeBase CreateTopRef(RefAlignParam refAlignParam) { return CreateLeaf(new TopRef(refAlignParam, Size.Zero)); }
 
         internal static CodeBase CreateInternalRef(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode) { return new InternalRef(refAlignParam, code, destructorCode); }
 
-        public static CodeBase CreateTopRef(RefAlignParam refAlignParam, Size offset) { return CreateLeaf(new TopRef(refAlignParam, offset)); }
+        internal static CodeBase CreateTopRef(RefAlignParam refAlignParam, Size offset) { return CreateLeaf(new TopRef(refAlignParam, offset)); }
 
-        public static CodeBase CreateFrameRef(RefAlignParam refAlignParam) { return CreateLeaf(new FrameRef(refAlignParam, Size.Create(0))); }
+        internal static CodeBase CreateFrameRef(RefAlignParam refAlignParam) { return CreateLeaf(new FrameRef(refAlignParam, Size.Create(0))); }
 
         private static CodeBase CreateLeaf(LeafElement leafElement) { return new Leaf(leafElement); }
 
-        public virtual CodeBase CreateChild(LeafElement leafElement) { return new Child(this, leafElement); }
+        internal virtual CodeBase CreateChild(LeafElement leafElement) { return new Child(this, leafElement); }
 
         public CodeBase CreateChildren(LeafElement[] leafElements)
         {
@@ -323,7 +326,7 @@ namespace Reni.Code
 
         public InternalRefCode(RefAlignParam refAlignParam) { _refAlignParam = refAlignParam; }
 
-        internal protected override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
     }
 
     internal interface IRefInCode
