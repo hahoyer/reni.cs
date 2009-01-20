@@ -61,7 +61,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, UseThen, UseElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction]
-    [Target(@"f: function arg = 1 then 1000 type(1) else arg * f(arg type((arg-1)enable_cut));f(4)dump_print")]
+    [Target(@"f: function {1000 type(arg = 1 then 1 else (arg * f(arg type((arg-1)enable_cut)))};f(4)dump_print")]
     [Output("24")]
     public class RecursiveFunction : CompilerTest
     {

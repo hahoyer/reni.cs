@@ -20,7 +20,7 @@ namespace Reni.Type
 
         public Sequence(TypeBase elementType, int count)
         {
-            Tracer.Assert(count > 0);
+            Tracer.Assert(count > 0, "count="+count);
             _inheritedType = elementType.CreateArray(count);
             _enableCutCutFeature = new EnableCutFeature(this);
         }

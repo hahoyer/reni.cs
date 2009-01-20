@@ -18,6 +18,7 @@ namespace Reni.Type
         {
             Tracer.Assert(!(target is Aligner));
             RefAlignParam = refAlignParam;
+            StopByObjectId(-6);
         }
 
         [DumpData(false)]

@@ -48,7 +48,7 @@ namespace Reni.Context
             {
                 return
                     Cache._topRefResultCache.Find(
-                        () => new Result { Code = CreateTopRefCode(), Refs = Refs.None() });
+                        () => new Result {Code = CreateTopRefCode(), Refs = Refs.None()});
             }
         }
 
@@ -57,7 +57,7 @@ namespace Reni.Context
         {
             get
             {
-                if (_childChainCache == null)
+                if(_childChainCache == null)
                     _childChainCache = ObtainChildChain();
                 return _childChainCache;
             }
@@ -115,7 +115,7 @@ namespace Reni.Context
         internal List<Result> Result(Category category, List<ICompileSyntax> list)
         {
             var results = new List<Result>();
-            for (var i = 0; i < list.Count; i++)
+            for(var i = 0; i < list.Count; i++)
                 results.Add(Result(category, list[i]));
             return results;
         }
@@ -142,7 +142,7 @@ namespace Reni.Context
 
         internal bool IsStructParentOf(ContextBase child)
         {
-            if (IsChildOf(child))
+            if(IsChildOf(child))
                 return false;
             NotImplementedMethod(child);
             return false;
@@ -150,15 +150,15 @@ namespace Reni.Context
 
         internal void AssertCorrectRefs(Result result)
         {
-            if (result.HasRefs)
+            if(result.HasRefs)
                 AssertCorrectRefs(result.Refs.Data);
-            else if (result.HasCode)
+            else if(result.HasCode)
                 AssertCorrectRefs(result.Code.Refs);
         }
 
         private void AssertCorrectRefs(IEnumerable<IRefInCode> refs)
         {
-            foreach (var @ref in refs)
+            foreach(var @ref in refs)
                 CheckRef(@ref);
         }
 
@@ -188,26 +188,36 @@ namespace Reni.Context
 
         internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType)
         {
+            var trace = (syntax is ExpressionSyntax) && (syntax as ExpressionSyntax).ObjectId == -86
+                && this is PendingResultContext;
+            StartMethodDumpWithBreak(trace, category, syntax, elementType);
+
+            if(trace)
+            {
+               Dump(true, "type",Type(syntax));
+               Dump(true, "type[P]", ((PendingResultContext)this).Parent.Type(syntax));
+                
+            }
             var target = Type(syntax).CreateSequenceType(elementType);
-            var trace = target.ObjectId == 228;
-            StartMethodDumpWithBreak(trace,category,syntax,elementType,"target",target);
-            return ReturnMethodDumpWithBreak(trace,ConvertToViaRef(category, syntax, target));
+            var result = ConvertToViaRef(category, syntax, target);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
 
         private Result ConvertToViaRef(Category category, ICompileSyntax syntax, TypeBase target)
         {
-            var trace = target.ObjectId == 228;
+            var trace = target.ObjectId == -228;
             StartMethodDumpWithBreak(trace, category, syntax, target);
+            var resultAsIs = Result(category | Category.Type, syntax);
             var resultAsRef = ResultAsRef(category | Category.Type, syntax);
             var convertTo = resultAsRef.ConvertTo(target);
             var result = convertTo.Align(AlignBits);
-            return ReturnMethodDumpWithBreak(trace,result);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax)
         {
             var result = Result(category | Category.Type, syntax);
-            if (result.Type.IsRef(RefAlignParam))
+            if(result.Type.IsRef(RefAlignParam))
                 return Result(category, syntax);
 
             return result.CreateAutomaticRefResult(category, result.Type.CreateAutomaticRef(RefAlignParam));
@@ -216,10 +226,10 @@ namespace Reni.Context
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target)
         {
             var result = Result(category | Category.Type, syntax);
-            if (result.Type.IsRefLike(target))
+            if(result.Type.IsRefLike(target))
                 return target.CreateResult(category, Result(category & (Category.Code | Category.Refs), syntax));
 
-            if (result.Type.IsRef(RefAlignParam))
+            if(result.Type.IsRef(RefAlignParam))
             {
                 var convertedResult = result.ConvertTo(target.Target);
                 NotImplementedMethod(category, syntax, target, "type", result.Type, "result", result, "convertedResult",
@@ -246,10 +256,10 @@ namespace Reni.Context
         internal Result PrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
         {
             var contextSearchResult = SearchDefineable(defineableToken);
-            if (contextSearchResult.IsSuccessFull)
+            if(contextSearchResult.IsSuccessFull)
                 return contextSearchResult.Feature.ApplyResult(this, category, right);
 
-            if (right == null)
+            if(right == null)
             {
                 NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult);
                 return null;
@@ -257,7 +267,7 @@ namespace Reni.Context
 
             var argType = Type(right);
             var prefixSearchResult = argType.SearchDefineablePrefix(defineableToken);
-            if (prefixSearchResult.IsSuccessFull)
+            if(prefixSearchResult.IsSuccessFull)
                 return prefixSearchResult.Feature.ApplyResult(this, category, right);
 
             NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult,
@@ -270,7 +280,7 @@ namespace Reni.Context
         {
             var leftType = Type(left).EnsureRef(RefAlignParam);
             var searchResult = leftType.SearchDefineable(defineableToken);
-            if (searchResult.IsSuccessFull)
+            if(searchResult.IsSuccessFull)
                 return searchResult.Feature.ApplyResult(this, category, left, right);
             NotImplementedMethod(category, left, defineableToken, right, "leftType", leftType, "searchResult",
                                  searchResult);
@@ -280,17 +290,14 @@ namespace Reni.Context
         internal Result Result(Category category, ICompileSyntax left, DefineableToken defineableToken,
                                ICompileSyntax right)
         {
-            if (left == null)
+            if(left == null)
                 return PrefixResult(category, defineableToken, right);
             return InfixResult(category, left, defineableToken, right);
         }
 
         internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingResultContext().PendingResult(category, syntax); }
 
-        internal virtual Result CommonResult(Category category, CondSyntax condSyntax)
-        {
-            return condSyntax.CommonResult(this, category);
-        }
+        internal virtual Result CommonResult(Category category, CondSyntax condSyntax) { return condSyntax.CommonResult(this, category); }
 
         internal Category PendingCategory(ICompileSyntax syntax) { return Cache._resultCache[syntax].Data.PendingCategory; }
         internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
@@ -340,16 +347,14 @@ namespace Reni.Context
         public PendingResultContext(ContextBase parent)
             : base(parent) { }
 
-        internal override Result PendingResult(Category category, ICompileSyntax syntax)
-        {
-            return Result(category, syntax);
-        }
+        internal override Result PendingResult(Category category, ICompileSyntax syntax) { return Result(category, syntax); }
 
         internal override Result CommonResult(Category category, CondSyntax condSyntax)
         {
             Tracer.Assert(category == Category.Type || category == Category.Refs);
 
-            if (category <= Parent.PendingCategory(condSyntax))
+            if(category <= Parent.PendingCategory(condSyntax))
+            {
                 return condSyntax.CommonResult
                     (
                     this,
@@ -357,6 +362,7 @@ namespace Reni.Context
                     category <= Parent.PendingCategory(condSyntax.Then),
                     category <= Parent.PendingCategory(condSyntax.Else)
                     );
+            }
             return base.CommonResult(category, condSyntax);
         }
     }
