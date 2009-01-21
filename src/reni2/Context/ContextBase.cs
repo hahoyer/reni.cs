@@ -360,7 +360,7 @@ namespace Reni.Context
                     this,
                     category,
                     category <= Parent.PendingCategory(condSyntax.Then),
-                    category <= Parent.PendingCategory(condSyntax.Else)
+                    category <= (condSyntax.Else == null ? category : Parent.PendingCategory(condSyntax.Else))
                     );
             }
             return base.CommonResult(category, condSyntax);

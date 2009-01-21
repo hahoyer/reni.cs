@@ -82,7 +82,7 @@ namespace Reni
                 return ThenResult(context,category);
             if(!elseIsPending)
                 return ElseResult(context,category);
-            NotImplementedMethod(context,thenIsPending,elseIsPending);
+            NotImplementedMethod(context,category, thenIsPending,elseIsPending);
             return null;                   
         }
 
