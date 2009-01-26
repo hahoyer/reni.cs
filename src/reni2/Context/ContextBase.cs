@@ -77,10 +77,9 @@ namespace Reni.Context
                                                      () => new Function(this, args));
         }
 
-        internal PendingResultContext CreatePendingResultContext()
+        internal PendingTypeContext CreatePendingTypeContext()
         {
-            return Cache._pendingResultContext.Find(()
-                                                    => new PendingResultContext(this));
+            return Cache._pendingTypeContext.Find(() => new PendingTypeContext(this));
         }
 
         internal FullContext CreateStruct(Container container)
@@ -188,30 +187,17 @@ namespace Reni.Context
 
         internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType)
         {
-            var trace = (syntax is ExpressionSyntax) && (syntax as ExpressionSyntax).ObjectId == -86
-                && this is PendingResultContext;
-            StartMethodDumpWithBreak(trace, category, syntax, elementType);
-
-            if(trace)
-            {
-               Dump(true, "type",Type(syntax));
-               Dump(true, "type[P]", ((PendingResultContext)this).Parent.Type(syntax));
-                
-            }
             var target = Type(syntax).CreateSequenceType(elementType);
             var result = ConvertToViaRef(category, syntax, target);
-            return ReturnMethodDumpWithBreak(trace, result);
+            return result;
         }
 
         private Result ConvertToViaRef(Category category, ICompileSyntax syntax, TypeBase target)
         {
-            var trace = target.ObjectId == -228;
-            StartMethodDumpWithBreak(trace, category, syntax, target);
-            var resultAsIs = Result(category | Category.Type, syntax);
             var resultAsRef = ResultAsRef(category | Category.Type, syntax);
             var convertTo = resultAsRef.ConvertTo(target);
             var result = convertTo.Align(AlignBits);
-            return ReturnMethodDumpWithBreak(trace, result);
+            return result;
         }
 
         internal Result ResultAsRef(Category category, ICompileSyntax syntax)
@@ -295,7 +281,19 @@ namespace Reni.Context
             return InfixResult(category, left, defineableToken, right);
         }
 
-        internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingResultContext().PendingResult(category, syntax); }
+        internal virtual Result PendingResult(Category category, ICompileSyntax syntax)
+        {
+            var result = new Result();
+            if(category.HasRefs)
+                result.Refs = Refs.None();
+            if (category.HasType)
+                result.Type = CreatePendingTypeContext().PendingType(syntax);
+            if (category.HasSize)
+                result.Size = CreatePendingTypeContext().PendingType(syntax).Size;
+            if(category.HasCode)
+                NotImplementedMethod(category,syntax);
+            return result;
+        }
 
         internal virtual Result CommonResult(Category category, CondSyntax condSyntax) { return condSyntax.CommonResult(this, category); }
 
@@ -331,8 +329,7 @@ namespace Reni.Context
             new DictionaryEx<ICompileSyntax, CacheItem>();
 
         [Node, SmartNode]
-        internal readonly SimpleCache<PendingResultContext> _pendingResultContext =
-            new SimpleCache<PendingResultContext>();
+        internal readonly SimpleCache<PendingTypeContext> _pendingTypeContext = new SimpleCache<PendingTypeContext>();
 
         /// <summary>
         /// Gets the icon key.
@@ -342,17 +339,19 @@ namespace Reni.Context
         public string IconKey { get { return "Cache"; } }
     }
 
-    internal class PendingResultContext : Child
+    internal class PendingTypeContext : Child
     {
-        public PendingResultContext(ContextBase parent)
-            : base(parent) { }
+        public PendingTypeContext(ContextBase parent): base(parent) { }
 
-        internal override Result PendingResult(Category category, ICompileSyntax syntax) { return Result(category, syntax); }
+        internal override Result PendingResult(Category category, ICompileSyntax syntax)
+        {
+            Tracer.Assert(category == Category.Type);
+            return Result(category, syntax);
+        }
 
         internal override Result CommonResult(Category category, CondSyntax condSyntax)
         {
-            Tracer.Assert(category == Category.Type || category == Category.Refs);
-
+            Tracer.Assert(category == Category.Type);
             if(category <= Parent.PendingCategory(condSyntax))
             {
                 return condSyntax.CommonResult
@@ -360,10 +359,15 @@ namespace Reni.Context
                     this,
                     category,
                     category <= Parent.PendingCategory(condSyntax.Then),
-                    category <= (condSyntax.Else == null ? category : Parent.PendingCategory(condSyntax.Else))
+                    condSyntax.Else != null && category <= Parent.PendingCategory(condSyntax.Else)
                     );
             }
             return base.CommonResult(category, condSyntax);
+        }
+
+        internal TypeBase PendingType(ICompileSyntax syntax)
+        {
+            return Type(syntax);
         }
     }
 }

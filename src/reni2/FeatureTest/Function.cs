@@ -19,7 +19,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, UseThen, UseElse, Assignment, SimpleFunction, RecursiveFunction]
-    [Target(@"i: 10; f: function i > 0 then (i := i - 1; i dump_print; f());f()")]
+    [Target(@"i: 10; f: function i > 0 then (i := (i - 1)enable_cut; i dump_print; f());f()")]
     [Output("9876543210")]
     public class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
     {
@@ -28,7 +28,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
-    [Target(@"i: 400000; f: function i > 0 then (i := i - 1; f());f()")]
+    [Target(@"i: 400000; f: function i > 0 then (i := (i - 1)enable_cut; f());f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionSmall]
     public class PrimitiveRecursiveFunctionHuge : CompilerTest
@@ -41,7 +41,7 @@ namespace Reni.FeatureTest.Function
     /// Recursive function that will result in a stack overflow, except when compiled as a loop
     /// </summary>
     [TestFixture]
-    [Target(@"i: 400000 type(400); f: function i > 0 then (i := i - 1; f());f()")]
+    [Target(@"i: 400000 type(400); f: function i > 0 then (i := (i - 1)enable_cut; f());f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionByteWithDump]
     public class PrimitiveRecursiveFunctionSmall : CompilerTest
@@ -51,7 +51,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
-    [Target(@"i: 400000 type(10); f: function i > 0 then (i := i - 1; i dump_print; f());f()")]
+    [Target(@"i: 400000 type(10); f: function i > 0 then (i := (i - 1)enable_cut; i dump_print; f());f()")]
     [Output("9876543210")]
     [PrimitiveRecursiveFunctionByteWithDump, UseThen, UseElse]
     public class PrimitiveRecursiveFunctionWithDump : CompilerTest

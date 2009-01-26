@@ -2,6 +2,7 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
+using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -16,6 +17,11 @@ namespace Reni.Struct
         {
             _position = position;
             _context = context;
+        }
+
+        public override Ref NaturalRefType
+        {
+            get { return _context.NaturalRefType; }
         }
 
         [DumpData(false)]

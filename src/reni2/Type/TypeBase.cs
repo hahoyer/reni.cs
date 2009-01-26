@@ -276,7 +276,10 @@ namespace Reni.Type
             return IsConvertableToVirt(dest, conversionFeature);
         }
 
-        internal virtual bool HasConverterTo(TypeBase dest) { return false; }
+        internal virtual bool HasConverterTo(TypeBase dest)
+        {
+            return false;
+        }
 
         internal virtual bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
         {

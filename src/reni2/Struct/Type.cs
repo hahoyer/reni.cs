@@ -14,9 +14,9 @@ namespace Reni.Struct
     internal sealed class Type : TypeBase
     {
         [Node]
-        internal readonly StructContextBase Context;
+        internal readonly FullContext Context;
 
-        internal Type(StructContextBase context) { Context = context; }
+        internal Type(FullContext context) { Context = context; }
 
         protected override Size GetSize() { return Context.InternalSize(); }
         internal override string DumpShort() { return "type." + ObjectId + "(context." + Context.DumpShort() + ")"; }
@@ -39,8 +39,22 @@ namespace Reni.Struct
             return Result.ConcatPrintResult(category, result);
         }
 
-        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(
-            Defineable defineable)
+        internal override Result ConvertToVirt(Category category, TypeBase dest) { 
+            Tracer.Assert(dest.IsVoid);
+            Tracer.Assert(Size.IsZero);
+            Tracer.Assert(category == Category.Refs);
+            return new Result { Refs = Context.ConstructorRefs() };
+        }
+
+        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        {
+            if (dest.IsVoid)
+                return Size.IsZero;
+            NotImplementedMethod(dest,conversionFeature);
+            return false;
+        }
+
+        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
         {
             var containerResult = Context.Container.SearchFromRefToStruct(defineable);
             var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature,

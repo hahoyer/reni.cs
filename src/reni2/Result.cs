@@ -16,26 +16,25 @@ namespace Reni
     internal sealed class Result : ReniObject, ITreeNodeSupport, Sequence<Result>.ICombiner<Result>
     {
         private bool _isDirty;
-        private Category _pendingCategory;
         private Size _size;
         private TypeBase _type;
         private CodeBase _code;
         private Refs _refs;
-        internal PostProcessorForResult PostProcessor;
+        internal readonly PostProcessorForResult PostProcessor;
 
         public Result()
         {
             PostProcessor = new PostProcessorForResult(this);
-            _pendingCategory = new Category();
+            PendingCategory = new Category();
         }
 
         private bool HasSize { get { return Size != null; } }
-        internal bool HasType { get { return Type != null; } }
+        private bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
 
         [Node]
-        internal Category PendingCategory { get { return _pendingCategory; } set { _pendingCategory = value; } }
+        internal Category PendingCategory;
 
         public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
 
@@ -155,7 +154,7 @@ namespace Reni
 
         internal static Error Error { get { return null; } }
 
-        internal bool IsDirty
+        private bool IsDirty
         {
             get { return _isDirty; }
             set
@@ -270,7 +269,7 @@ namespace Reni
             return r;
         }
 
-        internal Result Clone(Category category)
+        private Result Clone(Category category)
         {
             var r = new Result {PendingCategory = PendingCategory & category};
             if(category.HasSize)
@@ -319,6 +318,7 @@ namespace Reni
                 return;
 
             var result = context.PendingResult(category, syntax);
+            Tracer.Assert(result.CompleteCategory == category);
             Update(result);
         }
 
@@ -347,9 +347,9 @@ namespace Reni
                 );
         }
 
-        internal void Add(Result other) { Add(other, CompleteCategory); }
+        private void Add(Result other) { Add(other, CompleteCategory); }
 
-        internal void Add(Result other, Category category)
+        private void Add(Result other, Category category)
         {
             Tracer.Assert(category <= other.CompleteCategory);
             Tracer.Assert(category <= CompleteCategory);
@@ -365,7 +365,7 @@ namespace Reni
             IsDirty = false;
         }
 
-        internal Result CreateSequence(Result second, Category category)
+        private Result CreateSequence(Result second, Category category)
         {
             var result = Clone(category);
             result.Add(second);
@@ -509,7 +509,7 @@ namespace Reni
             return Code.Serialize(false).Evaluate();
         }
 
-        internal Result UnProperty() { return Type.UnProperty(this); }
+        private Result UnProperty() { return Type.UnProperty(this); }
 
         internal Result AutomaticDereference()
         {
@@ -521,7 +521,7 @@ namespace Reni
 
         internal Result PostProcess(int alignBits) { return PostProcess().Align(alignBits); }
 
-        internal Result PostProcess() { return UnProperty().AutomaticDereference(); }
+        private Result PostProcess() { return UnProperty().AutomaticDereference(); }
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
         {

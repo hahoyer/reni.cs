@@ -14,7 +14,6 @@ namespace Reni.Struct
     [Serializable]
     internal abstract class StructContextBase : ContextBase, IStructContext
     {
-        private readonly SimpleCache<Type> _typeCache = new SimpleCache<Type>();
         private readonly SimpleCache<PositionFeature[]> _featuresCache = new SimpleCache<PositionFeature[]>();
         [Node]
         internal readonly ContextBase Parent;
@@ -35,9 +34,7 @@ namespace Reni.Struct
         [DumpData(false)]
         internal override Root RootContext { get { return Parent.RootContext; } }
         [DumpData(false)]
-        Ref IStructContext.NaturalRefType { get { return NaturalType.CreateAutomaticRef(RefAlignParam); } }
-        [DumpData(false)]
-        public TypeBase NaturalType { get { return _typeCache.Find(() => new Type(this)); } }
+        public abstract Ref NaturalRefType { get; }
         [DumpData(false)]
         public abstract IRefInCode ForCode { get; }
         [DumpData(false)]
