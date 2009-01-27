@@ -286,11 +286,15 @@ namespace Reni.Context
             var result = new Result();
             if(category.HasRefs)
                 result.Refs = Refs.None();
-            if (category.HasType)
-                result.Type = CreatePendingTypeContext().PendingType(syntax);
-            if (category.HasSize)
-                result.Size = CreatePendingTypeContext().PendingType(syntax).Size;
-            if(category.HasCode)
+            if (category.HasType || category.HasSize)
+            {
+                TypeBase pendingType = CreatePendingTypeContext().PendingType(syntax);
+                if (category.HasType)
+                    result.Type = pendingType;
+                if (category.HasSize)
+                    result.Size = pendingType.Size;
+            }
+            if (category.HasCode)
                 NotImplementedMethod(category,syntax);
             return result;
         }
