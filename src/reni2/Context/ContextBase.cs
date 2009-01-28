@@ -350,7 +350,7 @@ namespace Reni.Context
         internal override Result PendingResult(Category category, ICompileSyntax syntax)
         {
             Tracer.Assert(category == Category.Type);
-            return Result(category, syntax);
+            return syntax.Result(this,category);
         }
 
         internal override Result CommonResult(Category category, CondSyntax condSyntax)
@@ -371,7 +371,7 @@ namespace Reni.Context
 
         internal TypeBase PendingType(ICompileSyntax syntax)
         {
-            return Type(syntax);
+            return PendingResult(Category.Type, syntax).Type;
         }
     }
 }

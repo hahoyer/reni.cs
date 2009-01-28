@@ -42,8 +42,8 @@ namespace Reni.Struct
         internal override Result ConvertToVirt(Category category, TypeBase dest) { 
             Tracer.Assert(dest.IsVoid);
             Tracer.Assert(Size.IsZero);
-            Tracer.Assert(category == Category.Refs);
-            return new Result { Refs = Context.ConstructorRefs() };
+            Tracer.Assert(!category.HasCode);
+            return dest.CreateResult(category, () => null, () => Context.ConstructorRefs());
         }
 
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)

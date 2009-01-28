@@ -46,7 +46,8 @@ namespace Reni
         {
             var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
-            Tracer.ConditionalBreak(1, ObjectId == objectId, @"_objectId==" + objectId + "\n" + Dump());
+            if(ObjectId == objectId)
+                Tracer.ConditionalBreak(1, "", @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
 
