@@ -74,6 +74,8 @@ namespace Reni.Context
 
         public Result CreateCall(Category category, Result args)
         {
+            var trace = ObjectId == -10 && (category.HasRefs || category.HasRefs);
+            StartMethodDumpWithBreak(trace, category, args);
             var localCategory = category;
             if(category.HasCode)
                 localCategory = (localCategory - Category.Code) | Category.Size;
@@ -85,7 +87,7 @@ namespace Reni.Context
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(Index, result.Size);
 
             Context.CreateFunction(Args).AssertCorrectRefs(result);
-            return result;
+            return ReturnMethodDumpWithBreak(trace,result);
         }
 
         private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return ForeignRefs.ToCode().CreateSequence(argsCode); }
@@ -114,15 +116,17 @@ namespace Reni.Context
             var trace = ObjectId == -10 && category.HasRefs;
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category| Category.Type;
-            var result = functionContext.Result(categoryEx, Body).Clone();
+            var rawResult = functionContext.Result(categoryEx, Body).Clone();
 
-            Tracer.ConditionalBreak(trace, Dump() + "\nfunctionContext=" + functionContext.Dump() + "\nresult=" + result.Dump());
+            DumpWithBreak(trace, category, "functionContext", functionContext, "result", rawResult);
 
-            var postProcessedResult = result.PostProcessor.FunctionResult(category, functionContext.RefAlignParam);
+            var postProcessedResult = rawResult.PostProcessor.FunctionResult(category, functionContext.RefAlignParam);
 
-            Tracer.ConditionalBreak(trace, Dump() + "\npostProcessedResult=" + postProcessedResult.Dump());
-            var finalResult = postProcessedResult.ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(postProcessedResult.CompleteCategory));
-            return ReturnMethodDump(trace, finalResult);
+            DumpWithBreak(trace, category, "postProcessedResult", postProcessedResult);
+            var result = 
+                postProcessedResult
+                .ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(postProcessedResult.CompleteCategory));
+            return ReturnMethodDump(trace, result);
         }
 
         private Result CreateArgsRef(Category category)

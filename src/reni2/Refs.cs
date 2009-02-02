@@ -13,13 +13,14 @@ namespace Reni
     [Serializable]
     internal sealed class Refs : ReniObject, Sequence<Refs>.ICombiner<Refs>
     {
+        private static int _nextId;
         private readonly List<IRefInCode> _data;
         private SizeArray _sizesCache;
 
-        private Refs()
+        private Refs(): base(_nextId++)
         {
             _data = new List<IRefInCode>();
-            //StopByObjectId(5128);
+            StopByObjectId(-49);
         }
 
         private Refs(IRefInCode context): this()

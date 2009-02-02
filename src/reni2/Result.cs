@@ -213,16 +213,16 @@ namespace Reni
 
         internal void Update(Result result)
         {
-            if(result.HasSize && !result.PendingCategory.HasSize)
+            if(result.HasSize)
                 _size = result.Size;
 
-            if(result.HasType && !result.PendingCategory.HasType)
+            if(result.HasType)
                 _type = result.Type;
 
-            if(result.HasRefs && !result.PendingCategory.HasRefs)
+            if(result.HasRefs)
                 _refs = result.Refs;
 
-            if(result.HasCode && !result.PendingCategory.HasCode)
+            if(result.HasCode)
                 _code = result.Code;
 
             AssertValid();
@@ -308,8 +308,11 @@ namespace Reni
         //[DebuggerHidden]
         internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
+            var trace = context.ObjectId == -11 && category.HasRefs && IsObjectId(syntax, 90);
+            StartMethodDumpWithBreak(trace, context,category,syntax);
             InternalAddCategories(context, category - CompleteCategory - PendingCategory, syntax);
             TreatPendingCategories(context, category - CompleteCategory, syntax);
+            ReturnMethodDumpWithBreak(trace);
         }
 
         private void TreatPendingCategories(ContextBase context, Category category, ICompileSyntax syntax)
@@ -477,7 +480,7 @@ namespace Reni
             if(category.HasCode)
                 result.Code = Code.CreateStatement(copier.Code, refAlignParam);
             if(category.HasRefs)
-                result.Refs = result.Refs.CreateSequence(copier.Refs);
+                result.Refs = Refs.CreateSequence(copier.Refs);
             return result;
         }
 

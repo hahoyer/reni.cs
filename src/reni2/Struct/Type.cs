@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -42,8 +43,8 @@ namespace Reni.Struct
         internal override Result ConvertToVirt(Category category, TypeBase dest) { 
             Tracer.Assert(dest.IsVoid);
             Tracer.Assert(Size.IsZero);
-            Tracer.Assert(!category.HasCode);
-            return dest.CreateResult(category, () => null, () => Context.ConstructorRefs());
+            return dest.CreateResult(category, 
+                () => CodeBase.CreateArg(Size.Zero), () => Context.ConstructorRefs());
         }
 
         internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)

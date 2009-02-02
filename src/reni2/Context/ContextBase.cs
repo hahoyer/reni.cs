@@ -77,9 +77,9 @@ namespace Reni.Context
                                                      () => new Function(this, args));
         }
 
-        internal PendingTypeContext CreatePendingTypeContext()
+        internal PendingContext CreatePendingContext()
         {
-            return Cache._pendingTypeContext.Find(() => new PendingTypeContext(this));
+            return Cache._pendingContext.Find(() => new PendingContext(this));
         }
 
         internal FullContext CreateStruct(Container container)
@@ -283,20 +283,7 @@ namespace Reni.Context
 
         internal virtual Result PendingResult(Category category, ICompileSyntax syntax)
         {
-            var result = new Result();
-            if(category.HasRefs)
-                result.Refs = Refs.None();
-            if (category.HasType || category.HasSize)
-            {
-                TypeBase pendingType = CreatePendingTypeContext().PendingType(syntax);
-                if (category.HasType)
-                    result.Type = pendingType;
-                if (category.HasSize)
-                    result.Size = pendingType.Size;
-            }
-            if (category.HasCode)
-                NotImplementedMethod(category,syntax);
-            return result;
+            return CreatePendingContext().PendingResult(category,syntax);
         }
 
         internal virtual Result CommonResult(Category category, CondSyntax condSyntax) { return condSyntax.CommonResult(this, category); }
@@ -333,7 +320,7 @@ namespace Reni.Context
             new DictionaryEx<ICompileSyntax, CacheItem>();
 
         [Node, SmartNode]
-        internal readonly SimpleCache<PendingTypeContext> _pendingTypeContext = new SimpleCache<PendingTypeContext>();
+        internal readonly SimpleCache<PendingContext> _pendingContext = new SimpleCache<PendingContext>();
 
         /// <summary>
         /// Gets the icon key.
@@ -343,19 +330,17 @@ namespace Reni.Context
         public string IconKey { get { return "Cache"; } }
     }
 
-    internal class PendingTypeContext : Child
+    internal class PendingContext : Child
     {
-        public PendingTypeContext(ContextBase parent): base(parent) { }
+        public PendingContext(ContextBase parent): base(parent) { }
 
         internal override Result PendingResult(Category category, ICompileSyntax syntax)
         {
-            Tracer.Assert(category == Category.Type);
             return syntax.Result(this,category);
         }
 
         internal override Result CommonResult(Category category, CondSyntax condSyntax)
         {
-            Tracer.Assert(category == Category.Type);
             if(category <= Parent.PendingCategory(condSyntax))
             {
                 return condSyntax.CommonResult
@@ -372,6 +357,11 @@ namespace Reni.Context
         internal TypeBase PendingType(ICompileSyntax syntax)
         {
             return PendingResult(Category.Type, syntax).Type;
+        }
+
+        public Refs PendingRefs(ICompileSyntax syntax)
+        {
+            return PendingResult(Category.Refs, syntax).Refs;
         }
     }
 }

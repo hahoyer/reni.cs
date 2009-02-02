@@ -64,5 +64,7 @@ namespace Reni
             DumpMethodWithBreak("Not implemented", other);
             return false;
         }
+
+        internal static bool IsObjectId(object syntax, int objectId) { return ((syntax is ReniObject) && ((ReniObject) syntax) .ObjectId == objectId); }
     }
 }
