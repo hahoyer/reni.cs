@@ -305,7 +305,7 @@ namespace Reni
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
             var trace = context.ObjectId == -11 && category.HasRefs && IsObjectId(syntax, 90);
@@ -325,6 +325,7 @@ namespace Reni
             Update(result);
         }
 
+        [DebuggerHidden]
         private void InternalAddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
             if(category.IsNull)

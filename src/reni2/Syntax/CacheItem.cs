@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
@@ -23,7 +24,7 @@ namespace Reni.Syntax
             _context = context;
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         public Result Result(Category category)
         {
             _data.AddCategories(_context, category, _syntax);
