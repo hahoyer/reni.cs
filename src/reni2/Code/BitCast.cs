@@ -36,9 +36,11 @@ namespace Reni.Code
             if(precedingElement.Size != TargetSize)
                 return null;
             var significantSize = SignificantSize.Min(precedingElement.SignificantSize);
-            if(TargetSize == Size && TargetSize == significantSize)
+            if (Size == TargetSize && Size == significantSize)
                 return new LeafElement[0];
-            return new[] {new BitCast(Size, precedingElement.TargetSize, significantSize)};
+            if (Size == precedingElement.TargetSize && Size == significantSize)
+                return new LeafElement[0];
+            return new[] { new BitCast(Size, precedingElement.TargetSize, significantSize) };
         }
 
         internal override LeafElement TryToCombineBack(BitArray precedingElement)

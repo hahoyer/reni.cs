@@ -14,64 +14,74 @@ namespace Reni
         /// </summary>
         public static void reni()
         {
-            fixed(sbyte* data = new sbyte[5])
+            fixed (sbyte* data = new sbyte[7])
             {
-                (*(data + 4)) = (4); // BitArray 15258
-                reni_0((data + 5)); // Call     14062
-                (*(data + 3)) = (*(data + 4)); // TopData  15259
-                (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 4) >> 4); // CreateBitCast  14158
-                Data.DumpPrint((*(data + 3))); // DumpPrint  14141
-                Data.MoveBytes(0, (data + 5), (data + 4)); // StatementEnd 14233
-            }
-            ;
+                (*(sbyte*)(data + 6)) = (sbyte)(10); // BitArray     22534
+                var a = Data.ToInt64(1, (data + 6));
+                Data.MoveBytes(3, (data + 3), (data + 6)); // TopData      22536
+                var b = Data.ToInt64(3, (data + 3));
+                Data.BitCast(3, (data + 3), 19); // BitCast      18326
+                var c = Data.ToInt64(3, (data + 3));
+                Data.MoveBytes(3, (data + 4), (data + 3)); // StatementEnd 18361
+                (*(Int32*)(data + 0)) = (Int32)(data + 7); // TopRef     22537
+                reni_0((data + 4)); // Call       20617
+
+
+            };
         }
 
-        // ((arg)=(1))then((arg)type(1))else((arg)*(f((arg)type(((arg)-(1))enable_cut))))
-        private static void reni_0(SByte* frame)
+        // ((i)>(0))then(container.22)
+        private static void reni_0(System.SByte* frame)
         {
-            fixed(sbyte* data = new sbyte[10])
+            fixed (sbyte* data = new sbyte[15])
             {
-                (*(data + 9)) = (1); // BitArray     15273
-                (*(data + 8)) = (*(frame - 1)); // TopFrame     15275
-                (*(data + 8)) = (sbyte) ((sbyte) ((*(data + 8)) << 4) >> 4); // CreateBitCast      14522
-                (*(data + 7)) = (*(data + 9)); // TopData      15276
-                (*(data + 7)) = (sbyte) ((sbyte) ((*(data + 7)) << 6) >> 6); // CreateBitCast      14469
-                if((*(data + 8)) == (*(data + 7)))
+            StartFunction:
+                (*(sbyte*)(data + 14)) = (sbyte)(0); // BitArray     22549
+                (*(Int32*)(data + 10)) = (*(Int32*)(frame - 4)); // TopFrame     22551
+                (*(Int32*)(data + 10)) += -3; // RefPlus      21179
+                Data.MoveBytes(3, (data + 11), ((sbyte*)(*(Int32*)(data + 10)))); // Dereference  21204
+                Data.BitCast(3, (data + 11), 4); // BitCast      21205
+                (*(sbyte*)(data + 10)) = (*(sbyte*)(data + 14)); // TopData      22553
+                (*(sbyte*)(data + 10)) = (sbyte)((sbyte)((*(sbyte*)(data + 10)) << 7) >> 7); // BitCast      21133
+                var a = Data.ToInt64(3, (data + 11));
+                var b = Data.ToInt64(1, (data + 10));
+                Data.Greater(1, (data + 13), 3, (data + 11), 1, (data + 10)); // BitArrayOp   21244
+                var c = Data.ToInt64(1, (data + 13));
+
+                (*(sbyte*)(data + 13)) = (sbyte)((sbyte)((*(sbyte*)(data + 13)) << 7) >> 7); // BitCast      21245
+                (*(sbyte*)(data + 14)) = (*(sbyte*)(data + 13)); // StatementEnd 21274
+                if ((*(sbyte*)(data + 14)) != 0)
                 {
-                    ; // CreateBitArrayOpThen 15278
-                    (*(data + 8)) = (1); // BitArray       15279
-                    (*(data + 7)) = (*(data + 8)); // TopData        15280
-                    (*(data + 7)) = (sbyte) ((sbyte) ((*(data + 7)) << 6) >> 6); // CreateBitCast      15013
-                    (*(data + 8)) = (*(data + 7)); // StatementEnd 15058
+                    ; // Then        22555
+                    (*(sbyte*)(data + 14)) = (sbyte)(1); // BitArray    22556
+                    (*(Int32*)(data + 10)) = (*(Int32*)(frame - 4)); // TopFrame    22558
+                    (*(Int32*)(data + 10)) += -3; // RefPlus     21507
+                    Data.MoveBytes(3, (data + 11), ((sbyte*)(*(Int32*)(data + 10)))); // Dereference 21532
+                    Data.BitCast(3, (data + 11), 4); // BitCast   21533
+                    (*(sbyte*)(data + 10)) = (*(sbyte*)(data + 14)); // TopData  22560
+                    (*(sbyte*)(data + 10)) = (sbyte)((sbyte)((*(sbyte*)(data + 10)) << 6) >> 6); // BitCast  21455
+                    Data.Minus(3, (data + 11), 3, (data + 11), 1, (data + 10)); // BitArrayOp 21547
+                    Data.BitCast(3, (data + 11), 3); // BitCast    21548
+                    Data.MoveBytes(3, (data + 8), (data + 11)); // TopData    22562
+                    Data.BitCast(3, (data + 8), 4); // BitCast    21623
+                    (*(Int32*)(data + 4)) = (*(Int32*)(frame - 4)); // TopFrame   22564
+                    (*(Int32*)(data + 4)) += -3; // RefPlus    21679
+                    (*(Int32*)(data + 0)) = (Int32)(data + 8); // TopRef     22565
+                    Data.MoveBytes(3, (sbyte*)(*(Int32*)(data + 4)), (sbyte*)(*(Int32*)(data + 0))); // Assign     21350
+                    (*(Int32*)(data + 11)) = (*(Int32*)(frame - 4)); // TopFrame   22567
+                    (*(Int32*)(data + 11)) += -3; // RefPlus    21896
+                    Data.MoveBytes(3, (data + 12), ((sbyte*)(*(Int32*)(data + 11)))); // Dereference 21926
+                    Data.BitCast(3, (data + 12), 4); // BitCast     21927
+                    Data.DumpPrint(3, (data + 12)); // DumpPrint   21920
+                    goto StartFunction; // RecursiveCall 22570
                 }
                 else
                 {
-                    ; // Else         15281
-                    (*(data + 8)) = (1); // BitArray    15282
-                    (*(data + 7)) = (*(frame - 1)); // TopFrame    15284
-                    (*(data + 7)) = (sbyte) ((sbyte) ((*(data + 7)) << 4) >> 4); // CreateBitCast     13332
-                    (*(data + 6)) = (*(data + 8)); // TopData     15285
-                    (*(data + 6)) = (sbyte) ((sbyte) ((*(data + 6)) << 6) >> 6); // CreateBitCast     13247
-                    (*(data + 7)) = (sbyte) ((*(data + 7)) - (*(data + 6))); // CreateBitArrayOp  13387
-                    (*(data + 7)) = (sbyte) ((sbyte) ((*(data + 7)) << 3) >> 3); // CreateBitCast       13388
-                    (*(data + 6)) = (*(data + 7)); // TopData         15286
-                    (*(data + 6)) = (sbyte) ((sbyte) ((*(data + 6)) << 3) >> 3); // CreateBitCast           13488
-                    (*(data + 5)) = (*(data + 6)); // TopData             15287
-                    (*(data + 5)) = (sbyte) ((sbyte) ((*(data + 5)) << 4) >> 4); // CreateBitCast              13620
-                    reni_0((data + 6)); // Call                   13653
-                    (*(data + 4)) = (*(frame - 1)); // TopFrame               15289
-                    (*(data + 4)) = (sbyte) ((sbyte) ((*(data + 4)) << 4) >> 4); // CreateBitCast                14884
-                    (*(data + 3)) = (*(data + 5)); // TopData                15290
-                    (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 4) >> 4); // CreateBitCast                14827
-                    (*(data + 4)) = (sbyte) ((*(data + 4))*(*(data + 3))); // CreateBitArrayOp             14934
-                    (*(data + 4)) = (sbyte) ((sbyte) ((*(data + 4)) << 1) >> 1); // CreateBitCast                  14935
-                    (*(data + 8)) = (*(data + 4)); // StatementEnd               15163
-                }
-                ; //                                                                                      EndCondional 15291
-                (*(data + 9)) = (*(data + 8)); // StatementEnd                   15191
-                (*(frame - 1)) = (*(data + 9)); // StorageDescriptor.FunctionReturn
-            }
-            ;
+                    ; // Else          22571
+                };                                    //                                                      EndCondional 22572
+                ;                                    //                                                      StorageDescriptor.CreateFunctionReturn
+
+            };
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Reni.FeatureTest.Function
     [PrimitiveRecursiveFunctionSmall]
     public class PrimitiveRecursiveFunctionHuge : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -127,10 +127,10 @@ f1()dump_print;
         public override void AssertValid(Compiler c)
         {
             var x = new ExpectedCompilationResult(c);
-            Tracer.Assert(x.FunctionCount() == 3);
+            Tracer.Assert(x.FunctionCount() == 2);
         }
 
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 }

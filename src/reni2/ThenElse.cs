@@ -37,7 +37,16 @@ namespace Reni
             return ReturnMethodDump(trace, InternalResult(context, category));
         }
 
-        internal Result CondResult(ContextBase context, Category category) { return context.Result(category | Category.Type, Cond).ConvertTo(TypeBase.CreateBit) & category; }
+        internal Result CondResult(ContextBase context, Category category)
+        {
+            return context
+                .Result(category | Category.Type, Cond)
+                .ConvertTo(TypeBase.CreateBit)
+                .Align(context.AlignBits)
+                .CreateStatement(category | Category.Type, context.RefAlignParam)
+                .ConvertTo(TypeBase.CreateBit)
+                ;
+        }
 
         private Result ElseResult(ContextBase context, Category category)
         {

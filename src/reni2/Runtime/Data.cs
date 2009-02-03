@@ -31,8 +31,12 @@ namespace Reni.Runtime
         /// created 08.10.2006 17:43
         public static unsafe void MoveBytes(int count, byte* destination, byte* source)
         {
-            for(var i = 0; i < count; i++)
-                destination[i] = source[i];
+            if(destination < source)
+                for(var i = 0; i < count; i++)
+                    destination[i] = source[i];
+            else if(destination > source)
+                for(var i = count - 1; i >= 0; i--)
+                    destination[i] = source[i];
         }
 
         /// <summary>
@@ -132,7 +136,7 @@ namespace Reni.Runtime
             BitsConst.Convert(data).PrintNumber();
         }
 
-        private static unsafe Int64 ToInt64(int count, sbyte* source)
+        public static unsafe Int64 ToInt64(int count, sbyte* source)
         {
             Int64 data = source[count - 1] < 0 ? -1 : 0;
             MoveBytes(count, (byte*) &data, (byte*) source);
@@ -290,6 +294,28 @@ namespace Reni.Runtime
             }
 
             return false;
+        }
+
+        public static unsafe void Greater(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
+        {
+            BoolToSBytes(countResult, dataResult, Greater(count1st, data1st, count2nd, data2nd));
+        }
+
+        public static unsafe void Less(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
+        {
+            BoolToSBytes(countResult, dataResult, Less(count1st, data1st, count2nd, data2nd));
+        }
+
+        public static unsafe void Equal(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
+        {
+            BoolToSBytes(countResult, dataResult, Equal(count1st, data1st, count2nd, data2nd));
+        }
+
+        private static unsafe void BoolToSBytes(int countResult, sbyte* dataResult, bool result)
+        {
+            var value = (sbyte)(result ? -1 : 0);
+            for(int i = 0; i < countResult; i++)
+                dataResult[i] = value;
         }
 
         public static unsafe bool Less(int count1st, sbyte* data1st, int count2nd, sbyte* data2nd) { return Greater(count2nd, data2nd, count1st, data1st); }
