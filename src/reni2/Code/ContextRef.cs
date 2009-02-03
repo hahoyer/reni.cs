@@ -14,7 +14,7 @@ namespace Reni.Code
         internal RefCode(IRefInCode context)
         {
             _leafElement = new ContextRef(context);
-            StopByObjectId(2766);
+            StopByObjectId(-2766);
         }
 
         [Node]

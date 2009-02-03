@@ -139,15 +139,15 @@ namespace Reni.Code
                                         + ") {";
             return "if(Data."
                 + opToken.DataFunctionName
-                    + "("
-                        + leftSize.ByteCount
-                            + ", "
-                                + CreateDataPtr(Start + rightSize)
-                                    + ", "
-                                        + rightSize.ByteCount
-                                            + ", "
-                                                + CreateDataPtr(Start)
-                                                    + ") {" ;
+                + "("
+                  + leftSize.ByteCount
+                  + ", "
+                  + CreateDataPtr(Start + rightSize)
+                  + ", "
+                  + rightSize.ByteCount
+                  + ", "
+                  + CreateDataPtr(Start)
+                + ")) {" ;
         }
 
         internal string CreateBitCast(Size targetSize, Size size, Size significantSize)

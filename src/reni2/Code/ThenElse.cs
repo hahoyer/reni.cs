@@ -45,6 +45,12 @@ namespace Reni.Code
         {
             return actual.ThenElseVisit(this);
         }
+
+        internal override Refs GetRefs()
+        {
+            return CondCode.GetRefs().CreateSequence(ThenCode.GetRefs()).CreateSequence(ElseCode.GetRefs());
+        }
+
     }
 
     [Serializable]
