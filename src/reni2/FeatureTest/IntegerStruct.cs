@@ -16,10 +16,10 @@ Integer8: function
     _data: 127 type (arg enable_cut);
 
     create   : function(Integer8(arg));
-    dump_print: property function (_data dump_print);
+    !property dump_print: function (_data dump_print);
     +        : function create(_data + create(arg) _data);
     clone    : function create(_data);
-    converter _data
+    !converter: function _data
 }
 ";
         }
@@ -27,10 +27,10 @@ Integer8: function
         /// <summary>
         /// Integers the class.
         /// </summary>
-        [Test, Category(Worked)]
+        [Test, Explicit, Category(UnderConstruction)]
         public void DumpPrint1()
         {
-            CreateFileAndRunCompiler("DumpPrint1"
+              CreateFileAndRunCompiler("DumpPrint1"
                         , IntegerDefinition() + "; Integer8(1) dump_print"
                         , "1"
                 );
@@ -38,7 +38,7 @@ Integer8: function
         /// <summary>
         /// Integers the class.
         /// </summary>
-        [Test, Category(Worked)]
+        [Test, Explicit, Category(Worked)]
         public void DumpPrint2()
         {
             Parameters.Trace.All();
@@ -50,7 +50,7 @@ Integer8: function
         /// <summary>
         /// Integers the class.
         /// </summary>
-        [Test, Category(Worked)]
+        [Test, Explicit, Category(Worked)]
         public void DumpPrint127()
         {
             CreateFileAndRunCompiler("DumpPrint127"
