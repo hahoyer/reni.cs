@@ -231,9 +231,9 @@ namespace Reni.Type
             _definable = definable;
         }
 
-        Result IPrefixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object)
+        Result IPrefixFeature.ApplyResult(ContextBase callCallContext, Category category, ICompileSyntax @object)
         {
-            return _sequence.Element.ApplySequenceOperation(_definable, callContext, category, @object);
+            return _sequence.Element.ApplySequenceOperation(_definable, callCallContext, category, @object);
         }
 
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)

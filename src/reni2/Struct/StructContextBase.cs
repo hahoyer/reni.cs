@@ -5,6 +5,7 @@ using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
@@ -52,9 +53,13 @@ namespace Reni.Struct
         {
             var result = new List<PositionFeature>();
             for (var i = 0; i < Position; i++)
-                result.Add(new PositionFeature(this, i));
+                result.Add(new PositionFeature(EmptyList, this, i));
             return result.ToArray();
         }
+
+        private EmptyList EmptyList
+        {
+            get { return Container.EmptyList; } }
 
         internal abstract ContextAtPosition CreatePosition(int position);
 

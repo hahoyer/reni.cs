@@ -76,7 +76,7 @@ namespace Reni.FeatureTest.Struct
         public override string Target { get { return @"! property x: function 11; x dump_print"; } }
         public override string Output { get { return "11"; } }
     
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 

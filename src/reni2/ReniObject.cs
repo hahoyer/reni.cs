@@ -5,8 +5,10 @@ using HWClassLibrary.Helper;
 
 namespace Reni
 {
+    public abstract class PositionFeatureBase : Dumpable {}
+
     [AdditionalNodeInfo("NodeDump"),Serializable]
-    public abstract class ReniObject : Dumpable
+    public abstract class ReniObject : PositionFeatureBase
     {
         private static int _nextObjectId;
         private readonly int _objectId;

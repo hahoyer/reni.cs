@@ -37,7 +37,7 @@ namespace Reni.Struct
         internal readonly List<string> Properties = new List<string>();
 
         private Container(Token token)
-            : base(token, _nextObjectId++) { }
+            : base(token, _nextObjectId++) { EmptyList = new EmptyList(token); }
 
         internal DictionaryEx<int, string> ReverseDictionary
         {
@@ -59,6 +59,9 @@ namespace Reni.Struct
 
         [DumpData(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
+
+        [DumpData(false)]
+        internal readonly EmptyList EmptyList;
 
         protected internal override string DumpShort() { return "container." + ObjectId; }
 
@@ -194,8 +197,14 @@ namespace Reni.Struct
             _isPoperty = isPoperty;
         }
 
-        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type) { return type.Context.Features[_index]; }
+        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type)
+        {
+            return type.Context.Features[_index].ToProperty(_isPoperty);
+        }
 
-        IContextFeature IConverter<IContextFeature, StructContextBase>.Convert(StructContextBase context) { return context.Features[_index]; }
+        IContextFeature IConverter<IContextFeature, StructContextBase>.Convert(StructContextBase context)
+        {
+            return context.Features[_index].ToProperty(_isPoperty);
+        }
     }
 }

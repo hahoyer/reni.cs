@@ -17,11 +17,11 @@ namespace Reni.Feature
 
     internal interface IPrefixFeature
     {
-        Result ApplyResult(ContextBase contextBase, Category category, ICompileSyntax @object);
+        Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object);
     }
 
     internal interface IContextFeature
     {
-        Result ApplyResult(ContextBase contextBase, Category category, ICompileSyntax args);
+        Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax args);
     }
 }
