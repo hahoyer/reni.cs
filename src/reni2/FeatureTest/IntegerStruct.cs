@@ -1,6 +1,8 @@
+using System;
+using HWClassLibrary.Debug;
 using NUnit.Framework;
 
-namespace Reni.FeatureTest
+namespace Reni.FeatureTest.Integer
 {
     /// <summary>
     /// Structure, that is all between brackets
@@ -8,9 +10,10 @@ namespace Reni.FeatureTest
     [TestFixture]
     public class IntegerStruct : CompilerTest
     {
-        static string IntegerDefinition()
+        protected static string IntegerDefinition()
         {
-            return @"
+            return
+                @"
 Integer8: function
 {
     _data: 127 type (arg enable_cut);
@@ -24,80 +27,63 @@ Integer8: function
 ";
         }
 
-        /// <summary>
-        /// Integers the class.
-        /// </summary>
-        [Test, Explicit, Category(UnderConstruction)]
-        public void DumpPrint1()
+        public override void Run() { }
+
+        public override string Target
         {
-              CreateFileAndRunCompiler("DumpPrint1"
-                        , IntegerDefinition() + "; Integer8(1) dump_print"
-                        , "1"
-                );
-        }
-        /// <summary>
-        /// Integers the class.
-        /// </summary>
-        [Test, Explicit, Category(Worked)]
-        public void DumpPrint2()
-        {
-            Parameters.Trace.All();
-            CreateFileAndRunCompiler("DumpPrint2"
-                        , IntegerDefinition() + "; Integer8(2) dump_print"
-                        , "2"
-                );
-        }
-        /// <summary>
-        /// Integers the class.
-        /// </summary>
-        [Test, Explicit, Category(Worked)]
-        public void DumpPrint127()
-        {
-            CreateFileAndRunCompiler("DumpPrint127"
-                        , IntegerDefinition() + "; Integer8(127) dump_print"
-                        , "127"
-                );
-        }
-        /// <summary>
-        /// Integers the class.
-        /// </summary>
-        [Test, Explicit, Category(UnderConstruction)]
-        public void Create()
-        {
-            CreateFileAndRunCompiler("Create"
-                        , IntegerDefinition() + "; Integer8(0) create(23) dump_print"
-                        , "23"
-                );
-        }
-        /// <summary>
-        /// Integers the class.
-        /// </summary>
-        [Test, Explicit, Category(UnderConstruction)]
-        public void Clone()
-        {
-            CreateFileAndRunCompiler("Clone"
-                        , IntegerDefinition() + "; Integer8(23) clone() dump_print"
-                        , "23"
-                );
+            get { return IntegerDefinition() + "; " + InstanceCode + " dump_print"; }
         }
 
-        /// <summary>
-        /// Integers the class.
-        /// </summary>
-        [Test, Explicit, Category(UnderConstruction)]
-        public void Plus()
-        {
-            CreateFileAndRunCompiler("Plus", PlusText, "3");
-        }
-
-        public static string PlusText
-        {
-             get
-             {
-                  return IntegerDefinition() 
-                      + "; (Integer8(1)+Integer8(2)) dump_print";
-             }
-        }
-        public override void Run() {  }
+        protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
+
+    [TestFixture, Output("2"), InstanceCode("(Integer8(1)+Integer8(2))")]
+    public class Plus : IntegerStruct
+    {
+        [Test, Explicit, Category(UnderConstruction)]
+        public override void Run() { }
+    }
+
+    [TestFixture, Output("23"), InstanceCode("Integer8(0) clone(23)")]
+    public class Clone : IntegerStruct
+    {
+        [Test, Explicit, Category(UnderConstruction)]
+        public override void Run() { }
+    }
+
+    [TestFixture, Output("23"), InstanceCode("Integer8(0) create(23)")]
+    public class Create : IntegerStruct
+    {
+        [Test, Explicit, Category(UnderConstruction)]
+        public override void Run() { }
+    }
+
+    [TestFixture, Output("1"), InstanceCode("Integer8(1)")]
+    public class DumpPrint1 : IntegerStruct
+    {
+        [Test, Explicit, Category(UnderConstruction)]
+        public override void Run() { }
+    }
+
+    [TestFixture, Output("2"), InstanceCode("Integer8(2)")]
+    public class DumpPrint2 : IntegerStruct
+    {
+        [Test, Explicit, Category(UnderConstruction)]
+        public override void Run() { }
+    }
+
+    [TestFixture, Output("127"), InstanceCode("Integer8(127)")]
+    public class DumpPrint127 : IntegerStruct
+    {
+        [Test, Explicit, Category(UnderConstruction)]
+        public override void Run() { }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    internal sealed class InstanceCodeAttribute : StringAttribute
+    {
+        public InstanceCodeAttribute(string value)
+            : base(value) { }
+    }
+
 }

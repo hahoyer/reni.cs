@@ -9,7 +9,6 @@ namespace Reni.Struct
     [Serializable]
     internal sealed class ContextAtPosition : StructContextBase
     {
-        internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
         private readonly int _position;
         private readonly FullContext _context;
 

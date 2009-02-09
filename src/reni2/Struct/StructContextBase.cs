@@ -133,5 +133,7 @@ namespace Reni.Struct
 
             return base.Search(defineable).AlternativeTrial(result);
         }
+
+        internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
     }
 }

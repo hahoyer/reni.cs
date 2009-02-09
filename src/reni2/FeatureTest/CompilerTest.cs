@@ -134,7 +134,7 @@ namespace Reni.FeatureTest
             return result.ToArray();
         }
 
-        private string GetStringAttribute<T>() where T : StringAttribute
+        internal string GetStringAttribute<T>() where T : StringAttribute
         {
             var attrs = GetType().GetCustomAttributes(typeof(T), true);
             if (attrs.Length == 1)

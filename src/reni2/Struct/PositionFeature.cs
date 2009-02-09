@@ -49,7 +49,16 @@ namespace Reni.Struct
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
-        protected Result ObjectResult(Category category) { return NaturalRefType.CreateContextResult(_structContext.ForCode, category | Category.Type); }
+        protected Result NaturalResult(Category category)
+        {
+            return NaturalRefType.CreateContextResult(_structContext.ForCode, category | Category.Type);
+        }
+
+        protected Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
+        {
+            return callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(NaturalRefType);
+        }
+
     }
 
     [Serializable]
@@ -66,11 +75,10 @@ namespace Reni.Struct
         public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                            ICompileSyntax args)
         {
-            var objectResult = callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(NaturalRefType);
-            return ApplyResult(callContext, category, objectResult, args);
+            return ApplyResult(callContext, category, ObjectResult(callContext, category, @object), args);
         }
 
-        public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax args) { return ApplyResult(callContext, category, ObjectResult(category), args); }
+        public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax args) { return ApplyResult(callContext, category, NaturalResult(category), args); }
 
         public PositionFeatureBase ToProperty(bool isPoperty)
         {
@@ -93,7 +101,7 @@ namespace Reni.Struct
         public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax args)
         {
             if(args == null)
-                return ApplyResult(callContext, category, ObjectResult(category), _emptyList);
+                return ApplyResult(callContext, category, NaturalResult(category), _emptyList);
             NotImplementedMethod(callContext, category, args);
             return null;
         }
@@ -101,6 +109,8 @@ namespace Reni.Struct
         public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                            ICompileSyntax args)
         {
+            if (args == null)
+                return ApplyResult(callContext, category, ObjectResult(callContext, category, @object), _emptyList);
             NotImplementedMethod(callContext, category, @object, args);
             return null;
         }
