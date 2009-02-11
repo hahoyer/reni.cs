@@ -3,7 +3,6 @@ using System;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -29,7 +28,7 @@ namespace Reni.Struct
         }
 
         [DumpData(false)]
-        internal Ref NaturalRefType { get { return _structContext.NaturalRefType; } }
+        private Ref NaturalRefType { get { return _structContext.NaturalRefType; } }
 
         Result IContextFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax args)
         {
@@ -41,14 +40,18 @@ namespace Reni.Struct
         {
             var trace = ObjectId == 1541 && callContext.ObjectId == 5 && (category.HasCode);
             StartMethodDumpWithBreak(trace, callContext, category, @object, args);
-            Result objectResult = ObjectResult(callContext, category, @object);
             var accessResult = NaturalRefType.AccessResult(category | Category.Type, _index)
                 .UseWithArg(objectResult);
-            if(args == null)
-                return ReturnMethodDumpWithBreak(trace, accessResult);
-            Dump(trace, "accessResult", accessResult);
-            var result = accessResult.Type.ApplyFunction(category, callContext, args);
-            return ReturnMethodDumpWithBreak(trace, result);
+            var rawResult = accessResult;
+            if (args != null)
+            {
+                Dump(trace, "accessResult", accessResult);
+                rawResult = accessResult.Type.ApplyFunction(category, callContext, args);
+            }
+
+            var objectResult = ObjectResult(callContext, category, @object);
+            var result = rawResult.ReplaceRelativeContextRef()
+            return ReturnMethodDumpWithBreak(trace, rawResult);
         }
 
         private Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
