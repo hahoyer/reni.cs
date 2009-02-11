@@ -23,6 +23,11 @@ namespace Reni.Code.ReplaceVisitor
         }
     }
 
+    /// <summary>
+    /// Replaces appearences of context in code tree. 
+    /// Assumes, that replacement requires offset alignment when walking along code tree
+    /// </summary>
+    /// <typeparam name="Context"></typeparam>
     internal sealed class ReplaceRelativeContextRef<Context>: ReplaceContextRef<Context>
         where Context : IRefInCode
     {
@@ -37,7 +42,12 @@ namespace Reni.Code.ReplaceVisitor
         }
     }
 
-    internal sealed class ReplaceAbsoluteContextRef<Context>: ReplaceContextRef<Context>
+    /// <summary>
+    /// Replaces appearences of context in code tree. 
+    /// Assumes, that replacement isn't a reference, that changes when walking along the code tree
+    /// </summary>
+    /// <typeparam name="Context"></typeparam>
+    internal sealed class ReplaceAbsoluteContextRef<Context> : ReplaceContextRef<Context>
         where Context : IRefInCode
     {
         public ReplaceAbsoluteContextRef(Context context, CodeBase replacement)

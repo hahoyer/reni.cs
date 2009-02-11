@@ -25,8 +25,10 @@ namespace Reni.Struct
 
         private List<ICompileSyntax> StatementList { get { return Context.StatementList; } }
 
-        internal override Result AccessResultFromRef(Category category, int position,
-            RefAlignParam refAlignParam) { return Context.AccessResultFromRef(category, position, refAlignParam); }
+        internal override Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
+        {
+            return Context.AccessResultFromRef(category, position, refAlignParam);
+        }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {

@@ -412,6 +412,13 @@ namespace Reni
             return ReturnMethodDump(trace, result);
         }
 
+        /// <summary>
+        /// Replaces the absolute context ref.
+        /// </summary>
+        /// <typeparam name="C"></typeparam>
+        /// <param name="context">The context.</param>
+        /// <param name="replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
+        /// <returns></returns>
         internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : IRefInCode
         {
             if(HasRefs && !Refs.Contains(context))
@@ -426,6 +433,13 @@ namespace Reni
             return result;
         }
 
+        /// <summary>
+        /// Replaces the relative context ref.
+        /// </summary>
+        /// <typeparam name="C"></typeparam>
+        /// <param name="context">The context.</param>
+        /// <param name="replacement">The replacement. Should be a reference that varies when walking along code tree.</param>
+        /// <returns></returns>
         internal Result ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : IRefInCode
         {
             if(HasRefs && !Refs.Contains(context))

@@ -137,6 +137,14 @@ namespace Reni.Code
             return result ?? this;
         }
 
+        /// <summary>
+        /// Replaces appearences of context in code tree. 
+        /// Assumes, that replacement requires offset alignment when walking along code tree
+        /// </summary>
+        /// <typeparam name="C"></typeparam>
+        /// <param name="context">The context.</param>
+        /// <param name="replacement">The replacement.</param>
+        /// <returns></returns>
         public CodeBase ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : IRefInCode
         {
             var result = Visit(new ReplaceRelativeContextRef<C>(context, replacement));
@@ -145,6 +153,14 @@ namespace Reni.Code
             return this;
         }
 
+        /// <summary>
+        /// Replaces appearences of context in code tree. 
+        /// Assumes, that replacement isn't a reference, that changes when walking along the code tree
+        /// </summary>
+        /// <typeparam name="C"></typeparam>
+        /// <param name="context">The context.</param>
+        /// <param name="replacement">The replacement.</param>
+        /// <returns></returns>
         public CodeBase ReplaceAbsoluteContextRef<C>(C context, CodeBase replacement) where C : IRefInCode
         {
             var result = Visit(new ReplaceAbsoluteContextRef<C>(context, replacement));
