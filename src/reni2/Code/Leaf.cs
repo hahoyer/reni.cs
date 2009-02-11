@@ -24,7 +24,8 @@ namespace Reni.Code
             StopByObjectId(-526);
         }
 
-        protected override Size GetSize (){ return LeafElement.Size; } 
+        protected override Size SizeImplementation { get { return LeafElement.Size; } }
+
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
         internal override bool IsEmpty { get { return LeafElement.IsEmpty; } }
@@ -45,7 +46,7 @@ namespace Reni.Code
             return result;
         }
 
-        public override Result VirtVisit<Result>(Visitor<Result> actual)
+        public override Result VisitImplementation<Result>(Visitor<Result> actual)
         {
             return actual.Leaf(LeafElement);
         }

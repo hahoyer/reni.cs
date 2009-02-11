@@ -256,12 +256,12 @@ namespace Reni.Type
         {
             if(this == dest)
                 return ConvertToItself(category);
-            return ConvertToVirt(category, dest);
+            return ConvertToImplementation(category, dest);
         }
 
         internal virtual Result ConvertToItself(Category category) { return CreateArgResult(category); }
 
-        internal virtual Result ConvertToVirt(Category category, TypeBase dest)
+        internal virtual Result ConvertToImplementation(Category category, TypeBase dest)
         {
             NotImplementedMethod(category, dest);
             throw new NotImplementedException();
@@ -273,7 +273,7 @@ namespace Reni.Type
                 return IsConvertableToItself(conversionFeature);
             if(conversionFeature.IsUseConverter && HasConverterTo(dest))
                 return true;
-            return IsConvertableToVirt(dest, conversionFeature);
+            return IsConvertableToImplementation(dest, conversionFeature);
         }
 
         internal virtual bool HasConverterTo(TypeBase dest)
@@ -281,7 +281,7 @@ namespace Reni.Type
             return false;
         }
 
-        internal virtual bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal virtual bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             NotImplementedMethod(dest, conversionFeature);
             throw new NotImplementedException();

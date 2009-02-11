@@ -9,9 +9,9 @@ namespace Reni.Type
 
         protected override string TagTitle { get { return "enable_cut"; } }
 
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
-            return base.IsConvertableToVirt(dest, conversionFeature.EnableCut);
+            return base.IsConvertableToImplementation(dest, conversionFeature.EnableCut);
         }
     }
 }

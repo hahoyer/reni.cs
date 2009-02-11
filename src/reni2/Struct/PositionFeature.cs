@@ -39,7 +39,7 @@ namespace Reni.Struct
         protected Result ApplyResult(ContextBase callContext, Category category, Result objectResult,
                                      ICompileSyntax args)
         {
-            var trace = ObjectId == 303 && callContext.ObjectId == 10 && (category.HasRefs || category.HasRefs);
+            var trace = ObjectId == 1541 && callContext.ObjectId == 5 && (category.HasCode);
             StartMethodDumpWithBreak(trace, callContext, category, objectResult, args);
             var accessResult = NaturalRefType.AccessResult(category | Category.Type, _index).UseWithArg(objectResult);
             if(args == null)

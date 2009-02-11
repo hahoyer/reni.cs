@@ -49,12 +49,12 @@ namespace Reni.Type
             return Parent.ArrayCopier(category, count);
         }
 
-        internal override Result ConvertToVirt(Category category, TypeBase dest)
+        internal override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return Parent.ConvertTo(category, dest);
         }
 
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             return Parent.IsConvertableTo(dest, conversionFeature);
         }

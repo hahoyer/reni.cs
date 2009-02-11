@@ -29,7 +29,7 @@ namespace Reni.Type
             return CreateResult(category);
         }
 
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             return false;
         }

@@ -26,31 +26,35 @@ namespace Reni.Code
             ElseCode = elseCode;
         }
 
-        protected override Size GetSize()
-        {
-            return ThenCode.Size;
-        }
+        protected override Size SizeImplementation { get { return ThenCode.Size; } }
 
         internal int ThenElseObjectId { get { return _thenElseObjectId; } }
 
-        protected override Size GetMaxSize()
+        protected override Size MaxSizeImplementation
         {
-            var cSize = CondCode.MaxSize;
-            var tSize = ThenCode.MaxSize;
-            var eSize = ElseCode.MaxSize;
-            return cSize.Max(tSize).Max(eSize);
+            get
+            {
+                var cSize = CondCode.MaxSize;
+                var tSize = ThenCode.MaxSize;
+                var eSize = ElseCode.MaxSize;
+                return cSize.Max(tSize).Max(eSize);
+            }
         }
 
-        public override Result VirtVisit<Result>(Visitor<Result> actual)
+        public override Result VisitImplementation<Result>(Visitor<Result> actual)
         {
             return actual.ThenElseVisit(this);
         }
 
-        internal override Refs GetRefs()
+        internal override Refs RefsImplementation
         {
-            return CondCode.GetRefs().CreateSequence(ThenCode.GetRefs()).CreateSequence(ElseCode.GetRefs());
+            get
+            {
+                return
+                    CondCode.RefsImplementation.CreateSequence(ThenCode.RefsImplementation).CreateSequence(
+                        ElseCode.RefsImplementation);
+            }
         }
-
     }
 
     [Serializable]

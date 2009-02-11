@@ -50,7 +50,7 @@ namespace Reni.Type
             return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")";
         }
 
-        internal override Result ConvertToVirt(Category category, TypeBase dest)
+        internal override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             var destArray = dest as Array;
             if(destArray != null)
@@ -63,7 +63,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destArray = dest as Array;
             if(destArray != null)

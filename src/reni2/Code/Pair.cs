@@ -25,27 +25,23 @@ namespace Reni.Code
         [Node]
         internal CodeBase Right { get { return _right; } }
 
-        protected override Size GetSize()
-        {
-            return Left.Size + Right.Size;
-        }
+        protected override Size SizeImplementation { get { return Left.Size + Right.Size; } }
 
-        internal override Refs GetRefs()
-        {
-            return _left.GetRefs().CreateSequence(_right.GetRefs());
-        }
+        internal override Refs RefsImplementation { get { return _left.RefsImplementation.CreateSequence(_right.RefsImplementation); } }
 
-        public override T VirtVisit<T>(Visitor<T> actual)
+        public override T VisitImplementation<T>(Visitor<T> actual)
         {
             return actual.PairVisit(this);
         }
 
-
-        protected override Size GetMaxSize()
+        protected override Size MaxSizeImplementation
         {
-            var lSize = Left.MaxSize;
-            var rSize = Left.Size + Right.MaxSize;
-            return lSize.Max(rSize);
+            get
+            {
+                var lSize = Left.MaxSize;
+                var rSize = Left.Size + Right.MaxSize;
+                return lSize.Max(rSize);
+            }
         }
     }
 }

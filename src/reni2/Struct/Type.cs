@@ -40,14 +40,14 @@ namespace Reni.Struct
             return Result.ConcatPrintResult(category, result);
         }
 
-        internal override Result ConvertToVirt(Category category, TypeBase dest) { 
+        internal override Result ConvertToImplementation(Category category, TypeBase dest) { 
             Tracer.Assert(dest.IsVoid);
             Tracer.Assert(Size.IsZero);
             return dest.CreateResult(category, 
                 () => CodeBase.CreateArg(Size.Zero), () => Context.ConstructorRefs());
         }
 
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             if (dest.IsVoid)
                 return Size.IsZero;

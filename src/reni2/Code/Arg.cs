@@ -15,8 +15,8 @@ namespace Reni.Code
             StopByObjectId(-579);
         }
 
-        protected override Size GetSize() { return _size; }
+        protected override Size SizeImplementation { get { return _size; } }
 
-        public override Result VirtVisit<Result>(Visitor<Result> actual) { return actual.Arg(this); }
+        public override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.Arg(this); }
     }
 }

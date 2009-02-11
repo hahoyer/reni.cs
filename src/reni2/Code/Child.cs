@@ -26,20 +26,11 @@ namespace Reni.Code
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
 
-        protected override Size GetSize()
-        {
-            return LeafElement.Size;
-        }
+        protected override Size SizeImplementation { get { return LeafElement.Size; } }
 
-        protected override Size GetMaxSize()
-        {
-            return Parent.MaxSize.Max(LeafElement.Size);
-        }
+        protected override Size MaxSizeImplementation { get { return Parent.MaxSize.Max(LeafElement.Size); } }
 
-        internal override Refs GetRefs()
-        {
-            return _parent.GetRefs();
-        }
+        internal override Refs RefsImplementation { get { return _parent.RefsImplementation; } }
 
         internal override RefAlignParam RefAlignParam
         {
@@ -61,7 +52,7 @@ namespace Reni.Code
             return base.CreateChild(leafElement);
         }
 
-        public override T VirtVisit<T>(Visitor<T> actual)
+        public override T VisitImplementation<T>(Visitor<T> actual)
         {
             return actual.ChildVisit(this);
         }

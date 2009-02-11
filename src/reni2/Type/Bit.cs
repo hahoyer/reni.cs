@@ -27,7 +27,7 @@ namespace Reni.Type
             return CreateArgResult(category).DumpPrintBitSequence();
         }
 
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             if(conversionFeature.IsUseConverter)
                 return dest.HasConverterFromBit();

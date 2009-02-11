@@ -12,16 +12,16 @@ namespace Reni.Code
     internal abstract class CodeBase : ReniObject, IIconKeyProvider, Sequence<CodeBase>.ICombiner<CodeBase>
     {
         [Node]
-        internal Size Size { get { return GetSize(); } }
+        internal Size Size { get { return SizeImplementation; } }
 
         [Node, DumpData(false)]
-        internal Size MaxSize { get { return GetMaxSize(); } }
+        internal Size MaxSize { get { return MaxSizeImplementation; } }
 
         [Node, DumpData(false), SmartNode]
         internal List<IRefInCode> RefsData { get { return Refs.Data; } }
 
         [DumpData(false)]
-        internal Refs Refs { get { return GetRefs(); } }
+        internal Refs Refs { get { return RefsImplementation; } }
 
         [DumpData(false)]
         internal virtual bool IsEmpty { get { return false; } }
@@ -35,15 +35,18 @@ namespace Reni.Code
         [Node, DumpData(false)]
         internal List<LeafElement> Serial { get { return Serialize(true).Data; } }
 
-        protected virtual Size GetMaxSize() { return Size; }
+        protected virtual Size MaxSizeImplementation { get { return Size; } }
 
-        protected virtual Size GetSize()
+        protected virtual Size SizeImplementation
         {
-            NotImplementedMethod();
-            return null;
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
-        internal virtual Refs GetRefs() { return Refs.None(); }
+        internal virtual Refs RefsImplementation { get { return Refs.None(); } }
 
         internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, Size leftSize) { return CreateChild(new BitArrayOp(name, size, leftSize, Size - leftSize)); }
 
@@ -150,9 +153,9 @@ namespace Reni.Code
             return this;
         }
 
-        public Result Visit<Result>(Visitor<Result> actual) { return VirtVisit(actual); }
+        public Result Visit<Result>(Visitor<Result> actual) { return VisitImplementation(actual); }
 
-        public virtual Result VirtVisit<Result>(Visitor<Result> actual)
+        public virtual Result VisitImplementation<Result>(Visitor<Result> actual)
         {
             NotImplementedMethod(actual);
             throw new NotImplementedException();
@@ -326,7 +329,7 @@ namespace Reni.Code
 
         public InternalRefCode(RefAlignParam refAlignParam) { _refAlignParam = refAlignParam; }
 
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
     }
 
     internal interface IRefInCode

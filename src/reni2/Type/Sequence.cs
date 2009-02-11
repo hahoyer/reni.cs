@@ -46,7 +46,7 @@ namespace Reni.Type
             return "(" + Element.DumpShort() + ")sequence(" + Count + ")";
         }
 
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destSequence = dest as Sequence;
             if(destSequence != null)
@@ -60,7 +60,7 @@ namespace Reni.Type
             if(destAligner != null)
                 return IsConvertableTo(destAligner.Parent, conversionFeature);
 
-            return base.IsConvertableToVirt(dest, conversionFeature);
+            return base.IsConvertableToImplementation(dest, conversionFeature);
         }
 
         internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
@@ -91,7 +91,7 @@ namespace Reni.Type
             return resultFromSequence.SearchResultDescriptor.Convert(resultFromSequence.Feature, this);
         }
 
-        internal override Result ConvertToVirt(Category category, TypeBase dest)
+        internal override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             var result = ConvertTo(category, dest as Sequence);
             if(result != null)

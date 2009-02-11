@@ -100,7 +100,7 @@ namespace Reni.Type
             return ShortName + "." + Parent.DumpShort();
         }
 
-        internal override sealed Result ConvertToVirt(Category category, TypeBase dest)
+        internal override sealed Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return Target
                 .ConvertTo(category, dest)
@@ -117,7 +117,7 @@ namespace Reni.Type
             return Target.TypeOperator(category);
         }
 
-        internal override sealed bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature)
+        internal override sealed bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             return Target.IsConvertableTo(dest, conversionFeature);
         }

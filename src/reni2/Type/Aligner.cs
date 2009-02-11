@@ -35,7 +35,7 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam) { return Parent.DumpPrintFromRef(category, refAlignParam); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
-        internal override bool IsConvertableToVirt(TypeBase dest, ConversionFeature conversionFeature) { return Parent.IsConvertableTo(dest, conversionFeature); }
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature) { return Parent.IsConvertableTo(dest, conversionFeature); }
 
         internal override SearchResult<IFeature> Search(Defineable defineable) { return Parent.Search(defineable); }
         internal override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable) { return Parent.SearchPrefix(defineable); }
@@ -44,7 +44,7 @@ namespace Reni.Type
         internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable) { return Parent.SearchPrefixFromSequence(defineable); }
         internal override SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable) { return Parent.SearchFromRefToSequence(defineable); }
 
-        internal override Result ConvertToVirt(Category category, TypeBase dest)
+        internal override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return Parent
                 .ConvertTo(category, dest)
