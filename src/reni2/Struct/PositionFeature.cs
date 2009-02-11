@@ -31,17 +31,19 @@ namespace Reni.Struct
         [DumpData(false)]
         internal Ref NaturalRefType { get { return _structContext.NaturalRefType; } }
 
-        public abstract Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax args);
+        Result IContextFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax args)
+        {
+            return ApplyResult(callContext, category, null, args);
+        }
 
-        public abstract Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                           ICompileSyntax args);
-
-        protected Result ApplyResult(ContextBase callContext, Category category, Result objectResult,
+        public virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                      ICompileSyntax args)
         {
             var trace = ObjectId == 1541 && callContext.ObjectId == 5 && (category.HasCode);
-            StartMethodDumpWithBreak(trace, callContext, category, objectResult, args);
-            var accessResult = NaturalRefType.AccessResult(category | Category.Type, _index).UseWithArg(objectResult);
+            StartMethodDumpWithBreak(trace, callContext, category, @object, args);
+            Result objectResult = ObjectResult(callContext, category, @object);
+            var accessResult = NaturalRefType.AccessResult(category | Category.Type, _index)
+                .UseWithArg(objectResult);
             if(args == null)
                 return ReturnMethodDumpWithBreak(trace, accessResult);
             Dump(trace, "accessResult", accessResult);
@@ -49,13 +51,10 @@ namespace Reni.Struct
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
-        protected Result NaturalResult(Category category)
+        private Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
         {
-            return NaturalRefType.CreateContextResult(_structContext.ForCode, category | Category.Type);
-        }
-
-        protected Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
-        {
+            if(@object == null)
+                return NaturalRefType.CreateContextResult(_structContext.ForCode, category | Category.Type);
             return callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(NaturalRefType);
         }
 
@@ -71,14 +70,6 @@ namespace Reni.Struct
         {
             _property = new PropertyPositionFeature(emptyList, structContext, index);
         }
-
-        public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                           ICompileSyntax args)
-        {
-            return ApplyResult(callContext, category, ObjectResult(callContext, category, @object), args);
-        }
-
-        public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax args) { return ApplyResult(callContext, category, NaturalResult(category), args); }
 
         public PositionFeatureBase ToProperty(bool isPoperty)
         {
@@ -98,19 +89,12 @@ namespace Reni.Struct
             _emptyList = emptyList;
         }
 
-        public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax args)
-        {
-            if(args == null)
-                return ApplyResult(callContext, category, NaturalResult(category), _emptyList);
-            NotImplementedMethod(callContext, category, args);
-            return null;
-        }
-
         public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                            ICompileSyntax args)
         {
+            var result = base.ApplyResult(callContext, category, @object, _emptyList);
             if (args == null)
-                return ApplyResult(callContext, category, ObjectResult(callContext, category, @object), _emptyList);
+                return result;
             NotImplementedMethod(callContext, category, @object, args);
             return null;
         }
