@@ -27,9 +27,6 @@ namespace Reni.Struct
             return this;
         }
 
-        [DumpData(false)]
-        private Ref NaturalRefType { get { return _structContext.NaturalRefType; } }
-
         Result IContextFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax args)
         {
             return ApplyResult(callContext, category, null, args);
@@ -40,7 +37,7 @@ namespace Reni.Struct
         {
             var trace = ObjectId == 1541 && callContext.ObjectId == 5 && (category.HasCode);
             StartMethodDumpWithBreak(trace, callContext, category, @object, args);
-            var accessResult = NaturalRefType.AccessResult(category | Category.Type, _index)
+            var accessResult = _structContext.NaturalRefType.AccessResult(category | Category.Type, _index)
                 .UseWithArg(objectResult);
             var rawResult = accessResult;
             if (args != null)
@@ -49,16 +46,16 @@ namespace Reni.Struct
                 rawResult = accessResult.Type.ApplyFunction(category, callContext, args);
             }
 
-            var objectResult = ObjectResult(callContext, category, @object);
+            var objectResult = ObjectResult(_structContext, callContext, category, @object);
             var result = rawResult.ReplaceRelativeContextRef()
             return ReturnMethodDumpWithBreak(trace, rawResult);
         }
 
-        private Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
+        private static Result ObjectResult(IStructContext context, ContextBase callContext, Category category, ICompileSyntax @object)
         {
             if(@object == null)
-                return NaturalRefType.CreateContextResult(_structContext.ForCode, category | Category.Type);
-            return callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(NaturalRefType);
+                return context.NaturalRefType.CreateContextResult(context.ForCode, category | Category.Type);
+            return callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(context.NaturalRefType);
         }
 
     }

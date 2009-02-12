@@ -345,12 +345,6 @@ namespace Reni.Type
         internal virtual SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable) { return defineable.SearchPrefixFromSequenceElement().SubTrial(this); }
         internal virtual SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable) { return SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>>.Failure(this, defineable); }
 
-        internal Result ConvertToSequence(ContextBase callContext, Category category, ICompileSyntax args)
-        {
-            var result = callContext.Result(category | Category.Type, args);
-            return result.ConvertTo(CreateSequence(result.Type.SequenceCount));
-        }
-
         internal Result SequenceOperationResult(Category category, Defineable definable, Size objSize, Size argsSize)
         {
             var type = SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt());
@@ -377,12 +371,6 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual Result AssignmentFeatureResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-        
         internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode)
         {
             if(Size.IsZero)
