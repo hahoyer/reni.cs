@@ -217,7 +217,7 @@ namespace Reni.Parser.TokenClass
     [Serializable]
     internal abstract class Infix : Special
     {
-        internal abstract Result Result(ContextBase context, Category category, ICompileSyntax left, Token token, ICompileSyntax right);
+        internal abstract Result Result(ContextBase callContext, Category category, ICompileSyntax left, Token token, ICompileSyntax right);
 
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
