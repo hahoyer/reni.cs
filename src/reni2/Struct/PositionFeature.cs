@@ -35,20 +35,21 @@ namespace Reni.Struct
         public virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                      ICompileSyntax args)
         {
-            var trace = ObjectId == 1541 && callContext.ObjectId == 5 && (category.HasCode);
+            var trace = ObjectId == -1541 && callContext.ObjectId == 5 && (category.HasCode);
             StartMethodDumpWithBreak(trace, callContext, category, @object, args);
-            var accessResult = _structContext.NaturalRefType.AccessResult(category | Category.Type, _index)
-                .UseWithArg(objectResult);
-            var rawResult = accessResult;
+            var rawResult = _structContext.NaturalRefType.AccessResult(category | Category.Type, _index);
             if (args != null)
             {
-                Dump(trace, "accessResult", accessResult);
-                rawResult = accessResult.Type.ApplyFunction(category, callContext, args);
+                Dump(trace, "accessResult", _structContext.NaturalRefType.AccessResult(category | Category.Type, _index));
+                rawResult = _structContext.NaturalRefType.AccessResult(category | Category.Type, _index).Type.ApplyFunction(category, callContext, args);
             }
 
+            var replacedResult = rawResult.ReplaceRelativeContextRef(_structContext.ForCode, CodeBase.CreateArg(_structContext.ForCode.RefSize));
+            if(trace)DumpDataWithBreak("","replacedResult",replacedResult);
             var objectResult = ObjectResult(_structContext, callContext, category, @object);
-            var result = rawResult.ReplaceRelativeContextRef()
-            return ReturnMethodDumpWithBreak(trace, rawResult);
+            var replacedArgResult = replacedResult.UseWithArg(objectResult);
+            if (trace) DumpDataWithBreak("", "replacedArgResult", replacedArgResult);
+            return ReturnMethodDumpWithBreak(trace, replacedArgResult);
         }
 
         private static Result ObjectResult(IStructContext context, ContextBase callContext, Category category, ICompileSyntax @object)
@@ -58,6 +59,11 @@ namespace Reni.Struct
             return callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(context.NaturalRefType);
         }
 
+        internal static Result AccessResult(ContextBase callContext, Category category, ICompileSyntax left, int position) 
+        {
+            var objectResult = callContext.ResultAsRef(category | Category.Type, left);
+            return objectResult.Type.AccessResult(category, position).UseWithArg(objectResult);
+        }
     }
 
     [Serializable]

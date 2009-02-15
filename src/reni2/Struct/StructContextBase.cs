@@ -32,6 +32,7 @@ namespace Reni.Struct
 
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
+
         [DumpData(false)]
         internal override Root RootContext { get { return Parent.RootContext; } }
         [DumpData(false)]
@@ -86,7 +87,7 @@ namespace Reni.Struct
             for(var i = position + 1; i < currentPosition; i++)
                 offset += InternalSize(i);
 
-            return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
+            return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
         }
 
         private Size InternalSize(int position)

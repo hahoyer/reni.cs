@@ -295,7 +295,7 @@ namespace Reni.Code
             return result + internalRef.Code.Size;
         }
 
-        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size) { return new Arg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1)); }
+        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size) { return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1)); }
 
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
