@@ -23,7 +23,9 @@ namespace Reni.Code
         [DumpData(false)]
         internal LeafElement ToLeafElement { get { return _leafElement; } }
 
+        [DumpData(false)]
         protected override Size SizeImplementation { get { return _leafElement.Size; } }
+        [DumpData(false)]
         internal override Refs RefsImplementation { get { return _leafElement.GetRefs(); } }
         public override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.ContextRef(this); }
     }

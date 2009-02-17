@@ -26,10 +26,11 @@ namespace Reni.Code
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
 
+        [DumpData(false)]
         protected override Size SizeImplementation { get { return LeafElement.Size; } }
-
+        [DumpData(false)]
         protected override Size MaxSizeImplementation { get { return Parent.MaxSize.Max(LeafElement.Size); } }
-
+        [DumpData(false)]
         internal override Refs RefsImplementation { get { return _parent.RefsImplementation; } }
 
         internal override RefAlignParam RefAlignParam

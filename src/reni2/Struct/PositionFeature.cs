@@ -35,23 +35,38 @@ namespace Reni.Struct
         public virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                      ICompileSyntax args)
         {
-            var trace = ObjectId == -1541 && callContext.ObjectId == 5 && (category.HasCode);
-            StartMethodDumpWithBreak(trace, callContext, category, @object, args);
             var rawResult = _structContext.NaturalRefType.AccessResult(category | Category.Type, _index);
             if (args != null)
+                rawResult =
+                    _structContext.NaturalRefType.AccessResult(category | Category.Type, _index).Type.ApplyFunction(
+                        category, callContext, args);
+
+            return PostProcessApplyResult(callContext, category, @object, rawResult);
+        }
+
+        private Result PostProcessApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
+                                              Result rawResult)
+        {
+            if (!category.HasCode)
             {
-                Dump(trace, "accessResult", _structContext.NaturalRefType.AccessResult(category | Category.Type, _index));
-                rawResult = _structContext.NaturalRefType.AccessResult(category | Category.Type, _index).Type.ApplyFunction(category, callContext, args);
+                Tracer.Assert(rawResult.Refs == null || rawResult.Refs.Count == 0);
+                return rawResult;
             }
 
             var naturalTypeSize = _structContext.NaturalRefType.UnrefSize;
-            var arg = CodeBase.CreateArg(_structContext.ForCode.RefSize).CreateRefPlus(_structContext.ForCode.RefAlignParam, naturalTypeSize);
+            var arg =
+                CodeBase.CreateArg(_structContext.ForCode.RefSize).CreateRefPlus(_structContext.ForCode.RefAlignParam,
+                                                                                 naturalTypeSize);
             var replacedResult = rawResult.ReplaceRelativeContextRef(_structContext.ForCode, arg);
-            if(trace)DumpDataWithBreak("","replacedResult",replacedResult);
             var objectResult = ObjectResult(_structContext, callContext, category, @object);
             var replacedArgResult = replacedResult.UseWithArg(objectResult);
-            if (trace) DumpDataWithBreak("", "replacedArgResult", replacedArgResult);
-            return ReturnMethodDumpWithBreak(trace, replacedArgResult);
+
+            bool trace = replacedResult.Code != rawResult.Code;
+            DumpWithBreak(trace, "rawResult=" + rawResult.Code);
+            DumpWithBreak(trace, "replacedResult=" + replacedResult.Code);
+            DumpWithBreak(trace, "replacedArgResult=" + replacedArgResult.Code);
+
+            return replacedArgResult;
         }
 
         private static Result ObjectResult(IStructContext context, ContextBase callContext, Category category, ICompileSyntax @object)

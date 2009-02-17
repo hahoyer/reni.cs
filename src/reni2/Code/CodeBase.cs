@@ -9,7 +9,8 @@ using Reni.Parser.TokenClass;
 namespace Reni.Code
 {
     [Serializable]
-    internal abstract class CodeBase : ReniObject, IIconKeyProvider, Sequence<CodeBase>.ICombiner<CodeBase>
+    internal abstract class 
+        CodeBase : ReniObject, IIconKeyProvider, Sequence<CodeBase>.ICombiner<CodeBase>
     {
         [Node]
         internal Size Size { get { return SizeImplementation; } }
@@ -35,8 +36,10 @@ namespace Reni.Code
         [Node, DumpData(false)]
         internal List<LeafElement> Serial { get { return Serialize(true).Data; } }
 
+        [DumpData(false)]
         protected virtual Size MaxSizeImplementation { get { return Size; } }
 
+        [DumpData(false)]
         protected virtual Size SizeImplementation
         {
             get
@@ -46,6 +49,7 @@ namespace Reni.Code
             }
         }
 
+        [DumpData(false)]
         internal virtual Refs RefsImplementation { get { return Refs.None(); } }
 
         internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, Size leftSize) { return CreateChild(new BitArrayOp(name, size, leftSize, Size - leftSize)); }
