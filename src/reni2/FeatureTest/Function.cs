@@ -130,7 +130,7 @@ f1()dump_print;
             Tracer.Assert(x.FunctionCount() == 2);
         }
 
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 }

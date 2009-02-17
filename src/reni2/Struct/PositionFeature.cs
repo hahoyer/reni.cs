@@ -44,7 +44,9 @@ namespace Reni.Struct
                 rawResult = _structContext.NaturalRefType.AccessResult(category | Category.Type, _index).Type.ApplyFunction(category, callContext, args);
             }
 
-            var replacedResult = rawResult.ReplaceRelativeContextRef(_structContext.ForCode, CodeBase.CreateArg(_structContext.ForCode.RefSize));
+            var naturalTypeSize = _structContext.NaturalRefType.UnrefSize;
+            var arg = CodeBase.CreateArg(_structContext.ForCode.RefSize).CreateRefPlus(_structContext.ForCode.RefAlignParam, naturalTypeSize);
+            var replacedResult = rawResult.ReplaceRelativeContextRef(_structContext.ForCode, arg);
             if(trace)DumpDataWithBreak("","replacedResult",replacedResult);
             var objectResult = ObjectResult(_structContext, callContext, category, @object);
             var replacedArgResult = replacedResult.UseWithArg(objectResult);
