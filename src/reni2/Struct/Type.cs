@@ -25,9 +25,14 @@ namespace Reni.Struct
 
         private List<ICompileSyntax> StatementList { get { return Context.StatementList; } }
 
-        internal override Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
+        internal override Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
-            return Context.AccessResultFromRef(category, position, refAlignParam);
+            return Context.AccessResultAsArgFromRef(category, position, refAlignParam);
+        }
+
+        internal override Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam)
+        {
+            return Context.AccessResultAsContextRefFromRef(category, position, refAlignParam);
         }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
@@ -36,7 +41,7 @@ namespace Reni.Struct
             var result = new List<Result>();
             for(var i = 0; i < StatementList.Count; i++)
             {
-                var accessResult = AccessResultFromRef(category | Category.Type, i, refAlignParam);
+                var accessResult = AccessResultAsArgFromRef(category | Category.Type, i, refAlignParam);
                 result.Add(accessResult.Type.DumpPrint(category).UseWithArg(accessResult));
             }
             return Result.ConcatPrintResult(category, result);

@@ -122,9 +122,14 @@ namespace Reni.Type
             return Target.IsConvertableTo(dest, conversionFeature);
         }
 
-        internal override Result AccessResult(Category category, int position)
+        internal override Result AccessResultAsArg(Category category, int position)
         {
-            return Target.AccessResultFromRef(category, position,RefAlignParam);
+            return Target.AccessResultAsArgFromRef(category, position,RefAlignParam);
+        }
+
+        internal override Result AccessResultAsContextRef(Category category, int position)
+        {
+            return Target.AccessResultAsContextRefFromRef(category, position, RefAlignParam);
         }
 
         internal override bool IsRefLike(Ref target) { return Target == target.Target && RefAlignParam == target.RefAlignParam; }

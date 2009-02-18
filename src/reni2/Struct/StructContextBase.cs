@@ -42,7 +42,7 @@ namespace Reni.Struct
         [DumpData(false)]
         internal PositionFeature[] Features { get { return _featuresCache.Find(CreateFeaturesCache); } }
         [DumpData(false)]
-        internal abstract int Position { get; }
+        protected abstract int Position { get; }
         [DumpData(false)]
         internal abstract FullContext Context { get; }
         [DumpData(false)]
@@ -71,17 +71,18 @@ namespace Reni.Struct
 
         internal override IStructContext FindStruct() { return this; }
 
-        internal Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
+        internal Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
             return Type(StatementList[position])
                 .PostProcessor
                 .AccessResultForStruct(category, refAlignParam,
-                    () => AccessCode(position, refAlignParam));
+                    () => AccessAsArgCode(position, refAlignParam),
+                    () => Refs.None());
         }
 
-        private CodeBase AccessCode(int position, RefAlignParam refAlignParam) { return AccessCode(position, Position, refAlignParam); }
+        private CodeBase AccessAsArgCode(int position, RefAlignParam refAlignParam) { return AccessAsArgCode(position, Position, refAlignParam); }
 
-        private CodeBase AccessCode(int position, int currentPosition, RefAlignParam refAlignParam)
+        private CodeBase AccessAsArgCode(int position, int currentPosition, RefAlignParam refAlignParam)
         {
             var offset = Reni.Size.Zero;
             for(var i = position + 1; i < currentPosition; i++)
@@ -90,7 +91,7 @@ namespace Reni.Struct
             return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
         }
 
-        private Size InternalSize(int position)
+        protected Size InternalSize(int position)
         {
             return InternalResult(Category.Size, position).Size;
         }

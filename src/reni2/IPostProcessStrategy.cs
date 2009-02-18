@@ -44,11 +44,11 @@ namespace Reni
 
         internal PostProcessorForType(TypeBase typeBase) { _typeBase = typeBase; }
 
-        internal Result AccessResultForStruct(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode)
+        internal Result AccessResultForStruct(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
             return _typeBase
                 .AutomaticDereference()
-                .CreateAssignableRefResult(category, refAlignParam, getCode);
+                .CreateAssignableRefResult(category, refAlignParam, getCode, getRefs);
         }
 
         [Obsolete]

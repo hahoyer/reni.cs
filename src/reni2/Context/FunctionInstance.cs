@@ -15,11 +15,15 @@ namespace Reni.Context
     internal sealed class FunctionInstance : ReniObject
     {
         [Node]
+        [DumpData(true)]
         private readonly TypeBase Args;
         [Node]
+        [DumpData(true)]
         private readonly ICompileSyntax Body;
         [Node]
+        [DumpData(true)]
         private readonly ContextBase Context;
+        [DumpData(true)]
         private readonly int Index;
         [Node]
         private CodeBase _bodyCodeCache;
@@ -113,12 +117,12 @@ namespace Reni.Context
                 return null;
 
             var functionContext = Context.CreateFunction(Args);
-            var trace = ObjectId == -10 && category.HasRefs;
+            var trace = ObjectId == 1 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category| Category.Type;
             var rawResult = functionContext.Result(categoryEx, Body).Clone();
 
-            DumpWithBreak(trace, category, "functionContext", functionContext, "result", rawResult);
+            DumpWithBreak(trace, "functionContext", functionContext, "result", rawResult);
 
             var postProcessedResult = rawResult.PostProcessor.FunctionResult(category, functionContext.RefAlignParam);
 

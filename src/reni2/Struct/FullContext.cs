@@ -26,7 +26,8 @@ namespace Reni.Struct
         public override IRefInCode ForCode { get { return this; } }
         [DumpData(false)]
         internal override FullContext Context { get { return this; } }
-        internal override int Position { get { return StatementList.Count; } }
+
+        protected override int Position { get { return StatementList.Count; } }
 
         [DumpData(false)]
         public override Ref NaturalRefType { get { return NaturalType.CreateAutomaticRef(RefAlignParam); } }
@@ -41,6 +42,24 @@ namespace Reni.Struct
                 .ReplaceRelativeContextRef(this, CodeBase.CreateTopRef(RefAlignParam));
             _constructorResult.Update(constructorResult);
             return constructorResult;
+        }
+
+        private CodeBase AccessAsContextRefCode(int position, RefAlignParam refAlignParam)
+        {
+            var offset = Reni.Size.Zero;
+            for (var i = 0; i <= position; i++)
+                offset -= InternalSize(i);
+
+            return CodeBase.CreateContextRef(this).CreateRefPlus(refAlignParam, offset);
+        }
+
+        internal Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam)
+        {
+            return Type(StatementList[position])
+                .PostProcessor
+                .AccessResultForStruct(category, refAlignParam,
+                    () => AccessAsContextRefCode(position, refAlignParam),
+                    () => Refs.Context(this));
         }
 
         internal override ContextAtPosition CreatePosition(int position)

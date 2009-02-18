@@ -35,10 +35,10 @@ namespace Reni.Struct
         public virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                      ICompileSyntax args)
         {
-            var rawResult = _structContext.NaturalRefType.AccessResult(category | Category.Type, _index);
+            var rawResult = _structContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, _index);
             if (args != null)
                 rawResult =
-                    _structContext.NaturalRefType.AccessResult(category | Category.Type, _index).Type.ApplyFunction(
+                    _structContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, _index).Type.ApplyFunction(
                         category, callContext, args);
 
             return PostProcessApplyResult(callContext, category, @object, rawResult);
@@ -47,26 +47,23 @@ namespace Reni.Struct
         private Result PostProcessApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                               Result rawResult)
         {
-            if (!category.HasCode)
-            {
-                Tracer.Assert(rawResult.Refs == null || rawResult.Refs.Count == 0);
+            if(!category.HasCode && !category.HasRefs)
                 return rawResult;
-            }
 
             var naturalTypeSize = _structContext.NaturalRefType.UnrefSize;
-            var arg =
-                CodeBase.CreateArg(_structContext.ForCode.RefSize).CreateRefPlus(_structContext.ForCode.RefAlignParam,
-                                                                                 naturalTypeSize);
-            var replacedResult = rawResult.ReplaceRelativeContextRef(_structContext.ForCode, arg);
             var objectResult = ObjectResult(_structContext, callContext, category, @object);
-            var replacedArgResult = replacedResult.UseWithArg(objectResult);
-
+            var arg = objectResult.Code.CreateRefPlus(_structContext.ForCode.RefAlignParam, naturalTypeSize);
+            var replacedResult = rawResult.ReplaceRelativeContextRef(_structContext.ForCode, arg);
+            if(objectResult.HasRefs && objectResult.Refs.Count > 0)
+            {
+                replacedResult = replacedResult.Clone();
+                replacedResult.Refs += objectResult.Refs;
+            }
             bool trace = replacedResult.Code != rawResult.Code;
             DumpWithBreak(trace, "rawResult=" + rawResult.Code);
             DumpWithBreak(trace, "replacedResult=" + replacedResult.Code);
-            DumpWithBreak(trace, "replacedArgResult=" + replacedArgResult.Code);
 
-            return replacedArgResult;
+            return replacedResult;
         }
 
         private static Result ObjectResult(IStructContext context, ContextBase callContext, Category category, ICompileSyntax @object)
@@ -79,7 +76,7 @@ namespace Reni.Struct
         internal static Result AccessResult(ContextBase callContext, Category category, ICompileSyntax left, int position) 
         {
             var objectResult = callContext.ResultAsRef(category | Category.Type, left);
-            return objectResult.Type.AccessResult(category, position).UseWithArg(objectResult);
+            return objectResult.Type.AccessResultAsArg(category, position).UseWithArg(objectResult);
         }
     }
 

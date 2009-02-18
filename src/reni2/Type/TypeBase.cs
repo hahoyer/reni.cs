@@ -359,24 +359,34 @@ namespace Reni.Type
                 .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize));
         }
 
-        internal virtual Result AccessResultFromRef(Category category, int position, RefAlignParam refAlignParam)
+        internal virtual Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category, position, refAlignParam);
             return null;
         }
 
-        internal virtual Result AccessResult(Category category, int position)
+        internal virtual Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(category, position, refAlignParam);
+            return null;
+        }
+        internal virtual Result AccessResultAsArg(Category category, int position)
         {
             NotImplementedMethod(category, position);
             return null;
         }
 
-        internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode)
+        internal virtual Result AccessResultAsContextRef(Category category, int position)
+        {
+            NotImplementedMethod(category, position);
+            return null;
+        }
+        internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
             if(Size.IsZero)
                 return CreateResult(category);
 
-            return CreateAssignableRef(refAlignParam).CreateResult(category, getCode);
+            return CreateAssignableRef(refAlignParam).CreateResult(category, getCode, getRefs);
         }
 
         /// <summary>
