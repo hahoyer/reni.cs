@@ -584,6 +584,7 @@ namespace Reni
         }
 
         internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs) 
+        : this()
         {
             if (category.HasSize) _size = getSize();
             if (category.HasType) _type = getType();

@@ -62,9 +62,9 @@ namespace Reni.Struct
                     () => (rawResult.Refs - _structContext.ForCode) + objectResult.Refs
                     );
 
-            bool trace = replacedResult.Code != rawResult.Code;
-            DumpWithBreak(trace, "rawResult=" + rawResult.Code);
-            DumpWithBreak(trace, "replacedResult=" + replacedResult.Code);
+            //bool trace = replacedResult.Code != rawResult.Code;
+            //DumpWithBreak(trace, "rawResult.Code", rawResult.Code);
+            //DumpWithBreak(trace, "replacedResult.Code", replacedResult.Code);
 
             return replacedResult;
         }
