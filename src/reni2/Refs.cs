@@ -127,6 +127,14 @@ namespace Reni
             return new Refs(r);
         }
 
+        public Refs Without(Refs other)
+        {
+            var result = this;
+            foreach(var refInCode in other._data)
+                result = result.Without(refInCode);
+            return result;
+        }
+
         public bool Contains(IRefInCode context)
         {
             return _data.Contains(context);
@@ -168,6 +176,14 @@ namespace Reni
         public static Refs operator +(Refs x, Refs y)
         {
             return x.CreateSequence(y);
+        }
+        public static Refs operator -(Refs x, Refs y)
+        {
+            return x.Without(y);
+        }
+        public static Refs operator -(Refs x, IRefInCode y)
+        {
+            return x.Without(y);
         }
     }
 }

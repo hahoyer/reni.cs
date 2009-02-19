@@ -582,6 +582,14 @@ namespace Reni
             result.Update(bResult);
             return result;
         }
+
+        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs) 
+        {
+            if (category.HasSize) _size = getSize();
+            if (category.HasType) _type = getType();
+            if (category.HasCode) _code = getCode();
+            if (category.HasRefs) _refs = getRefs();
+        }
     }
 
     internal sealed class Error

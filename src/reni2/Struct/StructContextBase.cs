@@ -5,7 +5,6 @@ using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
@@ -21,7 +20,7 @@ namespace Reni.Struct
         [Node]
         internal readonly Container Container;
         [Node, DumpData(false)]
-        internal readonly Result[] _internalResult;
+        private readonly Result[] _internalResult;
         
         protected StructContextBase(ContextBase parent, Container container)
         {
@@ -77,7 +76,7 @@ namespace Reni.Struct
                 .PostProcessor
                 .AccessResultForStruct(category, refAlignParam,
                     () => AccessAsArgCode(position, refAlignParam),
-                    () => Refs.None());
+                    Refs.None);
         }
 
         private CodeBase AccessAsArgCode(int position, RefAlignParam refAlignParam) { return AccessAsArgCode(position, Position, refAlignParam); }
@@ -100,7 +99,7 @@ namespace Reni.Struct
 
         private Result InternalResult(Category category, int position)
         {
-            Result result = CreatePosition(position)
+            var result = CreatePosition(position)
                 .Result(category | Category.Type, StatementList[position])
                 .PostProcessor
                 .InternalResultForStruct(category,RefAlignParam);
@@ -110,9 +109,9 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Result InternalResult(Category category) { return InternalResult(category, 0, Position); }
+        protected Result InternalResult(Category category) { return InternalResult(category, 0, Position); }
 
-        internal Result InternalResult(Category category, int fromPosition, int fromNotPosition)
+        private Result InternalResult(Category category, int fromPosition, int fromNotPosition)
         {
             var result = Reni.Type.Void.CreateResult(category);
             for (var i = fromPosition; i < fromNotPosition; i++)
@@ -137,5 +136,19 @@ namespace Reni.Struct
         }
 
         internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
+
+        Result IStructContext.ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
+        {
+            if(@object == null)
+                return NaturalRefType.CreateResult(
+                    category | Category.Type,
+                    () => CodeBase.CreateContextRef(ForCode),
+                    () => Refs.Context(ForCode));
+            return callContext
+                .ResultAsRef(category | Category.Type, @object)
+                .ConvertTo(NaturalRefType)
+                .CreateRefPlus(category, ForCode.RefAlignParam, NaturalRefType.UnrefSize);
+        }
+
     }
 }

@@ -38,7 +38,9 @@ namespace Reni.Struct
             var rawResult = _structContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, _index);
             if (args != null)
                 rawResult =
-                    _structContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, _index).Type.ApplyFunction(
+                    _structContext
+                    .NaturalRefType
+                    .AccessResultAsContextRef(category | Category.Type, _index).Type.ApplyFunction(
                         category, callContext, args);
 
             return PostProcessApplyResult(callContext, category, @object, rawResult);
@@ -50,27 +52,21 @@ namespace Reni.Struct
             if(!category.HasCode && !category.HasRefs)
                 return rawResult;
 
-            var naturalTypeSize = _structContext.NaturalRefType.UnrefSize;
-            var objectResult = ObjectResult(_structContext, callContext, category, @object);
-            var arg = objectResult.Code.CreateRefPlus(_structContext.ForCode.RefAlignParam, naturalTypeSize);
-            var replacedResult = rawResult.ReplaceRelativeContextRef(_structContext.ForCode, arg);
-            if(objectResult.HasRefs && objectResult.Refs.Count > 0)
-            {
-                replacedResult = replacedResult.Clone();
-                replacedResult.Refs += objectResult.Refs;
-            }
+            var objectResult = _structContext.ObjectResult(callContext, category, @object);
+            var replacedResult =
+                new Result(
+                    category,
+                    () => rawResult.Size,
+                    () => rawResult.Type,
+                    () => rawResult.Code.ReplaceRelativeContextRef(_structContext.ForCode, objectResult.Code),
+                    () => (rawResult.Refs - _structContext.ForCode) + objectResult.Refs
+                    );
+
             bool trace = replacedResult.Code != rawResult.Code;
             DumpWithBreak(trace, "rawResult=" + rawResult.Code);
             DumpWithBreak(trace, "replacedResult=" + replacedResult.Code);
 
             return replacedResult;
-        }
-
-        private static Result ObjectResult(IStructContext context, ContextBase callContext, Category category, ICompileSyntax @object)
-        {
-            if(@object == null)
-                return context.NaturalRefType.CreateContextResult(context.ForCode, category | Category.Type);
-            return callContext.ResultAsRef(category | Category.Type, @object).ConvertTo(context.NaturalRefType);
         }
 
         internal static Result AccessResult(ContextBase callContext, Category category, ICompileSyntax left, int position) 
@@ -124,5 +120,6 @@ namespace Reni.Struct
     {
         Ref NaturalRefType { get; }
         IRefInCode ForCode { get; }
-    }
+        Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object);
+   }
 }
