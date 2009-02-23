@@ -11,7 +11,7 @@ namespace Reni.Code
         internal Size DeltaSize { get { return GetInputSize() - GetSize(); } }
         [DumpData(false)]
         internal virtual bool IsEmpty { get { return false; } }
-        [Node]
+        [Node, DumpData(false)]
         internal Size Size { get { return GetSize(); } }
         private string CommentDump { get { return GetType().Name + " " + ObjectId; } }
         [DumpData(false)]

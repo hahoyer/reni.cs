@@ -14,6 +14,7 @@ namespace Reni.Code
         [Node]
         private readonly Size SignificantSize;
         [Node]
+        [DumpData(false)]
         internal readonly Size TargetSize;
 
         internal BitCast(Size size, Size targetSize, Size significantSize)

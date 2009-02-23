@@ -33,6 +33,7 @@ namespace Reni.Code
         [DumpData(false)]
         internal override Refs RefsImplementation { get { return _parent.RefsImplementation; } }
 
+        [DumpData(false)]
         internal override RefAlignParam RefAlignParam
         {
             get

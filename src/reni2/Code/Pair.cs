@@ -25,8 +25,10 @@ namespace Reni.Code
         [Node]
         internal CodeBase Right { get { return _right; } }
 
+        [DumpData(false)]
         protected override Size SizeImplementation { get { return Left.Size + Right.Size; } }
 
+        [DumpData(false)]
         internal override Refs RefsImplementation { get { return _left.RefsImplementation.CreateSequence(_right.RefsImplementation); } }
 
         public override T VisitImplementation<T>(Visitor<T> actual)
@@ -34,6 +36,7 @@ namespace Reni.Code
             return actual.PairVisit(this);
         }
 
+        [DumpData(false)]
         protected override Size MaxSizeImplementation
         {
             get

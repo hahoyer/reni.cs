@@ -24,11 +24,14 @@ namespace Reni.Code
             StopByObjectId(-526);
         }
 
+        [DumpData(false)]
         protected override Size SizeImplementation { get { return LeafElement.Size; } }
 
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
+        [DumpData(false)]
         internal override bool IsEmpty { get { return LeafElement.IsEmpty; } }
+        [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return LeafElement.RefAlignParam; } }
 
         internal override CodeBase CreateChild(LeafElement leafElement)

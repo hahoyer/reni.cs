@@ -20,6 +20,7 @@ namespace Reni.Code
             StopByObjectId(-399);
         }
 
+        [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         protected override Size GetSize()
@@ -44,6 +45,7 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
+            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopData(RefAlignParam, precedingElement.Offset, GetSize());
         }

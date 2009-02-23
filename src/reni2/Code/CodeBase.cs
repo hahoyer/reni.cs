@@ -9,10 +9,11 @@ using Reni.Parser.TokenClass;
 namespace Reni.Code
 {
     [Serializable]
-    internal abstract class 
+    internal abstract class
         CodeBase : ReniObject, IIconKeyProvider, Sequence<CodeBase>.ICombiner<CodeBase>
     {
         [Node]
+        [DumpData(false)]
         internal Size Size { get { return SizeImplementation; } }
 
         [Node, DumpData(false)]
@@ -27,7 +28,7 @@ namespace Reni.Code
         [DumpData(false)]
         internal virtual bool IsEmpty { get { return false; } }
 
-        [DumpExcept(false)]
+        [DumpData(false)]
         internal bool IsRelativeReference { get { return RefAlignParam != null; } }
 
         [DumpData(false)]
@@ -220,6 +221,7 @@ namespace Reni.Code
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
+        public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
         internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam) { return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam); }
 
@@ -231,12 +233,10 @@ namespace Reni.Code
 
             var result = this;
             if(!resultSize.IsZero)
-            {
                 result = result
                     .CreateChild(new StatementEnd(resultSize, intermediateSize))
                     .CreateSequence(
                     copier.UseWithArg(InternalRefSequenceVisitor.InternalRefCode(refAlignParam, resultSize)));
-            }
 
             return result.CreateChild(new Drop(Size, resultSize));
         }
@@ -247,7 +247,7 @@ namespace Reni.Code
         private readonly SimpleCache<CodeBase> _codeCache = new SimpleCache<CodeBase>();
 
         [Node, DumpData(true)]
-        private List<InternalRef> _data = new List<InternalRef>();
+        private readonly List<InternalRef> _data = new List<InternalRef>();
 
         [DumpData(false)]
         public CodeBase Code

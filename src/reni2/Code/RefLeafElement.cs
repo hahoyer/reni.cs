@@ -14,6 +14,7 @@ namespace Reni.Code
         private readonly RefAlignParam _refAlignParam;
 
         [Node]
+        [DumpData(false)]
         internal readonly Size Offset;
 
         protected RefLeafElement(RefAlignParam refAlignParam, Size offset)
@@ -24,7 +25,9 @@ namespace Reni.Code
 
         protected override sealed Size GetSize() { return _refAlignParam.RefSize; }
         protected override Size GetInputSize() { return Size.Zero; }
+        [DumpData(false)]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset; } }
+        [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
     }
 }

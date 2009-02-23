@@ -1,4 +1,5 @@
 using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
 namespace Reni.Code
@@ -22,6 +23,7 @@ namespace Reni.Code
             return _size;
         }
 
+        [DumpData(false)]
         internal override bool IsEmpty { get { return Data.IsEmpty; } }
 
         protected override Size GetInputSize()
