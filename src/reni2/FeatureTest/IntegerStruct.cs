@@ -20,7 +20,8 @@ Integer8: function
     create   : function(Integer8(arg));
     !property dump_print: function (_data dump_print);
     +        : function create(_data + create(arg) _data);
-    clone    : function create(_data);
+    !property clone: function create(_data);
+    !property enable_cut: function _data enable_cut;
     !converter: function _data
 }
 ";
@@ -36,17 +37,17 @@ Integer8: function
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
-    [TestFixture, Output("2"), InstanceCode("(Integer8(1)+Integer8(2))")]
+    [TestFixture, Output("3"), InstanceCode("(Integer8(1)+Integer8(2))")]
     public class Plus : IntegerStruct
     {
         [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun();}
     }
 
-    [TestFixture, Output("23"), InstanceCode("Integer8(0) clone(23)")]
+    [TestFixture, Output("23"), InstanceCode("Integer8(23) clone")]
     public class Clone : IntegerStruct
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
