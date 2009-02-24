@@ -58,7 +58,7 @@ namespace Reni.Struct
                     category,
                     () => rawResult.Size,
                     () => rawResult.Type,
-                    () => rawResult.Code.ReplaceRelativeContextRef(_structContext.ForCode, objectResult.Code),
+                    () => rawResult.Code.ReplaceAbsoluteContextRef(_structContext.ForCode, objectResult.Code),
                     () => (rawResult.Refs - _structContext.ForCode) + objectResult.Refs
                     );
 

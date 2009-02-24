@@ -7,7 +7,6 @@ namespace Reni.FeatureTest.Integer
     /// <summary>
     /// Structure, that is all between brackets
     /// </summary>
-    [TestFixture]
     public class IntegerStruct : CompilerTest
     {
         protected static string IntegerDefinition()
@@ -40,43 +39,43 @@ Integer8: function
     [TestFixture, Output("2"), InstanceCode("(Integer8(1)+Integer8(2))")]
     public class Plus : IntegerStruct
     {
-        [Test, Explicit, Category(UnderConstruction)]
-        public override void Run() { }
+        [Test, Category(UnderConstruction)]
+        public override void Run() { BaseRun();}
     }
 
     [TestFixture, Output("23"), InstanceCode("Integer8(0) clone(23)")]
     public class Clone : IntegerStruct
     {
-        [Test, Explicit, Category(UnderConstruction)]
-        public override void Run() { }
+        [Test, Category(UnderConstruction)]
+        public override void Run() { BaseRun(); }
     }
 
     [TestFixture, Output("23"), InstanceCode("Integer8(0) create(23)")]
     public class Create : IntegerStruct
     {
-        [Test, Explicit, Category(UnderConstruction)]
-        public override void Run() { }
+        [Test, Category(UnderConstruction)]
+        public override void Run() { BaseRun(); }
     }
 
     [TestFixture, Output("1"), InstanceCode("Integer8(1)")]
     public class DumpPrint1 : IntegerStruct
     {
-        [Test, Explicit, Category(UnderConstruction)]
-        public override void Run() { }
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
     }
 
     [TestFixture, Output("2"), InstanceCode("Integer8(2)")]
     public class DumpPrint2 : IntegerStruct
     {
-        [Test, Explicit, Category(UnderConstruction)]
-        public override void Run() { }
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
     }
 
     [TestFixture, Output("127"), InstanceCode("Integer8(127)")]
     public class DumpPrint127 : IntegerStruct
     {
-        [Test, Explicit, Category(UnderConstruction)]
-        public override void Run() { }
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
     }
 
     [AttributeUsage(AttributeTargets.Class)]

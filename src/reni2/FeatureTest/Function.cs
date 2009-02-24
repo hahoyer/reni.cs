@@ -72,7 +72,7 @@ namespace Reni.FeatureTest.Function
     [TestFixture, Target(@"f: function arg;g: function f(arg);x:4; g(x)dump_print"), Output("4"), UseThen, UseElse, SimpleFunction]
     public class FunctionWithRefArg : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 

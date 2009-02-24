@@ -23,7 +23,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             Right = right;
             StopByObjectId(-878);
-            StopByObjectId(881);
+            StopByObjectId(-881);
             StopByObjectId(-591);
             StopByObjectId(-428);
         }
@@ -47,7 +47,6 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
-            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopRef(RefAlignParam, precedingElement.Offset + Right);
         }
@@ -65,7 +64,6 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(RefPlus precedingElement)
         {
-            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
                 return new RefPlus(RefAlignParam, Right + precedingElement.Right);
             return base.TryToCombineBack(precedingElement);
