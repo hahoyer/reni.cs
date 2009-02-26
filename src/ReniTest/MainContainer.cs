@@ -17,12 +17,12 @@ namespace ReniTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TreeForm { Target = CreateCompiler(new FunctionWithRefArg().Target) });
+            Application.Run(new TreeForm { Target = CreateCompiler(new Plus().Target) });
         }
 
         private static Compiler CreateCompiler(string text)
         {
-            var fileName = "temptest.reni";
+            const string fileName = "temptest.reni";
             var f = File.m(fileName);
             f.String = text;
             return new Compiler(fileName);
