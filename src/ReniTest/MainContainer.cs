@@ -2,12 +2,12 @@ using System;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.IO;
 using Reni;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.Struct;
 using Reni.FeatureTest.BitArrayOp;
+using File=HWClassLibrary.IO.File;
 
 namespace ReniTest
 {
