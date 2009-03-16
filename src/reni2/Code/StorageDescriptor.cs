@@ -35,7 +35,7 @@ namespace Reni.Code
             if(_frameSize.IsZero && resultSize.IsZero)
                 return "";
             return CreateMoveBytesToFrame(resultSize, resultSize, Start)
-                   + "; // StorageDescriptor.CreateFunctionReturn";
+                   + "; // FunctionReturn";
         }
 
         internal string CreateFunctionBody(List<LeafElement> data, bool isFunction)

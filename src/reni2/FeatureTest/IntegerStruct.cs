@@ -54,7 +54,7 @@ Integer8: function
     [TestFixture, Output("23"), InstanceCode("Integer8(0) create(23)")]
     public class Create : IntegerStruct
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
