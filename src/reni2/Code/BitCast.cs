@@ -10,6 +10,7 @@ namespace Reni.Code
     [Serializable]
     internal sealed class BitCast : LeafElement
     {
+        private static int _nextId;
         private readonly Size _size;
         [Node]
         private readonly Size SignificantSize;
@@ -18,12 +19,13 @@ namespace Reni.Code
         internal readonly Size TargetSize;
 
         internal BitCast(Size size, Size targetSize, Size significantSize)
+            : base(_nextId++)
         {
             _size = size;
-            SignificantSize = significantSize;
+            SignificantSize = significantSize.Min(size);
             TargetSize = targetSize;
-            Tracer.Assert(targetSize != size || targetSize != significantSize);
-            StopByObjectId(614);
+            Tracer.Assert(TargetSize != Size || TargetSize != SignificantSize);
+            StopByObjectId(-17);
         }
 
         protected override Size GetSize() { return _size; }
@@ -106,14 +108,18 @@ namespace Reni.Code
         internal override LeafElement[] TryToCombineBackN(Dereference precedingElement)
         {
             if(precedingElement.Size == TargetSize && TargetSize != Size)
-                return new LeafElement[]
-                {
-                    new Dereference(precedingElement.RefAlignParam, Size),
-                    new BitCast(Size, Size, SignificantSize)
-                };
+            {
+                var dereference = new Dereference(precedingElement.RefAlignParam, Size);
+                if (Size == SignificantSize)
+                    return new LeafElement[] {dereference};
+                return new LeafElement[] { dereference, new BitCast(Size, Size, SignificantSize) };
+            }
             return null;
         }
 
-        protected override string Format(StorageDescriptor start) { return start.CreateBitCast(TargetSize, Size, SignificantSize); }
+        protected override string Format(StorageDescriptor start)
+        {
+            return start.CreateBitCast(TargetSize, Size, SignificantSize);
+        }
     }
 }

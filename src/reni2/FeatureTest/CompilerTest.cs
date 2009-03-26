@@ -18,7 +18,7 @@ namespace Reni.FeatureTest
         public const string UnderConstruction = "Under Construction";
         public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
         public const string Worked = "Worked";
-        public CompilerParameters Parameters;
+        public CompilerParameters Parameters;                    
         static private Dictionary<System.Type, CompilerTest> _cache;
         private bool _needToRunDependants = true;
 

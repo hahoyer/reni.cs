@@ -40,7 +40,7 @@ Integer8: function
     [TestFixture, Output("3"), InstanceCode("(Integer8(1)+Integer8(2))")]
     public class Plus : IntegerStruct
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun();}
     }
 

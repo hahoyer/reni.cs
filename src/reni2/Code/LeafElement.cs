@@ -7,6 +7,10 @@ namespace Reni.Code
 {
     internal abstract class LeafElement : ReniObject, IIconKeyProvider
     {
+        private static int _nextId;
+        protected LeafElement(int objectId) : base(objectId) { }
+        protected LeafElement(): base(_nextId++) {}
+
         [Node, DumpData(false)]
         internal Size DeltaSize { get { return GetInputSize() - GetSize(); } }
         [DumpData(false)]
