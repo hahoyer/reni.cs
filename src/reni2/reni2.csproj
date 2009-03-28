@@ -63,6 +63,7 @@
     <Compile Include="Context\Number.cs" />
     <Compile Include="Context\RefAlignParam.cs" />
     <Compile Include="Context\Root.cs" />
+    <Compile Include="FeatureTest\StringStruct.cs" />
     <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
     <Compile Include="Feature\IFeature.cs" />
     <Compile Include="Parser\DefineableToken.cs" />
