@@ -9,7 +9,7 @@ namespace Reni.FeatureTest.Integer
     /// </summary>
     public class IntegerStruct : CompilerTest
     {
-        protected static string IntegerDefinition()
+        protected static string Definition()
         {
             return
                 @"
@@ -22,7 +22,7 @@ Integer8: function
     +        : function create(_data + create(arg) _data);
     !property clone: function create(_data);
     !property enable_cut: function _data enable_cut;
-    !converter: function _data
+    !converter: function _data;
 }
 ";
         }
@@ -31,7 +31,7 @@ Integer8: function
 
         public override string Target
         {
-            get { return IntegerDefinition() + "; " + InstanceCode + " dump_print"; }
+            get { return Definition() + "; " + InstanceCode + " dump_print"; }
         }
 
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
@@ -77,13 +77,6 @@ Integer8: function
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
-    }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    internal sealed class InstanceCodeAttribute : StringAttribute
-    {
-        public InstanceCodeAttribute(string value)
-            : base(value) { }
     }
 
 }

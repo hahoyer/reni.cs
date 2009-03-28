@@ -164,4 +164,12 @@ namespace Reni.FeatureTest
         internal TargetAttribute(string value)
             : base(value) { }
     }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    internal sealed class InstanceCodeAttribute : StringAttribute
+    {
+        public InstanceCodeAttribute(string value)
+            : base(value) { }
+    }
+
 }
