@@ -25,4 +25,4 @@ String: function
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
-}
+}                                                                
