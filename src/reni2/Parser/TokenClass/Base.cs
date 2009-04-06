@@ -13,7 +13,6 @@ namespace Reni.Parser.TokenClass
         {
             var x = PrioTable.LeftAssoc("<else>");
             x += PrioTable.LeftAssoc(
-                "array", "explicit_ref",
                 "at", "content", "_A_T_", "_N_E_X_T_",
                 "raw_convert", "construct", "bit_cast", "bit_expand",
                 "stable_ref", "consider_as",
