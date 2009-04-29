@@ -28,7 +28,7 @@ namespace Reni.Code
         private readonly Size _maxSize;
 
         [DumpData(false)]
-        private List<LeafElement> _data = new List<LeafElement>();
+        private readonly List<LeafElement> _data = new List<LeafElement>();
 
         public Container(Size maxSize, Size frameSize, string description, bool isInternal)
         {
@@ -178,7 +178,7 @@ namespace Reni.Code
                 statements = StatementAligner(statements);
             statements = statements.Surround("{", "}");
             statements = "fixed(sbyte*data=new sbyte[" + _maxSize.ByteCount + "])" + statements;
-            statements = HWString.Indent(statements, 3);
+            statements = statements.Indent(3);
             return statements;
         }
 
