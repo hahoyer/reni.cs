@@ -1,5 +1,7 @@
+using HWClassLibrary.TreeStructure;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code.ReplaceVisitor;
@@ -53,9 +55,15 @@ namespace Reni.Code
         [DumpData(false)]
         internal virtual Refs RefsImplementation { get { return Refs.None(); } }
 
-        internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, Size leftSize) { return CreateChild(new BitArrayOp(name, size, leftSize, Size - leftSize)); }
+        internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, Size leftSize)
+        {
+            return CreateChild(new BitArrayOp(name, size, leftSize, Size - leftSize));
+        }
 
-        private CodeBase CreateDumpPrint(Size leftSize) { return CreateChild(new DumpPrint(leftSize, Size - leftSize)); }
+        private CodeBase CreateDumpPrint(Size leftSize)
+        {
+            return CreateChild(new DumpPrint(leftSize, Size - leftSize));
+        }
 
         public CodeBase CreateAssignment(RefAlignParam refAlignParam, Size size)
         {
@@ -63,9 +71,15 @@ namespace Reni.Code
             return CreateChild(new Assign(refAlignParam, alignedSize));
         }
 
-        public CodeBase CreateBitSequenceOperation(Defineable name, Size size) { return CreateChild(new BitArrayPrefixOp(name, size, Size)); }
+        public CodeBase CreateBitSequenceOperation(Defineable name, Size size)
+        {
+            return CreateChild(new BitArrayPrefixOp(name, size, Size));
+        }
 
-        public static CodeBase CreateDumpPrintText(string dumpPrintText) { return CreateLeaf(new DumpPrintText(dumpPrintText)); }
+        public static CodeBase CreateDumpPrintText(string dumpPrintText)
+        {
+            return CreateLeaf(new DumpPrintText(dumpPrintText));
+        }
 
         public CodeBase CreateDumpPrint()
         {
@@ -75,19 +89,40 @@ namespace Reni.Code
                 .CreateDumpPrint(alignedSize);
         }
 
-        public CodeBase CreateThenElse(CodeBase thenCode, CodeBase elseCode) { return new ThenElse(this, thenCode, elseCode); }
+        public CodeBase CreateThenElse(CodeBase thenCode, CodeBase elseCode)
+        {
+            return new ThenElse(this, thenCode, elseCode);
+        }
 
-        internal static CodeBase CreateTopRef(RefAlignParam refAlignParam) { return CreateLeaf(new TopRef(refAlignParam, Size.Zero)); }
+        internal static CodeBase CreateTopRef(RefAlignParam refAlignParam)
+        {
+            return CreateLeaf(new TopRef(refAlignParam, Size.Zero));
+        }
 
-        internal static CodeBase CreateInternalRef(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode) { return new InternalRef(refAlignParam, code, destructorCode); }
+        internal static CodeBase CreateInternalRef(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
+        {
+            return new InternalRef(refAlignParam, code, destructorCode);
+        }
 
-        internal static CodeBase CreateTopRef(RefAlignParam refAlignParam, Size offset) { return CreateLeaf(new TopRef(refAlignParam, offset)); }
+        internal static CodeBase CreateTopRef(RefAlignParam refAlignParam, Size offset)
+        {
+            return CreateLeaf(new TopRef(refAlignParam, offset));
+        }
 
-        internal static CodeBase CreateFrameRef(RefAlignParam refAlignParam) { return CreateLeaf(new FrameRef(refAlignParam, Size.Create(0))); }
+        internal static CodeBase CreateFrameRef(RefAlignParam refAlignParam)
+        {
+            return CreateLeaf(new FrameRef(refAlignParam, Size.Create(0)));
+        }
 
-        private static CodeBase CreateLeaf(LeafElement leafElement) { return new Leaf(leafElement); }
+        private static CodeBase CreateLeaf(LeafElement leafElement)
+        {
+            return new Leaf(leafElement);
+        }
 
-        internal virtual CodeBase CreateChild(LeafElement leafElement) { return new Child(this, leafElement); }
+        internal virtual CodeBase CreateChild(LeafElement leafElement)
+        {
+            return new Child(this, leafElement);
+        }
 
         public CodeBase CreateChildren(LeafElement[] leafElements)
         {
@@ -104,9 +139,15 @@ namespace Reni.Code
             return container;
         }
 
-        public CodeBase CreateRefPlus(RefAlignParam refAlignParam, Size right) { return CreateChild(new RefPlus(refAlignParam, right)); }
+        public CodeBase CreateRefPlus(RefAlignParam refAlignParam, Size right)
+        {
+            return CreateChild(new RefPlus(refAlignParam, right));
+        }
 
-        public CodeBase CreateDereference(RefAlignParam refAlignParam, Size targetSize) { return CreateChild(new Dereference(refAlignParam, targetSize)); }
+        public CodeBase CreateDereference(RefAlignParam refAlignParam, Size targetSize)
+        {
+            return CreateChild(new Dereference(refAlignParam, targetSize));
+        }
 
         public CodeBase CreateBitCast(Size size)
         {
@@ -124,15 +165,30 @@ namespace Reni.Code
             return new Pair(this, right);
         }
 
-        public static CodeBase CreateBitArray(Size size, BitsConst t) { return CreateLeaf(new BitArray(size, t)); }
+        public static CodeBase CreateBitArray(Size size, BitsConst t)
+        {
+            return CreateLeaf(new BitArray(size, t));
+        }
 
-        public static CodeBase CreateBitArray(BitsConst t) { return CreateBitArray(t.Size, t); }
+        public static CodeBase CreateBitArray(BitsConst t)
+        {
+            return CreateBitArray(t.Size, t);
+        }
 
-        public static CodeBase CreateVoid() { return CreateLeaf(BitArray.CreateVoid()); }
+        public static CodeBase CreateVoid()
+        {
+            return CreateLeaf(BitArray.CreateVoid());
+        }
 
-        public static CodeBase CreateArg(Size size) { return new Arg(size); }
+        public static CodeBase CreateArg(Size size)
+        {
+            return new Arg(size);
+        }
 
-        public static CodeBase CreateContextRef(IRefInCode context) { return new RefCode(context); }
+        public static CodeBase CreateContextRef(IRefInCode context)
+        {
+            return new RefCode(context);
+        }
 
         public CodeBase UseWithArg(CodeBase argCode)
         {
@@ -174,7 +230,10 @@ namespace Reni.Code
             return this;
         }
 
-        public Result Visit<Result>(Visitor<Result> actual) { return VisitImplementation(actual); }
+        public Result Visit<Result>(Visitor<Result> actual)
+        {
+            return VisitImplementation(actual);
+        }
 
         public virtual Result VisitImplementation<Result>(Visitor<Result> actual)
         {
@@ -182,7 +241,10 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        public CodeBase CreateCall(int index, Size resultSize) { return CreateChild(new Call(index, resultSize, Size)); }
+        public CodeBase CreateCall(int index, Size resultSize)
+        {
+            return CreateChild(new Call(index, resultSize, Size));
+        }
 
         internal Container Serialize(bool isInternal)
         {
@@ -197,7 +259,10 @@ namespace Reni.Code
             }
         }
 
-        public static LeafElement CreateRecursiveCall(Size refsSize) { return new RecursiveCallCandidate(refsSize); }
+        public static LeafElement CreateRecursiveCall(Size refsSize)
+        {
+            return new RecursiveCallCandidate(refsSize);
+        }
 
         public CodeBase TryReplacePrimitiveRecursivity(int functionIndex)
         {
@@ -214,16 +279,23 @@ namespace Reni.Code
             return null;
         }
 
-        internal CodeBase Align() { return CreateBitCast(Size.ByteAlignedSize); }
+        internal CodeBase Align()
+        {
+            return CreateBitCast(Size.ByteAlignedSize);
+        }
 
         /// <summary>
         /// Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
+
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
-        internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam) { return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam); }
+        internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam)
+        {
+            return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam);
+        }
 
         internal CodeBase CreateStatementEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
         {
@@ -244,21 +316,19 @@ namespace Reni.Code
 
     internal class InternalRefSequenceVisitor : Base
     {
-        private readonly SimpleCache<CodeBase> _codeCache = new SimpleCache<CodeBase>();
+        private readonly SimpleCache<CodeBase> _codeCache;
 
         [Node, DumpData(true)]
         private readonly List<InternalRef> _data = new List<InternalRef>();
 
-        [DumpData(false)]
-        public CodeBase Code
+        public InternalRefSequenceVisitor()
         {
-            get
-            {
-                return
-                    _codeCache.Find(
-                        () => HWString.Sequence<InternalRef>(_data).Apply1(x => x.Code).Serialize(CodeBase.CreateVoid()));
-            }
+            _codeCache = new SimpleCache<CodeBase>(
+                () => HWString.Sequence<InternalRef>(_data).Apply1(x => x.Code).Serialize(CodeBase.CreateVoid()));
         }
+
+        [DumpData(false)]
+        public CodeBase Code { get { return _codeCache.Value; } }
 
         public CodeBase DestructorCode
         {
@@ -268,10 +338,10 @@ namespace Reni.Code
                 return HWString.Sequence<InternalRef>(_data).Apply1
                     (
                     delegate(InternalRef x)
-                    {
-                        size += x.Code.Size;
-                        return x.DestructorCode.UseWithArg(InternalRefCode(x.RefAlignParam, size));
-                    }
+                        {
+                            size += x.Code.Size;
+                            return x.DestructorCode.UseWithArg(InternalRefCode(x.RefAlignParam, size));
+                        }
                     )
                     .Serialize(CodeBase.CreateVoid());
             }
@@ -284,7 +354,7 @@ namespace Reni.Code
             if(newCode != null)
                 newVisitedObject = new InternalRef(visitedObject.RefAlignParam, newCode, visitedObject.DestructorCode);
             var offset = Find(newVisitedObject);
-            _codeCache.Value = null;
+            _codeCache.Reset();
             return InternalRefCode(newVisitedObject.RefAlignParam, offset);
         }
 
@@ -299,7 +369,10 @@ namespace Reni.Code
             return result + internalRef.Code.Size;
         }
 
-        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size) { return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1)); }
+        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size)
+        {
+            return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1));
+        }
 
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
@@ -338,16 +411,30 @@ namespace Reni.Code
 
         public override string NodeDump { get { return base.NodeDump + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; } }
 
-        protected override Size GetSize() { return _afterSize; }
-        protected override Size GetInputSize() { return _beforeSize; }
-        protected override string Format(StorageDescriptor start) { return ""; }
+        protected override Size GetSize()
+        {
+            return _afterSize;
+        }
+
+        protected override Size GetInputSize()
+        {
+            return _beforeSize;
+        }
+
+        protected override string Format(StorageDescriptor start)
+        {
+            return "";
+        }
     }
 
     internal class InternalRefCode : CodeBase
     {
         private readonly RefAlignParam _refAlignParam;
 
-        public InternalRefCode(RefAlignParam refAlignParam) { _refAlignParam = refAlignParam; }
+        public InternalRefCode(RefAlignParam refAlignParam)
+        {
+            _refAlignParam = refAlignParam;
+        }
 
         protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
     }
@@ -375,10 +462,23 @@ namespace Reni.Code
             _targetSize = targetSize;
         }
 
-        protected override Size GetSize() { return Size.Zero; }
-        protected override Size GetInputSize() { return _refAlignParam.RefSize*2; }
-        protected override string Format(StorageDescriptor start) { return start.CreateAssignment(_refAlignParam, _targetSize); }
+        protected override Size GetSize()
+        {
+            return Size.Zero;
+        }
+
+        protected override Size GetInputSize()
+        {
+            return _refAlignParam.RefSize*2;
+        }
+
+        protected override string Format(StorageDescriptor start)
+        {
+            return start.CreateAssignment(_refAlignParam, _targetSize);
+        }
     }
 
-    internal class UnexpectedVisitOfPending : Exception {}
+    internal class UnexpectedVisitOfPending : Exception
+    {
+    }
 }

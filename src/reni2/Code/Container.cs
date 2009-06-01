@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Type;
 
 namespace Reni.Code

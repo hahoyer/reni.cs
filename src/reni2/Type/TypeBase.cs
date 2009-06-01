@@ -1,3 +1,4 @@
+using HWClassLibrary.TreeStructure;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -13,24 +14,41 @@ namespace Reni.Type
     [Serializable]
     internal abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
-        private static readonly Bit _bit = new Bit();
-        private static readonly Void _void = new Void();
-        private readonly DictionaryEx<int, Aligner> _aligner = new DictionaryEx<int, Aligner>();
-        private readonly DictionaryEx<int, Array> _array = new DictionaryEx<int, Array>();
-        private readonly DictionaryEx<int, Sequence> _chain = new DictionaryEx<int, Sequence>();
-        private readonly DictionaryEx<TypeBase, Pair> _pair = new DictionaryEx<TypeBase, Pair>();
-        private readonly DictionaryEx<RefAlignParam, AutomaticRef> _ref = new DictionaryEx<RefAlignParam, AutomaticRef>();
-        private readonly DictionaryEx<RefAlignParam, AssignableRef> _assignableRef = new DictionaryEx<RefAlignParam, AssignableRef>();
-        private readonly SimpleCache<TypeType> _typeTypeCache = new SimpleCache<TypeType>();
-        private readonly SimpleCache<PostProcessorForType> _postProcessor = new SimpleCache<PostProcessorForType>();
+        class Cache
+        {
+            public static readonly Bit _bit = new Bit();
+            public static readonly Void _void = new Void();
+            public readonly DictionaryEx<int, Aligner> _aligner = new DictionaryEx<int, Aligner>();
+            public readonly DictionaryEx<int, Array> _array = new DictionaryEx<int, Array>();
+            public readonly DictionaryEx<int, Sequence> _chain = new DictionaryEx<int, Sequence>();
+            public readonly DictionaryEx<TypeBase, Pair> _pair = new DictionaryEx<TypeBase, Pair>();
+            public readonly DictionaryEx<RefAlignParam, AutomaticRef> _ref = new DictionaryEx<RefAlignParam, AutomaticRef>();
+            public readonly DictionaryEx<RefAlignParam, AssignableRef> _assignableRef = new DictionaryEx<RefAlignParam, AssignableRef>();
+            public readonly SimpleCache<TypeType> TypeType;
+            public readonly SimpleCache<PostProcessorForType> PostProcessor;
+
+            public Cache(TypeBase parent)
+            {
+                PostProcessor = new SimpleCache<PostProcessorForType>(() => new PostProcessorForType(parent));
+                TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
+            }
+        }
+        
+        private readonly Cache _cache;
 
         protected TypeBase(int objectId)
-            : base(objectId) { }
+            : base(objectId)
+        {
+            _cache = new Cache(this);
+        }
 
-        protected TypeBase() { }
+        protected TypeBase()
+        {
+            _cache = new Cache(this);
+        }
 
-        internal static TypeBase CreateVoid { get { return _void; } }
-        internal static TypeBase CreateBit { get { return _bit; } }
+        internal static TypeBase CreateVoid { get { return Cache._void; } }
+        internal static TypeBase CreateBit { get { return Cache._bit; } }
 
         [Node]
         internal Size Size { get { return GetSize(); } }
@@ -50,7 +68,7 @@ namespace Reni.Type
 
         internal abstract string DumpShort();
 
-        private TypeBase TypeType { get { return _typeTypeCache.Find(() => new TypeType(this)); } }
+        private TypeBase TypeType { get { return _cache.TypeType.Value; } }
 
         [DumpData(false)]
         internal virtual string DumpPrintText
@@ -85,16 +103,16 @@ namespace Reni.Type
         internal protected virtual int IndexSize { get { return 0; } }
 
         [DumpData(false)]
-        internal PostProcessorForType PostProcessor { get { return _postProcessor.Find(() => new PostProcessorForType(this)); } }
+        internal PostProcessorForType PostProcessor { get { return _cache.PostProcessor.Value; } }
 
         internal TypeBase CreateAlign(int alignBits)
         {
             if(Size.Align(alignBits) == Size)
                 return this;
-            return _aligner.Find(alignBits, () => new Aligner(this, alignBits));
+            return _cache._aligner.Find(alignBits, () => new Aligner(this, alignBits));
         }
 
-        internal Array CreateArray(int count) { return _array.Find(count, () => new Array(this, count)); }
+        internal Array CreateArray(int count) { return _cache._array.Find(count, () => new Array(this, count)); }
 
         internal static TypeBase CreateNumber(int bitCount) { return CreateBit.CreateSequence(bitCount); }
 
@@ -102,13 +120,13 @@ namespace Reni.Type
 
         protected virtual TypeBase CreateReversePair(TypeBase first)
         {
-            return first._pair.Find(this,
+            return first._cache._pair.Find(this,
                 () => new Pair(first, this));
         }
 
-        internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam) { return _ref.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam)); }
+        internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam) { return _cache._ref.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam)); }
 
-        internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return _assignableRef.Find(refAlignParam, () => new AssignableRef(this, refAlignParam)); }
+        internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return _cache._assignableRef.Find(refAlignParam, () => new AssignableRef(this, refAlignParam)); }
 
         internal Ref EnsureRef(RefAlignParam refAlignParam)
         {
@@ -117,7 +135,7 @@ namespace Reni.Type
             return CreateAutomaticRef(refAlignParam);
         }
 
-        internal Sequence CreateSequence(int elementCount) { return _chain.Find(elementCount, () => new Sequence(this, elementCount)); }
+        internal Sequence CreateSequence(int elementCount) { return _cache._chain.Find(elementCount, () => new Sequence(this, elementCount)); }
 
         internal virtual Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 

@@ -1,3 +1,4 @@
+using HWClassLibrary.TreeStructure;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -11,14 +12,20 @@ namespace Reni.Struct
     internal sealed class FullContext : StructContextBase, IRefInCode
     {
         [Node]
-        private readonly Result _internalConstructorResult = new Result();
+        private readonly Result _internalConstructorResult;
         [Node]
-        private readonly Result _constructorResult = new Result();
-        private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
-        private readonly SimpleCache<Type> _typeCache = new SimpleCache<Type>();
+        private readonly Result _constructorResult;
+        private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache;
+        private readonly SimpleCache<Type> _typeCache;
 
         internal FullContext(ContextBase contextBase, Container container)
-            : base(contextBase, container) { }
+            : base(contextBase, container)
+        {
+            _internalConstructorResult = new Result();
+            _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
+            _constructorResult = new Result();
+            _typeCache = new SimpleCache<Type>(() => new Type(this));
+        }
 
         RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
@@ -32,7 +39,7 @@ namespace Reni.Struct
         [DumpData(false)]
         public override Ref NaturalRefType { get { return NaturalType.CreateAutomaticRef(RefAlignParam); } }
 
-        private TypeBase NaturalType { get { return _typeCache.Find(() => new Type(this)); } }
+        private TypeBase NaturalType { get { return _typeCache.Value; } }
 
         internal Result ConstructorResult(Category category)
         {

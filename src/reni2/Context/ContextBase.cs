@@ -1,3 +1,4 @@
+using HWClassLibrary.TreeStructure;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,12 +24,23 @@ namespace Reni.Context
         private static int _nextId;
 
         [Node, DumpData(false)]
-        internal Cache Cache = new Cache();
+        internal Cache Cache;
 
         private Sequence<ContextBase> _childChainCache;
 
         protected ContextBase()
-            : base(_nextId++) { }
+            : base(_nextId++)
+        {
+            Cache = new Cache
+            (
+                () => new PendingContext(this), 
+                () => new Result
+                {
+                    Code = CreateTopRefCode(), 
+                    Refs = Refs.None()
+                }
+            );
+        }
 
         [Node, DumpData(false)]
         internal abstract RefAlignParam RefAlignParam { get; }
@@ -43,15 +55,7 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DumpData(false)]
-        internal Result TopRefResult
-        {
-            get
-            {
-                return
-                    Cache._topRefResultCache.Find(
-                        () => new Result {Code = CreateTopRefCode(), Refs = Refs.None()});
-            }
-        }
+        internal Result TopRefResult { get { return Cache.TopRefResult.Value; } }
 
         [DumpData(false)]
         internal Sequence<ContextBase> ChildChain
@@ -80,7 +84,7 @@ namespace Reni.Context
 
         internal PendingContext CreatePendingContext()
         {
-            return Cache._pendingContext.Find(() => new PendingContext(this));
+            return Cache.PendingContext.Value;
         }
 
         internal FullContext CreateStruct(Container container)
@@ -314,14 +318,20 @@ namespace Reni.Context
             new DictionaryEx<Container, FullContext>();
 
         [Node, SmartNode]
-        internal readonly SimpleCache<Result> _topRefResultCache = new SimpleCache<Result>();
+        internal readonly SimpleCache<Result> TopRefResult;
 
         [Node, SmartNode]
         internal readonly DictionaryEx<ICompileSyntax, CacheItem> _resultCache =
             new DictionaryEx<ICompileSyntax, CacheItem>();
 
         [Node, SmartNode]
-        internal readonly SimpleCache<PendingContext> _pendingContext = new SimpleCache<PendingContext>();
+        internal readonly SimpleCache<PendingContext> PendingContext;
+
+        public Cache(Func<PendingContext> pendingContext, Func<Result> topRefResult)
+        {
+            PendingContext = new SimpleCache<PendingContext>(pendingContext);
+            TopRefResult = new SimpleCache<Result>(topRefResult);
+        }
 
         /// <summary>
         /// Gets the icon key.

@@ -1,3 +1,4 @@
+using HWClassLibrary.TreeStructure;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using System;
@@ -14,7 +15,7 @@ namespace Reni.Struct
     [Serializable]
     internal abstract class StructContextBase : ContextBase, IStructContext
     {
-        private readonly SimpleCache<PositionFeature[]> _featuresCache = new SimpleCache<PositionFeature[]>();
+        private readonly SimpleCache<PositionFeature[]> _featuresCache;
         [Node]
         internal readonly ContextBase Parent;
         [Node]
@@ -24,6 +25,7 @@ namespace Reni.Struct
         
         protected StructContextBase(ContextBase parent, Container container)
         {
+            _featuresCache = new SimpleCache<PositionFeature[]>(CreateFeaturesCache);
             Parent = parent;
             Container = container;
             _internalResult = new Result[StatementList.Count];
@@ -39,7 +41,7 @@ namespace Reni.Struct
         [DumpData(false)]
         public abstract IRefInCode ForCode { get; }
         [DumpData(false)]
-        internal PositionFeature[] Features { get { return _featuresCache.Find(CreateFeaturesCache); } }
+        internal PositionFeature[] Features { get { return _featuresCache.Value; } }
         [DumpData(false)]
         protected abstract int Position { get; }
         [DumpData(false)]
