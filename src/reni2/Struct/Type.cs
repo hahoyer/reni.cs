@@ -70,7 +70,7 @@ namespace Reni.Struct
                 this);
             if(result.IsSuccessFull)
                 return result;
-            return base.SearchFromRef(defineable).SubTrial(this);
+            return base.SearchFromRef(defineable).SubTrial(this, "try at base class");
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using HWClassLibrary.Debug;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -15,22 +16,25 @@ namespace Reni
         public Defineable Defineable { get; private set; }
         public SearchTrial SearchTrial { get; private set; }
 
-        public SearchResult<FeatureType> Convert<FeatureType, TargetType>(IConverter<FeatureType,TargetType> feature, TargetType target)
-            where FeatureType : class
+        public SearchResult<TFeatureType> Convert<TFeatureType,
+                                                  TTargetType>(IConverter<TFeatureType, TTargetType> feature,
+                                                               TTargetType target)
+            where TFeatureType : class
         {
-            FeatureType resultFeature = null;
+            TFeatureType resultFeature = null;
             if(feature != null)
                 resultFeature = feature.Convert(target);
-            return SearchResult<FeatureType>.Create(resultFeature, this);
+            return SearchResult<TFeatureType>.Create(resultFeature, this);
         }
     }
 
-    internal struct SearchResult<FeatureType> where FeatureType : class
+    internal struct SearchResult<TFeatureType>
+        where TFeatureType : class
     {
-        private SearchResult(FeatureType feature, Defineable defineable, SearchTrial searchTrial)
-            : this(feature, new SearchResultDescriptor(defineable, searchTrial)) {}
+        private SearchResult(TFeatureType feature, Defineable defineable, SearchTrial searchTrial)
+            : this(feature, new SearchResultDescriptor(defineable, searchTrial)) { }
 
-        private SearchResult(FeatureType feature, SearchResultDescriptor searchResultDescriptor)
+        private SearchResult(TFeatureType feature, SearchResultDescriptor searchResultDescriptor)
             : this()
         {
             Feature = feature;
@@ -38,53 +42,59 @@ namespace Reni
         }
 
         private SearchResult(Defineable defineable, SearchTrial searchTrial)
-            : this(null, defineable, searchTrial) {}
+            : this(null, defineable, searchTrial) { }
 
         public bool IsSuccessFull { get { return Feature != null; } }
         public SearchResultDescriptor SearchResultDescriptor { get; private set; }
 
         [DumpExcept(null)]
-        public FeatureType Feature { get; private set; }
+        public TFeatureType Feature { get; private set; }
 
-        public static SearchResult<FeatureType> Failure<Target>(Target target, Defineable defineable)
-            where Target : IDumpShortProvider
+        public static SearchResult<TFeatureType> Failure<TTarget>(TTarget target, Defineable defineable)
+            where TTarget : IDumpShortProvider
         {
-            return new SearchResult<FeatureType>(defineable, SearchTrial.
-                Create(target, Tracer.MethodHeader(1, true)));
+            return new SearchResult<TFeatureType>(defineable, SearchTrial.
+                                                                  Create(target, Tracer.MethodHeader(1, true)));
         }
 
-        public static SearchResult<FeatureType> Failure(Defineable defineable)
+        public static SearchResult<TFeatureType> Failure(Defineable defineable) { return new SearchResult<TFeatureType>(defineable, SearchTrial.Create(Tracer.MethodHeader(1, true))); }
+
+        public static SearchResult<TFeatureType> Success(TFeatureType feature, Defineable defineable) { return new SearchResult<TFeatureType>(feature, defineable, SearchTrial.Create(Tracer.MethodHeader(1, true))); }
+
+        public SearchResult<TFeatureType> AlternativeTrial(SearchResult<TFeatureType> failedResult)
         {
-            return new SearchResult<FeatureType>(defineable, SearchTrial.Create(Tracer.MethodHeader(1, true)));
+            var searchTrial = SearchTrial.AlternativeTrial(failedResult.SearchResultDescriptor.SearchTrial,
+                                                           SearchResultDescriptor.SearchTrial,
+                                                           Tracer.MethodHeader(1, true));
+            return new SearchResult<TFeatureType>(Feature, SearchResultDescriptor.Defineable, searchTrial);
         }
 
-        public static SearchResult<FeatureType> Success(FeatureType feature, Defineable defineable)
+        public SearchResult<TFeatureType> SubTrial<TTarget>(TTarget target, string reason)
+            where TTarget : IDumpShortProvider
+
         {
-            return new SearchResult<FeatureType>(feature, defineable, SearchTrial.Create(Tracer.MethodHeader(1, true)));
+            return new SearchResult<TFeatureType>
+            (
+                Feature, 
+                SearchResultDescriptor.Defineable,
+                SearchTrial.SubTrial
+                (
+                    SearchResultDescriptor.SearchTrial,
+                    target,
+                    Tracer.MethodHeader(1, true) + reason 
+                )
+            );
         }
 
-        public SearchResult<FeatureType> AlternativeTrial(SearchResult<FeatureType> failedResult)
+        public static SearchResult<TFeatureType> Create(TFeatureType feature, SearchResultDescriptor descriptor)
         {
-            var searchTrial = SearchTrial.AlternativeTrial(failedResult.SearchResultDescriptor.SearchTrial, SearchResultDescriptor.SearchTrial,
-                Tracer.MethodHeader(1, true));
-            return new SearchResult<FeatureType>(Feature, SearchResultDescriptor.Defineable, searchTrial);
+            return new SearchResult<TFeatureType>(feature, descriptor);
         }
 
-        public SearchResult<FeatureType> SubTrial<Target>(Target target) where Target : IDumpShortProvider
+        public static SearchResult<TFeatureType> Create<TSubFeatureType>(SearchResult<TSubFeatureType> result)
+            where TSubFeatureType : class, TFeatureType
         {
-            return new SearchResult<FeatureType>(Feature, SearchResultDescriptor.Defineable, SearchTrial.
-                SubTrial
-                (SearchResultDescriptor.SearchTrial, target, Tracer.MethodHeader(1, true)));
-        }
-
-        public static SearchResult<FeatureType> Create(FeatureType feature, SearchResultDescriptor descriptor)
-        {
-            return new SearchResult<FeatureType>(feature, descriptor);
-        }
-
-        public static SearchResult<FeatureType> Create<FeatureType2>(SearchResult<FeatureType2> result) where FeatureType2 : class, FeatureType
-        {
-            return new SearchResult<FeatureType>(result.Feature, result.SearchResultDescriptor);
+            return new SearchResult<TFeatureType>(result.Feature, result.SearchResultDescriptor);
         }
     }
 }

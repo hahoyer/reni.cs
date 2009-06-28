@@ -87,15 +87,15 @@ namespace Reni
         {
             var result = new List<TreeNode>();
             if(!PendingCategory.IsNull)
-                result.Add(Service.CreateNamedNode("Pending", "Pending", Dump()));
+                result.Add(Dump().CreateNamedNode("Pending", "Pending"));
             if(HasSize)
-                result.Add(Service.CreateNamedNode("Size", "Number", Size.FormatForView()));
+                result.Add(Size.FormatForView().CreateNamedNode("Size", "Number"));
             if(HasType)
-                result.Add(Service.CreateNamedNode("Type", "Type", Type));
+                result.Add(Type.CreateNamedNode("Type", "Type"));
             if(HasCode)
-                result.Add(Service.CreateNamedNode("Code", "Code", Code));
+                result.Add(Code.CreateNamedNode("Code", "Code"));
             if(HasRefs)
-                result.Add(Service.CreateNamedNode("Refs", "Refs", Refs.Data));
+                result.Add(Refs.Data.CreateNamedNode("Refs", "Refs"));
             return result.ToArray();
         }
 
@@ -416,20 +416,21 @@ namespace Reni
         /// <summary>
         /// Replaces the absolute context ref.
         /// </summary>
-        /// <typeparam name="C"></typeparam>
-        /// <param name="context">The context.</param>
+        /// <typeparam name="TRefInCode"></typeparam>
+        /// <param name="refInCode">The context.</param>
         /// <param name="replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
         /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<C>(C context, Result replacement) where C : IRefInCode
+        internal Result ReplaceAbsoluteContextRef<TRefInCode>(TRefInCode refInCode, Result replacement) 
+            where TRefInCode : IRefInCode
         {
-            if(HasRefs && !Refs.Contains(context))
+            if(HasRefs && !Refs.Contains(refInCode))
                 return this;
 
             var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
-                result.Code = Code.ReplaceAbsoluteContextRef(context, replacement.Code);
+                result.Code = Code.ReplaceAbsoluteContextRef(refInCode, replacement.Code);
             if(HasRefs)
-                result.Refs = Refs.Without(context).CreateSequence(replacement.Refs);
+                result.Refs = Refs.Without(refInCode).CreateSequence(replacement.Refs);
             result.IsDirty = false;
             return result;
         }

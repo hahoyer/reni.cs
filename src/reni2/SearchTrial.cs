@@ -6,19 +6,19 @@ namespace Reni
     {
         private SearchTrial(string caller)
         {
-            Caller = caller;
+            _caller = caller;
         }
 
-        public string Caller { get; private set; }
+        private readonly string _caller;
 
         public override string DumpData()
         {
-            return "Caller:\n" + Caller;
+            return "Called at position:\n\t" + _caller;
         }
 
-        public static SearchTrial Create<Target>(Target target, string caller) where Target : IDumpShortProvider
+        public static SearchTrial Create<TTarget>(TTarget target, string caller) where TTarget : IDumpShortProvider
         {
-            return new Based<Target>(target, caller);
+            return new Based<TTarget>(target, caller);
         }
 
         public static SearchTrial Create(string caller)
@@ -26,9 +26,9 @@ namespace Reni
             return new Untyped(caller);
         }
 
-        public static SearchTrial SubTrial<Target>(SearchTrial subResult, Target target, string caller) where Target : IDumpShortProvider
+        public static SearchTrial SubTrial<TTarget>(SearchTrial subResult, TTarget target, string caller) where TTarget : IDumpShortProvider
         {
-            return new Sub<Target>(subResult, target, caller);
+            return new Sub<TTarget>(subResult, target, caller);
         }
 
         public static SearchTrial AlternativeTrial(SearchTrial failedTrial, SearchTrial alternativeResult, string caller)
@@ -36,79 +36,83 @@ namespace Reni
             return failedTrial.AddAlternative(alternativeResult, caller);
         }
 
-        internal virtual SearchTrial AddAlternative(SearchTrial alternativeResult, string caller)
+        protected virtual SearchTrial AddAlternative(SearchTrial alternativeResult, string caller)
         {
             return new Alternatives(this, alternativeResult, caller);
         }
 
-        internal sealed class Alternatives : SearchTrial
+        private sealed class Alternatives : SearchTrial
         {
             public Alternatives(SearchTrial failedTrial, SearchTrial alternativeResult, string caller) : base(caller)
             {
-                Trials = new[] {failedTrial, alternativeResult};
+                _trials = new[] {failedTrial, alternativeResult};
             }
 
             private Alternatives(ICollection<SearchTrial> failedTrials, SearchTrial alternativeResult, string caller)
                 : base(caller)
             {
-                Trials = new SearchTrial[failedTrials.Count + 1];
+                _trials = new SearchTrial[failedTrials.Count + 1];
                 var i = 0;
                 foreach(var failedTrial in failedTrials)
-                    Trials[i++] = failedTrial;
-                Trials[i] = alternativeResult;
+                    _trials[i++] = failedTrial;
+                _trials[i] = alternativeResult;
             }
 
-            internal SearchTrial[] Trials { get; private set; }
+            private readonly SearchTrial[] _trials;
 
-            internal override SearchTrial AddAlternative(SearchTrial alternativeResult, string caller)
+            protected override SearchTrial AddAlternative(SearchTrial alternativeResult, string caller)
             {
-                return new Alternatives(Trials, alternativeResult, Caller);
+                return new Alternatives(_trials, alternativeResult, _caller);
             }
 
             public override string DumpData()
             {
-                var result = base.DumpData() + "\nTrials:";
-                foreach(var trial in Trials)
-                    result += "\n" + trial.Dump();
+                var result = base.DumpData() + "\n";
+                var length = _trials.Length;
+                for(var i = 0; i < length; i++)
+                {
+                    var trial = _trials[i];
+                    result += i+". trial of "+length+"\n" + trial.Dump();
+                }
                 return result;
             }
         }
 
-        internal sealed class Based<TargetType> : SearchTrial where TargetType : IDumpShortProvider
+        private sealed class Based<TTargetType> : SearchTrial where TTargetType : IDumpShortProvider
         {
-            internal Based(TargetType target, string caller)
+            internal Based(TTargetType target, string caller)
                 : base(caller)
             {
-                Target = target;
+                _target = target;
             }
 
-            public TargetType Target { get; private set; }
+            private readonly TTargetType _target;
 
             public override string DumpData()
             {
-                return base.DumpData() + "\nTarget=" + Target.DumpShort();
+                return base.DumpData() + "\nTarget=" + _target.DumpShort();
             }
         }
 
-        internal sealed class Sub<TargetType> : SearchTrial where TargetType : IDumpShortProvider
+        private sealed class Sub<TTargetType> : SearchTrial where TTargetType : IDumpShortProvider
         {
-            public Sub(SearchTrial subResult, TargetType target, string caller)
+            public Sub(SearchTrial subResult, TTargetType target, string caller)
                 : base(caller)
             {
-                SubResult = subResult;
-                Target = target;
+                _subResult = subResult;
+                _target = target;
             }
 
-            public TargetType Target { get; private set; }
-            public SearchTrial SubResult { get; private set; }
+            private readonly TTargetType _target;
+            private readonly SearchTrial _subResult;
 
             public override string DumpData()
             {
-                return base.DumpData() + "\nTarget=" + Target.DumpShort() + "\nSubResult=" + SubResult.Dump();
+                return base.DumpData() + "\nTarget=" + _target.DumpShort() + "\nSubResult=" + _subResult.Dump();
             }
         }
 
-        internal sealed class Untyped : SearchTrial
+        private sealed class Untyped : SearchTrial
         {
             internal Untyped(string caller) : base(caller) {}
         }

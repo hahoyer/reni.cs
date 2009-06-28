@@ -100,9 +100,9 @@ namespace Reni.Parser.TokenClass
             return SearchResult<IConverter<IFeature, AssignableRef>>.Failure(this);
         }
 
-        internal virtual SearchResult<StructFeature> SearchFromStruct()
+        internal virtual SearchResult<IStructFeature> SearchFromStruct()
         {
-            return SearchResult<StructFeature>.Failure(this);
+            return SearchResult<IStructFeature>.Failure(this);
         }
     }
 

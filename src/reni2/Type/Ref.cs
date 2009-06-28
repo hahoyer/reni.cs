@@ -136,7 +136,7 @@ namespace Reni.Type
 
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var resultFromRef = Parent.SearchFromRef(defineable).SubTrial(Parent);
+            var resultFromRef = Parent.SearchFromRef(defineable).SubTrial(Parent, "try at referenced type");
             var result = resultFromRef.SearchResultDescriptor.Convert(resultFromRef.Feature, this);
             if(result.IsSuccessFull)
                 return result;

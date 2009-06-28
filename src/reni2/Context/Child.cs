@@ -23,11 +23,11 @@ namespace Reni.Context
         [DumpData(false)]
         internal override sealed Root RootContext { get { return Parent.RootContext; } }
 
-        internal protected override sealed Sequence<ContextBase> ObtainChildChain() { return Parent.ChildChain + this; }
+        protected override sealed Sequence<ContextBase> ObtainChildChain() { return Parent.ChildChain + this; }
 
         internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
 
-        internal override SearchResult<IContextFeature> Search(Defineable defineable) { return Parent.Search(defineable).SubTrial(Parent); }
+        internal override SearchResult<IContextFeature> Search(Defineable defineable) { return Parent.Search(defineable).SubTrial(Parent, "try parent"); }
 
         internal override IStructContext FindStruct()
         {

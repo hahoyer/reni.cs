@@ -2,12 +2,14 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using JetBrains.Annotations;
 using Reni.Context;
 using Reni.Parser.TokenClass.Symbol;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
 {
+    [MeansImplicitUse]
     internal sealed class TokenAttribute : TokenAttributeBase
     {
         internal override PrioTable CreatePrioTable()

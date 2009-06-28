@@ -21,7 +21,7 @@ namespace Reni.Type
 
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var assignableResult = defineable.SearchFromAssignableRef().SubTrial(this);
+            var assignableResult = defineable.SearchFromAssignableRef().SubTrial(this, "try common definitions");
             var result = assignableResult.SearchResultDescriptor.Convert(assignableResult.Feature,
                 this);
             if(result.IsSuccessFull)

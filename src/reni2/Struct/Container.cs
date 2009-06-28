@@ -160,7 +160,7 @@ namespace Reni.Struct
 
         private bool Defined(string name) { return Dictionary.ContainsKey(name); }
 
-        private StructFeature FindStructFeature(string name)
+        private IStructFeature FindStructFeature(string name)
         {
             return new StructFeature(Dictionary[name], Properties.Contains(name));
         }
@@ -170,11 +170,11 @@ namespace Reni.Struct
             return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable));
         }
 
-        private SearchResult<StructFeature> Search(Defineable defineable)
+        private SearchResult<IStructFeature> Search(Defineable defineable)
         {
             if (Defined(defineable.Name))
-                return SearchResult<StructFeature>.Success(FindStructFeature(defineable.Name),defineable);
-            return defineable.SearchFromStruct().SubTrial(this);
+                return SearchResult<IStructFeature>.Success(FindStructFeature(defineable.Name),defineable);
+            return defineable.SearchFromStruct().SubTrial(this,"try common definition");
         }
 
         internal SearchResult<IConverter<IContextFeature, StructContextBase>> SearchFromStructContext(Defineable defineable)
@@ -183,11 +183,15 @@ namespace Reni.Struct
         }
     }
 
+    internal interface IStructFeature 
+            : IConverter<IConverter<IFeature, Ref>, Type>
+            , IConverter<IContextFeature, StructContextBase>
+    { }
+
     [Serializable]
     internal class StructFeature
         : ReniObject
-            , IConverter<IConverter<IFeature, Ref>, Type>
-            , IConverter<IContextFeature, StructContextBase>
+        , IStructFeature
     {
         private readonly int _index;
         private readonly bool _isPoperty;

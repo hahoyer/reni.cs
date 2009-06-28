@@ -5,9 +5,9 @@ using Reni.Syntax;
 
 namespace Reni.Feature
 {
-    internal interface IConverter<OutType, InType>
+    internal interface IConverter<TOutType, TInType>
     {
-        OutType Convert(InType type);
+        TOutType Convert(TInType type);
     }
 
     internal interface IFeature

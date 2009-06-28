@@ -66,7 +66,7 @@ namespace Reni.Type
 
         internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
         {
-            var subTrial = Element.SearchFromRefToSequence(defineable).SubTrial(Element);
+            var subTrial = Element.SearchFromRefToSequence(defineable).SubTrial(Element, "try at element");
             var result = subTrial.SearchResultDescriptor.Convert(subTrial.Feature, this);
             if(result.IsSuccessFull)
                 return result;
@@ -75,7 +75,7 @@ namespace Reni.Type
 
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var resultFromSequenceElement = Element.SearchFromSequence(defineable).SubTrial(Element);
+            var resultFromSequenceElement = Element.SearchFromSequence(defineable).SubTrial(Element, "try at element");
             var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,this);
             if(result.IsSuccessFull)
                 return result;
@@ -88,7 +88,7 @@ namespace Reni.Type
 
         internal override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
         {
-            var resultFromSequence = Element.SearchPrefixFromSequence(defineable).SubTrial(Element);
+            var resultFromSequence = Element.SearchPrefixFromSequence(defineable).SubTrial(Element, "try at element");
             return resultFromSequence.SearchResultDescriptor.Convert(resultFromSequence.Feature, this);
         }
 

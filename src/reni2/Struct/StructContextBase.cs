@@ -130,7 +130,7 @@ namespace Reni.Struct
             var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature,this);
             if(result.IsSuccessFull)
                 return result;
-            result = Parent.Search(defineable).SubTrial(Parent);
+            result = Parent.Search(defineable).SubTrial(Parent, "try parent of struct");
             if (result.IsSuccessFull)
                 return result;
 

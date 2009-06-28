@@ -1,14 +1,10 @@
-using HWClassLibrary.TreeStructure;
 using System;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.IO;
+using HWClassLibrary.TreeStructure;
 using Reni;
-using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
-using Reni.FeatureTest.Struct;
-using Reni.FeatureTest.BitArrayOp;
-using File=HWClassLibrary.IO.File;
 
 namespace ReniTest
 {
@@ -18,7 +14,7 @@ namespace ReniTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TreeForm { Target = CreateCompiler(new Plus().Target) });
+            Application.Run(new TreeForm {Target = CreateCompiler(new Plus().Target)});
         }
 
         private static Compiler CreateCompiler(string text)
@@ -29,6 +25,5 @@ namespace ReniTest
             return new Compiler(fileName);
             //_compiler.Exec();
         }
-
     }
 }

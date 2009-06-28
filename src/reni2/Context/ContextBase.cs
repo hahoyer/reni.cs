@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Parser;
@@ -24,21 +25,16 @@ namespace Reni.Context
         private static int _nextId;
 
         [Node, DumpData(false)]
-        internal Cache Cache;
+        private readonly Cache _cache;
 
         private Sequence<ContextBase> _childChainCache;
 
         protected ContextBase()
             : base(_nextId++)
         {
-            Cache = new Cache
+            _cache = new Cache
             (
-                () => new PendingContext(this), 
-                () => new Result
-                {
-                    Code = CreateTopRefCode(), 
-                    Refs = Refs.None()
-                }
+                () => new PendingContext(this)
             );
         }
 
@@ -55,9 +51,6 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DumpData(false)]
-        internal Result TopRefResult { get { return Cache.TopRefResult.Value; } }
-
-        [DumpData(false)]
         internal Sequence<ContextBase> ChildChain
         {
             get
@@ -68,32 +61,31 @@ namespace Reni.Context
             }
         }
 
-        internal protected virtual Sequence<ContextBase> ObtainChildChain() { return HWString.Sequence(this); }
+        protected virtual Sequence<ContextBase> ObtainChildChain() { return HWString.Sequence(this); }
 
         internal virtual string DumpShort() { return base.ToString(); }
 
+        [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
         internal static Root CreateRoot() { return new Root(); }
 
         internal Function CreateFunction(TypeBase args)
         {
-            return Cache._functionInstanceCache.Find(args,
+            return _cache.FunctionInstanceCache.Find(args,
                                                      () => new Function(this, args));
         }
 
-        internal PendingContext CreatePendingContext()
+        private PendingContext CreatePendingContext()
         {
-            return Cache.PendingContext.Value;
+            return _cache.PendingContext.Value;
         }
 
         internal FullContext CreateStruct(Container container)
         {
-            return Cache._structContainerCache.Find(container,
+            return _cache.StructContainerCache.Find(container,
                                                     () => new FullContext(this, container));
         }
-
-        internal CodeBase CreateTopRefCode() { return CodeBase.CreateTopRef(RefAlignParam); }
 
         internal virtual Result CreateArgsRefResult(Category category)
         {
@@ -102,12 +94,9 @@ namespace Reni.Context
         }
 
         internal Result CreateFunctionResult(Category category, ICompileSyntax body) { return CreateFunctionType(body).CreateResult(category); }
-        internal Result CreatePropertyResult(Category category, ICompileSyntax body) { return CreatePropertyType(body).CreateResult(category); }
-        internal TypeBase CreatePropertyType(ICompileSyntax body) { return Cache._propertyType.Find(body, () => new Property(this, body)); }
-        internal TypeBase CreateFunctionType(ICompileSyntax body) { return Cache._functionType.Find(body, () => new Type.Function(this, body)); }
-        internal SearchResult<IContextFeature> SearchDefineable(DefineableToken defineableToken) { return Search(defineableToken.TokenClass).SubTrial(this); }
+        private TypeBase CreateFunctionType(ICompileSyntax body) { return _cache.FunctionType.Find(body, () => new Type.Function(this, body)); }
+        internal SearchResult<IContextFeature> SearchDefineable(DefineableToken defineableToken) { return Search(defineableToken.TokenClass).SubTrial(this, "main trial"); }
         internal virtual SearchResult<IContextFeature> Search(Defineable defineable) { return defineable.SearchContext(); }
-        internal Size Size(ICompileSyntax syntax) { return Result(Category.Size, syntax).Size; }
 
         internal TypeBase Type(ICompileSyntax syntax)
         {
@@ -116,18 +105,10 @@ namespace Reni.Context
             return result;
         }
 
-        internal List<Result> Result(Category category, List<ICompileSyntax> list)
-        {
-            var results = new List<Result>();
-            for(var i = 0; i < list.Count; i++)
-                results.Add(Result(category, list[i]));
-            return results;
-        }
-
         [DebuggerHidden]
         internal Result Result(Category category, ICompileSyntax syntax)
         {
-            return Cache._resultCache.Find
+            return _cache.ResultCache.Find
                 (
                 syntax,
                 () => CreateCacheElement(syntax)
@@ -144,6 +125,7 @@ namespace Reni.Context
 
         internal bool IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
 
+        [UsedImplicitly]
         internal bool IsStructParentOf(ContextBase child)
         {
             if(IsChildOf(child))
@@ -180,6 +162,7 @@ namespace Reni.Context
             return convertedResult.Evaluate();
         }
 
+        [UsedImplicitly]
         internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
 
         internal Result ApplyResult(Category category, ICompileSyntax @object, Func<TypeBase, Result> apply)
@@ -244,7 +227,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result PrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
+        private Result PrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
         {
             var contextSearchResult = SearchDefineable(defineableToken);
             if(contextSearchResult.IsSuccessFull)
@@ -266,7 +249,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result InfixResult(Category category, ICompileSyntax left, DefineableToken defineableToken,
+        private Result InfixResult(Category category, ICompileSyntax left, DefineableToken defineableToken,
                                     ICompileSyntax right)
         {
             var leftType = Type(left).EnsureRef(RefAlignParam);
@@ -293,7 +276,7 @@ namespace Reni.Context
 
         internal virtual Result CommonResult(Category category, CondSyntax condSyntax) { return condSyntax.CommonResult(this, category); }
 
-        internal Category PendingCategory(ICompileSyntax syntax) { return Cache._resultCache[syntax].Data.PendingCategory; }
+        internal Category PendingCategory(ICompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
         internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
         internal Refs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.Refs, condSyntax).Refs; }
     }
@@ -302,35 +285,27 @@ namespace Reni.Context
     internal class Cache : ReniObject, IIconKeyProvider
     {
         [Node, SmartNode]
-        internal readonly DictionaryEx<TypeBase, Function> _functionInstanceCache =
+        internal readonly DictionaryEx<TypeBase, Function> FunctionInstanceCache =
             new DictionaryEx<TypeBase, Function>();
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _functionType =
+        internal readonly DictionaryEx<ICompileSyntax, TypeBase> FunctionType =
             new DictionaryEx<ICompileSyntax, TypeBase>();
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, TypeBase> _propertyType =
-            new DictionaryEx<ICompileSyntax, TypeBase>();
-
-        [Node, SmartNode]
-        internal readonly DictionaryEx<Container, FullContext> _structContainerCache =
+        internal readonly DictionaryEx<Container, FullContext> StructContainerCache =
             new DictionaryEx<Container, FullContext>();
 
         [Node, SmartNode]
-        internal readonly SimpleCache<Result> TopRefResult;
-
-        [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, CacheItem> _resultCache =
+        internal readonly DictionaryEx<ICompileSyntax, CacheItem> ResultCache =
             new DictionaryEx<ICompileSyntax, CacheItem>();
 
         [Node, SmartNode]
         internal readonly SimpleCache<PendingContext> PendingContext;
 
-        public Cache(Func<PendingContext> pendingContext, Func<Result> topRefResult)
+        public Cache(Func<PendingContext> pendingContext)
         {
             PendingContext = new SimpleCache<PendingContext>(pendingContext);
-            TopRefResult = new SimpleCache<Result>(topRefResult);
         }
 
         /// <summary>
@@ -363,16 +338,6 @@ namespace Reni.Context
                     );
             }
             return base.CommonResult(category, condSyntax);
-        }
-
-        internal TypeBase PendingType(ICompileSyntax syntax)
-        {
-            return PendingResult(Category.Type, syntax).Type;
-        }
-
-        public Refs PendingRefs(ICompileSyntax syntax)
-        {
-            return PendingResult(Category.Refs, syntax).Refs;
         }
     }
 }

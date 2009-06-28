@@ -72,6 +72,7 @@
     <Compile Include="Parser\IParsedSyntax.cs" />
     <Compile Include="Parser\ParsedSyntax.cs" />
     <Compile Include="Parser\TokenClass\DefinableTokenSyntax.cs" />
+    <Compile Include="Parser\TokenClass\Name\Array.cs" />
     <Compile Include="Parser\TokenClass\Name\TthenT.cs" />
     <Compile Include="Parser\TokenClass\Name\TthisT.cs" />
     <Compile Include="Parser\TokenClass\SequenceOfBitOperation.cs" />
@@ -140,7 +141,7 @@
     <Compile Include="Parser\TokenClass\LPar.cs" />
     <Compile Include="Parser\TokenClass\Name\TargT.cs" />
     <Compile Include="Parser\TokenClass\Name\TfunctionT.cs" />
-    <Compile Include="Parser\TokenClass\Name\Tdump_printT.cs" />
+    <Compile Include="Parser\TokenClass\Name\DumpPrint.cs" />
     <Compile Include="Parser\TokenClass\Number.cs" />
     <Compile Include="Parser\TokenClass\RPar.cs" />
     <Compile Include="Parser\TokenClass\Symbol\Colon.cs" />
