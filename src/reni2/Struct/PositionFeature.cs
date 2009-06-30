@@ -32,7 +32,12 @@ namespace Reni.Struct
             return ApplyResult(callContext, category, null, args);
         }
 
-        public virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
+        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            return ApplyResult(callContext, category,@object, args);
+        }
+
+        protected virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                      ICompileSyntax args)
         {
             var rawResult = _structContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, _index);
@@ -105,7 +110,7 @@ namespace Reni.Struct
             _emptyList = emptyList;
         }
 
-        public override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
+        protected override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                            ICompileSyntax args)
         {
             var result = base.ApplyResult(callContext, category, @object, _emptyList);

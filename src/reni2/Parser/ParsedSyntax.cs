@@ -33,8 +33,8 @@ namespace Reni.Parser
 
         public override sealed string Dump()
         {
-            var isInContainerDump = Container._isInDump;
-            Container._isInDump = false;
+            var isInContainerDump = Container.IsInContainerDump;
+            Container.IsInContainerDump = false;
             var isInDump = _isInDump;
             _isInDump = true;
             var result = DumpShort();
@@ -44,7 +44,7 @@ namespace Reni.Parser
                 result += FilePosition();
             if(!isInContainerDump)
                 result += "\n" + base.Dump();
-            Container._isInDump = isInContainerDump;
+            Container.IsInContainerDump = isInContainerDump;
             _isInDump = isInDump;
             return result;
         }

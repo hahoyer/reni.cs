@@ -9,7 +9,7 @@ using Reni.Type;
 namespace Reni.Parser.TokenClass.Name
 {
     [Token("array")]
-    internal sealed class Array : Defineable, IStructFeature, IConverter<IFeature, Ref>, IFeature
+    internal sealed class Array : Defineable, IStructFeature
     {
         internal override SearchResult<IStructFeature> SearchFromStruct()
         {
@@ -18,23 +18,8 @@ namespace Reni.Parser.TokenClass.Name
 
         IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Struct.Type>.Convert(Struct.Type type)
         {
-            return this;
+            return type.ArrayFeature;
         }
-
-        IContextFeature IConverter<IContextFeature, StructContextBase>.Convert(StructContextBase type)
-        {
-            throw new NotImplementedException();
-        }
-
-        IFeature IConverter<IFeature, Ref>.Convert(Ref type) { return this; }
-        
-        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
-        {
-            if(args != null)
-                throw new NotImplementedException();
-            
-            
-            return 
-        }
+        IContextFeature IConverter<IContextFeature, StructContextBase>.Convert(StructContextBase type) { throw new NotImplementedException(); }
     }
 }

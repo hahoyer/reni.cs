@@ -19,8 +19,8 @@ namespace Reni.Struct
     [Serializable]
     internal sealed class Container : CompileSyntax, IDumpShortProvider
     {
-        private static readonly string _runId = Compiler.FormattedNow + "\n";
-        public static bool _isInDump;
+        private static readonly string RunId = Compiler.FormattedNow + "\n";
+        public static bool IsInContainerDump;
         private static bool _isInsideFileDump;
         private static int _nextObjectId;
         private DictionaryEx<int, string> _reverseDictionaryCache;
@@ -38,7 +38,10 @@ namespace Reni.Struct
         internal readonly List<string> Properties = new List<string>();
 
         private Container(Token token)
-            : base(token, _nextObjectId++) { EmptyList = new EmptyList(token); }
+            : base(token, _nextObjectId++)
+        {
+            EmptyList = new EmptyList(token);
+        }
 
         internal DictionaryEx<int, string> ReverseDictionary
         {
@@ -136,8 +139,8 @@ namespace Reni.Struct
         {
             var dumpFile = File.m("struct." + ObjectId);
             var oldResult = dumpFile.String;
-            var newResult = (_runId + DumpDataToString()).Replace("\n", "\r\n");
-            if (oldResult == null || !oldResult.StartsWith(_runId))
+            var newResult = (RunId + DumpDataToString()).Replace("\n", "\r\n");
+            if (oldResult == null || !oldResult.StartsWith(RunId))
             {
                 oldResult = newResult;
                 dumpFile.String = oldResult;
@@ -149,10 +152,10 @@ namespace Reni.Struct
 
         private string DumpDataToString()
         {
-            var isInDump = _isInDump;
-            _isInDump = true;
+            var isInDump = IsInContainerDump;
+            IsInContainerDump = true;
             var result = base.DumpData();
-            _isInDump = isInDump;
+            IsInContainerDump = isInDump;
             return result;
         }
 
@@ -180,6 +183,11 @@ namespace Reni.Struct
         internal SearchResult<IConverter<IContextFeature, StructContextBase>> SearchFromStructContext(Defineable defineable)
         {
             return SearchResult<IConverter<IContextFeature, StructContextBase>>.Create(Search(defineable));
+        }
+
+        internal Result ArrayConversion(Category category)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -211,5 +219,5 @@ namespace Reni.Struct
         {
             return context.Features[_index].ToProperty(_isPoperty);
         }
-    }
+    }           
 }
