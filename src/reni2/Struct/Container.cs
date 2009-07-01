@@ -1,15 +1,16 @@
-using HWClassLibrary.TreeStructure;
 using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
+using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
+using Function=Reni.Type.Function;
 
 namespace Reni.Struct
 {
@@ -38,16 +39,13 @@ namespace Reni.Struct
         internal readonly List<string> Properties = new List<string>();
 
         private Container(Token token)
-            : base(token, _nextObjectId++)
-        {
-            EmptyList = new EmptyList(token);
-        }
+            : base(token, _nextObjectId++) { EmptyList = new EmptyList(token); }
 
         internal DictionaryEx<int, string> ReverseDictionary
         {
             get
             {
-                if (_reverseDictionaryCache == null)
+                if(_reverseDictionaryCache == null)
                     CreateReverseDictionary();
                 return _reverseDictionaryCache;
             }
@@ -56,10 +54,10 @@ namespace Reni.Struct
         [DumpData(false)]
         internal ICompileSyntax this[int index] { get { return List[index]; } }
 
-        protected internal override Result Result(ContextBase context, Category category) { return context.CreateStruct(this).ConstructorResult(category); }
+        internal protected override Result Result(ContextBase context, Category category) { return context.CreateStruct(this).ConstructorResult(category); }
 
         [DumpData(false)]
-        protected internal override ICompileSyntax ToCompileSyntax { get { return this; } }
+        internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
 
         [DumpData(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
@@ -67,19 +65,19 @@ namespace Reni.Struct
         [DumpData(false)]
         internal readonly EmptyList EmptyList;
 
-        protected internal override string DumpShort() { return "container." + ObjectId; }
+        internal protected override string DumpShort() { return "container." + ObjectId; }
 
         private void CreateReverseDictionary()
         {
             _reverseDictionaryCache = new DictionaryEx<int, string>();
-            foreach (var pair in Dictionary)
+            foreach(var pair in Dictionary)
                 _reverseDictionaryCache[pair.Value] = pair.Key;
         }
 
         internal static Container Create(Token token, List<IParsedSyntax> parsed)
         {
             var result = new Container(token);
-            foreach (var parsedSyntax in parsed)
+            foreach(var parsedSyntax in parsed)
                 result.Add(parsedSyntax);
             return result;
         }
@@ -93,16 +91,16 @@ namespace Reni.Struct
 
         private void Add(IParsedSyntax parsedSyntax)
         {
-            while (parsedSyntax is DeclarationSyntax)
+            while(parsedSyntax is DeclarationSyntax)
             {
                 var d = (DeclarationSyntax) parsedSyntax;
                 Dictionary.Add(d.Name.Name, List.Count);
                 parsedSyntax = d.Definition;
-                if (d.IsProperty)
+                if(d.IsProperty)
                     Properties.Add(d.Name.Name);
             }
 
-            if (parsedSyntax is ConverterSyntax)
+            if(parsedSyntax is ConverterSyntax)
             {
                 var body = ((ConverterSyntax) parsedSyntax).Body;
                 parsedSyntax = (IParsedSyntax) body;
@@ -115,11 +113,11 @@ namespace Reni.Struct
         public string DumpPrintText(ContextBase context)
         {
             var result = "";
-            for (var i = 0; i < List.Count; i++)
+            for(var i = 0; i < List.Count; i++)
             {
-                if (i > 0)
+                if(i > 0)
                     result += ";";
-                if (ReverseDictionary.ContainsKey(i))
+                if(ReverseDictionary.ContainsKey(i))
                     result += ReverseDictionary[i] + ": ";
                 result += context.Type(List[i]);
             }
@@ -140,7 +138,7 @@ namespace Reni.Struct
             var dumpFile = File.m("struct." + ObjectId);
             var oldResult = dumpFile.String;
             var newResult = (RunId + DumpDataToString()).Replace("\n", "\r\n");
-            if (oldResult == null || !oldResult.StartsWith(RunId))
+            if(oldResult == null || !oldResult.StartsWith(RunId))
             {
                 oldResult = newResult;
                 dumpFile.String = oldResult;
@@ -163,43 +161,30 @@ namespace Reni.Struct
 
         private bool Defined(string name) { return Dictionary.ContainsKey(name); }
 
-        private IStructFeature FindStructFeature(string name)
-        {
-            return new StructFeature(Dictionary[name], Properties.Contains(name));
-        }
+        private IStructFeature FindStructFeature(string name) { return new StructFeature(Dictionary[name], Properties.Contains(name)); }
 
-        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(Defineable defineable)
-        {
-            return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable));
-        }
+        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(Defineable defineable) { return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable)); }
 
         private SearchResult<IStructFeature> Search(Defineable defineable)
         {
-            if (Defined(defineable.Name))
-                return SearchResult<IStructFeature>.Success(FindStructFeature(defineable.Name),defineable);
-            return defineable.SearchFromStruct().SubTrial(this,"try common definition");
+            if(Defined(defineable.Name))
+                return SearchResult<IStructFeature>.Success(FindStructFeature(defineable.Name), defineable);
+            return defineable.SearchFromStruct().SubTrial(this, "try common definition");
         }
 
-        internal SearchResult<IConverter<IContextFeature, StructContextBase>> SearchFromStructContext(Defineable defineable)
-        {
-            return SearchResult<IConverter<IContextFeature, StructContextBase>>.Create(Search(defineable));
-        }
+        internal SearchResult<IConverter<IContextFeature, StructContextBase>> SearchFromStructContext(
+            Defineable defineable) { return SearchResult<IConverter<IContextFeature, StructContextBase>>.Create(Search(defineable)); }
 
-        internal Result ArrayConversion(Category category)
-        {
-            throw new NotImplementedException();
-        }
     }
 
-    internal interface IStructFeature 
-            : IConverter<IConverter<IFeature, Ref>, Type>
-            , IConverter<IContextFeature, StructContextBase>
-    { }
+    internal interface IStructFeature
+        : IConverter<IConverter<IFeature, Ref>, Type>
+          , IConverter<IContextFeature, StructContextBase> {}
 
     [Serializable]
     internal class StructFeature
         : ReniObject
-        , IStructFeature
+          , IStructFeature
     {
         private readonly int _index;
         private readonly bool _isPoperty;
@@ -210,14 +195,8 @@ namespace Reni.Struct
             _isPoperty = isPoperty;
         }
 
-        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type)
-        {
-            return type.Context.Features[_index].ToProperty(_isPoperty);
-        }
+        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type) { return type.Context.Features[_index].ToProperty(_isPoperty); }
 
-        IContextFeature IConverter<IContextFeature, StructContextBase>.Convert(StructContextBase context)
-        {
-            return context.Features[_index].ToProperty(_isPoperty);
-        }
-    }           
+        IContextFeature IConverter<IContextFeature, StructContextBase>.Convert(StructContextBase context) { return context.Features[_index].ToProperty(_isPoperty); }
+    }
 }

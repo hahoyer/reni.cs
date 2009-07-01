@@ -18,11 +18,11 @@ namespace Reni.Struct
         [Node]
         internal readonly FullContext Context;
 
-        private readonly SimpleCache<ArrayFeature> _arrayFeature;
+        private readonly SimpleCache<ArrayFeature> _arrayFeatureCache;
 
         internal Type(FullContext context)
         {
-            _arrayFeature = new SimpleCache<ArrayFeature>(() => new ArrayFeature(this));
+            _arrayFeatureCache = new SimpleCache<ArrayFeature>(() => new ArrayFeature(this));
             Context = context;
         }
 
@@ -31,7 +31,7 @@ namespace Reni.Struct
         internal protected override int IndexSize { get { return Context.IndexSize; } }
 
         private List<ICompileSyntax> StatementList { get { return Context.StatementList; } }
-        internal IConverter<IFeature, Ref> ArrayFeature { get { return _arrayFeature.Value; } }
+        internal IConverter<IFeature, Ref> ArrayFeature { get { return _arrayFeatureCache.Value; } }
 
         internal override Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam) { return Context.AccessResultAsArgFromRef(category, position, refAlignParam); }
 
@@ -75,6 +75,15 @@ namespace Reni.Struct
                 return result;
             return base.SearchFromRef(defineable).SubTrial(this, "try at base class");
         }
+    
+        internal Result ArrayConversion(Category category)
+        {
+            var list = StatementList;
+            var elementType = Context.Type(0);
+            for (var i = 1; i < list.Count; i++)
+                elementType = TypeBase.CommonType(elementType, context.Type(list[i]));
+
+        }
     }
 
     internal class ArrayFeature : ReniObject, IConverter<IFeature, Ref>, IFeature
@@ -89,10 +98,15 @@ namespace Reni.Struct
         {
             if(args != null)
                 NotImplementedMethod(callContext, category, @object, args);
-            return callContext.ApplyResult(category, @object,
-                                           typeBase =>
-                                           (_type.Context.Container.ArrayConversion(category)).UseWithArg(typeBase.ConvertTo(category,
-                                                                                                            _type)));
+            return callContext
+                .ApplyResult
+                (
+                    category, 
+                    @object,
+                    typeBase => 
+                        (_type.ArrayConversion(category))
+                        .UseWithArg(typeBase.ConvertTo(category,_type))
+                );
         }
     }
 }

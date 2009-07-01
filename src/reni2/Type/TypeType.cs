@@ -6,11 +6,11 @@ namespace Reni.Type
     [Serializable]
     internal sealed class TypeType : TypeBase
     {
-        private readonly TypeBase _parent;
+        internal readonly TypeBase Value;
 
-        public TypeType(TypeBase parent)
+        public TypeType(TypeBase value)
         {
-            _parent = parent;
+            Value = value;
         }
 
         protected override Size GetSize()
@@ -18,7 +18,7 @@ namespace Reni.Type
             return Size.Zero;
         }
 
-        internal override string DumpPrintText { get { return "(" + _parent.DumpPrintText + "()) type"; } }
+        internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
         internal override Result ConvertToItself(Category category)
         {
@@ -32,12 +32,12 @@ namespace Reni.Type
 
         private CodeBase DumpPrintCode()
         {
-            return CodeBase.CreateDumpPrintText(_parent.DumpPrintText);
+            return CodeBase.CreateDumpPrintText(Value.DumpPrintText);
         }
 
         internal override string DumpShort()
         {
-            return "(" + _parent.DumpShort() + ") type"; 
+            return "(" + Value.DumpShort() + ") type"; 
         }
     }
 }

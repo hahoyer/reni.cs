@@ -157,9 +157,12 @@ namespace Reni.Context
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
         {
-            var compiledResult = Result(Category.Code | Category.Type | Category.Refs, syntax);
-            var convertedResult = compiledResult.ConvertTo(resultType);
-            return convertedResult.Evaluate();
+            return Result(Category.Code | Category.Type | Category.Refs, syntax).ConvertTo(resultType).Evaluate();
+        }
+
+        internal BitsConst Evaluate(ICompileSyntax syntax)
+        {
+            return Result(Category.Code | Category.Type | Category.Refs, syntax).Evaluate();
         }
 
         [UsedImplicitly]
