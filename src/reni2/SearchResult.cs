@@ -61,6 +61,14 @@ namespace Reni
 
         public static SearchResult<TFeatureType> Success(TFeatureType feature, Defineable defineable) { return new SearchResult<TFeatureType>(feature, defineable, SearchTrial.Create(Tracer.MethodHeader(1, true))); }
 
+        public static SearchResult<TFeatureType> SuccessIfMatch(Defineable defineable)
+        {
+            var x = defineable as TFeatureType;
+            if(x == null) 
+                return Failure(defineable);
+            return Success(x, defineable);
+        }
+
         public SearchResult<TFeatureType> AlternativeTrial(SearchResult<TFeatureType> failedResult)
         {
             var searchTrial = SearchTrial.AlternativeTrial(failedResult.SearchResultDescriptor.SearchTrial,

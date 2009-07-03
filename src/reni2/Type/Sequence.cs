@@ -195,10 +195,7 @@ namespace Reni.Type
             return new SequenceOperationFeatureClass(this, definable);
         }
 
-        public IFeature EnableCutFeatureObject()
-        {
-            return _enableCutCutFeature;
-        }
+        public IFeature EnableCutFeature { get { return _enableCutCutFeature; } }
     }
 
     [Serializable]

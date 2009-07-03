@@ -50,7 +50,7 @@ namespace Reni.Syntax
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            return Prefix.Result(context, category, Token, Right);
+            return Prefix.Result(context, category, Right);
         }
 
         protected internal override string DumpShort()
@@ -78,7 +78,7 @@ namespace Reni.Syntax
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            return Infix.Result(context, category, Left, Token, Right);
+            return Infix.Result(context, category, Left, Right);
         }
 
         protected internal override string DumpShort()

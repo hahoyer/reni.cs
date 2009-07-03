@@ -1,7 +1,6 @@
-﻿using HWClassLibrary.TreeStructure;
-using System;
+﻿using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Feature;
 using Reni.Parser.TokenClass.Symbol;
 using Reni.Struct;
@@ -17,8 +16,10 @@ namespace Reni.Parser.TokenClass
     {
         [Node, DumpData(false)]
         internal virtual string CSharpNameOfDefaultOperation { get { return Name; } }
+
         [Node]
         internal string DataFunctionName { get { return GetType().Name; } }
+
         [Node]
         internal virtual bool IsCompareOperator { get { return false; } }
 
@@ -44,66 +45,27 @@ namespace Reni.Parser.TokenClass
         }
 
         internal override IParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax,
-            Token token)
-        {
-            return new DeclarationPartSyntax(extensionSyntax, token);
-        }
+                                                                    Token token) { return new DeclarationPartSyntax(extensionSyntax, token); }
 
-        internal virtual SearchResult<IFeature> Search()
-        {
-            return SearchResult<IFeature>.Failure(this);
-        }
+        internal SearchResult<IFeature> Search() { return SearchResult<IFeature>.SuccessIfMatch(this); }
+        internal SearchResult<IPrefixFeature> SearchPrefix() { return SearchResult<IPrefixFeature>.SuccessIfMatch(this); }
+        internal SearchResult<IContextFeature> SearchContext() { return SearchResult<IContextFeature>.SuccessIfMatch(this); }
 
-        internal virtual SearchResult<IPrefixFeature> SearchPrefix()
-        {
-            return SearchResult<IPrefixFeature>.Failure(this);
-        }
+        internal SearchResult<IConverter<IFeature, Sequence>> SearchFromSequenceElement() { return SearchResult<IConverter<IFeature, Sequence>>.SuccessIfMatch(this); }
+        internal SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequenceElement() { return SearchResult<IConverter<IPrefixFeature, Sequence>>.SuccessIfMatch(this); }
+        internal SearchResult<IConverter<IFeature, Sequence>> SearchForSequence() { return SearchResult<IConverter<IFeature, Sequence>>.SuccessIfMatch(this); }
 
-        internal virtual SearchResult<IConverter<IFeature, Sequence>> SearchFromSequenceElement()
-        {
-            return SearchResult<IConverter<IFeature, Sequence>>.Failure(this);
-        }
+        internal SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>> SearchFromSequenceOfBit() { return SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>>.SuccessIfMatch(this); }
+        internal SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>> SearchPrefixFromSequenceOfBit() { return SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>>.SuccessIfMatch(this); }
 
-        internal virtual SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequenceElement()
-        {
-            return SearchResult<IConverter<IPrefixFeature, Sequence>>.Failure(this);
-        }
 
-        internal virtual SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>> SearchFromSequenceOfBit()
-        {
-            return SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>>.Failure(this);
-        }
+        internal SearchResult<IConverter<IFeature, Ref>> SearchFromRef() { return SearchResult<IConverter<IFeature, Ref>>.SuccessIfMatch(this); }
 
-        internal virtual SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>>
-            SearchPrefixFromSequenceOfBit()
-        {
-            return SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>>.Failure(this);
-        }
+        internal SearchResult<IConverter<IFeature, AssignableRef>> SearchFromAssignableRef() { return SearchResult<IConverter<IFeature, AssignableRef>>.SuccessIfMatch(this); }
 
-        internal virtual SearchResult<IContextFeature> SearchContext()
-        {
-            return SearchResult<IContextFeature>.Failure(this);
-        }
+        internal SearchResult<IStructFeature> SearchFromStruct() { return SearchResult<IStructFeature>.Failure(this); }
 
-        internal virtual SearchResult<IConverter<IFeature, Sequence>> SearchForSequence()
-        {
-            return SearchResult<IConverter<IFeature, Sequence>>.Failure(this);
-        }
-
-        internal virtual SearchResult<IConverter<IFeature, Ref>> SearchFromRef()
-        {
-            return SearchResult<IConverter<IFeature, Ref>>.Failure(this);
-        }
-
-        internal virtual SearchResult<IConverter<IFeature, AssignableRef>> SearchFromAssignableRef()
-        {
-            return SearchResult<IConverter<IFeature, AssignableRef>>.Failure(this);
-        }
-
-        internal virtual SearchResult<IStructFeature> SearchFromStruct()
-        {
-            return SearchResult<IStructFeature>.Failure(this);
-        }
+        internal SearchResult<IConverter<IFeature, IArray>> SearchFromArray() { return SearchResult<IConverter<IFeature, IArray>>.SuccessIfMatch(this); }
     }
 
     internal sealed class DeclarationPartSyntax : ParsedSyntax
@@ -111,15 +73,13 @@ namespace Reni.Parser.TokenClass
         private readonly DefineableToken _defineableToken;
         private readonly DeclarationExtensionSyntax _extensionSyntax;
 
-        internal DeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, Token token) : base(token)
+        internal DeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, Token token)
+            : base(token)
         {
             _defineableToken = new DefineableToken(token);
             _extensionSyntax = extensionSyntax;
         }
 
-        internal protected override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
-        {
-            return new DeclarationSyntax(_extensionSyntax, _defineableToken, token, right);
-        }
+        internal protected override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right) { return new DeclarationSyntax(_extensionSyntax, _defineableToken, token, right); }
     }
 }

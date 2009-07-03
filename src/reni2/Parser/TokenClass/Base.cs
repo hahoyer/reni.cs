@@ -9,75 +9,6 @@ using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
 {
-    [MeansImplicitUse]
-    internal sealed class TokenAttribute : TokenAttributeBase
-    {
-        internal override PrioTable CreatePrioTable()
-        {
-            var x = PrioTable.LeftAssoc("<else>");
-            x += PrioTable.LeftAssoc(
-                "at", "content", "_A_T_", "_N_E_X_T_",
-                "raw_convert", "construct", "bit_cast", "bit_expand",
-                "stable_ref", "consider_as",
-                "size",
-                "bit_address", "bit_align"
-                );
-
-            x += PrioTable.LeftAssoc(".");
-
-            x += PrioTable.LeftAssoc("~");
-            x += PrioTable.LeftAssoc("&");
-            x += PrioTable.LeftAssoc("|");
-
-            x += PrioTable.LeftAssoc("*", "/", "\\");
-            x += PrioTable.LeftAssoc("+", "-");
-
-            x += PrioTable.LeftAssoc("<", ">", "<=", ">=");
-            x += PrioTable.LeftAssoc("=", "<>");
-
-            x += PrioTable.LeftAssoc("!~");
-            x += PrioTable.LeftAssoc("!&!");
-            x += PrioTable.LeftAssoc("!|!");
-
-            x += PrioTable.RightAssoc(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
-
-            x = x.ParLevel
-                (new[]
-                {
-                    "+--",
-                    "+?+",
-                    "?-+"
-                },
-                    new[] {"then"},
-                    new[] {"else"}
-                );
-            x += PrioTable.RightAssoc("!");
-            x += PrioTable.RightAssoc(":", "function");
-            x += PrioTable.RightAssoc(",");
-            x += PrioTable.RightAssoc(";");
-            x = x.ParLevel
-                (new[]
-                {
-                    "++-",
-                    "+?-",
-                    "?--"
-                },
-                    new[] {"(", "[", "{", "<frame>"},
-                    new[] {")", "]", "}", "<end>"}
-                );
-            //x.Correct("(", "<else>", '-');
-            //x.Correct("[", "<else>", '-');
-            //x.Correct("{", "<else>", '-');
-
-            //Tracer.FlaggedLine("\n"+x.ToString());
-            return x;
-        }
-
-        internal TokenAttribute(string token) : base(token) {}
-
-        public TokenAttribute() : base(null) {}
-    }
-
     /// <summary>
     /// Base clas for compiler tokens
     /// </summary>
@@ -130,6 +61,7 @@ namespace Reni.Parser.TokenClass
             return name;
         }
 
+        [UsedImplicitly]
         internal static string Symbolize(string token)
         {
             var name = "";
@@ -138,9 +70,9 @@ namespace Reni.Parser.TokenClass
             return name;
         }
 
-        internal static string SymbolizeChar(char Char)
+        private static string SymbolizeChar(char @char)
         {
-            switch(Char)
+            switch(@char)
             {
                 case '&':
                     return "And";
@@ -171,7 +103,7 @@ namespace Reni.Parser.TokenClass
                 case '~':
                     return "Tilde";
                 default:
-                    throw new NotImplementedException("Symbolize(" + Char + ")");
+                    throw new NotImplementedException("Symbolize(" + @char + ")");
             }
         }
 
@@ -184,12 +116,7 @@ namespace Reni.Parser.TokenClass
 
     [Serializable]
     internal abstract class Special : TokenClassBase
-    {
-        internal string DumpShort()
-        {
-            return Name;
-        }
-    }
+    {}
 
     [Serializable]
     internal abstract class Terminal : Special
@@ -207,7 +134,7 @@ namespace Reni.Parser.TokenClass
     [Serializable]
     internal abstract class Prefix : Special
     {
-        internal abstract Result Result(ContextBase context, Category category, Token token, ICompileSyntax right);
+        internal abstract Result Result(ContextBase context, Category category, ICompileSyntax right);
 
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
@@ -219,7 +146,7 @@ namespace Reni.Parser.TokenClass
     [Serializable]
     internal abstract class Infix : Special
     {
-        internal abstract Result Result(ContextBase callContext, Category category, ICompileSyntax left, Token token, ICompileSyntax right);
+        internal abstract Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right);
 
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {

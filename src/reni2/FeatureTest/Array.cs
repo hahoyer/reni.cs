@@ -3,17 +3,17 @@
 namespace Reni.FeatureTest.Array
 {
     [TestFixture]
-    [Target("(1,3,5,1) array dump_print")]
-    [Output("array(4 bits,(1,3,5,1))")]
-    public class FromStruct : CompilerTest
+    [Target("(()<*5<*3<*5<*1) dump_print")]
+    [Output("array(4 bits,(5,3,5,1))")]
+    public class ArrayFromPieces : CompilerTest
     {
         [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
     [TestFixture]
-    [Target("(<*5<*3<*5<*1) dump_print")]
+    [Target("(()<*5<*3)<<(()<*5<*1) dump_print")]
     [Output("array(4 bits,(5,3,5,1))")]
-    public class ArrayFromPieces: CompilerTest
+    public class CombineArraysFromPieces : CompilerTest
     {
         [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }

@@ -1,7 +1,7 @@
-﻿using HWClassLibrary.TreeStructure;
-using System;
+﻿using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
@@ -44,10 +44,7 @@ namespace Reni.Parser
         /// asis
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return _token.GetHashCode() + _data.GetHashCode();
-        }
+        public override int GetHashCode() { return _token.GetHashCode() + _data.GetHashCode(); }
 
         /// <summary>
         /// asis
@@ -76,24 +73,22 @@ namespace Reni.Parser
             for(var i = 0; i < Length; i++)
                 if(maxlen < _token[i].Length)
                     maxlen = _token[i].Length;
-            ;
-            var Head0 = "";
-            Head0 = Head0.PadLeft(maxlen);
-            Head0 += "    ";
-            var Head1 = Head0;
-            var Result = "";
+            var head0 = "";
+            head0 = head0.PadLeft(maxlen);
+            head0 += "    ";
+            var head1 = head0;
+            var result = "";
             for(var i = 0; i < _token.Length; i++)
             {
                 var ii = Convert.ToString(i + 10000);
-                Head0 += ii[3];
-                Head1 += ii[4];
-                Result += _token[i].PadLeft(maxlen) + " " + ii.Substring(3, 2) + " ";
+                head0 += ii[3];
+                head1 += ii[4];
+                result += _token[i].PadLeft(maxlen) + " " + ii.Substring(3, 2) + " ";
                 for(var j = 0; j < Length; j++)
-                    Result += _data[i, j];
-                Result += "\n";
+                    result += _data[i, j];
+                result += "\n";
             }
-            ;
-            return Head0 + "\n" + Head1 + "\n" + Result;
+            return head0 + "\n" + head1 + "\n" + result;
         }
 
         private void AllocData(params string[][] x)
@@ -118,7 +113,7 @@ namespace Reni.Parser
         /// <summary>
         /// Returns number of token in table
         /// </summary>
-        public int Length { get { return _token.Length; } }
+        private int Length { get { return _token.Length; } }
 
         private PrioTable(char data, string[] token)
         {
@@ -159,22 +154,22 @@ namespace Reni.Parser
             return x.Length;
         }
 
-        private PrioTable(PrioTable x, string[] Data, string[] Left, string[] Right)
+        private PrioTable(PrioTable x, string[] data, string[] left, string[] right)
         {
-            AllocData(Left, x._token, Right);
+            AllocData(left, x._token, right);
             for(var i = 0; i < Length; i++)
                 for(var j = 0; j < Length; j++)
                 {
-                    var iData = Find(i, Left, x._token);
-                    var jData = Find(j, Left, x._token);
-                    _data[i, j] = Data[iData][jData];
+                    var iData = Find(i, left, x._token);
+                    var jData = Find(j, left, x._token);
+                    _data[i, j] = data[iData][jData];
 
                     if(iData == 1 && jData == 1)
-                        _data[i, j] = x._data[i - Left.Length, j - Left.Length];
+                        _data[i, j] = x._data[i - left.Length, j - left.Length];
                     else if(iData == 2 && jData == 0)
-                        if(j < i - Left.Length - x.Length)
+                        if(j < i - left.Length - x.Length)
                             _data[i, j] = '-';
-                        else if(j == i - Left.Length - x.Length)
+                        else if(j == i - left.Length - x.Length)
                             _data[i, j] = '=';
                         else
                             _data[i, j] = '+';
@@ -193,12 +188,10 @@ namespace Reni.Parser
             for(var i = 0; i < Length; i++)
                 if(_token[i] == name)
                     return (i);
-            ;
 
             for(var i = 0; i < Length; i++)
                 if(_token[i] == "<else>")
                     return (i);
-            ;
             throw new NotImplementedException("missing <else> entry in priority table");
         }
 
@@ -207,20 +200,14 @@ namespace Reni.Parser
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static PrioTable LeftAssoc(params string[] x)
-        {
-            return new PrioTable('-', x);
-        }
+        public static PrioTable LeftAssoc(params string[] x) { return new PrioTable('-', x); }
 
         /// <summary>
         /// Define a prio table with thokens that have the sam priority and are right associative
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static PrioTable RightAssoc(params string[] x)
-        {
-            return new PrioTable('+', x);
-        }
+        public static PrioTable RightAssoc(params string[] x) { return new PrioTable('+', x); }
 
         /// <summary>
         /// Define a prio table that adds a parenthesis level. 
@@ -243,10 +230,7 @@ namespace Reni.Parser
         /// <param name="lToken">list of strings that play the role of left parenthesis</param>
         /// <param name="rToken">list of strings that play the role of right parenthesis</param>
         /// <returns></returns>
-        public PrioTable ParLevel(string[] data, string[] lToken, string[] rToken)
-        {
-            return new PrioTable(this, data, lToken, rToken);
-        }
+        public PrioTable ParLevel(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
 
         /// <summary>
         /// Combines two prioritity tables. The tokens contained in left operand are considered as higher priority operands
@@ -254,10 +238,7 @@ namespace Reni.Parser
         /// <param name="x">higher priority tokens</param>
         /// <param name="y">lower priority tokens</param>
         /// <returns></returns>
-        public static PrioTable operator +(PrioTable x, PrioTable y)
-        {
-            return new PrioTable(x, y);
-        }
+        public static PrioTable operator +(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
 
         /// <summary>
         /// Combines two prioritity tables. The tokens contained in left operand are considered as higher priority operands
@@ -265,10 +246,8 @@ namespace Reni.Parser
         /// <param name="x">higher priority tokens</param>
         /// <param name="y">lower priority tokens</param>
         /// <returns></returns>
-        public static PrioTable Add(PrioTable x, PrioTable y)
-        {
-            return new PrioTable(x, y);
-        }
+        [UsedImplicitly]
+        public static PrioTable Add(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
 
         /// <summary>
         /// Manual correction of table entries
@@ -276,14 +255,13 @@ namespace Reni.Parser
         /// <param name="n"></param>
         /// <param name="t"></param>
         /// <param name="d"></param>
-        public void Correct(string n, string t, char d)
-        {
-            _data[Index(n), Index(t)] = d;
-        }
+        [UsedImplicitly]
+        public void Correct(string n, string t, char d) { _data[Index(n), Index(t)] = d; }
 
         /// <summary>
         /// List of names, without the special tokens "frame", "end" and "else" in angle brackets
         /// </summary>
+        [UsedImplicitly]
         public string[] GetNameList()
         {
             var result = new string[NormalNameLength()];
@@ -291,7 +269,6 @@ namespace Reni.Parser
             for(var i = 0; i < Length; i++)
                 if(IsNormalName(_token[i]))
                     result[k++] = _token[i];
-            ;
             return result;
         }
 
@@ -301,14 +278,10 @@ namespace Reni.Parser
             for(var i = 0; i < Length; i++)
                 if(IsNormalName(_token[i]))
                     n++;
-            ;
             return n;
         }
 
-        private static bool IsNormalName(string name)
-        {
-            return name != "<frame>" && name != "<end>" && name != "<else>";
-        }
+        private static bool IsNormalName(string name) { return name != "<frame>" && name != "<end>" && name != "<else>"; }
 
         /// <summary>
         /// Returns the priority information of a pair of tokens
@@ -317,18 +290,19 @@ namespace Reni.Parser
         /// Minus: Found token is higher than new token
         /// Equal sign: New token and found token are matching
         /// </summary>
-        /// <param name="New"></param>
-        /// <param name="Top"></param>
+        /// <param name="newToken"></param>
+        /// <param name="recentToken"></param>
         /// <returns></returns>
-        public char Relation(Token New, Token Top)
+        public char Relation(Token newToken, Token recentToken)
         {
-            //Tracer.FlaggedLine("\"" + _token[New] + "\" on \"" + _token[Top] + "\" --> \"" + _data[New, Top] + "\"");
-            return _data[New.Index(this), Top.Index(this)];
+            //Tracer.FlaggedLine("\"" + _token[New] + "\" on \"" + _token[recentToken] + "\" --> \"" + _data[New, recentToken] + "\"");
+            return _data[newToken.Index(this), recentToken.Index(this)];
         }
 
         //For debug only
         [Node]
         public string[] Token { get { return _token; } }
+
         //For debug only
         [Node]
         public string[] Data

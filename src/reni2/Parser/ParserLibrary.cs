@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using HWClassLibrary.Debug;
+using JetBrains.Annotations;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
@@ -183,6 +184,7 @@ namespace Reni.Parser
         }
     }
 
+    [MeansImplicitUse]
     internal abstract class TokenAttributeBase : Attribute
     {
         internal readonly string Token;
@@ -227,20 +229,20 @@ namespace Reni.Parser
     }
 
     [Serializable]
-    internal sealed class TokenFactory<TokenAttribute> : TokenFactory where TokenAttribute : TokenAttributeBase, new()
+    internal sealed class TokenFactory<TTokenAttribute> : TokenFactory where TTokenAttribute : TokenAttributeBase, new()
     {
         internal TokenFactory()
-            : base(CreateTokenClasses(), new TokenAttribute().CreatePrioTable()) {}
+            : base(CreateTokenClasses(), new TTokenAttribute().CreatePrioTable()) {}
 
         private static Dictionary<string, TokenClassBase> CreateTokenClasses()
         {
             var result = new Dictionary<string, TokenClassBase>();
-            var assembly = Assembly.GetAssembly(typeof(TokenAttribute));
+            var assembly = Assembly.GetAssembly(typeof(TTokenAttribute));
             var types = assembly.GetTypes();
             foreach(var type in types)
             {
-                var attributes = type.GetCustomAttributes(typeof(TokenAttribute), true);
-                foreach(TokenAttribute attribute in attributes)
+                var attributes = type.GetCustomAttributes(typeof(TTokenAttribute), true);
+                foreach(TTokenAttribute attribute in attributes)
                     result.Add(attribute.Token, (TokenClassBase) Activator.CreateInstance(type, new object[0]));
             }
             return result;
