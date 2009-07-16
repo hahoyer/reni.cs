@@ -325,7 +325,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount)
+        protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount)
         {
             NotImplementedMethod(token, objBitCount);
             return null;

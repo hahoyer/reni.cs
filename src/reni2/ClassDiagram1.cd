@@ -11,7 +11,7 @@
   <Class Name="Reni.Parser.TokenClass.Special" Collapsed="true">
     <Position X="18.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Parser\TokenClass\Base.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -110,7 +110,7 @@
     <Position X="9.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
+      <FileName>Parser\TokenClass\Colon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.SyntaxError" Collapsed="true">
@@ -123,7 +123,7 @@
   <Class Name="Reni.Parser.ParsedSyntax" Collapsed="true">
     <Position X="11.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgAAAAABAgAACAEBBgCAAIgAAQAAKgCAAEAABJEI=</HashCode>
+      <HashCode>BAAAgAAAAABAgAACAEBBgCAAIgAAQAAKgCAAEAABJMI=</HashCode>
       <FileName>Parser\ParsedSyntax.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -152,7 +152,7 @@
   <Class Name="Reni.Struct.Container" Collapsed="true">
     <Position X="20.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IEbAACAAAgIA0AAACBRIAAQQAgAIBEAAAGAAIAAiAAI=</HashCode>
+      <HashCode>KEbAAAAAAgIA0AAAihQIAAQAAgAEBEAAAGAAIAAiAAI=</HashCode>
       <FileName>Struct\Container.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -174,7 +174,7 @@
   <Class Name="Reni.Syntax.CompileSyntax" Collapsed="true">
     <Position X="16.75" Y="9" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAEAAAAAABAwAAAAAAAAAQAAAAAgAAAAAAAIAAAAAo=</HashCode>
+      <HashCode>AAAEAAAAAABAwAAAAABAAAQAAAAAgAAAAAAAIAAAAAI=</HashCode>
       <FileName>Syntax\CompileSyntax.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -190,28 +190,28 @@
     <Position X="6" Y="9" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAIAAAAAAAAAAAAAABA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
+      <FileName>Parser\TokenClass\Colon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.Symbol.PropertyDeclarationSyntax" Collapsed="true">
     <Position X="6" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAABAAI=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
+      <FileName>Parser\TokenClass\Colon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.Symbol.ConverterDeclarationSyntax" Collapsed="true">
     <Position X="8.25" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
+      <FileName>Parser\TokenClass\Colon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.Symbol.ExclamationSyntax" Collapsed="true">
     <Position X="3.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Colon.cs</FileName>
+      <FileName>Parser\TokenClass\Colon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Parser.TokenClass.Name.T_A_T_T" Collapsed="true">
@@ -221,43 +221,11 @@
       <FileName>Parser\TokenClass\Name\T_A_T_T.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Reni.Parser.TokenClass.Name.Tdump_printT" Collapsed="true">
-    <Position X="2.75" Y="3.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAABAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAgAAA=</HashCode>
-      <FileName>Parser\TokenClass\Name\Tdump_printT.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Name.Tenable_cutT" Collapsed="true">
-    <Position X="0.5" Y="3.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAQAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Name\Tenable_cutT.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Name.TtypeT" Collapsed="true">
-    <Position X="5" Y="3.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
-      <FileName>Parser\TokenClass\Name\TtypeT.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
   <Class Name="Reni.Parser.TokenClass.SequenceOfBitOperation" Collapsed="true">
     <Position X="7.25" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CAAAAAAIIAAAAAAAAAAAAAAAAAAAAABAAAAQAAAAAgg=</HashCode>
+      <HashCode>AAAAAAAIAAAAAAIAAAAAAAAAAAAAAABAAAAAAAAAAAg=</HashCode>
       <FileName>Parser\TokenClass\SequenceOfBitOperation.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.ColonEqual" Collapsed="true">
-    <Position X="11.75" Y="3.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAEAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\ColonEqual.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -275,73 +243,10 @@
       <FileName>Parser\TokenClass\CompareOperator.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.Minus" Collapsed="true">
-    <Position X="2.75" Y="5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>CAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Minus.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.Plus" Collapsed="true">
-    <Position X="5" Y="5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>CAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Plus.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.Star" Collapsed="true">
-    <Position X="9.5" Y="5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Star.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.Equal" Collapsed="true">
-    <Position X="0.5" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Equal.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.Greater" Collapsed="true">
-    <Position X="2.75" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Greater.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.GreaterEqual" Collapsed="true">
-    <Position X="5" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\GreaterEqual.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.Less" Collapsed="true">
-    <Position X="7.25" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\Less.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.LessEqual" Collapsed="true">
-    <Position X="9.5" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\LessEqual.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Reni.Parser.TokenClass.Symbol.LessGreater" Collapsed="true">
-    <Position X="11.75" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Parser\TokenClass\Symbol\LessGreater.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Reni.Parser.ExpressionSyntax" Collapsed="true">
     <Position X="16.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAEAAAAAAAAAAAQAAAAAAAEACCCAAAAAAAI=</HashCode>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAAAQAAAAAAAAACCCAAAAAAAA=</HashCode>
       <FileName>Parser\ExpressionSyntax.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -355,21 +260,21 @@
   <Class Name="Reni.CondSyntax" Collapsed="true">
     <Position X="18.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAABAQAQAAQAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <HashCode>AAAACABAAAEAAAAEAQAQAAQAAAAABQIAACAAAAAAAAA=</HashCode>
       <FileName>ThenElse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.ThenSyntax" Collapsed="true">
     <Position X="17.75" Y="11.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
       <FileName>ThenElse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.ThenElseSyntax" Collapsed="true">
     <Position X="19.75" Y="11.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAABAAAAAAAABAAAAAAAAAAQAAAAAACAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAACAAAAAAAAA=</HashCode>
       <FileName>ThenElse.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -397,7 +302,7 @@
   <Interface Name="Reni.Syntax.ICompileSyntax" Collapsed="true">
     <Position X="23" Y="1" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAACAgAAAAAEA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAQAAAAAACAAAAAAAEA=</HashCode>
       <FileName>Syntax\SyntaxBase.cs</FileName>
     </TypeIdentifier>
   </Interface>

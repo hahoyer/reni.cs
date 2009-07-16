@@ -1,5 +1,6 @@
 using System;
-using HWClassLibrary.Debug;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -49,12 +50,13 @@ namespace Reni.Type
                 .CreateBitSequenceOperation(token, size);
         }
 
-        protected internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
+        protected internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount,
+                                                                         int argBitCount)
         {
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
 
-        protected internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount)
+        protected override TypeBase SequenceOperationResultType(Defineable token, int objBitCount)
         {
             return token.BitSequenceOperationResultType(objBitCount);
         }
@@ -65,7 +67,8 @@ namespace Reni.Type
             return result.SearchResultDescriptor.Convert(result.Feature, this);
         }
 
-        internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable)
+        internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(
+            Defineable defineable)
         {
             var result = defineable.SearchPrefixFromSequenceOfBit();
             return result.SearchResultDescriptor.Convert(result.Feature, this);

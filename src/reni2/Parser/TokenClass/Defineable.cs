@@ -64,8 +64,6 @@ namespace Reni.Parser.TokenClass
         internal SearchResult<IConverter<IFeature, AssignableRef>> SearchFromAssignableRef() { return SearchResult<IConverter<IFeature, AssignableRef>>.SuccessIfMatch(this); }
 
         internal SearchResult<IStructFeature> SearchFromStruct() { return SearchResult<IStructFeature>.Failure(this); }
-
-        internal SearchResult<IConverter<IFeature, IArray>> SearchFromArray() { return SearchResult<IConverter<IFeature, IArray>>.SuccessIfMatch(this); }
     }
 
     internal sealed class DeclarationPartSyntax : ParsedSyntax

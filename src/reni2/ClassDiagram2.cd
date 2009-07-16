@@ -1,66 +1,97 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Reni.Code.ReplaceVisitor.Base">
-    <Position X="6.5" Y="0.5" Width="2" />
+    <Position X="7.75" Y="4.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AEAAAAAAAAgAAIAAAACAAAAgQAAAAIIAAAAKAAACAAA=</HashCode>
+      <HashCode>AEAAAAAAAAgAAIAAABCAAAAgQAAAAIIAAAAKAAACAAA=</HashCode>
       <FileName>Code\ReplaceVisitor\Base.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Code.ReplaceVisitor.ReplaceArg">
-    <Position X="3.75" Y="4.5" Width="1.5" />
+    <Position X="5" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAIAAAAAAAAAAAAAAAAAAAAAAAIAAABAAAAAAAAA=</HashCode>
       <FileName>Code\ReplaceVisitor\ReplaceArg.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Code.ReplaceVisitor.ReplaceContextRef&lt;Context&gt;">
-    <Position X="9.75" Y="4.5" Width="1.5" />
+    <Position X="9.75" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAABAAAAAAAAAAAABAAAAIAAAAAAAAAAAA=</HashCode>
       <FileName>Code\ReplaceVisitor\ReplaceContextRefWithArg.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Reni.Code.ReplaceVisitor.ReplaceEnvironment">
-    <Position X="5.75" Y="4.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAQAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Code\ReplaceVisitor\ReplaceEnvironment.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Reni.Context.ReplacePrimitiveRecursivity">
-    <Position X="7.75" Y="4.5" Width="1.5" />
+    <Position X="7.75" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAABAAAAAAAAAAAAAAAAAAAIAAAAAgQAAAAAAAIg=</HashCode>
       <FileName>Context\FunctionInstance.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Code.ReplaceVisitor.ReplaceAbsoluteArg">
-    <Position X="2.75" Y="7.25" Width="1.5" />
+    <Position X="4" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
       <FileName>Code\ReplaceVisitor\ReplaceAbsoluteArg.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Code.ReplaceVisitor.ReplaceRelRefArg">
-    <Position X="4.75" Y="7.25" Width="1.5" />
+    <Position X="6" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAIAgAAAAAAAAAAAAAABAAAAAAyAA=</HashCode>
       <FileName>Code\ReplaceVisitor\ReplaceRelRefArg.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Code.ReplaceVisitor.ReplaceRelativeContextRef&lt;Context&gt;">
-    <Position X="8" Y="7.75" Width="2.25" />
+    <Position X="8" Y="11.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA=</HashCode>
       <FileName>Code\ReplaceVisitor\ReplaceContextRefWithArg.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Reni.Code.ReplaceVisitor.ReplaceAbsoluteContextRef&lt;Context&gt;">
-    <Position X="10.75" Y="7.75" Width="2.25" />
+    <Position X="10.75" Y="11.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Code\ReplaceVisitor\ReplaceContextRefWithArg.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Reni.Code.Visitor&lt;T&gt;">
+    <Position X="8" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAIAAABCAAAAgAAIAAIIAgAAKAAACQAg=</HashCode>
+      <FileName>Code\Visitor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Reni.Code.CCode">
+    <Position X="1" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAACgCAAAAAAAAAAAAADAgAAAAAgAAAAA=</HashCode>
+      <FileName>Code\CCode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Reni.Code.Container">
+    <Position X="15.75" Y="4.75" Width="1.5" />
+    <NestedTypes>
+      <Class Name="Reni.Code.Container.UnexpectedContextRefInContainer" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Code\Container.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Reni.Code.Container.CodeBaseException" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Code\Container.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Reni.Code.Container.UnexpectedInternalRefInContainer" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Code\Container.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAApQogAIAEABCgAgAgMAABARYAAiAKAAACQCA=</HashCode>
+      <FileName>Code\Container.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Tahoma" Size="8.25" />

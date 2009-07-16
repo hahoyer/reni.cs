@@ -16,12 +16,19 @@ namespace Reni.Type
 
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var arrayResult = defineable.SearchFromArray().SubTrial(this, "try common definitions for arrays");
-            var result = arrayResult.SearchResultDescriptor.Convert(arrayResult.Feature,
-                                                                    this);
+            var result = ExecueAndConvert(this, () => SearchResult<IConverter<IFeature, IArray>>.SuccessIfMatch(defineable));
             if(result.IsSuccessFull)
                 return result;
             return base.Search(defineable).AlternativeTrial(result);
+        }
+
+        private static SearchResult<TFeature> ExecueAndConvert<TFeature, TType> (TType type, Func<SearchResult<IConverter<TFeature, TType>>> 
+            searchFunc) 
+            where TFeature : class 
+            where TType : IDumpShortProvider
+        {
+            var arrayResult = searchFunc().SubTrial(type, "try common definitions for type");
+            return arrayResult.SearchResultDescriptor.Convert(arrayResult.Feature, type);
         }
 
         internal override TypeBase CreatePair(TypeBase second) { return second; }

@@ -72,7 +72,7 @@ namespace Reni.Type
         long IArray.Count { get { return Count; } }
     }
 
-    internal interface IArray
+    internal interface IArray : IDumpShortProvider
     {
         TypeBase ElementType { get; }
         long Count { get; }
