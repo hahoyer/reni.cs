@@ -1,0 +1,58 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProjectGuid>{0402FAE1-D5D6-490F-BC68-C26C8873C0B2}</ProjectGuid>
+    <AssemblyName>HWClassLibrary</AssemblyName>
+    <TargetTypeEx>CSharp.Library.UnitTest</TargetTypeEx>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Assembly.cs" />
+    <Compile Include="BigInteger.cs" />
+    <Compile Include="DataBase\SQLGenerator.cs" />
+    <Compile Include="DataBase\DataBase.cs" />
+    <Compile Include="DataBase\TableColumn.cs" />
+    <Compile Include="Debug\Dumpable.cs" />
+    <Compile Include="Debug\dumpExcludeAttribute.cs" />
+    <Compile Include="Debug\Profiler.cs" />
+    <Compile Include="Debug\Tracer.cs" />
+    <Compile Include="Debug\Visualizer.cs" />
+    <Compile Include="Helper\CSharpCompiler.cs" />
+    <Compile Include="Helper\Dictionary.cs" />
+    <Compile Include="Helper\HWListExtender.cs" />
+    <Compile Include="Helper\HWString.cs" />
+    <Compile Include="Helper\Number.cs" />
+    <Compile Include="Helper\Sequence.cs" />
+    <Compile Include="Helper\Set.cs" />
+    <Compile Include="Helper\SimpleCache.cs" />
+    <Compile Include="Helper\StringAligner.cs" />
+    <Compile Include="IO\File.cs" />
+    <Compile Include="JetBrainsAnnotations.cs" />
+    <Compile Include="TreeStructure\Extender.cs" />
+    <Compile Include="TreeStructure\TreeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TreeStructure\TreeForm.Designer.cs">
+      <DependentUpon>TreeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TreeStructure\Helper.cs">
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.DebuggerVisualizers, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.SQLite" />
+    <Reference Include="System.Data.SQLite.Linq" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TreeStructure\TreeForm.resx">
+      <DependentUpon>TreeForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="sys.targets" />
+</Project>
