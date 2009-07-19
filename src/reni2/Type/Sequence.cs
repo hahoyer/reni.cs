@@ -70,25 +70,10 @@ namespace Reni.Type
             return base.IsConvertableToImplementation(dest, conversionFeature);
         }
 
-        internal override SearchResult<IFeature> Search(Defineable defineable)
+        internal override void Search(ISearchVisitor searchVisitor)
         {
-            return Element.SearchFromSequence(defineable).RecordSubTrial(this).Convert(this)
-                .Or(() => defineable.SubSearch<IFeature, Sequence>(this))
-                .Or(() => base.Search(defineable));
-        }
-
-        internal override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
-        {
-            return Element.SearchPrefixFromSequence(defineable).RecordSubTrial(this).Convert(this)
-                .Or(() => defineable.SubSearch<IPrefixFeature, Sequence>(this))
-                .Or(() => base.SearchPrefix(defineable));
-        }
-
-        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
-        {
-            return Element.SearchFromRefToSequence(defineable).RecordSubTrial(this).Convert(this)
-                .Or(() => defineable.SubSearch<IConverter<IFeature, Ref>, Sequence>(this))
-                .Or(() => base.SearchFromRef(defineable));
+            Element.Search(searchVisitor.Child(this));
+            base.Search(searchVisitor);
         }
 
         protected override Result ConvertToImplementation(Category category, TypeBase dest)

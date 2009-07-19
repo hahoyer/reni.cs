@@ -21,11 +21,10 @@ namespace Reni.Type
 
         protected override string ShortName { get { return "assignable_ref"; } }
 
-        internal override SearchResult<IFeature> Search(Defineable defineable)
+        internal override void Search(ISearchVisitor searchVisitor)
         {
-            return defineable
-                .SubSearch<IFeature,AssignableRef>(this)
-                .Or(() => base.Search(defineable));
+            Parent.Search(searchVisitor.Child(this));
+            base.Search(searchVisitor);
         }
     }
 

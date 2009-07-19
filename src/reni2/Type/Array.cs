@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Syntax;
@@ -12,7 +13,7 @@ namespace Reni.Type
     /// Fixed sized array of a type
     /// </summary>
     [Serializable]
-    internal sealed class Array : Child, IArray
+    internal sealed class Array : Child
     {
         private readonly int _count;
 
@@ -66,56 +67,79 @@ namespace Reni.Type
             return false;
         }
 
+        internal override void Search(ISearchVisitor searchVisitor)
+        {
+            searchVisitor.Child(this).SearchTypeBase();
+            base.Search(searchVisitor);
+        }
+
         internal override string DumpShort() { return "(" + Element.DumpShort() + ")array(" + Count + ")"; }
 
-        TypeBase IArray.ElementType { get { return Element; } }
-        long IArray.Count { get { return Count; } }
-    }
-
-    internal interface IArray : IDumpShortProvider
-    {
-        TypeBase ElementType { get; }
-        long Count { get; }
+        protected override bool IsInheritor { get { return false; } }
     }
 
     internal class ConcatArraysFeature : IFeature
     {
-        private readonly IArray _type;
+        private Array _type;
 
-        public ConcatArraysFeature(IArray type) { _type = type; }
+        public ConcatArraysFeature(Array type) { _type = type; }
 
         Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                     ICompileSyntax args) { throw new NotImplementedException(); }
     }
 
-    internal class ConcatArrayWithObjectFeature : IFeature
+    internal class ConcatArrayWithObjectFeatureBase
     {
-        private readonly IArray _type;
-
-        public ConcatArrayWithObjectFeature(IArray type) { _type = type; }
-
-        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                    ICompileSyntax args)
+        protected static Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args, TypeBase elementType, int count)
         {
-            var elementType = _type.ElementType;
-            if(elementType == null)
-                elementType = callContext.Type(args);
+            var resultType = new Array(elementType, count);
 
-            var count = _type.Count + 1;
-            Tracer.Assert(count == (int) count);
-            var resultType = new Array(elementType, (int) count);
+            var categoryWithType = category | Category.Type;
 
-            var leftResult = callContext.Result(category, @object).AutomaticDereference();
-            var rightResult = callContext
-                .ConvertedRefResult(category, args, elementType.CreateAutomaticRef(callContext.RefAlignParam))
+            var leftResult = callContext
+                .Result(categoryWithType, @object)
                 .AutomaticDereference();
+
+            var rightResult = callContext
+                .ConvertedRefResult(categoryWithType, args, elementType.CreateAutomaticRef(callContext.RefAlignParam))
+                .AutomaticDereference()
+                .Align(callContext.AlignBits);
 
             return resultType.CreateResult
                 (
-                category, 
-                ()=> rightResult.Code.CreateSequence(leftResult.Code),
-                ()=> leftResult.Refs + rightResult.Refs
+                category,
+                () => rightResult.Code.CreateSequence(leftResult.Code),
+                () => leftResult.Refs + rightResult.Refs
                 );
+        }
+    }
+
+    internal class CreateArrayFeature : ConcatArrayWithObjectFeatureBase, IFeature
+    {
+        Result IFeature.ApplyResult(
+            ContextBase callContext, 
+            Category category, 
+            ICompileSyntax @object,
+            ICompileSyntax args)
+        {
+            var elementType = callContext.Type(args).CreateAlign(callContext.AlignBits);
+            return ApplyResult(callContext, category, @object, args, elementType, 1);
+        }
+    }
+
+    internal class ConcatArrayWithObjectFeature : ConcatArrayWithObjectFeatureBase, IFeature
+    {
+        private readonly Array _type;
+
+        public ConcatArrayWithObjectFeature(Array type) { _type = type; }
+
+        Result IFeature.ApplyResult(
+            ContextBase callContext, 
+            Category category, 
+            ICompileSyntax @object, 
+            ICompileSyntax args)
+        {
+            return ApplyResult(callContext, category, @object, args, _type.Element, _type.Count + 1);
         }
     }
 }

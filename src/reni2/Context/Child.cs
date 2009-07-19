@@ -5,7 +5,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Feature;
-using Reni.Parser.TokenClass;
 using Reni.Struct;
 
 namespace Reni.Context
@@ -38,9 +37,9 @@ namespace Reni.Context
             return Parent.CreateArgsRefResult(category);
         }
 
-        internal override SearchResult<IContextFeature> Search(Defineable defineable)
+        internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
-            return Parent.Search(defineable).RecordSubTrial(this);
+            Parent.Search(searchVisitor);
         }
 
         internal override IStructContext FindStruct()

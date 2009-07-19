@@ -13,5 +13,6 @@ namespace Reni.Type
         {
             return base.IsConvertableToImplementation(dest, conversionFeature.EnableCut);
         }
+
     }
 }

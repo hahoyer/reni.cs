@@ -58,5 +58,9 @@ namespace Reni.Type
         {
             return Parent.IsConvertableTo(dest, conversionFeature);
         }
+        protected override bool IsInheritor
+        {
+            get { return true; }
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace Reni.FeatureTest.Array
     [Output("array(4 bits,(5,3,5,1))")]
     public class ArrayFromPieces : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(UnderConstruction),Explicit]
         public override void Run() { BaseRun(); }
     }
     [TestFixture]
@@ -15,7 +15,7 @@ namespace Reni.FeatureTest.Array
     [Output("array(4 bits,(5,3,5,1))")]
     public class CombineArraysFromPieces : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(UnderConstruction), Explicit]
         public override void Run() { BaseRun(); }
     }
     [TestFixture]
@@ -23,7 +23,7 @@ namespace Reni.FeatureTest.Array
     [Output("array(4 bits,(0,1,2,3,4))")]
     public class FromTypeAndFunction : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(UnderConstruction), Explicit]
         public override void Run() { BaseRun(); }
     }
 }

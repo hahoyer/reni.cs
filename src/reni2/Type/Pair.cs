@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
@@ -11,7 +12,8 @@ namespace Reni.Type
     {
         private readonly TypeBase _second;
 
-        internal Pair(TypeBase first, TypeBase second) : base(first)
+        internal Pair(TypeBase first, TypeBase second)
+            : base(first)
         {
             _second = second;
         }
@@ -36,12 +38,12 @@ namespace Reni.Type
                     result += "\n";
                     result += types[i];
                 }
-                return "(" + HWString.Indent(result) + "\n)";
+                return "(" + result.Indent() + "\n)";
             }
         }
 
         [DumpData(false)]
-        internal protected override TypeBase[] ToList
+        protected internal override TypeBase[] ToList
         {
             get
             {
@@ -85,5 +87,7 @@ namespace Reni.Type
         {
             return "pair." + ObjectId;
         }
+
+        protected override bool IsInheritor { get { return false; } }
     }
 }

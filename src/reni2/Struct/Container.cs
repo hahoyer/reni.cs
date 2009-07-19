@@ -178,15 +178,16 @@ namespace Reni.Struct
             return null;
         }
 
-        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(Defineable defineable)
+        internal IConverter<IConverter<IFeature, Ref>, Type> SearchFromRefToStruct(Defineable defineable)
         {
-            return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(FindStructFeature(defineable.Name), defineable);
+            return FindStructFeature(defineable.Name);
         }
 
-        internal SearchResult<IConverter<IContextFeature, Context>> SearchFromStructContext(Defineable defineable)
+        internal IConverter<IContextFeature, Context> SearchFromStructContext(Defineable defineable)
         {
-            return SearchResult<IConverter<IContextFeature, Context>>.Create(FindStructFeature(defineable.Name), defineable);
+            return FindStructFeature(defineable.Name);
         }
+
     }
 
     internal interface IStructFeature

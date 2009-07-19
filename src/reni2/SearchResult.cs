@@ -2,118 +2,130 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
-using Reni.Struct;
+using Reni.Type;
 
 namespace Reni
 {
-    internal class SearchResultDescriptor : ReniObject
-    {
-        internal SearchResultDescriptor(Defineable defineable, SearchTrial searchTrial)
-        {
-            Defineable = defineable;
-            SearchTrial = searchTrial;
-        }
-
-        public Defineable Defineable { get; private set; }
-        public SearchTrial SearchTrial { get; private set; }
-
-        public SearchResult<TFeatureType> Convert<TFeatureType,TTargetType>
-            (
-            IConverter<TFeatureType, TTargetType> feature,
-            TTargetType target)
-            where TFeatureType : class
-        {
-            TFeatureType resultFeature = null;
-            if(feature != null)
-                resultFeature = feature.Convert(target);
-            return SearchResult<TFeatureType>.Create(resultFeature, this);
-        }
-    }
-
-    internal struct SearchResult<TFeatureType>
-        where TFeatureType : class
-    {
-        private SearchResult(TFeatureType feature, Defineable defineable, SearchTrial searchTrial)
-            : this(feature, new SearchResultDescriptor(defineable, searchTrial))
-        {
-        }
-
-        private SearchResult(TFeatureType feature, SearchResultDescriptor searchResultDescriptor)
-            : this()
-        {
-            Feature = feature;
-            SearchResultDescriptor = searchResultDescriptor;
-        }
-
-        public SearchResult(TFeatureType feature, Defineable defineable)
-            : this(feature, defineable, SearchTrial.Create(Tracer.MethodHeader(1, true)))
-        {                               
-        }
-
-        public bool IsSuccessFull { get { return Feature != null; } }
-        public SearchResultDescriptor SearchResultDescriptor { get; private set; }
-
-        [DumpExcept(null)]
-        public TFeatureType Feature { get; private set; }
-
-        public static SearchResult<TFeatureType> Create(TFeatureType feature, Defineable defineable)
-        {
-            return new SearchResult<TFeatureType>(feature, defineable, SearchTrial.Create(Tracer.MethodHeader(1, true)));
-        }
-
-        public SearchResult<TFeatureType> RecordAlternativeTrial(SearchResult<TFeatureType> failedResult)
-        {
-            var searchTrial = SearchTrial.AlternativeTrial(failedResult.SearchResultDescriptor.SearchTrial,
-                                                           SearchResultDescriptor.SearchTrial,
-                                                           Tracer.MethodHeader(1, true));
-            return new SearchResult<TFeatureType>(Feature, SearchResultDescriptor.Defineable, searchTrial);
-        }
-
-        public SearchResult<TFeatureType> RecordSubTrial<TTarget>(TTarget target)
-            where TTarget : IDumpShortProvider
-
-        {
-            return new SearchResult<TFeatureType>
-                (
-                Feature,
-                SearchResultDescriptor.Defineable,
-                SearchTrial.SubTrial
-                    (
-                    SearchResultDescriptor.SearchTrial,
-                    target,
-                    Tracer.MethodHeader(1, true)
-                    )
-                );
-        }
-
-        public static SearchResult<TFeatureType> Create(TFeatureType feature, SearchResultDescriptor descriptor)
-        {
-            return new SearchResult<TFeatureType>(feature, descriptor);
-        }
-
-        public static SearchResult<TFeatureType> Convert<TSubFeatureType>(SearchResult<TSubFeatureType> result)
-            where TSubFeatureType : class, TFeatureType
-        {
-            return Create(result.Feature, result.SearchResultDescriptor);
-        }
-
-        internal SearchResult<TFeatureType> Or(Func<SearchResult<TFeatureType>> alternative)
-        {
-            if(IsSuccessFull)
-                return this;
-            return alternative().RecordAlternativeTrial(this);
-        }
-    }
-
     internal static class SearchResultExtender
     {
-        internal static SearchResult<TFeature> Convert<TFeature, TType>(this SearchResult<IConverter<TFeature, TType>> containerResult, TType target)
+        internal static TFeature CheckedConvert<TFeature, TType>(this IConverter<TFeature, TType> feature, TType target)
             where TFeature : class
+            where TType : IDumpShortProvider
         {
-            return containerResult.SearchResultDescriptor.Convert(containerResult.Feature, target);
+            if(feature == null)
+                return null;
+            return feature.Convert(target);
+        }
+    }
+
+    internal interface ISearchVisitor
+    {
+        void SearchTypeBase();
+        ISearchVisitor Child(Ref target);
+        ISearchVisitor Child(AssignableRef target);
+        ISearchVisitor Child(Sequence target);
+        ISearchVisitor Child(Type.Array target);
+        ISearchVisitor Child(Type.Void target);
+    }
+
+    internal abstract class SearchVisitor<TFeature> : ISearchVisitor
+        where TFeature : class
+    {
+        void ISearchVisitor.SearchTypeBase() { SearchTypeBase(); }
+        ISearchVisitor ISearchVisitor.Child(Ref target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(AssignableRef target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Sequence target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Type.Array target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Type.Void target) { return InternalChild(target); }
+
+        internal abstract bool IsSuccessFull { get; }
+        internal abstract TFeature InternalResult { set; }
+        internal abstract Defineable Defineable { get; }
+
+        internal void Search(TypeBase typeBase)
+        {
+            if (IsSuccessFull)
+                return;
+            typeBase.Search(this);
         }
 
+        internal void SearchTypeBase()
+        {
+            if (IsSuccessFull)
+                return;
+
+            InternalResult = Defineable.Check<TFeature>();
+        }
+
+        private ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider { return new ChildSearchVisitor<TFeature, TType>(this, target); }
+    }
+
+    internal class RootSearchVisitor<TFeature> : SearchVisitor<TFeature>
+        where TFeature : class
+    {
+        private readonly Defineable _defineable;
+        private TFeature _result;
+
+        internal RootSearchVisitor(Defineable defineable) { _defineable = defineable; }
+
+        internal override bool IsSuccessFull { get { return _result != null; } }
+
+        internal override TFeature InternalResult
+        {
+            set
+            {
+                Tracer.Assert(_result == null);
+                _result = value;
+            }
+        }
+
+        internal TFeature Result { get { return _result; } }
+
+        internal override Defineable Defineable { get { return _defineable; } }
+    }
+
+    internal class ContextSearchVisitor : RootSearchVisitor<IContextFeature>
+    {
+        internal ContextSearchVisitor(Defineable defineable)
+            : base(defineable) { }
+
+        internal void Search(ContextBase contextBase)
+        {
+            if(IsSuccessFull)
+                return;
+            contextBase.Search(this);
+        }
+    }
+
+    internal class ChildSearchVisitor<TFeature, TType> : SearchVisitor<IConverter<TFeature, TType>>
+        where TFeature : class
+        where TType : IDumpShortProvider
+    {
+        private readonly SearchVisitor<TFeature> _parent;
+        private readonly TType _target;
+
+        public ChildSearchVisitor(SearchVisitor<TFeature> parent, TType target)
+        {
+            _parent = parent;
+            _target = target;
+        }
+
+        internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
+
+        internal override IConverter<TFeature, TType> InternalResult
+        {
+            set
+            {
+                if(value == null)
+                    return;
+                Tracer.Assert(!IsSuccessFull);
+                _parent.InternalResult = value.Convert(_target);
+            }
+        }
+
+        internal override Defineable Defineable { get { return _parent.Defineable; } }
     }
 }

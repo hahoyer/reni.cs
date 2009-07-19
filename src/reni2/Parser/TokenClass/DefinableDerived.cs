@@ -41,15 +41,16 @@ namespace Reni.Parser.TokenClass
     }
 
     [Token("<<")]
-    internal sealed class ConcatArrays : Defineable, IConverter<IFeature, IArray>
+    internal sealed class ConcatArrays : Defineable, IConverter<IFeature, Type.Array>
     {
-        IFeature IConverter<IFeature, IArray>.Convert(IArray type) { return new ConcatArraysFeature(type); }
+        IFeature IConverter<IFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArraysFeature(type); }
     }
 
     [Token("<*")]
-    internal sealed class ConcatArrayWithObject : Defineable, IConverter<IFeature, IArray>
+    internal sealed class ConcatArrayWithObject : Defineable, IConverter<IFeature, Type.Array>, IConverter<IFeature,Type.Void>
     {
-        IFeature IConverter<IFeature, IArray>.Convert(IArray type) { return new ConcatArrayWithObjectFeature(type); }
+        IFeature IConverter<IFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArrayWithObjectFeature(type); }
+        IFeature IConverter<IFeature, Type.Void>.Convert(Type.Void type) { return new CreateArrayFeature(); }
     }
 
     [Token(":=")]

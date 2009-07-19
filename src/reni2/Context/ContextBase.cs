@@ -115,14 +115,16 @@ namespace Reni.Context
             return _cache.FunctionType.Find(body, () => new Type.Function(this, body));
         }
 
-        internal SearchResult<IContextFeature> SearchDefineable(DefineableToken defineableToken)
+        internal IContextFeature SearchDefineable(DefineableToken defineableToken)
         {
-            return Search(defineableToken.TokenClass).RecordSubTrial(this);
+            var searchVisitor = new ContextSearchVisitor(defineableToken.TokenClass);
+            searchVisitor.Search(this);
+            return searchVisitor.Result;
         }
 
-        internal virtual SearchResult<IContextFeature> Search(Defineable defineable)
+        internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
-            return defineable.Check<IContextFeature>();
+            searchVisitor.SearchTypeBase();
         }
 
         internal TypeBase Type(ICompileSyntax syntax)
@@ -269,8 +271,8 @@ namespace Reni.Context
         private Result PrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
         {
             var contextSearchResult = SearchDefineable(defineableToken);
-            if(contextSearchResult.IsSuccessFull)
-                return contextSearchResult.Feature.ApplyResult(this, category, right);
+            if(contextSearchResult != null)
+                return contextSearchResult.ApplyResult(this, category, right);
 
             if(right == null)
             {
@@ -280,8 +282,8 @@ namespace Reni.Context
 
             var argType = Type(right);
             var prefixSearchResult = argType.SearchDefineablePrefix(defineableToken);
-            if(prefixSearchResult.IsSuccessFull)
-                return prefixSearchResult.Feature.ApplyResult(this, category, right);
+            if(prefixSearchResult != null)
+                return prefixSearchResult.ApplyResult(this, category, right);
 
             NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult,
                                  "prefixSearchResult", prefixSearchResult);
@@ -293,8 +295,8 @@ namespace Reni.Context
         {
             var leftType = Type(left).EnsureRef(RefAlignParam);
             var searchResult = leftType.SearchDefineable(defineableToken);
-            if(searchResult.IsSuccessFull)
-                return searchResult.Feature.ApplyResult(this, category, left, right);
+            if(searchResult != null)
+                return searchResult.ApplyResult(this, category, left, right);
             NotImplementedMethod(category, left, defineableToken, right, "leftType", leftType, "searchResult",
                                  searchResult);
             return null;
@@ -332,6 +334,7 @@ namespace Reni.Context
         {
             return CommonResult(Category.Refs, condSyntax).Refs;
         }
+
     }
 
     [Serializable]

@@ -140,12 +140,13 @@ namespace Reni.Type
             return Target == target.Target && RefAlignParam == target.RefAlignParam;
         }
 
-        internal override SearchResult<IFeature> Search(Defineable defineable)
+        internal override void Search(ISearchVisitor searchVisitor)
         {
-            return Parent.SearchFromRef(defineable).RecordSubTrial(Parent).Convert(this)
-                .Or(() => Parent.Search(defineable))
-                .Or(() => base.Search(defineable));
+            Parent.Search(searchVisitor.Child(this));
+            base.Search(searchVisitor);
         }
+
+        protected override bool IsInheritor { get { return true; } }
 
         internal Result CreateContextResult(IRefInCode context, Category category)
         {

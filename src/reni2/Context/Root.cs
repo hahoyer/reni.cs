@@ -4,8 +4,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
-using Reni.Feature;
-using Reni.Parser.TokenClass;
 using Reni.Syntax;
 
 namespace Reni.Context
@@ -24,11 +22,6 @@ namespace Reni.Context
 
         [DumpData(false)]
         internal override Root RootContext { get { return this; } }
-
-        internal override SearchResult<IContextFeature> Search(Defineable defineable)
-        {
-            return defineable.Check<IContextFeature>().RecordSubTrial(this);
-        }
 
         internal List<Container> CompileFunctions()
         {

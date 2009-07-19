@@ -1,21 +1,23 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 
 namespace Reni.Type
 {
     [Serializable]
     internal abstract class Child : TypeBase
     {
-        readonly TypeBase _parent;
+        private readonly TypeBase _parent;
 
         protected Child(TypeBase parent)
         {
             _parent = parent;
         }
 
-        protected Child(int objectId, TypeBase parent): base(objectId)
+        protected Child(int objectId, TypeBase parent)
+            : base(objectId)
         {
             _parent = parent;
         }
@@ -24,9 +26,15 @@ namespace Reni.Type
         public TypeBase Parent { get { return _parent; } }
 
         [DumpData(false)]
-        protected internal override int IndexSize
+        protected internal override int IndexSize { get { return Parent.IndexSize; } }
+
+        protected abstract bool IsInheritor { get; }
+
+        internal override void Search(ISearchVisitor searchVisitor)
         {
-            get { return Parent.IndexSize; }
+            if(IsInheritor)
+                Parent.Search(searchVisitor);
+            base.Search(searchVisitor);
         }
     }
 }

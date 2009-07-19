@@ -61,16 +61,6 @@ namespace Reni.Type
             return token.BitSequenceOperationResultType(objBitCount);
         }
 
-        internal override SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable)
-        {
-            return defineable.SubSearch<IConverter<IFeature, Sequence>, Bit>(this);
-        }
-
-        internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable)
-        {
-            return defineable.SubSearch<IConverter<IPrefixFeature, Sequence>, Bit>(this);
-        }
-
         public override string Dump()
         {
             return GetType().FullName;

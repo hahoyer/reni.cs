@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Reni.Code;
-using Reni.Feature;
-using Reni.Parser.TokenClass;
 
 #pragma warning disable 1911
 
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class Void : TypeBase, IArray
+    internal sealed class Void : TypeBase
     {
         protected override Size GetSize()
         {
@@ -20,11 +18,10 @@ namespace Reni.Type
         internal override bool IsVoid { get { return true; } }
         internal override string DumpPrintText { get { return "void"; } }
 
-        internal override SearchResult<IFeature> Search(Defineable defineable)
+        internal override void Search(ISearchVisitor searchVisitor)
         {
-            return defineable
-                .SubSearch<IFeature, IArray>(this)
-                .Or(() => base.Search(defineable));
+            searchVisitor.Child(this).SearchTypeBase();
+            base.Search(searchVisitor);
         }
 
         internal override TypeBase CreatePair(TypeBase second)
@@ -66,9 +63,5 @@ namespace Reni.Type
         {
             return "void";
         }
-
-        TypeBase IArray.ElementType { get { return null; } }
-
-        long IArray.Count { get { return 0; } }
     }
 }

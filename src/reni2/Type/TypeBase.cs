@@ -395,51 +395,6 @@ namespace Reni.Type
             return rawResult;
         }
 
-        internal SearchResult<IFeature> SearchDefineable(DefineableToken defineableToken)
-        {
-            return Search(defineableToken.TokenClass).RecordSubTrial(this);
-        }
-
-        internal SearchResult<IPrefixFeature> SearchDefineablePrefix(DefineableToken defineableToken)
-        {
-            return SearchPrefix(defineableToken.TokenClass).RecordSubTrial(this);
-        }
-
-        private SearchResult<TFeature> Search<TFeature>(Defineable defineable) where TFeature : class
-        {
-            return defineable.Check<TFeature>().RecordSubTrial(this);
-        }
-
-        internal virtual SearchResult<IFeature> Search(Defineable defineable)
-        {
-            return Search<IFeature>(defineable);
-        }
-
-        internal virtual SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
-        {
-            return Search<IPrefixFeature>(defineable);
-        }
-
-        internal virtual SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
-        {
-            return Search<IConverter<IFeature, Ref>>(defineable);
-        }
-
-        internal virtual SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable)
-        {
-            return Search<IConverter<IFeature, Sequence>>(defineable);
-        }
-
-        internal virtual SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable)
-        {
-            return Search<IConverter<IPrefixFeature, Sequence>>(defineable);
-        }
-
-        internal virtual SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable)
-        {
-            return Search<IConverter<IConverter<IFeature, Ref>, Sequence>>(defineable);
-        }
-
         private Result SequenceOperationResult(Category category, Defineable definable, Size objSize, Size argsSize)
         {
             var type = SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt());
@@ -526,5 +481,25 @@ namespace Reni.Type
         {
             return elementType.CreateSequence(SequenceCount);
         }
+
+        internal IFeature SearchDefineable(DefineableToken defineableToken)
+        {
+            var searchVisitor = new RootSearchVisitor<IFeature>(defineableToken.TokenClass);
+            searchVisitor.Search(this);
+            return searchVisitor.Result;
+        }
+
+        internal IPrefixFeature SearchDefineablePrefix(DefineableToken defineableToken)
+        {
+            var searchVisitor = new RootSearchVisitor<IPrefixFeature>(defineableToken.TokenClass);
+            searchVisitor.Search(this);
+            return searchVisitor.Result;
+        }
+
+        internal virtual void Search(ISearchVisitor searchVisitor)
+        {
+            searchVisitor.SearchTypeBase();
+        }
     }
+
 }

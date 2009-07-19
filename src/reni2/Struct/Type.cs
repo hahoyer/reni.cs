@@ -78,11 +78,12 @@ namespace Reni.Struct
             return false;
         }
 
-        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
+        internal override void Search(ISearchVisitor searchVisitor)
         {
-            return Context.Container.SearchFromRefToStruct(defineable).RecordSubTrial(this).Convert(this)
-                .Or(() => defineable.SubSearch<IConverter<IFeature, Ref>, Type>(this))
-                .Or(() => base.SearchFromRef(defineable));
+            var searchVisitorChild = searchVisitor as SearchVisitor<IConverter<IFeature, Ref>>;
+            if (searchVisitorChild != null)
+                searchVisitorChild.InternalResult = Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
+            base.Search(searchVisitor);
         }
 
     

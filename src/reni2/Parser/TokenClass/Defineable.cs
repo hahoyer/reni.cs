@@ -51,17 +51,10 @@ namespace Reni.Parser.TokenClass
             return new DeclarationPartSyntax(extensionSyntax, token);
         }
 
-        internal SearchResult<TFeatureType> SubSearch<TFeatureType, TType>(TType type)
-            where TType : IDumpShortProvider
+        internal TFeatureType Check<TFeatureType>() 
             where TFeatureType : class
         {
-            return Check<IConverter<TFeatureType, TType>>().RecordSubTrial(type).Convert(type);
-        }
-
-        internal SearchResult<TFeatureType> Check<TFeatureType>() 
-            where TFeatureType : class
-        {
-            return new SearchResult<TFeatureType>(this as TFeatureType, this);
+            return this as TFeatureType;
         }
     }
 

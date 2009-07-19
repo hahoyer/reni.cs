@@ -63,7 +63,7 @@ namespace Reni.Parser.TokenClass
             return name;
         }
 
-        private static string SymbolizeChar(char @char)
+        private static string SymbolizeChar(Char @char)
         {
             switch (@char)
             {
@@ -95,7 +95,13 @@ namespace Reni.Parser.TokenClass
                     return "Star";
                 case '~':
                     return "Tilde";
+                case '_':
+                    return "__";
                 default:
+                    if(Char.IsLetter(@char))
+                        return "_"+@char;
+                    if (Char.IsDigit(@char))
+                        return @char.ToString();
                     throw new NotImplementedException("Symbolize(" + @char + ")");
             }
         }
