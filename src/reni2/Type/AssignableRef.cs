@@ -6,6 +6,8 @@ using Reni.Feature;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
 
+#pragma warning disable 1911
+
 namespace Reni.Type
 {
     [Serializable]
@@ -21,12 +23,9 @@ namespace Reni.Type
 
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var assignableResult = defineable.SearchFromAssignableRef().SubTrial(this, "try common definitions");
-            var result = assignableResult.SearchResultDescriptor.Convert(assignableResult.Feature,
-                this);
-            if(result.IsSuccessFull)
-                return result;
-            return base.Search(defineable).AlternativeTrial(result);
+            return defineable
+                .SubSearch<IFeature,AssignableRef>(this)
+                .Or(() => base.Search(defineable));
         }
     }
 

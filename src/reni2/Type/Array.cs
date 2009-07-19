@@ -41,7 +41,7 @@ namespace Reni.Type
 
         public override string Dump() { return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")"; }
 
-        internal override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             var destArray = dest as Array;
             if(destArray != null)

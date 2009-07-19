@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Feature;
 using Reni.Parser.TokenClass.Symbol;
-using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass
@@ -45,25 +46,23 @@ namespace Reni.Parser.TokenClass
         }
 
         internal override IParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax,
-                                                                    Token token) { return new DeclarationPartSyntax(extensionSyntax, token); }
+                                                                    Token token)
+        {
+            return new DeclarationPartSyntax(extensionSyntax, token);
+        }
 
-        internal SearchResult<IFeature> Search() { return SearchResult<IFeature>.SuccessIfMatch(this); }
-        internal SearchResult<IPrefixFeature> SearchPrefix() { return SearchResult<IPrefixFeature>.SuccessIfMatch(this); }
-        internal SearchResult<IContextFeature> SearchContext() { return SearchResult<IContextFeature>.SuccessIfMatch(this); }
+        internal SearchResult<TFeatureType> SubSearch<TFeatureType, TType>(TType type)
+            where TType : IDumpShortProvider
+            where TFeatureType : class
+        {
+            return Check<IConverter<TFeatureType, TType>>().RecordSubTrial(type).Convert(type);
+        }
 
-        internal SearchResult<IConverter<IFeature, Sequence>> SearchFromSequenceElement() { return SearchResult<IConverter<IFeature, Sequence>>.SuccessIfMatch(this); }
-        internal SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequenceElement() { return SearchResult<IConverter<IPrefixFeature, Sequence>>.SuccessIfMatch(this); }
-        internal SearchResult<IConverter<IFeature, Sequence>> SearchForSequence() { return SearchResult<IConverter<IFeature, Sequence>>.SuccessIfMatch(this); }
-
-        internal SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>> SearchFromSequenceOfBit() { return SearchResult<IConverter<IConverter<IFeature, Sequence>, Bit>>.SuccessIfMatch(this); }
-        internal SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>> SearchPrefixFromSequenceOfBit() { return SearchResult<IConverter<IConverter<IPrefixFeature, Sequence>, Bit>>.SuccessIfMatch(this); }
-
-
-        internal SearchResult<IConverter<IFeature, Ref>> SearchFromRef() { return SearchResult<IConverter<IFeature, Ref>>.SuccessIfMatch(this); }
-
-        internal SearchResult<IConverter<IFeature, AssignableRef>> SearchFromAssignableRef() { return SearchResult<IConverter<IFeature, AssignableRef>>.SuccessIfMatch(this); }
-
-        internal SearchResult<IStructFeature> SearchFromStruct() { return SearchResult<IStructFeature>.Failure(this); }
+        internal SearchResult<TFeatureType> Check<TFeatureType>() 
+            where TFeatureType : class
+        {
+            return new SearchResult<TFeatureType>(this as TFeatureType, this);
+        }
     }
 
     internal sealed class DeclarationPartSyntax : ParsedSyntax
@@ -78,6 +77,9 @@ namespace Reni.Parser.TokenClass
             _extensionSyntax = extensionSyntax;
         }
 
-        internal protected override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right) { return new DeclarationSyntax(_extensionSyntax, _defineableToken, token, right); }
+        protected internal override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
+        {
+            return new DeclarationSyntax(_extensionSyntax, _defineableToken, token, right);
+        }
     }
 }

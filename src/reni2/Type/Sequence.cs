@@ -1,12 +1,15 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
+
+#pragma warning disable 1911
 
 namespace Reni.Type
 {
@@ -21,7 +24,7 @@ namespace Reni.Type
 
         public Sequence(TypeBase elementType, int count)
         {
-            Tracer.Assert(count > 0, "count="+count);
+            Tracer.Assert(count > 0, "count=" + count);
             _inheritedType = elementType.CreateArray(count);
             _enableCutCutFeature = new EnableCutFeature(this);
         }
@@ -35,10 +38,13 @@ namespace Reni.Type
         }
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
+
         [Node, DumpData(false)]
         internal override int SequenceCount { get { return Count; } }
+
         [DumpData(false)]
         internal int Count { get { return _inheritedType.Count; } }
+
         [Node, DumpData(false)]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
@@ -64,35 +70,28 @@ namespace Reni.Type
             return base.IsConvertableToImplementation(dest, conversionFeature);
         }
 
-        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
-        {
-            var subTrial = Element.SearchFromRefToSequence(defineable).SubTrial(Element, "try at element");
-            var result = subTrial.SearchResultDescriptor.Convert(subTrial.Feature, this);
-            if(result.IsSuccessFull)
-                return result;
-            return base.SearchFromRef(defineable).AlternativeTrial(result);
-        }
-
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var resultFromSequenceElement = Element.SearchFromSequence(defineable).SubTrial(Element, "try at element");
-            var result = resultFromSequenceElement.SearchResultDescriptor.Convert(resultFromSequenceElement.Feature,this);
-            if(result.IsSuccessFull)
-                return result;
-            var resultForSequence = defineable.SearchForSequence();
-            result = resultForSequence.SearchResultDescriptor.Convert(resultForSequence.Feature, this).AlternativeTrial(result);
-            if (result.IsSuccessFull)
-                return result;
-            return base.Search(defineable).AlternativeTrial(result);
+            return Element.SearchFromSequence(defineable).RecordSubTrial(this).Convert(this)
+                .Or(() => defineable.SubSearch<IFeature, Sequence>(this))
+                .Or(() => base.Search(defineable));
         }
 
         internal override SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
         {
-            var resultFromSequence = Element.SearchPrefixFromSequence(defineable).SubTrial(Element, "try at element");
-            return resultFromSequence.SearchResultDescriptor.Convert(resultFromSequence.Feature, this);
+            return Element.SearchPrefixFromSequence(defineable).RecordSubTrial(this).Convert(this)
+                .Or(() => defineable.SubSearch<IPrefixFeature, Sequence>(this))
+                .Or(() => base.SearchPrefix(defineable));
         }
 
-        internal override Result ConvertToImplementation(Category category, TypeBase dest)
+        internal override SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
+        {
+            return Element.SearchFromRefToSequence(defineable).RecordSubTrial(this).Convert(this)
+                .Or(() => defineable.SubSearch<IConverter<IFeature, Ref>, Sequence>(this))
+                .Or(() => base.SearchFromRef(defineable));
+        }
+
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             var result = ConvertTo(category, dest as Sequence);
             if(result != null)
@@ -103,7 +102,7 @@ namespace Reni.Type
                 return result;
 
             result = ConvertTo(category, dest as EnableCut);
-            if (result != null)
+            if(result != null)
                 return result;
 
             NotImplementedMethod(category, dest);
@@ -210,7 +209,7 @@ namespace Reni.Type
 
         public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            if (args != null)
+            if(args != null)
                 NotImplementedMethod(callContext, category, @object, args);
 
             return callContext.ApplyResult(category, @object, ot => ot.ConvertTo(category, new EnableCut(_sequence)));

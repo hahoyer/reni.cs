@@ -136,7 +136,7 @@ namespace Reni
 
         public static int MultiplySize(int left, int right) { return left + right - 1; }
 
-        private static int DivideSize(int left, int right) { return Math.Max(0, left - right) + 2; }
+        internal static int DivideSize(int left, int right) { return Math.Max(0, left - right) + 2; }
 
         internal static int AutoSize(long value)
         {

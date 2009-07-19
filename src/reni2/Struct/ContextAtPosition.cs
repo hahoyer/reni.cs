@@ -8,7 +8,7 @@ using Reni.Type;
 namespace Reni.Struct
 {
     [Serializable]
-    internal sealed class ContextAtPosition : StructContextBase
+    internal sealed class ContextAtPosition : Context
     {
         private readonly int _position;
         private readonly FullContext _context;
@@ -30,9 +30,6 @@ namespace Reni.Struct
 
         [Node]
         protected override int Position { get { return _position; } }
-
-        [DumpData(false), Node]
-        internal override FullContext Context { get { return _context; } }
 
         internal override ContextAtPosition CreatePosition(int position) { return _context.CreatePosition(position); }
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }

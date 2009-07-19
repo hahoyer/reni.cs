@@ -36,22 +36,22 @@ namespace Reni.Type
             return false;
         }
 
-        internal override CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize, Size argsSize)
+        protected override CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize, Size argsSize)
         {
             return CreateSequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
                 .CreateArgCode()
                 .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
-        internal override CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize)
+        protected override CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize)
         {
             return CreateSequence((objSize.ByteAlignedSize).ToInt())
                 .CreateArgCode()
                 .CreateBitSequenceOperation(token, size);
         }
 
-        protected internal override TypeBase SequenceOperationResultType(Defineable token, int objBitCount,
-                                                                         int argBitCount)
+        protected override TypeBase SequenceOperationResultType(Defineable token, int objBitCount,
+                                                                int argBitCount)
         {
             return token.BitSequenceOperationResultType(objBitCount, argBitCount);
         }
@@ -63,15 +63,12 @@ namespace Reni.Type
 
         internal override SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable)
         {
-            var result = defineable.SearchFromSequenceOfBit();
-            return result.SearchResultDescriptor.Convert(result.Feature, this);
+            return defineable.SubSearch<IConverter<IFeature, Sequence>, Bit>(this);
         }
 
-        internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(
-            Defineable defineable)
+        internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable)
         {
-            var result = defineable.SearchPrefixFromSequenceOfBit();
-            return result.SearchResultDescriptor.Convert(result.Feature, this);
+            return defineable.SubSearch<IConverter<IPrefixFeature, Sequence>, Bit>(this);
         }
 
         public override string Dump()

@@ -190,9 +190,9 @@ namespace Reni.Parser
                     return (i);
 
             for(var i = 0; i < Length; i++)
-                if(_token[i] == "<else>")
+                if(_token[i] == "<common>")
                     return (i);
-            throw new NotImplementedException("missing <else> entry in priority table");
+            throw new NotImplementedException("missing <common> entry in priority table");
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace Reni.Parser
             return n;
         }
 
-        private static bool IsNormalName(string name) { return name != "<frame>" && name != "<end>" && name != "<else>"; }
+        private static bool IsNormalName(string name) { return name != "<frame>" && name != "<end>" && name != "<common>"; }
 
         /// <summary>
         /// Returns the priority information of a pair of tokens

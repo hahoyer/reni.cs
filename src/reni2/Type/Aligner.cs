@@ -44,7 +44,7 @@ namespace Reni.Type
         internal override SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable) { return Parent.SearchPrefixFromSequence(defineable); }
         internal override SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable) { return Parent.SearchFromRefToSequence(defineable); }
 
-        internal override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return Parent
                 .ConvertTo(category, dest)

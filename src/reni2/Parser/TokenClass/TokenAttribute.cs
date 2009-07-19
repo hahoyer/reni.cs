@@ -9,7 +9,7 @@ namespace Reni.Parser.TokenClass
     {
         internal override PrioTable CreatePrioTable()
         {
-            var x = PrioTable.LeftAssoc("<else>");
+            var x = PrioTable.LeftAssoc("<common>");
             x += PrioTable.LeftAssoc(
                 "at", "content", "_A_T_", "_N_E_X_T_",
                 "raw_convert", "construct", "bit_cast", "bit_expand",
@@ -60,9 +60,9 @@ namespace Reni.Parser.TokenClass
                  new[] {"(", "[", "{", "<frame>"},
                  new[] {")", "]", "}", "<end>"}
                 );
-            //x.Correct("(", "<else>", '-');
-            //x.Correct("[", "<else>", '-');
-            //x.Correct("{", "<else>", '-');
+            //x.Correct("(", "<common>", '-');
+            //x.Correct("[", "<common>", '-');
+            //x.Correct("{", "<common>", '-');
 
             //Tracer.FlaggedLine("\n"+x.ToString());
             return x;

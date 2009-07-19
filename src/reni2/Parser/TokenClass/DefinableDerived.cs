@@ -58,45 +58,4 @@ namespace Reni.Parser.TokenClass
         IFeature IConverter<IFeature, AssignableRef>.Convert(AssignableRef type) { return type.AssignmentFeature; }
     }
 
-    [Token("+")]
-    internal sealed class Plus : PrefixableSequenceOfBitOperation
-    {
-        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize) { return TypeBase.CreateNumber(BitsConst.PlusSize(objSize, argSize)); }
-    }
-
-    [Token("-")]
-    internal sealed class Minus : PrefixableSequenceOfBitOperation
-    {
-        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize) { return TypeBase.CreateNumber(BitsConst.PlusSize(objSize, argSize)); }
-    }
-
-    [Token("*")]
-    internal sealed class Star : SequenceOfBitOperation
-    {
-        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize) { return TypeBase.CreateNumber(BitsConst.MultiplySize(objSize, argSize)); }
-    }
-
-    [Token("=")]
-    internal sealed class Equal : CompareOperator
-    {
-        internal override string CSharpNameOfDefaultOperation { get { return "=="; } }
-    }
-
-    [Token("<>")]
-    internal sealed class NotEqual : CompareOperator
-    {
-        internal override string CSharpNameOfDefaultOperation { get { return "!="; } }
-    }
-
-    [Token("<=")]
-    internal sealed class LessEqual : CompareOperator {}
-
-    [Token(">=")]
-    internal sealed class GreaterEqual : CompareOperator {}
-
-    [Token("<")]
-    internal sealed class Less : CompareOperator {}
-
-    [Token(">")]
-    internal sealed class Greater : CompareOperator {}
 }

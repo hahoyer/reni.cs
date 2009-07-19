@@ -9,7 +9,7 @@ using Reni.Type;
 namespace Reni.Struct
 {
     [Serializable]
-    internal sealed class FullContext : StructContextBase, IRefInCode
+    internal sealed class FullContext : Context, IRefInCode
     {
         [Node]
         private readonly Result _internalConstructorResult;
@@ -32,7 +32,7 @@ namespace Reni.Struct
         [DumpData(false)]
         public override IRefInCode ForCode { get { return this; } }
         [DumpData(false)]
-        internal override FullContext Context { get { return this; } }
+        private FullContext Context { get { return this; } }
 
         protected override int Position { get { return StatementList.Count; } }
 

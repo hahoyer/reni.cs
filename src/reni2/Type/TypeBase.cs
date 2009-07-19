@@ -1,7 +1,9 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -14,16 +16,16 @@ namespace Reni.Type
     [Serializable]
     internal abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
-        class Cache
+        private class Cache
         {
-            public static readonly Bit _bit = new Bit();
-            public static readonly Void _void = new Void();
-            public readonly DictionaryEx<int, Aligner> _aligner = new DictionaryEx<int, Aligner>();
-            public readonly DictionaryEx<int, Array> _array = new DictionaryEx<int, Array>();
-            public readonly DictionaryEx<int, Sequence> _chain = new DictionaryEx<int, Sequence>();
-            public readonly DictionaryEx<TypeBase, Pair> _pair = new DictionaryEx<TypeBase, Pair>();
-            public readonly DictionaryEx<RefAlignParam, AutomaticRef> _ref = new DictionaryEx<RefAlignParam, AutomaticRef>();
-            public readonly DictionaryEx<RefAlignParam, AssignableRef> _assignableRef = new DictionaryEx<RefAlignParam, AssignableRef>();
+            public static readonly Bit Bit = new Bit();
+            public static readonly Void Void = new Void();
+            public readonly DictionaryEx<int, Aligner> Aligners = new DictionaryEx<int, Aligner>();
+            public readonly DictionaryEx<int, Array> Arrays = new DictionaryEx<int, Array>();
+            public readonly DictionaryEx<int, Sequence> Sequences = new DictionaryEx<int, Sequence>();
+            public readonly DictionaryEx<TypeBase, Pair> Pairs = new DictionaryEx<TypeBase, Pair>();
+            public readonly DictionaryEx<RefAlignParam, AutomaticRef> AutomaticRefs = new DictionaryEx<RefAlignParam, AutomaticRef>();
+            public readonly DictionaryEx<RefAlignParam, AssignableRef> AssignableRefs = new DictionaryEx<RefAlignParam, AssignableRef>();
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<PostProcessorForType> PostProcessor;
 
@@ -33,7 +35,7 @@ namespace Reni.Type
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
             }
         }
-        
+
         private readonly Cache _cache;
 
         protected TypeBase(int objectId)
@@ -47,24 +49,32 @@ namespace Reni.Type
             _cache = new Cache(this);
         }
 
-        internal static TypeBase CreateVoid { get { return Cache._void; } }
-        internal static TypeBase CreateBit { get { return Cache._bit; } }
+        internal static TypeBase CreateVoid { get { return Cache.Void; } }
+        internal static TypeBase CreateBit { get { return Cache.Bit; } }
 
         [Node]
         internal Size Size { get { return GetSize(); } }
 
         protected abstract Size GetSize();
 
-        internal virtual bool IsRef(RefAlignParam refAlignParam) { return false; }
+        internal virtual bool IsRef(RefAlignParam refAlignParam)
+        {
+            return false;
+        }
 
         [DumpData(false)]
         internal virtual bool IsVoid { get { return false; } }
+
         [DumpData(false)]
         internal virtual Size UnrefSize { get { return Size; } }
-        [DumpData(false)]
-        internal protected virtual TypeBase[] ToList { get { return new[] {this}; } }
 
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
+        [DumpData(false)]
+        protected internal virtual TypeBase[] ToList { get { return new[] {this}; } }
+
+        string IDumpShortProvider.DumpShort()
+        {
+            return DumpShort();
+        }
 
         internal abstract string DumpShort();
 
@@ -100,7 +110,7 @@ namespace Reni.Type
         internal TypeBase IndexType { get { return CreateNumber(IndexSize); } }
 
         [DumpData(false)]
-        internal protected virtual int IndexSize { get { return 0; } }
+        protected internal virtual int IndexSize { get { return 0; } }
 
         [DumpData(false)]
         internal PostProcessorForType PostProcessor { get { return _cache.PostProcessor.Value; } }
@@ -109,24 +119,39 @@ namespace Reni.Type
         {
             if(Size.Align(alignBits) == Size)
                 return this;
-            return _cache._aligner.Find(alignBits, () => new Aligner(this, alignBits));
+            return _cache.Aligners.Find(alignBits, () => new Aligner(this, alignBits));
         }
 
-        internal Array CreateArray(int count) { return _cache._array.Find(count, () => new Array(this, count)); }
+        internal Array CreateArray(int count)
+        {
+            return _cache.Arrays.Find(count, () => new Array(this, count));
+        }
 
-        internal static TypeBase CreateNumber(int bitCount) { return CreateBit.CreateSequence(bitCount); }
+        internal static TypeBase CreateNumber(int bitCount)
+        {
+            return CreateBit.CreateSequence(bitCount);
+        }
 
-        internal virtual TypeBase CreatePair(TypeBase second) { return second.CreateReversePair(this); }
+        internal virtual TypeBase CreatePair(TypeBase second)
+        {
+            return second.CreateReversePair(this);
+        }
 
         protected virtual TypeBase CreateReversePair(TypeBase first)
         {
-            return first._cache._pair.Find(this,
-                () => new Pair(first, this));
+            return first._cache.Pairs.Find(this,
+                                           () => new Pair(first, this));
         }
 
-        internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam) { return _cache._ref.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam)); }
+        internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
+        {
+            return _cache.AutomaticRefs.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam));
+        }
 
-        internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return _cache._assignableRef.Find(refAlignParam, () => new AssignableRef(this, refAlignParam)); }
+        internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
+        {
+            return _cache.AssignableRefs.Find(refAlignParam, () => new AssignableRef(this, refAlignParam));
+        }
 
         internal Ref EnsureRef(RefAlignParam refAlignParam)
         {
@@ -135,24 +160,45 @@ namespace Reni.Type
             return CreateAutomaticRef(refAlignParam);
         }
 
-        internal Sequence CreateSequence(int elementCount) { return _cache._chain.Find(elementCount, () => new Sequence(this, elementCount)); }
+        internal Sequence CreateSequence(int elementCount)
+        {
+            return _cache.Sequences.Find(elementCount, () => new Sequence(this, elementCount));
+        }
 
-        internal virtual Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
+        internal virtual Result Destructor(Category category)
+        {
+            return CreateVoidCodeAndRefs(category);
+        }
 
-        internal virtual Result ArrayDestructor(Category category, int count) { return CreateVoidCodeAndRefs(category); }
+        internal virtual Result ArrayDestructor(Category category, int count)
+        {
+            return CreateVoidCodeAndRefs(category);
+        }
 
-        internal virtual Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
+        internal virtual Result Copier(Category category)
+        {
+            return CreateVoidCodeAndRefs(category);
+        }
 
-        internal virtual Result ArrayCopier(Category category, int count) { return CreateVoidCodeAndRefs(category); }
+        internal virtual Result ArrayCopier(Category category, int count)
+        {
+            return CreateVoidCodeAndRefs(category);
+        }
 
-        internal Result CreateArgResult(Category category) { return CreateResult(category, CreateArgCode); }
+        internal Result CreateArgResult(Category category)
+        {
+            return CreateResult(category, CreateArgCode);
+        }
 
-        internal CodeBase CreateArgCode() { return CodeBase.CreateArg(Size); }
+        internal CodeBase CreateArgCode()
+        {
+            return CodeBase.CreateArg(Size);
+        }
 
         internal Result CreateResult(Category category)
         {
             return CreateResult(category,
-                () => CodeBase.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)));
+                                () => CodeBase.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)));
         }
 
         internal Result CreateResult(Category category, Result codeAndRefs)
@@ -173,7 +219,7 @@ namespace Reni.Type
         {
             return CreateResult(category, getCode, Refs.None);
         }
-        
+
         internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
             var result = new Result();
@@ -200,13 +246,25 @@ namespace Reni.Type
             return null;
         }
 
-        internal static Result CreateVoidCodeAndRefs(Category category) { return CreateVoidResult(category & (Category.Code | Category.Refs)); }
+        internal static Result CreateVoidCodeAndRefs(Category category)
+        {
+            return CreateVoidResult(category & (Category.Code | Category.Refs));
+        }
 
-        internal static Result CreateVoidResult(Category category) { return CreateVoid.CreateResult(category); }
+        internal static Result CreateVoidResult(Category category)
+        {
+            return CreateVoid.CreateResult(category);
+        }
 
-        internal virtual Result AutomaticDereference(Result result) { return result; }
+        internal virtual Result AutomaticDereference(Result result)
+        {
+            return result;
+        }
 
-        internal virtual TypeBase AutomaticDereference() { return this; }
+        internal virtual TypeBase AutomaticDereference()
+        {
+            return this;
+        }
 
         internal virtual Result TypeOperator(Category category)
         {
@@ -228,7 +286,7 @@ namespace Reni.Type
             return DumpPrint(category).UseWithArg(argResult);
         }
 
-        internal virtual Result ArrayDumpPrint(Category category, int count)
+        internal Result ArrayDumpPrint(Category category, int count)
         {
             NotImplementedMethod(category, count);
             throw new NotImplementedException();
@@ -240,21 +298,16 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        internal virtual TypeBase DumpPrintArrayType(int count)
+        internal virtual Result ApplyTypeOperator(Result argResult)
         {
-            NotImplementedMethod(count);
-            throw new NotImplementedException();
+            return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult);
         }
-
-        internal Result ApplyTypeOperator(Category category, TypeBase targetType) { return targetType.Conversion(category, this); }
-
-        internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult); }
 
         internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
         {
-            if (thenType.IsConvertableTo(elseType, ConversionFeature.Instance))
+            if(thenType.IsConvertableTo(elseType, ConversionFeature.Instance))
                 return elseType;
-            if (elseType.IsConvertableTo(thenType, ConversionFeature.Instance))
+            if(elseType.IsConvertableTo(thenType, ConversionFeature.Instance))
                 return thenType;
             thenType.NotImplementedMethod(elseType);
             throw new NotImplementedException();
@@ -262,7 +315,7 @@ namespace Reni.Type
 
         internal Result Conversion(Category category, TypeBase dest)
         {
-            if(category <= (Category.Size | Category.Type)) 
+            if(category <= (Category.Size | Category.Type))
                 return dest.CreateResult(category);
             if(IsConvertableTo(dest, ConversionFeature.Instance))
                 return ConvertTo(category, dest);
@@ -277,9 +330,12 @@ namespace Reni.Type
             return ConvertToImplementation(category, dest);
         }
 
-        internal virtual Result ConvertToItself(Category category) { return CreateArgResult(category); }
+        protected virtual Result ConvertToItself(Category category)
+        {
+            return CreateArgResult(category);
+        }
 
-        internal virtual Result ConvertToImplementation(Category category, TypeBase dest)
+        protected virtual Result ConvertToImplementation(Category category, TypeBase dest)
         {
             NotImplementedMethod(category, dest);
             throw new NotImplementedException();
@@ -305,21 +361,24 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        internal virtual bool IsConvertableToItself(ConversionFeature conversionFeature) { return true; }
+        private bool IsConvertableToItself(ConversionFeature conversionFeature)
+        {
+            return true;
+        }
 
-        internal virtual CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize, Size argsSize)
+        protected virtual CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize, Size argsSize)
         {
             NotImplementedMethod(size, token, objSize, argsSize);
             return null;
         }
 
-        internal virtual CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize)
+        protected virtual CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize)
         {
             NotImplementedMethod(size, token, objSize);
             return null;
         }
 
-        internal protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
+        protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
         {
             NotImplementedMethod(token, objBitCount, argBitCount);
             return null;
@@ -331,46 +390,64 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result ThenElseWithPending(Category category, Refs condRefs, Refs elseOrThenRefs)
+        internal virtual Result UnProperty(Result rawResult)
         {
-            Tracer.Assert(!category.HasCode);
-
-            return CreateResult
-                (
-                category,
-                () => null,
-                () => condRefs.CreateSequence(elseOrThenRefs)
-                );
+            return rawResult;
         }
 
-        internal virtual CodeBase CreateRefCodeForContext(ContextBase context)
+        internal SearchResult<IFeature> SearchDefineable(DefineableToken defineableToken)
         {
-            NotImplementedMethod(context);
-            return null;
+            return Search(defineableToken.TokenClass).RecordSubTrial(this);
         }
 
-        internal virtual Result UnProperty(Result rawResult) { return rawResult; }
+        internal SearchResult<IPrefixFeature> SearchDefineablePrefix(DefineableToken defineableToken)
+        {
+            return SearchPrefix(defineableToken.TokenClass).RecordSubTrial(this);
+        }
 
-        internal virtual TypeBase UnProperty() { return this; }
+        private SearchResult<TFeature> Search<TFeature>(Defineable defineable) where TFeature : class
+        {
+            return defineable.Check<TFeature>().RecordSubTrial(this);
+        }
 
-        internal SearchResult<IFeature> SearchDefineable(DefineableToken defineableToken) { return Search(defineableToken.TokenClass).SubTrial(this, "main search origin"); }
-        internal SearchResult<IPrefixFeature> SearchDefineablePrefix(DefineableToken defineableToken) { return SearchPrefix(defineableToken.TokenClass).SubTrial(this, "main search origin"); }
+        internal virtual SearchResult<IFeature> Search(Defineable defineable)
+        {
+            return Search<IFeature>(defineable);
+        }
 
-        internal virtual SearchResult<IFeature> Search(Defineable defineable) { return defineable.Search().SubTrial(this, "try common definitions"); }
-        internal virtual SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable) { return defineable.SearchPrefix().SubTrial(this, "try common definitions"); }
-        internal virtual SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable) { return defineable.SearchFromRef().SubTrial(this, "try common definitions"); }
-        internal virtual SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable) { return defineable.SearchFromSequenceElement().SubTrial(this, "try common definitions"); }
-        internal virtual SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable) { return defineable.SearchPrefixFromSequenceElement().SubTrial(this, "try common definitions"); }
-        internal virtual SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable) { return SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>>.Failure(this, defineable); }
+        internal virtual SearchResult<IPrefixFeature> SearchPrefix(Defineable defineable)
+        {
+            return Search<IPrefixFeature>(defineable);
+        }
 
-        internal Result SequenceOperationResult(Category category, Defineable definable, Size objSize, Size argsSize)
+        internal virtual SearchResult<IConverter<IFeature, Ref>> SearchFromRef(Defineable defineable)
+        {
+            return Search<IConverter<IFeature, Ref>>(defineable);
+        }
+
+        internal virtual SearchResult<IConverter<IFeature, Sequence>> SearchFromSequence(Defineable defineable)
+        {
+            return Search<IConverter<IFeature, Sequence>>(defineable);
+        }
+
+        internal virtual SearchResult<IConverter<IPrefixFeature, Sequence>> SearchPrefixFromSequence(Defineable defineable)
+        {
+            return Search<IConverter<IPrefixFeature, Sequence>>(defineable);
+        }
+
+        internal virtual SearchResult<IConverter<IConverter<IFeature, Ref>, Sequence>> SearchFromRefToSequence(Defineable defineable)
+        {
+            return Search<IConverter<IConverter<IFeature, Ref>, Sequence>>(defineable);
+        }
+
+        private Result SequenceOperationResult(Category category, Defineable definable, Size objSize, Size argsSize)
         {
             var type = SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt());
             return type
                 .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize, argsSize));
         }
 
-        internal Result SequenceOperationResult(Category category, Defineable definable, Size objSize)
+        private Result SequenceOperationResult(Category category, Defineable definable, Size objSize)
         {
             var type = SequenceOperationResultType(definable, objSize.ToInt());
             return type
@@ -388,17 +465,13 @@ namespace Reni.Type
             NotImplementedMethod(category, position, refAlignParam);
             return null;
         }
+
         internal virtual Result AccessResultAsArg(Category category, int position)
         {
             NotImplementedMethod(category, position);
             return null;
         }
 
-        internal virtual Result AccessResultAsContextRef(Category category, int position)
-        {
-            NotImplementedMethod(category, position);
-            return null;
-        }
         internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
             if(Size.IsZero)
@@ -413,18 +486,22 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
-        internal virtual bool IsRefLike(Ref target) { return false; }
+        internal virtual bool IsRefLike(Ref target)
+        {
+            return false;
+        }
 
-        internal Result ApplySequenceOperation(SequenceOfBitOperation definable, ContextBase callContext, Category category, ICompileSyntax @object) {
+        internal Result ApplySequenceOperation(SequenceOfBitOperation definable, ContextBase callContext, Category category, ICompileSyntax @object)
+        {
             var result = SequenceOperationResult
                 (
-                category, 
-                definable, 
+                category,
+                definable,
                 callContext.Type(@object).UnrefSize
                 );
 
             var objectResult = callContext.ConvertToSequence(category, @object, this);
-            
+
             return result.UseWithArg(objectResult);
         }
 
@@ -445,6 +522,9 @@ namespace Reni.Type
             return result.UseWithArg(objectResult.CreateSequence(argsResult));
         }
 
-        virtual internal TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(SequenceCount); }
+        internal TypeBase CreateSequenceType(TypeBase elementType)
+        {
+            return elementType.CreateSequence(SequenceCount);
+        }
     }
 }

@@ -95,7 +95,7 @@
     <Compile Include="Parser\TokenClass\DeclarationSyntax.cs" />
     <Compile Include="StructAccess.cs" />
     <Compile Include="Struct\PositionFeature.cs" />
-    <Compile Include="Struct\StructContextBase.cs" />
+    <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\Type.cs" />
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
@@ -160,6 +160,7 @@
     <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
     <None Include="sys.targets" />
+    <None Include="TokenClass.cd" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Core">

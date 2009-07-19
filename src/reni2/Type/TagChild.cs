@@ -49,7 +49,7 @@ namespace Reni.Type
             return Parent.ArrayCopier(category, count);
         }
 
-        internal override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return Parent.ConvertTo(category, dest);
         }

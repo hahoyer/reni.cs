@@ -10,10 +10,12 @@ using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
 
+#pragma warning disable 1911
+
 namespace Reni.Struct
 {
     [Serializable]
-    internal abstract class StructContextBase : ContextBase, IStructContext
+    internal abstract class Context : ContextBase, IStructContext
     {
         private readonly SimpleCache<PositionFeature[]> _featuresCache;
         [Node]
@@ -23,7 +25,7 @@ namespace Reni.Struct
         [Node, DumpData(false)]
         private readonly Result[] _internalResult;
         
-        protected StructContextBase(ContextBase parent, Container container)
+        protected Context(ContextBase parent, Container container)
         {
             _featuresCache = new SimpleCache<PositionFeature[]>(CreateFeaturesCache);
             Parent = parent;
@@ -44,8 +46,7 @@ namespace Reni.Struct
         internal PositionFeature[] Features { get { return _featuresCache.Value; } }
         [DumpData(false)]
         protected abstract int Position { get; }
-        [DumpData(false)]
-        internal abstract FullContext Context { get; }
+
         [DumpData(false)]
         internal List<ICompileSyntax> StatementList { get { return Container.List; } }
         [DumpData(false)]
@@ -126,15 +127,11 @@ namespace Reni.Struct
 
         sealed internal override SearchResult<IContextFeature> Search(Defineable defineable)
         {
-            var containerResult = Container.SearchFromStructContext(defineable);
-            var result = containerResult.SearchResultDescriptor.Convert(containerResult.Feature,this);
-            if(result.IsSuccessFull)
-                return result;
-            result = Parent.Search(defineable).SubTrial(Parent, "try parent of struct");
-            if (result.IsSuccessFull)
-                return result;
-
-            return base.Search(defineable).AlternativeTrial(result);
+            return Container
+                .SearchFromStructContext(defineable)
+                .Convert(this)
+                .Or(() => Parent.Search(defineable).RecordSubTrial(Parent))
+                .Or(() => base.Search(defineable));
         }
 
         internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }

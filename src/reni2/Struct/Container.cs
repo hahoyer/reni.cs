@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
@@ -10,7 +11,6 @@ using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
-using Function=Reni.Type.Function;
 
 namespace Reni.Struct
 {
@@ -39,7 +39,10 @@ namespace Reni.Struct
         internal readonly List<string> Properties = new List<string>();
 
         private Container(Token token)
-            : base(token, _nextObjectId++) { EmptyList = new EmptyList(token); }
+            : base(token, _nextObjectId++)
+        {
+            EmptyList = new EmptyList(token);
+        }
 
         internal DictionaryEx<int, string> ReverseDictionary
         {
@@ -54,10 +57,13 @@ namespace Reni.Struct
         [DumpData(false)]
         internal ICompileSyntax this[int index] { get { return List[index]; } }
 
-        internal protected override Result Result(ContextBase context, Category category) { return context.CreateStruct(this).ConstructorResult(category); }
+        protected internal override Result Result(ContextBase context, Category category)
+        {
+            return context.CreateStruct(this).ConstructorResult(category);
+        }
 
         [DumpData(false)]
-        internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
+        protected internal override ICompileSyntax ToCompileSyntax { get { return this; } }
 
         [DumpData(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
@@ -65,7 +71,10 @@ namespace Reni.Struct
         [DumpData(false)]
         internal readonly EmptyList EmptyList;
 
-        internal protected override string DumpShort() { return "container." + ObjectId; }
+        protected internal override string DumpShort()
+        {
+            return "container." + ObjectId;
+        }
 
         private void CreateReverseDictionary()
         {
@@ -157,34 +166,37 @@ namespace Reni.Struct
             return result;
         }
 
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
-
-        private bool Defined(string name) { return Dictionary.ContainsKey(name); }
-
-        private IStructFeature FindStructFeature(string name) { return new StructFeature(Dictionary[name], Properties.Contains(name)); }
-
-        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(Defineable defineable) { return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(Search(defineable)); }
-
-        private SearchResult<IStructFeature> Search(Defineable defineable)
+        string IDumpShortProvider.DumpShort()
         {
-            if(Defined(defineable.Name))
-                return SearchResult<IStructFeature>.Success(FindStructFeature(defineable.Name), defineable);
-            return defineable.SearchFromStruct().SubTrial(this, "try common definition");
+            return DumpShort();
         }
 
-        internal SearchResult<IConverter<IContextFeature, StructContextBase>> SearchFromStructContext(
-            Defineable defineable) { return SearchResult<IConverter<IContextFeature, StructContextBase>>.Create(Search(defineable)); }
+        private IStructFeature FindStructFeature(string name)
+        {
+            if (Dictionary.ContainsKey(name))
+                return new StructFeature(Dictionary[name], Properties.Contains(name));
+            return null;
+        }
 
+        internal SearchResult<IConverter<IConverter<IFeature, Ref>, Type>> SearchFromRefToStruct(Defineable defineable)
+        {
+            return SearchResult<IConverter<IConverter<IFeature, Ref>, Type>>.Create(FindStructFeature(defineable.Name), defineable);
+        }
+
+        internal SearchResult<IConverter<IContextFeature, Context>> SearchFromStructContext(Defineable defineable)
+        {
+            return SearchResult<IConverter<IContextFeature, Context>>.Create(FindStructFeature(defineable.Name), defineable);
+        }
     }
 
     internal interface IStructFeature
         : IConverter<IConverter<IFeature, Ref>, Type>
-          , IConverter<IContextFeature, StructContextBase> {}
+          , IConverter<IContextFeature, Context>
+    {
+    }
 
     [Serializable]
-    internal class StructFeature
-        : ReniObject
-          , IStructFeature
+    internal class StructFeature : ReniObject, IStructFeature
     {
         private readonly int _index;
         private readonly bool _isPoperty;
@@ -195,8 +207,14 @@ namespace Reni.Struct
             _isPoperty = isPoperty;
         }
 
-        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type) { return type.Context.Features[_index].ToProperty(_isPoperty); }
+        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type)
+        {
+            return type.Context.Features[_index].ToProperty(_isPoperty);
+        }
 
-        IContextFeature IConverter<IContextFeature, StructContextBase>.Convert(StructContextBase context) { return context.Features[_index].ToProperty(_isPoperty); }
+        IContextFeature IConverter<IContextFeature, Context>.Convert(Context context)
+        {
+            return context.Features[_index].ToProperty(_isPoperty);
+        }
     }
 }

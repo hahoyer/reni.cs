@@ -80,7 +80,7 @@ namespace Reni.Parser.TokenClass.Symbol
                  new[] {"(", "[", "{", "<frame>"},
                  new[] {")", "]", "}", "<end>"}
                 );
-            x += PrioTable.LeftAssoc("<else>");
+            x += PrioTable.LeftAssoc("<common>");
             return x;
         }
     }

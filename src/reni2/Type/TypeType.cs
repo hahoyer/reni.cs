@@ -20,7 +20,7 @@ namespace Reni.Type
 
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
-        internal override Result ConvertToItself(Category category)
+        protected override Result ConvertToItself(Category category)
         {
             return CreateVoidResult(category);
         }

@@ -185,6 +185,7 @@ namespace Reni.Parser
     }
 
     [MeansImplicitUse]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     internal abstract class TokenAttributeBase : Attribute
     {
         internal readonly string Token;

@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
-using Reni.Struct;
+
+#pragma warning disable 1911
 
 namespace Reni.Type
 {
@@ -12,9 +15,10 @@ namespace Reni.Type
     internal abstract class Ref : Child
     {
         private static int _nextObjectId;
-        internal RefAlignParam RefAlignParam;
+        internal readonly RefAlignParam RefAlignParam;
 
-        protected Ref(TypeBase target, RefAlignParam refAlignParam) : base(_nextObjectId++, target)
+        protected Ref(TypeBase target, RefAlignParam refAlignParam)
+            : base(_nextObjectId++, target)
         {
             Tracer.Assert(!(target is Aligner));
             RefAlignParam = refAlignParam;
@@ -31,8 +35,10 @@ namespace Reni.Type
 
         [DumpData(false)]
         internal override sealed string DumpPrintText { get { return "#(#" + ShortName + "#)# " + Parent.DumpPrintText; } }
+
         [DumpData(false)]
         protected abstract string ShortName { get; }
+
         [DumpData(false)]
         internal override sealed int SequenceCount { get { return Target.SequenceCount; } }
 
@@ -88,10 +94,7 @@ namespace Reni.Type
         }
 
         [DumpData(false)]
-        internal override Size UnrefSize
-        {
-            get { return Target.UnrefSize; }
-        }
+        internal override Size UnrefSize { get { return Target.UnrefSize; } }
 
         internal TypeBase AlignedTarget { get { return Target.CreateAlign(RefAlignParam.AlignBits); } }
 
@@ -100,7 +103,7 @@ namespace Reni.Type
             return ShortName + "." + Parent.DumpShort();
         }
 
-        internal override sealed Result ConvertToImplementation(Category category, TypeBase dest)
+        protected override sealed Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return Target
                 .ConvertTo(category, dest)
@@ -124,34 +127,31 @@ namespace Reni.Type
 
         internal override Result AccessResultAsArg(Category category, int position)
         {
-            return Target.AccessResultAsArgFromRef(category, position,RefAlignParam);
+            return Target.AccessResultAsArgFromRef(category, position, RefAlignParam);
         }
 
-        internal override Result AccessResultAsContextRef(Category category, int position)
+        internal Result AccessResultAsContextRef(Category category, int position)
         {
             return Target.AccessResultAsContextRefFromRef(category, position, RefAlignParam);
         }
 
-        internal override bool IsRefLike(Ref target) { return Target == target.Target && RefAlignParam == target.RefAlignParam; }
+        internal override bool IsRefLike(Ref target)
+        {
+            return Target == target.Target && RefAlignParam == target.RefAlignParam;
+        }
 
         internal override SearchResult<IFeature> Search(Defineable defineable)
         {
-            var resultFromRef = Parent.SearchFromRef(defineable).SubTrial(Parent, "try at referenced type");
-            var result = resultFromRef.SearchResultDescriptor.Convert(resultFromRef.Feature, this);
-            if(result.IsSuccessFull)
-                return result;
-            result = Parent.Search(defineable).AlternativeTrial(result);
-            if(result.IsSuccessFull)
-                return result;
-
-            return base.Search(defineable).AlternativeTrial(result);
+            return Parent.SearchFromRef(defineable).RecordSubTrial(Parent).Convert(this)
+                .Or(() => Parent.Search(defineable))
+                .Or(() => base.Search(defineable));
         }
 
         internal Result CreateContextResult(IRefInCode context, Category category)
         {
             return CreateResult(
                 category,
-                () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Target.Size * -1),
+                () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Target.Size*-1),
                 () => Refs.Context(context));
         }
     }
@@ -159,7 +159,11 @@ namespace Reni.Type
     [Serializable]
     internal sealed class AutomaticRef : Ref
     {
-        internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam) : base(target, refAlignParam) {}
+        internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam)
+            : base(target, refAlignParam)
+        {
+        }
+
         protected override string ShortName { get { return "automatic_ref"; } }
     }
 }

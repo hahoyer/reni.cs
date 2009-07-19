@@ -119,15 +119,6 @@ namespace Reni.Type
                 ;
         }
 
-        internal override TypeBase UnProperty()
-        {
-            return _context
-                .Type(_body)
-                .ApplyFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
-                .Type
-                ;
-        }
-
         internal override string DumpShort()
         {
             return "context." + _context.ObjectId + ".property(" + _body.DumpShort() + ")";

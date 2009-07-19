@@ -2,7 +2,6 @@
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using JetBrains.Annotations;
 using Reni.Context;
 using Reni.Parser.TokenClass.Symbol;
 using Reni.Syntax;
@@ -59,52 +58,6 @@ namespace Reni.Parser.TokenClass
         internal virtual string PrioTableName(string name)
         {
             return name;
-        }
-
-        [UsedImplicitly]
-        internal static string Symbolize(string token)
-        {
-            var name = "";
-            for(var i = 0; i < token.Length; i++)
-                name += SymbolizeChar(token[i]);
-            return name;
-        }
-
-        private static string SymbolizeChar(char @char)
-        {
-            switch(@char)
-            {
-                case '&':
-                    return "And";
-                case '\\':
-                    return "Backslash";
-                case ':':
-                    return "Colon";
-                case '.':
-                    return "Dot";
-                case '=':
-                    return "Equal";
-                case '>':
-                    return "Greater";
-                case '<':
-                    return "Less";
-                case '-':
-                    return "Minus";
-                case '!':
-                    return "Not";
-                case '|':
-                    return "Or";
-                case '+':
-                    return "Plus";
-                case '/':
-                    return "Slash";
-                case '*':
-                    return "Star";
-                case '~':
-                    return "Tilde";
-                default:
-                    throw new NotImplementedException("Symbolize(" + @char + ")");
-            }
         }
 
         /// <summary>

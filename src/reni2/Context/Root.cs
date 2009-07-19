@@ -1,8 +1,8 @@
-using HWClassLibrary.TreeStructure;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
@@ -20,14 +20,14 @@ namespace Reni.Context
 
         internal override RefAlignParam RefAlignParam { get { return DefaultRefAlignParam; } }
 
-        private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(3, Reni.Size.Create(32)); } }
+        private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(3, Size.Create(32)); } }
 
         [DumpData(false)]
         internal override Root RootContext { get { return this; } }
 
         internal override SearchResult<IContextFeature> Search(Defineable defineable)
         {
-            return SearchResult<IContextFeature>.Failure(this, defineable);
+            return defineable.Check<IContextFeature>().RecordSubTrial(this);
         }
 
         internal List<Container> CompileFunctions()
