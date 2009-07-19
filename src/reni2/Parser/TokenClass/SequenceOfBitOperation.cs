@@ -50,13 +50,18 @@ namespace Reni.Parser.TokenClass
     [Token("*")]
     internal sealed class Star : SequenceOfBitOperation
     {
-        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize) { return TypeBase.CreateNumber(BitsConst.MultiplySize(objSize, argSize)); }
+        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize)
+        {
+            return TypeBase.CreateNumber(BitsConst.MultiplySize(objSize, argSize));
+        }
     }
 
     [Token("/")]
     internal sealed class Slash : SequenceOfBitOperation
     {
-        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize) { return TypeBase.CreateNumber(BitsConst.DivideSize(objSize, argSize)); }
+        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize)
+        {
+            return TypeBase.CreateNumber(BitsConst.DivideSize(objSize, argSize));
+        }
     }
-
 }

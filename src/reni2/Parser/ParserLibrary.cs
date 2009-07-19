@@ -244,7 +244,11 @@ namespace Reni.Parser
             {
                 var attributes = type.GetCustomAttributes(typeof(TTokenAttribute), true);
                 foreach(TTokenAttribute attribute in attributes)
-                    result.Add(attribute.Token, (TokenClassBase) Activator.CreateInstance(type, new object[0]));
+                {
+                    var instance = (TokenClassBase) Activator.CreateInstance(type, new object[0]);
+                    instance.Name = attribute.Token;
+                    result.Add(attribute.Token, instance);
+                }
             }
             return result;
         }

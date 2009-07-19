@@ -1,5 +1,6 @@
 ﻿using System;
-using Reni.Context;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
@@ -22,11 +23,11 @@ namespace Reni.Parser.TokenClass
         internal static TokenClassBase Brace { get { return _brace; } }
         internal static TokenClassBase Frame { get { return _frame; } }
 
-        internal override string Name { get { return "<left "+_level+">"; } }
 
         private LPar(int level)
         {
             _level = level;
+            Name = "<left " + _level + ">";
         }
 
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)

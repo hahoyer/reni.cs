@@ -1,7 +1,10 @@
-﻿using HWClassLibrary.TreeStructure;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Context;
 using Reni.Parser.TokenClass.Symbol;
 using Reni.Syntax;
@@ -15,31 +18,22 @@ namespace Reni.Parser.TokenClass
     internal abstract class TokenClassBase : ReniObject, IIconKeyProvider
     {
         private static int _nextObjectId;
-        private string _tokenCache;
+        private string _name;
 
-        protected TokenClassBase() : base(_nextObjectId++) {}
+        protected TokenClassBase()
+            : base(_nextObjectId++)
+        {
+        }
 
         [Node]
-        internal virtual string Name
-        {
-            get
-            {
-                if(_tokenCache == null)
-                {
-                    _tokenCache = "";
-                    var attributes = GetType().GetCustomAttributes(typeof(TokenAttribute), true);
-                    if(attributes.Length == 1)
-                        _tokenCache = ((TokenAttribute) (attributes[0])).Token;
+        internal string Name { get { return _name; } set { _name = value; } }
 
-                }
-                return _tokenCache;
-            }
-        }
         [DumpData(false)]
         internal virtual bool IsEnd { get { return false; } }
 
         [DumpData(false)]
-        public override string NodeDump { get { return Name.Quote()+"."+ObjectId; } }
+        public override string NodeDump { get { return Name.Quote() + "." + ObjectId; } }
+
         [DumpData(false)]
         internal virtual TokenFactory NewTokenFactory { get { return null; } }
 
@@ -60,6 +54,51 @@ namespace Reni.Parser.TokenClass
             return name;
         }
 
+        [UsedImplicitly]
+        internal static string Symbolize(string token)
+        {
+            var name = "";
+            for (var i = 0; i < token.Length; i++)
+                name += SymbolizeChar(token[i]);
+            return name;
+        }
+
+        private static string SymbolizeChar(char @char)
+        {
+            switch (@char)
+            {
+                case '&':
+                    return "And";
+                case '\\':
+                    return "Backslash";
+                case ':':
+                    return "Colon";
+                case '.':
+                    return "Dot";
+                case '=':
+                    return "Equal";
+                case '>':
+                    return "Greater";
+                case '<':
+                    return "Less";
+                case '-':
+                    return "Minus";
+                case '!':
+                    return "Not";
+                case '|':
+                    return "Or";
+                case '+':
+                    return "Plus";
+                case '/':
+                    return "Slash";
+                case '*':
+                    return "Star";
+                case '~':
+                    return "Tilde";
+                default:
+                    throw new NotImplementedException("Symbolize(" + @char + ")");
+            }
+        }
         /// <summary>
         /// Gets the icon key.
         /// </summary>
@@ -69,7 +108,8 @@ namespace Reni.Parser.TokenClass
 
     [Serializable]
     internal abstract class Special : TokenClassBase
-    {}
+    {
+    }
 
     [Serializable]
     internal abstract class Terminal : Special

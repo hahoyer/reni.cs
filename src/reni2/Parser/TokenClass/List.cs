@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -7,14 +9,17 @@ namespace Reni.Parser.TokenClass
     /// <summary>
     /// List token (comma, semicolon)
     /// </summary>
-    sealed internal class List : TokenClassBase
+    internal sealed class List : TokenClassBase
     {
-        private List() { }
+        private List()
+        {
+            Name = ",";
+        }
+
         private static readonly List _instance = new List();
 
-        internal static List Instance{get { return _instance; } }
+        internal static List Instance { get { return _instance; } }
 
-        internal override string Name { get { return ","; } }
 
         /// <summary>
         /// Creates the syntax.
@@ -30,39 +35,37 @@ namespace Reni.Parser.TokenClass
         }
     }
 
-    sealed internal class ListSyntax : ParsedSyntax
+    internal sealed class ListSyntax : ParsedSyntax
     {
         private readonly IParsedSyntax _left;
         private readonly IParsedSyntax _right;
 
-        public ListSyntax(IParsedSyntax left, Token token, IParsedSyntax right):base(token)
+        public ListSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+            : base(token)
         {
             _left = left ?? new EmptyList(token);
             _right = right ?? new EmptyList(token);
         }
 
-        internal protected override string DumpShort()
+        protected internal override string DumpShort()
         {
-            return "("+ _left.DumpShort() + ", " + _right.DumpShort() + ")";
+            return "(" + _left.DumpShort() + ", " + _right.DumpShort() + ")";
         }
 
-        internal protected override IParsedSyntax SurroundedByParenthesis(Token token)
+        protected internal override IParsedSyntax SurroundedByParenthesis(Token token)
         {
             var list = new List<IParsedSyntax>();
-            IParsedSyntax next = this; 
+            IParsedSyntax next = this;
             do
             {
                 var current = (ListSyntax) next;
                 list.Add(current._left);
                 next = current._right;
-            } 
-            while(next is ListSyntax);
+            } while(next is ListSyntax);
 
             list.Add(next);
 
             return Container.Create(token, list);
-
-
         }
     }
 }

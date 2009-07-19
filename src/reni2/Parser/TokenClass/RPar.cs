@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
@@ -9,7 +11,6 @@ namespace Reni.Parser.TokenClass
     [Serializable]
     internal sealed class RPar : TokenClassBase
     {
-
         private readonly int _level;
 
         private static readonly TokenClassBase _parenthesis = new RPar(3);
@@ -21,11 +22,11 @@ namespace Reni.Parser.TokenClass
         internal static TokenClassBase Bracket { get { return _bracket; } }
         internal static TokenClassBase Brace { get { return _brace; } }
         internal static TokenClassBase Frame { get { return _frame; } }
-        internal override string Name { get { return "<right " + _level + ">"; } }
 
         private RPar(int level)
         {
             _level = level;
+            Name = "<right " + _level + ">";
         }
 
         /// <summary>

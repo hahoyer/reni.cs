@@ -15,8 +15,7 @@ namespace Reni.Parser.TokenClass
         public SyntaxError(string message)
         {
             _message = message;
-        }
-
-        internal override string Name { get { return "<error>"; } }
+            Name = "<error>"; 
+        } 
     }
 }

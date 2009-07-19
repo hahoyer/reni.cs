@@ -19,7 +19,7 @@ namespace Reni.Parser.TokenClass
         internal virtual string CSharpNameOfDefaultOperation { get { return Name; } }
 
         [Node]
-        internal string DataFunctionName { get { return GetType().Name; } }
+        internal string DataFunctionName { get { return Symbolize(Name); } }
 
         [Node]
         internal virtual bool IsCompareOperator { get { return false; } }

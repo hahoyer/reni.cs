@@ -1,5 +1,6 @@
 ﻿using System;
-using HWClassLibrary.Debug;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Code;
 using Reni.Context;
 using Reni.Type;
@@ -12,8 +13,12 @@ namespace Reni.Parser.TokenClass
     [Serializable]
     internal sealed class Number : Terminal
     {
+        public Number()
+        {
+            Name = "<number>";
+        }
+
         internal static readonly TokenClassBase Instance = new Number();
-        internal override string Name { get { return "<number>"; } }
 
         internal override Result Result(ContextBase context, Category category, Token token)
         {

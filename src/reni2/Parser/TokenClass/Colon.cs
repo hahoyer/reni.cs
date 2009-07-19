@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Syntax;
 
@@ -21,10 +23,7 @@ namespace Reni.Parser.TokenClass.Symbol
         private static readonly TokenFactory _tokenFactory = new TokenFactory<DeclarationTokenAttribute>();
 
         [DumpData(false)]
-        internal override TokenFactory NewTokenFactory
-        {
-            get { return _tokenFactory; }
-        }
+        internal override TokenFactory NewTokenFactory { get { return _tokenFactory; } }
 
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
@@ -58,11 +57,13 @@ namespace Reni.Parser.TokenClass.Symbol
 
     internal sealed class DeclarationTokenAttribute : TokenAttributeBase
     {
-        public DeclarationTokenAttribute(string token) : base(token)
+        public DeclarationTokenAttribute(string token)
+            : base(token)
         {
         }
 
-        public DeclarationTokenAttribute() : base(null)
+        public DeclarationTokenAttribute()
+            : base(null)
         {
         }
 
@@ -87,14 +88,12 @@ namespace Reni.Parser.TokenClass.Symbol
 
     internal abstract class DeclarationExtensionSyntax : ParsedSyntax
     {
-        protected DeclarationExtensionSyntax(Token token) : base(token)
+        protected DeclarationExtensionSyntax(Token token)
+            : base(token)
         {
         }
 
-        internal virtual bool IsProperty
-        {
-            get { return false; }
-        }
+        internal virtual bool IsProperty { get { return false; } }
 
         internal virtual IParsedSyntax ExtendByProperty(Token token)
         {
@@ -119,10 +118,7 @@ namespace Reni.Parser.TokenClass.Symbol
             Token = otherToken;
         }
 
-        internal override bool IsProperty
-        {
-            get { return true; }
-        }
+        internal override bool IsProperty { get { return true; } }
 
         protected internal override IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
         {

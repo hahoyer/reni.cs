@@ -1,5 +1,7 @@
 using System;
-using HWClassLibrary.Debug;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 
 namespace Reni.Runtime
 {
@@ -61,6 +63,7 @@ namespace Reni.Runtime
         /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 08.10.2006 20:07
+        [UsedImplicitly]
         public static void MoveBytes(int count, byte[] destination, byte[] source)
         {
             for(var i = 0; i < count; i++)
@@ -72,35 +75,54 @@ namespace Reni.Runtime
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        public static void DumpPrint(Int64 x) { BitsConst.Convert(x).PrintNumber(); }
+        [UsedImplicitly]
+        public static void DumpPrint(Int64 x)
+        {
+            BitsConst.Convert(x).PrintNumber();
+        }
 
         /// <summary>
         /// Bits the array op_printnum.
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        public static void DumpPrint(Int32 x) { BitsConst.Convert(x).PrintNumber(); }
+        [UsedImplicitly]
+        public static void DumpPrint(Int32 x)
+        {
+            BitsConst.Convert(x).PrintNumber();
+        }
 
         /// <summary>
         /// Bits the array op_printnum.
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        public static void DumpPrint(Int16 x) { BitsConst.Convert(x).PrintNumber(); }
+        public static void DumpPrint(Int16 x)
+        {
+            BitsConst.Convert(x).PrintNumber();
+        }
 
         /// <summary>
         /// Bits the array op_printnum.
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        public static void DumpPrint(byte x) { BitsConst.Convert(x).PrintNumber(); }
+        [UsedImplicitly]
+        public static void DumpPrint(byte x)
+        {
+            BitsConst.Convert(x).PrintNumber();
+        }
 
         /// <summary>
         /// Dumps the print.
         /// </summary>
         /// <param name="s">The s.</param>
         /// created 08.01.2007 18:42
-        public static void DumpPrint(string s) { BitsConst.OutStream.Add(s); }
+        [UsedImplicitly]
+        public static void DumpPrint(string s)
+        {
+            BitsConst.OutStream.Add(s);
+        }
 
         /// <summary>
         /// Bitses the array.
@@ -109,6 +131,7 @@ namespace Reni.Runtime
         /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 02.02.2007 01:01
+        [UsedImplicitly]
         public static unsafe void BitsArray(int count, sbyte* destination, params byte[] source)
         {
             fixed(byte* s = &source[0])
@@ -122,7 +145,10 @@ namespace Reni.Runtime
         /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 02.02.2007 01:09
-        public static unsafe void MoveBytes(int count, sbyte* destination, sbyte* source) { MoveBytes(count, (byte*) destination, (byte*) source); }
+        public static unsafe void MoveBytes(int count, sbyte* destination, sbyte* source)
+        {
+            MoveBytes(count, (byte*) destination, (byte*) source);
+        }
 
         /// <summary>
         /// Dumps the print.
@@ -130,6 +156,7 @@ namespace Reni.Runtime
         /// <param name="count">The count.</param>
         /// <param name="source">The source.</param>
         /// created 02.02.2007 01:10
+        [UsedImplicitly]
         public static unsafe void DumpPrint(int count, sbyte* source)
         {
             var data = ToInt64(count, source);
@@ -150,6 +177,7 @@ namespace Reni.Runtime
         /// <param name="x">The x.</param>
         /// <param name="bits">The bits.</param>
         /// created 03.02.2007 01:39
+        [UsedImplicitly]
         public static unsafe void BitCast(int count, sbyte* x, int bits)
         {
             var isNegative = x[count - 1] < 0;
@@ -187,7 +215,7 @@ namespace Reni.Runtime
                 carry = data[i] == 0 ? 1 : 0;
             }
 
-            if (countResult != countData)
+            if(countResult != countData)
             {
                 NotImplementedFunction(countResult, data[0], countData);
                 throw new NotImplementedException();
@@ -204,6 +232,7 @@ namespace Reni.Runtime
         /// <param name="count2nd">The count2nd.</param>
         /// <param name="data2nd">The data2nd.</param>
         /// created 03.02.2007 20:48
+        [UsedImplicitly]
         public static unsafe void Minus(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
             fixed(sbyte* m = new sbyte[count2nd])
@@ -224,6 +253,7 @@ namespace Reni.Runtime
         /// <param name="count2nd">The count2nd.</param>
         /// <param name="data2nd">The data2nd.</param>
         /// created 03.02.2007 20:48
+        [UsedImplicitly]
         public static unsafe void Plus(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
             var d = 0;
@@ -296,16 +326,19 @@ namespace Reni.Runtime
             return false;
         }
 
+        [UsedImplicitly]
         public static unsafe void Greater(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
             BoolToSBytes(countResult, dataResult, Greater(count1st, data1st, count2nd, data2nd));
         }
 
+        [UsedImplicitly]
         public static unsafe void Less(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
             BoolToSBytes(countResult, dataResult, Less(count1st, data1st, count2nd, data2nd));
         }
 
+        [UsedImplicitly]
         public static unsafe void Equal(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
         {
             BoolToSBytes(countResult, dataResult, Equal(count1st, data1st, count2nd, data2nd));
@@ -313,11 +346,14 @@ namespace Reni.Runtime
 
         private static unsafe void BoolToSBytes(int countResult, sbyte* dataResult, bool result)
         {
-            var value = (sbyte)(result ? -1 : 0);
-            for(int i = 0; i < countResult; i++)
+            var value = (sbyte) (result ? -1 : 0);
+            for(var i = 0; i < countResult; i++)
                 dataResult[i] = value;
         }
 
-        public static unsafe bool Less(int count1st, sbyte* data1st, int count2nd, sbyte* data2nd) { return Greater(count2nd, data2nd, count1st, data1st); }
+        public static unsafe bool Less(int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
+        {
+            return Greater(count2nd, data2nd, count1st, data1st);
+        }
     }
 }
