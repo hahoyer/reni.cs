@@ -39,6 +39,11 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Element.ArrayCopier(category, Count); }
 
         internal override Result DumpPrint(Category category) { return Element.ArrayDumpPrint(category, Count); }
+        
+        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
+        {
+            return Element.ArrayDumpPrintFromRef(category,Count, refAlignParam);
+        }
 
         public override string Dump() { return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")"; }
 

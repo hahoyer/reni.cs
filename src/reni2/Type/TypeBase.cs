@@ -500,6 +500,12 @@ namespace Reni.Type
         {
             searchVisitor.SearchTypeBase();
         }
+
+        internal virtual Result ArrayDumpPrintFromRef(Category category, int count, RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(category, count, refAlignParam);
+            return null;
+        }
     }
 
 }
