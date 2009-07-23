@@ -3,6 +3,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.Helper;
 using Reni.Parser.TokenClass;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -10,13 +11,13 @@ namespace Reni.Code
     /// Bit array operation
     /// </summary>
     [Serializable]
-    internal sealed class BitArrayOp : BinaryOp
+    internal sealed class BitArrayBinaryOp : BinaryOp
     {
         [Node]
-        internal readonly Defineable OpToken;
+        internal readonly ISequenceOfBitBinaryOperation OpToken;
         private readonly Size _size;
 
-        internal BitArrayOp(Defineable opToken, Size size, Size leftSize, Size rightSize)
+        internal BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
             : base(leftSize, rightSize)
         {
             OpToken = opToken;
@@ -38,22 +39,23 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBackN(this);
         }
 
-        public override string NodeDump { get { return base.NodeDump + " <"+LeftSize+"> "+OpToken.Name+" <"+RightSize+">"; } }
+        public override string NodeDump { get { return base.NodeDump + " <"+LeftSize+"> "+
+            OpToken.DataFunctionName+" <"+RightSize+">"; } }
     }
 
     /// <summary>
-    /// Bit array prafix operation
+    /// Bit array prefix operation
     /// </summary>
     [Serializable]
     internal sealed class BitArrayPrefixOp : LeafElement
     {
         [Node]
-        internal readonly Defineable OpToken;
+        internal readonly ISequenceOfBitPrefixOperation OpToken;
         private readonly Size _size;
         [Node]
         internal readonly Size ArgSize;
 
-        internal BitArrayPrefixOp(Defineable name, Size size, Size argSize)
+        internal BitArrayPrefixOp(ISequenceOfBitPrefixOperation name, Size size, Size argSize)
         {
             OpToken = name;
             _size = size;
@@ -79,7 +81,7 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBackN(this);
         }
 
-        public override string NodeDump { get { return base.NodeDump + " " + OpToken.Name + " " + ArgSize; } }
+        public override string NodeDump { get { return base.NodeDump + " " + OpToken.DataFunctionName + " " + ArgSize; } }
     }
 
     /// <summary>

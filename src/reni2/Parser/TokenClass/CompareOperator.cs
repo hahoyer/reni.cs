@@ -9,9 +9,9 @@ namespace Reni.Parser.TokenClass
     [Token(">")]
     internal class CompareOperator : SequenceOfBitOperation
     {
-        internal override bool IsCompareOperator { get { return true; } }
+        protected override bool IsCompareOperator { get { return true; } }
 
-        internal override TypeBase BitSequenceOperationResultType(int objSize, int argSize)
+        protected override TypeBase ResultType(int objSize, int argSize)
         {
             return TypeBase.CreateBit;
         }
@@ -19,13 +19,13 @@ namespace Reni.Parser.TokenClass
     [Token("=")]
     internal sealed class Equal : CompareOperator
     {
-        internal override string CSharpNameOfDefaultOperation { get { return "=="; } }
+        protected override string CSharpNameOfDefaultOperation { get { return "=="; } }
     }
 
     [Token("<>")]
     internal sealed class NotEqual : CompareOperator
     {
-        internal override string CSharpNameOfDefaultOperation { get { return "!="; } }
+        protected override string CSharpNameOfDefaultOperation { get { return "!="; } }
     }
 
 }

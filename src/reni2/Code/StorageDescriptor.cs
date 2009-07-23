@@ -4,6 +4,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Parser.TokenClass;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -77,7 +78,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal string CreateBitArrayPrefixOp(Defineable opToken, Size size, Size argSize)
+        internal string CreateBitArrayPrefixOp(ISequenceOfBitOperation opToken, Size size, Size argSize)
         {
             if(IsBuildInIntType(size))
                 return CreateDataRef(Start, size)
@@ -100,7 +101,7 @@ namespace Reni.Code
                                             + ")";
         }
 
-        internal string CreateBitArrayOp(Defineable opToken, Size resultSize, Size leftSize, Size rightSize)
+        internal string CreateBitArrayOp(ISequenceOfBitBinaryOperation opToken, Size resultSize, Size leftSize, Size rightSize)
         {
             if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
             {
@@ -127,7 +128,7 @@ namespace Reni.Code
                                                                     + ")";
         }
 
-        internal string CreateBitArrayOpThen(Defineable opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
+        internal string CreateBitArrayOpThen(ISequenceOfBitBinaryOperation opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
         {
             if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
                 return "if("
@@ -324,7 +325,7 @@ namespace Reni.Code
                     + CreateIntCast(resultSize);
         }
 
-        private string CreateBinaryOperation(Size leftSize, Defineable opToken, Size rightSize)
+        private string CreateBinaryOperation(Size leftSize, ISequenceOfBitBinaryOperation opToken, Size rightSize)
         {
             return "("
                 + CreateDataRef(Start + rightSize, leftSize)

@@ -16,10 +16,11 @@
   <ItemGroup>
     <Compile Include="BitsConst.cs" />
     <Compile Include="Category.cs" />
+    <Compile Include="ChildSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\BinaryOp.cs" />
     <Compile Include="Code\BitArray.cs" />
-    <Compile Include="Code\BitArrayOp.cs" />
+    <Compile Include="Code\BitArrayBinaryOp.cs" />
     <Compile Include="Code\BitCast.cs" />
     <Compile Include="Code\Child.cs" />
     <Compile Include="Code\CodeBase.cs" />
@@ -51,6 +52,7 @@
     <Compile Include="Code\Dereference.cs" />
     <Compile Include="Code\Visitor.cs" />
     <Compile Include="Compiler.cs" />
+    <Compile Include="ContextSearchVisitor.cs" />
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\FunctionInstance.cs" />
     <Compile Include="Context\FunctionList.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="FeatureTest\StringStruct.cs" />
     <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
     <Compile Include="Feature\IFeature.cs" />
+    <Compile Include="ISearchVisitor.cs" />
     <Compile Include="Parser\DefineableToken.cs" />
     <Compile Include="Parser\ExpressionSyntax.cs" />
     <Compile Include="Parser\IParsedSyntax.cs" />
@@ -78,8 +81,10 @@
     <Compile Include="Parser\TokenClass\SequenceOfBitOperation.cs" />
     <Compile Include="IPostProcessStrategy.cs" />
     <Compile Include="Parser\TokenClass\TokenAttribute.cs" />
-    <Compile Include="SearchResult.cs" />
+    <Compile Include="RootSearchVisitor.cs" />
+    <Compile Include="SearchResultExtender.cs" />
     <Compile Include="SearchTrial.cs" />
+    <Compile Include="SearchVisitor.cs" />
     <Compile Include="Struct\AtToken.cs" />
     <Compile Include="Struct\FullContext.cs" />
     <Compile Include="Struct\ContextAtPosition.cs" />

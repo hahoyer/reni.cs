@@ -15,27 +15,6 @@ namespace Reni.Parser.TokenClass
     [Serializable]
     internal abstract class Defineable : TokenClassBase
     {
-        [Node, DumpData(false)]
-        internal virtual string CSharpNameOfDefaultOperation { get { return Name; } }
-
-        [Node]
-        internal string DataFunctionName { get { return Symbolize(Name); } }
-
-        [Node]
-        internal virtual bool IsCompareOperator { get { return false; } }
-
-        internal virtual TypeBase BitSequenceOperationResultType(int objSize, int argSize)
-        {
-            NotImplementedMethod(objSize, argSize);
-            throw new NotImplementedException();
-        }
-
-        internal virtual TypeBase BitSequenceOperationResultType(int objSize)
-        {
-            NotImplementedMethod(objSize);
-            throw new NotImplementedException();
-        }
-
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
             if(left == null && right == null)
@@ -56,6 +35,8 @@ namespace Reni.Parser.TokenClass
         {
             return this as TFeatureType;
         }
+
+        protected string DataFunctionName { get { return Symbolize(Name); } }
     }
 
     internal sealed class DeclarationPartSyntax : ParsedSyntax

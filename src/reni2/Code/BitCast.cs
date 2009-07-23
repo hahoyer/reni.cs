@@ -78,12 +78,12 @@ namespace Reni.Code
             return null;
         }
 
-        internal override LeafElement[] TryToCombineBackN(BitArrayOp precedingElement)
+        internal override LeafElement[] TryToCombineBackN(BitArrayBinaryOp precedingElement)
         {
             if(TargetSize == Size)
                 return null;
 
-            var bitArrayOp = new BitArrayOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize,
+            var bitArrayOp = new BitArrayBinaryOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize,
                 precedingElement.LeftSize, precedingElement.RightSize);
 
             if(SignificantSize == Size)

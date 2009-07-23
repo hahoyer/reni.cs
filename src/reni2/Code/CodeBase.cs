@@ -7,6 +7,7 @@ using HWClassLibrary.Helper;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
 using Reni.Parser.TokenClass;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -55,9 +56,9 @@ namespace Reni.Code
         [DumpData(false)]
         internal virtual Refs RefsImplementation { get { return Refs.None(); } }
 
-        internal CodeBase CreateBitSequenceOperation(Defineable name, Size size, Size leftSize)
+        internal CodeBase CreateBitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize)
         {
-            return CreateChild(new BitArrayOp(name, size, leftSize, Size - leftSize));
+            return CreateChild(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize));
         }
 
         private CodeBase CreateDumpPrint(Size leftSize)
@@ -71,9 +72,9 @@ namespace Reni.Code
             return CreateChild(new Assign(refAlignParam, alignedSize));
         }
 
-        public CodeBase CreateBitSequenceOperation(Defineable name, Size size)
+        public CodeBase CreateBitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size)
         {
-            return CreateChild(new BitArrayPrefixOp(name, size, Size));
+            return CreateChild(new BitArrayPrefixOp(feature, size, Size));
         }
 
         public static CodeBase CreateDumpPrintText(string dumpPrintText)

@@ -25,7 +25,7 @@ namespace Reni.Type
             return CreateVoidResult(category);
         }
 
-        internal override Result DumpPrint(Category category)
+        internal new Result DumpPrint(Category category)
         {
             return Void.CreateResult(category, DumpPrintCode);
         }

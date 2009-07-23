@@ -274,10 +274,10 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual Result DumpPrint(Category category)
+        internal Result DumpPrint(Category category)
         {
             NotImplementedMethod(category);
-            throw new NotImplementedException();
+            return null;
         }
 
         internal virtual Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
@@ -366,25 +366,25 @@ namespace Reni.Type
             return true;
         }
 
-        protected virtual CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize, Size argsSize)
+        protected virtual CodeBase CreateSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, Size objSize, Size argsSize)
         {
             NotImplementedMethod(size, token, objSize, argsSize);
             return null;
         }
 
-        protected virtual CodeBase CreateSequenceOperation(Size size, Defineable token, Size objSize)
+        protected virtual CodeBase CreateSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
         {
-            NotImplementedMethod(size, token, objSize);
+            NotImplementedMethod(size, feature, objSize);
             return null;
         }
 
-        protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount, int argBitCount)
+        protected virtual TypeBase SequenceOperationResultType(ISequenceOfBitBinaryOperation token, int objBitCount, int argBitCount)
         {
             NotImplementedMethod(token, objBitCount, argBitCount);
             return null;
         }
 
-        protected virtual TypeBase SequenceOperationResultType(Defineable token, int objBitCount)
+        protected virtual TypeBase SequenceOperationResultType(ISequenceOfBitPrefixOperation token, int objBitCount)
         {
             NotImplementedMethod(token, objBitCount);
             return null;
@@ -395,18 +395,25 @@ namespace Reni.Type
             return rawResult;
         }
 
-        private Result SequenceOperationResult(Category category, Defineable definable, Size objSize, Size argsSize)
+        private Result SequenceOperationResult(Category category, ISequenceOfBitBinaryOperation definable, Size objSize, Size argsSize)
         {
             var type = SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt());
             return type
-                .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize, argsSize));
+                .CreateResult(category, () => CreateSequenceOperation(type.Size, 
+                    definable, objSize, argsSize));
         }
 
-        private Result SequenceOperationResult(Category category, Defineable definable, Size objSize)
+        private Result SequenceOperationResult(Category category, ISequenceOfBitOperation feature, Size objSize)
         {
-            var type = SequenceOperationResultType(definable, objSize.ToInt());
+            return feature.SequenceOperationResult(category, this, objSize);
+        }
+
+        internal Result PrefixSequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize)
+        {
+            var type = SequenceOperationResultType(feature, objSize.ToInt());
             return type
-                .CreateResult(category, () => CreateSequenceOperation(type.Size, definable, objSize));
+                .CreateResult(category, () => CreateSequenceOperation(type.Size, 
+                    feature, objSize));
         }
 
         internal virtual Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
@@ -446,7 +453,7 @@ namespace Reni.Type
             return false;
         }
 
-        internal Result ApplySequenceOperation(SequenceOfBitOperation definable, ContextBase callContext, Category category, ICompileSyntax @object)
+        internal Result ApplySequenceOperation(ISequenceOfBitOperation definable, ContextBase callContext, Category category, ICompileSyntax @object)
         {
             var result = SequenceOperationResult
                 (
@@ -460,7 +467,7 @@ namespace Reni.Type
             return result.UseWithArg(objectResult);
         }
 
-        internal Result ApplySequenceOperation(SequenceOfBitOperation definable, ContextBase callContext,
+        internal Result ApplySequenceOperation(ISequenceOfBitBinaryOperation definable, ContextBase callContext,
                                                Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             var result = SequenceOperationResult
@@ -498,7 +505,7 @@ namespace Reni.Type
 
         internal virtual void Search(ISearchVisitor searchVisitor)
         {
-            searchVisitor.SearchTypeBase();
+            searchVisitor.Search();
         }
 
         internal virtual Result ArrayDumpPrintFromRef(Category category, int count, RefAlignParam refAlignParam)
@@ -508,4 +515,10 @@ namespace Reni.Type
         }
     }
 
+    internal interface ISequenceOfBitOperation
+    {
+        string CSharpNameOfDefaultOperation { get; }
+        string DataFunctionName { get; }
+        Result SequenceOperationResult(Category category, TypeBase typeBase, Size objSize);
+    }
 }

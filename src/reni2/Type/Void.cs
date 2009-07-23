@@ -20,7 +20,7 @@ namespace Reni.Type
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            searchVisitor.Child(this).SearchTypeBase();
+            searchVisitor.Child(this).Search();
             base.Search(searchVisitor);
         }
 
@@ -34,7 +34,7 @@ namespace Reni.Type
             return first;
         }
 
-        internal override Result DumpPrint(Category category)
+        internal new Result DumpPrint(Category category)
         {
             return CreateResult(category);
         }

@@ -146,7 +146,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal override LeafElement TryToCombineBack(BitArrayOp precedingElement)
+        internal override LeafElement TryToCombineBack(BitArrayBinaryOp precedingElement)
         {
             if(precedingElement.Size == CondSize)
                 return new BitArrayOpThen(this, precedingElement);
@@ -163,14 +163,14 @@ namespace Reni.Code
     internal class BitArrayOpThen : LeafElement
     {
         [Node, DumpData(true)]
-        private readonly BitArrayOp _bitArrayOp;
+        private readonly BitArrayBinaryOp _bitArrayBinaryOp;
         [Node, DumpData(true)]
         private readonly Then _thenCode;
 
-        public BitArrayOpThen(Then thenCode, BitArrayOp bitArrayOp)
+        public BitArrayOpThen(Then thenCode, BitArrayBinaryOp bitArrayBinaryOp)
         {
             _thenCode = thenCode;
-            _bitArrayOp = bitArrayOp;
+            _bitArrayBinaryOp = bitArrayBinaryOp;
         }
 
         protected override Size GetSize()
@@ -180,12 +180,12 @@ namespace Reni.Code
 
         protected override Size GetInputSize()
         {
-            return _bitArrayOp.DeltaSize + _bitArrayOp.Size;
+            return _bitArrayBinaryOp.DeltaSize + _bitArrayBinaryOp.Size;
         }
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateBitArrayOpThen(_bitArrayOp.OpToken, _bitArrayOp.LeftSize, _bitArrayOp.RightSize, _thenCode.ThenElseObjectId, _thenCode.CondSize);
+            return start.CreateBitArrayOpThen(_bitArrayBinaryOp.OpToken, _bitArrayBinaryOp.LeftSize, _bitArrayBinaryOp.RightSize, _thenCode.ThenElseObjectId, _thenCode.CondSize);
         }
     }
 }

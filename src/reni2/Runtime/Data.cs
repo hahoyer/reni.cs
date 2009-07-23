@@ -8,6 +8,7 @@ namespace Reni.Runtime
     /// <summary>
     /// Data class that contains data for a stack layer
     /// </summary>
+    [UsedImplicitly]
     public class Data : ReniObject
     {
         /// <summary>

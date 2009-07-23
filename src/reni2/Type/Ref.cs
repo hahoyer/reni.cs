@@ -76,7 +76,7 @@ namespace Reni.Type
             return Target.AutomaticDereference();
         }
 
-        internal override sealed Result DumpPrint(Category category)
+        internal new Result DumpPrint(Category category)
         {
             return Target.DumpPrintFromRef(category, RefAlignParam);
         }
