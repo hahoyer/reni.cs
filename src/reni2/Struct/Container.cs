@@ -178,7 +178,7 @@ namespace Reni.Struct
             return null;
         }
 
-        internal IConverter<IConverter<IFeature, Ref>, Type> SearchFromRefToStruct(Defineable defineable)
+        internal IConverter<IConverter<IInfixFeature, Ref>, Type> SearchFromRefToStruct(Defineable defineable)
         {
             return FindStructFeature(defineable.Name);
         }
@@ -191,7 +191,7 @@ namespace Reni.Struct
     }
 
     internal interface IStructFeature
-        : IConverter<IConverter<IFeature, Ref>, Type>
+        : IConverter<IConverter<IInfixFeature, Ref>, Type>
           , IConverter<IContextFeature, Context>
     {
     }
@@ -208,7 +208,7 @@ namespace Reni.Struct
             _isPoperty = isPoperty;
         }
 
-        IConverter<IFeature, Ref> IConverter<IConverter<IFeature, Ref>, Type>.Convert(Type type)
+        IConverter<IInfixFeature, Ref> IConverter<IConverter<IInfixFeature, Ref>, Type>.Convert(Type type)
         {
             return type.Context.Features[_index].ToProperty(_isPoperty);
         }

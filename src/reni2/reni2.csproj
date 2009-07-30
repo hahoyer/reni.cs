@@ -68,7 +68,7 @@
     <Compile Include="Context\Root.cs" />
     <Compile Include="FeatureTest\StringStruct.cs" />
     <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
-    <Compile Include="Feature\IFeature.cs" />
+    <Compile Include="Feature\IInfixFeature.cs" />
     <Compile Include="ISearchVisitor.cs" />
     <Compile Include="Parser\DefineableToken.cs" />
     <Compile Include="Parser\ExpressionSyntax.cs" />

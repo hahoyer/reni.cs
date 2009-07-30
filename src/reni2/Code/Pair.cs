@@ -32,7 +32,7 @@ namespace Reni.Code
         [DumpData(false)]
         internal override Refs RefsImplementation { get { return _left.RefsImplementation.CreateSequence(_right.RefsImplementation); } }
 
-        public override T VisitImplementation<T>(Visitor<T> actual)
+        protected override T VisitImplementation<T>(Visitor<T> actual)
         {
             return actual.PairVisit(this);
         }

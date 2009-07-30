@@ -7,7 +7,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni
 {
-    internal class ChildSearchVisitor<TFeature, TType> : SearchVisitor<IConverter<TFeature, TType>>
+    internal class ChildSearchVisitor<TFeature, TType> : SearchVisitor<ISearchPath<TFeature, TType>>
         where TFeature : class
         where TType : IDumpShortProvider
     {
@@ -22,7 +22,7 @@ namespace Reni
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
 
-        internal override IConverter<TFeature, TType> InternalResult
+        internal override ISearchPath<TFeature, TType> InternalResult
         {
             set
             {

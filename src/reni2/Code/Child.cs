@@ -55,7 +55,7 @@ namespace Reni.Code
             return base.CreateChild(leafElement);
         }
 
-        public override T VisitImplementation<T>(Visitor<T> actual)
+        protected override T VisitImplementation<T>(Visitor<T> actual)
         {
             return actual.ChildVisit(this);
         }

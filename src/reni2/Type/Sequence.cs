@@ -32,10 +32,7 @@ namespace Reni.Type
         [DumpData(false)]
         internal Array InheritedType { get { return _inheritedType; } }
 
-        protected override Size GetSize()
-        {
-            return _inheritedType.Size;
-        }
+        protected override Size GetSize() { return _inheritedType.Size; }
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
 
@@ -48,10 +45,7 @@ namespace Reni.Type
         [Node, DumpData(false)]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
-        internal override string DumpShort()
-        {
-            return "(" + Element.DumpShort() + ")sequence(" + Count + ")";
-        }
+        internal override string DumpShort() { return "(" + Element.DumpShort() + ")sequence(" + Count + ")"; }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
@@ -159,38 +153,19 @@ namespace Reni.Type
             return result;
         }
 
-        internal new Result DumpPrint(Category category)
-        {
-            return Element.SequenceDumpPrint(category, Count);
-        }
+        internal new Result DumpPrint(Category category) { return Element.SequenceDumpPrint(category, Count); }
 
-        internal override Result Destructor(Category category)
-        {
-            return _inheritedType.Destructor(category);
-        }
+        internal override Result Destructor(Category category) { return _inheritedType.Destructor(category); }
 
-        internal override Result Copier(Category category)
-        {
-            return _inheritedType.Copier(category);
-        }
+        internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
-        public SequenceOperationFeature BitOperationFeature(ISequenceOfBitBinaryOperation definable)
-        {
-            return new SequenceOperationFeature(this, definable);
-        }
+        public SequenceOperationPrefixFeature BitOperationPrefixFeature(ISequenceOfBitPrefixOperation definable) { return new SequenceOperationPrefixFeature(this, definable); }
 
-        public SequenceOperationPrefixFeature BitOperationPrefixFeature(ISequenceOfBitPrefixOperation definable)
-        {
-            return new SequenceOperationPrefixFeature(this, definable);
-        }
-
-        public IFeature EnableCutFeature { get { return _enableCutCutFeature; } }
-        public IFeature BitOperationFeature(ISequenceOfBitDumpPrint feature) {
-            return new SequenceOfBitDumpPrintFeature(this, feature);
-        }
+        public IInfixFeature EnableCutFeature { get { return _enableCutCutFeature; } }
+        public IInfixFeature BitOperationFeature(ISequenceOfBitDumpPrint feature) { return new SequenceOfBitDumpPrintFeature(this, feature); }
     }
 
-    internal class SequenceOfBitDumpPrintFeature : ReniObject, IFeature
+    internal class SequenceOfBitDumpPrintFeature : ReniObject, IInfixFeature
     {
         private readonly Sequence _sequence;
         private readonly ISequenceOfBitDumpPrint _feature;
@@ -201,9 +176,9 @@ namespace Reni.Type
             _feature = feature;
         }
 
-        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            if (args != null)
+            if(args != null)
                 NotImplementedMethod(callContext, category, @object, args);
 
             return _sequence.Element.ApplySequenceOperation(_feature, callContext, category, @object);
@@ -211,14 +186,11 @@ namespace Reni.Type
     }
 
     [Serializable]
-    internal class EnableCutFeature : ReniObject, IFeature
+    internal class EnableCutFeature : ReniObject, IInfixFeature
     {
         private readonly Sequence _sequence;
 
-        public EnableCutFeature(Sequence sequence)
-        {
-            _sequence = sequence;
-        }
+        public EnableCutFeature(Sequence sequence) { _sequence = sequence; }
 
         public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
@@ -230,39 +202,37 @@ namespace Reni.Type
     }
 
     [Serializable]
-    internal class SequenceOperationFeature : ReniObject, IFeature
+    internal class SequenceOperationFeature : ReniObject, IInfixFeature, IConverter<IInfixFeature, Sequence>
     {
         private readonly ISequenceOfBitBinaryOperation _definable;
-        private readonly Sequence _sequence;
+        private readonly Bit _bit;
 
-        public SequenceOperationFeature(Sequence sequence, ISequenceOfBitBinaryOperation definable)
+        public SequenceOperationFeature(Bit bit, ISequenceOfBitBinaryOperation definable)
         {
-            _sequence = sequence;
+            _bit = bit;
             _definable = definable;
         }
 
-        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
-        {
-            return _sequence.Element.ApplySequenceOperation(_definable, callContext, category, @object, args);
-        }
+        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args) { return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args); }
+
+        public IInfixFeature Convert(Sequence type) { return this; }
     }
 
     [Serializable]
     internal class SequenceOperationPrefixFeature : ReniObject, IPrefixFeature
     {
         private readonly ISequenceOfBitPrefixOperation _definable;
-        private readonly Sequence _sequence;
+        private readonly Bit _bit;
 
-        public SequenceOperationPrefixFeature(Sequence sequence, ISequenceOfBitPrefixOperation definable)
+        public SequenceOperationPrefixFeature(Bit bit, ISequenceOfBitPrefixOperation definable)
         {
-            _sequence = sequence;
+            _bit = bit;
             _definable = definable;
         }
 
         Result IPrefixFeature.ApplyResult(ContextBase callCallContext, Category category, ICompileSyntax @object)
         {
-            return _sequence.Element.ApplySequenceOperation(_definable, callCallContext, category, @object);
+            return _bit.ApplySequenceOperation(_definable, callCallContext, category, @object);
         }
-
     }
 }

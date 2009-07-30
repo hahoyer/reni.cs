@@ -17,6 +17,6 @@ namespace Reni.Code
 
         protected override Size SizeImplementation { get { return _size; } }
 
-        public override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.Arg(this); }
+        protected override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.Arg(this); }
     }
 }

@@ -83,13 +83,13 @@ namespace Reni.Type
         protected override bool IsInheritor { get { return false; } }
     }
 
-    internal class ConcatArraysFeature : IFeature
+    internal class ConcatArraysFeature : IInfixFeature
     {
         private Array _type;
 
         public ConcatArraysFeature(Array type) { _type = type; }
 
-        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
+        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                     ICompileSyntax args) { throw new NotImplementedException(); }
     }
 
@@ -119,9 +119,9 @@ namespace Reni.Type
         }
     }
 
-    internal class CreateArrayFeature : ConcatArrayWithObjectFeatureBase, IFeature
+    internal class CreateArrayFeature : ConcatArrayWithObjectFeatureBase, IInfixFeature
     {
-        Result IFeature.ApplyResult(
+        Result IInfixFeature.ApplyResult(
             ContextBase callContext, 
             Category category, 
             ICompileSyntax @object,
@@ -132,13 +132,13 @@ namespace Reni.Type
         }
     }
 
-    internal class ConcatArrayWithObjectFeature : ConcatArrayWithObjectFeatureBase, IFeature
+    internal class ConcatArrayWithObjectFeature : ConcatArrayWithObjectFeatureBase, IInfixFeature
     {
         private readonly Array _type;
 
         public ConcatArrayWithObjectFeature(Array type) { _type = type; }
 
-        Result IFeature.ApplyResult(
+        Result IInfixFeature.ApplyResult(
             ContextBase callContext, 
             Category category, 
             ICompileSyntax @object, 

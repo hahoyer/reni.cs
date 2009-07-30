@@ -50,7 +50,7 @@ namespace Reni.Code
             return result;
         }
 
-        public override Result VisitImplementation<Result>(Visitor<Result> actual)
+        protected override Result VisitImplementation<Result>(Visitor<Result> actual)
         {
             return actual.Leaf(LeafElement);
         }

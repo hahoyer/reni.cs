@@ -57,7 +57,7 @@ namespace Reni.Struct
             for(var i = 0; i < StatementList.Count; i++)
             {
                 var accessResult = AccessResultAsArgFromRef(category | Category.Type, i, refAlignParam);
-                result.Add(accessResult.Type.DumpPrint(category).UseWithArg(accessResult));
+                result.Add(accessResult.Type.DumpPrint(category, error).UseWithArg(accessResult));
             }
             return Result.ConcatPrintResult(category, result);
         }
@@ -80,7 +80,7 @@ namespace Reni.Struct
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            var searchVisitorChild = searchVisitor as SearchVisitor<IConverter<IFeature, Ref>>;
+            var searchVisitorChild = searchVisitor as SearchVisitor<IConverter<IInfixFeature, Ref>>;
             if (searchVisitorChild != null)
                 searchVisitorChild.InternalResult = Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
             base.Search(searchVisitor);

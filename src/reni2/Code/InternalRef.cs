@@ -23,7 +23,7 @@ namespace Reni.Code
         public LeafElement ToLeafElement { get { return new ContextRef(this); } }
 
         protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
-        public override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.InternalRef(this); }
+        protected override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.InternalRef(this); }
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         Size IRefInCode.RefSize { get { return RefAlignParam.RefSize; } }

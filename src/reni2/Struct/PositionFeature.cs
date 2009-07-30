@@ -8,7 +8,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal abstract class PositionFeatureBase : ReniObject, IContextFeature, IConverter<IFeature, Ref>, IFeature
+    internal abstract class PositionFeatureBase : ReniObject, IContextFeature, IConverter<IInfixFeature, Ref>, IInfixFeature
     {
         private readonly IStructContext _structContext;
 
@@ -21,7 +21,7 @@ namespace Reni.Struct
             _structContext = structContext;
         }
 
-        IFeature IConverter<IFeature, Ref>.Convert(Ref type)
+        IInfixFeature IConverter<IInfixFeature, Ref>.Convert(Ref type)
         {
             Tracer.Assert(type.RefAlignParam == _structContext.ForCode.RefAlignParam);
             return this;
@@ -32,7 +32,7 @@ namespace Reni.Struct
             return ApplyResult(callContext, category, null, args);
         }
 
-        Result IFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             return ApplyResult(callContext, category,@object, args);
         }

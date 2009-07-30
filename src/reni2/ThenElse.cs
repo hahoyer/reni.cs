@@ -61,7 +61,7 @@ namespace Reni
         private Result CondBranchResult(ContextBase context, Category category, ICompileSyntax syntax)
         {
             var branchResult = context.Result(category | Category.Type, syntax).AutomaticDereference();
-            if ((category - Category.Type).IsNull)
+            if ((category - Category.Type).IsNone)
                 return branchResult;
 
             var commonType = context.CommonType(this);

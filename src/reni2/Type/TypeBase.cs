@@ -292,12 +292,6 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        internal virtual Result SequenceDumpPrint(Category category, int count)
-        {
-            NotImplementedMethod(category, count);
-            throw new NotImplementedException();
-        }
-
         internal virtual Result ApplyTypeOperator(Result argResult)
         {
             return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult);
@@ -366,54 +360,9 @@ namespace Reni.Type
             return true;
         }
 
-        protected virtual CodeBase CreateSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, Size objSize, Size argsSize)
-        {
-            NotImplementedMethod(size, token, objSize, argsSize);
-            return null;
-        }
-
-        protected virtual CodeBase CreateSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
-        {
-            NotImplementedMethod(size, feature, objSize);
-            return null;
-        }
-
-        protected virtual TypeBase SequenceOperationResultType(ISequenceOfBitBinaryOperation token, int objBitCount, int argBitCount)
-        {
-            NotImplementedMethod(token, objBitCount, argBitCount);
-            return null;
-        }
-
-        protected virtual TypeBase SequenceOperationResultType(ISequenceOfBitPrefixOperation token, int objBitCount)
-        {
-            NotImplementedMethod(token, objBitCount);
-            return null;
-        }
-
         internal virtual Result UnProperty(Result rawResult)
         {
             return rawResult;
-        }
-
-        private Result SequenceOperationResult(Category category, ISequenceOfBitBinaryOperation definable, Size objSize, Size argsSize)
-        {
-            var type = SequenceOperationResultType(definable, objSize.ToInt(), argsSize.ToInt());
-            return type
-                .CreateResult(category, () => CreateSequenceOperation(type.Size, 
-                    definable, objSize, argsSize));
-        }
-
-        private Result SequenceOperationResult(Category category, ISequenceOfBitOperation feature, Size objSize)
-        {
-            return feature.SequenceOperationResult(category, this, objSize);
-        }
-
-        internal Result PrefixSequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize)
-        {
-            var type = SequenceOperationResultType(feature, objSize.ToInt());
-            return type
-                .CreateResult(category, () => CreateSequenceOperation(type.Size, 
-                    feature, objSize));
         }
 
         internal virtual Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
@@ -453,52 +402,15 @@ namespace Reni.Type
             return false;
         }
 
-        internal Result ApplySequenceOperation(ISequenceOfBitOperation definable, ContextBase callContext, Category category, ICompileSyntax @object)
-        {
-            var result = SequenceOperationResult
-                (
-                category,
-                definable,
-                callContext.Type(@object).UnrefSize
-                );
-
-            var objectResult = callContext.ConvertToSequence(category, @object, this);
-
-            return result.UseWithArg(objectResult);
-        }
-
-        internal Result ApplySequenceOperation(ISequenceOfBitBinaryOperation definable, ContextBase callContext,
-                                               Category category, ICompileSyntax @object, ICompileSyntax args)
-        {
-            var result = SequenceOperationResult
-                (
-                category,
-                definable,
-                callContext.Type(@object).UnrefSize,
-                callContext.Type(args).UnrefSize
-                );
-
-            var argsResult = callContext.ConvertToSequence(category, args, this);
-            var objectResult = callContext.ConvertToSequence(category, @object, this);
-
-            return result.UseWithArg(objectResult.CreateSequence(argsResult));
-        }
-
         internal TypeBase CreateSequenceType(TypeBase elementType)
         {
             return elementType.CreateSequence(SequenceCount);
         }
 
-        internal IFeature SearchDefineable(DefineableToken defineableToken)
+        internal TFeature SearchDefineable<TFeature>(DefineableToken defineableToken) 
+            where TFeature : class
         {
-            var searchVisitor = new RootSearchVisitor<IFeature>(defineableToken.TokenClass);
-            searchVisitor.Search(this);
-            return searchVisitor.Result;
-        }
-
-        internal IPrefixFeature SearchDefineablePrefix(DefineableToken defineableToken)
-        {
-            var searchVisitor = new RootSearchVisitor<IPrefixFeature>(defineableToken.TokenClass);
+            var searchVisitor = new RootSearchVisitor<TFeature>(defineableToken.TokenClass);
             searchVisitor.Search(this);
             return searchVisitor.Result;
         }
@@ -519,6 +431,6 @@ namespace Reni.Type
     {
         string CSharpNameOfDefaultOperation { get; }
         string DataFunctionName { get; }
-        Result SequenceOperationResult(Category category, TypeBase typeBase, Size objSize);
+        Result SequenceOperationResult(Category category, Size objSize);
     }
 }

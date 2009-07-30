@@ -94,15 +94,15 @@ namespace Reni.Code
             return tempActual.Child(parent, child.LeafElement);
         }
 
-        internal virtual T ThenElseVisit(ThenElse This)
+        internal virtual T ThenElseVisit(ThenElse @this)
         {
-            var condResult = This.CondCode.Visit(this);
-            var tempActual = AfterCond(This.ThenElseObjectId);
-            var thenResult = This.ThenCode.Visit(tempActual);
-            tempActual = tempActual.AfterThen(This.ThenElseObjectId, This.ThenCode.Size);
-            var elseResult = This.ElseCode.Visit(tempActual);
-            tempActual = tempActual.AfterElse(This.ThenElseObjectId);
-            return tempActual.ThenElse(This, condResult, thenResult, elseResult);
+            var condResult = @this.CondCode.Visit(this);
+            var tempActual = AfterCond(@this.ThenElseObjectId);
+            var thenResult = @this.ThenCode.Visit(tempActual);
+            tempActual = tempActual.AfterThen(@this.ThenElseObjectId, @this.ThenCode.Size);
+            var elseResult = @this.ElseCode.Visit(tempActual);
+            tempActual = tempActual.AfterElse(@this.ThenElseObjectId);
+            return tempActual.ThenElse(@this, condResult, thenResult, elseResult);
         }
 
     }

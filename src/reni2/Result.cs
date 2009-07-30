@@ -86,7 +86,7 @@ namespace Reni
         TreeNode[] ITreeNodeSupport.CreateNodes()
         {
             var result = new List<TreeNode>();
-            if(!PendingCategory.IsNull)
+            if(!PendingCategory.IsNone)
                 result.Add(Dump().CreateNamedNode("Pending", "Pending"));
             if(HasSize)
                 result.Add(Size.FormatForView().CreateNamedNode("Size", "Number"));
@@ -194,6 +194,10 @@ namespace Reni
                 return true;
             }
         }
+
+        internal bool HasArg
+        {
+            get { return HasCode && Code.HasArg; } }
 
         public override string DumpData()
         {
@@ -318,7 +322,7 @@ namespace Reni
 
         private void TreatPendingCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
-            if(category.IsNull)
+            if(category.IsNone)
                 return;
 
             var result = context.PendingResult(category, syntax);
@@ -329,7 +333,7 @@ namespace Reni
         [DebuggerHidden]
         private void InternalAddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
-            if(category.IsNull)
+            if(category.IsNone)
                 return;
 
             var oldPendingCategory = PendingCategory;
@@ -579,7 +583,7 @@ namespace Reni
 
         public static Result operator |(Result aResult, Result bResult)
         {
-            Tracer.Assert((aResult.CompleteCategory & bResult.CompleteCategory).IsNull);
+            Tracer.Assert((aResult.CompleteCategory & bResult.CompleteCategory).IsNone);
             var result = aResult.Clone();
             result.Update(bResult);
             return result;

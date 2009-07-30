@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
@@ -61,26 +60,14 @@ namespace Reni.Context
             }
         }
 
-        protected virtual Sequence<ContextBase> ObtainChildChain()
-        {
-            return HWString.Sequence(this);
-        }
+        protected virtual Sequence<ContextBase> ObtainChildChain() { return HWString.Sequence(this); }
 
-        internal virtual string DumpShort()
-        {
-            return base.ToString();
-        }
+        internal virtual string DumpShort() { return base.ToString(); }
 
         [UsedImplicitly]
-        internal int SizeToPacketCount(Size size)
-        {
-            return size.SizeToPacketCount(RefAlignParam.AlignBits);
-        }
+        internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal static Root CreateRoot()
-        {
-            return new Root();
-        }
+        internal static Root CreateRoot() { return new Root(); }
 
         internal Function CreateFunction(TypeBase args)
         {
@@ -88,10 +75,7 @@ namespace Reni.Context
                                                      () => new Function(this, args));
         }
 
-        private PendingContext CreatePendingContext()
-        {
-            return _cache.PendingContext.Value;
-        }
+        private PendingContext CreatePendingContext() { return _cache.PendingContext.Value; }
 
         internal FullContext CreateStruct(Struct.Container container)
         {
@@ -105,27 +89,18 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result CreateFunctionResult(Category category, ICompileSyntax body)
-        {
-            return CreateFunctionType(body).CreateResult(category);
-        }
+        internal Result CreateFunctionResult(Category category, ICompileSyntax body) { return CreateFunctionType(body).CreateResult(category); }
 
-        private TypeBase CreateFunctionType(ICompileSyntax body)
-        {
-            return _cache.FunctionType.Find(body, () => new Type.Function(this, body));
-        }
+        private TypeBase CreateFunctionType(ICompileSyntax body) { return _cache.FunctionType.Find(body, () => new Type.Function(this, body)); }
 
-        internal IContextFeature SearchDefineable(DefineableToken defineableToken)
+        internal IContextFeature<TFeature> SearchDefineable<TFeature>(DefineableToken defineableToken)
         {
-            var searchVisitor = new ContextSearchVisitor(defineableToken.TokenClass);
+            var searchVisitor = new ContextSearchVisitor<TFeature>(defineableToken.TokenClass);
             searchVisitor.Search(this);
             return searchVisitor.Result;
         }
 
-        internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor)
-        {
-            searchVisitor.SearchTypeBase();
-        }
+        internal virtual void Search<TFeature>(SearchVisitor<IContextFeature<TFeature>> searchVisitor) { searchVisitor.SearchTypeBase(); }
 
         internal TypeBase Type(ICompileSyntax syntax)
         {
@@ -152,10 +127,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal bool IsChildOf(ContextBase parentCandidate)
-        {
-            return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain);
-        }
+        internal bool IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
 
         [UsedImplicitly]
         internal bool IsStructParentOf(ContextBase child)
@@ -187,26 +159,17 @@ namespace Reni.Context
                                                  + @ref.Dump());
         }
 
-        internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
-        {
-            return Result(Category.Code | Category.Type | Category.Refs, syntax).ConvertTo(resultType).Evaluate();
-        }
+        internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType) { return Result(Category.Code | Category.Type | Category.Refs, syntax).ConvertTo(resultType).Evaluate(); }
 
-        internal BitsConst Evaluate(ICompileSyntax syntax)
-        {
-            return Result(Category.Code | Category.Type | Category.Refs, syntax).Evaluate();
-        }
+        internal BitsConst Evaluate(ICompileSyntax syntax) { return Result(Category.Code | Category.Type | Category.Refs, syntax).Evaluate(); }
 
         [UsedImplicitly]
-        internal CodeBase Code(ICompileSyntax syntax)
-        {
-            return Result(Category.Code, syntax).Code;
-        }
+        internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
 
-        internal Result ApplyResult(Category category, ICompileSyntax @object, Func<TypeBase, Result> apply)
+        internal Result ApplyResult(Category category, ICompileSyntax @object, Func<Ref, Result> apply)
         {
             var objectResult = ResultAsRef(category | Category.Type, @object);
-            return apply(objectResult.Type)
+            return apply((Ref) objectResult.Type)
                 .Align(AlignBits)
                 .UseWithArg(objectResult);
         }
@@ -251,10 +214,7 @@ namespace Reni.Context
             return result.ConvertTo(target.AlignedTarget).CreateAutomaticRefResult(category, target);
         }
 
-        string IDumpShortProvider.DumpShort()
-        {
-            return DumpShort();
-        }
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         /// <summary>
         /// Gets the icon key.
@@ -268,73 +228,108 @@ namespace Reni.Context
             return null;
         }
 
+        private Result Result(Category category, DefineableToken defineableToken)
+        {
+            NotImplementedMethod(category, defineableToken);
+            return null;
+        }
+
         private Result PrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
         {
-            var contextSearchResult = SearchDefineable(defineableToken);
-            if(contextSearchResult != null)
-                return contextSearchResult.ApplyResult(this, category, right);
-
             if(right == null)
             {
-                NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult);
+                NotImplementedMethod(category, defineableToken, right);
                 return null;
             }
 
-            var argType = Type(right);
-            var prefixSearchResult = argType.SearchDefineablePrefix(defineableToken);
-            if(prefixSearchResult != null)
-                return prefixSearchResult.ApplyResult(this, category, right);
+            return UnaryResult<IPrefixFeature>(category, defineableToken, right);
+        }
 
-            NotImplementedMethod(category, defineableToken, right, "contextSearchResult", contextSearchResult,
-                                 "prefixSearchResult", prefixSearchResult);
-            return null;
+        private Result SuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken) { return UnaryResult<ISuffixFeature>(category, defineableToken, left); }
+
+        private Result UnaryResult<TFeature>(Category category, DefineableToken defineableToken, ICompileSyntax @object)
+            where TFeature : class, IUnaryFeature
+        {
+            var objectType = Type(@object).EnsureRef(RefAlignParam);
+            var feature = objectType.SearchDefineable<TFeature>(defineableToken);
+            if(feature == null)
+            {
+                NotImplementedMethod(category, defineableToken, @object, "feature", feature);
+                return null;
+            }
+
+            var resultType = feature.ResultType;
+            if(!category.HasCode && !category.HasRefs && resultType != null)
+                return resultType.CreateResult(category);
+
+            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
+            var rawResult = feature.Apply(applyCategory, objectType);
+            var result = rawResult;
+            if (result.HasArg)
+                result = result.UseWithArg(ResultAsRef(Category.Type | category, @object));
+
+            if(resultType == null)
+                return result;
+
+            return result.ConvertTo(resultType) & category;
         }
 
         private Result InfixResult(Category category, ICompileSyntax left, DefineableToken defineableToken,
                                    ICompileSyntax right)
         {
             var leftType = Type(left).EnsureRef(RefAlignParam);
-            var searchResult = leftType.SearchDefineable(defineableToken);
-            if(searchResult != null)
-                return searchResult.ApplyResult(this, category, left, right);
-            NotImplementedMethod(category, left, defineableToken, right, "leftType", leftType, "searchResult",
-                                 searchResult);
-            return null;
+            var feature = leftType.SearchDefineable<IInfixFeature>(defineableToken);
+            if(feature == null)
+            {
+                NotImplementedMethod(category, left, defineableToken, right, "leftType", leftType, "feature", feature);
+                return null;
+            }
+
+            var resultType = feature.ResultType;
+            if(!category.HasCode && !category.HasRefs && resultType != null)
+                return resultType.CreateResult(category);
+
+            var leftCategory = Category.Type | (feature.IsEvalLeft ? category : Category.None);
+            var leftResult = ResultAsRef(leftCategory, left);
+            if(right == null)
+            {
+                NotImplementedMethod(feature, category, left, right);
+                return null;
+            }
+
+            var rightResult = ResultAsRef(category | Category.Type, right);
+            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
+            var result = feature.Apply(applyCategory, leftResult, rightResult);
+            if(resultType == null)
+                return result;
+
+            return result.ConvertTo(resultType) & category;
         }
 
         internal Result Result(Category category, ICompileSyntax left, DefineableToken defineableToken,
                                ICompileSyntax right)
         {
             if(left == null)
+            {
+                if(right == null)
+                    return Result(category, defineableToken);
                 return PrefixResult(category, defineableToken, right);
+            }
+
+            if(right == null)
+                return SuffixResult(category, left, defineableToken);
             return InfixResult(category, left, defineableToken, right);
         }
 
-        internal virtual Result PendingResult(Category category, ICompileSyntax syntax)
-        {
-            return CreatePendingContext().PendingResult(category, syntax);
-        }
+        internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingContext().PendingResult(category, syntax); }
 
-        internal virtual Result CommonResult(Category category, CondSyntax condSyntax)
-        {
-            return condSyntax.CommonResult(this, category);
-        }
+        internal virtual Result CommonResult(Category category, CondSyntax condSyntax) { return condSyntax.CommonResult(this, category); }
 
-        internal Category PendingCategory(ICompileSyntax syntax)
-        {
-            return _cache.ResultCache[syntax].Data.PendingCategory;
-        }
+        internal Category PendingCategory(ICompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
 
-        internal TypeBase CommonType(CondSyntax condSyntax)
-        {
-            return CommonResult(Category.Type, condSyntax).Type;
-        }
+        internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
 
-        internal Refs CommonRefs(CondSyntax condSyntax)
-        {
-            return CommonResult(Category.Refs, condSyntax).Refs;
-        }
-
+        internal Refs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.Refs, condSyntax).Refs; }
     }
 
     [Serializable]
@@ -359,10 +354,7 @@ namespace Reni.Context
         [Node, SmartNode]
         internal readonly SimpleCache<PendingContext> PendingContext;
 
-        public Cache(Func<PendingContext> pendingContext)
-        {
-            PendingContext = new SimpleCache<PendingContext>(pendingContext);
-        }
+        public Cache(Func<PendingContext> pendingContext) { PendingContext = new SimpleCache<PendingContext>(pendingContext); }
 
         /// <summary>
         /// Gets the icon key.
@@ -375,14 +367,9 @@ namespace Reni.Context
     internal class PendingContext : Child
     {
         public PendingContext(ContextBase parent)
-            : base(parent)
-        {
-        }
+            : base(parent) { }
 
-        internal override Result PendingResult(Category category, ICompileSyntax syntax)
-        {
-            return syntax.Result(this, category);
-        }
+        internal override Result PendingResult(Category category, ICompileSyntax syntax) { return syntax.Result(this, category); }
 
         internal override Result CommonResult(Category category, CondSyntax condSyntax)
         {

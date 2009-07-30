@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using JetBrains.Annotations;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
-using Reni.Parser.TokenClass;
 using Reni.Type;
 
 namespace Reni.Code
@@ -32,12 +32,12 @@ namespace Reni.Code
         internal virtual bool IsEmpty { get { return false; } }
 
         [DumpData(false)]
-        internal bool IsRelativeReference { get { return RefAlignParam != null; } }
+        private bool IsRelativeReference { get { return RefAlignParam != null; } }
 
         [DumpData(false)]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
-        [Node, DumpData(false)]
+        [Node, DumpData(false), UsedImplicitly]
         internal List<LeafElement> Serial { get { return Serialize(true).Data; } }
 
         [DumpData(false)]
@@ -199,17 +199,22 @@ namespace Reni.Code
             return result ?? this;
         }
 
+        internal bool HasArg
+        {
+            get { return Visit(new HasArgVisitor()); }
+        }
+
         /// <summary>
         /// Replaces appearences of context in code tree. 
         /// Assumes, that replacement requires offset alignment when walking along code tree
         /// </summary>
-        /// <typeparam name="C"></typeparam>
+        /// <typeparam name="TContext"></typeparam>
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public CodeBase ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : IRefInCode
+        public CodeBase ReplaceRelativeContextRef<TContext>(TContext context, CodeBase replacement) where TContext : IRefInCode
         {
-            var result = Visit(new ReplaceRelativeContextRef<C>(context, replacement));
+            var result = Visit(new ReplaceRelativeContextRef<TContext>(context, replacement));
             if(result != null)
                 return result;
             return this;
@@ -219,24 +224,24 @@ namespace Reni.Code
         /// Replaces appearences of context in code tree. 
         /// Assumes, that replacement isn't a reference, that changes when walking along the code tree
         /// </summary>
-        /// <typeparam name="C"></typeparam>
+        /// <typeparam name="TContext"></typeparam>
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public CodeBase ReplaceAbsoluteContextRef<C>(C context, CodeBase replacement) where C : IRefInCode
+        public CodeBase ReplaceAbsoluteContextRef<TContext>(TContext context, CodeBase replacement) where TContext : IRefInCode
         {
-            var result = Visit(new ReplaceAbsoluteContextRef<C>(context, replacement));
+            var result = Visit(new ReplaceAbsoluteContextRef<TContext>(context, replacement));
             if(result != null)
                 return result;
             return this;
         }
 
-        public Result Visit<Result>(Visitor<Result> actual)
+        public TResult Visit<TResult>(Visitor<TResult> actual)
         {
             return VisitImplementation(actual);
         }
 
-        public virtual Result VisitImplementation<Result>(Visitor<Result> actual)
+        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual)
         {
             NotImplementedMethod(actual);
             throw new NotImplementedException();
@@ -315,6 +320,13 @@ namespace Reni.Code
         }
     }
 
+    internal class HasArgVisitor : Visitor<bool>
+    {
+        internal override bool Pair(Pair visitedObject, bool left, bool right) { return left || right; }
+
+        internal override bool Arg(Arg visitedObject) { return true; }
+    }
+
     internal class InternalRefSequenceVisitor : Base
     {
         private readonly SimpleCache<CodeBase> _codeCache;
@@ -329,9 +341,9 @@ namespace Reni.Code
         }
 
         [DumpData(false)]
-        public CodeBase Code { get { return _codeCache.Value; } }
+        private CodeBase Code { get { return _codeCache.Value; } }
 
-        public CodeBase DestructorCode
+        private CodeBase DestructorCode
         {
             get
             {
@@ -379,9 +391,7 @@ namespace Reni.Code
         {
             var trace = body.ObjectId == -1658;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
-            var newBody = body.Visit(this);
-            if(newBody == null)
-                newBody = body;
+            var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();
             var resultSize = alignedBody.Size;
             var alignedInternal = Code.Align();
@@ -428,18 +438,6 @@ namespace Reni.Code
         }
     }
 
-    internal class InternalRefCode : CodeBase
-    {
-        private readonly RefAlignParam _refAlignParam;
-
-        public InternalRefCode(RefAlignParam refAlignParam)
-        {
-            _refAlignParam = refAlignParam;
-        }
-
-        protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
-    }
-
     internal interface IRefInCode
     {
         Size RefSize { get; }
@@ -479,7 +477,7 @@ namespace Reni.Code
         }
     }
 
-    internal class UnexpectedVisitOfPending : Exception
+    internal abstract class UnexpectedVisitOfPending : Exception
     {
     }
 }

@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Reni.Code;
-using Reni.Parser.TokenClass;
+using Reni.Context;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -14,7 +15,7 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount { get { return 1; } }
 
-        internal override Result SequenceDumpPrint(Category category, int count) { return CreateSequence(count).CreateArgResult(category).DumpPrintBitSequence(); }
+        static internal Result SequenceDumpPrint(Category category, int count) { return CreateBit.CreateSequence(count).CreateArgResult(category).DumpPrintBitSequence(); }
 
         internal new Result DumpPrint(Category category) { return CreateArgResult(category).DumpPrintBitSequence(); }
 
@@ -26,28 +27,18 @@ namespace Reni.Type
             return false;
         }
 
-        protected override CodeBase CreateSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, Size objSize, Size argsSize)
+        private CodeBase CreateSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, Size objSize, Size argsSize)
         {
             return CreateSequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
                 .CreateArgCode()
                 .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
-        protected override CodeBase CreateSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
+        private CodeBase CreateSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
         {
             return CreateSequence((objSize.ByteAlignedSize).ToInt())
                 .CreateArgCode()
                 .CreateBitSequenceOperation(feature, size);
-        }
-
-        protected override TypeBase SequenceOperationResultType(ISequenceOfBitBinaryOperation token, int objBitCount, int argBitCount)
-        {
-            return token.ResultType(objBitCount, argBitCount);
-        }
-
-        protected override TypeBase SequenceOperationResultType(ISequenceOfBitPrefixOperation token, int objBitCount)
-        {
-            return token.ResultType(objBitCount);
         }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -59,16 +50,61 @@ namespace Reni.Type
         public override string Dump() { return GetType().FullName; }
 
         internal override string DumpShort() { return "bit"; }
+
+        internal Result ApplySequenceOperation(ISequenceOfBitBinaryOperation definable, ContextBase callContext,
+                                               Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            var result = SequenceOperationResult
+                (
+                category,
+                definable,
+                callContext.Type(@object).UnrefSize,
+                callContext.Type(args).UnrefSize
+                );
+
+            var argsResult = callContext.ConvertToSequence(category, args, this);
+            var objectResult = callContext.ConvertToSequence(category, @object, this);
+
+            return result.UseWithArg(objectResult.CreateSequence(argsResult));
+        }
+
+        internal Result ApplySequenceOperation(ISequenceOfBitOperation definable, ContextBase callContext, Category category, ICompileSyntax @object)
+        {
+            var result = SequenceOperationResult
+                (
+                category,
+                definable,
+                callContext.Type(@object).UnrefSize
+                );
+
+            var objectResult = callContext.ConvertToSequence(category, @object, this);
+
+            return result.UseWithArg(objectResult);
+        }
+
+        private Result SequenceOperationResult(Category category, ISequenceOfBitBinaryOperation definable, Size objSize, Size argsSize)
+        {
+            var type = CreateNumber(definable.ResultSize(objSize.ToInt(), argsSize.ToInt()));
+            return type.CreateResult(category, () => CreateSequenceOperation(type.Size,definable, objSize, argsSize));
+        }
+
+        private static Result SequenceOperationResult(Category category, ISequenceOfBitOperation feature, Size objSize) { return feature.SequenceOperationResult(category, objSize); }
+
+        internal Result PrefixSequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize)
+        {
+            var type = CreateNumber(feature.ResultSize(objSize.ToInt()));
+            return type.CreateResult(category, () => CreateSequenceOperation(type.Size,feature, objSize));
+        }
     }
 
     internal interface ISequenceOfBitPrefixOperation : ISequenceOfBitOperation
     {
-        TypeBase ResultType(int objBitCount);
+        int ResultSize(int objBitCount);
     }
 
     internal interface ISequenceOfBitBinaryOperation
     {
-        TypeBase ResultType(int objBitCount, int argBitCount);
+        int ResultSize(int objBitCount, int argBitCount);
         bool IsCompareOperator { get; }
         string DataFunctionName { get; }
         string CSharpNameOfDefaultOperation { get; }

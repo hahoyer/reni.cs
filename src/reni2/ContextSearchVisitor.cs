@@ -7,7 +7,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni
 {
-    internal class ContextSearchVisitor : RootSearchVisitor<IContextFeature>
+    internal class ContextSearchVisitor<TFeature> : RootSearchVisitor<IContextFeature<TFeature>>
     {
         internal ContextSearchVisitor(Defineable defineable)
             : base(defineable) { }

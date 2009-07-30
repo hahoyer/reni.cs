@@ -8,13 +8,13 @@ namespace Reni.Parser.TokenClass
 {
     internal abstract class SequenceOfBitOperation :
         Defineable,
-        IConverter<IConverter<IFeature, Sequence>, Bit>,
-        IConverter<IFeature, Sequence>,
+        IConverter<IConverter<IInfixFeature, Sequence>, Bit>,
         ISequenceOfBitBinaryOperation
     {
-        IFeature IConverter<IFeature, Sequence>.Convert(Sequence type) { return type.BitOperationFeature(this); }
-
-        IConverter<IFeature, Sequence> IConverter<IConverter<IFeature, Sequence>, Bit>.Convert(Bit type) { return this; }
+        IConverter<IInfixFeature, Sequence> IConverter<IConverter<IInfixFeature, Sequence>, Bit>.Convert(Bit type)
+        {
+            return new SequenceOperationFeature(type, this);
+        }
 
         bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
         string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }
@@ -33,15 +33,20 @@ namespace Reni.Parser.TokenClass
     internal sealed class Sign :
         SequenceOfBitOperation,
         IConverter<IConverter<IPrefixFeature, Sequence>, Bit>,
-        IConverter<IPrefixFeature, Sequence>,
         ISequenceOfBitPrefixOperation
     {
-        IConverter<IPrefixFeature, Sequence> IConverter<IConverter<IPrefixFeature, Sequence>, Bit>.Convert(Bit type) { return this; }
-        IPrefixFeature IConverter<IPrefixFeature, Sequence>.Convert(Sequence type) { return type.BitOperationPrefixFeature(this); }
+        IConverter<IPrefixFeature, Sequence> IConverter<IConverter<IPrefixFeature, Sequence>, Bit>.Convert(Bit type)
+        {
+            return new SequenceOperationPrefixFeature(type, this);
+        }
         TypeBase ISequenceOfBitPrefixOperation.ResultType(int objBitCount) { return TypeBase.CreateNumber(objBitCount); }
         string ISequenceOfBitOperation.CSharpNameOfDefaultOperation { get { return Name; } }
         string ISequenceOfBitOperation.DataFunctionName { get { return DataFunctionName; } }
-        Result ISequenceOfBitOperation.SequenceOperationResult(Category category, TypeBase typeBase, Size objSize) { return typeBase.PrefixSequenceOperationResult(category, this, objSize); }
+
+        Result ISequenceOfBitOperation.SequenceOperationResult(Category category, Size objSize)
+        {
+            return Bit.PrefixSequenceOperationResult(category, this, objSize);
+        }
 
         protected override TypeBase ResultType(int objSize, int argSize) { return TypeBase.CreateNumber(BitsConst.PlusSize(objSize, argSize)); }
     }

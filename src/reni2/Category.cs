@@ -38,8 +38,10 @@ namespace Reni
         public static Category Code { get { return new Category(false, false, true, false); } }
         [DebuggerHidden]
         public static Category Refs { get { return new Category(false, false, false, true); } }
+        [DebuggerHidden]
+        public static Category None { get { return new Category(false, false, false, false); } }
 
-        public bool IsNull { get { return !(_code || _type || _refs || _size); } }
+        public bool IsNone { get { return !(_code || _type || _refs || _size); } }
         public bool HasCode { get { return _code; } }
         public bool HasType { get { return _type; } }
         public bool HasRefs { get { return _refs; } }

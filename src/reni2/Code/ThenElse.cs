@@ -42,7 +42,7 @@ namespace Reni.Code
             }
         }
 
-        public override Result VisitImplementation<Result>(Visitor<Result> actual)
+        protected override Result VisitImplementation<Result>(Visitor<Result> actual)
         {
             return actual.ThenElseVisit(this);
         }

@@ -9,51 +9,45 @@ using Reni.Type;
 namespace Reni.Parser.TokenClass
 {
     [Token("type")]
-    internal sealed class TtypeT : Defineable, IFeature
+    internal sealed class TtypeT : Defineable, IInfixFeature, ISuffixFeature
     {
-        public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                  ICompileSyntax args)
-        {
-            var objectType = callContext.Type(@object).AutomaticDereference();
-            if(args == null)
-                return objectType.TypeOperator(category);
-            return callContext.ApplyResult(category, args, argsType => argsType.Conversion(category, objectType));
-        }
+        bool IInfixFeature.IsEvalLeft { get { return false; } }
+        TypeBase IInfixFeature.ResultType { get { return null; } }
+        Result IInfixFeature.Apply(Category category, Result leftResult, Result rightResult) { return rightResult.ConvertTo(leftResult.Type.AutomaticDereference()); }
+
+        bool IUnaryFeature.IsEval { get { return false; } }
+        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        Result IUnaryFeature.Apply(Category category, Result objectResult) { return objectResult.Type.AutomaticDereference().TypeOperator(category); }
     }
 
     [Token("dump_print")]
-    internal sealed class DumpPrint : Defineable,
-                                      IFeature,
-                                      IConverter<IConverter<IFeature, Sequence>, Bit>
+    internal sealed class DumpPrint :
+        Defineable,
+        ISuffixFeature,
+        ISearchPath<ISearchPath<IInfixFeature, Sequence>, Bit>
     {
-        private sealed class BitFeature : ReniObject, IConverter<IFeature, Sequence>, ISequenceOfBitDumpPrint
+        private readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
+
+        private sealed class BitSequenceFeature : ReniObject, ISearchPath<IInfixFeature, Sequence>
         {
-            IFeature IConverter<IFeature, Sequence>.Convert(Sequence type)
-            {
-                return type.BitOperationFeature(
-                    this);
-            }
-
-            TypeBase ISequenceOfBitOperation.ResultType(int objBitCount) { return TypeBase.CreateVoid; }
-            string ISequenceOfBitOperation.DataFunctionName { get { return "DumpPrint"; } }
-            public Result SequenceOperationResult(Category category, TypeBase typeBase, Size objSize) { return typeBase.DumpPrint() }
-
-            string ISequenceOfBitOperation.CSharpNameOfDefaultOperation { get { return ""; } }
+            IInfixFeature ISearchPath<IInfixFeature, Sequence>.Convert(Sequence type) { return type.BitOperationFeature(this); }
         }
 
-        private readonly BitFeature _bitFeature = new BitFeature();
-
-        public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                  ICompileSyntax args)
+        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             if(args != null)
                 NotImplementedMethod(callContext, category, @object, args);
             if(category.HasCode || category.HasRefs)
-                return callContext.ApplyResult(category, @object, ot => ot.DumpPrint(category));
+                return callContext.ApplyResult(category, @object, @ref => @ref.DumpPrint(category));
             return Type.Void.CreateResult(category);
         }
 
-        IConverter<IFeature, Sequence> IConverter<IConverter<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitFeature; }
+        ISearchPath<IInfixFeature, Sequence> ISearchPath<ISearchPath<IInfixFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
+
+        bool IUnaryFeature.IsEval { get { return true; } }
+        TypeBase IUnaryFeature.ResultType { get { return TypeBase.CreateVoid; } }
+
+        Result IUnaryFeature.Apply(Category category, Result objectResult) { throw new NotImplementedException(); }
     }
 
     internal interface ISequenceOfBitDumpPrint : ISequenceOfBitOperation
@@ -61,27 +55,27 @@ namespace Reni.Parser.TokenClass
     }
 
     [Token("enable_cut")]
-    internal sealed class EnableCut : Defineable, IConverter<IFeature, Sequence>
+    internal sealed class EnableCut : Defineable, ISearchPath<IInfixFeature, Sequence>
     {
-        IFeature IConverter<IFeature, Sequence>.Convert(Sequence type) { return type.EnableCutFeature; }
+        IInfixFeature ISearchPath<IInfixFeature, Sequence>.Convert(Sequence type) { return type.EnableCutFeature; }
     }
 
     [Token("<<")]
-    internal sealed class ConcatArrays : Defineable, IConverter<IFeature, Type.Array>
+    internal sealed class ConcatArrays : Defineable, ISearchPath<IInfixFeature, Type.Array>
     {
-        IFeature IConverter<IFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArraysFeature(type); }
+        IInfixFeature ISearchPath<IInfixFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArraysFeature(type); }
     }
 
     [Token("<*")]
-    internal sealed class ConcatArrayWithObject : Defineable, IConverter<IFeature, Type.Array>, IConverter<IFeature, Type.Void>
+    internal sealed class ConcatArrayWithObject : Defineable, ISearchPath<IInfixFeature, Type.Array>, ISearchPath<IInfixFeature, Type.Void>
     {
-        IFeature IConverter<IFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArrayWithObjectFeature(type); }
-        IFeature IConverter<IFeature, Type.Void>.Convert(Type.Void type) { return new CreateArrayFeature(); }
+        IInfixFeature ISearchPath<IInfixFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArrayWithObjectFeature(type); }
+        IInfixFeature ISearchPath<IInfixFeature, Type.Void>.Convert(Type.Void type) { return new CreateArrayFeature(); }
     }
 
     [Token(":=")]
-    internal sealed class ColonEqual : Defineable, IConverter<IFeature, AssignableRef>
+    internal sealed class ColonEqual : Defineable, ISearchPath<IInfixFeature, AssignableRef>
     {
-        IFeature IConverter<IFeature, AssignableRef>.Convert(AssignableRef type) { return type.AssignmentFeature; }
+        IInfixFeature ISearchPath<IInfixFeature, AssignableRef>.Convert(AssignableRef type) { return type.AssignmentFeature; }
     }
 }
