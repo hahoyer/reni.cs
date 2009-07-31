@@ -125,7 +125,7 @@ namespace Reni.Struct
             return result;
         }
 
-        internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
+        internal override void Search<TFeature>(SearchVisitor<IContextFeature<TFeature>> searchVisitor)
         {
             if(!searchVisitor.IsSuccessFull)
                 searchVisitor.InternalResult = Container.SearchFromStructContext(searchVisitor.Defineable).CheckedConvert(this);

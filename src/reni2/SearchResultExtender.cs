@@ -7,7 +7,7 @@ namespace Reni
 {
     internal static class SearchResultExtender
     {
-        internal static TFeature CheckedConvert<TFeature, TType>(this IConverter<TFeature, TType> feature, TType target)
+        internal static TFeature CheckedConvert<TFeature, TType>(this ISearchPath<TFeature, TType> feature, TType target)
             where TFeature : class
             where TType : IDumpShortProvider
         {

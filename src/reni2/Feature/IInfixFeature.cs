@@ -6,11 +6,6 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    internal interface IConverter<TOutType, TInType>
-    {
-        TOutType Convert(TInType type);
-    }
-
     internal interface ISearchPath<TOutType, TInType>
     {
         TOutType Convert(TInType type);
@@ -33,14 +28,16 @@ namespace Reni.Feature
 
     internal interface IUnaryFeature
     {
+        bool IsEval { get; }
         TypeBase ResultType { get; }
-        Result Apply(Category category, TypeBase objectType);
+        Result Apply(Category category, Result objectResult);
     }
 
     internal interface IInfixFeature
     {
+        bool IsEvalLeft { get; }
         TypeBase ResultType { get; }
-        Result Apply(Category category, TypeBase leftType, TypeBase rightType);
+        Result Apply(Category category, Result leftResult, Result rightResult);
     }
 
     internal interface IContextFeature<TFeature>

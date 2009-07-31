@@ -68,7 +68,7 @@ namespace Reni.Type
             return result.UseWithArg(objectResult.CreateSequence(argsResult));
         }
 
-        internal Result ApplySequenceOperation(ISequenceOfBitOperation definable, ContextBase callContext, Category category, ICompileSyntax @object)
+        internal Result ApplySequenceOperation(ISequenceOfBitPrefixOperation definable, ContextBase callContext, Category category, ICompileSyntax @object)
         {
             var result = SequenceOperationResult
                 (
@@ -88,7 +88,7 @@ namespace Reni.Type
             return type.CreateResult(category, () => CreateSequenceOperation(type.Size,definable, objSize, argsSize));
         }
 
-        private static Result SequenceOperationResult(Category category, ISequenceOfBitOperation feature, Size objSize) { return feature.SequenceOperationResult(category, objSize); }
+        private static Result SequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize) { return feature.SequenceOperationResult(category, objSize); }
 
         internal Result PrefixSequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize)
         {
@@ -97,9 +97,12 @@ namespace Reni.Type
         }
     }
 
-    internal interface ISequenceOfBitPrefixOperation : ISequenceOfBitOperation
+    internal interface ISequenceOfBitPrefixOperation 
     {
         int ResultSize(int objBitCount);
+        string CSharpNameOfDefaultOperation { get; }
+        string DataFunctionName { get; }
+        Result SequenceOperationResult(Category category, Size objSize);
     }
 
     internal interface ISequenceOfBitBinaryOperation

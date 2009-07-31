@@ -427,10 +427,4 @@ namespace Reni.Type
         }
     }
 
-    internal interface ISequenceOfBitOperation
-    {
-        string CSharpNameOfDefaultOperation { get; }
-        string DataFunctionName { get; }
-        Result SequenceOperationResult(Category category, Size objSize);
-    }
 }

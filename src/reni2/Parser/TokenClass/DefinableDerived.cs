@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Parser.TokenClass
@@ -24,34 +22,35 @@ namespace Reni.Parser.TokenClass
     internal sealed class DumpPrint :
         Defineable,
         ISuffixFeature,
-        ISearchPath<ISearchPath<IInfixFeature, Sequence>, Bit>
+        ISearchPath<ISearchPath<ISuffixFeature, Sequence>, Bit>
     {
         private readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
 
-        private sealed class BitSequenceFeature : ReniObject, ISearchPath<IInfixFeature, Sequence>
+        private sealed class BitSequenceFeature :
+            ReniObject,
+            ISearchPath<ISuffixFeature, Sequence>,
+            ISuffixFeature
         {
-            IInfixFeature ISearchPath<IInfixFeature, Sequence>.Convert(Sequence type) { return type.BitOperationFeature(this); }
+            ISuffixFeature ISearchPath<ISuffixFeature, Sequence>.Convert(Sequence type) { return this; }
+            bool IUnaryFeature.IsEval { get { return true; } }
+            TypeBase IUnaryFeature.ResultType { get { return TypeBase.CreateVoid; } }
+            Result IUnaryFeature.Apply(Category category, Result objectResult)
+            {
+                NotImplementedMethod(category,objectResult);
+                return objectResult.DumpPrintBitSequence() & category;
+            }
         }
 
-        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
-        {
-            if(args != null)
-                NotImplementedMethod(callContext, category, @object, args);
-            if(category.HasCode || category.HasRefs)
-                return callContext.ApplyResult(category, @object, @ref => @ref.DumpPrint(category));
-            return Type.Void.CreateResult(category);
-        }
-
-        ISearchPath<IInfixFeature, Sequence> ISearchPath<ISearchPath<IInfixFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
+        ISearchPath<ISuffixFeature, Sequence> ISearchPath<ISearchPath<ISuffixFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
 
         bool IUnaryFeature.IsEval { get { return true; } }
         TypeBase IUnaryFeature.ResultType { get { return TypeBase.CreateVoid; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult) { throw new NotImplementedException(); }
-    }
-
-    internal interface ISequenceOfBitDumpPrint : ISequenceOfBitOperation
-    {
+        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        {
+            NotImplementedMethod(category, objectResult);
+            return null;
+        }
     }
 
     [Token("enable_cut")]

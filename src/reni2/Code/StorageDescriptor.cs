@@ -78,7 +78,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal string CreateBitArrayPrefixOp(ISequenceOfBitOperation opToken, Size size, Size argSize)
+        internal string CreateBitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize)
         {
             if(IsBuildInIntType(size))
                 return CreateDataRef(Start, size)

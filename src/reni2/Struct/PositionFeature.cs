@@ -8,7 +8,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal abstract class PositionFeatureBase : ReniObject, IContextFeature, IConverter<IInfixFeature, Ref>, IInfixFeature
+    internal abstract class PositionFeatureBase : ReniObject, IContextFeature, ISearchPath<IInfixFeature, Ref>, IInfixFeature
     {
         private readonly IStructContext _structContext;
 
@@ -21,7 +21,7 @@ namespace Reni.Struct
             _structContext = structContext;
         }
 
-        IInfixFeature IConverter<IInfixFeature, Ref>.Convert(Ref type)
+        IInfixFeature ISearchPath<IInfixFeature, Ref>.Convert(Ref type)
         {
             Tracer.Assert(type.RefAlignParam == _structContext.ForCode.RefAlignParam);
             return this;

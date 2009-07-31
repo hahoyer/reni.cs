@@ -28,11 +28,7 @@ namespace Reni.Parser.TokenClass
 
         protected internal override Result Result(ContextBase context, Category category)
         {
-            var contextSearchResult = context.SearchDefineable(_defineableToken);
-            if(contextSearchResult != null)
-                return contextSearchResult.ApplyResult(context, category, null);
-
-            NotImplementedMethod(context, category, "contextSearchResult", contextSearchResult);
+            NotImplementedMethod(context, category);
             return null;
         }
     }

@@ -100,7 +100,10 @@ namespace Reni.Context
             return searchVisitor.Result;
         }
 
-        internal virtual void Search<TFeature>(SearchVisitor<IContextFeature<TFeature>> searchVisitor) { searchVisitor.SearchTypeBase(); }
+        internal virtual void Search<TFeature>(SearchVisitor<IContextFeature<TFeature>> searchVisitor)
+        {
+            searchVisitor.SearchTypeBase();
+        }
 
         internal TypeBase Type(ICompileSyntax syntax)
         {
@@ -262,12 +265,10 @@ namespace Reni.Context
             if(!category.HasCode && !category.HasRefs && resultType != null)
                 return resultType.CreateResult(category);
 
+            var objectCategory = Category.Type | (feature.IsEval ? category : Category.None);
+            var objectResult = ResultAsRef(objectCategory, @object);
             var applyCategory = category | (resultType == null ? Category.None : Category.Type);
-            var rawResult = feature.Apply(applyCategory, objectType);
-            var result = rawResult;
-            if (result.HasArg)
-                result = result.UseWithArg(ResultAsRef(Category.Type | category, @object));
-
+            var result = feature.Apply(applyCategory, objectResult);
             if(resultType == null)
                 return result;
 
@@ -290,7 +291,7 @@ namespace Reni.Context
                 return resultType.CreateResult(category);
 
             var leftCategory = Category.Type | (feature.IsEvalLeft ? category : Category.None);
-            var leftResult = ResultAsRef(leftCategory, left);
+            var leftResult = ResultAsRef(leftCategory , left);
             if(right == null)
             {
                 NotImplementedMethod(feature, category, left, right);

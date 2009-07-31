@@ -11,9 +11,9 @@ namespace Reni.Parser.TokenClass
     {
         protected override bool IsCompareOperator { get { return true; } }
 
-        protected override TypeBase ResultType(int objSize, int argSize)
+        protected override int ResultSize(int objSize, int argSize)
         {
-            return TypeBase.CreateBit;
+            return 1;
         }
     }
     [Token("=")]
