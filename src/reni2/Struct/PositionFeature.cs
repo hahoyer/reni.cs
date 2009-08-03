@@ -1,5 +1,7 @@
-using HWClassLibrary.Debug;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -8,7 +10,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal abstract class PositionFeatureBase : ReniObject, IContextFeature, ISearchPath<IInfixFeature, Ref>, IInfixFeature
+    internal abstract class PositionFeatureBase : ReniObject, IContextFeature<IInfixFeature>, ISearchPath<IInfixFeature, Ref>, IInfixFeature
     {
         private readonly IStructContext _structContext;
 
@@ -27,25 +29,24 @@ namespace Reni.Struct
             return this;
         }
 
-        Result IContextFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax args)
-        {
-            return ApplyResult(callContext, category, null, args);
-        }
+        Result IContextFeature<IInfixFeature>.ApplyResult(ContextBase callContext, Category category, ICompileSyntax args) { return ApplyResult(callContext, category, null, args); }
 
-        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        bool IInfixFeature.IsEvalLeft { get { return true; } }
+        TypeBase IInfixFeature.ResultType { get { return null; } }
+        Result IInfixFeature.Apply(Category category, Result leftResult, Result rightResult)
         {
-            return ApplyResult(callContext, category,@object, args);
+            return ApplyResult(callContext, category, @object, args);
         }
 
         protected virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                     ICompileSyntax args)
+                                             ICompileSyntax args)
         {
             var rawResult = _structContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, _index);
-            if (args != null)
+            if(args != null)
                 rawResult =
                     _structContext
-                    .NaturalRefType
-                    .AccessResultAsContextRef(category | Category.Type, _index).Type.ApplyFunction(
+                        .NaturalRefType
+                        .AccessResultAsContextRef(category | Category.Type, _index).Type.ApplyFunction(
                         category, callContext, args);
 
             return PostProcessApplyResult(callContext, category, @object, rawResult);
@@ -74,11 +75,12 @@ namespace Reni.Struct
             return replacedResult;
         }
 
-        internal static Result AccessResult(ContextBase callContext, Category category, ICompileSyntax left, int position) 
+        internal static Result AccessResult(ContextBase callContext, Category category, ICompileSyntax left, int position)
         {
             var objectResult = callContext.ResultAsRef(category | Category.Type, left);
             return objectResult.Type.AccessResultAsArg(category, position).UseWithArg(objectResult);
         }
+
     }
 
     [Serializable]
@@ -87,10 +89,7 @@ namespace Reni.Struct
         private readonly PropertyPositionFeature _property;
 
         internal PositionFeature(EmptyList emptyList, IStructContext structContext, int index)
-            : base(structContext, index)
-        {
-            _property = new PropertyPositionFeature(emptyList, structContext, index);
-        }
+            : base(structContext, index) { _property = new PropertyPositionFeature(emptyList, structContext, index); }
 
         public PositionFeatureBase ToProperty(bool isPoperty)
         {
@@ -105,16 +104,13 @@ namespace Reni.Struct
         private readonly EmptyList _emptyList;
 
         public PropertyPositionFeature(EmptyList emptyList, IStructContext structContext, int index)
-            : base(structContext, index)
-        {
-            _emptyList = emptyList;
-        }
+            : base(structContext, index) { _emptyList = emptyList; }
 
         protected override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                           ICompileSyntax args)
+                                              ICompileSyntax args)
         {
             var result = base.ApplyResult(callContext, category, @object, _emptyList);
-            if (args == null)
+            if(args == null)
                 return result;
             NotImplementedMethod(callContext, category, @object, args);
             return null;
@@ -126,5 +122,5 @@ namespace Reni.Struct
         Ref NaturalRefType { get; }
         IRefInCode ForCode { get; }
         Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object);
-   }
+    }
 }

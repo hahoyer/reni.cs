@@ -86,11 +86,7 @@ namespace Reni.Type
     internal class ConcatArraysFeature : IInfixFeature
     {
         private Array _type;
-
         public ConcatArraysFeature(Array type) { _type = type; }
-
-        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                    ICompileSyntax args) { throw new NotImplementedException(); }
     }
 
     internal class ConcatArrayWithObjectFeatureBase
