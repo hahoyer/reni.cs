@@ -177,10 +177,7 @@ namespace Reni.Type
         bool IUnaryFeature.IsEval { get { return true; } }
         TypeBase IUnaryFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
-        {
-            throw new NotImplementedException();
-        }
+        Result IUnaryFeature.Apply(Category category, Result objectResult) { throw new NotImplementedException(); }
     }
 
     [Serializable]
@@ -195,13 +192,24 @@ namespace Reni.Type
             _definable = definable;
         }
 
-        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args) { return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args); }
+        IInfixFeature ISearchPath<IInfixFeature, Sequence>.Convert(Sequence type) { return this; }
 
-        public IInfixFeature Convert(Sequence type) { return this; }
+        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
+            return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args);
+        }
+
+        bool IInfixFeature.IsEvalLeft { get { return true; } }
+        TypeBase IInfixFeature.ResultType { get { return null; } }
+
+        Result IInfixFeature.Apply(Category category, Result leftResult, Result rightResult)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [Serializable]
-    internal class SequenceOperationPrefixFeature : ReniObject, IPrefixFeature
+    internal class SequenceOperationPrefixFeature : ReniObject, IPrefixFeature, ISearchPath<IPrefixFeature, Sequence>
     {
         private readonly ISequenceOfBitPrefixOperation _definable;
         private readonly Bit _bit;
@@ -213,5 +221,6 @@ namespace Reni.Type
         }
 
         Result IPrefixFeature.ApplyResult(ContextBase callCallContext, Category category, ICompileSyntax @object) { return _bit.ApplySequenceOperation(_definable, callCallContext, category, @object); }
+        IPrefixFeature ISearchPath<IPrefixFeature, Sequence>.Convert(Sequence type) { return this; }
     }
 }

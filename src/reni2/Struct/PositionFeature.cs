@@ -10,7 +10,11 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal abstract class PositionFeatureBase : ReniObject, IContextFeature<IInfixFeature>, ISearchPath<IInfixFeature, Ref>, IInfixFeature
+    internal abstract class PositionFeatureBase : 
+        ReniObject, 
+        IContextFeature<IInfixFeature>, 
+        ISearchPath<IInfixFeature, Ref>, 
+        IInfixFeature
     {
         private readonly IStructContext _structContext;
 
@@ -29,17 +33,16 @@ namespace Reni.Struct
             return this;
         }
 
-        Result IContextFeature<IInfixFeature>.ApplyResult(ContextBase callContext, Category category, ICompileSyntax args) { return ApplyResult(callContext, category, null, args); }
-
         bool IInfixFeature.IsEvalLeft { get { return true; } }
         TypeBase IInfixFeature.ResultType { get { return null; } }
+
         Result IInfixFeature.Apply(Category category, Result leftResult, Result rightResult)
         {
-            return ApplyResult(callContext, category, @object, args);
+            NotImplementedMethod(category, leftResult,rightResult);
+            return null;
         }
 
-        protected virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                             ICompileSyntax args)
+        protected virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             var rawResult = _structContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, _index);
             if(args != null)
@@ -52,8 +55,7 @@ namespace Reni.Struct
             return PostProcessApplyResult(callContext, category, @object, rawResult);
         }
 
-        private Result PostProcessApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                              Result rawResult)
+        private Result PostProcessApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, Result rawResult)
         {
             if(!category.HasCode && !category.HasRefs)
                 return rawResult;
@@ -67,11 +69,6 @@ namespace Reni.Struct
                     () => rawResult.Code.ReplaceAbsoluteContextRef(_structContext.ForCode, objectResult.Code),
                     () => (rawResult.Refs - _structContext.ForCode) + objectResult.Refs
                     );
-
-            //bool trace = replacedResult.Code != rawResult.Code;
-            //DumpWithBreak(trace, "rawResult.Code", rawResult.Code);
-            //DumpWithBreak(trace, "replacedResult.Code", replacedResult.Code);
-
             return replacedResult;
         }
 

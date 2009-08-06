@@ -92,14 +92,13 @@ namespace Reni.Type
 
         internal Result PrefixSequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize)
         {
-            var type = CreateNumber(feature.ResultSize(objSize.ToInt()));
+            var type = CreateNumber(objSize.ToInt());
             return type.CreateResult(category, () => CreateSequenceOperation(type.Size,feature, objSize));
         }
     }
 
     internal interface ISequenceOfBitPrefixOperation 
     {
-        int ResultSize(int objBitCount);
         string CSharpNameOfDefaultOperation { get; }
         string DataFunctionName { get; }
         Result SequenceOperationResult(Category category, Size objSize);

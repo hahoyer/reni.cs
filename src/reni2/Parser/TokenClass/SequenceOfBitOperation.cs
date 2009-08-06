@@ -11,19 +11,13 @@ namespace Reni.Parser.TokenClass
         ISearchPath<ISearchPath<IInfixFeature, Sequence>, Bit>,
         ISequenceOfBitBinaryOperation
     {
-        ISearchPath<IInfixFeature, Sequence> ISearchPath<ISearchPath<IInfixFeature, Sequence>, Bit>.Convert(Bit type)
-        {
-            return new SequenceOperationFeature(type, this);
-        }
+        ISearchPath<IInfixFeature, Sequence> ISearchPath<ISearchPath<IInfixFeature, Sequence>, Bit>.Convert(Bit type) { return new SequenceOperationFeature(type, this); }
 
         bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
         string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }
         string ISequenceOfBitBinaryOperation.CSharpNameOfDefaultOperation { get { return CSharpNameOfDefaultOperation; } }
 
-        int ISequenceOfBitBinaryOperation.ResultSize(int objBitCount, int argBitCount)
-        {
-            return ResultSize(objBitCount, argBitCount);
-        }
+        int ISequenceOfBitBinaryOperation.ResultSize(int objBitCount, int argBitCount) { return ResultSize(objBitCount, argBitCount); }
 
         protected abstract int ResultSize(int objSize, int argSize);
 
@@ -38,19 +32,11 @@ namespace Reni.Parser.TokenClass
         ISearchPath<ISearchPath<IPrefixFeature, Sequence>, Bit>,
         ISequenceOfBitPrefixOperation
     {
-        ISearchPath<IPrefixFeature, Sequence> ISearchPath<ISearchPath<IPrefixFeature, Sequence>, Bit>.Convert(Bit type)
-        {
-            return new SequenceOperationPrefixFeature(type, this);
-        }
-        
-        int ISequenceOfBitPrefixOperation.ResultSize(int objBitCount) { return objBitCount; }
-        string ISequenceOfBitOperation.CSharpNameOfDefaultOperation { get { return Name; } }
-        string ISequenceOfBitOperation.DataFunctionName { get { return DataFunctionName; } }
+        ISearchPath<IPrefixFeature, Sequence> ISearchPath<ISearchPath<IPrefixFeature, Sequence>, Bit>.Convert(Bit type) { return new SequenceOperationPrefixFeature(type, this); }
 
-        Result ISequenceOfBitOperation.SequenceOperationResult(Category category, Size objSize)
-        {
-            return Bit.PrefixSequenceOperationResult(category, this, objSize);
-        }
+        string ISequenceOfBitPrefixOperation.CSharpNameOfDefaultOperation { get { return Name; } }
+        string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
+        Result ISequenceOfBitPrefixOperation.SequenceOperationResult(Category category, Size objSize) { return Bit.PrefixSequenceOperationResult(category, this, objSize); }
 
         protected override int ResultSize(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
     }
