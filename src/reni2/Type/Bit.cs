@@ -34,9 +34,10 @@ namespace Reni.Type
                 .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
-        private CodeBase CreateSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
+        static private CodeBase CreateSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
         {
-            return CreateSequence((objSize.ByteAlignedSize).ToInt())
+            return CreateBit
+                .CreateSequence((objSize.ByteAlignedSize).ToInt())
                 .CreateArgCode()
                 .CreateBitSequenceOperation(feature, size);
         }
@@ -90,7 +91,7 @@ namespace Reni.Type
 
         private static Result SequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize) { return feature.SequenceOperationResult(category, objSize); }
 
-        internal Result PrefixSequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize)
+        static internal Result PrefixSequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize)
         {
             var type = CreateNumber(objSize.ToInt());
             return type.CreateResult(category, () => CreateSequenceOperation(type.Size,feature, objSize));

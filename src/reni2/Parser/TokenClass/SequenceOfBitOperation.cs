@@ -36,7 +36,10 @@ namespace Reni.Parser.TokenClass
 
         string ISequenceOfBitPrefixOperation.CSharpNameOfDefaultOperation { get { return Name; } }
         string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
-        Result ISequenceOfBitPrefixOperation.SequenceOperationResult(Category category, Size objSize) { return Bit.PrefixSequenceOperationResult(category, this, objSize); }
+        Result ISequenceOfBitPrefixOperation.SequenceOperationResult(Category category, Size objSize)
+        {
+            return Bit.PrefixSequenceOperationResult(category, this, objSize);
+        }
 
         protected override int ResultSize(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
     }

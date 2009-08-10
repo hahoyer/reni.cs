@@ -93,13 +93,6 @@ namespace Reni.Context
 
         private TypeBase CreateFunctionType(ICompileSyntax body) { return _cache.FunctionType.Find(body, () => new Type.Function(this, body)); }
 
-        internal IContextFeature<TFeature> SearchDefineable<TFeature>(DefineableToken defineableToken)
-        {
-            var searchVisitor = new ContextSearchVisitor<TFeature>(defineableToken.TokenClass);
-            searchVisitor.Search(this);
-            return searchVisitor.Result;
-        }
-
         internal virtual void Search<TFeature>(SearchVisitor<IContextFeature<TFeature>> searchVisitor)
         {
             searchVisitor.SearchTypeBase();
