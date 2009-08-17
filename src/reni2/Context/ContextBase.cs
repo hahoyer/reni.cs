@@ -232,18 +232,12 @@ namespace Reni.Context
 
         private Result PrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
         {
-            if(right == null)
-            {
-                NotImplementedMethod(category, defineableToken, right);
-                return null;
-            }
-
             return UnaryResult<IPrefixFeature>(category, defineableToken, right);
         }
 
         private Result SuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken) { return UnaryResult<ISuffixFeature>(category, defineableToken, left); }
 
-        private Result UnaryResult<TFeature>(Category category, DefineableToken defineableToken, ICompileSyntax @object)
+        private Result UnaryResult<TFeature>(Category category, DefineableToken defineableToken, [NotNull] ICompileSyntax @object)
             where TFeature : class, IUnaryFeature
         {
             var objectType = Type(@object).EnsureRef(RefAlignParam);
@@ -268,8 +262,7 @@ namespace Reni.Context
             return result.ConvertTo(resultType) & category;
         }
 
-        private Result InfixResult(Category category, ICompileSyntax left, DefineableToken defineableToken,
-                                   ICompileSyntax right)
+        private Result InfixResult(Category category, [NotNull] ICompileSyntax left, DefineableToken defineableToken, [NotNull] ICompileSyntax right)
         {
             var leftType = Type(left).EnsureRef(RefAlignParam);
             var feature = leftType.SearchDefineable<IInfixFeature>(defineableToken);
