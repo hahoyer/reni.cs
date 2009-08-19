@@ -275,15 +275,15 @@ namespace Reni.Context
         internal Result GetResult(Category category, ICompileSyntax left, DefineableToken defineableToken,
                                ICompileSyntax right)
         {
-            var feature = GetSuffixFeature(category, left, defineableToken);
-            if(feature == null)
+            var suffixResult = GetSuffixResult(category, left, defineableToken);
+            if(suffixResult == null)
             {
                 var prefixResult = GetPrefixResult(category, defineableToken, right);
                 if (prefixResult != null)
                     return prefixResult;
-                feature = SearchD
+                suffixResult = GetContextResult(category, defineableToken);
             }
-            NotImplementedMethod(category, left, defineableToken, right, "feature", feature);
+            NotImplementedMethod(category, left, defineableToken, right, "feature", suffixResult);
             return null;
         }
 
@@ -309,7 +309,7 @@ namespace Reni.Context
             return result.ConvertTo(resultType) & category;
         }
 
-        private ISuffixFeature GetSuffixFeature(Category category, ICompileSyntax left, DefineableToken defineableToken)
+        private Result GetSuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken)
         {
             if(left == null)
                 return null;
