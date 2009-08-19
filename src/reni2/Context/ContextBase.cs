@@ -235,7 +235,10 @@ namespace Reni.Context
             return UnaryResult<IPrefixFeature>(category, defineableToken, right);
         }
 
-        private Result SuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken) { return UnaryResult<ISuffixFeature>(category, defineableToken, left); }
+        private Result SuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken)
+        {
+            return UnaryResult<ISuffixFeature>(category, defineableToken, left);
+        }
 
         private Result UnaryResult<TFeature>(Category category, DefineableToken defineableToken, [NotNull] ICompileSyntax @object)
             where TFeature : class, IUnaryFeature
@@ -264,48 +267,72 @@ namespace Reni.Context
 
         private Result InfixResult(Category category, [NotNull] ICompileSyntax left, DefineableToken defineableToken, [NotNull] ICompileSyntax right)
         {
-            var leftType = Type(left).EnsureRef(RefAlignParam);
-            var feature = leftType.SearchDefineable<IInfixFeature>(defineableToken);
+            var suffixResult = SuffixResult(category | Category.Type, left, defineableToken);
+            NotImplementedMethod(category, left, right,"suffixResult",suffixResult);
+            return null;
+        }
+
+        internal Result GetResult(Category category, ICompileSyntax left, DefineableToken defineableToken,
+                               ICompileSyntax right)
+        {
+            var feature = GetSuffixFeature(category, left, defineableToken);
             if(feature == null)
             {
-                NotImplementedMethod(category, left, defineableToken, right, "leftType", leftType, "feature", feature);
-                return null;
+                var prefixResult = GetPrefixResult(category, defineableToken, right);
+                if (prefixResult != null)
+                    return prefixResult;
+                feature = SearchD
             }
+            NotImplementedMethod(category, left, defineableToken, right, "feature", feature);
+            return null;
+        }
+
+        private Result GetPrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
+        {
+            if(right == null)
+                return null;
+            var feature = Type(right).EnsureRef(RefAlignParam).SearchDefineable<IPrefixFeature>(defineableToken);
+            if(feature == null)
+                return null;
 
             var resultType = feature.ResultType;
-            if(!category.HasCode && !category.HasRefs && resultType != null)
+            if (!category.HasCode && !category.HasRefs && resultType != null)
                 return resultType.CreateResult(category);
 
-            var leftCategory = Category.Type | (feature.IsEvalLeft ? category : Category.None);
-            var leftResult = ResultAsRef(leftCategory , left);
-            if(right == null)
-            {
-                NotImplementedMethod(feature, category, left, right);
-                return null;
-            }
-
-            var rightResult = ResultAsRef(category | Category.Type, right);
+            var rightCategory = Category.Type | (feature.IsEval ? category : Category.None);
+            var rightResult = ResultAsRef(rightCategory, right);
             var applyCategory = category | (resultType == null ? Category.None : Category.Type);
-            var result = feature.Apply(applyCategory, leftResult, rightResult);
-            if(resultType == null)
+            var result = feature.Apply(applyCategory, rightResult);
+            if (resultType == null)
                 return result;
 
             return result.ConvertTo(resultType) & category;
         }
 
-        internal Result Result(Category category, ICompileSyntax left, DefineableToken defineableToken,
-                               ICompileSyntax right)
+        private ISuffixFeature GetSuffixFeature(Category category, ICompileSyntax left, DefineableToken defineableToken)
         {
             if(left == null)
-            {
-                if(right == null)
-                    return Result(category, defineableToken);
-                return PrefixResult(category, defineableToken, right);
-            }
+                return null;
+            var leftType = Type(left).EnsureRef(RefAlignParam);
+            var result = leftType.SearchDefineable<ISuffixFeature>(defineableToken);
+            if(result == null)
+                NotImplementedMethod(category, defineableToken, left, "leftType", leftType);
+            return result;
+        }
 
-            if(right == null)
-                return SuffixResult(category, left, defineableToken);
-            return InfixResult(category, left, defineableToken, right);
+        internal Result Result(Category category, ICompileSyntax left, DefineableToken defineableToken)
+        {
+            NotImplementedMethod(category, left, defineableToken);
+            return null;
+        }
+
+        private Result Result(Category category, DefineableToken defineableToken, ICompileSyntax right)
+        {
+            if (right == null)
+                return Result(category, defineableToken);
+
+            NotImplementedMethod(category, defineableToken, right);
+            return null;
         }
 
         internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingContext().PendingResult(category, syntax); }

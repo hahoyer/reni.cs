@@ -39,7 +39,7 @@ namespace Reni.Parser
         {
             var trace = ObjectId == -90 && category.HasRefs;
             StartMethodDumpWithBreak(trace, context, category);
-            var result = context.Result(category, Left, DefineableToken, Right);
+            var result = context.GetResult(category, Left, DefineableToken, Right);
             return ReturnMethodDumpWithBreak(trace, result);
         }
     }
