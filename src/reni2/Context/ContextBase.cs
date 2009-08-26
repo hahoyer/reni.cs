@@ -265,15 +265,7 @@ namespace Reni.Context
             return result.ConvertTo(resultType) & category;
         }
 
-        private Result InfixResult(Category category, [NotNull] ICompileSyntax left, DefineableToken defineableToken, [NotNull] ICompileSyntax right)
-        {
-            var suffixResult = SuffixResult(category | Category.Type, left, defineableToken);
-            NotImplementedMethod(category, left, right,"suffixResult",suffixResult);
-            return null;
-        }
-
-        internal Result GetResult(Category category, ICompileSyntax left, DefineableToken defineableToken,
-                               ICompileSyntax right)
+        internal Result GetResult(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
         {
             var suffixResult = GetSuffixResult(category, left, defineableToken);
             if(suffixResult == null)
@@ -284,6 +276,12 @@ namespace Reni.Context
                 suffixResult = GetContextResult(category, defineableToken);
             }
             NotImplementedMethod(category, left, defineableToken, right, "feature", suffixResult);
+            return null;
+        }
+
+        private Result GetContextResult(Category category, DefineableToken defineableToken)
+        {
+            NotImplementedMethod(category, defineableToken);
             return null;
         }
 
@@ -299,10 +297,10 @@ namespace Reni.Context
             if (!category.HasCode && !category.HasRefs && resultType != null)
                 return resultType.CreateResult(category);
 
-            var rightCategory = Category.Type | (feature.IsEval ? category : Category.None);
-            var rightResult = ResultAsRef(rightCategory, right);
+            var resultCategory = Category.Type | (feature.IsEval ? category : Category.None);
+            var resultAsRef = ResultAsRef(resultCategory, right);
             var applyCategory = category | (resultType == null ? Category.None : Category.Type);
-            var result = feature.Apply(applyCategory, rightResult);
+            var result = feature.Apply(applyCategory, resultAsRef);
             if (resultType == null)
                 return result;
 
@@ -314,25 +312,25 @@ namespace Reni.Context
             if(left == null)
                 return null;
             var leftType = Type(left).EnsureRef(RefAlignParam);
-            var result = leftType.SearchDefineable<ISuffixFeature>(defineableToken);
-            if(result == null)
+            var feature = leftType.SearchDefineable<ISuffixFeature>(defineableToken);
+            if(feature == null)
+            {
                 NotImplementedMethod(category, defineableToken, left, "leftType", leftType);
-            return result;
-        }
+                return null;
+            }
 
-        internal Result Result(Category category, ICompileSyntax left, DefineableToken defineableToken)
-        {
-            NotImplementedMethod(category, left, defineableToken);
-            return null;
-        }
+            var resultType = feature.ResultType;
+            if (!category.HasCode && !category.HasRefs && resultType != null)
+                return resultType.CreateResult(category);
 
-        private Result Result(Category category, DefineableToken defineableToken, ICompileSyntax right)
-        {
-            if (right == null)
-                return Result(category, defineableToken);
+            var resultCategory = Category.Type | (feature.IsEval ? category : Category.None);
+            var resultAsRef = ResultAsRef(resultCategory, left);
+            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
+            var result = feature.Apply(applyCategory, resultAsRef);
+            if (resultType == null)
+                return result;
 
-            NotImplementedMethod(category, defineableToken, right);
-            return null;
+            return result.ConvertTo(resultType) & category;
         }
 
         internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingContext().PendingResult(category, syntax); }
