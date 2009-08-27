@@ -224,52 +224,17 @@ namespace Reni.Context
             return null;
         }
 
-        private Result Result(Category category, DefineableToken defineableToken)
-        {
-            NotImplementedMethod(category, defineableToken);
-            return null;
-        }
-
-        private Result PrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
-        {
-            return UnaryResult<IPrefixFeature>(category, defineableToken, right);
-        }
-
-        private Result SuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken)
-        {
-            return UnaryResult<ISuffixFeature>(category, defineableToken, left);
-        }
-
-        private Result UnaryResult<TFeature>(Category category, DefineableToken defineableToken, [NotNull] ICompileSyntax @object)
-            where TFeature : class, IUnaryFeature
-        {
-            var objectType = Type(@object).EnsureRef(RefAlignParam);
-            var feature = objectType.SearchDefineable<TFeature>(defineableToken);
-            if(feature == null)
-            {
-                NotImplementedMethod(category, defineableToken, @object, "feature", feature);
-                return null;
-            }
-
-            var resultType = feature.ResultType;
-            if(!category.HasCode && !category.HasRefs && resultType != null)
-                return resultType.CreateResult(category);
-
-            var objectCategory = Category.Type | (feature.IsEval ? category : Category.None);
-            var objectResult = ResultAsRef(objectCategory, @object);
-            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
-            var result = feature.Apply(applyCategory, objectResult);
-            if(resultType == null)
-                return result;
-
-            return result.ConvertTo(resultType) & category;
-        }
-
         internal Result GetResult(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
         {
             var suffixResult = GetSuffixResult(category, left, defineableToken);
             if(suffixResult == null)
             {
+                if(left != null)
+                {
+                    NotImplementedMethod(category, left, defineableToken, right);
+                    return null;
+                }
+
                 var prefixResult = GetPrefixResult(category, defineableToken, right);
                 if (prefixResult != null)
                     return prefixResult;
@@ -287,37 +252,22 @@ namespace Reni.Context
 
         private Result GetPrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
         {
-            if(right == null)
-                return null;
-            var feature = Type(right).EnsureRef(RefAlignParam).SearchDefineable<IPrefixFeature>(defineableToken);
-            if(feature == null)
-                return null;
-
-            var resultType = feature.ResultType;
-            if (!category.HasCode && !category.HasRefs && resultType != null)
-                return resultType.CreateResult(category);
-
-            var resultCategory = Category.Type | (feature.IsEval ? category : Category.None);
-            var resultAsRef = ResultAsRef(resultCategory, right);
-            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
-            var result = feature.Apply(applyCategory, resultAsRef);
-            if (resultType == null)
-                return result;
-
-            return result.ConvertTo(resultType) & category;
+            return GetUnaryResult<IPrefixFeature>(category, right, defineableToken);
         }
 
         private Result GetSuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken)
         {
-            if(left == null)
+            return GetUnaryResult<ISuffixFeature>(category, left, defineableToken);
+        }
+
+        private Result GetUnaryResult<TFeature>(Category category, ICompileSyntax left, DefineableToken defineableToken) 
+            where TFeature : class, IUnaryFeature
+        {
+            if (left == null)
                 return null;
-            var leftType = Type(left).EnsureRef(RefAlignParam);
-            var feature = leftType.SearchDefineable<ISuffixFeature>(defineableToken);
+            var feature = Type(left).EnsureRef(RefAlignParam).SearchDefineable<TFeature>(defineableToken);
             if(feature == null)
-            {
-                NotImplementedMethod(category, defineableToken, left, "leftType", leftType);
                 return null;
-            }
 
             var resultType = feature.ResultType;
             if (!category.HasCode && !category.HasRefs && resultType != null)
