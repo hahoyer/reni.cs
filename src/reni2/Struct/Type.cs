@@ -80,7 +80,7 @@ namespace Reni.Struct
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            var searchVisitorChild = searchVisitor as SearchVisitor<IConverter<IInfixFeature, Ref>>;
+            var searchVisitorChild = searchVisitor as SearchVisitor<ISearchPath<IInfixFeature, Ref>>;
             if (searchVisitorChild != null)
                 searchVisitorChild.InternalResult = Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
             base.Search(searchVisitor);

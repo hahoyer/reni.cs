@@ -93,7 +93,7 @@ namespace Reni.Context
 
         private TypeBase CreateFunctionType(ICompileSyntax body) { return _cache.FunctionType.Find(body, () => new Type.Function(this, body)); }
 
-        internal virtual void Search<TFeature>(SearchVisitor<IContextFeature<TFeature>> searchVisitor)
+        internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
             searchVisitor.SearchTypeBase();
         }
@@ -246,9 +246,13 @@ namespace Reni.Context
 
         private Result GetContextResult(Category category, DefineableToken defineableToken)
         {
+            var feature = SearchDefinable(defineableToken);
+
             NotImplementedMethod(category, defineableToken);
             return null;
         }
+
+        private IContextFeature SearchDefinable(DefineableToken token) { throw new NotImplementedException(); }
 
         private Result GetPrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
         {

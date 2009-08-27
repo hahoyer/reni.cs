@@ -40,8 +40,7 @@ namespace Reni.Feature
         Result Apply(Category category, Result leftResult, Result rightResult);
     }
 
-    internal interface IContextFeature<TFeature>
-
+    internal interface IContextFeature
     {
     }
 }

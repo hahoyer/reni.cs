@@ -183,7 +183,7 @@ namespace Reni.Struct
             return FindStructFeature(defineable.Name);
         }
 
-        internal ISearchPath<IContextFeature<TFeature>, Context> SearchFromStructContext<TFeature>(Defineable defineable)
+        internal ISearchPath<IContextFeature, Context> SearchFromStructContext(Defineable defineable)
         {
             return FindStructFeature(defineable.Name);
         }

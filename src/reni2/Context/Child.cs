@@ -37,7 +37,7 @@ namespace Reni.Context
             return Parent.CreateArgsRefResult(category);
         }
 
-        internal override void Search<TFeature>(SearchVisitor<IContextFeature<TFeature>> searchVisitor)
+        internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
             Parent.Search(searchVisitor);
         }

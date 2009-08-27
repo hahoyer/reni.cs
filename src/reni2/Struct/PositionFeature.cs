@@ -12,7 +12,7 @@ namespace Reni.Struct
 {
     internal abstract class PositionFeatureBase : 
         ReniObject, 
-        IContextFeature<IInfixFeature>, 
+        IContextFeature, 
         ISearchPath<IInfixFeature, Ref>, 
         IInfixFeature
     {
