@@ -57,7 +57,7 @@ namespace Reni.Struct
             for(var i = 0; i < StatementList.Count; i++)
             {
                 var accessResult = AccessResultAsArgFromRef(category | Category.Type, i, refAlignParam);
-                result.Add(accessResult.Type.DumpPrint(category, error).UseWithArg(accessResult));
+                result.Add(accessResult.Type.DumpPrint(category).UseWithArg(accessResult));
             }
             return Result.ConcatPrintResult(category, result);
         }

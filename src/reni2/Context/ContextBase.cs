@@ -248,11 +248,15 @@ namespace Reni.Context
         {
             var feature = SearchDefinable(defineableToken);
 
-            NotImplementedMethod(category, defineableToken);
+            NotImplementedMethod(category, defineableToken,"feature",feature);
             return null;
         }
 
-        private IContextFeature SearchDefinable(DefineableToken token) { throw new NotImplementedException(); }
+        private IContextFeature SearchDefinable(DefineableToken defineableToken)
+        {
+            NotImplementedMethod(defineableToken);
+            return null;
+        }
 
         private Result GetPrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
         {
