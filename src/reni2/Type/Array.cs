@@ -39,11 +39,8 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Element.ArrayCopier(category, Count); }
 
         internal new Result DumpPrint(Category category) { return Element.ArrayDumpPrint(category, Count); }
-        
-        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            return Element.ArrayDumpPrintFromRef(category,Count, refAlignParam);
-        }
+
+        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam) { return Element.ArrayDumpPrintFromRef(category, Count, refAlignParam); }
 
         public override string Dump() { return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")"; }
 
@@ -83,13 +80,21 @@ namespace Reni.Type
         protected override bool IsInheritor { get { return false; } }
     }
 
-    internal class ConcatArraysFeature : IInfixFeature
+    internal class ConcatArraysFeature : ReniObject, ISuffixFeature
     {
         private Array _type;
         public ConcatArraysFeature(Array type) { _type = type; }
+        bool IUnaryFeature.IsEval { get { return true; } }
+        TypeBase IUnaryFeature.ResultType { get { return null; } }
+
+        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        {
+            NotImplementedMethod(category, objectResult);
+            return null;
+        }
     }
 
-    internal class ConcatArrayWithObjectFeatureBase
+    internal class ConcatArrayWithObjectFeatureBase : ReniObject
     {
         protected static Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args, TypeBase elementType, int count)
         {
@@ -115,32 +120,47 @@ namespace Reni.Type
         }
     }
 
-    internal class CreateArrayFeature : ConcatArrayWithObjectFeatureBase, IInfixFeature
+    internal class CreateArrayFeature : ConcatArrayWithObjectFeatureBase, ISuffixFeature
     {
-        Result IInfixFeature.ApplyResult(
-            ContextBase callContext, 
-            Category category, 
+        Result ApplyResult(
+            ContextBase callContext,
+            Category category,
             ICompileSyntax @object,
             ICompileSyntax args)
         {
             var elementType = callContext.Type(args).CreateAlign(callContext.AlignBits);
             return ApplyResult(callContext, category, @object, args, elementType, 1);
         }
+
+        bool IUnaryFeature.IsEval { get { return true; } }
+        TypeBase IUnaryFeature.ResultType { get { return null; } }
+
+        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        {
+            NotImplementedMethod(category, objectResult);
+            return null;
+        }
     }
 
-    internal class ConcatArrayWithObjectFeature : ConcatArrayWithObjectFeatureBase, IInfixFeature
+    internal class ConcatArrayWithObjectFeature : ConcatArrayWithObjectFeatureBase, ISuffixFeature
     {
         private readonly Array _type;
 
         public ConcatArrayWithObjectFeature(Array type) { _type = type; }
 
-        Result IInfixFeature.ApplyResult(
-            ContextBase callContext, 
-            Category category, 
-            ICompileSyntax @object, 
-            ICompileSyntax args)
+        Result ApplyResult(
+            ContextBase callContext,
+            Category category,
+            ICompileSyntax @object,
+            ICompileSyntax args) { return ApplyResult(callContext, category, @object, args, _type.Element, _type.Count + 1); }
+
+        bool IUnaryFeature.IsEval { get { return true; } }
+        TypeBase IUnaryFeature.ResultType { get { return null; } }
+
+        Result IUnaryFeature.Apply(Category category, Result objectResult)
         {
-            return ApplyResult(callContext, category, @object, args, _type.Element, _type.Count + 1);
+            NotImplementedMethod(category, objectResult);
+            return null;
         }
     }
 }

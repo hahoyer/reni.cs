@@ -156,7 +156,7 @@ namespace Reni.Type
 
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
-        public IInfixFeature EnableCutFeature { get { return _enableCutCutFeature; } }
+        public ISuffixFeature EnableCutFeature { get { return _enableCutCutFeature; } }
     }
 
     [Serializable]
@@ -166,22 +166,20 @@ namespace Reni.Type
 
         public EnableCutFeature(Sequence sequence) { _sequence = sequence; }
 
-        public Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
-        {
-            if(args != null)
-                NotImplementedMethod(callContext, category, @object, args);
-
-            return callContext.ApplyResult(category, @object, ot => ot.ConvertTo(category, new EnableCut(_sequence)));
-        }
-
         bool IUnaryFeature.IsEval { get { return true; } }
         TypeBase IUnaryFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult) { throw new NotImplementedException(); }
+        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        {
+            return objectResult.Type.ConvertTo(category, new EnableCut(_sequence))
+                .UseWithArg(objectResult);
+        }
     }
 
     [Serializable]
-    internal class SequenceOperationFeature : ReniObject, IInfixFeature, ISearchPath<IInfixFeature, Sequence>
+    internal class SequenceOperationFeature : ReniObject
+        , ISuffixFeature
+        , ISearchPath<ISuffixFeature, Sequence>
     {
         private readonly ISequenceOfBitBinaryOperation _definable;
         private readonly Bit _bit;
@@ -192,24 +190,28 @@ namespace Reni.Type
             _definable = definable;
         }
 
-        IInfixFeature ISearchPath<IInfixFeature, Sequence>.Convert(Sequence type) { return this; }
+        ISuffixFeature ISearchPath<ISuffixFeature, Sequence>.Convert(Sequence type) { return this; }
 
-        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
             return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args);
         }
 
-        bool IInfixFeature.IsEvalLeft { get { return true; } }
-        TypeBase IInfixFeature.ResultType { get { return null; } }
+        bool IUnaryFeature.IsEval { get { return true; } }
+        TypeBase IUnaryFeature.ResultType { get { return null; } }
 
-        Result IInfixFeature.Apply(Category category, Result leftResult, Result rightResult)
+        Result IUnaryFeature.Apply(Category category, Result objectResult)
         {
-            throw new NotImplementedException();
+            NotImplementedMethod(category, objectResult);
+            return null;
         }
+
     }
 
     [Serializable]
-    internal class SequenceOperationPrefixFeature : ReniObject, IPrefixFeature, ISearchPath<IPrefixFeature, Sequence>
+    internal class SequenceOperationPrefixFeature : ReniObject
+        , IPrefixFeature
+        , ISearchPath<IPrefixFeature, Sequence>
     {
         private readonly ISequenceOfBitPrefixOperation _definable;
         private readonly Bit _bit;
@@ -220,7 +222,15 @@ namespace Reni.Type
             _definable = definable;
         }
 
-        Result IPrefixFeature.ApplyResult(ContextBase callCallContext, Category category, ICompileSyntax @object) { return _bit.ApplySequenceOperation(_definable, callCallContext, category, @object); }
+        bool IUnaryFeature.IsEval { get { return true; } }
+        TypeBase IUnaryFeature.ResultType { get { return null; } }
+
+        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        {
+            NotImplementedMethod(category, objectResult);
+            return null;
+        }
+
         IPrefixFeature ISearchPath<IPrefixFeature, Sequence>.Convert(Sequence type) { return this; }
     }
 }

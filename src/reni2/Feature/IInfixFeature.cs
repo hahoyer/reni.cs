@@ -1,7 +1,6 @@
 using System;
-using HWClassLibrary.Debug;
-using Reni.Context;
-using Reni.Syntax;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -9,12 +8,6 @@ namespace Reni.Feature
     internal interface ISearchPath<TOutType, TInType>
     {
         TOutType Convert(TInType type);
-    }
-
-    internal interface ISimpleFeature
-    {
-        TypeBase ResultType { get; }
-        Result Apply(Category category);
     }
 
     internal interface ISuffixFeature : IUnaryFeature
@@ -31,13 +24,6 @@ namespace Reni.Feature
         bool IsEval { get; }
         TypeBase ResultType { get; }
         Result Apply(Category category, Result objectResult);
-    }
-
-    internal interface IInfixFeature
-    {
-        bool IsEvalLeft { get; }
-        TypeBase ResultType { get; }
-        Result Apply(Category category, Result leftResult, Result rightResult);
     }
 
     internal interface IContextFeature

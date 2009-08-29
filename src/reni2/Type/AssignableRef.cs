@@ -29,18 +29,24 @@ namespace Reni.Type
     }
 
     [Serializable]
-    internal class AssignmentFeature : ReniObject, IInfixFeature
+    internal class AssignmentFeature : ReniObject, ISuffixFeature
     {
         [DumpData(true)]
         private readonly AssignableRef _assignableRef;
 
         public AssignmentFeature(AssignableRef assignableRef) { _assignableRef = assignableRef; }
 
-        Result IInfixFeature.ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        bool IUnaryFeature.IsEval { get { return true; } }
+        TypeBase IUnaryFeature.ResultType { get { return null; } }
+
+        Result IUnaryFeature.Apply(Category category, Result objectResult)
         {
-            return ApplyBinaryToVoid(callContext, category, @object, args, )
+            NotImplementedMethod(category, objectResult);
+            return null;
+        }
 
-
+        Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        {
             var destinationType = (AssignableRef)callContext.Type(@object);
 
             var result = TypeBase.CreateVoid.CreateResult(

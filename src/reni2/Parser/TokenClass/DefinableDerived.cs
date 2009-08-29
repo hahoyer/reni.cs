@@ -7,12 +7,8 @@ using Reni.Type;
 namespace Reni.Parser.TokenClass
 {
     [Token("type")]
-    internal sealed class TtypeT : Defineable, IInfixFeature, ISuffixFeature
+    internal sealed class TtypeT : Defineable, ISuffixFeature
     {
-        bool IInfixFeature.IsEvalLeft { get { return false; } }
-        TypeBase IInfixFeature.ResultType { get { return null; } }
-        Result IInfixFeature.Apply(Category category, Result leftResult, Result rightResult) { return rightResult.ConvertTo(leftResult.Type.AutomaticDereference()); }
-
         bool IUnaryFeature.IsEval { get { return false; } }
         TypeBase IUnaryFeature.ResultType { get { return null; } }
         Result IUnaryFeature.Apply(Category category, Result objectResult) { return objectResult.Type.AutomaticDereference().TypeOperator(category); }
@@ -54,27 +50,27 @@ namespace Reni.Parser.TokenClass
     }
 
     [Token("enable_cut")]
-    internal sealed class EnableCut : Defineable, ISearchPath<IInfixFeature, Sequence>
+    internal sealed class EnableCut : Defineable, ISearchPath<ISuffixFeature, Sequence>
     {
-        IInfixFeature ISearchPath<IInfixFeature, Sequence>.Convert(Sequence type) { return type.EnableCutFeature; }
+        ISuffixFeature ISearchPath<ISuffixFeature, Sequence>.Convert(Sequence type) { return type.EnableCutFeature; }
     }
 
     [Token("<<")]
-    internal sealed class ConcatArrays : Defineable, ISearchPath<IInfixFeature, Type.Array>
+    internal sealed class ConcatArrays : Defineable, ISearchPath<ISuffixFeature, Type.Array>
     {
-        IInfixFeature ISearchPath<IInfixFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArraysFeature(type); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArraysFeature(type); }
     }
 
     [Token("<*")]
-    internal sealed class ConcatArrayWithObject : Defineable, ISearchPath<IInfixFeature, Type.Array>, ISearchPath<IInfixFeature, Type.Void>
+    internal sealed class ConcatArrayWithObject : Defineable, ISearchPath<ISuffixFeature, Type.Array>, ISearchPath<ISuffixFeature, Type.Void>
     {
-        IInfixFeature ISearchPath<IInfixFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArrayWithObjectFeature(type); }
-        IInfixFeature ISearchPath<IInfixFeature, Type.Void>.Convert(Type.Void type) { return new CreateArrayFeature(); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArrayWithObjectFeature(type); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Void>.Convert(Type.Void type) { return new CreateArrayFeature(); }
     }
 
     [Token(":=")]
-    internal sealed class ColonEqual : Defineable, ISearchPath<IInfixFeature, AssignableRef>
+    internal sealed class ColonEqual : Defineable, ISearchPath<ISuffixFeature, AssignableRef>
     {
-        IInfixFeature ISearchPath<IInfixFeature, AssignableRef>.Convert(AssignableRef type) { return type.AssignmentFeature; }
+        ISuffixFeature ISearchPath<ISuffixFeature, AssignableRef>.Convert(AssignableRef type) { return type.AssignmentFeature; }
     }
 }
