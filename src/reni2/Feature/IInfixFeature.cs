@@ -10,22 +10,28 @@ namespace Reni.Feature
         TOutType Convert(TInType type);
     }
 
-    internal interface ISuffixFeature : IUnaryFeature
-    {
-    }
-
-    internal interface IPrefixFeature : IUnaryFeature
-
-    {
-    }
-
-    internal interface IUnaryFeature
+    internal interface IFeature 
     {
         bool IsEval { get; }
         TypeBase ResultType { get; }
         Result Apply(Category category, Result objectResult);
     }
 
+    internal interface IPrefixFeature 
+    {
+        IFeature Feature { get; }
+    }
+
+
+    static class Extender
+    {
+        internal static IFeature Feature(this object feature)
+        {
+            if (feature is IFeature)
+                return (IFeature) feature;
+            return ((IPrefixFeature) feature).Feature;
+        }
+    }
     internal interface IContextFeature
     {
     }

@@ -265,15 +265,15 @@ namespace Reni.Context
 
         private Result GetSuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken)
         {
-            return GetUnaryResult<ISuffixFeature>(category, left, defineableToken);
+            return GetUnaryResult<IFeature>(category, left, defineableToken);
         }
 
         private Result GetUnaryResult<TFeature>(Category category, ICompileSyntax left, DefineableToken defineableToken) 
-            where TFeature : class, IUnaryFeature
+            where TFeature : class
         {
             if (left == null)
                 return null;
-            var feature = Type(left).EnsureRef(RefAlignParam).SearchDefineable<TFeature>(defineableToken);
+            var feature = Type(left).EnsureRef(RefAlignParam).SearchDefineable<TFeature>(defineableToken).Feature();
             if(feature == null)
                 return null;
 

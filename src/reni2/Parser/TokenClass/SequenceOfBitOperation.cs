@@ -8,10 +8,10 @@ namespace Reni.Parser.TokenClass
 {
     internal abstract class SequenceOfBitOperation :
         Defineable,
-        ISearchPath<ISearchPath<ISuffixFeature, Sequence>, Bit>,
+        ISearchPath<ISearchPath<IFeature, Sequence>, Bit>,
         ISequenceOfBitBinaryOperation
     {
-        ISearchPath<ISuffixFeature, Sequence> ISearchPath<ISearchPath<ISuffixFeature, Sequence>, Bit>.Convert(Bit type) { return new SequenceOperationFeature(type, this); }
+        ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return new SequenceOperationFeature(type, this); }
 
         bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
         string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }

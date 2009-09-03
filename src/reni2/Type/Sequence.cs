@@ -156,20 +156,20 @@ namespace Reni.Type
 
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
-        public ISuffixFeature EnableCutFeature { get { return _enableCutCutFeature; } }
+        public IFeature EnableCutFeature { get { return _enableCutCutFeature; } }
     }
 
     [Serializable]
-    internal class EnableCutFeature : ReniObject, ISuffixFeature
+    internal class EnableCutFeature : ReniObject, IFeature
     {
         private readonly Sequence _sequence;
 
         public EnableCutFeature(Sequence sequence) { _sequence = sequence; }
 
-        bool IUnaryFeature.IsEval { get { return true; } }
-        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        bool IFeature.IsEval { get { return true; } }
+        TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, Result objectResult)
         {
             return objectResult.Type.ConvertTo(category, new EnableCut(_sequence))
                 .UseWithArg(objectResult);
@@ -178,10 +178,12 @@ namespace Reni.Type
 
     [Serializable]
     internal class SequenceOperationFeature : ReniObject
-        , ISuffixFeature
-        , ISearchPath<ISuffixFeature, Sequence>
+                                              , IFeature
+                                              , ISearchPath<IFeature, Sequence>
     {
+        [DumpData(true)]
         private readonly ISequenceOfBitBinaryOperation _definable;
+
         private readonly Bit _bit;
 
         public SequenceOperationFeature(Bit bit, ISequenceOfBitBinaryOperation definable)
@@ -190,28 +192,25 @@ namespace Reni.Type
             _definable = definable;
         }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, Sequence>.Convert(Sequence type) { return this; }
+        IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
 
-        Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
-        {
-            return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args);
-        }
+        private Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args) { return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args); }
 
-        bool IUnaryFeature.IsEval { get { return true; } }
-        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        bool IFeature.IsEval { get { return true; } }
+        TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, Result objectResult)
         {
             NotImplementedMethod(category, objectResult);
             return null;
         }
-
     }
 
     [Serializable]
     internal class SequenceOperationPrefixFeature : ReniObject
-        , IPrefixFeature
-        , ISearchPath<IPrefixFeature, Sequence>
+                                                    , IPrefixFeature
+                                                    , ISearchPath<IPrefixFeature, Sequence>
+                                                    , IFeature
     {
         private readonly ISequenceOfBitPrefixOperation _definable;
         private readonly Bit _bit;
@@ -222,15 +221,16 @@ namespace Reni.Type
             _definable = definable;
         }
 
-        bool IUnaryFeature.IsEval { get { return true; } }
-        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        bool IFeature.IsEval { get { return true; } }
+        TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, Result objectResult)
         {
             NotImplementedMethod(category, objectResult);
             return null;
         }
 
         IPrefixFeature ISearchPath<IPrefixFeature, Sequence>.Convert(Sequence type) { return this; }
+        IFeature IPrefixFeature.Feature { get { return this; } }
     }
 }

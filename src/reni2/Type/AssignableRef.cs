@@ -29,17 +29,17 @@ namespace Reni.Type
     }
 
     [Serializable]
-    internal class AssignmentFeature : ReniObject, ISuffixFeature
+    internal class AssignmentFeature : ReniObject, IFeature
     {
         [DumpData(true)]
         private readonly AssignableRef _assignableRef;
 
         public AssignmentFeature(AssignableRef assignableRef) { _assignableRef = assignableRef; }
 
-        bool IUnaryFeature.IsEval { get { return true; } }
-        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        bool IFeature.IsEval { get { return true; } }
+        TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, Result objectResult)
         {
             NotImplementedMethod(category, objectResult);
             return null;

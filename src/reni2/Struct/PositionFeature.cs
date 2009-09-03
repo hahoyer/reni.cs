@@ -13,7 +13,7 @@ namespace Reni.Struct
     internal abstract class PositionFeatureBase : 
         ReniObject, 
         IContextFeature,
-        ISuffixFeature, ISearchPath<ISuffixFeature, Ref>
+        IFeature, ISearchPath<IFeature, Ref>
     {
         private readonly IStructContext _structContext;
 
@@ -26,16 +26,16 @@ namespace Reni.Struct
             _structContext = structContext;
         }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, Ref>.Convert(Ref type)
+        IFeature ISearchPath<IFeature, Ref>.Convert(Ref type)
         {
             Tracer.Assert(type.RefAlignParam == _structContext.ForCode.RefAlignParam);
             return this;
         }
 
-        bool IUnaryFeature.IsEval { get { return true; } }
-        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        bool IFeature.IsEval { get { return true; } }
+        TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, Result objectResult)
         {
             NotImplementedMethod(category, objectResult);
             return null;

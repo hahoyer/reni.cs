@@ -80,14 +80,14 @@ namespace Reni.Type
         protected override bool IsInheritor { get { return false; } }
     }
 
-    internal class ConcatArraysFeature : ReniObject, ISuffixFeature
+    internal class ConcatArraysFeature : ReniObject, IFeature
     {
         private Array _type;
         public ConcatArraysFeature(Array type) { _type = type; }
-        bool IUnaryFeature.IsEval { get { return true; } }
-        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        bool IFeature.IsEval { get { return true; } }
+        TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, Result objectResult)
         {
             NotImplementedMethod(category, objectResult);
             return null;
@@ -120,7 +120,7 @@ namespace Reni.Type
         }
     }
 
-    internal class CreateArrayFeature : ConcatArrayWithObjectFeatureBase, ISuffixFeature
+    internal class CreateArrayFeature : ConcatArrayWithObjectFeatureBase, IFeature
     {
         Result ApplyResult(
             ContextBase callContext,
@@ -132,17 +132,17 @@ namespace Reni.Type
             return ApplyResult(callContext, category, @object, args, elementType, 1);
         }
 
-        bool IUnaryFeature.IsEval { get { return true; } }
-        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        bool IFeature.IsEval { get { return true; } }
+        TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, Result objectResult)
         {
             NotImplementedMethod(category, objectResult);
             return null;
         }
     }
 
-    internal class ConcatArrayWithObjectFeature : ConcatArrayWithObjectFeatureBase, ISuffixFeature
+    internal class ConcatArrayWithObjectFeature : ConcatArrayWithObjectFeatureBase, IFeature
     {
         private readonly Array _type;
 
@@ -154,10 +154,10 @@ namespace Reni.Type
             ICompileSyntax @object,
             ICompileSyntax args) { return ApplyResult(callContext, category, @object, args, _type.Element, _type.Count + 1); }
 
-        bool IUnaryFeature.IsEval { get { return true; } }
-        TypeBase IUnaryFeature.ResultType { get { return null; } }
+        bool IFeature.IsEval { get { return true; } }
+        TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IUnaryFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, Result objectResult)
         {
             NotImplementedMethod(category, objectResult);
             return null;
