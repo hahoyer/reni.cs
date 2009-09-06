@@ -240,7 +240,10 @@ namespace Reni.Context
                     return prefixResult;
                 suffixResult = GetContextResult(category, defineableToken);
             }
-            NotImplementedMethod(category, left, defineableToken, right, "feature", suffixResult);
+            var feature = suffixResult.Type.FunctionalFeature;
+            
+
+            NotImplementedMethod(category, left, defineableToken, right, "suffixResult", suffixResult);
             return null;
         }
 

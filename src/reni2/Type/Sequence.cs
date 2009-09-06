@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
@@ -180,6 +178,8 @@ namespace Reni.Type
     internal class SequenceOperationFeature : ReniObject
                                               , IFeature
                                               , ISearchPath<IFeature, Sequence>
+                                              , IFunctionalFeature
+
     {
         [DumpData(true)]
         private readonly ISequenceOfBitBinaryOperation _definable;
@@ -194,17 +194,21 @@ namespace Reni.Type
 
         IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
 
-        private Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args) { return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args); }
+        private Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
+                                   ICompileSyntax args) { return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args); }
 
         bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
         Result IFeature.Apply(Category category, Result objectResult)
         {
-            NotImplementedMethod(category, objectResult);
-            return null;
+            return objectResult.CreateFunctionalResult(category, this);
         }
+
+        string IDumpShortProvider.DumpShort() { return _definable.DataFunctionName; }
     }
+
+    internal interface IFunctionalFeature:IDumpShortProvider {}
 
     [Serializable]
     internal class SequenceOperationPrefixFeature : ReniObject

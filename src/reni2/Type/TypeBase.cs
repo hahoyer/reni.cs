@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
 using Reni.Syntax;
 
 namespace Reni.Type
@@ -24,10 +20,18 @@ namespace Reni.Type
             public readonly DictionaryEx<int, Array> Arrays = new DictionaryEx<int, Array>();
             public readonly DictionaryEx<int, Sequence> Sequences = new DictionaryEx<int, Sequence>();
             public readonly DictionaryEx<TypeBase, Pair> Pairs = new DictionaryEx<TypeBase, Pair>();
-            public readonly DictionaryEx<RefAlignParam, AutomaticRef> AutomaticRefs = new DictionaryEx<RefAlignParam, AutomaticRef>();
-            public readonly DictionaryEx<RefAlignParam, AssignableRef> AssignableRefs = new DictionaryEx<RefAlignParam, AssignableRef>();
+
+            public readonly DictionaryEx<RefAlignParam, AutomaticRef> AutomaticRefs =
+                new DictionaryEx<RefAlignParam, AutomaticRef>();
+
+            public readonly DictionaryEx<RefAlignParam, AssignableRef> AssignableRefs =
+                new DictionaryEx<RefAlignParam, AssignableRef>();
+
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<PostProcessorForType> PostProcessor;
+
+            public readonly DictionaryEx<IFunctionalFeature, FunctionalType> FunctionalTypes =
+                new DictionaryEx<IFunctionalFeature, FunctionalType>();
 
             public Cache(TypeBase parent)
             {
@@ -39,15 +43,9 @@ namespace Reni.Type
         private readonly Cache _cache;
 
         protected TypeBase(int objectId)
-            : base(objectId)
-        {
-            _cache = new Cache(this);
-        }
+            : base(objectId) { _cache = new Cache(this); }
 
-        protected TypeBase()
-        {
-            _cache = new Cache(this);
-        }
+        protected TypeBase() { _cache = new Cache(this); }
 
         internal static TypeBase CreateVoid { get { return Cache.Void; } }
         internal static TypeBase CreateBit { get { return Cache.Bit; } }
@@ -57,10 +55,7 @@ namespace Reni.Type
 
         protected abstract Size GetSize();
 
-        internal virtual bool IsRef(RefAlignParam refAlignParam)
-        {
-            return false;
-        }
+        internal virtual bool IsRef(RefAlignParam refAlignParam) { return false; }
 
         [DumpData(false)]
         internal virtual bool IsVoid { get { return false; } }
@@ -69,12 +64,9 @@ namespace Reni.Type
         internal virtual Size UnrefSize { get { return Size; } }
 
         [DumpData(false)]
-        protected internal virtual TypeBase[] ToList { get { return new[] {this}; } }
+        internal protected virtual TypeBase[] ToList { get { return new[] {this}; } }
 
-        string IDumpShortProvider.DumpShort()
-        {
-            return DumpShort();
-        }
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         internal abstract string DumpShort();
 
@@ -110,7 +102,7 @@ namespace Reni.Type
         internal TypeBase IndexType { get { return CreateNumber(IndexSize); } }
 
         [DumpData(false)]
-        protected internal virtual int IndexSize { get { return 0; } }
+        internal protected virtual int IndexSize { get { return 0; } }
 
         [DumpData(false)]
         internal PostProcessorForType PostProcessor { get { return _cache.PostProcessor.Value; } }
@@ -122,20 +114,11 @@ namespace Reni.Type
             return _cache.Aligners.Find(alignBits, () => new Aligner(this, alignBits));
         }
 
-        internal Array CreateArray(int count)
-        {
-            return _cache.Arrays.Find(count, () => new Array(this, count));
-        }
+        internal Array CreateArray(int count) { return _cache.Arrays.Find(count, () => new Array(this, count)); }
 
-        internal static TypeBase CreateNumber(int bitCount)
-        {
-            return CreateBit.CreateSequence(bitCount);
-        }
+        internal static TypeBase CreateNumber(int bitCount) { return CreateBit.CreateSequence(bitCount); }
 
-        internal virtual TypeBase CreatePair(TypeBase second)
-        {
-            return second.CreateReversePair(this);
-        }
+        internal virtual TypeBase CreatePair(TypeBase second) { return second.CreateReversePair(this); }
 
         protected virtual TypeBase CreateReversePair(TypeBase first)
         {
@@ -143,15 +126,9 @@ namespace Reni.Type
                                            () => new Pair(first, this));
         }
 
-        internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
-        {
-            return _cache.AutomaticRefs.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam));
-        }
+        internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam) { return _cache.AutomaticRefs.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam)); }
 
-        internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
-        {
-            return _cache.AssignableRefs.Find(refAlignParam, () => new AssignableRef(this, refAlignParam));
-        }
+        internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return _cache.AssignableRefs.Find(refAlignParam, () => new AssignableRef(this, refAlignParam)); }
 
         internal Ref EnsureRef(RefAlignParam refAlignParam)
         {
@@ -160,40 +137,21 @@ namespace Reni.Type
             return CreateAutomaticRef(refAlignParam);
         }
 
-        internal Sequence CreateSequence(int elementCount)
-        {
-            return _cache.Sequences.Find(elementCount, () => new Sequence(this, elementCount));
-        }
+        internal Sequence CreateSequence(int elementCount) { return _cache.Sequences.Find(elementCount, () => new Sequence(this, elementCount)); }
 
-        internal virtual Result Destructor(Category category)
-        {
-            return CreateVoidCodeAndRefs(category);
-        }
+        internal TypeBase CreateFunctionalType(IFunctionalFeature feature) { return _cache.FunctionalTypes.Find(feature, () => new FunctionalType(this, feature)); }
 
-        internal virtual Result ArrayDestructor(Category category, int count)
-        {
-            return CreateVoidCodeAndRefs(category);
-        }
+        internal virtual Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 
-        internal virtual Result Copier(Category category)
-        {
-            return CreateVoidCodeAndRefs(category);
-        }
+        internal virtual Result ArrayDestructor(Category category, int count) { return CreateVoidCodeAndRefs(category); }
 
-        internal virtual Result ArrayCopier(Category category, int count)
-        {
-            return CreateVoidCodeAndRefs(category);
-        }
+        internal virtual Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
 
-        internal Result CreateArgResult(Category category)
-        {
-            return CreateResult(category, CreateArgCode);
-        }
+        internal virtual Result ArrayCopier(Category category, int count) { return CreateVoidCodeAndRefs(category); }
 
-        internal CodeBase CreateArgCode()
-        {
-            return CodeBase.CreateArg(Size);
-        }
+        internal Result CreateArgResult(Category category) { return CreateResult(category, CreateArgCode); }
+
+        internal CodeBase CreateArgCode() { return CodeBase.CreateArg(Size); }
 
         internal Result CreateResult(Category category)
         {
@@ -215,10 +173,7 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result CreateResult(Category category, Func<CodeBase> getCode)
-        {
-            return CreateResult(category, getCode, Refs.None);
-        }
+        internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None); }
 
         internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
@@ -246,25 +201,13 @@ namespace Reni.Type
             return null;
         }
 
-        internal static Result CreateVoidCodeAndRefs(Category category)
-        {
-            return CreateVoidResult(category & (Category.Code | Category.Refs));
-        }
+        internal static Result CreateVoidCodeAndRefs(Category category) { return CreateVoidResult(category & (Category.Code | Category.Refs)); }
 
-        internal static Result CreateVoidResult(Category category)
-        {
-            return CreateVoid.CreateResult(category);
-        }
+        internal static Result CreateVoidResult(Category category) { return CreateVoid.CreateResult(category); }
 
-        internal virtual Result AutomaticDereference(Result result)
-        {
-            return result;
-        }
+        internal virtual Result AutomaticDereference(Result result) { return result; }
 
-        internal virtual TypeBase AutomaticDereference()
-        {
-            return this;
-        }
+        internal virtual TypeBase AutomaticDereference() { return this; }
 
         internal virtual Result TypeOperator(Category category)
         {
@@ -292,10 +235,7 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        internal virtual Result ApplyTypeOperator(Result argResult)
-        {
-            return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult);
-        }
+        internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult); }
 
         internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
         {
@@ -324,10 +264,7 @@ namespace Reni.Type
             return ConvertToImplementation(category, dest);
         }
 
-        protected virtual Result ConvertToItself(Category category)
-        {
-            return CreateArgResult(category);
-        }
+        protected virtual Result ConvertToItself(Category category) { return CreateArgResult(category); }
 
         protected virtual Result ConvertToImplementation(Category category, TypeBase dest)
         {
@@ -344,10 +281,7 @@ namespace Reni.Type
             return IsConvertableToImplementation(dest, conversionFeature);
         }
 
-        internal virtual bool HasConverterTo(TypeBase dest)
-        {
-            return false;
-        }
+        internal virtual bool HasConverterTo(TypeBase dest) { return false; }
 
         internal virtual bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
@@ -355,15 +289,9 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        private bool IsConvertableToItself(ConversionFeature conversionFeature)
-        {
-            return true;
-        }
+        private bool IsConvertableToItself(ConversionFeature conversionFeature) { return true; }
 
-        internal virtual Result UnProperty(Result rawResult)
-        {
-            return rawResult;
-        }
+        internal virtual Result UnProperty(Result rawResult) { return rawResult; }
 
         internal virtual Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
@@ -371,7 +299,8 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam)
+        internal virtual Result AccessResultAsContextRefFromRef(Category category, int position,
+                                                                RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category, position, refAlignParam);
             return null;
@@ -383,7 +312,8 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode, Func<Refs> getRefs)
+        internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode,
+                                                  Func<Refs> getRefs)
         {
             if(Size.IsZero)
                 return CreateResult(category);
@@ -397,17 +327,20 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
-        internal virtual bool IsRefLike(Ref target)
+        internal virtual IFunctionalFeature FunctionalFeature
         {
-            return false;
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
-        internal TypeBase CreateSequenceType(TypeBase elementType)
-        {
-            return elementType.CreateSequence(SequenceCount);
-        }
+        internal virtual bool IsRefLike(Ref target) { return false; }
 
-        internal TFeature SearchDefineable<TFeature>(DefineableToken defineableToken) 
+        internal TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(SequenceCount); }
+
+        internal TFeature SearchDefineable<TFeature>(DefineableToken defineableToken)
             where TFeature : class
         {
             var searchVisitor = new RootSearchVisitor<TFeature>(defineableToken.TokenClass);
@@ -415,10 +348,7 @@ namespace Reni.Type
             return searchVisitor.Result;
         }
 
-        internal virtual void Search(ISearchVisitor searchVisitor)
-        {
-            searchVisitor.Search();
-        }
+        internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
 
         internal virtual Result ArrayDumpPrintFromRef(Category category, int count, RefAlignParam refAlignParam)
         {
@@ -427,4 +357,22 @@ namespace Reni.Type
         }
     }
 
+    internal class FunctionalType : TypeBase
+    {
+        [DumpData(true)]
+        private readonly TypeBase _objectType;
+
+        [DumpData(true)]
+        private readonly IFunctionalFeature _feature;
+
+        public FunctionalType(TypeBase objectType, IFunctionalFeature feature)
+        {
+            _objectType = objectType;
+            _feature = feature;
+        }
+
+        protected override Size GetSize() { return _objectType.Size; }
+        internal override string DumpShort() { return _objectType.DumpShort() + " " + _feature.DumpShort(); }
+        internal override IFunctionalFeature FunctionalFeature { get { return _feature; } }
+    }
 }

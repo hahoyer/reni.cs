@@ -597,6 +597,13 @@ namespace Reni
             if (category.HasCode) _code = getCode();
             if (category.HasRefs) _refs = getRefs();
         }
+
+        internal Result CreateFunctionalResult(Category category, IFunctionalFeature feature)
+        {
+            if(!category.HasType) 
+                return this;
+            return Type.CreateFunctionalType(feature).CreateResult(category, () => Code, () => Refs);
+        }
     }
 
     internal sealed class Error
