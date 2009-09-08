@@ -199,6 +199,7 @@ namespace Reni
         {
             get { return HasCode && Code.HasArg; } }
 
+
         public override string DumpData()
         {
             var result = "";
@@ -602,7 +603,20 @@ namespace Reni
         {
             if(!category.HasType) 
                 return this;
-            return Type.CreateFunctionalType(feature).CreateResult(category, () => Code, () => Refs);
+            return Type.CreateFunctionalType(feature).CreateResult(category, this);
+        }
+
+        internal Result StripFunctional()
+        {
+            if(!HasType)
+                return this;
+            return Type.StripFunctional().CreateResult(this);
+            ;
+        }
+
+        public Result ConvertToSequence(Category category, TypeBase elementType)
+        {
+            return Type.ConvertToSequence(category, elementType).UseWithArg(this);
         }
     }
 

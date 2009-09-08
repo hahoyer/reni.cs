@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
@@ -64,7 +66,7 @@ namespace Reni.Type
         internal virtual Size UnrefSize { get { return Size; } }
 
         [DumpData(false)]
-        internal protected virtual TypeBase[] ToList { get { return new[] {this}; } }
+        protected internal virtual TypeBase[] ToList { get { return new[] {this}; } }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
@@ -102,7 +104,7 @@ namespace Reni.Type
         internal TypeBase IndexType { get { return CreateNumber(IndexSize); } }
 
         [DumpData(false)]
-        internal protected virtual int IndexSize { get { return 0; } }
+        protected internal virtual int IndexSize { get { return 0; } }
 
         [DumpData(false)]
         internal PostProcessorForType PostProcessor { get { return _cache.PostProcessor.Value; } }
@@ -162,15 +164,20 @@ namespace Reni.Type
         internal Result CreateResult(Category category, Result codeAndRefs)
         {
             var result = new Result();
-            if(category.HasSize)
+            if (category.HasSize)
                 result.Size = Size;
-            if(category.HasType)
+            if (category.HasType)
                 result.Type = this;
-            if(category.HasCode)
+            if (category.HasCode)
                 result.Code = codeAndRefs.Code;
-            if(category.HasRefs)
+            if (category.HasRefs)
                 result.Refs = codeAndRefs.Refs;
             return result;
+        }
+
+        internal Result CreateResult(Result codeAndRefs)
+        {
+            return CreateResult(codeAndRefs.CompleteCategory, codeAndRefs);
         }
 
         internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None); }
@@ -264,6 +271,11 @@ namespace Reni.Type
             return ConvertToImplementation(category, dest);
         }
 
+        internal Result ConvertToSequence(Category category, TypeBase elementType)
+        {
+            return Conversion(category, CreateSequenceType(elementType));
+        }
+
         protected virtual Result ConvertToItself(Category category) { return CreateArgResult(category); }
 
         protected virtual Result ConvertToImplementation(Category category, TypeBase dest)
@@ -327,13 +339,13 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
-        internal virtual IFunctionalFeature FunctionalFeature
+        [DumpExcept(null)]
+        internal virtual IFunctionalFeature FunctionalFeature { get { return null; } }
+
+        internal virtual TypeBase StripFunctional()
         {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
+            NotImplementedMethod();
+            return null;
         }
 
         internal virtual bool IsRefLike(Ref target) { return false; }
@@ -355,6 +367,14 @@ namespace Reni.Type
             NotImplementedMethod(category, count, refAlignParam);
             return null;
         }
+
+        internal static CodeBase CreateBitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, Size objSize, Size argsSize)
+        {
+            return CreateBit.CreateSequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
+                .CreateArgCode()
+                .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
+        }
+
     }
 
     internal class FunctionalType : TypeBase
@@ -374,5 +394,6 @@ namespace Reni.Type
         protected override Size GetSize() { return _objectType.Size; }
         internal override string DumpShort() { return _objectType.DumpShort() + " " + _feature.DumpShort(); }
         internal override IFunctionalFeature FunctionalFeature { get { return _feature; } }
+        internal override TypeBase StripFunctional() { return _objectType; }
     }
 }

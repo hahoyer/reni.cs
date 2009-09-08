@@ -172,8 +172,11 @@ namespace Reni.Context
 
         internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType)
         {
-            var target = Type(syntax).CreateSequenceType(elementType);
-            var result = ConvertToViaRef(category, syntax, target);
+            var resultAsRef = ResultAsRef(category | Category.Type, syntax);
+            var target = resultAsRef.Type.CreateSequenceType(elementType);
+            var convertTo = resultAsRef.ConvertTo(target);
+            var result1 = convertTo.Align(AlignBits);
+            var result = result1;
             return result;
         }
 
@@ -226,7 +229,7 @@ namespace Reni.Context
 
         internal Result GetResult(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
         {
-            var suffixResult = GetSuffixResult(category, left, defineableToken);
+            var suffixResult = GetSuffixResult(category|Category.Type, left, defineableToken);
             if(suffixResult == null)
             {
                 if(left != null)
@@ -238,12 +241,12 @@ namespace Reni.Context
                 var prefixResult = GetPrefixResult(category, defineableToken, right);
                 if (prefixResult != null)
                     return prefixResult;
-                suffixResult = GetContextResult(category, defineableToken);
+                suffixResult = GetContextResult(category | Category.Type, defineableToken);
             }
             var feature = suffixResult.Type.FunctionalFeature;
-            
-
-            NotImplementedMethod(category, left, defineableToken, right, "suffixResult", suffixResult);
+            if (feature != null)
+                return feature.Apply(category, suffixResult.StripFunctional(), ResultAsRef(category|Category.Type, right));
+            NotImplementedMethod(category, left, defineableToken, right, "suffixResult", suffixResult,"feature",feature);
             return null;
         }
 
@@ -289,7 +292,7 @@ namespace Reni.Context
             var applyCategory = category | (resultType == null ? Category.None : Category.Type);
             var result = feature.Apply(applyCategory, resultAsRef);
             if (resultType == null)
-                return result;
+                return result & category;
 
             return result.ConvertTo(resultType) & category;
         }

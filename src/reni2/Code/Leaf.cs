@@ -1,7 +1,9 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Context;
 
 namespace Reni.Code
@@ -14,10 +16,9 @@ namespace Reni.Code
     {
         private readonly LeafElement _leafElement;
 
-#pragma warning disable 649
         // Warnind disabled, since it is used for debugging purposes
+        [UsedImplicitly]
         internal static bool TryToCombine;
-#pragma warning restore 649
 
         internal Leaf(LeafElement leafElement)
         {
@@ -30,34 +31,30 @@ namespace Reni.Code
 
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
+
         [DumpData(false)]
         internal override bool IsEmpty { get { return LeafElement.IsEmpty; } }
+
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return LeafElement.RefAlignParam; } }
 
         internal override CodeBase CreateChild(LeafElement leafElement)
         {
-            if (!TryToCombine)
+            if(!TryToCombine)
                 return base.CreateChild(leafElement);
 
             var newLeafElements = LeafElement.TryToCombineN(leafElement);
-            if (newLeafElements == null)
+            if(newLeafElements == null)
                 return base.CreateChild(leafElement);
 
             CodeBase result = new Leaf(newLeafElements[0]);
-            for (var i = 1; i < newLeafElements.Length; i++ )
+            for(var i = 1; i < newLeafElements.Length; i++)
                 result = result.CreateChild(newLeafElements[i]);
             return result;
         }
 
-        protected override Result VisitImplementation<Result>(Visitor<Result> actual)
-        {
-            return actual.Leaf(LeafElement);
-        }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Leaf(LeafElement); }
 
-        internal override BitsConst Evaluate()
-        {
-            return LeafElement.Evaluate();
-        }
+        internal override BitsConst Evaluate() { return LeafElement.Evaluate(); }
     }
 }

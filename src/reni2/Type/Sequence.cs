@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
@@ -184,31 +186,47 @@ namespace Reni.Type
         [DumpData(true)]
         private readonly ISequenceOfBitBinaryOperation _definable;
 
-        private readonly Bit _bit;
-
-        public SequenceOperationFeature(Bit bit, ISequenceOfBitBinaryOperation definable)
+        public SequenceOperationFeature(ISequenceOfBitBinaryOperation definable)
         {
-            _bit = bit;
             _definable = definable;
         }
 
         IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
 
-        private Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                   ICompileSyntax args) { return _bit.ApplySequenceOperation(_definable, callContext, category, @object, args); }
-
         bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IFeature.Apply(Category category, Result objectResult)
-        {
-            return objectResult.CreateFunctionalResult(category, this);
-        }
+        Result IFeature.Apply(Category category, Result objectResult) { return objectResult.CreateFunctionalResult(category, this); }
 
         string IDumpShortProvider.DumpShort() { return _definable.DataFunctionName; }
+
+        Result IFunctionalFeature.Apply(Category category, Result objectResult, Result argsResult)
+        {
+            var result = SequenceOperationResult
+                (
+                category,
+                _definable,
+                objectResult.Type.UnrefSize,
+                argsResult.Type.UnrefSize
+                );
+
+            var convertedObjectResult = objectResult.ConvertToSequence(category, TypeBase.CreateBit);
+            var convertedArgsResult = argsResult.ConvertToSequence(category, TypeBase.CreateBit);
+            return result.UseWithArg(convertedObjectResult.CreateSequence(convertedArgsResult));
+        }
+
+        private static Result SequenceOperationResult(Category category, ISequenceOfBitBinaryOperation definable, Size objSize, Size argsSize)
+        {
+            var type = TypeBase.CreateNumber(definable.ResultSize(objSize.ToInt(), argsSize.ToInt()));
+            return type.CreateResult(category, () => TypeBase.CreateBitSequenceOperation(type.Size, definable, objSize, argsSize));
+        }
+
     }
 
-    internal interface IFunctionalFeature:IDumpShortProvider {}
+    internal interface IFunctionalFeature : IDumpShortProvider
+    {
+        Result Apply(Category category, Result objectResult, Result argsResult);
+    }
 
     [Serializable]
     internal class SequenceOperationPrefixFeature : ReniObject

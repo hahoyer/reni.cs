@@ -27,13 +27,6 @@ namespace Reni.Type
             return false;
         }
 
-        private CodeBase CreateSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, Size objSize, Size argsSize)
-        {
-            return CreateSequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
-                .CreateArgCode()
-                .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
-        }
-
         static private CodeBase CreateSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
         {
             return CreateBit
@@ -52,23 +45,6 @@ namespace Reni.Type
 
         internal override string DumpShort() { return "bit"; }
 
-        internal Result ApplySequenceOperation(ISequenceOfBitBinaryOperation definable, ContextBase callContext,
-                                               Category category, ICompileSyntax @object, ICompileSyntax args)
-        {
-            var result = SequenceOperationResult
-                (
-                category,
-                definable,
-                callContext.Type(@object).UnrefSize,
-                callContext.Type(args).UnrefSize
-                );
-
-            var argsResult = callContext.ConvertToSequence(category, args, this);
-            var objectResult = callContext.ConvertToSequence(category, @object, this);
-
-            return result.UseWithArg(objectResult.CreateSequence(argsResult));
-        }
-
         internal Result ApplySequenceOperation(ISequenceOfBitPrefixOperation definable, ContextBase callContext, Category category, ICompileSyntax @object)
         {
             var result = SequenceOperationResult
@@ -83,13 +59,7 @@ namespace Reni.Type
             return result.UseWithArg(objectResult);
         }
 
-        private Result SequenceOperationResult(Category category, ISequenceOfBitBinaryOperation definable, Size objSize, Size argsSize)
-        {
-            var type = CreateNumber(definable.ResultSize(objSize.ToInt(), argsSize.ToInt()));
-            return type.CreateResult(category, () => CreateSequenceOperation(type.Size,definable, objSize, argsSize));
-        }
-
-        private static Result SequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize) { return feature.SequenceOperationResult(category, objSize); }
+        internal static Result SequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize) { return feature.SequenceOperationResult(category, objSize); }
 
         static internal Result PrefixSequenceOperationResult(Category category, ISequenceOfBitPrefixOperation feature, Size objSize)
         {

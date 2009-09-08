@@ -199,6 +199,7 @@ namespace Reni.Code
             return result ?? this;
         }
 
+        [DumpExcept(false)]
         internal bool HasArg
         {
             get { return Visit(new HasArgVisitor()); }
@@ -318,13 +319,6 @@ namespace Reni.Code
 
             return result.CreateChild(new Drop(Size, resultSize));
         }
-    }
-
-    internal class HasArgVisitor : Visitor<bool>
-    {
-        internal override bool Pair(Pair visitedObject, bool left, bool right) { return left || right; }
-
-        internal override bool Arg(Arg visitedObject) { return true; }
     }
 
     internal class InternalRefSequenceVisitor : Base
