@@ -16,6 +16,7 @@ namespace Reni
         ISearchVisitor ISearchVisitor.Child(Sequence target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Array target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Void target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Struct.Type target) { return InternalChild(target); }
 
         internal abstract bool IsSuccessFull { get; }
         internal abstract TFeature InternalResult { set; }

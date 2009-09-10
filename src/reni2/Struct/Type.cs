@@ -84,6 +84,7 @@ namespace Reni.Struct
                 IFeature, Ref>>;
             if (searchVisitorChild != null)
                 searchVisitorChild.InternalResult = Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
+            searchVisitor.Child(this).Search();
             base.Search(searchVisitor);
         }
 

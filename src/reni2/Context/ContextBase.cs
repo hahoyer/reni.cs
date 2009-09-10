@@ -60,7 +60,7 @@ namespace Reni.Context
             }
         }
 
-        protected virtual Sequence<ContextBase> ObtainChildChain() { return HWString.Sequence(this); }
+        protected virtual Sequence<ContextBase> ObtainChildChain() { return StringExtender.Sequence(this); }
 
         internal virtual string DumpShort() { return base.ToString(); }
 
@@ -229,7 +229,11 @@ namespace Reni.Context
 
         internal Result GetResult(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
         {
-            var suffixResult = GetSuffixResult(category|Category.Type, left, defineableToken);
+            var categoryForFunctionals = category;
+            if (right != null)
+                categoryForFunctionals |= Category.Type;
+
+            var suffixResult = GetSuffixResult(categoryForFunctionals, left, defineableToken);
             if(suffixResult == null)
             {
                 if(left != null)
@@ -241,8 +245,11 @@ namespace Reni.Context
                 var prefixResult = GetPrefixResult(category, defineableToken, right);
                 if (prefixResult != null)
                     return prefixResult;
-                suffixResult = GetContextResult(category | Category.Type, defineableToken);
+                suffixResult = GetContextResult(categoryForFunctionals, defineableToken);
             }
+            if(right == null)
+                return suffixResult;
+
             var feature = suffixResult.Type.FunctionalFeature;
             if (feature != null)
                 return feature.Apply(category, suffixResult.StripFunctional(), ResultAsRef(category|Category.Type, right));

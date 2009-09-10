@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
+using JetBrains.Annotations;
 using NUnit.Framework;
 
 namespace Reni.FeatureTest
@@ -13,12 +14,18 @@ namespace Reni.FeatureTest
     [AttributeUsage(AttributeTargets.Class)]
     public abstract class CompilerTest : Attribute
     {
+        [UsedImplicitly]
         public const string Damaged = "Damaged";
+        [UsedImplicitly]
         public const string Rare = "Rare";
+        [UsedImplicitly]
         public const string UnderConstruction = "Under Construction";
+        [UsedImplicitly]
         public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
+        [UsedImplicitly]
         public const string Worked = "Worked";
-        public CompilerParameters Parameters;                    
+
+        internal CompilerParameters Parameters;                    
         static private Dictionary<System.Type, CompilerTest> _cache;
         private bool _needToRunDependants = true;
 
@@ -28,14 +35,6 @@ namespace Reni.FeatureTest
         protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput){CreateFileAndRunCompiler(1, name, text, null, expectedOutput);}
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
-        
-        protected void RunCompiler(string name, string expectedOutput) { RunCompiler(1, name, null, expectedOutput); }
-        protected void RunCompiler(int depth, string name, string expectedOutput) { RunCompiler(depth + 1, name, null, expectedOutput); }
-
-        private void RunCompiler(int depth, string name, Action<Compiler> expectedResult, string expectedOutput)
-        {
-            InternalRunCompiler(depth + 1, File.SourcePath(1) + "\\" + name + ".reni", expectedResult, expectedOutput);
-        }
 
         private void CreateFileAndRunCompiler(int depth, string name, string text, Action<Compiler> expectedResult, string expectedOutput)
         {

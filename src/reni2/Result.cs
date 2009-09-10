@@ -518,16 +518,6 @@ namespace Reni
                 );
         }
 
-        internal Result DumpPrintBitSequence()
-        {
-            return Void.CreateResult
-                (
-                CompleteCategory,
-                () => Code.CreateDumpPrint(),
-                () => Refs
-                );
-        }
-
         internal BitsConst Evaluate()
         {
             Tracer.Assert(Refs.IsNone);
@@ -614,9 +604,14 @@ namespace Reni
             ;
         }
 
-        public Result ConvertToSequence(Category category, TypeBase elementType)
+        private Result ConvertToSequence(Category category, TypeBase elementType)
         {
             return Type.ConvertToSequence(category, elementType).UseWithArg(this);
+        }
+
+        internal Result ConvertToSequence(Category category)
+        {
+            return ConvertToSequence(category, TypeBase.CreateBit).Align(BitsConst.SegmentAlignBits);
         }
     }
 

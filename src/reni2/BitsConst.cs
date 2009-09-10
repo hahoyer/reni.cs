@@ -12,7 +12,7 @@ namespace Reni
     internal class BitsConst : ReniObject
     {
         private const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private const int SegmentAlignBits = 3;
+        internal const int SegmentAlignBits = 3;
         private static OutStream _outStream;
         private static int _nextObjectId = 0;
 

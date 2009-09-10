@@ -18,7 +18,7 @@ namespace Reni.Context
 
         internal override RefAlignParam RefAlignParam { get { return DefaultRefAlignParam; } }
 
-        private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(3, Size.Create(32)); } }
+        private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
         [DumpData(false)]
         internal override Root RootContext { get { return this; } }

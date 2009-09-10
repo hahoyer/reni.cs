@@ -28,12 +28,12 @@ namespace Reni
         /// asis
         /// </summary>
         public bool IsZero { get { return _data == 0; } }
-        public int SaveByteCount { get { return SaveSizeToPacketCount(3); } }
+        public int SaveByteCount { get { return SaveSizeToPacketCount(BitsConst.SegmentAlignBits); } }
         public static Size Zero { get { return Create(0); } }
         public static Size Byte { get { return Create(1).ByteAlignedSize; } }
         public bool IsPositive { get { return _data > 0; } }
-        public int ByteCount { get { return SizeToPacketCount(3); } }
-        public Size ByteAlignedSize { get { return NextPacketSize(3); } }
+        public int ByteCount { get { return SizeToPacketCount(BitsConst.SegmentAlignBits); } }
+        public Size ByteAlignedSize { get { return NextPacketSize(BitsConst.SegmentAlignBits); } }
 
         public static Size Create(int x)
         {
@@ -416,7 +416,7 @@ namespace Reni
             private static void TestNextPacketSize(int x, int b)
             {
                 var xs = Create(x);
-                Tracer.Assert(xs.NextPacketSize(3) == Create(b));
+                Tracer.Assert(xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b));
             }
 
             [Test, Category(CompilerTest.Worked)]

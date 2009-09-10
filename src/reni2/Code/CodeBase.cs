@@ -56,7 +56,7 @@ namespace Reni.Code
         [DumpData(false)]
         internal virtual Refs RefsImplementation { get { return Refs.None(); } }
 
-        internal CodeBase CreateBitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize)
+        private CodeBase CreateBitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize)
         {
             return CreateChild(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize));
         }
@@ -72,7 +72,7 @@ namespace Reni.Code
             return CreateChild(new Assign(refAlignParam, alignedSize));
         }
 
-        public CodeBase CreateBitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size)
+        private CodeBase CreateBitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size)
         {
             return CreateChild(new BitArrayPrefixOp(feature, size, Size));
         }
@@ -80,14 +80,6 @@ namespace Reni.Code
         public static CodeBase CreateDumpPrintText(string dumpPrintText)
         {
             return CreateLeaf(new DumpPrintText(dumpPrintText));
-        }
-
-        public CodeBase CreateDumpPrint()
-        {
-            var alignedSize = Size.ByteAlignedSize;
-
-            return CreateBitCast(alignedSize)
-                .CreateDumpPrint(alignedSize);
         }
 
         public CodeBase CreateThenElse(CodeBase thenCode, CodeBase elseCode)
@@ -319,6 +311,31 @@ namespace Reni.Code
 
             return result.CreateChild(new Drop(Size, resultSize));
         }
+
+        internal static CodeBase CreateBitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
+        {
+            return TypeBase.CreateBit
+                .CreateSequence((objSize.ByteAlignedSize).ToInt())
+                .CreateArgCode()
+                .CreateBitSequenceOperation(feature, size);
+        }
+
+        internal static CodeBase CreateBitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objBits, int argsBits)
+        {
+            var objSize = Size.Create(objBits);
+            var argsSize = Size.Create(argsBits);
+            return TypeBase.CreateBit.CreateSequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
+                .CreateArgCode()
+                .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
+        }
+
+        internal static CodeBase CreateBitSequenceDumpPrint(int objSize)
+        {
+            var alignedSize = Size.Create(objSize).ByteAlignedSize;
+            return TypeBase.CreateBit.CreateSequence(alignedSize.ToInt())
+                .CreateArgCode()
+                .CreateDumpPrint(alignedSize);
+        }
     }
 
     internal class InternalRefSequenceVisitor : Base
@@ -331,7 +348,7 @@ namespace Reni.Code
         public InternalRefSequenceVisitor()
         {
             _codeCache = new SimpleCache<CodeBase>(
-                () => HWString.Sequence<InternalRef>(_data).Apply1(x => x.Code).Serialize(CodeBase.CreateVoid()));
+                () => StringExtender.Sequence<InternalRef>(_data).Apply1(x => x.Code).Serialize(CodeBase.CreateVoid()));
         }
 
         [DumpData(false)]
@@ -342,7 +359,7 @@ namespace Reni.Code
             get
             {
                 var size = Size.Zero;
-                return HWString.Sequence<InternalRef>(_data).Apply1
+                return StringExtender.Sequence<InternalRef>(_data).Apply1
                     (
                     delegate(InternalRef x)
                         {

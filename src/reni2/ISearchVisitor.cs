@@ -14,5 +14,6 @@ namespace Reni
         ISearchVisitor Child(Type.Array target);
         ISearchVisitor Child(Type.Void target);
         ISearchVisitor Child(Bit target);
+        ISearchVisitor Child(Struct.Type target);
     }
 }

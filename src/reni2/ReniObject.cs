@@ -29,7 +29,7 @@ namespace Reni
 
         public override string Dump()
         {
-            return NodeDump + HWString.Surround(DumpData(), "{", "}");
+            return NodeDump + StringExtender.Surround(DumpData(), "{", "}");
         }
 
         public override string ToString()

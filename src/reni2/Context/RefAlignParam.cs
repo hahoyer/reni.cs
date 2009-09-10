@@ -22,7 +22,7 @@ namespace Reni.Context
         public int AlignBits { get { return _alignBits; } }
         public Size RefSize { get { return _refSize; } }
 
-        public bool Is_3_32 { get { return _alignBits == 3 && _refSize.ToInt() == 32; } }
+        public bool Is_3_32 { get { return _alignBits == BitsConst.SegmentAlignBits && _refSize.ToInt() == 32; } }
 
         public RefAlignParam Align(int alignBits)
         {

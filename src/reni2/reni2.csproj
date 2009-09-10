@@ -129,6 +129,9 @@
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
     <Compile Include="Type\EnableCut.cs" />
+    <Compile Include="Type\EnableCutFeature.cs" />
+    <Compile Include="Type\FunctionalType.cs" />
+    <Compile Include="Type\IFunctionalFeature.cs" />
     <Compile Include="Type\Pending.cs" />
     <Compile Include="Type\Sequence.cs" />
     <Compile Include="Parser\TokenClass\SyntaxError.cs" />
@@ -157,6 +160,8 @@
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\Ref.cs" />
     <Compile Include="Struct\PartialType.cs" />
+    <Compile Include="Type\SequenceOperationFeature.cs" />
+    <Compile Include="Type\SequenceOperationPrefixFeature.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />

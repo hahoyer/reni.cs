@@ -367,33 +367,5 @@ namespace Reni.Type
             NotImplementedMethod(category, count, refAlignParam);
             return null;
         }
-
-        internal static CodeBase CreateBitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, Size objSize, Size argsSize)
-        {
-            return CreateBit.CreateSequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
-                .CreateArgCode()
-                .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
-        }
-
-    }
-
-    internal class FunctionalType : TypeBase
-    {
-        [DumpData(true)]
-        private readonly TypeBase _objectType;
-
-        [DumpData(true)]
-        private readonly IFunctionalFeature _feature;
-
-        public FunctionalType(TypeBase objectType, IFunctionalFeature feature)
-        {
-            _objectType = objectType;
-            _feature = feature;
-        }
-
-        protected override Size GetSize() { return _objectType.Size; }
-        internal override string DumpShort() { return _objectType.DumpShort() + " " + _feature.DumpShort(); }
-        internal override IFunctionalFeature FunctionalFeature { get { return _feature; } }
-        internal override TypeBase StripFunctional() { return _objectType; }
     }
 }

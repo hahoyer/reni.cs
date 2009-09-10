@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Reni.Code;
 using Reni.Feature;
 using Reni.Type;
 
@@ -18,9 +19,24 @@ namespace Reni.Parser.TokenClass
     internal sealed class DumpPrint :
         Defineable,
         IFeature,
+        ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>,
         ISearchPath<ISearchPath<IFeature, Sequence>, Bit>
     {
         private readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
+        private readonly ISearchPath<IFeature, Ref> _structRefFeature = new StructRefFeature();
+
+        private sealed class StructRefFeature : ReniObject, ISearchPath<IFeature, Ref>, IFeature
+        {
+            IFeature ISearchPath<IFeature, Ref>.Convert(Ref type) { return this; }
+            bool IFeature.IsEval { get { return true; } }
+            TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
+
+            Result IFeature.Apply(Category category, Result objectResult)
+            {
+                NotImplementedMethod(category, objectResult);
+                return null;
+            }
+        }
 
         private sealed class BitSequenceFeature :
             ReniObject,
@@ -30,10 +46,16 @@ namespace Reni.Parser.TokenClass
             IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
             bool IFeature.IsEval { get { return true; } }
             TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
+
+            private static Result Apply(Category category, int objSize)
+            {
+                return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize));
+            }
+
             Result IFeature.Apply(Category category, Result objectResult)
             {
-                NotImplementedMethod(category,objectResult);
-                return objectResult.DumpPrintBitSequence() & category;
+                return Apply(category, objectResult.Type.SequenceCount)
+                    .UseWithArg(objectResult.ConvertToSequence(category));
             }
         }
 
@@ -47,6 +69,8 @@ namespace Reni.Parser.TokenClass
             NotImplementedMethod(category, objectResult);
             return null;
         }
+
+        public ISearchPath<IFeature, Ref> Convert(Struct.Type type) { return _structRefFeature; }
     }
 
     [Token("enable_cut")]
