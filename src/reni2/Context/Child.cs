@@ -27,9 +27,9 @@ namespace Reni.Context
         [DumpData(false)]
         internal override sealed Root RootContext { get { return Parent.RootContext; } }
 
-        protected override sealed Sequence<ContextBase> ObtainChildChain()
+        protected override sealed ContextBase[] ObtainChildChain()
         {
-            return Parent.ChildChain + this;
+            return Parent.ChildChain.Concat(new []{this}).ToArray();
         }
 
         internal override Result CreateArgsRefResult(Category category)

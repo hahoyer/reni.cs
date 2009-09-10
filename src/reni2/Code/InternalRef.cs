@@ -29,5 +29,11 @@ namespace Reni.Code
         Size IRefInCode.RefSize { get { return RefAlignParam.RefSize; } }
         RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IRefInCode.IsChildOf(ContextBase contextBase) { return false; }
+
+        internal CodeBase AccompayningDestructorCode(Size size)
+        {
+            size += Code.Size;
+            return DestructorCode.UseWithArg(InternalRefSequenceVisitor.InternalRefCode(RefAlignParam, size));
+        }
     }
 }

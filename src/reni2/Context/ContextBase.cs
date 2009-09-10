@@ -26,7 +26,7 @@ namespace Reni.Context
         [Node, DumpData(false)]
         private readonly Cache _cache;
 
-        private Sequence<ContextBase> _childChainCache;
+        private ContextBase[] _childChainCache;
 
         protected ContextBase()
             : base(_nextId++)
@@ -50,7 +50,7 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DumpData(false)]
-        internal Sequence<ContextBase> ChildChain
+        internal ContextBase[] ChildChain
         {
             get
             {
@@ -60,7 +60,7 @@ namespace Reni.Context
             }
         }
 
-        protected virtual Sequence<ContextBase> ObtainChildChain() { return StringExtender.Sequence(this); }
+        protected virtual ContextBase[] ObtainChildChain() { return new []{this}; }
 
         internal virtual string DumpShort() { return base.ToString(); }
 
@@ -123,15 +123,9 @@ namespace Reni.Context
             return result;
         }
 
-        internal bool IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
-
-        [UsedImplicitly]
-        internal bool IsStructParentOf(ContextBase child)
+        internal bool IsChildOf(ContextBase parentCandidate)
         {
-            if(IsChildOf(child))
-                return false;
-            NotImplementedMethod(child);
-            return false;
+            return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain);
         }
 
         internal void AssertCorrectRefs(Result result)
@@ -150,9 +144,7 @@ namespace Reni.Context
 
         private void CheckRef(IRefInCode @ref)
         {
-            Tracer.Assert(!@ref
-                               .IsChildOf(this), "context=" + Dump() + "\nref="
-                                                 + @ref.Dump());
+            Tracer.Assert(!@ref.IsChildOf(this), "context=" + Dump() + "\nref="+ @ref.Dump());
         }
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType) { return Result(Category.Code | Category.Type | Category.Refs, syntax).ConvertTo(resultType).Evaluate(); }

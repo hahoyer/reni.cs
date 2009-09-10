@@ -1,20 +1,19 @@
-﻿using HWClassLibrary.TreeStructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
-using Void=Reni.Type.Void;
 
 namespace Reni
 {
     [Serializable]
-    internal sealed class Result : ReniObject, ITreeNodeSupport, Sequence<Result>.ICombiner<Result>
+    internal sealed class Result : ReniObject, ITreeNodeSupport
     {
         private bool _isDirty;
         private Size _size;
@@ -131,9 +130,9 @@ namespace Reni
         {
             get
             {
-                if (HasRefs)
+                if(HasRefs)
                     return Refs;
-                if (HasCode)
+                if(HasCode)
                     return Code.Refs;
                 return null;
             }
@@ -143,8 +142,8 @@ namespace Reni
         {
             get
             {
-                Refs result = FindRefs;
-                if (result == null)
+                var result = FindRefs;
+                if(result == null)
                 {
                     DumpMethodWithBreak("No approriate result property defined");
                     Debugger.Break();
@@ -195,9 +194,7 @@ namespace Reni
             }
         }
 
-        internal bool HasArg
-        {
-            get { return HasCode && Code.HasArg; } }
+        internal bool HasArg { get { return HasCode && Code.HasArg; } }
 
 
         public override string DumpData()
@@ -237,9 +234,9 @@ namespace Reni
         private Result Filter(Category category)
         {
             var result = new Result
-                         {
-                             PendingCategory = PendingCategory & category
-                         };
+                             {
+                                 PendingCategory = PendingCategory & category
+                             };
 
             if(category.HasSize)
                 result._size = Size;
@@ -315,7 +312,7 @@ namespace Reni
         internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
             var trace = context.ObjectId == -11 && category.HasRefs && IsObjectId(syntax, 90);
-            StartMethodDumpWithBreak(trace, context,category,syntax);
+            StartMethodDumpWithBreak(trace, context, category, syntax);
             InternalAddCategories(context, category - CompleteCategory - PendingCategory, syntax);
             TreatPendingCategories(context, category - CompleteCategory, syntax);
             ReturnMethodDumpWithBreak(trace);
@@ -425,7 +422,7 @@ namespace Reni
         /// <param name="refInCode">The context.</param>
         /// <param name="replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
         /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<TRefInCode>(TRefInCode refInCode, Result replacement) 
+        internal Result ReplaceAbsoluteContextRef<TRefInCode>(TRefInCode refInCode, Result replacement)
             where TRefInCode : IRefInCode
         {
             if(HasRefs && !Refs.Contains(refInCode))
@@ -540,7 +537,7 @@ namespace Reni
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
         {
-            var result = Void.CreateResult(category);
+            var result = Reni.Type.Void.CreateResult(category);
             if(category.HasCode)
                 result.Code = CodeBase.CreateDumpPrintText("(");
 
@@ -580,18 +577,22 @@ namespace Reni
             return result;
         }
 
-        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs) 
-        : this()
+        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs)
+            : this()
         {
-            if (category.HasSize) _size = getSize();
-            if (category.HasType) _type = getType();
-            if (category.HasCode) _code = getCode();
-            if (category.HasRefs) _refs = getRefs();
+            if(category.HasSize)
+                _size = getSize();
+            if(category.HasType)
+                _type = getType();
+            if(category.HasCode)
+                _code = getCode();
+            if(category.HasRefs)
+                _refs = getRefs();
         }
 
         internal Result CreateFunctionalResult(Category category, IFunctionalFeature feature)
         {
-            if(!category.HasType) 
+            if(!category.HasType)
                 return this;
             return Type.CreateFunctionalType(feature).CreateResult(category, this);
         }
@@ -604,15 +605,9 @@ namespace Reni
             ;
         }
 
-        private Result ConvertToSequence(Category category, TypeBase elementType)
-        {
-            return Type.ConvertToSequence(category, elementType).UseWithArg(this);
-        }
+        private Result ConvertToSequence(Category category, TypeBase elementType) { return Type.ConvertToSequence(category, elementType).UseWithArg(this); }
 
-        internal Result ConvertToSequence(Category category)
-        {
-            return ConvertToSequence(category, TypeBase.CreateBit).Align(BitsConst.SegmentAlignBits);
-        }
+        internal Result ConvertToSequence(Category category) { return ConvertToSequence(category, TypeBase.CreateBit).Align(BitsConst.SegmentAlignBits); }
     }
 
     internal sealed class Error
