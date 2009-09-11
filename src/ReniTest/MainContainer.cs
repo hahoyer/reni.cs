@@ -22,8 +22,10 @@ namespace ReniTest
             const string fileName = "temptest.reni";
             var f = File.m(fileName);
             f.String = text;
-            return new Compiler(fileName);
-            //_compiler.Exec();
+            var compiler = new Compiler(fileName);
+            Profiler.Measure(()=>compiler.Exec());
+            Tracer.FlaggedLine(Profiler.Format(10,0.0));
+            return compiler;
         }
     }
 }
