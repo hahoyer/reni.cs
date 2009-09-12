@@ -6,7 +6,9 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 using Reni.Syntax;
 
 namespace Reni.Type
@@ -226,8 +228,7 @@ namespace Reni.Type
 
         internal Result DumpPrint(Category category)
         {
-            NotImplementedMethod(category);
-            return null;
+            return GetUnaryResult<IFeature>(category, new Parser.TokenClass.DumpPrint());
         }
 
         internal virtual Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
@@ -274,6 +275,11 @@ namespace Reni.Type
         internal Result ConvertToSequence(Category category, TypeBase elementType)
         {
             return Conversion(category, CreateSequenceType(elementType));
+        }
+
+        internal Result ConvertToBitSequence(Category category)
+        {
+            return ConvertToSequence(category, CreateBit).Align(BitsConst.SegmentAlignBits);
         }
 
         protected virtual Result ConvertToItself(Category category) { return CreateArgResult(category); }
@@ -352,20 +358,39 @@ namespace Reni.Type
 
         internal TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(SequenceCount); }
 
-        internal TFeature SearchDefineable<TFeature>(DefineableToken defineableToken)
+        internal TFeature SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class
         {
-            var searchVisitor = new RootSearchVisitor<TFeature>(defineableToken.TokenClass);
+            var searchVisitor = new RootSearchVisitor<TFeature>(defineable);
             searchVisitor.Search(this);
             return searchVisitor.Result;
         }
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        internal virtual Result ArrayDumpPrintFromRef(Category category, int count, RefAlignParam refAlignParam)
+        internal Result ArrayDumpPrintFromRef(Category category, int count, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category, count, refAlignParam);
             return null;
+        }
+
+        internal Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
+            where TFeature : class
+        {
+            var feature = SearchDefineable<TFeature>(defineable).Feature();
+            if (feature == null)
+                return null;
+
+            var resultType = feature.ResultType;
+
+            if (!category.HasCode && !category.HasRefs && resultType != null)
+                return resultType.CreateResult(category);
+
+            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
+            var result = feature.Apply(applyCategory, this);
+            if (resultType != null)
+                result = result.ConvertTo(resultType);
+            return result & category;
         }
     }
 }

@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Parser;
+using Reni.Parser.TokenClass;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
@@ -219,25 +220,25 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result GetResult(Category category, ICompileSyntax left, DefineableToken defineableToken, ICompileSyntax right)
+        internal Result GetResult(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
             var categoryForFunctionals = category;
             if (right != null)
                 categoryForFunctionals |= Category.Type;
 
-            var suffixResult = GetSuffixResult(categoryForFunctionals, left, defineableToken);
+            var suffixResult = GetSuffixResult(categoryForFunctionals, left, defineable);
             if(suffixResult == null)
             {
                 if(left != null)
                 {
-                    NotImplementedMethod(category, left, defineableToken, right);
+                    NotImplementedMethod(category, left, defineable, right);
                     return null;
                 }
 
-                var prefixResult = GetPrefixResult(category, defineableToken, right);
+                var prefixResult = GetPrefixResult(category, defineable, right);
                 if (prefixResult != null)
                     return prefixResult;
-                suffixResult = GetContextResult(categoryForFunctionals, defineableToken);
+                suffixResult = GetContextResult(categoryForFunctionals, defineable);
             }
             if(right == null)
                 return suffixResult;
@@ -245,55 +246,48 @@ namespace Reni.Context
             var feature = suffixResult.Type.FunctionalFeature;
             if (feature != null)
                 return feature.Apply(category, suffixResult.StripFunctional(), ResultAsRef(category|Category.Type, right));
-            NotImplementedMethod(category, left, defineableToken, right, "suffixResult", suffixResult,"feature",feature);
+            NotImplementedMethod(category, left, defineable, right, "suffixResult", suffixResult,"feature",feature);
             return null;
         }
 
-        private Result GetContextResult(Category category, DefineableToken defineableToken)
+        private Result GetContextResult(Category category, Defineable defineable)
         {
-            var feature = SearchDefinable(defineableToken);
+            var feature = SearchDefinable(defineable);
 
-            NotImplementedMethod(category, defineableToken,"feature",feature);
+            NotImplementedMethod(category, defineable,"feature",feature);
             return null;
         }
 
-        private IContextFeature SearchDefinable(DefineableToken defineableToken)
+        private IContextFeature SearchDefinable(Defineable defineable)
         {
-            NotImplementedMethod(defineableToken);
+            NotImplementedMethod(defineable);
             return null;
         }
 
-        private Result GetPrefixResult(Category category, DefineableToken defineableToken, ICompileSyntax right)
+        private Result GetPrefixResult(Category category, Defineable defineable, ICompileSyntax right)
         {
-            return GetUnaryResult<IPrefixFeature>(category, right, defineableToken);
+            return GetUnaryResult<IPrefixFeature>(category, right, defineable);
         }
 
-        private Result GetSuffixResult(Category category, ICompileSyntax left, DefineableToken defineableToken)
+        private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
-            return GetUnaryResult<IFeature>(category, left, defineableToken);
+            return GetUnaryResult<IFeature>(category, left, defineable);
         }
 
-        private Result GetUnaryResult<TFeature>(Category category, ICompileSyntax left, DefineableToken defineableToken) 
+        private Result GetUnaryResult<TFeature>(Category category, ICompileSyntax left, Defineable defineable)
             where TFeature : class
         {
             if (left == null)
                 return null;
-            var feature = Type(left).EnsureRef(RefAlignParam).SearchDefineable<TFeature>(defineableToken).Feature();
-            if(feature == null)
+            var leftType = Type(left).EnsureRef(RefAlignParam);
+
+            var result = leftType.GetUnaryResult<TFeature>(category, defineable);
+            if(result == null)
                 return null;
 
-            var resultType = feature.ResultType;
-            if (!category.HasCode && !category.HasRefs && resultType != null)
-                return resultType.CreateResult(category);
-
-            var resultCategory = Category.Type | (feature.IsEval ? category : Category.None);
-            var resultAsRef = ResultAsRef(resultCategory, left);
-            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
-            var result = feature.Apply(applyCategory, resultAsRef);
-            if (resultType == null)
-                return result & category;
-
-            return result.ConvertTo(resultType) & category;
+            if (result.HasArg)
+                result = result.UseWithArg(ResultAsRef(category, left));
+            return result;
         }
 
         internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingContext().PendingResult(category, syntax); }

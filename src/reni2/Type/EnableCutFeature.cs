@@ -12,13 +12,11 @@ namespace Reni.Type
 
         public EnableCutFeature(Sequence sequence) { _sequence = sequence; }
 
-        bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            return objectResult.Type.ConvertTo(category, new EnableCut(_sequence))
-                .UseWithArg(objectResult);
+            return objectType.ConvertTo(category, new EnableCut(_sequence));
         }
     }
 }

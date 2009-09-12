@@ -12,9 +12,8 @@ namespace Reni.Feature
 
     internal interface IFeature 
     {
-        bool IsEval { get; }
         TypeBase ResultType { get; }
-        Result Apply(Category category, Result objectResult);
+        Result Apply(Category category, TypeBase objectType);
     }
 
     internal interface IPrefixFeature 

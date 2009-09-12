@@ -24,18 +24,17 @@ namespace Reni.Type
 
         IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
 
-        bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IFeature.Apply(Category category, Result objectResult) { return objectResult.CreateFunctionalResult(category, this); }
+        Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.CreateFunctionalType(this).CreateArgResult(category); }
 
         string IDumpShortProvider.DumpShort() { return _definable.DataFunctionName; }
 
         Result IFunctionalFeature.Apply(Category category, Result objectResult, Result argsResult)
         {
             var result = Apply(category, objectResult.Type.SequenceCount, argsResult.Type.SequenceCount);
-            var convertedObjectResult = objectResult.ConvertToSequence(category);
-            var convertedArgsResult = argsResult.ConvertToSequence(category);
+            var convertedObjectResult = objectResult.ConvertToBitSequence(category);
+            var convertedArgsResult = argsResult.ConvertToBitSequence(category);
             return result.UseWithArg(convertedObjectResult.CreateSequence(convertedArgsResult));
         }
 

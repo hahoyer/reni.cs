@@ -23,13 +23,12 @@ namespace Reni.Type
             _definable = definable;
         }
 
-        bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            var result = Apply(category,objectResult.Type.UnrefSize);
-            return result.UseWithArg(objectResult.ConvertToSequence(category));
+            return Apply(category,objectType.UnrefSize)
+                .UseWithArg(objectType.ConvertToBitSequence(category));
         }
 
         IPrefixFeature ISearchPath<IPrefixFeature, Sequence>.Convert(Sequence type) { return this; }

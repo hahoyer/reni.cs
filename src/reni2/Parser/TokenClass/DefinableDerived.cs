@@ -10,9 +10,8 @@ namespace Reni.Parser.TokenClass
     [Token("type")]
     internal sealed class TtypeT : Defineable, IFeature
     {
-        bool IFeature.IsEval { get { return false; } }
         TypeBase IFeature.ResultType { get { return null; } }
-        Result IFeature.Apply(Category category, Result objectResult) { return objectResult.Type.AutomaticDereference().TypeOperator(category); }
+        Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.AutomaticDereference().TypeOperator(category); }
     }
 
     [Token("dump_print")]
@@ -23,20 +22,6 @@ namespace Reni.Parser.TokenClass
         ISearchPath<ISearchPath<IFeature, Sequence>, Bit>
     {
         private readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
-        private readonly ISearchPath<IFeature, Ref> _structRefFeature = new StructRefFeature();
-
-        private sealed class StructRefFeature : ReniObject, ISearchPath<IFeature, Ref>, IFeature
-        {
-            IFeature ISearchPath<IFeature, Ref>.Convert(Ref type) { return this; }
-            bool IFeature.IsEval { get { return true; } }
-            TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
-
-            Result IFeature.Apply(Category category, Result objectResult)
-            {
-                NotImplementedMethod(category, objectResult);
-                return null;
-            }
-        }
 
         private sealed class BitSequenceFeature :
             ReniObject,
@@ -44,7 +29,6 @@ namespace Reni.Parser.TokenClass
             IFeature
         {
             IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
-            bool IFeature.IsEval { get { return true; } }
             TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
 
             private static Result Apply(Category category, int objSize)
@@ -52,25 +36,23 @@ namespace Reni.Parser.TokenClass
                 return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize));
             }
 
-            Result IFeature.Apply(Category category, Result objectResult)
+            Result IFeature.Apply(Category category, TypeBase objectType)
             {
-                return Apply(category, objectResult.Type.SequenceCount)
-                    .UseWithArg(objectResult.ConvertToSequence(category));
+                return Apply(category, objectType.SequenceCount).UseWithArg(objectType.ConvertToBitSequence(category));
             }
         }
 
         ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
+        ISearchPath<IFeature, Ref> ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintFromRefFeature; }
 
-        bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
 
-        Result IFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            NotImplementedMethod(category, objectResult);
+            NotImplementedMethod(category, objectType);
             return null;
         }
 
-        public ISearchPath<IFeature, Ref> Convert(Struct.Type type) { return _structRefFeature; }
     }
 
     [Token("enable_cut")]

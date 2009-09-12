@@ -6,7 +6,6 @@ using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -20,39 +19,56 @@ namespace Reni.Struct
         [Node]
         internal readonly FullContext Context;
 
+        private readonly ISearchPath<IFeature, Ref> _dumpPrintFromRefFeature;
+
+        private class DumpPrintFromRefFeatureImplementation : ReniObject
+                                                              , ISearchPath<IFeature, Ref>, IFeature
+        {
+            [DumpData(true)]
+            private readonly Type _type;
+
+            public DumpPrintFromRefFeatureImplementation(Type type) { _type = type; }
+
+            IFeature ISearchPath<IFeature, Ref>.Convert(Ref @ref) { return this; }
+            TypeBase IFeature.ResultType { get { return CreateVoid; } }
+
+            Result IFeature.Apply(Category category, TypeBase objectType)
+            {
+                return _type.DumpPrintFromRef(category);
+            }
+        }
+
         internal Type(FullContext context)
         {
+            _dumpPrintFromRefFeature = new DumpPrintFromRefFeatureImplementation(this);
             Context = context;
         }
 
-        protected override Size GetSize()
-        {
-            return Context.InternalSize();
-        }
+        protected override Size GetSize() { return Context.InternalSize(); }
 
-        internal override string DumpShort()
-        {
-            return "type." + ObjectId + "(context." + Context.DumpShort() + ")";
-        }
+        internal override string DumpShort() { return "type." + ObjectId + "(context." + Context.DumpShort() + ")"; }
 
         protected internal override int IndexSize { get { return Context.IndexSize; } }
 
         private List<ICompileSyntax> StatementList { get { return Context.StatementList; } }
 
-        internal override Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
-        {
-            return Context.AccessResultAsArgFromRef(category, position, refAlignParam);
-        }
+        [DumpData(false)]
+        internal ISearchPath<IFeature, Ref> DumpPrintFromRefFeature { get { return _dumpPrintFromRefFeature; } }
+
+        internal override Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam) { return Context.AccessResultAsArgFromRef(category, position, refAlignParam); }
 
         internal override Result AccessResultAsContextRefFromRef(Category category, int position,
-                                                                 RefAlignParam refAlignParam)
-        {
-            return Context.AccessResultAsContextRefFromRef(category, position, refAlignParam);
-        }
+                                                                 RefAlignParam refAlignParam) { return Context.AccessResultAsContextRefFromRef(category, position, refAlignParam); }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
             Tracer.Assert(refAlignParam.Equals(Context.RefAlignParam));
+            return DumpPrintFromRef(category);
+        }
+
+        private Result DumpPrintFromRef(Category category)
+        {
+            var refAlignParam = Context.RefAlignParam;
             var result = new List<Result>();
             for(var i = 0; i < StatementList.Count; i++)
             {
@@ -81,13 +97,11 @@ namespace Reni.Struct
         internal override void Search(ISearchVisitor searchVisitor)
         {
             var searchVisitorChild = searchVisitor as SearchVisitor<ISearchPath<
-                IFeature, Ref>>;
-            if (searchVisitorChild != null)
+                                                          IFeature, Ref>>;
+            if(searchVisitorChild != null)
                 searchVisitorChild.InternalResult = Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
             searchVisitor.Child(this).Search();
             base.Search(searchVisitor);
         }
-
-    
     }
 }

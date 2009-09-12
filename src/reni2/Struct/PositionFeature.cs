@@ -32,12 +32,11 @@ namespace Reni.Struct
             return this;
         }
 
-        bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            NotImplementedMethod(category, objectResult);
+            NotImplementedMethod(category, objectType);
             return null;
         }
 

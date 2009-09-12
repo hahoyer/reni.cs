@@ -84,12 +84,11 @@ namespace Reni.Type
     {
         private Array _type;
         public ConcatArraysFeature(Array type) { _type = type; }
-        bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            NotImplementedMethod(category, objectResult);
+            NotImplementedMethod(category, objectType);
             return null;
         }
     }
@@ -132,12 +131,11 @@ namespace Reni.Type
             return ApplyResult(callContext, category, @object, args, elementType, 1);
         }
 
-        bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            NotImplementedMethod(category, objectResult);
+            NotImplementedMethod(category, objectType);
             return null;
         }
     }
@@ -154,12 +152,11 @@ namespace Reni.Type
             ICompileSyntax @object,
             ICompileSyntax args) { return ApplyResult(callContext, category, @object, args, _type.Element, _type.Count + 1); }
 
-        bool IFeature.IsEval { get { return true; } }
         TypeBase IFeature.ResultType { get { return null; } }
 
-        Result IFeature.Apply(Category category, Result objectResult)
+        Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            NotImplementedMethod(category, objectResult);
+            NotImplementedMethod(category, objectType);
             return null;
         }
     }

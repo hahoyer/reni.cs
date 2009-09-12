@@ -13,7 +13,7 @@ namespace Reni.Parser
         [Node]
         internal readonly ICompileSyntax Left;
         [Node]
-        private readonly DefineableToken DefineableToken;
+        internal readonly DefineableToken DefineableToken;
         [Node]
         internal readonly ICompileSyntax Right;
 
@@ -39,7 +39,7 @@ namespace Reni.Parser
         {
             var trace = ObjectId == -90 && category.HasRefs;
             StartMethodDumpWithBreak(trace, context, category);
-            var result = context.GetResult(category, Left, DefineableToken, Right);
+            var result = context.GetResult(category, Left, DefineableToken.TokenClass, Right);
             return ReturnMethodDumpWithBreak(trace, result);
         }
     }

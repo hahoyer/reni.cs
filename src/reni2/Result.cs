@@ -590,24 +590,18 @@ namespace Reni
                 _refs = getRefs();
         }
 
-        internal Result CreateFunctionalResult(Category category, IFunctionalFeature feature)
-        {
-            if(!category.HasType)
-                return this;
-            return Type.CreateFunctionalType(feature).CreateResult(category, this);
-        }
-
         internal Result StripFunctional()
         {
             if(!HasType)
                 return this;
             return Type.StripFunctional().CreateResult(this);
-            ;
         }
 
-        private Result ConvertToSequence(Category category, TypeBase elementType) { return Type.ConvertToSequence(category, elementType).UseWithArg(this); }
-
-        internal Result ConvertToSequence(Category category) { return ConvertToSequence(category, TypeBase.CreateBit).Align(BitsConst.SegmentAlignBits); }
+        internal Result ConvertToBitSequence(Category category)
+        {
+            return Type.ConvertToBitSequence(category).UseWithArg(this)
+                ;
+        }
     }
 
     internal sealed class Error
@@ -633,4 +627,6 @@ namespace Reni
         internal ContextBase Context { get { return _context; } }
         internal ICompileSyntax Syntax { get { return _syntax; } }
     }
+
+
 }

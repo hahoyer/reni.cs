@@ -1,10 +1,9 @@
-﻿using HWClassLibrary.TreeStructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
+using HWClassLibrary.TreeStructure;
 using NUnit.Framework;
 using Reni.Code;
 using Reni.Context;
@@ -45,7 +44,8 @@ namespace Reni
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// created 14.07.2007 15:59 on HAHOYER-DELL by hh
-        public Compiler(string fileName) : this(new CompilerParameters(), fileName) {}
+        public Compiler(string fileName)
+            : this(new CompilerParameters(), fileName) { }
 
         internal FunctionList Functions { get { return RootContext.Functions; } }
 
@@ -97,7 +97,7 @@ namespace Reni
             get
             {
                 if(_code == null)
-                    _code = Struct.Container.Create(Syntax.Token, Syntax).Result(RootContext,Category.Code).Code;
+                    _code = Struct.Container.Create(Syntax.Token, Syntax).Result(RootContext, Category.Code).Code;
 
                 return _code;
             }
@@ -211,7 +211,6 @@ namespace Reni
             }
             return BitsConst.OutStream;
         }
-
     }
 
     /// <summary>
@@ -225,6 +224,7 @@ namespace Reni
         /// </summary>
         [Node, DumpData(true)]
         public TraceParamters Trace = new TraceParamters();
+
         public bool ParseOnly;
 
         #region Nested type: TraceParamters
