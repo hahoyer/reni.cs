@@ -36,7 +36,7 @@ namespace Reni.Parser.TokenClass
             return Name.Name + ": " + Definition.DumpShort();
         }
 
-        protected internal override IParsedSyntax SurroundedByParenthesis(Token token)
+        protected override IParsedSyntax SurroundedByParenthesis(Token token)
         {
             return Container.Create(token, this);
         }

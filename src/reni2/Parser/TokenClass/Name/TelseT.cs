@@ -10,9 +10,9 @@ namespace Reni.Parser.TokenClass.Name
     {
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntax.IsNotNull(left);
-            ParsedSyntax.IsNotNull(right);
-            return left.CreateElseSyntax(token, ParsedSyntax.ToCompiledSyntax(right));
+            ParsedSyntaxExtender.AssertIsNotNull(left);
+            ParsedSyntaxExtender.AssertIsNotNull(right);
+            return left.CreateElseSyntax(token, ParsedSyntaxExtender.CheckedToCompiledSyntax(right));
         }
     }
 }

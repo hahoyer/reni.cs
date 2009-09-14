@@ -62,8 +62,7 @@ namespace Reni.Struct
             return context.CreateStruct(this).ConstructorResult(category);
         }
 
-        [DumpData(false)]
-        protected internal override ICompileSyntax ToCompileSyntax { get { return this; } }
+        protected override ICompileSyntax ToCompiledSyntax() { return this; }
 
         [DumpData(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
@@ -116,7 +115,7 @@ namespace Reni.Struct
                 Converters.Add(List.Count);
             }
 
-            List.Add(parsedSyntax.ToCompileSyntax);
+            List.Add(parsedSyntax.ToCompiledSyntax());
         }
 
         public string DumpPrintText(ContextBase context)

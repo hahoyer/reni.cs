@@ -137,7 +137,7 @@ namespace Reni.Code
             return result ?? this;
         }
 
-        [DumpExcept(false)]
+        [DumpData(false)]
         internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
 
         /// <summary>

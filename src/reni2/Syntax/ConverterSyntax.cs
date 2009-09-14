@@ -17,7 +17,7 @@ namespace Reni.Syntax
             return "converter (" + Body.DumpShort() + ")";
         }
 
-        protected internal override IParsedSyntax SurroundedByParenthesis(Token token)
+        protected override IParsedSyntax SurroundedByParenthesis(Token token)
         {
             return Container.Create(token, this);
         }

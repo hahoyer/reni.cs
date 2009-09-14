@@ -18,6 +18,7 @@ namespace Reni.Parser.TokenClass
     internal sealed class DumpPrint :
         Defineable,
         IFeature,
+        ISearchPath<IFeature, TypeType>,
         ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>,
         ISearchPath<ISearchPath<IFeature, Sequence>, Bit>
     {
@@ -31,19 +32,14 @@ namespace Reni.Parser.TokenClass
             IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
             TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
 
-            private static Result Apply(Category category, int objSize)
-            {
-                return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize));
-            }
+            private static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
 
-            Result IFeature.Apply(Category category, TypeBase objectType)
-            {
-                return Apply(category, objectType.SequenceCount).UseWithArg(objectType.ConvertToBitSequence(category));
-            }
+            Result IFeature.Apply(Category category, TypeBase objectType) { return Apply(category, objectType.SequenceCount).UseWithArg(objectType.ConvertToBitSequence(category)); }
         }
 
         ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<IFeature, Ref> ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintFromRefFeature; }
+        IFeature ISearchPath<IFeature, TypeType>.Convert(TypeType type) { return type.DumpPrintFeature; }
 
         TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
 
@@ -52,7 +48,6 @@ namespace Reni.Parser.TokenClass
             NotImplementedMethod(category, objectType);
             return null;
         }
-
     }
 
     [Token("enable_cut")]

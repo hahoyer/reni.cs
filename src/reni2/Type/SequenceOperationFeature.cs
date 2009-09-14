@@ -30,8 +30,9 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return _definable.DataFunctionName; }
 
-        Result IFunctionalFeature.Apply(Category category, Result objectResult, Result argsResult)
+        Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
+            var objectResult = functionalResult.StripFunctional();
             var result = Apply(category, objectResult.Type.SequenceCount, argsResult.Type.SequenceCount);
             var convertedObjectResult = objectResult.ConvertToBitSequence(category);
             var convertedArgsResult = argsResult.ConvertToBitSequence(category);

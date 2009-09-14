@@ -52,7 +52,7 @@ namespace Reni.Parser.TokenClass
             return "(" + _left.DumpShort() + ", " + _right.DumpShort() + ")";
         }
 
-        protected internal override IParsedSyntax SurroundedByParenthesis(Token token)
+        protected override IParsedSyntax SurroundedByParenthesis(Token token)
         {
             var list = new List<IParsedSyntax>();
             IParsedSyntax next = this;

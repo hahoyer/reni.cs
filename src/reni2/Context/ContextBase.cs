@@ -8,7 +8,6 @@ using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Struct;
 using Reni.Syntax;
@@ -155,32 +154,6 @@ namespace Reni.Context
         [UsedImplicitly]
         internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
 
-        internal Result ApplyResult(Category category, ICompileSyntax @object, Func<Ref, Result> apply)
-        {
-            var objectResult = ResultAsRef(category | Category.Type, @object);
-            return apply((Ref) objectResult.Type)
-                .Align(AlignBits)
-                .UseWithArg(objectResult);
-        }
-
-        internal Result ConvertToSequence(Category category, ICompileSyntax syntax, TypeBase elementType)
-        {
-            var resultAsRef = ResultAsRef(category | Category.Type, syntax);
-            var target = resultAsRef.Type.CreateSequenceType(elementType);
-            var convertTo = resultAsRef.ConvertTo(target);
-            var result1 = convertTo.Align(AlignBits);
-            var result = result1;
-            return result;
-        }
-
-        private Result ConvertToViaRef(Category category, ICompileSyntax syntax, TypeBase target)
-        {
-            var resultAsRef = ResultAsRef(category | Category.Type, syntax);
-            var convertTo = resultAsRef.ConvertTo(target);
-            var result = convertTo.Align(AlignBits);
-            return result;
-        }
-
         internal Result ResultAsRef(Category category, ICompileSyntax syntax)
         {
             var result = Result(category | Category.Type, syntax);
@@ -245,23 +218,16 @@ namespace Reni.Context
 
             var feature = suffixResult.Type.FunctionalFeature;
             if (feature != null)
-                return feature.Apply(category, suffixResult.StripFunctional(), ResultAsRef(category|Category.Type, right));
+                return feature.Apply(category, suffixResult, ResultAsRef(category|Category.Type, right));
             NotImplementedMethod(category, left, defineable, right, "suffixResult", suffixResult,"feature",feature);
-            return null;
-        }
-
-        private Result GetContextResult(Category category, Defineable defineable)
-        {
-            var feature = SearchDefinable(defineable);
-
-            NotImplementedMethod(category, defineable,"feature",feature);
             return null;
         }
 
         private IContextFeature SearchDefinable(Defineable defineable)
         {
-            NotImplementedMethod(defineable);
-            return null;
+            var visitor = new ContextSearchVisitor(defineable);
+            visitor.Search(this);
+            return visitor.Result;
         }
 
         private Result GetPrefixResult(Category category, Defineable defineable, ICompileSyntax right)
@@ -288,6 +254,24 @@ namespace Reni.Context
             if (result.HasArg)
                 result = result.UseWithArg(ResultAsRef(category, left));
             return result;
+        }
+
+        private Result GetContextResult(Category category, Defineable defineable)
+        {
+            IContextFeature feature = SearchDefinable(defineable);
+            if (feature == null)
+                return null;
+
+            var resultType = feature.ResultType;
+
+            if (!category.HasCode && !category.HasRefs && resultType != null)
+                return resultType.CreateResult(category);
+
+            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
+            var result = feature.Apply(applyCategory);
+            if (resultType != null)
+                result = result.ConvertTo(resultType);
+            return result & category;
         }
 
         internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingContext().PendingResult(category, syntax); }

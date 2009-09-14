@@ -20,8 +20,8 @@ namespace Reni.Parser.TokenClass
             if(left == null && right == null)
                 return new DefinableTokenSyntax(token);
             if(left == null)
-                return new ExpressionSyntax(null, token, ParsedSyntax.ToCompiledSyntaxOrNull(right));
-            return left.CreateSyntax(token, right);
+                return new ExpressionSyntax(null, token, ParsedSyntaxExtender.ToCompiledSyntaxOrNull(right));
+            return left.CreateSyntaxOrDeclaration(token, right);
         }
 
         internal override IParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax,
@@ -51,7 +51,7 @@ namespace Reni.Parser.TokenClass
             _extensionSyntax = extensionSyntax;
         }
 
-        protected internal override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
+        protected override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
         {
             return new DeclarationSyntax(_extensionSyntax, _defineableToken, token, right);
         }

@@ -27,8 +27,8 @@ namespace Reni.Parser.TokenClass.Symbol
 
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntax.IsNull(left);
-            ParsedSyntax.IsNull(right);
+            left.AssertIsNull();
+            right.AssertIsNull();
             return new ExclamationSyntax(token);
         }
     }
@@ -39,7 +39,7 @@ namespace Reni.Parser.TokenClass.Symbol
     {
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntax.IsNull(right);
+            right.AssertIsNull();
             return ((DeclarationExtensionSyntax) left).ExtendByProperty(token);
         }
     }
@@ -50,7 +50,7 @@ namespace Reni.Parser.TokenClass.Symbol
     {
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntax.IsNull(right);
+            right.AssertIsNull();
             return ((DeclarationExtensionSyntax) left).ExtendByConverter(token);
         }
     }
@@ -120,9 +120,9 @@ namespace Reni.Parser.TokenClass.Symbol
 
         internal override bool IsProperty { get { return true; } }
 
-        protected internal override IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
+        protected override IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right)
         {
-            IsNull(right);
+            right.AssertIsNull();
             return token.TokenClass.CreateDeclarationPartSyntax(this, token);
         }
     }
@@ -137,9 +137,9 @@ namespace Reni.Parser.TokenClass.Symbol
             Token = otherToken;
         }
 
-        protected internal override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
+        protected override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
         {
-            return new ConverterSyntax(Token, ToCompiledSyntax(right));
+            return new ConverterSyntax(Token, right.CheckedToCompiledSyntax());
         }
     }
 

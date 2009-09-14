@@ -1,7 +1,9 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -12,23 +14,16 @@ namespace Reni.Parser
     {
         private static bool _isInDump;
         internal readonly Token Token;
-#pragma warning disable 649
-        // Warnind disabled, since it is used for debugging purposes
-        internal static bool IsDetailedDumpRequired = true;
-#pragma warning restore 649
 
-        protected ParsedSyntax(Token token)
-        {
-            Token = token;
-        }
+        [UsedImplicitly]
+        internal static bool IsDetailedDumpRequired = true;
+
+        protected ParsedSyntax(Token token) { Token = token; }
 
         protected ParsedSyntax(Token token, int nextObjectId)
-            : base(nextObjectId)
-        {
-            Token = token;
-        }
+            : base(nextObjectId) { Token = token; }
 
-        [DumpData(false)]
+        [DumpData(false), UsedImplicitly]
         public new string NodeDump { get { return base.NodeDump + " " + DumpShort(); } }
 
         public override sealed string Dump()
@@ -49,123 +44,81 @@ namespace Reni.Parser
             return result;
         }
 
-        string IParsedSyntax.DumpShort()
-        {
-            return DumpShort();
-        }
+        string IParsedSyntax.DumpShort() { return DumpShort(); }
 
         Token IParsedSyntax.Token { get { return Token; } }
 
-        IParsedSyntax IParsedSyntax.SurroundedByParenthesis(Token token)
+        IParsedSyntax IParsedSyntax.SurroundedByParenthesis(Token token) { return SurroundedByParenthesis(token); }
+
+        IParsedSyntax IParsedSyntax.CreateDeclarationSyntax(Token token, IParsedSyntax right) { return CreateDeclarationSyntax(token, right); }
+
+        ICompileSyntax IParsedSyntax.ToCompiledSyntax() { return ToCompiledSyntax(); }
+
+        protected virtual ICompileSyntax ToCompiledSyntax()
         {
-            return SurroundedByParenthesis(token);
+            NotImplementedMethod();
+            return null;
         }
 
-        IParsedSyntax IParsedSyntax.CreateDeclarationSyntax(Token token, IParsedSyntax right)
-        {
-            return CreateDeclarationSyntax(token, right);
-        }
+        IParsedSyntax IParsedSyntax.CreateThenSyntax(Token token, ICompileSyntax condition) { return CreateThenSyntax(token, condition); }
 
-        [DumpData(false)]
-        ICompileSyntax IParsedSyntax.ToCompileSyntax { get { return ToCompileSyntax; } }
+        IParsedSyntax IParsedSyntax.CreateSyntaxOrDeclaration(Token token, IParsedSyntax right) { return CreateSyntaxOrDeclaration(token, right); }
 
-        [DumpData(false)]
-        internal protected virtual ICompileSyntax ToCompileSyntax
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        IParsedSyntax IParsedSyntax.CreateElseSyntax(Token token, ICompileSyntax elseSyntax) { return CreateElseSyntax(token, elseSyntax); }
 
-        IParsedSyntax IParsedSyntax.CreateThenSyntax(Token token, ICompileSyntax condition)
-        {
-            return CreateThenSyntax(token, condition);
-        }
+        protected virtual IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition) { return new ThenSyntax(condition, token, ToCompiledSyntax()); }
 
-        IParsedSyntax IParsedSyntax.CreateSyntax(Token token, IParsedSyntax right)
-        {
-            return CreateSyntax(token, right);
-        }
-
-        IParsedSyntax IParsedSyntax.CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
-        {
-            return CreateElseSyntax(token, elseSyntax);
-        }
-
-        internal protected virtual IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition)
-        {
-            return new ThenSyntax(condition, token, ToCompileSyntax);
-        }
-
-        internal protected virtual IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
+        protected virtual IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax)
         {
             NotImplementedMethod(token, elseSyntax);
             return null;
         }
 
-        internal protected virtual string DumpShort()
-        {
-            return Token.Name;
-        }
+        protected internal virtual string DumpShort() { return Token.Name; }
 
-        internal protected virtual IParsedSyntax CreateListSyntax(Token token, IParsedSyntax right)
+        protected virtual IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
         {
             NotImplementedMethod(token, right);
             return null;
         }
 
-        internal protected virtual IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
-        {
-            NotImplementedMethod(token, right);
-            return null;
-        }
-
-        internal protected virtual IParsedSyntax SurroundedByParenthesis(Token token)
+        protected virtual IParsedSyntax SurroundedByParenthesis(Token token)
         {
             NotImplementedMethod(token);
             return null;
         }
 
-        internal protected virtual IParsedSyntax CreateSyntax(Token token, IParsedSyntax right)
+        protected virtual IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right)
         {
-            NotImplementedMethod(token, right);
-            return null;
+            return new ExpressionSyntax(ToCompiledSyntax(), token, right.ToCompiledSyntaxOrNull());
         }
 
-        internal protected virtual string FilePosition()
-        {
-            return Token.FilePosition;
-        }
-
-        internal static ICompileSyntax ToCompiledSyntax(IParsedSyntax parsedSyntax)
-        {
-            Tracer.Assert(parsedSyntax != null);
-            return parsedSyntax.ToCompileSyntax;
-        }
-
-        internal static void IsNull(IParsedSyntax parsedSyntax)
-        {
-            Tracer.Assert(parsedSyntax == null);
-        }
-
-        internal static void IsNotNull(IParsedSyntax parsedSyntax)
-        {
-            Tracer.Assert(parsedSyntax != null);
-        }
-
-        internal static ICompileSyntax ToCompiledSyntaxOrNull(IParsedSyntax parsedSyntax)
-        {
-            if(parsedSyntax == null)
-                return null;
-            return parsedSyntax.ToCompileSyntax;
-        }
+        protected virtual string FilePosition() { return Token.FilePosition; }
 
         /// <summary>
         /// Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Syntax"; } }
+    }
+
+    internal static class ParsedSyntaxExtender
+    {
+        internal static ICompileSyntax CheckedToCompiledSyntax(this IParsedSyntax parsedSyntax)
+        {
+            parsedSyntax.AssertIsNotNull();
+            return parsedSyntax.ToCompiledSyntax();
+        }
+
+        internal static void AssertIsNull(this IParsedSyntax parsedSyntax) { Tracer.Assert(parsedSyntax == null); }
+
+        internal static void AssertIsNotNull(this IParsedSyntax parsedSyntax) { Tracer.Assert(parsedSyntax != null); }
+
+        internal static ICompileSyntax ToCompiledSyntaxOrNull(this IParsedSyntax parsedSyntax)
+        {
+            if(parsedSyntax == null)
+                return null;
+            return parsedSyntax.ToCompiledSyntax();
+        }
     }
 }

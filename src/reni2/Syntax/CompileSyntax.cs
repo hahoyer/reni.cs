@@ -37,12 +37,10 @@ namespace Reni.Syntax
             return null;
         }
 
-        internal protected override IParsedSyntax SurroundedByParenthesis(Token token) { return this; }
+        protected override IParsedSyntax SurroundedByParenthesis(Token token) { return this; }
 
-        [DumpData(false)]
-        internal protected override ICompileSyntax ToCompileSyntax { get { return this; } }
-
-        internal protected override IParsedSyntax CreateSyntax(Token token, IParsedSyntax right) { return new ExpressionSyntax(this, token, ToCompiledSyntaxOrNull(right)); }
+        protected override ICompileSyntax ToCompiledSyntax() { return this; }
+        protected override IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right) { return new ExpressionSyntax(this, token, ParsedSyntaxExtender.ToCompiledSyntaxOrNull(right)); }
     }
 
 }

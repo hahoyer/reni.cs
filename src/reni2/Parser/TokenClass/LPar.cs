@@ -32,7 +32,7 @@ namespace Reni.Parser.TokenClass
 
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntax.IsNull(left);
+            ParsedSyntaxExtender.AssertIsNull(left);
             if(right == null)
                 return new EmptyList(token);
             return right.SurroundedByParenthesis(token);

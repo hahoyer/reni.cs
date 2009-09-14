@@ -124,8 +124,8 @@ namespace Reni.Parser.TokenClass
 
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntax.IsNull(left);
-            ParsedSyntax.IsNull(right);
+            ParsedSyntaxExtender.AssertIsNull(left);
+            ParsedSyntaxExtender.AssertIsNull(right);
             return new TerminalSyntax(token, this);
         }
     }
@@ -137,8 +137,8 @@ namespace Reni.Parser.TokenClass
 
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntax.IsNull(left);
-            return new PrefixSyntax(token, this, ParsedSyntax.ToCompiledSyntax(right));
+            ParsedSyntaxExtender.AssertIsNull(left);
+            return new PrefixSyntax(token, this, ParsedSyntaxExtender.CheckedToCompiledSyntax(right));
         }
     }
 
@@ -149,7 +149,7 @@ namespace Reni.Parser.TokenClass
 
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            return new InfixSyntax(token, ParsedSyntax.ToCompiledSyntax(left), this, ParsedSyntax.ToCompiledSyntax(right));
+            return new InfixSyntax(token, ParsedSyntaxExtender.CheckedToCompiledSyntax(left), this, ParsedSyntaxExtender.CheckedToCompiledSyntax(right));
         }
     }
 }

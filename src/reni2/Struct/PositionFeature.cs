@@ -33,6 +33,11 @@ namespace Reni.Struct
         }
 
         TypeBase IFeature.ResultType { get { return null; } }
+        Result IContextFeature.Apply(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
@@ -76,6 +81,9 @@ namespace Reni.Struct
             return objectResult.Type.AccessResultAsArg(category, position).UseWithArg(objectResult);
         }
 
+        TypeBase IContextFeature.ResultType
+        {
+            get { return null; } }
     }
 
     [Serializable]

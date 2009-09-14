@@ -119,7 +119,7 @@ namespace Reni
         internal ThenSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax)
             : base(condSyntax, thenToken, thenSyntax, null) { }
 
-        internal protected override IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
+        protected override IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
     }
 
     [Serializable]

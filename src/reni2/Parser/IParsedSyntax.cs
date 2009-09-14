@@ -13,13 +13,12 @@ namespace Reni.Parser
 
         [DumpData(false)]
         Token Token { get; }
-        [DumpData(false)]
-        ICompileSyntax ToCompileSyntax { get; }
 
+        ICompileSyntax ToCompiledSyntax();
         IParsedSyntax SurroundedByParenthesis(Token token);
         IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right);
         IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition);
-        IParsedSyntax CreateSyntax(Token token, IParsedSyntax right);
+        IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right);
         IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax);
     }
 }

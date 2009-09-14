@@ -33,5 +33,7 @@ namespace Reni.Feature
     }
     internal interface IContextFeature
     {
+        TypeBase ResultType { get; }
+        Result Apply(Category category);
     }
 }

@@ -2,34 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
 {
     [Serializable]
-    internal sealed class DefinableTokenSyntax : CompileSyntax
+    internal sealed class DefinableTokenSyntax : ParsedSyntax
     {
         private readonly DefineableToken _defineableToken;
 
         public DefinableTokenSyntax(Token token)
-            : base(token)
-        {
-            _defineableToken = new DefineableToken(token);
-        }
+            : base(token) { _defineableToken = new DefineableToken(token); }
 
-        protected internal override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
-        {
-            return new DeclarationSyntax(_defineableToken, token, right);
-        }
-
-        [DumpData(false)]
-        protected internal override ICompileSyntax ToCompileSyntax { get { return this; } }
-
-        protected internal override Result Result(ContextBase context, Category category)
-        {
-            NotImplementedMethod(context, category);
-            return null;
-        }
+        protected override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right) { return new DeclarationSyntax(_defineableToken, token, right); }
+        protected override ICompileSyntax ToCompiledSyntax() { return new ExpressionSyntax(null, Token, null); }
     }
 }

@@ -6,6 +6,6 @@ namespace Reni.Type
 {
     internal interface IFunctionalFeature : IDumpShortProvider
     {
-        Result Apply(Category category, Result objectResult, Result argsResult);
+        Result Apply(Category category, Result functionalResult, Result argsResult);
     }
 }

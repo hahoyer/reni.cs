@@ -10,7 +10,7 @@ namespace Reni.FeatureTest.DefaultOperations
     public class TypeOperator : CompilerTest
     {
         public override string Target { get { return @"31 type dump_print"; } }
-        public override string Output { get { return "#(#align3#)# (bit)sequence(6)"; } }
+        public override string Output { get { return "(bit)sequence(6)"; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
