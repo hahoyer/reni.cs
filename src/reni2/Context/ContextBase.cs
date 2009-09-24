@@ -262,16 +262,7 @@ namespace Reni.Context
             if (feature == null)
                 return null;
 
-            var resultType = feature.ResultType;
-
-            if (!category.HasCode && !category.HasRefs && resultType != null)
-                return resultType.CreateResult(category);
-
-            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
-            var result = feature.Apply(applyCategory);
-            if (resultType != null)
-                result = result.ConvertTo(resultType);
-            return result & category;
+            return feature.Apply(category) & category;
         }
 
         internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingContext().PendingResult(category, syntax); }

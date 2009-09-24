@@ -381,16 +381,7 @@ namespace Reni.Type
             if (feature == null)
                 return null;
 
-            var resultType = feature.ResultType;
-
-            if (!category.HasCode && !category.HasRefs && resultType != null)
-                return resultType.CreateResult(category);
-
-            var applyCategory = category | (resultType == null ? Category.None : Category.Type);
-            var result = feature.Apply(applyCategory, this);
-            if (resultType != null)
-                result = result.ConvertTo(resultType);
-            return result & category;
+            return feature.Apply(category, this) & category;
         }
     }
 }

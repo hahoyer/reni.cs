@@ -10,34 +10,31 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal abstract class PositionFeatureBase : 
-        ReniObject, 
+    internal abstract class PositionFeatureBase :
+        ReniObject,
         IContextFeature,
         IFeature, ISearchPath<IFeature, Ref>
     {
-        private readonly IStructContext _structContext;
+        protected readonly IStructContext StructContext;
 
         [DumpData(true)]
-        private readonly int _index;
+        protected readonly int Position;
 
-        protected PositionFeatureBase(IStructContext structContext, int index)
+        protected PositionFeatureBase(IStructContext structContext, int position)
         {
-            _index = index;
-            _structContext = structContext;
+            Position = position;
+            StructContext = structContext;
         }
 
         IFeature ISearchPath<IFeature, Ref>.Convert(Ref type)
         {
-            Tracer.Assert(type.RefAlignParam == _structContext.ForCode.RefAlignParam);
+            Tracer.Assert(type.RefAlignParam == StructContext.ForCode.RefAlignParam);
             return this;
         }
 
-        TypeBase IFeature.ResultType { get { return null; } }
-        Result IContextFeature.Apply(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
+        Result IContextFeature.Apply(Category category) { return Apply(category); }
+
+        protected abstract Result Apply(Category category);
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
@@ -47,12 +44,12 @@ namespace Reni.Struct
 
         protected virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
         {
-            var rawResult = _structContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, _index);
+            var rawResult = StructContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, Position);
             if(args != null)
                 rawResult =
-                    _structContext
+                    StructContext
                         .NaturalRefType
-                        .AccessResultAsContextRef(category | Category.Type, _index).Type.ApplyFunction(
+                        .AccessResultAsContextRef(category | Category.Type, Position).Type.ApplyFunction(
                         category, callContext, args);
 
             return PostProcessApplyResult(callContext, category, @object, rawResult);
@@ -63,14 +60,14 @@ namespace Reni.Struct
             if(!category.HasCode && !category.HasRefs)
                 return rawResult;
 
-            var objectResult = _structContext.ObjectResult(callContext, category, @object);
+            var objectResult = StructContext.ObjectResult(callContext, category, @object);
             var replacedResult =
                 new Result(
                     category,
                     () => rawResult.Size,
                     () => rawResult.Type,
-                    () => rawResult.Code.ReplaceAbsoluteContextRef(_structContext.ForCode, objectResult.Code),
-                    () => (rawResult.Refs - _structContext.ForCode) + objectResult.Refs
+                    () => rawResult.Code.ReplaceAbsoluteContextRef(StructContext.ForCode, objectResult.Code),
+                    () => (rawResult.Refs - StructContext.ForCode) + objectResult.Refs
                     );
             return replacedResult;
         }
@@ -80,10 +77,6 @@ namespace Reni.Struct
             var objectResult = callContext.ResultAsRef(category | Category.Type, left);
             return objectResult.Type.AccessResultAsArg(category, position).UseWithArg(objectResult);
         }
-
-        TypeBase IContextFeature.ResultType
-        {
-            get { return null; } }
     }
 
     [Serializable]
@@ -91,8 +84,8 @@ namespace Reni.Struct
     {
         private readonly PropertyPositionFeature _property;
 
-        internal PositionFeature(EmptyList emptyList, IStructContext structContext, int index)
-            : base(structContext, index) { _property = new PropertyPositionFeature(emptyList, structContext, index); }
+        internal PositionFeature(EmptyList emptyList, IStructContext structContext, int position)
+            : base(structContext, position) { _property = new PropertyPositionFeature(emptyList, structContext, position); }
 
         public PositionFeatureBase ToProperty(bool isPoperty)
         {
@@ -100,14 +93,19 @@ namespace Reni.Struct
                 return _property;
             return this;
         }
+
+        protected override Result Apply(Category category)
+        {
+            return StructContext.NaturalRefType.AccessResultAsArg(category, Position);
+        }
     }
 
     internal class PropertyPositionFeature : PositionFeatureBase
     {
         private readonly EmptyList _emptyList;
 
-        public PropertyPositionFeature(EmptyList emptyList, IStructContext structContext, int index)
-            : base(structContext, index) { _emptyList = emptyList; }
+        public PropertyPositionFeature(EmptyList emptyList, IStructContext structContext, int position)
+            : base(structContext, position) { _emptyList = emptyList; }
 
         protected override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
                                               ICompileSyntax args)
@@ -116,6 +114,12 @@ namespace Reni.Struct
             if(args == null)
                 return result;
             NotImplementedMethod(callContext, category, @object, args);
+            return null;
+        }
+
+        protected override Result Apply(Category category)
+        {
+            NotImplementedMethod(category);
             return null;
         }
     }

@@ -23,8 +23,6 @@ namespace Reni.Type
             _definable = definable;
         }
 
-        TypeBase IFeature.ResultType { get { return null; } }
-
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
             return Apply(category,objectType.UnrefSize)

@@ -24,8 +24,6 @@ namespace Reni.Type
 
         IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
 
-        TypeBase IFeature.ResultType { get { return null; } }
-
         Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.CreateFunctionalType(this).CreateArgResult(category); }
 
         string IDumpShortProvider.DumpShort() { return _definable.DataFunctionName; }

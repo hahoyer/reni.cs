@@ -84,7 +84,6 @@ namespace Reni.Type
     {
         private Array _type;
         public ConcatArraysFeature(Array type) { _type = type; }
-        TypeBase IFeature.ResultType { get { return null; } }
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
@@ -131,8 +130,6 @@ namespace Reni.Type
             return ApplyResult(callContext, category, @object, args, elementType, 1);
         }
 
-        TypeBase IFeature.ResultType { get { return null; } }
-
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
             NotImplementedMethod(category, objectType);
@@ -151,8 +148,6 @@ namespace Reni.Type
             Category category,
             ICompileSyntax @object,
             ICompileSyntax args) { return ApplyResult(callContext, category, @object, args, _type.Element, _type.Count + 1); }
-
-        TypeBase IFeature.ResultType { get { return null; } }
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {

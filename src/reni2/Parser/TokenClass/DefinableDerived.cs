@@ -10,8 +10,7 @@ namespace Reni.Parser.TokenClass
     [Token("type")]
     internal sealed class TtypeT : Defineable, IFeature
     {
-        TypeBase IFeature.ResultType { get { return null; } }
-        Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.AutomaticDereference().TypeOperator(category); }
+       Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.AutomaticDereference().TypeOperator(category); }
     }
 
     [Token("dump_print")]
@@ -30,7 +29,6 @@ namespace Reni.Parser.TokenClass
             IFeature
         {
             IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
-            TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
 
             private static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
 
@@ -40,8 +38,6 @@ namespace Reni.Parser.TokenClass
         ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<IFeature, Ref> ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintFromRefFeature; }
         IFeature ISearchPath<IFeature, TypeType>.Convert(TypeType type) { return type.DumpPrintFeature; }
-
-        TypeBase IFeature.ResultType { get { return TypeBase.CreateVoid; } }
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {

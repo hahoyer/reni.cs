@@ -36,8 +36,6 @@ namespace Reni.Type
 
         public AssignmentFeature(AssignableRef assignableRef) { _assignableRef = assignableRef; }
 
-        TypeBase IFeature.ResultType { get { return null; } }
-
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
             NotImplementedMethod(category, objectType);
