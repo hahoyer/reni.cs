@@ -138,7 +138,7 @@ namespace Reni.Struct
 
         internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
 
-        Result IStructContext.ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
+        Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
         {
             if(@object == null)
                 return NaturalRefType.CreateResult(

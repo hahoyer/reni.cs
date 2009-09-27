@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
@@ -15,12 +13,12 @@ namespace Reni.Struct
         IContextFeature,
         IFeature, ISearchPath<IFeature, Ref>
     {
-        protected readonly IStructContext StructContext;
+        protected readonly Context StructContext;
 
         [DumpData(true)]
         protected readonly int Position;
 
-        protected PositionFeatureBase(IStructContext structContext, int position)
+        protected PositionFeatureBase(Context structContext, int position)
         {
             Position = position;
             StructContext = structContext;
@@ -42,36 +40,6 @@ namespace Reni.Struct
             return null;
         }
 
-        protected virtual Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
-        {
-            var rawResult = StructContext.NaturalRefType.AccessResultAsContextRef(category | Category.Type, Position);
-            if(args != null)
-                rawResult =
-                    StructContext
-                        .NaturalRefType
-                        .AccessResultAsContextRef(category | Category.Type, Position).Type.ApplyFunction(
-                        category, callContext, args);
-
-            return PostProcessApplyResult(callContext, category, @object, rawResult);
-        }
-
-        private Result PostProcessApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, Result rawResult)
-        {
-            if(!category.HasCode && !category.HasRefs)
-                return rawResult;
-
-            var objectResult = StructContext.ObjectResult(callContext, category, @object);
-            var replacedResult =
-                new Result(
-                    category,
-                    () => rawResult.Size,
-                    () => rawResult.Type,
-                    () => rawResult.Code.ReplaceAbsoluteContextRef(StructContext.ForCode, objectResult.Code),
-                    () => (rawResult.Refs - StructContext.ForCode) + objectResult.Refs
-                    );
-            return replacedResult;
-        }
-
         internal static Result AccessResult(ContextBase callContext, Category category, ICompileSyntax left, int position)
         {
             var objectResult = callContext.ResultAsRef(category | Category.Type, left);
@@ -84,8 +52,9 @@ namespace Reni.Struct
     {
         private readonly PropertyPositionFeature _property;
 
-        internal PositionFeature(EmptyList emptyList, IStructContext structContext, int position)
-            : base(structContext, position) { _property = new PropertyPositionFeature(emptyList, structContext, position); }
+        internal PositionFeature(EmptyList emptyList, Context structContext, int position)
+            : base(
+            structContext, position) { _property = new PropertyPositionFeature(emptyList, structContext, position); }
 
         public PositionFeatureBase ToProperty(bool isPoperty)
         {
@@ -96,7 +65,7 @@ namespace Reni.Struct
 
         protected override Result Apply(Category category)
         {
-            return StructContext.NaturalRefType.AccessResultAsArg(category, Position);
+            return StructContext.AccessResultAsArgFromRef(category,Position,StructContext.RefAlignParam);
         }
     }
 
@@ -104,18 +73,8 @@ namespace Reni.Struct
     {
         private readonly EmptyList _emptyList;
 
-        public PropertyPositionFeature(EmptyList emptyList, IStructContext structContext, int position)
+        public PropertyPositionFeature(EmptyList emptyList, Context structContext, int position)
             : base(structContext, position) { _emptyList = emptyList; }
-
-        protected override Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object,
-                                              ICompileSyntax args)
-        {
-            var result = base.ApplyResult(callContext, category, @object, _emptyList);
-            if(args == null)
-                return result;
-            NotImplementedMethod(callContext, category, @object, args);
-            return null;
-        }
 
         protected override Result Apply(Category category)
         {
@@ -128,6 +87,5 @@ namespace Reni.Struct
     {
         Ref NaturalRefType { get; }
         IRefInCode ForCode { get; }
-        Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object);
     }
 }

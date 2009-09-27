@@ -25,9 +25,9 @@ namespace Reni.Feature
     {
         internal static IFeature Feature(this object feature)
         {
-            if (feature is IFeature)
-                return (IFeature) feature;
-            return ((IPrefixFeature) feature).Feature;
+            if (feature is IPrefixFeature) 
+                return ((IPrefixFeature)feature).Feature;
+            return (IFeature) feature;
         }
     }
     internal interface IContextFeature
