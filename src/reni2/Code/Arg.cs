@@ -12,11 +12,10 @@ namespace Reni.Code
         internal Arg(Size size)
         {
             _size = size;
-            StopByObjectId(-579);
+            StopByObjectId(2264);
         }
 
         protected override Size SizeImplementation { get { return _size; } }
-
-        protected override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.Arg(this); }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Arg(this); }
     }
 }

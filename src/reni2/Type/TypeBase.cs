@@ -34,8 +34,8 @@ namespace Reni.Type
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<PostProcessorForType> PostProcessor;
 
-            public readonly DictionaryEx<IFunctionalFeature, FunctionalType> FunctionalTypes =
-                new DictionaryEx<IFunctionalFeature, FunctionalType>();
+            public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes =
+                new DictionaryEx<IFunctionalFeature, FunctionAccessType>();
 
             public Cache(TypeBase parent)
             {
@@ -143,7 +143,7 @@ namespace Reni.Type
 
         internal Sequence CreateSequence(int elementCount) { return _cache.Sequences.Find(elementCount, () => new Sequence(this, elementCount)); }
 
-        internal TypeBase CreateFunctionalType(IFunctionalFeature feature) { return _cache.FunctionalTypes.Find(feature, () => new FunctionalType(this, feature)); }
+        internal TypeBase CreateFunctionalType(IFunctionalFeature feature) { return _cache.FunctionalTypes.Find(feature, () => new FunctionAccessType(this, feature)); }
 
         internal virtual Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 
@@ -345,8 +345,7 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
-        [DumpExcept(null)]
-        internal virtual IFunctionalFeature FunctionalFeature { get { return null; } }
+        internal virtual IFunctionalFeature GetFunctionalFeature() { return null; }
 
         internal virtual TypeBase StripFunctional()
         {

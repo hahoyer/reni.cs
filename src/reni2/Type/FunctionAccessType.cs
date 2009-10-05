@@ -5,7 +5,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Type
 {
-    internal class FunctionalType : TypeBase
+    internal class FunctionAccessType : TypeBase
     {
         [DumpData(true)]
         private readonly TypeBase _objectType;
@@ -13,7 +13,7 @@ namespace Reni.Type
         [DumpData(true)]
         private readonly IFunctionalFeature _feature;
 
-        public FunctionalType(TypeBase objectType, IFunctionalFeature feature)
+        public FunctionAccessType(TypeBase objectType, IFunctionalFeature feature)
         {
             _objectType = objectType;
             _feature = feature;
@@ -21,7 +21,7 @@ namespace Reni.Type
 
         protected override Size GetSize() { return _objectType.Size; }
         internal override string DumpShort() { return _objectType.DumpShort() + " " + _feature.DumpShort(); }
-        internal override IFunctionalFeature FunctionalFeature { get { return _feature; } }
+        internal override IFunctionalFeature GetFunctionalFeature() { return _feature; }
         internal override TypeBase StripFunctional() { return _objectType; }
     }
 }

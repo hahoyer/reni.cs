@@ -65,7 +65,7 @@ namespace Reni.Struct
 
         protected override Result Apply(Category category)
         {
-            return StructContext.AccessResultAsArgFromRef(category,Position,StructContext.RefAlignParam);
+            return StructContext.AccessResultAsContextRef(category,Position);
         }
     }
 

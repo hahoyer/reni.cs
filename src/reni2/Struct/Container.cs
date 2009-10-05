@@ -20,7 +20,7 @@ namespace Reni.Struct
     [Serializable]
     internal sealed class Container : CompileSyntax, IDumpShortProvider
     {
-        private static readonly string RunId = Compiler.FormattedNow + "\n";
+        private static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
         private static bool _isInsideFileDump;
         private static int _nextObjectId;
@@ -145,8 +145,8 @@ namespace Reni.Struct
         {
             var dumpFile = File.m("struct." + ObjectId);
             var oldResult = dumpFile.String;
-            var newResult = (RunId + DumpDataToString()).Replace("\n", "\r\n");
-            if(oldResult == null || !oldResult.StartsWith(RunId))
+            var newResult = (_runId + DumpDataToString()).Replace("\n", "\r\n");
+            if(oldResult == null || !oldResult.StartsWith(_runId))
             {
                 oldResult = newResult;
                 dumpFile.String = oldResult;

@@ -6,9 +6,21 @@ using Reni.Syntax;
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class Function : TypeBase
+    internal sealed class Function : TypeBase, IFunctionalFeature
     {
         private readonly ICompileSyntax _body;
+        
+        internal override TypeBase StripFunctional()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
+        internal override IFunctionalFeature GetFunctionalFeature()
+        {
+            return this;
+        }
+
         private readonly ContextBase _context;
         private static int _nextObjectId;
 
@@ -72,6 +84,11 @@ namespace Reni.Type
         internal override string DumpShort()
         {
             return "context." + _context.ObjectId + ".function(" + _body.DumpShort() + ")";
+        }
+
+        Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
+        {
+            return ApplyFunction(category,argsResult);
         }
     }
 

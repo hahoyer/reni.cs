@@ -308,10 +308,10 @@ namespace Reni
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
-            var trace = context.ObjectId == -11 && category.HasRefs && IsObjectId(syntax, 90);
+            var trace = context.ObjectId == -17 && category.HasRefs && IsObjectId(syntax, 1192);
             StartMethodDumpWithBreak(trace, context, category, syntax);
             InternalAddCategories(context, category - CompleteCategory - PendingCategory, syntax);
             TreatPendingCategories(context, category - CompleteCategory, syntax);
@@ -328,7 +328,7 @@ namespace Reni
             Update(result);
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         private void InternalAddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
             if(category.IsNone)
@@ -567,8 +567,10 @@ namespace Reni
                 );
         }
 
+        [DebuggerHidden]
         public static Result operator &(Result result, Category category) { return result.Filter(category); }
 
+        [DebuggerHidden]
         public static Result operator |(Result aResult, Result bResult)
         {
             Tracer.Assert((aResult.CompleteCategory & bResult.CompleteCategory).IsNone);

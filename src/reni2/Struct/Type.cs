@@ -16,6 +16,8 @@ namespace Reni.Struct
     [Serializable]
     internal sealed class Type : TypeBase
     {
+        private bool _isGetSizeActive;
+
         [Node]
         internal readonly FullContext Context;
 
@@ -43,7 +45,15 @@ namespace Reni.Struct
             Context = context;
         }
 
-        protected override Size GetSize() { return Context.InternalSize(); }
+        protected override Size GetSize()
+        {
+            if(_isGetSizeActive)
+                return Size.Create(-1);
+            _isGetSizeActive = true;
+            var result = Context.InternalSize();
+            _isGetSizeActive = false;
+            return result;
+        }
 
         internal override string DumpShort() { return "type." + ObjectId + "(context." + Context.DumpShort() + ")"; }
 
@@ -56,8 +66,10 @@ namespace Reni.Struct
 
         internal override Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam) { return Context.AccessResultAsArgFromRef(category, position, refAlignParam); }
 
-        internal override Result AccessResultAsContextRefFromRef(Category category, int position,
-                                                                 RefAlignParam refAlignParam) { return Context.AccessResultAsContextRefFromRef(category, position, refAlignParam); }
+        internal override Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam)
+        {
+            return Context.AccessResultAsContextRefFromRef(category, position, refAlignParam);
+        }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {

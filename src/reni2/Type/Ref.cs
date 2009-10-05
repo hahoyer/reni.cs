@@ -96,6 +96,7 @@ namespace Reni.Type
         [DumpData(false)]
         internal override Size UnrefSize { get { return Target.UnrefSize; } }
 
+        [DumpData(false)]
         internal TypeBase AlignedTarget { get { return Target.CreateAlign(RefAlignParam.AlignBits); } }
 
         internal override sealed string DumpShort()

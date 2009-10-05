@@ -21,7 +21,7 @@ namespace Reni.Code
         /// </summary>
         /// <value>The name of the main method.</value>
         /// created 15.11.2006 22:04
-        public static string MainMethodName { get { return "reni"; } }
+        public static string MainMethodName { get { return "ReniMain"; } }
 
         /// <summary>
         /// Functions the name of the method.
@@ -29,7 +29,7 @@ namespace Reni.Code
         /// <param name="i">The i.</param>
         /// <returns></returns>
         /// created 15.11.2006 22:04
-        public static string FunctionMethodName(int i) { return "reni_" + i; }
+        public static string FunctionMethodName(int i) { return "ReniFunction" + i; }
 
         /// <summary>
         /// Creates the C sharp code.
@@ -150,11 +150,8 @@ namespace Reni.Code
 
             var result = _baseName;
             var id = _nextId++;
-            if (id != 0)
-            {
-                result += "_";
-                result += id;
-            }
+            if(id != 0)
+                result += "Id" + id;
             return result;
         }
 

@@ -95,7 +95,7 @@
     <Compile Include="FeatureTest\SimpleFiles.cs" />
     <Compile Include="FeatureTest\Struct.cs" />
     <Compile Include="FeatureTest\ThenElse.cs" />
-    <Compile Include="generated.cs" />
+    <Compile Include="ReniTest.cs" />
     <Compile Include="Intervall.cs" />
     <Compile Include="Parser\Test.cs" />
     <Compile Include="Parser\TokenClass\DeclarationSyntax.cs" />
@@ -130,7 +130,7 @@
     <Compile Include="Type\ConversionFeature.cs" />
     <Compile Include="Type\EnableCut.cs" />
     <Compile Include="Type\EnableCutFeature.cs" />
-    <Compile Include="Type\FunctionalType.cs" />
+    <Compile Include="Type\FunctionAccessType.cs" />
     <Compile Include="Type\IFunctionalFeature.cs" />
     <Compile Include="Type\Pending.cs" />
     <Compile Include="Type\Sequence.cs" />

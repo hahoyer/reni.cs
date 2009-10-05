@@ -42,7 +42,7 @@ namespace Reni.Type
         protected override Size GetSize() { return Size.Zero; }
         internal override string DumpPrintText { get { return "(" + _value.DumpPrintText + "()) type"; } }
         protected override Result ConvertToItself(Category category) { return CreateVoidResult(category); }
-        internal override IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }
+        internal override IFunctionalFeature GetFunctionalFeature() { return _functionalFeature; }
         internal override TypeBase StripFunctional() { return _value; }
         internal override string DumpShort() { return "(" + _value.DumpShort() + ") type"; }
 

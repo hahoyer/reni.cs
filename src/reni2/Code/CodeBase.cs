@@ -222,7 +222,10 @@ namespace Reni.Code
 
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
-        internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam) { return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam); }
+        internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam)
+        {
+            return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam);
+        }
 
         internal CodeBase CreateStatementEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
         {
@@ -319,11 +322,15 @@ namespace Reni.Code
             return result + internalRef.Code.Size;
         }
 
-        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size) { return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1)); }
+        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size)
+        {
+            return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1));
+        }
 
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
-            var trace = body.ObjectId == -1658;
+            Tracer.Assert(!body.HasArg);
+            var trace = body.ObjectId == 2324;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();

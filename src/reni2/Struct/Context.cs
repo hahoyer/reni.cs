@@ -82,11 +82,29 @@ namespace Reni.Struct
                     Refs.None);
         }
 
+        internal Result AccessResultAsContextRef(Category category, int position)
+        {
+            return Type(StatementList[position])
+                .PostProcessor
+                .AccessResultForStruct(category, ForCode.RefAlignParam,
+                    () => AccessCodeAsContextRef(position),
+                    () => Refs.Context(ForCode));
+        }
+
         private CodeBase AccessAsArgCode(int position, RefAlignParam refAlignParam) { return AccessAsArgCode(position, Position, refAlignParam); }
+
+        private CodeBase AccessCodeAsContextRef(int position)
+        {
+            var offset = Size.Zero;
+            for (var i = 0; i <= position; i++)
+                offset += InternalSize(i);
+
+            return CodeBase.CreateContextRef(ForCode).CreateRefPlus(ForCode.RefAlignParam, offset*(-1));
+        }
 
         private CodeBase AccessAsArgCode(int position, int currentPosition, RefAlignParam refAlignParam)
         {
-            var offset = Reni.Size.Zero;
+            var offset = Size.Zero;
             for(var i = position + 1; i < currentPosition; i++)
                 offset += InternalSize(i);
 
@@ -141,14 +159,19 @@ namespace Reni.Struct
         Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
         {
             if(@object == null)
-                return NaturalRefType.CreateResult(
-                    category | Category.Type,
-                    () => CodeBase.CreateContextRef(ForCode),
-                    () => Refs.Context(ForCode));
+                return CreateContextRef(category);
             return callContext
                 .ResultAsRef(category | Category.Type, @object)
                 .ConvertTo(NaturalRefType)
                 .CreateRefPlus(category, ForCode.RefAlignParam, NaturalRefType.UnrefSize);
+        }
+
+        private Result CreateContextRef(Category category)
+        {
+            return NaturalRefType.CreateResult(
+                category | Category.Type,
+                () => CodeBase.CreateContextRef(ForCode),
+                () => Refs.Context(ForCode));
         }
 
     }

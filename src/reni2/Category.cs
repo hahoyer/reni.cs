@@ -64,6 +64,7 @@ namespace Reni
                 );
         }
 
+        [DebuggerHidden]
         public static Category operator &(Category x, Category y)
         {
             return new Category(
@@ -118,6 +119,7 @@ namespace Reni
             return true;
         }
 
+        [DebuggerHidden]
         public static Category operator -(Category x, Category y)
         {
             return new Category(

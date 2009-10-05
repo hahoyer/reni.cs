@@ -118,14 +118,17 @@ namespace Reni.Context
                 return null;
 
             var functionContext = Context.CreateFunction(Args);
-            var trace = ObjectId == -1 && (category.HasCode || category.HasRefs);
+            var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category| Category.Type;
             var rawResult = functionContext.Result(categoryEx, Body).Clone();
 
-            DumpWithBreak(trace, "functionContext", functionContext, "result", rawResult);
+            DumpWithBreak(trace, "functionContext", functionContext, "rawResult", rawResult);
 
-            var postProcessedResult = rawResult.PostProcessor.FunctionResult(category, functionContext.RefAlignParam);
+            var postProcessedResult = 
+                rawResult
+                .PostProcessor
+                .FunctionResult(category, functionContext.RefAlignParam);
 
             DumpWithBreak(trace, "postProcessedResult", postProcessedResult);
             var result = 

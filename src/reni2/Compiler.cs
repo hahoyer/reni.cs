@@ -131,15 +131,14 @@ namespace Reni
             get
             {
                 var n = DateTime.Now;
-                var result = "reni_";
+                var result = "Date";
                 result += n.Year.ToString("0000");
                 result += n.Month.ToString("00");
                 result += n.Day.ToString("00");
-                result += "_";
+                result += "Time";
                 result += n.Hour.ToString("00");
                 result += n.Minute.ToString("00");
                 result += n.Second.ToString("00");
-                result += "_";
                 result += n.Millisecond.ToString("000");
                 return result;
             }
@@ -301,7 +300,7 @@ namespace Reni
         {
             var os = BitsConst.OutStream;
             BitsConst.OutStream = new OutStream();
-            reni_Test.reni();
+            ReniTest.Reni();
 #pragma warning disable 168
             var osNew = BitsConst.OutStream;
 #pragma warning restore 168

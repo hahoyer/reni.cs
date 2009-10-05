@@ -105,7 +105,7 @@ namespace Reni.Context
             return result;
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result Result(Category category, ICompileSyntax syntax)
         {
             return _cache.ResultCache.Find
@@ -216,7 +216,7 @@ namespace Reni.Context
             if(right == null)
                 return suffixResult;
 
-            var feature = suffixResult.Type.FunctionalFeature;
+            var feature = suffixResult.Type.GetFunctionalFeature();
             if (feature != null)
                 return feature.Apply(category, suffixResult, ResultAsRef(category|Category.Type, right));
             NotImplementedMethod(category, left, defineable, right, "suffixResult", suffixResult,"feature",feature);
@@ -247,12 +247,11 @@ namespace Reni.Context
                 return null;
             var leftType = Type(left).EnsureRef(RefAlignParam);
 
-            var result = leftType.GetUnaryResult<TFeature>(category, defineable);
-            if(result == null)
+            var rawResult = leftType.GetUnaryResult<TFeature>(category, defineable);
+            if(rawResult == null)
                 return null;
 
-            if (result.HasArg)
-                result = result.UseWithArg(ResultAsRef(category, left));
+            var result = rawResult.UseWithArg(ResultAsRef(category, left));
             return result;
         }
 
