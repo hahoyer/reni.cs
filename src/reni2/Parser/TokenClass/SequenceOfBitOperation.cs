@@ -11,7 +11,12 @@ namespace Reni.Parser.TokenClass
         ISearchPath<ISearchPath<IFeature, Sequence>, Bit>,
         ISequenceOfBitBinaryOperation
     {
-        ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return new SequenceOperationFeature(this); }
+        ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type)
+        {
+            if(IsCompareOperator)
+                return new SequenceCompareOperationFeature(this);
+            return new SequenceOperationFeature(this);
+        }
 
         bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
         string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }

@@ -26,6 +26,7 @@ namespace Reni.Type
             Tracer.Assert(count > 0, "count=" + count);
             _inheritedType = elementType.CreateArray(count);
             _enableCutCutFeature = new EnableCutFeature(this);
+            StopByObjectId(172);
         }
 
         [DumpData(false)]

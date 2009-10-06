@@ -7,26 +7,19 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    [Serializable]
-    internal class SequenceOperationFeature : ReniObject
-                                              , IFeature
-                                              , ISearchPath<IFeature, Sequence>
-                                              , IFunctionalFeature
-
+    internal abstract class SequenceOperationFeatureBase : ReniObject, IFeature, ISearchPath<IFeature, Sequence>, IFunctionalFeature
     {
         [DumpData(true)]
-        private readonly ISequenceOfBitBinaryOperation _definable;
+        protected readonly ISequenceOfBitBinaryOperation Definable;
 
-        public SequenceOperationFeature(ISequenceOfBitBinaryOperation definable)
+        protected SequenceOperationFeatureBase(ISequenceOfBitBinaryOperation definable)
         {
-            _definable = definable;
+            Definable = definable;
         }
 
         IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
-
         Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.CreateFunctionalType(this).CreateArgResult(category); }
-
-        string IDumpShortProvider.DumpShort() { return _definable.DataFunctionName; }
+        string IDumpShortProvider.DumpShort() { return Definable.DataFunctionName; }
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
@@ -39,9 +32,35 @@ namespace Reni.Type
 
         private Result Apply(Category category, int objSize, int argsSize)
         {
-            var type = TypeBase.CreateNumber(_definable.ResultSize(objSize, argsSize));
-            return type.CreateResult(category, () => CodeBase.CreateBitSequenceOperation(type.Size, _definable, objSize, argsSize));
+            var type = ResultType(objSize, argsSize);
+            return type.CreateResult(category, () => CodeBase.CreateBitSequenceOperation(type.Size, Definable, objSize, argsSize));
         }
 
+        protected abstract TypeBase ResultType(int objSize, int argsSize);
+    }
+
+    internal class SequenceOperationFeature : SequenceOperationFeatureBase
+
+    {
+        public SequenceOperationFeature(ISequenceOfBitBinaryOperation definable)
+            : base(definable) {
+            }
+
+        protected override TypeBase ResultType(int objSize, int argsSize)
+        {
+            return TypeBase.CreateNumber(Definable.ResultSize(objSize, argsSize));
+        }
+    }
+    internal class SequenceCompareOperationFeature : SequenceOperationFeatureBase
+    {
+        public SequenceCompareOperationFeature(ISequenceOfBitBinaryOperation definable)
+            : base(definable)
+        {
+        }
+
+        protected override TypeBase ResultType(int objSize, int argsSize)
+        {
+            return TypeBase.CreateBit;
+        }
     }
 }
