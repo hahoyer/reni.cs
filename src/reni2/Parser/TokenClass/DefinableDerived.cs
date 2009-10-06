@@ -19,31 +19,46 @@ namespace Reni.Parser.TokenClass
         IFeature,
         ISearchPath<IFeature, TypeType>,
         ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>,
+        ISearchPath<IFeature, Bit>,
         ISearchPath<ISearchPath<IFeature, Sequence>, Bit>
     {
+        private sealed class BitFeature : BitFeatureBase, IFeature
+        {
+            Result IFeature.Apply(Category category, TypeBase objectType)
+            {
+                return Apply(category, 1).UseWithArg(objectType.Conversion(category, TypeBase.CreateBit).Align(BitsConst.SegmentAlignBits));
+            }
+        }
+
+        private abstract class BitFeatureBase
+        {
+            protected static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
+
+        }
+
         private readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
+        private readonly BitFeature _bitFeature = new BitFeature();
 
         private sealed class BitSequenceFeature :
-            ReniObject,
-            ISearchPath<IFeature, Sequence>,
-            IFeature
+            BitFeatureBase,
+            IFeature,
+            ISearchPath<IFeature, Sequence>
         {
             IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
-
-            private static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
-
             Result IFeature.Apply(Category category, TypeBase objectType) { return Apply(category, objectType.SequenceCount).UseWithArg(objectType.ConvertToBitSequence(category)); }
         }
 
         ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<IFeature, Ref> ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintFromRefFeature; }
         IFeature ISearchPath<IFeature, TypeType>.Convert(TypeType type) { return type.DumpPrintFeature; }
+        IFeature ISearchPath<IFeature, Bit>.Convert(Bit type) { return _bitFeature; }
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
             NotImplementedMethod(category, objectType);
             return null;
         }
+
     }
 
     [Token("enable_cut")]
