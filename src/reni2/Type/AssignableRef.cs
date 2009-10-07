@@ -26,42 +26,35 @@ namespace Reni.Type
             Parent.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);
         }
+        internal override AutomaticRef CreateAutomaticRef() { return Target.CreateAutomaticRef(RefAlignParam); }
     }
 
     [Serializable]
-    internal class AssignmentFeature : ReniObject, IFeature
+    internal class AssignmentFeature : ReniObject, IFeature, IFunctionalFeature
     {
         [DumpData(true)]
         private readonly AssignableRef _assignableRef;
 
         public AssignmentFeature(AssignableRef assignableRef) { _assignableRef = assignableRef; }
 
-        Result IFeature.Apply(Category category, TypeBase objectType)
-        {
-            NotImplementedMethod(category, objectType);
-            return null;
-        }
+        Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.CreateFunctionalType(this).CreateArgResult(category); }
 
-        Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args)
+        Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
-            var destinationType = (AssignableRef)callContext.Type(@object);
-
             var result = TypeBase.CreateVoid.CreateResult(
                 category,
-                () => CodeBase.CreateArg(destinationType.Size*2).CreateAssignment(callContext.RefAlignParam,destinationType.Target.Size)
+                () => CodeBase.CreateArg(_assignableRef.Size * 2).CreateAssignment(_assignableRef.RefAlignParam, _assignableRef.Target.Size)
                 );
 
             if (!category.HasCode && !category.HasRefs)
                 return result;
 
-            var sourceResult = callContext.ConvertedRefResult
-                (
-                category, 
-                args, 
-                destinationType.Target.CreateAutomaticRef(destinationType.RefAlignParam)
-                );
-            var objectAndSourceRefs = callContext.Result(category, @object).CreateSequence(sourceResult);
+            var sourceResult = argsResult.ConvertToAsRef(category, _assignableRef.CreateAutomaticRef());
+            var objectAndSourceRefs = functionalResult.StripFunctional().CreateSequence(sourceResult);
             return result.UseWithArg(objectAndSourceRefs);
         }
+
+        string IDumpShortProvider.DumpShort() { return _assignableRef.DumpShort() + " :="; }
+
     }
 }

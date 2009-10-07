@@ -156,6 +156,8 @@ namespace Reni.Type
                 () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Target.Size*-1),
                 () => Refs.Context(context));
         }
+
+        internal abstract AutomaticRef CreateAutomaticRef();
     }
 
     [Serializable]
@@ -167,5 +169,6 @@ namespace Reni.Type
         }
 
         protected override string ShortName { get { return "automatic_ref"; } }
+        internal override AutomaticRef CreateAutomaticRef() { return this; }
     }
 }

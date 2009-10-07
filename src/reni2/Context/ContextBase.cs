@@ -166,17 +166,7 @@ namespace Reni.Context
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target)
         {
             var result = Result(category | Category.Type, syntax);
-            if(result.Type.IsRefLike(target))
-                return target.CreateResult(category, Result(category & (Category.Code | Category.Refs), syntax));
-
-            if(result.Type.IsRef(RefAlignParam))
-            {
-                var convertedResult = result.ConvertTo(target.Target);
-                NotImplementedMethod(category, syntax, target, "type", result.Type, "result", result, "convertedResult",
-                                     convertedResult);
-                return result;
-            }
-            return result.ConvertTo(target.AlignedTarget).CreateAutomaticRefResult(category, target);
+            return result.ConvertToAsRef(category, target);
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }

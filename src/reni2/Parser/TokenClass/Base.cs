@@ -18,7 +18,7 @@ namespace Reni.Parser.TokenClass
     internal abstract class TokenClassBase : ReniObject, IIconKeyProvider
     {
         private static int _nextObjectId;
-        private string _name;
+        private string _name = "";
 
         protected TokenClassBase()
             : base(_nextObjectId++)

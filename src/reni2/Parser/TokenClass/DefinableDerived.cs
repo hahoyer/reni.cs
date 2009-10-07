@@ -10,7 +10,7 @@ namespace Reni.Parser.TokenClass
     [Token("type")]
     internal sealed class TtypeT : Defineable, IFeature
     {
-       Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.AutomaticDereference().TypeOperator(category); }
+        Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.AutomaticDereference().TypeOperator(category); }
     }
 
     [Token("dump_print")]
@@ -20,24 +20,27 @@ namespace Reni.Parser.TokenClass
         ISearchPath<IFeature, TypeType>,
         ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>,
         ISearchPath<IFeature, Bit>,
+        ISearchPath<IFeature, Type.Void>,
         ISearchPath<ISearchPath<IFeature, Sequence>, Bit>
     {
         private sealed class BitFeature : BitFeatureBase, IFeature
         {
-            Result IFeature.Apply(Category category, TypeBase objectType)
-            {
-                return Apply(category, 1).UseWithArg(objectType.Conversion(category, TypeBase.CreateBit).Align(BitsConst.SegmentAlignBits));
-            }
+            Result IFeature.Apply(Category category, TypeBase objectType) { return Apply(category, 1).UseWithArg(objectType.Conversion(category, TypeBase.CreateBit).Align(BitsConst.SegmentAlignBits)); }
         }
 
         private abstract class BitFeatureBase
         {
             protected static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
-
         }
 
-        private readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
-        private readonly BitFeature _bitFeature = new BitFeature();
+        private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
+        private static readonly BitFeature _bitFeature = new BitFeature();
+        private static readonly VoidFeature _voidFeature = new VoidFeature();
+
+        private class VoidFeature: ReniObject, IFeature
+        {
+            Result IFeature.Apply(Category category, TypeBase objectType) { return TypeBase.CreateVoidResult(category); }
+        }
 
         private sealed class BitSequenceFeature :
             BitFeatureBase,
@@ -52,6 +55,7 @@ namespace Reni.Parser.TokenClass
         ISearchPath<IFeature, Ref> ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintFromRefFeature; }
         IFeature ISearchPath<IFeature, TypeType>.Convert(TypeType type) { return type.DumpPrintFeature; }
         IFeature ISearchPath<IFeature, Bit>.Convert(Bit type) { return _bitFeature; }
+        IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return _voidFeature; }
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
