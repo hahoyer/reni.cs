@@ -21,7 +21,7 @@ namespace Reni.Type
             string IDumpShortProvider.DumpShort() { return "type"; }
             Result IFunctionalFeature.Apply(Category category, Result functionResult, Result argsResult)
             {
-                return argsResult.ConvertTo(functionResult.Type.StripFunctional().AutomaticDereference());
+                return argsResult.ConvertTo(functionResult.Type.StripFunctional().AutomaticDereference()) & category;
             }
         }
 

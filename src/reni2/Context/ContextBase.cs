@@ -302,7 +302,12 @@ namespace Reni.Context
         public PendingContext(ContextBase parent)
             : base(parent) { }
 
-        internal override Result PendingResult(Category category, ICompileSyntax syntax) { return syntax.Result(this, category); }
+        internal override Result PendingResult(Category category, ICompileSyntax syntax)
+        {
+            Result result = syntax.Result(this, category);
+            Tracer.Assert(result.CompleteCategory == category);
+            return result;
+        }
 
         internal override Result CommonResult(Category category, CondSyntax condSyntax)
         {
