@@ -21,6 +21,7 @@ namespace Reni.Type
             : base(_nextObjectId++, target)
         {
             Tracer.Assert(!(target is Aligner));
+            Tracer.Assert(!(target.Size.IsZero));
             RefAlignParam = refAlignParam;
             StopByObjectId(-6);
         }

@@ -235,7 +235,7 @@ namespace Reni.Context
         {
             if (left == null)
                 return null;
-            var leftType = Type(left).EnsureRef(RefAlignParam);
+            var leftType = Type(left).EnsureRefOrVoid(RefAlignParam);
 
             var rawResult = leftType.GetUnaryResult<TFeature>(category, defineable);
             if(rawResult == null)

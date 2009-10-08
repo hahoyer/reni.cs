@@ -382,5 +382,12 @@ namespace Reni.Type
 
             return feature.Apply(category, this) & category;
         }
+
+        internal TypeBase EnsureRefOrVoid(RefAlignParam refAlignParam)
+        {
+            if(Size.IsZero)
+                return this;
+            return EnsureRef(refAlignParam);
+        }
     }
 }

@@ -609,12 +609,6 @@ namespace Reni
             if(Type.IsRefLike(target))
                 return target.CreateResult(category, this & (Category.Code | Category.Refs));
 
-            if(Type.IsRef(target.RefAlignParam))
-            {
-                var convertedResult = ConvertTo(target.Target);
-                NotImplementedMethod(category, target, "convertedResult",convertedResult);
-                return this;
-            }
             return ConvertTo(target.AlignedTarget).CreateAutomaticRefResult(category, target);
         }
     }
