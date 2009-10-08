@@ -50,7 +50,8 @@ namespace Reni.Type
                 return result;
 
             var sourceResult = argsResult.ConvertToAsRef(category, _assignableRef.CreateAutomaticRef());
-            var objectAndSourceRefs = functionalResult.StripFunctional().CreateSequence(sourceResult);
+            var destinationResult = functionalResult.StripFunctional() & category;
+            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
             return result.UseWithArg(objectAndSourceRefs);
         }
 

@@ -32,13 +32,13 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Element.Size*_count; }
 
+        internal override bool IsValidRefTarget() { return Count > 0 && Element.IsValidRefTarget(); }
+
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
 
         internal override Result Destructor(Category category) { return Element.ArrayDestructor(category, Count); }
 
         internal override Result Copier(Category category) { return Element.ArrayCopier(category, Count); }
-
-        internal new Result DumpPrint(Category category) { return Element.ArrayDumpPrint(category, Count); }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam) { return Element.ArrayDumpPrintFromRef(category, Count, refAlignParam); }
 

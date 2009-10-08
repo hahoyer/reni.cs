@@ -9,6 +9,8 @@ namespace Reni.Type
 
         protected override string TagTitle { get { return "enable_cut"; } }
 
+        internal override bool IsValidRefTarget() { return Parent.IsValidRefTarget(); }
+
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             return base.IsConvertableToImplementation(dest, conversionFeature.EnableCut);

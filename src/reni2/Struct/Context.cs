@@ -52,6 +52,14 @@ namespace Reni.Struct
         [DumpData(false)]
         internal int IndexSize { get { return Container.IndexSize; } }
 
+        internal bool IsValidRefTarget()
+        {
+            for(var i = 0; i <= Position; i++)
+                if(InternalType(i).IsValidRefTarget())
+                    return true;
+            return false;
+        }
+
         private PositionFeature[] CreateFeaturesCache()
         {
             var result = new List<PositionFeature>();
@@ -114,6 +122,11 @@ namespace Reni.Struct
         protected Size InternalSize(int position)
         {
             return InternalResult(Category.Size, position).Size;
+        }
+
+        protected TypeBase InternalType(int position)
+        {
+            return InternalResult(Category.Type, position).Type;
         }
 
         internal Size InternalSize() { return InternalResult(Category.Size).Size; }

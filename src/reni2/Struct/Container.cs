@@ -118,20 +118,6 @@ namespace Reni.Struct
             List.Add(parsedSyntax.ToCompiledSyntax());
         }
 
-        public string DumpPrintText(ContextBase context)
-        {
-            var result = "";
-            for(var i = 0; i < List.Count; i++)
-            {
-                if(i > 0)
-                    result += ";";
-                if(ReverseDictionary.ContainsKey(i))
-                    result += ReverseDictionary[i] + ": ";
-                result += context.Type(List[i]);
-            }
-            return result;
-        }
-
         public override string DumpData()
         {
             var isInsideFileDump = _isInsideFileDump;

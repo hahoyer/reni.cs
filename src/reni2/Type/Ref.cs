@@ -21,7 +21,7 @@ namespace Reni.Type
             : base(_nextObjectId++, target)
         {
             Tracer.Assert(!(target is Aligner));
-            Tracer.Assert(!(target.Size.IsZero));
+            Tracer.Assert(target.IsValidRefTarget());
             RefAlignParam = refAlignParam;
             StopByObjectId(-6);
         }
@@ -159,6 +159,7 @@ namespace Reni.Type
         }
 
         internal abstract AutomaticRef CreateAutomaticRef();
+        internal override bool IsValidRefTarget() { return true; }
     }
 
     [Serializable]

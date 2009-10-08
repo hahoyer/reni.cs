@@ -45,6 +45,8 @@ namespace Reni.Struct
             Context = context;
         }
 
+        internal override bool IsValidRefTarget() { return Context.IsValidRefTarget(); }
+
         protected override Size GetSize()
         {
             if(_isGetSizeActive)

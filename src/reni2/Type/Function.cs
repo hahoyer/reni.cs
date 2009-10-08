@@ -50,6 +50,8 @@ namespace Reni.Type
             get { return "#(#context " + _context.ObjectId + "#)# function(" + _body.DumpShort() + ")"; }
         }
 
+        internal override bool IsValidRefTarget() { return false; }
+
         internal override AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
         {
             NotImplementedMethod(refAlignParam);
@@ -108,6 +110,8 @@ namespace Reni.Type
         {
             return Size.Create(0);
         }
+
+        internal override bool IsValidRefTarget() { return false; }
 
         internal override string DumpPrintText
         {

@@ -98,6 +98,7 @@ namespace Reni.Type
             return "aligner(" + Parent.DumpShort() + ")";
         }
 
+        internal override bool IsValidRefTarget() { return Parent.IsValidRefTarget(); }
         protected override bool IsInheritor { get { return true; } }
     }
 }

@@ -32,6 +32,7 @@ namespace Reni.Type
         public override string Dump() { return GetType().FullName; }
 
         internal override string DumpShort() { return "bit"; }
+        internal override bool IsValidRefTarget() { return true; }
     }
 
     internal interface ISequenceOfBitPrefixOperation 

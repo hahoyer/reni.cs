@@ -24,6 +24,8 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
+        internal override bool IsValidRefTarget() { return false; }
+
         internal override TypeBase CreatePair(TypeBase second)
         {
             return second;
@@ -32,11 +34,6 @@ namespace Reni.Type
         protected override TypeBase CreateReversePair(TypeBase first)
         {
             return first;
-        }
-
-        internal new Result DumpPrint(Category category)
-        {
-            return CreateResult(category);
         }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
@@ -52,11 +49,6 @@ namespace Reni.Type
         internal new static Result CreateResult(Category category, Func<CodeBase> getCode)
         {
             return CreateVoid.CreateResult(category, getCode);
-        }
-
-        internal new static Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
-        {
-            return CreateVoid.CreateResult(category, getCode, getRefs);
         }
 
         internal override string DumpShort()

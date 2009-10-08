@@ -20,6 +20,7 @@ namespace Reni.Type
 
         internal TypeBase First { get { return Parent; } }
         internal TypeBase Second { get { return _second; } }
+        internal override bool IsValidRefTarget() { return First.IsValidRefTarget() || Second.IsValidRefTarget(); }
 
         protected override Size GetSize()
         {

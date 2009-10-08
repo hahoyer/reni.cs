@@ -157,7 +157,7 @@ namespace Reni.Context
         internal Result ResultAsRef(Category category, ICompileSyntax syntax)
         {
             var result = Result(category | Category.Type, syntax);
-            if(result.Type.IsRef(RefAlignParam))
+            if (result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
                 return Result(category, syntax);
 
             return result.CreateAutomaticRefResult(category, result.Type.CreateAutomaticRef(RefAlignParam));

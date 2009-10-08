@@ -36,6 +36,8 @@ namespace Reni.Type
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
 
+        internal override bool IsValidRefTarget() { return _inheritedType.IsValidRefTarget(); }
+
         [Node, DumpData(false)]
         internal override int SequenceCount { get { return Count; } }
 
