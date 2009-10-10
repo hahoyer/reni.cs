@@ -4,8 +4,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Parser.TokenClass;
 
 #pragma warning disable 1911
 
@@ -29,10 +27,7 @@ namespace Reni.Type
         [DumpData(false)]
         internal TypeBase Target { get { return Parent; } }
 
-        protected override sealed Size GetSize()
-        {
-            return RefAlignParam.RefSize;
-        }
+        protected override sealed Size GetSize() { return RefAlignParam.RefSize; }
 
         [DumpData(false)]
         internal override sealed string DumpPrintText { get { return "#(#" + ShortName + "#)# " + Parent.DumpPrintText; } }
@@ -43,20 +38,11 @@ namespace Reni.Type
         [DumpData(false)]
         internal override sealed int SequenceCount { get { return Target.SequenceCount; } }
 
-        internal override sealed Result Destructor(Category category)
-        {
-            return CreateVoidCodeAndRefs(category);
-        }
+        internal override sealed Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 
-        internal override sealed Result Copier(Category category)
-        {
-            return CreateVoidCodeAndRefs(category);
-        }
+        internal override sealed Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
 
-        internal override sealed Result AutomaticDereference(Result result)
-        {
-            return Target.AutomaticDereference(CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result));
-        }
+        internal override sealed Result AutomaticDereference(Result result) { return Target.AutomaticDereference(CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result)); }
 
         internal Result CreateDereferencedArgResult(Category category)
         {
@@ -67,20 +53,11 @@ namespace Reni.Type
                 );
         }
 
-        private CodeBase CreateDereferencedArgCode()
-        {
-            return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size);
-        }
+        private CodeBase CreateDereferencedArgCode() { return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size); }
 
-        internal override sealed TypeBase AutomaticDereference()
-        {
-            return Target.AutomaticDereference();
-        }
+        internal override sealed TypeBase AutomaticDereference() { return Target.AutomaticDereference(); }
 
-        internal new Result DumpPrint(Category category)
-        {
-            return Target.DumpPrintFromRef(category, RefAlignParam);
-        }
+        internal new Result DumpPrint(Category category) { return Target.DumpPrintFromRef(category, RefAlignParam); }
 
         internal override sealed Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
@@ -100,10 +77,7 @@ namespace Reni.Type
         [DumpData(false)]
         internal TypeBase AlignedTarget { get { return Target.CreateAlign(RefAlignParam.AlignBits); } }
 
-        internal override sealed string DumpShort()
-        {
-            return ShortName + "." + Parent.DumpShort();
-        }
+        internal override sealed string DumpShort() { return ShortName + "." + Parent.DumpShort(); }
 
         protected override sealed Result ConvertToImplementation(Category category, TypeBase dest)
         {
@@ -112,35 +86,17 @@ namespace Reni.Type
                 .UseWithArg(CreateDereferencedArgResult(category));
         }
 
-        internal override sealed Result ApplyTypeOperator(Result argResult)
-        {
-            return Target.ApplyTypeOperator(argResult);
-        }
+        internal override sealed Result ApplyTypeOperator(Result argResult) { return Target.ApplyTypeOperator(argResult); }
 
-        internal override sealed Result TypeOperator(Category category)
-        {
-            return Target.TypeOperator(category);
-        }
+        internal override sealed Result TypeOperator(Category category) { return Target.TypeOperator(category); }
 
-        internal override sealed bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
-        {
-            return Target.IsConvertableTo(dest, conversionFeature);
-        }
+        internal override sealed bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature) { return Target.IsConvertableTo(dest, conversionFeature); }
 
-        internal override Result AccessResultAsArg(Category category, int position)
-        {
-            return Target.AccessResultAsArgFromRef(category, position, RefAlignParam);
-        }
+        internal override Result AccessResultAsArg(Category category, int position) { return Target.AccessResultAsArgFromRef(category, position, RefAlignParam); }
 
-        internal Result AccessResultAsContextRef(Category category, int position)
-        {
-            return Target.AccessResultAsContextRefFromRef(category, position, RefAlignParam);
-        }
+        internal Result AccessResultAsContextRef(Category category, int position) { return Target.AccessResultAsContextRefFromRef(category, position, RefAlignParam); }
 
-        internal override bool IsRefLike(Ref target)
-        {
-            return Target == target.Target && RefAlignParam == target.RefAlignParam;
-        }
+        internal override bool IsRefLike(Ref target) { return Target == target.Target && RefAlignParam == target.RefAlignParam; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -166,9 +122,7 @@ namespace Reni.Type
     internal sealed class AutomaticRef : Ref
     {
         internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam)
-            : base(target, refAlignParam)
-        {
-        }
+            : base(target, refAlignParam) { }
 
         protected override string ShortName { get { return "automatic_ref"; } }
         internal override AutomaticRef CreateAutomaticRef() { return this; }

@@ -1,7 +1,8 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Code.ReplaceVisitor;
 using Reni.Syntax;
@@ -18,14 +19,18 @@ namespace Reni.Context
         [Node]
         [DumpData(true)]
         private readonly TypeBase Args;
+
         [Node]
         [DumpData(true)]
         private readonly ICompileSyntax Body;
+
         [Node]
         [DumpData(true)]
         private readonly ContextBase Context;
+
         [DumpData(true)]
         private readonly int Index;
+
         [Node]
         private CodeBase _bodyCodeCache;
 
@@ -92,7 +97,7 @@ namespace Reni.Context
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(Index, result.Size);
 
             Context.CreateFunction(Args).AssertCorrectRefs(result);
-            return ReturnMethodDumpWithBreak(trace,result);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
 
         private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return ForeignRefs.ToCode().CreateSequence(argsCode); }
@@ -120,30 +125,40 @@ namespace Reni.Context
             var functionContext = Context.CreateFunction(Args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
-            var categoryEx = category| Category.Type;
+            var categoryEx = category | Category.Type;
             var rawResult = functionContext.Result(categoryEx, Body).Clone();
 
             DumpWithBreak(trace, "functionContext", functionContext, "rawResult", rawResult);
 
-            var postProcessedResult = 
+            var postProcessedResult =
                 rawResult
-                .PostProcessor
-                .FunctionResult(category, functionContext.RefAlignParam);
+                    .PostProcessor
+                    .FunctionResult(category, functionContext.RefAlignParam);
 
             DumpWithBreak(trace, "postProcessedResult", postProcessedResult);
-            var result = 
+            var result =
                 postProcessedResult
-                .ReplaceAbsoluteContextRef(functionContext, CreateArgsRef(postProcessedResult.CompleteCategory));
+                    .ReplaceAbsoluteContextRef(functionContext,
+                                               CreateContextRef(postProcessedResult.CompleteCategory));
             return ReturnMethodDump(trace, result);
         }
 
-        private Result CreateArgsRef(Category category)
+        private Result CreateContextRef(Category category)
+        {
+            return new Result(
+                category, 
+                () => Context.RefAlignParam.RefSize, 
+                CreateContextRefCode, 
+                Refs.None);
+        }
+
+        private CodeBase CreateContextRefCode()
         {
             var refAlignParam = Context.RefAlignParam;
-            return Args.CreateAutomaticRef(refAlignParam).CreateResult(category, () => CodeBase
+            return CodeBase
                 .CreateFrameRef(refAlignParam)
                 .CreateRefPlus(refAlignParam,
-                    FrameSize*-1));
+                               FrameSize*-1);
         }
 
         private TypeBase Type() { return Result(Category.Type).Type; }
