@@ -17,7 +17,7 @@ namespace Reni.Struct
     [Serializable]
     internal abstract class Context : ContextBase, IStructContext
     {
-        private readonly SimpleCache<PositionFeature[]> _featuresCache;
+        private readonly SimpleCache<ContextPosition[]> _featuresCache;
         [Node]
         internal readonly ContextBase Parent;
         [Node]
@@ -27,7 +27,7 @@ namespace Reni.Struct
         
         protected Context(ContextBase parent, Container container)
         {
-            _featuresCache = new SimpleCache<PositionFeature[]>(CreateFeaturesCache);
+            _featuresCache = new SimpleCache<ContextPosition[]>(CreateFeaturesCache);
             Parent = parent;
             Container = container;
             _internalResult = new Result[StatementList.Count];
@@ -43,7 +43,7 @@ namespace Reni.Struct
         [DumpData(false)]
         public abstract IRefInCode ForCode { get; }
         [DumpData(false)]
-        internal PositionFeature[] Features { get { return _featuresCache.Value; } }
+        internal ContextPosition[] Features { get { return _featuresCache.Value; } }
         [DumpData(false)]
         protected abstract int Position { get; }
 
@@ -60,17 +60,13 @@ namespace Reni.Struct
             return false;
         }
 
-        private PositionFeature[] CreateFeaturesCache()
+        private ContextPosition[] CreateFeaturesCache()
         {
-            var result = new List<PositionFeature>();
+            var result = new List<ContextPosition>();
             for (var i = 0; i < Position; i++)
-                result.Add(new PositionFeature(EmptyList, this, i));
+                result.Add(new ContextPosition(this, i));
             return result.ToArray();
         }
-
-        private EmptyList EmptyList
-        {
-            get { return Container.EmptyList; } }
 
         internal abstract ContextAtPosition CreatePosition(int position);
 

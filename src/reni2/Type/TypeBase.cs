@@ -7,9 +7,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Parser.TokenClass;
-using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -134,7 +132,7 @@ namespace Reni.Type
 
         internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return _cache.AssignableRefs.Find(refAlignParam, () => new AssignableRef(this, refAlignParam)); }
 
-        internal Ref EnsureRef(RefAlignParam refAlignParam)
+        private Ref EnsureRef(RefAlignParam refAlignParam)
         {
             if(IsRef(refAlignParam))
                 return (Ref) this;
@@ -198,12 +196,6 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual Result ApplyFunction(Category category, ContextBase callContext, ICompileSyntax args)
-        {
-            NotImplementedMethod(callContext, category, args);
-            throw new NotImplementedException();
-        }
-
         internal virtual Result ApplyFunction(Category category, Result argsResult)
         {
             NotImplementedMethod(category, argsResult);
@@ -237,12 +229,6 @@ namespace Reni.Type
             return DumpPrint(category).UseWithArg(argResult);
         }
 
-        internal Result ArrayDumpPrint(Category category, int count)
-        {
-            NotImplementedMethod(category, count);
-            throw new NotImplementedException();
-        }
-
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult); }
 
         internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
@@ -272,7 +258,7 @@ namespace Reni.Type
             return ConvertToImplementation(category, dest);
         }
 
-        internal Result ConvertToSequence(Category category, TypeBase elementType)
+        private Result ConvertToSequence(Category category, TypeBase elementType)
         {
             return Conversion(category, CreateSequenceType(elementType));
         }
@@ -357,9 +343,9 @@ namespace Reni.Type
 
         internal virtual bool IsRefLike(Ref target) { return false; }
 
-        internal TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(SequenceCount); }
+        private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(SequenceCount); }
 
-        internal TFeature SearchDefineable<TFeature>(Defineable defineable)
+        private TFeature SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class
         {
             var searchVisitor = new RootSearchVisitor<TFeature>(defineable);

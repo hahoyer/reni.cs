@@ -1,86 +1,58 @@
 using System;
 using HWClassLibrary.Debug;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal abstract class PositionFeatureBase :
+    internal class PositionFeature :
         ReniObject,
+        ISearchPath<IFeature, Ref>,
         IContextFeature,
-        IFeature, ISearchPath<IFeature, Ref>
+        IFeature
     {
-        protected readonly Context StructContext;
-
         [DumpData(true)]
-        protected readonly int Position;
+        private readonly Context _structContext;
+        [DumpData(true)]
+        private readonly int _position;
+        [DumpData(true)]
+        private readonly bool _isProperty;
 
-        protected PositionFeatureBase(Context structContext, int position)
+        public PositionFeature(Context structContext, int position, bool isProperty)
         {
-            Position = position;
-            StructContext = structContext;
+            _isProperty = isProperty;
+            _structContext = structContext;
+            _position = position;
         }
 
         IFeature ISearchPath<IFeature, Ref>.Convert(Ref type)
         {
-            Tracer.Assert(type.RefAlignParam == StructContext.ForCode.RefAlignParam);
+            Tracer.Assert(type.RefAlignParam == _structContext.ForCode.RefAlignParam);
             return this;
         }
-
-        Result IContextFeature.Apply(Category category) { return Apply(category); }
-
-        protected abstract Result Apply(Category category);
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            NotImplementedMethod(category, objectType);
-            return null;
+            return ApplyProperty(category, objectType.AccessResultAsArg(category | Category.Type, _position));
         }
 
-        internal static Result AccessResult(ContextBase callContext, Category category, ICompileSyntax left, int position)
+        Result IContextFeature.Apply(Category category)
         {
-            var objectResult = callContext.ResultAsRef(category | Category.Type, left);
-            return objectResult.Type.AccessResultAsArg(category, position).UseWithArg(objectResult);
+            return ApplyProperty(category, _structContext.AccessResultAsContextRef(category | Category.Type, _position));
         }
-    }
 
-    [Serializable]
-    internal sealed class PositionFeature : PositionFeatureBase
-    {
-        private readonly PropertyPositionFeature _property;
-
-        internal PositionFeature(EmptyList emptyList, Context structContext, int position)
-            : base(
-            structContext, position) { _property = new PropertyPositionFeature(emptyList, structContext, position); }
-
-        public PositionFeatureBase ToProperty(bool isPoperty)
+        private Result ApplyProperty(Category category, Result applyResult)
         {
-            if(isPoperty)
-                return _property;
-            return this;
+            if (!_isProperty)
+                return applyResult;
+
+            return applyResult
+                .Type
+                .GetFunctionalFeature()
+                .Apply(category, applyResult, TypeBase.CreateVoidResult(category | Category.Type));
         }
 
-        protected override Result Apply(Category category)
-        {
-            return StructContext.AccessResultAsContextRef(category,Position);
-        }
-    }
-
-    internal class PropertyPositionFeature : PositionFeatureBase
-    {
-        private readonly EmptyList _emptyList;
-
-        public PropertyPositionFeature(EmptyList emptyList, Context structContext, int position)
-            : base(structContext, position) { _emptyList = emptyList; }
-
-        protected override Result Apply(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
     }
 
     internal interface IStructContext

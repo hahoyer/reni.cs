@@ -185,22 +185,22 @@ namespace Reni.Struct
     internal class StructFeature : ReniObject, IStructFeature
     {
         private readonly int _index;
-        private readonly bool _isPoperty;
+        private readonly bool _isProperty;
 
-        public StructFeature(int index, bool isPoperty)
+        public StructFeature(int index, bool isProperty)
         {
             _index = index;
-            _isPoperty = isPoperty;
+            _isProperty = isProperty;
         }
 
         ISearchPath<IFeature, Ref> ISearchPath<ISearchPath<IFeature, Ref>, Type>.Convert(Type type)
         {
-            return type.Context.Features[_index].ToProperty(_isPoperty);
+            return type.Context.Features[_index].ToProperty(_isProperty);
         }
 
         IContextFeature ISearchPath<IContextFeature, Context>.Convert(Context context)
         {
-            return context.Features[_index].ToProperty(_isPoperty);
+            return context.Features[_index].ToProperty(_isProperty);
         }
     }
 }

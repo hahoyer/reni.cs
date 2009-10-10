@@ -29,7 +29,7 @@ namespace Reni
         }
 
         private bool HasSize { get { return Size != null; } }
-        private bool HasType { get { return Type != null; } }
+        internal bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
 

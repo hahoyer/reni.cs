@@ -263,6 +263,12 @@ namespace Reni.Context
         internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
 
         internal Refs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.Refs, condSyntax).Refs; }
+
+        internal Result AccessResult(Category category, ICompileSyntax left, int position)
+        {
+            var objectResult = ResultAsRef(category | Category.Type, left);
+            return objectResult.Type.AccessResultAsArg(category, position).UseWithArg(objectResult);
+        }
     }
 
     [Serializable]

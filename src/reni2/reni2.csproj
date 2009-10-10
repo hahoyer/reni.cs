@@ -87,6 +87,7 @@
     <Compile Include="SearchTrial.cs" />
     <Compile Include="SearchVisitor.cs" />
     <Compile Include="Struct\AtToken.cs" />
+    <Compile Include="Struct\ContextPosition.cs" />
     <Compile Include="Struct\FullContext.cs" />
     <Compile Include="Struct\ContextAtPosition.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />

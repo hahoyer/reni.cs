@@ -64,20 +64,9 @@ namespace Reni.Type
             return base.CreateAssignableRef(refAlignParam);
         }
 
-        internal override Result ApplyFunction(Category category, ContextBase callContext, ICompileSyntax args)
-        {
-            var trace = ObjectId == -1 && callContext.ObjectId == 11 && (category.HasRefs ||category.HasCode);
-            StartMethodDumpWithBreak(trace, category,callContext,args);
-            var rawResult = callContext.Result(category | Category.Type, args);
-            //DumpWithBreak(trace, "rawResult", rawResult);
-            var argsResult = rawResult.PostProcessor.ArgsResult(Context.AlignBits);
-            DumpWithBreak(trace, "argsResult", argsResult);
-            var result = ApplyFunction(category, argsResult);
-            return ReturnMethodDumpWithBreak(trace, result);
-        }
-
         internal override Result ApplyFunction(Category category, Result argsResult)
         {
+            Tracer.Assert(argsResult.HasType);
             return _context
                 .RootContext
                 .CreateFunctionCall(_context, category, Body, argsResult);
@@ -90,7 +79,8 @@ namespace Reni.Type
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
-            return ApplyFunction(category,argsResult);
+            Tracer.Assert(argsResult.HasType);
+            return ApplyFunction(category, argsResult);
         }
     }
 

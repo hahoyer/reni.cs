@@ -13,7 +13,7 @@ namespace Reni.Struct
         internal override Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right)
         {
             var position = callContext.Evaluate(right, callContext.Type(left).IndexType).ToInt32();
-            return PositionFeatureBase.AccessResult(callContext, category, left, position);
+            return callContext.AccessResult(category, left, position);
         }
     }
 }
