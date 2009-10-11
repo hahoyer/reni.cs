@@ -14,7 +14,7 @@ namespace ReniTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TreeForm {Target = CreateCompiler(new Plus().Target)});
+            Application.Run(new TreeForm { Target = CreateCompiler(new Clone().Target) });
         }
 
         private static Compiler CreateCompiler(string text)
@@ -23,8 +23,8 @@ namespace ReniTest
             var f = File.m(fileName);
             f.String = text;
             var compiler = new Compiler(fileName);
-            Profiler.Measure(()=>compiler.Exec());
-            Tracer.FlaggedLine(Profiler.Format(10,0.0));
+            //Profiler.Measure(()=>compiler.Exec());
+            //Tracer.FlaggedLine(Profiler.Format(10,0.0));
             return compiler;
         }
     }

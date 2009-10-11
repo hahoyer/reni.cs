@@ -15,7 +15,7 @@ namespace Reni.Code
         internal RefCode(IRefInCode context)
         {
             _leafElement = new ContextRef(context);
-            StopByObjectId(-2766);
+            StopByObjectId(5525);
         }
 
         [Node]
@@ -29,7 +29,7 @@ namespace Reni.Code
         [DumpData(false)]
         internal override Refs RefsImplementation { get { return _leafElement.GetRefs(); } }
 
-        protected override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.ContextRef(this); }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }
     }
 
     [Serializable]

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -23,8 +22,11 @@ namespace Reni.Context
     {
         private static int _nextId;
 
-        [Node, DumpData(false)]
+        [DumpData(false)]
         private readonly Cache _cache;
+
+        [Node, DumpData(false), UsedImplicitly]
+        internal Cache Cache { get { return _cache; } }
 
         private ContextBase[] _childChainCache;
 
@@ -60,7 +62,7 @@ namespace Reni.Context
             }
         }
 
-        protected virtual ContextBase[] ObtainChildChain() { return new []{this}; }
+        protected virtual ContextBase[] ObtainChildChain() { return new[] {this}; }
 
         internal virtual string DumpShort() { return base.ToString(); }
 
@@ -93,10 +95,7 @@ namespace Reni.Context
 
         private TypeBase CreateFunctionType(ICompileSyntax body) { return _cache.FunctionType.Find(body, () => new Type.Function(this, body)); }
 
-        internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor)
-        {
-            searchVisitor.SearchTypeBase();
-        }
+        internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
 
         internal TypeBase Type(ICompileSyntax syntax)
         {
@@ -123,10 +122,7 @@ namespace Reni.Context
             return result;
         }
 
-        internal bool IsChildOf(ContextBase parentCandidate)
-        {
-            return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain);
-        }
+        internal bool IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
 
         internal void AssertCorrectRefs(Result result)
         {
@@ -142,10 +138,7 @@ namespace Reni.Context
                 CheckRef(@ref);
         }
 
-        private void CheckRef(IRefInCode @ref)
-        {
-            Tracer.Assert(!@ref.IsChildOf(this), "context=" + Dump() + "\nref="+ @ref.Dump());
-        }
+        private void CheckRef(IRefInCode @ref) { Tracer.Assert(!@ref.IsChildOf(this), "context=" + Dump() + "\nref=" + @ref.Dump()); }
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType) { return Result(Category.Code | Category.Type | Category.Refs, syntax).ConvertTo(resultType).Evaluate(); }
 
@@ -157,7 +150,7 @@ namespace Reni.Context
         internal Result ResultAsRef(Category category, ICompileSyntax syntax)
         {
             var result = Result(category | Category.Type, syntax);
-            if (result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
+            if(result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
                 return Result(category, syntax);
 
             return result.CreateAutomaticRefResult(category, result.Type.CreateAutomaticRef(RefAlignParam));
@@ -186,7 +179,7 @@ namespace Reni.Context
         internal Result GetResult(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
             var categoryForFunctionals = category;
-            if (right != null)
+            if(right != null)
                 categoryForFunctionals |= Category.Type;
 
             var suffixResult = GetSuffixResult(categoryForFunctionals, left, defineable);
@@ -199,7 +192,7 @@ namespace Reni.Context
                 }
 
                 var prefixResult = GetPrefixResult(category, defineable, right);
-                if (prefixResult != null)
+                if(prefixResult != null)
                     return prefixResult;
                 suffixResult = GetContextResult(categoryForFunctionals, defineable);
             }
@@ -207,9 +200,9 @@ namespace Reni.Context
                 return suffixResult;
 
             var feature = suffixResult.Type.GetFunctionalFeature();
-            if (feature != null)
-                return feature.Apply(category, suffixResult, ResultAsRef(category|Category.Type, right));
-            NotImplementedMethod(category, left, defineable, right, "suffixResult", suffixResult,"feature",feature);
+            if(feature != null)
+                return feature.Apply(category, suffixResult, ResultAsRef(category | Category.Type, right));
+            NotImplementedMethod(category, left, defineable, right, "suffixResult", suffixResult, "feature", feature);
             return null;
         }
 
@@ -220,20 +213,14 @@ namespace Reni.Context
             return visitor.Result;
         }
 
-        private Result GetPrefixResult(Category category, Defineable defineable, ICompileSyntax right)
-        {
-            return GetUnaryResult<IPrefixFeature>(category, right, defineable);
-        }
+        private Result GetPrefixResult(Category category, Defineable defineable, ICompileSyntax right) { return GetUnaryResult<IPrefixFeature>(category, right, defineable); }
 
-        private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
-        {
-            return GetUnaryResult<IFeature>(category, left, defineable);
-        }
+        private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable) { return GetUnaryResult<IFeature>(category, left, defineable); }
 
         private Result GetUnaryResult<TFeature>(Category category, ICompileSyntax left, Defineable defineable)
             where TFeature : class
         {
-            if (left == null)
+            if(left == null)
                 return null;
             var leftType = Type(left).EnsureRefOrVoid(RefAlignParam);
 
@@ -247,8 +234,8 @@ namespace Reni.Context
 
         private Result GetContextResult(Category category, Defineable defineable)
         {
-            IContextFeature feature = SearchDefinable(defineable);
-            if (feature == null)
+            var feature = SearchDefinable(defineable);
+            if(feature == null)
                 return null;
 
             return feature.Apply(category) & category;
@@ -310,7 +297,7 @@ namespace Reni.Context
 
         internal override Result PendingResult(Category category, ICompileSyntax syntax)
         {
-            Result result = syntax.Result(this, category);
+            var result = syntax.Result(this, category);
             Tracer.Assert(result.CompleteCategory == category);
             return result;
         }

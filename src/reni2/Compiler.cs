@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using NUnit.Framework;
@@ -20,13 +21,13 @@ namespace Reni
         private readonly CompilerParameters _parameters;
         private readonly ParserInst _parser = new ParserInst();
         private readonly Root _rootContext = ContextBase.CreateRoot();
-        private string _executedCode;
 
-        private List<Container> _functionContainers;
-        private Container _mainContainer;
-        private CodeBase _code;
-        private Source _source;
-        private IParsedSyntax _syntax;
+        private readonly SimpleCache<Source> _source;
+        private readonly SimpleCache<IParsedSyntax> _syntax;
+        private readonly SimpleCache<CodeBase> _code;
+        private readonly SimpleCache<Container> _mainContainer;
+        private readonly SimpleCache<List<Container>> _functionContainers;
+        private readonly SimpleCache<string> _executedCode;
 
         /// <summary>
         /// ctor from file
@@ -37,6 +38,12 @@ namespace Reni
         {
             _fileName = fileName;
             _parameters = parameters;
+            _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
+            _syntax = new SimpleCache<IParsedSyntax>(() => _parser.Compile(Source));
+            _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax.Token, Syntax).Result(_rootContext, Category.Code).Code);
+            _mainContainer = new SimpleCache<Container>(()=>Code.Serialize(false));
+            _functionContainers = new SimpleCache<List<Container>>(()=>_rootContext.CompileFunctions());
+            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
         }
 
         /// <summary>
@@ -47,84 +54,23 @@ namespace Reni
         public Compiler(string fileName)
             : this(new CompilerParameters(), fileName) { }
 
-        internal FunctionList Functions { get { return RootContext.Functions; } }
-
-        [DumpData(false)]
-        internal ParserInst Parser { get { return _parser; } }
+        internal FunctionList Functions { get { return _rootContext.Functions; } }
 
         [DumpData(false)]
         public string FileName { get { return _fileName; } }
-
         [DumpData(false)]
-        public Source Source
-        {
-            get
-            {
-                if(_source == null)
-                    _source = new Source(File.m(_fileName));
-                return _source;
-            }
-        }
-
+        public Source Source { get { return _source.Value; } }
         [Node, DumpData(false)]
-        internal IParsedSyntax Syntax
-        {
-            get
-            {
-                if(_syntax == null)
-                    _syntax = _parser.Compile(Source);
-                return _syntax;
-            }
-        }
-
-        [Node, DumpData(false)]
-        internal Root RootContext { get { return _rootContext; } }
-
+        internal IParsedSyntax Syntax { get { return _syntax.Value; } }
         [DumpData(false)]
-        public string ExecutedCode
-        {
-            get
-            {
-                if(_executedCode == null)
-                    _executedCode = Generator.CreateCSharpString(MainContainer, FunctionContainers, true);
-                return _executedCode;
-            }
-        }
+        public string ExecutedCode { get { return _executedCode.Value; } }
 
         [Node, DumpData(false)]
-        internal CodeBase Code
-        {
-            get
-            {
-                if(_code == null)
-                    _code = Struct.Container.Create(Syntax.Token, Syntax).Result(RootContext, Category.Code).Code;
-
-                return _code;
-            }
-        }
-
+        private CodeBase Code { get { return _code.Value; } }
         [DumpData(false)]
-        internal Container MainContainer
-        {
-            get
-            {
-                if(_mainContainer == null)
-                    _mainContainer = Code.Serialize(false);
-                return _mainContainer;
-            }
-        }
-
+        private Container MainContainer { get { return _mainContainer.Value; } }
         [Node, DumpData(false)]
-        internal List<Container> FunctionContainers
-        {
-            get
-            {
-                if(_functionContainers == null)
-                    _functionContainers = RootContext.CompileFunctions();
-
-                return _functionContainers;
-            }
-        }
+        private List<Container> FunctionContainers { get { return _functionContainers.Value; } }
 
         public static string FormattedNow
         {
@@ -161,15 +107,15 @@ namespace Reni
             if(_parameters.Trace.Functions)
             {
                 Materialize();
-                for(var i = 0; i < RootContext.Functions.Count; i++)
-                    Tracer.FlaggedLine(RootContext.Functions[i].DumpFunction());
+                for(var i = 0; i < _rootContext.Functions.Count; i++)
+                    Tracer.FlaggedLine(_rootContext.Functions[i].DumpFunction());
             }
 
             if(_parameters.Trace.CodeTree)
             {
                 Tracer.FlaggedLine("main\n" + Code.Dump());
                 for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + RootContext.Functions[i].BodyCode.Dump());
+                    Tracer.FlaggedLine("function index=" + i + "\n" + _rootContext.Functions[i].BodyCode.Dump());
             }
             if(_parameters.Trace.CodeSequence)
             {
@@ -188,10 +134,9 @@ namespace Reni
         {
             if(_parameters.ParseOnly)
                 return;
-            var dummy = Code;
-            for(var i = 0; i < RootContext.Functions.Count; i++)
-                dummy = RootContext.Functions[i].BodyCode;
-            Tracer.Assert(dummy != null);
+            _code.Ensure();
+            for(var i = 0; i < _rootContext.Functions.Count; i++)
+                _rootContext.Functions[i].EnsureBodyCode();
         }
 
         public OutStream GetOutStream()
@@ -222,7 +167,7 @@ namespace Reni
         /// Shows or hides syntax tree
         /// </summary>
         [Node, DumpData(true)]
-        public TraceParamters Trace = new TraceParamters();
+        public readonly TraceParamters Trace = new TraceParamters();
 
         public bool ParseOnly;
 

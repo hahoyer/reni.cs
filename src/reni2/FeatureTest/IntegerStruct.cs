@@ -47,7 +47,7 @@ Integer8: function
     [TestFixture, Output("23"), InstanceCode("Integer8(23) clone")]
     public class Clone : IntegerStruct
     {
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 
