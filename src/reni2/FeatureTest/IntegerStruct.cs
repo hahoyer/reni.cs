@@ -18,10 +18,13 @@ Integer8: function
     _data: 127 type (arg enable_cut);
 
     create   : function(Integer8(arg));
-    !property dump_print: function (_data dump_print);
+    !property 
+    dump_print: function (_data dump_print);
     +        : function create(_data + create(arg) _data);
-    !property clone: function create(_data);
-    !property enable_cut: function _data enable_cut;
+    !property 
+    clone: function create(_data);
+    !property 
+    enable_cut: function _data enable_cut;
     !converter: function _data;
 }
 ";
