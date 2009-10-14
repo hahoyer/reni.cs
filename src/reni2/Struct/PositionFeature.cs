@@ -1,6 +1,7 @@
 using System;
 using HWClassLibrary.Debug;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -34,25 +35,29 @@ namespace Reni.Struct
 
         Result IFeature.Apply(Category category, TypeBase objectType)
         {
-            return ApplyProperty(category, objectType.AccessResultAsArg(category | Category.Type, _position));
+            var result = Apply(category);
+            if(category.HasCode || category.HasRefs)
+                NotImplementedMethod(category,objectType,"result",result);
+            return result;
+        }
+
+        private RefAlignParam RefAlignParam { get { return _structContext.ForCode.RefAlignParam; } }
+
+        private Result Apply(Category category) {
+            var result = _structContext.AccessResultAsContextRef(category | Category.Type, _position);
+            if (!_isProperty)
+                return result;
+            return result
+                .Type
+                .GetFunctionalFeature()
+                .Apply(category, result, TypeBase.CreateVoidResult(category | Category.Type));
+
         }
 
         Result IContextFeature.Apply(Category category)
         {
-            return ApplyProperty(category, _structContext.AccessResultAsContextRef(category | Category.Type, _position));
+            return Apply(category);
         }
-
-        private Result ApplyProperty(Category category, Result applyResult)
-        {
-            if (!_isProperty)
-                return applyResult;
-
-            return applyResult
-                .Type
-                .GetFunctionalFeature()
-                .Apply(category, applyResult, TypeBase.CreateVoidResult(category | Category.Type));
-        }
-
     }
 
     internal interface IStructContext
