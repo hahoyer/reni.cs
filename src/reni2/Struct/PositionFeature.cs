@@ -37,7 +37,12 @@ namespace Reni.Struct
         {
             var result = Apply(category);
             if(category.HasCode || category.HasRefs)
-                NotImplementedMethod(category,objectType,"result",result);
+            {
+                var objectCode = objectType
+                    .Conversion(Category.Code, _structContext.NaturalRefType).Code
+                    .CreateRefPlus(RefAlignParam, _structContext.NaturalRefType.UnrefSize);
+                result = result.ReplaceRelativeContextRef(_structContext.ForCode, objectCode);
+            }
             return result;
         }
 
