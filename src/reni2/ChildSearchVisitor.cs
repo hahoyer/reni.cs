@@ -11,6 +11,7 @@ namespace Reni
         where TFeature : class
         where TType : IDumpShortProvider
     {
+        [DumpData(true)]
         private readonly SearchVisitor<TFeature> _parent;
         private readonly TType _target;
 
@@ -28,7 +29,6 @@ namespace Reni
             {
                 if(value == null)
                     return;
-                Tracer.Assert(!IsSuccessFull);
                 _parent.InternalResult = value.Convert(_target);
             }
         }

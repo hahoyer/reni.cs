@@ -6,7 +6,7 @@ using Reni.Type;
 
 namespace Reni
 {
-    internal abstract class SearchVisitor<TFeature> : ISearchVisitor
+    internal abstract class SearchVisitor<TFeature> : ReniObject, ISearchVisitor
         where TFeature : class
     {
         void ISearchVisitor.Search() { SearchTypeBase(); }

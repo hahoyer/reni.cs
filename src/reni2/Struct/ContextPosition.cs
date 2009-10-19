@@ -1,20 +1,21 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using HWClassLibrary.Helper;
 
 namespace Reni.Struct
 {
     internal class ContextPosition : ReniObject
     {
-        private readonly Context _structContext;
-        private readonly int _position;
+        private readonly SimpleCache<PositionFeature> _trueFeature;
+        private readonly SimpleCache<PositionFeature> _falseFeature;
 
         internal ContextPosition(Context structContext, int position)
         {
-            _position = position;
-            _structContext = structContext;
+            _trueFeature = new SimpleCache<PositionFeature>(() => new PositionFeature(structContext, position, true));
+            _falseFeature = new SimpleCache<PositionFeature>(() => new PositionFeature(structContext, position, false));
         }
 
-        public PositionFeature ToProperty(bool isProperty) { return new PositionFeature(_structContext, _position, isProperty); }
+        public PositionFeature ToProperty(bool isProperty) { return isProperty ? _trueFeature.Value : _falseFeature.Value; }
     }
 }

@@ -39,7 +39,7 @@ namespace Reni.Parser
 
         protected internal override Result Result(ContextBase context, Category category)
         {
-            var trace = ObjectId == 1201 && (category.HasCode || category.HasRefs);
+            var trace = ObjectId == -38;
             StartMethodDumpWithBreak(trace, context, category);
             var result = context.GetResult(category, Left, DefineableToken.TokenClass, Right);
             return ReturnMethodDumpWithBreak(trace, result);

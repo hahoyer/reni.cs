@@ -20,7 +20,7 @@ namespace Reni
         {
             set
             {
-                Tracer.Assert(_result == null);
+                Tracer.Assert(_result == null || _result == value);
                 _result = value;
             }
         }
