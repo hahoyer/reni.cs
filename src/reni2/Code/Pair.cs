@@ -1,7 +1,8 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 
 namespace Reni.Code
 {
@@ -12,17 +13,20 @@ namespace Reni.Code
     {
         private readonly CodeBase _left;
         private readonly CodeBase _right;
+        private static int _nextObjectId;
 
         internal Pair(CodeBase left, CodeBase right)
+            : base(_nextObjectId++)
         {
             _left = left;
             _right = right;
             var bc = Left.Size.SaveByteCount;
-            StopByObjectId(1720);
+            StopByObjectId(8);
         }
 
         [Node]
         internal CodeBase Left { get { return _left; } }
+
         [Node]
         internal CodeBase Right { get { return _right; } }
 

@@ -15,6 +15,9 @@ namespace Reni.Code
     internal abstract class
         CodeBase : ReniObject, IIconKeyProvider
     {
+        protected CodeBase(int objectId):base(objectId) {  }
+        protected CodeBase(){ }
+
         [Node]
         [DumpData(false)]
         internal Size Size { get { return SizeImplementation; } }

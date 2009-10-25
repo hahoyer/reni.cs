@@ -1,5 +1,6 @@
 using System;
-using HWClassLibrary.Debug;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Context;
 
 namespace Reni.Code
@@ -7,7 +8,8 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopRef : RefLeafElement
     {
-        public TopRef(RefAlignParam refAlignParam, Size offset) : base(refAlignParam,offset)
+        public TopRef(RefAlignParam refAlignParam, Size offset)
+            : base(refAlignParam, offset)
         {
             StopByObjectId(-259);
             StopByObjectId(-1897);
