@@ -29,7 +29,7 @@ namespace Reni.Struct
 
         IFeature ISearchPath<IFeature, Ref>.Convert(Ref type)
         {
-            Tracer.Assert(type.RefAlignParam == _structContext.ForCode.RefAlignParam);
+            Tracer.Assert(type.RefAlignParam == RefAlignParam);
             return this;
         }
 
