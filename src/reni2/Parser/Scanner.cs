@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HWClassLibrary.Debug;
-using JetBrains.Annotations;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
@@ -31,29 +28,29 @@ namespace Reni.Parser
             SetCharType('?', "#'\"({[)}];,");
         }
 
-        private bool IsDigit(char Char)
+        private bool IsDigit(char @char)
         {
-            return _charType[Char] == '0';
+            return _charType[@char] == '0';
         }
 
-        private bool IsAlpha(char Char)
+        private bool IsAlpha(char @char)
         {
-            return _charType[Char] == 'a';
+            return _charType[@char] == 'a';
         }
 
-        private bool IsSymbol(char Char)
+        private bool IsSymbol(char @char)
         {
-            return _charType[Char] == '*';
+            return _charType[@char] == '*';
         }
 
-        private bool IsWhiteSpace(char Char)
+        private bool IsWhiteSpace(char @char)
         {
-            return _charType[Char] == ' ';
+            return _charType[@char] == ' ';
         }
 
-        private bool IsAlphaNum(char Char)
+        private bool IsAlphaNum(char @char)
         {
-            return IsAlpha(Char) || IsDigit(Char);
+            return IsAlpha(@char) || IsDigit(@char);
         }
 
         /// <summary>
@@ -80,12 +77,12 @@ namespace Reni.Parser
                 switch(sp.Current)
                 {
                     case '#':
-                    {
-                        var error = JumpComment(sp);
-                        if(error != null)
-                            return error;
-                        break;
-                    }
+                        {
+                            var error = JumpComment(sp);
+                            if(error != null)
+                                return error;
+                            break;
+                        }
 
                     case '"':
                         return CreateStringToken(sp);
@@ -177,80 +174,10 @@ namespace Reni.Parser
             return null;
         }
 
-        private void SetCharType(char Type, string Chars)
+        private void SetCharType(char type, IEnumerable<char> chars)
         {
-            for(var i = 0; i < Chars.Length; i++)
-                _charType[Chars[i]] = Type;
-        }
-    }
-
-    [MeansImplicitUse]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    internal abstract class TokenAttributeBase : Attribute
-    {
-        internal readonly string Token;
-
-        protected TokenAttributeBase(string token)
-        {
-            Token = token;
-        }
-
-        internal abstract PrioTable CreatePrioTable();
-    }
-
-    [Serializable]
-    internal abstract class TokenFactory
-    {
-        private readonly PrioTable _prioTable;
-        private readonly Dictionary<string, TokenClassBase> _tokenClasses;
-
-        protected TokenFactory(Dictionary<string, TokenClassBase> tokenClasses, PrioTable prioTable)
-        {
-            _tokenClasses = tokenClasses;
-            _prioTable = prioTable;
-        }
-
-        internal Token CreateToken(SourcePosn sourcePosn, int length)
-        {
-            return new Token(sourcePosn, length, Find(sourcePosn.SubString(0, length)));
-        }
-
-        private TokenClassBase Find(string name)
-        {
-            TokenClassBase result;
-            if(_tokenClasses.TryGetValue(name, out result))
-                return result;
-            return UserSymbol.Instance(name);
-        }
-
-        public char Relation(Token newToken, Token topToken)
-        {
-            return _prioTable.Relation(newToken, topToken);
-        }
-    }
-
-    [Serializable]
-    internal sealed class TokenFactory<TTokenAttribute> : TokenFactory where TTokenAttribute : TokenAttributeBase, new()
-    {
-        internal TokenFactory()
-            : base(CreateTokenClasses(), new TTokenAttribute().CreatePrioTable()) {}
-
-        private static Dictionary<string, TokenClassBase> CreateTokenClasses()
-        {
-            var result = new Dictionary<string, TokenClassBase>();
-            var assembly = Assembly.GetAssembly(typeof(TTokenAttribute));
-            var types = assembly.GetTypes();
-            foreach(var type in types)
-            {
-                var attributes = type.GetCustomAttributes(typeof(TTokenAttribute), true);
-                foreach(TTokenAttribute attribute in attributes)
-                {
-                    var instance = (TokenClassBase) Activator.CreateInstance(type, new object[0]);
-                    instance.Name = attribute.Token;
-                    result.Add(attribute.Token, instance);
-                }
-            }
-            return result;
+            foreach(var t in chars)
+                _charType[t] = type;
         }
     }
 }

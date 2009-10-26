@@ -14,7 +14,7 @@ namespace ReniTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TreeForm { Target = CreateCompiler(new Clone().Target) });
+            Application.Run(new TreeForm { Target = CreateCompiler(new Plus().Target) });
         }
 
         private static Compiler CreateCompiler(string text)

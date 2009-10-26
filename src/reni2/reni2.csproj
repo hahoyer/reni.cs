@@ -75,6 +75,8 @@
     <Compile Include="Parser\ExpressionSyntax.cs" />
     <Compile Include="Parser\IParsedSyntax.cs" />
     <Compile Include="Parser\ParsedSyntax.cs" />
+    <Compile Include="Parser\Scanner.cs" />
+    <Compile Include="Parser\TokenAttributeBase.cs" />
     <Compile Include="Parser\TokenClass\DefinableDerived.cs" />
     <Compile Include="Parser\TokenClass\DefinableTokenSyntax.cs" />
     <Compile Include="Parser\TokenClass\Name\TthenT.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="Parser\TokenClass\SequenceOfBitOperation.cs" />
     <Compile Include="IPostProcessStrategy.cs" />
     <Compile Include="Parser\TokenClass\TokenAttribute.cs" />
+    <Compile Include="Parser\TokenFactory.cs" />
     <Compile Include="RootSearchVisitor.cs" />
     <Compile Include="SearchResultExtender.cs" />
     <Compile Include="SearchTrial.cs" />
@@ -110,7 +113,6 @@
     <Compile Include="Syntax\MemberElem.cs" />
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="Parser\ParserInst.cs" />
-    <Compile Include="Parser\ParserLibrary.cs" />
     <Compile Include="Parser\PrioTable.cs" />
     <Compile Include="Parser\PushedSyntax.cs" />
     <Compile Include="Parser\Source.cs" />

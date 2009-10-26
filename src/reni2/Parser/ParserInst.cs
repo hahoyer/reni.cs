@@ -12,7 +12,6 @@ namespace Reni.Parser
     internal sealed class ParserInst
     {
         private readonly Scanner _scanner = new Scanner();
-        private readonly TokenFactory _tokenFactory = new TokenFactory<TokenAttribute>();
 
         /// <summary>
         /// Scans and parses source and creates the syntax tree
@@ -23,7 +22,7 @@ namespace Reni.Parser
         {
             var sourcePosn = new SourcePosn(source, 0);
             IParsedSyntax start = null;
-            var stack = new PushedSyntaxStack(sourcePosn, _tokenFactory);
+            var stack = new PushedSyntaxStack(sourcePosn, new TokenFactory<TokenAttribute>());
             while(stack.Apply(ref start, _scanner.CreateToken(sourcePosn, stack.TokenFactory)))
                 start = null;
             return start;
