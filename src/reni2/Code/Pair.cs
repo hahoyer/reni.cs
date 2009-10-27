@@ -21,7 +21,7 @@ namespace Reni.Code
             _left = left;
             _right = right;
             var bc = Left.Size.SaveByteCount;
-            StopByObjectId(8);
+            StopByObjectId(-8);
         }
 
         [Node]

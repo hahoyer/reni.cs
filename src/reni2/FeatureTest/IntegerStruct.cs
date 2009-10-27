@@ -41,14 +41,14 @@ Integer8: function
     }
 
     [TestFixture, Output("3"), InstanceCode("(Integer8(1)+Integer8(2))")]
-    public class PlusII : IntegerStruct
+    public class IntegerPlusInteger : IntegerStruct
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun();}
     }
 
     [TestFixture, Output("3"), InstanceCode("(Integer8(1)+2)")]
-    public class Plus : IntegerStruct
+    public class IntegerPlusNumber : IntegerStruct
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
