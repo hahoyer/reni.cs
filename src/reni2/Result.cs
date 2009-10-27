@@ -521,8 +521,6 @@ namespace Reni
             return Code.Serialize(false).Evaluate();
         }
 
-        private Result UnProperty() { return Type.UnProperty(this); }
-
         internal Result AutomaticDereference()
         {
             if(CompleteCategory == Category.Refs)
@@ -530,10 +528,6 @@ namespace Reni
 
             return Type.AutomaticDereference(this);
         }
-
-        internal Result PostProcess(int alignBits) { return PostProcess().Align(alignBits); }
-
-        private Result PostProcess() { return UnProperty().AutomaticDereference(); }
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
         {

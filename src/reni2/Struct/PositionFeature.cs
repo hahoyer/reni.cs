@@ -1,4 +1,7 @@
+// #pragma warning disable 649
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
@@ -15,8 +18,10 @@ namespace Reni.Struct
     {
         [DumpData(true)]
         private readonly Context _structContext;
+
         [DumpData(true)]
         private readonly int _position;
+
         [DumpData(true)]
         private readonly bool _isProperty;
 
@@ -33,30 +38,22 @@ namespace Reni.Struct
             return this;
         }
 
-        Result IFeature.Apply(Category category, TypeBase objectType)
+        Result IFeature.Apply(Category category)
         {
-            var result = Apply(category);
-            if(category.HasCode || category.HasRefs)
-            {
-                var objectCode = objectType
-                    .Conversion(Category.Code, _structContext.NaturalRefType).Code
-                    .CreateRefPlus(RefAlignParam, _structContext.NaturalRefType.UnrefSize);
-                result = result.ReplaceRelativeContextRef(_structContext.ForCode, objectCode);
-            }
-            return result;
+            return Apply(category);
         }
 
         private RefAlignParam RefAlignParam { get { return _structContext.ForCode.RefAlignParam; } }
 
-        private Result Apply(Category category) {
+        private Result Apply(Category category)
+        {
             var result = _structContext.AccessResultAsContextRef(category | Category.Type, _position);
-            if (!_isProperty)
+            if(!_isProperty)
                 return result;
             return result
                 .Type
                 .GetFunctionalFeature()
                 .Apply(category, result, TypeBase.CreateVoidResult(category | Category.Type));
-
         }
 
         Result IContextFeature.Apply(Category category)

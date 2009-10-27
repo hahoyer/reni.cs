@@ -11,7 +11,7 @@ namespace Reni.Parser
     [Serializable]
     internal sealed class ParserInst
     {
-        private readonly Scanner _scanner = new Scanner();
+        private readonly IScanner _scanner = new Scanner();
 
         /// <summary>
         /// Scans and parses source and creates the syntax tree
@@ -28,6 +28,16 @@ namespace Reni.Parser
             return start;
         }
 
+    }
+
+    internal interface IScanner
+    {
+        Token CreateToken(SourcePosn sourcePosn, ITokenFactory tokenFactory);
+    }
+
+    internal interface ITokenFactory
+    {
+        Token CreateToken(SourcePosn sourcePosn, int length);
     }
 
     internal sealed class PushedSyntaxStack

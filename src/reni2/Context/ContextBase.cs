@@ -212,7 +212,7 @@ namespace Reni.Context
             visitor.Search(this);
             return visitor.Result;
         }
-
+                            
         private Result GetPrefixResult(Category category, Defineable defineable, ICompileSyntax right) { return GetUnaryResult<IPrefixFeature>(category, right, defineable); }
 
         private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable) { return GetUnaryResult<IFeature>(category, left, defineable); }

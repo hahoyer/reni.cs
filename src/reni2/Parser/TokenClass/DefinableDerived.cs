@@ -8,9 +8,13 @@ using Reni.Type;
 namespace Reni.Parser.TokenClass
 {
     [Token("type")]
-    internal sealed class TtypeT : Defineable, IFeature
+    internal sealed class TtypeT : Defineable, ISearchPath<IFeature,TypeBase>
     {
-        Result IFeature.Apply(Category category, TypeBase objectType) { return objectType.AutomaticDereference().TypeOperator(category); }
+        IFeature ISearchPath<IFeature, TypeBase>.Convert(TypeBase type)
+        {
+            NotImplementedMethod(type);
+            return null;
+        }
     }
 
     [Token("dump_print")]
@@ -25,12 +29,10 @@ namespace Reni.Parser.TokenClass
     {
         private sealed class BitFeature : BitFeatureBase, IFeature
         {
-            Result IFeature.Apply(Category category, TypeBase objectType) { return Apply(category, 1).UseWithArg(objectType.Conversion(category, TypeBase.CreateBit).Align(BitsConst.SegmentAlignBits)); }
-        }
-
-        private abstract class BitFeatureBase
-        {
-            protected static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
+            Result IFeature.Apply(Category category)
+            {
+                return Apply(category, 1).UseWithArg(TypeBase.CreateBit.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
+            }
         }
 
         private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
@@ -39,16 +41,14 @@ namespace Reni.Parser.TokenClass
 
         private class VoidFeature: ReniObject, IFeature
         {
-            Result IFeature.Apply(Category category, TypeBase objectType) { return TypeBase.CreateVoidResult(category); }
+            Result IFeature.Apply(Category category) { return TypeBase.CreateVoidResult(category); }
         }
 
         private sealed class BitSequenceFeature :
-            BitFeatureBase,
-            IFeature,
+            ReniObject,
             ISearchPath<IFeature, Sequence>
         {
-            IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return this; }
-            Result IFeature.Apply(Category category, TypeBase objectType) { return Apply(category, objectType.SequenceCount).UseWithArg(objectType.ConvertToBitSequence(category)); }
+            IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return type.BitDumpPrintFeature; }
         }
 
         ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
@@ -57,10 +57,15 @@ namespace Reni.Parser.TokenClass
         IFeature ISearchPath<IFeature, Bit>.Convert(Bit type) { return _bitFeature; }
         IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return _voidFeature; }
 
-        Result IFeature.Apply(Category category, TypeBase objectType)
+        Result IFeature.Apply(Category category)
         {
-            NotImplementedMethod(category, objectType);
+            NotImplementedMethod(category);
             return null;
+        }
+
+        internal abstract class BitFeatureBase : ReniObject
+        {
+            protected static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
         }
 
     }

@@ -1,6 +1,7 @@
 using HWClassLibrary.Debug;
 using System;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Context;
 
 namespace Reni.Code
@@ -8,7 +9,9 @@ namespace Reni.Code
     internal class InternalRef : CodeBase, IRefInCode
     {
         private readonly RefAlignParam _refAlignParam;
+        [Node]
         internal readonly CodeBase Code;
+        [Node]
         internal readonly CodeBase DestructorCode;
 
         public InternalRef(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
@@ -23,7 +26,7 @@ namespace Reni.Code
         public LeafElement ToLeafElement { get { return new ContextRef(this); } }
 
         protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
-        protected override Result VisitImplementation<Result>(Visitor<Result> actual) { return actual.InternalRef(this); }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.InternalRef(this); }
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         Size IRefInCode.RefSize { get { return RefAlignParam.RefSize; } }

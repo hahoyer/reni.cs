@@ -12,9 +12,9 @@ namespace Reni.Type
 
         public EnableCutFeature(Sequence sequence) { _sequence = sequence; }
 
-        Result IFeature.Apply(Category category, TypeBase objectType)
+        Result IFeature.Apply(Category category)
         {
-            return objectType.ConvertTo(category, new EnableCut(_sequence));
+            return new EnableCut(_sequence).CreateArgResult(category);
         }
     }
 }

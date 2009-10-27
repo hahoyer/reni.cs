@@ -5,7 +5,7 @@ using Reni.Parser.TokenClass;
 namespace Reni.Parser
 {
     [Serializable]
-    internal class Scanner : ReniObject
+    internal class Scanner : ReniObject, IScanner
     {
         private readonly char[] _charType = new char[256];
 
@@ -59,7 +59,7 @@ namespace Reni.Parser
         /// <param name="sp">Source position, is advanced during create token</param>
         /// <param name="tokenFactory">The token factory.</param>
         /// <returns>the next token</returns>
-        internal Token CreateToken(SourcePosn sp, TokenFactory tokenFactory)
+        Token IScanner.CreateToken(SourcePosn sp, ITokenFactory tokenFactory)
         {
             for(;;)
             {
@@ -129,7 +129,7 @@ namespace Reni.Parser
             return new Token(sp, i, Number.Instance);
         }
 
-        private Token CreateNameToken(SourcePosn sp, TokenFactory tokenFactory)
+        private Token CreateNameToken(SourcePosn sp, ITokenFactory tokenFactory)
         {
             var i = 1;
             while(IsAlphaNum(sp[i]))
@@ -137,7 +137,7 @@ namespace Reni.Parser
             return tokenFactory.CreateToken(sp, i);
         }
 
-        private Token CreateSymbolToken(SourcePosn sp, TokenFactory tokenFactory)
+        private Token CreateSymbolToken(SourcePosn sp, ITokenFactory tokenFactory)
         {
             var i = 1;
             while(IsSymbol(sp[i]))
@@ -145,28 +145,52 @@ namespace Reni.Parser
             return tokenFactory.CreateToken(sp, i);
         }
 
-        private static Token JumpComment(SourcePosn sp)
+        private Token JumpComment(SourcePosn sp)
         {
-            var i = 0;
-            if(sp.SubString(0, 3) == "#(#")
+            var closingParenthesis = "?)}]"["({[".IndexOf(sp[1]) + 1];
+
+            if(closingParenthesis == '?')
             {
-                i += 6;
-                while(sp[i - 1] != '\0' && sp.SubString(i - 3, 3) != "#)#")
-                    i++;
-                if(sp[i - 1] == '\0')
-                    return new Token(sp, i - 1, _syntaxErrorEOFComment);
+                JumpSingleLineComment(sp);
+                return null;
+            }
+
+            int? errorPosition = null;
+            var i = 3;
+            var endOfComment = closingParenthesis + "#";
+            if (IsSymbol(sp[2]))
+                endOfComment = sp[2] + endOfComment;
+            else if(IsAlpha(sp[2]))
+            {
+            while(IsAlphaNum(sp[i]))
+                i++;
+                endOfComment = sp.SubString(2, i - 2) + endOfComment;
             }
             else
-            {
-                i += 2;
-                while(sp[i - 1] != '\0' && sp[i - 1] != '\n')
-                    i++;
-            }
+                errorPosition = 2;
+
+
+            while(sp[i] != '\0' && IsWhiteSpace(sp[i]) && sp.SubString(i+1, endOfComment.Length) != endOfComment)
+                i++ ;
+            if(sp[i] == '\0')
+                return new Token(sp, i, _syntaxErrorEOFComment);
+
+            sp.Incr(i + 1 + endOfComment.Length);
+            if (errorPosition == null)
+                return null;
+            return new Token(sp, i, _syntaxErrorBeginComment);
+        }
+
+        private static void JumpSingleLineComment(SourcePosn sp)
+        {
+            var i = 2;
+            while (sp[i - 1] != '\0' && sp[i - 1] != '\n')
+                i++;
             sp.Incr(i);
-            return null;
         }
 
         private static readonly SyntaxError _syntaxErrorEOFComment = new SyntaxError("unexpected end of file in comment");
+        private static readonly SyntaxError _syntaxErrorBeginComment = new SyntaxError("invalid opening character for comment");
 
         private static Token CreateStringToken(SourcePosn sp)
         {

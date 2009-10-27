@@ -6,6 +6,8 @@ using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Context;
 
+#pragma warning disable 649
+
 namespace Reni.Code
 {
     /// <summary>
@@ -53,8 +55,14 @@ namespace Reni.Code
             return result;
         }
 
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Leaf(LeafElement); }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
+        {
+            return actual.Leaf(LeafElement);
+        }
 
-        internal override BitsConst Evaluate() { return LeafElement.Evaluate(); }
+        internal override BitsConst Evaluate()
+        {
+            return LeafElement.Evaluate();
+        }
     }
 }

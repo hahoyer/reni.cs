@@ -64,12 +64,11 @@ namespace Reni.Type
             return base.CreateAssignableRef(refAlignParam);
         }
 
-        internal override Result ApplyFunction(Category category, Result argsResult)
+        internal override Result ApplyFunction(Category category, TypeBase argsType)
         {
-            Tracer.Assert(argsResult.HasType);
             return _context
                 .RootContext
-                .CreateFunctionCall(_context, category, Body, argsResult);
+                .CreateFunctionCall(_context, category, Body, argsType.CreateArgResult(category));
         }
 
         internal override string DumpShort()
@@ -79,8 +78,11 @@ namespace Reni.Type
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
+            var trace = ObjectId == 8 && functionalResult.ObjectId == 9884 && argsResult.ObjectId == 9898 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category,functionalResult,argsResult);
             Tracer.Assert(argsResult.HasType);
-            return ApplyFunction(category, argsResult);
+            var result = ApplyFunction(category, argsResult);
+            return ReturnMethodDumpWithBreak(trace,result);
         }
     }
 
@@ -118,16 +120,6 @@ namespace Reni.Type
                     .ApplyFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
                     .Type;
             }
-        }
-
-        internal override Result UnProperty(Result rawResult)
-        {
-            Tracer.Assert(!rawResult.CompleteCategory.HasCode || rawResult.Code.IsEmpty);
-            Tracer.Assert(!rawResult.CompleteCategory.HasRefs || rawResult.Refs.IsNone);
-            return _context
-                .Type(_body)
-                .ApplyFunction(rawResult.CompleteCategory, CreateVoid.CreateResult(rawResult.CompleteCategory))
-                ;
         }
 
         internal override string DumpShort()

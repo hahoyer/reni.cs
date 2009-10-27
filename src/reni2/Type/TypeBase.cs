@@ -196,9 +196,14 @@ namespace Reni.Type
             return result;
         }
 
-        internal virtual Result ApplyFunction(Category category, Result argsResult)
+        internal Result ApplyFunction(Category category, Result argsResult)
         {
-            NotImplementedMethod(category, argsResult);
+            return ApplyFunction(category, argsResult.Type).UseWithArg(argsResult);
+        }
+
+        internal virtual Result ApplyFunction(Category category, TypeBase argsType)
+        {
+            NotImplementedMethod(category, argsType);
             return null;
         }
 
@@ -295,8 +300,6 @@ namespace Reni.Type
 
         private bool IsConvertableToItself(ConversionFeature conversionFeature) { return true; }
 
-        internal virtual Result UnProperty(Result rawResult) { return rawResult; }
-
         internal virtual Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category, position, refAlignParam);
@@ -368,7 +371,7 @@ namespace Reni.Type
             if (feature == null)
                 return null;
 
-            return feature.Apply(category, this) & category;
+            return feature.Apply(category) & category;
         }
 
         internal TypeBase EnsureRefOrVoid(RefAlignParam refAlignParam)

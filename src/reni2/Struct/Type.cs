@@ -33,7 +33,7 @@ namespace Reni.Struct
 
             IFeature ISearchPath<IFeature, Ref>.Convert(Ref @ref) { return this; }
 
-            Result IFeature.Apply(Category category, TypeBase objectType)
+            Result IFeature.Apply(Category category)
             {
                 return _type.DumpPrintFromRef(category);
             }

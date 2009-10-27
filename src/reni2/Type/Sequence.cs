@@ -1,12 +1,12 @@
+// #pragma warning disable 649
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
+using Reni.Parser.TokenClass;
 
 #pragma warning disable 1911
 
@@ -20,23 +20,115 @@ namespace Reni.Type
     {
         private readonly EnableCutFeature _enableCutCutFeature;
         private readonly Array _inheritedType;
+        internal readonly IFeature BitDumpPrintFeature;
+
+        internal IFeature Feature(SequenceFeatureBase sequenceFeatureBase)
+        {
+            return new FeatureClass(this, sequenceFeatureBase);
+        }
+
+        internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable)
+        {
+            return new PrefixFeatureClass(this, definable);
+        }
+
+        private class BitDumpPrintFeatureClass : Parser.TokenClass.DumpPrint.BitFeatureBase, IFeature
+        {
+            private readonly Sequence _parent;
+
+            public BitDumpPrintFeatureClass(Sequence parent)
+            {
+                _parent = parent;
+            }
+
+            Result IFeature.Apply(Category category)
+            {
+                return Apply(category, _parent.SequenceCount).UseWithArg(_parent.CreateArgResult(category));
+            }
+        }
+
+        private class FeatureClass : IFeature, IFunctionalFeature
+        {
+            private readonly Sequence _parent;
+            private readonly SequenceFeatureBase _sequenceFeature;
+
+            protected internal FeatureClass(Sequence parent, SequenceFeatureBase sequenceFeature)
+            {
+                _parent = parent;
+                _sequenceFeature = sequenceFeature;
+            }
+
+            Result IFeature.Apply(Category category) { return _parent.CreateFunctionalType(this).CreateArgResult(category); }
+
+            string IDumpShortProvider.DumpShort() { return _sequenceFeature.Definable.DataFunctionName; }
+
+            private Result Apply(Category category, int objSize, int argsSize)
+            {
+                var type = _sequenceFeature.ResultType(objSize, argsSize);
+                return type.CreateResult(category, () => CodeBase.CreateBitSequenceOperation(type.Size, _sequenceFeature.Definable, objSize, argsSize));
+            }
+
+            Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
+            {
+                var objectResult = functionalResult.StripFunctional();
+                var result = Apply(category, objectResult.Type.SequenceCount, argsResult.Type.SequenceCount);
+                var convertedObjectResult = objectResult.ConvertToBitSequence(category);
+                var convertedArgsResult = argsResult.ConvertToBitSequence(category);
+                return result.UseWithArg(convertedObjectResult.CreateSequence(convertedArgsResult));
+            }
+        }
+
+        private class PrefixFeatureClass : ReniObject, IFeature, IPrefixFeature
+        {
+            private readonly Sequence _parent;
+            private readonly ISequenceOfBitPrefixOperation _definable;
+
+            protected internal PrefixFeatureClass(Sequence parent, ISequenceOfBitPrefixOperation definable)
+            {
+                _parent = parent;
+                _definable = definable;
+            }
+
+            IFeature IPrefixFeature.Feature { get { return this; } }
+
+            Result IFeature.Apply(Category category)
+            {
+                return Apply(category, _parent.UnrefSize)
+                    .UseWithArg(_parent.ConvertToBitSequence(category));
+            }
+
+            private Result Apply(Category category, Size objSize)
+            {
+                var type = CreateNumber(objSize.ToInt());
+                return type.CreateResult(category,
+                    () => CodeBase.CreateBitSequenceOperation(type.Size, _definable, objSize));
+            }
+
+        }
 
         public Sequence(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0, "count=" + count);
             _inheritedType = elementType.CreateArray(count);
             _enableCutCutFeature = new EnableCutFeature(this);
+            BitDumpPrintFeature = new BitDumpPrintFeatureClass(this);
             StopByObjectId(172);
         }
 
         [DumpData(false)]
         internal Array InheritedType { get { return _inheritedType; } }
 
-        protected override Size GetSize() { return _inheritedType.Size; }
+        protected override Size GetSize()
+        {
+            return _inheritedType.Size;
+        }
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
 
-        internal override bool IsValidRefTarget() { return _inheritedType.IsValidRefTarget(); }
+        internal override bool IsValidRefTarget()
+        {
+            return _inheritedType.IsValidRefTarget();
+        }
 
         [Node, DumpData(false)]
         internal override int SequenceCount { get { return Count; } }
@@ -47,7 +139,10 @@ namespace Reni.Type
         [Node, DumpData(false)]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
-        internal override string DumpShort() { return "(" + Element.DumpShort() + ")sequence(" + Count + ")"; }
+        internal override string DumpShort()
+        {
+            return "(" + Element.DumpShort() + ")sequence(" + Count + ")";
+        }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
@@ -155,10 +250,17 @@ namespace Reni.Type
             return result;
         }
 
-        internal override Result Destructor(Category category) { return _inheritedType.Destructor(category); }
+        internal override Result Destructor(Category category)
+        {
+            return _inheritedType.Destructor(category);
+        }
 
-        internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
+        internal override Result Copier(Category category)
+        {
+            return _inheritedType.Copier(category);
+        }
 
         public IFeature EnableCutFeature { get { return _enableCutCutFeature; } }
+
     }
 }

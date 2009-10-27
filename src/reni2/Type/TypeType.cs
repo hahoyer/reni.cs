@@ -30,7 +30,7 @@ namespace Reni.Type
             private readonly TypeBase _value;
             public DumpPrintFeatureImplementation(TypeBase value) { _value = value; }
 
-            Result IFeature.Apply(Category category, TypeBase objectType) { return Void.CreateResult(category, () => CodeBase.CreateDumpPrintText(_value.DumpPrintText)); }
+            Result IFeature.Apply(Category category) { return Void.CreateResult(category, () => CodeBase.CreateDumpPrintText(_value.DumpPrintText)); }
         }
 
         public TypeType(TypeBase value)

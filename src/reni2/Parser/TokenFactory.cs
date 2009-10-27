@@ -6,7 +6,7 @@ using Reni.Parser.TokenClass;
 namespace Reni.Parser
 {
     [Serializable]
-    internal abstract class TokenFactory
+    internal abstract class TokenFactory: ReniObject, ITokenFactory
     {
         private readonly PrioTable _prioTable;
         private readonly Dictionary<string, TokenClassBase> _tokenClasses;
@@ -17,7 +17,7 @@ namespace Reni.Parser
             _prioTable = prioTable;
         }
 
-        internal Token CreateToken(SourcePosn sourcePosn, int length)
+        Token ITokenFactory.CreateToken(SourcePosn sourcePosn, int length)
         {
             return new Token(sourcePosn, length, Find(sourcePosn.SubString(0, length)));
         }
