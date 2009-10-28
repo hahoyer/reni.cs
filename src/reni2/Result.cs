@@ -386,23 +386,6 @@ namespace Reni
             return result;
         }
 
-        internal static Result ConvertBitArrayToBitArray(Category category, int sourceBitCount, int destBitCount)
-        {
-            if(sourceBitCount == 0 && destBitCount == 0)
-                return TypeBase.CreateVoidResult(category);
-            var result = new Result();
-            if(category.HasCode)
-            {
-                var codeResult = CodeBase.CreateArg(Size.Create(sourceBitCount));
-                if(destBitCount != sourceBitCount)
-                    codeResult = codeResult.CreateBitCast(Size.Create(destBitCount));
-                result.Code = codeResult;
-            }
-            if(category.HasRefs)
-                result.Refs = Refs.None();
-            return result;
-        }
-
         internal Result UseWithArg(Result resultForArg)
         {
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;

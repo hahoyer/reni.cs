@@ -68,6 +68,20 @@ namespace Reni.Parser.TokenClass
             protected static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
         }
 
+        internal class BitSequenceFeatureClass : BitFeatureBase, IFeature
+        {
+            private readonly Sequence _parent;
+
+            public BitSequenceFeatureClass(Sequence parent)
+            {
+                _parent = parent;
+            }
+
+            Result IFeature.Apply(Category category)
+            {
+                return Apply(category, _parent.SequenceCount).UseWithArg(_parent.CreateAlign(BitsConst.SegmentAlignBits).CreateArgResult(category));
+            }
+        }
     }
 
     [Token("enable_cut")]

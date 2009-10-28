@@ -32,21 +32,6 @@ namespace Reni.Type
             return new PrefixFeatureClass(this, definable);
         }
 
-        private class BitDumpPrintFeatureClass : Parser.TokenClass.DumpPrint.BitFeatureBase, IFeature
-        {
-            private readonly Sequence _parent;
-
-            public BitDumpPrintFeatureClass(Sequence parent)
-            {
-                _parent = parent;
-            }
-
-            Result IFeature.Apply(Category category)
-            {
-                return Apply(category, _parent.SequenceCount).UseWithArg(_parent.CreateArgResult(category));
-            }
-        }
-
         private class FeatureClass : IFeature, IFunctionalFeature
         {
             private readonly Sequence _parent;
@@ -111,7 +96,7 @@ namespace Reni.Type
             Tracer.Assert(count > 0, "count=" + count);
             _inheritedType = elementType.CreateArray(count);
             _enableCutCutFeature = new EnableCutFeature(this);
-            BitDumpPrintFeature = new BitDumpPrintFeatureClass(this);
+            BitDumpPrintFeature = new Parser.TokenClass.DumpPrint.BitSequenceFeatureClass(this);
             StopByObjectId(172);
         }
 
