@@ -371,7 +371,10 @@ namespace Reni.Type
             if (feature == null)
                 return null;
 
-            return feature.Apply(category) & category;
+            var result = feature.Apply(category);
+            if (this != feature.DefiningType)
+                result = result.UseWithArg(Conversion(category, feature.DefiningType));
+            return result & category;
         }
 
         internal TypeBase EnsureRefOrVoid(RefAlignParam refAlignParam)

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Reni.Type;
 
 namespace Reni.Feature
 {
@@ -13,6 +14,7 @@ namespace Reni.Feature
     internal interface IFeature
     {
         Result Apply(Category category);
+        TypeBase DefiningType { get; }
     }
 
     internal interface IPrefixFeature

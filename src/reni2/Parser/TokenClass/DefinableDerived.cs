@@ -33,6 +33,8 @@ namespace Reni.Parser.TokenClass
             {
                 return Apply(category, 1).UseWithArg(TypeBase.CreateBit.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
             }
+
+            public TypeBase DefiningType { get { throw new NotImplementedException(); } }
         }
 
         private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
@@ -61,6 +63,15 @@ namespace Reni.Parser.TokenClass
         {
             NotImplementedMethod(category);
             return null;
+        }
+
+        public TypeBase DefiningType
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
         internal abstract class BitFeatureBase : ReniObject
