@@ -12,6 +12,12 @@ namespace Reni.Type
 
         public EnableCutFeature(Sequence sequence) { _sequence = sequence; }
 
+        TypeBase IFeature.DefiningType()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
         Result IFeature.Apply(Category category)
         {
             return new EnableCut(_sequence).CreateArgResult(category);

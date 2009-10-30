@@ -56,6 +56,12 @@ namespace Reni.Struct
                 .Apply(category, result, TypeBase.CreateVoidResult(category | Category.Type));
         }
 
+        TypeBase IFeature.DefiningType()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
         Result IContextFeature.Apply(Category category)
         {
             return Apply(category);

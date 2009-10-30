@@ -88,7 +88,7 @@ namespace Reni.Parser.TokenClass
                 case '|':
                     return "Or";
                 case '+':
-                    return "IntegerPlusNumber";
+                    return "Plus";
                 case '/':
                     return "Slash";
                 case '*':

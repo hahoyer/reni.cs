@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser.TokenClass;
 
 #pragma warning disable 1911
 
@@ -22,17 +22,11 @@ namespace Reni.Type
         private readonly Array _inheritedType;
         internal readonly IFeature BitDumpPrintFeature;
 
-        internal IFeature Feature(SequenceFeatureBase sequenceFeatureBase)
-        {
-            return new FeatureClass(this, sequenceFeatureBase);
-        }
+        internal IFeature Feature(SequenceFeatureBase sequenceFeatureBase) { return new FeatureClass(this, sequenceFeatureBase); }
 
-        internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable)
-        {
-            return new PrefixFeatureClass(this, definable);
-        }
+        internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeatureClass(this, definable); }
 
-        private class FeatureClass : IFeature, IFunctionalFeature
+        private class FeatureClass : ReniObject, IFeature, IFunctionalFeature
         {
             private readonly Sequence _parent;
             private readonly SequenceFeatureBase _sequenceFeature;
@@ -52,6 +46,8 @@ namespace Reni.Type
                 var type = _sequenceFeature.ResultType(objSize, argsSize);
                 return type.CreateResult(category, () => CodeBase.CreateBitSequenceOperation(type.Size, _sequenceFeature.Definable, objSize, argsSize));
             }
+
+            TypeBase IFeature.DefiningType() { return _parent; }
 
             Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
             {
@@ -76,6 +72,8 @@ namespace Reni.Type
 
             IFeature IPrefixFeature.Feature { get { return this; } }
 
+            TypeBase IFeature.DefiningType() { return _parent; }
+
             Result IFeature.Apply(Category category)
             {
                 return Apply(category, _parent.UnrefSize)
@@ -86,9 +84,8 @@ namespace Reni.Type
             {
                 var type = CreateNumber(objSize.ToInt());
                 return type.CreateResult(category,
-                    () => CodeBase.CreateBitSequenceOperation(type.Size, _definable, objSize));
+                                         () => CodeBase.CreateBitSequenceOperation(type.Size, _definable, objSize));
             }
-
         }
 
         public Sequence(TypeBase elementType, int count)
@@ -100,20 +97,14 @@ namespace Reni.Type
             StopByObjectId(172);
         }
 
-        [DumpData(false)]
+        [DumpData(false), UsedImplicitly]
         internal Array InheritedType { get { return _inheritedType; } }
 
-        protected override Size GetSize()
-        {
-            return _inheritedType.Size;
-        }
+        protected override Size GetSize() { return _inheritedType.Size; }
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
 
-        internal override bool IsValidRefTarget()
-        {
-            return _inheritedType.IsValidRefTarget();
-        }
+        internal override bool IsValidRefTarget() { return _inheritedType.IsValidRefTarget(); }
 
         [Node, DumpData(false)]
         internal override int SequenceCount { get { return Count; } }
@@ -124,10 +115,7 @@ namespace Reni.Type
         [Node, DumpData(false)]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
-        internal override string DumpShort()
-        {
-            return "(" + Element.DumpShort() + ")sequence(" + Count + ")";
-        }
+        internal override string DumpShort() { return "(" + Element.DumpShort() + ")sequence(" + Count + ")"; }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
         {
@@ -235,17 +223,10 @@ namespace Reni.Type
             return result;
         }
 
-        internal override Result Destructor(Category category)
-        {
-            return _inheritedType.Destructor(category);
-        }
+        internal override Result Destructor(Category category) { return _inheritedType.Destructor(category); }
 
-        internal override Result Copier(Category category)
-        {
-            return _inheritedType.Copier(category);
-        }
+        internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
         public IFeature EnableCutFeature { get { return _enableCutCutFeature; } }
-
     }
 }

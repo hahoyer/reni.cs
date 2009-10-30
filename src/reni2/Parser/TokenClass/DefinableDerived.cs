@@ -34,7 +34,11 @@ namespace Reni.Parser.TokenClass
                 return Apply(category, 1).UseWithArg(TypeBase.CreateBit.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
             }
 
-            public TypeBase DefiningType { get { throw new NotImplementedException(); } }
+            TypeBase IFeature.DefiningType()
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
         private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
@@ -44,6 +48,7 @@ namespace Reni.Parser.TokenClass
         private class VoidFeature: ReniObject, IFeature
         {
             Result IFeature.Apply(Category category) { return TypeBase.CreateVoidResult(category); }
+            TypeBase IFeature.DefiningType() { return TypeBase.CreateVoid; }
         }
 
         private sealed class BitSequenceFeature :
@@ -65,13 +70,10 @@ namespace Reni.Parser.TokenClass
             return null;
         }
 
-        public TypeBase DefiningType
+        TypeBase IFeature.DefiningType()
         {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
+            NotImplementedMethod();
+            return null;
         }
 
         internal abstract class BitFeatureBase : ReniObject
@@ -90,7 +92,12 @@ namespace Reni.Parser.TokenClass
 
             Result IFeature.Apply(Category category)
             {
-                return Apply(category, _parent.SequenceCount).UseWithArg(_parent.CreateAlign(BitsConst.SegmentAlignBits).CreateArgResult(category));
+                return Apply(category, _parent.SequenceCount).UseWithArg(_parent.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
+            }
+
+            TypeBase IFeature.DefiningType()
+            {
+                return _parent;
             }
         }
     }

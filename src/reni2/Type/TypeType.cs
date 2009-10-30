@@ -25,10 +25,16 @@ namespace Reni.Type
             }
         }
 
-        private class DumpPrintFeatureImplementation : IFeature
+        private class DumpPrintFeatureImplementation : ReniObject, IFeature
         {
             private readonly TypeBase _value;
             public DumpPrintFeatureImplementation(TypeBase value) { _value = value; }
+
+            TypeBase IFeature.DefiningType()
+            {
+                NotImplementedMethod();
+                return null;
+            }
 
             Result IFeature.Apply(Category category) { return Void.CreateResult(category, () => CodeBase.CreateDumpPrintText(_value.DumpPrintText)); }
         }

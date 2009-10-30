@@ -14,7 +14,7 @@ namespace Reni.Feature
     internal interface IFeature
     {
         Result Apply(Category category);
-        TypeBase DefiningType { get; }
+        TypeBase DefiningType();
     }
 
     internal interface IPrefixFeature

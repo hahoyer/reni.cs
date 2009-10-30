@@ -69,6 +69,12 @@ namespace Reni.Type
             return result.UseWithArg(objectAndSourceRefs);
         }
 
+        TypeBase IFeature.DefiningType()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
         string IDumpShortProvider.DumpShort()
         {
             return _assignableRef.DumpShort() + " :=";

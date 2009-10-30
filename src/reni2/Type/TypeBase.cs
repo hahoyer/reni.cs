@@ -372,8 +372,11 @@ namespace Reni.Type
                 return null;
 
             var result = feature.Apply(category);
-            if (this != feature.DefiningType)
-                result = result.UseWithArg(Conversion(category, feature.DefiningType));
+            if (this != feature.DefiningType())
+            {
+                var conversion = Conversion(category, feature.DefiningType());
+                result = result.UseWithArg(conversion);
+            }
             return result & category;
         }
 

@@ -27,15 +27,20 @@ namespace Reni.Struct
                                                               , ISearchPath<IFeature, Ref>, IFeature
         {
             [DumpData(true)]
-            private readonly Type _type;
+            private readonly Type _parent;
 
-            public DumpPrintFromRefFeatureImplementation(Type type) { _type = type; }
+            public DumpPrintFromRefFeatureImplementation(Type parent) { _parent = parent; }
 
             IFeature ISearchPath<IFeature, Ref>.Convert(Ref @ref) { return this; }
 
+            TypeBase IFeature.DefiningType()
+            {
+                return _parent;
+            }
+
             Result IFeature.Apply(Category category)
             {
-                return _type.DumpPrintFromRef(category);
+                return _parent.DumpPrintFromRef(category);
             }
         }
 
