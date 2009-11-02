@@ -61,7 +61,7 @@ namespace Reni.Code
 
         private CodeBase CreateBitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize) { return CreateChild(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
 
-        private CodeBase CreateDumpPrint(Size leftSize) { return CreateChild(new DumpPrint(leftSize, Size - leftSize)); }
+        private CodeBase CreateDumpPrint(Size leftSize) { return CreateChild(new DumpPrintOperation(leftSize, Size - leftSize)); }
 
         public CodeBase CreateAssignment(RefAlignParam refAlignParam, Size size)
         {
@@ -333,7 +333,7 @@ namespace Reni.Code
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg);
-            var trace = body.ObjectId == 2324;
+            var trace = body.ObjectId == 1802;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();

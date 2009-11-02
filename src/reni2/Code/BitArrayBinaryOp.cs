@@ -88,9 +88,9 @@ namespace Reni.Code
     /// Dump and print
     /// </summary>
     [Serializable]
-    internal sealed class DumpPrint : BinaryOp
+    internal sealed class DumpPrintOperation : BinaryOp
     {
-        internal DumpPrint(Size leftSize, Size rightSize) : base(leftSize, rightSize) {}
+        internal DumpPrintOperation(Size leftSize, Size rightSize) : base(leftSize, rightSize) {}
 
         protected override Size GetSize()
         {

@@ -7,6 +7,7 @@ using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 
 #pragma warning disable 1911
 
@@ -93,7 +94,7 @@ namespace Reni.Type
             Tracer.Assert(count > 0, "count=" + count);
             _inheritedType = elementType.CreateArray(count);
             _enableCutCutFeature = new EnableCutFeature(this);
-            BitDumpPrintFeature = new Parser.TokenClass.DumpPrint.BitSequenceFeatureClass(this);
+            BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             StopByObjectId(172);
         }
 

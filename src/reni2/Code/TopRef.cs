@@ -12,7 +12,7 @@ namespace Reni.Code
             : base(refAlignParam, offset)
         {
             StopByObjectId(-259);
-            StopByObjectId(-1897);
+            StopByObjectId(281);
         }
 
         protected override string Format(StorageDescriptor start)

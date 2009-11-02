@@ -1,7 +1,8 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Context;
 
 namespace Reni.Code
@@ -13,60 +14,58 @@ namespace Reni.Code
     internal sealed class RefPlus : LeafElement
     {
         private readonly RefAlignParam _refAlignParam;
+
         [Node]
         [DumpData(false)]
-        internal readonly Size Right;
+        private readonly Size _right;
+
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         public RefPlus(RefAlignParam refAlignParam, Size right)
         {
             _refAlignParam = refAlignParam;
-            Right = right;
-            StopByObjectId(645);
-            StopByObjectId(-881);
-            StopByObjectId(-591);
-            StopByObjectId(-428);
+            _right = right;
+            StopByObjectId(152);
+            StopByObjectId(138);
         }
 
-        public override string NodeDump { get { return base.NodeDump + " Right="+Right; } }
+        public override string NodeDump { get { return base.NodeDump + " Right=" + _right; } }
 
-        protected override Size GetSize()
-        {
-            return RefAlignParam.RefSize;
-        }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
 
-        protected override Size GetInputSize()
-        {
-            return RefAlignParam.RefSize;
-        }
+        protected override Size GetInputSize() { return RefAlignParam.RefSize; }
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateRefPlus(GetSize(), Right.SizeToPacketCount(RefAlignParam.AlignBits));
+            return start
+                .CreateRefPlus(GetSize(), _right.SizeToPacketCount(RefAlignParam.AlignBits));
         }
 
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
+            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopRef(RefAlignParam, precedingElement.Offset + Right);
+            return new TopRef(RefAlignParam, precedingElement.Offset + _right);
         }
 
         internal override LeafElement TryToCombineBack(FrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new FrameRef(RefAlignParam, precedingElement.Offset + Right);
+            return new FrameRef(RefAlignParam, precedingElement.Offset + _right);
         }
 
         internal override LeafElement TryToCombine(LeafElement subsequentElement)
         {
-            return subsequentElement.TryToCombineBack(this);
+            return subsequentElement
+                .TryToCombineBack(this);
         }
 
         internal override LeafElement TryToCombineBack(RefPlus precedingElement)
         {
+            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
-                return new RefPlus(RefAlignParam, Right + precedingElement.Right);
+                return new RefPlus(RefAlignParam, _right + precedingElement._right);
             return base.TryToCombineBack(precedingElement);
         }
     }

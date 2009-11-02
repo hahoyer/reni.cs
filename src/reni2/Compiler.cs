@@ -5,10 +5,8 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
-using NUnit.Framework;
 using Reni.Code;
 using Reni.Context;
-using Reni.FeatureTest;
 using Reni.Parser;
 using Reni.Runtime;
 
@@ -145,7 +143,7 @@ namespace Reni
             try
             {
                 var assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false);
-                var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainMethodName);
+                var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
                 methodInfo.Invoke(null, new object[0]);
             }
             catch(CompilerErrorException e)
@@ -154,102 +152,6 @@ namespace Reni
                     BitsConst.OutStream.Add(e.CompilerErrorCollection[i].ToString());
             }
             return BitsConst.OutStream;
-        }
-    }
-
-    /// <summary>
-    /// Parameters for compilation
-    /// </summary>
-    [Serializable]
-    public class CompilerParameters
-    {
-        /// <summary>
-        /// Shows or hides syntax tree
-        /// </summary>
-        [Node, DumpData(true)]
-        public readonly TraceParamters Trace = new TraceParamters();
-
-        public bool ParseOnly;
-
-        #region Nested type: TraceParamters
-
-        [Serializable]
-        public class TraceParamters
-        {
-            /// <summary>
-            /// Shows or hides serialize code sequence
-            /// </summary>
-            [Node, DumpData(true)]
-            public bool CodeSequence;
-
-            /// <summary>
-            /// Shows or hides code tree
-            /// </summary>
-            [Node, DumpData(true)]
-            public bool CodeTree;
-
-            /// <summary>
-            /// Shows or hides code code to execute
-            /// </summary>
-            [Node, DumpData(true)]
-            public bool ExecutedCode;
-
-            [Node, DumpData(true)]
-            public bool Functions;
-
-            /// <summary>
-            /// Shows or hides syntax tree
-            /// </summary>
-            [Node, DumpData(true)]
-            public bool Source;
-
-            /// <summary>
-            /// Shows or hides syntax tree
-            /// </summary>
-            [Node, DumpData(true)]
-            public bool Syntax;
-
-            public void None()
-            {
-                Source = false;
-                Syntax = false;
-                CodeTree = false;
-                CodeSequence = false;
-                ExecutedCode = false;
-                Functions = false;
-            }
-
-            public void All()
-            {
-                Source = true;
-                Syntax = true;
-                CodeTree = true;
-                CodeSequence = true;
-                ExecutedCode = true;
-                Functions = true;
-            }
-        }
-
-        #endregion
-    }
-
-    [TestFixture]
-    public class Generated
-    {
-        /// <summary>
-        /// Special test, will not work automatically.
-        /// </summary>
-        /// created 18.07.2007 01:29 on HAHOYER-DELL by hh
-        [Test, Explicit, Category(CompilerTest.Rare)]
-        public void Exec()
-        {
-            var os = BitsConst.OutStream;
-            BitsConst.OutStream = new OutStream();
-            ReniTest.Reni();
-#pragma warning disable 168
-            var osNew = BitsConst.OutStream;
-#pragma warning restore 168
-            BitsConst.OutStream = os;
         }
     }
 }

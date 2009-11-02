@@ -1,9 +1,10 @@
-using HWClassLibrary.TreeStructure;
 using System;
-using HWClassLibrary.Helper;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
 
 namespace Reni.Syntax
 {
@@ -11,79 +12,102 @@ namespace Reni.Syntax
     internal abstract class SpecialSyntax : CompileSyntax
     {
         protected SpecialSyntax(Token token)
-            : base(token) {}
-
+            : base(token) { }
     }
 
     [Serializable]
     internal sealed class TerminalSyntax : SpecialSyntax
     {
-        [Node]
-        internal readonly Terminal Terminal;
+        [Node, DumpData(true)]
+        internal readonly ITerminal Terminal;
 
-        public TerminalSyntax(Token token, Terminal terminal)
-            : base(token)
-        {
-            Terminal = terminal;
-        }
+        public TerminalSyntax(Token token, ITerminal terminal)
+            : base(token) { Terminal = terminal; }
 
-        internal protected override Result Result(ContextBase context, Category category)
-        {
-            return Terminal.Result(context, category, Token);
-        }
+        protected internal override Result Result(ContextBase context, Category category) { return Terminal.Result(context, category, Token); }
     }
 
     [Serializable]
     internal sealed class PrefixSyntax : SpecialSyntax
     {
-        [Node]
-        internal readonly Prefix Prefix;
-        [Node]
-        internal readonly ICompileSyntax Right;
+        [Node, DumpData(true)]
+        private readonly IPrefix _prefix;
 
-        public PrefixSyntax(Token token, Prefix prefix, ICompileSyntax right)
+        [Node, DumpData(true)]
+        private readonly ICompileSyntax _right;
+
+        public PrefixSyntax(Token token, IPrefix prefix, ICompileSyntax right)
             : base(token)
         {
-            Prefix = prefix;
-            Right = right;
+            _prefix = prefix;
+            _right = right;
         }
 
-        internal protected override Result Result(ContextBase context, Category category)
-        {
-            return Prefix.Result(context, category, Right);
-        }
+        protected internal override Result Result(ContextBase context, Category category) { return _prefix.Result(context, category, _right); }
 
-        protected internal override string DumpShort()
-        {
-            return base.DumpShort() + "(" + Right.DumpShort() + ")";
-        }
+        protected internal override string DumpShort() { return base.DumpShort() + "(" + _right.DumpShort() + ")"; }
     }
 
     [Serializable]
     internal sealed class InfixSyntax : SpecialSyntax
     {
-        [Node]
-        internal readonly ICompileSyntax Left;
-        [Node]
-        internal readonly Infix Infix;
-        [Node]
-        internal readonly ICompileSyntax Right;
+        [Node, DumpData(true)]
+        private readonly ICompileSyntax _left;
 
-        public InfixSyntax(Token token, ICompileSyntax left, Infix infix, ICompileSyntax right) : base(token)
+        [Node, DumpData(true)]
+        private readonly IInfix _infix;
+
+        [Node, DumpData(true)]
+        private readonly ICompileSyntax _right;
+
+        public InfixSyntax(Token token, ICompileSyntax left, IInfix infix, ICompileSyntax right)
+            : base(token)
         {
-            Left = left;
-            Infix = infix;
-            Right = right;
+            _left = left;
+            _infix = infix;
+            _right = right;
         }
 
-        internal protected override Result Result(ContextBase context, Category category)
-        {
-            return Infix.Result(context, category, Left, Right);
-        }
+        protected internal override Result Result(ContextBase context, Category category) { return _infix.Result(context, category, _left, _right); }
 
-        protected internal override string DumpShort()
+        protected internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort() + "(" + _right.DumpShort() + ")"; }
+    }
+
+    internal class SuffixSyntax : SpecialSyntax
+    {
+        [Node, DumpData(true)]
+        private readonly ICompileSyntax _left;
+
+        [Node, DumpData(true)]
+        private readonly ISuffix _suffix;
+
+        internal SuffixSyntax(Token token, ICompileSyntax left, ISuffix suffix)
+            : base(token)
         {
-            return "("+Left.DumpShort() + ")"+base.DumpShort()+"("+Right.DumpShort()+")";
+            _left = left;
+            _suffix = suffix;
         }
+        
+        protected internal override Result Result(ContextBase context, Category category) { return _suffix.Result(context, category, _left); }
+    }
+
+    internal interface ITerminal
+    {
+        Result Result(ContextBase context, Category category, Token token);
+    }
+
+    internal interface IPrefix
+    {
+        Result Result(ContextBase context, Category category, ICompileSyntax right);
+    }
+
+    internal interface IInfix
+    {
+        Result Result(ContextBase context, Category category, ICompileSyntax left, ICompileSyntax right);
+    }
+
+    internal interface ISuffix
+    {
+        Result Result(ContextBase context, Category category, ICompileSyntax left);
     }
 }

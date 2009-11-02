@@ -1,3 +1,4 @@
+// #pragma warning disable 649
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -21,33 +23,13 @@ namespace Reni.Struct
         [Node]
         internal readonly FullContext Context;
 
-        private readonly ISearchPath<IFeature, Ref> _dumpPrintFromRefFeature;
-
-        private class DumpPrintFromRefFeatureImplementation : ReniObject
-                                                              , ISearchPath<IFeature, Ref>, IFeature
-        {
-            [DumpData(true)]
-            private readonly Type _parent;
-
-            public DumpPrintFromRefFeatureImplementation(Type parent) { _parent = parent; }
-
-            IFeature ISearchPath<IFeature, Ref>.Convert(Ref @ref) { return this; }
-
-            TypeBase IFeature.DefiningType()
-            {
-                return _parent;
-            }
-
-            Result IFeature.Apply(Category category)
-            {
-                return _parent.DumpPrintFromRef(category);
-            }
-        }
+        [DumpData(false)]
+        internal readonly ISearchPath<IFeature, Ref> DumpPrintFromRefFeature;
 
         internal Type(FullContext context)
         {
-            _dumpPrintFromRefFeature = new DumpPrintFromRefFeatureImplementation(this);
             Context = context;
+            DumpPrintFromRefFeature = new RefToStructFeature();
         }
 
         internal override bool IsValidRefTarget() { return Context.IsValidRefTarget(); }
@@ -68,15 +50,9 @@ namespace Reni.Struct
 
         private List<ICompileSyntax> StatementList { get { return Context.StatementList; } }
 
-        [DumpData(false)]
-        internal ISearchPath<IFeature, Ref> DumpPrintFromRefFeature { get { return _dumpPrintFromRefFeature; } }
-
         internal override Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam) { return Context.AccessResultAsArgFromRef(category, position, refAlignParam); }
 
-        internal override Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam)
-        {
-            return Context.AccessResultAsContextRefFromRef(category, position, refAlignParam);
-        }
+        internal override Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam) { return Context.AccessResultAsContextRefFromRef(category, position, refAlignParam); }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
@@ -84,7 +60,7 @@ namespace Reni.Struct
             return DumpPrintFromRef(category);
         }
 
-        private Result DumpPrintFromRef(Category category)
+        internal Result DumpPrintFromRef(Category category)
         {
             var refAlignParam = Context.RefAlignParam;
             var result = new List<Result>();

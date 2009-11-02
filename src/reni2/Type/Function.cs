@@ -66,9 +66,10 @@ namespace Reni.Type
 
         internal override Result ApplyFunction(Category category, TypeBase argsType)
         {
+            var argsResult = argsType.CreateArgResult(category|Category.Type);
             return _context
                 .RootContext
-                .CreateFunctionCall(_context, category, Body, argsType.CreateArgResult(category));
+                .CreateFunctionCall(_context, category, Body, argsResult);
         }
 
         internal override string DumpShort()

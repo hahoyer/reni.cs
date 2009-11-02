@@ -9,7 +9,7 @@ namespace Reni.Parser.TokenClass.Name
     [Serializable]
     internal sealed class TfunctionT : Prefix
     {
-        internal override Result Result(ContextBase context, Category category, ICompileSyntax right)
+        public override Result Result(ContextBase context, Category category, ICompileSyntax right)
         {
             return context.CreateFunctionResult(category, right);
         }

@@ -4,6 +4,8 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
 
 #pragma warning disable 1911
 
@@ -15,12 +17,16 @@ namespace Reni.Type
         private static int _nextObjectId;
         internal readonly RefAlignParam RefAlignParam;
 
+        [DumpData(false)]
+        internal readonly IFeature DumpPrintFeature;
+
         protected Ref(TypeBase target, RefAlignParam refAlignParam)
             : base(_nextObjectId++, target)
         {
             Tracer.Assert(!(target is Aligner));
             Tracer.Assert(target.IsValidRefTarget());
             RefAlignParam = refAlignParam;
+            DumpPrintFeature = new StructFeature(this);
             StopByObjectId(-6);
         }
 
@@ -42,7 +48,11 @@ namespace Reni.Type
 
         internal override sealed Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
 
-        internal override sealed Result AutomaticDereference(Result result) { return Target.AutomaticDereference(CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result)); }
+        internal override sealed Result AutomaticDereference(Result result)
+        {
+            return Target
+                .AutomaticDereference(CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result));
+        }
 
         internal Result CreateDereferencedArgResult(Category category)
         {
@@ -88,13 +98,23 @@ namespace Reni.Type
 
         internal override sealed Result ApplyTypeOperator(Result argResult) { return Target.ApplyTypeOperator(argResult); }
 
-        internal override sealed Result TypeOperator(Category category) { return Target.TypeOperator(category); }
+        internal override sealed bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
+        {
+            return Target
+                .IsConvertableTo(dest, conversionFeature);
+        }
 
-        internal override sealed bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature) { return Target.IsConvertableTo(dest, conversionFeature); }
+        internal override Result AccessResultAsArg(Category category, int position)
+        {
+            return Target
+                .AccessResultAsArgFromRef(category, position, RefAlignParam);
+        }
 
-        internal override Result AccessResultAsArg(Category category, int position) { return Target.AccessResultAsArgFromRef(category, position, RefAlignParam); }
-
-        internal Result AccessResultAsContextRef(Category category, int position) { return Target.AccessResultAsContextRefFromRef(category, position, RefAlignParam); }
+        internal Result AccessResultAsContextRef(Category category, int position)
+        {
+            return Target
+                .AccessResultAsContextRefFromRef(category, position, RefAlignParam);
+        }
 
         internal override bool IsRefLike(Ref target) { return Target == target.Target && RefAlignParam == target.RefAlignParam; }
 
@@ -116,6 +136,7 @@ namespace Reni.Type
 
         internal abstract AutomaticRef CreateAutomaticRef();
         internal override bool IsValidRefTarget() { return true; }
+        internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
     }
 
     [Serializable]

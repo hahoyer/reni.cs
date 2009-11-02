@@ -19,30 +19,23 @@ namespace Reni.Type
         private class FunctionalFeatureImplementation : IFunctionalFeature
         {
             string IDumpShortProvider.DumpShort() { return "type"; }
-            Result IFunctionalFeature.Apply(Category category, Result functionResult, Result argsResult)
-            {
-                return argsResult.ConvertTo(functionResult.Type.StripFunctional().AutomaticDereference()) & category;
-            }
+            Result IFunctionalFeature.Apply(Category category, Result functionResult, Result argsResult) { return argsResult.ConvertTo(functionResult.Type.StripFunctional().AutomaticDereference()) & category; }
         }
 
         private class DumpPrintFeatureImplementation : ReniObject, IFeature
         {
-            private readonly TypeBase _value;
-            public DumpPrintFeatureImplementation(TypeBase value) { _value = value; }
+            private readonly TypeType _parent;
+            public DumpPrintFeatureImplementation(TypeType parent) { _parent = parent; }
 
-            TypeBase IFeature.DefiningType()
-            {
-                NotImplementedMethod();
-                return null;
-            }
+            TypeBase IFeature.DefiningType() { return _parent; }
 
-            Result IFeature.Apply(Category category) { return Void.CreateResult(category, () => CodeBase.CreateDumpPrintText(_value.DumpPrintText)); }
+            Result IFeature.Apply(Category category) { return Void.CreateResult(category, () => CodeBase.CreateDumpPrintText(_parent._value.DumpPrintText)); }
         }
 
         public TypeType(TypeBase value)
         {
-            DumpPrintFeature = new DumpPrintFeatureImplementation(value);
             _value = value;
+            DumpPrintFeature = new DumpPrintFeatureImplementation(this);
         }
 
         internal override bool IsValidRefTarget() { return false; }

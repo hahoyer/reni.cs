@@ -9,7 +9,7 @@ namespace Reni.Parser.TokenClass.Name
     [Serializable]
     internal sealed class TargT : Terminal
     {
-        internal override Result Result(ContextBase context, Category category, Token token)
+        public override Result Result(ContextBase context, Category category, Token token)
         {
             var trace = token.ObjectId == -119 && category.HasRefs;
             StartMethodDump(trace, context, category, token);

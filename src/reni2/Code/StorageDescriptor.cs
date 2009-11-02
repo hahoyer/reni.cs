@@ -215,7 +215,7 @@ namespace Reni.Code
                                 + ")";
         }
 
-        internal string CreateCall(int index, Size frameSize) { return Generator.FunctionMethodName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
+        internal string CreateCall(int index, Size frameSize) { return Generator.FunctionName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
 
         internal string CreateDumpPrint(Size leftSize, Size rightSize)
         {

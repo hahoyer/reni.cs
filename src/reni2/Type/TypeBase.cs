@@ -72,7 +72,8 @@ namespace Reni.Type
 
         internal abstract string DumpShort();
 
-        private TypeBase TypeType { get { return _cache.TypeType.Value; } }
+        [DumpData(false)]
+        internal TypeType TypeType { get { return _cache.TypeType.Value; } }
 
         [DumpData(false)]
         internal virtual string DumpPrintText
@@ -215,17 +216,19 @@ namespace Reni.Type
 
         internal virtual TypeBase AutomaticDereference() { return this; }
 
-        internal virtual Result TypeOperator(Category category)
+        internal Result TypeOperator(Category category)
         {
             var result = CreateVoidResult(category).Clone();
             if(category.HasType)
-                result.Type = TypeType;
+                result.Type = GetEffectiveType().TypeType;
             return result;
         }
 
+        virtual internal TypeBase GetEffectiveType() { return this; }
+
         internal Result DumpPrint(Category category)
         {
-            return GetUnaryResult<IFeature>(category, new Parser.TokenClass.DumpPrint());
+            return GetUnaryResult<IFeature>(category, new Feature.DumpPrint.Token() );
         }
 
         internal virtual Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)

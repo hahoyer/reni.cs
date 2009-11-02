@@ -53,8 +53,8 @@ namespace Reni.FeatureTest.DefaultOperations
     abstract public class ApplyCompareOperator : CompilerTest
     {
         public override string Target { get { return "(1"+Operator+"100)dump_print"; } }
-        internal abstract string Operator { get; }
-        internal abstract bool Result { get; }
+        protected abstract string Operator { get; }
+        protected abstract bool Result { get; }
         public override string Output { get { return Result ? "-1" : "0"; } }
         public override System.Type[] DependsOn { get { return new[] { typeof(Add2Numbers) }; } }
 
@@ -64,32 +64,32 @@ namespace Reni.FeatureTest.DefaultOperations
 
     public class Equal : ApplyCompareOperator
     {
-        internal override string Operator { get { return "="; } }
-        internal override bool Result { get { return false; } }
+        protected override string Operator { get { return "="; } }
+        protected override bool Result { get { return false; } }
     }
     public class NotEqual : ApplyCompareOperator
     {
-        internal override string Operator { get { return "<>"; } }
-        internal override bool Result { get { return true; } }
+        protected override string Operator { get { return "<>"; } }
+        protected override bool Result { get { return true; } }
     }
     public class GreaterThan : ApplyCompareOperator
     {
-        internal override string Operator { get { return ">"; } }
-        internal override bool Result { get { return false; } }
+        protected override string Operator { get { return ">"; } }
+        protected override bool Result { get { return false; } }
     }
     public class LessThan : ApplyCompareOperator
     {
-        internal override string Operator { get { return "<"; } }
-        internal override bool Result { get { return true; } }
+        protected override string Operator { get { return "<"; } }
+        protected override bool Result { get { return true; } }
     }
     public class LessOrEqual : ApplyCompareOperator
     {
-        internal override string Operator { get { return "<="; } }
-        internal override bool Result { get { return true; } }
+        protected override string Operator { get { return "<="; } }
+        protected override bool Result { get { return true; } }
     }
     public class GreaterOrEqual : ApplyCompareOperator
     {
-        internal override string Operator { get { return ">="; } }
-        internal override bool Result { get { return false; } }
+        protected override string Operator { get { return ">="; } }
+        protected override bool Result { get { return false; } }
     }
 }

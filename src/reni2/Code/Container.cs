@@ -139,9 +139,9 @@ namespace Reni.Code
         {
             var result = new CodeTypeDeclaration(name);
             result.Comments.Add(new CodeCommentStatement(Generator.NotACommentFlag + "unsafe"));
-            result.Members.Add(GetCSharpFunctionCode(Generator.MainMethodName, false, align));
+            result.Members.Add(GetCSharpFunctionCode(Generator.MainFunctionName, false, align));
             for(var i = 0; i < functions.Count; i++)
-                result.Members.Add(functions[i].GetCSharpFunctionCode(Generator.FunctionMethodName(i), true, align));
+                result.Members.Add(functions[i].GetCSharpFunctionCode(Generator.FunctionName(i), true, align));
             return result;
         }
 

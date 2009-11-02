@@ -57,10 +57,7 @@ namespace Reni.Parser.TokenClass
         [UsedImplicitly]
         internal static string Symbolize(string token)
         {
-            var name = "";
-            for (var i = 0; i < token.Length; i++)
-                name += SymbolizeChar(token[i]);
-            return name;
+            return token.Aggregate("", (current, tokenChar) => current + SymbolizeChar(tokenChar));
         }
 
         private static string SymbolizeChar(Char @char)
@@ -105,10 +102,6 @@ namespace Reni.Parser.TokenClass
                     throw new NotImplementedException("Symbolize(" + @char + ")");
             }
         }
-        /// <summary>
-        /// Gets the icon key.
-        /// </summary>
-        /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Symbol"; } }
     }
 
@@ -118,38 +111,38 @@ namespace Reni.Parser.TokenClass
     }
 
     [Serializable]
-    internal abstract class Terminal : Special
+    internal abstract class Terminal : Special, ITerminal
     {
-        internal abstract Result Result(ContextBase context, Category category, Token token);
-
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntaxExtender.AssertIsNull(left);
-            ParsedSyntaxExtender.AssertIsNull(right);
+            left.AssertIsNull();
+            right.AssertIsNull();
             return new TerminalSyntax(token, this);
         }
+
+        public abstract Result Result(ContextBase context, Category category, Token token);
     }
 
     [Serializable]
-    internal abstract class Prefix : Special
+    internal abstract class Prefix : Special, IPrefix
     {
-        internal abstract Result Result(ContextBase context, Category category, ICompileSyntax right);
+        public abstract Result Result(ContextBase context, Category category, ICompileSyntax right);
 
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntaxExtender.AssertIsNull(left);
-            return new PrefixSyntax(token, this, ParsedSyntaxExtender.CheckedToCompiledSyntax(right));
+            left.AssertIsNull();
+            return new PrefixSyntax(token, this, right.CheckedToCompiledSyntax());
         }
     }
 
     [Serializable]
-    internal abstract class Infix : Special
+    internal abstract class Infix : Special, IInfix
     {
-        internal abstract Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right);
+        public abstract Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right);
 
         internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            return new InfixSyntax(token, ParsedSyntaxExtender.CheckedToCompiledSyntax(left), this, ParsedSyntaxExtender.CheckedToCompiledSyntax(right));
+            return new InfixSyntax(token, left.CheckedToCompiledSyntax(), this, right.CheckedToCompiledSyntax());
         }
     }
 }

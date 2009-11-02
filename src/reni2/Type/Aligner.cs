@@ -4,8 +4,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Parser.TokenClass;
 
 namespace Reni.Type
 {
@@ -56,6 +54,8 @@ namespace Reni.Type
         {
             return Parent.Copier(category);
         }
+
+        internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
 
         internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {

@@ -8,7 +8,7 @@ namespace Reni.Parser.TokenClass.Name
     [Serializable]
     internal sealed class TthisT : Terminal
     {
-        internal override Result Result(ContextBase context, Category category, Token token)
+        public override Result Result(ContextBase context, Category category, Token token)
         {
             var structContext = context.FindStruct();
             return structContext.NaturalRefType

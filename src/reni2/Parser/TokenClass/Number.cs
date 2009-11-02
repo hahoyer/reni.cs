@@ -20,7 +20,7 @@ namespace Reni.Parser.TokenClass
 
         internal static readonly TokenClassBase Instance = new Number();
 
-        internal override Result Result(ContextBase context, Category category, Token token)
+        public override Result Result(ContextBase context, Category category, Token token)
         {
             var bitsConst = BitsConst.Convert(token.Name);
             return TypeBase

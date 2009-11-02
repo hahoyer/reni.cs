@@ -10,7 +10,7 @@ namespace Reni.Struct
     [Token("_A_T_")]
     internal sealed class AtToken : Infix
     {
-        internal override Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right)
+        public override Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right)
         {
             var position = callContext.Evaluate(right, callContext.Type(left).IndexType).ToInt32();
             return callContext.AccessResult(category, left, position);
