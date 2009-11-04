@@ -216,14 +216,6 @@ namespace Reni.Type
 
         internal virtual TypeBase AutomaticDereference() { return this; }
 
-        internal Result TypeOperator(Category category)
-        {
-            var result = CreateVoidResult(category).Clone();
-            if(category.HasType)
-                result.Type = GetEffectiveType().TypeType;
-            return result;
-        }
-
         virtual internal TypeBase GetEffectiveType() { return this; }
 
         internal Result DumpPrint(Category category)
