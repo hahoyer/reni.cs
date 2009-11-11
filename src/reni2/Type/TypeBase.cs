@@ -359,7 +359,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
+        private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
             var feature = SearchDefineable<TFeature>(defineable).Feature();
@@ -380,6 +380,16 @@ namespace Reni.Type
             if(Size.IsZero)
                 return this;
             return EnsureRef(refAlignParam);
+        }
+
+        internal Result GetSuffixResult(Category category, Defineable defineable)
+        {
+            return GetUnaryResult<IFeature>(category, defineable);
+        }
+
+        internal Result GetPrefixResult(Category category, Defineable defineable)
+        {
+            return GetUnaryResult<IPrefixFeature>(category, defineable);
         }
     }
 }

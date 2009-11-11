@@ -132,12 +132,18 @@ namespace Reni.Code
 
         public static CodeBase CreateContextRef(IRefInCode context) { return new RefCode(context); }
 
-        public CodeBase UseWithArg(CodeBase argCode)
+        internal CodeBase UseWithArg(CodeBase argCode)
         {
             var result = argCode.IsRelativeReference
-                             ? Visit(new ReplaceRelRefArg(argCode, argCode.RefAlignParam))
+                             ? Visit(new ReplaceRelRefArg(argCode))
                              : Visit(new ReplaceAbsoluteArg(argCode));
             return result ?? this;
+        }
+
+
+        internal CodeBase UseWithObject(CodeBase objectCode)
+        {
+            return Visit(new ReplaceObjectRef(objectCode)) ?? this;
         }
 
         [DumpData(false)]

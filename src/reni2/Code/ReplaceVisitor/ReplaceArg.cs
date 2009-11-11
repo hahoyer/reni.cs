@@ -16,8 +16,9 @@ namespace Reni.Code.ReplaceVisitor
         }
 
         [DumpData(false)]
-        public CodeBase ActualArg { get { return _actualArg; } }
-        public abstract CodeBase Actual { get; }
+        protected CodeBase ActualArg { get { return _actualArg; } }
+
+        protected abstract CodeBase Actual { get; }
 
         internal override CodeBase Arg(Arg visitedObject)
         {

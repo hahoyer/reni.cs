@@ -44,7 +44,6 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
-            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopRef(RefAlignParam, precedingElement.Offset + _right);
         }
@@ -63,7 +62,6 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(RefPlus precedingElement)
         {
-            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
                 return new RefPlus(RefAlignParam, _right + precedingElement._right);
             return base.TryToCombineBack(precedingElement);

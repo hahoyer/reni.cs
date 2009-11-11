@@ -182,21 +182,27 @@ namespace Reni.Context
             if(right != null)
                 categoryForFunctionals |= Category.Type;
 
-            var suffixResult = GetSuffixResult(categoryForFunctionals, left, defineable);
-            if(suffixResult == null)
+            if(left == null && right != null)
             {
-                if(left != null)
-                {
-                    NotImplementedMethod(category, left, defineable, right);
-                    return null;
-                }
-
-                var prefixResult = GetPrefixResult(category, defineable, right);
+                var prefixResult = Type(right)
+                    .EnsureRefOrVoid(RefAlignParam)
+                    .GetPrefixResult(category, defineable);
                 if(prefixResult != null)
-                    return prefixResult;
-                suffixResult = GetContextResult(categoryForFunctionals, defineable);
+                    return prefixResult.UseWithArg(ResultAsRef(category | Category.Type, right));
             }
-            if(right == null)
+
+            var suffixResult = 
+                left == null
+                ? GetContextResult(categoryForFunctionals, defineable)
+                : GetSuffixResult(categoryForFunctionals, left, defineable);
+
+            if (suffixResult == null)
+            {
+                NotImplementedMethod(category, left, defineable, right);
+                return null;
+            }
+
+            if (right == null)
                 return suffixResult;
 
             var feature = suffixResult.Type.GetFunctionalFeature();
@@ -206,30 +212,21 @@ namespace Reni.Context
             return null;
         }
 
+        private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
+        {
+            var suffixResult = Type(left)
+                .EnsureRefOrVoid(RefAlignParam)
+                .GetSuffixResult(category, defineable);
+            if (suffixResult == null)
+                return null;
+            return suffixResult.UseWithArg(ResultAsRef(category,left));
+        }
+
         private IContextFeature SearchDefinable(Defineable defineable)
         {
             var visitor = new ContextSearchVisitor(defineable);
             visitor.Search(this);
             return visitor.Result;
-        }
-                            
-        private Result GetPrefixResult(Category category, Defineable defineable, ICompileSyntax right) { return GetUnaryResult<IPrefixFeature>(category, right, defineable); }
-
-        private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable) { return GetUnaryResult<IFeature>(category, left, defineable); }
-
-        private Result GetUnaryResult<TFeature>(Category category, ICompileSyntax left, Defineable defineable)
-            where TFeature : class
-        {
-            if(left == null)
-                return null;
-            var leftType = Type(left).EnsureRefOrVoid(RefAlignParam);
-
-            var rawResult = leftType.GetUnaryResult<TFeature>(category, defineable);
-            if(rawResult == null)
-                return null;
-
-            var result = rawResult.UseWithArg(ResultAsRef(category, left));
-            return result;
         }
 
         private Result GetContextResult(Category category, Defineable defineable)

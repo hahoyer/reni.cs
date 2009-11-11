@@ -1,6 +1,7 @@
-using HWClassLibrary.Debug;
 using System;
-using HWClassLibrary.Helper;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Context;
 
@@ -9,8 +10,10 @@ namespace Reni.Code
     internal class InternalRef : CodeBase, IRefInCode
     {
         private readonly RefAlignParam _refAlignParam;
+
         [Node]
         internal readonly CodeBase Code;
+
         [Node]
         internal readonly CodeBase DestructorCode;
 

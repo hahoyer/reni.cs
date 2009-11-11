@@ -20,7 +20,7 @@ namespace Reni.Code.ReplaceVisitor
         /// </summary>
         /// <value>The actual.</value>
         /// created 28.09.2006 22:46
-        public override Code.CodeBase Actual { get { return ActualArg; } }
+        protected override Code.CodeBase Actual { get { return ActualArg; } }
 
     }
 }

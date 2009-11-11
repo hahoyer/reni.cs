@@ -115,6 +115,13 @@ namespace Reni.Struct
             return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
         }
 
+        internal CodeBase ContextRefCodeAsArgCode()
+        {
+            return CodeBase
+                .CreateArg(RefAlignParam.RefSize)
+                .CreateRefPlus(RefAlignParam, InternalSize());
+        }
+
         protected Size InternalSize(int position)
         {
             return InternalResult(Category.Size, position).Size;

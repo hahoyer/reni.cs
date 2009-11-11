@@ -6,39 +6,71 @@ namespace Reni.Code.ReplaceVisitor
 {
     internal sealed class ReplaceRelRefArg : ReplaceArg
     {
-        private readonly RefAlignParam _refAlignParam;
-
         [DumpData(true)]
         private readonly Size _offset;
 
-        private ReplaceRelRefArg(CodeBase actual, RefAlignParam refAlignParam, Size offset)
+        private ReplaceRelRefArg(CodeBase actual, Size offset)
             : base(actual)
         {
-            _refAlignParam = refAlignParam;
             _offset = offset;
             //StopByObjectId(2188);
         }
 
-        internal ReplaceRelRefArg(CodeBase actualArg, RefAlignParam refAlignParam)
-            : this(actualArg, refAlignParam, Size.Create(0)) {}
+        internal ReplaceRelRefArg(CodeBase actualArg)
+            : this(actualArg, Size.Create(0)) { }
 
-        public RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        private RefAlignParam RefAlignParam { get { return ActualArg.RefAlignParam; } }
 
-        public override CodeBase Actual
+        protected override CodeBase Actual
         {
             get
             {
-                if(_offset.IsZero)
+                if (_offset.IsZero)
                     return ActualArg;
                 return ActualArg.CreateRefPlus(RefAlignParam, Offset);
             }
         }
 
-        public Size Offset { get { return _offset; } }
+        private Size Offset { get { return _offset; } }
 
         internal override Visitor<CodeBase> After(Size size)
         {
-            return new ReplaceRelRefArg(ActualArg, RefAlignParam, Offset + size);
+            return new ReplaceRelRefArg(ActualArg, Offset + size);
+        }
+    }
+
+    internal sealed class ReplaceObjectRef: Base
+    {
+        private readonly CodeBase _actual;
+
+        [DumpData(true)]
+        private readonly Size _offset;
+
+        private ReplaceObjectRef(CodeBase actual, Size offset)
+        {
+            _actual = actual;
+            _offset = offset;
+            //StopByObjectId(2188);
+        }
+
+        internal ReplaceObjectRef(CodeBase actualArg)
+            : this(actualArg, Size.Create(0)) { }
+
+        private RefAlignParam RefAlignParam { get { return _actual.RefAlignParam; } }
+
+        internal CodeBase Actual
+        {
+            get
+            {
+                if (_offset.IsZero)
+                    return _actual;
+                return _actual.CreateRefPlus(RefAlignParam, _offset);
+            }
+        }
+
+        internal override Visitor<CodeBase> After(Size size)
+        {
+            return new ReplaceObjectRef(_actual, _offset + size);
         }
     }
 }
