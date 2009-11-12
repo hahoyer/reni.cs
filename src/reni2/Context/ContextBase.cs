@@ -196,12 +196,6 @@ namespace Reni.Context
                 ? GetContextResult(categoryForFunctionals, defineable)
                 : GetSuffixResult(categoryForFunctionals, left, defineable);
 
-            if (suffixResult == null)
-            {
-                NotImplementedMethod(category, left, defineable, right);
-                return null;
-            }
-
             if (right == null)
                 return suffixResult;
 
@@ -218,8 +212,12 @@ namespace Reni.Context
                 .EnsureRefOrVoid(RefAlignParam)
                 .GetSuffixResult(category, defineable);
             if (suffixResult == null)
+            {
+                NotImplementedMethod(category, left, defineable);
                 return null;
-            return suffixResult.UseWithArg(ResultAsRef(category,left));
+            }
+
+            return suffixResult.UseWithArg(ResultAsRef(category, left));
         }
 
         private IContextFeature SearchDefinable(Defineable defineable)
@@ -233,7 +231,10 @@ namespace Reni.Context
         {
             var feature = SearchDefinable(defineable);
             if(feature == null)
+            {
+                NotImplementedMethod(category, defineable);
                 return null;
+            }
 
             return feature.Apply(category) & category;
         }

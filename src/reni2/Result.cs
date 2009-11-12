@@ -399,15 +399,6 @@ namespace Reni
         }
 
 
-        internal Result UseWithObject(Result resultForObject)
-        {
-            var result = new Result { Size = Size, Type = Type };
-            if (HasCode && resultForObject.HasCode)
-                result.Code = Code.UseWithObject(resultForObject.Code);
-            if (HasRefs && resultForObject.HasRefs)
-                result.Refs = Refs.CreateSequence(resultForObject.Refs);
-            return result;
-        }
         /// <summary>
         /// Replaces the absolute context ref.
         /// </summary>

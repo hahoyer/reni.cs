@@ -141,11 +141,6 @@ namespace Reni.Code
         }
 
 
-        internal CodeBase UseWithObject(CodeBase objectCode)
-        {
-            return Visit(new ReplaceObjectRef(objectCode)) ?? this;
-        }
-
         [DumpData(false)]
         internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
 

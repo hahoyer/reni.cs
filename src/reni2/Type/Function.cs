@@ -79,7 +79,7 @@ namespace Reni.Type
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
-            var trace = ObjectId == 8 && functionalResult.ObjectId == 9884 && argsResult.ObjectId == 9898 && category.HasCode;
+            var trace = true;// ObjectId == 8 && functionalResult.ObjectId == 9884 && argsResult.ObjectId == 9898 && category.HasCode;
             StartMethodDumpWithBreak(trace, category,functionalResult,argsResult);
             Tracer.Assert(argsResult.HasType);
             var result = ApplyFunction(category, argsResult);

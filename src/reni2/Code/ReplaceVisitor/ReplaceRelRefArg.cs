@@ -39,38 +39,4 @@ namespace Reni.Code.ReplaceVisitor
         }
     }
 
-    internal sealed class ReplaceObjectRef: Base
-    {
-        private readonly CodeBase _actual;
-
-        [DumpData(true)]
-        private readonly Size _offset;
-
-        private ReplaceObjectRef(CodeBase actual, Size offset)
-        {
-            _actual = actual;
-            _offset = offset;
-            //StopByObjectId(2188);
-        }
-
-        internal ReplaceObjectRef(CodeBase actualArg)
-            : this(actualArg, Size.Create(0)) { }
-
-        private RefAlignParam RefAlignParam { get { return _actual.RefAlignParam; } }
-
-        internal CodeBase Actual
-        {
-            get
-            {
-                if (_offset.IsZero)
-                    return _actual;
-                return _actual.CreateRefPlus(RefAlignParam, _offset);
-            }
-        }
-
-        internal override Visitor<CodeBase> After(Size size)
-        {
-            return new ReplaceObjectRef(_actual, _offset + size);
-        }
-    }
 }

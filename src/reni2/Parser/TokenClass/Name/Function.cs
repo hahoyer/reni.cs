@@ -7,7 +7,7 @@ namespace Reni.Parser.TokenClass.Name
 {
     [Token("function")]
     [Serializable]
-    internal sealed class TfunctionT : Prefix
+    internal sealed class Function : Prefix
     {
         public override Result Result(ContextBase context, Category category, ICompileSyntax right)
         {
