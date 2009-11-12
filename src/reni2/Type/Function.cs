@@ -87,45 +87,4 @@ namespace Reni.Type
         }
     }
 
-    [Serializable]
-    internal sealed class Property : TypeBase
-    {
-        [DumpData(true)] private readonly ICompileSyntax _body;
-        [DumpData(true)] private readonly ContextBase _context;
-
-        public Property(ContextBase context, ICompileSyntax body)
-        {
-            _context = context;
-            _body = body;
-        }
-
-        protected override Size GetSize()
-        {
-            return Size.Create(0);
-        }
-
-        internal override bool IsValidRefTarget() { return false; }
-
-        internal override string DumpPrintText
-        {
-            get { return "#(#context " + _context.ObjectId + "#)# property(" + _body.DumpShort() + ")"; }
-        }
-
-        [DumpData(false)]
-        internal TypeBase ResolvedType
-        {
-            get
-            {
-                return _context
-                    .Type(_body)
-                    .ApplyFunction(Category.Type, CreateVoid.CreateResult(Category.Type))
-                    .Type;
-            }
-        }
-
-        internal override string DumpShort()
-        {
-            return "context." + _context.ObjectId + ".property(" + _body.DumpShort() + ")";
-        }
-    }
 }
