@@ -377,9 +377,9 @@ namespace Reni.Type
 
         internal TypeBase EnsureRefOrVoid(RefAlignParam refAlignParam)
         {
-            if(Size.IsZero)
-                return this;
-            return EnsureRef(refAlignParam);
+            if(IsValidRefTarget())
+                return EnsureRef(refAlignParam);
+            return this;
         }
 
         internal Result GetSuffixResult(Category category, Defineable defineable)

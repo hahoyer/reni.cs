@@ -14,9 +14,9 @@ namespace Reni.Type
         private readonly TypeBase _value;
 
         internal readonly IFeature DumpPrintFeature;
-        private static readonly IFunctionalFeature _functionalFeature = new FunctionalFeatureImplementation();
+        private static readonly IFunctionalFeature _functionalFeature = new FunctionalFeature();
 
-        private class FunctionalFeatureImplementation : IFunctionalFeature
+        private class FunctionalFeature : IFunctionalFeature
         {
             string IDumpShortProvider.DumpShort() { return "type"; }
             Result IFunctionalFeature.Apply(Category category, Result functionResult, Result argsResult) { return argsResult.ConvertTo(functionResult.Type.StripFunctional().AutomaticDereference()) & category; }

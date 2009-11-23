@@ -6,21 +6,10 @@ using Reni.Syntax;
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class Function : TypeBase, IFunctionalFeature
+    internal sealed class Function : ReniObject, IFunctionalFeature
     {
         private readonly ICompileSyntax _body;
         
-        internal override TypeBase StripFunctional()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
-        internal override IFunctionalFeature GetFunctionalFeature()
-        {
-            return this;
-        }
-
         private readonly ContextBase _context;
         private static int _nextObjectId;
 
@@ -30,41 +19,22 @@ namespace Reni.Type
             _body = body;
         }
 
-        internal ContextBase Context
+        private ContextBase Context
         {
             get { return _context; }
         }
 
-        internal ICompileSyntax Body
+        private ICompileSyntax Body
         {
             get { return _body; }
         }
 
-        protected override Size GetSize()
-        {
-            return Size.Create(0);
-        }
-
-        internal override string DumpPrintText
+        internal string DumpPrintText
         {
             get { return "#(#context " + _context.ObjectId + "#)# function(" + _body.DumpShort() + ")"; }
         }
 
-        internal override bool IsValidRefTarget() { return false; }
-
-        internal override AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(refAlignParam);
-            return base.CreateAutomaticRef(refAlignParam);
-        }
-
-        internal override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(refAlignParam);
-            return base.CreateAssignableRef(refAlignParam);
-        }
-
-        internal override Result ApplyFunction(Category category, TypeBase argsType)
+        private Result ApplyFunction(Category category, TypeBase argsType)
         {
             var argsResult = argsType.CreateArgResult(category|Category.Type);
             return _context
@@ -72,7 +42,7 @@ namespace Reni.Type
                 .CreateFunctionCall(_context, category, Body, argsResult);
         }
 
-        internal override string DumpShort()
+        public string DumpShort()
         {
             return "context." + _context.ObjectId + ".function(" + _body.DumpShort() + ")";
         }
