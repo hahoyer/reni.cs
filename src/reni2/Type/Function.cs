@@ -52,7 +52,7 @@ namespace Reni.Type
             var trace = true;// ObjectId == 8 && functionalResult.ObjectId == 9884 && argsResult.ObjectId == 9898 && category.HasCode;
             StartMethodDumpWithBreak(trace, category,functionalResult,argsResult);
             Tracer.Assert(argsResult.HasType);
-            var result = ApplyFunction(category, argsResult);
+            var result = ApplyFunction(category, argsResult.Type).UseWithArg(argsResult);
             return ReturnMethodDumpWithBreak(trace,result);
         }
     }

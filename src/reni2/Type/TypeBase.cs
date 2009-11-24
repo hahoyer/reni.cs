@@ -197,17 +197,6 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result ApplyFunction(Category category, Result argsResult)
-        {
-            return ApplyFunction(category, argsResult.Type).UseWithArg(argsResult);
-        }
-
-        internal virtual Result ApplyFunction(Category category, TypeBase argsType)
-        {
-            NotImplementedMethod(category, argsType);
-            return null;
-        }
-
         internal static Result CreateVoidCodeAndRefs(Category category) { return CreateVoidResult(category & (Category.Code | Category.Refs)); }
 
         internal static Result CreateVoidResult(Category category) { return CreateVoid.CreateResult(category); }

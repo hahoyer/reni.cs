@@ -93,7 +93,12 @@ namespace Reni.Context
 
         internal Result CreateFunctionResult(Category category, ICompileSyntax body) { return CreateFunctionType(body).CreateResult(category); }
 
-        private TypeBase CreateFunctionType(ICompileSyntax body) { return _cache.FunctionType.Find(body, () => new Type.Function(this, body)); }
+        private TypeBase CreateFunctionType(ICompileSyntax body)
+        {
+            return _cache
+                .FunctionType
+                .Find(body, () => new Type.Function(this, body));
+        }
 
         internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
 
