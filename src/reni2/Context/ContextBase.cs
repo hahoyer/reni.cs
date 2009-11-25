@@ -91,9 +91,12 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result CreateFunctionResult(Category category, ICompileSyntax body) { return CreateFunctionType(body).CreateResult(category); }
+        internal Result CreateFunctionResult(Category category, ICompileSyntax body)
+        {
+            return CreateFunctionType(body).CreateResult(category);
+        }
 
-        private TypeBase CreateFunctionType(ICompileSyntax body)
+        private Type.Function CreateFunctionType(ICompileSyntax body)
         {
             return _cache
                 .FunctionType
@@ -269,8 +272,8 @@ namespace Reni.Context
             new DictionaryEx<TypeBase, Function>();
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, TypeBase> FunctionType =
-            new DictionaryEx<ICompileSyntax, TypeBase>();
+        internal readonly DictionaryEx<ICompileSyntax, Type.Function> FunctionType =
+            new DictionaryEx<ICompileSyntax, Type.Function>();
 
         [Node, SmartNode]
         internal readonly DictionaryEx<Struct.Container, FullContext> StructContainerCache =

@@ -11,6 +11,7 @@ namespace Reni.Parser.TokenClass.Name
     {
         public override Result Result(ContextBase context, Category category, ICompileSyntax right)
         {
+
             return context.CreateFunctionResult(category, right);
         }
     }
