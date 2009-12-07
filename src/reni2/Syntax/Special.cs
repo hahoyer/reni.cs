@@ -24,7 +24,11 @@ namespace Reni.Syntax
         public TerminalSyntax(Token token, ITerminal terminal)
             : base(token) { Terminal = terminal; }
 
-        protected internal override Result Result(ContextBase context, Category category) { return Terminal.Result(context, category, Token); }
+        protected internal override Result Result(ContextBase context, Category category)
+        {
+            return Terminal
+                .Result(context, category, Token);
+        }
     }
 
     [Serializable]
@@ -43,7 +47,11 @@ namespace Reni.Syntax
             _right = right;
         }
 
-        protected internal override Result Result(ContextBase context, Category category) { return _prefix.Result(context, category, _right); }
+        protected internal override Result Result(ContextBase context, Category category)
+        {
+            return _prefix
+                .Result(context, category, _right);
+        }
 
         protected internal override string DumpShort() { return base.DumpShort() + "(" + _right.DumpShort() + ")"; }
     }
@@ -68,7 +76,11 @@ namespace Reni.Syntax
             _right = right;
         }
 
-        protected internal override Result Result(ContextBase context, Category category) { return _infix.Result(context, category, _left, _right); }
+        protected internal override Result Result(ContextBase context, Category category)
+        {
+            return _infix
+                .Result(context, category, _left, _right);
+        }
 
         protected internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort() + "(" + _right.DumpShort() + ")"; }
     }
@@ -87,8 +99,12 @@ namespace Reni.Syntax
             _left = left;
             _suffix = suffix;
         }
-        
-        protected internal override Result Result(ContextBase context, Category category) { return _suffix.Result(context, category, _left); }
+
+        protected internal override Result Result(ContextBase context, Category category)
+        {
+            return _suffix
+                .Result(context, category, _left);
+        }
     }
 
     internal interface ITerminal

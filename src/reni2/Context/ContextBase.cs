@@ -93,13 +93,13 @@ namespace Reni.Context
 
         internal Result CreateFunctionResult(Category category, ICompileSyntax body)
         {
-            return CreateFunctionType(body).CreateResult(category);
+            return new FunctionDefinitionType(CreateFunctionType(body)).CreateResult(category);
         }
 
         private Type.Function CreateFunctionType(ICompileSyntax body)
         {
             return _cache
-                .FunctionType
+                .Function
                 .Find(body, () => new Type.Function(this, body));
         }
 
@@ -272,7 +272,7 @@ namespace Reni.Context
             new DictionaryEx<TypeBase, Function>();
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, Type.Function> FunctionType =
+        internal readonly DictionaryEx<ICompileSyntax, Type.Function> Function =
             new DictionaryEx<ICompileSyntax, Type.Function>();
 
         [Node, SmartNode]

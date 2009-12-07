@@ -25,4 +25,19 @@ namespace Reni.Type
         internal override IFunctionalFeature GetFunctionalFeature() { return _feature; }
         internal override TypeBase StripFunctional() { return _objectType; }
     }
+
+    internal class FunctionDefinitionType : TypeBase
+    {
+        [DumpData(true)]
+        private readonly IFunctionalFeature _feature;
+
+        public FunctionDefinitionType(IFunctionalFeature feature)
+        {
+            _feature = feature;
+        }
+
+        internal override bool IsValidRefTarget() { return false; }
+        protected override Size GetSize() { return Size.Zero; }
+        internal override string DumpShort() { return _feature.DumpShort(); }
+    }
 }
