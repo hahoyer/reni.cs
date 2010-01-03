@@ -26,8 +26,6 @@ namespace Reni.Type
 
         private ICompileSyntax Body { get { return _body; } }
 
-        internal string DumpPrintText { get { return "#(#context " + _context.ObjectId + "#)# function(" + _body.DumpShort() + ")"; } }
-
         private Result ApplyFunction(Category category, TypeBase argsType)
         {
             var argsResult = argsType.CreateArgResult(category | Category.Type);

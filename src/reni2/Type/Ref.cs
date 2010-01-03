@@ -89,8 +89,13 @@ namespace Reni.Type
 
         internal override sealed string DumpShort() { return ShortName + "." + Parent.DumpShort(); }
 
-        protected override sealed Result ConvertToImplementation(Category category, TypeBase dest)
+        protected Result ConvertTo_Implementation<TRefType>(Category category, TypeBase dest)
+            where TRefType : Ref
         {
+            var destAsRef = dest as TRefType;
+            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Target == destAsRef.Target)
+                return dest.ConvertToItself(category);
+
             return Target
                 .ConvertTo(category, dest)
                 .UseWithArg(CreateDereferencedArgResult(category));
@@ -98,8 +103,13 @@ namespace Reni.Type
 
         internal override sealed Result ApplyTypeOperator(Result argResult) { return Target.ApplyTypeOperator(argResult); }
 
-        internal override sealed bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
+        protected bool IsConvertableTo_Implementation<TRefType>(TypeBase dest, ConversionFeature conversionFeature)
+            where TRefType: Ref
         {
+            var destAsRef = dest as TRefType;
+            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Target == destAsRef.Target)
+                return true;
+
             return Target
                 .IsConvertableTo(dest, conversionFeature);
         }
@@ -137,15 +147,5 @@ namespace Reni.Type
         internal abstract AutomaticRef CreateAutomaticRef();
         internal override bool IsValidRefTarget() { return true; }
         internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
-    }
-
-    [Serializable]
-    internal sealed class AutomaticRef : Ref
-    {
-        internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam)
-            : base(target, refAlignParam) { }
-
-        protected override string ShortName { get { return "automatic_ref"; } }
-        internal override AutomaticRef CreateAutomaticRef() { return this; }
     }
 }

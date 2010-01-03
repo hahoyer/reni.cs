@@ -15,7 +15,7 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount { get { return 1; } }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             if(conversionFeature.IsUseConverter)
                 return dest.HasConverterFromBit();

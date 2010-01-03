@@ -39,5 +39,6 @@ namespace Reni.Type
         internal override bool IsValidRefTarget() { return false; }
         protected override Size GetSize() { return Size.Zero; }
         internal override string DumpShort() { return _feature.DumpShort(); }
+        internal override IFunctionalFeature GetFunctionalFeature() { return _feature; }
     }
 }

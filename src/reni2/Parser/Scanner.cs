@@ -162,8 +162,8 @@ namespace Reni.Parser
                 endOfComment = sp[2] + endOfComment;
             else if(IsAlpha(sp[2]))
             {
-            while(IsAlphaNum(sp[i]))
-                i++;
+                while (IsAlphaNum(sp[i]))
+                    i++;
                 endOfComment = sp.SubString(2, i - 2) + endOfComment;
             }
             else

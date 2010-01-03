@@ -118,7 +118,7 @@ namespace Reni.Type
 
         internal override string DumpShort() { return "(" + Element.DumpShort() + ")sequence(" + Count + ")"; }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destSequence = dest as Sequence;
             if(destSequence != null)
@@ -132,7 +132,7 @@ namespace Reni.Type
             if(destAligner != null)
                 return IsConvertableTo(destAligner.Parent, conversionFeature);
 
-            return base.IsConvertableToImplementation(dest, conversionFeature);
+            return base.IsConvertableTo_Implementation(dest, conversionFeature);
         }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -141,7 +141,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        protected override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
             var result = ConvertTo(category, dest as Sequence);
             if(result != null)

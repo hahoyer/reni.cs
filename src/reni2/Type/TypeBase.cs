@@ -7,6 +7,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Parser.TokenClass;
 
 namespace Reni.Type
@@ -142,7 +143,12 @@ namespace Reni.Type
 
         internal Sequence CreateSequence(int elementCount) { return _cache.Sequences.Find(elementCount, () => new Sequence(this, elementCount)); }
 
-        internal TypeBase CreateFunctionalType(IFunctionalFeature feature) { return _cache.FunctionalTypes.Find(feature, () => new FunctionAccessType(this, feature)); }
+        internal TypeBase CreateFunctionalType(IFunctionalFeature feature)
+        {
+            return _cache
+                .FunctionalTypes
+                .Find(feature, () => new FunctionAccessType(this, feature));
+        }
 
         internal virtual Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 
@@ -165,21 +171,18 @@ namespace Reni.Type
         internal Result CreateResult(Category category, Result codeAndRefs)
         {
             var result = new Result();
-            if (category.HasSize)
+            if(category.HasSize)
                 result.Size = Size;
-            if (category.HasType)
+            if(category.HasType)
                 result.Type = this;
-            if (category.HasCode)
+            if(category.HasCode)
                 result.Code = codeAndRefs.Code;
-            if (category.HasRefs)
+            if(category.HasRefs)
                 result.Refs = codeAndRefs.Refs;
             return result;
         }
 
-        internal Result CreateResult(Result codeAndRefs)
-        {
-            return CreateResult(codeAndRefs.CompleteCategory, codeAndRefs);
-        }
+        internal Result CreateResult(Result codeAndRefs) { return CreateResult(codeAndRefs.CompleteCategory, codeAndRefs); }
 
         internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None); }
 
@@ -205,12 +208,9 @@ namespace Reni.Type
 
         internal virtual TypeBase AutomaticDereference() { return this; }
 
-        virtual internal TypeBase GetEffectiveType() { return this; }
+        internal virtual TypeBase GetEffectiveType() { return this; }
 
-        internal Result DumpPrint(Category category)
-        {
-            return GetUnaryResult<IFeature>(category, new Feature.DumpPrint.Token() );
-        }
+        internal Result DumpPrint(Category category) { return GetUnaryResult<IFeature>(category, new Token()); }
 
         internal virtual Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
         {
@@ -244,22 +244,16 @@ namespace Reni.Type
         {
             if(this == dest)
                 return ConvertToItself(category);
-            return ConvertToImplementation(category, dest);
+            return ConvertTo_Implementation(category, dest);
         }
 
-        private Result ConvertToSequence(Category category, TypeBase elementType)
-        {
-            return Conversion(category, CreateSequenceType(elementType));
-        }
+        private Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
 
-        internal Result ConvertToBitSequence(Category category)
-        {
-            return ConvertToSequence(category, CreateBit).Align(BitsConst.SegmentAlignBits);
-        }
+        internal Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, CreateBit).Align(BitsConst.SegmentAlignBits); }
 
-        protected virtual Result ConvertToItself(Category category) { return CreateArgResult(category); }
+        protected internal virtual Result ConvertToItself(Category category) { return CreateArgResult(category); }
 
-        protected virtual Result ConvertToImplementation(Category category, TypeBase dest)
+        protected virtual Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
             NotImplementedMethod(category, dest);
             throw new NotImplementedException();
@@ -271,12 +265,12 @@ namespace Reni.Type
                 return IsConvertableToItself(conversionFeature);
             if(conversionFeature.IsUseConverter && HasConverterTo(dest))
                 return true;
-            return IsConvertableToImplementation(dest, conversionFeature);
+            return IsConvertableTo_Implementation(dest, conversionFeature.DontUseConverter);
         }
 
         internal virtual bool HasConverterTo(TypeBase dest) { return false; }
 
-        internal virtual bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal virtual bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             NotImplementedMethod(dest, conversionFeature);
             throw new NotImplementedException();
@@ -352,11 +346,11 @@ namespace Reni.Type
             where TFeature : class
         {
             var feature = SearchDefineable<TFeature>(defineable).Feature();
-            if (feature == null)
+            if(feature == null)
                 return null;
 
             var result = feature.Apply(category);
-            if (this != feature.DefiningType())
+            if(this != feature.DefiningType())
             {
                 var conversion = Conversion(category, feature.DefiningType());
                 result = result.UseWithArg(conversion);
@@ -371,14 +365,8 @@ namespace Reni.Type
             return this;
         }
 
-        internal Result GetSuffixResult(Category category, Defineable defineable)
-        {
-            return GetUnaryResult<IFeature>(category, defineable);
-        }
+        internal Result GetSuffixResult(Category category, Defineable defineable) { return GetUnaryResult<IFeature>(category, defineable); }
 
-        internal Result GetPrefixResult(Category category, Defineable defineable)
-        {
-            return GetUnaryResult<IPrefixFeature>(category, defineable);
-        }
+        internal Result GetPrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
     }
 }

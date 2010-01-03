@@ -63,16 +63,14 @@ namespace Reni.Struct
         internal Result DumpPrintFromRef(Category category)
         {
             var refAlignParam = Context.RefAlignParam;
-            var result = new List<Result>();
-            for(var i = 0; i < StatementList.Count; i++)
-            {
-                var accessResult = AccessResultAsArgFromRef(category | Category.Type, i, refAlignParam);
-                result.Add(accessResult.Type.DumpPrint(category).UseWithArg(accessResult));
-            }
+            var result = StatementList
+                .Select((t, i) => AccessResultAsArgFromRef(category | Category.Type, i, refAlignParam))
+                .Select(accessResult => accessResult.Type.DumpPrint(category).UseWithArg(accessResult))
+				.ToList();
             return Result.ConcatPrintResult(category, result);
         }
 
-        protected override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
             Tracer.Assert(dest.IsVoid);
             Tracer.Assert(Size.IsZero);
@@ -80,7 +78,7 @@ namespace Reni.Struct
                                      () => CodeBase.CreateArg(Size.Zero), () => Context.ConstructorRefs());
         }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             if(dest.IsVoid)
                 return Size.IsZero;

@@ -36,7 +36,7 @@ namespace Reni.Type
             return first;
         }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             return false;
         }

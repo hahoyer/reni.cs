@@ -9,6 +9,16 @@ using Reni.FeatureTest.ThenElse;
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
+    [Target(@"a:(x: 100;f: function arg+x);g: a f; g context dump_print;")]
+    [Output("102")]
+    [InnerAccessTheOnlyOne, Add2Numbers]
+    public class FunctionVariable : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
     [Target(@"x: 100;f: function arg+x;f(200) dump_print;")]
     [Output("102")]
     [InnerAccessTheOnlyOne, Add2Numbers]

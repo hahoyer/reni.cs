@@ -11,9 +11,9 @@ namespace Reni.Type
 
         internal override bool IsValidRefTarget() { return Parent.IsValidRefTarget(); }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
-            return base.IsConvertableToImplementation(dest, conversionFeature.EnableCut);
+            return base.IsConvertableTo_Implementation(dest, conversionFeature.EnableCut);
         }
 
     }

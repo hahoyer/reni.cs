@@ -1,4 +1,3 @@
-// #pragma warning disable 649
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +39,8 @@ namespace Reni.Struct
 
         Result IFeature.Apply(Category category)
         {
-            return Apply(category).ReplaceRelativeContextRef(_structContext.ForCode, _structContext.ContextRefCodeAsArgCode());
+            return Apply(category)
+                .ReplaceRelativeContextRef(_structContext.ForCode, _structContext.ContextRefCodeAsArgCode());
         }
 
         private RefAlignParam RefAlignParam { get { return _structContext.ForCode.RefAlignParam; } }
@@ -56,16 +56,9 @@ namespace Reni.Struct
                 .Apply(category, result, TypeBase.CreateVoidResult(category | Category.Type));
         }
 
-        TypeBase IFeature.DefiningType()
-        {
-            NotImplementedMethod();
-            return null;
-        }
+        TypeBase IFeature.DefiningType() { return _structContext.NaturalRefType; }
 
-        Result IContextFeature.Apply(Category category)
-        {
-            return Apply(category);
-        }
+        Result IContextFeature.Apply(Category category) { return Apply(category); }
     }
 
     internal interface IStructContext

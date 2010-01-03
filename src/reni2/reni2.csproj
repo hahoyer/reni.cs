@@ -134,6 +134,7 @@
     <Compile Include="Syntax\EmptyList.cs" />
     <Compile Include="Syntax\VisitStrategy.cs" />
     <Compile Include="Type\AssignableRef.cs" />
+    <Compile Include="Type\AutomaticRef.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
     <Compile Include="Type\EnableCut.cs" />
