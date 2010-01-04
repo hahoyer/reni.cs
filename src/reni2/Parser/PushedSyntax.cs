@@ -9,9 +9,9 @@ namespace Reni.Parser
     {
         private readonly IParsedSyntax _left;
         private readonly Token _token;
-        internal readonly TokenFactory TokenFactory;
+        internal readonly ITokenFactory TokenFactory;
 
-        internal PushedSyntax(IParsedSyntax left, Token token, TokenFactory tokenFactory)
+        internal PushedSyntax(IParsedSyntax left, Token token, ITokenFactory tokenFactory)
         {
             _left = left;
             _token = token;

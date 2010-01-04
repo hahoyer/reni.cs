@@ -29,6 +29,6 @@ namespace Reni.Parser
             return UserSymbol.Instance(name);
         }
 
-        internal char Relation(string newTokenName, string recentTokenName) { return _prioTable.Relation(newTokenName, recentTokenName); }
+        char ITokenFactory.Relation(string newTokenName, string recentTokenName) { return _prioTable.Relation(newTokenName, recentTokenName); }
     }
 }

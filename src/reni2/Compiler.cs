@@ -17,7 +17,7 @@ namespace Reni
     {
         private readonly string _fileName;
         private readonly CompilerParameters _parameters;
-        private readonly ParserInst _parser = new ParserInst();
+        private readonly ParserInst _parser;
         private readonly Root _rootContext = ContextBase.CreateRoot();
 
         private readonly SimpleCache<Source> _source;
@@ -36,6 +36,7 @@ namespace Reni
         {
             _fileName = fileName;
             _parameters = parameters;
+            _parser = new ParserInst(new Scanner(), MainTokenFactory.Instance);
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
             _syntax = new SimpleCache<IParsedSyntax>(() => _parser.Compile(Source));
             _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax.Token, Syntax).Result(_rootContext, Category.Code).Code);
