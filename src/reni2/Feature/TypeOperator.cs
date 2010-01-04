@@ -7,7 +7,6 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    [Token("type")]
     internal sealed class TypeOperator : Special, ISuffix, IInfix
     {
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)

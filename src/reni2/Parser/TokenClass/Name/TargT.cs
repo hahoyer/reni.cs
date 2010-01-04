@@ -5,7 +5,6 @@ using Reni.Context;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    [Token("arg")]
     [Serializable]
     internal sealed class TargT : Terminal
     {

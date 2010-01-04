@@ -38,7 +38,7 @@ namespace Reni.Type
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
-            var trace = true;
+            var trace = false;
                 // ObjectId == 8 && functionalResult.ObjectId == 9884 && argsResult.ObjectId == 9898 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, functionalResult, argsResult);
             Tracer.Assert(argsResult.HasType);

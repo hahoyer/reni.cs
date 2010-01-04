@@ -30,8 +30,6 @@ namespace Reni.Parser.TokenClass
         protected virtual bool IsCompareOperator { get { return false; } }
     }
 
-    [Token("+")]
-    [Token("-")]
     internal sealed class Sign :
         SequenceOfBitOperation,
         ISearchPath<ISearchPath<IPrefixFeature, Sequence>, Bit>,
@@ -46,13 +44,11 @@ namespace Reni.Parser.TokenClass
         protected override int ResultSize(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
     }
 
-    [Token("*")]
     internal sealed class Star : SequenceOfBitOperation
     {
         protected override int ResultSize(int objSize, int argSize) { return BitsConst.MultiplySize(objSize, argSize); }
     }
 
-    [Token("/")]
     internal sealed class Slash : SequenceOfBitOperation
     {
         protected override int ResultSize(int objSize, int argSize) { return BitsConst.DivideSize(objSize, argSize); }

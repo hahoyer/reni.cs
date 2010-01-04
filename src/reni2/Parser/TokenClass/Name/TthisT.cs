@@ -4,7 +4,6 @@ using Reni.Context;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    [Token("this")]
     [Serializable]
     internal sealed class TthisT : Terminal
     {

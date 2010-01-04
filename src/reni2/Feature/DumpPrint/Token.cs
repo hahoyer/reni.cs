@@ -6,7 +6,6 @@ using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
 {
-    [Token("dump_print")]
     internal sealed class Token :
         Defineable,
         IFeature,

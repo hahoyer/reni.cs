@@ -6,7 +6,6 @@ using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass.Name
 {
-    [Token("function")]
     [Serializable]
     internal sealed class Function : Prefix
     {

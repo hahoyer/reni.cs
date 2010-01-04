@@ -296,11 +296,11 @@ namespace Reni
             var size = FindSize;
             if(size != null)
             {
-                if(HasSize && !(Size == size))
+                if(HasSize && Size != size)
                     Tracer.AssertionFailed(1, @"Size==size", "Size differs " + Dump());
-                if(HasType && !(Type.Size == size))
+                if(HasType && Type.Size != size)
                     Tracer.AssertionFailed(1, @"Type.Size==size", "Type size differs " + Dump());
-                if(HasCode && !(Code.Size == size))
+                if(HasCode && Code.Size != size)
                     Tracer.AssertionFailed(1, @"Code.Size==size", "Code size differs " + Dump());
             }
 

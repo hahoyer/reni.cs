@@ -1,5 +1,5 @@
 ﻿using System;
-using HWClassLibrary.Debug;
+using System.Linq;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 
@@ -91,17 +91,15 @@ namespace Reni.Parser
             return head0 + "\n" + head1 + "\n" + result;
         }
 
-        private void AllocData(params string[][] x)
+        private void AllocData(params string[][] tokenArrayList)
         {
-            var l = 0;
-            for(var i = 0; i < x.Length; i++)
-                l += x[i].Length;
+            var l = tokenArrayList.Sum(t => t.Length);
             _token = new string[l];
             var k = 0;
-            for(var i = 0; i < x.Length; i++)
-                for(var j = 0; j < x[i].Length; j++)
+            foreach(var tokenArray in tokenArrayList)
+                foreach(var token in tokenArray)
                 {
-                    _token[k] = x[i][j];
+                    _token[k] = token;
                     k++;
                 }
             _data = new char[Length,Length];
@@ -179,7 +177,7 @@ namespace Reni.Parser
         /// <summary>
         /// Obtain the index in token list. 
         /// Empty string is considered as "end" in angle brackets. 
-        /// If name is not found the entry "else" in angle brackets is used
+        /// If name is not found the entry "common" in angle brackets is used
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -192,26 +190,27 @@ namespace Reni.Parser
             for(var i = 0; i < Length; i++)
                 if(_token[i] == "<common>")
                     return (i);
+            
             throw new NotImplementedException("missing <common> entry in priority table");
         }
 
         /// <summary>
-        /// Define a prio table with thokens that have the sam priority and are left associative
+        /// Define a prio table with tokens that have the sam priority and are left associative
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static PrioTable LeftAssoc(params string[] x) { return new PrioTable('-', x); }
+        public static PrioTable Left(params string[] x) { return new PrioTable('-', x); }
 
         /// <summary>
-        /// Define a prio table with thokens that have the sam priority and are right associative
+        /// Define a prio table with tokens that have the sam priority and are right associative
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static PrioTable RightAssoc(params string[] x) { return new PrioTable('+', x); }
+        public static PrioTable Right(params string[] x) { return new PrioTable('+', x); }
 
         /// <summary>
         /// Define a prio table that adds a parenthesis level. 
-        /// LToken and RToken shopuld have the same number of elements. 
+        /// LToken and RToken should have the same number of elements. 
         /// Elements of these lists that have the same index are consiedered as matching
         /// </summary>
         /// <param name="data">contains a 3 by 3 character table.
@@ -224,13 +223,12 @@ namespace Reni.Parser
         /// 1,2: TokenClass defined so far finds right TokenClass;
         /// 2,0: ignored, "-=+"-Table generated (use '?');
         /// 2,1: right TokenClass finds TokenClass defined so far;
-        /// 2,1: right TokenClass finds TokenClass defined so far;
         /// 2,2: right TokenClass finds right TokenClass
         /// </param>
         /// <param name="lToken">list of strings that play the role of left parenthesis</param>
         /// <param name="rToken">list of strings that play the role of right parenthesis</param>
         /// <returns></returns>
-        public PrioTable ParLevel(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
+        public PrioTable Level(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
 
         /// <summary>
         /// Combines two prioritity tables. The tokens contained in left operand are considered as higher priority operands
@@ -286,17 +284,17 @@ namespace Reni.Parser
         /// <summary>
         /// Returns the priority information of a pair of tokens
         /// The characters have the following meaning:
-        /// Plus: New token is higher the found token, 
-        /// Minus: Found token is higher than new token
-        /// Equal sign: New token and found token are matching
+        /// Plus: New token is higher the recent token, 
+        /// Minus: Recent token is higher than new token
+        /// Equal sign: New token and recent token are matching
         /// </summary>
-        /// <param name="newToken"></param>
-        /// <param name="recentToken"></param>
+        /// <param name="newTokenName"></param>
+        /// <param name="recentTokenName"></param>
         /// <returns></returns>
-        public char Relation(Token newToken, Token recentToken)
+        public char Relation(string newTokenName, string recentTokenName)
         {
             //Tracer.FlaggedLine("\"" + _token[New] + "\" on \"" + _token[recentToken] + "\" --> \"" + _data[New, recentToken] + "\"");
-            return _data[newToken.Index(this), recentToken.Index(this)];
+            return _data[Index(newTokenName), Index(recentTokenName)];
         }
 
         //For debug only

@@ -50,22 +50,5 @@ namespace Reni
                 .AutomaticDereference()
                 .CreateAssignableRefResult(category, refAlignParam, getCode, getRefs);
         }
-
-        [Obsolete]
-        internal Result PostProcess_old(AutomaticRef visitedType, Result result)
-        {
-            if(_typeBase == visitedType.Target)
-                return result.UseWithArg(visitedType.CreateDereferencedArgResult(result.CompleteCategory));
-            NotImplementedMethod(visitedType, result);
-            return null;
-        }
-
-        [Obsolete]
-        internal Result PostProcess_oldOfAutomaticRef(AutomaticRef visitedType, Result result)
-        {
-            if(_typeBase == visitedType)
-                return result;
-            return PostProcess_old(visitedType, result);
-        }
     }
 }

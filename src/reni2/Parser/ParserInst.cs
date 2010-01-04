@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
@@ -21,11 +20,13 @@ namespace Reni.Parser
         public IParsedSyntax Compile(Source source)
         {
             var sourcePosn = new SourcePosn(source, 0);
-            IParsedSyntax start = null;
-            var stack = new PushedSyntaxStack(sourcePosn, new TokenFactory<TokenAttribute>());
-            while(stack.Apply(ref start, _scanner.CreateToken(sourcePosn, stack.TokenFactory)))
-                start = null;
-            return start;
+            var stack = new PushedSyntaxStack(sourcePosn, MainTokenFactory.Instance);
+            while(true)
+            {
+                var result = stack.Apply(_scanner.CreateToken(sourcePosn, stack.TokenFactory));
+                if (result != null)
+                    return result;
+            }
         }
 
     }
@@ -46,35 +47,31 @@ namespace Reni.Parser
 
         public PushedSyntaxStack(SourcePosn sourcePosn, TokenFactory tokenFactory)
         {
-            _data.Push(new PushedSyntax(null, sourcePosn.CreateStart(), tokenFactory));
+            Push(null, sourcePosn.CreateStart(), tokenFactory);
         }
 
         internal TokenFactory TokenFactory { get { return _data.Peek().TokenFactory; } }
 
-        internal bool Apply(ref IParsedSyntax syntax, Token token)
+        private void Push(IParsedSyntax syntax, Token token, TokenFactory tokenFactory) { _data.Push(new PushedSyntax(syntax, token, tokenFactory)); }
+
+        internal IParsedSyntax Apply(Token token)
         {
+            IParsedSyntax result = null;
+            var newTokenName = token.PrioTableName;
             while(true)
             {
-                var relation = _data.Peek().Relation(token);
+                var relation = _data.Peek().Relation(newTokenName);
                 if(relation != '+')
-                    syntax = PullAndCall(syntax);
+                    result = _data.Pop().CreateSyntax(result);
 
                 if(relation != '-')
                 {
-                    if (token.TokenClass.IsEnd)
-                        return false;
-                    var tokenFactory = token.NewTokenFactory ?? _data.Peek().TokenFactory;
-                    _data.Push(new PushedSyntax(syntax, token, tokenFactory));
-                    return true;
+                    if(token.TokenClass.IsEnd)
+                        return result;
+                    Push(result, token, token.NewTokenFactory ?? TokenFactory);
+                    return null;
                 }
             }
         }
-
-        private IParsedSyntax PullAndCall(IParsedSyntax args)
-        {
-            var x = _data.Pop();
-            return x.CreateSyntax(args);
-        }
-
     }
 }

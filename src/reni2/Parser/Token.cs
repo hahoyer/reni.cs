@@ -64,11 +64,6 @@ namespace Reni.Parser
             return Name;
         }
 
-        public int Index(PrioTable prioTable)
-        {
-            return prioTable.Index(PrioTableName);
-        }
-
         [DumpData(false)]
         internal TokenFactory NewTokenFactory { get { return TokenClass.NewTokenFactory; } }
     }

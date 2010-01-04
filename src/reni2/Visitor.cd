@@ -38,7 +38,7 @@
   <Class Name="Reni.Code.ReplaceVisitor.ReplaceRelRefArg">
     <Position X="6" Y="11" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAIAgAAAAAAAAAAAAAABAAAAAAyAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAABAAAAAAyAA=</HashCode>
       <FileName>Code\ReplaceVisitor\ReplaceRelRefArg.cs</FileName>
     </TypeIdentifier>
   </Class>

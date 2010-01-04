@@ -9,7 +9,7 @@ using Reni.FeatureTest.ThenElse;
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
-    [Target(@"a:(x: 100;f: function arg+x);g: a f; g context dump_print;")]
+    [Target(@"a:(x: 100;f: function arg+x);g: a f; g \|/ dump_print;")]
     [Output("102")]
     [InnerAccessTheOnlyOne, Add2Numbers]
     public class FunctionVariable : CompilerTest

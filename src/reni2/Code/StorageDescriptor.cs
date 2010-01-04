@@ -103,6 +103,8 @@ namespace Reni.Code
 
         internal string CreateBitArrayOp(ISequenceOfBitBinaryOperation opToken, Size resultSize, Size leftSize, Size rightSize)
         {
+            Tracer.Assert(opToken.CSharpNameOfDefaultOperation != "");
+
             if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
             {
                 var value = CreateBinaryOperation(leftSize, opToken, rightSize);

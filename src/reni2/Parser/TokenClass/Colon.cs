@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Syntax;
 
-namespace Reni.Parser.TokenClass.Symbol
+namespace Reni.Parser.TokenClass
 {
-    [Token(":")]
     [Serializable]
     internal sealed class Colon : TokenClassBase
     {
@@ -16,11 +13,10 @@ namespace Reni.Parser.TokenClass.Symbol
         }
     }
 
-    [Token("!")]
     [Serializable]
     internal sealed class Exclamation : TokenClassBase
     {
-        private static readonly TokenFactory _tokenFactory = new TokenFactory<DeclarationTokenAttribute>();
+        private static readonly TokenFactory _tokenFactory = DeclarationTokenFactory.Instance;
 
         [DumpData(false)]
         internal override TokenFactory NewTokenFactory { get { return _tokenFactory; } }
@@ -33,7 +29,6 @@ namespace Reni.Parser.TokenClass.Symbol
         }
     }
 
-    [DeclarationToken("property")]
     [Serializable]
     internal sealed class Property : TokenClassBase
     {
@@ -44,7 +39,6 @@ namespace Reni.Parser.TokenClass.Symbol
         }
     }
 
-    [DeclarationToken("converter")]
     [Serializable]
     internal sealed class Converter : TokenClassBase
     {
@@ -52,37 +46,6 @@ namespace Reni.Parser.TokenClass.Symbol
         {
             right.AssertIsNull();
             return ((DeclarationExtensionSyntax) left).ExtendByConverter(token);
-        }
-    }
-
-    internal sealed class DeclarationTokenAttribute : TokenAttributeBase
-    {
-        public DeclarationTokenAttribute(string token)
-            : base(token)
-        {
-        }
-
-        public DeclarationTokenAttribute()
-            : base(null)
-        {
-        }
-
-        internal override PrioTable CreatePrioTable()
-        {
-            var x = PrioTable.LeftAssoc("!");
-            x += PrioTable.LeftAssoc("property", "converter");
-            x = x.ParLevel
-                (new[]
-                     {
-                         "++-",
-                         "+?-",
-                         "?--"
-                     },
-                 new[] {"(", "[", "{", "<frame>"},
-                 new[] {")", "]", "}", "<end>"}
-                );
-            x += PrioTable.LeftAssoc("<common>");
-            return x;
         }
     }
 
@@ -110,7 +73,7 @@ namespace Reni.Parser.TokenClass.Symbol
 
     internal sealed class PropertyDeclarationSyntax : DeclarationExtensionSyntax
     {
-        internal new Token Token;
+        private new Token Token;
 
         internal PropertyDeclarationSyntax(Token token, Token otherToken)
             : base(token)
@@ -129,7 +92,7 @@ namespace Reni.Parser.TokenClass.Symbol
 
     internal sealed class ConverterDeclarationSyntax : DeclarationExtensionSyntax
     {
-        internal new Token Token;
+        private new Token Token;
 
         internal ConverterDeclarationSyntax(Token token, Token otherToken)
             : base(token)

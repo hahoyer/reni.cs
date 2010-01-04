@@ -193,7 +193,7 @@ namespace Reni.Context
             if(left == null && right != null)
             {
                 var prefixResult = Type(right)
-                    .EnsureRefOrVoid(RefAlignParam)
+                    .EnsureRefIfAppropriate(RefAlignParam)
                     .GetPrefixResult(category, defineable);
                 if(prefixResult != null)
                     return prefixResult.UseWithArg(ResultAsRef(category | Category.Type, right));
@@ -217,7 +217,7 @@ namespace Reni.Context
         private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
             var suffixResult = Type(left)
-                .EnsureRefOrVoid(RefAlignParam)
+                .EnsureRefIfAppropriate(RefAlignParam)
                 .GetSuffixResult(category, defineable);
             if (suffixResult == null)
             {
@@ -321,6 +321,14 @@ namespace Reni.Context
                     );
             }
             return base.CommonResult(category, condSyntax);
+        }
+    }
+
+    internal class ContextOperator: Defineable, ISearchPath<IFeature,FunctionDefinitionType>
+    {
+        IFeature ISearchPath<IFeature, FunctionDefinitionType>.Convert(FunctionDefinitionType type)
+        {
+            return type.ContextOperatorFeature;
         }
     }
 }

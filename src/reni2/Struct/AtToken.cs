@@ -7,7 +7,6 @@ using Reni.Syntax;
 
 namespace Reni.Struct
 {
-    [Token("_A_T_")]
     internal sealed class AtToken : Infix
     {
         public override Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right)

@@ -48,7 +48,7 @@ namespace Reni.Struct
 
         protected internal override int IndexSize { get { return Context.IndexSize; } }
 
-        private List<ICompileSyntax> StatementList { get { return Context.StatementList; } }
+        private IEnumerable<ICompileSyntax> StatementList { get { return Context.StatementList; } }
 
         internal override Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam) { return Context.AccessResultAsArgFromRef(category, position, refAlignParam); }
 
@@ -60,7 +60,7 @@ namespace Reni.Struct
             return DumpPrintFromRef(category);
         }
 
-        internal Result DumpPrintFromRef(Category category)
+        private Result DumpPrintFromRef(Category category)
         {
             var refAlignParam = Context.RefAlignParam;
             var result = StatementList

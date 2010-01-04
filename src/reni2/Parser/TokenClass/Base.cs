@@ -6,7 +6,6 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Context;
-using Reni.Parser.TokenClass.Symbol;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass

@@ -358,7 +358,7 @@ namespace Reni.Type
             return result & category;
         }
 
-        internal TypeBase EnsureRefOrVoid(RefAlignParam refAlignParam)
+        internal TypeBase EnsureRefIfAppropriate(RefAlignParam refAlignParam)
         {
             if(IsValidRefTarget())
                 return EnsureRef(refAlignParam);

@@ -18,9 +18,9 @@ namespace Reni.Parser
             TokenFactory = tokenFactory;
         }
 
-        internal char Relation(Token token)
+        internal char Relation(string newTokenName)
         {
-            return TokenFactory.Relation(token, _token);
+            return TokenFactory.Relation(newTokenName, _token.PrioTableName);
         }
 
         public IParsedSyntax CreateSyntax(IParsedSyntax args)

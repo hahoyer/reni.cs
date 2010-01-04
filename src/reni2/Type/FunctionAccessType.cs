@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -35,6 +36,10 @@ namespace Reni.Type
         {
             _feature = feature;
         }
+
+        public IFeature ContextOperatorFeature
+        {
+            get { throw new NotImplementedException(); } }
 
         internal override bool IsValidRefTarget() { return false; }
         protected override Size GetSize() { return Size.Zero; }
