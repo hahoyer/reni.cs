@@ -11,27 +11,35 @@ using Reni.Feature;
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class AssignableRef : Ref
+    internal sealed class AssignableRef : TypeBase
     {
+        private static int _nextObjectId;
+        private readonly Struct.Type _target;
+        internal readonly RefAlignParam RefAlignParam;
         [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
 
-        internal AssignableRef(TypeBase target, RefAlignParam refAlignParam)
-            : base(target, refAlignParam) { AssignmentFeature = new AssignmentFeature(this); }
+        internal AssignableRef(Struct.Type target, RefAlignParam refAlignParam)
+            : base(_nextObjectId++)
+        {
+            _target = target;
+            RefAlignParam = refAlignParam;
+            AssignmentFeature = new AssignmentFeature(this);
+        }
 
-        protected override string ShortName { get { return "assignable_ref"; } }
-
-        protected override Result ConvertTo_Implementation(Category category, TypeBase dest) { return ConvertTo_Implementation<Ref>(category, dest); }
-
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature) { return IsConvertableTo_Implementation<Ref>(dest, conversionFeature); }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        
+        internal override string DumpShort() { return "ref." + _target.DumpShort(); }
+        internal override bool IsValidRefTarget() { return false; }
+        internal Size TargetSize { get { return _target.Size; } }
+        internal AutomaticRef CreateAutomaticRef() { return _target.CreateAutomaticRef(RefAlignParam); }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            Parent.Search(searchVisitor.Child(this));
+            _target.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);
         }
 
-        internal override AutomaticRef CreateAutomaticRef() { return Target.CreateAutomaticRef(RefAlignParam); }
     }
 
     [Serializable]
@@ -49,8 +57,9 @@ namespace Reni.Type
             var result = TypeBase.CreateVoid.CreateResult(
                 category,
                 () =>
-                CodeBase.CreateArg(_assignableRef.Size*2).CreateAssignment(_assignableRef.RefAlignParam,
-                                                                           _assignableRef.Target.Size)
+                CodeBase
+                .CreateArg(_assignableRef.Size*2)
+                .CreateAssignment(_assignableRef.RefAlignParam,_assignableRef.TargetSize)
                 );
 
             if(!category.HasCode && !category.HasRefs)

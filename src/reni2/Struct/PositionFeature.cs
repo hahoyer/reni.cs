@@ -47,13 +47,8 @@ namespace Reni.Struct
 
         private Result Apply(Category category)
         {
-            var result = _structContext.AccessResultAsContextRef(category | Category.Type, _position);
-            if(!_isProperty)
-                return result;
-            return result
-                .Type
-                .GetFunctionalFeature()
-                .Apply(category, result, TypeBase.CreateVoidResult(category | Category.Type));
+            NotImplementedMethod(category);
+            return null;
         }
 
         TypeBase IFeature.DefiningType() { return _structContext.NaturalRefType; }

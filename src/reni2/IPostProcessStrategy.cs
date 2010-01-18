@@ -1,8 +1,7 @@
 using System;
-using HWClassLibrary.Debug;
-using Reni.Code;
+using System.Collections.Generic;
+using System.Linq;
 using Reni.Context;
-using Reni.Type;
 
 namespace Reni
 {
@@ -34,21 +33,6 @@ namespace Reni
             return _result
                 .AutomaticDereference()
                 .Align(alignBits);
-        }
-    }
-
-    [Serializable]
-    internal class PostProcessorForType : ReniObject
-    {
-        private readonly TypeBase _typeBase;
-
-        internal PostProcessorForType(TypeBase typeBase) { _typeBase = typeBase; }
-
-        internal Result AccessResultForStruct(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode, Func<Refs> getRefs)
-        {
-            return _typeBase
-                .AutomaticDereference()
-                .CreateAssignableRefResult(category, refAlignParam, getCode, getRefs);
         }
     }
 }

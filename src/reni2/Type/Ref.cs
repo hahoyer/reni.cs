@@ -4,8 +4,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Feature.DumpPrint;
 
 #pragma warning disable 1911
 
@@ -17,21 +15,14 @@ namespace Reni.Type
         private static int _nextObjectId;
         internal readonly RefAlignParam RefAlignParam;
 
-        [DumpData(false)]
-        internal readonly IFeature DumpPrintFeature;
-
         protected Ref(TypeBase target, RefAlignParam refAlignParam)
             : base(_nextObjectId++, target)
         {
             Tracer.Assert(!(target is Aligner));
             Tracer.Assert(target.IsValidRefTarget());
             RefAlignParam = refAlignParam;
-            DumpPrintFeature = new StructFeature(this);
             StopByObjectId(-6);
         }
-
-        [DumpData(false)]
-        internal TypeBase Target { get { return Parent; } }
 
         protected override sealed Size GetSize() { return RefAlignParam.RefSize; }
 
@@ -42,7 +33,7 @@ namespace Reni.Type
         protected abstract string ShortName { get; }
 
         [DumpData(false)]
-        internal override sealed int SequenceCount { get { return Target.SequenceCount; } }
+        internal override sealed int SequenceCount { get { return Parent.SequenceCount; } }
 
         internal override sealed Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 
@@ -50,30 +41,23 @@ namespace Reni.Type
 
         internal override sealed Result AutomaticDereference(Result result)
         {
-            return Target
+            return Parent
                 .AutomaticDereference(CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result));
         }
 
-        internal Result CreateDereferencedArgResult(Category category)
+        private Result CreateDereferencedArgResult(Category category)
         {
-            return Target.CreateResult
+            return Parent
+                .CreateResult
                 (
                 category,
                 CreateDereferencedArgCode
                 );
         }
 
-        private CodeBase CreateDereferencedArgCode() { return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Target.Size); }
+        private CodeBase CreateDereferencedArgCode() { return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Parent.Size); }
 
-        internal override sealed TypeBase AutomaticDereference() { return Target.AutomaticDereference(); }
-
-        internal new Result DumpPrint(Category category) { return Target.DumpPrintFromRef(category, RefAlignParam); }
-
-        internal override sealed Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            Tracer.Assert(refAlignParam == RefAlignParam);
-            return DumpPrint(category);
-        }
+        internal override sealed TypeBase AutomaticDereference() { return Parent.AutomaticDereference(); }
 
         internal override sealed bool IsRef(RefAlignParam refAlignParam)
         {
@@ -82,10 +66,10 @@ namespace Reni.Type
         }
 
         [DumpData(false)]
-        internal override Size UnrefSize { get { return Target.UnrefSize; } }
+        internal override Size UnrefSize { get { return Parent.UnrefSize; } }
 
         [DumpData(false)]
-        internal TypeBase AlignedTarget { get { return Target.CreateAlign(RefAlignParam.AlignBits); } }
+        internal TypeBase AlignedTarget { get { return Parent.CreateAlign(RefAlignParam.AlignBits); } }
 
         internal override sealed string DumpShort() { return ShortName + "." + Parent.DumpShort(); }
 
@@ -93,40 +77,28 @@ namespace Reni.Type
             where TRefType : Ref
         {
             var destAsRef = dest as TRefType;
-            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Target == destAsRef.Target)
+            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Parent == destAsRef.Parent)
                 return dest.ConvertToItself(category);
 
-            return Target
+            return Parent
                 .ConvertTo(category, dest)
                 .UseWithArg(CreateDereferencedArgResult(category));
         }
 
-        internal override sealed Result ApplyTypeOperator(Result argResult) { return Target.ApplyTypeOperator(argResult); }
+        internal override sealed Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
 
         protected bool IsConvertableTo_Implementation<TRefType>(TypeBase dest, ConversionFeature conversionFeature)
-            where TRefType: Ref
+            where TRefType : Ref
         {
             var destAsRef = dest as TRefType;
-            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Target == destAsRef.Target)
+            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Parent == destAsRef.Parent)
                 return true;
 
-            return Target
+            return Parent
                 .IsConvertableTo(dest, conversionFeature);
         }
 
-        internal override Result AccessResultAsArg(Category category, int position)
-        {
-            return Target
-                .AccessResultAsArgFromRef(category, position, RefAlignParam);
-        }
-
-        internal Result AccessResultAsContextRef(Category category, int position)
-        {
-            return Target
-                .AccessResultAsContextRefFromRef(category, position, RefAlignParam);
-        }
-
-        internal override bool IsRefLike(Ref target) { return Target == target.Target && RefAlignParam == target.RefAlignParam; }
+        internal override bool IsRefLike(Ref target) { return Parent == target.Parent && RefAlignParam == target.RefAlignParam; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -140,11 +112,10 @@ namespace Reni.Type
         {
             return CreateResult(
                 category,
-                () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Target.Size*-1),
+                () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Parent.Size*-1),
                 () => Refs.Context(context));
         }
 
-        internal abstract AutomaticRef CreateAutomaticRef();
         internal override bool IsValidRefTarget() { return true; }
         internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
     }

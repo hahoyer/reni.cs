@@ -1,13 +1,10 @@
-// #pragma warning disable 649
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -24,12 +21,15 @@ namespace Reni.Struct
         internal readonly FullContext Context;
 
         [DumpData(false)]
-        internal readonly ISearchPath<IFeature, Ref> DumpPrintFromRefFeature;
+        internal readonly IFeature DumpPrintFeature;
+        [DumpData(false)]
+        internal readonly IFeature AtFeature;
 
         internal Type(FullContext context)
         {
+            AtFeature = new AtToken.Feature(this);
             Context = context;
-            DumpPrintFromRefFeature = new RefToStructFeature();
+            DumpPrintFeature = new Feature.DumpPrint.StructFeature(this);
         }
 
         internal override bool IsValidRefTarget() { return Context.IsValidRefTarget(); }
@@ -50,32 +50,16 @@ namespace Reni.Struct
 
         private IEnumerable<ICompileSyntax> StatementList { get { return Context.StatementList; } }
 
-        internal override Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam) { return Context.AccessResultAsArgFromRef(category, position, refAlignParam); }
-
-        internal override Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam) { return Context.AccessResultAsContextRefFromRef(category, position, refAlignParam); }
-
-        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            Tracer.Assert(refAlignParam.Equals(Context.RefAlignParam));
-            return DumpPrintFromRef(category);
-        }
-
-        private Result DumpPrintFromRef(Category category)
-        {
-            var refAlignParam = Context.RefAlignParam;
-            var result = StatementList
-                .Select((t, i) => AccessResultAsArgFromRef(category | Category.Type, i, refAlignParam))
-                .Select(accessResult => accessResult.Type.DumpPrint(category).UseWithArg(accessResult))
-				.ToList();
-            return Result.ConcatPrintResult(category, result);
-        }
-
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
             Tracer.Assert(dest.IsVoid);
             Tracer.Assert(Size.IsZero);
-            return dest.CreateResult(category,
-                                     () => CodeBase.CreateArg(Size.Zero), () => Context.ConstructorRefs());
+            return dest.CreateResult
+                (
+                category,
+                () => CodeBase.CreateArg(Size.Zero), 
+                () => Context.ConstructorRefs()
+                );
         }
 
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
@@ -90,9 +74,27 @@ namespace Reni.Struct
         {
             var searchVisitorChild = searchVisitor as SearchVisitor<ISearchPath<IFeature, Ref>>;
             if(searchVisitorChild != null)
-                searchVisitorChild.InternalResult = Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
+                searchVisitorChild.InternalResult =
+                    Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
             searchVisitor.Child(this).Search();
             base.Search(searchVisitor);
+        }
+
+        internal Result DumpPrint(Category category)
+        {
+            var types = StatementList.Select(syntax => Context.Type(syntax)).ToList();
+            var dumpPrint = types.Select(typeBase => typeBase.GenericDumpPrint(category)).ToList();
+            var result = types
+                .Select((type, i) => type.CreateResult(category, () => AccessCodeFromArg(i)))
+                .Join(accessResult => accessResult.Type.GenericDumpPrint(category).UseWithArg(accessResult))
+                .ToList();
+            return Result.ConcatPrintResult(category, result);
+        }
+
+        private CodeBase AccessCodeFromArg(int i)
+        {
+            NotImplementedMethod(i);
+            return null;
         }
     }
 }

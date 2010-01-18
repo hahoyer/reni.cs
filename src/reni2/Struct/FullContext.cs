@@ -51,29 +51,12 @@ namespace Reni.Struct
             return constructorResult;
         }
 
-        private CodeBase AccessAsContextRefCode(int position, RefAlignParam refAlignParam)
-        {
-            var offset = Reni.Size.Zero;
-            for (var i = 0; i <= position; i++)
-                offset -= InternalSize(i);
-
-            return CodeBase.CreateContextRef(this).CreateRefPlus(refAlignParam, offset);
-        }
-
-        internal Result AccessResultAsContextRefFromRef(Category category, int position, RefAlignParam refAlignParam)
-        {
-            return Type(StatementList[position])
-                .PostProcessor
-                .AccessResultForStruct(category, refAlignParam,
-                    () => AccessAsContextRefCode(position, refAlignParam),
-                    () => Refs.Context(this));
-        }
-
         internal override ContextAtPosition CreatePosition(int position)
         {
             return _contextAtPositionCache.Find(position, () => new ContextAtPosition(Context, position));
         }
 
         internal Refs ConstructorRefs() { return ConstructorResult(Category.Refs).Refs; }
+
     }
 }

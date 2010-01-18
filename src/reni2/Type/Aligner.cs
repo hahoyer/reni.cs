@@ -40,11 +40,6 @@ namespace Reni.Type
             return Parent.CreateAutomaticRef(refAlignParam.Align(AlignBits));
         }
 
-        internal override AssignableRef CreateAssignableRef(RefAlignParam refAlignParam)
-        {
-            return Parent.CreateAssignableRef(refAlignParam.Align(AlignBits));
-        }
-
         internal override Result Destructor(Category category)
         {
             return Parent.Destructor(category);
@@ -56,11 +51,6 @@ namespace Reni.Type
         }
 
         internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
-
-        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            return Parent.DumpPrintFromRef(category, refAlignParam);
-        }
 
         internal override Result ApplyTypeOperator(Result argResult)
         {

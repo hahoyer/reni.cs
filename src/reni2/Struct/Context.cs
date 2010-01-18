@@ -77,42 +77,12 @@ namespace Reni.Struct
 
         internal override IStructContext FindStruct() { return this; }
 
-        internal Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
+        private Size RegionSize(int position, int currentPosition)
         {
-            return Type(StatementList[position])
-                .PostProcessor
-                .AccessResultForStruct(category, refAlignParam,
-                    () => AccessAsArgCode(position, refAlignParam),
-                    Refs.None);
-        }
-
-        internal Result AccessResultAsContextRef(Category category, int position)
-        {
-            return Type(StatementList[position])
-                .PostProcessor
-                .AccessResultForStruct(category, ForCode.RefAlignParam,
-                    () => AccessCodeAsContextRef(position),
-                    () => Refs.Context(ForCode));
-        }
-
-        private CodeBase AccessAsArgCode(int position, RefAlignParam refAlignParam) { return AccessAsArgCode(position, Position, refAlignParam); }
-
-        private CodeBase AccessCodeAsContextRef(int position)
-        {
-            var offset = Size.Zero;
-            for (var i = 0; i <= position; i++)
-                offset += InternalSize(i);
-
-            return CodeBase.CreateContextRef(ForCode).CreateRefPlus(ForCode.RefAlignParam, offset*(-1));
-        }
-
-        private CodeBase AccessAsArgCode(int position, int currentPosition, RefAlignParam refAlignParam)
-        {
-            var offset = Size.Zero;
-            for(var i = position + 1; i < currentPosition; i++)
-                offset += InternalSize(i);
-
-            return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, offset);
+            var result = Size.Zero;
+            for (var i = position; i < currentPosition; i++)
+                result += InternalSize(i);
+            return result;
         }
 
         internal CodeBase ContextRefCodeAsArgCode()

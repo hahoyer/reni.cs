@@ -12,7 +12,6 @@ namespace Reni.Type
             : base(target, refAlignParam) { }
 
         protected override string ShortName { get { return "automatic_ref"; } }
-        internal override AutomaticRef CreateAutomaticRef() { return this; }
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature) { return IsConvertableTo_Implementation<AutomaticRef>(dest, conversionFeature); }
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest) { return ConvertTo_Implementation<AutomaticRef>(category, dest); }
     }

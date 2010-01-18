@@ -23,22 +23,12 @@ namespace Reni.Type
             public readonly DictionaryEx<int, Array> Arrays = new DictionaryEx<int, Array>();
             public readonly DictionaryEx<int, Sequence> Sequences = new DictionaryEx<int, Sequence>();
             public readonly DictionaryEx<TypeBase, Pair> Pairs = new DictionaryEx<TypeBase, Pair>();
-
-            public readonly DictionaryEx<RefAlignParam, AutomaticRef> AutomaticRefs =
-                new DictionaryEx<RefAlignParam, AutomaticRef>();
-
-            public readonly DictionaryEx<RefAlignParam, AssignableRef> AssignableRefs =
-                new DictionaryEx<RefAlignParam, AssignableRef>();
-
+            public readonly DictionaryEx<RefAlignParam, AutomaticRef> AutomaticRefs = new DictionaryEx<RefAlignParam, AutomaticRef>();
             public readonly SimpleCache<TypeType> TypeType;
-            public readonly SimpleCache<PostProcessorForType> PostProcessor;
-
-            public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes =
-                new DictionaryEx<IFunctionalFeature, FunctionAccessType>();
+            public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes = new DictionaryEx<IFunctionalFeature, FunctionAccessType>();
 
             public Cache(TypeBase parent)
             {
-                PostProcessor = new SimpleCache<PostProcessorForType>(() => new PostProcessorForType(parent));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
             }
         }
@@ -108,9 +98,6 @@ namespace Reni.Type
         [DumpData(false)]
         protected internal virtual int IndexSize { get { return 0; } }
 
-        [DumpData(false)]
-        internal PostProcessorForType PostProcessor { get { return _cache.PostProcessor.Value; } }
-
         internal TypeBase CreateAlign(int alignBits)
         {
             if(Size.Align(alignBits) == Size)
@@ -131,15 +118,6 @@ namespace Reni.Type
         }
 
         internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam) { return _cache.AutomaticRefs.Find(refAlignParam, () => new AutomaticRef(this, refAlignParam)); }
-
-        internal virtual AssignableRef CreateAssignableRef(RefAlignParam refAlignParam) { return _cache.AssignableRefs.Find(refAlignParam, () => new AssignableRef(this, refAlignParam)); }
-
-        private Ref EnsureRef(RefAlignParam refAlignParam)
-        {
-            if(IsRef(refAlignParam))
-                return (Ref) this;
-            return CreateAutomaticRef(refAlignParam);
-        }
 
         internal Sequence CreateSequence(int elementCount) { return _cache.Sequences.Find(elementCount, () => new Sequence(this, elementCount)); }
 
@@ -210,13 +188,7 @@ namespace Reni.Type
 
         internal virtual TypeBase GetEffectiveType() { return this; }
 
-        internal Result DumpPrint(Category category) { return GetUnaryResult<IFeature>(category, new Token()); }
-
-        internal virtual Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            var argResult = CreateAutomaticRef(refAlignParam).Conversion(category, this);
-            return DumpPrint(category).UseWithArg(argResult);
-        }
+        internal Result GenericDumpPrint(Category category) { return GetUnaryResult<IFeature>(category, new Token()); }
 
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult); }
 
@@ -278,34 +250,6 @@ namespace Reni.Type
 
         private bool IsConvertableToItself(ConversionFeature conversionFeature) { return true; }
 
-        internal virtual Result AccessResultAsArgFromRef(Category category, int position, RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(category, position, refAlignParam);
-            return null;
-        }
-
-        internal virtual Result AccessResultAsContextRefFromRef(Category category, int position,
-                                                                RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(category, position, refAlignParam);
-            return null;
-        }
-
-        internal virtual Result AccessResultAsArg(Category category, int position)
-        {
-            NotImplementedMethod(category, position);
-            return null;
-        }
-
-        internal Result CreateAssignableRefResult(Category category, RefAlignParam refAlignParam, Func<CodeBase> getCode,
-                                                  Func<Refs> getRefs)
-        {
-            if(Size.IsZero)
-                return CreateResult(category);
-
-            return CreateAssignableRef(refAlignParam).CreateResult(category, getCode, getRefs);
-        }
-
         /// <summary>
         /// Gets the icon key.
         /// </summary>
@@ -336,12 +280,6 @@ namespace Reni.Type
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        internal Result ArrayDumpPrintFromRef(Category category, int count, RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(category, count, refAlignParam);
-            return null;
-        }
-
         private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
@@ -356,13 +294,6 @@ namespace Reni.Type
                 result = result.UseWithArg(conversion);
             }
             return result & category;
-        }
-
-        internal TypeBase EnsureRefIfAppropriate(RefAlignParam refAlignParam)
-        {
-            if(IsValidRefTarget())
-                return EnsureRef(refAlignParam);
-            return this;
         }
 
         internal Result GetSuffixResult(Category category, Defineable defineable) { return GetUnaryResult<IFeature>(category, defineable); }

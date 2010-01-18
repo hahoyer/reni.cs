@@ -41,17 +41,12 @@ namespace Reni.Feature.DumpPrint
         TypeBase IFeature.DefiningType() { return _parent; }
     }
 
-    internal class RefToStructFeature : ReniObject, ISearchPath<IFeature, Ref>
-    {
-        IFeature ISearchPath<IFeature, Ref>.Convert(Ref @ref) { return @ref.DumpPrintFeature; }
-    }
-
     internal class StructFeature : ReniObject, IFeature
     {
         [DumpData(true)]
-        private readonly Ref _parent;
+        private readonly Struct.Type _parent;
 
-        public StructFeature(Ref parent) { _parent = parent; }
+        public StructFeature(Struct.Type parent) { _parent = parent; }
 
         TypeBase IFeature.DefiningType() { return _parent; }
 

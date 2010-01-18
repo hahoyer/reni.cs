@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Context;
 
 namespace Reni.Type
 {
@@ -64,24 +63,6 @@ namespace Reni.Type
 
             NotImplementedMethod(category);
             throw new NotImplementedException();
-        }
-
-        internal override Result DumpPrintFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            var result = DumpPrintArrayFromRef(category, refAlignParam);
-            return Result.ConcatPrintResult(category, result);
-        }
-
-        private List<Result> DumpPrintArrayFromRef(Category category, RefAlignParam refAlignParam)
-        {
-            var result = new List<Result>();
-            var list = ToList;
-            for(var i = 0; i < list.Length; i++)
-            {
-                var iResult = list[i].DumpPrintFromRef(category, refAlignParam);
-                result.Add(iResult);
-            }
-            return result;
         }
 
         internal override string DumpShort()

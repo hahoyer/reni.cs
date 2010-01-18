@@ -193,10 +193,9 @@ namespace Reni.Context
             if(left == null && right != null)
             {
                 var prefixResult = Type(right)
-                    .EnsureRefIfAppropriate(RefAlignParam)
                     .GetPrefixResult(category, defineable);
                 if(prefixResult != null)
-                    return prefixResult.UseWithArg(ResultAsRef(category | Category.Type, right));
+                    return prefixResult.UseWithArg(Result(category | Category.Type, right));
             }
 
             var suffixResult = 
@@ -217,7 +216,6 @@ namespace Reni.Context
         private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
             var suffixResult = Type(left)
-                .EnsureRefIfAppropriate(RefAlignParam)
                 .GetSuffixResult(category, defineable);
             if (suffixResult == null)
             {
@@ -225,7 +223,7 @@ namespace Reni.Context
                 return null;
             }
 
-            return suffixResult.UseWithArg(ResultAsRef(category, left));
+            return suffixResult.UseWithArg(Result(category, left));
         }
 
         private IContextFeature SearchDefinable(Defineable defineable)
@@ -256,12 +254,6 @@ namespace Reni.Context
         internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
 
         internal Refs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.Refs, condSyntax).Refs; }
-
-        internal Result AccessResult(Category category, ICompileSyntax left, int position)
-        {
-            var objectResult = ResultAsRef(category | Category.Type, left);
-            return objectResult.Type.AccessResultAsArg(category, position).UseWithArg(objectResult);
-        }
     }
 
     [Serializable]

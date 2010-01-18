@@ -12,7 +12,7 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<IFeature, TypeType>,
         ISearchPath<IFeature, Bit>,
         ISearchPath<IFeature, Type.Void>,
-        ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>,
+        ISearchPath<IFeature, Struct.Type>,
         ISearchPath<ISearchPath<IFeature, Sequence>, Bit>
     {
         private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
@@ -22,9 +22,9 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, TypeType>.Convert(TypeType type) { return type.DumpPrintFeature; }
         IFeature ISearchPath<IFeature, Bit>.Convert(Bit type) { return _bitFeature; }
         IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return _voidFeature; }
+        IFeature ISearchPath<IFeature, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintFeature; }
 
         ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
-        ISearchPath<IFeature, Ref> ISearchPath<ISearchPath<IFeature, Ref>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintFromRefFeature; }
 
         Result IFeature.Apply(Category category)
         {
@@ -37,5 +37,6 @@ namespace Reni.Feature.DumpPrint
             NotImplementedMethod();
             return null;
         }
+
     }
 }
