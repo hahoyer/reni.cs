@@ -26,7 +26,8 @@ namespace Reni.Struct
         [DumpData(false)]
         internal readonly IFeature AtFeature;
 
-        private List<TypeBase> _typesCache;
+        private TypeBase[] _typesCache;
+        private Size[] _offsetsCache;
 
         internal Type(FullContext context)
         {
@@ -39,7 +40,7 @@ namespace Reni.Struct
 
         protected override Size GetSize()
         {
-            if(_isGetSizeActive)
+            if (_isGetSizeActive)
                 return Size.Create(-1);
             _isGetSizeActive = true;
             var result = Context.InternalSize();
@@ -67,7 +68,7 @@ namespace Reni.Struct
 
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
-            if(dest.IsVoid)
+            if (dest.IsVoid)
                 return Size.IsZero;
             NotImplementedMethod(dest, conversionFeature);
             return false;
@@ -76,7 +77,7 @@ namespace Reni.Struct
         internal override void Search(ISearchVisitor searchVisitor)
         {
             var searchVisitorChild = searchVisitor as SearchVisitor<ISearchPath<IFeature, Ref>>;
-            if(searchVisitorChild != null)
+            if (searchVisitorChild != null)
                 searchVisitorChild.InternalResult =
                     Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
             searchVisitor.Child(this).Search();
@@ -85,50 +86,61 @@ namespace Reni.Struct
 
         internal Result DumpPrint(Category category)
         {
-            var offsets = Types
-                .Select(typeBase => typeBase.Size)
-                .Aggregate(new Size[0], AggregateSizes)
-                .ToArray();
-            var argCodes = Types
-                .Select((type,i)=>AutomaticDereference(type, offsets[i], category))
-                .ToArray();
-            var dumpPrint = 
+            var argCodes = CreateArgCodes(category);
+            var dumpPrint =
                 Types
-                .Select(type => type.GenericDumpPrint(category))
-                .ToArray();
-            var replacedResult = dumpPrint
-                .Select((r,i)=>r.UseWithArg(argCodes[i]))
-                .ToArray();
-            var concatPrintResult = Result.ConcatPrintResult(category, replacedResult);
+                    .Select((type,i) => type.GenericDumpPrint(category).UseWithArg(argCodes[i]))
+                    .ToArray();
+            var concatPrintResult = Result.ConcatPrintResult(category, dumpPrint);
             return concatPrintResult;
+        }
+
+        private Result[] CreateArgCodes(Category category)
+        {
+            return Types
+                .Select((type, i) => AutomaticDereference(type, Offsets[i], category))
+                .ToArray();
+        }
+
+        private IEnumerable<Size> GetOffsets()
+        {
+            return Types
+                .Select(typeBase => typeBase.Size)
+                .Aggregate(new Size[0], AggregateSizes);
         }
 
         private Result AutomaticDereference(TypeBase type, Size offset, Category category)
         {
             return type
                 .CreateAutomaticRef(Context.RefAlignParam)
-                .CreateResult(category, ()=>CreateRefArgCode().CreateRefPlus(Context.RefAlignParam,offset))
+                .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(Context.RefAlignParam, offset))
                 .AutomaticDereference();
         }
 
         private CodeBase CreateRefArgCode() { return CreateAutomaticRef(Context.RefAlignParam).CreateArgCode(); }
 
-        private static Size[] AggregateSizes(Size[] sizesSoFar, Size nextSize)
-        {
-            return sizesSoFar.Select(size=>size+nextSize).Union(new[]{Size.Zero}).ToArray();
-        }
+        private static Size[] AggregateSizes(Size[] sizesSoFar, Size nextSize) { return sizesSoFar.Select(size => size + nextSize).Union(new[] {Size.Zero}).ToArray(); }
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(syntax => Context.Type(syntax)); }
 
-        private IEnumerable<TypeBase> Types
+        internal TypeBase[] Types
         {
             get
             {
-                if(_typesCache == null)
-                    _typesCache = GetTypes().ToList();
+                if (_typesCache == null)
+                    _typesCache = GetTypes().ToArray();
                 return _typesCache;
             }
         }
 
+        internal Size[] Offsets
+        {
+            get
+            {
+                if (_offsetsCache == null)
+                    _offsetsCache = GetOffsets().ToArray();
+                return _offsetsCache;
+            }
+        }
     }
 }
