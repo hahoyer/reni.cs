@@ -19,9 +19,11 @@ namespace Reni.Type
     [Serializable]
     internal sealed class Sequence : TypeBase
     {
-        private readonly EnableCutFeature _enableCutCutFeature;
         private readonly Array _inheritedType;
+        [DumpData(false)]
         internal readonly IFeature BitDumpPrintFeature;
+        [DumpData(false)]
+        internal readonly EnableCutFeature EnableCutFeature;
 
         internal IFeature Feature(SequenceFeatureBase sequenceFeatureBase) { return new FeatureClass(this, sequenceFeatureBase); }
 
@@ -93,7 +95,7 @@ namespace Reni.Type
         {
             Tracer.Assert(count > 0, "count=" + count);
             _inheritedType = elementType.CreateArray(count);
-            _enableCutCutFeature = new EnableCutFeature(this);
+            EnableCutFeature = new EnableCutFeature(this);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             StopByObjectId(172);
         }
@@ -228,6 +230,5 @@ namespace Reni.Type
 
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
-        public IFeature EnableCutFeature { get { return _enableCutCutFeature; } }
     }
 }

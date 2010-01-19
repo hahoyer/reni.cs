@@ -22,8 +22,11 @@ namespace Reni.Struct
 
         [DumpData(false)]
         internal readonly IFeature DumpPrintFeature;
+
         [DumpData(false)]
         internal readonly IFeature AtFeature;
+
+        private List<TypeBase> _typesCache;
 
         internal Type(FullContext context)
         {
@@ -57,7 +60,7 @@ namespace Reni.Struct
             return dest.CreateResult
                 (
                 category,
-                () => CodeBase.CreateArg(Size.Zero), 
+                () => CodeBase.CreateArg(Size.Zero),
                 () => Context.ConstructorRefs()
                 );
         }
@@ -82,19 +85,50 @@ namespace Reni.Struct
 
         internal Result DumpPrint(Category category)
         {
-            var types = StatementList.Select(syntax => Context.Type(syntax)).ToList();
-            var dumpPrint = types.Select(typeBase => typeBase.GenericDumpPrint(category)).ToList();
-            var result = types
-                .Select((type, i) => type.CreateResult(category, () => AccessCodeFromArg(i)))
-                .Join(accessResult => accessResult.Type.GenericDumpPrint(category).UseWithArg(accessResult))
-                .ToList();
-            return Result.ConcatPrintResult(category, result);
+            var offsets = Types
+                .Select(typeBase => typeBase.Size)
+                .Aggregate(new Size[0], AggregateSizes)
+                .ToArray();
+            var argCodes = Types
+                .Select((type,i)=>AutomaticDereference(type, offsets[i], category))
+                .ToArray();
+            var dumpPrint = 
+                Types
+                .Select(type => type.GenericDumpPrint(category))
+                .ToArray();
+            var replacedResult = dumpPrint
+                .Select((r,i)=>r.UseWithArg(argCodes[i]))
+                .ToArray();
+            var concatPrintResult = Result.ConcatPrintResult(category, replacedResult);
+            return concatPrintResult;
         }
 
-        private CodeBase AccessCodeFromArg(int i)
+        private Result AutomaticDereference(TypeBase type, Size offset, Category category)
         {
-            NotImplementedMethod(i);
-            return null;
+            return type
+                .CreateAutomaticRef(Context.RefAlignParam)
+                .CreateResult(category, ()=>CreateRefArgCode().CreateRefPlus(Context.RefAlignParam,offset))
+                .AutomaticDereference();
         }
+
+        private CodeBase CreateRefArgCode() { return CreateAutomaticRef(Context.RefAlignParam).CreateArgCode(); }
+
+        private static Size[] AggregateSizes(Size[] sizesSoFar, Size nextSize)
+        {
+            return sizesSoFar.Select(size=>size+nextSize).Union(new[]{Size.Zero}).ToArray();
+        }
+
+        private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(syntax => Context.Type(syntax)); }
+
+        private IEnumerable<TypeBase> Types
+        {
+            get
+            {
+                if(_typesCache == null)
+                    _typesCache = GetTypes().ToList();
+                return _typesCache;
+            }
+        }
+
     }
 }
