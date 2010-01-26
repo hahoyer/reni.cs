@@ -306,18 +306,10 @@ namespace Reni.Code
 
         internal override CodeBase InternalRef(InternalRef visitedObject)
         {
-            var newVisitedObject = ReVisit(visitedObject, this);
+            var newVisitedObject = ReVisit(visitedObject) ?? visitedObject;
             var offset = Find(newVisitedObject);
             _codeCache.Reset();
             return InternalRefCode(newVisitedObject.RefAlignParam, offset);
-        }
-
-        private static InternalRef ReVisit(InternalRef visitedObject, InternalRefSequenceVisitor visitor) {
-            var newVisitedObject = visitedObject;
-            var newCode = visitedObject.Code.Visit(visitor);
-            if(newCode != null)
-                newVisitedObject = new InternalRef(visitedObject.RefAlignParam, newCode, visitedObject.DestructorCode);
-            return newVisitedObject;
         }
 
         private Size Find(InternalRef internalRef)

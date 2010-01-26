@@ -9,23 +9,12 @@ namespace Reni.Code.ReplaceVisitor
     internal abstract class Base : Visitor<CodeBase>
     {
         private DictionaryEx<InternalRef, InternalRef> _internalRefs = new DictionaryEx<InternalRef, InternalRef>();
-        internal static CodeBase BitArray(BitArray visitedObject) { return null; }
-
-        public CodeBase TopRef(TopRef visitedObject) { return null; }
-
-        public CodeBase Child(Child visitedObject, CodeBase parent)
-        {
-            if(parent == null)
-                return null;
-            return visitedObject.ReCreate(parent);
-        }
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
 
         internal override CodeBase InternalRef(InternalRef visitedObject)
         {
-            var cachedResult = _internalRefs.Find(visitedObject,()=>)
-            return null;
+            return _internalRefs.Find(visitedObject, () => ReVisit(visitedObject));
         }
 
         internal override sealed CodeBase Child(CodeBase parent, LeafElement leafElement)
@@ -69,5 +58,13 @@ namespace Reni.Code.ReplaceVisitor
         internal override Visitor<CodeBase> AfterElse(int objectId) { return this; }
 
         internal override CodeBase ContextRef(RefCode visitedObject) { return null; }
+
+        internal InternalRef ReVisit(InternalRef visitedObject)
+        {
+            var newCode = visitedObject.Code.Visit(this);
+            if (newCode == null)
+                return null;
+            return new InternalRef(visitedObject.RefAlignParam, newCode, visitedObject.DestructorCode);
+        }
     }
 }
