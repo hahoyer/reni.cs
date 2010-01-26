@@ -8,7 +8,7 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     internal abstract class Base : Visitor<CodeBase>
     {
-        private DictionaryEx<InternalRef, InternalRef> _internalRefs = new DictionaryEx<InternalRef, InternalRef>();
+        private readonly DictionaryEx<InternalRef, InternalRef> _internalRefs = new DictionaryEx<InternalRef, InternalRef>();
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
 
