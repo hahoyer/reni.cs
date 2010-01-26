@@ -535,12 +535,14 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateAutomaticRefResult(Category category, AutomaticRef target)
+        internal Result CreateAutomaticRefResult(RefAlignParam refAlignParam)
         {
-            var destructor = Type.Destructor(category);
-            return target.CreateResult(
-                category,
-                () => CodeBase.CreateInternalRef(target.RefAlignParam, Code, destructor.Code),
+            var destructor = Type.Destructor(CompleteCategory);
+            return Type
+                .CreateAutomaticRef(refAlignParam)
+                .CreateResult(
+                CompleteCategory,
+                () => CodeBase.CreateInternalRef(refAlignParam, Code, destructor.Code),
                 () => Refs + destructor.Refs
                 );
         }
@@ -598,7 +600,13 @@ namespace Reni
             if(Type.IsRefLike(target))
                 return target.CreateResult(category, this & (Category.Code | Category.Refs));
 
-            return ConvertTo(target.AlignedTarget).CreateAutomaticRefResult(category, target);
+            Result tempQualifier = ConvertTo(target.AlignedTarget);
+            var destructor = tempQualifier.Type.Destructor(category);
+            return target.CreateResult(
+                category,
+                () => CodeBase.CreateInternalRef(target.RefAlignParam, tempQualifier.Code, destructor.Code),
+                () => tempQualifier.Refs + destructor.Refs
+                );
         }
     }
 

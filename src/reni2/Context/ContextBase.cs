@@ -52,15 +52,7 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DumpData(false)]
-        internal ContextBase[] ChildChain
-        {
-            get
-            {
-                if(_childChainCache == null)
-                    _childChainCache = ObtainChildChain();
-                return _childChainCache;
-            }
-        }
+        internal ContextBase[] ChildChain { get { return _childChainCache ?? (_childChainCache = ObtainChildChain()); } }
 
         protected virtual ContextBase[] ObtainChildChain() { return new[] {this}; }
 
@@ -73,16 +65,18 @@ namespace Reni.Context
 
         internal Function CreateFunction(TypeBase args)
         {
-            return _cache.FunctionInstanceCache.Find(args,
-                                                     () => new Function(this, args));
+            return _cache
+                .FunctionInstanceCache
+                .Find(args, () => new Function(this, args));
         }
 
         private PendingContext CreatePendingContext() { return _cache.PendingContext.Value; }
 
         internal FullContext CreateStruct(Struct.Container container)
         {
-            return _cache.StructContainerCache.Find(container,
-                                                    () => new FullContext(this, container));
+            return _cache
+                .StructContainerCache
+                .Find(container, () => new FullContext(this, container));
         }
 
         internal virtual Result CreateArgsRefResult(Category category)
@@ -91,10 +85,7 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result CreateFunctionResult(Category category, ICompileSyntax body)
-        {
-            return new FunctionDefinitionType(CreateFunctionType(body)).CreateResult(category);
-        }
+        internal Result CreateFunctionResult(Category category, ICompileSyntax body) { return new FunctionDefinitionType(CreateFunctionType(body)).CreateResult(category); }
 
         private Type.Function CreateFunctionType(ICompileSyntax body)
         {
@@ -115,11 +106,9 @@ namespace Reni.Context
         //[DebuggerHidden]
         internal Result Result(Category category, ICompileSyntax syntax)
         {
-            return _cache.ResultCache.Find
-                (
-                syntax,
-                () => CreateCacheElement(syntax)
-                )
+            return _cache
+                .ResultCache
+                .Find(syntax,() => CreateCacheElement(syntax))
                 .Result(category);
         }
 
@@ -161,7 +150,7 @@ namespace Reni.Context
             if(result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
                 return Result(category, syntax);
 
-            return result.CreateAutomaticRefResult(category, result.Type.CreateAutomaticRef(RefAlignParam));
+            return result.CreateAutomaticRefResult(RefAlignParam);
         }
 
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target)
@@ -198,12 +187,12 @@ namespace Reni.Context
                     return prefixResult.UseWithArg(Result(category | Category.Type, right));
             }
 
-            var suffixResult = 
+            var suffixResult =
                 left == null
-                ? GetContextResult(categoryForFunctionals, defineable)
-                : GetSuffixResult(categoryForFunctionals, left, defineable);
+                    ? GetContextResult(categoryForFunctionals, defineable)
+                    : GetSuffixResult(categoryForFunctionals, left, defineable);
 
-            if (right == null)
+            if(right == null)
                 return suffixResult;
 
             var feature = suffixResult.Type.GetFunctionalFeature();
@@ -217,7 +206,7 @@ namespace Reni.Context
         {
             var suffixResult = Type(left)
                 .GetSuffixResult(category, defineable);
-            if (suffixResult == null)
+            if(suffixResult == null)
             {
                 NotImplementedMethod(category, left, defineable);
                 return null;
@@ -316,11 +305,8 @@ namespace Reni.Context
         }
     }
 
-    internal class ContextOperator: Defineable, ISearchPath<IFeature,FunctionDefinitionType>
+    internal class ContextOperator : Defineable, ISearchPath<IFeature, FunctionDefinitionType>
     {
-        IFeature ISearchPath<IFeature, FunctionDefinitionType>.Convert(FunctionDefinitionType type)
-        {
-            return type.ContextOperatorFeature;
-        }
+        IFeature ISearchPath<IFeature, FunctionDefinitionType>.Convert(FunctionDefinitionType type) { return type.ContextOperatorFeature; }
     }
 }

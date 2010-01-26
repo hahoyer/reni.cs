@@ -1,5 +1,5 @@
 using System;
-using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 
 namespace Reni.Code.ReplaceVisitor
 {
@@ -8,6 +8,7 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     internal abstract class Base : Visitor<CodeBase>
     {
+        private DictionaryEx<InternalRef, InternalRef> _internalRefs = new DictionaryEx<InternalRef, InternalRef>();
         internal static CodeBase BitArray(BitArray visitedObject) { return null; }
 
         public CodeBase TopRef(TopRef visitedObject) { return null; }
@@ -21,7 +22,11 @@ namespace Reni.Code.ReplaceVisitor
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
 
-        internal override CodeBase InternalRef(InternalRef visitedObject) { return null; }
+        internal override CodeBase InternalRef(InternalRef visitedObject)
+        {
+            var cachedResult = _internalRefs.Find(visitedObject,()=>)
+            return null;
+        }
 
         internal override sealed CodeBase Child(CodeBase parent, LeafElement leafElement)
         {

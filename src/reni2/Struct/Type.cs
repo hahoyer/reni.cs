@@ -91,8 +91,12 @@ namespace Reni.Struct
                 Types
                     .Select((type,i) => type.GenericDumpPrint(category).UseWithArg(argCodes[i]))
                     .ToArray();
-            var concatPrintResult = Result.ConcatPrintResult(category, dumpPrint);
-            return concatPrintResult;
+            var thisRef = CreateArgResult(category)
+                .CreateAutomaticRefResult(Context.RefAlignParam);
+            var result = Result
+                .ConcatPrintResult(category, dumpPrint)
+                .UseWithArg(thisRef);
+            return result;
         }
 
         private Result[] CreateArgCodes(Category category)
@@ -114,7 +118,8 @@ namespace Reni.Struct
             return type
                 .CreateAutomaticRef(Context.RefAlignParam)
                 .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(Context.RefAlignParam, offset))
-                .AutomaticDereference();
+                .AutomaticDereference()
+                .Align(Context.AlignBits);
         }
 
         private CodeBase CreateRefArgCode() { return CreateAutomaticRef(Context.RefAlignParam).CreateArgCode(); }

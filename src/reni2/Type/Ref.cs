@@ -18,8 +18,8 @@ namespace Reni.Type
         protected Ref(TypeBase target, RefAlignParam refAlignParam)
             : base(_nextObjectId++, target)
         {
-            Tracer.Assert(!(target is Aligner));
-            Tracer.Assert(target.IsValidRefTarget());
+            Tracer.Assert(!(target is Aligner), target.Dump());
+            Tracer.Assert(target.IsValidRefTarget(), target.Dump());
             RefAlignParam = refAlignParam;
             StopByObjectId(-6);
         }
