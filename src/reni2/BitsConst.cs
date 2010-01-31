@@ -154,14 +154,14 @@ namespace Reni
         public BitsConst Multiply(BitsConst left, Size size)
         {
             if(!(Marshal.SizeOf(typeof(Int64))*8 >= size.ToInt()))
-                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", "left=" + left + ";size=" + size.Dump());
+                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "left=" + left + ";size=" + size.Dump());
             return Convert(ToInt64()*left.ToInt64()).Resize(size);
         }
 
         public BitsConst Divide(BitsConst left, Size size)
         {
             if(!(Marshal.SizeOf(typeof(Int64))*8 >= size.ToInt()))
-                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", "left=" + left + ";size=" + size.Dump());
+                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "left=" + left + ";size=" + size.Dump());
             return Convert(ToInt64()/left.ToInt64()).Resize(size);
         }
 
@@ -190,7 +190,7 @@ namespace Reni
         public string ToString(int radix)
         {
             if(radix <= 0 || radix > Digits.Length)
-                Tracer.AssertionFailed("radix <= 0 || radix > " + Digits.Length, radix.ToString());
+                Tracer.AssertionFailed("radix <= 0 || radix > " + Digits.Length, () => radix.ToString());
 
             if(IsZero)
                 return "0";
@@ -212,7 +212,7 @@ namespace Reni
         {
             var sizeInt64 = Marshal.SizeOf(typeof(Int64));
             if(!(64 >= _size.ToInt()))
-                Tracer.AssertionFailed(@"64 >= _size.ToInt()", "size=" + _size.Dump());
+                Tracer.AssertionFailed(@"64 >= _size.ToInt()", () => "size=" + _size.Dump());
 
             var x64 = ByteResize(sizeInt64);
             fixed(byte* dataPtr = &x64._data[0])
@@ -223,7 +223,7 @@ namespace Reni
         {
             var sizeInt32 = Marshal.SizeOf(typeof(Int32));
             if(!(64 >= _size.ToInt()))
-                Tracer.AssertionFailed(@"64 >= _size.ToInt()", "size=" + _size.Dump());
+                Tracer.AssertionFailed(@"64 >= _size.ToInt()", () => "size=" + _size.Dump());
 
             var x32 = ByteResize(sizeInt32);
             fixed(byte* dataPtr = &x32._data[0])
@@ -369,9 +369,9 @@ namespace Reni
                 Tracer.Assert((Convert(1111) + Convert(-1110)).ToInt64() == 1);
                 Tracer.Assert((Convert(1111) + Convert(-1112)).ToInt64() == -1);
 
-                Tracer.Assert(Convert("0").ToString(10) == "0", Convert("0").ToString(10));
-                Tracer.Assert(Convert("1").ToString(10) == "1", Convert("1").ToString(10));
-                Tracer.Assert(Convert("21").ToString(10) == "21", Convert("21").ToString(10));
+                Tracer.Assert(Convert("0").ToString(10) == "0", () => Convert("0").ToString(10));
+                Tracer.Assert(Convert("1").ToString(10) == "1", () => Convert("1").ToString(10));
+                Tracer.Assert(Convert("21").ToString(10) == "21", () => Convert("21").ToString(10));
                 Tracer.Assert(Convert("321").ToString(10) == "321");
                 Tracer.Assert(Convert("4321").ToString(10) == "4321");
                 Tracer.Assert(Convert("54321").ToString(10) == "54321");
@@ -396,13 +396,13 @@ namespace Reni
 
                 Tracer.Assert(Convert("2").Resize(Size.Create(1)).ToString(10) == "0");
                 Tracer.Assert(Convert("2").Resize(Size.Create(2)).ToString(10) == "-2",
-                              Convert("2").Resize(Size.Create(2)).ToString(10));
+                              () => Convert("2").Resize(Size.Create(2)).ToString(10));
                 Tracer.Assert(Convert("2").Resize(Size.Create(3)).ToString(10) == "2");
 
                 Tracer.Assert(Convert("-4").Resize(Size.Create(32)).ToString(10) == "-4",
-                              Convert("-4").Resize(Size.Create(32)).ToString(10));
+                              () => Convert("-4").Resize(Size.Create(32)).ToString(10));
                 Tracer.Assert(Convert("-4095").Resize(Size.Create(8)).ToString(10) == "1",
-                              Convert("-4095").Resize(Size.Create(32)).ToString(10));
+                              () => Convert("-4095").Resize(Size.Create(32)).ToString(10));
             }
         }
     }

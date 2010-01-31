@@ -338,7 +338,7 @@ namespace Reni.Code
             var resultSize = alignedBody.Size;
             var alignedInternal = Code.Align();
             // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
-            var gap = CodeBase.CreateVoid();
+            var gap = CodeBase .CreateVoid();
             if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                 gap = CodeBase.CreateBitArray(resultSize - alignedInternal.Size, BitsConst.None());
             var result = alignedInternal

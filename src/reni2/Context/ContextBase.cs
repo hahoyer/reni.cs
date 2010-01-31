@@ -135,7 +135,7 @@ namespace Reni.Context
                 CheckRef(@ref);
         }
 
-        private void CheckRef(IRefInCode @ref) { Tracer.Assert(!@ref.IsChildOf(this), "context=" + Dump() + "\nref=" + @ref.Dump()); }
+        private void CheckRef(IRefInCode @ref) { Tracer.Assert(!@ref.IsChildOf(this), ()=>"context=" + Dump() + "\nref=" + @ref.Dump()); }
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType) { return Result(Category.Code | Category.Type | Category.Refs, syntax).ConvertTo(resultType).Evaluate(); }
 

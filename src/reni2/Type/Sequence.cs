@@ -93,11 +93,11 @@ namespace Reni.Type
 
         public Sequence(TypeBase elementType, int count)
         {
-            Tracer.Assert(count > 0, "count=" + count);
+            Tracer.Assert(count > 0, () => "count=" + count);
             _inheritedType = elementType.CreateArray(count);
             EnableCutFeature = new EnableCutFeature(this);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
-            StopByObjectId(172);
+            StopByObjectId(-172);
         }
 
         [DumpData(false), UsedImplicitly]

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
 using JetBrains.Annotations;
@@ -16,23 +17,27 @@ namespace Reni.FeatureTest
     {
         [UsedImplicitly]
         public const string Damaged = "Damaged";
+
         [UsedImplicitly]
         public const string Rare = "Rare";
+
         [UsedImplicitly]
         public const string UnderConstruction = "Under Construction";
+
         [UsedImplicitly]
         public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
+
         [UsedImplicitly]
         public const string Worked = "Worked";
 
-        internal CompilerParameters Parameters;                    
-        static private Dictionary<System.Type, CompilerTest> _cache;
+        internal CompilerParameters Parameters;
+        private static Dictionary<System.Type, CompilerTest> _cache;
         private bool _needToRunDependants = true;
 
         [SetUp]
         public void Start() { Parameters = new CompilerParameters(); }
 
-        protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput){CreateFileAndRunCompiler(1, name, text, null, expectedOutput);}
+        protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
 
@@ -64,7 +69,7 @@ namespace Reni.FeatureTest
                 os.Exec();
                 Tracer.ThrowAssertionFailed(
                     "os.Data != expectedOutput",
-                    "os.Data:" + os.Data + " expected: " + expectedOutput);
+                    () => "os.Data:" + os.Data + " expected: " + expectedOutput);
             }
         }
 
@@ -98,7 +103,7 @@ namespace Reni.FeatureTest
         {
             if(_cache == null)
                 _cache = new Dictionary<System.Type, CompilerTest>();
-            
+
             RunDependants();
 
             CreateFileAndRunCompiler(1, GetType().Name, Target, AssertValid, Output);
@@ -106,69 +111,69 @@ namespace Reni.FeatureTest
 
         private void RunDependants()
         {
-            if (!_needToRunDependants)
+            if(!_needToRunDependants)
                 return;
-            
+
             _needToRunDependants = false;
 
-            if (_cache.ContainsKey(GetType()))
+            if(_cache.ContainsKey(GetType()))
                 return;
 
             _cache.Add(GetType(), this);
 
-            foreach(var dependsOnType in DependsOn)
-                if(!_cache.ContainsKey(dependsOnType))
-                    ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
+            foreach(var dependsOnType in DependsOn.Where(dependsOnType => !_cache.ContainsKey(dependsOnType)))
+                ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
         }
 
-        public virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
+        protected virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
         public virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
-        public virtual System.Type[] DependsOn { get { return ToTypes(GetType().GetCustomAttributes(typeof(CompilerTest), true)); } }
 
-        private static System.Type[] ToTypes(object[] objects)
+        protected virtual IEnumerable<System.Type> DependsOn
         {
-            var result = new List<System.Type>();
-            foreach(var o in objects)
-                result.Add(o.GetType());
-            return result.ToArray();
+            get
+            {
+                return GetType()
+                    .GetCustomAttributes(typeof(CompilerTest), true)
+                    .Select(o => o.GetType());
+            }
         }
 
         internal string GetStringAttribute<T>() where T : StringAttribute
         {
             var attrs = GetType().GetCustomAttributes(typeof(T), true);
-            if (attrs.Length == 1)
-                return ((T)attrs[0]).Value;
+            if(attrs.Length == 1)
+                return ((T) attrs[0]).Value;
             return "";
         }
 
-        public virtual void AssertValid(Compiler c) { }
+        protected virtual void AssertValid(Compiler c) { }
     }
 
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple= false)]
     internal abstract class StringAttribute : Attribute
     {
-        internal string Value;
+        internal readonly string Value;
         protected StringAttribute(string value) { Value = value; }
     }
 
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     internal sealed class OutputAttribute : StringAttribute
     {
         internal OutputAttribute(string value)
             : base(value) { }
     }
 
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     internal sealed class TargetAttribute : StringAttribute
     {
         internal TargetAttribute(string value)
             : base(value) { }
     }
 
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     internal sealed class InstanceCodeAttribute : StringAttribute
     {
         public InstanceCodeAttribute(string value)
             : base(value) { }
     }
-
 }

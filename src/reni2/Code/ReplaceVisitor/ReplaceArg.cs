@@ -11,7 +11,7 @@ namespace Reni.Code.ReplaceVisitor
 
         internal ReplaceArg(CodeBase actualArg)
         {
-            Tracer.Assert(actualArg != null, "actualArg != null");
+            Tracer.Assert(actualArg != null, () => "actualArg != null");
             _actualArg = actualArg;
         }
 
@@ -24,7 +24,7 @@ namespace Reni.Code.ReplaceVisitor
         {
             visitedObject.StopByObjectId(-363);
             Tracer.Assert(Actual.Size == visitedObject.Size,
-                "Actual=" + Actual.Dump() + "\nvisitedObject=" + visitedObject.Dump());
+                () => "Actual=" + Actual.Dump() + "\nvisitedObject=" + visitedObject.Dump());
             return Actual;
         }
     }

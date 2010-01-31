@@ -8,8 +8,6 @@ using Reni.Feature;
 using Reni.Syntax;
 using Reni.Type;
 
-#pragma warning disable 1911
-
 namespace Reni.Struct
 {
     [Serializable]
@@ -128,6 +126,7 @@ namespace Reni.Struct
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(syntax => Context.Type(syntax)); }
 
+        [DumpData(false)]
         internal TypeBase[] Types
         {
             get
@@ -138,6 +137,7 @@ namespace Reni.Struct
             }
         }
 
+        [DumpData(false)]
         internal Size[] Offsets
         {
             get

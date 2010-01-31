@@ -116,7 +116,8 @@ f1()dump_print;
 ";
             }
         }
-        public override string Output { get { return "106"; } }
+
+        protected override string Output { get { return "106"; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -134,7 +135,7 @@ f1()dump_print;
 "), Output("3")]
     public class TwoFunctions1 : CompilerTest
     {
-        public override void AssertValid(Compiler c)
+        protected override void AssertValid(Compiler c)
         {
             var x = new ExpectedCompilationResult(c);
             //Tracer.Assert(x.FunctionCount() == 2);

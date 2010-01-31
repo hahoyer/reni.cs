@@ -297,15 +297,15 @@ namespace Reni
             if(size != null)
             {
                 if(HasSize && Size != size)
-                    Tracer.AssertionFailed(1, @"Size==size", "Size differs " + Dump());
+                    Tracer.AssertionFailed(1, @"Size==size", ()=>"Size differs " + Dump());
                 if(HasType && Type.Size != size)
-                    Tracer.AssertionFailed(1, @"Type.Size==size", "Type size differs " + Dump());
+                    Tracer.AssertionFailed(1, @"Type.Size==size", () => "Type size differs " + Dump());
                 if(HasCode && Code.Size != size)
-                    Tracer.AssertionFailed(1, @"Code.Size==size", "Code size differs " + Dump());
+                    Tracer.AssertionFailed(1, @"Code.Size==size", () => "Code size differs " + Dump());
             }
 
             if(HasRefs && HasCode && !Refs.Contains(Code.RefsImplementation))
-                Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", "Code and Refs differ " + Dump());
+                Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
         }
 
         //[DebuggerHidden]
@@ -350,7 +350,7 @@ namespace Reni
                 (
                 1,
                 category <= (CompleteCategory | PendingCategory),
-                string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort())
+                () => string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort())
                 );
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using NUnit.Framework;
 
@@ -74,7 +75,7 @@ namespace Reni.FeatureTest.Struct
     [TestFixture, InnerAccessTheOnlyOne]
     public class PropertyVariable: CompilerTest{
         public override string Target { get { return @"! property x: function 11; x dump_print"; } }
-        public override string Output { get { return "11"; } }
+        protected override string Output { get { return "11"; } }
     
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -91,7 +92,7 @@ namespace Reni.FeatureTest.Struct
     public class InnerAccessTheOnlyOne : CompilerTest
     {
         public override string Target { get { return "5, (this _A_T_ 0) dump_print"; } }
-        public override string Output { get { return "5"; } }
+        protected override string Output { get { return "5"; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -101,7 +102,7 @@ namespace Reni.FeatureTest.Struct
     public class AccessAndAdd : CompilerTest
     {
         public override string Target { get { return "5, (this _A_T_ 0 + this _A_T_ 0)dump_print"; } }
-        public override string Output { get { return "10"; } }
+        protected override string Output { get { return "10"; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -111,7 +112,7 @@ namespace Reni.FeatureTest.Struct
     public class InnerAccessSecondOfTwo : CompilerTest
     {
         public override string Target { get { return "5,6, (this _A_T_ 1) dump_print"; } }
-        public override string Output { get { return "6"; } }
+        protected override string Output { get { return "6"; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -121,7 +122,7 @@ namespace Reni.FeatureTest.Struct
     public class InnerAccessFirstOfTwo : CompilerTest
     {
         public override string Target { get { return "5,6, (this _A_T_ 0) dump_print"; } }
-        public override string Output { get { return "5"; } }
+        protected override string Output { get { return "5"; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -134,8 +135,9 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { BaseRun(); }
 
         public override string Target { get { return @" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;"; } }
-        public override string Output { get { return "2055"; } }
-        public override System.Type[] DependsOn
+        protected override string Output { get { return "2055"; } }
+
+        protected override IEnumerable<System.Type> DependsOn
         {
             get
             {
@@ -160,8 +162,8 @@ x3: 2050;
 x4: x1 + x2 + x3;
 x4 dump_print;
 "; } }
-        public override string Output { get { return "2055"; } }
-        public override System.Type[] DependsOn { get { return new[] {typeof(AccessAndAddMultiple)}; } }
+        protected override string Output { get { return "2055"; } }
+        protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(AccessAndAddMultiple)}; } }
 
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
