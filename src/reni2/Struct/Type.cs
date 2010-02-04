@@ -21,15 +21,11 @@ namespace Reni.Struct
         [DumpData(false)]
         internal readonly IFeature DumpPrintFeature;
 
-        [DumpData(false)]
-        internal readonly IFeature AtFeature;
-
         private TypeBase[] _typesCache;
         private Size[] _offsetsCache;
 
         internal Type(FullContext context)
         {
-            AtFeature = new AtToken.Feature(this);
             Context = context;
             DumpPrintFeature = new Feature.DumpPrint.StructFeature(this);
         }

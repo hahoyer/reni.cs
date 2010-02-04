@@ -60,5 +60,15 @@ namespace Reni.Struct
     {
         Ref NaturalRefType { get; }
         IRefInCode ForCode { get; }
+        ThisType GetThisType();
+    }
+
+    internal class ThisType: TypeBase
+    {
+        protected override Size GetSize() { throw new NotImplementedException(); }
+
+        internal override string DumpShort() { throw new NotImplementedException(); }
+
+        internal override bool IsValidRefTarget() { throw new NotImplementedException(); }
     }
 }
