@@ -106,14 +106,6 @@ namespace Reni.Type
 
         protected override bool IsInheritor { get { return true; } }
 
-        internal Result CreateContextResult(IRefInCode context, Category category)
-        {
-            return CreateResult(
-                category,
-                () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Parent.Size*-1),
-                () => Refs.Context(context));
-        }
-
         internal override bool IsValidRefTarget() { return true; }
         internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
     }

@@ -70,5 +70,14 @@ namespace Reni.Struct
         internal override string DumpShort() { throw new NotImplementedException(); }
 
         internal override bool IsValidRefTarget() { throw new NotImplementedException(); }
+
+        internal Result CreateContextResult(IRefInCode context, Category category)
+        {
+            return CreateResult(
+                category,
+                () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Parent.Size * -1),
+                () => Refs.Context(context));
+        }
+
     }
 }
