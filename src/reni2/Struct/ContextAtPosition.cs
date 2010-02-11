@@ -1,9 +1,8 @@
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Code;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -12,17 +11,14 @@ namespace Reni.Struct
     {
         private readonly int _position;
         private readonly FullContext _context;
+        private readonly SimpleCache<ThisType> _thisTypeCache; 
 
         internal ContextAtPosition(FullContext context, int position)
             : base(context.Parent, context.Container)
         {
             _position = position;
             _context = context;
-        }
-
-        public override Ref NaturalRefType
-        {
-            get { return _context.NaturalRefType; }
+            _thisTypeCache = new SimpleCache<ThisType>(() => new ThisType(this));
         }
 
         [DumpData(false)]
@@ -30,6 +26,9 @@ namespace Reni.Struct
 
         [Node]
         protected override int Position { get { return _position; } }
+
+        [DumpData(false)]
+        internal override ThisType ThisType { get { return _thisTypeCache.Value; } }
 
         internal override ContextAtPosition CreatePosition(int position) { return _context.CreatePosition(position); }
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }

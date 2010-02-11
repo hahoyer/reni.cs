@@ -1,5 +1,4 @@
 using System;
-using HWClassLibrary.Debug;
 using Reni.Context;
 
 namespace Reni.Parser.TokenClass.Name
@@ -9,9 +8,7 @@ namespace Reni.Parser.TokenClass.Name
     {
         public override Result Result(ContextBase context, Category category, Token token)
         {
-            var structContext = context.FindStruct();
-            var thisType  = structContext.GetThisType();
-            return thisType.CreateContextResult(structContext.ForCode, category);
+            return context.FindStruct().ThisType.CreateContextResult(category);
         }
     }
 }

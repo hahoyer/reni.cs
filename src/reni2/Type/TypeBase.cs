@@ -9,6 +9,8 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Parser.TokenClass;
+using Reni.Struct;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -93,9 +95,6 @@ namespace Reni.Type
                 return 0;
             }
         }
-
-        [DumpData(false)]
-        internal TypeBase IndexType { get { return CreateNumber(IndexSize); } }
 
         [DumpData(false)]
         protected internal virtual int IndexSize { get { return 0; } }
@@ -304,8 +303,18 @@ namespace Reni.Type
         internal Result GetSuffixResult(Category category, Defineable defineable) { return GetUnaryResult<IFeature>(category, defineable); }
 
         internal Result GetPrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
-        
-        internal virtual Struct.Type GetAtTarget()
+
+        internal Result AtResult(ContextBase callContext, Category category, ICompileSyntax right)
+        {
+            var thisTypeResult = Conversion(category | Category.Type, GetThisType());
+            var thisType = (ThisType) thisTypeResult.Type;
+            var position = callContext.Evaluate(right, thisType.IndexType).ToInt32();
+            return thisType
+                .AccessResult(category, position)
+                .UseWithArg(thisTypeResult);
+        }
+
+        protected virtual ThisType GetThisType()
         {
             NotImplementedMethod();
             return null;

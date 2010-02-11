@@ -36,10 +36,16 @@ namespace Reni.Struct
 
         protected override int Position { get { return StatementList.Count; } }
 
-        [DumpData(false)]
-        public override Ref NaturalRefType { get { return NaturalType.CreateAutomaticRef(RefAlignParam); } }
-
         private TypeBase NaturalType { get { return _typeCache.Value; } }
+
+        internal override ThisType ThisType
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
 
         internal Result ConstructorResult(Category category)
         {

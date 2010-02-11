@@ -5,6 +5,7 @@ using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -13,13 +14,11 @@ namespace Reni.Struct
         public override Result Result(ContextBase callContext, Category category, ICompileSyntax left,
                                       ICompileSyntax right)
         {
-            var leftType = callContext.Type(left);
-            var atTargetType = leftType.GetAtTarget();
-            var position = callContext.Evaluate(right, atTargetType.IndexType).ToInt32();
-
-            NotImplementedMethod(callContext, category, left, right, "position", position);
-            return null;
-            //return callContext.AccessResult(category, left, position);
+            return callContext
+                .Type(left)
+                .AtResult(callContext, category, right)
+                .UseWithArg(callContext.Result(category, left))
+                ;
         }
     }
 }

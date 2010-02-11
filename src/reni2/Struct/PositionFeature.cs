@@ -51,33 +51,14 @@ namespace Reni.Struct
             return null;
         }
 
-        TypeBase IFeature.DefiningType() { return _structContext.NaturalRefType; }
+        TypeBase IFeature.DefiningType() { return _structContext.ThisType; }
 
         Result IContextFeature.Apply(Category category) { return Apply(category); }
     }
 
     internal interface IStructContext
-    {
-        Ref NaturalRefType { get; }
+    {                                                      
         IRefInCode ForCode { get; }
-        ThisType GetThisType();
-    }
-
-    internal class ThisType: TypeBase
-    {
-        protected override Size GetSize() { throw new NotImplementedException(); }
-
-        internal override string DumpShort() { throw new NotImplementedException(); }
-
-        internal override bool IsValidRefTarget() { throw new NotImplementedException(); }
-
-        internal Result CreateContextResult(IRefInCode context, Category category)
-        {
-            return CreateResult(
-                category,
-                () => CodeBase.CreateContextRef(context).CreateRefPlus(context.RefAlignParam, Parent.Size * -1),
-                () => Refs.Context(context));
-        }
-
+        ThisType ThisType { get; }
     }
 }

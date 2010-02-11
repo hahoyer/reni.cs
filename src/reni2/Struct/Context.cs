@@ -6,7 +6,6 @@ using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Parser.TokenClass;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -39,9 +38,10 @@ namespace Reni.Struct
         [DumpData(false)]
         internal override Root RootContext { get { return Parent.RootContext; } }
         [DumpData(false)]
-        public abstract Ref NaturalRefType { get; }
-        [DumpData(false)]
         public abstract IRefInCode ForCode { get; }
+
+        ThisType IStructContext.ThisType { get { return ThisType; } }
+
         [DumpData(false)]
         internal ContextPosition[] Features { get { return _featuresCache.Value; } }
         [DumpData(false)]
@@ -51,6 +51,9 @@ namespace Reni.Struct
         internal List<ICompileSyntax> StatementList { get { return Container.List; } }
         [DumpData(false)]
         internal int IndexSize { get { return Container.IndexSize; } }
+
+        [DumpData(false)]
+        internal abstract ThisType ThisType { get; }
 
         internal bool IsValidRefTarget()
         {
@@ -92,12 +95,12 @@ namespace Reni.Struct
                 .CreateRefPlus(RefAlignParam, InternalSize());
         }
 
-        protected Size InternalSize(int position)
+        private Size InternalSize(int position)
         {
             return InternalResult(Category.Size, position).Size;
         }
 
-        protected TypeBase InternalType(int position)
+        private TypeBase InternalType(int position)
         {
             return InternalResult(Category.Type, position).Type;
         }
@@ -142,23 +145,6 @@ namespace Reni.Struct
 
         internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
 
-        Result ObjectResult(ContextBase callContext, Category category, ICompileSyntax @object)
-        {
-            if(@object == null)
-                return CreateContextRef(category);
-            return callContext
-                .ResultAsRef(category | Category.Type, @object)
-                .ConvertTo(NaturalRefType)
-                .CreateRefPlus(category, ForCode.RefAlignParam, NaturalRefType.UnrefSize);
-        }
-
-        private Result CreateContextRef(Category category)
-        {
-            return NaturalRefType.CreateResult(
-                category | Category.Type,
-                () => CodeBase.CreateContextRef(ForCode),
-                () => Refs.Context(ForCode));
-        }
-
+        internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize);} }
     }
 }

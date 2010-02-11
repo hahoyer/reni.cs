@@ -74,6 +74,7 @@
     <Compile Include="Feature\IInfixFeature.cs" />
     <Compile Include="Parser\DeclarationTokenFactory.cs" />
     <Compile Include="Parser\MainTokenFactory.cs" />
+    <Compile Include="Struct\ThisType.cs" />
     <Compile Include="TestGenerated.cs" />
     <Compile Include="ISearchVisitor.cs" />
     <Compile Include="Parser\DefineableToken.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="Type\Void.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="ParsedSyntax.cd" />
     <None Include="Visitor.cd" />
     <None Include="sys.targets" />
