@@ -29,7 +29,7 @@ namespace Reni
 
         public override string Dump()
         {
-            return NodeDump + StringExtender.Surround(DumpData(), "{", "}");
+            return NodeDump + DumpData().Surround("{", "}");
         }
 
         public override string ToString()
@@ -48,7 +48,7 @@ namespace Reni
             var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
             if(ObjectId == objectId)
-                Tracer.ConditionalBreak(1, "", @"_objectId==" + objectId + "\n" + Dump());
+                Tracer.ConditionalBreak(1, "", ()=>@"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
 
