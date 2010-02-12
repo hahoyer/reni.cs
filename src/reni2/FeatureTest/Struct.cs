@@ -74,7 +74,7 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture, InnerAccessTheOnlyOne]
     public class PropertyVariable: CompilerTest{
-        public override string Target { get { return @"! property x: function 11; x dump_print"; } }
+        public override string Target { get { return @"! property x: /\11; x dump_print"; } }
         protected override string Output { get { return "11"; } }
     
         [Test, Category(Worked)]

@@ -19,7 +19,7 @@ namespace Reni.FeatureTest.Array
         public override void Run() { BaseRun(); }
     }
     [TestFixture]
-    [Target("(5 type * 5)(function arg) array dump_print")]
+    [Target("(5 type * 5)(/\\arg) array dump_print")]
     [Output("array(4 bits,(0,1,2,3,4))")]
     public class FromTypeAndFunction : CompilerTest
     {

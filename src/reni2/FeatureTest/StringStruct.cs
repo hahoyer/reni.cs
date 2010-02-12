@@ -6,10 +6,10 @@ namespace Reni.FeatureTest
         {
             return
                 @"
-String: function
+String: /\
 {
     elementType: arg;
-    CreateObject: function 
+    CreateObject: /\
 
 }
 ";

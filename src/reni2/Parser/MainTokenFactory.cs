@@ -51,7 +51,7 @@ namespace Reni.Parser
                  new[] { "else" }
                 );
             x += PrioTable.Right("!");
-            x += PrioTable.Right(":", "function");
+            x += PrioTable.Right(":", "/\\");
             x += PrioTable.Right(",");
             x += PrioTable.Right(";");
             x = x.Level
@@ -72,6 +72,10 @@ namespace Reni.Parser
             return x;
         }
 
+        /// <summary>
+        /// Creates the main token classes.
+        /// </summary>
+        /// <returns></returns>
         private static Dictionary<string, TokenClassBase> CreateMainTokenClasses()
         {
             var result =
@@ -92,6 +96,7 @@ namespace Reni.Parser
                         {"!", new Exclamation()},
                         {"+", new Sign()},
                         {"/", new Slash()},
+                        {"/\\", new TokenClass.Name.Function()},
                         {"*", new Star()},
 
                         {"_A_T_", new AtToken()},
@@ -99,7 +104,6 @@ namespace Reni.Parser
                         {"dump_print", new Feature.DumpPrint.Token()},
                         {"else", new TelseT()},
                         {"enable_cut", new EnableCut()},
-                        {"function", new TokenClass.Name.Function()},
                         {"then", new TthenT()},
                         {"this", new TthisT()},
                         {"type", new TypeOperator()}
