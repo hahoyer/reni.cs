@@ -1,5 +1,7 @@
 ﻿using System;
-using Reni.Code;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -14,23 +16,24 @@ namespace Reni.Struct
         protected override ThisType GetThisType() { return this; }
         internal override string DumpShort() { return "type(this)"; }
         internal override bool IsValidRefTarget() { return false; }
-
-        internal Result AccessResult(Category category, int position)
-        {
-            NotImplementedMethod(category, position);
-            return null;
-        }
-
+        internal Result AccessResult(Category category, int position) { return At(position).CreateArgResult(category); }
         internal TypeBase IndexType { get { return _context.IndexType; } }
+        private ThisAtType At(int position) { return new ThisAtType(_context, position); }
+    }
 
-        internal Result CreateContextResult(Category category)
+    internal class ThisAtType : TypeBase
+    {
+        private readonly Context _context;
+        private readonly int _position;
+
+        public ThisAtType(Context context, int position)
         {
-            return CreateResult(
-                category,
-                () =>
-                CodeBase.CreateContextRef(_context.ForCode).CreateRefPlus(_context.RefAlignParam,
-                                                                          _context.InternalSize()*-1),
-                () => Refs.Context(_context.ForCode));
+            _context = context;
+            _position = position;
         }
+
+        protected override Size GetSize() { return _context.RefSize; }
+        internal override string DumpShort() { return "type(this at " + _position + ")"; }
+        internal override bool IsValidRefTarget() { return false; }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
@@ -54,11 +53,5 @@ namespace Reni.Struct
         TypeBase IFeature.DefiningType() { return _structContext.ThisType; }
 
         Result IContextFeature.Apply(Category category) { return Apply(category); }
-    }
-
-    internal interface IStructContext
-    {                                                      
-        IRefInCode ForCode { get; }
-        ThisType ThisType { get; }
     }
 }

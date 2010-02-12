@@ -40,8 +40,6 @@ namespace Reni.Struct
         [DumpData(false)]
         public abstract IRefInCode ForCode { get; }
 
-        ThisType IStructContext.ThisType { get { return ThisType; } }
-
         [DumpData(false)]
         internal ContextPosition[] Features { get { return _featuresCache.Value; } }
         [DumpData(false)]
@@ -146,5 +144,22 @@ namespace Reni.Struct
         internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
 
         internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize);} }
+
+        private CodeBase CreateContextCode()
+        {
+            return CodeBase
+                .CreateContextRef(ForCode)
+                .CreateRefPlus(RefAlignParam,InternalSize()*-1);
+        }
+
+        private Refs CreateContextRefs()
+        {
+            return Refs.Context(ForCode);
+        }
+
+        Result IStructContext.CreateThisResult(Category category)
+        {
+            return ThisType.CreateResult(category,CreateContextCode,CreateContextRefs);
+        }
     }
 }

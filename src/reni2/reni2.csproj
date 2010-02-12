@@ -178,7 +178,6 @@
     <Compile Include="Type\Void.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
     <None Include="ParsedSyntax.cd" />
     <None Include="Visitor.cd" />
     <None Include="sys.targets" />

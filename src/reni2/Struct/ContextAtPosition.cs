@@ -37,4 +37,9 @@ namespace Reni.Struct
         [DumpData(false)]
         public override string NodeDump { get { return base.NodeDump + ": " + _context.NodeDump + "@" + _position; } }
     }
+
+    internal interface IStructContext
+    {
+        Result CreateThisResult(Category category);
+    }
 }
