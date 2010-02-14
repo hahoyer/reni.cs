@@ -2,44 +2,53 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 
-#pragma warning disable 1911
-
 namespace Reni.Type
 {
-    [Serializable]
     internal sealed class AssignableRef : TypeBase
     {
-        private static int _nextObjectId;
-        private readonly Struct.Type _target;
-        internal readonly RefAlignParam RefAlignParam;
+        private readonly Struct.Context _context;
+        private readonly int _position;
+        private readonly SimpleCache<TypeBase> _targetCache;
         [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
 
-        internal AssignableRef(Struct.Type target, RefAlignParam refAlignParam)
-            : base(_nextObjectId++)
+        public AssignableRef(Struct.Context context, int position)
         {
-            _target = target;
-            RefAlignParam = refAlignParam;
+            _context = context;
+            _position = position;
+            _targetCache = new SimpleCache<TypeBase>(GetTargetType);
             AssignmentFeature = new AssignmentFeature(this);
         }
 
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
-        
-        internal override string DumpShort() { return "ref." + _target.DumpShort(); }
+        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        internal Size TargetSize { get { return _targetCache.Value.Size; } }
+        protected override Size GetSize() { return _context.RefSize; }
+        internal override string DumpShort() { return "type(this at " + _position + ")"; }
         internal override bool IsValidRefTarget() { return false; }
-        internal Size TargetSize { get { return _target.Size; } }
-        internal AutomaticRef CreateAutomaticRef() { return _target.CreateAutomaticRef(RefAlignParam); }
+
+        private TypeBase GetTargetType()
+        {
+            NotImplementedMethod();
+            return null;
+        }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            _target.Search(searchVisitor.Child(this));
+            _targetCache.Value.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);
         }
 
+        internal AutomaticRef CreateAutomaticRef()
+        {
+            return _targetCache
+                .Value
+                .CreateAutomaticRef(_context.RefAlignParam);
+        }
     }
 
     [Serializable]
@@ -54,12 +63,15 @@ namespace Reni.Type
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
-            var result = TypeBase.CreateVoid.CreateResult(
-                category,
-                () =>
-                CodeBase
-                .CreateArg(_assignableRef.Size*2)
-                .CreateAssignment(_assignableRef.RefAlignParam,_assignableRef.TargetSize)
+            var result = TypeBase
+                .CreateVoid
+                .CreateResult
+                (
+                    category,
+                    () =>
+                    CodeBase
+                        .CreateArg(_assignableRef.Size*2)
+                        .CreateAssignment(_assignableRef.RefAlignParam, _assignableRef.TargetSize)
                 );
 
             if(!category.HasCode && !category.HasRefs)
