@@ -28,7 +28,7 @@ namespace Reni.Syntax
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
-            return Result(context, category).Align(context.AlignBits);
+            return Result(context, category);
         }
 
         internal protected virtual Result Result(ContextBase context, Category category)

@@ -78,14 +78,6 @@ namespace Reni.Struct
 
         internal override IStructContext FindStruct() { return this; }
 
-        private Size RegionSize(int position, int currentPosition)
-        {
-            var result = Size.Zero;
-            for (var i = position; i < currentPosition; i++)
-                result += InternalSize(i);
-            return result;
-        }
-
         internal CodeBase ContextRefCodeAsArgCode()
         {
             return CodeBase
@@ -93,12 +85,7 @@ namespace Reni.Struct
                 .CreateRefPlus(RefAlignParam, InternalSize());
         }
 
-        private Size InternalSize(int position)
-        {
-            return InternalResult(Category.Size, position).Size;
-        }
-
-        private TypeBase InternalType(int position)
+        internal TypeBase InternalType(int position)
         {
             return InternalResult(Category.Type, position).Type;
         }
@@ -108,9 +95,7 @@ namespace Reni.Struct
         private Result InternalResult(Category category, int position)
         {
             var result = CreatePosition(position)
-                .Result(category | Category.Type, StatementList[position])
-                .PostProcessor
-                .InternalResultForStruct(category,RefAlignParam);
+                .Result(category | Category.Type, StatementList[position]);
             if (_internalResult[position] == null)
                 _internalResult[position] = new Result();
             _internalResult[position].Update(result);
@@ -124,7 +109,9 @@ namespace Reni.Struct
             var result = Reni.Type.Void.CreateResult(category);
             for (var i = fromPosition; i < fromNotPosition; i++)
             {
-                var internalResult = InternalResult(category, i);
+                var internalResult = InternalResult(category, i)
+                    .PostProcessor
+                    .InternalResultForStruct(category, RefAlignParam);
                 result = result.CreateSequence(internalResult);
             }
             return result;

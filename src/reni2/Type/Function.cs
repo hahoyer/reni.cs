@@ -34,7 +34,7 @@ namespace Reni.Type
                 .CreateFunctionCall(_context, category, Body, argsResult);
         }
 
-        public string DumpShort() { return "context." + _context.ObjectId + "./\\(" + _body.DumpShort() + ")"; }
+        public string DumpShort() { return "context." + _context.ObjectId + "/\\(" + _body.DumpShort() + ")"; }
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {

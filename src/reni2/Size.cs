@@ -80,14 +80,20 @@ namespace Reni
         /// </summary>
         /// <param name="alignBits"></param>
         /// <returns></returns>
-        public int SaveSizeToPacketCount(int alignBits)
+        internal void AssertAlignedSize(int alignBits)
         {
             var result = SizeToPacketCount(alignBits);
             if((result << alignBits) == _data)
-                return result;
+                return;
             NotImplementedMethod(alignBits);
 
             throw new NotAlignableException(this, alignBits);
+        }
+
+        private int SaveSizeToPacketCount(int alignBits)
+        {
+            AssertAlignedSize(alignBits);
+            return SizeToPacketCount(alignBits);
         }
 
         /// <summary>

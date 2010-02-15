@@ -19,7 +19,7 @@ namespace Reni.Type
             : base(target)
         {
             _alignBits = alignBits;
-            StopByObjectId(1117);
+            StopByObjectId(-130);
         }
 
         internal int AlignBits { get { return _alignBits; } }

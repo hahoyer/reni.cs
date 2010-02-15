@@ -25,17 +25,9 @@ namespace Reni.Type
             AssignmentFeature = new AssignmentFeature(this);
         }
 
-        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
-        internal Size TargetSize { get { return _targetCache.Value.Size; } }
         protected override Size GetSize() { return _context.RefSize; }
         internal override string DumpShort() { return "type(this at " + _position + ")"; }
         internal override bool IsValidRefTarget() { return false; }
-
-        private TypeBase GetTargetType()
-        {
-            NotImplementedMethod();
-            return null;
-        }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -43,12 +35,11 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal AutomaticRef CreateAutomaticRef()
-        {
-            return _targetCache
-                .Value
-                .CreateAutomaticRef(_context.RefAlignParam);
-        }
+        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        internal Size TargetSize { get { return _targetCache.Value.Size; } }
+        internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
+
+        private TypeBase GetTargetType() { return _context.InternalType(_position); }
     }
 
     [Serializable]

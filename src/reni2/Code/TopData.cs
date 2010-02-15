@@ -12,7 +12,7 @@ namespace Reni.Code
         public TopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
             : base(refAlignParam, offset, targetSize)
         {
-            StopByObjectId(273);
+            StopByObjectId(45);
         }
         /// <summary>
         /// Tries to combine two leaf elements. .
