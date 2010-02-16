@@ -216,7 +216,8 @@ namespace Reni.Code
             return null;
         }
 
-        internal CodeBase Align() { return CreateBitCast(Size.ByteAlignedSize); }
+        internal CodeBase Align(int alignBits) { return CreateBitCast(Size.NextPacketSize(alignBits)); }
+        internal CodeBase Align() { return Align(BitsConst.SegmentAlignBits); }
 
         /// <summary>
         /// Gets the icon key.
@@ -299,7 +300,7 @@ namespace Reni.Code
                 var size = Size.Zero;
                 return
                     _data
-                        .Select(x => x.AccompayningDestructorCode(size))
+                        .Select(x => x.AccompayningDestructorCode(ref size))
                         .Aggregate(CodeBase.CreateVoid(), (a, b) => a.CreateSequence(b));
             }
         }
@@ -331,7 +332,7 @@ namespace Reni.Code
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg);
-            var trace = body.ObjectId == 1802;
+            var trace = body.ObjectId == -268;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();

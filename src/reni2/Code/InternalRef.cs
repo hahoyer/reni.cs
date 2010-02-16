@@ -12,7 +12,7 @@ namespace Reni.Code
         private readonly RefAlignParam _refAlignParam;
 
         [Node]
-        internal readonly CodeBase Code;
+        private readonly CodeBase _unalignedCode;
 
         [Node]
         internal readonly CodeBase DestructorCode;
@@ -20,26 +20,30 @@ namespace Reni.Code
         public InternalRef(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
         {
             _refAlignParam = refAlignParam;
-            Code = code;
+            _unalignedCode = code;
             DestructorCode = destructorCode;
             StopByObjectId(-1100);
         }
-
-        [DumpData(false)]
-        public LeafElement ToLeafElement { get { return new ContextRef(this); } }
-
-        protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.InternalRef(this); }
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         Size IRefInCode.RefSize { get { return RefAlignParam.RefSize; } }
         RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IRefInCode.IsChildOf(ContextBase contextBase) { return false; }
 
-        internal CodeBase AccompayningDestructorCode(Size size)
+        protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.InternalRef(this); }
+        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+
+        internal CodeBase Code { get { return _unalignedCode.Align(RefAlignParam.AlignBits); } }
+
+        internal CodeBase AccompayningDestructorCode(ref Size size)
         {
             size += Code.Size;
             return DestructorCode.UseWithArg(InternalRefSequenceVisitor.InternalRefCode(RefAlignParam, size));
         }
+
+        [DumpData(false)]
+        public LeafElement ToLeafElement { get { return new ContextRef(this); } }
+
+
     }
 }
