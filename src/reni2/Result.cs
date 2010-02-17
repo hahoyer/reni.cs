@@ -406,7 +406,7 @@ namespace Reni
         /// <param name="refInCode">The context.</param>
         /// <param name="replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
         /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<TRefInCode>(TRefInCode refInCode, Result replacement)
+        internal Result ReplaceAbsoluteContextRef<TRefInCode>(TRefInCode refInCode, Func<Result> replacement)
             where TRefInCode : IRefInCode
         {
             if(HasRefs && !Refs.Contains(refInCode))
@@ -414,9 +414,9 @@ namespace Reni
 
             var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
-                result.Code = Code.ReplaceAbsoluteContextRef(refInCode, replacement.Code);
+                result.Code = Code.ReplaceAbsoluteContextRef(refInCode, ()=>replacement().Code);
             if(HasRefs)
-                result.Refs = Refs.Without(refInCode).CreateSequence(replacement.Refs);
+                result.Refs = Refs.Without(refInCode).CreateSequence(replacement().Refs);
             result.IsDirty = false;
             return result;
         }
@@ -428,7 +428,7 @@ namespace Reni
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement. Should be a reference that varies when walking along code tree.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, CodeBase replacement) where C : IRefInCode
+        internal Result ReplaceRelativeContextRef<C>(C context, Func<CodeBase> replacement) where C : IRefInCode
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;

@@ -39,7 +39,7 @@ namespace Reni.Struct
         Result IFeature.Apply(Category category)
         {
             return Apply(category)
-                .ReplaceRelativeContextRef(_structContext.ForCode, _structContext.ContextRefCodeAsArgCode());
+                .ReplaceRelativeContextRef(_structContext.ForCode, ()=>_structContext.ContextRefCodeAsArgCode());
         }
 
         private RefAlignParam RefAlignParam { get { return _structContext.ForCode.RefAlignParam; } }

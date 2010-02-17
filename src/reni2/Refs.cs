@@ -150,7 +150,7 @@ namespace Reni
                 var unrefPtrAlignment = refAlignParam;
                 p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize*-1);
                 var replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
-                result = result.ReplaceAbsoluteContextRef(_data[i], replacement);
+                result = result.ReplaceAbsoluteContextRef(_data[i], ()=>replacement);
             }
             return result;
         }

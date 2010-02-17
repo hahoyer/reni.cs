@@ -135,7 +135,7 @@ namespace Reni.Context
             var result =
                 postProcessedResult
                     .ReplaceAbsoluteContextRef(functionContext,
-                                               CreateContextRef(postProcessedResult.CompleteCategory));
+                                               ()=>CreateContextRef(postProcessedResult.CompleteCategory));
             return ReturnMethodDump(trace, result);
         }
 

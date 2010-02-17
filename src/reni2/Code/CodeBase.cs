@@ -152,7 +152,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public CodeBase ReplaceRelativeContextRef<TContext>(TContext context, CodeBase replacement) where TContext : IRefInCode
+        public CodeBase ReplaceRelativeContextRef<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
         {
             var result = Visit(new ReplaceRelativeContextRef<TContext>(context, replacement));
             if(result != null)
@@ -168,7 +168,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public CodeBase ReplaceAbsoluteContextRef<TContext>(TContext context, CodeBase replacement) where TContext : IRefInCode
+        public CodeBase ReplaceAbsoluteContextRef<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
         {
             var result = Visit(new ReplaceAbsoluteContextRef<TContext>(context, replacement));
             if(result != null)

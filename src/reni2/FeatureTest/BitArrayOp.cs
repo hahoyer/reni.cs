@@ -71,7 +71,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [TestFixture, Target(@"(2+4) dump_print"), Output("6")]
     public class Add2Numbers : CompilerTest
     {
-        [Test, Category(CompilerTest.UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 

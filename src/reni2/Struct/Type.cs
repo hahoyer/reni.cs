@@ -102,9 +102,8 @@ namespace Reni.Struct
 
         private IEnumerable<Size> GetOffsets()
         {
-            return Types
-                .Select(typeBase => typeBase.Size)
-                .Aggregate(new Size[0], AggregateSizes);
+            var sizes = Types.Select(typeBase => typeBase.Size).ToArray();
+            return sizes.Aggregate(new Size[0], AggregateSizes);
         }
 
         private Result AutomaticDereference(TypeBase type, Size offset, Category category)
@@ -112,13 +111,15 @@ namespace Reni.Struct
             return type
                 .CreateAutomaticRef(Context.RefAlignParam)
                 .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(Context.RefAlignParam, offset))
-                .AutomaticDereference()
-                .Align(Context.AlignBits);
+                .AutomaticDereference();
         }
 
         private CodeBase CreateRefArgCode() { return CreateAutomaticRef(Context.RefAlignParam).CreateArgCode(); }
 
-        private static Size[] AggregateSizes(Size[] sizesSoFar, Size nextSize) { return sizesSoFar.Select(size => size + nextSize).Union(new[] {Size.Zero}).ToArray(); }
+        private Size[] AggregateSizes(Size[] sizesSoFar, Size nextSize)
+        {
+            return sizesSoFar.Select(size => size + nextSize.Align(Context.AlignBits)).Union(new[] {Size.Zero}).ToArray();
+        }
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(syntax => Context.Type(syntax)); }
 

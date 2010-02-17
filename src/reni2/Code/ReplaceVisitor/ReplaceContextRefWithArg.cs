@@ -7,9 +7,9 @@ namespace Reni.Code.ReplaceVisitor
         where Context : IRefInCode
     {
         protected readonly Context _context;
-        protected readonly CodeBase _replacement;
+        protected readonly Func<CodeBase> _replacement;
 
-        protected ReplaceContextRef(Context context, CodeBase replacement)
+        protected ReplaceContextRef(Context context, Func<CodeBase> replacement)
         {
             _context = context;
             _replacement = replacement;
@@ -18,7 +18,7 @@ namespace Reni.Code.ReplaceVisitor
         internal override CodeBase ContextRef(RefCode visitedObject)
         {
             if(visitedObject.Context == (IRefInCode) _context)
-                return _replacement;
+                return _replacement();
             return null;
         }
     }
@@ -31,14 +31,14 @@ namespace Reni.Code.ReplaceVisitor
     internal sealed class ReplaceRelativeContextRef<Context>: ReplaceContextRef<Context>
         where Context : IRefInCode
     {
-        public ReplaceRelativeContextRef(Context context, CodeBase replacement)
+        public ReplaceRelativeContextRef(Context context, Func<CodeBase> replacement)
             : base(context, replacement) { }
 
         internal override Visitor<CodeBase> After(Size size)
         {
             return new ReplaceRelativeContextRef<Context>(
                 _context,
-                _replacement.CreateRefPlus(_context.RefAlignParam, size));
+                ()=>_replacement().CreateRefPlus(_context.RefAlignParam, size));
         }
     }
 
@@ -50,7 +50,7 @@ namespace Reni.Code.ReplaceVisitor
     internal sealed class ReplaceAbsoluteContextRef<Context> : ReplaceContextRef<Context>
         where Context : IRefInCode
     {
-        public ReplaceAbsoluteContextRef(Context context, CodeBase replacement)
+        public ReplaceAbsoluteContextRef(Context context, Func<CodeBase> replacement)
             : base(context, replacement) { }
     }
 }

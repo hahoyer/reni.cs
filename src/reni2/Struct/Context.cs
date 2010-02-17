@@ -107,14 +107,16 @@ namespace Reni.Struct
         private Result InternalResult(Category category, int fromPosition, int fromNotPosition)
         {
             var result = Reni.Type.Void.CreateResult(category);
-            for (var i = fromPosition; i < fromNotPosition; i++)
-            {
-                var internalResult = InternalResult(category, i)
-                    .PostProcessor
-                    .InternalResultForStruct(category, RefAlignParam);
-                result = result.CreateSequence(internalResult);
-            }
+            for(var i = fromPosition; i < fromNotPosition; i++)
+                result = result.CreateSequence(InternalAlignedResult(category, i));
             return result;
+        }
+
+        internal Result InternalAlignedResult(Category category, int i)
+        {
+            return InternalResult(category, i)
+                .PostProcessor
+                .InternalResultForStruct(category, RefAlignParam);
         }
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
