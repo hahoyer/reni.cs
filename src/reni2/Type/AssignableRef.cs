@@ -9,20 +9,25 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    internal sealed class AssignableRef : TypeBase
+    internal sealed class StructRef : TypeBase
     {
         private readonly Struct.Context _context;
         private readonly int _position;
         private readonly SimpleCache<TypeBase> _targetCache;
+
         [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
 
-        public AssignableRef(Struct.Context context, int position)
+        [DumpData(false)]
+        internal readonly DumpPrintFeature DumpPrintFeature;
+
+        public StructRef(Struct.Context context, int position)
         {
             _context = context;
             _position = position;
             _targetCache = new SimpleCache<TypeBase>(GetTargetType);
             AssignmentFeature = new AssignmentFeature(this);
+            DumpPrintFeature = new DumpPrintFeature(this);
         }
 
         protected override Size GetSize() { return _context.RefSize; }
@@ -42,15 +47,34 @@ namespace Reni.Type
         private TypeBase GetTargetType() { return _context.InternalType(_position); }
     }
 
-    [Serializable]
-    internal class AssignmentFeature : ReniObject, IFeature, IFunctionalFeature
+    internal sealed class DumpPrintFeature : ReniObject, IFeature
     {
         [DumpData(true)]
-        private readonly AssignableRef _assignableRef;
+        private readonly StructRef _structRef;
 
-        public AssignmentFeature(AssignableRef assignableRef) { _assignableRef = assignableRef; }
+        public DumpPrintFeature(StructRef structRef) { _structRef = structRef; }
 
-        Result IFeature.Apply(Category category) { return _assignableRef.CreateFunctionalType(this).CreateArgResult(category); }
+        Result IFeature.Apply(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+
+        TypeBase IFeature.DefiningType()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+    }
+
+    internal sealed class AssignmentFeature : ReniObject, IFeature, IFunctionalFeature
+    {
+        [DumpData(true)]
+        private readonly StructRef _structRef;
+
+        public AssignmentFeature(StructRef structRef) { _structRef = structRef; }
+
+        Result IFeature.Apply(Category category) { return _structRef.CreateFunctionalType(this).CreateArgResult(category); }
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
@@ -61,14 +85,14 @@ namespace Reni.Type
                     category,
                     () =>
                     CodeBase
-                        .CreateArg(_assignableRef.Size*2)
-                        .CreateAssignment(_assignableRef.RefAlignParam, _assignableRef.TargetSize)
+                        .CreateArg(_structRef.Size*2)
+                        .CreateAssignment(_structRef.RefAlignParam, _structRef.TargetSize)
                 );
 
             if(!category.HasCode && !category.HasRefs)
                 return result;
 
-            var sourceResult = argsResult.ConvertToAsRef(category, _assignableRef.CreateAutomaticRef());
+            var sourceResult = argsResult.ConvertToAsRef(category, _structRef.CreateAutomaticRef());
             var destinationResult = functionalResult.StripFunctional() & category;
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
             return result.UseWithArg(objectAndSourceRefs);
@@ -80,6 +104,6 @@ namespace Reni.Type
             return null;
         }
 
-        string IDumpShortProvider.DumpShort() { return _assignableRef.DumpShort() + " :="; }
+        string IDumpShortProvider.DumpShort() { return _structRef.DumpShort() + " :="; }
     }
 }

@@ -23,8 +23,8 @@ namespace Reni.Parser.TokenClass
         IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new CreateArrayFeature(); }
     }
 
-    internal sealed class Assignment : Defineable, ISearchPath<IFeature, AssignableRef>
+    internal sealed class Assignment : Defineable, ISearchPath<IFeature, StructRef>
     {
-        IFeature ISearchPath<IFeature, AssignableRef>.Convert(AssignableRef type) { return type.AssignmentFeature; }
+        IFeature ISearchPath<IFeature, StructRef>.Convert(StructRef type) { return type.AssignmentFeature; }
     }
 }

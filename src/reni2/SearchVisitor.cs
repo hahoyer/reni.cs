@@ -12,7 +12,7 @@ namespace Reni
         void ISearchVisitor.Search() { SearchTypeBase(); }
         ISearchVisitor ISearchVisitor.Child(Bit target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Ref target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(AssignableRef target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(StructRef target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Sequence target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Array target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Void target) { return InternalChild(target); }
