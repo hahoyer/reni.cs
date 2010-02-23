@@ -18,16 +18,12 @@ namespace Reni.Type
         [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
 
-        [DumpData(false)]
-        internal readonly DumpPrintFeature DumpPrintFeature;
-
         public StructRef(Struct.Context context, int position)
         {
             _context = context;
             _position = position;
             _targetCache = new SimpleCache<TypeBase>(GetTargetType);
             AssignmentFeature = new AssignmentFeature(this);
-            DumpPrintFeature = new DumpPrintFeature(this);
         }
 
         protected override Size GetSize() { return _context.RefSize; }
@@ -40,31 +36,15 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
+        internal override int SequenceCount { get { return 1; } }
+
+        internal override string DumpPrintText { get { return _context.DumpShort() + " AT "+ _position; } }
+
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
         internal Size TargetSize { get { return _targetCache.Value.Size; } }
         internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
 
         private TypeBase GetTargetType() { return _context.InternalType(_position); }
-    }
-
-    internal sealed class DumpPrintFeature : ReniObject, IFeature
-    {
-        [DumpData(true)]
-        private readonly StructRef _structRef;
-
-        public DumpPrintFeature(StructRef structRef) { _structRef = structRef; }
-
-        Result IFeature.Apply(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
-        TypeBase IFeature.DefiningType()
-        {
-            NotImplementedMethod();
-            return null;
-        }
     }
 
     internal sealed class AssignmentFeature : ReniObject, IFeature, IFunctionalFeature
