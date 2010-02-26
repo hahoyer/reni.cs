@@ -19,6 +19,7 @@ namespace Reni
         {
             _parent = parent;
             _target = target;
+            _parent.AddChild(this);
         }
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }

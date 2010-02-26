@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -38,6 +40,9 @@ namespace Reni.Type
         }
 
         private readonly Cache _cache;
+
+        [UsedImplicitly]
+        private static ReniObject _lastSearchVisitor;
 
         protected TypeBase(int objectId)
             : base(objectId) { _cache = new Cache(this); }
@@ -181,7 +186,7 @@ namespace Reni.Type
                 result.Refs = codeAndRefs.Refs;
             return result;
         }
- 
+
         internal Result CreateResult(Category category, Func<CodeBase> getCode, Func<Refs> getRefs)
         {
             var result = new Result();
@@ -279,6 +284,8 @@ namespace Reni.Type
         {
             var searchVisitor = new RootSearchVisitor<TFeature>(defineable);
             searchVisitor.Search(this);
+            if(Debugger.IsAttached)
+                _lastSearchVisitor = searchVisitor;
             return searchVisitor.Result;
         }
 
@@ -287,7 +294,8 @@ namespace Reni.Type
         private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            var feature = SearchDefineable<TFeature>(defineable).Feature();
+            var searchResult = SearchDefineable<TFeature>(defineable);
+            var feature = searchResult.Feature();
             if(feature == null)
                 return null;
 
@@ -318,6 +326,12 @@ namespace Reni.Type
         {
             NotImplementedMethod();
             return null;
+        }
+
+        internal void ChildSearch(ISearchVisitor searchVisitor, StructRef structRef)
+        {
+            Search(searchVisitor.Child(structRef));
+            Search(searchVisitor);
         }
     }
 }
