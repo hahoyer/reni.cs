@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 
 #pragma warning disable 1911
 
@@ -108,5 +109,10 @@ namespace Reni.Type
 
         internal override bool IsValidRefTarget() { return true; }
         internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
+    }
+
+    internal interface IRef
+    {
+        IFeature GetDumpPrintFeature();
     }
 }

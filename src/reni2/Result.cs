@@ -424,11 +424,11 @@ namespace Reni
         /// <summary>
         /// Replaces the relative context ref.
         /// </summary>
-        /// <typeparam name="C"></typeparam>
+        /// <typeparam name="TContext"></typeparam>
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement. Should be a reference that varies when walking along code tree.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<C>(C context, Func<CodeBase> replacement) where C : IRefInCode
+        internal Result ReplaceRelativeContextRef<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
         {
             if(HasRefs && !Refs.Contains(context))
                 return this;

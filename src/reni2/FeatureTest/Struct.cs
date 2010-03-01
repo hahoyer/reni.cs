@@ -1,7 +1,6 @@
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using HWClassLibrary.Debug;
-using NUnit.Framework;
 
 namespace Reni.FeatureTest.Struct
 {

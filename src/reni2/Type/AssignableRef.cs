@@ -17,6 +17,8 @@ namespace Reni.Type
 
         [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
+        [DumpData(false)]
+        internal readonly DumpPrintFeature DumpPrintFeature;
 
         public StructRef(Struct.Context context, int position)
         {
@@ -24,10 +26,11 @@ namespace Reni.Type
             _position = position;
             _targetCache = new SimpleCache<TypeBase>(GetTargetType);
             AssignmentFeature = new AssignmentFeature(this);
+            DumpPrintFeature = new DumpPrintFeature(this);
         }
 
         protected override Size GetSize() { return _context.RefSize; }
-        internal override string DumpShort() { return "type(this at " + _position + ")"; }
+        internal override string DumpShort() { return String.Format("type(this at {0})", _position); }
         internal override bool IsValidRefTarget() { return false; }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -45,6 +48,25 @@ namespace Reni.Type
         internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
 
         private TypeBase GetTargetType() { return _context.InternalType(_position); }
+    }
+
+    internal sealed class DumpPrintFeature : ReniObject, IFeature
+    {
+        private readonly StructRef _structRef;
+
+        public DumpPrintFeature(StructRef structRef) { _structRef = structRef; }
+
+        Result IFeature.Apply(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+
+        TypeBase IFeature.DefiningType()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 
     internal sealed class AssignmentFeature : ReniObject, IFeature, IFunctionalFeature

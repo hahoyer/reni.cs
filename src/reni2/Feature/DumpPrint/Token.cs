@@ -9,6 +9,7 @@ namespace Reni.Feature.DumpPrint
     internal sealed class Token :
         Defineable,
         IFeature,
+        ISearchPath<IFeature, StructRef>,
         ISearchPath<IFeature, TypeType>,
         ISearchPath<IFeature, Bit>,
         ISearchPath<IFeature, Type.Void>,
@@ -37,5 +38,8 @@ namespace Reni.Feature.DumpPrint
             NotImplementedMethod();
             return null;
         }
+
+        public IFeature Convert(StructRef type) { return type.DumpPrintFeature; }
     }
+
 }
