@@ -45,10 +45,14 @@ namespace Reni.Type
 
         internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
 
-        internal Result DumpPrint(Category category)
+        internal Result DumpPrint(Category category) { return _targetCache.Value.DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam); }
+
+        private Result CreateAccessResult(Category category) { return CreateResult(category, CreateAccessCode); }
+
+        private CodeBase CreateAccessCode()
         {
-            var accessResult = CreateResult(category, () => CreateArgCode().CreateRefPlus(RefAlignParam, GetOffset()));
-            return _targetCache.Value.DumpPrintFromReference(category, accessResult, RefAlignParam);
+            return CreateArgCode()
+                .CreateRefPlus(RefAlignParam, GetOffset());
         }
 
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
