@@ -1,7 +1,6 @@
 using HWClassLibrary.TreeStructure;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Context;
 
 namespace Reni.Code
@@ -13,8 +12,10 @@ namespace Reni.Code
     {
         private readonly LeafElement _leafElement;
         private readonly CodeBase _parent;
+        private static int _nextObjectId;
 
         internal Child(CodeBase parent, LeafElement leafElement)
+            : base(_nextObjectId++)
         {
             Tracer.Assert(leafElement != null);
             _parent = parent;

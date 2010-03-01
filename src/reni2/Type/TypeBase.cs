@@ -333,5 +333,16 @@ namespace Reni.Type
             Search(searchVisitor.Child(structRef));
             Search(searchVisitor);
         }
+
+        internal Result DumpPrintFromReference(Category category, Result referenceResult, RefAlignParam refAlignParam)
+        {
+            var dereferencedResult = CreateResult
+                (
+                    category,
+                    () => referenceResult.Code.CreateDereference(refAlignParam, Size),
+                    () => referenceResult.Refs
+                );
+            return GenericDumpPrint(category).UseWithArg(dereferencedResult);
+        }
     }
 }

@@ -150,5 +150,10 @@ namespace Reni.Struct
         {
             return ThisType.CreateResult(category,CreateContextCode,CreateContextRefs);
         }
+
+        internal Size Offset(int position)
+        {
+            return InternalResult(Category.Size, 0,position).Size;
+        }
     }
 }

@@ -17,6 +17,7 @@ namespace Reni.Type
 
         [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
+
         [DumpData(false)]
         internal readonly DumpPrintFeature DumpPrintFeature;
 
@@ -31,6 +32,7 @@ namespace Reni.Type
 
         protected override Size GetSize() { return _context.RefSize; }
         internal override string DumpShort() { return String.Format("type(this at {0})", _position); }
+        internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + _position; } }
         internal override bool IsValidRefTarget() { return false; }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -41,12 +43,18 @@ namespace Reni.Type
 
         internal override int SequenceCount { get { return 1; } }
 
-        internal override string DumpPrintText { get { return _context.DumpShort() + " AT "+ _position; } }
+        internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
+
+        internal Result DumpPrint(Category category)
+        {
+            var accessResult = CreateResult(category, () => CreateArgCode().CreateRefPlus(RefAlignParam, GetOffset()));
+            return _targetCache.Value.DumpPrintFromReference(category, accessResult, RefAlignParam);
+        }
 
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
         internal Size TargetSize { get { return _targetCache.Value.Size; } }
-        internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
 
+        private Size GetOffset() { return _context.Offset(_position); }
         private TypeBase GetTargetType() { return _context.InternalType(_position); }
     }
 
@@ -56,17 +64,9 @@ namespace Reni.Type
 
         public DumpPrintFeature(StructRef structRef) { _structRef = structRef; }
 
-        Result IFeature.Apply(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
+        Result IFeature.Apply(Category category) { return _structRef.DumpPrint(category); }
 
-        TypeBase IFeature.DefiningType()
-        {
-            NotImplementedMethod();
-            return null;
-        }
+        TypeBase IFeature.DefiningType() { return _structRef; }
     }
 
     internal sealed class AssignmentFeature : ReniObject, IFeature, IFunctionalFeature
