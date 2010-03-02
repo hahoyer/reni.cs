@@ -30,9 +30,11 @@ namespace Reni.Type
             DumpPrintFeature = new DumpPrintFeature(this);
         }
 
+        protected override Result ConvertTo_Implementation(Category category, TypeBase dest) { return _targetCache.Value.GetResult(RefAlignParam, category, dest); }
         protected override Size GetSize() { return _context.RefSize; }
         internal override string DumpShort() { return String.Format("type(this at {0})", _position); }
         internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + _position; } }
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature) { return _targetCache.Value.IsConvertableTo(dest, conversionFeature); }
         internal override bool IsValidRefTarget() { return false; }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -45,7 +47,11 @@ namespace Reni.Type
 
         internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
 
-        internal Result DumpPrint(Category category) { return _targetCache.Value.DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam); }
+        internal Result DumpPrint(Category category)
+        {
+            return _targetCache.Value
+                .DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam);
+        }
 
         private Result CreateAccessResult(Category category) { return CreateResult(category, CreateAccessCode); }
 

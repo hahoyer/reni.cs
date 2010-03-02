@@ -336,13 +336,24 @@ namespace Reni.Type
 
         internal Result DumpPrintFromReference(Category category, Result referenceResult, RefAlignParam refAlignParam)
         {
-            var dereferencedResult = CreateResult
+            var dereferencedResult = DereferencedResult(category, referenceResult, refAlignParam);
+            return GenericDumpPrint(category).UseWithArg(dereferencedResult);
+        }
+
+        private Result DereferencedResult(Category category, Result referenceResult, RefAlignParam refAlignParam)
+        {
+            return CreateResult
                 (
                     category,
                     () => referenceResult.Code.CreateDereference(refAlignParam, Size),
                     () => referenceResult.Refs
                 );
-            return GenericDumpPrint(category).UseWithArg(dereferencedResult);
+        }
+
+        internal Result GetResult(RefAlignParam refAlignParam, Category category, TypeBase dest)
+        {
+            var targetResult = Conversion(category, dest);
+            return DereferencedResult(category, targetResult, refAlignParam);
         }
     }
 }
