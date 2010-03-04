@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.Feature;
 using Reni.Type;
 
@@ -18,15 +19,20 @@ namespace Reni.Parser.TokenClass
             return new SequenceFeature(this);
         }
 
+        [DumpExcept(true)]
         bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
+        [DumpData(false)]
         string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }
+        [DumpData(false)]
         string ISequenceOfBitBinaryOperation.CSharpNameOfDefaultOperation { get { return CSharpNameOfDefaultOperation; } }
 
         int ISequenceOfBitBinaryOperation.ResultSize(int objBitCount, int argBitCount) { return ResultSize(objBitCount, argBitCount); }
 
         protected abstract int ResultSize(int objSize, int argSize);
 
+        [DumpData(false)]
         protected virtual string CSharpNameOfDefaultOperation { get { return Name; } }
+        [DumpExcept(true)]
         protected virtual bool IsCompareOperator { get { return false; } }
     }
 
@@ -37,7 +43,9 @@ namespace Reni.Parser.TokenClass
     {
         ISearchPath<IPrefixFeature, Sequence> ISearchPath<ISearchPath<IPrefixFeature, Sequence>, Bit>.Convert(Bit type) { return new SequenceOperationPrefixFeature(type, this); }
 
+        [DumpData(false)]
         string ISequenceOfBitPrefixOperation.CSharpNameOfDefaultOperation { get { return Name; } }
+        [DumpData(false)]
         string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
         public Result SequenceOperationResult(Category category, Size objSize) { throw new NotImplementedException(); }
 

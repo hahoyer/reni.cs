@@ -32,6 +32,7 @@ namespace Reni.Type
         private class FeatureClass : ReniObject, IFeature, IFunctionalFeature
         {
             private readonly Sequence _parent;
+            [DumpData(true)]
             private readonly SequenceFeatureBase _sequenceFeature;
 
             protected internal FeatureClass(Sequence parent, SequenceFeatureBase sequenceFeature)

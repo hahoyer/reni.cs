@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
@@ -37,7 +38,9 @@ namespace Reni.Type
 
     internal interface ISequenceOfBitPrefixOperation 
     {
+        [DumpData(false)]
         string CSharpNameOfDefaultOperation { get; }
+        [DumpData(false)]
         string DataFunctionName { get; }
         Result SequenceOperationResult(Category category, Size objSize);
     }
