@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
@@ -30,7 +28,11 @@ namespace Reni.Type
             DumpPrintFeature = new DumpPrintFeature(this);
         }
 
-        protected override Result ConvertTo_Implementation(Category category, TypeBase dest) { return _targetCache.Value.GetResult(RefAlignParam, category, dest); }
+        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
+        {
+return _targetCache.Value.Conversion(category, dest);
+        }
+
         protected override Size GetSize() { return _context.RefSize; }
         internal override string DumpShort() { return String.Format("type(this at {0})", _position); }
         internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + _position; } }

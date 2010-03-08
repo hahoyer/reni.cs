@@ -104,7 +104,11 @@ namespace Reni.Code
 
         public CodeBase CreateRefPlus(RefAlignParam refAlignParam, Size right) { return CreateChild(new RefPlus(refAlignParam, right)); }
 
-        public CodeBase CreateDereference(RefAlignParam refAlignParam, Size targetSize) { return CreateChild(new Dereference(refAlignParam, targetSize)); }
+        public CodeBase CreateDereference(RefAlignParam refAlignParam, Size targetSize)
+        {
+            Tracer.Assert(Size == refAlignParam.RefSize);
+            return CreateChild(new Dereference(refAlignParam, targetSize));
+        }
 
         public CodeBase CreateBitCast(Size size)
         {
@@ -120,7 +124,7 @@ namespace Reni.Code
             if(right.IsEmpty)
                 return this;
             return new Pair(this, right);
-        }
+        }                                                                                                                                                  
 
         public static CodeBase CreateBitArray(Size size, BitsConst t) { return CreateLeaf(new BitArray(size, t)); }
 

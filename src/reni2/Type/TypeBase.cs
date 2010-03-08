@@ -350,9 +350,9 @@ namespace Reni.Type
                 );
         }
 
-        internal Result GetResult(RefAlignParam refAlignParam, Category category, TypeBase dest)
+        internal Result StructRefConvertTo(RefAlignParam refAlignParam, Category category, TypeBase dest)
         {
-            var targetResult = Conversion(category, dest);
+            return Conversion(category, dest);
             return DereferencedResult(category, targetResult, refAlignParam);
         }
     }
