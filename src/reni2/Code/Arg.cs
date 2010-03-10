@@ -7,12 +7,14 @@ namespace Reni.Code
     /// </summary>
     internal sealed class Arg : CodeBase
     {
+        private static int _nextObjectId;
         private readonly Size _size;
 
         internal Arg(Size size)
+            :base(_nextObjectId++)
         {
             _size = size;
-            StopByObjectId(2264);
+            StopByObjectId(-351);
         }
 
         protected override Size SizeImplementation { get { return _size; } }

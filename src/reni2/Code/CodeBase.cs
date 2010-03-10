@@ -87,12 +87,10 @@ namespace Reni.Code
 
         internal virtual CodeBase CreateChild(LeafElement leafElement) { return new Child(this, leafElement); }
 
-        public CodeBase CreateChildren(LeafElement[] leafElements)
+        public CodeBase CreateChildren(IEnumerable<LeafElement> leafElements)
         {
-            var result = this;
-            for(var i = 0; i < leafElements.Length; i++)
-                result = result.CreateChild(leafElements[i]);
-            return result;
+            return leafElements
+                .Aggregate(this, (current, t) => current.CreateChild(t));
         }
 
         public Container Serialize(Size frameSize, string description, bool isInternal)

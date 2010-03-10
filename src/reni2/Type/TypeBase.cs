@@ -349,11 +349,5 @@ namespace Reni.Type
                     () => referenceResult.Refs
                 );
         }
-
-        internal Result StructRefConvertTo(RefAlignParam refAlignParam, Category category, TypeBase dest)
-        {
-            return Conversion(category, dest);
-            return DereferencedResult(category, targetResult, refAlignParam);
-        }
     }
 }

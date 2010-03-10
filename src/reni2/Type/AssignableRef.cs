@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
@@ -30,7 +32,9 @@ namespace Reni.Type
 
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
-return _targetCache.Value.Conversion(category, dest);
+            var result1 = _targetCache.Value.Conversion(category, dest);
+            var result = result1.UseWithArg();
+            return result;
         }
 
         protected override Size GetSize() { return _context.RefSize; }
@@ -59,8 +63,7 @@ return _targetCache.Value.Conversion(category, dest);
 
         private CodeBase CreateAccessCode()
         {
-            return CreateArgCode()
-                .CreateRefPlus(RefAlignParam, GetOffset());
+            return CreateArgCode().CreateRefPlus(RefAlignParam, GetOffset());
         }
 
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
