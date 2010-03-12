@@ -56,7 +56,7 @@ namespace Reni.Type
             Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
             {
                 var objectResult = functionalResult.StripFunctional();
-                var result = Apply(category, objectResult.Type.SequenceCount, argsResult.Type.SequenceCount);
+                var result = Apply(category, objectResult.Type.GetSequenceCount(_parent.Element), argsResult.Type.GetSequenceCount(_parent.Element));
                 var convertedObjectResult = objectResult.ConvertToBitSequence(category);
                 var convertedArgsResult = argsResult.ConvertToBitSequence(category);
                 return result.UseWithArg(convertedObjectResult.CreateSequence(convertedArgsResult));
@@ -110,8 +110,7 @@ namespace Reni.Type
 
         internal override bool IsValidRefTarget() { return _inheritedType.IsValidRefTarget(); }
 
-        [Node, DumpData(false)]
-        internal override int SequenceCount { get { return Count; } }
+        internal override int GetSequenceCount(TypeBase elementType) { return elementType == Element? Count:1; }
 
         [DumpData(false)]
         internal int Count { get { return _inheritedType.Count; } }

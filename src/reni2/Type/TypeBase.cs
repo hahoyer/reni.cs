@@ -91,14 +91,10 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        [DumpData(false)]
-        internal virtual int SequenceCount
+        internal virtual int GetSequenceCount(TypeBase elementType)
         {
-            get
-            {
-                NotImplementedMethod();
-                return 0;
-            }
+            NotImplementedMethod(elementType);
+            return 0;
         }
 
         [DumpData(false)]
@@ -277,7 +273,7 @@ namespace Reni.Type
 
         internal virtual bool IsRefLike(Ref target) { return false; }
 
-        private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(SequenceCount); }
+        private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(GetSequenceCount(elementType)); }
 
         private TFeature SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class
@@ -340,7 +336,7 @@ namespace Reni.Type
             return GenericDumpPrint(category).UseWithArg(dereferencedResult);
         }
 
-        private Result DereferencedResult(Category category, Result referenceResult, RefAlignParam refAlignParam)
+        internal Result DereferencedResult(Category category, Result referenceResult, RefAlignParam refAlignParam)
         {
             return CreateResult
                 (

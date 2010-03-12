@@ -33,7 +33,9 @@ namespace Reni.Type
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
             var result1 = _targetCache.Value.Conversion(category, dest);
-            var result = result1.UseWithArg();
+            var accessResult = CreateAccessResult(category);
+            var dereference = _targetCache.Value.DereferencedResult(category, accessResult, RefAlignParam);
+            var result = result1.UseWithArg(dereference);
             return result;
         }
 
@@ -42,6 +44,12 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + _position; } }
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature) { return _targetCache.Value.IsConvertableTo(dest, conversionFeature); }
         internal override bool IsValidRefTarget() { return false; }
+        
+        internal override bool IsRef(RefAlignParam refAlignParam)
+        {
+            Tracer.Assert(RefAlignParam == refAlignParam);
+            return true;
+        }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -49,7 +57,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override int SequenceCount { get { return 1; } }
+        internal override int GetSequenceCount(TypeBase elementType) { return _targetCache.Value.GetSequenceCount(elementType); }
 
         internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
 

@@ -31,8 +31,7 @@ namespace Reni.Type
         [DumpData(false)]
         protected abstract string ShortName { get; }
 
-        [DumpData(false)]
-        internal override sealed int SequenceCount { get { return Parent.SequenceCount; } }
+        internal override sealed int GetSequenceCount(TypeBase elementType) { return Parent.GetSequenceCount(elementType); }
 
         internal override sealed Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 

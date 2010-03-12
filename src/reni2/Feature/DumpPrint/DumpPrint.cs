@@ -34,7 +34,7 @@ namespace Reni.Feature.DumpPrint
         Result IFeature.Apply(Category category)
         {
             return
-                Apply(category, _parent.SequenceCount)
+                Apply(category, _parent.GetSequenceCount(TypeBase.CreateBit))
                     .UseWithArg(_parent.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
         }
 

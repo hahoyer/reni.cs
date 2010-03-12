@@ -14,7 +14,7 @@ namespace Reni.Type
         protected override Size GetSize() { return Size.Create(1); }
 
         internal override string DumpPrintText { get { return "bit"; } }
-        internal override int SequenceCount { get { return 1; } }
+        internal override int GetSequenceCount(TypeBase elementType) { return 1; }
 
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {

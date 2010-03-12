@@ -25,8 +25,7 @@ namespace Reni.Type
         internal int AlignBits { get { return _alignBits; } }
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
 
-        [DumpData(false)]
-        internal override int SequenceCount { get { return Parent.SequenceCount; } }
+        internal override int GetSequenceCount(TypeBase elementType) { return Parent.GetSequenceCount(elementType); }
 
         protected override Size GetSize()
         {
