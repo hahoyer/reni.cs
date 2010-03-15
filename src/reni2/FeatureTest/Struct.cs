@@ -123,7 +123,7 @@ namespace Reni.FeatureTest.Struct
         public override string Target { get { return "5,6, (this _A_T_ 0) dump_print"; } }
         protected override string Output { get { return "5"; } }
 
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 
