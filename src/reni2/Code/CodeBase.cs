@@ -100,7 +100,8 @@ namespace Reni.Code
             return container;
         }
 
-        public CodeBase CreateRefPlus(RefAlignParam refAlignParam, Size right) { return CreateChild(new RefPlus(refAlignParam, right)); }
+        public CodeBase CreateRefPlus(RefAlignParam refAlignParam, Size right) { return 
+            CreateChild(new RefPlus(refAlignParam, right)); }
 
         public CodeBase CreateDereference(RefAlignParam refAlignParam, Size targetSize)
         {

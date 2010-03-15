@@ -153,7 +153,7 @@ namespace Reni.Struct
 
         internal Size Offset(int position)
         {
-            return InternalResult(Category.Size, 0,position).Size;
+            return InternalResult(Category.Size, position+1, Position).Size;
         }
     }
 }

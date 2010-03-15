@@ -27,8 +27,9 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _right = right;
             AssertValid();
-            StopByObjectId(32);
-            StopByObjectId(-138);
+            StopByObjectId(-30);
+            StopByObjectId(-22);
+            StopByObjectId(-16);
         }
 
         private void AssertValid() { _right.AssertAlignedSize(_refAlignParam.AlignBits); }
