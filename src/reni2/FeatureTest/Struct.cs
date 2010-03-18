@@ -151,7 +151,7 @@ namespace Reni.FeatureTest.Struct
         }
     }
 
-    [TestFixture]
+    [TestFixture(Description = "x1: 1;x2: 4;x3: 2050;x4: x1 + x2 + x3;x4 dump_print;")]
     public class SomeVariables : CompilerTest
     {
         public override string Target { get { return @"

@@ -134,14 +134,14 @@ namespace Reni.Struct
 
         internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize);} }
 
-        private CodeBase CreateContextCode()
+        internal CodeBase CreateContextCode()
         {
             return CodeBase
                 .CreateContextRef(ForCode)
                 .CreateRefPlus(RefAlignParam,InternalSize()*-1);
         }
 
-        private Refs CreateContextRefs()
+        internal Refs CreateContextRefs()
         {
             return Refs.Context(ForCode);
         }
@@ -154,6 +154,12 @@ namespace Reni.Struct
         internal Size Offset(int position)
         {
             return InternalResult(Category.Size, position+1, Position).Size;
+        }
+
+        internal TypeBase CreateAccess(int position)
+        {
+            NotImplementedMethod(position);
+            return null;
         }
     }
 }
