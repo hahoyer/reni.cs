@@ -9,7 +9,7 @@ using Reni.FeatureTest.ThenElse;
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
-    [Target(@"a:(x: 100;f: /\arg+x);g: a f; g \|/ dump_print;")]
+    [Target(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;")]
     [Output("102")]
     [InnerAccessTheOnlyOne, Add2Numbers]
     public class FunctionVariable : CompilerTest
@@ -19,7 +19,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
-    [Target(@"x: 100;f: /\arg+x;f(200) dump_print;")]
+    [Target(@"x: 100;f: arg+x/\;f(200) dump_print;")]
     [Output("102")]
     [InnerAccessTheOnlyOne, Add2Numbers]
     public class FunctionWithNonLocal : CompilerTest
@@ -29,7 +29,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, UseThen, UseElse, Assignment, SimpleFunction, RecursiveFunction]
-    [Target(@"i: 10; f: /\i > 0 then (i := (i - 1)enable_cut; i dump_print; f());f()")]
+    [Target(@"i: 10; f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()")]
     [Output("9876543210")]
     public class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
     {
@@ -38,7 +38,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
-    [Target(@"i: 400000; f: /\i > 0 then (i := (i - 1)enable_cut; f());f()")]
+    [Target(@"i: 400000; f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionSmall]
     public class PrimitiveRecursiveFunctionHuge : CompilerTest
@@ -51,7 +51,7 @@ namespace Reni.FeatureTest.Function
     /// Recursive function that will result in a stack overflow, except when compiled as a loop
     /// </summary>
     [TestFixture]
-    [Target(@"i: 400000 type(400); f: /\i > 0 then (i := (i - 1)enable_cut; f());f()")]
+    [Target(@"i: 400000 type(400); f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionByteWithDump]
     public class PrimitiveRecursiveFunctionSmall : CompilerTest
@@ -61,7 +61,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
-    [Target(@"i: 400000 type(10); f: /\i > 0 then (i := (i - 1)enable_cut; i dump_print; f());f()")]
+    [Target(@"i: 400000 type(10); f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()")]
     [Output("9876543210")]
     [PrimitiveRecursiveFunctionByteWithDump, UseThen, UseElse]
     public class PrimitiveRecursiveFunctionWithDump : CompilerTest
@@ -71,7 +71,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, UseThen, UseElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction]
-    [Target(@"f: /\{1000 type({arg = 1 then 1 else (arg * f(arg type((arg-1)enable_cut))}enable_cut)};f(4)dump_print")]
+    [Target(@"f: {1000 type({arg = 1 then 1 else (arg * f(arg type((arg-1)enable_cut))}enable_cut)}/\;f(4)dump_print")]
     [Output("24")]
     public class RecursiveFunction : CompilerTest
     {
@@ -79,7 +79,7 @@ namespace Reni.FeatureTest.Function
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"f: /\arg;g: function f(arg);x:4; g(x)dump_print"), Output("4"), UseThen, UseElse, SimpleFunction]
+    [TestFixture, Target(@"f: arg/\;g: f(arg)/\;x:4; g(x)dump_print"), Output("4"), UseThen, UseElse, SimpleFunction]
     public class FunctionWithRefArg : CompilerTest
     {
         [Test, Category(Worked)]
@@ -87,7 +87,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture,
-    Target(@"f: /\arg+1;f(2) dump_print;"), Output("3"), 
+    Target(@"f: arg+1/\;f(2) dump_print;"), Output("3"), 
     InnerAccessTheOnlyOne, Add2Numbers] 
     public class SimpleFunction : CompilerTest
     {
@@ -105,12 +105,11 @@ namespace Reni.FeatureTest.Function
                 return
                     @"
 x: 100;
-f1: /\
-((
+f1: ((
   y: 3;
-  f: /\arg*y+x;
+  f: arg*y+x/\;
   f(2)
-) _A_T_ 2);
+) _A_T_ 2)/\;
 
 f1()dump_print;
 ";
@@ -124,12 +123,11 @@ f1()dump_print;
     }
 
     [TestFixture, Target(@"
-f1: /\
-((
+f1: ((
   y: 3;
-  f: /\y;
+  f: y/\;
   f(2)
-) _A_T_ 2);
+) _A_T_ 2)/\;
 
 f1()dump_print;
 "), Output("3")]

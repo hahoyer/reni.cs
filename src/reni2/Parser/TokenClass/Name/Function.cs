@@ -7,11 +7,11 @@ using Reni.Syntax;
 namespace Reni.Parser.TokenClass.Name
 {
     [Serializable]
-    internal sealed class Function : Prefix
+    internal sealed class Function : Suffix
     {
-        public override Result Result(ContextBase context, Category category, ICompileSyntax right)
+        public override Result Result(ContextBase context, Category category, ICompileSyntax target)
         {
-            return context.CreateFunctionResult(category, right);
+            return context.CreateFunctionResult(category, target);
         }
     }
 }

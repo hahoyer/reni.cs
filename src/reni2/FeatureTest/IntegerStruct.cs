@@ -13,20 +13,20 @@ namespace Reni.FeatureTest.Integer
         {
             return
                 @"
-Integer8: /\
+Integer8: 
 {
     _data: 127 type (arg enable_cut);
 
-    create   : /\(Integer8(arg));
+    create   : (Integer8(arg))/\;
     !property 
-    dump_print: /\ (_data dump_print);
-    +        : /\ create(_data + create(arg) _data);
+    dump_print: (_data dump_print)/\ ;
+    +        :  create(_data + create(arg) _data)/\;
     !property 
-    clone: /\ create(_data);
+    clone: create(_data)/\ ;
     !property 
-    enable_cut: /\ _data enable_cut;
-    !converter: /\ _data;
-}
+    enable_cut: _data enable_cut /\ ;
+    !converter: _data /\ ;
+}/\
 ";
         }
 

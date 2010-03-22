@@ -58,6 +58,7 @@ namespace Reni.Type
         }
 
         internal override int GetSequenceCount(TypeBase elementType) { return _targetCache.Value.GetSequenceCount(elementType); }
+        internal override TypeBase GetEffectiveType() { return _targetCache.Value.GetEffectiveType(); }
 
         internal AutomaticRef CreateAutomaticRef() { return _targetCache.Value.CreateAutomaticRef(_context.RefAlignParam); }
 

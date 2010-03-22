@@ -158,8 +158,7 @@ namespace Reni.Struct
 
         internal TypeBase CreateAccess(int position)
         {
-            NotImplementedMethod(position);
-            return null;
+            return ThisType.At(position);
         }
     }
 }

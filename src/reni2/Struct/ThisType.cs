@@ -19,7 +19,7 @@ namespace Reni.Struct
         internal override bool IsValidRefTarget() { return false; }
         internal Result AccessResult(Category category, int position) { return At(position).CreateArgResult(category); }
         internal TypeBase IndexType { get { return _context.IndexType; } }
-        private StructRef At(int position) { return new StructRef(_context, position); }
+        internal StructRef At(int position) { return new StructRef(_context, position); }
     }
 
 }

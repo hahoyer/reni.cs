@@ -135,6 +135,18 @@ namespace Reni.Parser.TokenClass
     }
 
     [Serializable]
+    internal abstract class Suffix : Special, ISuffix
+    {
+        public abstract Result Result(ContextBase context, Category category, ICompileSyntax right);
+
+        internal override sealed IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        {
+            right.AssertIsNull();
+            return new SuffixSyntax(token, left.CheckedToCompiledSyntax(), this);
+        }
+    }
+
+    [Serializable]
     internal abstract class Infix : Special, IInfix
     {
         public abstract Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right);
