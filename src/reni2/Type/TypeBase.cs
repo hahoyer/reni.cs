@@ -314,7 +314,7 @@ namespace Reni.Type
             var thisType = (ThisType) thisTypeResult.Type;
             var position = callContext.Evaluate(right, thisType.IndexType).ToInt32();
             return thisType
-                .AccessResult(category, position)
+                .AtResult(category, position)
                 .UseWithArg(thisTypeResult);
         }
 
@@ -327,6 +327,7 @@ namespace Reni.Type
         internal void ChildSearch(ISearchVisitor searchVisitor, StructRef structRef)
         {
             Search(searchVisitor.Child(structRef));
+            Search(searchVisitor.Child(structRef.CreateAutomaticRef()));
             Search(searchVisitor);
         }
 

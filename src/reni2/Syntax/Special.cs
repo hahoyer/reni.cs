@@ -105,6 +105,8 @@ namespace Reni.Syntax
             return _suffix
                 .Result(context, category, _left);
         }
+
+        protected internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort(); }
     }
 
     internal interface ITerminal

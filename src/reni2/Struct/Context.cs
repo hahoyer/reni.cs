@@ -1,3 +1,4 @@
+using System.Linq;
 using HWClassLibrary.TreeStructure;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
@@ -16,6 +17,8 @@ namespace Reni.Struct
     [Serializable]
     internal abstract class Context : ContextBase, IStructContext
     {
+        private Size[] _offsetsCache;
+        private TypeBase[] _typesCache;
         private readonly SimpleCache<ContextPosition[]> _featuresCache;
         [Node]
         internal readonly ContextBase Parent;
@@ -23,13 +26,16 @@ namespace Reni.Struct
         internal readonly Container Container;
         [Node, DumpData(false)]
         private readonly Result[] _internalResult;
-        
+
+        private readonly SimpleCache<ThisType> _thisTypeCache;
+
         protected Context(ContextBase parent, Container container)
         {
             _featuresCache = new SimpleCache<ContextPosition[]>(CreateFeaturesCache);
             Parent = parent;
             Container = container;
             _internalResult = new Result[StatementList.Count];
+            _thisTypeCache = new SimpleCache<ThisType>(() => new ThisType(this));
         }
 
         [DumpData(false)]
@@ -49,9 +55,6 @@ namespace Reni.Struct
         internal List<ICompileSyntax> StatementList { get { return Container.List; } }
         [DumpData(false)]
         internal int IndexSize { get { return Container.IndexSize; } }
-
-        [DumpData(false)]
-        internal abstract ThisType ThisType { get; }
 
         internal bool IsValidRefTarget()
         {
@@ -132,7 +135,10 @@ namespace Reni.Struct
 
         internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
 
-        internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize);} }
+        internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize); } }
+
+        [DumpData(false)]
+        internal ThisType ThisType { get { return _thisTypeCache.Value; } }
 
         internal CodeBase CreateContextCode()
         {
@@ -156,9 +162,42 @@ namespace Reni.Struct
             return InternalResult(Category.Size, position+1, Position).Size;
         }
 
-        internal TypeBase CreateAccess(int position)
+        [DumpData(false)]
+        internal TypeBase[] Types
         {
-            return ThisType.At(position);
+            get
+            {
+                if (_typesCache == null)
+                    _typesCache = GetTypes().ToArray();
+                return _typesCache;
+            }
         }
+        [DumpData(false)]
+        internal Size[] Offsets
+        {
+            get
+            {
+                if (_offsetsCache == null)
+                    _offsetsCache = GetOffsets().ToArray();
+                return _offsetsCache;
+            }
+        }
+
+        private IEnumerable<Size> GetOffsets()
+        {
+            var sizes = Types.Select(typeBase => typeBase.Size).ToArray();
+            return sizes.Aggregate(new Size[0], AggregateSizes);
+        }
+        
+        private Size[] AggregateSizes(Size[] sizesSoFar, Size nextSize)
+        {
+            return sizesSoFar
+                .Select(size => size + nextSize.Align(AlignBits))
+                .Union(new[] { Size.Zero })
+                .ToArray();
+        }
+
+        private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(syntax => Type(syntax)); }
+
     }
-}
+}                                    

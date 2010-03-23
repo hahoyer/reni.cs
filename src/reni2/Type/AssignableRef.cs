@@ -6,6 +6,7 @@ using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -75,11 +76,11 @@ namespace Reni.Type
             return CreateArgCode().CreateRefPlus(RefAlignParam, GetOffset());
         }
 
-        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
         internal Size TargetSize { get { return _targetCache.Value.Size; } }
 
         private Size GetOffset() { return _context.Offset(_position); }
         private TypeBase GetTargetType() { return _context.InternalType(_position); }
+        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
     }
 
     internal sealed class DumpPrintFeature : ReniObject, IFeature
@@ -126,8 +127,7 @@ namespace Reni.Type
 
         TypeBase IFeature.DefiningType()
         {
-            NotImplementedMethod();
-            return null;
+            return _structRef;
         }
 
         string IDumpShortProvider.DumpShort() { return _structRef.DumpShort() + " :="; }

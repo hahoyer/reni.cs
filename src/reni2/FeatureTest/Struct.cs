@@ -80,7 +80,9 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccessSecondOfTwo, Target(@"(1, 11, 3, (this _A_T_ 1) := 3) dump_print"), Output("(1, 3, 3, )")]
+    [TestFixture, InnerAccessSecondOfTwo]
+    [Target(@"(1, 11, 3, (this _A_T_ 1) := 3) dump_print")]
+    [Output("(1, 3, 3, )")]
     public class Assignment : CompilerTest
     {
         [Test, Category(Worked)]

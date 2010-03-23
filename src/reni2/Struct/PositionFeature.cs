@@ -46,7 +46,7 @@ namespace Reni.Struct
 
         private Result Apply(Category category)
         {
-            return _structContext.CreateAccess(_position).CreateResult(category, _structContext.CreateContextCode, _structContext.CreateContextRefs);
+            return _structContext.ThisType.At(_position).CreateResult(category, _structContext.CreateContextCode, _structContext.CreateContextRefs);
         }
 
         TypeBase IFeature.DefiningType() { return _structContext.ThisType; }
