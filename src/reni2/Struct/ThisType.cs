@@ -1,15 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class ThisType : TypeBase
+    internal abstract class ThisType<TContext> : TypeBase
+        where TContext : Context
+    {
+        private readonly Type<TContext> _type;
+        
+        protected ThisType(Type<TContext> type)
+        {
+            _type = type;
+        }
+
+        protected override Size GetSize() { return _type.RefAlignParam.RefSize; }
+        internal override string DumpShort() { return "type(this)"; }
+    }
+
+    internal sealed class ThisTypeX : TypeBase
     {
         [DumpData(true)]
         private readonly Context _context;
@@ -18,7 +32,7 @@ namespace Reni.Struct
         [DumpData(false)]
         internal readonly IFeature DumpPrintFeature;
 
-        internal ThisType(Context context)
+        internal ThisTypeX(Context context)
         {
             _context = context; 
             DumpPrintFeature = new Feature.DumpPrint.StructFeature(this);
@@ -63,7 +77,6 @@ namespace Reni.Struct
         protected override Size GetSize() { return _context.RefSize; }
         protected override ThisType GetThisType() { return this; }
         internal override string DumpShort() { return "type(this)"; }
-        internal override bool IsValidRefTarget() { return false; }
 
         internal StructRef At(int position) { return new StructRef(_context, position); }
         internal Result AtResult(Category category, int position) { return At(position).CreateArgResult(category); }

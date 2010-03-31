@@ -27,6 +27,8 @@ namespace Reni.Struct
             _constructorResult = new Result();
         }
 
+        protected override TypeBase GetThisType() { return new FullContextType(this); }
+
         RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
 
@@ -44,7 +46,7 @@ namespace Reni.Struct
         {
             var internalResult = InternalResult(category - Category.Type);
             _internalConstructorResult.Update(internalResult);
-            var result = NaturalType.CreateResult(category, internalResult);
+            var result = ThisType.CreateResult(category, internalResult);
             var constructorResult = result
                 .ReplaceRelativeContextRef(this, ()=>CodeBase.CreateTopRef(RefAlignParam));
             _constructorResult.Update(constructorResult);

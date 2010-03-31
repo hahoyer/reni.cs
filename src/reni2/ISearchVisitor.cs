@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni
@@ -14,7 +15,7 @@ namespace Reni
         ISearchVisitor Child(Type.Array target);
         ISearchVisitor Child(Type.Void target);
         ISearchVisitor Child(Bit target);
-        ISearchVisitor Child(Struct.Type target);
+        ISearchVisitor Child(FullContextType target);
         ISearchVisitor Child(TypeType target);
     }
 }

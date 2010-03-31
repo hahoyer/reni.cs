@@ -261,8 +261,6 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
-        internal abstract bool IsValidRefTarget();
-
         internal virtual IFunctionalFeature GetFunctionalFeature() { return null; }
 
         internal virtual TypeBase StripFunctional()

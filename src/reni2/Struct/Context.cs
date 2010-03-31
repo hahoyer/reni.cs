@@ -10,8 +10,6 @@ using Reni.Feature;
 using Reni.Syntax;
 using Reni.Type;
 
-#pragma warning disable 1911
-
 namespace Reni.Struct
 {
     [Serializable]
@@ -27,7 +25,7 @@ namespace Reni.Struct
         [Node, DumpData(false)]
         private readonly Result[] _internalResult;
 
-        private readonly SimpleCache<ThisType> _thisTypeCache;
+        private readonly SimpleCache<TypeBase> _thisTypeCache;
 
         protected Context(ContextBase parent, Container container)
         {
@@ -35,8 +33,10 @@ namespace Reni.Struct
             Parent = parent;
             Container = container;
             _internalResult = new Result[StatementList.Count];
-            _thisTypeCache = new SimpleCache<ThisType>(() => new ThisType(this));
+            _thisTypeCache = new SimpleCache<TypeBase>(GetThisType);
         }
+
+        protected abstract TypeBase GetThisType();
 
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
@@ -55,14 +55,6 @@ namespace Reni.Struct
         internal List<ICompileSyntax> StatementList { get { return Container.List; } }
         [DumpData(false)]
         internal int IndexSize { get { return Container.IndexSize; } }
-
-        internal bool IsValidRefTarget()
-        {
-            for(var i = 0; i <= Position; i++)
-                if(InternalType(i).IsValidRefTarget())
-                    return true;
-            return false;
-        }
 
         private ContextPosition[] CreateFeaturesCache()
         {
@@ -138,7 +130,7 @@ namespace Reni.Struct
         internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize); } }
 
         [DumpData(false)]
-        internal ThisType ThisType { get { return _thisTypeCache.Value; } }
+        internal TypeBase ThisType { get { return _thisTypeCache.Value; } }
 
         internal CodeBase CreateContextCode()
         {
@@ -163,7 +155,7 @@ namespace Reni.Struct
         }
 
         [DumpData(false)]
-        internal TypeBase[] Types
+        internal IEnumerable<TypeBase> Types
         {
             get
             {

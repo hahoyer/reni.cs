@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -31,8 +31,6 @@ namespace Reni.Type
         internal TypeBase Element { get { return Parent; } }
 
         protected override Size GetSize() { return Element.Size*_count; }
-
-        internal override bool IsValidRefTarget() { return Count > 0 && Element.IsValidRefTarget(); }
 
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
 

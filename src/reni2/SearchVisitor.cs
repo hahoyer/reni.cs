@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni
@@ -20,7 +21,7 @@ namespace Reni
         ISearchVisitor ISearchVisitor.Child(Sequence target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Array target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Void target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Struct.Type target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(FullContextType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(TypeType target) { return InternalChild(target); }
 
         internal abstract bool IsSuccessFull { get; }

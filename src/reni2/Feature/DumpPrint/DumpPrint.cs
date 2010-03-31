@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
@@ -41,12 +42,13 @@ namespace Reni.Feature.DumpPrint
         TypeBase IFeature.DefiningType() { return _parent; }
     }
 
-    internal class StructFeature : ReniObject, IFeature
+    internal class StructFeature<TContext> : ReniObject, IFeature
+         where TContext : Struct.Context
     {
         [DumpData(true)]
-        private readonly Struct.Type _parent;
+        private readonly Type<TContext> _parent;
 
-        public StructFeature(Struct.Type parent) { _parent = parent; }
+        public StructFeature(Type<TContext> parent) { _parent = parent; }
 
         TypeBase IFeature.DefiningType() { return _parent; }
 

@@ -38,7 +38,6 @@ namespace Reni.Type
             DumpPrintFeature = new DumpPrintFeatureImplementation(this);
         }
 
-        internal override bool IsValidRefTarget() { return false; }
         protected override Size GetSize() { return Size.Zero; }
         internal override string DumpPrintText { get { return "(" + _value.DumpPrintText + "()) type"; } }
         protected internal override Result ConvertToItself(Category category) { return CreateVoidResult(category); }

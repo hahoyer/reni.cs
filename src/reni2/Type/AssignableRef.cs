@@ -44,8 +44,7 @@ namespace Reni.Type
         internal override string DumpShort() { return String.Format("type(this at {0})", _position); }
         internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + _position; } }
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature) { return _targetCache.Value.IsConvertableTo(dest, conversionFeature); }
-        internal override bool IsValidRefTarget() { return false; }
-        
+
         internal override bool IsRef(RefAlignParam refAlignParam)
         {
             Tracer.Assert(RefAlignParam == refAlignParam);

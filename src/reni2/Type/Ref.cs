@@ -106,7 +106,6 @@ namespace Reni.Type
 
         protected override bool IsInheritor { get { return true; } }
 
-        internal override bool IsValidRefTarget() { return true; }
         internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
     }
 

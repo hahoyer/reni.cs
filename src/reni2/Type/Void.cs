@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Reni.Code;
@@ -23,8 +23,6 @@ namespace Reni.Type
             searchVisitor.Child(this).Search();
             base.Search(searchVisitor);
         }
-
-        internal override bool IsValidRefTarget() { return false; }
 
         internal override TypeBase CreatePair(TypeBase second)
         {
