@@ -5,6 +5,7 @@ using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -21,6 +22,11 @@ namespace Reni.Struct
 
         protected override Size GetSize() { return _type.RefAlignParam.RefSize; }
         internal override string DumpShort() { return "type(this)"; }
+
+        internal Result GetAtResult(ContextBase callContext, Category category, ICompileSyntax right) {
+            var position = callContext.Evaluate(right, IndexType).ToInt32();
+            return AtResult(category, position);
+        }
     }
 
     internal sealed class ThisTypeX : TypeBase

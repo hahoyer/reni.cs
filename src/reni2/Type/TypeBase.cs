@@ -310,9 +310,7 @@ namespace Reni.Type
         {
             var thisTypeResult = Conversion(category | Category.Type, GetThisType());
             var thisType = (ThisType) thisTypeResult.Type;
-            var position = callContext.Evaluate(right, thisType.IndexType).ToInt32();
-            return thisType
-                .AtResult(category, position)
+            return thisType.GetAtResult(callContext, category, right)
                 .UseWithArg(thisTypeResult);
         }
 
