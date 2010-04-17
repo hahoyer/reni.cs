@@ -9,7 +9,7 @@ namespace Reni
     internal interface ISearchVisitor
     {
         void Search();
-        ISearchVisitor Child(Ref target);
+        ISearchVisitor Child(Reference target);
         ISearchVisitor Child(StructRef target);
         ISearchVisitor Child(Sequence target);
         ISearchVisitor Child(Type.Array target);

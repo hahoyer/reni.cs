@@ -6,7 +6,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -26,8 +25,6 @@ namespace Reni.Struct
             _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
             _constructorResult = new Result();
         }
-
-        protected override TypeBase GetThisType() { return new FullContextType(this); }
 
         RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }

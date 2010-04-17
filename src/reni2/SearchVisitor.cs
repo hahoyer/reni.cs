@@ -16,7 +16,7 @@ namespace Reni
         private readonly List<SearchResult<TFeature>> _searchResults = new List<SearchResult<TFeature>>();
         void ISearchVisitor.Search() { SearchTypeBase(); }
         ISearchVisitor ISearchVisitor.Child(Bit target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Ref target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Reference target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(StructRef target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Sequence target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Array target) { return InternalChild(target); }

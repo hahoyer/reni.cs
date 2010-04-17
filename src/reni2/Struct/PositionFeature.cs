@@ -10,7 +10,7 @@ namespace Reni.Struct
 {
     internal class PositionFeature :
         ReniObject,
-        ISearchPath<IFeature, Ref>,
+        ISearchPath<IFeature, Reference>,
         IContextFeature,
         IFeature
     {
@@ -30,7 +30,7 @@ namespace Reni.Struct
             _position = position;
         }
 
-        IFeature ISearchPath<IFeature, Ref>.Convert(Ref type)
+        IFeature ISearchPath<IFeature, Reference>.Convert(Reference type)
         {
             Tracer.Assert(type.RefAlignParam == RefAlignParam);
             return this;

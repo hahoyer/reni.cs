@@ -4,7 +4,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -20,8 +19,6 @@ namespace Reni.Struct
             _position = position;
             _context = context;
         }
-
-        protected override TypeBase GetThisType() { return new ContextAtPositionType(this); }
 
         [DumpData(false)]
         public override IRefInCode ForCode { get { return _context; } }

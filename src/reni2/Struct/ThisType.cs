@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -10,6 +11,18 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
+    internal abstract class Type: TypeBase
+    {
+        [DumpData(true)]
+        private readonly Context _context;
+
+        protected Type(Context context) { _context = context; }
+
+        protected override Size GetSize() { return _context.InternalSize(); }
+        internal override string DumpShort() { return "type("+_context.DumpShort()+")"; }
+    }
+
+    [Obsolete("", true)]
     internal abstract class ThisType<TContext> : TypeBase
         where TContext : Context
     {

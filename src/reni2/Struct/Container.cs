@@ -163,7 +163,7 @@ namespace Reni.Struct
             return null;
         }
 
-        internal ISearchPath<ISearchPath<IFeature, Ref>, FullContextType> SearchFromRefToStruct(Defineable defineable)
+        internal ISearchPath<ISearchPath<IFeature, Reference>, FullContextType> SearchFromRefToStruct(Defineable defineable)
         {
             return FindStructFeature(defineable.Name);
         }
@@ -176,7 +176,7 @@ namespace Reni.Struct
     }
 
     internal interface IStructFeature
-        : ISearchPath<ISearchPath<IFeature, Ref>, FullContextType>
+        : ISearchPath<ISearchPath<IFeature, Reference>, FullContextType>
           , ISearchPath<IContextFeature, Context>
     {
     }
@@ -193,7 +193,7 @@ namespace Reni.Struct
             _isProperty = isProperty;
         }
 
-        ISearchPath<IFeature, Ref> ISearchPath<ISearchPath<IFeature, Ref>, FullContextType>.Convert(FullContextType type)
+        ISearchPath<IFeature, Reference> ISearchPath<ISearchPath<IFeature, Reference>, FullContextType>.Convert(FullContextType type)
         {
             return type.Context.Features[_index].ToProperty(_isProperty);
         }

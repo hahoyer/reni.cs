@@ -25,18 +25,13 @@ namespace Reni.Struct
         [Node, DumpData(false)]
         private readonly Result[] _internalResult;
 
-        private readonly SimpleCache<TypeBase> _thisTypeCache;
-
         protected Context(ContextBase parent, Container container)
         {
             _featuresCache = new SimpleCache<ContextPosition[]>(CreateFeaturesCache);
             Parent = parent;
             Container = container;
             _internalResult = new Result[StatementList.Count];
-            _thisTypeCache = new SimpleCache<TypeBase>(GetThisType);
         }
-
-        protected abstract TypeBase GetThisType();
 
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
@@ -129,9 +124,6 @@ namespace Reni.Struct
 
         internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize); } }
 
-        [DumpData(false)]
-        internal TypeBase ThisType { get { return _thisTypeCache.Value; } }
-
         internal CodeBase CreateContextCode()
         {
             return CodeBase
@@ -142,11 +134,6 @@ namespace Reni.Struct
         internal Refs CreateContextRefs()
         {
             return Refs.Context(ForCode);
-        }
-
-        Result IStructContext.CreateThisResult(Category category)
-        {
-            return ThisType.CreateResult(category,CreateContextCode,CreateContextRefs);
         }
 
         internal Size Offset(int position)

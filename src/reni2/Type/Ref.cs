@@ -10,7 +10,25 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    [Serializable]
+    internal sealed class Reference: TypeBase
+    {
+        private readonly TypeBase _target;
+        private readonly RefAlignParam _refAlignParam;
+        
+        internal Reference(TypeBase target, RefAlignParam refAlignParam)
+        {
+            _target = target;
+            _refAlignParam = refAlignParam;
+        }
+
+        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
+
+        internal override string DumpShort() { return "reference("+_target.DumpShort()+")"; }
+    }
+
+    [Obsolete("",true)]
     internal abstract class Ref : Child
     {
         private static int _nextObjectId;
