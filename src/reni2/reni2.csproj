@@ -1,9 +1,16 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectGuid>{EBB73C84-6622-4183-A28F-B0DFF606006B}</ProjectGuid>
     <AssemblyName>Reni</AssemblyName>
     <TargetTypeEx>CSharp.Library.UnitTest</TargetTypeEx>
     <ProductVersion>9.0.30729</ProductVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\HWClassLibrary\HWClassLibrary.csproj">
@@ -74,6 +81,7 @@
     <Compile Include="Feature\IInfixFeature.cs" />
     <Compile Include="Parser\DeclarationTokenFactory.cs" />
     <Compile Include="Parser\MainTokenFactory.cs" />
+    <Compile Include="Struct\Reference.cs" />
     <Compile Include="Struct\ThisType.cs" />
     <Compile Include="TestGenerated.cs" />
     <Compile Include="ISearchVisitor.cs" />
