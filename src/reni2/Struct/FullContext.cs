@@ -6,6 +6,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -43,11 +44,17 @@ namespace Reni.Struct
         {
             var internalResult = InternalResult(category - Category.Type);
             _internalConstructorResult.Update(internalResult);
-            var result = ThisType.CreateResult(category, internalResult);
+            var result = CreateThisType().CreateResult(category, internalResult);
             var constructorResult = result
                 .ReplaceRelativeContextRef(this, ()=>CodeBase.CreateTopRef(RefAlignParam));
             _constructorResult.Update(constructorResult);
             return constructorResult;
+        }
+
+        private TypeBase CreateThisType()
+        {
+            NotImplementedMethod();
+            return null;
         }
 
         [DumpData(false)]

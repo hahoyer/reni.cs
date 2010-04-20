@@ -50,19 +50,6 @@ namespace Reni.Struct
             return false;
         }
 
-        internal override void Search(ISearchVisitor searchVisitor)
-        {
-            var searchVisitorChild = searchVisitor as SearchVisitor<ISearchPath<IFeature, Ref>>;
-            if(searchVisitorChild != null)
-                searchVisitorChild.InternalResult =
-                    Context
-                    .Container
-                    .SearchFromRefToStruct(searchVisitorChild.Defineable)
-                    .CheckedConvert(this);
-            searchVisitor.Child(this).Search();
-            base.Search(searchVisitor);
-        }
-
         internal RefAlignParam RefAlignParam { get { return Context.RefAlignParam; } }
 
         internal Result DumpPrint(Category category)
@@ -90,12 +77,12 @@ namespace Reni.Struct
         private Result AutomaticDereference(TypeBase type, Size offset, Category category)
         {
             return type
-                .CreateAutomaticRef(Context.RefAlignParam)
+                .CreateReference(Context.RefAlignParam)
                 .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(Context.RefAlignParam, offset))
                 .AutomaticDereference();
         }
 
-        private CodeBase CreateRefArgCode() { return CreateAutomaticRef(Context.RefAlignParam).CreateArgCode(); }
+        private CodeBase CreateRefArgCode() { return CreateReference(Context.RefAlignParam).CreateArgCode(); }
     }
 
     internal sealed class FullContextType : Type<FullContext>

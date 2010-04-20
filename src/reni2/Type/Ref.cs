@@ -6,8 +6,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 
-#pragma warning disable 1911
-
 namespace Reni.Type
 {
     internal sealed class Reference: TypeBase
@@ -23,9 +21,32 @@ namespace Reni.Type
 
         internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
+        internal TypeBase Target { get { return _target; } }
+
+        [DumpData(false)]
+        internal TypeBase AlignedTarget { get { return _target.CreateAlign(RefAlignParam.AlignBits); } }
+
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
         internal override string DumpShort() { return "reference("+_target.DumpShort()+")"; }
+        internal override int GetSequenceCount(TypeBase elementType) { return _target.GetSequenceCount(elementType); }
+
+        internal override void Search(ISearchVisitor searchVisitor)
+        {
+            _target.Search(searchVisitor.Child(this));
+            base.Search(searchVisitor);
+        }
+
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        {
+            var destAsRef = dest as TRefType;
+            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Parent == destAsRef.Parent)
+                return true;
+
+            return Parent
+                .IsConvertableTo(dest, conversionFeature);
+        }
+
     }
 
     [Obsolete("",true)]
@@ -84,9 +105,6 @@ namespace Reni.Type
         [DumpData(false)]
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }
 
-        [DumpData(false)]
-        internal TypeBase AlignedTarget { get { return Parent.CreateAlign(RefAlignParam.AlignBits); } }
-
         internal override sealed string DumpShort() { return ShortName + "." + Parent.DumpShort(); }
 
         protected Result ConvertTo_Implementation<TRefType>(Category category, TypeBase dest)
@@ -103,24 +121,7 @@ namespace Reni.Type
 
         internal override sealed Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
 
-        protected bool IsConvertableTo_Implementation<TRefType>(TypeBase dest, ConversionFeature conversionFeature)
-            where TRefType : Ref
-        {
-            var destAsRef = dest as TRefType;
-            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Parent == destAsRef.Parent)
-                return true;
-
-            return Parent
-                .IsConvertableTo(dest, conversionFeature);
-        }
-
-        internal override bool IsRefLike(Ref target) { return Parent == target.Parent && RefAlignParam == target.RefAlignParam; }
-
-        internal override void Search(ISearchVisitor searchVisitor)
-        {
-            Parent.Search(searchVisitor.Child(this));
-            base.Search(searchVisitor);
-        }
+        internal override bool IsRefLike(Reference target) { return Parent == target.Target && RefAlignParam == target.RefAlignParam; }
 
         protected override bool IsInheritor { get { return true; } }
 

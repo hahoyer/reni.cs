@@ -34,11 +34,6 @@ namespace Reni.Type
 
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }
 
-        internal override AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
-        {
-            return Parent.CreateAutomaticRef(refAlignParam.Align(AlignBits));
-        }
-
         internal override Result Destructor(Category category)
         {
             return Parent.Destructor(category);

@@ -137,9 +137,18 @@ namespace Reni.Context
 
         private void CheckRef(IRefInCode @ref) { Tracer.Assert(!@ref.IsChildOf(this), ()=>"context=" + Dump() + "\nref=" + @ref.Dump()); }
 
-        internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType) { return Result(Category.Code | Category.Type | Category.Refs, syntax).ConvertTo(resultType).Evaluate(); }
+        internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
+        {
+            return Result(Category.Code | Category.Type | Category.Refs, syntax)
+                .ConvertTo(resultType)
+                .Evaluate();
+        }
 
-        internal BitsConst Evaluate(ICompileSyntax syntax) { return Result(Category.Code | Category.Type | Category.Refs, syntax).Evaluate(); }
+        internal BitsConst Evaluate(ICompileSyntax syntax)
+        {
+            return Result(Category.Code | Category.Type | Category.Refs, syntax)
+                .Evaluate();
+        }
 
         [UsedImplicitly]
         internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
@@ -153,7 +162,7 @@ namespace Reni.Context
             return result.CreateAutomaticRefResult(RefAlignParam);
         }
 
-        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticRef target)
+        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Type.Reference target)
         {
             var result = Result(category | Category.Type, syntax);
             return result.ConvertToAsRef(category, target);

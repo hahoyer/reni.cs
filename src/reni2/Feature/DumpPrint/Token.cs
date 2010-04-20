@@ -10,7 +10,7 @@ namespace Reni.Feature.DumpPrint
     internal sealed class Token :
         Defineable,
         IFeature,
-        ISearchPath<IFeature, StructRef>,
+        ISearchPath<ISearchPath<IFeature, Type.Reference>,Struct.Type>,
         ISearchPath<IFeature, TypeType>,
         ISearchPath<IFeature, Bit>,
         ISearchPath<IFeature, Type.Void>,
@@ -27,6 +27,7 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, FullContextType>.Convert(FullContextType type) { return type.DumpPrintFeature; }
 
         ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
+        ISearchPath<IFeature, Type.Reference> ISearchPath<ISearchPath<IFeature, Type.Reference>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintFeature; }
 
         Result IFeature.Apply(Category category)
         {
@@ -40,7 +41,6 @@ namespace Reni.Feature.DumpPrint
             return null;
         }
 
-        public IFeature Convert(StructRef type) { return type.DumpPrintFeature; }
     }
 
 }

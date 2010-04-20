@@ -14,11 +14,12 @@ namespace Reni.Struct
         public override Result Result(ContextBase callContext, Category category, ICompileSyntax left,
                                       ICompileSyntax right)
         {
-            return callContext
-                .Type(left)
-                .AtResult(callContext, category, right)
-                .UseWithArg(callContext.Result(category, left))
-                ;
+            var typeBase = callContext.Type(left);
+            var context = typeBase.GetStruct();
+            var position = callContext.Evaluate(right, context.IndexType).ToInt32();
+            var atResult = context.CreateAtResult(category, position);
+
+            return atResult.UseWithArg(callContext.Result(category, left));
         }
     }
 }

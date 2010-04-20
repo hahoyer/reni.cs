@@ -1,8 +1,7 @@
 using System;
-using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
-using Reni.Feature;
+using JetBrains.Annotations;
 using Reni.Parser.TokenClass;
 using Reni.Struct;
 using Reni.Type;
@@ -12,12 +11,12 @@ namespace Reni
     internal abstract class SearchVisitor<TFeature> : ReniObject, ISearchVisitor
         where TFeature : class
     {
-        readonly List<ISearchVisitor> _children = new List<ISearchVisitor>();
+        private readonly List<ISearchVisitor> _children = new List<ISearchVisitor>();
         private readonly List<SearchResult<TFeature>> _searchResults = new List<SearchResult<TFeature>>();
         void ISearchVisitor.Search() { SearchTypeBase(); }
         ISearchVisitor ISearchVisitor.Child(Bit target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Reference target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(StructRef target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Type.Reference target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Struct.Reference target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Sequence target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Array target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Type.Void target) { return InternalChild(target); }
@@ -32,12 +31,12 @@ namespace Reni
         {
             var searchResult = new SearchResult<TFeature>(typeBase, this);
             _searchResults.Add(searchResult);
-            
+
             if(IsSuccessFull)
                 return;
-            
+
             searchResult.SetSearchMode();
-            
+
             typeBase.Search(this);
         }
 
@@ -46,30 +45,32 @@ namespace Reni
             var searchResult = new SearchResult<TFeature>(null, this);
             _searchResults.Add(searchResult);
 
-            if (IsSuccessFull)
+            if(IsSuccessFull)
                 return;
 
             searchResult.SetSearchMode();
 
             InternalResult = Defineable.Check<TFeature>();
 
-            if (IsSuccessFull)
+            if(IsSuccessFull)
                 searchResult.SetFoundMode();
         }
 
-        private ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider
-        {
-            return new ChildSearchVisitor<TFeature, TType>(this, target);
-        }
+        private ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider { return new ChildSearchVisitor<TFeature, TType>(this, target); }
 
         public void AddChild(ISearchVisitor child) { _children.Add(child); }
     }
 
-    sealed internal class SearchResult<TFeature>: ReniObject
+    internal sealed class SearchResult<TFeature> : ReniObject
         where TFeature : class
     {
+        [UsedImplicitly]
         private readonly TypeBase _typeBase;
+
+        [UsedImplicitly]
         private readonly SearchVisitor<TFeature> _searchVisitor;
+
+        [UsedImplicitly]
         private bool? _isFoundMode;
 
         public SearchResult(TypeBase typeBase, SearchVisitor<TFeature> searchVisitor)

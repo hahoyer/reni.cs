@@ -1,4 +1,3 @@
-// #pragma warning disable 649
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +7,6 @@ using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-
-#pragma warning disable 1911
 
 namespace Reni.Type
 {

@@ -5,7 +5,7 @@ using Reni.Context;
 
 namespace Reni.Type
 {
-    [Serializable]
+    [Obsolete("",true)]
     internal sealed class AutomaticRef : Ref
     {
         internal AutomaticRef(TypeBase target, RefAlignParam refAlignParam)

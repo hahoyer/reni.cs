@@ -20,7 +20,7 @@ namespace Reni.Context
 
         internal override Result CreateArgsRefResult(Category category)
         {
-            return ArgsType.CreateAutomaticRef(RefAlignParam).CreateResult
+            return ArgsType.CreateReference(RefAlignParam).CreateResult
                 (
                 category,
                 () => CodeBase.CreateContextRef(this),

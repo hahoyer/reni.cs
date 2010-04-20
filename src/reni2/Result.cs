@@ -502,7 +502,9 @@ namespace Reni
         internal BitsConst Evaluate()
         {
             Tracer.Assert(Refs.IsNone);
-            return Code.Serialize(false).Evaluate();
+            return Code
+                .Serialize(false)
+                .Evaluate();
         }
 
         internal Result AutomaticDereference()
@@ -539,7 +541,7 @@ namespace Reni
         {
             var destructor = Type.Destructor(CompleteCategory);
             return Type
-                .CreateAutomaticRef(refAlignParam)
+                .CreateReference(refAlignParam)
                 .CreateResult(
                 CompleteCategory,
                 () => CodeBase.CreateInternalRef(refAlignParam, Code, destructor.Code),
@@ -596,7 +598,7 @@ namespace Reni
                 ;
         }
 
-        internal Result ConvertToAsRef(Category category, AutomaticRef target) { 
+        internal Result ConvertToAsRef(Category category, Reference target) { 
             if(Type.IsRefLike(target))
                 return target.CreateResult(category, this & (Category.Code | Category.Refs));
 

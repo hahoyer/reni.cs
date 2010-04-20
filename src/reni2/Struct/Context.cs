@@ -162,6 +162,15 @@ namespace Reni.Struct
             }
         }
 
+        internal TypeBase ThisType
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
         private IEnumerable<Size> GetOffsets()
         {
             var sizes = Types.Select(typeBase => typeBase.Size).ToArray();
@@ -178,5 +187,12 @@ namespace Reni.Struct
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(syntax => Type(syntax)); }
 
+        Result IStructContext.CreateThisResult(Category category) { throw new NotImplementedException(); }
+
+        internal Result CreateAtResult(Category category, int position)
+        {
+            NotImplementedMethod(category, position);
+            return null;
+        }
     }
 }                                    

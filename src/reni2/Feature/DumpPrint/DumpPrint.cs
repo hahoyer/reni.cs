@@ -66,4 +66,23 @@ namespace Reni.Feature.DumpPrint
 
         TypeBase IFeature.DefiningType() { return TypeBase.CreateBit; }
     }
+
+    internal class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Type.Reference>, IFeature
+    {
+        IFeature ISearchPath<IFeature, Type.Reference>.Convert(Type.Reference type) { return this; }
+
+        Result IFeature.Apply(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+
+        TypeBase IFeature.DefiningType()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+    }
+
+
 }

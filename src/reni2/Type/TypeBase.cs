@@ -28,8 +28,8 @@ namespace Reni.Type
             public readonly DictionaryEx<int, Sequence> Sequences = new DictionaryEx<int, Sequence>();
             public readonly DictionaryEx<TypeBase, Pair> Pairs = new DictionaryEx<TypeBase, Pair>();
 
-            public readonly DictionaryEx<RefAlignParam, AutomaticRef> AutomaticRefs =
-                new DictionaryEx<RefAlignParam, AutomaticRef>();
+            public readonly DictionaryEx<RefAlignParam, Reference> References =
+                new DictionaryEx<RefAlignParam, Reference>();
 
             public readonly SimpleCache<TypeType> TypeType;
 
@@ -124,11 +124,11 @@ namespace Reni.Type
                 .Find(this, () => new Pair(first, this));
         }
 
-        internal virtual AutomaticRef CreateAutomaticRef(RefAlignParam refAlignParam)
+        internal virtual Reference CreateReference(RefAlignParam refAlignParam)
         {
             return _cache
-                .AutomaticRefs
-                .Find(refAlignParam, () => new AutomaticRef(this, refAlignParam));
+                .References
+                .Find(refAlignParam, () => new Reference(this, refAlignParam));
         }
 
         internal Sequence CreateSequence(int elementCount)
@@ -269,7 +269,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal virtual bool IsRefLike(Ref target) { return false; }
+        internal virtual bool IsRefLike(Reference target) { return false; }
 
         private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.CreateSequence(GetSequenceCount(elementType)); }
 
@@ -306,27 +306,6 @@ namespace Reni.Type
 
         internal Result GetPrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
 
-        internal Result AtResult(ContextBase callContext, Category category, ICompileSyntax right)
-        {
-            var thisTypeResult = Conversion(category | Category.Type, GetThisType());
-            var thisType = (ThisType) thisTypeResult.Type;
-            return thisType.GetAtResult(callContext, category, right)
-                .UseWithArg(thisTypeResult);
-        }
-
-        protected virtual ThisType GetThisType()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
-        internal void ChildSearch(ISearchVisitor searchVisitor, StructRef structRef)
-        {
-            Search(searchVisitor.Child(structRef));
-            Search(searchVisitor.Child(structRef.CreateAutomaticRef()));
-            Search(searchVisitor);
-        }
-
         internal Result DumpPrintFromReference(Category category, Result referenceResult, RefAlignParam refAlignParam)
         {
             var dereferencedResult = DereferencedResult(category, referenceResult, refAlignParam);
@@ -341,6 +320,12 @@ namespace Reni.Type
                     () => referenceResult.Code.CreateDereference(refAlignParam, Size),
                     () => referenceResult.Refs
                 );
+        }
+
+        internal Struct.Context GetStruct()
+        {
+            NotImplementedMethod();
+            return null;
         }
     }
 }

@@ -2,140 +2,56 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal abstract class Type: TypeBase
+    internal abstract class Type : TypeBase
     {
         [DumpData(true)]
         private readonly Context _context;
 
-        protected Type(Context context) { _context = context; }
+        internal readonly ISearchPath<IFeature, Reni.Type.Reference> DumpPrintFeature;
+        [DumpData(false)]
+        internal readonly AssignmentFeature AssignmentFeature;
+
+
+        protected Type(Context context)
+        {
+            _context = context;
+            DumpPrintFeature = new StructReferenceFeature();
+            AssignmentFeature = new AssignmentFeature(this);
+        }
+
+        internal RefAlignParam RefAlignParam
+        {
+            get { return _context.RefAlignParam; } }
 
         protected override Size GetSize() { return _context.InternalSize(); }
-        internal override string DumpShort() { return "type("+_context.DumpShort()+")"; }
-    }
+        internal override string DumpShort() { return "type(" + _context.DumpShort() + ")"; }
 
-    [Obsolete("", true)]
-    internal abstract class ThisType<TContext> : TypeBase
-        where TContext : Context
-    {
-        private readonly Type<TContext> _type;
-        
-        protected ThisType(Type<TContext> type)
+        internal Result ApplyAssignment(Category category, Result functionalResult, Result argsResult)
         {
-            _type = type;
-        }
-
-        protected override Size GetSize() { return _type.RefAlignParam.RefSize; }
-        internal override string DumpShort() { return "type(this)"; }
-
-        internal Result GetAtResult(ContextBase callContext, Category category, ICompileSyntax right) {
-            var position = callContext.Evaluate(right, IndexType).ToInt32();
-            return AtResult(category, position);
-        }
-    }
-
-    internal sealed class ThisTypeX : TypeBase
-    {
-        [DumpData(true)]
-        private readonly Context _context;
-
-
-        [DumpData(false)]
-        internal readonly IFeature DumpPrintFeature;
-
-        internal ThisTypeX(Context context)
-        {
-            _context = context; 
-            DumpPrintFeature = new Feature.DumpPrint.StructFeature(this);
-        }
-
-        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
-        {
-            var fullContext = Context as FullContext;
-            if (fullContext == null)
-                return base.ConvertTo_Implementation(category, dest);
-            Tracer.Assert(dest.IsVoid);
-            Tracer.Assert(Size.IsZero);
-            return dest.CreateResult
+            var result = CreateVoid
+                .CreateResult
                 (
-                category,
-                () => CodeBase.CreateArg(Size.Zero),
-                fullContext.ConstructorRefs
+                    category,
+                    () => CodeBase.CreateArg(RefAlignParam.RefSize*2).CreateAssignment(RefAlignParam, Size)
                 );
+
+            if(!category.HasCode && !category.HasRefs)
+                return result;
+
+            var sourceResult = argsResult.ConvertToAsRef(category, CreateReference(RefAlignParam));
+            var destinationResult = functionalResult.StripFunctional() & category;
+            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
+            return result.UseWithArg(objectAndSourceRefs);
         }
-
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
-        {
-            var fullContext = Context as FullContext;
-            if (fullContext == null)
-                return base.IsConvertableTo_Implementation(dest,conversionFeature);
-            if (dest.IsVoid)
-                return Size.IsZero;
-            NotImplementedMethod(dest, conversionFeature);
-            return false;
-        }
-
-        internal override void Search(ISearchVisitor searchVisitor)
-        {
-            var searchVisitorChild = searchVisitor as SearchVisitor<ISearchPath<IFeature, Ref>>;
-            if (searchVisitorChild != null)
-                searchVisitorChild.InternalResult =
-                    Context.Container.SearchFromRefToStruct(searchVisitorChild.Defineable).CheckedConvert(this);
-            searchVisitor.Child(this).Search();
-            base.Search(searchVisitor);
-        }
-
-        protected override Size GetSize() { return _context.RefSize; }
-        protected override ThisType GetThisType() { return this; }
-        internal override string DumpShort() { return "type(this)"; }
-
-        internal StructRef At(int position) { return new StructRef(_context, position); }
-        internal Result AtResult(Category category, int position) { return At(position).CreateArgResult(category); }
-        internal Context Context { get { return _context; } }
-
-        internal Result DumpPrint(Category category)
-        {
-            var argCodes = CreateArgCodes(category);
-            var dumpPrint =
-                _context.Types
-                    .Select((type, i) => type.GenericDumpPrint(category).UseWithArg(argCodes[i]))
-                    .ToArray();
-            var thisRef = CreateArgResult(category)
-                .CreateAutomaticRefResult(_context.RefAlignParam);
-            var result = Result
-                .ConcatPrintResult(category, dumpPrint)
-                .UseWithArg(thisRef);
-            return result;
-        }
-
-        [DumpData(false)]
-        internal TypeBase IndexType { get { return _context.IndexType; } }
-        
-        private Result[] CreateArgCodes(Category category)
-        {
-            return _context.Types
-                .Select((type, i) => AutomaticDereference(type, _context.Offsets[i], category))
-                .ToArray();
-        }
-
-        private Result AutomaticDereference(TypeBase type, Size offset, Category category)
-        {
-            return type
-                .CreateAutomaticRef(_context.RefAlignParam)
-                .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(_context.RefAlignParam, offset))
-                .AutomaticDereference();
-        }
-
-        private CodeBase CreateRefArgCode() { return CreateAutomaticRef(_context.RefAlignParam).CreateArgCode(); }
-
     }
 
 }
