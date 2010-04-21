@@ -6,31 +6,33 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal abstract class Type : TypeBase
+    internal class Type : TypeBase
     {
         [DumpData(true)]
         private readonly Context _context;
 
-        internal readonly ISearchPath<IFeature, Reni.Type.Reference> DumpPrintFeature;
+        [DumpData(false)]
+        internal readonly IFeature DumpPrintFeature;
+        [DumpData(false)]
+        internal readonly ISearchPath<IFeature, Reni.Type.Reference> DumpPrintReferenceFeature;
         [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
 
 
-        protected Type(Context context)
+        internal Type(Context context)
         {
             _context = context;
-            DumpPrintFeature = new StructReferenceFeature();
+            DumpPrintFeature = new Feature.DumpPrint.StructFeature(this);
+            DumpPrintReferenceFeature = new StructReferenceFeature(this);
             AssignmentFeature = new AssignmentFeature(this);
         }
 
-        internal RefAlignParam RefAlignParam
-        {
-            get { return _context.RefAlignParam; } }
+        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        internal Context Context { get { return _context; } }
 
         protected override Size GetSize() { return _context.InternalSize(); }
         internal override string DumpShort() { return "type(" + _context.DumpShort() + ")"; }
@@ -52,6 +54,20 @@ namespace Reni.Struct
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
             return result.UseWithArg(objectAndSourceRefs);
         }
-    }
 
+        internal override void Search(ISearchVisitor searchVisitor)
+        {
+            var searchVisitorChild = searchVisitor as SearchVisitor<ISearchPath<IFeature, Reni.Type.Reference>>;
+            if (searchVisitorChild != null)
+            {
+                searchVisitorChild.InternalResult =
+                    _context
+                    .Container
+                    .SearchFromRefToStruct(searchVisitorChild.Defineable)
+                    .CheckedConvert(this);
+            }
+            searchVisitor.Child(this).Search();
+            base.Search(searchVisitor);
+        }
+    }
 }

@@ -6,7 +6,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -18,10 +17,12 @@ namespace Reni.Struct
         [Node]
         private readonly Result _constructorResult;
         private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache;
+        private readonly Type _type;
 
         internal FullContext(ContextBase contextBase, Container container)
             : base(contextBase, container)
         {
+            _type = new Type(this);
             _internalConstructorResult = new Result();
             _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
             _constructorResult = new Result();
@@ -44,17 +45,11 @@ namespace Reni.Struct
         {
             var internalResult = InternalResult(category - Category.Type);
             _internalConstructorResult.Update(internalResult);
-            var result = CreateThisType().CreateResult(category, internalResult);
+            var result = _type.CreateResult(category, internalResult);
             var constructorResult = result
                 .ReplaceRelativeContextRef(this, ()=>CodeBase.CreateTopRef(RefAlignParam));
             _constructorResult.Update(constructorResult);
             return constructorResult;
-        }
-
-        private TypeBase CreateThisType()
-        {
-            NotImplementedMethod();
-            return null;
         }
 
         [DumpData(false)]

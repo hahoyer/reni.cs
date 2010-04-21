@@ -162,6 +162,7 @@ namespace Reni.Struct
             }
         }
 
+        [DumpData(false)]
         internal TypeBase ThisType
         {
             get

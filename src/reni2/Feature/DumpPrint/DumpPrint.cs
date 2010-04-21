@@ -69,7 +69,14 @@ namespace Reni.Feature.DumpPrint
 
     internal class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Type.Reference>, IFeature
     {
-        IFeature ISearchPath<IFeature, Type.Reference>.Convert(Type.Reference type) { return this; }
+        [DumpData(true)]
+        private readonly Struct.Type _type;
+        public StructReferenceFeature(Struct.Type type) { _type = type; }
+        IFeature ISearchPath<IFeature, Type.Reference>.Convert(Type.Reference type)
+        {
+            Tracer.Assert(type.RefAlignParam == _type.RefAlignParam);
+            return this;
+        }
 
         Result IFeature.Apply(Category category)
         {
@@ -84,5 +91,23 @@ namespace Reni.Feature.DumpPrint
         }
     }
 
+    internal class StructFeature : ReniObject, IFeature
+    {
+        [DumpData(true)]
+        private readonly Struct.Type _type;
+        public StructFeature(Struct.Type type) { _type = type; }
+
+        Result IFeature.Apply(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+
+        TypeBase IFeature.DefiningType()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+    }
 
 }

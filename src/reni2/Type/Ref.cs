@@ -39,14 +39,47 @@ namespace Reni.Type
 
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
-            var destAsRef = dest as TRefType;
-            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Parent == destAsRef.Parent)
+            var destAsRef = dest as Reference;
+            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && _target == destAsRef._target)
                 return true;
 
-            return Parent
-                .IsConvertableTo(dest, conversionFeature);
+            return _target.IsConvertableTo(dest, conversionFeature);
         }
 
+        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
+        {
+            var destAsRef = dest as Reference;
+            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && _target == destAsRef._target)
+                return dest.ConvertToItself(category);
+
+            return _target
+                .ConvertTo(category, dest)
+                .UseWithArg(CreateDereferencedArgResult(category));
+        }
+
+        private Result CreateDereferencedArgResult(Category category)
+        {
+            return _target
+                .CreateResult
+                (
+                category,
+                CreateDereferencedArgCode
+                );
+        }
+
+        private CodeBase CreateDereferencedArgCode()
+        {
+            return CodeBase
+                .CreateArg(Size)
+                .CreateDereference(RefAlignParam, _target.Size);
+        }
+
+        internal override sealed Result AutomaticDereference(Result result)
+        {
+            Result useWithArg = CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result);
+            return _target
+                .AutomaticDereference(useWithArg);
+        }
     }
 
     [Obsolete("",true)]
@@ -76,24 +109,6 @@ namespace Reni.Type
 
         internal override sealed Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
 
-        internal override sealed Result AutomaticDereference(Result result)
-        {
-            return Parent
-                .AutomaticDereference(CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result));
-        }
-
-        private Result CreateDereferencedArgResult(Category category)
-        {
-            return Parent
-                .CreateResult
-                (
-                category,
-                CreateDereferencedArgCode
-                );
-        }
-
-        private CodeBase CreateDereferencedArgCode() { return CodeBase.CreateArg(Size).CreateDereference(RefAlignParam, Parent.Size); }
-
         internal override sealed TypeBase AutomaticDereference() { return Parent.AutomaticDereference(); }
 
         internal override sealed bool IsRef(RefAlignParam refAlignParam)
@@ -106,18 +121,6 @@ namespace Reni.Type
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }
 
         internal override sealed string DumpShort() { return ShortName + "." + Parent.DumpShort(); }
-
-        protected Result ConvertTo_Implementation<TRefType>(Category category, TypeBase dest)
-            where TRefType : Ref
-        {
-            var destAsRef = dest as TRefType;
-            if (destAsRef != null && RefAlignParam == destAsRef.RefAlignParam && Parent == destAsRef.Parent)
-                return dest.ConvertToItself(category);
-
-            return Parent
-                .ConvertTo(category, dest)
-                .UseWithArg(CreateDereferencedArgResult(category));
-        }
 
         internal override sealed Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
 
