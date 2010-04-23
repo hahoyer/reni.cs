@@ -111,8 +111,9 @@ namespace Reni.Code
             var cp = new System.CodeDom.Compiler.CompilerParameters
                          {
                              GenerateInMemory = true,
-                             CompilerOptions = "/unsafe",
-                             IncludeDebugInformation = true
+                             CompilerOptions = "/unsafe /debug",
+                             IncludeDebugInformation = true,
+                             TempFiles = new TempFileCollection(".")
                          };
             cp.ReferencedAssemblies.AddRange(GetReferencesAssemblies(cu));
             var cr = _provider.CompileAssemblyFromFile(cp, name);

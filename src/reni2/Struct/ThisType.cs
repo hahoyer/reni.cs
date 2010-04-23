@@ -69,5 +69,37 @@ namespace Reni.Struct
             searchVisitor.Child(this).Search();
             base.Search(searchVisitor);
         }
+
+        internal Result DumpPrint(Category category)
+        {
+            var argCodes = CreateArgCodes(category);
+            var dumpPrint =
+                Context.Types
+                    .Select((type, i) => type.GenericDumpPrint(category).UseWithArg(argCodes[i]))
+                    .ToArray();
+            var thisRef = CreateArgResult(category)
+                .CreateAutomaticRefResult(Context.RefAlignParam);
+            var result = Result
+                .ConcatPrintResult(category, dumpPrint)
+                .UseWithArg(thisRef);
+            return result;
+        }
+
+        private Result[] CreateArgCodes(Category category)
+        {
+            return Context.Types
+                .Select((type, i) => AutomaticDereference(type, Context.Offsets[i], category))
+                .ToArray();
+        }
+
+        private Result AutomaticDereference(TypeBase type, Size offset, Category category)
+        {
+            return type
+                .CreateReference(Context.RefAlignParam)
+                .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(Context.RefAlignParam, offset))
+                .AutomaticDereference();
+        }
+
+        private CodeBase CreateRefArgCode() { return CreateReference(Context.RefAlignParam).CreateArgCode(); }
     }
 }

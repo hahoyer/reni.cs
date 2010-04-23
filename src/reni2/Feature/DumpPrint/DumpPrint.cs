@@ -42,19 +42,6 @@ namespace Reni.Feature.DumpPrint
         TypeBase IFeature.DefiningType() { return _parent; }
     }
 
-    internal class StructFeature<TContext> : ReniObject, IFeature
-         where TContext : Struct.Context
-    {
-        [DumpData(true)]
-        private readonly Type<TContext> _parent;
-
-        public StructFeature(Type<TContext> parent) { _parent = parent; }
-
-        TypeBase IFeature.DefiningType() { return _parent; }
-
-        Result IFeature.Apply(Category category) { return _parent.DumpPrint(category); }
-    }
-
     internal sealed class BitFeature : BitFeatureBase, IFeature
     {
         Result IFeature.Apply(Category category)
@@ -96,18 +83,8 @@ namespace Reni.Feature.DumpPrint
         [DumpData(true)]
         private readonly Struct.Type _type;
         public StructFeature(Struct.Type type) { _type = type; }
-
-        Result IFeature.Apply(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
-        TypeBase IFeature.DefiningType()
-        {
-            NotImplementedMethod();
-            return null;
-        }
+        Result IFeature.Apply(Category category) { return _type.DumpPrint(category); }
+        TypeBase IFeature.DefiningType() { return _type; }
     }
 
 }

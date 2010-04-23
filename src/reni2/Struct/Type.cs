@@ -19,13 +19,9 @@ namespace Reni.Struct
         [Node]
         internal readonly TContext Context;
 
-        [DumpData(false)]
-        internal readonly IFeature DumpPrintFeature;
-
         internal Type(TContext context)
         {
             Context = context;
-            DumpPrintFeature = new Feature.DumpPrint.StructFeature<TContext>(this);
         }
 
         protected override Size GetSize()
@@ -52,37 +48,6 @@ namespace Reni.Struct
 
         internal RefAlignParam RefAlignParam { get { return Context.RefAlignParam; } }
 
-        internal Result DumpPrint(Category category)
-        {
-            var argCodes = CreateArgCodes(category);
-            var dumpPrint =
-                Context.Types
-                    .Select((type, i) => type.GenericDumpPrint(category).UseWithArg(argCodes[i]))
-                    .ToArray();
-            var thisRef = CreateArgResult(category)
-                .CreateAutomaticRefResult(Context.RefAlignParam);
-            var result = Result
-                .ConcatPrintResult(category, dumpPrint)
-                .UseWithArg(thisRef);
-            return result;
-        }
-
-        private Result[] CreateArgCodes(Category category)
-        {
-            return Context.Types
-                .Select((type, i) => AutomaticDereference(type, Context.Offsets[i], category))
-                .ToArray();
-        }
-
-        private Result AutomaticDereference(TypeBase type, Size offset, Category category)
-        {
-            return type
-                .CreateReference(Context.RefAlignParam)
-                .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(Context.RefAlignParam, offset))
-                .AutomaticDereference();
-        }
-
-        private CodeBase CreateRefArgCode() { return CreateReference(Context.RefAlignParam).CreateArgCode(); }
     }
 
     internal sealed class FullContextType : Type<FullContext>
