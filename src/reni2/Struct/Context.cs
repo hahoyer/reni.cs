@@ -186,9 +186,13 @@ namespace Reni.Struct
                 .ToArray();
         }
 
-        private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(syntax => Type(syntax)); }
+        private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(Type); }
 
-        Result IStructContext.CreateThisResult(Category category) { throw new NotImplementedException(); }
+        Result IStructContext.CreateThisResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
 
         internal Result CreateAtResult(Category category, int position)
         {

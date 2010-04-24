@@ -113,7 +113,7 @@ namespace Reni.Code
                              GenerateInMemory = true,
                              CompilerOptions = "/unsafe /debug",
                              IncludeDebugInformation = true,
-                             TempFiles = new TempFileCollection(".", true)
+                             TempFiles = new TempFileCollection(null, true)
                          };
             cp.ReferencedAssemblies.AddRange(GetReferencesAssemblies(cu));
             var cr = _provider.CompileAssemblyFromFile(cp, name);
