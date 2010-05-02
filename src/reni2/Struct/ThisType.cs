@@ -70,6 +70,8 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
+        internal override Context GetStruct() { return _context; }
+
         internal Result DumpPrint(Category category)
         {
             var argCodes = CreateArgCodes(category);

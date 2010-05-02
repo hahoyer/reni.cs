@@ -37,6 +37,8 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
+        internal override Struct.Context GetStruct() { return _target.GetStruct(); }
+
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destAsRef = dest as Reference;

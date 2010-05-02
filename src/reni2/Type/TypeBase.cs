@@ -322,7 +322,7 @@ namespace Reni.Type
                 );
         }
 
-        internal Struct.Context GetStruct()
+        virtual internal Struct.Context GetStruct()
         {
             NotImplementedMethod();
             return null;

@@ -24,6 +24,7 @@ namespace Reni.Struct
         internal readonly Container Container;
         [Node, DumpData(false)]
         private readonly Result[] _internalResult;
+        private readonly Type _type;
 
         protected Context(ContextBase parent, Container container)
         {
@@ -31,7 +32,11 @@ namespace Reni.Struct
             Parent = parent;
             Container = container;
             _internalResult = new Result[StatementList.Count];
+            _type = new Type(this);
         }
+
+        [DumpData(false)]
+        protected Type ContextType { get { return _type; } }
 
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
@@ -65,8 +70,6 @@ namespace Reni.Struct
         {
             return "context." + ObjectId + "(" + Container.DumpShort() + ")";
         }
-
-        internal override IStructContext FindStruct() { return this; }
 
         internal CodeBase ContextRefCodeAsArgCode()
         {
@@ -188,16 +191,20 @@ namespace Reni.Struct
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(Type); }
 
-        Result IStructContext.CreateThisResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
         internal Result CreateAtResult(Category category, int position)
         {
             NotImplementedMethod(category, position);
             return null;
         }
+
+        sealed internal override IStructContext FindStruct() { return this; }
+
+        Result IStructContext.CreateThisResult(Category category)
+        {
+            return ContextType
+                .CreateReference(RefAlignParam)
+                .CreateResult(category, CreateContextCode, CreateContextRefs);
+        }
+
     }
 }                                    
