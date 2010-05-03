@@ -68,7 +68,8 @@ namespace Reni.Struct
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            searchVisitor.Child(this).Search();
+            _targetCache.Value.Search(searchVisitor.Child(this));
+            _targetCache.Value.Search(searchVisitor);
             base.Search(searchVisitor);
         }
 
