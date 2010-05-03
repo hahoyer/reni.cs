@@ -191,10 +191,9 @@ namespace Reni.Struct
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(Type); }
 
-        internal Result CreateAtResult(Category category, int position)
+        internal Result CreateAtResultFromArg(Category category, int position)
         {
-            NotImplementedMethod(category, position);
-            return null;
+            return new Reference(this, position).CreateArgResult(category);
         }
 
         sealed internal override IStructContext FindStruct() { return this; }

@@ -5,21 +5,25 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Reference : TypeBase
+    internal sealed class Reference : TypeBase, IFeatureTarget
     {
         private readonly Context _context;
         private readonly int _position;
         private readonly SimpleCache<TypeBase> _targetCache;
+        internal readonly IFeature DumpPrintFeature;
 
         public Reference(Context context, int position)
         {
             _context = context;
             _position = position;
             _targetCache = new SimpleCache<TypeBase>(GetTargetType);
+            DumpPrintFeature = new Feature.DumpPrint.Feature<Reference>(this);
         }
 
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
@@ -45,12 +49,6 @@ namespace Reni.Struct
         internal override int GetSequenceCount(TypeBase elementType) { return _targetCache.Value.GetSequenceCount(elementType); }
         internal override TypeBase GetEffectiveType() { return _targetCache.Value.GetEffectiveType(); }
 
-        internal Result DumpPrint(Category category)
-        {
-            return _targetCache.Value
-                .DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam);
-        }
-
         private Result CreateAccessResult(Category category) { return CreateResult(category, CreateAccessCode); }
 
         private CodeBase CreateAccessCode() { return CreateArgCode().CreateRefPlus(RefAlignParam, GetOffset()); }
@@ -60,5 +58,20 @@ namespace Reni.Struct
         private Size GetOffset() { return _context.Offset(_position); }
         private TypeBase GetTargetType() { return _context.InternalType(_position); }
         private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+
+        Result IFeatureTarget.Apply(Category category)
+        {
+            return _targetCache
+                .Value
+                .DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam);
+        }
+
+        internal override void Search(ISearchVisitor searchVisitor)
+        {
+            searchVisitor.Child(this).Search();
+            base.Search(searchVisitor);
+        }
+
     }
 }
+

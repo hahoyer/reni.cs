@@ -10,7 +10,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal class Type : TypeBase
+    internal class Type : TypeBase, IFeatureTarget
     {
         [DumpData(true)]
         private readonly Context _context;
@@ -26,7 +26,7 @@ namespace Reni.Struct
         internal Type(Context context)
         {
             _context = context;
-            DumpPrintFeature = new Feature.DumpPrint.StructFeature(this);
+            DumpPrintFeature = new Feature.DumpPrint.Feature<Type>(this);
             DumpPrintReferenceFeature = new StructReferenceFeature(this);
             AssignmentFeature = new AssignmentFeature(this);
         }
@@ -72,7 +72,7 @@ namespace Reni.Struct
 
         internal override Context GetStruct() { return _context; }
 
-        internal Result DumpPrint(Category category)
+        Result IFeatureTarget.Apply(Category category)
         {
             var argCodes = CreateArgCodes(category);
             var dumpPrint =
