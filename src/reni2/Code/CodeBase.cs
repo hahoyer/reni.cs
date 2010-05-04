@@ -116,14 +116,19 @@ namespace Reni.Code
             return CreateChild(new BitCast(size, Size, Size));
         }
 
-        public CodeBase CreateSequence(CodeBase right)
+        private CodeBase CreateSequenceOfTwo(CodeBase right)
         {
             if(IsEmpty)
                 return right;
             if(right.IsEmpty)
                 return this;
             return new Pair(this, right);
-        }                                                                                                                                                  
+        }
+
+        internal CodeBase CreateSequence(params CodeBase[] more)
+        {
+            return more.Aggregate(this, (current, t) => current.CreateSequenceOfTwo(t));
+        }
 
         public static CodeBase CreateBitArray(Size size, BitsConst t) { return CreateLeaf(new BitArray(size, t)); }
 
@@ -334,7 +339,7 @@ namespace Reni.Code
 
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
-            Tracer.Assert(!body.HasArg);
+            Tracer.Assert(!body.HasArg, body.Dump);
             var trace = body.ObjectId == -268;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
@@ -346,9 +351,7 @@ namespace Reni.Code
             if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                 gap = CodeBase.CreateBitArray(resultSize - alignedInternal.Size, BitsConst.None());
             var result = alignedInternal
-                .CreateSequence(gap)
-                .CreateSequence(alignedBody)
-                .CreateSequence(DestructorCode)
+                .CreateSequence(gap, alignedBody, DestructorCode)
                 .CreateStatementEnd(copier, refAlignParam, resultSize)
                 .UseWithArg(CodeBase.CreateTopRef(refAlignParam));
             return ReturnMethodDump(trace, result);

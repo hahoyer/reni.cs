@@ -196,14 +196,20 @@ namespace Reni.Struct
             return new Reference(this, position).CreateArgResult(category);
         }
 
+        internal Result CreateAtResultFromContext(Category category, int position)
+        {
+            return CreateAtResultFromArg(category,position).UseWithArg(CreateThisResult(category));
+        }
+
         sealed internal override IStructContext FindStruct() { return this; }
 
-        Result IStructContext.CreateThisResult(Category category)
+        Result IStructContext.CreateThisResult(Category category) { return CreateThisResult(category); }
+
+        private Result CreateThisResult(Category category)
         {
             return ContextType
                 .CreateReference(RefAlignParam)
                 .CreateResult(category, CreateContextCode, CreateContextRefs);
         }
-
     }
 }                                    
