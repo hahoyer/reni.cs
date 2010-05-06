@@ -19,6 +19,8 @@ namespace Reni.Parser.TokenClass
         private static int _nextObjectId;
         private string _name = "";
 
+        public override string ToString() { return base.ToString() + " Name=" + _name.Quote(); }
+
         protected TokenClassBase()
             : base(_nextObjectId++)
         {

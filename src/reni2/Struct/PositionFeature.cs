@@ -10,7 +10,6 @@ namespace Reni.Struct
 {
     internal class PositionFeature :
         ReniObject,
-        ISearchPath<IFeature, Reni.Type.Reference>,
         IContextFeature,
         IFeature
     {
@@ -30,12 +29,6 @@ namespace Reni.Struct
             _position = position;
         }
 
-        IFeature ISearchPath<IFeature, Reni.Type.Reference>.Convert(Reni.Type.Reference type)
-        {
-            Tracer.Assert(type.RefAlignParam == RefAlignParam);
-            return this;
-        }
-
         Result IFeature.Apply(Category category)
         {
             return Apply(category)
@@ -49,7 +42,7 @@ namespace Reni.Struct
             return _structContext.CreateAtResultFromContext(category, _position);
         }
 
-        TypeBase IFeature.DefiningType() { return _structContext.ThisType; }
+        TypeBase IFeature.DefiningType() { return _structContext.ContextType; }
 
         Result IContextFeature.Apply(Category category) { return Apply(category); }
     }

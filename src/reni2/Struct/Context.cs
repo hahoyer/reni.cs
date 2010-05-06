@@ -36,7 +36,7 @@ namespace Reni.Struct
         }
 
         [DumpData(false)]
-        protected Type ContextType { get { return _type; } }
+        internal Type ContextType { get { return _type; } }
 
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
@@ -162,16 +162,6 @@ namespace Reni.Struct
                 if (_offsetsCache == null)
                     _offsetsCache = GetOffsets().ToArray();
                 return _offsetsCache;
-            }
-        }
-
-        [DumpData(false)]
-        internal TypeBase ThisType
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
             }
         }
 
