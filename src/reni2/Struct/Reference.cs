@@ -16,6 +16,7 @@ namespace Reni.Struct
         private readonly Context _context;
         private readonly int _position;
         private readonly SimpleCache<TypeBase> _targetCache;
+        [DumpData(false)]
         internal readonly IFeature DumpPrintFeature;
 
         public Reference(Context context, int position)
@@ -52,8 +53,6 @@ namespace Reni.Struct
         private Result CreateAccessResult(Category category) { return CreateResult(category, CreateAccessCode); }
 
         private CodeBase CreateAccessCode() { return CreateArgCode().CreateRefPlus(RefAlignParam, GetOffset()); }
-
-        internal Size TargetSize { get { return _targetCache.Value.Size; } }
 
         private Size GetOffset() { return _context.Offset(_position); }
         private TypeBase GetTargetType() { return _context.InternalType(_position); }
