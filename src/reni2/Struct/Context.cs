@@ -25,6 +25,7 @@ namespace Reni.Struct
         [Node, DumpData(false)]
         private readonly Result[] _internalResult;
         private readonly Type _type;
+        private readonly Reni.Type.Reference _referenceType;
 
         protected Context(ContextBase parent, Container container)
         {
@@ -33,10 +34,13 @@ namespace Reni.Struct
             Container = container;
             _internalResult = new Result[StatementList.Count];
             _type = new Type(this);
+            _referenceType = _type.CreateReference(parent.RefAlignParam);
         }
 
         [DumpData(false)]
         internal Type ContextType { get { return _type; } }
+        [DumpData(false)]
+        internal Reni.Type.Reference ContextReferenceType { get { return _referenceType; } }
 
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
@@ -71,13 +75,6 @@ namespace Reni.Struct
             return "context." + ObjectId + "(" + Container.DumpShort() + ")";
         }
 
-        internal CodeBase ContextRefCodeAsArgCode()
-        {
-            return CodeBase
-                .CreateArg(RefAlignParam.RefSize)
-                .CreateRefPlus(RefAlignParam, InternalSize());
-        }
-
         internal TypeBase InternalType(int position)
         {
             return InternalResult(Category.Type, position).Type;
@@ -105,7 +102,7 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Result InternalAlignedResult(Category category, int i)
+        private Result InternalAlignedResult(Category category, int i)
         {
             return InternalResult(category, i)
                 .PostProcessor
@@ -127,43 +124,15 @@ namespace Reni.Struct
 
         internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize); } }
 
-        internal CodeBase CreateContextCode()
-        {
-            return CodeBase
-                .CreateContextRef(ForCode)
-                .CreateRefPlus(RefAlignParam,InternalSize()*-1);
-        }
-
-        internal Refs CreateContextRefs()
-        {
-            return Refs.Context(ForCode);
-        }
-
         internal Size Offset(int position)
         {
             return InternalResult(Category.Size, position+1, Position).Size;
         }
 
         [DumpData(false)]
-        internal IEnumerable<TypeBase> Types
-        {
-            get
-            {
-                if (_typesCache == null)
-                    _typesCache = GetTypes().ToArray();
-                return _typesCache;
-            }
-        }
+        internal IEnumerable<TypeBase> Types { get { return _typesCache ?? (_typesCache = GetTypes().ToArray()); } }
         [DumpData(false)]
-        internal Size[] Offsets
-        {
-            get
-            {
-                if (_offsetsCache == null)
-                    _offsetsCache = GetOffsets().ToArray();
-                return _offsetsCache;
-            }
-        }
+        internal Size[] Offsets { get { return _offsetsCache ?? (_offsetsCache = GetOffsets().ToArray()); } }
 
         private IEnumerable<Size> GetOffsets()
         {
@@ -181,25 +150,37 @@ namespace Reni.Struct
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(Type); }
 
+        sealed internal override IStructContext FindStruct() { return this; }
+
+        Result IStructContext.CreateThisResult(Category category)
+        {
+            return ContextReferenceType
+                .CreateResult(category, CreateContextCode, CreateContextRefs);
+        }
+
         internal Result CreateAtResultFromArg(Category category, int position)
         {
-            return new Reference(this, position).CreateArgResult(category);
+            return new Reference(this, position)
+                .CreateArgResult(category);
         }
 
         internal Result CreateAtResultFromContext(Category category, int position)
         {
-            return CreateAtResultFromArg(category,position).UseWithArg(CreateThisResult(category));
-        }
-
-        sealed internal override IStructContext FindStruct() { return this; }
-
-        Result IStructContext.CreateThisResult(Category category) { return CreateThisResult(category); }
-
-        private Result CreateThisResult(Category category)
-        {
-            return ContextType
-                .CreateReference(RefAlignParam)
+            return new Reference(this, position)
                 .CreateResult(category, CreateContextCode, CreateContextRefs);
         }
+
+        private CodeBase CreateContextCode()
+        {
+            return CodeBase
+                .CreateContextRef(ForCode)
+                .CreateRefPlus(RefAlignParam, InternalSize() * -1);
+        }
+
+        private Refs CreateContextRefs()
+        {
+            return Refs.Context(ForCode);
+        }
+
     }
 }                                    

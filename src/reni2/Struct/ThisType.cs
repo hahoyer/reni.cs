@@ -12,6 +12,7 @@ namespace Reni.Struct
 {
     internal class Type : TypeBase, IFeatureTarget
     {
+        private static int _nextObjectId;
         [DumpData(true)]
         private readonly Context _context;
 
@@ -24,6 +25,7 @@ namespace Reni.Struct
 
 
         internal Type(Context context)
+            : base(_nextObjectId++)
         {
             _context = context;
             DumpPrintFeature = new Feature.DumpPrint.Feature<Type>(this);

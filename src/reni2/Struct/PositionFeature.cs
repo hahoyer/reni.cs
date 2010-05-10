@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -29,21 +28,18 @@ namespace Reni.Struct
             _position = position;
         }
 
+        TypeBase IFeature.DefiningType() { return _structContext.ContextReferenceType; }
+
         Result IFeature.Apply(Category category)
         {
-            return Apply(category)
-                .ReplaceRelativeContextRef(_structContext.ForCode, ()=>_structContext.ContextRefCodeAsArgCode());
+            return _structContext
+                .CreateAtResultFromArg(category, _position);
         }
 
-        private RefAlignParam RefAlignParam { get { return _structContext.ForCode.RefAlignParam; } }
-
-        private Result Apply(Category category)
+        Result IContextFeature.Apply(Category category)
         {
-            return _structContext.CreateAtResultFromContext(category, _position);
+            return _structContext
+                .CreateAtResultFromContext(category, _position);
         }
-
-        TypeBase IFeature.DefiningType() { return _structContext.ContextType; }
-
-        Result IContextFeature.Apply(Category category) { return Apply(category); }
     }
 }

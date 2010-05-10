@@ -171,9 +171,17 @@ x4 dump_print;
     }
 
     [TestFixture]
-    [Target(@"a: (b:400,c:4); a c dump_print")]
+    [Target(@"a: (b:222,c:4); a b dump_print")]
+    [Output("222")]
+    public class AccessMemberB : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+    [TestFixture]
+    [Target(@"a: (b:222,c:4); a c dump_print")]
     [Output("4")]
-    public class AccessMember : CompilerTest
+    public class AccessMemberC : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }

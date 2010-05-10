@@ -10,10 +10,12 @@ namespace Reni.Type
 {
     internal sealed class Reference: TypeBase
     {
+        private static int _nextObjectId;
         private readonly TypeBase _target;
         private readonly RefAlignParam _refAlignParam;
         
         internal Reference(TypeBase target, RefAlignParam refAlignParam)
+            :base(_nextObjectId++)
         {
             _target = target;
             _refAlignParam = refAlignParam;
