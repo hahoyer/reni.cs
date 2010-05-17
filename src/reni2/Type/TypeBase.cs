@@ -11,8 +11,6 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Parser.TokenClass;
-using Reni.Struct;
-using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -308,11 +306,11 @@ namespace Reni.Type
 
         internal Result DumpPrintFromReference(Category category, Result referenceResult, RefAlignParam refAlignParam)
         {
-            var dereferencedResult = DereferencedResult(category, referenceResult, refAlignParam);
+            var dereferencedResult = CreateDereferencedResult(category, referenceResult, refAlignParam);
             return GenericDumpPrint(category).UseWithArg(dereferencedResult);
         }
 
-        internal Result DereferencedResult(Category category, Result referenceResult, RefAlignParam refAlignParam)
+        internal Result CreateDereferencedResult(Category category, Result referenceResult, RefAlignParam refAlignParam)
         {
             return CreateResult
                 (

@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [Target(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;")]
     [Output("102")]
-    [InnerAccessTheOnlyOne, SomeVariables, Add2Numbers, AccessMember]
+    [InnerAccessTheOnlyOne, SomeVariables, Add2Numbers, AccessMemberC]
     public class FunctionVariable : CompilerTest
     {
         [Test, Category(Worked)]
