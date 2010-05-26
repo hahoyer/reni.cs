@@ -25,7 +25,7 @@ namespace Reni.Feature
 
     internal static class Extender
     {
-        internal static IFeature Feature(this object feature)
+        internal static IFeature ConvertToFeature(this object feature)
         {
             if(feature is IPrefixFeature)
                 return ((IPrefixFeature) feature).Feature;

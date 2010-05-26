@@ -287,7 +287,7 @@ namespace Reni.Type
             where TFeature : class
         {
             var searchResult = SearchDefineable<TFeature>(defineable);
-            var feature = searchResult.Feature();
+            var feature = searchResult.ConvertToFeature();
             if(feature == null)
                 return null;
 
