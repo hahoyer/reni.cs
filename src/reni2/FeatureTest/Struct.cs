@@ -106,7 +106,8 @@ namespace Reni.FeatureTest.Struct
         protected override string Output { get { return "10"; } }
 
         [Test, Category(Worked)]
-        public override void Run() { BaseRun(); }
+        public override void Run() { qsynergy
+            BaseRun(); }
     }
 
     [TestFixture, InnerAccessTheOnlyOne]

@@ -42,15 +42,17 @@ namespace Reni.Struct
 
         private Result CreateTypeReferenceResult(Category category)
         {
-            NotImplementedMethod(category);
-            return null;
+            return CreateAccessResult(category);
         }
 
         protected override Size GetSize() { return _context.RefSize; }
         internal override string DumpShort() { return String.Format("type(this at {0})", _position); }
         internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + _position; } }
 
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature) { return AsTypeReference(dest) != null || _targetCache.Value.IsConvertableTo(dest, conversionFeature); }
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        {
+            return AsTypeReference(dest) != null;
+        }
 
         internal override bool IsRef(RefAlignParam refAlignParam)
         {
@@ -66,7 +68,7 @@ namespace Reni.Struct
             var destAsRef = dest as Reni.Type.Reference;
             if(destAsRef == null)
                 return null;
-            if(RefAlignParam == destAsRef.RefAlignParam)
+            if(RefAlignParam != destAsRef.RefAlignParam)
                 return null;
             if(_targetCache.Value != destAsRef.Target)
                 return null;
@@ -76,7 +78,11 @@ namespace Reni.Struct
 
         private Result CreateAccessResult(Category category) { return CreateResult(category, CreateAccessCode); }
 
-        private CodeBase CreateAccessCode() { return CreateArgCode().CreateRefPlus(RefAlignParam, GetOffset()); }
+        private CodeBase CreateAccessCode()
+        {
+            return CreateArgCode()
+                .CreateRefPlus(RefAlignParam, GetOffset());
+        }
 
         private Result CreateDereferencedResult(Category category)
         {
