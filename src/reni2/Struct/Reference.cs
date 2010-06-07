@@ -51,7 +51,8 @@ namespace Reni.Struct
 
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
-            return AsTypeReference(dest) != null;
+            return AsTypeReference(dest) != null
+                   || _targetCache.Value.IsConvertableTo(dest, conversionFeature);
         }
 
         internal override bool IsRef(RefAlignParam refAlignParam)
@@ -59,7 +60,6 @@ namespace Reni.Struct
             Tracer.Assert(RefAlignParam == refAlignParam);
             return true;
         }
-
         internal override int GetSequenceCount(TypeBase elementType) { return _targetCache.Value.GetSequenceCount(elementType); }
         internal override TypeBase GetEffectiveType() { return _targetCache.Value.GetEffectiveType(); }
 
