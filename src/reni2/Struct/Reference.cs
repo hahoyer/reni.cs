@@ -19,6 +19,8 @@ namespace Reni.Struct
 
         [DumpData(false)]
         internal readonly IFeature DumpPrintFeature;
+        [DumpData(false)]
+        internal readonly AssignmentFeature AssignmentFeature;
 
         public Reference(Context context, int position)
         {
@@ -26,6 +28,21 @@ namespace Reni.Struct
             _position = position;
             _targetCache = new SimpleCache<TypeBase>(GetTargetType);
             DumpPrintFeature = new Feature<Reference>(this);
+            AssignmentFeature = new AssignmentFeature(this);
+        }
+
+        Result IFeatureTarget.Apply(Category category)
+        {
+            return _targetCache
+                .Value
+                .DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam);
+        }
+
+        internal override void Search(ISearchVisitor searchVisitor)
+        {
+            _targetCache.Value.Search(searchVisitor.Child(this));
+            _targetCache.Value.Search(searchVisitor);
+            base.Search(searchVisitor);
         }
 
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
@@ -38,11 +55,6 @@ namespace Reni.Struct
                 .Value
                 .Conversion(category, dest)
                 .UseWithArg(CreateDereferencedResult(category));
-        }
-
-        private Result CreateTypeReferenceResult(Category category)
-        {
-            return CreateAccessResult(category);
         }
 
         protected override Size GetSize() { return _context.RefSize; }
@@ -62,6 +74,24 @@ namespace Reni.Struct
         }
         internal override int GetSequenceCount(TypeBase elementType) { return _targetCache.Value.GetSequenceCount(elementType); }
         internal override TypeBase GetEffectiveType() { return _targetCache.Value.GetEffectiveType(); }
+
+        internal Result ApplyAssignment(Category category, Result functionalResult, Result argsResult)
+        {
+            var result = CreateVoid
+                .CreateResult
+                (
+                    category,
+                    () => CodeBase.CreateArg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, Size)
+                );
+
+            if (!category.HasCode && !category.HasRefs)
+                return result;
+
+            var sourceResult = argsResult.ConvertToAsRef(category, CreateReference(RefAlignParam));
+            var destinationResult = functionalResult.StripFunctional() & category;
+            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
+            return result.UseWithArg(objectAndSourceRefs);
+        }
 
         private Reni.Type.Reference AsTypeReference(TypeBase dest)
         {
@@ -94,18 +124,10 @@ namespace Reni.Struct
         private TypeBase GetTargetType() { return _context.InternalType(_position); }
         private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
 
-        Result IFeatureTarget.Apply(Category category)
+        private Result CreateTypeReferenceResult(Category category)
         {
-            return _targetCache
-                .Value
-                .DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam);
+            return CreateAccessResult(category);
         }
 
-        internal override void Search(ISearchVisitor searchVisitor)
-        {
-            _targetCache.Value.Search(searchVisitor.Child(this));
-            _targetCache.Value.Search(searchVisitor);
-            base.Search(searchVisitor);
-        }
     }
 }

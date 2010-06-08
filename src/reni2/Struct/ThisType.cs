@@ -20,9 +20,6 @@ namespace Reni.Struct
         internal readonly IFeature DumpPrintFeature;
         [DumpData(false)]
         internal readonly ISearchPath<IFeature, Reni.Type.Reference> DumpPrintReferenceFeature;
-        [DumpData(false)]
-        internal readonly AssignmentFeature AssignmentFeature;
-
 
         internal Type(Context context)
             : base(_nextObjectId++)
@@ -30,7 +27,6 @@ namespace Reni.Struct
             _context = context;
             DumpPrintFeature = new Feature.DumpPrint.Feature<Type>(this);
             DumpPrintReferenceFeature = new StructReferenceFeature(this);
-            AssignmentFeature = new AssignmentFeature(this);
         }
 
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
@@ -38,24 +34,6 @@ namespace Reni.Struct
 
         protected override Size GetSize() { return _context.InternalSize(); }
         internal override string DumpShort() { return "type(" + _context.DumpShort() + ")"; }
-
-        internal Result ApplyAssignment(Category category, Result functionalResult, Result argsResult)
-        {
-            var result = CreateVoid
-                .CreateResult
-                (
-                    category,
-                    () => CodeBase.CreateArg(RefAlignParam.RefSize*2).CreateAssignment(RefAlignParam, Size)
-                );
-
-            if(!category.HasCode && !category.HasRefs)
-                return result;
-
-            var sourceResult = argsResult.ConvertToAsRef(category, CreateReference(RefAlignParam));
-            var destinationResult = functionalResult.StripFunctional() & category;
-            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
-            return result.UseWithArg(objectAndSourceRefs);
-        }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
