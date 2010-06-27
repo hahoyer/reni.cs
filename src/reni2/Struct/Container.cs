@@ -30,7 +30,7 @@ namespace Reni.Struct
         internal readonly List<ICompileSyntax> List = new List<ICompileSyntax>();
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<string, int> Dictionary = new DictionaryEx<string, int>();
+        internal readonly DictionaryEx<string, int> Dictionary;
 
         [Node, SmartNode]
         internal readonly List<int> Converters = new List<int>();
@@ -41,6 +41,7 @@ namespace Reni.Struct
         private Container(Token token)
             : base(token, _nextObjectId++)
         {
+            Dictionary = new DictionaryEx<string, int>();
             EmptyList = new EmptyList(token);
         }
 

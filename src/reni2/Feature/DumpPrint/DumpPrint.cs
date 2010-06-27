@@ -13,12 +13,6 @@ namespace Reni.Feature.DumpPrint
         protected static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
     }
 
-    internal class VoidFeature : ReniObject, IFeature
-    {
-        Result IFeature.Apply(Category category) { return TypeBase.CreateVoidResult(category); }
-        TypeBase IFeature.DefiningType() { return TypeBase.CreateVoid; }
-    }
-
     internal sealed class BitSequenceFeature :
         ReniObject,
         ISearchPath<IFeature, Sequence>

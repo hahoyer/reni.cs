@@ -16,18 +16,19 @@ namespace Reni.Context
     internal sealed class FunctionList : ReniObject
     {
         [Node]
-        private readonly DictionaryEx<ICompileSyntax, ContextArgsVariant> _data =
-            new DictionaryEx<ICompileSyntax, ContextArgsVariant>();
+        private readonly DictionaryEx<ICompileSyntax, ContextArgsVariant> _data;
 
         [Node]
         private readonly List<FunctionInstance> _list = new List<FunctionInstance>();
 
+        public FunctionList() { _data = new DictionaryEx<ICompileSyntax, ContextArgsVariant>(body => new ContextArgsVariant(this, body)); }
+
         internal FunctionInstance this[int i] { get { return _list[i]; } }
         internal int Count { get { return _list.Count; } }
 
-        internal FunctionInstance Find(ICompileSyntax body, ContextBase env, TypeBase args)
+        internal FunctionInstance Find(ICompileSyntax body, ContextBase context, TypeBase args)
         {
-            var index = _data.Find(body, () => new ContextArgsVariant()).Find(this, env, args, body);
+            var index = _data.Find(body).Find(context, args);
             return _list[index];
         }
 
@@ -43,20 +44,23 @@ namespace Reni.Context
         private class ContextArgsVariant : ReniObject
         {
             [Node]
-            private readonly DictionaryEx<ContextBase, ArgsVariant> _data = new DictionaryEx<ContextBase, ArgsVariant>();
+            private readonly DictionaryEx<ContextBase, ArgsVariant> _data;
 
-            public int Find(FunctionList fl, ContextBase context, TypeBase args, ICompileSyntax body) { return _data.Find(context, () => new ArgsVariant()).Find(fl, args, body, context); }
+            public ContextArgsVariant(FunctionList fl, ICompileSyntax body) { _data = new DictionaryEx<ContextBase, ArgsVariant>(context => new ArgsVariant(fl, body, context)); }
+            public int Find(ContextBase context, TypeBase args) { return _data.Find(context).Find(args); }
         }
 
         [Serializable]
         private class ArgsVariant : ReniObject
         {
             [Node]
-            private readonly DictionaryEx<TypeBase, int> _data = new DictionaryEx<TypeBase, int>(-1);
+            private readonly DictionaryEx<TypeBase, int> _data;
 
-            public int Find(FunctionList fl, TypeBase args, ICompileSyntax body, ContextBase context)
+            public ArgsVariant(FunctionList fl, ICompileSyntax body, ContextBase context) { _data = new DictionaryEx<TypeBase, int>(-1, args => CreateFunctionInstance(fl, args, body, context)); }
+
+            public int Find(TypeBase args)
             {
-                return _data.Find(args, () => CreateFunctionInstance(fl, args, body, context));
+                return _data.Find(args);
             }
 
             private static int CreateFunctionInstance(FunctionList fl, TypeBase args, ICompileSyntax body, ContextBase context)

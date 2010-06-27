@@ -21,20 +21,24 @@ namespace Reni.Type
         {
             public static readonly Bit Bit = new Bit();
             public static readonly Void Void = new Void();
-            public readonly DictionaryEx<int, Aligner> Aligners = new DictionaryEx<int, Aligner>();
-            public readonly DictionaryEx<int, Array> Arrays = new DictionaryEx<int, Array>();
-            public readonly DictionaryEx<int, Sequence> Sequences = new DictionaryEx<int, Sequence>();
-            public readonly DictionaryEx<TypeBase, Pair> Pairs = new DictionaryEx<TypeBase, Pair>();
-
-            public readonly DictionaryEx<RefAlignParam, Reference> References =
-                new DictionaryEx<RefAlignParam, Reference>();
-
+            public readonly DictionaryEx<int, Aligner> Aligners;
+            public readonly DictionaryEx<int, Array> Arrays;
+            public readonly DictionaryEx<int, Sequence> Sequences;
+            public readonly DictionaryEx<TypeBase, Pair> Pairs;
+            public readonly DictionaryEx<RefAlignParam, Reference> References;
             public readonly SimpleCache<TypeType> TypeType;
+            public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes;
 
-            public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes =
-                new DictionaryEx<IFunctionalFeature, FunctionAccessType>();
-
-            public Cache(TypeBase parent) { TypeType = new SimpleCache<TypeType>(() => new TypeType(parent)); }
+            public Cache(TypeBase parent)
+            {
+                FunctionalTypes = new DictionaryEx<IFunctionalFeature, FunctionAccessType>(feature => new FunctionAccessType(parent, feature));
+                References = new DictionaryEx<RefAlignParam, Reference>(refAlignParam => new Reference(parent, refAlignParam));
+                Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
+                Sequences = new DictionaryEx<int, Sequence>(elementCount => new Sequence(parent, elementCount));
+                Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
+                Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
+                TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
+            }
         }
 
         private readonly Cache _cache;
@@ -102,47 +106,20 @@ namespace Reni.Type
         {
             if(Size.Align(alignBits) == Size)
                 return this;
-            return _cache
-                .Aligners
-                .Find(alignBits, () => new Aligner(this, alignBits));
+            return _cache.Aligners.Find(alignBits);
         }
 
-        internal Array CreateArray(int count)
-        {
-            return _cache
-                .Arrays
-                .Find(count, () => new Array(this, count));
-        }
-
-        protected virtual TypeBase CreateReversePair(TypeBase first)
-        {
-            return first
-                ._cache
-                .Pairs
-                .Find(this, () => new Pair(first, this));
-        }
-
-        internal virtual Reference CreateReference(RefAlignParam refAlignParam)
-        {
-            return _cache
-                .References
-                .Find(refAlignParam, () => new Reference(this, refAlignParam));
-        }
-
+        internal Array CreateArray(int count) { return _cache.Arrays.Find(count); }
+        protected virtual TypeBase CreateReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
+        internal Reference CreateReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
         internal Sequence CreateSequence(int elementCount)
         {
-            return _cache
-                .Sequences
-                .Find(elementCount, () => new Sequence(this, elementCount));
+            return _cache.Sequences.Find(elementCount);
         }
-
         internal TypeBase CreateFunctionalType(IFunctionalFeature feature)
         {
-            return _cache
-                .FunctionalTypes
-                .Find(feature, () => new FunctionAccessType(this, feature));
+            return _cache.FunctionalTypes.Find(feature);
         }
-
         internal static TypeBase CreateNumber(int bitCount) { return CreateBit.CreateSequence(bitCount); }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase CreatePair(TypeBase second) { return second.CreateReversePair(this); }
@@ -320,7 +297,7 @@ namespace Reni.Type
                 );
         }
 
-        virtual internal Struct.Context GetStruct()
+        internal virtual Struct.Context GetStruct()
         {
             NotImplementedMethod();
             return null;

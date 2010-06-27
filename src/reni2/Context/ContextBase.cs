@@ -35,7 +35,7 @@ namespace Reni.Context
         {
             _cache = new Cache
                 (
-                () => new PendingContext(this)
+                this
                 );
         }
 
@@ -67,7 +67,7 @@ namespace Reni.Context
         {
             return _cache
                 .FunctionInstanceCache
-                .Find(args, () => new Function(this, args));
+                .Find(args);
         }
 
         private PendingContext CreatePendingContext() { return _cache.PendingContext.Value; }
@@ -76,7 +76,7 @@ namespace Reni.Context
         {
             return _cache
                 .StructContainerCache
-                .Find(container, () => new FullContext(this, container));
+                .Find(container);
         }
 
         internal virtual Result CreateArgsRefResult(Category category)
@@ -91,7 +91,7 @@ namespace Reni.Context
         {
             return _cache
                 .Function
-                .Find(body, () => new Type.Function(this, body));
+                .Find(body);
         }
 
         internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
@@ -108,11 +108,11 @@ namespace Reni.Context
         {
             return _cache
                 .ResultCache
-                .Find(syntax,() => CreateCacheElement(syntax))
+                .Find(syntax)
                 .Result(category);
         }
 
-        private CacheItem CreateCacheElement(ICompileSyntax syntax)
+        internal CacheItem CreateCacheElement(ICompileSyntax syntax)
         {
             var result = new CacheItem(syntax, this);
             syntax.AddToCacheForDebug(this, result);
@@ -258,25 +258,29 @@ namespace Reni.Context
     internal class Cache : ReniObject, IIconKeyProvider
     {
         [Node, SmartNode]
-        internal readonly DictionaryEx<TypeBase, Function> FunctionInstanceCache =
-            new DictionaryEx<TypeBase, Function>();
+        internal readonly DictionaryEx<TypeBase, Function> FunctionInstanceCache;
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, Type.Function> Function =
-            new DictionaryEx<ICompileSyntax, Type.Function>();
+        internal readonly DictionaryEx<ICompileSyntax, Type.Function> Function;
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<Struct.Container, FullContext> StructContainerCache =
-            new DictionaryEx<Struct.Container, FullContext>();
+        internal readonly DictionaryEx<Struct.Container, FullContext> StructContainerCache;
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, CacheItem> ResultCache =
-            new DictionaryEx<ICompileSyntax, CacheItem>();
+        internal readonly DictionaryEx<ICompileSyntax, CacheItem> ResultCache;
 
         [Node, SmartNode]
         internal readonly SimpleCache<PendingContext> PendingContext;
 
-        public Cache(Func<PendingContext> pendingContext) { PendingContext = new SimpleCache<PendingContext>(pendingContext); }
+        public Cache(ContextBase contextBase)
+        {
+            ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(contextBase.CreateCacheElement);
+            StructContainerCache = new DictionaryEx<Struct.Container, FullContext>(container => new FullContext(contextBase, container));
+            Function = new DictionaryEx<ICompileSyntax, Type.Function>(body => new Type.Function(contextBase, body));
+            FunctionInstanceCache = new DictionaryEx<TypeBase, Function>(args => new Function(contextBase, args));
+            PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(contextBase)
+);
+        }
 
         /// <summary>
         /// Gets the icon key.
@@ -316,6 +320,9 @@ namespace Reni.Context
 
     internal class ContextOperator : Defineable, ISearchPath<IFeature, FunctionDefinitionType>
     {
-        IFeature ISearchPath<IFeature, FunctionDefinitionType>.Convert(FunctionDefinitionType type) { return type.ContextOperatorFeature; }
+        IFeature ISearchPath<IFeature, FunctionDefinitionType>.Convert(FunctionDefinitionType type)
+        {
+            return new Feature.Feature(type.ContextOperatorFeatureApply);
+        }
     }
 }

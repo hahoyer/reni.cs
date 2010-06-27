@@ -8,13 +8,17 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     internal abstract class Base : Visitor<CodeBase>
     {
-        private readonly DictionaryEx<InternalRef, InternalRef> _internalRefs = new DictionaryEx<InternalRef, InternalRef>();
+        private readonly DictionaryEx<InternalRef, InternalRef> _internalRefs;
+        public Base()
+        {
+            _internalRefs = new DictionaryEx<InternalRef, InternalRef>(ReVisit);
+        }
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
 
         internal override CodeBase InternalRef(InternalRef visitedObject)
         {
-            return _internalRefs.Find(visitedObject, () => ReVisit(visitedObject));
+            return _internalRefs.Find(visitedObject);
         }
 
         internal override sealed CodeBase Child(CodeBase parent, LeafElement leafElement)

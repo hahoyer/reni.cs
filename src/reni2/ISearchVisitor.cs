@@ -9,13 +9,9 @@ namespace Reni
     internal interface ISearchVisitor
     {
         void Search();
-        ISearchVisitor Child(Type.Reference target);
+        void ChildSearch<TType>(TType target) where TType : IDumpShortProvider;
         ISearchVisitor Child(Sequence target);
-        ISearchVisitor Child(Type.Array target);
-        ISearchVisitor Child(Type.Void target);
-        ISearchVisitor Child(Bit target);
-        ISearchVisitor Child(TypeType target);
         ISearchVisitor Child(Struct.Reference target);
-        ISearchVisitor Child(Struct.Type target);
+        ISearchVisitor Child(Type.Reference target);
     }
 }

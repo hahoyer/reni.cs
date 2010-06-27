@@ -13,7 +13,6 @@ namespace Reni.Type
         [DumpData(true)]
         private readonly TypeBase _value;
 
-        internal readonly IFeature DumpPrintFeature;
         private static readonly IFunctionalFeature _functionalFeature = new FunctionalFeature();
 
         private class FunctionalFeature : IFunctionalFeature
@@ -22,20 +21,9 @@ namespace Reni.Type
             Result IFunctionalFeature.Apply(Category category, Result functionResult, Result argsResult) { return argsResult.ConvertTo(functionResult.Type.StripFunctional().AutomaticDereference()) & category; }
         }
 
-        private class DumpPrintFeatureImplementation : ReniObject, IFeature
-        {
-            private readonly TypeType _parent;
-            public DumpPrintFeatureImplementation(TypeType parent) { _parent = parent; }
-
-            TypeBase IFeature.DefiningType() { return _parent; }
-
-            Result IFeature.Apply(Category category) { return Void.CreateResult(category, () => CodeBase.CreateDumpPrintText(_parent._value.DumpPrintText)); }
-        }
-
         public TypeType(TypeBase value)
         {
             _value = value;
-            DumpPrintFeature = new DumpPrintFeatureImplementation(this);
         }
 
         protected override Size GetSize() { return Size.Zero; }
@@ -47,8 +35,10 @@ namespace Reni.Type
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            searchVisitor.Child(this).Search();
+            searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
+
+        internal Result ApplyDumpPrintFeature(Category category) { return Void.CreateResult(category, () => CodeBase.CreateDumpPrintText(_value.DumpPrintText)); }
     }
 }

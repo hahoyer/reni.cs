@@ -22,7 +22,7 @@ namespace Reni.Struct
             : base(contextBase, container)
         {
             _internalConstructorResult = new Result();
-            _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>();
+            _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>(position => new ContextAtPosition(Context, position));
             _constructorResult = new Result();
         }
 
@@ -36,7 +36,7 @@ namespace Reni.Struct
 
         internal override ContextAtPosition CreatePosition(int position)
         {
-            return _contextAtPositionCache.Find(position, () => new ContextAtPosition(Context, position));
+            return _contextAtPositionCache.Find(position);
         }
 
         internal Result ConstructorResult(Category category)

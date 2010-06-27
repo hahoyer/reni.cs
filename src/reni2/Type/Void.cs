@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Reni.Code;
 
 namespace Reni.Type
 {
@@ -10,7 +9,7 @@ namespace Reni.Type
     {
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            searchVisitor.Child(this).Search();
+            searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
 
@@ -22,8 +21,5 @@ namespace Reni.Type
         internal override string DumpShort() { return "void"; }
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature) { return false; }
         internal override bool IsVoid { get { return true; } }
-
-        internal new static Result CreateResult(Category category) { return CreateVoid.CreateResult(category); }
-        internal new static Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateVoid.CreateResult(category, getCode); }
     }
 }

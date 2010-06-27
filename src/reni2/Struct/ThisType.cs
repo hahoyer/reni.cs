@@ -46,7 +46,7 @@ namespace Reni.Struct
                     .SearchFromRefToStruct(searchVisitorChild.Defineable)
                     .CheckedConvert(this);
             }
-            searchVisitor.Child(this).Search();
+            searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
 

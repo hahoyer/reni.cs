@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -29,19 +28,29 @@ namespace Reni.Type
     internal class FunctionDefinitionType : TypeBase
     {
         [DumpData(true)]
-        private readonly IFunctionalFeature _feature;
+        private readonly IFunctionalFeature _functionalFeature;
 
-        public FunctionDefinitionType(IFunctionalFeature feature)
+        public FunctionDefinitionType(IFunctionalFeature functionalFeature)
         {
-            _feature = feature;
+            _functionalFeature = functionalFeature;
         }
 
-        public IFeature ContextOperatorFeature
+        internal override void Search(ISearchVisitor searchVisitor)
         {
-            get { throw new NotImplementedException(); } }
+            searchVisitor.ChildSearch(this);
+            base.Search(searchVisitor);
+        }
 
         protected override Size GetSize() { return Size.Zero; }
-        internal override string DumpShort() { return _feature.DumpShort(); }
-        internal override IFunctionalFeature GetFunctionalFeature() { return _feature; }
+        internal override string DumpShort() { return _functionalFeature.DumpShort(); }
+        internal override IFunctionalFeature GetFunctionalFeature() { return _functionalFeature; }
+
+        internal Result ContextOperatorFeatureApply(Category category)
+        {
+            return _functionalFeature.ContextOperatorFeatureApply(category);
+        }
+
+        internal override string DumpPrintText { get { return _functionalFeature.DumpShort(); } }
     }
+
 }

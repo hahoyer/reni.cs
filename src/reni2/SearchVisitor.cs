@@ -1,27 +1,29 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using HWClassLibrary.Debug;
 using JetBrains.Annotations;
 using Reni.Parser.TokenClass;
-using Reni.Struct;
 using Reni.Type;
 
 namespace Reni
 {
-    internal abstract class SearchVisitor<TFeature> : ReniObject, ISearchVisitor
+    internal abstract class SearchVisitor : ReniObject, ISearchVisitor
+    {
+        void ISearchVisitor.Search() { SearchTypeBase(); }
+        void ISearchVisitor.ChildSearch<TType>(TType target) { InternalChild(target).Search(); }
+        ISearchVisitor ISearchVisitor.Child(Sequence target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Struct.Reference target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Reference target) { return InternalChild(target); }
+        internal abstract void SearchTypeBase();
+        protected abstract ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider;
+    }
+
+    internal abstract class SearchVisitor<TFeature> : SearchVisitor
         where TFeature : class
     {
         private readonly List<ISearchVisitor> _children = new List<ISearchVisitor>();
         private readonly List<SearchResult<TFeature>> _searchResults = new List<SearchResult<TFeature>>();
-        void ISearchVisitor.Search() { SearchTypeBase(); }
-        ISearchVisitor ISearchVisitor.Child(Bit target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Type.Reference target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Struct.Reference target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Sequence target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Type.Array target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Type.Void target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Struct.Type target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(TypeType target) { return InternalChild(target); }
 
         internal abstract bool IsSuccessFull { get; }
         internal abstract TFeature InternalResult { set; }
@@ -40,7 +42,7 @@ namespace Reni
             typeBase.Search(this);
         }
 
-        internal void SearchTypeBase()
+        internal override void SearchTypeBase()
         {
             var searchResult = new SearchResult<TFeature>(null, this);
             _searchResults.Add(searchResult);
@@ -56,7 +58,7 @@ namespace Reni
                 searchResult.SetFoundMode();
         }
 
-        private ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider { return new ChildSearchVisitor<TFeature, TType>(this, target); }
+        protected override ISearchVisitor InternalChild<TType>(TType target) { return new ChildSearchVisitor<TFeature, TType>(this, target); }
 
         public void AddChild(ISearchVisitor child) { _children.Add(child); }
     }
