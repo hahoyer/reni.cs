@@ -61,8 +61,7 @@ namespace Reni.Feature.DumpPrint
 
         Result IFeature.Apply(Category category)
         {
-            NotImplementedMethod(category);
-            return null;
+            return _type.CreateDumpPrintResult(category);
         }
 
         TypeBase IFeature.DefiningType()

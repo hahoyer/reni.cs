@@ -52,8 +52,11 @@ namespace Reni.Struct
 
         internal override Context GetStruct() { return _context; }
 
-        Result IFeatureTarget.Apply(Category category)
-        {
+        Result IFeatureTarget.Apply(Category category) {
+            return CreateDumpPrintResult(category);
+        }
+
+        internal Result CreateDumpPrintResult(Category category) {
             var argCodes = CreateArgCodes(category);
             var dumpPrint =
                 Context.Types
