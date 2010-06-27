@@ -517,7 +517,7 @@ namespace Reni
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
         {
-            var result = Reni.Type.Void.CreateResult(category);
+            var result = TypeBase.CreateVoidResult(category);
             if(category.HasCode)
                 result.Code = CodeBase.CreateDumpPrintText("(");
 

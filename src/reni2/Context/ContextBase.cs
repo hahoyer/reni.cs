@@ -85,15 +85,6 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result CreateFunctionResult(Category category, ICompileSyntax body) { return new FunctionDefinitionType(CreateFunctionType(body)).CreateResult(category); }
-
-        private Type.Function CreateFunctionType(ICompileSyntax body)
-        {
-            return _cache
-                .Function
-                .Find(body);
-        }
-
         internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
 
         internal TypeBase Type(ICompileSyntax syntax)
@@ -176,7 +167,7 @@ namespace Reni.Context
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Context"; } }
 
-        internal virtual IStructContext FindStruct()
+        internal virtual Struct.Context FindStruct()
         {
             NotImplementedMethod();
             return null;
@@ -261,9 +252,6 @@ namespace Reni.Context
         internal readonly DictionaryEx<TypeBase, Function> FunctionInstanceCache;
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, Type.Function> Function;
-
-        [Node, SmartNode]
         internal readonly DictionaryEx<Struct.Container, FullContext> StructContainerCache;
 
         [Node, SmartNode]
@@ -276,7 +264,6 @@ namespace Reni.Context
         {
             ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(contextBase.CreateCacheElement);
             StructContainerCache = new DictionaryEx<Struct.Container, FullContext>(container => new FullContext(contextBase, container));
-            Function = new DictionaryEx<ICompileSyntax, Type.Function>(body => new Type.Function(contextBase, body));
             FunctionInstanceCache = new DictionaryEx<TypeBase, Function>(args => new Function(contextBase, args));
             PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(contextBase)
 );

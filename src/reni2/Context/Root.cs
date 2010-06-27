@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
-using Reni.Code;
+using Reni.Struct;
 using Reni.Syntax;
 
 namespace Reni.Context
@@ -23,7 +23,7 @@ namespace Reni.Context
         [DumpData(false)]
         internal override Root RootContext { get { return this; } }
 
-        internal List<Container> CompileFunctions()
+        internal List<Code.Container> CompileFunctions()
         {
             return _function.Compile();
         }
@@ -31,7 +31,7 @@ namespace Reni.Context
         [Node, DumpData(false)]
         public FunctionList Functions { get { return _function; } }
 
-        public Result CreateFunctionCall(ContextBase context, Category category, ICompileSyntax body, Result argsResult)
+        public Result CreateFunctionCall(Struct.Context context, Category category, ICompileSyntax body, Result argsResult)
         {
             Tracer.Assert(argsResult.HasType);
             return Functions.Find(body, context, argsResult.Type).CreateCall(category, argsResult);

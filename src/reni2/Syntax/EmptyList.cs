@@ -1,6 +1,7 @@
 using System;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Type;
 
 namespace Reni.Syntax
 {
@@ -11,7 +12,7 @@ namespace Reni.Syntax
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            return Type.Void.CreateResult(category);
+            return TypeBase.CreateVoidResult(category);
         }
 
         internal protected override string DumpShort()

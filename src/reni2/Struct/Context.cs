@@ -13,28 +13,29 @@ using Reni.Type;
 namespace Reni.Struct
 {
     [Serializable]
-    internal abstract class Context : ContextBase, IStructContext
+    internal abstract class Context : Reni.Context.Child
     {
         private Size[] _offsetsCache;
         private TypeBase[] _typesCache;
         private readonly SimpleCache<ContextPosition[]> _featuresCache;
-        [Node]
-        internal readonly ContextBase Parent;
         [Node]
         internal readonly Container Container;
         [Node, DumpData(false)]
         private readonly Result[] _internalResult;
         private readonly Type _type;
         private readonly Reni.Type.Reference _referenceType;
+        [Node, SmartNode]
+        private readonly DictionaryEx<ICompileSyntax, Reni.Type.Function> _function;
 
         protected Context(ContextBase parent, Container container)
+            : base(parent)
         {
             _featuresCache = new SimpleCache<ContextPosition[]>(CreateFeaturesCache);
-            Parent = parent;
             Container = container;
             _internalResult = new Result[StatementList.Count];
             _type = new Type(this);
             _referenceType = _type.CreateReference(parent.RefAlignParam);
+            _function = new DictionaryEx<ICompileSyntax, Reni.Type.Function>(body => new Reni.Type.Function(this, body));
         }
 
         [DumpData(false)]
@@ -42,11 +43,6 @@ namespace Reni.Struct
         [DumpData(false)]
         internal Reni.Type.Reference ContextReferenceType { get { return _referenceType; } }
 
-        [DumpData(false)]
-        internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
-
-        [DumpData(false)]
-        internal override Root RootContext { get { return Parent.RootContext; } }
         [DumpData(false)]
         public abstract IRefInCode ForCode { get; }
 
@@ -96,7 +92,7 @@ namespace Reni.Struct
 
         private Result InternalResult(Category category, int fromPosition, int fromNotPosition)
         {
-            var result = Reni.Type.Void.CreateResult(category);
+            var result = TypeBase.CreateVoidResult(category);
             for(var i = fromPosition; i < fromNotPosition; i++)
                 result = result.CreateSequence(InternalAlignedResult(category, i));
             return result;
@@ -150,18 +146,22 @@ namespace Reni.Struct
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(x=>Type(x)); }
 
-        sealed internal override IStructContext FindStruct() { return this; }
+        sealed internal override Context FindStruct() { return this; }
 
-        Result IStructContext.CreateThisResult(Category category)
+        internal Result CreateThisResult(Category category)
         {
             return ContextReferenceType
                 .CreateResult(category, CreateContextCode, CreateContextRefs);
         }
 
+        internal Result CreateFunctionResult(Category category, ICompileSyntax body)
+        {
+            return new FunctionDefinitionType(CreateFunctionType(body)).CreateResult(category); 
+        }
+
         internal Result CreateAtResultFromArg(Category category, int position)
         {
-            return new Reference(this, position)
-                .CreateArgResult(category);
+            return new Reference(this, position).CreateArgResult(category);
         }
 
         internal Result CreateAtResultFromContext(Category category, int position)
@@ -181,6 +181,8 @@ namespace Reni.Struct
         {
             return Refs.Context(ForCode);
         }
+
+        private Reni.Type.Function CreateFunctionType(ICompileSyntax body) { return _function.Find(body); }
 
     }
 }                                    

@@ -42,10 +42,8 @@ namespace Reni.Context
             Parent.Search(searchVisitor);
         }
 
-        internal override IStructContext FindStruct()
+        internal override Struct.Context FindStruct()
         {
-            if(this is IStructContext)
-                return (IStructContext) this;
             return Parent.FindStruct();
         }
     }

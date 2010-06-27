@@ -2,15 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
+using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.Struct
 {
     [Serializable]
     internal sealed class ContextAtPosition : Context, IRefInCode
     {
+
         private readonly int _position;
         private readonly FullContext _context;
 
@@ -36,10 +40,6 @@ namespace Reni.Struct
         RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
 
         bool IRefInCode.IsChildOf(ContextBase contextBase) { throw new NotImplementedException(); }
-    }
 
-    internal interface IStructContext
-    {
-        Result CreateThisResult(Category category);
     }
 }

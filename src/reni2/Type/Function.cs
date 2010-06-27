@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Syntax;
 
 namespace Reni.Type
@@ -12,17 +11,15 @@ namespace Reni.Type
     {
         private readonly ICompileSyntax _body;
 
-        private readonly ContextBase _context;
+        private readonly Struct.Context _context;
         private static int _nextObjectId;
 
-        internal Function(ContextBase context, ICompileSyntax body)
+        internal Function(Struct.Context context, ICompileSyntax body)
             : base(_nextObjectId++)
         {
             _context = context;
             _body = body;
         }
-
-        private ContextBase Context { get { return _context; } }
 
         private ICompileSyntax Body { get { return _body; } }
 
@@ -39,17 +36,13 @@ namespace Reni.Type
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
             var trace = false;
-                // ObjectId == 8 && functionalResult.ObjectId == 9884 && argsResult.ObjectId == 9898 && category.HasCode;
+            // ObjectId == 8 && functionalResult.ObjectId == 9884 && argsResult.ObjectId == 9898 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, functionalResult, argsResult);
             Tracer.Assert(argsResult.HasType);
             var result = ApplyFunction(category, argsResult.Type).UseWithArg(argsResult);
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
-        internal Result CreateResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
+        Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { return _context.CreateThisResult(category); }
     }
 }

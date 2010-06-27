@@ -58,6 +58,8 @@ namespace Reni.Type
                 var convertedArgsResult = argsResult.ConvertToBitSequence(category);
                 return result.UseWithArg(convertedObjectResult.CreateSequence(convertedArgsResult));
             }
+
+            Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
         }
 
         private class PrefixFeatureClass : ReniObject, IFeature, IPrefixFeature

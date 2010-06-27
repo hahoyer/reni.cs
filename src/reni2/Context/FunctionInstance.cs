@@ -6,6 +6,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Code.ReplaceVisitor;
+using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -27,7 +28,7 @@ namespace Reni.Context
 
         [Node]
         [DumpData(true)]
-        private readonly ContextBase _context;
+        private readonly Struct.Context _context;
 
         [DumpData(true)]
         private readonly int _index;
@@ -43,7 +44,7 @@ namespace Reni.Context
         /// <param name="context">The context.</param>
         /// <param name="args">The args.</param>
         /// created 03.01.2007 21:19
-        internal FunctionInstance(int index, ICompileSyntax body, ContextBase context, TypeBase args)
+        internal FunctionInstance(int index, ICompileSyntax body, Struct.Context context, TypeBase args)
             : base(index)
         {
             StopByObjectId(-1);
@@ -159,7 +160,7 @@ namespace Reni.Context
 
         private TypeBase Type() { return Result(Category.Type).Type; }
 
-        internal Container Serialize(bool isInternal)
+        internal Code.Container Serialize(bool isInternal)
         {
             try
             {
@@ -167,7 +168,7 @@ namespace Reni.Context
             }
             catch(UnexpectedVisitOfPending)
             {
-                return Container.UnexpectedVisitOfPending;
+                return Code.Container.UnexpectedVisitOfPending;
             }
         }
 
