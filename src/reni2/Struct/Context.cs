@@ -148,7 +148,7 @@ namespace Reni.Struct
                 .ToArray();
         }
 
-        private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(Type); }
+        private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(x=>Type(x)); }
 
         sealed internal override IStructContext FindStruct() { return this; }
 
