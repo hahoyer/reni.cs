@@ -1,5 +1,5 @@
 using System;
-using NUnit.Framework;
+using HWClassLibrary.UnitTest;
 
 namespace Reni.FeatureTest
 {

@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
+using HWClassLibrary.UnitTest;
 using JetBrains.Annotations;
-using NUnit.Framework;
 
 namespace Reni.FeatureTest
 {
@@ -79,13 +79,9 @@ namespace Reni.FeatureTest
             {
                 var x = new StackTrace(true).GetFrame(depth + i).GetMethod();
                 if(x.GetCustomAttributes(typeof(TestAttribute), true).Length > 0)
-                {
-                    var xx = x.GetCustomAttributes(typeof(CategoryAttribute), true);
-                    for(var ii = 0; ii < xx.Length; ii++)
-                        if(((CategoryAttribute) xx[ii]).Name == UnderConstruction)
-                            return true;
-                    return false;
-                }
+                    return x
+                        .GetCustomAttributes(typeof(CategoryAttribute), true)
+                        .Any(t => ((CategoryAttribute) t).Name == UnderConstruction);
             }
             return false;
         }
@@ -106,8 +102,10 @@ namespace Reni.FeatureTest
 
             RunDependants();
 
-            CreateFileAndRunCompiler(1, GetType().Name, Target, AssertValid, Output);
+            foreach(var tuple in TargetSet)
+                CreateFileAndRunCompiler(1, GetType().Name, tuple.Item1, AssertValid, tuple.Item2);
         }
+
 
         private void RunDependants()
         {
@@ -125,6 +123,14 @@ namespace Reni.FeatureTest
                 ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
         }
 
+        private IEnumerable<Tuple<string, string>> TargetSet { get
+        {
+            var result = GetStringPairAttributes<TargetSetAttribute>();
+            if (Target != "")
+                result = result.Union(new[] {new Tuple<string, string>(Target, Output)}).ToArray();
+
+            return result;
+        } }
         protected virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
         public virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
 
@@ -141,9 +147,15 @@ namespace Reni.FeatureTest
         internal string GetStringAttribute<T>() where T : StringAttribute
         {
             var attrs = GetType().GetCustomAttributes(typeof(T), true);
-            if(attrs.Length == 1)
-                return ((T) attrs[0]).Value;
-            return "";
+            return attrs.Length == 1 ? ((T) attrs[0]).Value : "";
+        }
+
+        private Tuple<string,string >[] GetStringPairAttributes<T>() where T : StringPairAttribute
+        {
+            return GetType()
+                .GetCustomAttributes(typeof(T), true)
+                .Select(x => ((StringPairAttribute)x).Value)
+                .ToArray();
         }
 
         protected virtual void AssertValid(Compiler c) { }
@@ -176,4 +188,20 @@ namespace Reni.FeatureTest
         public InstanceCodeAttribute(string value)
             : base(value) { }
     }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    internal sealed class TargetSetAttribute : StringPairAttribute
+    {
+        internal TargetSetAttribute(string target, string output)
+            :base(new Tuple<string, string>(target,output))
+        {
+        }
+    }
+
+    internal abstract class StringPairAttribute : Attribute
+    {
+        public readonly Tuple<string, string> Value;
+        protected StringPairAttribute(Tuple<string, string> value) { Value = value; }
+    }
+
 }

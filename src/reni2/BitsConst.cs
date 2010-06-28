@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using NUnit.Framework;
+using HWClassLibrary.UnitTest;
 using Reni.FeatureTest;
 using Reni.Runtime;
 

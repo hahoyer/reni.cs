@@ -1,6 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
-using NUnit.Framework;
+using HWClassLibrary.UnitTest;
 using Reni.FeatureTest;
 using Reni.FeatureTest.Structure;
 

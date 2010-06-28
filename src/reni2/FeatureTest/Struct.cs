@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using HWClassLibrary.UnitTest;
 using System;
 using System.Collections.Generic;
 
@@ -71,7 +71,7 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { }
     }
 
-    [TestFixture, InnerAccessTheOnlyOne]
+    [TestFixture, InnerAccess]
     public class PropertyVariable: CompilerTest{
         public override string Target { get { return @"! property x: 11/\; x dump_print"; } }
         protected override string Output { get { return "11"; } }
@@ -80,110 +80,56 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccessSecondOfTwo]
-    [Target(@"(1, 11, 3, (this _A_T_ 1) := 3) dump_print")]
-    [Output("(1, 3, 3, )")]
+    [TestFixture, InnerAccess]
+    [TargetSet(@"(1, 11, 3, (this _A_T_ 1) := 3) dump_print","(1, 3, 3, )")]
     public class Assignment : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
-    public class InnerAccessTheOnlyOne : CompilerTest
-    {
-        public override string Target { get { return "5, (this _A_T_ 0) dump_print"; } }
-        protected override string Output { get { return "5"; } }
-
-        [Test, Category(Worked)]
-        public override void Run() { BaseRun(); }
-    }
-
-    [TestFixture, InnerAccessTheOnlyOne]
+    [TestFixture, InnerAccess]
+    [TargetSet("5, (this _A_T_ 0 + this _A_T_ 0)dump_print","10")]
+    [TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
     public class AccessAndAdd : CompilerTest
     {
-        public override string Target { get { return "5, (this _A_T_ 0 + this _A_T_ 0)dump_print"; } }
-        protected override string Output { get { return "10"; } }
-
-        [Test, Category(Worked)]
-        public override void Run() { BaseRun(); }
-    }
-
-    [TestFixture, InnerAccessTheOnlyOne]
-    public class InnerAccessSecondOfTwo : CompilerTest
-    {
-        public override string Target { get { return "5,6, (this _A_T_ 1) dump_print"; } }
-        protected override string Output { get { return "6"; } }
-
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
-    public class InnerAccessFirstOfTwo : CompilerTest
-    {
-        public override string Target { get { return "5,6, (this _A_T_ 0) dump_print"; } }
-        protected override string Output { get { return "5"; } }
-
-        [Test, Category(Worked)]
-        public override void Run() { BaseRun(); }
-    }
-
-    [TestFixture]
-    public class AccessAndAddMultiple : CompilerTest
+    [TargetSet("5, (this _A_T_ 0) dump_print", "5")]
+    [TargetSet("5,6, (this _A_T_ 0) dump_print", "5")]
+    [TargetSet("5,6, (this _A_T_ 1) dump_print", "6")]
+    public class InnerAccess : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
-
-        public override string Target { get { return @" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;"; } }
-        protected override string Output { get { return "2055"; } }
-
-        protected override IEnumerable<System.Type> DependsOn
-        {
-            get
-            {
-                return new[]
-                {
-                    typeof(AccessAndAdd),
-                    typeof(InnerAccessTheOnlyOne),
-                    typeof(InnerAccessFirstOfTwo),
-                    typeof(InnerAccessSecondOfTwo)
-                };
-            }
-        }
     }
 
     [TestFixture(Description = "x1: 1;x2: 4;x3: 2050;x4: x1 + x2 + x3;x4 dump_print;")]
-    public class SomeVariables : CompilerTest
-    {
-        public override string Target { get { return @"
+    [TargetSet(@"
 x1: 1;
 x2: 4;
 x3: 2050;
 x4: x1 + x2 + x3;
 x4 dump_print;
-"; } }
-        protected override string Output { get { return "2055"; } }
-        protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(AccessAndAddMultiple)}; } }
-
+","2055")]
+    [AccessAndAdd]
+    public class SomeVariables : CompilerTest
+    {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
-    [Target(@"a: (b:222,c:4); a b dump_print")]
-    [Output("222")]
-    public class AccessMemberB : CompilerTest
+    [TargetSet(@"a: (b:222,c:4); a b dump_print","222")]
+    [TargetSet(@"a: (b:222,c:4); a c dump_print", "4")]
+    [InnerAccess]
+    public class AccessMember : CompilerTest
     {
         [Test, Category(Worked)]
-        public override void Run() { BaseRun(); }
-    }
-    [TestFixture,AccessMemberB]
-    [Target(@"a: (b:222,c:4); a c dump_print")]
-    [Output("4")]
-    public class AccessMemberC : CompilerTest
-    {
-        [Test, Category(Worked)]
+        public void Run1() { BaseRun(); }
         public override void Run() { BaseRun(); }
     }
 }

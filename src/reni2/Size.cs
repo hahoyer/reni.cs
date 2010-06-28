@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using NUnit.Framework;
+using HWClassLibrary.UnitTest;
 using Reni.FeatureTest;
 
 namespace Reni
@@ -416,7 +416,7 @@ namespace Reni
             return ToInt().ToString();
         }
 
-        [TestFixture, Category(CompilerTest.Worked)]
+        [TestFixture]
         private class Tests
         {
             private static void TestNextPacketSize(int x, int b)

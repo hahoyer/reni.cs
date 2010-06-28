@@ -1,6 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
-using NUnit.Framework;
+using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.DefaultOperations;
 using Reni.FeatureTest.Struct;
@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [Target(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;")]
     [Output("102")]
-    [InnerAccessTheOnlyOne, SomeVariables, Add2Numbers, AccessMemberC]
+    [SomeVariables, Add2Numbers, AccessMember]
     public class FunctionVariable : CompilerTest
     {
         [Test, Category(Worked)]
@@ -21,14 +21,14 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [Target(@"x: 100;f: arg+x/\;f(200) dump_print;")]
     [Output("102")]
-    [InnerAccessTheOnlyOne, SomeVariables, Add2Numbers]
+    [InnerAccess, SomeVariables, Add2Numbers]
     public class FunctionWithNonLocal : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, UseThen, UseElse, Assignment, SimpleFunction, RecursiveFunction]
+    [TestFixture, InnerAccess, Add2Numbers, UseThen, UseElse, Assignment, SimpleFunction, RecursiveFunction]
     [Target(@"i: 10; f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()")]
     [Output("9876543210")]
     public class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
@@ -61,8 +61,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
-    [Target(@"i: 400000 type(10); f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()")]
-    [Output("9876543210")]
+    [TargetSet(@"i: 400000 type(10); f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()", "9876543210")]
     [PrimitiveRecursiveFunctionByteWithDump, UseThen, UseElse]
     public class PrimitiveRecursiveFunctionWithDump : CompilerTest
     {
@@ -70,7 +69,7 @@ namespace Reni.FeatureTest.Function
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccessTheOnlyOne, Add2Numbers, UseThen, UseElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction]
+    [TestFixture, InnerAccess, Add2Numbers, UseThen, UseElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction]
     [Target(@"f: {1000 type({arg = 1 then 1 else (arg * f(arg type((arg-1)enable_cut))}enable_cut)}/\;f(4)dump_print")]
     [Output("24")]
     public class RecursiveFunction : CompilerTest
@@ -87,8 +86,8 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture,
-    Target(@"f: arg+1/\;f(2) dump_print;"), Output("3"), 
-    InnerAccessTheOnlyOne, Add2Numbers] 
+    TargetSet(@"f: arg+1/\;f(2) dump_print;","3"), 
+    InnerAccess, Add2Numbers] 
     public class SimpleFunction : CompilerTest
     {
         [Test, Category(Worked)]

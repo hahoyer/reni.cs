@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using NUnit.Framework;
+using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.Struct;
 
