@@ -11,8 +11,8 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-	    <ProductVersion>9.0.21022</ProductVersion>
-	    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+        <ProductVersion>9.0.30729</ProductVersion>
+        <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(AssemblyName)</RootNamespace>
     </PropertyGroup>
