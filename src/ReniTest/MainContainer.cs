@@ -18,7 +18,7 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //InspectCompiler();
-            TestExtender.RunTests(Assembly.GetExecutingAssembly());
+            Assembly.GetExecutingAssembly().RunTests();
         }
 
         private static void InspectCompiler()
