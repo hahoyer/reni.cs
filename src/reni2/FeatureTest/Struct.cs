@@ -107,7 +107,7 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture(Description = "x1: 1;x2: 4;x3: 2050;x4: x1 + x2 + x3;x4 dump_print;")]
+    [TestFixture]
     [TargetSet(@"
 x1: 1;
 x2: 4;

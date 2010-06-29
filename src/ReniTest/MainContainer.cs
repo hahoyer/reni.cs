@@ -18,41 +18,7 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //InspectCompiler();
-            RunTests();
-        }
-
-        private static void RunTests()
-        {
-            var attributeType = typeof(TestFixtureAttribute);
-            var x = GetAssemblies()
-                .SelectMany(assembly=> assembly.GetTypes())
-                .Where(t => t.GetCustomAttributes(attributeType,true).Length > 0)
-                .ToArray();
-        }
-
-        private static IEnumerable<Assembly> GetAssemblies()
-        {
-            var x = AppDomain.CurrentDomain.GetAssemblies();
-            for (; ; )
-            {
-                var xCount = x.Length;
-                var z = x.SelectMany(xx => xx.GetReferencedAssemblies()).Select(AssemblyLoad);
-                x = x.Union(z).Distinct().ToArray();
-                if (xCount == x.Length)
-                    return x;
-            }
-        }
-
-        private static Assembly AssemblyLoad(AssemblyName yy)
-        {
-            try
-            {
-                return AppDomain.CurrentDomain.Load(yy);
-            }
-            catch(Exception e)
-            {
-                return Assembly.GetExecutingAssembly();
-            }
+            TestExtender.RunTests(Assembly.GetExecutingAssembly());
         }
 
         private static void InspectCompiler()
@@ -77,5 +43,4 @@ namespace ReniTest
             return compiler;
         }
     }
-
 }
