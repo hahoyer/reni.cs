@@ -20,6 +20,7 @@ namespace Reni.Type
             string IDumpShortProvider.DumpShort() { return "type"; }
             Result IFunctionalFeature.Apply(Category category, Result functionResult, Result argsResult) { return argsResult.ConvertTo(functionResult.Type.StripFunctional().AutomaticDereference()) & category; }
             Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
+            Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
         }
 
         public TypeType(TypeBase value)
@@ -40,6 +41,9 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal Result ApplyDumpPrintFeature(Category category) { return CreateVoid.CreateResult(category, () => CodeBase.CreateDumpPrintText(_value.DumpPrintText)); }
+        internal Result ApplyDumpPrintFeature(Category category)
+        {
+            return CreateVoid.CreateResult(category, () => CodeBase.CreateDumpPrintText(_value.DumpPrintText));
+        }
     }
 }

@@ -60,6 +60,7 @@ namespace Reni.Type
             }
 
             Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
+            Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
         }
 
         private class PrefixFeatureClass : ReniObject, IFeature, IPrefixFeature

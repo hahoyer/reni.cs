@@ -11,11 +11,11 @@ namespace Reni.Code
     internal sealed class RefCode : CodeBase
     {
         private readonly ContextRef _leafElement;
-
-        internal RefCode(IRefInCode context)
+        private static int _nextObjectId = 1;
+        internal RefCode(IRefInCode context):base(_nextObjectId++)
         {
             _leafElement = new ContextRef(context);
-            StopByObjectId(-5525);
+            StopByObjectId(17);
         }
 
         [Node]

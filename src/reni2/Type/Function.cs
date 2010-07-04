@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Code;
 using Reni.Syntax;
 
 namespace Reni.Type
@@ -21,17 +22,7 @@ namespace Reni.Type
             _body = body;
         }
 
-        private ICompileSyntax Body { get { return _body; } }
-
-        private Result ApplyFunction(Category category, TypeBase argsType)
-        {
-            var argsResult = argsType.CreateArgResult(category | Category.Type);
-            return _context
-                .RootContext
-                .CreateFunctionCall(_context, category, Body, argsResult);
-        }
-
-        public string DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _context.ObjectId + "#)#"; }
+        string IDumpShortProvider.DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _context.ObjectId + "#)#"; }
 
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
@@ -44,5 +35,24 @@ namespace Reni.Type
         }
 
         Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { return _context.CreateThisResult(category); }
+
+        Result IFunctionalFeature.DumpPrintFeatureApply(Category category)
+        {
+            return TypeBase
+                .CreateVoid
+                .CreateResult(category, () => CodeBase.CreateDumpPrintText(DumpPrintText));
+        }
+
+        private Result ApplyFunction(Category category, TypeBase argsType)
+        {
+            var argsResult = argsType.CreateArgResult(category | Category.Type);
+            return _context
+                .RootContext
+                .CreateFunctionCall(_context, category, Body, argsResult);
+        }
+
+        private ICompileSyntax Body { get { return _body; } }
+
+        private string DumpPrintText { get { return "(#(#" + ObjectId + "#)#)/\\"; } }
     }
 }

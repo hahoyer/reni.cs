@@ -11,7 +11,7 @@ namespace Reni
     /// </summary>
     [dump("Dump")]
     [Serializable]
-    internal class Category : IEquatable<Category>
+    internal class Category : ReniObject, IEquatable<Category>
     {
         private readonly bool _code;
         private readonly bool _type;
@@ -133,7 +133,7 @@ namespace Reni
         /// dump 
         /// </summary>
         /// <returns></returns>
-        public string Dump()
+        public override string Dump()
         {
             string result = "";
             if(HasSize) result += ".Size.";
@@ -146,8 +146,6 @@ namespace Reni
             return result;
 
         }
-
-        public override string ToString(){return Dump();}
 
         public bool Equals(Category obj)
         {

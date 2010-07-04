@@ -66,8 +66,7 @@ namespace Reni.Feature.DumpPrint
 
         TypeBase IFeature.DefiningType()
         {
-            NotImplementedMethod();
-            return null;
+            return _type;
         }
     }
 

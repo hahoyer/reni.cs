@@ -8,5 +8,6 @@ namespace Reni.Type
     {
         Result Apply(Category category, Result functionalResult, Result argsResult);
         Result ContextOperatorFeatureApply(Category category);
+        Result DumpPrintFeatureApply(Category category);
     }
 }

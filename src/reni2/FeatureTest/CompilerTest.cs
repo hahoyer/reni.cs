@@ -127,7 +127,7 @@ namespace Reni.FeatureTest
         {
             var result = GetStringPairAttributes<TargetSetAttribute>();
             if (Target != "")
-                result = result.Union(new[] {new Tuple<string, string>(Target, Output)}).ToArray();
+                result = result.Concat(new[] {new Tuple<string, string>(Target, Output)}).ToArray();
 
             return result;
         } }

@@ -15,6 +15,7 @@ namespace Reni
     [Serializable]
     internal sealed class Result : ReniObject, ITreeNodeSupport
     {
+        private static int _nextObjectId = 1;
         private bool _isDirty;
         private Size _size;
         private TypeBase _type;
@@ -22,7 +23,7 @@ namespace Reni
         private Refs _refs;
         internal readonly PostProcessorForResult PostProcessor;
 
-        public Result()
+        public Result(): base(_nextObjectId++)
         {
             PostProcessor = new PostProcessorForResult(this);
             PendingCategory = new Category();
@@ -313,7 +314,21 @@ namespace Reni
         {
             var trace = context.ObjectId == -17 && category.HasRefs && IsObjectId(syntax, 1192);
             StartMethodDumpWithBreak(trace, context, category, syntax);
-            InternalAddCategories(context, category - CompleteCategory - PendingCategory, syntax);
+            var localCateogory = category - CompleteCategory - PendingCategory;
+            
+            if(localCateogory.HasSize && FindSize != null)
+            {
+                _size = FindSize;
+                localCateogory -= Category.Size;
+            }
+
+            if (localCateogory.HasRefs && FindRefs != null)
+            {
+                _refs = FindRefs;
+                localCateogory -= Category.Refs;
+            }
+
+            InternalAddCategories(context, localCateogory, syntax);
             TreatPendingCategories(context, category - CompleteCategory, syntax);
             ReturnMethodDumpWithBreak(trace);
         }

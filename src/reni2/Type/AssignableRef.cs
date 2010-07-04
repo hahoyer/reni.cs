@@ -22,6 +22,8 @@ namespace Reni.Type
 
         TypeBase IFeature.DefiningType() { return _type; }
         Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
+        Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
+
         Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
         {
             return _type

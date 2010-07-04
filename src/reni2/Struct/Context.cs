@@ -128,7 +128,10 @@ namespace Reni.Struct
         [DumpData(false)]
         internal IEnumerable<TypeBase> Types { get { return _typesCache ?? (_typesCache = GetTypes().ToArray()); } }
         [DumpData(false)]
-        internal Size[] Offsets { get { return _offsetsCache ?? (_offsetsCache = GetOffsets().ToArray()); } }
+        internal Size[] Offsets { get
+        {
+            return _offsetsCache ?? (_offsetsCache = GetOffsets().ToArray());
+        } }
 
         private IEnumerable<Size> GetOffsets()
         {
@@ -138,10 +141,11 @@ namespace Reni.Struct
         
         private Size[] AggregateSizes(Size[] sizesSoFar, Size nextSize)
         {
-            return sizesSoFar
+            var result = sizesSoFar
                 .Select(size => size + nextSize.Align(AlignBits))
-                .Union(new[] { Size.Zero })
+                .Concat(new[] { Size.Zero })
                 .ToArray();
+            return result;
         }
 
         private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(x=>Type(x)); }
@@ -184,5 +188,21 @@ namespace Reni.Struct
 
         private Reni.Type.Function CreateFunctionType(ICompileSyntax body) { return _function.Find(body); }
 
+        internal Result[] CreateArgCodes(Category category)
+        {
+            return Types
+                .Select((type, i) => AutomaticDereference(type, Offsets[i], category))
+                .ToArray();
+        }
+        private Result AutomaticDereference(TypeBase type, Size offset, Category category)
+        {
+            return type
+                .CreateReference(RefAlignParam)
+                .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(RefAlignParam, offset))
+                .AutomaticDereference()
+                & category;
+        }
+
+        private CodeBase CreateRefArgCode() { return ContextType.CreateReference(RefAlignParam).CreateArgCode(); }
     }
 }                                    
