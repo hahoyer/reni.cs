@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [Target(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;")]
     [Output("102")]
-    [SomeVariables, Add2Numbers, AccessMember]
+    [SomeVariables, Add2Numbers, AccessMember, FunctionWithNonLocal]
     public class FunctionVariable : CompilerTest
     {
         [Test, Category(Worked)]
@@ -19,7 +19,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
-    [Target(@"x: 100;f: arg+x/\;f(200) dump_print;")]
+    [Target(@"x: 100;f: arg+x/\;f(2) dump_print;")]
     [Output("102")]
     [InnerAccess, SomeVariables, Add2Numbers]
     public class FunctionWithNonLocal : CompilerTest

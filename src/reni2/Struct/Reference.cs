@@ -33,15 +33,16 @@ namespace Reni.Struct
 
         Result IFeatureTarget.Apply(Category category)
         {
-            return _targetCache
-                .Value
+            return Target
                 .DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam);
         }
 
+        internal TypeBase Target { get { return _targetCache.Value; } }
+
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            _targetCache.Value.Search(searchVisitor.Child(this));
-            _targetCache.Value.Search(searchVisitor);
+            Target.Search(searchVisitor.Child(this));
+            Target.Search(searchVisitor);
             base.Search(searchVisitor);
         }
 
@@ -51,8 +52,7 @@ namespace Reni.Struct
             if(destAsRef != null)
                 return CreateTypeReferenceResult(category);
 
-            return _targetCache
-                .Value
+            return Target
                 .Conversion(category, dest)
                 .UseWithArg(CreateDereferencedResult(category));
         }
@@ -64,16 +64,18 @@ namespace Reni.Struct
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             return AsTypeReference(dest) != null
-                   || _targetCache.Value.IsConvertableTo(dest, conversionFeature);
+                   || Target.IsConvertableTo(dest, conversionFeature);
         }
+
+        internal override IFunctionalFeature GetFunctionalFeature() { return Target.GetFunctionalFeature(); }
 
         internal override bool IsRef(RefAlignParam refAlignParam)
         {
             Tracer.Assert(RefAlignParam == refAlignParam);
             return true;
         }
-        internal override int GetSequenceCount(TypeBase elementType) { return _targetCache.Value.GetSequenceCount(elementType); }
-        internal override TypeBase GetEffectiveType() { return _targetCache.Value.GetEffectiveType(); }
+        internal override int GetSequenceCount(TypeBase elementType) { return Target.GetSequenceCount(elementType); }
+        internal override TypeBase GetEffectiveType() { return Target.GetEffectiveType(); }
 
         internal Result ApplyAssignment(Category category, Result functionalResult, Result argsResult)
         {
@@ -100,7 +102,7 @@ namespace Reni.Struct
                 return null;
             if(RefAlignParam != destAsRef.RefAlignParam)
                 return null;
-            if(_targetCache.Value != destAsRef.Target)
+            if(Target != destAsRef.Target)
                 return null;
 
             return destAsRef;
@@ -117,7 +119,7 @@ namespace Reni.Struct
         private Result CreateDereferencedResult(Category category)
         {
             var accessResult = CreateAccessResult(category);
-            return _targetCache.Value.CreateDereferencedResult(category, accessResult, RefAlignParam);
+            return Target.CreateDereferencedResult(category, accessResult, RefAlignParam);
         }
 
         private Size GetOffset() { return _context.Offset(_position); }

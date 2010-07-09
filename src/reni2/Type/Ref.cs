@@ -36,6 +36,7 @@ namespace Reni.Type
         internal override void Search(ISearchVisitor searchVisitor)
         {
             _target.Search(searchVisitor.Child(this));
+            _target.Search(searchVisitor);
             base.Search(searchVisitor);
         }
 
