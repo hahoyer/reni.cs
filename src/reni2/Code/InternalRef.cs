@@ -31,6 +31,8 @@ namespace Reni.Code
 
         protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.InternalRef(this); }
+        protected override bool IsRelativeReference { get { return false; } }
+
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         internal CodeBase Code { get { return _unalignedCode.Align(RefAlignParam.AlignBits); } }

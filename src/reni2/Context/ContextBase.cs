@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -94,7 +95,7 @@ namespace Reni.Context
             return result;
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result Result(Category category, ICompileSyntax syntax)
         {
             return _cache

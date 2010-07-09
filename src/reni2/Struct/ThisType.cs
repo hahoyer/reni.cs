@@ -38,7 +38,7 @@ namespace Reni.Struct
         internal override void Search(ISearchVisitor searchVisitor)
         {
             var searchVisitorChild = searchVisitor as SearchVisitor<IFeature>;
-            if (searchVisitorChild != null)
+            if (searchVisitorChild != null && !searchVisitorChild.IsSuccessFull)
             {
                 searchVisitorChild.InternalResult =
                     _context

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
@@ -25,7 +26,7 @@ namespace Reni.Syntax
             _context = context;
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         public Result Result(Category category)
         {
             _data.AddCategories(_context, category, _syntax);

@@ -35,7 +35,7 @@ namespace Reni.Code
         internal virtual bool IsEmpty { get { return false; } }
 
         [DumpData(false)]
-        private bool IsRelativeReference { get { return RefAlignParam != null; } }
+        protected virtual bool IsRelativeReference { get { return RefAlignParam != null; } }
 
         [DumpData(false)]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
@@ -340,7 +340,7 @@ namespace Reni.Code
         internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
-            var trace = body.ObjectId == -268;
+            var trace = body.ObjectId == -438 || body.ObjectId == -440;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();
@@ -348,11 +348,14 @@ namespace Reni.Code
             var alignedInternal = Code.Align();
             // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
             var gap = CodeBase .CreateVoid();
+            DumpWithBreak(trace,"newBody",newBody,"alignedBody",alignedBody,"alignedInternal",alignedInternal);
             if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                 gap = CodeBase.CreateBitArray(resultSize - alignedInternal.Size, BitsConst.None());
-            var result = alignedInternal
+            var statement = alignedInternal
                 .CreateSequence(gap, alignedBody, DestructorCode)
-                .CreateStatementEnd(copier, refAlignParam, resultSize)
+                .CreateStatementEnd(copier, refAlignParam, resultSize);
+            DumpWithBreak(trace, "statement", statement);
+            var result = statement
                 .UseWithArg(CodeBase.CreateTopRef(refAlignParam));
             return ReturnMethodDump(trace, result);
         }

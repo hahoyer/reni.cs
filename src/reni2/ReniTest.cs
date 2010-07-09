@@ -10,45 +10,39 @@ namespace Reni
     /// </summary>
     public static unsafe class ReniTest
     {
-        /// <summary>
-        /// sss
-        /// </summary>
-        // 
         public static void MainFunction()
         {
-            fixed(sbyte* data = new sbyte[10])
+            fixed (sbyte* data = new sbyte[10])
             {
-                (*(data + 9)) = (100); // BitArray 4280
-                (*(data + 8)) = (2); // BitArray 4412
-                (*(Int32*) (data + 4)) = (Int32) (data + 10); // TopRef 4413
-                (*(Int32*) (data + 0)) = (Int32) (data + 12); // TopRef 4414
-                ReniFunction0((data + 8)); // Call 4300
-                (*(Int16*) (data + 4)) = (*(Int16*) (data + 6)); // TopData 4416
-                (*(Int16*) (data + 4)) = (Int16) ((Int16) ((*(Int16*) (data + 4)) << 7) >> 7); // BitCast 514
-                Data.DumpPrint((*(Int16*) (data + 4))); // DumpPrintOperation 4292
-            }
+                (*(sbyte*)(data + 9)) = (sbyte)(100); // BitArray         491
+                (*(sbyte*)(data + 8)) = (sbyte)(2); // BitArray         561
+                (*(Int32*)(data + 4)) = (Int32)(data + 10); // TopRef           562
+                (*(Int32*)(data + 0)) = (Int32)(data + 12); // TopRef           563
+                Function0((data + 8)); // Call             510
+                (*(Int16*)(data + 6)) = (Int16)((Int16)((*(Int16*)(data + 6)) << 7) >> 7); // BitCast          84
+                Data.DumpPrint((*(Int16*)(data + 6))); // DumpPrintOperation 503
+
+
+            };
         }
 
         // (arg)+(x)
-        private static void ReniFunction0(SByte* frame)
+        private static void Function0(System.SByte* frame)
         {
-            fixed(sbyte* data = new sbyte[5])
+            fixed (sbyte* data = new sbyte[5])
             {
-                var argRefRef = (Int32*) (data + 1);
-                (*argRefRef) = (*(Int32*) (frame - 8)); // TopFrame 4418
-                var argRef = (data + 4);
-                (*argRef) = (*(sbyte*) (*argRefRef)); // Dereference 4400
-                (*argRef) = (sbyte) ((sbyte) ((*argRef) << 5) >> 5); // BitCast 517
-                var contextRef = (Int32*) (data + 0);
-                (*contextRef) = (*(Int32*) (frame - 4)); // TopFrame 4420
-                (*contextRef) += -1; // RefPlus 4398
-                var xRef = (data + 3);
-                (*xRef) = (*(sbyte*) (*contextRef)); // Dereference 4401
-                var result = (Int16*) xRef;
-                (*result) = (Int16) ((*argRef) + (*xRef)); // BitArrayBinaryOp 4402
-                (*result) = (Int16) ((Int16) ((*result) << 7) >> 7); // BitCast 519
-                (*(Int16*) (frame - 2)) = (*result); // FunctionReturn
-            }
+            StartFunction:
+                (*(Int32*)(data + 1)) = (*(Int32*)(frame - 8)); // TopFrame         565
+                (*(sbyte*)(data + 4)) = (*(sbyte*)(*(Int32*)(data + 1))); // Dereference      547
+                (*(sbyte*)(data + 4)) = (sbyte)((sbyte)((*(sbyte*)(data + 4)) << 5) >> 5); // BitCast          90
+                (*(Int32*)(data + 0)) = (*(Int32*)(frame - 4)); // TopFrame         567
+                (*(Int32*)(data + 0)) += -1; // RefPlus          550
+                (*(sbyte*)(data + 3)) = (*(sbyte*)(*(Int32*)(data + 0))); // Dereference      549
+                (*(Int16*)(data + 3)) = (Int16)((*(sbyte*)(data + 4)) + (*(sbyte*)(data + 3))); // BitArrayBinaryOp 551
+                (*(Int16*)(data + 3)) = (Int16)((Int16)((*(Int16*)(data + 3)) << 7) >> 7); // BitCast          92
+                (*(Int16*)(frame - 2)) = (*(Int16*)(data + 3)); // FunctionReturn  
+
+            };
         }
     }
 }
