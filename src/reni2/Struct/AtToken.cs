@@ -19,7 +19,8 @@ namespace Reni.Struct
             var position = callContext.Evaluate(right, context.IndexType).ToInt32();
             var atResult = context.CreateAtResultFromArg(category, position);
 
-            return atResult.UseWithArg(callContext.Result(category, left));
+            var leftResult = callContext.ResultAsRef(category, left);
+            return atResult.UseWithArg(leftResult);
         }
     }
 }

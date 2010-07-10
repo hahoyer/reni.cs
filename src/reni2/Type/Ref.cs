@@ -30,7 +30,13 @@ namespace Reni.Type
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
-        internal override string DumpShort() { return "reference("+_target.DumpShort()+")"; }
+        internal override sealed bool IsRef(RefAlignParam refAlignParam)
+        {
+            Tracer.Assert(RefAlignParam == refAlignParam);
+            return true;
+        }
+
+        internal override string DumpShort() { return "reference(" + _target.DumpShort() + ")"; }
         internal override int GetSequenceCount(TypeBase elementType) { return _target.GetSequenceCount(elementType); }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -115,12 +121,6 @@ namespace Reni.Type
         internal override sealed Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
 
         internal override sealed TypeBase AutomaticDereference() { return Parent.AutomaticDereference(); }
-
-        internal override sealed bool IsRef(RefAlignParam refAlignParam)
-        {
-            Tracer.Assert(RefAlignParam == refAlignParam);
-            return true;
-        }
 
         [DumpData(false)]
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }

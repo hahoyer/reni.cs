@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [Target(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;")]
     [Output("102")]
-    [SomeVariables, Add2Numbers, AccessMember, FunctionWithNonLocal]
+    [SomeVariables, Add2Numbers, AccessMember, FunctionWithNonLocal, SimpleFunction, TwoFunctions, FunctionWithRefArg]
     public class FunctionVariable : CompilerTest
     {
         [Test, Category(Worked)]
@@ -94,7 +94,7 @@ namespace Reni.FeatureTest.Function
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
+    [TestFixture, SimpleFunction]
     public class TwoFunctions : CompilerTest
     {
         public override string Target
