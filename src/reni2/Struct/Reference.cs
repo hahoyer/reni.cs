@@ -46,6 +46,8 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
+        internal override Result AutomaticDereference(Result result) { return CreateDereferencedResult(result.CompleteCategory).UseWithArg(result); }
+
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
             var destAsRef = AsTypeReference(dest);
