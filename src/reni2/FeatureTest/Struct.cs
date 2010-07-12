@@ -129,7 +129,6 @@ x4 dump_print;
     public class AccessMember : CompilerTest
     {
         [Test, Category(Worked)]
-        public void Run1() { BaseRun(); }
         public override void Run() { BaseRun(); }
     }
 }

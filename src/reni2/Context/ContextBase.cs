@@ -205,6 +205,8 @@ namespace Reni.Context
 
         private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
+            bool trace = ObjectId == 136 && left.ObjectId == 40290 && category.HasCode;
+            StartMethodDump(trace,category,left,defineable);
             var suffixResult = Type(left)
                 .GetSuffixResult(category, defineable);
             if(suffixResult == null)
@@ -213,7 +215,9 @@ namespace Reni.Context
                 return null;
             }
 
-            return suffixResult.UseWithArg(Result(category, left));
+            var leftResult = Result(category, left);
+            DumpWithBreak(trace,"suffixResult",suffixResult,"leftResult",leftResult);
+            return ReturnMethodDumpWithBreak(trace, suffixResult.UseWithArg(leftResult));
         }
 
         private IContextFeature SearchDefinable(Defineable defineable)

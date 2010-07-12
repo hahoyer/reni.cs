@@ -10,5 +10,6 @@ namespace Reni.Syntax
         string DumpShort();
         string FilePosition();
         void AddToCacheForDebug(ContextBase context, object cacheItem);
+        int ObjectId{ get;}
     }
 }

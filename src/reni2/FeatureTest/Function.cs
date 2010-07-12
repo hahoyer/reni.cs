@@ -14,7 +14,7 @@ namespace Reni.FeatureTest.Function
     [SomeVariables, Add2Numbers, AccessMember, FunctionWithNonLocal, SimpleFunction, TwoFunctions, FunctionWithRefArg]
     public class FunctionVariable : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 
