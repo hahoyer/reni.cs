@@ -14,13 +14,17 @@ namespace Reni.Struct
         public override Result Result(ContextBase callContext, Category category, ICompileSyntax left,
                                       ICompileSyntax right)
         {
+            var trace = left != null && left.ObjectId == 16822 && category.HasCode;
+            StartMethodDumpWithBreak(trace, callContext, category, left, right);
+
             var typeBase = callContext.Type(left);
             var context = typeBase.GetStruct();
             var position = callContext.Evaluate(right, context.IndexType).ToInt32();
             var atResult = context.CreateAtResultFromArg(category, position);
 
             var leftResult = callContext.ResultAsRef(category, left);
-            return atResult.UseWithArg(leftResult);
+            DumpWithBreak(trace, "atResult", atResult, "leftResult", leftResult);
+            return ReturnMethodDumpWithBreak(trace, atResult.UseWithArg(leftResult));
         }
     }
 }

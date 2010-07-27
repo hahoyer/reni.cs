@@ -127,7 +127,9 @@ namespace Reni.Struct
 
         private Result CreateDereferencedResult(Category category)
         {
-            return Target.CreateDereferencedResult(category, RefAlignParam);
+            return Target
+                .CreateDereferencedResult(category, RefAlignParam)
+                .UseWithArg(CreateAccessResult(category));
         }
 
         private Size GetOffset() { return _context.Offset(_position); }
