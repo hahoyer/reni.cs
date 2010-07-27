@@ -176,6 +176,8 @@ namespace Reni.Context
 
         internal Result GetResult(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
+            var trace = left!= null && left.ObjectId == 16822 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category, left, defineable);
             var categoryForFunctionals = category;
             if(right != null)
                 categoryForFunctionals |= Category.Type;
@@ -194,19 +196,19 @@ namespace Reni.Context
                     : GetSuffixResult(categoryForFunctionals, left, defineable);
 
             if(right == null)
-                return suffixResult;
+                return ReturnMethodDumpWithBreak(trace, suffixResult);
 
             var feature = suffixResult.Type.GetFunctionalFeature();
             if(feature != null)
-                return feature.Apply(category, suffixResult, ResultAsRef(category | Category.Type, right));
+                return ReturnMethodDumpWithBreak(trace, feature.Apply(category, suffixResult, ResultAsRef(category | Category.Type, right)));
             NotImplementedMethod(category, left, defineable, right, "suffixResult", suffixResult, "feature", feature);
             return null;
         }
 
         private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
-            bool trace = ObjectId == 136 && left.ObjectId == 40290 && category.HasCode;
-            StartMethodDump(trace,category,left,defineable);
+            var trace = left.ObjectId == 16828 && category.HasCode;
+            StartMethodDumpWithBreak(trace,category,left,defineable);
             var suffixResult = Type(left)
                 .GetSuffixResult(category, defineable);
             if(suffixResult == null)

@@ -1,3 +1,4 @@
+using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using System;
 using HWClassLibrary.Helper;
@@ -8,7 +9,7 @@ namespace Reni.Code
     [Serializable]
     internal abstract class Top : LeafElement
     {
-        [Node]
+        [Node, DumpData(false)]
         internal protected readonly Size Offset;
         private readonly RefAlignParam _refAlignParam;
         private readonly Size _size;

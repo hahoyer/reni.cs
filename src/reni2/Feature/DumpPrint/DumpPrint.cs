@@ -69,21 +69,4 @@ namespace Reni.Feature.DumpPrint
             return _type;
         }
     }
-
-    internal interface IFeatureTarget
-    {
-        Result Apply(Category category);
-        
-    }
- 
-    internal class Feature<TType> : ReniObject, IFeature
-        where TType:TypeBase, IFeatureTarget
-    {
-        [DumpData(true)]
-        private readonly TType _type;
-        public Feature(TType type) { _type = type; }
-        Result IFeature.Apply(Category category) { return _type.Apply(category); }
-        TypeBase IFeature.DefiningType() { return _type; }
-    }
-
 }

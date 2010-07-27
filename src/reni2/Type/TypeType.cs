@@ -41,7 +41,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal Result ApplyDumpPrintFeature(Category category)
+        internal Result CreateDumpPrintResult(Category category)
         {
             return CreateVoid.CreateResult(category, () => CodeBase.CreateDumpPrintText(_value.DumpPrintText));
         }

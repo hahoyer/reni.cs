@@ -14,7 +14,7 @@ namespace Reni.Code
             :base(_nextObjectId++)
         {
             _size = size;
-            StopByObjectId(-351);
+            StopByObjectId(-2);
         }
 
         protected override Size SizeImplementation { get { return _size; } }

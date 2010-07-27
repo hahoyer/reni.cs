@@ -135,7 +135,7 @@ namespace Reni.Type
         internal Result CreateArgResult(Category category) { return CreateResult(category, CreateArgCode); }
         internal Result CreateResult(Result codeAndRefs) { return CreateResult(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None); }
-        internal Result GenericDumpPrint(Category category) { return GetUnaryResult<IFeature>(category, new Token()); }
+        internal Result GenericDumpPrint(Category category) { return GetSuffixResult(category, new Token()); }
         internal CodeBase CreateArgCode() { return CodeBase.CreateArg(Size); }
 
         internal Result CreateResult(Category category)
@@ -263,10 +263,12 @@ namespace Reni.Type
         private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
+            bool trace = ObjectId == 41727 && defineable.ObjectId == 568 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
             if(feature == null)
-                return null;
+                return ReturnMethodDump<Result>(trace, null);
 
             var result = feature.Apply(category);
             if(this != feature.DefiningType())
@@ -274,26 +276,28 @@ namespace Reni.Type
                 var conversion = Conversion(category, feature.DefiningType());
                 result = result.UseWithArg(conversion);
             }
-            return result & category;
+            //var result2 = PostProcessGetUnaryResult(result & category);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
+
+        protected virtual Result PostProcessGetUnaryResult(Result result) { return result; }
 
         internal Result GetSuffixResult(Category category, Defineable defineable) { return GetUnaryResult<IFeature>(category, defineable); }
 
         internal Result GetPrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
 
-        internal Result DumpPrintFromReference(Category category, Result referenceResult, RefAlignParam refAlignParam)
+        internal Result DumpPrintFromReference(Category category, RefAlignParam refAlignParam)
         {
-            var dereferencedResult = CreateDereferencedResult(category, referenceResult, refAlignParam);
+            var dereferencedResult = CreateDereferencedResult(category, refAlignParam);
             return GenericDumpPrint(category).UseWithArg(dereferencedResult);
         }
 
-        internal Result CreateDereferencedResult(Category category, Result referenceResult, RefAlignParam refAlignParam)
+        internal Result CreateDereferencedResult(Category category, RefAlignParam refAlignParam)
         {
             return CreateResult
                 (
                     category,
-                    () => referenceResult.Code.CreateDereference(refAlignParam, Size),
-                    () => referenceResult.Refs
+                    () => CodeBase.CreateArg(refAlignParam.RefSize).CreateDereference(refAlignParam, Size)
                 );
         }
 

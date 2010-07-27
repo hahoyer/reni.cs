@@ -8,7 +8,7 @@ namespace Reni.Code
     internal class BitArray : LeafElement
     {
         private readonly Size _size;
-        [Node]
+        [Node,DumpData(false)]
         internal readonly BitsConst Data;
 
         public BitArray(Size size, BitsConst data)

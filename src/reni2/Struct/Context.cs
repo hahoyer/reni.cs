@@ -118,6 +118,7 @@ namespace Reni.Struct
 
         internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
 
+        [DumpData(false)]
         internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize); } }
 
         internal Size Offset(int position)

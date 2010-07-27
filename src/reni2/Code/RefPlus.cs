@@ -27,7 +27,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _right = right;
             AssertValid();
-            StopByObjectId(-30);
+            StopByObjectId(-167);
             StopByObjectId(-22);
             StopByObjectId(-16);
         }

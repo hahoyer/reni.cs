@@ -51,7 +51,7 @@ namespace Reni.Type
         }
 
         internal override string DumpPrintText { get { return _functionalFeature.DumpShort(); } }
-        public Result DumpPrintFeatureApply(Category category) { return _functionalFeature.DumpPrintFeatureApply(category); }
+        public Result CreateDumpPrintResult(Category category) { return _functionalFeature.DumpPrintFeatureApply(category); }
     }
 
 }

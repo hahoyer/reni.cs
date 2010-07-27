@@ -93,7 +93,7 @@ namespace Reni.FeatureTest.Struct
     [TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
     public class AccessAndAdd : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 

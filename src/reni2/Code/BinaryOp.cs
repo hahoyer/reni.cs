@@ -1,4 +1,6 @@
 using System;
+using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 
 namespace Reni.Code
 {
@@ -8,7 +10,9 @@ namespace Reni.Code
     [Serializable]
     internal abstract class BinaryOp : LeafElement
     {
+        [DumpData(false)]
         internal protected readonly Size LeftSize;
+        [DumpData(false)]
         internal protected readonly Size RightSize;
 
         protected BinaryOp(Size leftSize, Size rightSize)

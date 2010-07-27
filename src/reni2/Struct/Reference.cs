@@ -5,20 +5,19 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Reference : TypeBase, IFeatureTarget
+    internal sealed class Reference : TypeBase
     {
+        [DumpData(true)]
         private readonly Context _context;
+        [DumpData(true)]
         private readonly int _position;
         private readonly SimpleCache<TypeBase> _targetCache;
 
-        [DumpData(false)]
-        internal readonly IFeature DumpPrintFeature;
         [DumpData(false)]
         internal readonly AssignmentFeature AssignmentFeature;
 
@@ -27,23 +26,31 @@ namespace Reni.Struct
             _context = context;
             _position = position;
             _targetCache = new SimpleCache<TypeBase>(GetTargetType);
-            DumpPrintFeature = new Feature<Reference>(this);
             AssignmentFeature = new AssignmentFeature(this);
         }
 
-        Result IFeatureTarget.Apply(Category category)
+        internal Result CreateDumpPrintResult(Category category)
         {
-            return Target
-                .DumpPrintFromReference(category, CreateAccessResult(category), RefAlignParam);
+            var refType = Target.CreateReference(RefAlignParam);
+            var result = refType.GenericDumpPrint(category);
+            if(result.HasArg)
+               result = result.UseWithArg(CreateAccessResult(category));
+            return result;
         }
 
-        internal TypeBase Target { get { return _targetCache.Value; } }
+        private TypeBase Target { get { return _targetCache.Value; } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
             Target.Search(searchVisitor.Child(this));
             Target.Search(searchVisitor);
             base.Search(searchVisitor);
+        }
+
+        protected override Result PostProcessGetUnaryResult(Result result) 
+        {
+            NotImplementedMethod(result);
+            return result;
         }
 
         internal override Result AutomaticDereference(Result result) { return CreateDereferencedResult(result.CompleteCategory).UseWithArg(result); }
@@ -120,8 +127,7 @@ namespace Reni.Struct
 
         private Result CreateDereferencedResult(Category category)
         {
-            var accessResult = CreateAccessResult(category);
-            return Target.CreateDereferencedResult(category, accessResult, RefAlignParam);
+            return Target.CreateDereferencedResult(category, RefAlignParam);
         }
 
         private Size GetOffset() { return _context.Offset(_position); }
@@ -132,6 +138,5 @@ namespace Reni.Struct
         {
             return CreateAccessResult(category);
         }
-
-    }
+   }
 }

@@ -13,7 +13,7 @@ namespace Reni.Code
     [Serializable]
     internal sealed class BitArrayBinaryOp : BinaryOp
     {
-        [Node]
+        [Node, DumpData(false)]
         internal readonly ISequenceOfBitBinaryOperation OpToken;
         private readonly Size _size;
 
@@ -22,6 +22,7 @@ namespace Reni.Code
         {
             OpToken = opToken;
             _size = size;
+            StopByObjectId(381);
         }
 
         protected override Size GetSize()
