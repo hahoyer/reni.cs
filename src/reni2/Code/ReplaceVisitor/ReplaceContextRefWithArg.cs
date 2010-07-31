@@ -24,7 +24,7 @@ namespace Reni.Code.ReplaceVisitor
     }
 
     /// <summary>
-    /// Replaces appearences of context in code tree. 
+    /// Replaces appearences of refInCode in code tree. 
     /// Assumes, that replacement requires offset alignment when walking along code tree
     /// </summary>
     /// <typeparam name="Context"></typeparam>
@@ -34,16 +34,16 @@ namespace Reni.Code.ReplaceVisitor
         public ReplaceRelativeContextRef(Context context, Func<CodeBase> replacement)
             : base(context, replacement) { }
 
-        internal override Visitor<CodeBase> After(Size size)
+        protected override Visitor<CodeBase> After(Size size)
         {
             return new ReplaceRelativeContextRef<Context>(
                 _context,
-                ()=>_replacement().CreateRefPlus(_context.RefAlignParam, size));
+                ()=>_replacement().CreateRefPlus(_context.RefAlignParam, size, "After"));
         }
     }
 
     /// <summary>
-    /// Replaces appearences of context in code tree. 
+    /// Replaces appearences of refInCode in code tree. 
     /// Assumes, that replacement isn't a reference, that changes when walking along the code tree
     /// </summary>
     /// <typeparam name="Context"></typeparam>

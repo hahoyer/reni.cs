@@ -34,7 +34,7 @@ namespace Reni.Struct
             var refType = Target.CreateReference(RefAlignParam);
             var result = refType.GenericDumpPrint(category);
             if(result.HasArg)
-               result = result.UseWithArg(CreateAccessResult(category));
+               result = result.ReplaceArg(CreateAccessResult(category));
             return result;
         }
 
@@ -47,13 +47,7 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        protected override Result PostProcessGetUnaryResult(Result result) 
-        {
-            NotImplementedMethod(result);
-            return result;
-        }
-
-        internal override Result AutomaticDereference(Result result) { return CreateDereferencedResult(result.CompleteCategory).UseWithArg(result); }
+        internal override Result AutomaticDereference(Result result) { return CreateDereferencedResult(result.CompleteCategory).ReplaceArg(result); }
 
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
@@ -63,7 +57,7 @@ namespace Reni.Struct
 
             return Target
                 .Conversion(category, dest)
-                .UseWithArg(CreateDereferencedResult(category));
+                .ReplaceArg(CreateDereferencedResult(category));
         }
 
         protected override Size GetSize() { return _context.RefSize; }
@@ -86,23 +80,7 @@ namespace Reni.Struct
         internal override int GetSequenceCount(TypeBase elementType) { return Target.GetSequenceCount(elementType); }
         internal override TypeBase GetEffectiveType() { return Target.GetEffectiveType(); }
 
-        internal Result ApplyAssignment(Category category, Result functionalResult, Result argsResult)
-        {
-            var result = CreateVoid
-                .CreateResult
-                (
-                    category,
-                    () => CodeBase.CreateArg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, Size)
-                );
-
-            if (!category.HasCode && !category.HasRefs)
-                return result;
-
-            var sourceResult = argsResult.ConvertToAsRef(category, CreateReference(RefAlignParam));
-            var destinationResult = functionalResult.StripFunctional() & category;
-            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
-            return result.UseWithArg(objectAndSourceRefs);
-        }
+        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
 
         private Reni.Type.Reference AsTypeReference(TypeBase dest)
         {
@@ -122,23 +100,59 @@ namespace Reni.Struct
         private CodeBase CreateAccessCode()
         {
             return CreateArgCode()
-                .CreateRefPlus(RefAlignParam, GetOffset());
+                .CreateRefPlus(RefAlignParam, GetOffset(), "CreateAccessCode");
         }
 
         private Result CreateDereferencedResult(Category category)
         {
             return Target
                 .CreateDereferencedResult(category, RefAlignParam)
-                .UseWithArg(CreateAccessResult(category));
+                .ReplaceArg(CreateAccessResult(category));
         }
 
         private Size GetOffset() { return _context.Offset(_position); }
-        private TypeBase GetTargetType() { return _context.InternalType(_position); }
-        private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        private TypeBase GetTargetType() { return _context.Type(_position); }
 
         private Result CreateTypeReferenceResult(Category category)
         {
             return CreateAccessResult(category);
         }
-   }
+
+        internal Result ApplyAssignment(Category category, TypeBase argsType)
+        {
+            var result = CreateVoid
+                .CreateResult
+                (
+                    category,
+                    () => CodeBase.CreateArg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, Target.Size)
+                );
+
+            if (!category.HasCode && !category.HasRefs)
+                return result;
+
+            var sourceResult = argsType.ConvertToAsRef(category, Target.CreateReference(RefAlignParam));
+            var destinationResult = Target.CreateObjectRefInCode(category,RefAlignParam);
+            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
+            return result.ReplaceArg(objectAndSourceRefs);
+        }
+
+        internal Result ApplyAssignment(Category category, Result functionalResult, Result argsResult)
+        {
+            var result = CreateVoid
+                .CreateResult
+                (
+                    category,
+                    () => CodeBase.CreateArg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, Size)
+                );
+
+            if (!category.HasCode && !category.HasRefs)
+                return result;
+
+            var sourceResult = argsResult.ConvertToAsRef(category, CreateReference(RefAlignParam));
+            var destinationResult = functionalResult.StripFunctional() & category;
+            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
+            return result.ReplaceArg(objectAndSourceRefs);
+        }
+
+    }
 }

@@ -24,7 +24,7 @@ namespace Reni.Struct
 
             var leftResult = callContext.ResultAsRef(category, left);
             DumpWithBreak(trace, "atResult", atResult, "leftResult", leftResult);
-            return ReturnMethodDumpWithBreak(trace, atResult.UseWithArg(leftResult));
+            return ReturnMethodDumpWithBreak(trace, atResult.ReplaceArg(leftResult));
         }
     }
 }

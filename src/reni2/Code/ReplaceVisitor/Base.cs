@@ -55,11 +55,11 @@ namespace Reni.Code.ReplaceVisitor
             return condResult.CreateThenElse(thenResult, elseResult);
         }
 
-        internal override Visitor<CodeBase> AfterCond(int objectId) { return this; }
+        protected override Visitor<CodeBase> AfterCond() { return this; }
 
-        internal override Visitor<CodeBase> AfterThen(int objectId, Size theSize) { return this; }
+        protected override Visitor<CodeBase> AfterThen(Size theSize) { return this; }
 
-        internal override Visitor<CodeBase> AfterElse(int objectId) { return this; }
+        protected override Visitor<CodeBase> AfterElse() { return this; }
 
         internal override CodeBase ContextRef(RefCode visitedObject) { return null; }
 

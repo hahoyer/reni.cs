@@ -135,7 +135,7 @@ namespace Reni.Context
             DumpWithBreak(trace, "postProcessedResult", postProcessedResult);
             var result =
                 postProcessedResult
-                    .ReplaceAbsoluteContextRef(functionContext,
+                    .ReplaceAbsolute(functionContext,
                                                ()=>CreateContextRef(postProcessedResult.CompleteCategory));
             return ReturnMethodDump(trace, result);
         }
@@ -155,7 +155,7 @@ namespace Reni.Context
             return CodeBase
                 .CreateFrameRef(refAlignParam)
                 .CreateRefPlus(refAlignParam,
-                               FrameSize*-1);
+                               FrameSize * -1, "FunctionInstance.CreateContextRefCode");
         }
 
         private TypeBase Type() { return Result(Category.Type).Type; }

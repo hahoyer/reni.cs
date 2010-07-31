@@ -23,8 +23,8 @@ namespace Reni.Context
             return ArgsType.CreateReference(RefAlignParam).CreateResult
                 (
                 category,
-                () => CodeBase.CreateContextRef(this),
-                () => Refs.Context(this)
+                () => CodeBase.Create(this),
+                () => Refs.Create(this)
                 )
                 ;
         }

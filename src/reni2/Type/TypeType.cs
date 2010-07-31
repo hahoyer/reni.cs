@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -13,18 +14,27 @@ namespace Reni.Type
         [DumpData(true)]
         private readonly TypeBase _value;
 
-        private static readonly IFunctionalFeature _functionalFeature = new FunctionalFeature();
+        private readonly IFunctionalFeature _functionalFeature;
 
         private class FunctionalFeature : IFunctionalFeature
         {
-            string IDumpShortProvider.DumpShort() { return "type"; }
-            Result IFunctionalFeature.Apply(Category category, Result functionResult, Result argsResult) { return argsResult.ConvertTo(functionResult.Type.StripFunctional().AutomaticDereference()) & category; }
+            private readonly TypeBase _typeBase;
+            public FunctionalFeature(TypeBase typeBase) { _typeBase = typeBase; }
+            string IDumpShortProvider.DumpShort() { return _typeBase.DumpShort() + " type"; }
+
             Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
             Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
+
+            Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+            {
+                return argsType
+                    .ConvertTo(category, _typeBase.AutomaticDereference());
+            }
         }
 
         public TypeType(TypeBase value)
         {
+            _functionalFeature = new FunctionalFeature(value);
             _value = value;
         }
 

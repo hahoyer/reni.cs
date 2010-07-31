@@ -27,13 +27,13 @@ namespace Reni.Code.ReplaceVisitor
             {
                 if (_offset.IsZero)
                     return ActualArg;
-                return ActualArg.CreateRefPlus(RefAlignParam, Offset);
+                return ActualArg.CreateRefPlus(RefAlignParam, Offset, "ReplaceRelRefArg.Actual");
             }
         }
 
         private Size Offset { get { return _offset; } }
 
-        internal override Visitor<CodeBase> After(Size size)
+        protected override Visitor<CodeBase> After(Size size)
         {
             return new ReplaceRelRefArg(ActualArg, Offset + size);
         }

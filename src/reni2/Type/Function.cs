@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
 using Reni.Code;
+using Reni.Context;
 using Reni.Syntax;
 
 namespace Reni.Type
@@ -24,17 +24,7 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _context.ObjectId + "#)#"; }
 
-        Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
-        {
-            var trace = false;
-            // ObjectId == 8 && functionalResult.ObjectId == 9884 && argsResult.ObjectId == 9898 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category, functionalResult, argsResult);
-            Tracer.Assert(argsResult.HasType);
-            var result = ApplyFunction(category, argsResult.Type).UseWithArg(argsResult);
-            return ReturnMethodDumpWithBreak(trace, result);
-        }
-
-        Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { return _context.CreateThisResult(category); }
+        Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { return _context.CreateContextReference(category); }
 
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category)
         {
@@ -43,7 +33,7 @@ namespace Reni.Type
                 .CreateResult(category, () => CodeBase.CreateDumpPrintText(DumpPrintText));
         }
 
-        private Result ApplyFunction(Category category, TypeBase argsType)
+        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
             var argsResult = argsType.CreateArgResult(category | Category.Type);
             return _context

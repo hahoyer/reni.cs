@@ -39,8 +39,8 @@ namespace Reni.Code
         internal readonly IRefInCode Context;
 
         public ContextRef(IRefInCode context) { Context = context; }
-        protected override Size GetSize() { return Context.RefSize; }
+        protected override Size GetSize() { return Context.RefAlignParam.RefSize; }
         protected override Size GetInputSize() { return Size.Zero; }
-        internal Refs GetRefs() { return Refs.Context(Context); }
+        internal Refs GetRefs() { return Refs.Create(Context); }
     }
 }

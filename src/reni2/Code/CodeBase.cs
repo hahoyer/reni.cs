@@ -100,8 +100,11 @@ namespace Reni.Code
             return container;
         }
 
-        public CodeBase CreateRefPlus(RefAlignParam refAlignParam, Size right) { return 
-            CreateChild(new RefPlus(refAlignParam, right)); }
+        public CodeBase CreateRefPlus(RefAlignParam refAlignParam, Size right, string reason)
+        {
+            return
+                CreateChild(new RefPlus(refAlignParam, right, reason));
+        }
 
         public CodeBase CreateDereference(RefAlignParam refAlignParam, Size targetSize)
         {
@@ -130,17 +133,17 @@ namespace Reni.Code
             return more.Aggregate(this, (current, t) => current.CreateSequenceOfTwo(t));
         }
 
-        public static CodeBase CreateBitArray(Size size, BitsConst t) { return CreateLeaf(new BitArray(size, t)); }
+        public static CodeBase Create(Size size, BitsConst t) { return CreateLeaf(new BitArray(size, t)); }
 
-        public static CodeBase CreateBitArray(BitsConst t) { return CreateBitArray(t.Size, t); }
+        public static CodeBase Create(BitsConst t) { return Create(t.Size, t); }
 
         public static CodeBase CreateVoid() { return CreateLeaf(BitArray.CreateVoid()); }
 
         public static CodeBase CreateArg(Size size) { return new Arg(size); }
 
-        public static CodeBase CreateContextRef(IRefInCode context) { return new RefCode(context); }
+        public static CodeBase Create(IRefInCode context) { return new RefCode(context); }
 
-        internal CodeBase UseWithArg(CodeBase argCode)
+        internal CodeBase ReplaceArg(CodeBase argCode)
         {
             var result = argCode.IsRelativeReference
                              ? Visit(new ReplaceRelRefArg(argCode))
@@ -160,7 +163,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public CodeBase ReplaceRelativeContextRef<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
+        public CodeBase ReplaceRelative<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
         {
             var result = Visit(new ReplaceRelativeContextRef<TContext>(context, replacement));
             if(result != null)
@@ -176,7 +179,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public CodeBase ReplaceAbsoluteContextRef<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
+        public CodeBase ReplaceAbsolute<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
         {
             var result = Visit(new ReplaceAbsoluteContextRef<TContext>(context, replacement));
             if(result != null)
@@ -235,12 +238,12 @@ namespace Reni.Code
 
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
-        internal CodeBase CreateStatement(CodeBase copier, RefAlignParam refAlignParam)
+        internal CodeBase CreateLocalBlock(CodeBase copier, RefAlignParam refAlignParam)
         {
-            return new InternalRefSequenceVisitor().CreateStatement(this, copier, refAlignParam);
+            return new InternalRefSequenceVisitor().CreateLocalBlock(this, copier, refAlignParam);
         }
 
-        internal CodeBase CreateStatementEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
+        internal CodeBase CreateLocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
         {
             var intermediateSize = Size - resultSize;
             if(intermediateSize.IsZero)
@@ -249,9 +252,9 @@ namespace Reni.Code
             var result = this;
             if(!resultSize.IsZero)
                 result = result
-                    .CreateChild(new StatementEnd(resultSize, intermediateSize))
+                    .CreateChild(new LocalBlockEnd(resultSize, intermediateSize))
                     .CreateSequence(
-                    copier.UseWithArg(InternalRefSequenceVisitor.InternalRefCode(refAlignParam, resultSize)));
+                    copier.ReplaceArg(InternalRefSequenceVisitor.InternalRefCode(refAlignParam, resultSize)));
 
             return result.CreateChild(new Drop(Size, resultSize));
         }
@@ -334,10 +337,10 @@ namespace Reni.Code
 
         internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size)
         {
-            return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size*(-1));
+            return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size * (-1), "InternalRefCode");
         }
 
-        internal CodeBase CreateStatement(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
+        internal CodeBase CreateLocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
             var trace = body.ObjectId == -438 || body.ObjectId == -440;
@@ -350,13 +353,13 @@ namespace Reni.Code
             var gap = CodeBase .CreateVoid();
             DumpWithBreak(trace,"newBody",newBody,"alignedBody",alignedBody,"alignedInternal",alignedInternal);
             if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
-                gap = CodeBase.CreateBitArray(resultSize - alignedInternal.Size, BitsConst.None());
+                gap = CodeBase.Create(resultSize - alignedInternal.Size, BitsConst.None());
             var statement = alignedInternal
                 .CreateSequence(gap, alignedBody, DestructorCode)
-                .CreateStatementEnd(copier, refAlignParam, resultSize);
+                .CreateLocalBlockEnd(copier, refAlignParam, resultSize);
             DumpWithBreak(trace, "statement", statement);
             var result = statement
-                .UseWithArg(CodeBase.CreateTopRef(refAlignParam));
+                .ReplaceArg(CodeBase.CreateTopRef(refAlignParam));
             return ReturnMethodDump(trace, result);
         }
     }
@@ -379,14 +382,6 @@ namespace Reni.Code
         protected override Size GetInputSize() { return _beforeSize; }
 
         protected override string Format(StorageDescriptor start) { return ""; }
-    }
-
-    internal interface IRefInCode
-    {
-        Size RefSize { get; }
-        RefAlignParam RefAlignParam { get; }
-        bool IsChildOf(ContextBase contextBase);
-        string Dump();
     }
 
     [Serializable]

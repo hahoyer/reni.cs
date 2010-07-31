@@ -54,13 +54,13 @@ namespace Reni.Struct
             var argCodes = Context.CreateArgCodes(category);
             var dumpPrint =
                 Context.Types
-                    .Select((type, i) => type.GenericDumpPrint(category).UseWithArg(argCodes[i]))
+                    .Select((type, i) => type.GenericDumpPrint(category).ReplaceArg(argCodes[i]))
                     .ToArray();
             var thisRef = CreateArgResult(category)
                 .CreateAutomaticRefResult(Context.RefAlignParam);
             var result = Result
                 .ConcatPrintResult(category, dumpPrint)
-                .UseWithArg(thisRef);
+                .ReplaceArg(thisRef);
             return result;
         }
     }

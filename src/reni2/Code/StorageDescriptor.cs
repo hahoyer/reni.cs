@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
-using Reni.Parser.TokenClass;
 using Reni.Type;
 
 namespace Reni.Code
@@ -26,9 +25,9 @@ namespace Reni.Code
             _start = dataEndAddr;
         }
 
-        public Size Start { get { return _start; } }
-        public Size DataEndAddr { get { return _dataEndAddr; } }
-        public void ShiftStartAddress(Size deltaSize) { _start += deltaSize; }
+        private Size Start { get { return _start; } }
+        private Size DataEndAddr { get { return _dataEndAddr; } }
+        private void ShiftStartAddress(Size deltaSize) { _start += deltaSize; }
 
         private string CreateFunctionReturn()
         {
@@ -39,7 +38,7 @@ namespace Reni.Code
                    + "; // FunctionReturn";
         }
 
-        internal string CreateFunctionBody(List<LeafElement> data, bool isFunction)
+        internal string CreateFunctionBody(IEnumerable<LeafElement> data, bool isFunction)
         {
             var result = GetStatements(data);
             if(isFunction)
@@ -75,7 +74,7 @@ namespace Reni.Code
             }
 
             NotImplementedFunction(this, refAlignParam, size);
-            throw new NotImplementedException();
+            return null;
         }
 
         internal string CreateBitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize)
@@ -130,7 +129,7 @@ namespace Reni.Code
                                                                     + ")";
         }
 
-        internal string CreateBitArrayOpThen(ISequenceOfBitBinaryOperation opToken, Size leftSize, Size rightSize, int thenElseObjectId, Size condSize)
+        internal string CreateBitArrayOpThen(ISequenceOfBitBinaryOperation opToken, Size leftSize, Size rightSize)
         {
             if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
                 return "if("
@@ -188,7 +187,7 @@ namespace Reni.Code
             }
 
             NotImplementedFunction(this, targetSize, size);
-            throw new NotImplementedException();
+            return null;
         }
 
         internal string CreateBitsArray(Size size, BitsConst data)
@@ -224,14 +223,14 @@ namespace Reni.Code
             if(rightSize.IsZero)
                 return CreateDumpPrintOperation(leftSize);
             NotImplementedMethod(leftSize, rightSize);
-            throw new NotImplementedException();
+            return null;
         }
 
         internal static string CreateDumpPrintText(string text) { return "Data.DumpPrint(" + text.Quote() + ")"; }
 
-        internal static string CreateElse(int objectId) { return "} else {" ; }
+        internal static string CreateElse() { return "} else {" ; }
 
-        internal static string CreateEndCondional(int objectId) { return "}"; }
+        internal static string CreateEndCondional() { return "}"; }
 
         internal static string CreateRecursiveCall() { return "goto StartFunction"; }
 
@@ -244,7 +243,7 @@ namespace Reni.Code
                 return CreateDataRef(Start, size) + " += " + right;
 
             NotImplementedFunction(this, size, right);
-            throw new NotImplementedException();
+            return null;
         }
 
         internal string CreateTopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize)
@@ -253,12 +252,12 @@ namespace Reni.Code
                 return CreateMoveBytesFromFrame(targetSize, Start - targetSize, offset*-1);
 
             NotImplementedFunction(this, refAlignParam, offset, targetSize, targetSize);
-            throw new NotImplementedException();
+            return null;
         }
 
-        internal string CreateStatementEnd(Size size, Size bodySize) { return CreateMoveBytes(size, Start + bodySize, Start); }
+        internal string CreateLocalBlockEnd(Size size, Size bodySize) { return CreateMoveBytes(size, Start + bodySize, Start); }
 
-        internal string CreateThen(int objectId, Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
+        internal string CreateThen(Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
 
         internal string CreateTopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
         {
@@ -266,7 +265,7 @@ namespace Reni.Code
                 return CreateMoveBytes(targetSize, Start - targetSize, Start + offset);
 
             NotImplementedFunction(this, refAlignParam, offset, targetSize);
-            throw new NotImplementedException();
+            return null;
         }
 
         internal string CreateTopRef(RefAlignParam refAlignParam, Size offset)
@@ -278,7 +277,7 @@ namespace Reni.Code
                             + CreateDataPtr(Start + offset);
 
             NotImplementedMethod(refAlignParam);
-            throw new NotImplementedException();
+            return null;
         }
 
         internal string CreateFrameRef(RefAlignParam refAlignParam, Size offset)
@@ -290,7 +289,7 @@ namespace Reni.Code
                             + CreateFrameBackPtr(offset*-1);
 
             NotImplementedMethod(refAlignParam, offset);
-            throw new NotImplementedException();
+            return null;
         }
 
         internal string CreateUnref(RefAlignParam refAlignParam, Size targetSize)
@@ -310,10 +309,10 @@ namespace Reni.Code
                                         + ")";
             }
             NotImplementedMethod(refAlignParam, targetSize);
-            throw new NotImplementedException();
+            return null;
         }
 
-        internal string CreateDumpPrintOperation(Size size)
+        private string CreateDumpPrintOperation(Size size)
         {
             if(IsBuildInIntType(size))
                 return "Data.DumpPrint(" + CreateDataRef(Start, size) + ")";
@@ -362,7 +361,7 @@ namespace Reni.Code
                     return "(" + CreateIntType(size) + ")";
             }
             NotImplementedFunction(size, "bits", bits);
-            throw new NotImplementedException();
+            return null;
         }
 
         private static string CreateIntPtrCast(Size size) { return "(" + CreateIntType(size) + "*)"; }
@@ -380,7 +379,7 @@ namespace Reni.Code
                     return "Int" + bits;
             }
             NotImplementedFunction(size, "bits", bits);
-            throw new NotImplementedException();
+            return null;
         }
 
         private static string CreateMoveBytes(Size size, Size destStart, Size sourceStart)
@@ -451,13 +450,13 @@ namespace Reni.Code
             return false;
         }
 
-        private string GetStatements(IList<LeafElement> data)
+        private string GetStatements(IEnumerable<LeafElement> data)
         {
             var statements = "";
-            for(var i = 0; i < data.Count; i++)
+            foreach(LeafElement t in data)
             {
-                statements += data[i].Statements(this);
-                ShiftStartAddress(data[i].DeltaSize);
+                statements += t.Statements(this);
+                ShiftStartAddress(t.DeltaSize);
             }
             return statements;
         }

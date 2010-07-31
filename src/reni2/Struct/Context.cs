@@ -71,11 +71,16 @@ namespace Reni.Struct
             return "context." + ObjectId + "(" + Container.DumpShort() + ")";
         }
 
-        internal TypeBase InternalType(int position)
+        private TypeBase InternalType(int position)
         {
             return InternalResult(Category.Type, position).Type;
         }
 
+        internal TypeBase Type(int position)
+        {
+            return InternalType(position).AccessType;
+
+        }
         internal Size InternalSize() { return InternalResult(Category.Size).Size; }
 
         private Result InternalResult(Category category, int position)
@@ -149,7 +154,7 @@ namespace Reni.Struct
             return result;
         }
 
-        private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(x=>Type(x)); }
+        private IEnumerable<TypeBase> GetTypes() { return StatementList.Select(Type); }
 
         sealed internal override Context FindStruct() { return this; }
 
@@ -159,9 +164,16 @@ namespace Reni.Struct
                 .CreateResult(category, CreateContextCode, CreateContextRefs);
         }
 
+        internal Result CreateContextReference(Category category)
+        {
+            return ContextReferenceType.CreateArgResult(category);
+        }
+
         internal Result CreateFunctionResult(Category category, ICompileSyntax body)
         {
-            return new FunctionDefinitionType(CreateFunctionType(body)).CreateResult(category); 
+            NotImplementedMethod(category,body);
+            var functionType = CreateFunctionType(body);
+            return null;
         }
 
         internal Result CreateAtResultFromArg(Category category, int position)
@@ -178,13 +190,13 @@ namespace Reni.Struct
         private CodeBase CreateContextCode()
         {
             return CodeBase
-                .CreateContextRef(ForCode)
-                .CreateRefPlus(RefAlignParam, InternalSize() * -1);
+                .Create(ForCode)
+                .CreateRefPlus(RefAlignParam, InternalSize() * -1, "CreateContextCode");
         }
 
         private Refs CreateContextRefs()
         {
-            return Refs.Context(ForCode);
+            return Refs.Create(ForCode);
         }
 
         private Reni.Type.Function CreateFunctionType(ICompileSyntax body) { return _function.Find(body); }
@@ -199,7 +211,7 @@ namespace Reni.Struct
         {
             return type
                 .CreateReference(RefAlignParam)
-                .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(RefAlignParam, offset))
+                .CreateResult(category, () => CreateRefArgCode().CreateRefPlus(RefAlignParam, offset, "AutomaticDereference"))
                 .AutomaticDereference()
                 & category;
         }

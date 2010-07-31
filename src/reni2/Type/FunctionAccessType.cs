@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using Reni.Context;
 
 namespace Reni.Type
 {
@@ -11,29 +12,25 @@ namespace Reni.Type
         private readonly TypeBase _objectType;
 
         [DumpData(true)]
-        private readonly IFunctionalFeature _feature;
-
-        public FunctionAccessType(TypeBase objectType, IFunctionalFeature feature)
-        {
-            _objectType = objectType;
-            _feature = feature;
-        }
-
-        protected override Size GetSize() { return _objectType.Size; }
-        internal override string DumpShort() { return _objectType.DumpShort() + " " + _feature.DumpShort(); }
-        internal override IFunctionalFeature GetFunctionalFeature() { return _feature; }
-        internal override TypeBase StripFunctional() { return _objectType; }
-    }
-
-    internal class FunctionDefinitionType : TypeBase
-    {
-        [DumpData(true)]
         private readonly IFunctionalFeature _functionalFeature;
 
-        public FunctionDefinitionType(IFunctionalFeature functionalFeature)
+        public FunctionAccessType(TypeBase objectType, IFunctionalFeature functionalFeature)
         {
+            _objectType = objectType;
             _functionalFeature = functionalFeature;
         }
+
+        internal IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }
+        internal TypeBase ObjectType { get { return _objectType; } }
+
+        protected override Size GetSize() { return _objectType.Size; }
+        internal override string DumpPrintText { get { return _functionalFeature.DumpShort(); } }
+
+        internal Result ContextOperatorFeatureApply(Category category) { return _functionalFeature.ContextOperatorFeatureApply(category); }
+        public Result CreateDumpPrintResult(Category category) { return _functionalFeature.DumpPrintFeatureApply(category); }
+        internal override string DumpShort() { return _objectType.DumpShort() + " " + _functionalFeature.DumpShort(); }
+        internal override IFunctionalFeature GetFunctionalFeature() { return _functionalFeature; }
+        internal override TypeBase StripFunctional() { return _objectType; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -41,17 +38,25 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        protected override Size GetSize() { return Size.Zero; }
-        internal override string DumpShort() { return _functionalFeature.DumpShort(); }
-        internal override IFunctionalFeature GetFunctionalFeature() { return _functionalFeature; }
-
-        internal Result ContextOperatorFeatureApply(Category category)
+        internal override Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
         {
-            return _functionalFeature.ContextOperatorFeatureApply(category);
+            return _functionalFeature
+                .Apply(category, right(Category.Type).Type, refAlignParam)
+                .ReplaceArg(right(category))
+                .ReplaceObjectRefByArg(refAlignParam, _objectType);
         }
+    }
 
-        internal override string DumpPrintText { get { return _functionalFeature.DumpShort(); } }
-        public Result CreateDumpPrintResult(Category category) { return _functionalFeature.DumpPrintFeatureApply(category); }
+    internal class FunctionDefinitionType : TypeBase
+    {
+        [DumpData(true)]
+        private readonly FunctionAccessType _functionAccessType;
+
+        public FunctionDefinitionType(FunctionAccessType functionAccessType) { _functionAccessType = functionAccessType; }
+
+        protected override Size GetSize() { return Size.Zero; }
+        internal override string DumpShort() { return _functionAccessType.DumpShort(); }
+
     }
 
 }

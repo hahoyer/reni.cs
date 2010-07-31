@@ -45,7 +45,7 @@ namespace Reni.Struct
             _internalConstructorResult.Update(internalResult);
             var result = ContextType.CreateResult(category, internalResult);
             var constructorResult = result
-                .ReplaceRelativeContextRef(this, ()=>CodeBase.CreateTopRef(RefAlignParam));
+                .ReplaceRelative(this, ()=>CodeBase.CreateTopRef(RefAlignParam));
             _constructorResult.Update(constructorResult);
             return constructorResult;
         }

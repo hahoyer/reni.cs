@@ -34,7 +34,7 @@ namespace Reni
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
 
-        [Node]
+        [Node, DumpData(false)]
         internal Category PendingCategory;
 
         public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
@@ -401,13 +401,13 @@ namespace Reni
             return result;
         }
 
-        internal Result UseWithArg(Result resultForArg)
+        internal Result ReplaceArg(Result resultForArg)
         {
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
             StartMethodDump(trace, resultForArg);
             var result = new Result {Size = Size, Type = Type};
             if(HasCode && resultForArg.HasCode)
-                result.Code = Code.UseWithArg(resultForArg.Code);
+                result.Code = Code.ReplaceArg(resultForArg.Code);
             if(HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.CreateSequence(resultForArg.Refs);
             return ReturnMethodDump(trace, result);
@@ -415,13 +415,13 @@ namespace Reni
 
 
         /// <summary>
-        /// Replaces the absolute context ref.
+        /// Replaces the absolute refInCode ref.
         /// </summary>
         /// <typeparam name="TRefInCode"></typeparam>
-        /// <param name="refInCode">The context.</param>
+        /// <param name="refInCode">The refInCode.</param>
         /// <param name="replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
         /// <returns></returns>
-        internal Result ReplaceAbsoluteContextRef<TRefInCode>(TRefInCode refInCode, Func<Result> replacement)
+        internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Result> replacement)
             where TRefInCode : IRefInCode
         {
             if(HasRefs && !Refs.Contains(refInCode))
@@ -429,7 +429,7 @@ namespace Reni
 
             var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
-                result.Code = Code.ReplaceAbsoluteContextRef(refInCode, ()=>replacement().Code);
+                result.Code = Code.ReplaceAbsolute(refInCode, ()=>replacement().Code);
             if(HasRefs)
                 result.Refs = Refs.Without(refInCode).CreateSequence(replacement().Refs);
             result.IsDirty = false;
@@ -437,24 +437,27 @@ namespace Reni
         }
 
         /// <summary>
-        /// Replaces the relative context ref.
+        /// Replaces the relative refInCode ref.
         /// </summary>
-        /// <typeparam name="TContext"></typeparam>
-        /// <param name="context">The context.</param>
+        /// <typeparam name="TRefInCode"></typeparam>
+        /// <param name="refInCode">The refInCode.</param>
         /// <param name="replacement">The replacement. Should be a reference that varies when walking along code tree.</param>
         /// <returns></returns>
-        internal Result ReplaceRelativeContextRef<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
+        internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacement)
+            where TRefInCode : IRefInCode
         {
-            if(HasRefs && !Refs.Contains(context))
+            if(HasRefs && !Refs.Contains(refInCode))
                 return this;
 
             var result = new Result {Size = Size, Type = Type};
             if(HasCode)
-                result.Code = Code.ReplaceRelativeContextRef(context, replacement);
+                result.Code = Code.ReplaceRelative(refInCode, replacement);
             if(HasRefs)
-                result.Refs = Refs.Without(context);
+                result.Refs = Refs.Without(refInCode);
             return result;
         }
+
+        internal Result ReplaceObjectRefByArg(RefAlignParam refAlignParam, TypeBase objectType) { return objectType.ReplaceObjectRefByArg(this, refAlignParam); }
 
         internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, CodeBase replacement)
         {
@@ -480,15 +483,15 @@ namespace Reni
             throw new NotImplementedException();
         }
 
-        internal Result CreateRefPlus(Category c, RefAlignParam refAlignParam, Size value)
+        internal Result CreateRefPlus(Category c, RefAlignParam refAlignParam, Size value, string reason)
         {
             var result = Clone();
             if(c.HasCode)
-                result.Code = Code.CreateRefPlus(refAlignParam, value);
+                result.Code = Code.CreateRefPlus(refAlignParam, value, reason);
             return result;
         }
 
-        internal Result CreateStatement(Category category, RefAlignParam refAlignParam)
+        internal Result CreateLocalBlock(Category category, RefAlignParam refAlignParam)
         {
             if(!category.HasCode && !category.HasRefs)
                 return this;
@@ -496,13 +499,16 @@ namespace Reni
             var result = Clone(category);
             var copier = Type.Copier(category);
             if(category.HasCode)
-                result.Code = Code.CreateStatement(copier.Code, refAlignParam);
+                result.Code = Code.CreateLocalBlock(copier.Code, refAlignParam);
             if(category.HasRefs)
                 result.Refs = Refs.CreateSequence(copier.Refs);
             return result;
         }
 
-        internal Result ConvertTo(TypeBase target) { return Type.Conversion(CompleteCategory, target).UseWithArg(this); }
+        internal Result ConvertTo(TypeBase target)
+        {
+            return Type.Conversion(CompleteCategory, target).ReplaceArg(this);
+        }
 
         internal Result CreateUnref(TypeBase type, RefAlignParam refAlignParam)
         {
@@ -609,22 +615,18 @@ namespace Reni
 
         internal Result ConvertToBitSequence(Category category)
         {
-            return Type.ConvertToBitSequence(category).UseWithArg(this)
-                ;
+            return Type
+                .ConvertToBitSequence(category)
+                .ReplaceArg(this);
         }
 
-        internal Result ConvertToAsRef(Category category, Reference target) { 
-            if(Type.IsRefLike(target))
-                return target.CreateResult(category, this & (Category.Code | Category.Refs));
-
-            Result tempQualifier = ConvertTo(target.AlignedTarget);
-            var destructor = tempQualifier.Type.Destructor(category);
-            return target.CreateResult(
-                category,
-                () => CodeBase.CreateInternalRef(target.RefAlignParam, tempQualifier.Code, destructor.Code),
-                () => tempQualifier.Refs + destructor.Refs
-                );
+        internal Result ConvertToAsRef(Category category, Reference target)
+        {
+            return Type
+                .ConvertToAsRef(category, target)
+                .ReplaceArg(this);
         }
+
     }
 
     internal sealed class Error

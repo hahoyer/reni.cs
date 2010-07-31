@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Context;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -24,11 +25,12 @@ namespace Reni.Type
         Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
 
-        Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
+
+        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            return _type
-                .ApplyAssignment(category, functionalResult, argsResult);
+            return _type.ApplyAssignment(category, argsType);
         }
+
         string IDumpShortProvider.DumpShort() { return _type.DumpShort() + " :="; }
     }
 }

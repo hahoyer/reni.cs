@@ -5,6 +5,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 
@@ -50,13 +51,13 @@ namespace Reni.Type
 
             TypeBase IFeature.DefiningType() { return _parent; }
 
-            Result IFunctionalFeature.Apply(Category category, Result functionalResult, Result argsResult)
+            Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
             {
-                var objectResult = functionalResult.StripFunctional();
-                var result = Apply(category, objectResult.Type.GetSequenceCount(_parent.Element), argsResult.Type.GetSequenceCount(_parent.Element));
+                var objectResult = _parent.CreateObjectRefInCode(category|Category.Type,refAlignParam);
+                var result = Apply(category, objectResult.Type.GetSequenceCount(_parent.Element), argsType.GetSequenceCount(_parent.Element));
                 var convertedObjectResult = objectResult.ConvertToBitSequence(category);
-                var convertedArgsResult = argsResult.ConvertToBitSequence(category);
-                return result.UseWithArg(convertedObjectResult.CreateSequence(convertedArgsResult));
+                var convertedArgsResult = argsType.ConvertToBitSequence(category);
+                return result.ReplaceArg(convertedObjectResult.CreateSequence(convertedArgsResult));
             }
 
             Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
@@ -81,7 +82,7 @@ namespace Reni.Type
             Result IFeature.Apply(Category category)
             {
                 return Apply(category, _parent.UnrefSize)
-                    .UseWithArg(_parent.ConvertToBitSequence(category));
+                    .ReplaceArg(_parent.ConvertToBitSequence(category));
             }
 
             private Result Apply(Category category, Size objSize)
@@ -175,7 +176,7 @@ namespace Reni.Type
                 return null;
             }
             if(Count < dest.Count)
-                result = dest.ExtendFrom(category, Count).UseWithArg(result);
+                result = dest.ExtendFrom(category, Count).ReplaceArg(result);
             return result;
         }
 

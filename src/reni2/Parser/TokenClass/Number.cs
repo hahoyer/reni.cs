@@ -26,7 +26,7 @@ namespace Reni.Parser.TokenClass
             return TypeBase
                 .CreateBit
                 .CreateSequence(bitsConst.Size.ToInt())
-                .CreateResult(category, () => CodeBase.CreateBitArray(bitsConst));
+                .CreateResult(category, () => CodeBase.Create(bitsConst));
         }
 
         public static Int64 ToInt64(Token token)

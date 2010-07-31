@@ -44,7 +44,7 @@ namespace Reni
                 .Result(category | Category.Type, Cond)
                 .ConvertTo(TypeBase.CreateBit)
                 .Align(context.AlignBits)
-                .CreateStatement(category | Category.Type, context.RefAlignParam)
+                .CreateLocalBlock(category | Category.Type, context.RefAlignParam)
                 .ConvertTo(TypeBase.CreateBit)
                 ;
         }
@@ -67,8 +67,8 @@ namespace Reni
             var commonType = context.CommonType(this);
             return branchResult.Type
                 .Conversion(category | Category.Type, commonType)
-                .UseWithArg(branchResult)
-                .CreateStatement(category, context.RefAlignParam);
+                .ReplaceArg(branchResult)
+                .CreateLocalBlock(category, context.RefAlignParam);
         }
 
         private Result InternalResult(ContextBase context, Category category)

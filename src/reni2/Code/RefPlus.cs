@@ -15,26 +15,27 @@ namespace Reni.Code
     {
         private readonly RefAlignParam _refAlignParam;
 
-        [Node]
-        [DumpData(false)]
+        [Node, DumpData(false)]
         private readonly Size _right;
+
+        [Node, DumpData(false)]
+        private readonly string _reason;
 
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        public RefPlus(RefAlignParam refAlignParam, Size right)
+        public RefPlus(RefAlignParam refAlignParam, Size right, string reason)
         {
             _refAlignParam = refAlignParam;
             _right = right;
+            _reason = reason;
             AssertValid();
-            StopByObjectId(-167);
-            StopByObjectId(-22);
-            StopByObjectId(-16);
+            StopByObjectId(303);
         }
 
-        private void AssertValid() { _right.AssertAlignedSize(_refAlignParam.AlignBits); }
+        private void AssertValid() { _right.AssertAlignedSize(RefAlignParam.AlignBits); }
 
-        public override string NodeDump { get { return base.NodeDump + " Right=" + _right; } }
+        public override string NodeDump { get { return base.NodeDump + " Right=" + _right + " Reason=" + _reason; } }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
 
@@ -66,8 +67,9 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(RefPlus precedingElement)
         {
+            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
-                return new RefPlus(RefAlignParam, _right + precedingElement._right);
+                return new RefPlus(RefAlignParam, _right + precedingElement._right, _reason + " + " + precedingElement._reason);
             return base.TryToCombineBack(precedingElement);
         }
     }

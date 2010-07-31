@@ -28,9 +28,11 @@ namespace Reni.Type
             public readonly DictionaryEx<RefAlignParam, Reference> References;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes;
+            public readonly DictionaryEx<RefAlignParam,ObjectRef> ObjectRefs;
 
             public Cache(TypeBase parent)
             {
+                ObjectRefs = new DictionaryEx<RefAlignParam, ObjectRef>(refAlignParam=>new ObjectRef(parent, refAlignParam));
                 FunctionalTypes = new DictionaryEx<IFunctionalFeature, FunctionAccessType>(feature => new FunctionAccessType(parent, feature));
                 References = new DictionaryEx<RefAlignParam, Reference>(refAlignParam => new Reference(parent, refAlignParam));
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
@@ -131,7 +133,7 @@ namespace Reni.Type
         internal virtual Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
         internal virtual Result ArrayCopier(Category category, int count) { return CreateVoidCodeAndRefs(category); }
         internal virtual Result AutomaticDereference(Result result) { return result; }
-        internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).UseWithArg(argResult); }
+        internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
         internal Result CreateArgResult(Category category) { return CreateResult(category, CreateArgCode); }
         internal Result CreateResult(Result codeAndRefs) { return CreateResult(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result CreateResult(Category category, Func<CodeBase> getCode) { return CreateResult(category, getCode, Refs.None); }
@@ -141,7 +143,7 @@ namespace Reni.Type
         internal Result CreateResult(Category category)
         {
             return CreateResult(category,
-                                () => CodeBase.CreateBitArray(Size, BitsConst.Convert(0).Resize(Size)));
+                                () => CodeBase.Create(Size, BitsConst.Convert(0).Resize(Size)));
         }
 
         internal Result CreateResult(Category category, Result codeAndRefs)
@@ -236,6 +238,9 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
+        [DumpData(false)]
+        internal virtual TypeBase AccessType { get { return this; } }
+
         internal virtual IFunctionalFeature GetFunctionalFeature() { return null; }
 
         internal virtual TypeBase StripFunctional()
@@ -263,34 +268,29 @@ namespace Reni.Type
         private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            bool trace = ObjectId == 17175 && defineable.ObjectId == 372 && category.HasCode;
+            bool trace = ObjectId == 41678 && defineable.ObjectId == 568 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
             if(feature == null)
                 return ReturnMethodDump<Result>(trace, null);
 
+            DumpWithBreak(trace, "feature", feature);
             var result = feature.Apply(category);
-            if(this != feature.DefiningType())
+            DumpWithBreak(trace, "result", result);
+            if (this != feature.DefiningType())
             {
+                DumpWithBreak(trace, "feature.DefiningType()", feature.DefiningType());
                 var conversion = Conversion(category, feature.DefiningType());
-                result = result.UseWithArg(conversion);
+                DumpWithBreak(trace, "conversion", conversion);
+                result = result.ReplaceArg(conversion);
             }
-            //var result2 = PostProcessGetUnaryResult(result & category);
             return ReturnMethodDumpWithBreak(trace, result);
         }
-
-        protected virtual Result PostProcessGetUnaryResult(Result result) { return result; }
 
         internal Result GetSuffixResult(Category category, Defineable defineable) { return GetUnaryResult<IFeature>(category, defineable); }
 
         internal Result GetPrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
-
-        internal Result DumpPrintFromReference(Category category, RefAlignParam refAlignParam)
-        {
-            var dereferencedResult = CreateDereferencedResult(category, refAlignParam);
-            return GenericDumpPrint(category).UseWithArg(dereferencedResult);
-        }
 
         internal Result CreateDereferencedResult(Category category, RefAlignParam refAlignParam)
         {
@@ -306,5 +306,59 @@ namespace Reni.Type
             NotImplementedMethod();
             return null;
         }
+
+        virtual internal Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(category,right);
+            return null;
+        }
+
+        internal Result ConvertToAsRef(Category category, Reference target) { 
+            if(IsRefLike(target))
+                return target.CreateArgResult(category);
+
+            Result convertedResult = Conversion(category|Category.Type, target.AlignedTarget);
+            var destructor = convertedResult.Type.Destructor(category);
+            return target.CreateResult(
+                category,
+                () => CodeBase.CreateInternalRef(target.RefAlignParam, convertedResult.Code, destructor.Code),
+                () => convertedResult.Refs + destructor.Refs
+                );
+        }
+
+        internal Result CreateObjectRefInCode(Category category, RefAlignParam refAlignParam)
+        {
+            var objectRef = ObjectRef(refAlignParam);
+            return CreateReference(refAlignParam)
+                .CreateResult(
+                category, 
+                () => CodeBase.Create(objectRef),
+                () => Refs.Create(objectRef)
+                );
+        }
+
+        internal Result ReplaceObjectRefByArg(Result result, RefAlignParam refAlignParam)
+        {
+            return result
+                .ReplaceAbsolute(ObjectRef(refAlignParam), () => CreateReference(refAlignParam).CreateArgResult(result.CompleteCategory));
+        }
+
+        private ObjectRef ObjectRef(RefAlignParam refAlignParam) { return _cache.ObjectRefs.Find(refAlignParam); }
+    }
+
+    internal class ObjectRef: IRefInCode
+    {
+        private readonly TypeBase _objectType;
+        private readonly RefAlignParam _refAlignParam;
+
+        public ObjectRef(TypeBase objectType, RefAlignParam refAlignParam)
+        {
+            _objectType = objectType;
+            _refAlignParam = refAlignParam;
+        }
+
+        RefAlignParam IRefInCode.RefAlignParam { get { return _refAlignParam; } }
+        bool IRefInCode.IsChildOf(ContextBase contextBase) { return false; }
+        string IRefInCode.Dump() { return "ObjectRef("+_objectType.DumpShort()+")"; }
     }
 }

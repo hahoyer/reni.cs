@@ -115,21 +115,21 @@ namespace Reni.Code
 
         internal override int ThenElse(ThenElse visitedObject, int condResult, int thenResult, int elseResult) { return thenResult; }
 
-        internal override Visitor<int> AfterCond(int objectId)
+        protected override Visitor<int> AfterCond()
         {
-            DataAdd(new Then(objectId, TypeBase.CreateBit.Size));
+            DataAdd(new Then(TypeBase.CreateBit.Size));
             return this;
         }
 
-        internal override Visitor<int> AfterThen(int objectId, Size thenSize)
+        protected override Visitor<int> AfterThen(Size thenSize)
         {
-            DataAdd(new Else(objectId, thenSize));
+            DataAdd(new Else(thenSize));
             return this;
         }
 
-        internal override Visitor<int> AfterElse(int objectId)
+        protected override Visitor<int> AfterElse()
         {
-            DataAdd(new EndCondional(objectId));
+            DataAdd(new EndCondional());
             return this;
         }
 

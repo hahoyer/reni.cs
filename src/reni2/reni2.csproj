@@ -35,6 +35,7 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\HasArgVisitor.cs" />
     <Compile Include="Code\InternalRef.cs" />
+    <Compile Include="Code\IRefInCode.cs" />
     <Compile Include="Code\Leaf.cs" />
     <Compile Include="Code\LeafElement.cs" />
     <Compile Include="Code\Multiplyop.cs" />
@@ -47,7 +48,7 @@
     <Compile Include="Code\ReplaceVisitor\ReplaceRelRefArg.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceContextRefWithArg.cs" />
     <Compile Include="Code\Pair.cs" />
-    <Compile Include="Code\StatementEnd.cs" />
+    <Compile Include="Code\LocalBlockEnd.cs" />
     <Compile Include="Code\StorageDescriptor.cs" />
     <Compile Include="Code\ThenElse.cs" />
     <Compile Include="Code\Top.cs" />

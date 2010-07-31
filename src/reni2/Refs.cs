@@ -81,7 +81,7 @@ namespace Reni
             return new Refs(_data, refs._data);
         }
 
-        public static Refs Context(IRefInCode context) { return new Refs(context); }
+        internal static Refs Create(IRefInCode refInCode) { return new Refs(refInCode); }
 
         public override string DumpData()
         {
@@ -99,7 +99,7 @@ namespace Reni
         {
             var result = new SizeArray();
             for(int i = 0, n = Count; i < n; i++)
-                result.Add((this)[i].RefSize);
+                result.Add((this)[i].RefAlignParam.RefSize);
             return result;
         }
 
@@ -134,7 +134,7 @@ namespace Reni
         internal CodeBase ToCode()
         {
             return _data
-                .Aggregate(CodeBase.CreateVoid(), (current, t) => current.CreateSequence(CodeBase.CreateContextRef(t)));
+                .Aggregate(CodeBase.CreateVoid(), (current, t) => current.CreateSequence(CodeBase.Create(t)));
         }
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)
@@ -146,9 +146,9 @@ namespace Reni
                 var unrefAlignment = _data[i].RefAlignParam;
                 Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
                 var unrefPtrAlignment = refAlignParam;
-                p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize*-1);
+                p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize * -1, "ReplaceRefsForFunctionBody");
                 var replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
-                result = result.ReplaceAbsoluteContextRef(_data[i], ()=>replacement);
+                result = result.ReplaceAbsolute(_data[i], ()=>replacement);
             }
             return result;
         }

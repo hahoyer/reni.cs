@@ -187,7 +187,7 @@ namespace Reni.Context
                 var prefixResult = Type(right)
                     .GetPrefixResult(category, defineable);
                 if(prefixResult != null)
-                    return prefixResult.UseWithArg(Result(category | Category.Type, right));
+                    return prefixResult.ReplaceArg(Result(category | Category.Type, right));
             }
 
             var suffixResult =
@@ -198,16 +198,15 @@ namespace Reni.Context
             if(right == null)
                 return ReturnMethodDumpWithBreak(trace, suffixResult);
 
-            var feature = suffixResult.Type.GetFunctionalFeature();
-            if(feature != null)
-                return ReturnMethodDumpWithBreak(trace, feature.Apply(category, suffixResult, ResultAsRef(category | Category.Type, right)));
-            NotImplementedMethod(category, left, defineable, right, "suffixResult", suffixResult, "feature", feature);
-            return null;
+            return suffixResult
+                .Type
+                .Apply(category, rightCategory => ResultAsRef(rightCategory, right), RefAlignParam)
+                .ReplaceArg(suffixResult.CreateAutomaticRefResult(RefAlignParam));
         }
 
         private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
-            var trace = left.ObjectId == 16828 && category.HasCode;
+            var trace = left.ObjectId == 4779 && category.HasCode;
             StartMethodDumpWithBreak(trace,category,left,defineable);
             var suffixResult = Type(left)
                 .GetSuffixResult(category, defineable);
@@ -219,7 +218,7 @@ namespace Reni.Context
 
             var leftResult = Result(category, left);
             DumpWithBreak(trace,"suffixResult",suffixResult,"leftResult",leftResult);
-            return ReturnMethodDumpWithBreak(trace, suffixResult.UseWithArg(leftResult));
+            return ReturnMethodDumpWithBreak(trace, suffixResult.ReplaceArg(leftResult));
         }
 
         private IContextFeature SearchDefinable(Defineable defineable)
@@ -312,11 +311,7 @@ namespace Reni.Context
         }
     }
 
-    internal class ContextOperator : Defineable, ISearchPath<IFeature, FunctionDefinitionType>
+    internal class ContextOperator : Defineable
     {
-        IFeature ISearchPath<IFeature, FunctionDefinitionType>.Convert(FunctionDefinitionType type)
-        {
-            return new Feature.Feature(type.ContextOperatorFeatureApply);
-        }
     }
 }

@@ -9,13 +9,13 @@ namespace Reni.Code
     /// Code for end of statement
     /// </summary>
     [Serializable]
-    internal sealed class StatementEnd : LeafElement
+    internal sealed class LocalBlockEnd : LeafElement
     {
         [Node]
         private readonly Size IntermediateSize;
         private readonly Size _size;
 
-        public StatementEnd(Size size, Size intermediateSize)
+        public LocalBlockEnd(Size size, Size intermediateSize)
         {
             Tracer.Assert(!intermediateSize.IsZero);
 
@@ -36,7 +36,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateStatementEnd(_size, IntermediateSize);
+            return start.CreateLocalBlockEnd(_size, IntermediateSize);
         }
 
     }

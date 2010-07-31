@@ -30,7 +30,7 @@ namespace Reni.Feature.DumpPrint
         {
             return
                 Apply(category, _parent.GetSequenceCount(TypeBase.CreateBit))
-                    .UseWithArg(_parent.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
+                    .ReplaceArg(_parent.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
         }
 
         TypeBase IFeature.DefiningType() { return _parent; }
@@ -42,7 +42,7 @@ namespace Reni.Feature.DumpPrint
         {
             return
                 Apply(category, 1)
-                    .UseWithArg(TypeBase.CreateBit.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
+                    .ReplaceArg(TypeBase.CreateBit.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
         }
 
         TypeBase IFeature.DefiningType() { return TypeBase.CreateBit; }

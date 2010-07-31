@@ -60,7 +60,7 @@ namespace Reni.Type
         {
             return Parent
                 .ConvertTo(category, dest)
-                .UseWithArg(CreateUnalignedArgResult(category));
+                .ReplaceArg(CreateUnalignedArgResult(category));
         }
 
         private Result CreateUnalignedArgResult(Category category)

@@ -65,7 +65,7 @@ namespace Reni.Type
 
             return _target
                 .ConvertTo(category, dest)
-                .UseWithArg(CreateDereferencedArgResult(category));
+                .ReplaceArg(CreateDereferencedArgResult(category));
         }
 
         private Result CreateDereferencedArgResult(Category category)
@@ -87,7 +87,7 @@ namespace Reni.Type
 
         internal override sealed Result AutomaticDereference(Result result)
         {
-            Result useWithArg = CreateDereferencedArgResult(result.CompleteCategory).UseWithArg(result);
+            Result useWithArg = CreateDereferencedArgResult(result.CompleteCategory).ReplaceArg(result);
             return _target
                 .AutomaticDereference(useWithArg);
         }

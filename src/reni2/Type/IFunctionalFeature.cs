@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Reni.Context;
 
 namespace Reni.Type
 {
     internal interface IFunctionalFeature : IDumpShortProvider
     {
-        Result Apply(Category category, Result functionalResult, Result argsResult);
         Result ContextOperatorFeatureApply(Category category);
         Result DumpPrintFeatureApply(Category category);
+        Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam);
     }
 }

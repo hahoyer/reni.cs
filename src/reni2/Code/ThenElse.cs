@@ -61,14 +61,6 @@ namespace Reni.Code
     [Serializable]
     internal sealed class EndCondional : LeafElement
     {
-        [Node, DumpData(true)]
-        private readonly int _thenElseObjectId;
-
-        internal EndCondional(int thenElseObjectId)
-        {
-            _thenElseObjectId = thenElseObjectId;
-        }
-
         protected override Size GetInputSize()
         {
             return Size.Zero;
@@ -81,7 +73,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return StorageDescriptor.CreateEndCondional(_thenElseObjectId);
+            return StorageDescriptor.CreateEndCondional();
         }
     }
     [Serializable]
@@ -89,13 +81,10 @@ namespace Reni.Code
     internal sealed class Else : LeafElement
     {
         [Node, DumpData(true)]
-        private readonly int _thenElseObjectId;
-        [Node, DumpData(true)]
         private readonly Size _thenSize;
 
-        public Else(int thenElseObjectId, Size thenSize)
+        public Else(Size thenSize)
         {
-            _thenElseObjectId = thenElseObjectId;
             _thenSize = thenSize;
         }
 
@@ -111,7 +100,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return StorageDescriptor.CreateElse(_thenElseObjectId);
+            return StorageDescriptor.CreateElse();
         }
     }
 
@@ -119,13 +108,10 @@ namespace Reni.Code
     internal sealed class Then : LeafElement
     {
         [Node]
-        internal readonly int ThenElseObjectId;
-        [Node]
         internal readonly Size CondSize;
 
-        public Then(int thenElseObjectId, Size condSize)
+        public Then(Size condSize)
         {
-            ThenElseObjectId = thenElseObjectId;
             CondSize = condSize;
         }
 
@@ -142,7 +128,7 @@ namespace Reni.Code
         internal override LeafElement TryToCombineBack(BitCast precedingElement)
         {
             if(precedingElement.Size == CondSize)
-                return new Then(ThenElseObjectId, precedingElement.TargetSize);
+                return new Then(precedingElement.TargetSize);
             return null;
         }
 
@@ -155,7 +141,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateThen(ThenElseObjectId, CondSize);
+            return start.CreateThen(CondSize);
         }
     }
 
@@ -185,7 +171,8 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateBitArrayOpThen(_bitArrayBinaryOp.OpToken, _bitArrayBinaryOp.LeftSize, _bitArrayBinaryOp.RightSize, _thenCode.ThenElseObjectId, _thenCode.CondSize);
+            return start
+                .CreateBitArrayOpThen(_bitArrayBinaryOp.OpToken, _bitArrayBinaryOp.LeftSize, _bitArrayBinaryOp.RightSize);
         }
     }
 }
