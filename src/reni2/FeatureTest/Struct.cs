@@ -88,12 +88,13 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccess]
-    [TargetSet("5, (this _A_T_ 0 + this _A_T_ 0)dump_print","10")]
-    //[TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
+    [TestFixture]
+    [InnerAccess]
+    [TargetSet("5, (this _A_T_ 0 + this _A_T_ 0)dump_print", "10")]
+    [TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
     public class AccessAndAdd : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 

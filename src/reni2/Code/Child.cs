@@ -33,19 +33,9 @@ namespace Reni.Code
         [DumpData(false)]
         protected override Size MaxSizeImplementation { get { return Parent.MaxSize.Max(LeafElement.Size); } }
         [DumpData(false)]
-        internal override Refs RefsImplementation { get { return _parent.RefsImplementation; } }
-
+        internal override Refs RefsImplementation { get { return Parent.RefsImplementation; } }
         [DumpData(false)]
-        internal override RefAlignParam RefAlignParam
-        {
-            get
-            {
-                var result = LeafElement.RefAlignParam;
-                if(result != null)
-                    return result;
-                return Parent.RefAlignParam;
-            }
-        }
+        internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
 
         internal override CodeBase CreateChild(LeafElement leafElement)
         {
