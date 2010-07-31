@@ -30,7 +30,7 @@ namespace Reni.Code
             _right = right;
             _reason = reason;
             AssertValid();
-            StopByObjectId(303);
+            StopByObjectId(29);
         }
 
         private void AssertValid() { _right.AssertAlignedSize(RefAlignParam.AlignBits); }

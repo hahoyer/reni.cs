@@ -22,7 +22,7 @@ namespace Reni.Code
         {
             OpToken = opToken;
             _size = size;
-            StopByObjectId(381);
+            StopByObjectId(-381);
         }
 
         protected override Size GetSize()
