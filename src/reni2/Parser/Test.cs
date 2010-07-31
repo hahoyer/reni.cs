@@ -9,12 +9,6 @@ namespace Reni.Parser
     [TestFixture]
     public class ParserTest : CompilerTest
     {
-        [SetUp]
-        public new void Start()
-        {
-            base.Start();
-        }
-
         public override void Run() { 
         }
 

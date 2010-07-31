@@ -30,12 +30,9 @@ namespace Reni.FeatureTest
         [UsedImplicitly]
         public const string Worked = "Worked";
 
-        internal CompilerParameters Parameters;
+        internal readonly CompilerParameters Parameters = new CompilerParameters();
         private static Dictionary<System.Type, CompilerTest> _cache;
         private bool _needToRunDependants = true;
-
-        [SetUp]
-        public void Start() { Parameters = new CompilerParameters(); }
 
         protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
@@ -89,7 +86,6 @@ namespace Reni.FeatureTest
         private void RunDependant()
         {
             RunDependants();
-            Start();
             Run();
         }
 
