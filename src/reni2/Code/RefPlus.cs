@@ -67,7 +67,6 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(RefPlus precedingElement)
         {
-            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
                 return new RefPlus(RefAlignParam, _right + precedingElement._right, _reason + " + " + precedingElement._reason);
             return base.TryToCombineBack(precedingElement);

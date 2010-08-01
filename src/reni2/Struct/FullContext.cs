@@ -6,6 +6,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
+using Reni.Syntax;
 
 namespace Reni.Struct
 {
