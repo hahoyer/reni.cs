@@ -22,7 +22,7 @@ namespace Reni.Type
             _body = body;
         }
 
-        string IDumpShortProvider.DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _context.ObjectId + "#)#"; }
+        public string DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _context.ObjectId + "#)#"; }
 
         Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { return _context.CreateContextReference(category); }
 

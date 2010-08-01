@@ -49,14 +49,18 @@ namespace Reni.Type
 
     internal class FunctionDefinitionType : TypeBase
     {
-        [DumpData(true)]
-        private readonly FunctionAccessType _functionAccessType;
-
-        public FunctionDefinitionType(FunctionAccessType functionAccessType) { _functionAccessType = functionAccessType; }
+        private readonly Function _function;
+        public FunctionDefinitionType(Function function) { _function = function; }
 
         protected override Size GetSize() { return Size.Zero; }
-        internal override string DumpShort() { return _functionAccessType.DumpShort(); }
+        internal override string DumpShort() { return _function.DumpShort(); }
 
+        internal override TypeBase AccessType(Struct.Context context, int position)
+        {
+            return context
+                .ContextReferenceType
+                .CreateFunctionalType(_function);
+        }
     }
 
 }

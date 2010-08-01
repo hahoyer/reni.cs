@@ -29,9 +29,11 @@ namespace Reni.Type
             public readonly SimpleCache<TypeType> TypeType;
             public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes;
             public readonly DictionaryEx<RefAlignParam,ObjectRef> ObjectRefs;
+            public readonly DictionaryEx<Struct.Context, DictionaryEx<int, Struct.Reference>> StructReferences;
 
             public Cache(TypeBase parent)
             {
+                StructReferences = new DictionaryEx<Struct.Context, DictionaryEx<int, Struct.Reference>>(context=> new DictionaryEx<int, Struct.Reference>(position=>new Struct.Reference(context,position)));
                 ObjectRefs = new DictionaryEx<RefAlignParam, ObjectRef>(refAlignParam=>new ObjectRef(parent, refAlignParam));
                 FunctionalTypes = new DictionaryEx<IFunctionalFeature, FunctionAccessType>(feature => new FunctionAccessType(parent, feature));
                 References = new DictionaryEx<RefAlignParam, Reference>(refAlignParam => new Reference(parent, refAlignParam));
@@ -114,6 +116,7 @@ namespace Reni.Type
         internal Array CreateArray(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase CreateReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
         internal Reference CreateReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
+        internal Struct.Reference CreateReference(Struct.Context context, int position) { return _cache.StructReferences.Find(context).Find(position); }
         internal Sequence CreateSequence(int elementCount)
         {
             return _cache.Sequences.Find(elementCount);
@@ -238,8 +241,10 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
-        [DumpData(false)]
-        internal virtual TypeBase AccessType { get { return this; } }
+        internal virtual TypeBase AccessType(Struct.Context context, int position)
+        {
+            return CreateReference(context, position);
+        }
 
         internal virtual IFunctionalFeature GetFunctionalFeature() { return null; }
 
@@ -309,7 +314,7 @@ namespace Reni.Type
 
         virtual internal Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
         {
-            NotImplementedMethod(category,right);
+            NotImplementedMethod(category,right,refAlignParam);
             return null;
         }
 

@@ -71,16 +71,10 @@ namespace Reni.Struct
             return "context." + ObjectId + "(" + Container.DumpShort() + ")";
         }
 
-        private TypeBase InternalType(int position)
-        {
-            return InternalResult(Category.Type, position).Type;
-        }
+        internal TypeBase RawType(int position) { return InternalType(position); }
+        private TypeBase AccessType(int position) { return InternalType(position).AccessType(this, position); }
 
-        internal TypeBase Type(int position)
-        {
-            return InternalType(position).AccessType;
-
-        }
+        private TypeBase InternalType(int position) { return InternalResult(Category.Type, position).Type; }
         internal Size InternalSize() { return InternalResult(Category.Size).Size; }
 
         private Result InternalResult(Category category, int position)
@@ -171,20 +165,17 @@ namespace Reni.Struct
 
         internal Result CreateFunctionResult(Category category, ICompileSyntax body)
         {
-            NotImplementedMethod(category,body);
-            var functionType = CreateFunctionType(body);
-            return null;
+            return new FunctionDefinitionType(Function(body)).CreateResult(category);
         }
 
         internal Result CreateAtResultFromArg(Category category, int position)
         {
-            return new Reference(this, position).CreateArgResult(category);
+            return AccessType(position).CreateArgResult(category);
         }
 
         internal Result CreateAtResultFromContext(Category category, int position)
         {
-            return new Reference(this, position)
-                .CreateResult(category, CreateContextCode, CreateContextRefs);
+            return AccessType(position).CreateResult(category, CreateContextCode, CreateContextRefs);
         }
 
         private CodeBase CreateContextCode()
@@ -199,7 +190,7 @@ namespace Reni.Struct
             return Refs.Create(ForCode);
         }
 
-        private Reni.Type.Function CreateFunctionType(ICompileSyntax body) { return _function.Find(body); }
+        private Reni.Type.Function Function(ICompileSyntax body) { return _function.Find(body); }
 
         internal Result[] CreateArgCodes(Category category)
         {

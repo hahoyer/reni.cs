@@ -111,7 +111,7 @@ namespace Reni.Struct
         }
 
         private Size GetOffset() { return _context.Offset(_position); }
-        private TypeBase GetTargetType() { return _context.Type(_position); }
+        private TypeBase GetTargetType() { return _context.RawType(_position); }
 
         private Result CreateTypeReferenceResult(Category category)
         {
@@ -135,24 +135,5 @@ namespace Reni.Struct
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
             return result.ReplaceArg(objectAndSourceRefs);
         }
-
-        internal Result ApplyAssignment(Category category, Result functionalResult, Result argsResult)
-        {
-            var result = CreateVoid
-                .CreateResult
-                (
-                    category,
-                    () => CodeBase.CreateArg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, Size)
-                );
-
-            if (!category.HasCode && !category.HasRefs)
-                return result;
-
-            var sourceResult = argsResult.ConvertToAsRef(category, CreateReference(RefAlignParam));
-            var destinationResult = functionalResult.StripFunctional() & category;
-            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
-            return result.ReplaceArg(objectAndSourceRefs);
-        }
-
     }
 }
