@@ -376,6 +376,7 @@ namespace Reni.Code
         }
 
         public override string NodeDump { get { return base.NodeDump + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; } }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Drop(_beforeSize, _afterSize); }
 
         protected override Size GetSize() { return _afterSize; }
 

@@ -10,6 +10,13 @@ namespace Reni
     [Serializable]
     public class CompilerParameters
     {
+        static public CompilerParameters CreateTraceAll()
+        {
+            var result = new CompilerParameters();
+            result.Trace.All();
+            return result;
+        }
+
         /// <summary>
         /// Shows or hides syntax tree
         /// </summary>
@@ -54,12 +61,19 @@ namespace Reni
             [Node, DumpData(true)]
             public bool Syntax;
 
+            /// <summary>
+            /// Shows or hides a graphic repesentation of generated code
+            /// </summary>
+            [Node, DumpData(true)]
+            public bool CodeGraph;
+
             public void None()
             {
                 Source = false;
                 Syntax = false;
                 CodeTree = false;
                 CodeSequence = false;
+                CodeGraph = false;
                 ExecutedCode = false;
                 Functions = false;
             }
@@ -70,6 +84,7 @@ namespace Reni
                 Syntax = true;
                 CodeTree = true;
                 CodeSequence = true;
+                CodeGraph = true;
                 ExecutedCode = true;
                 Functions = true;
             }

@@ -122,6 +122,12 @@ namespace Reni
                 for(var i = 0; i < FunctionContainers.Count; i++)
                     Tracer.FlaggedLine("function index=" + i + "\n" + FunctionContainers[i].Dump());
             }
+            if (_parameters.Trace.CodeGraph)
+            {
+                Tracer.FlaggedLine("main\n" + MainContainer.CreateGraph());
+                for (var i = 0; i < FunctionContainers.Count; i++)
+                    Tracer.FlaggedLine("function index=" + i + "\n" + FunctionContainers[i].CreateGraph());
+            }
 
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(ExecutedCode);

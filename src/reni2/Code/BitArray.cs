@@ -55,5 +55,10 @@ namespace Reni.Code
             return new BitArray(Size.Create(0),BitsConst.None());
         }
 
+        internal override void Execute(IFormalMaschine formalMaschine)
+        {
+            formalMaschine.BitsArray(Size, Data);
+        }
+
     }
 }

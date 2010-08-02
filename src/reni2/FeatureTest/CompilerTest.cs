@@ -34,7 +34,10 @@ namespace Reni.FeatureTest
         private static Dictionary<System.Type, CompilerTest> _cache;
         private bool _needToRunDependants = true;
 
-        protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
+        protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput)
+        {
+            CreateFileAndRunCompiler(1, name, text, null, expectedOutput);
+        }
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
 
@@ -46,13 +49,25 @@ namespace Reni.FeatureTest
             InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
         }
 
+        public static void Run(string name, string target, string expectedOutput)
+        {
+            var fileName = name + ".reni";
+            var f = File.m(fileName);
+            f.String = target;
+            InternalRunCompiler(CompilerParameters.CreateTraceAll(), fileName, null, expectedOutput);
+        }
+
         private void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
             Tracer.FlaggedLine(depth + 1, "Position of method tested");
             if(IsCallerUnderConstruction(1))
                 Parameters.Trace.All();
 
-            var c = new Compiler(Parameters, fileName);
+            InternalRunCompiler(Parameters, fileName, expectedResult, expectedOutput);
+        }
+
+        private static void InternalRunCompiler(CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, string expectedOutput) {
+            var c = new Compiler(compilerParameters, fileName);
 
             if(expectedResult != null)
             {

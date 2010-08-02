@@ -25,6 +25,8 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBackN(this);
         }
 
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopData(Size, Offset); }
+
         /// <summary>
         /// Formats this instance.
         /// </summary>
@@ -58,6 +60,8 @@ namespace Reni.Code
         {
             return subsequentElement.TryToCombineBackN(this);
         }
+
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrame(Size, Offset); }
 
         /// <summary>
         /// Formats this instance.

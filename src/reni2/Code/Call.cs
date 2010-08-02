@@ -10,11 +10,11 @@ namespace Reni.Code
 
     sealed internal class Call : LeafElement
     {
-        [Node]
+        [Node,DumpData(false)]
         internal readonly int FunctionIndex;
-        [Node]
+        [Node, DumpData(false)]
         private readonly Size ResultSize;
-        [Node]
+        [Node, DumpData(false)]
         internal readonly Size ArgsAndRefsSize;
 
         internal Call(int functionIndex, Size resultSize, Size argsAndRefsSize)
@@ -45,6 +45,8 @@ namespace Reni.Code
         }
 
         public override string NodeDump { get { return base.NodeDump + " FunctionIndex="+FunctionIndex+" ArgsAndRefsSize="+ArgsAndRefsSize;  } }
+
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Call(Size, FunctionIndex, ArgsAndRefsSize); }
 
         public LeafElement TryConvertToRecursiveCall(int functionIndex)
         {

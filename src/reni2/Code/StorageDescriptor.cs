@@ -255,7 +255,10 @@ namespace Reni.Code
             return null;
         }
 
-        internal string CreateLocalBlockEnd(Size size, Size bodySize) { return CreateMoveBytes(size, Start + bodySize, Start); }
+        internal string CreateLocalBlockEnd(Size size, Size bodySize)
+        {
+            return CreateMoveBytes(size, Start + bodySize, Start);
+        }
 
         internal string CreateThen(Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
 
@@ -452,13 +455,13 @@ namespace Reni.Code
 
         private string GetStatements(IEnumerable<LeafElement> data)
         {
-            var statements = "";
+            var result = "";
             foreach(LeafElement t in data)
             {
-                statements += t.Statements(this);
+                result += t.Statements(this);
                 ShiftStartAddress(t.DeltaSize);
             }
-            return statements;
+            return result;
         }
 
     }

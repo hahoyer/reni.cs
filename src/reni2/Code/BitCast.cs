@@ -55,6 +55,7 @@ namespace Reni.Code
         }
 
         public override string NodeDump { get { return base.NodeDump + " TargetSize=" + TargetSize + " SignificantSize=" + SignificantSize; } }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(Size, TargetSize, SignificantSize); }
 
         internal override LeafElement[] TryToCombineBackN(TopData precedingElement)
         {

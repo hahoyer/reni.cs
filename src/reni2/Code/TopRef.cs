@@ -23,6 +23,8 @@ namespace Reni.Code
         {
             return subsequentElement.TryToCombineBack(this);
         }
+
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopRef(RefAlignParam, Offset); }
     }
 
     [Serializable]

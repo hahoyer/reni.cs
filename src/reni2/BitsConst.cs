@@ -331,6 +331,15 @@ namespace Reni
             return this;
         }
 
+        public bool? Access(Size start)
+        {
+            if (start.IsNegative)
+                return null;
+            if (start >= Size)
+                return null;
+            return GetBit(start) != 0;
+        }
+
         public void CopyTo(byte[] data, int index) { _data.CopyTo(data, index); }
 
         public static BitsConst Convert(byte[] value) { return new BitsConst(value.Length, value, 0); }

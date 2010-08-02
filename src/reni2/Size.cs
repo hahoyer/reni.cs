@@ -452,6 +452,8 @@ namespace Reni
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Size"; } }
+
+        internal bool IsNegative { get { return !(IsPositive || IsZero); } }
     }
 
     internal class NotAlignableException : Exception

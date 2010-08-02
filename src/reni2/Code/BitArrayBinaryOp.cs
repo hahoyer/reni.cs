@@ -98,6 +98,8 @@ namespace Reni.Code
             return Size.Zero;
         }
 
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintOperation(LeftSize,RightSize); }
+
         protected override string Format(StorageDescriptor start)
         {
             return start.CreateDumpPrint(LeftSize, RightSize);

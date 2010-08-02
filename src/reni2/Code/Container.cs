@@ -229,6 +229,20 @@ namespace Reni.Code
             public UnexpectedInternalRefInContainer(Container container, CodeBase visitedObject)
                 : base(container, visitedObject) { }
         }
+
+        internal string CreateGraph()
+        {
+            var formalMaschine = new FormalMaschine(_maxSize);
+            string result = formalMaschine.CreateGraph() + "\n";
+            foreach(LeafElement t in Data)
+            {
+                result += t.Dump() + "\n";
+                t.Execute(formalMaschine);
+                result += formalMaschine.CreateGraph() + "\n";
+                formalMaschine.ShiftStartAddress(t.DeltaSize);
+            }
+            return result;
+        }
     }
 
     [Serializable]

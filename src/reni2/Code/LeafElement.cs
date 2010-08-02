@@ -170,5 +170,10 @@ namespace Reni.Code
         [DumpExcept(false)]
         protected virtual bool IsError { get { return false; } }
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
+        
+        internal virtual void Execute(IFormalMaschine formalMaschine)
+        {
+            NotImplementedMethod(formalMaschine);
+        }
     }
 }

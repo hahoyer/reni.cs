@@ -12,32 +12,35 @@ namespace Reni.Code
     internal sealed class LocalBlockEnd : LeafElement
     {
         [Node]
-        private readonly Size IntermediateSize;
+        private readonly Size _intermediateSize;
         private readonly Size _size;
 
         public LocalBlockEnd(Size size, Size intermediateSize)
         {
             Tracer.Assert(!intermediateSize.IsZero);
 
-            IntermediateSize = intermediateSize;
+            _intermediateSize = intermediateSize;
             _size = size;
             StopByObjectId(166);
         }
 
         protected override Size GetSize()
         {
-            return IntermediateSize + _size;
+            return _intermediateSize + _size;
         }
 
         protected override Size GetInputSize()
         {
-            return IntermediateSize + _size;
+            return _intermediateSize + _size;
         }
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateLocalBlockEnd(_size, IntermediateSize);
+            return start.CreateLocalBlockEnd(_size, _intermediateSize);
         }
 
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalBlockEnd(Size, _intermediateSize); }
+
+        public override string NodeDump { get { return base.NodeDump + " IntermediateSize=" + _intermediateSize; } }
     }
 }

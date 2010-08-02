@@ -7,6 +7,7 @@ using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
+using Reni.FeatureTest;
 using Reni.FeatureTest.Integer;
 
 namespace ReniTest
@@ -18,6 +19,26 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //InspectCompiler();
+            CompilerTest.Run("Test", @"
+x: 100;
+f1: ((
+  y:3;
+  f: x+3/\;
+  f()
+) _A_T_ 2)/\;
+
+f1()dump_print;
+", "103");
+            CompilerTest.Run("Test", @"
+x: 100;
+f1: ((
+  y: 3;
+  f: arg*y+x/\;
+  f(2)
+) _A_T_ 2)/\;
+
+f1()dump_print;
+", "106");
             Assembly.GetExecutingAssembly().RunTests();
         }
 
