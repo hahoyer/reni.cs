@@ -54,5 +54,7 @@ namespace Reni.Code
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopFrame(RefAlignParam, precedingElement.Offset, GetSize());
         }
+
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, Size); }
     }
 }

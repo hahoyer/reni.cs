@@ -33,8 +33,10 @@
     <Compile Include="Code\ContextRef.cs" />
     <Compile Include="Code\Environment.cs" />
     <Compile Include="Code\FormalMaschine.cs" />
+    <Compile Include="Code\FormalValueAccess.cs" />
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\HasArgVisitor.cs" />
+    <Compile Include="Code\IFormalValue.cs" />
     <Compile Include="Code\InternalRef.cs" />
     <Compile Include="Code\IRefInCode.cs" />
     <Compile Include="Code\Leaf.cs" />

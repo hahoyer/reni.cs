@@ -42,6 +42,8 @@ namespace Reni.Code
 
         public override string NodeDump { get { return base.NodeDump + " <"+LeftSize+"> "+
             OpToken.DataFunctionName+" <"+RightSize+">"; } }
+
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayBinaryOp(OpToken, Size, LeftSize, RightSize); }
     }
 
     /// <summary>

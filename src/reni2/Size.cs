@@ -454,6 +454,16 @@ namespace Reni
         string IIconKeyProvider.IconKey { get { return "Size"; } }
 
         internal bool IsNegative { get { return !(IsPositive || IsZero); } }
+
+        internal Size Absolute
+        {
+            get
+            {
+                if(IsPositive)
+                    return this;
+                return this*-1;
+            }
+        }
     }
 
     internal class NotAlignableException : Exception

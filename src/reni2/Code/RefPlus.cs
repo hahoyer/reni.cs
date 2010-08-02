@@ -30,12 +30,13 @@ namespace Reni.Code
             _right = right;
             _reason = reason;
             AssertValid();
-            StopByObjectId(29);
+            StopByObjectId(-124);
         }
 
         private void AssertValid() { _right.AssertAlignedSize(RefAlignParam.AlignBits); }
 
         public override string NodeDump { get { return base.NodeDump + " Right=" + _right + " Reason=" + _reason; } }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.RefPlus(Size, _right); }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
 

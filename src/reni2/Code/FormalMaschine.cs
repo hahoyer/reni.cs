@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -18,6 +19,9 @@ namespace Reni.Code
         void TopData(Size size, Size offset);
         void LocalBlockEnd(Size size, Size intermediateSize);
         void Drop(Size beforeSize, Size afterSize);
+        void RefPlus(Size size, Size right);
+        void Dereference(RefAlignParam refAlignParam, Size size);
+        void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
@@ -74,15 +78,15 @@ namespace Reni.Code
 
         void IFormalMaschine.Call(Size size, int functionIndex, Size argsAndRefsSize)
         {
-            var formalSubValue = PullInputValuesFromData(argsAndRefsSize);
+            var formalSubValues = PullInputValuesFromData(argsAndRefsSize);
             var startAddress = (_startAddress + argsAndRefsSize - size).ToInt();
-            var element = FormalValueAccess.Call(formalSubValue, functionIndex);
+            var element = FormalValueAccess.Call(formalSubValues, functionIndex);
             SetFormalValues(element, startAddress, size);
         }
 
         void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
         {
-            var formalSubValue = PullInputValuesFromData(targetSize);
+            var formalSubValue = PullInputValuesFromData(targetSize).OnlyOne();
             var startAddress = (_startAddress + targetSize - size).ToInt();
             var element = FormalValueAccess.BitCast(formalSubValue, (size - significantSize).ToInt());
             SetFormalValues(element, startAddress, size);
@@ -97,9 +101,7 @@ namespace Reni.Code
         void IFormalMaschine.TopFrame(Size size, Size offset)
         {
             AlignFrame(offset);
-            var access = GetInputValuesFromFrame(size, offset);
-            if (access == null)
-                access = CreateValuesInFrame(size, offset);
+            var access = GetInputValuesFromFrame(offset, size).OnlyOne() ?? CreateValuesInFrame(size, offset);
             var startAddress = (_startAddress - size).ToInt();
             SetFormalValues(access, startAddress, size);
         }
@@ -126,6 +128,31 @@ namespace Reni.Code
         void IFormalMaschine.Drop(Size beforeSize, Size afterSize)
         {
             ResetInputValuesOfData(beforeSize - afterSize);
+        }
+
+        void IFormalMaschine.RefPlus(Size size, Size right)
+        {
+            var formalSubValue = PullInputValuesFromData(size).OnlyOne();
+            var startAddress = _startAddress.ToInt();
+            var element = FormalValueAccess.RefPlus(formalSubValue, right.ToInt());
+            SetFormalValues(element, startAddress, size);
+        }
+
+        void IFormalMaschine.Dereference(RefAlignParam refAlignParam, Size size)
+        {
+            var formalSubValue = PullInputValuesFromData(refAlignParam.RefSize).OnlyOne();
+            var startAddress = (_startAddress+ refAlignParam.RefSize- size).ToInt();
+            var element = FormalValueAccess.Dereference(formalSubValue);
+            SetFormalValues(element, startAddress, size);
+        }
+
+        public void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        {
+            var formalLeftSubValue = PullInputValuesFromData(leftSize).OnlyOne();
+            var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).OnlyOne();
+            var startAddress = (_startAddress + leftSize+rightSize - size).ToInt();
+            var element = FormalValueAccess.BitArrayBinaryOp(opToken.DataFunctionName, formalLeftSubValue,formalRightSubValue);
+            SetFormalValues(element, startAddress, size);
         }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
@@ -158,7 +185,7 @@ namespace Reni.Code
                 _framePoints[i + delta] = framePoints[i];
         }
 
-        private IFormalValue GetInputValuesFromFrame(Size size, Size offset)
+        private IFormalValue[] GetInputValuesFromFrame(Size offset, Size size)
         {
             var accesses = new List<FormalValueAccess>();
             var start = _frameData.Length + offset.ToInt();
@@ -166,17 +193,21 @@ namespace Reni.Code
                 accesses.Add(_frameData[i + start]);
             return FormalValueAccess.Transpose(accesses);
         }
-        private IFormalValue PullInputValuesFromData(Size inputSize)
+
+        private IFormalValue[] PullInputValuesFromData(Size offset, Size inputSize)
         {
-            var argsAndRefs = new List<FormalValueAccess>();
-            var start = _startAddress.ToInt();
+            var accesses = new List<FormalValueAccess>();
+            var start = (_startAddress+offset).ToInt();
             for (var i = 0; i < inputSize.ToInt(); i++)
             {
-                argsAndRefs.Add(_data[i + start]);
+                accesses.Add(_data[i + start]);
                 _data[i + start] = null;
             }
-            return FormalValueAccess.Transpose(argsAndRefs);
+            return FormalValueAccess.Transpose(accesses);
         }
+
+        private IFormalValue[] PullInputValuesFromData(Size inputSize) { return PullInputValuesFromData(Size.Zero, inputSize); }
+
         private void ResetInputValuesOfData(Size inputSize)
         {
             var start = _startAddress.ToInt();
@@ -192,168 +223,4 @@ namespace Reni.Code
 
     }
 
-    sealed internal class FormalPointer : IFormalValue
-    {
-        private readonly char _name;
-        public FormalPointer(char name) { _name = name; }
-        string IFormalValue.Dump() { return _name + ""; }
-        public string Dump() { return _name + " "; }
-
-        string IFormalValue.Dump(int index, int size)
-        {
-            var text = CreateText(_name, size);
-            return text.Substring(index*2, 2);
-        }
-
-        private static string CreateText(char name, int size)
-        {
-            var text = "P" + name;
-            var fillCount = 2*size - text.Length - 1;
-            if(fillCount >= 0)
-                return " " + "<".Repeat(fillCount/2) + text + ">".Repeat(fillCount - fillCount/2);
-            return " " + "P".Repeat(2*size - 1);
-        }
-    }
-
-    sealed internal class CallValue : IFormalValue
-    {
-        private readonly IFormalValue _formalSubValue;
-        private readonly int _functionIndex;
-
-        public CallValue(IFormalValue formalSubValue, int functionIndex)
-        {
-            _formalSubValue = formalSubValue;
-            _functionIndex = functionIndex;
-        }
-
-        private string CreateText(int size)
-        {
-            var text = Dump();
-            var fillCount = 2*size - text.Length - 1;
-            if(fillCount >= 0)
-                return " " + "<".Repeat(fillCount/2) + text + ">".Repeat(fillCount - fillCount/2);
-            return " " + "F".Repeat(2*size - 1);
-        }
-
-        public string Dump(int index, int size)
-        {
-            var text = CreateText(size);
-            return text.Substring(index*2, 2);
-        }
-
-        public string Dump() { return "F" + _functionIndex + "(" + _formalSubValue.Dump() + ")"; }
-    }
-
-    internal class VariableValue : IFormalValue
-    {
-        private readonly char _name;
-        public VariableValue(char name) { _name = name; }
-
-        private string CreateText(int size)
-        {
-            var text = Dump();
-            var fillCount = 2 * size - text.Length - 1;
-            if (fillCount >= 0)
-                return " " + "<".Repeat(fillCount / 2) + text + ">".Repeat(fillCount - fillCount / 2);
-            return " " + "V".Repeat(2 * size - 1);
-        }
-
-        string IFormalValue.Dump(int index, int size)
-        {
-            var text = CreateText(size);
-            return text.Substring(index*2, 2);
-        }
-
-        public string Dump() { return "V"+_name; }
-    }
-
-    internal class FormalValueAccess
-    {
-        private readonly int _index;
-        private readonly int _size;
-        private readonly IFormalValue _formalValue;
-        public int Index { get { return _index; } }
-        public int Size { get { return _size; } }
-        public IFormalValue FormalValue { get { return _formalValue; } }
-
-        public static IFormalValue Transpose(IEnumerable<FormalValueAccess> accesses)
-        {
-            var a0 = accesses.Distinct().ToArray();
-            if (a0.Length == 1 && a0[0] == null)
-                return null;
-            var aa = accesses.Select(x => x.FormalValue).Distinct().ToArray();
-            if (aa.Length != 1)
-                throw new NotImplementedException();
-            var ss = accesses.Select(x => x.Size).Distinct().ToArray();
-            if (ss.Length != 1 || ss[0] != accesses.ToArray().Length)
-                throw new NotImplementedException();
-            var ii = accesses.Select((x, i) => i - x.Index).Distinct().ToArray();
-            if (ii.Length != 1 || ii[0] != 0)
-                throw new NotImplementedException();
-            return aa[0];
-        }
-
-        public FormalValueAccess(IFormalValue formalValue, int index, int size)
-        {
-            _formalValue = formalValue;
-            _size = size;
-            _index = index;
-        }
-
-        public string Dump() { return _formalValue.Dump(_index, _size); }
-
-        public static IFormalValue BitsArray(BitsConst data) { return new BitsArrayValue(data); }
-        public static IFormalValue Call(IFormalValue formalSubValue, int functionIndex) { return new CallValue(formalSubValue, functionIndex); }
-        public static IFormalValue BitCast(IFormalValue formalSubValue, int castedBits) { return new BitCastValue(formalSubValue, castedBits); }
-        public static IFormalValue Variable(char name) { return new VariableValue(name); }
-    }
-
-    internal class BitCastValue : IFormalValue
-    {
-        private readonly IFormalValue _formalSubValue;
-        private readonly int _castedBits;
-
-        public BitCastValue(IFormalValue formalSubValue, int castedBits)
-        {
-            _formalSubValue = formalSubValue;
-            _castedBits = castedBits;
-        }
-
-        string IFormalValue.Dump(int index, int size)
-        {
-            if(index >= size - _castedBits)
-                return " .";
-            return _formalSubValue.Dump(index, size - _castedBits);
-        }
-
-        string IFormalValue.Dump() { return _formalSubValue.Dump(); }
-    }
-
-    internal sealed class BitsArrayValue : IFormalValue
-    {
-        private readonly BitsConst _data;
-
-        public BitsArrayValue(BitsConst data) { _data = data; }
-
-        string IFormalValue.Dump(int index, int size)
-        {
-            switch(_data.Access(Size.Create(index)))
-            {
-                case false:
-                    return " 0";
-                case true:
-                    return " 1";
-                default:
-                    return " .";
-            }
-        }
-
-        public string Dump() { return _data.DumpValue(); }
-    }
-
-    internal interface IFormalValue
-    {
-        string Dump(int index, int size);
-        string Dump();
-    }
 }

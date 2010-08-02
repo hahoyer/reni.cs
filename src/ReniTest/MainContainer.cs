@@ -18,27 +18,17 @@ namespace ReniTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //InspectCompiler();
-            CompilerTest.Run("Test", @"
-x: 100;
+            //TestGenerated.Exec();
+            if(false) CompilerTest.Run("Test", @"
+x: 1000;
 f1: ((
   y:3;
-  f: x+3/\;
+  f: x+y/\;
   f()
 ) _A_T_ 2)/\;
 
 f1()dump_print;
-", "103");
-            CompilerTest.Run("Test", @"
-x: 100;
-f1: ((
-  y: 3;
-  f: arg*y+x/\;
-  f(2)
-) _A_T_ 2)/\;
-
-f1()dump_print;
-", "106");
+", "1003");
             Assembly.GetExecutingAssembly().RunTests();
         }
 

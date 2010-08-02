@@ -13,12 +13,12 @@ namespace Reni
     {
         public static void MainFunction()
         {
-            fixed(sbyte* data = new sbyte[5])
+            fixed(sbyte* data = new sbyte[6])
             {
-                (*(data + 4)) = (100); // BitArray         2
-                (*(Int32*) (data + 0)) = (Int32) (data + 5); // TopRef           124
+                (*(Int16*) (data + 4)) = (1000); // BitArray         129
+                (*(Int32*) (data + 0)) = (Int32) (data + 6); // TopRef           130
                 Function0((data + 4)); // Call             20
-                (*(Int16*) (data + 2)) = (Int16) ((Int16) ((*(Int16*) (data + 2)) << 7) >> 7); // BitCast          2
+                (*(Int16*) (data + 2)) = (Int16) ((Int16) ((*(Int16*) (data + 2)) << 4) >> 4); // BitCast          3
                 Data.DumpPrint((*(Int16*) (data + 2))); // DumpPrintOperation 15
             }
             ;
@@ -29,11 +29,11 @@ namespace Reni
         {
             fixed(sbyte* data = new sbyte[9])
             {
-                (*(data + 8)) = (3); // BitArray   125
-                (*(Int32*) (data + 4)) = (Int32) (data + 9); // TopRef     126
-                (*(Int32*) (data + 0)) = (*(Int32*) (frame - 4)); // TopFrame   128
+                (*(data + 8)) = (3); // BitArray   131
+                (*(Int32*) (data + 4)) = (Int32) (data + 9); // TopRef     132
+                (*(Int32*) (data + 0)) = (*(Int32*) (frame - 4)); // TopFrame   134
                 Function1((data + 8)); // Call         60
-                (*(Int16*) (data + 4)) = (*(Int16*) (data + 6)); // TopData       130
+                (*(Int16*) (data + 4)) = (*(Int16*) (data + 6)); // TopData       136
                 (*(Int16*) (data + 7)) = (*(Int16*) (data + 4)); // LocalBlockEnd  80
                 (*(Int16*) (frame - 2)) = (*(Int16*) (data + 7)); // FunctionReturn
             }
@@ -43,20 +43,22 @@ namespace Reni
         // (x)+(y)
         private static void Function1(SByte* frame)
         {
-            fixed(sbyte* data = new sbyte[6])
+            fixed(sbyte* data = new sbyte[8])
             {
-                (*(Int32*) (data + 2)) = (*(Int32*) (frame - 4)); // TopFrame         132
-                (*(Int32*) (data + 2)) += -1; // RefPlus          94
-                (*(data + 5)) = (*(sbyte*) (*(Int32*) (data + 2))); // Dereference      90
-                (*(data + 4)) = (*(data + 5)); // TopData          134
-                (*(Int32*) (data + 0)) = (*(Int32*) (frame - 8)); // TopFrame         136
-                (*(Int32*) (data + 0)) += -1; // RefPlus          103
-                (*(data + 3)) = (*(sbyte*) (*(Int32*) (data + 0))); // Dereference      100
-                (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 5) >> 5); // BitCast          5
-                (*(Int16*) (data + 3)) = (Int16) ((*(data + 4)) + (*(data + 3))); // BitArrayBinaryOp 105
-                (*(Int16*) (data + 3)) = (Int16) ((Int16) ((*(Int16*) (data + 3)) << 7) >> 7); // BitCast          7
-                (*(Int16*) (data + 4)) = (*(Int16*) (data + 3)); // LocalBlockEnd    112
-                (*(Int16*) (frame - 2)) = (*(Int16*) (data + 4)); // FunctionReturn  
+                (*(Int32*) (data + 4)) = (*(Int32*) (frame - 4)); // TopFrame      138
+                (*(Int32*) (data + 4)) += -2; // RefPlus       94
+                (*(Int16*) (data + 6)) = (*(Int16*) (*(Int32*) (data + 4))); // Dereference   112
+                (*(Int16*) (data + 6)) = (Int16) ((Int16) ((*(Int16*) (data + 6)) << 5) >> 5); // BitCast       16
+                (*(Int16*) (data + 4)) = (*(Int16*) (data + 6)); // TopData         140
+                (*(Int16*) (data + 4)) = (Int16) ((Int16) ((*(Int16*) (data + 4)) << 5) >> 5); // BitCast         6
+                (*(Int32*) (data + 0)) = (*(Int32*) (frame - 8)); // TopFrame         142
+                (*(Int32*) (data + 0)) += -1; // RefPlus          104
+                (*(data + 3)) = (*(sbyte*) (*(Int32*) (data + 0))); // Dereference      101
+                (*(data + 3)) = (sbyte) ((sbyte) ((*(data + 3)) << 5) >> 5); // BitCast          8
+                (*(Int16*) (data + 4)) = (Int16) ((*(Int16*) (data + 4)) + (*(data + 3))); // BitArrayBinaryOp 106
+                (*(Int16*) (data + 4)) = (Int16) ((Int16) ((*(Int16*) (data + 4)) << 4) >> 4); // BitCast          10
+                (*(Int16*) (data + 6)) = (*(Int16*) (data + 4)); // LocalBlockEnd    117
+                (*(Int16*) (frame - 2)) = (*(Int16*) (data + 6)); // FunctionReturn  
             }
             ;
         }
