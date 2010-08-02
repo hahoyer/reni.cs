@@ -139,16 +139,16 @@ namespace Reni
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)
         {
-            var p = endOfRefsCode;
+            var p = endOfRefsCode.CreateRefPlus(refAlignParam, refAlignParam.RefSize * -_data.Count, "ReplaceRefsForFunctionBody");
             var result = code;
             for(var i = 0; i < _data.Count; i++)
             {
                 var unrefAlignment = _data[i].RefAlignParam;
                 Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
                 var unrefPtrAlignment = refAlignParam;
-                p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize * -1, "ReplaceRefsForFunctionBody");
                 var replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
                 result = result.ReplaceAbsolute(_data[i], ()=>replacement);
+                p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize, "." + i);
             }
             return result;
         }
