@@ -135,6 +135,6 @@ namespace Reni.Code
             return StorageDescriptor.CreateDumpPrintText(_dumpPrintText);
         }
 
-        public override string NodeDump { get { return base.NodeDump + " dump_print " + StringExtender.Quote(_dumpPrintText); } }
+        public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }
     }
 }

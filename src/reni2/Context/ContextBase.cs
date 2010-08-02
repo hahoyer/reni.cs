@@ -311,7 +311,8 @@ namespace Reni.Context
         }
     }
 
-    internal class ContextOperator : Defineable
+    internal class ContextOperator : Defineable, ISearchPath<IFeature, FunctionAccessType>
     {
+        IFeature ISearchPath<IFeature, FunctionAccessType>.Convert(FunctionAccessType type) { return new Feature.Feature(type.ContextOperatorFeatureApply); }
     }
 }

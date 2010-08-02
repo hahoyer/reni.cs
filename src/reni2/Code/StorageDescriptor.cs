@@ -226,7 +226,10 @@ namespace Reni.Code
             return null;
         }
 
-        internal static string CreateDumpPrintText(string text) { return "Data.DumpPrint(" + text.Quote() + ")"; }
+        internal static string CreateDumpPrintText(string text)
+        {
+            return "Data.DumpPrint(" + text.Quote() + ")";
+        }
 
         internal static string CreateElse() { return "} else {" ; }
 

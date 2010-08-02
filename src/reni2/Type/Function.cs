@@ -43,6 +43,6 @@ namespace Reni.Type
 
         private ICompileSyntax Body { get { return _body; } }
 
-        private string DumpPrintText { get { return "(#(#" + ObjectId + "#)#)/\\"; } }
+        internal string DumpPrintText { get { return _body.DumpShort() + "/\\"; } }
     }
 }

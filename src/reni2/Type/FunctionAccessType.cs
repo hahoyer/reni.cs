@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using Reni.Code;
 using Reni.Context;
 
 namespace Reni.Type
@@ -60,6 +61,17 @@ namespace Reni.Type
             return context
                 .ContextReferenceType
                 .CreateFunctionalType(_function);
+        }
+
+        internal override void Search(ISearchVisitor searchVisitor)
+        {
+            searchVisitor.ChildSearch(this);
+            base.Search(searchVisitor);
+        }
+
+        public Result CreateDumpPrintResult(Category category)
+        {
+            return CreateVoid.CreateResult(category, () => CodeBase.CreateDumpPrintText(_function.DumpPrintText));
         }
     }
 
