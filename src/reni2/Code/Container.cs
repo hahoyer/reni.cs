@@ -234,9 +234,10 @@ namespace Reni.Code
         {
             var formalMaschine = new FormalMaschine(_maxSize);
             string result = formalMaschine.CreateGraph() + "\n";
-            foreach(LeafElement t in Data)
+            for(var index = 0; index < Data.Count; index++)
             {
-                result += t.Dump() + "\n";
+                var t = Data[index];
+                result += "[" + index + "] " + t.Dump() + "\n";
                 t.Execute(formalMaschine);
                 result += formalMaschine.CreateGraph() + "\n";
                 formalMaschine.ShiftStartAddress(t.DeltaSize);

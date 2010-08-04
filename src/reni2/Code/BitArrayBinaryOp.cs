@@ -136,5 +136,6 @@ namespace Reni.Code
         }
 
         public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(); }
     }
 }

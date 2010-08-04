@@ -5,7 +5,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature.DumpPrint;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -31,7 +30,7 @@ namespace Reni.Struct
 
         internal Result CreateDumpPrintResult(Category category)
         {
-            var refType = Target.CreateReference(RefAlignParam);
+            var refType = CreateTypeReference();
             var result = refType.GenericDumpPrint(category);
             if(result.HasArg)
                result = result.ReplaceArg(CreateAccessResult(category));
@@ -47,13 +46,16 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        internal override Result AutomaticDereference(Result result) { return CreateDereferencedResult(result.CompleteCategory).ReplaceArg(result); }
+        internal override Result AutomaticDereference(Result result)
+        {
+            return CreateDereferencedResult(result.CompleteCategory).ReplaceArg(result);
+        }
 
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
             var destAsRef = AsTypeReference(dest);
             if(destAsRef != null)
-                return CreateTypeReferenceResult(category);
+                return CreateTypeReference().CreateResult(category,CreateAccessCode);
 
             return Target
                 .Conversion(category, dest)
@@ -103,6 +105,14 @@ namespace Reni.Struct
                 .CreateRefPlus(RefAlignParam, GetOffset(), "CreateAccessCode");
         }
 
+        private Result CreateTargetReferenceResult(Category category)
+        {
+            return CreateObjectRefInCode(category|Category.Type, RefAlignParam)
+                .ConvertTo(CreateTypeReference()) & category;
+        }
+
+        private Reni.Type.Reference CreateTypeReference() { return Target.CreateReference(RefAlignParam); }
+
         private Result CreateDereferencedResult(Category category)
         {
             return Target
@@ -113,13 +123,11 @@ namespace Reni.Struct
         private Size GetOffset() { return _context.Offset(_position); }
         private TypeBase GetTargetType() { return _context.RawType(_position); }
 
-        private Result CreateTypeReferenceResult(Category category)
-        {
-            return CreateAccessResult(category);
-        }
-
         internal Result ApplyAssignment(Category category, TypeBase argsType)
         {
+            var trace = false && category.HasCode;
+            StartMethodDump(trace, category,argsType);
+
             var result = CreateVoid
                 .CreateResult
                 (
@@ -127,13 +135,18 @@ namespace Reni.Struct
                     () => CodeBase.CreateArg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, Target.Size)
                 );
 
+            DumpWithBreak(trace,"result",result);
             if (!category.HasCode && !category.HasRefs)
-                return result;
+                return ReturnMethodDump(trace, result);
 
             var sourceResult = argsType.ConvertToAsRef(category, Target.CreateReference(RefAlignParam));
-            var destinationResult = Target.CreateObjectRefInCode(category,RefAlignParam);
+            DumpWithBreak(trace, "sourceResult", sourceResult);
+            var destinationResult = CreateTargetReferenceResult(category);
+            DumpWithBreak(trace, "destinationResult", destinationResult);
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
-            return result.ReplaceArg(objectAndSourceRefs);
+            DumpWithBreak(trace, "objectAndSourceRefs", objectAndSourceRefs);
+            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(objectAndSourceRefs));
         }
+
     }
 }

@@ -109,7 +109,7 @@ namespace Reni.Code
         public CodeBase CreateDereference(RefAlignParam refAlignParam, Size targetSize)
         {
             Tracer.Assert(Size == refAlignParam.RefSize);
-            return CreateChild(new Dereference(refAlignParam, targetSize));
+            return CreateChild(new Dereference(refAlignParam, targetSize,targetSize));
         }
 
         public CodeBase CreateBitCast(Size size)
@@ -388,10 +388,13 @@ namespace Reni.Code
     [Serializable]
     internal class Assign : LeafElement
     {
-        [DumpData(true)]
+        [DumpData(false)]
         private readonly RefAlignParam _refAlignParam;
 
-        [DumpData(true), Node]
+        public override string NodeDump { get { return base.NodeDump + " TargetSize=" + _targetSize + " RefSize=" + _refAlignParam.RefSize; } }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Assign(_targetSize, _refAlignParam); }
+
+        [DumpData(false), Node]
         private readonly Size _targetSize;
 
         public Assign(RefAlignParam refAlignParam, Size targetSize)

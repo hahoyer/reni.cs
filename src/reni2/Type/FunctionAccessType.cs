@@ -19,6 +19,7 @@ namespace Reni.Type
         {
             _objectType = objectType;
             _functionalFeature = functionalFeature;
+            StopByObjectId(51754);
         }
 
         internal IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }

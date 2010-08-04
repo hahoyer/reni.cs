@@ -81,7 +81,18 @@ namespace Reni.FeatureTest.Struct
     }
 
     [TestFixture, InnerAccess]
-    [TargetSet(@"(1, 11, 3, (this _A_T_ 1) := 3) dump_print","(1, 3, 3, )")]
+    [TargetSet(@"(10, (this _A_T_ 0) := 4) dump_print", "(4, )")]
+    [TargetSet(@"(10,20, (this _A_T_ 0) := 4) dump_print", "(4, 20, )")]
+    [TargetSet(@"(10,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
+    [TargetSet(@"(10,20, (this _A_T_ 1) := 4) dump_print", "(10, 4, )")]
+    [TargetSet(@"(10,20,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
+    [TargetSet(@"(10,20,30, (this _A_T_ 2) := 4) dump_print", "(10, 20, 4, )")]
+    [TargetSet(@"(1000,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
+    [TargetSet(@"(1000,20,30, (this _A_T_ 1) := 4) dump_print", "(1000, 4, 30, )")]
+    [TargetSet(@"(10,2000,30, (this _A_T_ 0) := 4) dump_print", "(4, 2000, 30, )")]
+    [TargetSet(@"(10,2000,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
+    [TargetSet(@"(10,2000,30, (this _A_T_ 2) := 4) dump_print", "(10, 2000, 4, )")]
+    [TargetSet(@"(3, (this _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
     public class Assignment : CompilerTest
     {
         [Test, Category(Worked)]

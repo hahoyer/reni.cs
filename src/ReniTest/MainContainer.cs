@@ -8,28 +8,23 @@ using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
 using Reni.FeatureTest;
-using Reni.FeatureTest.Integer;
 
 namespace ReniTest
 {
     public static class MainContainer
     {
+        
+        private const string Target = @"(3, (this _A_T_ 0) := 5 enable_cut) dump_print";
+        const string Output = "(1, )";
+
         public static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             //TestGenerated.Exec();
-            if(false) CompilerTest.Run("Test", @"
-x: 1000;
-f1: ((
-  y:3;
-  f: x+y/\;
-  f()
-) _A_T_ 2)/\;
-
-f1()dump_print;
-", "1003");
+            //CompilerTest.Run("Test", Target, Output);
             Assembly.GetExecutingAssembly().RunTests();
+            //InspectCompiler();
         }
 
         private static void InspectCompiler()
@@ -38,7 +33,7 @@ f1()dump_print;
                 (
                     new TreeForm
                         {
-                            Target = CreateCompiler(new IntegerPlusNumber().Target)
+                            Target = CreateCompiler(Target)
                         }
                 );
         }

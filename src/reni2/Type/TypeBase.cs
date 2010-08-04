@@ -351,9 +351,11 @@ namespace Reni.Type
         private ObjectRef ObjectRef(RefAlignParam refAlignParam) { return _cache.ObjectRefs.Find(refAlignParam); }
     }
 
-    internal class ObjectRef: IRefInCode
+    internal class ObjectRef: ReniObject, IRefInCode
     {
+        [DumpData(true)]
         private readonly TypeBase _objectType;
+        [DumpData(true)]
         private readonly RefAlignParam _refAlignParam;
 
         public ObjectRef(TypeBase objectType, RefAlignParam refAlignParam)

@@ -62,7 +62,7 @@ namespace Reni.Code
             if(precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
                 return new LeafElement[]
                 {
-                    new TopData(precedingElement.RefAlignParam, precedingElement.Offset, Size),
+                    new TopData(precedingElement.RefAlignParam, precedingElement.Offset, Size, SignificantSize),
                     new BitCast(Size, Size, SignificantSize)
                 };
             return null;
@@ -73,7 +73,7 @@ namespace Reni.Code
             if(precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
                 return new LeafElement[]
                 {
-                    new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, Size),
+                    new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, Size, SignificantSize),
                     new BitCast(Size, Size, SignificantSize)
                 };
             return null;
@@ -110,7 +110,7 @@ namespace Reni.Code
         {
             if(precedingElement.Size == TargetSize && TargetSize != Size)
             {
-                var dereference = new Dereference(precedingElement.RefAlignParam, Size);
+                var dereference = new Dereference(precedingElement.RefAlignParam, Size,precedingElement.DataSize);
                 if (Size == SignificantSize)
                     return new LeafElement[] {dereference};
                 return new LeafElement[] { dereference, new BitCast(Size, Size, SignificantSize) };

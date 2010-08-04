@@ -15,13 +15,15 @@ namespace Reni.Code
         void Call(Size size, int functionIndex, Size argsAndRefsSize);
         void BitCast(Size size, Size targetSize, Size significantSize);
         void DumpPrintOperation(Size leftSize, Size rightSize);
-        void TopFrame(Size size, Size offset);
-        void TopData(Size size, Size offset);
+        void TopFrame(Size offset, Size size, Size dataSize);
+        void TopData(Size offset, Size size, Size dataSize);
         void LocalBlockEnd(Size size, Size intermediateSize);
         void Drop(Size beforeSize, Size afterSize);
         void RefPlus(Size size, Size right);
-        void Dereference(RefAlignParam refAlignParam, Size size);
+        void Dereference(RefAlignParam refAlignParam, Size size, Size dataSize);
         void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
+        void Assign(Size targetSize, RefAlignParam refAlignParam);
+        void DumpPrintText();
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
@@ -34,7 +36,7 @@ namespace Reni.Code
         private FormalPointer[] _framePoints = new FormalPointer[1];
         private int _nextPointer;
         private int _nextValue;
-        private const string Names = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        internal const string Names = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
 
         internal FormalMaschine(Size dataSize)
         {
@@ -68,9 +70,7 @@ namespace Reni.Code
         void IFormalMaschine.TopRef(RefAlignParam refAlignParam, Size offset)
         {
             var index = (_startAddress + offset).ToInt();
-            if(_points[index] == null)
-                _points[index] = new FormalPointer(Names[_nextPointer++]);
-
+            FormalPointer.Ensure(_points, index);
             var size = refAlignParam.RefSize;
             var startAddress = (_startAddress - size).ToInt();
             SetFormalValues(_points[index], startAddress, size);
@@ -86,7 +86,7 @@ namespace Reni.Code
 
         void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
         {
-            var formalSubValue = PullInputValuesFromData(targetSize).OnlyOne();
+            var formalSubValue = PullInputValuesFromData(significantSize).OnlyOne();
             var startAddress = (_startAddress + targetSize - size).ToInt();
             var element = FormalValueAccess.BitCast(formalSubValue, (size - significantSize).ToInt());
             SetFormalValues(element, startAddress, size);
@@ -98,21 +98,19 @@ namespace Reni.Code
             ResetInputValuesOfData(leftSize);
         }
 
-        void IFormalMaschine.TopFrame(Size size, Size offset)
+        void IFormalMaschine.TopFrame(Size offset, Size size, Size dataSize)
         {
             AlignFrame(offset);
             var access = GetInputValuesFromFrame(offset, size).OnlyOne() ?? CreateValuesInFrame(size, offset);
             var startAddress = (_startAddress - size).ToInt();
-            SetFormalValues(access, startAddress, size);
+            SetFormalValues(access, startAddress, dataSize);
         }
 
-        void IFormalMaschine.TopData(Size size, Size offset)
+        void IFormalMaschine.TopData(Size offset, Size size, Size dataSize)
         {
+            var source = GetInputValuesFromData(offset, dataSize).OnlyOne();
             var startAddress = (_startAddress - size).ToInt();
-            var sourceAddress = (_startAddress + offset).ToInt();
-            var size1 = size.ToInt();
-            for(var i = 0; i < size1; i++)
-                _data[i + startAddress] = _data[i + sourceAddress];
+            SetFormalValues(source, startAddress, dataSize);
         }
 
         void IFormalMaschine.LocalBlockEnd(Size size, Size intermediateSize)
@@ -138,15 +136,15 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, size);
         }
 
-        void IFormalMaschine.Dereference(RefAlignParam refAlignParam, Size size)
+        void IFormalMaschine.Dereference(RefAlignParam refAlignParam, Size size, Size dataSize)
         {
             var formalSubValue = PullInputValuesFromData(refAlignParam.RefSize).OnlyOne();
             var startAddress = (_startAddress+ refAlignParam.RefSize- size).ToInt();
             var element = FormalValueAccess.Dereference(formalSubValue);
-            SetFormalValues(element, startAddress, size);
+            SetFormalValues(element, startAddress, dataSize);
         }
 
-        public void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        void IFormalMaschine.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
         {
             var formalLeftSubValue = PullInputValuesFromData(leftSize).OnlyOne();
             var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).OnlyOne();
@@ -154,6 +152,13 @@ namespace Reni.Code
             var element = FormalValueAccess.BitArrayBinaryOp(opToken.DataFunctionName, formalLeftSubValue,formalRightSubValue);
             SetFormalValues(element, startAddress, size);
         }
+
+        void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam)
+        {
+            ResetInputValuesOfData(refAlignParam.RefSize*2);
+        }
+
+        void IFormalMaschine.DumpPrintText() { }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {
@@ -203,6 +208,15 @@ namespace Reni.Code
                 accesses.Add(_data[i + start]);
                 _data[i + start] = null;
             }
+            return FormalValueAccess.Transpose(accesses);
+        }
+
+        private IFormalValue[] GetInputValuesFromData(Size offset, Size inputSize)
+        {
+            var accesses = new List<FormalValueAccess>();
+            var start = (_startAddress + offset).ToInt();
+            for(var i = 0; i < inputSize.ToInt(); i++)
+                accesses.Add(_data[i + start]);
             return FormalValueAccess.Transpose(accesses);
         }
 

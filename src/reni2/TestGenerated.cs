@@ -25,5 +25,10 @@ namespace Reni
 #pragma warning restore 168
             BitsConst.OutStream = os;
         }
+
     }
+struct raw
+{
+    public sbyte[] _data;
+}
 }

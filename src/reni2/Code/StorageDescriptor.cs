@@ -249,12 +249,12 @@ namespace Reni.Code
             return null;
         }
 
-        internal string CreateTopFrame(RefAlignParam refAlignParam, Size offset, Size targetSize)
+        internal string CreateTopFrame(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
         {
             if(refAlignParam.Is_3_32)
-                return CreateMoveBytesFromFrame(targetSize, Start - targetSize, offset*-1);
+                return CreateMoveBytesFromFrame(dataSize, Start - size, offset * -1);
 
-            NotImplementedFunction(this, refAlignParam, offset, targetSize, targetSize);
+            NotImplementedFunction(this, refAlignParam, offset, size, dataSize);
             return null;
         }
 
@@ -265,12 +265,12 @@ namespace Reni.Code
 
         internal string CreateThen(Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
 
-        internal string CreateTopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
+        internal string CreateTopData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
         {
             if(refAlignParam.Is_3_32)
-                return CreateMoveBytes(targetSize, Start - targetSize, Start + offset);
+                return CreateMoveBytes(dataSize, Start - size, Start + offset);
 
-            NotImplementedFunction(this, refAlignParam, offset, targetSize);
+            NotImplementedFunction(this, refAlignParam, offset, size, dataSize);
             return null;
         }
 
@@ -298,23 +298,23 @@ namespace Reni.Code
             return null;
         }
 
-        internal string CreateUnref(RefAlignParam refAlignParam, Size targetSize)
+        internal string CreateUnref(RefAlignParam refAlignParam, Size size, Size dataSize)
         {
             if(refAlignParam.Is_3_32)
             {
-                if(IsBuildInIntType(targetSize))
-                    return CreateDataRef(Start + refAlignParam.RefSize - targetSize, targetSize)
+                if(IsBuildInIntType(size))
+                    return CreateDataRef(Start + refAlignParam.RefSize - size, size)
                         + " = "
-                            + CreateCastToIntRef(targetSize, CreateDataRef(Start, refAlignParam.RefSize));
+                            + CreateCastToIntRef(dataSize, CreateDataRef(Start, refAlignParam.RefSize));
                 return "Data.MoveBytes("
-                    + targetSize.ByteCount
+                    + dataSize.ByteCount
                         + ", "
-                            + CreateDataPtr(Start + refAlignParam.RefSize - targetSize)
+                            + CreateDataPtr(Start + refAlignParam.RefSize - size)
                                 + ", "
                                     + CreateCastToIntPtr(Size.Byte, CreateDataRef(Start, refAlignParam.RefSize))
                                         + ")";
             }
-            NotImplementedMethod(refAlignParam, targetSize);
+            NotImplementedMethod(refAlignParam, size, dataSize);
             return null;
         }
 

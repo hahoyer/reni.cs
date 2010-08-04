@@ -12,21 +12,27 @@ namespace Reni.Code
     {
         private readonly RefAlignParam _refAlignParam;
         private readonly Size _size;
+        private readonly Size _dataSize;
 
-        public Dereference(RefAlignParam refAlignParam, Size size)
+        public Dereference(RefAlignParam refAlignParam, Size size, Size dataSize)
         {
             _refAlignParam = refAlignParam;
             _size = size;
-            StopByObjectId(-399);
+            _dataSize = dataSize;
+            StopByObjectId(-12);
         }
 
         [DumpData(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        [DumpData(false)]
+        internal Size DataSize { get { return _dataSize; } }
 
         protected override Size GetSize()
         {
             return _size;
         }
+
+        public override string NodeDump { get { return base.NodeDump + " DataSize=" + _dataSize; } }
 
         protected override Size GetInputSize()
         {
@@ -35,7 +41,7 @@ namespace Reni.Code
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateUnref(RefAlignParam, _size);
+            return start.CreateUnref(RefAlignParam, _size, _dataSize);
         }
 
         internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
@@ -46,15 +52,15 @@ namespace Reni.Code
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopData(RefAlignParam, precedingElement.Offset, GetSize());
+            return new TopData(RefAlignParam, precedingElement.Offset, GetSize(), DataSize);
         }
 
         internal override LeafElement TryToCombineBack(FrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopFrame(RefAlignParam, precedingElement.Offset, GetSize());
+            return new TopFrame(RefAlignParam, precedingElement.Offset, GetSize(), DataSize);
         }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, Size); }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, Size, _dataSize); }
     }
 }

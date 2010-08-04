@@ -11,8 +11,8 @@ namespace Reni.Code
         private readonly int _index;
         private readonly int _size;
         private readonly IFormalValue _formalValue;
-        private int Index { get { return _index; } }
-        private int Size { get { return _size; } }
+        internal int Index { get { return _index; } }
+        internal int Size { get { return _size; } }
         private IFormalValue FormalValue { get { return _formalValue; } }
 
         public static IFormalValue[] Transpose(IEnumerable<FormalValueAccess> accesses)
@@ -20,17 +20,9 @@ namespace Reni.Code
             var distinctAccesses = accesses.Distinct().ToArray();
             if (distinctAccesses.Length == 1 && distinctAccesses[0] == null)
                 return new IFormalValue[1];
-            var result = accesses.Select(x => x.FormalValue).Distinct().ToArray();
+            var result = accesses.Select(x => x == null?null:x.FormalValue).Distinct().ToArray();
             foreach(var formalValue in result)
-            {
-                var aaa = accesses.Where(x => x.FormalValue == formalValue);
-                var ss = aaa.Select(x => x.Size).Distinct().ToArray();
-                if (ss.Length != 1 || ss[0] != aaa.ToArray().Length)
-                    throw new NotImplementedException();
-                var ii = aaa.Select((x, i) => i - x.Index).Distinct().ToArray();
-                if (ii.Length != 1 || ii[0] != 0)
-                    throw new NotImplementedException();
-            }
+                formalValue.Check(accesses.Where(x => x.FormalValue == formalValue));
             return result;
         }
 
@@ -50,6 +42,17 @@ namespace Reni.Code
         public static IFormalValue RefPlus(IFormalValue formalSubValue, int right) { return formalSubValue.RefPlus(right); }
         public static IFormalValue Dereference(IFormalValue formalSubValue) { return new DereferenceValue(formalSubValue); }
         public static IFormalValue BitArrayBinaryOp(string operation, IFormalValue formalLeftSubValue, IFormalValue formalRightSubValue) { return new BitArrayBinaryOpValue(operation, formalLeftSubValue, formalRightSubValue); }
+
+        internal static void Check(IEnumerable<FormalValueAccess> accesses)
+        {
+            var ss = accesses.Select(x => x.Size).Distinct().ToArray();
+            if (ss.Length != 1 || ss[0] != accesses.ToArray().Length)
+                throw new NotImplementedException();
+            var ii = accesses.Select((x, i) => i - x.Index).Distinct().ToArray();
+            if (ii.Length != 1 || ii[0] != 0)
+                throw new NotImplementedException();
+        }
+
     }
 
     internal class BitArrayBinaryOpValue : NamedValue
@@ -83,10 +86,33 @@ namespace Reni.Code
     {
         [DumpData(true)]
         private readonly char _name;
-        public FormalPointer(char name) { _name = name; }
+
+        private readonly FormalPointer[] _points;
+        private readonly int _index;
+        static private int _nextPointer;
+
+        private FormalPointer(FormalPointer[] points, int index)
+        {
+            _name = FormalMaschine.Names[_nextPointer++];
+            _points = points;
+            _index = index;
+        }
 
         public override string Dump() { return _name + " "; }
+
+        protected override IFormalValue RefPlus(int right)
+        {
+            Ensure(_points,_index+right);
+            return _points[_index + right];
+        }
+
         protected override char DumpShort() { return _name; }
+
+        public static void Ensure(FormalPointer[] points, int index)
+        {
+            if(points[index] == null)
+                points[index] = new FormalPointer(points, index);
+        }
     }
 
     internal abstract class NamedValue : ReniObject, IFormalValue
@@ -114,12 +140,16 @@ namespace Reni.Code
 
         IFormalValue IFormalValue.RefPlus(int right) { return RefPlus(right); }
 
+        void IFormalValue.Check(IEnumerable<FormalValueAccess> accesses) { FormalValueAccess.Check(accesses); }
+
         protected virtual IFormalValue RefPlus(int right)
         {
             NotImplementedMethod(right);
             return null;
         }
     }
+
+
 
     sealed internal class CallValue : NamedValue
     {
@@ -207,6 +237,7 @@ namespace Reni.Code
         }
 
         string IFormalValue.Dump() { return _formalSubValue.Dump(); }
+        void IFormalValue.Check(IEnumerable<FormalValueAccess> accesses) { FormalValueAccess.Check(accesses); }
 
         IFormalValue IFormalValue.RefPlus(int right)
         {
@@ -236,6 +267,7 @@ namespace Reni.Code
         }
 
         public override string Dump() { return _data.DumpValue(); }
+        void IFormalValue.Check(IEnumerable<FormalValueAccess> accesses) {  }
 
         IFormalValue IFormalValue.RefPlus(int right)
         {

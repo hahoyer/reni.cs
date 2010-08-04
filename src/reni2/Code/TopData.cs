@@ -9,10 +9,10 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopData : Top
     {
-        public TopData(RefAlignParam refAlignParam, Size offset, Size targetSize)
-            : base(refAlignParam, offset, targetSize)
+        public TopData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+            : base(refAlignParam, offset, size, dataSize)
         {
-            StopByObjectId(-45);
+            StopByObjectId(-110);
         }
         /// <summary>
         /// Tries to combine two leaf elements. .
@@ -25,7 +25,7 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBackN(this);
         }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopData(Size, Offset); }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopData(Offset, Size, DataSize); }
 
         /// <summary>
         /// Formats this instance.
@@ -35,7 +35,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateTopData(RefAlignParam,Offset,GetSize());
+            return start.CreateTopData(RefAlignParam, Offset, GetSize(), DataSize);
         }
     }
 
@@ -45,8 +45,8 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopFrame : Top
     {
-        public TopFrame(RefAlignParam refAlignParam, Size offset, Size size)
-            : base(refAlignParam, offset, size)
+        public TopFrame(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+            : base(refAlignParam, offset, size, dataSize)
         {
             StopByObjectId(544);
         }
@@ -61,7 +61,7 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBackN(this);
         }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrame(Size, Offset); }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrame(Offset, Size, DataSize); }
 
         /// <summary>
         /// Formats this instance.
@@ -71,7 +71,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateTopFrame(RefAlignParam, Offset, GetSize());
+            return start.CreateTopFrame(RefAlignParam, Offset, GetSize(), DataSize);
         }
 
     }
