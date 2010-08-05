@@ -22,7 +22,8 @@ namespace Reni.Code
                 return new IFormalValue[1];
             var result = accesses.Select(x => x == null?null:x.FormalValue).Distinct().ToArray();
             foreach(var formalValue in result)
-                formalValue.Check(accesses.Where(x => x.FormalValue == formalValue));
+                if(formalValue != null)
+                    formalValue.Check(accesses.Where(x => x != null && x.FormalValue == formalValue));
             return result;
         }
 
@@ -46,11 +47,11 @@ namespace Reni.Code
         internal static void Check(IEnumerable<FormalValueAccess> accesses)
         {
             var ss = accesses.Select(x => x.Size).Distinct().ToArray();
-            if (ss.Length != 1 || ss[0] != accesses.ToArray().Length)
-                throw new NotImplementedException();
+            if(ss.Length != 1 || ss[0] != accesses.ToArray().Length)
+                Tracer.FlaggedLine("Size problem");
             var ii = accesses.Select((x, i) => i - x.Index).Distinct().ToArray();
             if (ii.Length != 1 || ii[0] != 0)
-                throw new NotImplementedException();
+                Tracer.FlaggedLine("Consequtivity problem");
         }
 
     }

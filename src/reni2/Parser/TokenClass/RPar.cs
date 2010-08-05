@@ -47,10 +47,15 @@ namespace Reni.Parser.TokenClass
         {
             if(right != null)
                 return base.CreateSyntax(left, token, right);
-            if(left != null)
-                return left;
-            return new EmptyList(token);
+            if (left != null)
+                return left.RightPar(token);
+            NotImplementedMethod(left,token,right);
+
+            return null;
+
         }
+
+        internal int Level { get { return _level; } }
 
         /// <summary>
         /// Special name for end of file

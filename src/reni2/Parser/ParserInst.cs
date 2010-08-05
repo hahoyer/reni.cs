@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HWClassLibrary.Debug;
 
 namespace Reni.Parser
 {
@@ -41,7 +42,10 @@ namespace Reni.Parser
                     if(relation != '-')
                     {
                         if(token.TokenClass.IsEnd)
-                            return result;
+                        {
+                            Tracer.Assert(result != null);
+                            return result.RightPar(token);
+                        }
                         stack.Push(new PushedSyntax(result, token, token.NewTokenFactory ?? stack.Peek().TokenFactory));
                         result = null;
                     }

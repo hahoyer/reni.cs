@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
@@ -38,7 +39,7 @@ namespace Reni.Code
                    + "; // FunctionReturn";
         }
 
-        internal string CreateFunctionBody(IEnumerable<LeafElement> data, bool isFunction)
+        internal string CreateFunctionBody(List<LeafElement> data, bool isFunction)
         {
             var result = GetStatements(data);
             if(isFunction)
@@ -456,11 +457,12 @@ namespace Reni.Code
             return false;
         }
 
-        private string GetStatements(IEnumerable<LeafElement> data)
+        private string GetStatements(List<LeafElement> data)
         {
             var result = "";
-            foreach(LeafElement t in data)
+            for(var index = 0; index < data.Count; index++)
             {
+                var t = data[index];
                 result += t.Statements(this);
                 ShiftStartAddress(t.DeltaSize);
             }

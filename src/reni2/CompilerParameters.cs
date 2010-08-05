@@ -84,7 +84,7 @@ namespace Reni
                 Syntax = true;
                 CodeTree = true;
                 CodeSequence = true;
-                CodeGraph = true;
+                CodeGraph = false;
                 ExecutedCode = true;
                 Functions = true;
             }

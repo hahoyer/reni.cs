@@ -13,9 +13,12 @@ namespace ReniTest
 {
     public static class MainContainer
     {
-        
-        private const string Target = @"(3, (this _A_T_ 0) := 5 enable_cut) dump_print";
-        const string Output = "(1, )";
+
+        private const string Target = @"
+f: {1000 type({arg = 1 then 1 else {arg * f[arg type((arg-1)enable_cut)]}}enable_cut)}/\;
+f(4)dump_print
+";
+        const string Output = "24";
 
         public static void Main()
         {

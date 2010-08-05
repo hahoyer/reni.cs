@@ -13,7 +13,7 @@ namespace Reni.Struct
     {
         private static int _nextObjectId;
 
-        [DumpData(true)]
+        [DumpData(false)]
         private readonly Context _context;
 
         [DumpData(false)]

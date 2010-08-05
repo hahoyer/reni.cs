@@ -12,7 +12,7 @@ namespace Reni.Parser.TokenClass.Name
         {
             var trace = token.ObjectId == -119 && category.HasRefs;
             StartMethodDump(trace, context, category, token);
-            var result = context.CreateArgsRefResult(category);
+            var result = context.CreateArgsReferenceResult(category);
             return ReturnMethodDumpWithBreak(trace, result);
         }
     }

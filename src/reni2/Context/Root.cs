@@ -34,7 +34,8 @@ namespace Reni.Context
         public Result CreateFunctionCall(Struct.Context context, Category category, ICompileSyntax body, Result argsResult)
         {
             Tracer.Assert(argsResult.HasType);
-            return Functions.Find(body, context, argsResult.Type).CreateCall(category, argsResult);
+            var functionInstance = Functions.Find(body, context, argsResult.Type);
+            return functionInstance.CreateCall(category, argsResult);
         }
     }
 }

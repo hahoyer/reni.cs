@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
@@ -30,12 +32,12 @@ namespace Reni.Parser.TokenClass
             Name = "<left " + _level + ">";
         }
 
+        internal int Level { get { return _level; } }
+
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            ParsedSyntaxExtender.AssertIsNull(left);
-            if(right == null)
-                return new EmptyList(token);
-            return right.SurroundedByParenthesis(token);
+            left.AssertIsNull();
+            return new LeftParSyntax(token, right);
         }
 
         internal override string PrioTableName(string name)
@@ -44,6 +46,26 @@ namespace Reni.Parser.TokenClass
                 return "<frame>";
 
             return base.PrioTableName(name);
+        }
+    }
+
+    internal class LeftParSyntax : ParsedSyntax
+    {
+        [DumpData(true)]
+        private readonly IParsedSyntax _right;
+
+        public LeftParSyntax(Token token, IParsedSyntax right)
+            : base(token)
+        {
+            _right = right;
+        }
+
+        protected override IParsedSyntax RightPar(Token token) {
+            if(((RPar) token.TokenClass).Level != ((LPar) Token.TokenClass).Level)
+                return base.RightPar(token);
+            if (_right == null)
+                return new EmptyList(Token,token);
+            return _right.SurroundedByParenthesis(Token,token);
         }
     }
 }

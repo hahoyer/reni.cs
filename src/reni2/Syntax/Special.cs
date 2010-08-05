@@ -29,6 +29,9 @@ namespace Reni.Syntax
             return Terminal
                 .Result(context, category, Token);
         }
+
+        protected override Token GetFirstToken() { return Token; }
+        protected override Token GetLastToken() { return Token; }
     }
 
     [Serializable]
@@ -54,6 +57,8 @@ namespace Reni.Syntax
         }
 
         protected internal override string DumpShort() { return base.DumpShort() + "(" + _right.DumpShort() + ")"; }
+        protected override Token GetFirstToken() { return Token; }
+        protected override Token GetLastToken() { return _right.LastToken; }
     }
 
     [Serializable]
@@ -83,6 +88,8 @@ namespace Reni.Syntax
         }
 
         protected internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort() + "(" + _right.DumpShort() + ")"; }
+        protected override Token GetFirstToken() { return _left.FirstToken; }
+        protected override Token GetLastToken() { return _right.LastToken; }
     }
 
     internal class SuffixSyntax : SpecialSyntax
@@ -107,6 +114,9 @@ namespace Reni.Syntax
         }
 
         protected internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort(); }
+
+        protected override Token GetFirstToken() { return _left.FirstToken; }
+        protected override Token GetLastToken() { return Token; }
     }
 
     internal interface ITerminal

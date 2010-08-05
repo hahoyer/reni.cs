@@ -44,10 +44,16 @@ namespace Reni.Struct
         internal Reni.Type.Reference ContextReferenceType { get { return _referenceType; } }
 
         [DumpData(false)]
-        public abstract IRefInCode ForCode { get; }
+        protected abstract IRefInCode ForCode { get; }
 
         [DumpData(false)]
-        internal ContextPosition[] Features { get { return _featuresCache.Value; } }
+        internal ContextPosition[] Features { get
+        {
+            ContextPosition[] contextPositions = _featuresCache.Value;
+            AssertValid();
+            return contextPositions;
+        }
+        }
         [DumpData(false)]
         protected abstract int Position { get; }
 
@@ -106,6 +112,7 @@ namespace Reni.Struct
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
+            AssertValid();
             if(!searchVisitor.IsSuccessFull)
                 searchVisitor.InternalResult = 
                     Container
@@ -115,7 +122,12 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        internal override Result CreateArgsRefResult(Category category) { return Parent.CreateArgsRefResult(category); }
+        internal void AssertValid() { 
+            if(_featuresCache.IsValid)
+                Tracer.Assert(_featuresCache.Value.Length == Position);
+        }
+
+        internal override Result CreateArgsReferenceResult(Category category) { return Parent.CreateArgsReferenceResult(category); }
 
         [DumpData(false)]
         internal TypeBase IndexType { get { return TypeBase.CreateNumber(IndexSize); } }
@@ -128,7 +140,7 @@ namespace Reni.Struct
         [DumpData(false)]
         internal IEnumerable<TypeBase> Types { get { return _typesCache ?? (_typesCache = GetTypes().ToArray()); } }
         [DumpData(false)]
-        internal Size[] Offsets { get
+        private Size[] Offsets { get
         {
             return _offsetsCache ?? (_offsetsCache = GetOffsets().ToArray());
         } }

@@ -32,9 +32,9 @@ namespace Reni.Context
             return Parent.ChildChain.Concat(new []{this}).ToArray();
         }
 
-        internal override Result CreateArgsRefResult(Category category)
+        internal override Result CreateArgsReferenceResult(Category category)
         {
-            return Parent.CreateArgsRefResult(category);
+            return Parent.CreateArgsReferenceResult(category);
         }
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)

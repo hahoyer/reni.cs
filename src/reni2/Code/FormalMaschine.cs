@@ -86,7 +86,7 @@ namespace Reni.Code
 
         void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
         {
-            var formalSubValue = PullInputValuesFromData(significantSize).OnlyOne();
+            var formalSubValue = GetInputValuesFromData(significantSize).OnlyOne();
             var startAddress = (_startAddress + targetSize - size).ToInt();
             var element = FormalValueAccess.BitCast(formalSubValue, (size - significantSize).ToInt());
             SetFormalValues(element, startAddress, size);
@@ -210,6 +210,7 @@ namespace Reni.Code
             }
             return FormalValueAccess.Transpose(accesses);
         }
+        private IFormalValue[] GetInputValuesFromData(Size inputSize) { return GetInputValuesFromData(Size.Zero, inputSize); }
 
         private IFormalValue[] GetInputValuesFromData(Size offset, Size inputSize)
         {

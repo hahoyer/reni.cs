@@ -80,7 +80,7 @@ namespace Reni.Context
                 .Find(container);
         }
 
-        internal virtual Result CreateArgsRefResult(Category category)
+        internal virtual Result CreateArgsReferenceResult(Category category)
         {
             NotImplementedMethod(category);
             return null;
@@ -176,8 +176,8 @@ namespace Reni.Context
 
         internal Result GetResult(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = left!= null && left.ObjectId == 16822 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category, left, defineable);
+            var trace = right!= null && right.ObjectId == -126 && category.HasCode;
+            StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
                 categoryForFunctionals |= Category.Type;
@@ -198,10 +198,11 @@ namespace Reni.Context
             if(right == null)
                 return ReturnMethodDumpWithBreak(trace, suffixResult);
 
-            return suffixResult
-                .Type
-                .Apply(category, rightCategory => ResultAsRef(rightCategory, right), RefAlignParam)
-                .ReplaceArg(suffixResult.CreateAutomaticRefResult(RefAlignParam));
+            var suffixType = suffixResult.Type;
+            DumpWithBreak(trace, "suffixType", suffixType );
+            var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right), RefAlignParam);
+            DumpWithBreak(trace, "result",result);
+            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult.CreateAutomaticRefResult(RefAlignParam)));
         }
 
         private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)

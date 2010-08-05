@@ -62,13 +62,13 @@ namespace Reni
         {
             var branchResult = context.Result(category | Category.Type, syntax).AutomaticDereference();
             if ((category - Category.Type).IsNone)
-                return branchResult;
+                return branchResult.Align(context.RefAlignParam.AlignBits);
 
             var commonType = context.CommonType(this);
-            return branchResult.Type
+            var result = branchResult.Type
                 .Conversion(category | Category.Type, commonType)
-                .ReplaceArg(branchResult)
-                .CreateLocalBlock(category, context.RefAlignParam);
+                .ReplaceArg(branchResult);
+            return result.CreateLocalBlock(category, context.RefAlignParam);
         }
 
         private Result InternalResult(ContextBase context, Category category)

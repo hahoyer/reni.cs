@@ -22,14 +22,8 @@ namespace Reni.Type
             StopByObjectId(51754);
         }
 
-        internal IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }
-        internal TypeBase ObjectType { get { return _objectType; } }
-
         protected override Size GetSize() { return _objectType.Size; }
         internal override string DumpPrintText { get { return _functionalFeature.DumpShort(); } }
-
-        internal Result ContextOperatorFeatureApply(Category category) { return _functionalFeature.ContextOperatorFeatureApply(category); }
-        public Result CreateDumpPrintResult(Category category) { return _functionalFeature.DumpPrintFeatureApply(category); }
         internal override string DumpShort() { return _objectType.DumpShort() + " " + _functionalFeature.DumpShort(); }
         internal override IFunctionalFeature GetFunctionalFeature() { return _functionalFeature; }
         internal override TypeBase StripFunctional() { return _objectType; }
@@ -42,17 +36,23 @@ namespace Reni.Type
 
         internal override Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
         {
-            return _functionalFeature
-                .Apply(category, right(Category.Type).Type, refAlignParam)
+            var result = _functionalFeature.Apply(category, right(Category.Type).Type, refAlignParam);
+            return result
                 .ReplaceArg(right(category))
                 .ReplaceObjectRefByArg(refAlignParam, _objectType);
         }
+
+        internal Result ContextOperatorFeatureApply(Category category) { return _functionalFeature.ContextOperatorFeatureApply(category); }
     }
 
     internal class FunctionDefinitionType : TypeBase
     {
         private readonly Function _function;
-        public FunctionDefinitionType(Function function) { _function = function; }
+        public FunctionDefinitionType(Function function)
+        {
+            _function = function;
+            StopByObjectId(-191);
+        }
 
         protected override Size GetSize() { return Size.Zero; }
         internal override string DumpShort() { return _function.DumpShort(); }

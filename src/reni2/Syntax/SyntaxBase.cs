@@ -1,6 +1,7 @@
 using System;
 using HWClassLibrary.Debug;
 using Reni.Context;
+using Reni.Parser;
 
 namespace Reni.Syntax
 {
@@ -11,5 +12,7 @@ namespace Reni.Syntax
         string FilePosition();
         void AddToCacheForDebug(ContextBase context, object cacheItem);
         int ObjectId{ get;}
+        Token FirstToken { get; }
+        Token LastToken { get; }
     }
 }

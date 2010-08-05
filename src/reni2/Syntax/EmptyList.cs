@@ -8,7 +8,8 @@ namespace Reni.Syntax
     [Serializable]
     internal sealed class EmptyList : CompileSyntax
     {
-        public EmptyList(Token token) : base(token) {}
+        private readonly Token _rightToken;
+        public EmptyList(Token leftToken, Token rightToken) : base(leftToken) { _rightToken = rightToken; }
 
         internal protected override Result Result(ContextBase context, Category category)
         {

@@ -26,7 +26,7 @@ namespace Reni.Feature
 
         Result IInfix.Result(ContextBase context, Category category, ICompileSyntax left, ICompileSyntax right)
         {
-            var leftType = context.Type(left);
+            var leftType = context.Type(left).AutomaticDereference();
             if(category.HasCode || category.HasRefs)
                 return context.ResultAsRef(category|Category.Type, right).ConvertTo(leftType) & category;
             return leftType.CreateResult(category);

@@ -39,7 +39,7 @@ namespace Reni
             _parser = new ParserInst(new Scanner(), MainTokenFactory.Instance);
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
             _syntax = new SimpleCache<IParsedSyntax>(() => _parser.Compile(Source));
-            _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax.Token, Syntax).Result(_rootContext, Category.Code).Code);
+            _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax).Result(_rootContext, Category.Code).Code);
             _mainContainer = new SimpleCache<Container>(()=>Code.Serialize(false));
             _functionContainers = new SimpleCache<List<Container>>(()=>_rootContext.CompileFunctions());
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));

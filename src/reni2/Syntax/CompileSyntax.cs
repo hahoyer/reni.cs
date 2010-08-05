@@ -21,10 +21,10 @@ namespace Reni.Syntax
             : base(token, objectId) { }
 
         string ICompileSyntax.DumpShort() { return DumpShort(); }
-
         string ICompileSyntax.FilePosition() { return FilePosition(); }
-
         void ICompileSyntax.AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
+        Token ICompileSyntax.FirstToken { get { return GetFirstToken(); } }
+        Token ICompileSyntax.LastToken { get { return GetLastToken(); } }
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
@@ -37,7 +37,7 @@ namespace Reni.Syntax
             return null;
         }
 
-        protected override IParsedSyntax SurroundedByParenthesis(Token token) { return this; }
+        protected override IParsedSyntax SurroundedByParenthesis(Token token, Token rightToken) { return this; }
 
         protected override ICompileSyntax ToCompiledSyntax() { return this; }
         protected override IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right) { return new ExpressionSyntax(this, token, ParsedSyntaxExtender.ToCompiledSyntaxOrNull(right)); }

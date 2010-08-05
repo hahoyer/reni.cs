@@ -24,12 +24,17 @@ namespace Reni.Struct
         }
 
         [DumpData(false)]
-        public override IRefInCode ForCode { get { return _context; } }
+        protected override IRefInCode ForCode { get { return _context; } }
 
         [Node]
         protected override int Position { get { return _position; } }
 
-        internal override ContextAtPosition CreatePosition(int position) { return _context.CreatePosition(position); }
+        internal override ContextAtPosition CreatePosition(int position)
+        {
+            if (position < _position)
+                return this;
+            return _context.CreatePosition(position);
+        }
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }
 
         [DumpData(false)]

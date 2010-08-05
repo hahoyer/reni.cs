@@ -17,6 +17,7 @@ namespace Reni.Type
         internal Reference(TypeBase target, RefAlignParam refAlignParam)
             :base(_nextObjectId++)
         {
+            Tracer.Assert(!(target is Reference));
             _target = target;
             _refAlignParam = refAlignParam;
         }
@@ -85,6 +86,8 @@ namespace Reni.Type
                 .CreateDereference(RefAlignParam, _target.Size);
         }
 
+        internal override sealed TypeBase AutomaticDereference() { return _target.AutomaticDereference(); }
+
         internal override sealed Result AutomaticDereference(Result result)
         {
             Result useWithArg = CreateDereferencedArgResult(result.CompleteCategory).ReplaceArg(result);
@@ -119,8 +122,6 @@ namespace Reni.Type
         internal override sealed Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
 
         internal override sealed Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
-
-        internal override sealed TypeBase AutomaticDereference() { return Parent.AutomaticDereference(); }
 
         [DumpData(false)]
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }

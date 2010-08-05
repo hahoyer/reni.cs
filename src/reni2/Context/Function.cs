@@ -18,8 +18,19 @@ namespace Reni.Context
             ArgsType = argsType;
         }
 
-        internal override Result CreateArgsRefResult(Category category)
+        internal override Result CreateArgsReferenceResult(Category category)
         {
+            if(ArgsType is Reference)
+            {
+                return ArgsType.CreateResult
+                    (
+                    category,
+                    () => CodeBase.Create(this).CreateDereference(RefAlignParam, RefAlignParam.RefSize),
+                    () => Refs.Create(this)
+                    )
+                    ;
+            }
+
             return ArgsType.CreateReference(RefAlignParam).CreateResult
                 (
                 category,

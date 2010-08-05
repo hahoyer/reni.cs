@@ -47,8 +47,22 @@ namespace Reni.Parser
         string IParsedSyntax.DumpShort() { return DumpShort(); }
 
         Token IParsedSyntax.Token { get { return Token; } }
+        Token IParsedSyntax.FirstToken { get { return GetFirstToken(); } }
+        Token IParsedSyntax.LastToken { get { return GetLastToken(); } }
 
-        IParsedSyntax IParsedSyntax.SurroundedByParenthesis(Token token) { return SurroundedByParenthesis(token); }
+        protected virtual Token GetFirstToken()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
+        protected virtual Token GetLastToken()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
+        IParsedSyntax IParsedSyntax.SurroundedByParenthesis(Token leftToken, Token rightToken) { return SurroundedByParenthesis(leftToken, rightToken); }
 
         IParsedSyntax IParsedSyntax.CreateDeclarationSyntax(Token token, IParsedSyntax right) { return CreateDeclarationSyntax(token, right); }
 
@@ -56,7 +70,7 @@ namespace Reni.Parser
 
         protected virtual ICompileSyntax ToCompiledSyntax()
         {
-            NotImplementedMethod();
+            NotImplementedMethod();  //Probably it's a missing right parenthesis
             return null;
         }
 
@@ -65,6 +79,13 @@ namespace Reni.Parser
         IParsedSyntax IParsedSyntax.CreateSyntaxOrDeclaration(Token token, IParsedSyntax right) { return CreateSyntaxOrDeclaration(token, right); }
 
         IParsedSyntax IParsedSyntax.CreateElseSyntax(Token token, ICompileSyntax elseSyntax) { return CreateElseSyntax(token, elseSyntax); }
+        IParsedSyntax IParsedSyntax.RightPar(Token token) { return RightPar(token); }
+
+        protected virtual IParsedSyntax RightPar(Token token)
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
 
         protected virtual IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition) { return new ThenSyntax(condition, token, ToCompiledSyntax()); }
 
@@ -82,9 +103,9 @@ namespace Reni.Parser
             return null;
         }
 
-        protected virtual IParsedSyntax SurroundedByParenthesis(Token token)
+        protected virtual IParsedSyntax SurroundedByParenthesis(Token leftToken, Token rightToken)
         {
-            NotImplementedMethod(token);
+            NotImplementedMethod(leftToken, rightToken);  //Probably it's a missing right parenthesis
             return null;
         }
 

@@ -31,7 +31,7 @@ namespace Reni.Struct
         bool IRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
 
         [DumpData(false)]
-        public override IRefInCode ForCode { get { return this; } }
+        protected override IRefInCode ForCode { get { return this; } }
 
         protected override int Position { get { return StatementList.Count; } }
 

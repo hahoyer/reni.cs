@@ -37,6 +37,16 @@ namespace Reni.Parser
             return result;
         }
 
+        protected override Token GetFirstToken()
+        {
+            return Left == null ? Token : Left.FirstToken;
+        }
+
+        protected override Token GetLastToken()
+        {
+            return Right == null ? Token : Right.LastToken;
+        }
+
         protected internal override Result Result(ContextBase context, Category category)
         {
             var trace = ObjectId == -57 && category.HasCode;

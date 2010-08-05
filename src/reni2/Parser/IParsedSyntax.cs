@@ -14,11 +14,15 @@ namespace Reni.Parser
         [DumpData(false)]
         Token Token { get; }
 
+        Token FirstToken { get; }
+        Token LastToken { get; }
+
         ICompileSyntax ToCompiledSyntax();
-        IParsedSyntax SurroundedByParenthesis(Token token);
+        IParsedSyntax SurroundedByParenthesis(Token token, Token token1);
         IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right);
         IParsedSyntax CreateThenSyntax(Token token, ICompileSyntax condition);
         IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right);
         IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax);
+        IParsedSyntax RightPar(Token token);
     }
 }

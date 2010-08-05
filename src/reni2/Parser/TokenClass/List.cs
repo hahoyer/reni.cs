@@ -43,8 +43,8 @@ namespace Reni.Parser.TokenClass
         public ListSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
             : base(token)
         {
-            _left = left ?? new EmptyList(token);
-            _right = right ?? new EmptyList(token);
+            _left = left ?? new EmptyList(token, token);
+            _right = right ?? new EmptyList(token, token);
         }
 
         protected internal override string DumpShort()
@@ -52,7 +52,7 @@ namespace Reni.Parser.TokenClass
             return "(" + _left.DumpShort() + ", " + _right.DumpShort() + ")";
         }
 
-        protected override IParsedSyntax SurroundedByParenthesis(Token token)
+        protected override IParsedSyntax SurroundedByParenthesis(Token leftToken, Token rightToken)
         {
             var list = new List<IParsedSyntax>();
             IParsedSyntax next = this;
@@ -65,7 +65,7 @@ namespace Reni.Parser.TokenClass
 
             list.Add(next);
 
-            return Container.Create(token, list);
+            return Container.Create(leftToken,rightToken, list);
         }
     }
 }

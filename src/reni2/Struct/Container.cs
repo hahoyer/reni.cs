@@ -20,6 +20,8 @@ namespace Reni.Struct
     [Serializable]
     internal sealed class Container : CompileSyntax, IDumpShortProvider
     {
+        private readonly Token _firstToken;
+        private readonly Token _lastToken;
         private static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
         private static bool _isInsideFileDump;
@@ -38,11 +40,17 @@ namespace Reni.Struct
         [Node, SmartNode]
         internal readonly List<string> Properties = new List<string>();
 
-        private Container(Token token)
-            : base(token, _nextObjectId++)
+        protected override Token GetFirstToken() { return _firstToken; }
+
+        protected override Token GetLastToken() { return _lastToken; }
+
+        private Container(Token leftToken, Token rightToken)
+            : base(leftToken, _nextObjectId++)
         {
+            _firstToken = leftToken;
+            _lastToken = rightToken;
             Dictionary = new DictionaryEx<string, int>();
-            EmptyList = new EmptyList(token);
+            EmptyList = new EmptyList(leftToken,rightToken);
         }
 
         internal DictionaryEx<int, string> ReverseDictionary
@@ -83,19 +91,24 @@ namespace Reni.Struct
                 _reverseDictionaryCache[pair.Value] = pair.Key;
         }
 
-        internal static Container Create(Token token, List<IParsedSyntax> parsed)
+        internal static Container Create(Token leftToken, Token rightToken, List<IParsedSyntax> parsed)
         {
-            var result = new Container(token);
+            var result = new Container(leftToken, rightToken);
             foreach(var parsedSyntax in parsed)
                 result.Add(parsedSyntax);
             return result;
         }
 
-        internal static Container Create(Token token, IParsedSyntax parsedSyntax)
+        internal static Container Create(Token leftToken, Token rightToken, IParsedSyntax parsedSyntax)
         {
-            var result = new Container(token);
+            var result = new Container(leftToken, rightToken);
             result.Add(parsedSyntax);
             return result;
+        }
+
+        internal static Container Create(IParsedSyntax parsedSyntax)
+        {
+            return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax);
         }
 
         private void Add(IParsedSyntax parsedSyntax)
@@ -195,6 +208,7 @@ namespace Reni.Struct
 
         IContextFeature ISearchPath<IContextFeature, Context>.Convert(Context context)
         {
+            context.AssertValid();
             return context
                 .Features[_index]
                 .ToProperty(_isProperty);
