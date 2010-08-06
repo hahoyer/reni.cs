@@ -14,16 +14,14 @@ namespace ReniTest
     public static class MainContainer
     {
 
-        private const string Target = @"
-f: {1000 type({arg = 1 then 1 else {arg * f[arg type((arg-1)enable_cut)]}}enable_cut)}/\;
-f(4)dump_print
-";
-        const string Output = "24";
+        private const string Target = @"((one: 1) one) dump_print;";
+        const string Output = "1";
 
         public static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            
             //TestGenerated.Exec();
             //CompilerTest.Run("Test", Target, Output);
             Assembly.GetExecutingAssembly().RunTests();

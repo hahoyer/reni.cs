@@ -28,7 +28,7 @@ namespace Reni.Type
             Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
             {
                 return argsType
-                    .ConvertTo(category, _typeBase.AutomaticDereference());
+                    .Conversion(category, _typeBase.AutomaticDereference());
             }
         }
 

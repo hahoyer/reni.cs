@@ -151,7 +151,7 @@ namespace Reni.Context
             if(result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
                 return Result(category, syntax);
 
-            return result.CreateAutomaticRefResult(RefAlignParam);
+            return result.CreateLocalReferenceResult(RefAlignParam);
         }
 
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Type.Reference target)
@@ -202,7 +202,7 @@ namespace Reni.Context
             DumpWithBreak(trace, "suffixType", suffixType );
             var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right), RefAlignParam);
             DumpWithBreak(trace, "result",result);
-            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult.CreateAutomaticRefResult(RefAlignParam)));
+            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult.CreateLocalReferenceResult(RefAlignParam)));
         }
 
         private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)

@@ -49,6 +49,8 @@ namespace Reni.Type
 
         internal override Struct.Context GetStruct() { return _target.GetStruct(); }
 
+        protected override bool IsReferenceTo(TypeBase target) { return Target == target; }
+
         internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
         {
             var destAsRef = dest as Reference;

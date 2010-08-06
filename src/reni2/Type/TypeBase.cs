@@ -201,7 +201,16 @@ namespace Reni.Type
         {
             if(this == dest)
                 return ConvertToItself(category);
+            if (dest.IsReferenceTo(this))
+                return ConvertToReference(category, ((Reference)dest).RefAlignParam);
             return ConvertTo_Implementation(category, dest);
+        }
+
+        private Result ConvertToReference(Category category, RefAlignParam refAlignParam)
+        {
+            return CreateArgResult(category|Category.Type)
+                .CreateLocalReferenceResult(refAlignParam)
+                & category;
         }
 
         private Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
@@ -220,10 +229,14 @@ namespace Reni.Type
         {
             if(this == dest)
                 return IsConvertableToItself(conversionFeature);
+            if (dest.IsReferenceTo(this))
+                return true;
             if(conversionFeature.IsUseConverter && HasConverterTo(dest))
                 return true;
             return IsConvertableTo_Implementation(dest, conversionFeature.DontUseConverter);
         }
+
+        protected virtual bool IsReferenceTo(TypeBase target) { return false; }
 
         internal virtual bool HasConverterTo(TypeBase dest) { return false; }
 
@@ -273,7 +286,8 @@ namespace Reni.Type
         private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            bool trace = ObjectId == -43296 && defineable.ObjectId == 602 && category.HasCode;
+            bool trace = ObjectId == 4 && defineable.ObjectId == 39 && category.HasCode;
+            if(!trace) trace = ObjectId == 4 && defineable.ObjectId == 39 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();

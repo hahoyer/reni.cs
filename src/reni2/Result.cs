@@ -558,7 +558,7 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateAutomaticRefResult(RefAlignParam refAlignParam)
+        internal Result CreateLocalReferenceResult(RefAlignParam refAlignParam)
         {
             var destructor = Type.Destructor(CompleteCategory);
             return Type
