@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
@@ -47,7 +48,26 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
+        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
+        {
+            Tracer.Assert(dest.IsVoid);
+            Tracer.Assert(Size.IsZero);
+            return dest.CreateResult
+                (
+                    category,
+                    () => CodeBase.CreateArg(Size.Zero),
+                    () => Context.ConstructorRefs()
+                );
+        }
         internal override Context GetStruct() { return _context; }
+
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        {
+            if (dest.IsVoid)
+                return Size.IsZero;
+            NotImplementedMethod(dest, conversionFeature);
+            return false;
+        }
 
         internal Result CreateDumpPrintResult(Category category)
         {

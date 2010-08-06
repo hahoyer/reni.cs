@@ -177,7 +177,6 @@
     <Compile Include="Type\List.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\Ref.cs" />
-    <Compile Include="Struct\PartialType.cs" />
     <Compile Include="Type\SequenceFeature.cs" />
     <Compile Include="Type\SequenceOperationPrefixFeature.cs" />
     <Compile Include="Type\TagChild.cs" />

@@ -13,7 +13,7 @@ using Reni.Type;
 namespace Reni.Struct
 {
     [Serializable]
-    internal abstract class Context : Reni.Context.Child
+    internal abstract class Context : Reni.Context.Child, IRefInCode
     {
         private Size[] _offsetsCache;
         private TypeBase[] _typesCache;
@@ -27,6 +27,12 @@ namespace Reni.Struct
         [Node, SmartNode]
         private readonly DictionaryEx<ICompileSyntax, Reni.Type.Function> _function;
 
+        [Node, DumpData(false)]
+        protected Result _internalConstructorResult;
+
+        [Node, DumpData(false)]
+        protected Result _constructorResult;
+
         protected Context(ContextBase parent, Container container)
             : base(parent)
         {
@@ -38,8 +44,11 @@ namespace Reni.Struct
             _function = new DictionaryEx<ICompileSyntax, Reni.Type.Function>(body => new Reni.Type.Function(this, body));
         }
 
+        RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
+        bool IRefInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
+
         [DumpData(false)]
-        internal Type ContextType { get { return _type; } }
+        private Type ContextType { get { return _type; } }
         [DumpData(false)]
         internal Reni.Type.Reference ContextReferenceType { get { return _referenceType; } }
 
@@ -220,5 +229,17 @@ namespace Reni.Struct
         }
 
         private CodeBase CreateRefArgCode() { return ContextType.CreateReference(RefAlignParam).CreateArgCode(); }
+
+        internal Result ConstructorResult(Category category)
+        {
+            var internalResult = InternalResult(category - Category.Type);
+            _internalConstructorResult.Update(internalResult);
+            var result = ContextType.CreateResult(category, internalResult);
+            var constructorResult = result.ReplaceRelative(this, ()=>CodeBase.CreateTopRef(RefAlignParam));
+            _constructorResult.Update(constructorResult);
+            return constructorResult;
+        }
+
+        internal Refs ConstructorRefs() { return ConstructorResult(Category.Refs).Refs; }
     }
 }                                    
