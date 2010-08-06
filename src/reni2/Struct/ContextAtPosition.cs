@@ -4,14 +4,11 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
-using Reni.Context;
-using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.Struct
 {
     [Serializable]
-    internal sealed class ContextAtPosition : Context, IRefInCode
+    internal sealed class ContextAtPosition : Context
     {
         private readonly int _position;
         private readonly FullContext _context;
@@ -39,9 +36,5 @@ namespace Reni.Struct
 
         [DumpData(false)]
         public override string NodeDump { get { return base.NodeDump + ": " + _context.NodeDump + "@" + _position; } }
-
-        RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
-
-        bool IRefInCode.IsChildOf(ContextBase contextBase) { throw new NotImplementedException(); }
     }
 }

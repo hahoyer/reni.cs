@@ -120,7 +120,6 @@
     <Compile Include="StructAccess.cs" />
     <Compile Include="Struct\PositionFeature.cs" />
     <Compile Include="Struct\Context.cs" />
-    <Compile Include="Struct\Type.cs" />
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Syntax\IResultProvider.cs" />

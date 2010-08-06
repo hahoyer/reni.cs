@@ -5,7 +5,6 @@ using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.Struct
 {

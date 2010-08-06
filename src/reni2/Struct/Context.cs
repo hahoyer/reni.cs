@@ -28,10 +28,10 @@ namespace Reni.Struct
         private readonly DictionaryEx<ICompileSyntax, Reni.Type.Function> _function;
 
         [Node, DumpData(false)]
-        protected Result _internalConstructorResult;
+        private Result _internalConstructorResult;
 
         [Node, DumpData(false)]
-        protected Result _constructorResult;
+        private Result _constructorResult;
 
         protected Context(ContextBase parent, Container container)
             : base(parent)
@@ -42,6 +42,8 @@ namespace Reni.Struct
             _type = new Type(this);
             _referenceType = _type.CreateReference(parent.RefAlignParam);
             _function = new DictionaryEx<ICompileSyntax, Reni.Type.Function>(body => new Reni.Type.Function(this, body));
+            _internalConstructorResult = new Result();
+            _constructorResult = new Result();
         }
 
         RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
@@ -69,7 +71,7 @@ namespace Reni.Struct
         [DumpData(false)]
         internal List<ICompileSyntax> StatementList { get { return Container.List; } }
         [DumpData(false)]
-        internal int IndexSize { get { return Container.IndexSize; } }
+        private int IndexSize { get { return Container.IndexSize; } }
 
         private ContextPosition[] CreateFeaturesCache()
         {
@@ -102,7 +104,7 @@ namespace Reni.Struct
             return result;
         }
 
-        protected Result InternalResult(Category category) { return InternalResult(category, 0, Position); }
+        private Result InternalResult(Category category) { return InternalResult(category, 0, Position); }
 
         private Result InternalResult(Category category, int fromPosition, int fromNotPosition)
         {

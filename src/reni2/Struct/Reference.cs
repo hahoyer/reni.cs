@@ -82,7 +82,7 @@ namespace Reni.Struct
         internal override int GetSequenceCount(TypeBase elementType) { return Target.GetSequenceCount(elementType); }
         internal override TypeBase GetEffectiveType() { return Target.GetEffectiveType(); }
 
-        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
 
         private Reni.Type.Reference AsTypeReference(TypeBase dest)
         {
@@ -125,9 +125,6 @@ namespace Reni.Struct
 
         internal Result ApplyAssignment(Category category, TypeBase argsType)
         {
-            var trace = false && category.HasCode;
-            StartMethodDump(trace, category,argsType);
-
             var result = CreateVoid
                 .CreateResult
                 (
@@ -135,17 +132,13 @@ namespace Reni.Struct
                     () => CodeBase.CreateArg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, Target.Size)
                 );
 
-            DumpWithBreak(trace,"result",result);
             if (!category.HasCode && !category.HasRefs)
-                return ReturnMethodDump(trace, result);
+                return result;
 
             var sourceResult = argsType.ConvertToAsRef(category, Target.CreateReference(RefAlignParam));
-            DumpWithBreak(trace, "sourceResult", sourceResult);
             var destinationResult = CreateTargetReferenceResult(category);
-            DumpWithBreak(trace, "destinationResult", destinationResult);
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
-            DumpWithBreak(trace, "objectAndSourceRefs", objectAndSourceRefs);
-            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(objectAndSourceRefs));
+            return result.ReplaceArg(objectAndSourceRefs);
         }
 
     }

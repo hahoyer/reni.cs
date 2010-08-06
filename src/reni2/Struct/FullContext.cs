@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.TreeStructure;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
-using Reni.Syntax;
 
 namespace Reni.Struct
 {
@@ -18,9 +16,7 @@ namespace Reni.Struct
         internal FullContext(ContextBase contextBase, Container container)
             : base(contextBase, container)
         {
-            _internalConstructorResult = new Result();
             _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>(position => new ContextAtPosition(Context, position));
-            _constructorResult = new Result();
         }
 
         [DumpData(false)]

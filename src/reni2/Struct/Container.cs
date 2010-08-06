@@ -10,7 +10,6 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.Parser.TokenClass;
 using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -50,7 +49,6 @@ namespace Reni.Struct
             _firstToken = leftToken;
             _lastToken = rightToken;
             Dictionary = new DictionaryEx<string, int>();
-            EmptyList = new EmptyList(leftToken,rightToken);
         }
 
         internal DictionaryEx<int, string> ReverseDictionary
@@ -63,9 +61,6 @@ namespace Reni.Struct
             }
         }
 
-        [DumpData(false)]
-        internal ICompileSyntax this[int index] { get { return List[index]; } }
-
         protected internal override Result Result(ContextBase context, Category category)
         {
             return context.CreateStruct(this).ConstructorResult(category);
@@ -75,9 +70,6 @@ namespace Reni.Struct
 
         [DumpData(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
-
-        [DumpData(false)]
-        internal readonly EmptyList EmptyList;
 
         protected internal override string DumpShort()
         {
@@ -94,8 +86,8 @@ namespace Reni.Struct
         internal static Container Create(Token leftToken, Token rightToken, List<IParsedSyntax> parsed)
         {
             var result = new Container(leftToken, rightToken);
-            foreach(var parsedSyntax in parsed)
-                result.Add(parsedSyntax);
+            for(var index = 0; index < parsed.Count; index++)
+                result.Add(parsed[index]);
             return result;
         }
 
