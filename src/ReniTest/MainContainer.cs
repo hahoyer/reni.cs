@@ -14,8 +14,8 @@ namespace ReniTest
     public static class MainContainer
     {
 
-        private const string Target = @"((one: 1) one) dump_print;";
-        const string Output = "1";
+        private const string Target = @"! property x: 11/\; x dump_print";
+        const string Output = "11";
 
         public static void Main()
         {
