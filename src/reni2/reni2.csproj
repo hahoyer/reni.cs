@@ -82,7 +82,7 @@
     <Compile Include="Parser\DeclarationTokenFactory.cs" />
     <Compile Include="Parser\MainTokenFactory.cs" />
     <Compile Include="Struct\Reference.cs" />
-    <Compile Include="Struct\ThisType.cs" />
+    <Compile Include="Struct\Type.cs" />
     <Compile Include="TestGenerated.cs" />
     <Compile Include="ISearchVisitor.cs" />
     <Compile Include="Parser\DefineableToken.cs" />
