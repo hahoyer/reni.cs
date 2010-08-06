@@ -202,15 +202,8 @@ namespace Reni.Type
             if(this == dest)
                 return ConvertToItself(category);
             if (dest.IsReferenceTo(this))
-                return ConvertToReference(category, ((Reference)dest).RefAlignParam);
+                return CreateLocalReferenceResult(category, ((Reference)dest).RefAlignParam);
             return ConvertTo_Implementation(category, dest);
-        }
-
-        private Result ConvertToReference(Category category, RefAlignParam refAlignParam)
-        {
-            return CreateArgResult(category|Category.Type)
-                .CreateLocalReferenceResult(refAlignParam)
-                & category;
         }
 
         private Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
@@ -336,12 +329,19 @@ namespace Reni.Type
             if(IsRefLike(target))
                 return target.CreateArgResult(category);
 
-            Result convertedResult = Conversion(category|Category.Type, target.AlignedTarget);
-            var destructor = convertedResult.Type.Destructor(category);
-            return target.CreateResult(
+            return CreateLocalReferenceResult(category, target.RefAlignParam);
+        }
+
+        internal Result CreateLocalReferenceResult(Category category, RefAlignParam refAlignParam)
+        {
+            var alignedResult = CreateArgResult(category|Category.Type).Align(refAlignParam.AlignBits);
+            var destructor = alignedResult.Type.Destructor(category);
+            return alignedResult.Type
+                .CreateReference(refAlignParam)
+                .CreateResult(
                 category,
-                () => CodeBase.CreateInternalRef(target.RefAlignParam, convertedResult.Code, destructor.Code),
-                () => convertedResult.Refs + destructor.Refs
+                () => CodeBase.CreateLocalReference(refAlignParam, alignedResult.Code, destructor.Code),
+                () => alignedResult.Refs + destructor.Refs
                 );
         }
 

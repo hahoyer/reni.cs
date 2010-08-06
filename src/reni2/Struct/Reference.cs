@@ -135,7 +135,7 @@ namespace Reni.Struct
             if (!category.HasCode && !category.HasRefs)
                 return result;
 
-            var sourceResult = argsType.ConvertToAsRef(category, Target.CreateReference(RefAlignParam));
+            var sourceResult = argsType.ConvertTo(category|Category.Type, Target).CreateLocalReferenceResult(RefAlignParam);
             var destinationResult = CreateTargetReferenceResult(category);
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
             return result.ReplaceArg(objectAndSourceRefs);

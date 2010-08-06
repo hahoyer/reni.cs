@@ -558,18 +558,6 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateLocalReferenceResult(RefAlignParam refAlignParam)
-        {
-            var destructor = Type.Destructor(CompleteCategory);
-            return Type
-                .CreateReference(refAlignParam)
-                .CreateResult(
-                CompleteCategory,
-                () => CodeBase.CreateInternalRef(refAlignParam, Code, destructor.Code),
-                () => Refs + destructor.Refs
-                );
-        }
-
         [DebuggerHidden]
         public static Result operator &(Result result, Category category) { return result.Filter(category); }
 
@@ -627,6 +615,11 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
+        public Result CreateLocalReferenceResult(RefAlignParam refAlignParam) {
+            return Type
+                .CreateLocalReferenceResult(CompleteCategory, refAlignParam)
+                .ReplaceArg(this);
+        }
     }
 
     internal sealed class Error

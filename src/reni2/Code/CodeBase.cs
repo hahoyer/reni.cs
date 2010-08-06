@@ -77,7 +77,7 @@ namespace Reni.Code
 
         internal static CodeBase CreateTopRef(RefAlignParam refAlignParam) { return CreateLeaf(new TopRef(refAlignParam, Size.Zero)); }
 
-        internal static CodeBase CreateInternalRef(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode) { return new InternalRef(refAlignParam, code, destructorCode); }
+        internal static CodeBase CreateLocalReference(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode) { return new LocalReference(refAlignParam, code, destructorCode); }
 
         internal static CodeBase CreateTopRef(RefAlignParam refAlignParam, Size offset) { return CreateLeaf(new TopRef(refAlignParam, offset)); }
 
@@ -240,7 +240,7 @@ namespace Reni.Code
 
         internal CodeBase CreateLocalBlock(CodeBase copier, RefAlignParam refAlignParam)
         {
-            return new InternalRefSequenceVisitor().CreateLocalBlock(this, copier, refAlignParam);
+            return new LocalReferenceSequenceVisitor().CreateLocalBlock(this, copier, refAlignParam);
         }
 
         internal CodeBase CreateLocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
@@ -254,7 +254,7 @@ namespace Reni.Code
                 result = result
                     .CreateChild(new LocalBlockEnd(resultSize, intermediateSize))
                     .CreateSequence(
-                    copier.ReplaceArg(InternalRefSequenceVisitor.InternalRefCode(refAlignParam, resultSize)));
+                    copier.ReplaceArg(LocalReferenceSequenceVisitor.LocalReferenceCode(refAlignParam, resultSize)));
 
             return result.CreateChild(new Drop(Size, resultSize));
         }
@@ -285,14 +285,14 @@ namespace Reni.Code
         }
     }
 
-    internal class InternalRefSequenceVisitor : Base
+    internal class LocalReferenceSequenceVisitor : Base
     {
         private readonly SimpleCache<CodeBase> _codeCache;
 
         [Node, DumpData(true)]
-        private readonly List<InternalRef> _data = new List<InternalRef>();
+        private readonly List<LocalReference> _data = new List<LocalReference>();
 
-        public InternalRefSequenceVisitor() { _codeCache = new SimpleCache<CodeBase>(Convert); }
+        public LocalReferenceSequenceVisitor() { _codeCache = new SimpleCache<CodeBase>(Convert); }
 
         private CodeBase Convert()
         {
@@ -316,28 +316,28 @@ namespace Reni.Code
             }
         }
 
-        internal override CodeBase InternalRef(InternalRef visitedObject)
+        internal override CodeBase LocalReference(LocalReference visitedObject)
         {
             var newVisitedObject = ReVisit(visitedObject) ?? visitedObject;
             var offset = Find(newVisitedObject);
             _codeCache.Reset();
-            return InternalRefCode(newVisitedObject.RefAlignParam, offset);
+            return LocalReferenceCode(newVisitedObject.RefAlignParam, offset);
         }
 
-        private Size Find(InternalRef internalRef)
+        private Size Find(LocalReference localReference)
         {
             var result = Size.Zero;
             var i = 0;
-            for(; i < _data.Count && _data[i] != internalRef; i++)
+            for(; i < _data.Count && _data[i] != localReference; i++)
                 result += _data[i].Code.Size;
             if(i == _data.Count)
-                _data.Add(internalRef);
-            return result + internalRef.Code.Size;
+                _data.Add(localReference);
+            return result + localReference.Code.Size;
         }
 
-        internal static CodeBase InternalRefCode(RefAlignParam refAlignParam, Size size)
+        internal static CodeBase LocalReferenceCode(RefAlignParam refAlignParam, Size size)
         {
-            return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size * (-1), "InternalRefCode");
+            return CodeBase.CreateArg(refAlignParam.RefSize).CreateRefPlus(refAlignParam, size * (-1), "LocalReferenceCode");
         }
 
         internal CodeBase CreateLocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)

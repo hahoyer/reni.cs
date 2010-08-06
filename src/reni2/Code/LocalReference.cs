@@ -7,7 +7,7 @@ using Reni.Context;
 
 namespace Reni.Code
 {
-    internal class InternalRef : CodeBase, IRefInCode
+    internal class LocalReference : CodeBase, IRefInCode
     {
         private readonly RefAlignParam _refAlignParam;
 
@@ -17,7 +17,7 @@ namespace Reni.Code
         [Node]
         internal readonly CodeBase DestructorCode;
 
-        public InternalRef(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
+        public LocalReference(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
         {
             _refAlignParam = refAlignParam;
             _unalignedCode = code;
@@ -29,7 +29,7 @@ namespace Reni.Code
         bool IRefInCode.IsChildOf(ContextBase contextBase) { return false; }
 
         protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.InternalRef(this); }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
         protected override bool IsRelativeReference { get { return false; } }
 
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
@@ -39,7 +39,7 @@ namespace Reni.Code
         internal CodeBase AccompayningDestructorCode(ref Size size)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(InternalRefSequenceVisitor.InternalRefCode(RefAlignParam, size));
+            return DestructorCode.ReplaceArg(LocalReferenceSequenceVisitor.LocalReferenceCode(RefAlignParam, size));
         }
 
         [DumpData(false)]

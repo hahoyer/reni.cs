@@ -95,7 +95,7 @@ namespace Reni.Code
             return 1;
         }
 
-        internal override int InternalRef(InternalRef visitedObject)
+        internal override int LocalReference(LocalReference visitedObject)
         {
             if(!IsInternal)
                 throw new UnexpectedInternalRefInContainer(this, visitedObject);

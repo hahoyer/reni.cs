@@ -76,8 +76,7 @@ namespace Reni.Struct
                 Context.Types
                     .Select((type, i) => type.GenericDumpPrint(category).ReplaceArg(argCodes[i]))
                     .ToArray();
-            var thisRef = CreateArgResult(category)
-                .CreateLocalReferenceResult(Context.RefAlignParam);
+            var thisRef = CreateLocalReferenceResult(category, Context.RefAlignParam);
             var result = Result
                 .ConcatPrintResult(category, dumpPrint)
                 .ReplaceArg(thisRef);

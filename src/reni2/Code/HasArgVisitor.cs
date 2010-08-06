@@ -14,7 +14,7 @@ namespace Reni.Code
         internal override bool ContextRef(RefCode visitedObject) { return false; }
         internal override bool Child(bool parent, LeafElement leafElement) { return parent; }
         internal override bool Leaf(LeafElement leafElement) { return false; }
-        internal override bool InternalRef(InternalRef visitedObject) { return false; }
+        internal override bool LocalReference(LocalReference visitedObject) { return false; }
         internal override bool ThenElse(ThenElse visitedObject, bool condResult, bool thenResult, bool elseResult){return condResult || thenResult || elseResult;}
     }
 }

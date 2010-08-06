@@ -151,7 +151,7 @@ namespace Reni.Context
             if(result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
                 return Result(category, syntax);
 
-            return result.CreateLocalReferenceResult(RefAlignParam);
+            return result.Type.CreateLocalReferenceResult(category, RefAlignParam).ReplaceArg(result);
         }
 
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Type.Reference target)

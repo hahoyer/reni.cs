@@ -22,7 +22,7 @@ namespace Reni.Code
             return default(T);
         }
 
-        internal virtual T InternalRef(InternalRef visitedObject)
+        internal virtual T LocalReference(LocalReference visitedObject)
         {
             NotImplementedMethod(visitedObject);
             return default(T);
