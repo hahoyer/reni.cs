@@ -26,7 +26,7 @@ namespace Reni.Code
         internal Size MaxSize { get { return MaxSizeImplementation; } }
 
         [Node, DumpData(false), SmartNode]
-        internal List<IRefInCode> RefsData { get { return Refs.Data; } }
+        internal List<IReferenceInCode> RefsData { get { return Refs.Data; } }
 
         [DumpData(false)]
         internal Refs Refs { get { return RefsImplementation; } }
@@ -141,7 +141,7 @@ namespace Reni.Code
 
         public static CodeBase CreateArg(Size size) { return new Arg(size); }
 
-        public static CodeBase Create(IRefInCode context) { return new RefCode(context); }
+        public static CodeBase Create(IReferenceInCode context) { return new ReferenceCode(context); }
 
         internal CodeBase ReplaceArg(CodeBase argCode)
         {
@@ -163,7 +163,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public CodeBase ReplaceRelative<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
+        public CodeBase ReplaceRelative<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IReferenceInCode
         {
             var result = Visit(new ReplaceRelativeContextRef<TContext>(context, replacement));
             if(result != null)
@@ -179,7 +179,7 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        public CodeBase ReplaceAbsolute<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IRefInCode
+        public CodeBase ReplaceAbsolute<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IReferenceInCode
         {
             var result = Visit(new ReplaceAbsoluteContextRef<TContext>(context, replacement));
             if(result != null)
@@ -227,8 +227,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal CodeBase Align(int alignBits) { return CreateBitCast(Size.NextPacketSize(alignBits)); }
-        internal CodeBase Align() { return Align(BitsConst.SegmentAlignBits); }
+        internal CodeBase Align(int alignBits = BitsConst.SegmentAlignBits) { return CreateBitCast(Size.NextPacketSize(alignBits)); }
 
         /// <summary>
         /// Gets the icon key.

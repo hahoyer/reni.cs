@@ -61,7 +61,7 @@ namespace Reni.Code.ReplaceVisitor
 
         protected override Visitor<CodeBase> AfterElse() { return this; }
 
-        internal override CodeBase ContextRef(RefCode visitedObject) { return null; }
+        internal override CodeBase ContextRef(ReferenceCode visitedObject) { return null; }
 
         internal LocalReference ReVisit(LocalReference visitedObject)
         {

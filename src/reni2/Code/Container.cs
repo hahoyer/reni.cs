@@ -87,7 +87,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal override int ContextRef(RefCode visitedObject)
+        internal override int ContextRef(ReferenceCode visitedObject)
         {
             if(!IsInternal)
                 throw new UnexpectedContextRefInContainer(this, visitedObject);

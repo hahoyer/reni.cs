@@ -2,7 +2,7 @@
 
 namespace Reni.Code
 {
-    internal interface IRefInCode
+    internal interface IReferenceInCode
     {
         RefAlignParam RefAlignParam { get; }
         bool IsChildOf(ContextBase contextBase);

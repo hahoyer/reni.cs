@@ -7,9 +7,9 @@ using Reni.Type;
 
 namespace Reni.Parser.TokenClass
 {
-    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, Sequence>
+    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, Type.Sequence>
     {
-        IFeature ISearchPath<IFeature, Sequence>.Convert(Sequence type) { return type.EnableCutFeature; }
+        IFeature ISearchPath<IFeature, Type.Sequence>.Convert(Type.Sequence type) { return new Feature.Feature(type.EnableCutFeature); }
     }
 
     internal sealed class ConcatArrays : Defineable, ISearchPath<IFeature, Type.Array>
@@ -27,8 +27,7 @@ namespace Reni.Parser.TokenClass
     {
         IFeature ISearchPath<IFeature, Struct.Reference>.Convert(Struct.Reference type)
         {
-            return type
-                .AssignmentFeature;
+            return new Feature.Feature(type.ApplyAssignment);
         }
     }
 }

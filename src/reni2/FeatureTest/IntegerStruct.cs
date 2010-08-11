@@ -41,13 +41,15 @@ Integer8:
     }
 
     [TestFixture, Output("3"), InstanceCode("(Integer8(1)+Integer8(2))")]
+    [IntegerPlusNumber]
     public class IntegerPlusInteger : IntegerStruct
     {
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun();}
     }
 
     [TestFixture, Output("3"), InstanceCode("(Integer8(1)+2)")]
+    [Create]
     public class IntegerPlusNumber : IntegerStruct
     {
         [Test, Category(Worked)]
@@ -55,13 +57,15 @@ Integer8:
     }
 
     [TestFixture, Output("23"), InstanceCode("Integer8(23) clone")]
+    [Create]
     public class Clone : IntegerStruct
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture, Output("23"), InstanceCode("Integer8(0) create(23)")]
+    [DumpPrint1, DumpPrint2, DumpPrint127]
     public class Create : IntegerStruct
     {
         [Test, Category(Worked)]

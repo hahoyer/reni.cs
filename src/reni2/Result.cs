@@ -422,7 +422,7 @@ namespace Reni
         /// <param name="replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
         /// <returns></returns>
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Result> replacement)
-            where TRefInCode : IRefInCode
+            where TRefInCode : IReferenceInCode
         {
             if(HasRefs && !Refs.Contains(refInCode))
                 return this;
@@ -444,7 +444,7 @@ namespace Reni
         /// <param name="replacement">The replacement. Should be a reference that varies when walking along code tree.</param>
         /// <returns></returns>
         internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacement)
-            where TRefInCode : IRefInCode
+            where TRefInCode : IReferenceInCode
         {
             if(HasRefs && !Refs.Contains(refInCode))
                 return this;
@@ -457,7 +457,10 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceObjectRefByArg(RefAlignParam refAlignParam, TypeBase objectType) { return objectType.ReplaceObjectRefByArg(this, refAlignParam); }
+        internal Result ReplaceObjectRefByArg(RefAlignParam refAlignParam, TypeBase objectType)
+        {
+            return objectType.ReplaceObjectRefByArg(this, refAlignParam);
+        }
 
         internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, CodeBase replacement)
         {
@@ -592,13 +595,6 @@ namespace Reni
                 _code = getCode();
             if (category.HasRefs)
                 _refs = getRefs();
-        }
-
-        internal Result StripFunctional()
-        {
-            if(!HasType)
-                return this;
-            return Type.StripFunctional().CreateResult(this);
         }
 
         internal Result ConvertToBitSequence(Category category)

@@ -106,12 +106,15 @@ namespace Reni.FeatureTest
 
         public abstract void Run();
 
-        protected void BaseRun()
+        public void RunFlat(){BaseRun(true);}
+
+        protected void BaseRun(bool isFlatCall = false)
         {
             if(_cache == null)
                 _cache = new Dictionary<System.Type, CompilerTest>();
 
-            RunDependants();
+            if(!isFlatCall)
+                RunDependants();
 
             foreach(var tuple in TargetSet)
                 CreateFileAndRunCompiler(1, GetType().Name, tuple.Item1, AssertValid, tuple.Item2);

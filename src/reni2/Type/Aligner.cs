@@ -44,7 +44,7 @@ namespace Reni.Type
             return Parent.Copier(category);
         }
 
-        internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
+        internal override TypeBase GetTypeForTypeOperator() { return Parent.GetTypeForTypeOperator(); }
 
         internal override Result ApplyTypeOperator(Result argResult)
         {

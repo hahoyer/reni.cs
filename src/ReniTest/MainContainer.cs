@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
 using Reni.FeatureTest;
+using Reni.FeatureTest.Function;
+using Reni.FeatureTest.Integer;
 
 namespace ReniTest
 {
@@ -24,8 +27,16 @@ namespace ReniTest
             
             //TestGenerated.Exec();
             //CompilerTest.Run("Test", Target, Output);
-            Assembly.GetExecutingAssembly().RunTests();
+            //Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
+            RunSpecificTest();
+        }
+
+        [Test, Category(CompilerTest.UnderConstruction)]
+        private static void RunSpecificTest()
+        {
+            new TwoFunctions().RunFlat();
+            new IntegerPlusNumber().RunFlat();
         }
 
         private static void InspectCompiler()

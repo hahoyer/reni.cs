@@ -7,7 +7,7 @@ using Reni.Context;
 
 namespace Reni.Code
 {
-    internal class LocalReference : CodeBase, IRefInCode
+    internal class LocalReference : CodeBase, IReferenceInCode
     {
         private readonly RefAlignParam _refAlignParam;
 
@@ -25,8 +25,8 @@ namespace Reni.Code
             StopByObjectId(-1100);
         }
 
-        RefAlignParam IRefInCode.RefAlignParam { get { return RefAlignParam; } }
-        bool IRefInCode.IsChildOf(ContextBase contextBase) { return false; }
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        bool IReferenceInCode.IsChildOf(ContextBase contextBase) { return false; }
 
         protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }

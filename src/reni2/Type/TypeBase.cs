@@ -26,22 +26,20 @@ namespace Reni.Type
             public readonly DictionaryEx<int, Sequence> Sequences;
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
             public readonly DictionaryEx<RefAlignParam, Reference> References;
-            public readonly SimpleCache<TypeType> TypeType;
+            public readonly DictionaryEx<RefAlignParam,ObjectReference> ObjectReferences;
             public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes;
-            public readonly DictionaryEx<RefAlignParam,ObjectRef> ObjectRefs;
             public readonly DictionaryEx<Struct.Context, DictionaryEx<int, Struct.Reference>> StructReferences;
 
             public Cache(TypeBase parent)
             {
                 StructReferences = new DictionaryEx<Struct.Context, DictionaryEx<int, Struct.Reference>>(context=> new DictionaryEx<int, Struct.Reference>(position=>new Struct.Reference(context,position)));
-                ObjectRefs = new DictionaryEx<RefAlignParam, ObjectRef>(refAlignParam=>new ObjectRef(parent, refAlignParam));
+                ObjectReferences = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam=>new ObjectReference(parent, refAlignParam));
                 FunctionalTypes = new DictionaryEx<IFunctionalFeature, FunctionAccessType>(feature => new FunctionAccessType(parent, feature));
                 References = new DictionaryEx<RefAlignParam, Reference>(refAlignParam => new Reference(parent, refAlignParam));
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Sequences = new DictionaryEx<int, Sequence>(elementCount => new Sequence(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
-                TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
             }
         }
 
@@ -77,9 +75,6 @@ namespace Reni.Type
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         internal abstract string DumpShort();
-
-        [DumpData(false)]
-        internal TypeType TypeType { get { return _cache.TypeType.Value; } }
 
         [DumpData(false)]
         internal virtual string DumpPrintText
@@ -128,7 +123,7 @@ namespace Reni.Type
         internal static TypeBase CreateNumber(int bitCount) { return CreateBit.CreateSequence(bitCount); }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase CreatePair(TypeBase second) { return second.CreateReversePair(this); }
-        internal virtual TypeBase GetEffectiveType() { return this; }
+        internal virtual TypeBase GetTypeForTypeOperator() { return this; }
         internal static Result CreateVoidCodeAndRefs(Category category) { return CreateVoidResult(category & (Category.Code | Category.Refs)); }
         internal static Result CreateVoidResult(Category category) { return CreateVoid.CreateResult(category); }
         internal virtual Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
@@ -254,7 +249,7 @@ namespace Reni.Type
 
         internal virtual IFunctionalFeature GetFunctionalFeature() { return null; }
 
-        internal virtual TypeBase StripFunctional()
+        protected virtual TypeBase GetObjectType()
         {
             NotImplementedMethod();
             return null;
@@ -279,7 +274,7 @@ namespace Reni.Type
         private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            bool trace = ObjectId == 197 && defineable.ObjectId == 23 && category.HasCode;
+            bool trace = ObjectId == -5 && defineable.ObjectId == 23 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
@@ -318,10 +313,12 @@ namespace Reni.Type
             return null;
         }
 
-        virtual internal Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
+        internal Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
         {
-            NotImplementedMethod(category,right,refAlignParam);
-            return null;
+            return GetFunctionalFeature()
+                .Apply(category, right(Category.Type).Type, refAlignParam)
+                .ReplaceArg(right(category))
+                .ReplaceObjectRefByArg(refAlignParam, GetObjectType());
         }
 
         internal Result ConvertToAsRef(Category category, Reference target) { 
@@ -346,7 +343,7 @@ namespace Reni.Type
 
         internal Result CreateObjectRefInCode(Category category, RefAlignParam refAlignParam)
         {
-            var objectRef = ObjectRef(refAlignParam);
+            var objectRef = ObjectReference(refAlignParam);
             return CreateReference(refAlignParam)
                 .CreateResult(
                 category, 
@@ -358,27 +355,9 @@ namespace Reni.Type
         internal Result ReplaceObjectRefByArg(Result result, RefAlignParam refAlignParam)
         {
             return result
-                .ReplaceAbsolute(ObjectRef(refAlignParam), () => CreateReference(refAlignParam).CreateArgResult(result.CompleteCategory));
+                .ReplaceAbsolute(ObjectReference(refAlignParam), () => CreateReference(refAlignParam).CreateArgResult(result.CompleteCategory));
         }
 
-        private ObjectRef ObjectRef(RefAlignParam refAlignParam) { return _cache.ObjectRefs.Find(refAlignParam); }
-    }
-
-    internal class ObjectRef: ReniObject, IRefInCode
-    {
-        [DumpData(true)]
-        private readonly TypeBase _objectType;
-        [DumpData(true)]
-        private readonly RefAlignParam _refAlignParam;
-
-        public ObjectRef(TypeBase objectType, RefAlignParam refAlignParam)
-        {
-            _objectType = objectType;
-            _refAlignParam = refAlignParam;
-        }
-
-        RefAlignParam IRefInCode.RefAlignParam { get { return _refAlignParam; } }
-        bool IRefInCode.IsChildOf(ContextBase contextBase) { return false; }
-        string IRefInCode.Dump() { return "ObjectRef("+_objectType.DumpShort()+")"; }
+        private ObjectReference ObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
     }
 }

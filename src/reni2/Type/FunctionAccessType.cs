@@ -3,11 +3,10 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Code;
-using Reni.Context;
 
 namespace Reni.Type
 {
-    internal class FunctionAccessType : TypeBase
+    sealed internal class FunctionAccessType : TypeBase
     {
         [DumpData(true)]
         private readonly TypeBase _objectType;
@@ -15,18 +14,20 @@ namespace Reni.Type
         [DumpData(true)]
         private readonly IFunctionalFeature _functionalFeature;
 
+
         public FunctionAccessType(TypeBase objectType, IFunctionalFeature functionalFeature)
         {
-            _objectType = objectType;
+            Tracer.Assert(!(objectType is Reference));
             _functionalFeature = functionalFeature;
-            StopByObjectId(51754);
+            _objectType = objectType;
+            StopByObjectId(-369);
         }
 
         protected override Size GetSize() { return _objectType.Size; }
         internal override string DumpPrintText { get { return _functionalFeature.DumpShort(); } }
         internal override string DumpShort() { return _objectType.DumpShort() + " " + _functionalFeature.DumpShort(); }
         internal override IFunctionalFeature GetFunctionalFeature() { return _functionalFeature; }
-        internal override TypeBase StripFunctional() { return _objectType; }
+        protected override TypeBase GetObjectType() { return _objectType; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -34,34 +35,27 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
-        {
-            var result = _functionalFeature.Apply(category, right(Category.Type).Type, refAlignParam);
-            return result
-                .ReplaceArg(right(category))
-                .ReplaceObjectRefByArg(refAlignParam, _objectType);
-        }
-
         internal Result ContextOperatorFeatureApply(Category category) { return _functionalFeature.ContextOperatorFeatureApply(category); }
     }
 
     internal class FunctionDefinitionType : TypeBase
     {
-        private readonly Function _function;
-        public FunctionDefinitionType(Function function)
+        private readonly FunctionalFeature _functionalFeature;
+        public FunctionDefinitionType(FunctionalFeature functionalFeature)
         {
-            _function = function;
+            _functionalFeature = functionalFeature;
             StopByObjectId(-191);
         }
 
         protected override Size GetSize() { return Size.Zero; }
-        internal override string DumpShort() { return _function.DumpShort(); }
+        internal override string DumpShort() { return _functionalFeature.DumpShort(); }
 
         internal override TypeBase AccessType(Struct.Context context, int position)
         {
             return context
-                .ContextReferenceType
-                .CreateFunctionalType(_function);
+                .ContextType
+                .CreateFunctionalType(_functionalFeature)
+                .CreateReference(context.RefAlignParam);
         }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -72,7 +66,7 @@ namespace Reni.Type
 
         public Result CreateDumpPrintResult(Category category)
         {
-            return CreateVoid.CreateResult(category, () => CodeBase.CreateDumpPrintText(_function.DumpPrintText));
+            return CreateVoid.CreateResult(category, () => CodeBase.CreateDumpPrintText(_functionalFeature.DumpPrintText));
         }
     }
 

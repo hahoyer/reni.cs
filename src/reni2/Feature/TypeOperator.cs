@@ -20,7 +20,11 @@ namespace Reni.Feature
         {
             var result = TypeBase.CreateVoidResult(category).Clone();
             if(category.HasType)
-                result.Type = context.Type(left).GetEffectiveType().TypeType;
+                result.Type = context
+                    .Type(left)
+                    .GetTypeForTypeOperator()
+                    .CreateReference(context.RefAlignParam)
+                    .TypeType;
             return result;
         }
 

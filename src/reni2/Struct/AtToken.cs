@@ -19,7 +19,7 @@ namespace Reni.Struct
             var typeBase = callContext.Type(left);
             var context = typeBase.GetStruct();
             var position = callContext.Evaluate(right, context.IndexType).ToInt32();
-            var atResult = context.CreateAtResultFromArg(category, position);
+            var atResult = context.CreateAccessResultFromArg(category, position);
 
             var leftResult = callContext.ResultAsRef(category, left);
             DumpWithBreak(trace, "atResult", atResult, "leftResult", leftResult);

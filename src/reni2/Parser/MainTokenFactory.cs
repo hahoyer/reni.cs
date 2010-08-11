@@ -3,6 +3,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser.TokenClass;
 using Reni.Parser.TokenClass.Name;
+using Reni.Sequence;
 using Reni.Struct;
 
 namespace Reni.Parser

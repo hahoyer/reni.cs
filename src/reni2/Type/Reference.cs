@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -13,13 +13,15 @@ namespace Reni.Type
         private static int _nextObjectId;
         private readonly TypeBase _target;
         private readonly RefAlignParam _refAlignParam;
-        
+        private readonly SimpleCache<TypeType> _typeTypeCache;
+
         internal Reference(TypeBase target, RefAlignParam refAlignParam)
             :base(_nextObjectId++)
         {
             Tracer.Assert(!(target is Reference));
             _target = target;
             _refAlignParam = refAlignParam;
+            _typeTypeCache = new SimpleCache<TypeType>(() => new TypeType(this));
         }
 
         internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
@@ -31,7 +33,7 @@ namespace Reni.Type
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
-        internal override sealed bool IsRef(RefAlignParam refAlignParam)
+        internal override bool IsRef(RefAlignParam refAlignParam)
         {
             Tracer.Assert(RefAlignParam == refAlignParam);
             return true;
@@ -39,6 +41,8 @@ namespace Reni.Type
 
         internal override string DumpShort() { return "reference(" + _target.DumpShort() + ")"; }
         internal override int GetSequenceCount(TypeBase elementType) { return _target.GetSequenceCount(elementType); }
+
+        internal override bool IsRefLike(Reference target) { return Target == target.Target && RefAlignParam == target.RefAlignParam; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -88,59 +92,27 @@ namespace Reni.Type
                 .CreateDereference(RefAlignParam, _target.Size);
         }
 
-        internal override sealed TypeBase AutomaticDereference() { return _target.AutomaticDereference(); }
+        internal override TypeBase AutomaticDereference() { return _target.AutomaticDereference(); }
+        internal override TypeBase GetTypeForTypeOperator() { return _target.GetTypeForTypeOperator(); }
 
-        internal override sealed Result AutomaticDereference(Result result)
+        internal override Result AutomaticDereference(Result result)
         {
             Result useWithArg = CreateDereferencedArgResult(result.CompleteCategory).ReplaceArg(result);
             return _target
                 .AutomaticDereference(useWithArg);
         }
-    }
 
-    [Obsolete("",true)]
-    internal abstract class Ref : Child
-    {
-        private static int _nextObjectId;
-        internal readonly RefAlignParam RefAlignParam;
+        private Result CreateObjectRefInCode(Category category) { return Target.CreateObjectRefInCode(category, RefAlignParam); }
 
-        protected Ref(TypeBase target, RefAlignParam refAlignParam)
-            : base(_nextObjectId++, target)
+        internal Result CreateResult(Category category, bool isContextFeature)
         {
-            RefAlignParam = refAlignParam;
-            StopByObjectId(-6);
+            if(isContextFeature)
+                return CreateObjectRefInCode(category);
+            return CreateArgResult(category);
         }
 
-        protected override sealed Size GetSize() { return RefAlignParam.RefSize; }
-
         [DumpData(false)]
-        internal override sealed string DumpPrintText { get { return "#(#" + ShortName + "#)# " + Parent.DumpPrintText; } }
+        internal TypeType TypeType { get { return _typeTypeCache.Value; } }
 
-        [DumpData(false)]
-        protected abstract string ShortName { get; }
-
-        internal override sealed int GetSequenceCount(TypeBase elementType) { return Parent.GetSequenceCount(elementType); }
-
-        internal override sealed Result Destructor(Category category) { return CreateVoidCodeAndRefs(category); }
-
-        internal override sealed Result Copier(Category category) { return CreateVoidCodeAndRefs(category); }
-
-        [DumpData(false)]
-        internal override Size UnrefSize { get { return Parent.UnrefSize; } }
-
-        internal override sealed string DumpShort() { return ShortName + "." + Parent.DumpShort(); }
-
-        internal override sealed Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
-
-        internal override bool IsRefLike(Reference target) { return Parent == target.Target && RefAlignParam == target.RefAlignParam; }
-
-        protected override bool IsInheritor { get { return true; } }
-
-        internal override TypeBase GetEffectiveType() { return Parent.GetEffectiveType(); }
-    }
-
-    internal interface IRef
-    {
-        IFeature GetDumpPrintFeature();
     }
 }

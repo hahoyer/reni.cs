@@ -10,7 +10,7 @@ namespace Reni
     {
         void Search();
         void ChildSearch<TType>(TType target) where TType : IDumpShortProvider;
-        ISearchVisitor Child(Sequence target);
+        ISearchVisitor Child(Type.Sequence target);
         ISearchVisitor Child(Struct.Reference target);
         ISearchVisitor Child(Type.Reference target);
     }

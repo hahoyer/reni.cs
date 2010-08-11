@@ -13,8 +13,10 @@ namespace Reni.Struct
     {
         [DumpData(true)]
         private readonly Context _context;
+
         [DumpData(true)]
         private readonly int _position;
+
         private readonly SimpleCache<TypeBase> _targetCache;
 
         [DumpData(false)]
@@ -33,7 +35,7 @@ namespace Reni.Struct
             var refType = CreateTypeReference();
             var result = refType.GenericDumpPrint(category);
             if(result.HasArg)
-               result = result.ReplaceArg(CreateAccessResult(category));
+                result = result.ReplaceArg(CreateAccessResult(category));
             return result;
         }
 
@@ -46,80 +48,44 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        internal override Result AutomaticDereference(Result result)
-        {
-            return CreateDereferencedResult(result.CompleteCategory).ReplaceArg(result);
-        }
+        internal override Result AutomaticDereference(Result result) { return CreateAccessResult(result.CompleteCategory).ReplaceArg(result); }
 
         protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
         {
-            var destAsRef = AsTypeReference(dest);
-            if(destAsRef != null)
-                return CreateTypeReference().CreateResult(category,CreateAccessCode);
-
             return Target
                 .Conversion(category, dest)
-                .ReplaceArg(CreateDereferencedResult(category));
+                .ReplaceArg(CreateAccessResult(category));
         }
 
-        protected override Size GetSize() { return _context.RefSize; }
+        protected override Size GetSize() { return Target.Size; }
         internal override string DumpShort() { return String.Format("type(this at {0})", _position); }
         internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + _position; } }
 
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
-        {
-            return AsTypeReference(dest) != null
-                   || Target.IsConvertableTo(dest, conversionFeature);
-        }
+        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature) { return Target.IsConvertableTo(dest, conversionFeature); }
 
         internal override IFunctionalFeature GetFunctionalFeature() { return Target.GetFunctionalFeature(); }
 
-        internal override bool IsRef(RefAlignParam refAlignParam)
-        {
-            Tracer.Assert(RefAlignParam == refAlignParam);
-            return true;
-        }
         internal override int GetSequenceCount(TypeBase elementType) { return Target.GetSequenceCount(elementType); }
-        internal override TypeBase GetEffectiveType() { return Target.GetEffectiveType(); }
-
-        private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
-
-        private Reni.Type.Reference AsTypeReference(TypeBase dest)
-        {
-            var destAsRef = dest as Reni.Type.Reference;
-            if(destAsRef == null)
-                return null;
-            if(RefAlignParam != destAsRef.RefAlignParam)
-                return null;
-            if(Target != destAsRef.Target)
-                return null;
-
-            return destAsRef;
-        }
+        internal override TypeBase GetTypeForTypeOperator() { return Target.GetTypeForTypeOperator(); }
 
         private Result CreateAccessResult(Category category) { return CreateResult(category, CreateAccessCode); }
 
         private CodeBase CreateAccessCode()
         {
-            return CreateArgCode()
-                .CreateRefPlus(RefAlignParam, GetOffset(), "CreateAccessCode");
+            return CodeBase.CreateArg(RefAlignParam.RefSize)
+                .CreateRefPlus(RefAlignParam, GetOffset(), "CreateAccessCode")
+                .CreateDereference(RefAlignParam, Size);
         }
 
         private Result CreateTargetReferenceResult(Category category)
         {
-            return CreateObjectRefInCode(category|Category.Type, RefAlignParam)
-                .ConvertTo(CreateTypeReference()) & category;
+            return CreateObjectRefInCode(category | Category.Type, RefAlignParam)
+                       .ConvertTo(CreateTypeReference()) & category;
         }
 
-        private Reni.Type.Reference CreateTypeReference() { return Target.CreateReference(RefAlignParam); }
+        internal Reni.Type.Reference CreateTypeReference() { return Target.CreateReference(RefAlignParam); }
 
-        private Result CreateDereferencedResult(Category category)
-        {
-            return Target
-                .CreateDereferencedResult(category, RefAlignParam)
-                .ReplaceArg(CreateAccessResult(category));
-        }
-
+        private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
         private Size GetOffset() { return _context.Offset(_position); }
         private TypeBase GetTargetType() { return _context.RawType(_position); }
 
@@ -129,17 +95,23 @@ namespace Reni.Struct
                 .CreateResult
                 (
                     category,
-                    () => CodeBase.CreateArg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, Target.Size)
+                    () => CodeBase.CreateArg(RefAlignParam.RefSize*2).CreateAssignment(RefAlignParam, Target.Size)
                 );
 
-            if (!category.HasCode && !category.HasRefs)
+            if(!category.HasCode && !category.HasRefs)
                 return result;
 
-            var sourceResult = argsType.ConvertTo(category|Category.Type, Target).CreateLocalReferenceResult(RefAlignParam);
+            var sourceResult = argsType.ConvertTo(category | Category.Type, Target).CreateLocalReferenceResult(RefAlignParam);
             var destinationResult = CreateTargetReferenceResult(category);
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
             return result.ReplaceArg(objectAndSourceRefs);
         }
 
+        internal Result ApplyAssignment(Category category)
+        {
+            return CreateTypeReference()
+                .CreateFunctionalType(AssignmentFeature)
+                .CreateArgResult(category);
+        }
     }
 }

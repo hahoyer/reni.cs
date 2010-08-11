@@ -121,13 +121,13 @@ namespace Reni.Context
                 AssertCorrectRefs(result.Code.RefsData);
         }
 
-        private void AssertCorrectRefs(IEnumerable<IRefInCode> refs)
+        private void AssertCorrectRefs(IEnumerable<IReferenceInCode> refs)
         {
             foreach(var @ref in refs)
                 CheckRef(@ref);
         }
 
-        private void CheckRef(IRefInCode @ref) { Tracer.Assert(!@ref.IsChildOf(this), ()=>"context=" + Dump() + "\nref=" + @ref.Dump()); }
+        private void CheckRef(IReferenceInCode reference) { Tracer.Assert(!reference.IsChildOf(this), ()=>"context=" + Dump() + "\nref=" + reference.Dump()); }
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
         {
@@ -176,7 +176,7 @@ namespace Reni.Context
 
         internal Result GetResult(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = right!= null && right.ObjectId == -126 && category.HasCode;
+            var trace = defineable.ObjectId == 46 && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -200,7 +200,7 @@ namespace Reni.Context
 
             var suffixType = suffixResult.Type;
             DumpWithBreak(trace, "suffixType", suffixType );
-            var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right), RefAlignParam);
+            var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right),RefAlignParam);
             DumpWithBreak(trace, "result",result);
             return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult.CreateLocalReferenceResult(RefAlignParam)));
         }

@@ -16,7 +16,7 @@ namespace Reni.Code
             return default(T);
         }
 
-        internal virtual T ContextRef(RefCode visitedObject)
+        internal virtual T ContextRef(ReferenceCode visitedObject)
         {
             NotImplementedMethod(visitedObject);
             return default(T);

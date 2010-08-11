@@ -29,22 +29,8 @@ namespace Reni.Struct
         }
 
         TypeBase IFeature.DefiningType() { return _structContext.ContextReferenceType; }
-        Result IFeature.Apply(Category category) { return PropertyApply(category, category1 => _structContext.CreateAtResultFromArg(category1, _position)); }
-        Result IContextFeature.Apply(Category category) { return PropertyApply(category, category1 => _structContext.CreateAtResultFromContext(category1, _position)); }
 
-        private Result PropertyApply(Category category, Func<Category, Result> getResult)
-        {
-            var result = getResult(_isProperty ? Category.Type : category);
-            if (!_isProperty)
-                return result;
-            var propertyApply = result
-                .Type
-                .GetFunctionalFeature()
-                .Apply(category, TypeBase.CreateVoid, _structContext.RefAlignParam)
-                .ReplaceArg(TypeBase.CreateVoidResult(category));
-            return propertyApply;
-
-        }
-
+        Result IFeature.Apply(Category category) { return _structContext.PositionFeatureApply(category, _position, _isProperty, false); }
+        Result IContextFeature.Apply(Category category) { return _structContext.PositionFeatureApply(category, _position, _isProperty, true); }
     }
 }

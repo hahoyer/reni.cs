@@ -20,7 +20,7 @@ namespace Reni.Code
             Tracer.Assert(leafElement != null);
             _parent = parent;
             _leafElement = leafElement;
-            StopByObjectId(-54);
+            StopByObjectId(6);
         }
 
         [Node]

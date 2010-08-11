@@ -11,4 +11,6 @@ namespace Reni.Type
         Result DumpPrintFeatureApply(Category category);
         Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam);
     }
+
+
 }

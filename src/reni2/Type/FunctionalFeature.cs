@@ -8,14 +8,13 @@ using Reni.Syntax;
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class Function : ReniObject, IFunctionalFeature
+    internal sealed class FunctionalFeature : ReniObject, IFunctionalFeature
     {
         private readonly ICompileSyntax _body;
-
         private readonly Struct.Context _context;
         private static int _nextObjectId;
 
-        internal Function(Struct.Context context, ICompileSyntax body)
+        internal FunctionalFeature(Struct.Context context, ICompileSyntax body)
             : base(_nextObjectId++)
         {
             _context = context;
@@ -24,7 +23,12 @@ namespace Reni.Type
 
         public string DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _context.ObjectId + "#)#"; }
 
-        Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { return _context.CreateContextReference(category); }
+        Result IFunctionalFeature.ContextOperatorFeatureApply(Category category)
+        {
+            return _context
+                .ContextReferenceType
+                .CreateArgResult(category);
+        }
 
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category)
         {

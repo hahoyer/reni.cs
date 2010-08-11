@@ -15,43 +15,43 @@ namespace Reni
     internal sealed class Refs : ReniObject
     {
         private static int _nextId;
-        private readonly List<IRefInCode> _data;
+        private readonly List<IReferenceInCode> _data;
         private SizeArray _sizesCache;
 
         private Refs()
             : base(_nextId++)
         {
-            _data = new List<IRefInCode>();
+            _data = new List<IReferenceInCode>();
             StopByObjectId(-49);
         }
 
-        private Refs(IRefInCode context)
+        private Refs(IReferenceInCode context)
             : this() { Add(context); }
 
-        private Refs(IEnumerable<IRefInCode> a, IEnumerable<IRefInCode> b)
+        private Refs(IEnumerable<IReferenceInCode> a, IEnumerable<IReferenceInCode> b)
             : this()
         {
             AddRange(a);
             AddRange(b);
         }
 
-        private Refs(IEnumerable<IRefInCode> a)
+        private Refs(IEnumerable<IReferenceInCode> a)
             : this() { AddRange(a); }
 
-        private void AddRange(IEnumerable<IRefInCode> a)
+        private void AddRange(IEnumerable<IReferenceInCode> a)
         {
             foreach(var e in a)
                 Add(e);
         }
 
-        private void Add(IRefInCode e)
+        private void Add(IReferenceInCode e)
         {
             if(!_data.Contains(e))
                 _data.Add(e);
         }
 
         [Node]
-        public List<IRefInCode> Data { get { return _data; } }
+        public List<IReferenceInCode> Data { get { return _data; } }
 
         [DumpData(false)]
         private SizeArray Sizes
@@ -59,14 +59,14 @@ namespace Reni
             get
             {
                 if(_sizesCache == null)
-                    _sizesCache = CalcSizes();
+                    _sizesCache = CalculateSizes();
                 return _sizesCache;
             }
         }
 
         public int Count { get { return _data.Count; } }
 
-        public IRefInCode this[int i] { get { return _data[i]; } }
+        public IReferenceInCode this[int i] { get { return _data[i]; } }
         public Size Size { get { return Sizes.Size; } }
         public bool IsNone { get { return Count == 0; } }
 
@@ -81,7 +81,7 @@ namespace Reni
             return new Refs(_data, refs._data);
         }
 
-        internal static Refs Create(IRefInCode refInCode) { return new Refs(refInCode); }
+        internal static Refs Create(IReferenceInCode referenceInCode) { return new Refs(referenceInCode); }
 
         public override string DumpData()
         {
@@ -95,19 +95,19 @@ namespace Reni
             return result;
         }
 
-        private SizeArray CalcSizes()
+        private SizeArray CalculateSizes()
         {
             var result = new SizeArray();
-            for(int i = 0, n = Count; i < n; i++)
+            for(var i = 0; i < Count; i++)
                 result.Add((this)[i].RefAlignParam.RefSize);
             return result;
         }
 
-        public Refs Without(IRefInCode e)
+        public Refs Without(IReferenceInCode e)
         {
             if(!_data.Contains(e))
                 return this;
-            var r = new List<IRefInCode>(_data);
+            var r = new List<IReferenceInCode>(_data);
             r.Remove(e);
             return new Refs(r);
         }
@@ -120,7 +120,7 @@ namespace Reni
             return result;
         }
 
-        public bool Contains(IRefInCode context) { return _data.Contains(context); }
+        public bool Contains(IReferenceInCode context) { return _data.Contains(context); }
 
         public bool Contains(Refs other)
         {
@@ -155,6 +155,6 @@ namespace Reni
 
         public static Refs operator +(Refs x, Refs y) { return x.CreateSequence(y); }
         public static Refs operator -(Refs x, Refs y) { return x.Without(y); }
-        public static Refs operator -(Refs x, IRefInCode y) { return x.Without(y); }
+        public static Refs operator -(Refs x, IReferenceInCode y) { return x.Without(y); }
     }
 }

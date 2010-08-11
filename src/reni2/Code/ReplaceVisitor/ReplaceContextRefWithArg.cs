@@ -4,7 +4,7 @@ using HWClassLibrary.Debug;
 namespace Reni.Code.ReplaceVisitor
 {
     internal abstract class ReplaceContextRef<Context> : Base
-        where Context : IRefInCode
+        where Context : IReferenceInCode
     {
         protected readonly Context _context;
         protected readonly Func<CodeBase> _replacement;
@@ -15,9 +15,9 @@ namespace Reni.Code.ReplaceVisitor
             _replacement = replacement;
         }
 
-        internal override CodeBase ContextRef(RefCode visitedObject)
+        internal override CodeBase ContextRef(ReferenceCode visitedObject)
         {
-            if(visitedObject.Context == (IRefInCode) _context)
+            if(visitedObject.Context == (IReferenceInCode) _context)
                 return _replacement();
             return null;
         }
@@ -29,7 +29,7 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     /// <typeparam name="Context"></typeparam>
     internal sealed class ReplaceRelativeContextRef<Context>: ReplaceContextRef<Context>
-        where Context : IRefInCode
+        where Context : IReferenceInCode
     {
         public ReplaceRelativeContextRef(Context context, Func<CodeBase> replacement)
             : base(context, replacement) { }
@@ -48,7 +48,7 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     /// <typeparam name="Context"></typeparam>
     internal sealed class ReplaceAbsoluteContextRef<Context> : ReplaceContextRef<Context>
-        where Context : IRefInCode
+        where Context : IReferenceInCode
     {
         public ReplaceAbsoluteContextRef(Context context, Func<CodeBase> replacement)
             : base(context, replacement) { }

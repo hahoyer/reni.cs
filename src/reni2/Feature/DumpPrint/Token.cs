@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.Parser.TokenClass;
-using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
@@ -10,13 +10,13 @@ namespace Reni.Feature.DumpPrint
     internal sealed class Token :
         Defineable,
         IFeature,
-        ISearchPath<ISearchPath<IFeature, Type.Reference>,Struct.Type>,
+        ISearchPath<ISearchPath<IFeature, Reference>, Struct.Type>,
         ISearchPath<IFeature, TypeType>,
         ISearchPath<IFeature, Bit>,
         ISearchPath<IFeature, Type.Void>,
         ISearchPath<IFeature, Struct.Type>,
         ISearchPath<IFeature, Struct.Reference>,
-        ISearchPath<ISearchPath<IFeature, Sequence>, Bit>,
+        ISearchPath<ISearchPath<IFeature, Type.Sequence>, Bit>,
         ISearchPath<IFeature, FunctionDefinitionType>
     {
         private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
@@ -29,8 +29,8 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, Struct.Reference>.Convert(Struct.Reference type) { return new Feature(type.CreateDumpPrintResult); }
         IFeature ISearchPath<IFeature, FunctionDefinitionType>.Convert(FunctionDefinitionType type) { return new Feature(type.CreateDumpPrintResult); }
 
-        ISearchPath<IFeature, Sequence> ISearchPath<ISearchPath<IFeature, Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
-        ISearchPath<IFeature, Type.Reference> ISearchPath<ISearchPath<IFeature, Type.Reference>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintReferenceFeature; }
+        ISearchPath<IFeature, Type.Sequence> ISearchPath<ISearchPath<IFeature, Type.Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
+        ISearchPath<IFeature, Reference> ISearchPath<ISearchPath<IFeature, Reference>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintReferenceFeature; }
 
         Result IFeature.Apply(Category category)
         {
@@ -43,7 +43,5 @@ namespace Reni.Feature.DumpPrint
             NotImplementedMethod();
             return null;
         }
-
     }
-
 }
