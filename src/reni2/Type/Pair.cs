@@ -25,7 +25,7 @@ namespace Reni.Type
             return First.Size + Second.Size;
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override string DumpPrintText
         {
             get
@@ -41,7 +41,7 @@ namespace Reni.Type
             }
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected internal override TypeBase[] ToList
         {
             get

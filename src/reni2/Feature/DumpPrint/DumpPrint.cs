@@ -9,7 +9,7 @@ namespace Reni.Feature.DumpPrint
 {
     internal abstract class BitFeatureBase : ReniObject
     {
-        protected static Result Apply(Category category, int objSize) { return TypeBase.CreateVoid.CreateResult(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
+        protected static Result Apply(Category category, int objSize) { return TypeBase.Void.Result(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
     }
 
     internal sealed class BitSequenceFeature :
@@ -28,8 +28,8 @@ namespace Reni.Feature.DumpPrint
         Result IFeature.Apply(Category category)
         {
             return
-                Apply(category, _parent.GetSequenceCount(TypeBase.CreateBit))
-                    .ReplaceArg(_parent.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
+                Apply(category, _parent.SequenceCount(TypeBase.Bit))
+                    .ReplaceArg(_parent.ArgResult(category).Align(BitsConst.SegmentAlignBits));
         }
 
         TypeBase IFeature.DefiningType() { return _parent; }
@@ -41,15 +41,15 @@ namespace Reni.Feature.DumpPrint
         {
             return
                 Apply(category, 1)
-                    .ReplaceArg(TypeBase.CreateBit.CreateArgResult(category).Align(BitsConst.SegmentAlignBits));
+                    .ReplaceArg(TypeBase.Bit.ArgResult(category).Align(BitsConst.SegmentAlignBits));
         }
 
-        TypeBase IFeature.DefiningType() { return TypeBase.CreateBit; }
+        TypeBase IFeature.DefiningType() { return TypeBase.Bit; }
     }
 
     internal class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Reference>, IFeature
     {
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly Struct.Type _type;
 
         public StructReferenceFeature(Struct.Type type) { _type = type; }

@@ -49,14 +49,14 @@ namespace Reni.Type
             return Parent.ArrayCopier(category, count);
         }
 
-        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return Parent.ConvertTo(category, dest);
         }
 
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
-            return Parent.IsConvertableTo(dest, conversionFeature);
+            return Parent.IsConvertableTo(dest, conversionParameter);
         }
         protected override bool IsInheritor
         {

@@ -41,6 +41,7 @@ namespace Reni.Code
 
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalBlockEnd(Size, _intermediateSize); }
 
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " IntermediateSize=" + _intermediateSize; } }
     }
 }

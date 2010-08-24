@@ -9,7 +9,7 @@ namespace Reni.Code
     [Serializable]
     internal abstract class Top : LeafElement
     {
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         internal protected readonly Size Offset;
         private readonly RefAlignParam _refAlignParam;
         private readonly Size _size;
@@ -34,9 +34,12 @@ namespace Reni.Code
             return Size.Zero;
         }
 
+        [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        [IsDumpEnabled(false)]
         protected Size DataSize { get { return _dataSize; } }
 
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset + " DataSize=" + _dataSize; } }
     }
 }

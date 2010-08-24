@@ -16,28 +16,28 @@ namespace Reni.Code
     [Serializable]
     internal sealed class Leaf : CodeBase
     {
-        private readonly LeafElement _leafElement;
+        private readonly StartingLeafElement _leafElement;
 
         // Warnind disabled, since it is used for debugging purposes
         [UsedImplicitly]
         internal static bool TryToCombine;
 
-        internal Leaf(LeafElement leafElement)
+        internal Leaf(StartingLeafElement leafElement)
         {
             _leafElement = leafElement;
             StopByObjectId(-526);
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected override Size SizeImplementation { get { return LeafElement.Size; } }
 
         [Node]
-        internal LeafElement LeafElement { get { return _leafElement; } }
+        internal StartingLeafElement LeafElement { get { return _leafElement; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override bool IsEmpty { get { return LeafElement.IsEmpty; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return LeafElement.RefAlignParam; } }
 
         internal override CodeBase CreateChild(LeafElement leafElement)
@@ -49,7 +49,9 @@ namespace Reni.Code
             if(newLeafElements == null)
                 return base.CreateChild(leafElement);
 
-            CodeBase result = new Leaf(newLeafElements[0]);
+            var startingLeafElement = newLeafElements[0] as StartingLeafElement;
+            Tracer.Assert(startingLeafElement != null);
+            CodeBase result = new Leaf(startingLeafElement);
             for(var i = 1; i < newLeafElements.Length; i++)
                 result = result.CreateChild(newLeafElements[i]);
             return result;
@@ -57,7 +59,7 @@ namespace Reni.Code
 
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
         {
-            return actual.Leaf(LeafElement);
+            return actual.Leaf((LeafElement) LeafElement);
         }
 
         internal override BitsConst Evaluate()

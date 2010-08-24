@@ -23,7 +23,7 @@ namespace Reni.Parser
         protected ParsedSyntax(Token token, int nextObjectId)
             : base(nextObjectId) { Token = token; }
 
-        [DumpData(false), UsedImplicitly]
+        [IsDumpEnabled(false), UsedImplicitly]
         public new string NodeDump { get { return base.NodeDump + " " + DumpShort(); } }
 
         public override sealed string Dump()

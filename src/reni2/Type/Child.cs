@@ -20,10 +20,10 @@ namespace Reni.Type
             _parent = parent;
         }
 
-        [Node, DumpData(true)]
+        [Node, IsDumpEnabled(true)]
         public TypeBase Parent { get { return _parent; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected internal override int IndexSize { get { return Parent.IndexSize; } }
 
         protected abstract bool IsInheritor { get; }

@@ -20,11 +20,11 @@ namespace Reni
             _objectId = nextObjectId;
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public virtual int ObjectId { get { return _objectId; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public virtual string NodeDump { get { return GetType().FullName + "." + ObjectId; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal bool IsStopByObjectIdActive { get; private set; }
 
         public override string Dump()

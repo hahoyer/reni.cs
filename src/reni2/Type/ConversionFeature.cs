@@ -1,36 +1,25 @@
-using System;
-using HWClassLibrary.Debug;
+﻿using System;
+using Reni.Context;
 
 namespace Reni.Type
 {
-    internal class ConversionFeature : ReniObject
+    internal class ConversionFeature : IFunctionalFeature
     {
-        private static ConversionFeature _instance;
-        private readonly bool _isDisableCut;
-        private readonly bool _isUseConverter;
+        private readonly TypeBase _typeBase;
 
-        private ConversionFeature(bool isUseConverter, bool isDisableCut)
+        public ConversionFeature(TypeBase typeBase)
         {
-            _isUseConverter = isUseConverter;
-            _isDisableCut = isDisableCut;
+            _typeBase = typeBase;
         }
 
-        [DumpData(false)]
-        internal ConversionFeature EnableCut { get { return new ConversionFeature(IsUseConverter, false); } }
-        [DumpData(false)]
-        internal ConversionFeature DontUseConverter { get { return new ConversionFeature(false, IsDisableCut); } }
+        string IDumpShortProvider.DumpShort() { return _typeBase.DumpShort() + " type"; }
 
-        internal bool IsDisableCut { get { return _isDisableCut; } }
-        internal bool IsUseConverter { get { return _isUseConverter; } }
+        Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
+        Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
 
-        internal static ConversionFeature Instance
+        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            get
-            {
-                if(_instance == null)
-                    _instance = new ConversionFeature(true, true);
-                return _instance;
-            }
+            return argsType.Conversion(category, _typeBase);
         }
     }
 }

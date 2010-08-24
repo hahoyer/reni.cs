@@ -11,15 +11,12 @@ using Reni;
 using Reni.FeatureTest;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
+using Reni.FeatureTest.Struct;
 
 namespace ReniTest
 {
     public static class MainContainer
     {
-
-        private const string Target = @"! property x: 11/\; x dump_print";
-        const string Output = "11";
-
         public static void Main()
         {
             Application.EnableVisualStyles();
@@ -27,28 +24,22 @@ namespace ReniTest
             
             //TestGenerated.Exec();
             //CompilerTest.Run("Test", Target, Output);
+            RunSpecificTest();
             //Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
-            RunSpecificTest();
         }
 
         [Test, Category(CompilerTest.UnderConstruction)]
         private static void RunSpecificTest()
         {
-            new TwoFunctions().RunFlat();
+            new InnerAccess().RunFlat();
+            new AccessAndAdd().RunFlat();
             new IntegerPlusNumber().RunFlat();
         }
 
-        private static void InspectCompiler()
-        {
-            Application.Run
-                (
-                    new TreeForm
-                        {
-                            Target = CreateCompiler(Target)
-                        }
-                );
-        }
+        private const string Target = @"! property x: 11/\; x dump_print";
+        const string Output = "11";
+        private static void InspectCompiler() { Application.Run(new TreeForm { Target = CreateCompiler(Target) }); }
 
         private static Compiler CreateCompiler(string text)
         {

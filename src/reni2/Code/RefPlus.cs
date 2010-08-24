@@ -15,13 +15,13 @@ namespace Reni.Code
     {
         private readonly RefAlignParam _refAlignParam;
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         private readonly Size _right;
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         private readonly string _reason;
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         public RefPlus(RefAlignParam refAlignParam, Size right, string reason)
@@ -35,6 +35,7 @@ namespace Reni.Code
 
         private void AssertValid() { _right.AssertAlignedSize(RefAlignParam.AlignBits); }
 
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Right=" + _right + " Reason=" + _reason; } }
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.RefPlus(Size, _right); }
 
@@ -50,12 +51,14 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(TopRef precedingElement)
         {
+            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopRef(RefAlignParam, precedingElement.Offset + _right);
         }
 
         internal override LeafElement TryToCombineBack(FrameRef precedingElement)
         {
+            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new FrameRef(RefAlignParam, precedingElement.Offset + _right);
         }
@@ -68,6 +71,7 @@ namespace Reni.Code
 
         internal override LeafElement TryToCombineBack(RefPlus precedingElement)
         {
+            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
                 return new RefPlus(RefAlignParam, _right + precedingElement._right, _reason + " + " + precedingElement._reason);
             return base.TryToCombineBack(precedingElement);

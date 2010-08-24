@@ -80,7 +80,7 @@ namespace Reni.Code
 
     internal sealed class Else : LeafElement
     {
-        [Node, DumpData(true)]
+        [Node, IsDumpEnabled(true)]
         private readonly Size _thenSize;
 
         public Else(Size thenSize)
@@ -148,9 +148,9 @@ namespace Reni.Code
     [Serializable]
     internal class BitArrayOpThen : LeafElement
     {
-        [Node, DumpData(true)]
+        [Node, IsDumpEnabled(true)]
         private readonly BitArrayBinaryOp _bitArrayBinaryOp;
-        [Node, DumpData(true)]
+        [Node, IsDumpEnabled(true)]
         private readonly Then _thenCode;
 
         public BitArrayOpThen(Then thenCode, BitArrayBinaryOp bitArrayBinaryOp)

@@ -6,7 +6,7 @@ namespace Reni.Context
     /// <summary>
     /// Parameter to describe alignment for references
     /// </summary>
-    [dump("Dump")]
+    [Dump("Dump")]
     [Serializable]
     sealed internal class RefAlignParam : IEquatable<RefAlignParam>
     {

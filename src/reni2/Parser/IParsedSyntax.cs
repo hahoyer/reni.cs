@@ -11,7 +11,7 @@ namespace Reni.Parser
         string Dump();
         string DumpShort();
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         Token Token { get; }
 
         Token FirstToken { get; }

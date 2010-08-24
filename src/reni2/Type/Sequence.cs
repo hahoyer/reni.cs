@@ -19,10 +19,10 @@ namespace Reni.Type
     {
         private readonly Array _inheritedType;
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal readonly IFeature BitDumpPrintFeature;
 
-        internal Result EnableCutFeature(Category category){ return new EnableCut(this).CreateArgResult(category);}
+        internal Result EnableCutFeature(Category category){ return new EnableCut(this).ArgResult(category);}
 
         internal IFeature Feature(FeatureBase featureBase) { return new Reni.Sequence.FunctionalFeature(this, featureBase); }
 
@@ -31,43 +31,43 @@ namespace Reni.Type
         public Sequence(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0, () => "count=" + count);
-            _inheritedType = elementType.CreateArray(count);
+            _inheritedType = elementType.Array(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             StopByObjectId(-172);
         }
 
-        [DumpData(false), UsedImplicitly]
+        [IsDumpEnabled(false), UsedImplicitly]
         internal Array InheritedType { get { return _inheritedType; } }
 
         protected override Size GetSize() { return _inheritedType.Size; }
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
 
-        internal override int GetSequenceCount(TypeBase elementType) { return elementType == Element ? Count : 1; }
+        internal override int SequenceCount(TypeBase elementType) { return elementType == Element ? Count : 1; }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal int Count { get { return _inheritedType.Count; } }
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
         internal override string DumpShort() { return "(" + Element.DumpShort() + ")sequence(" + Count + ")"; }
 
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
             var destSequence = dest as Sequence;
             if(destSequence != null)
             {
-                if(conversionFeature.IsDisableCut && Count > destSequence.Count)
+                if(conversionParameter.IsDisableCut && Count > destSequence.Count)
                     return false;
-                return Element.IsConvertableTo(destSequence.Element, conversionFeature.DontUseConverter);
+                return Element.IsConvertableTo(destSequence.Element, conversionParameter.DontUseConverter);
             }
 
             var destAligner = dest as Aligner;
             if(destAligner != null)
-                return IsConvertableTo(destAligner.Parent, conversionFeature);
+                return IsConvertableTo(destAligner.Parent, conversionParameter);
 
-            return base.IsConvertableTo_Implementation(dest, conversionFeature);
+            return base.IsConvertableToImplementation(dest, conversionParameter);
         }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -76,7 +76,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             var result = ConvertTo(category, dest as Sequence);
             if(result != null)
@@ -99,7 +99,7 @@ namespace Reni.Type
             if(dest == null)
                 return null;
 
-            var result = CreateArgResult(category);
+            var result = ArgResult(category);
             if(Count > dest.Count)
                 result = RemoveElementsAtEnd(category, dest.Count);
 
@@ -126,16 +126,16 @@ namespace Reni.Type
             if(dest == null)
                 return null;
             var result = ConvertTo(category, dest.Parent);
-            return dest.CreateResult(category, () => result.Code, () => result.Refs);
+            return dest.Result(category, () => result.Code, () => result.Refs);
         }
 
         private Result ExtendFrom(Category category, int oldCount)
         {
             var oldSize = Element.Size*oldCount;
-            var result = CreateResult
+            var result = Result
                 (
                     category,
-                    () => CodeBase.CreateArg(oldSize).CreateBitCast(Size)
+                    () => CodeBase.Arg(oldSize).CreateBitCast(Size)
                 );
             return result;
         }
@@ -149,12 +149,12 @@ namespace Reni.Type
                 return null;
             }
             var tempNewCount = Math.Min(Count, newCount);
-            var newType = Element.CreateSequence(tempNewCount);
+            var newType = Element.Sequence(tempNewCount);
             var result = newType
-                .CreateResult
+                .Result
                 (
                     category,
-                    () => CodeBase.CreateArg(Size).CreateBitCast(newType.Size)
+                    () => CodeBase.Arg(Size).CreateBitCast(newType.Size)
                 );
             return result;
         }

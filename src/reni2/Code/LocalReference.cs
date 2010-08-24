@@ -39,10 +39,10 @@ namespace Reni.Code
         internal CodeBase AccompayningDestructorCode(ref Size size)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(LocalReferenceSequenceVisitor.LocalReferenceCode(RefAlignParam, size));
+            return DestructorCode.ReplaceArg(LocalReferenceSequenceVisitor.LocalReferenceCode(RefAlignParam, size, "AccompayningDestructorCode"));
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public LeafElement ToLeafElement { get { return new ContextRef(this); } }
 
 

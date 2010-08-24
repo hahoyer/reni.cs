@@ -27,15 +27,16 @@ namespace Reni.Parser.TokenClass
         }
 
         [Node]
+        [IsDumpEnabled(false)]
         internal string Name { get { return _name; } set { _name = value; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal virtual bool IsEnd { get { return false; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return Name.Quote() + "." + ObjectId; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal virtual TokenFactory NewTokenFactory { get { return null; } }
 
         internal virtual IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)

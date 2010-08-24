@@ -20,7 +20,7 @@ namespace Reni.Context
 
         private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override Root RootContext { get { return this; } }
 
         internal List<Code.Container> CompileFunctions()
@@ -28,7 +28,7 @@ namespace Reni.Context
             return _function.Compile();
         }
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         public FunctionList Functions { get { return _function; } }
 
         public Result CreateFunctionCall(Struct.Context context, Category category, ICompileSyntax body, Result argsResult)

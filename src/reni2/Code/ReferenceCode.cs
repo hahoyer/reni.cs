@@ -13,18 +13,16 @@ namespace Reni.Code
         internal ReferenceCode(IReferenceInCode context):base(_nextObjectId++)
         {
             _leafElement = new ContextRef(context);
-            StopByObjectId(2);
+            StopByObjectId(-15);
         }
 
         [Node]
         internal IReferenceInCode Context { get { return _leafElement.Context; } }
-
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal LeafElement ToLeafElement { get { return _leafElement; } }
-
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected override Size SizeImplementation { get { return _leafElement.Size; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override Refs RefsImplementation { get { return _leafElement.GetRefs(); } }
 
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }

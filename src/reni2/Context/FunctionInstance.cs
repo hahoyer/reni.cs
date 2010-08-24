@@ -19,18 +19,18 @@ namespace Reni.Context
     internal sealed class FunctionInstance : ReniObject
     {
         [Node]
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly TypeBase _args;
 
         [Node]
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly ICompileSyntax _body;
 
         [Node]
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly Struct.Context _context;
 
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly int _index;
 
         [Node]
@@ -55,7 +55,7 @@ namespace Reni.Context
             _bodyCodeCache = new SimpleCache<CodeBase>(CreateBodyCode);
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private Refs ForeignRefs
         {
             get
@@ -66,17 +66,17 @@ namespace Reni.Context
             }
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
 
         internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
 
         [Node]
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private Size FrameSize { get { return _args.Size + ForeignRefs.Size; } }
 
         [Node]
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private string Description { get { return _body.DumpShort(); } }
 
         public Result CreateCall(Category category, Result args)
@@ -97,7 +97,7 @@ namespace Reni.Context
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
-        private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return ForeignRefs.ToCode().CreateSequence(argsCode); }
+        private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return ForeignRefs.ToCode().Sequence(argsCode); }
 
         private CodeBase CreateBodyCode()
         {
@@ -154,7 +154,7 @@ namespace Reni.Context
             var refAlignParam = _context.RefAlignParam;
             return CodeBase
                 .CreateFrameRef(refAlignParam)
-                .CreateRefPlus(refAlignParam,
+                .AddToReference(refAlignParam,
                                FrameSize * -1, "FunctionInstance.CreateContextRefCode");
         }
 
@@ -191,7 +191,7 @@ namespace Reni.Context
 
     internal sealed class ReplacePrimitiveRecursivity : Base
     {
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly int _functionIndex;
 
         public ReplacePrimitiveRecursivity(int functionIndex) { _functionIndex = functionIndex; }

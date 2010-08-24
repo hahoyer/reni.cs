@@ -21,6 +21,7 @@
     <Compile Include="Category.cs" />
     <Compile Include="ChildSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
+    <Compile Include="Code\Assign.cs" />
     <Compile Include="Code\BinaryOp.cs" />
     <Compile Include="Code\BitArray.cs" />
     <Compile Include="Code\BitArrayBinaryOp.cs" />
@@ -31,6 +32,7 @@
     <Compile Include="Code\Call.cs" />
     <Compile Include="Code\CCode.cs" />
     <Compile Include="Code\ContextRef.cs" />
+    <Compile Include="Code\Drop.cs" />
     <Compile Include="Code\Environment.cs" />
     <Compile Include="Code\FormalMaschine.cs" />
     <Compile Include="Code\FormalValueAccess.cs" />
@@ -41,6 +43,7 @@
     <Compile Include="Code\IReferenceInCode.cs" />
     <Compile Include="Code\Leaf.cs" />
     <Compile Include="Code\LeafElement.cs" />
+    <Compile Include="Code\LocalReferenceSequenceVisitor.cs" />
     <Compile Include="Code\Multiplyop.cs" />
     <Compile Include="Code\Op.cs" />
     <Compile Include="Code\ReferenceCode.cs" />
@@ -84,7 +87,7 @@
     <Compile Include="Parser\MainTokenFactory.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
     <Compile Include="Sequence\PrefixFeature.cs" />
-    <Compile Include="Struct\Reference.cs" />
+    <Compile Include="Struct\Field.cs" />
     <Compile Include="Struct\Type.cs" />
     <Compile Include="TestGenerated.cs" />
     <Compile Include="ISearchVisitor.cs" />
@@ -146,6 +149,7 @@
     <Compile Include="Struct\AssignmentFeature.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
+    <Compile Include="Type\ConversionParameter.cs" />
     <Compile Include="Type\EnableCut.cs" />
     <Compile Include="Type\EnableCutFeature.cs" />
     <Compile Include="Type\FunctionAccessType.cs" />

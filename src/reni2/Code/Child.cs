@@ -1,6 +1,9 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Context;
 
 namespace Reni.Code
@@ -20,21 +23,25 @@ namespace Reni.Code
             Tracer.Assert(leafElement != null);
             _parent = parent;
             _leafElement = leafElement;
-            StopByObjectId(6);
+            StopByObjectId(-6);
         }
 
         [Node]
         internal CodeBase Parent { get { return _parent; } }
+
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected override Size SizeImplementation { get { return LeafElement.Size; } }
-        [DumpData(false)]
+
+        [IsDumpEnabled(false)]
         protected override Size MaxSizeImplementation { get { return Parent.MaxSize.Max(LeafElement.Size); } }
-        [DumpData(false)]
+
+        [IsDumpEnabled(false)]
         internal override Refs RefsImplementation { get { return Parent.RefsImplementation; } }
-        [DumpData(false)]
+
+        [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
 
         internal override CodeBase CreateChild(LeafElement leafElement)
@@ -46,21 +53,33 @@ namespace Reni.Code
             return base.CreateChild(leafElement);
         }
 
-        protected override T VisitImplementation<T>(Visitor<T> actual)
-        {
-            return actual.ChildVisit(this);
-        }
+        protected override T VisitImplementation<T>(Visitor<T> actual) { return actual.ChildVisit(this); }
 
-        public int AddTo(Container container)
+        internal int AddTo(Container container)
         {
             NotImplementedMethod(container);
             throw new NotImplementedException();
         }
 
-        public CodeBase ReCreate(CodeBase parent)
+        public override string DumpData()
         {
-            NotImplementedMethod(parent);
-            throw new NotImplementedException();
+            var count = 0;
+            return "[*] " + InternalDump(ref count);
+        }
+
+        private string InternalDump(ref int count)
+        {
+            var result = "";
+            var parent = Parent as Child;
+            if(parent != null)
+                result += parent.InternalDump(ref count);
+            else
+                result += Tracer.Dump(Parent);
+
+            result += "\n[" + count + "] ";
+            count++;
+            result += Tracer.Dump(LeafElement);
+            return result;
         }
     }
 }

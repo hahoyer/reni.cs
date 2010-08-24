@@ -42,17 +42,17 @@ namespace Reni
         {
             return context
                 .Result(category | Category.Type, Cond)
-                .ConvertTo(TypeBase.CreateBit)
+                .ConvertTo(TypeBase.Bit)
                 .Align(context.AlignBits)
                 .CreateLocalBlock(category | Category.Type, context.RefAlignParam)
-                .ConvertTo(TypeBase.CreateBit)
+                .ConvertTo(TypeBase.Bit)
                 ;
         }
 
         private Result ElseResult(ContextBase context, Category category)
         {
             if (Else == null)
-                return TypeBase.CreateVoid.CreateResult(category);
+                return TypeBase.Void.Result(category);
             return CondBranchResult(context,category, Else);
         }
 
@@ -75,10 +75,10 @@ namespace Reni
         {
             var commonType = context.CommonType(this);
             if(category <= (Category.Type | Category.Size))
-                return commonType.CreateResult(category);
+                return commonType.Result(category);
 
             var condResult = CondResult(context, category);
-            return commonType.CreateResult
+            return commonType.Result
                 (
                 category,
                 () => condResult.Code.CreateThenElse(ThenResult(context, Category.Code).Code, ElseResult(context, Category.Code).Code),

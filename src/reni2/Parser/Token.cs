@@ -25,21 +25,22 @@ namespace Reni.Parser
         /// <summary>
         /// the source position the token starts
         /// </summary>
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public SourcePosn Source { get { return _source; } }
 
         /// <summary>
         /// the length in characters
         /// </summary>
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public int Length { get { return _length; } }
 
         /// <summary>
         /// the text of the token
         /// </summary>
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public string Name { get { return _source.SubString(0, _length); } }
 
+        [IsDumpEnabled(false)]
         public new string NodeDump { get { return ToString(); } }
 
         public string FilePosition { get { return "\n" + Source.FilePosn(Name); } }
@@ -47,7 +48,7 @@ namespace Reni.Parser
         /// <summary>
         /// Normally Name except for some spacial cases
         /// </summary>
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public string PrioTableName { get { return TokenClass.PrioTableName(Name); } }
 
         public override string ToString()
@@ -64,7 +65,7 @@ namespace Reni.Parser
             return Name;
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal TokenFactory NewTokenFactory { get { return TokenClass.NewTokenFactory; } }
     }
 }

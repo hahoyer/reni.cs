@@ -23,10 +23,10 @@ namespace Reni.Context
     {
         private static int _nextId;
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private readonly Cache _cache;
 
-        [Node, DumpData(false), UsedImplicitly]
+        [Node, IsDumpEnabled(false), UsedImplicitly]
         internal Cache Cache { get { return _cache; } }
 
         private ContextBase[] _childChainCache;
@@ -40,19 +40,19 @@ namespace Reni.Context
                 );
         }
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         internal abstract RefAlignParam RefAlignParam { get; }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public int AlignBits { get { return RefAlignParam.AlignBits; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public Size RefSize { get { return RefAlignParam.RefSize; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal abstract Root RootContext { get; }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal ContextBase[] ChildChain { get { return _childChainCache ?? (_childChainCache = ObtainChildChain()); } }
 
         protected virtual ContextBase[] ObtainChildChain() { return new[] {this}; }
@@ -151,7 +151,7 @@ namespace Reni.Context
             if(result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
                 return Result(category, syntax);
 
-            return result.Type.CreateLocalReferenceResult(category, RefAlignParam).ReplaceArg(result);
+            return result.Type.LocalReferenceResult(category, RefAlignParam).ReplaceArg(result);
         }
 
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Type.Reference target)
@@ -174,9 +174,9 @@ namespace Reni.Context
             return null;
         }
 
-        internal Result GetResult(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
+        internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == 46 && category.HasCode;
+            var trace = (defineable.ObjectId == -20 || defineable.ObjectId == -46) && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -185,15 +185,15 @@ namespace Reni.Context
             if(left == null && right != null)
             {
                 var prefixResult = Type(right)
-                    .GetPrefixResult(category, defineable);
+                    .PrefixResult(category, defineable);
                 if(prefixResult != null)
                     return prefixResult.ReplaceArg(Result(category | Category.Type, right));
             }
 
             var suffixResult =
                 left == null
-                    ? GetContextResult(categoryForFunctionals, defineable)
-                    : GetSuffixResult(categoryForFunctionals, left, defineable);
+                    ? ContextResult(categoryForFunctionals, defineable)
+                    : SuffixResult(categoryForFunctionals, left, defineable);
 
             if(right == null)
                 return ReturnMethodDumpWithBreak(trace, suffixResult);
@@ -202,12 +202,12 @@ namespace Reni.Context
             DumpWithBreak(trace, "suffixType", suffixType );
             var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right),RefAlignParam);
             DumpWithBreak(trace, "result",result);
-            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult.CreateLocalReferenceResult(RefAlignParam)));
+            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult));
         }
 
-        private Result GetSuffixResult(Category category, ICompileSyntax left, Defineable defineable)
+        private Result SuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
-            var trace = left.ObjectId == 4779 && category.HasCode;
+            var trace = ObjectId == -14 && defineable.ObjectId == 52 && category.HasType;
             StartMethodDumpWithBreak(trace,category,left,defineable);
             var suffixResult = Type(left)
                 .GetSuffixResult(category, defineable);
@@ -229,7 +229,7 @@ namespace Reni.Context
             return visitor.Result;
         }
 
-        private Result GetContextResult(Category category, Defineable defineable)
+        private Result ContextResult(Category category, Defineable defineable)
         {
             var feature = SearchDefinable(defineable);
             if(feature == null)
@@ -280,7 +280,7 @@ namespace Reni.Context
         /// Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public string IconKey { get { return "Cache"; } }
     }
 

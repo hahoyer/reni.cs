@@ -11,7 +11,7 @@ namespace Reni.Code
         public TopRef(RefAlignParam refAlignParam, Size offset)
             : base(refAlignParam, offset)
         {
-            StopByObjectId(-79);
+            StopByObjectId(34);
         }
 
         protected override string Format(StorageDescriptor start)

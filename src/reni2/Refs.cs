@@ -53,7 +53,7 @@ namespace Reni
         [Node]
         public List<IReferenceInCode> Data { get { return _data; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private SizeArray Sizes
         {
             get
@@ -134,21 +134,21 @@ namespace Reni
         internal CodeBase ToCode()
         {
             return _data
-                .Aggregate(CodeBase.CreateVoid(), (current, t) => current.CreateSequence(CodeBase.Create(t)));
+                .Aggregate(CodeBase.Void(), (current, t) => current.Sequence(CodeBase.ReferenceInCode(t)));
         }
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)
         {
-            var p = endOfRefsCode.CreateRefPlus(refAlignParam, refAlignParam.RefSize * -_data.Count, "ReplaceRefsForFunctionBody");
+            var p = endOfRefsCode.AddToReference(refAlignParam, refAlignParam.RefSize * -_data.Count, "ReplaceRefsForFunctionBody");
             var result = code;
             for(var i = 0; i < _data.Count; i++)
             {
                 var unrefAlignment = _data[i].RefAlignParam;
                 Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
                 var unrefPtrAlignment = refAlignParam;
-                var replacement = p.CreateDereference(unrefPtrAlignment, unrefAlignment.RefSize);
+                var replacement = p.Dereference(unrefPtrAlignment, unrefAlignment.RefSize);
                 result = result.ReplaceAbsolute(_data[i], ()=>replacement);
-                p = p.CreateRefPlus(unrefPtrAlignment, unrefPtrAlignment.RefSize, "." + i);
+                p = p.AddToReference(unrefPtrAlignment, unrefPtrAlignment.RefSize, "." + i);
             }
             return result;
         }

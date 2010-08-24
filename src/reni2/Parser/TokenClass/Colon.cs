@@ -18,7 +18,7 @@ namespace Reni.Parser.TokenClass
     {
         private static readonly TokenFactory _tokenFactory = DeclarationTokenFactory.Instance;
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override TokenFactory NewTokenFactory { get { return _tokenFactory; } }
 
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)

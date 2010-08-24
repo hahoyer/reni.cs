@@ -38,7 +38,7 @@ namespace Reni.Code.ReplaceVisitor
                 left = visitedObject.Left;
             if(right == null)
                 right = visitedObject.Right;
-            return left.CreateSequence(right);
+            return left.Sequence(right);
         }
 
         internal override CodeBase ThenElse(ThenElse visitedObject, CodeBase condResult, CodeBase thenResult,

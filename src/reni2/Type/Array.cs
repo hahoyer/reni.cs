@@ -40,7 +40,7 @@ namespace Reni.Type
 
         public override string Dump() { return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")"; }
 
-        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             var destArray = dest as Array;
             if(destArray != null)
@@ -53,13 +53,13 @@ namespace Reni.Type
             return null;
         }
 
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
             var destArray = dest as Array;
             if(destArray != null)
             {
                 if(Count == destArray.Count)
-                    return Element.IsConvertableTo(destArray.Element, conversionFeature.DontUseConverter);
+                    return Element.IsConvertableTo(destArray.Element, conversionParameter.DontUseConverter);
                 return false;
             }
             return false;
@@ -107,14 +107,14 @@ namespace Reni.Type
                 .AutomaticDereference();
 
             var rightResult = callContext
-                .ConvertedRefResult(categoryWithType, args, elementType.CreateReference(callContext.RefAlignParam))
+                .ConvertedRefResult(categoryWithType, args, elementType.Reference(callContext.RefAlignParam))
                 .AutomaticDereference()
                 .Align(callContext.AlignBits);
 
-            return resultType.CreateResult
+            return resultType.Result
                 (
                 category,
-                () => rightResult.Code.CreateSequence(leftResult.Code),
+                () => rightResult.Code.Sequence(leftResult.Code),
                 () => leftResult.Refs + rightResult.Refs
                 );
         }
@@ -128,7 +128,7 @@ namespace Reni.Type
             ICompileSyntax @object,
             ICompileSyntax args)
         {
-            var elementType = callContext.Type(args).CreateAlign(callContext.AlignBits);
+            var elementType = callContext.Type(args).Align(callContext.AlignBits);
             return ApplyResult(callContext, category, @object, args, elementType, 1);
         }
 

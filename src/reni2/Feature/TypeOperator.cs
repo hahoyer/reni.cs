@@ -18,12 +18,12 @@ namespace Reni.Feature
 
         Result ISuffix.Result(ContextBase context, Category category, ICompileSyntax left)
         {
-            var result = TypeBase.CreateVoidResult(category).Clone();
+            var result = TypeBase.VoidResult(category).Clone();
             if(category.HasType)
                 result.Type = context
                     .Type(left)
-                    .GetTypeForTypeOperator()
-                    .CreateReference(context.RefAlignParam)
+                    .TypeForTypeOperator()
+                    .Reference(context.RefAlignParam)
                     .TypeType;
             return result;
         }
@@ -33,7 +33,7 @@ namespace Reni.Feature
             var leftType = context.Type(left).AutomaticDereference();
             if(category.HasCode || category.HasRefs)
                 return context.ResultAsRef(category|Category.Type, right).ConvertTo(leftType) & category;
-            return leftType.CreateResult(category);
+            return leftType.Result(category);
         }
     }
 }

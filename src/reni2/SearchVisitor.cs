@@ -13,7 +13,7 @@ namespace Reni
         void ISearchVisitor.Search() { SearchTypeBase(); }
         void ISearchVisitor.ChildSearch<TType>(TType target) { InternalChild(target).Search(); }
         ISearchVisitor ISearchVisitor.Child(Type.Sequence target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Struct.Reference target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Struct.Field target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Reference target) { return InternalChild(target); }
         internal abstract void SearchTypeBase();
         protected abstract ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider;

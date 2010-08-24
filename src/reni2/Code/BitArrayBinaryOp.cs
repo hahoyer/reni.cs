@@ -2,6 +2,7 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.Helper;
+using Reni.Context;
 using Reni.Parser.TokenClass;
 using Reni.Type;
 
@@ -13,7 +14,7 @@ namespace Reni.Code
     [Serializable]
     internal sealed class BitArrayBinaryOp : BinaryOp
     {
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         internal readonly ISequenceOfBitBinaryOperation OpToken;
         private readonly Size _size;
 
@@ -40,8 +41,8 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBackN(this);
         }
 
-        public override string NodeDump { get { return base.NodeDump + " <"+LeftSize+"> "+
-            OpToken.DataFunctionName+" <"+RightSize+">"; } }
+        [IsDumpEnabled(false)]
+        public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> " + OpToken.DataFunctionName + " <" + RightSize + ">"; } }
 
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayBinaryOp(OpToken, Size, LeftSize, RightSize); }
     }
@@ -84,6 +85,7 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBackN(this);
         }
 
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " " + OpToken.DataFunctionName + " " + ArgSize; } }
     }
 
@@ -106,13 +108,14 @@ namespace Reni.Code
         {
             return start.CreateDumpPrint(LeftSize, RightSize);
         }
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
     }
     [Serializable]
 
-    internal sealed class DumpPrintText : LeafElement
+    internal sealed class DumpPrintText : StartingLeafElement
     {
-        [Node, DumpData(true)]
+        [Node, IsDumpEnabled(true)]
         private readonly string _dumpPrintText;
 
         internal DumpPrintText(string dumpPrintText)
@@ -120,22 +123,10 @@ namespace Reni.Code
             _dumpPrintText = dumpPrintText;
         }
 
-        protected override Size GetSize()
-        {
-            return Size.Zero;
-        }
-
-        protected override Size GetInputSize()
-        {
-            return Size.Zero;
-        }
-
-        protected override string Format(StorageDescriptor start)
-        {
-            return StorageDescriptor.CreateDumpPrintText(_dumpPrintText);
-        }
-
-        public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }
+        protected override Size GetSize() { return Size.Zero; }
+        protected override string Format(StorageDescriptor start) { return StorageDescriptor.CreateDumpPrintText(_dumpPrintText); }
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(); }
+        [IsDumpEnabled(false)]
+        public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }
     }
 }

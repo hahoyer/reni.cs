@@ -22,19 +22,19 @@ namespace Reni.Context
         {
             if(ArgsType is Reference)
             {
-                return ArgsType.CreateResult
+                return ArgsType.Result
                     (
                     category,
-                    () => CodeBase.Create(this).CreateDereference(RefAlignParam, RefAlignParam.RefSize),
+                    () => CodeBase.ReferenceInCode(this).Dereference(RefAlignParam, RefAlignParam.RefSize),
                     () => Refs.Create(this)
                     )
                     ;
             }
 
-            return ArgsType.CreateReference(RefAlignParam).CreateResult
+            return ArgsType.Reference(RefAlignParam).Result
                 (
                 category,
-                () => CodeBase.Create(this),
+                () => CodeBase.ReferenceInCode(this),
                 () => Refs.Create(this)
                 )
                 ;

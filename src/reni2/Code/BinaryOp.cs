@@ -10,9 +10,9 @@ namespace Reni.Code
     [Serializable]
     internal abstract class BinaryOp : LeafElement
     {
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal protected readonly Size LeftSize;
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal protected readonly Size RightSize;
 
         protected BinaryOp(Size leftSize, Size rightSize)

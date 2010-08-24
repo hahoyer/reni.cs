@@ -8,7 +8,7 @@ using Reni.Runtime;
 
 namespace Reni
 {
-    [dumpToString]
+    [DumpToString]
     internal class BitsConst : ReniObject
     {
         private const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

@@ -22,9 +22,9 @@ namespace Reni.Code
             StopByObjectId(-12);
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal Size DataSize { get { return _dataSize; } }
 
         protected override Size GetSize()
@@ -32,6 +32,7 @@ namespace Reni.Code
             return _size;
         }
 
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " DataSize=" + _dataSize; } }
 
         protected override Size GetInputSize()

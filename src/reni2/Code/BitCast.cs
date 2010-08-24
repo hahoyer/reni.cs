@@ -15,7 +15,7 @@ namespace Reni.Code
         [Node]
         private readonly Size SignificantSize;
         [Node]
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal readonly Size TargetSize;
 
         internal BitCast(Size size, Size targetSize, Size significantSize)
@@ -54,6 +54,7 @@ namespace Reni.Code
             return new BitArray(Size, bitsConst);
         }
 
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " TargetSize=" + TargetSize + " SignificantSize=" + SignificantSize; } }
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(Size, TargetSize, SignificantSize); }
 

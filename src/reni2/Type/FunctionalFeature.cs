@@ -27,19 +27,19 @@ namespace Reni.Type
         {
             return _context
                 .ContextReferenceType
-                .CreateArgResult(category);
+                .ArgResult(category);
         }
 
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category)
         {
             return TypeBase
-                .CreateVoid
-                .CreateResult(category, () => CodeBase.CreateDumpPrintText(DumpPrintText));
+                .Void
+                .Result(category, () => CodeBase.DumpPrintText(DumpPrintText));
         }
 
         Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            var argsResult = argsType.CreateArgResult(category | Category.Type);
+            var argsResult = argsType.ArgResult(category | Category.Type);
             return _context
                 .RootContext
                 .CreateFunctionCall(_context, category, Body, argsResult);

@@ -9,7 +9,7 @@ namespace Reni
     /// Used for the compiler visitor and the result objects to choose the categories.
     /// Categories are: <see cref="Size"/>Size, <see cref="Type"/>Type, <see cref="Refs"/>References and <see cref="Container"/>Code
     /// </summary>
-    [dump("Dump")]
+    [Dump("Dump")]
     [Serializable]
     internal class Category : ReniObject, IEquatable<Category>
     {

@@ -14,10 +14,10 @@ namespace Reni.Struct
     {
         private static int _nextObjectId;
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private readonly Context _context;
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal readonly ISearchPath<IFeature, Reni.Type.Reference> DumpPrintReferenceFeature;
 
         internal Type(Context context)
@@ -27,6 +27,7 @@ namespace Reni.Struct
             DumpPrintReferenceFeature = new StructReferenceFeature(this);
         }
 
+        [IsDumpEnabled(false)]
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
         internal Context Context { get { return _context; } }
 
@@ -48,24 +49,24 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             Tracer.Assert(dest.IsVoid);
             Tracer.Assert(Size.IsZero);
-            return dest.CreateResult
+            return dest.Result
                 (
                     category,
-                    () => CodeBase.CreateArg(Size.Zero),
+                    () => CodeBase.Arg(Size.Zero),
                     () => Context.ConstructorRefs()
                 );
         }
         internal override Context GetStruct() { return _context; }
 
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
             if (dest.IsVoid)
                 return Size.IsZero;
-            NotImplementedMethod(dest, conversionFeature);
+            NotImplementedMethod(dest, conversionParameter);
             return false;
         }
 
@@ -76,8 +77,8 @@ namespace Reni.Struct
                 Context.Types
                     .Select((type, i) => type.GenericDumpPrint(category).ReplaceArg(argCodes[i]))
                     .ToArray();
-            var thisRef = CreateLocalReferenceResult(category, Context.RefAlignParam);
-            var result = Result
+            var thisRef = LocalReferenceResult(category, Context.RefAlignParam);
+            var result = Reni.Result
                 .ConcatPrintResult(category, dumpPrint)
                 .ReplaceArg(thisRef);
             return result;

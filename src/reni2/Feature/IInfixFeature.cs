@@ -6,7 +6,7 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    internal interface ISearchPath<TOutType, TInType>
+    internal interface ISearchPath<out TOutType, in TInType>
     {
         TOutType Convert(TInType type);
     }

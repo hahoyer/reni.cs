@@ -10,12 +10,12 @@ namespace Reni.Code
     /// Reference to something 
     /// </summary>
     [Serializable]
-    internal abstract class RefLeafElement : LeafElement
+    internal abstract class RefLeafElement : StartingLeafElement
     {
         private readonly RefAlignParam _refAlignParam;
 
         [Node]
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal readonly Size Offset;
 
         protected RefLeafElement(RefAlignParam refAlignParam, Size offset)
@@ -25,10 +25,9 @@ namespace Reni.Code
         }
 
         protected override sealed Size GetSize() { return _refAlignParam.RefSize; }
-        protected override Size GetInputSize() { return Size.Zero; }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
     }
 }

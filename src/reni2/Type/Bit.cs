@@ -14,11 +14,11 @@ namespace Reni.Type
         protected override Size GetSize() { return Size.Create(1); }
 
         internal override string DumpPrintText { get { return "bit"; } }
-        internal override int GetSequenceCount(TypeBase elementType) { return 1; }
+        internal override int SequenceCount(TypeBase elementType) { return 1; }
 
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
-            if(conversionFeature.IsUseConverter)
+            if(conversionParameter.IsUseConverter)
                 return dest.HasConverterFromBit();
 
             return false;
@@ -37,9 +37,9 @@ namespace Reni.Type
 
     internal interface ISequenceOfBitPrefixOperation 
     {
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         string CSharpNameOfDefaultOperation { get; }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         string DataFunctionName { get; }
         Result SequenceOperationResult(Category category, Size objSize);
     }

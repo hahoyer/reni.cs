@@ -20,7 +20,7 @@ namespace Reni
         /// <summary>
         /// Shows or hides syntax tree
         /// </summary>
-        [Node, DumpData(true)]
+        [Node, IsDumpEnabled(true)]
         public readonly TraceParamters Trace = new TraceParamters();
 
         public bool ParseOnly;
@@ -31,40 +31,40 @@ namespace Reni
             /// <summary>
             /// Shows or hides serialize code sequence
             /// </summary>
-            [Node, DumpData(true)]
+            [Node, IsDumpEnabled(true)]
             public bool CodeSequence;
 
             /// <summary>
             /// Shows or hides code tree
             /// </summary>
-            [Node, DumpData(true)]
+            [Node, IsDumpEnabled(true)]
             public bool CodeTree;
 
             /// <summary>
             /// Shows or hides code code to execute
             /// </summary>
-            [Node, DumpData(true)]
+            [Node, IsDumpEnabled(true)]
             public bool ExecutedCode;
 
-            [Node, DumpData(true)]
+            [Node, IsDumpEnabled(true)]
             public bool Functions;
 
             /// <summary>
             /// Shows or hides syntax tree
             /// </summary>
-            [Node, DumpData(true)]
+            [Node, IsDumpEnabled(true)]
             public bool Source;
 
             /// <summary>
             /// Shows or hides syntax tree
             /// </summary>
-            [Node, DumpData(true)]
+            [Node, IsDumpEnabled(true)]
             public bool Syntax;
 
             /// <summary>
             /// Shows or hides a graphic repesentation of generated code
             /// </summary>
-            [Node, DumpData(true)]
+            [Node, IsDumpEnabled(true)]
             public bool CodeGraph;
 
             public void None()

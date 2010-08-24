@@ -30,18 +30,15 @@ namespace Reni.Code
         [Node]
         internal CodeBase Right { get { return _right; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected override Size SizeImplementation { get { return Left.Size + Right.Size; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal override Refs RefsImplementation { get { return _left.RefsImplementation.CreateSequence(_right.RefsImplementation); } }
 
-        protected override T VisitImplementation<T>(Visitor<T> actual)
-        {
-            return actual.PairVisit(this);
-        }
+        protected override T VisitImplementation<T>(Visitor<T> actual) { return actual.PairVisit(this); }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected override Size MaxSizeImplementation
         {
             get
@@ -50,6 +47,22 @@ namespace Reni.Code
                 var rSize = Left.Size + Right.MaxSize;
                 return lSize.Max(rSize);
             }
+        }
+
+        public override string DumpData() { return InternalDumpData(""); }
+
+        private static string InternalDumpData(string head, CodeBase x)
+        {
+            var pair = x as Pair;
+            if(pair == null)
+                return head + "\n" + x.Dump();
+            return pair.InternalDumpData(head);
+        }
+
+        private string InternalDumpData(string head)
+        {
+            var newHead = ObjectId + "." + head;
+            return InternalDumpData(newHead + "L", Left) + "\n" + InternalDumpData(newHead + "R", Right);
         }
     }
 }

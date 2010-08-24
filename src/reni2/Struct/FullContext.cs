@@ -19,7 +19,7 @@ namespace Reni.Struct
             _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>(position => new ContextAtPosition(Context, position));
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected override IReferenceInCode ForCode { get { return this; } }
 
         protected override int Position { get { return StatementList.Count; } }
@@ -29,7 +29,7 @@ namespace Reni.Struct
             return _contextAtPositionCache.Find(position);
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private FullContext Context { get { return this; } }
     }
 }

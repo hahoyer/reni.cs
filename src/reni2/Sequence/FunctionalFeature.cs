@@ -10,7 +10,7 @@ namespace Reni.Sequence
     internal class FunctionalFeature : ReniObject, IFeature, IFunctionalFeature
     {
         private readonly Type.Sequence _parent;
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly FeatureBase _feature;
 
         protected internal FunctionalFeature(Type.Sequence parent, FeatureBase feature)
@@ -22,8 +22,8 @@ namespace Reni.Sequence
         Result IFeature.Apply(Category category)
         {
             return _parent
-                .CreateFunctionalType(this)
-                .CreateArgResult(category);
+                .FunctionalType(this)
+                .ArgResult(category);
         }
 
         string IDumpShortProvider.DumpShort() { return _feature.Definable.DataFunctionName; }
@@ -31,15 +31,15 @@ namespace Reni.Sequence
         private Result Apply(Category category, int objSize, int argsSize)
         {
             var type = _feature.ResultType(objSize, argsSize);
-            return type.CreateResult(category, () => CodeBase.CreateBitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize));
+            return type.Result(category, () => CodeBase.CreateBitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize));
         }
 
         TypeBase IFeature.DefiningType() { return _parent; }
 
         Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            var objectResult = _parent.CreateObjectRefInCode(category|Category.Type,refAlignParam);
-            var result = Apply(category, objectResult.Type.GetSequenceCount(_parent.Element), argsType.GetSequenceCount(_parent.Element));
+            var objectResult = _parent.ObjectRefInCode(category|Category.Type,refAlignParam);
+            var result = Apply(category, objectResult.Type.SequenceCount(_parent.Element), argsType.SequenceCount(_parent.Element));
             var convertedObjectResult = objectResult.ConvertToBitSequence(category);
             var convertedArgsResult = argsType.ConvertToBitSequence(category);
             return result.ReplaceArg(convertedObjectResult.CreateSequence(convertedArgsResult));

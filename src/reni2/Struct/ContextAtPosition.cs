@@ -20,7 +20,7 @@ namespace Reni.Struct
             _context = context;
         }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         protected override IReferenceInCode ForCode { get { return _context; } }
 
         [Node]
@@ -34,7 +34,7 @@ namespace Reni.Struct
         }
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + ": " + _context.NodeDump + "@" + _position; } }
     }
 }

@@ -24,9 +24,9 @@ namespace Reni.Parser.TokenClass
         {
             var bitsConst = BitsConst.Convert(token.Name);
             return TypeBase
-                .CreateBit
-                .CreateSequence(bitsConst.Size.ToInt())
-                .CreateResult(category, () => CodeBase.Create(bitsConst));
+                .Bit
+                .Sequence(bitsConst.Size.ToInt())
+                .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
 
         public static Int64 ToInt64(Token token)

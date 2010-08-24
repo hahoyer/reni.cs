@@ -13,7 +13,7 @@ namespace Reni.Syntax
 
         internal protected override Result Result(ContextBase context, Category category)
         {
-            return TypeBase.CreateVoidResult(category);
+            return TypeBase.VoidResult(category);
         }
 
         internal protected override string DumpShort()

@@ -6,12 +6,12 @@ using Reni.Code;
 
 namespace Reni.Type
 {
-    sealed internal class FunctionAccessType : TypeBase
+    sealed internal class FunctionAccessType : TypeBase, IAccessType
     {
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly TypeBase _objectType;
 
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly IFunctionalFeature _functionalFeature;
 
 
@@ -23,11 +23,13 @@ namespace Reni.Type
             StopByObjectId(-369);
         }
 
+        Result IAccessType.Result(Category category) { return ArgResult(category); }
+
         protected override Size GetSize() { return _objectType.Size; }
         internal override string DumpPrintText { get { return _functionalFeature.DumpShort(); } }
         internal override string DumpShort() { return _objectType.DumpShort() + " " + _functionalFeature.DumpShort(); }
-        internal override IFunctionalFeature GetFunctionalFeature() { return _functionalFeature; }
-        protected override TypeBase GetObjectType() { return _objectType; }
+        internal override IFunctionalFeature FunctionalFeature() { return _functionalFeature; }
+        internal override TypeBase ObjectType() { return _objectType; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -36,6 +38,7 @@ namespace Reni.Type
         }
 
         internal Result ContextOperatorFeatureApply(Category category) { return _functionalFeature.ContextOperatorFeatureApply(category); }
+
     }
 
     internal class FunctionDefinitionType : TypeBase
@@ -50,12 +53,11 @@ namespace Reni.Type
         protected override Size GetSize() { return Size.Zero; }
         internal override string DumpShort() { return _functionalFeature.DumpShort(); }
 
-        internal override TypeBase AccessType(Struct.Context context, int position)
+        internal override IAccessType AccessType(Struct.Context context, int position)
         {
             return context
                 .ContextType
-                .CreateFunctionalType(_functionalFeature)
-                .CreateReference(context.RefAlignParam);
+                .FunctionalType(_functionalFeature);
         }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -66,7 +68,7 @@ namespace Reni.Type
 
         public Result CreateDumpPrintResult(Category category)
         {
-            return CreateVoid.CreateResult(category, () => CodeBase.CreateDumpPrintText(_functionalFeature.DumpPrintText));
+            return Void.Result(category, () => CodeBase.DumpPrintText(_functionalFeature.DumpPrintText));
         }
     }
 

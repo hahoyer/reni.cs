@@ -85,7 +85,7 @@ namespace Reni.Code
 
     sealed internal class FormalPointer : NamedValue
     {
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly char _name;
 
         private readonly FormalPointer[] _points;

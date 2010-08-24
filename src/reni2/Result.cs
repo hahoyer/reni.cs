@@ -34,12 +34,13 @@ namespace Reni
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         internal Category PendingCategory;
 
         public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
 
         [Node]
+        [DebuggerHidden]
         public Size Size
         {
             get { return _size; }
@@ -51,6 +52,7 @@ namespace Reni
         }
 
         [Node]
+        [DebuggerHidden]
         public TypeBase Type
         {
             get { return _type; }
@@ -64,7 +66,9 @@ namespace Reni
         [Node]
         internal CodeBase Code
         {
+            [DebuggerHidden]
             get { return _code; }
+            [DebuggerHidden]
             set
             {
                 _code = value;
@@ -73,6 +77,7 @@ namespace Reni
         }
 
         [Node]
+        [DebuggerHidden]
         public Refs Refs
         {
             get { return _refs; }
@@ -105,10 +110,10 @@ namespace Reni
             {
                 if(HasSize)
                     return Size;
-                if(HasType)
-                    return Type.Size;
-                if(HasCode)
+                if (HasCode)
                     return Code.Size;
+                if (HasType)
+                    return Type.Size;
                 return null;
             }
         }
@@ -139,6 +144,7 @@ namespace Reni
             }
         }
 
+        [IsDumpEnabled(false)]
         internal Refs SmartRefs
         {
             get
@@ -265,7 +271,7 @@ namespace Reni
             if(HasSize)
                 r.Size = alignedSize;
             if(HasType)
-                r.Type = Type.CreateAlign(alignBits);
+                r.Type = Type.Align(alignBits);
             if(HasCode)
                 r.Code = Code.CreateBitCast(alignedSize);
             if(HasRefs)
@@ -379,9 +385,9 @@ namespace Reni
             if(category.HasSize)
                 Size += other.Size;
             if(category.HasType)
-                Type = Type.CreatePair(other.Type);
+                Type = Type.Pair(other.Type);
             if(category.HasCode)
-                Code = Code.CreateSequence(other.Code);
+                Code = Code.Sequence(other.Code);
             if(category.HasRefs)
                 Refs = Refs.CreateSequence(other.Refs);
             IsDirty = false;
@@ -486,11 +492,11 @@ namespace Reni
             throw new NotImplementedException();
         }
 
-        internal Result CreateRefPlus(Category c, RefAlignParam refAlignParam, Size value, string reason)
+        internal Result AddToReference(Category c, RefAlignParam refAlignParam, Size value, string reason)
         {
             var result = Clone();
             if(c.HasCode)
-                result.Code = Code.CreateRefPlus(refAlignParam, value, reason);
+                result.Code = Code.AddToReference(refAlignParam, value, reason);
             return result;
         }
 
@@ -515,10 +521,10 @@ namespace Reni
 
         internal Result CreateUnref(TypeBase type, RefAlignParam refAlignParam)
         {
-            return type.CreateResult
+            return type.Result
                 (
                 CompleteCategory,
-                () => Code.CreateDereference(refAlignParam, type.Size),
+                () => Code.Dereference(refAlignParam, type.Size),
                 () => Refs
                 );
         }
@@ -536,28 +542,29 @@ namespace Reni
             if(CompleteCategory == Category.Refs)
                 return this;
 
-            return Type.AutomaticDereference(this);
+            Tracer.Assert(HasType, ()=>"Dereference requires type category:\n " + DebuggerDumpString );
+            return Type.AutomaticDereferenceResult(CompleteCategory).ReplaceArg(this);
         }
 
         internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
         {
-            var result = TypeBase.CreateVoidResult(category);
+            var result = TypeBase.VoidResult(category);
             if(category.HasCode)
-                result.Code = CodeBase.CreateDumpPrintText("(");
+                result.Code = CodeBase.DumpPrintText("(");
 
             for(var i = 0; i < elemResults.Count; i++)
             {
                 if(category.HasCode)
                 {
                     if(i > 0)
-                        result.Code = result.Code.CreateSequence(CodeBase.CreateDumpPrintText(", "));
-                    result.Code = result.Code.CreateSequence(elemResults[i].Code);
+                        result.Code = result.Code.Sequence(CodeBase.DumpPrintText(", "));
+                    result.Code = result.Code.Sequence(elemResults[i].Code);
                 }
                 if(category.HasRefs)
                     result.Refs = result.Refs.CreateSequence(elemResults[i].Refs);
             }
             if(category.HasCode)
-                result.Code = result.Code.CreateSequence(CodeBase.CreateDumpPrintText(")"));
+                result.Code = result.Code.Sequence(CodeBase.DumpPrintText(")"));
             return result;
         }
 
@@ -611,9 +618,9 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        public Result CreateLocalReferenceResult(RefAlignParam refAlignParam) {
+        public Result LocalReferenceResult(RefAlignParam refAlignParam) {
             return Type
-                .CreateLocalReferenceResult(CompleteCategory, refAlignParam)
+                .LocalReferenceResult(CompleteCategory, refAlignParam)
                 .ReplaceArg(this);
         }
     }

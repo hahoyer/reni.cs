@@ -12,14 +12,14 @@ namespace Reni.Code
         protected LeafElement(int objectId) : base(objectId) { }
         protected LeafElement(): base(_nextId++) {}
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         internal Size DeltaSize { get { return GetInputSize() - GetSize(); } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal virtual bool IsEmpty { get { return false; } }
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         internal Size Size { get { return GetSize(); } }
         private string CommentDump { get { return GetType().Name + " " + ObjectId; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
         protected abstract Size GetSize();

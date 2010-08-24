@@ -7,9 +7,9 @@ namespace Reni.Type
     internal class ObjectReference: ReniObject, IReferenceInCode
     {
         private static int _nextObjectId;
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly TypeBase _objectType;
-        [DumpData(true)]
+        [IsDumpEnabled(false)]
         private readonly RefAlignParam _refAlignParam;
 
         public ObjectReference(TypeBase objectType, RefAlignParam refAlignParam)
@@ -17,7 +17,7 @@ namespace Reni.Type
         {
             _objectType = objectType;
             _refAlignParam = refAlignParam;
-            StopByObjectId(4);
+            StopByObjectId(-4);
         }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return _refAlignParam; } }

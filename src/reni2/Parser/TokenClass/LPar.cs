@@ -32,6 +32,7 @@ namespace Reni.Parser.TokenClass
             Name = "<left " + _level + ">";
         }
 
+        [IsDumpEnabled(false)]
         internal int Level { get { return _level; } }
 
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
@@ -51,7 +52,7 @@ namespace Reni.Parser.TokenClass
 
     internal class LeftParSyntax : ParsedSyntax
     {
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly IParsedSyntax _right;
 
         public LeftParSyntax(Token token, IParsedSyntax right)

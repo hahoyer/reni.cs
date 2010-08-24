@@ -55,20 +55,20 @@ namespace Reni
 
         internal FunctionList Functions { get { return _rootContext.Functions; } }
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public string FileName { get { return _fileName; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public Source Source { get { return _source.Value; } }
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         internal IParsedSyntax Syntax { get { return _syntax.Value; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public string ExecutedCode { get { return _executedCode.Value; } }
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         private CodeBase Code { get { return _code.Value; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private Container MainContainer { get { return _mainContainer.Value; } }
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         private List<Container> FunctionContainers { get { return _functionContainers.Value; } }
 
         public static string FormattedNow

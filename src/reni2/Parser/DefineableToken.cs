@@ -22,13 +22,13 @@ namespace Reni.Parser
 
         [Node]
         internal Defineable TokenClass { get { return _tokenClass; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         internal string Name { get { return _source.SubString(0, _length); } }
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         public string FilePosition { get { return "\n" + _source.FilePosn(Name); } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public string IconKey { get { return "Symbol"; } }
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         public override string NodeDump { get { return Name.Quote() + "." + ObjectId; } }
     }
 }

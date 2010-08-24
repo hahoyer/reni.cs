@@ -22,13 +22,13 @@ namespace Reni.Code
         /// </summary>
         internal readonly bool IsInternal;
 
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly Size _frameSize;
 
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly Size _maxSize;
 
-        [DumpData(false)]
+        [IsDumpEnabled(false)]
         private readonly List<LeafElement> _data = new List<LeafElement>();
 
         public Container(Size maxSize, Size frameSize, string description, bool isInternal)
@@ -45,17 +45,17 @@ namespace Reni.Code
             IsInternal = false;
         }
 
-        [Node, DumpData(true)]
+        [Node, IsDumpEnabled(true)]
         internal List<LeafElement> Data { get { return _data; } }
 
-        [Node, DumpData(true)]
+        [Node, IsDumpEnabled(true)]
         internal string Description { get { return _description; } }
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         internal bool IsError { get { return _frameSize == null; } }
 
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         public Size MaxSize { get { return _maxSize; } }
-        [Node, DumpData(false)]
+        [Node, IsDumpEnabled(false)]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
 
         private void DataAdd(LeafElement leafElement)
@@ -117,7 +117,7 @@ namespace Reni.Code
 
         protected override Visitor<int> AfterCond()
         {
-            DataAdd(new Then(TypeBase.CreateBit.Size));
+            DataAdd(new Then(TypeBase.Bit.Size));
             return this;
         }
 

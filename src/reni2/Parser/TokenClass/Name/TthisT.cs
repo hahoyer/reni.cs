@@ -8,7 +8,7 @@ namespace Reni.Parser.TokenClass.Name
     {
         public override Result Result(ContextBase context, Category category, Token token)
         {
-            return context.FindStruct().CreateThisResult(category);
+            return context.FindStruct().ThisReferenceResult(category);
         }
     }
 }

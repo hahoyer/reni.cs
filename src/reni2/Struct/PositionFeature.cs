@@ -12,13 +12,13 @@ namespace Reni.Struct
         IContextFeature,
         IFeature
     {
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly Context _structContext;
 
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly int _position;
 
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly bool _isProperty;
 
         public PositionFeature(Context structContext, int position, bool isProperty)

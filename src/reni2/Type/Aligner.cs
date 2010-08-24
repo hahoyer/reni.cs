@@ -25,7 +25,7 @@ namespace Reni.Type
         internal int AlignBits { get { return _alignBits; } }
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
 
-        internal override int GetSequenceCount(TypeBase elementType) { return Parent.GetSequenceCount(elementType); }
+        internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
 
         protected override Size GetSize()
         {
@@ -44,19 +44,19 @@ namespace Reni.Type
             return Parent.Copier(category);
         }
 
-        internal override TypeBase GetTypeForTypeOperator() { return Parent.GetTypeForTypeOperator(); }
+        internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
 
         internal override Result ApplyTypeOperator(Result argResult)
         {
             return Parent.ApplyTypeOperator(argResult);
         }
 
-        internal override bool IsConvertableTo_Implementation(TypeBase dest, ConversionFeature conversionFeature)
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
-            return Parent.IsConvertableTo(dest, conversionFeature);
+            return Parent.IsConvertableTo(dest, conversionParameter);
         }
 
-        protected override Result ConvertTo_Implementation(Category category, TypeBase dest)
+        protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return Parent
                 .ConvertTo(category, dest)
@@ -65,10 +65,10 @@ namespace Reni.Type
 
         private Result CreateUnalignedArgResult(Category category)
         {
-            return Parent.CreateResult
+            return Parent.Result
                 (
                 category,
-                () => CodeBase.CreateArg(Size).CreateBitCast(Parent.Size)
+                () => CodeBase.Arg(Size).CreateBitCast(Parent.Size)
                 );
         }
 

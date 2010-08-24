@@ -11,7 +11,7 @@ namespace Reni
         where TFeature : class
         where TType : IDumpShortProvider
     {
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly SearchVisitor<TFeature> _parent;
         private readonly TType _target;
 

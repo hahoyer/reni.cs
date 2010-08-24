@@ -6,7 +6,7 @@ namespace Reni.Code.ReplaceVisitor
 {
     internal sealed class ReplaceRelRefArg : ReplaceArg
     {
-        [DumpData(true)]
+        [IsDumpEnabled(true)]
         private readonly Size _offset;
 
         private ReplaceRelRefArg(CodeBase actual, Size offset)
@@ -27,7 +27,7 @@ namespace Reni.Code.ReplaceVisitor
             {
                 if (_offset.IsZero)
                     return ActualArg;
-                return ActualArg.CreateRefPlus(RefAlignParam, Offset, "ReplaceRelRefArg.Actual");
+                return ActualArg.AddToReference(RefAlignParam, Offset, "ReplaceRelRefArg.Actual");
             }
         }
 
