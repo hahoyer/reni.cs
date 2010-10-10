@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
@@ -56,12 +57,12 @@ namespace Reni.Parser
 
     internal interface IScanner
     {
-        Token CreateToken(SourcePosn sourcePosn, ITokenFactory tokenFactory);
+            Token CreateToken(SourcePosn sourcePosn, ITokenFactory tokenFactory);
     }
 
     internal interface ITokenFactory
     {
-        Token CreateToken(SourcePosn sourcePosn, int length);
         char Relation(string newTokenName, string recentTokenName);
+        TokenClassBase CreateTokenClass(string name);
     }
 }

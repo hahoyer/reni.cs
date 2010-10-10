@@ -7,7 +7,7 @@ namespace Reni
 {
     /// <summary>
     /// Used for the compiler visitor and the result objects to choose the categories.
-    /// Categories are: <see cref="Size"/>Size, <see cref="Type"/>Type, <see cref="Refs"/>References and <see cref="Container"/>Code
+    /// Categories are: <see cref="Size"/>Size, <see cref="Type"/>Type, <see cref="Refs"/>References and <see cref="CodeBase"/>Code
     /// </summary>
     [Dump("Dump")]
     [Serializable]

@@ -134,7 +134,7 @@ namespace Reni.Parser
             var i = 1;
             while(IsAlphaNum(sp[i]))
                 i++;
-            return tokenFactory.CreateToken(sp, i);
+            return new Token(sp,i, tokenFactory.CreateTokenClass(sp.SubString(0, i)));
         }
 
         private Token CreateSymbolToken(SourcePosn sp, ITokenFactory tokenFactory)
@@ -142,7 +142,7 @@ namespace Reni.Parser
             var i = 1;
             while(IsSymbol(sp[i]))
                 i++;
-            return tokenFactory.CreateToken(sp, i);
+            return new Token(sp, i, tokenFactory.CreateTokenClass(sp.SubString(0, i)));
         }
 
         private Token JumpComment(SourcePosn sp)

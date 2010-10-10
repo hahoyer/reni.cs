@@ -8,7 +8,7 @@ namespace Reni.Code
     /// Dereferencing operation
     /// </summary>
     [Serializable]
-    internal sealed class Dereference : LeafElement
+    internal sealed class Dereference : FiberItem
     {
         private readonly RefAlignParam _refAlignParam;
         private readonly Size _size;
@@ -23,45 +23,38 @@ namespace Reni.Code
         }
 
         [IsDumpEnabled(false)]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
         [IsDumpEnabled(false)]
         internal Size DataSize { get { return _dataSize; } }
 
-        protected override Size GetSize()
-        {
-            return _size;
-        }
-
         [IsDumpEnabled(false)]
-        public override string NodeDump { get { return base.NodeDump + " DataSize=" + _dataSize; } }
+        public override string NodeDump { get { return base.NodeDump + " DataSize=" + DataSize; } }
 
-        protected override Size GetInputSize()
-        {
-            return RefAlignParam.RefSize;
-        }
+        internal override Size InputSize { get { return RefAlignParam.RefSize; } }
+        internal override Size OutputSize { get { return _size; } }
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateUnref(RefAlignParam, _size, _dataSize);
+            return start.CreateUnref(RefAlignParam, OutputSize, DataSize);
         }
 
-        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
+        internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
         {
-            return subsequentElement.TryToCombineBackN(this);
+            return subsequentElement.TryToCombineBack(this);
         }
 
-        internal override LeafElement TryToCombineBack(TopRef precedingElement)
-        {
-            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopData(RefAlignParam, precedingElement.Offset, GetSize(), DataSize);
-        }
-
-        internal override LeafElement TryToCombineBack(FrameRef precedingElement)
+        internal override CodeBase TryToCombineBack(TopRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopFrame(RefAlignParam, precedingElement.Offset, GetSize(), DataSize);
+            return new TopData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, Size, _dataSize); }
+        internal override CodeBase TryToCombineBack(FrameRef precedingElement)
+        {
+            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
+            return new TopFrame(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
+        }
+
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, OutputSize, DataSize); }
     }
 }

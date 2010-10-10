@@ -389,7 +389,7 @@ namespace Reni
             if(category.HasCode)
                 Code = Code.Sequence(other.Code);
             if(category.HasRefs)
-                Refs = Refs.CreateSequence(other.Refs);
+                Refs = Refs.Sequence(other.Refs);
             IsDirty = false;
         }
 
@@ -415,7 +415,7 @@ namespace Reni
             if(HasCode && resultForArg.HasCode)
                 result.Code = Code.ReplaceArg(resultForArg.Code);
             if(HasRefs && resultForArg.HasRefs)
-                result.Refs = Refs.CreateSequence(resultForArg.Refs);
+                result.Refs = Refs.Sequence(resultForArg.Refs);
             return ReturnMethodDump(trace, result);
         }
 
@@ -437,7 +437,7 @@ namespace Reni
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, ()=>replacement().Code);
             if(HasRefs)
-                result.Refs = Refs.Without(refInCode).CreateSequence(replacement().Refs);
+                result.Refs = Refs.Without(refInCode).Sequence(replacement().Refs);
             result.IsDirty = false;
             return result;
         }
@@ -500,7 +500,7 @@ namespace Reni
             return result;
         }
 
-        internal Result CreateLocalBlock(Category category, RefAlignParam refAlignParam)
+        internal Result LocalBlock(Category category, RefAlignParam refAlignParam)
         {
             if(!category.HasCode && !category.HasRefs)
                 return this;
@@ -508,9 +508,9 @@ namespace Reni
             var result = Clone(category);
             var copier = Type.Copier(category);
             if(category.HasCode)
-                result.Code = Code.CreateLocalBlock(copier.Code, refAlignParam);
+                result.Code = Code.LocalBlock(copier.Code, refAlignParam);
             if(category.HasRefs)
-                result.Refs = Refs.CreateSequence(copier.Refs);
+                result.Refs = Refs.Sequence(copier.Refs);
             return result;
         }
 
@@ -519,7 +519,7 @@ namespace Reni
             return Type.Conversion(CompleteCategory, target).ReplaceArg(this);
         }
 
-        internal Result CreateUnref(TypeBase type, RefAlignParam refAlignParam)
+        internal Result Dereference(TypeBase type, RefAlignParam refAlignParam)
         {
             return type.Result
                 (
@@ -532,9 +532,7 @@ namespace Reni
         internal BitsConst Evaluate()
         {
             Tracer.Assert(Refs.IsNone);
-            return Code
-                .Serialize(false)
-                .Evaluate();
+            return Code.Evaluate();
         }
 
         internal Result AutomaticDereference()
@@ -561,7 +559,7 @@ namespace Reni
                     result.Code = result.Code.Sequence(elemResults[i].Code);
                 }
                 if(category.HasRefs)
-                    result.Refs = result.Refs.CreateSequence(elemResults[i].Refs);
+                    result.Refs = result.Refs.Sequence(elemResults[i].Refs);
             }
             if(category.HasCode)
                 result.Code = result.Code.Sequence(CodeBase.DumpPrintText(")"));

@@ -64,7 +64,7 @@ namespace Reni.FeatureTest.BitArrayOp
     Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
     public class NegativeNumbers : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test, Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 

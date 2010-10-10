@@ -40,7 +40,7 @@ namespace Reni
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
             _syntax = new SimpleCache<IParsedSyntax>(() => _parser.Compile(Source));
             _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax).Result(_rootContext, Category.Code).Code);
-            _mainContainer = new SimpleCache<Container>(()=>Code.Serialize(false));
+            _mainContainer = new SimpleCache<Container>(() => new Container(Code));
             _functionContainers = new SimpleCache<List<Container>>(()=>_rootContext.CompileFunctions());
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
         }
@@ -122,13 +122,6 @@ namespace Reni
                 for(var i = 0; i < FunctionContainers.Count; i++)
                     Tracer.FlaggedLine("function index=" + i + "\n" + FunctionContainers[i].Dump());
             }
-            if (_parameters.Trace.CodeGraph)
-            {
-                Tracer.FlaggedLine("main\n" + MainContainer.CreateGraph());
-                for (var i = 0; i < FunctionContainers.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + FunctionContainers[i].CreateGraph());
-            }
-
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(ExecutedCode);
 
@@ -137,10 +130,10 @@ namespace Reni
 
         internal void Materialize()
         {
-            if(_parameters.ParseOnly)
+            if (_parameters.ParseOnly)
                 return;
             _code.Ensure();
-            for(var i = 0; i < _rootContext.Functions.Count; i++)
+            for (var i = 0; i < _rootContext.Functions.Count; i++)
                 _rootContext.Functions[i].EnsureBodyCode();
         }
 

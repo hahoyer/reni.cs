@@ -88,7 +88,7 @@ namespace Reni.Context
                 localCategory = (localCategory - Category.Code) | Category.Size;
             var result = Result(localCategory).Clone();
             if(category.HasRefs)
-                result.Refs = result.Refs.CreateSequence(args.Refs);
+                result.Refs = result.Refs.Sequence(args.Refs);
 
             if(category.HasCode)
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(_index, result.Size);
@@ -101,15 +101,15 @@ namespace Reni.Context
 
         private CodeBase CreateBodyCode()
         {
-            if(IsStopByObjectIdActive)
+            if (IsStopByObjectIdActive)
                 return null;
             var category = Category.Code;
             var refAlignParam = _context.RefAlignParam;
-            var foreignRefsRef = CodeBase.CreateFrameRef(refAlignParam);
+            var foreignRefsRef = CodeBase.FrameRef(refAlignParam, "FunctionInstance.CreateBodyCode");
             var visitResult = Result(category);
             var result = visitResult
                 .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
-            if(_args.Size.IsZero)
+            if (_args.Size.IsZero)
                 result.Code = result.Code.TryReplacePrimitiveRecursivity(_index);
             return result.Code;
         }
@@ -153,9 +153,8 @@ namespace Reni.Context
         {
             var refAlignParam = _context.RefAlignParam;
             return CodeBase
-                .CreateFrameRef(refAlignParam)
-                .AddToReference(refAlignParam,
-                               FrameSize * -1, "FunctionInstance.CreateContextRefCode");
+                .FrameRef(refAlignParam, "FunctionInstance.CreateContextRefCode")
+                .AddToReference(refAlignParam, FrameSize * -1, "FunctionInstance.CreateContextRefCode");
         }
 
         private TypeBase Type() { return Result(Category.Type).Type; }
@@ -164,7 +163,7 @@ namespace Reni.Context
         {
             try
             {
-                return BodyCode.Serialize(FrameSize, Description, isInternal);
+                return new Code.Container(BodyCode, FrameSize, Description, isInternal);
             }
             catch(UnexpectedVisitOfPending)
             {
@@ -200,10 +199,6 @@ namespace Reni.Context
 
         internal override CodeBase PairVisit(Code.Pair pair) { return Pair(pair, null, pair.Right.Visit(this)); }
 
-        internal override CodeBase ChildVisit(Code.Child child) { return Child(child.Parent, child.LeafElement.Visit(this)); }
-
-        internal override CodeBase ThenElseVisit(ThenElse This) { return ThenElse(This, null, This.ThenCode.Visit(this), This.ElseCode.Visit(this)); }
-
-        public LeafElement CallVisit(Call This) { return This.TryConvertToRecursiveCall(_functionIndex); }
+        public FiberItem CallVisit(Call @this) { return @this.TryConvertToRecursiveCall(_functionIndex); }
     }
 }

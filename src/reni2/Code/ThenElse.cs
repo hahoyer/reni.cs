@@ -1,155 +1,117 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 
 namespace Reni.Code
 {
     /// <summary>
     /// Then-Else construct
     /// </summary>
-    internal sealed class ThenElse : CodeBase
+    internal sealed class ThenElse : FiberItem
     {
         private static int _nextId;
-        private readonly int _thenElseObjectId = _nextId++;
 
         [Node]
-        internal readonly CodeBase CondCode;
-        [Node]
         internal readonly CodeBase ThenCode;
+
         [Node]
         internal readonly CodeBase ElseCode;
 
-        public ThenElse(CodeBase condCode, CodeBase thenCode, CodeBase elseCode)
+        public ThenElse(CodeBase thenCode, CodeBase elseCode)
+            : base(_nextId++)
         {
-            CondCode = condCode;
             ThenCode = thenCode;
             ElseCode = elseCode;
         }
 
-        protected override Size SizeImplementation { get { return ThenCode.Size; } }
-
-        internal int ThenElseObjectId { get { return _thenElseObjectId; } }
-
-        protected override Size MaxSizeImplementation
+        private Size MaxSizeImplementation
         {
             get
             {
-                var cSize = CondCode.MaxSize;
                 var tSize = ThenCode.MaxSize;
                 var eSize = ElseCode.MaxSize;
-                return cSize.Max(tSize).Max(eSize);
+                return tSize.Max(eSize);
             }
         }
 
-        protected override Result VisitImplementation<Result>(Visitor<Result> actual)
-        {
-            return actual.ThenElseVisit(this);
-        }
-
-        internal override Refs RefsImplementation
+        internal Refs RefsImplementation
         {
             get
             {
                 return
-                    CondCode.RefsImplementation.CreateSequence(ThenCode.RefsImplementation).CreateSequence(
-                        ElseCode.RefsImplementation);
+                    ThenCode.RefsImplementation.Sequence(ElseCode.RefsImplementation);
             }
         }
+
+        internal override Size InputSize { get { return Size.Create(1); } }
+        internal override Size OutputSize { get { return ThenCode.Size; } }
+
+        protected override string Format(StorageDescriptor start) { throw new NotImplementedException(); }
+
+        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
     [Serializable]
-    internal sealed class EndCondional : LeafElement
+    internal sealed class EndCondional : FiberItem
     {
-        protected override Size GetInputSize()
-        {
-            return Size.Zero;
-        }
+        internal override Size InputSize { get { return Size.Zero; } }
+        internal override Size OutputSize { get { return Size.Zero; } }
 
-        protected override Size GetSize()
-        {
-            return Size.Zero;
-        }
+        protected override string Format(StorageDescriptor start) { return StorageDescriptor.CreateEndCondional(); }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return StorageDescriptor.CreateEndCondional();
-        }
+        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
-    [Serializable]
 
-    internal sealed class Else : LeafElement
+    internal sealed class Else : FiberItem
     {
         [Node, IsDumpEnabled(true)]
         private readonly Size _thenSize;
 
-        public Else(Size thenSize)
-        {
-            _thenSize = thenSize;
-        }
+        public Else(Size thenSize) { _thenSize = thenSize; }
 
-        protected override Size GetSize()
-        {
-            return Size.Zero;
-        }
-
-        protected override Size GetInputSize()
-        {
-            return _thenSize;
-        }
-
-        protected override string Format(StorageDescriptor start)
-        {
-            return StorageDescriptor.CreateElse();
-        }
+        internal override Size OutputSize { get { return Size.Zero; } }
+        internal override Size InputSize { get { return _thenSize; } }
+        protected override string Format(StorageDescriptor start) { return StorageDescriptor.CreateElse(); }
+        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
     [Serializable]
-    internal sealed class Then : LeafElement
+    internal sealed class Then : FiberItem
     {
         [Node]
         internal readonly Size CondSize;
 
-        public Then(Size condSize)
-        {
-            CondSize = condSize;
-        }
+        public Then(Size condSize) { CondSize = condSize; }
 
-        protected override Size GetInputSize()
-        {
-            return CondSize;
-        }
+        internal override Size OutputSize { get { return Size.Zero; } }
+        internal override Size InputSize { get { return CondSize; } }
 
-        protected override Size GetSize()
+        internal override FiberItem[] TryToCombineBack(BitCast precedingElement)
         {
-            return Size.Zero;
-        }
-
-        internal override LeafElement TryToCombineBack(BitCast precedingElement)
-        {
-            if(precedingElement.Size == CondSize)
-                return new Then(precedingElement.TargetSize);
+            if(precedingElement.OutputSize == CondSize)
+                return new[] {new Then(precedingElement.TargetSize)};
             return null;
         }
 
-        internal override LeafElement TryToCombineBack(BitArrayBinaryOp precedingElement)
+        internal override FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement)
         {
-            if(precedingElement.Size == CondSize)
-                return new BitArrayOpThen(this, precedingElement);
+            if(precedingElement.OutputSize == CondSize)
+                return new[] {new BitArrayOpThen(this, precedingElement)};
             return null;
         }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.CreateThen(CondSize);
-        }
+        protected override string Format(StorageDescriptor start) { return start.CreateThen(CondSize); }
+        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
     [Serializable]
-    internal class BitArrayOpThen : LeafElement
+    internal class BitArrayOpThen : FiberItem
     {
         [Node, IsDumpEnabled(true)]
         private readonly BitArrayBinaryOp _bitArrayBinaryOp;
+
         [Node, IsDumpEnabled(true)]
         private readonly Then _thenCode;
 
@@ -159,20 +121,16 @@ namespace Reni.Code
             _bitArrayBinaryOp = bitArrayBinaryOp;
         }
 
-        protected override Size GetSize()
-        {
-            return _thenCode.Size;
-        }
+        internal override Size InputSize { get { return _bitArrayBinaryOp.DeltaSize + _bitArrayBinaryOp.OutputSize; } }
 
-        protected override Size GetInputSize()
-        {
-            return _bitArrayBinaryOp.DeltaSize + _bitArrayBinaryOp.Size;
-        }
+        internal override Size OutputSize { get { return _thenCode.OutputSize; } }
 
         protected override string Format(StorageDescriptor start)
         {
             return start
                 .CreateBitArrayOpThen(_bitArrayBinaryOp.OpToken, _bitArrayBinaryOp.LeftSize, _bitArrayBinaryOp.RightSize);
         }
+
+        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 }

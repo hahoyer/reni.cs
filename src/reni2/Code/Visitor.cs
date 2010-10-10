@@ -27,27 +27,22 @@ namespace Reni.Code
             NotImplementedMethod(visitedObject);
             return default(T);
         }
-        internal virtual T Child(T parent, LeafElement leafElement)
+
+        internal virtual T Fiber(Fiber visitedObject)
         {
-            NotImplementedMethod(parent, leafElement);
-            return default(T);
+            var newHead = visitedObject.FiberHead.Visit(this);
+            return Fiber(visitedObject,newHead);
         }
 
-        internal virtual T Leaf(LeafElement leafElement)
+        protected virtual T Fiber(Fiber visitedObject, T head)
         {
-            NotImplementedMethod(leafElement);
+            NotImplementedMethod(visitedObject, head);
             return default(T);
         }
 
         internal virtual T Pair(Pair visitedObject, T left, T right)
         {
             NotImplementedMethod(visitedObject, left, right);
-            return default(T);
-        }
-
-        internal virtual T ThenElse(ThenElse visitedObject, T condResult, T thenResult, T elseResult)
-        {
-            NotImplementedMethod(visitedObject, condResult, thenResult, elseResult);
             return default(T);
         }
 
@@ -85,24 +80,6 @@ namespace Reni.Code
             var right = pair.Right.Visit(tempActual);
             tempActual = tempActual.AfterAny(pair.Right.Size);
             return tempActual.Pair(pair, left, right);
-        }
-
-        internal virtual T ChildVisit(Child child)
-        {
-            var parent = child.Parent.Visit(this);
-            var tempActual = AfterAny(child.Parent.Size);
-            return tempActual.Child(parent, child.LeafElement);
-        }
-
-        internal virtual T ThenElseVisit(ThenElse @this)
-        {
-            var condResult = @this.CondCode.Visit(this);
-            var tempActual = AfterCond();
-            var thenResult = @this.ThenCode.Visit(tempActual);
-            tempActual = tempActual.AfterThen(@this.ThenCode.Size);
-            var elseResult = @this.ElseCode.Visit(tempActual);
-            tempActual = tempActual.AfterElse();
-            return tempActual.ThenElse(@this, condResult, thenResult, elseResult);
         }
 
     }

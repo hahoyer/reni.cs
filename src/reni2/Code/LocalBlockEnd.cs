@@ -9,7 +9,7 @@ namespace Reni.Code
     /// Code for end of statement
     /// </summary>
     [Serializable]
-    internal sealed class LocalBlockEnd : LeafElement
+    internal sealed class LocalBlockEnd : FiberItem
     {
         [Node]
         private readonly Size _intermediateSize;
@@ -24,22 +24,15 @@ namespace Reni.Code
             StopByObjectId(166);
         }
 
-        protected override Size GetSize()
-        {
-            return _intermediateSize + _size;
-        }
-
-        protected override Size GetInputSize()
-        {
-            return _intermediateSize + _size;
-        }
+        internal override Size InputSize { get { return _intermediateSize + _size; } }
+        internal override Size OutputSize { get { return _intermediateSize + _size; } }
 
         protected override string Format(StorageDescriptor start)
         {
             return start.CreateLocalBlockEnd(_size, _intermediateSize);
         }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalBlockEnd(Size, _intermediateSize); }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalBlockEnd(OutputSize, _intermediateSize); }
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " IntermediateSize=" + _intermediateSize; } }

@@ -72,7 +72,7 @@ namespace Reni
 
         public static Refs None() { return new Refs(); }
 
-        public Refs CreateSequence(Refs refs)
+        public Refs Sequence(Refs refs)
         {
             if(refs.Count == 0)
                 return this;
@@ -153,7 +153,7 @@ namespace Reni
             return result;
         }
 
-        public static Refs operator +(Refs x, Refs y) { return x.CreateSequence(y); }
+        public static Refs operator +(Refs x, Refs y) { return x.Sequence(y); }
         public static Refs operator -(Refs x, Refs y) { return x.Without(y); }
         public static Refs operator -(Refs x, IReferenceInCode y) { return x.Without(y); }
     }

@@ -8,12 +8,12 @@ namespace Reni.Code
     /// Expression to change size of an expression
     /// </summary>
     [Serializable]
-    internal sealed class BitCast : LeafElement
+    internal sealed class BitCast : FiberItem
     {
         private static int _nextId;
         private readonly Size _size;
         [Node]
-        private readonly Size SignificantSize;
+        private readonly Size _significantSize;
         [Node]
         [IsDumpEnabled(false)]
         internal readonly Size TargetSize;
@@ -21,107 +21,114 @@ namespace Reni.Code
         internal BitCast(Size size, Size targetSize, Size significantSize)
             : base(_nextId++)
         {
+            Tracer.Assert(size != targetSize || targetSize != significantSize);
             _size = size;
-            SignificantSize = significantSize.Min(size);
+            _significantSize = significantSize.Min(size);
             TargetSize = targetSize;
-            Tracer.Assert(TargetSize != Size || TargetSize != SignificantSize);
             StopByObjectId(-17);
         }
 
-        protected override Size GetSize() { return _size; }
+        [IsDumpEnabled(false)]
+        internal override Size OutputSize { get { return _size; } }
+        [IsDumpEnabled(false)]
+        internal override Size InputSize { get { return TargetSize; } }
 
-        protected override Size GetInputSize() { return TargetSize; }
+        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement) { return subsequentElement.TryToCombineBackN(this); }
-
-        internal override LeafElement[] TryToCombineBackN(BitCast precedingElement)
+        internal override FiberItem[] TryToCombineBack(BitCast precedingElement)
         {
-            if(precedingElement.Size != TargetSize)
+            if(precedingElement._size != TargetSize)
                 return null;
-            var significantSize = SignificantSize.Min(precedingElement.SignificantSize);
-            if (Size == TargetSize && Size == significantSize)
-                return new LeafElement[0];
-            if (Size == precedingElement.TargetSize && Size == significantSize)
-                return new LeafElement[0];
-            return new[] { new BitCast(Size, precedingElement.TargetSize, significantSize) };
+            var significantSize = _significantSize.Min(precedingElement._significantSize);
+            if (_size == TargetSize && _size == significantSize)
+                return new FiberItem[0];
+            if (_size == precedingElement.TargetSize && _size == significantSize)
+                return new FiberItem[0];
+            return new[] { new BitCast(_size, precedingElement.TargetSize, significantSize) };
         }
 
-        internal override LeafElement TryToCombineBack(BitArray precedingElement)
+        internal override CodeBase TryToCombineBack(BitArray precedingElement)
         {
             var bitsConst = precedingElement.Data;
-            if(bitsConst.Size > SignificantSize)
-                bitsConst = bitsConst.Resize(SignificantSize);
-            return new BitArray(Size, bitsConst);
+            if(bitsConst.Size > _significantSize)
+                bitsConst = bitsConst.Resize(_significantSize);
+            return new BitArray(_size, bitsConst);
         }
 
         [IsDumpEnabled(false)]
-        public override string NodeDump { get { return base.NodeDump + " TargetSize=" + TargetSize + " SignificantSize=" + SignificantSize; } }
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(Size, TargetSize, SignificantSize); }
+        public override string NodeDump { get { return base.NodeDump + " TargetSize=" + TargetSize + " SignificantSize=" + _significantSize; } }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(_size, TargetSize, _significantSize); }
 
-        internal override LeafElement[] TryToCombineBackN(TopData precedingElement)
+        internal override CodeBase TryToCombineBack(TopData precedingElement)
         {
-            if(precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
-                return new LeafElement[]
-                {
-                    new TopData(precedingElement.RefAlignParam, precedingElement.Offset, Size, SignificantSize),
-                    new BitCast(Size, Size, SignificantSize)
-                };
+            if(precedingElement.Size == TargetSize && _size >= _significantSize && _size > TargetSize)
+                return new Fiber
+                (
+                    new TopData(precedingElement.RefAlignParam, precedingElement.Offset, _size, _significantSize),
+                    new BitCast(_size, _size, _significantSize)
+                );
             return null;
         }
 
-        internal override LeafElement[] TryToCombineBackN(TopFrame precedingElement)
+        internal override CodeBase TryToCombineBack(TopFrame precedingElement)
         {
-            if(precedingElement.Size == TargetSize && Size >= SignificantSize && Size > TargetSize)
-                return new LeafElement[]
-                {
-                    new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, Size, SignificantSize),
-                    new BitCast(Size, Size, SignificantSize)
-                };
+            if(precedingElement.Size == TargetSize && _size >= _significantSize && _size > TargetSize)
+                return new Fiber
+                (
+                    new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, _size, _significantSize),
+                    new BitCast(_size, _size, _significantSize)
+                );
             return null;
         }
 
-        internal override LeafElement[] TryToCombineBackN(BitArrayBinaryOp precedingElement)
+        internal override FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement)
         {
-            if(TargetSize == Size)
+            if(TargetSize == _size)
                 return null;
 
-            var bitArrayOp = new BitArrayBinaryOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize,
-                precedingElement.LeftSize, precedingElement.RightSize);
+            FiberItem bitArrayOp = new BitArrayBinaryOp(
+                precedingElement.OpToken, 
+                precedingElement.OutputSize + _size - TargetSize,
+                precedingElement.LeftSize, 
+                precedingElement.RightSize);
 
-            if(SignificantSize == Size)
-                return new LeafElement[] {bitArrayOp};
+            if(_significantSize == _size)
+                return new[] {bitArrayOp};
 
-            return new LeafElement[] {bitArrayOp, new BitCast(Size, Size, SignificantSize)};
+            return new[] {bitArrayOp, new BitCast(_size, _size, _significantSize)};
         }
 
-        internal override LeafElement[] TryToCombineBackN(BitArrayPrefixOp precedingElement)
+        internal override FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement)
         {
-            if (TargetSize == Size)
+            if (TargetSize == _size)
                 return null;
 
-            var bitArrayOp = new BitArrayPrefixOp(precedingElement.OpToken, precedingElement.Size + Size - TargetSize, precedingElement.ArgSize);
+            var bitArrayOp = new BitArrayPrefixOp(
+                precedingElement.OpToken, 
+                precedingElement.OutputSize + _size - TargetSize, 
+                precedingElement.ArgSize);
 
-            if (SignificantSize == Size)
-                return new LeafElement[] { bitArrayOp };
+            if (_significantSize == _size)
+                return new FiberItem[] { bitArrayOp };
 
-            return new LeafElement[] { bitArrayOp, new BitCast(Size, Size, SignificantSize) };
+            return new FiberItem[] { bitArrayOp, new BitCast(_size, _size, _significantSize) };
         }
 
-        internal override LeafElement[] TryToCombineBackN(Dereference precedingElement)
+        internal override FiberItem[] TryToCombineBack(Dereference precedingElement)
         {
-            if(precedingElement.Size == TargetSize && TargetSize != Size)
+            if(precedingElement.OutputSize == TargetSize && TargetSize != _size)
             {
-                var dereference = new Dereference(precedingElement.RefAlignParam, Size,precedingElement.DataSize);
-                if (Size == SignificantSize)
-                    return new LeafElement[] {dereference};
-                return new LeafElement[] { dereference, new BitCast(Size, Size, SignificantSize) };
+                var dereference = new Dereference(precedingElement.RefAlignParam, _size,precedingElement.DataSize);
+                if (_size == _significantSize)
+                    return new FiberItem[] { dereference };
+                return new FiberItem[] { dereference, new BitCast(_size, _size, _significantSize) };
             }
             return null;
         }
 
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateBitCast(TargetSize, Size, SignificantSize);
+            return start.CreateBitCast(TargetSize, _size, _significantSize);
         }
     }
 }

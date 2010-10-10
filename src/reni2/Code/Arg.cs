@@ -5,7 +5,7 @@ namespace Reni.Code
     /// <summary>
     /// Arg is is used as a placeholder.
     /// </summary>
-    internal sealed class Arg : CodeBase
+    internal sealed class Arg : FiberHead
     {
         private static int _nextObjectId;
         private readonly Size _size;
@@ -14,10 +14,10 @@ namespace Reni.Code
             :base(_nextObjectId++)
         {
             _size = size;
-            StopByObjectId(11);
+            StopByObjectId(-11);
         }
 
-        protected override Size SizeImplementation { get { return _size; } }
+        protected override Size GetSize() { return _size; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Arg(this); }
     }
 }

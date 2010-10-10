@@ -34,7 +34,7 @@ namespace Reni
             var searchResult = new SearchResult<TFeature>(typeBase, this);
             _searchResults.Add(searchResult);
 
-            if(IsSuccessFull)
+            if (IsSuccessFull)
                 return;
 
             searchResult.SetSearchMode();

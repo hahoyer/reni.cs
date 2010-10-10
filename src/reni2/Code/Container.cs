@@ -11,8 +11,7 @@ namespace Reni.Code
     /// <summary>
     /// base class for all compiled code items
     /// </summary>
-    [Serializable]
-    internal sealed class Container : Visitor<int>
+    internal sealed class Container : ReniObject
     {
         private static readonly Container _unexpectedVisitOfPending = new Container("UnexpectedVisitOfPending");
         private readonly string _description;
@@ -25,18 +24,15 @@ namespace Reni.Code
         [IsDumpEnabled(true)]
         private readonly Size _frameSize;
 
-        [IsDumpEnabled(true)]
-        private readonly Size _maxSize;
-
         [IsDumpEnabled(false)]
-        private readonly List<LeafElement> _data = new List<LeafElement>();
+        private readonly CodeBase _data;
 
-        public Container(Size maxSize, Size frameSize, string description, bool isInternal)
+        public Container(CodeBase data, Size frameSize = null, string description = "", bool isInternal= false)
         {
-            _maxSize = maxSize;
             IsInternal = isInternal;
-            _frameSize = frameSize;
+            _frameSize = frameSize ?? Size.Zero;
             _description = description;
+            _data = data;
         }
 
         private Container(string errorText)
@@ -46,7 +42,7 @@ namespace Reni.Code
         }
 
         [Node, IsDumpEnabled(true)]
-        internal List<LeafElement> Data { get { return _data; } }
+        internal CodeBase Data { get { return _data; } }
 
         [Node, IsDumpEnabled(true)]
         internal string Description { get { return _description; } }
@@ -54,86 +50,14 @@ namespace Reni.Code
         internal bool IsError { get { return _frameSize == null; } }
 
         [Node, IsDumpEnabled(false)]
-        public Size MaxSize { get { return _maxSize; } }
+        public Size MaxSize { get { return _data.MaxSize; } }
         [Node, IsDumpEnabled(false)]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
 
-        private void DataAdd(LeafElement leafElement)
+        private void DataAdd(FiberItem leafElement)
         {
-            var toAdd = new List<LeafElement> {leafElement};
-            while(toAdd.Count > 0)
-            {
-                var next = toAdd[0];
-                toAdd.RemoveAt(0);
-
-                LeafElement[] newCorrectedElements = null;
-
-                if(_data.Count > 0)
-                    newCorrectedElements = _data[_data.Count - 1].TryToCombineN(next);
-
-                if(newCorrectedElements == null)
-                    _data.Add(next);
-                else
-                {
-                    _data.RemoveAt(_data.Count - 1);
-                    toAdd.InsertRange(0, newCorrectedElements);
-                }
-            }
+            NotImplementedMethod(leafElement);
         }
-
-        public BitsConst Eval(List<Container> functions)
-        {
-            NotImplementedMethod(functions);
-            throw new NotImplementedException();
-        }
-
-        internal override int ContextRef(ReferenceCode visitedObject)
-        {
-            if(!IsInternal)
-                throw new UnexpectedContextRefInContainer(this, visitedObject);
-            DataAdd(visitedObject.ToLeafElement);
-            return 1;
-        }
-
-        internal override int LocalReference(LocalReference visitedObject)
-        {
-            if(!IsInternal)
-                throw new UnexpectedInternalRefInContainer(this, visitedObject);
-            DataAdd(visitedObject.ToLeafElement);
-            return 1;
-        }
-
-        internal override int Child(int parent, LeafElement leafElement) { return parent + Leaf(leafElement); }
-
-        internal override int Leaf(LeafElement leafElement)
-        {
-            DataAdd(leafElement);
-            return 1;
-        }
-
-        internal override int Pair(Pair visitedObject, int left, int right) { return left + right; }
-
-        internal override int ThenElse(ThenElse visitedObject, int condResult, int thenResult, int elseResult) { return thenResult; }
-
-        protected override Visitor<int> AfterCond()
-        {
-            DataAdd(new Then(TypeBase.Bit.Size));
-            return this;
-        }
-
-        protected override Visitor<int> AfterThen(Size thenSize)
-        {
-            DataAdd(new Else(thenSize));
-            return this;
-        }
-
-        protected override Visitor<int> AfterElse()
-        {
-            DataAdd(new EndCondional());
-            return this;
-        }
-
-        public int Child(Child visitedObject, int parent) { return parent + visitedObject.AddTo(this); }
 
         public CodeTypeDeclaration GetCSharpTypeCode(List<Container> functions, string name, bool align)
         {
@@ -178,7 +102,7 @@ namespace Reni.Code
             if(useStatementAligner)
                 statements = StatementAligner(statements);
             statements = statements.Surround("{", "}");
-            statements = "fixed(sbyte*data=new sbyte[" + _maxSize.ByteCount + "])" + statements;
+            statements = "fixed(sbyte*data=new sbyte[" + MaxSize.ByteCount + "])" + statements;
             statements = statements.Indent(3);
             return statements;
         }
@@ -201,9 +125,6 @@ namespace Reni.Code
 
         internal BitsConst Evaluate()
         {
-            if(_data.Count == 1)
-                return _data[0].Evaluate();
-
             NotImplementedMethod();
             return null;
         }
@@ -230,20 +151,6 @@ namespace Reni.Code
                 : base(container, visitedObject) { }
         }
 
-        internal string CreateGraph()
-        {
-            var formalMaschine = new FormalMaschine(_maxSize);
-            string result = formalMaschine.CreateGraph() + "\n";
-            for(var index = 0; index < Data.Count; index++)
-            {
-                var t = Data[index];
-                result += "[" + index + "] " + t.Dump() + "\n";
-                t.Execute(formalMaschine);
-                result += formalMaschine.CreateGraph() + "\n";
-                formalMaschine.ShiftStartAddress(t.DeltaSize);
-            }
-            return result;
-        }
     }
 
     [Serializable]

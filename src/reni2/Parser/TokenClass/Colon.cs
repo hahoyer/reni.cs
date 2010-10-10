@@ -1,5 +1,6 @@
 using System;
 using HWClassLibrary.Debug;
+using JetBrains.Annotations;
 using Reni.Syntax;
 
 namespace Reni.Parser.TokenClass
@@ -73,12 +74,13 @@ namespace Reni.Parser.TokenClass
 
     internal sealed class PropertyDeclarationSyntax : DeclarationExtensionSyntax
     {
-        private new Token Token;
+        [UsedImplicitly]
+        private readonly Token _token;
 
         internal PropertyDeclarationSyntax(Token token, Token otherToken)
             : base(token)
         {
-            Token = otherToken;
+            _token = otherToken;
         }
 
         internal override bool IsProperty { get { return true; } }
@@ -92,17 +94,17 @@ namespace Reni.Parser.TokenClass
 
     internal sealed class ConverterDeclarationSyntax : DeclarationExtensionSyntax
     {
-        private new Token Token;
+        private readonly Token _token;
 
         internal ConverterDeclarationSyntax(Token token, Token otherToken)
             : base(token)
         {
-            Token = otherToken;
+            _token = otherToken;
         }
 
         protected override IParsedSyntax CreateDeclarationSyntax(Token token, IParsedSyntax right)
         {
-            return new ConverterSyntax(Token, right.CheckedToCompiledSyntax());
+            return new ConverterSyntax(_token, right.CheckedToCompiledSyntax());
         }
     }
 

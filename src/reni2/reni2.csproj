@@ -34,6 +34,7 @@
     <Compile Include="Code\ContextRef.cs" />
     <Compile Include="Code\Drop.cs" />
     <Compile Include="Code\Environment.cs" />
+    <Compile Include="Code\Fiber.cs" />
     <Compile Include="Code\FormalMaschine.cs" />
     <Compile Include="Code\FormalValueAccess.cs" />
     <Compile Include="Code\Generator.cs" />
@@ -41,13 +42,12 @@
     <Compile Include="Code\IFormalValue.cs" />
     <Compile Include="Code\LocalReference.cs" />
     <Compile Include="Code\IReferenceInCode.cs" />
-    <Compile Include="Code\Leaf.cs" />
     <Compile Include="Code\LeafElement.cs" />
     <Compile Include="Code\LocalReferenceSequenceVisitor.cs" />
     <Compile Include="Code\Multiplyop.cs" />
     <Compile Include="Code\Op.cs" />
     <Compile Include="Code\ReferenceCode.cs" />
-    <Compile Include="Code\RefLeafElement.cs" />
+    <Compile Include="Code\Ref.cs" />
     <Compile Include="Code\RefPlus.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceAbsoluteArg.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceArg.cs" />

@@ -19,7 +19,7 @@ namespace Reni.Parser
             _prioTable = prioTable;
         }
 
-        Token ITokenFactory.CreateToken(SourcePosn sourcePosn, int length) { return new Token(sourcePosn, length, Find(sourcePosn.SubString(0, length))); }
+        TokenClassBase ITokenFactory.CreateTokenClass(string name) { return Find(name); }
 
         private TokenClassBase Find(string name)
         {

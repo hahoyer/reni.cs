@@ -40,7 +40,7 @@ namespace Reni.Syntax
         protected override IParsedSyntax SurroundedByParenthesis(Token token, Token rightToken) { return this; }
 
         protected override ICompileSyntax ToCompiledSyntax() { return this; }
-        protected override IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right) { return new ExpressionSyntax(this, token, ParsedSyntaxExtender.ToCompiledSyntaxOrNull(right)); }
+        protected override IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right) { return new ExpressionSyntax(this, token, right.ToCompiledSyntaxOrNull()); }
     }
 
 }

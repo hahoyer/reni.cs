@@ -11,7 +11,7 @@ namespace Reni.Code
     /// Reference shift
     /// </summary>
     [Serializable]
-    internal sealed class RefPlus : LeafElement
+    internal sealed class RefPlus : FiberItem
     {
         private readonly RefAlignParam _refAlignParam;
 
@@ -22,7 +22,7 @@ namespace Reni.Code
         private readonly string _reason;
 
         [IsDumpEnabled(false)]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         public RefPlus(RefAlignParam refAlignParam, Size right, string reason)
         {
@@ -37,11 +37,10 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Right=" + _right + " Reason=" + _reason; } }
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.RefPlus(Size, _right); }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.RefPlus(GetSize(), _right); }
 
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
-
-        protected override Size GetInputSize() { return RefAlignParam.RefSize; }
+        internal override Size InputSize { get { return GetSize(); } }
+        internal override Size OutputSize { get { return GetSize(); } }
 
         protected override string Format(StorageDescriptor start)
         {
@@ -49,31 +48,34 @@ namespace Reni.Code
                 .CreateRefPlus(GetSize(), _right.SizeToPacketCount(RefAlignParam.AlignBits));
         }
 
-        internal override LeafElement TryToCombineBack(TopRef precedingElement)
+        private Size GetSize() { return RefAlignParam.RefSize; }
+
+        internal override CodeBase TryToCombineBack(TopRef precedingElement)
         {
-            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopRef(RefAlignParam, precedingElement.Offset + _right);
+            var reason = _reason + "(" + _right + ") + " + precedingElement.Reason;
+            return new TopRef(RefAlignParam, precedingElement.Offset + _right, reason);
         }
 
-        internal override LeafElement TryToCombineBack(FrameRef precedingElement)
+        internal override CodeBase TryToCombineBack(FrameRef precedingElement)
         {
-            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new FrameRef(RefAlignParam, precedingElement.Offset + _right);
+            var reason = _reason + "(" + _right + ") + " + precedingElement.Reason;
+            return new FrameRef(RefAlignParam, precedingElement.Offset + _right, reason);
         }
 
-        internal override LeafElement TryToCombine(LeafElement subsequentElement)
+        internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
         {
-            return subsequentElement
-                .TryToCombineBack(this);
+            return subsequentElement.TryToCombineBack(this);
         }
 
-        internal override LeafElement TryToCombineBack(RefPlus precedingElement)
+        internal override FiberItem[] TryToCombineBack(RefPlus precedingElement)
         {
-            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
-                return new RefPlus(RefAlignParam, _right + precedingElement._right, _reason + " + " + precedingElement._reason);
+            {
+                var reason = _reason + "(" + _right + ") + " + precedingElement._reason;
+                return new[]{new RefPlus(RefAlignParam, _right + precedingElement._right, reason)};
+            }
             return base.TryToCombineBack(precedingElement);
         }
     }

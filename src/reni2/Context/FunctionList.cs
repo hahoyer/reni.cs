@@ -34,10 +34,7 @@ namespace Reni.Context
 
         internal List<Code.Container> Compile()
         {
-            var result = new List<Code.Container>();
-            for(var i = 0; i < _list.Count; i++)
-                result.Add(this[i].Serialize(false));
-            return result;
+            return _list.Select((t, i) => this[i].Serialize(false)).ToList();
         }
 
         [Serializable]

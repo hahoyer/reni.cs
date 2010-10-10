@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
 namespace Reni.Code.ReplaceVisitor
@@ -9,26 +12,17 @@ namespace Reni.Code.ReplaceVisitor
     internal abstract class Base : Visitor<CodeBase>
     {
         private readonly DictionaryEx<LocalReference, LocalReference> _internalRefs;
-        public Base()
-        {
-            _internalRefs = new DictionaryEx<LocalReference, LocalReference>(ReVisit);
-        }
+        
+        protected Base() { _internalRefs = new DictionaryEx<LocalReference, LocalReference>(ReVisit); }
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
 
-        internal override CodeBase LocalReference(LocalReference visitedObject)
-        {
-            return _internalRefs.Find(visitedObject);
-        }
+        internal override CodeBase LocalReference(LocalReference visitedObject) { return _internalRefs.Find(visitedObject); }
 
-        internal override sealed CodeBase Child(CodeBase parent, LeafElement leafElement)
+        protected override CodeBase Fiber(Fiber visitedObject, CodeBase head)
         {
-            if(parent == null)
-                return null;
-            return parent.CreateChild(leafElement);
+            return head == null ? null : head.CreateFiber(visitedObject.FiberItems);
         }
-
-        internal override sealed CodeBase Leaf(LeafElement leafElement) { return null; }
 
         internal override CodeBase Pair(Pair visitedObject, CodeBase left, CodeBase right)
         {
@@ -39,20 +33,6 @@ namespace Reni.Code.ReplaceVisitor
             if(right == null)
                 right = visitedObject.Right;
             return left.Sequence(right);
-        }
-
-        internal override CodeBase ThenElse(ThenElse visitedObject, CodeBase condResult, CodeBase thenResult,
-            CodeBase elseResult)
-        {
-            if(condResult == null && thenResult == null && elseResult == null)
-                return null;
-            if(condResult == null)
-                condResult = visitedObject.CondCode;
-            if(thenResult == null)
-                thenResult = visitedObject.ThenCode;
-            if(elseResult == null)
-                elseResult = visitedObject.ElseCode;
-            return condResult.CreateThenElse(thenResult, elseResult);
         }
 
         protected override Visitor<CodeBase> AfterCond() { return this; }
@@ -66,7 +46,7 @@ namespace Reni.Code.ReplaceVisitor
         internal LocalReference ReVisit(LocalReference visitedObject)
         {
             var newCode = visitedObject.Code.Visit(this);
-            if (newCode == null)
+            if(newCode == null)
                 return null;
             return new LocalReference(visitedObject.RefAlignParam, newCode, visitedObject.DestructorCode);
         }

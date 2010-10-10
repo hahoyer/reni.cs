@@ -6,7 +6,7 @@ using Reni.Context;
 namespace Reni.Code
 {
     [Serializable]
-    internal class Assign : LeafElement
+    internal class Assign : FiberItem
     {
         [IsDumpEnabled(false)]
         private readonly RefAlignParam _refAlignParam;
@@ -23,9 +23,10 @@ namespace Reni.Code
             _targetSize = targetSize;
         }
 
-        protected override Size GetSize() { return Size.Zero; }
-
-        protected override Size GetInputSize() { return _refAlignParam.RefSize*2; }
+        [IsDumpEnabled(false)]
+        internal override Size InputSize { get { return _refAlignParam.RefSize * 2; } }
+        [IsDumpEnabled(false)]
+        internal override Size OutputSize { get { return Size.Zero; } }
 
         protected override string Format(StorageDescriptor start) { return start.CreateAssignment(_refAlignParam, _targetSize); }
     }

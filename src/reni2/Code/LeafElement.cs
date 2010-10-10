@@ -6,6 +6,7 @@ using Reni.Context;
 
 namespace Reni.Code
 {
+    [Obsolete]
     internal abstract class LeafElement : ReniObject, IIconKeyProvider
     {
         private static int _nextId;
@@ -39,19 +40,6 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal virtual LeafElement TryToCombine(LeafElement subsequentElement)
-        {
-            return null;
-        }
-
-        internal virtual LeafElement[] TryToCombineN(LeafElement subsequentElement)
-        {
-            var result = TryToCombine(subsequentElement);
-            if (result == null)
-                return null;
-            return new[]{result};
-        }
-
         internal virtual LeafElement[] TryToCombineBackN(TopData precedingElement)
         {
             var result = TryToCombineBack(precedingElement);
@@ -59,15 +47,6 @@ namespace Reni.Code
                 return null;
             return new[] { result };
         }
-
-        internal virtual LeafElement[] TryToCombineBackN(TopFrame precedingElement)
-        {
-            var result = TryToCombineBack(precedingElement);
-            if (result == null)
-                return null;
-            return new[] { result };
-        }
-
 
         internal virtual LeafElement[] TryToCombineBackN(BitArrayBinaryOp precedingElement)
         {
@@ -116,7 +95,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual LeafElement TryToCombineBack(FrameRef precedingElement)
+        internal virtual FiberHead TryToCombineBack(FrameRef precedingElement)
         {
             return null;
         }
@@ -131,7 +110,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual LeafElement TryToCombineBack(TopFrame precedingElement)
+        internal virtual FiberHead TryToCombineBack(TopFrame precedingElement)
         {
             return null;
         }

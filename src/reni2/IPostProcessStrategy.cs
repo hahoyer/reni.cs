@@ -17,7 +17,7 @@ namespace Reni
             return _result
                 .AutomaticDereference()
                 .Align(refAlignParam.AlignBits)
-                .CreateLocalBlock(category, refAlignParam);
+                .LocalBlock(category, refAlignParam);
         }
 
         internal Result FunctionResult(Category category, RefAlignParam refAlignParam)
@@ -25,7 +25,7 @@ namespace Reni
             return _result
                 .AutomaticDereference()
                 .Align(refAlignParam.AlignBits)
-                .CreateLocalBlock(category, refAlignParam);
+                .LocalBlock(category, refAlignParam);
         }
 
         internal Result ArgsResult(int alignBits)

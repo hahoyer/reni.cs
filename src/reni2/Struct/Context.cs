@@ -195,7 +195,7 @@ namespace Reni.Struct
         {
             return ContextReferenceType
                 .ArgResult(category)
-                .AddToReference(category, RefAlignParam, InternalSize(), "ContexReference");
+                .AddToReference(category, RefAlignParam, InternalSize(), "ContextReferenceAsArg");
         }
 
         private Result ReplaceContextReferenceByArg(Result result) { return result.ReplaceAbsolute(ForCode, () => ContextReferenceAsArg(result.CompleteCategory)); }
@@ -212,7 +212,7 @@ namespace Reni.Struct
         {
             return CodeBase
                 .ReferenceInCode(ForCode)
-                .AddToReference(RefAlignParam, InternalSize()*-1, "ContextCode");
+                .AddToReference(RefAlignParam, InternalSize() * -1, "CreateContextCode");
         }
 
         private Refs CreateContextRefs() { return Refs.Create(ForCode); }
@@ -228,11 +228,10 @@ namespace Reni.Struct
 
         private Result AutomaticDereference(TypeBase type, Size offset, Category category)
         {
-            return type
-                       .Reference(RefAlignParam)
-                       .Result(category, () => CreateRefArgCode().AddToReference(RefAlignParam, offset, "AutomaticDereference"))
-                       .AutomaticDereference()
-                   & category;
+            var reference = type.Reference(RefAlignParam);
+            var result = reference
+                .Result(category, () => CreateRefArgCode().AddToReference(RefAlignParam, offset, "AutomaticDereference"));
+            return result.AutomaticDereference()& category;
         }
 
         private CodeBase CreateRefArgCode() { return ContextType.Reference(RefAlignParam).ArgCode(); }
@@ -242,7 +241,7 @@ namespace Reni.Struct
             var internalResult = InternalResult(category - Category.Type);
             _internalConstructorResult.Update(internalResult);
             var result = ContextType.Result(category, internalResult);
-            var constructorResult = result.ReplaceRelative(this, () => CodeBase.CreateTopRef(RefAlignParam));
+            var constructorResult = result.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam, "Context.ConstructorResult"));
             _constructorResult.Update(constructorResult);
             return constructorResult;
         }

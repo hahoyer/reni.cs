@@ -20,9 +20,9 @@ namespace Reni.Code
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
+        protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
-            return subsequentElement.TryToCombineBackN(this);
+            return subsequentElement.TryToCombineBack(this);
         }
 
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopData(Offset, Size, DataSize); }
@@ -50,15 +50,16 @@ namespace Reni.Code
         {
             StopByObjectId(544);
         }
+
         /// <summary>
         /// Tries to combine two leaf elements. .
         /// </summary>
         /// <param name="subsequentElement">the element that follows.</param>
         /// <returns>null if no combination possible (default) or a leaf element that contains the combination of both</returns>
         /// created 19.10.2006 21:18
-        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
+        protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
-            return subsequentElement.TryToCombineBackN(this);
+            return subsequentElement.TryToCombineBack(this);
         }
 
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrame(Offset, Size, DataSize); }

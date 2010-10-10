@@ -7,7 +7,7 @@ using Reni.Context;
 namespace Reni.Code
 {
     [Serializable]
-    internal abstract class Top : LeafElement
+    internal abstract class Top : FiberHead
     {
         [Node, IsDumpEnabled(false)]
         internal protected readonly Size Offset;
@@ -29,11 +29,6 @@ namespace Reni.Code
             return _size;
         }
 
-        protected override Size GetInputSize()
-        {
-            return Size.Zero;
-        }
-
         [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
         [IsDumpEnabled(false)]
@@ -41,5 +36,6 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset + " DataSize=" + _dataSize; } }
+
     }
 }

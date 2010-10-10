@@ -17,10 +17,10 @@ namespace Reni.Parser.TokenClass
     {
         internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
         {
-            if(left == null && right == null)
+            if (left == null && right == null)
                 return new DefinableTokenSyntax(token);
-            if(left == null)
-                return new ExpressionSyntax(null, token, ParsedSyntaxExtender.ToCompiledSyntaxOrNull(right));
+            if (left == null)
+                return new ExpressionSyntax(null, token, right.ToCompiledSyntaxOrNull());
             return left.CreateSyntaxOrDeclaration(token, right);
         }
 

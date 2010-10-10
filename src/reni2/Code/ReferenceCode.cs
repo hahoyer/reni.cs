@@ -6,7 +6,7 @@ namespace Reni.Code
     /// <summary>
     /// ContextAtPosition reference, should be replaced
     /// </summary>
-    internal sealed class ReferenceCode : CodeBase
+    internal sealed class ReferenceCode : FiberHead
     {
         private readonly ContextRef _leafElement;
         private static int _nextObjectId;
@@ -19,9 +19,10 @@ namespace Reni.Code
         [Node]
         internal IReferenceInCode Context { get { return _leafElement.Context; } }
         [IsDumpEnabled(false)]
-        internal LeafElement ToLeafElement { get { return _leafElement; } }
-        [IsDumpEnabled(false)]
-        protected override Size SizeImplementation { get { return _leafElement.Size; } }
+        internal ContextRef ToLeafElement { get { return _leafElement; } }
+
+        protected override Size GetSize() { return _leafElement.OutputSize; }
+
         [IsDumpEnabled(false)]
         internal override Refs RefsImplementation { get { return _leafElement.GetRefs(); } }
 

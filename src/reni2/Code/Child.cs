@@ -11,6 +11,7 @@ namespace Reni.Code
     /// <summary>
     /// 
     /// </summary>
+    [Obsolete]
     internal sealed class Child : CodeBase
     {
         private readonly LeafElement _leafElement;
@@ -32,8 +33,7 @@ namespace Reni.Code
         [Node]
         internal LeafElement LeafElement { get { return _leafElement; } }
 
-        [IsDumpEnabled(false)]
-        protected override Size SizeImplementation { get { return LeafElement.Size; } }
+        protected override Size GetSize() { return LeafElement.Size; }
 
         [IsDumpEnabled(false)]
         protected override Size MaxSizeImplementation { get { return Parent.MaxSize.Max(LeafElement.Size); } }
@@ -41,19 +41,10 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal override Refs RefsImplementation { get { return Parent.RefsImplementation; } }
 
+        internal override CodeBase CreateFiber(FiberItem subsequentElement) { throw new NotImplementedException(); }
+
         [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
-
-        internal override CodeBase CreateChild(LeafElement leafElement)
-        {
-            var newLeafElement = LeafElement.TryToCombineN(leafElement);
-            if(newLeafElement != null)
-                return Parent.CreateChildren(newLeafElement);
-
-            return base.CreateChild(leafElement);
-        }
-
-        protected override T VisitImplementation<T>(Visitor<T> actual) { return actual.ChildVisit(this); }
 
         internal int AddTo(Container container)
         {

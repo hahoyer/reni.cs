@@ -44,7 +44,7 @@ namespace Reni.Code
             var newVisitedObject = ReVisit(visitedObject) ?? visitedObject;
             var offset = Find(newVisitedObject);
             _codeCache.Reset();
-            return LocalReferenceCode(newVisitedObject.RefAlignParam, offset, "LocalReference");
+            return CodeBase.LocalReferenceCode(newVisitedObject.RefAlignParam, offset, "LocalReferenceSequenceVisitor.LocalReference");
         }
 
         private Size Find(LocalReference localReference)
@@ -58,12 +58,10 @@ namespace Reni.Code
             return result + localReference.Code.Size;
         }
 
-        internal static CodeBase LocalReferenceCode(RefAlignParam refAlignParam, Size size, string reason) { return CodeBase.Arg(refAlignParam.RefSize).AddToReference(refAlignParam, size*(-1), reason); }
-
-        internal CodeBase CreateLocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
+        internal CodeBase LocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
-            var trace = body.ObjectId == -438 || body.ObjectId == -440;
+            var trace = body.ObjectId == 26 || body.ObjectId == -440;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();
@@ -78,8 +76,7 @@ namespace Reni.Code
                 .Sequence(gap, alignedBody, DestructorCode)
                 .CreateLocalBlockEnd(copier, refAlignParam, resultSize);
             DumpWithBreak(trace, "statement", statement);
-            var result = statement
-                .ReplaceArg(CodeBase.CreateTopRef(refAlignParam));
+            var result = statement.ReplaceArg(CodeBase.TopRef(refAlignParam, "LocalReferenceSequenceVisitor.LocalBlock"));
             return ReturnMethodDump(trace, result);
         }
     }

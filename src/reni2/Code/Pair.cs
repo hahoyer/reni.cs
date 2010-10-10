@@ -9,7 +9,7 @@ namespace Reni.Code
     /// <summary>
     /// Pair of code elements, first element can be accessed
     /// </summary>
-    internal sealed class Pair : CodeBase
+    internal sealed class Pair : FiberHead
     {
         private readonly CodeBase _left;
         private readonly CodeBase _right;
@@ -30,11 +30,10 @@ namespace Reni.Code
         [Node]
         internal CodeBase Right { get { return _right; } }
 
-        [IsDumpEnabled(false)]
-        protected override Size SizeImplementation { get { return Left.Size + Right.Size; } }
+        protected override Size GetSize() { return Left.Size + Right.Size; }
 
         [IsDumpEnabled(false)]
-        internal override Refs RefsImplementation { get { return _left.RefsImplementation.CreateSequence(_right.RefsImplementation); } }
+        internal override Refs RefsImplementation { get { return _left.RefsImplementation.Sequence(_right.RefsImplementation); } }
 
         protected override T VisitImplementation<T>(Visitor<T> actual) { return actual.PairVisit(this); }
 

@@ -61,19 +61,12 @@ namespace Reni
             [Node, IsDumpEnabled(true)]
             public bool Syntax;
 
-            /// <summary>
-            /// Shows or hides a graphic repesentation of generated code
-            /// </summary>
-            [Node, IsDumpEnabled(true)]
-            public bool CodeGraph;
-
             public void None()
             {
                 Source = false;
                 Syntax = false;
                 CodeTree = false;
                 CodeSequence = false;
-                CodeGraph = false;
                 ExecutedCode = false;
                 Functions = false;
             }
@@ -84,7 +77,6 @@ namespace Reni
                 Syntax = true;
                 CodeTree = true;
                 CodeSequence = true;
-                CodeGraph = false;
                 ExecutedCode = true;
                 Functions = true;
             }

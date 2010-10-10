@@ -7,7 +7,7 @@ using Reni.Context;
 
 namespace Reni.Code
 {
-    internal class LocalReference : CodeBase, IReferenceInCode
+    internal class LocalReference : FiberHead, IReferenceInCode
     {
         private readonly RefAlignParam _refAlignParam;
 
@@ -28,7 +28,7 @@ namespace Reni.Code
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IReferenceInCode.IsChildOf(ContextBase contextBase) { return false; }
 
-        protected override Size SizeImplementation { get { return _refAlignParam.RefSize; } }
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
         protected override bool IsRelativeReference { get { return false; } }
 
@@ -39,11 +39,11 @@ namespace Reni.Code
         internal CodeBase AccompayningDestructorCode(ref Size size)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(LocalReferenceSequenceVisitor.LocalReferenceCode(RefAlignParam, size, "AccompayningDestructorCode"));
+            return DestructorCode.ReplaceArg(LocalReferenceCode(RefAlignParam, size, "AccompayningDestructorCode"));
         }
 
         [IsDumpEnabled(false)]
-        public LeafElement ToLeafElement { get { return new ContextRef(this); } }
+        public ContextRef ToLeafElement { get { return new ContextRef(this); } }
 
 
     }

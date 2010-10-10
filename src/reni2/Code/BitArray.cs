@@ -8,7 +8,7 @@ using Reni.Context;
 namespace Reni.Code
 {
     [Serializable]
-    internal class BitArray : StartingLeafElement
+    internal class BitArray : FiberHead
     {
         private readonly Size _size;
 
@@ -26,7 +26,8 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         internal override bool IsEmpty { get { return Data.IsEmpty; } }
-        internal override LeafElement TryToCombine(LeafElement subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+
+        protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
         internal override BitsConst Evaluate() { return Data.Resize(_size); }
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitsArray(Size, Data); }
         [IsDumpEnabled(false)]
@@ -39,6 +40,6 @@ namespace Reni.Code
             return start.CreateBitsArray(GetSize(), Data);
         }
 
-        internal static BitArray Void() { return new BitArray(Size.Create(0), BitsConst.None()); }
+        internal new static BitArray Void() { return new BitArray(Size.Create(0), Reni.BitsConst.None()); }
     }
 }

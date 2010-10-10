@@ -26,37 +26,36 @@ namespace Reni.Code
             StopByObjectId(-381);
         }
 
-        protected override Size GetSize()
-        {
-            return _size;
-        }
-
         protected override string Format(StorageDescriptor start)
         {
-            return start.CreateBitArrayOp(OpToken, GetSize(), LeftSize, RightSize);
+            return start.CreateBitArrayOp(OpToken, OutputSize, LeftSize, RightSize);
         }
 
-        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
+        internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
         {
-            return subsequentElement.TryToCombineBackN(this);
+            return subsequentElement.TryToCombineBack(this);
         }
 
         [IsDumpEnabled(false)]
-        public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> " + OpToken.DataFunctionName + " <" + RightSize + ">"; } }
+        internal override Size OutputSize { get { return _size; } }
+        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayBinaryOp(OpToken, Size, LeftSize, RightSize); }
+        [IsDumpEnabled(false)]
+        public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> " + OpToken.DataFunctionName + " <" + RightSize + ">"; } }
     }
 
     /// <summary>
     /// Bit array prefix operation
     /// </summary>
     [Serializable]
-    internal sealed class BitArrayPrefixOp : LeafElement
+    internal sealed class BitArrayPrefixOp : FiberItem
     {
         [Node]
+        [IsDumpEnabled(false)]
         internal readonly ISequenceOfBitPrefixOperation OpToken;
         private readonly Size _size;
         [Node]
+        [IsDumpEnabled(false)]
         internal readonly Size ArgSize;
 
         internal BitArrayPrefixOp(ISequenceOfBitPrefixOperation name, Size size, Size argSize)
@@ -66,23 +65,21 @@ namespace Reni.Code
             ArgSize = argSize;
         }
 
-        protected override Size GetSize()
+        [IsDumpEnabled(false)]
+        internal override Size InputSize { get { return ArgSize; } }
+        [IsDumpEnabled(false)]
+        internal override Size OutputSize { get { return _size; } }
+        
+        internal override void Execute(IFormalMaschine formalMaschine)
         {
-            return _size;
+            NotImplementedMethod(formalMaschine);
+            throw new NotImplementedException();
         }
+        protected override string Format(StorageDescriptor start) { return start.CreateBitArrayPrefixOp(OpToken, _size, ArgSize); }
 
-        protected override Size GetInputSize()
+        internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
         {
-            return ArgSize;
-        }
-
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.CreateBitArrayPrefixOp(OpToken, GetSize(), ArgSize);
-        }
-        internal override LeafElement[] TryToCombineN(LeafElement subsequentElement)
-        {
-            return subsequentElement.TryToCombineBackN(this);
+            return subsequentElement.TryToCombineBack(this);
         }
 
         [IsDumpEnabled(false)]
@@ -97,23 +94,17 @@ namespace Reni.Code
     {
         internal DumpPrintOperation(Size leftSize, Size rightSize) : base(leftSize, rightSize) {}
 
-        protected override Size GetSize()
-        {
-            return Size.Zero;
-        }
-
+        [IsDumpEnabled(false)]
+        internal override Size OutputSize { get { return Size.Zero; } }
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintOperation(LeftSize,RightSize); }
+        protected override string Format(StorageDescriptor start) { return start.CreateDumpPrint(LeftSize, RightSize); }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.CreateDumpPrint(LeftSize, RightSize);
-        }
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
     }
     [Serializable]
 
-    internal sealed class DumpPrintText : StartingLeafElement
+    internal sealed class DumpPrintText : FiberHead
     {
         [Node, IsDumpEnabled(true)]
         private readonly string _dumpPrintText;

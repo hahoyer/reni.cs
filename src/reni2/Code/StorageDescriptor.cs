@@ -8,7 +8,7 @@ using Reni.Type;
 
 namespace Reni.Code
 {
-    internal class StorageDescriptor : ReniObject
+    internal sealed class StorageDescriptor : ReniObject
     {
         private Size _start;
         private readonly Size _dataEndAddr;
@@ -39,7 +39,7 @@ namespace Reni.Code
                    + "; // FunctionReturn";
         }
 
-        internal string CreateFunctionBody(List<LeafElement> data, bool isFunction)
+        internal string CreateFunctionBody(CodeBase data, bool isFunction)
         {
             var result = GetStatements(data);
             if(isFunction)
@@ -457,15 +457,16 @@ namespace Reni.Code
             return false;
         }
 
-        private string GetStatements(List<LeafElement> data)
+        private string GetStatements(CodeBase data)
         {
+            NotImplementedMethod(data);
             var result = "";
-            for(var index = 0; index < data.Count; index++)
-            {
-                var t = data[index];
-                result += t.Statements(this);
-                ShiftStartAddress(t.DeltaSize);
-            }
+            //for(var index = 0; index < data.Count; index++)
+            //{
+            //    var t = data[index];
+            //    result += t.Statements(this);
+            //    ShiftStartAddress(t.DeltaSize);
+            //}
             return result;
         }
 

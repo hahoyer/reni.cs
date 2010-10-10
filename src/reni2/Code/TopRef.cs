@@ -6,12 +6,12 @@ using Reni.Context;
 namespace Reni.Code
 {
     [Serializable]
-    internal sealed class TopRef : RefLeafElement
+    internal sealed class TopRef : Ref
     {
-        public TopRef(RefAlignParam refAlignParam, Size offset)
-            : base(refAlignParam, offset)
+        public TopRef(RefAlignParam refAlignParam, Size offset, string reason)
+            : base(refAlignParam, offset,reason)
         {
-            StopByObjectId(34);
+            StopByObjectId(37);
         }
 
         protected override string Format(StorageDescriptor start)
@@ -19,7 +19,7 @@ namespace Reni.Code
             return start.CreateTopRef(RefAlignParam, Offset);
         }
 
-        internal override LeafElement TryToCombine(LeafElement subsequentElement)
+        protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
@@ -28,10 +28,10 @@ namespace Reni.Code
     }
 
     [Serializable]
-    internal sealed class FrameRef : RefLeafElement
+    internal sealed class FrameRef : Ref
     {
-        public FrameRef(RefAlignParam refAlignParam, Size offset)
-            : base(refAlignParam, offset)
+        public FrameRef(RefAlignParam refAlignParam, Size offset, string reason)
+            : base(refAlignParam, offset, reason)
         {
             StopByObjectId(547);
         }
@@ -41,7 +41,7 @@ namespace Reni.Code
             return start.CreateFrameRef(RefAlignParam, Offset);
         }
 
-        internal override LeafElement TryToCombine(LeafElement subsequentElement)
+        protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
