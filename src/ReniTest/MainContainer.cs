@@ -9,6 +9,7 @@ using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
 using Reni.FeatureTest;
+using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.Struct;
@@ -24,14 +25,15 @@ namespace ReniTest
             
             //TestGenerated.Exec();
             //CompilerTest.Run("Test", Target, Output);
-            RunSpecificTest();
-            //Assembly.GetExecutingAssembly().RunTests();
+            //RunSpecificTest();
+            Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
         }
 
         [Test, Category(CompilerTest.UnderConstruction)]
         private static void RunSpecificTest()
         {
+            new NegativeNumbers().RunFlat();
             new InnerAccess().RunFlat();
             new AccessAndAdd().RunFlat();
             new IntegerPlusNumber().RunFlat();
