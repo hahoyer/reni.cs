@@ -109,7 +109,7 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
+    [TestFixture, BitArrayOp.Number]
     [TargetSet("5, (this _A_T_ 0) dump_print", "5")]
     [TargetSet("5,6, (this _A_T_ 0) dump_print", "5")]
     [TargetSet("5,6, (this _A_T_ 1) dump_print", "6")]

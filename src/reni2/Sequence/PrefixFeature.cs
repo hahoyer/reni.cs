@@ -32,7 +32,7 @@ namespace Reni.Sequence
         {
             var type = TypeBase.Number(objSize.ToInt());
             return type.Result(category,
-                                     () => CodeBase.CreateBitSequenceOperation(type.Size, _definable, objSize));
+                                     () => CodeBase.BitSequenceOperation(type.Size, _definable, objSize));
         }
     }
 

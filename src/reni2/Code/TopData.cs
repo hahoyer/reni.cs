@@ -22,7 +22,10 @@ namespace Reni.Code
         /// created 19.10.2006 21:18
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
-            return subsequentElement.TryToCombineBack(this);
+            var fiber = subsequentElement.TryToCombineBack(this);
+            if (fiber == null)
+                return null;
+            return fiber;
         }
 
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopData(Offset, Size, DataSize); }
@@ -33,7 +36,7 @@ namespace Reni.Code
         /// <param name="start">The start.</param>
         /// <returns></returns>
         /// created 07.10.2006 21:11
-        protected override string Format(StorageDescriptor start)
+        internal override string Format(StorageDescriptor start)
         {
             return start.CreateTopData(RefAlignParam, Offset, GetSize(), DataSize);
         }
@@ -59,7 +62,10 @@ namespace Reni.Code
         /// created 19.10.2006 21:18
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
-            return subsequentElement.TryToCombineBack(this);
+            var fiber = subsequentElement.TryToCombineBack(this);
+            if (fiber == null)
+                return null;
+            return fiber;
         }
 
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrame(Offset, Size, DataSize); }
@@ -70,7 +76,7 @@ namespace Reni.Code
         /// <param name="start">The start.</param>
         /// <returns></returns>
         /// created 07.10.2006 21:11
-        protected override string Format(StorageDescriptor start)
+        internal override string Format(StorageDescriptor start)
         {
             return start.CreateTopFrame(RefAlignParam, Offset, GetSize(), DataSize);
         }

@@ -26,11 +26,6 @@ namespace Reni.Code
             StopByObjectId(-381);
         }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.CreateBitArrayOp(OpToken, OutputSize, LeftSize, RightSize);
-        }
-
         internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
@@ -75,7 +70,6 @@ namespace Reni.Code
             NotImplementedMethod(formalMaschine);
             throw new NotImplementedException();
         }
-        protected override string Format(StorageDescriptor start) { return start.CreateBitArrayPrefixOp(OpToken, _size, ArgSize); }
 
         internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
         {
@@ -96,8 +90,13 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return Size.Zero; } }
+
+        internal override string Format()
+        {
+            return "DumpPrint(" + InputSize + ")";
+        }
+
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintOperation(LeftSize,RightSize); }
-        protected override string Format(StorageDescriptor start) { return start.CreateDumpPrint(LeftSize, RightSize); }
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
@@ -115,7 +114,7 @@ namespace Reni.Code
         }
 
         protected override Size GetSize() { return Size.Zero; }
-        protected override string Format(StorageDescriptor start) { return StorageDescriptor.CreateDumpPrintText(_dumpPrintText); }
+        internal override string Format(StorageDescriptor start) { return StorageDescriptor.CreateDumpPrintText(_dumpPrintText); }
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(); }
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }

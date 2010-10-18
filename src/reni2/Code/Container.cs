@@ -154,14 +154,12 @@ namespace Reni.Code
     }
 
     [Serializable]
-    internal class ErrorElement : LeafElement
+    internal class ErrorElement : FiberHead
     {
         [Node]
         internal readonly CodeBase CodeBase;
         public ErrorElement(CodeBase codeBase) { CodeBase = codeBase; }
         protected override Size GetSize() { return Size.Zero; }
-        protected override Size GetInputSize() { return Size.Zero; }
-        protected override bool IsError { get { return true; } }
     }
 
     /// <summary>

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code
@@ -31,7 +33,7 @@ namespace Reni.Code
         internal virtual T Fiber(Fiber visitedObject)
         {
             var newHead = visitedObject.FiberHead.Visit(this);
-            return Fiber(visitedObject,newHead);
+            return Fiber(visitedObject, newHead);
         }
 
         protected virtual T Fiber(Fiber visitedObject, T head)
@@ -40,15 +42,9 @@ namespace Reni.Code
             return default(T);
         }
 
-        internal virtual T Pair(Pair visitedObject, T left, T right)
-        {
-            NotImplementedMethod(visitedObject, left, right);
-            return default(T);
-        }
-
         private Visitor<T> AfterAny(Size size)
         {
-            if (size.IsZero)
+            if(size.IsZero)
                 return this;
             return After(size);
         }
@@ -73,14 +69,10 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual T PairVisit(Pair pair)
+        internal virtual T FiberHead(FiberHead visitedObject)
         {
-            var left = pair.Left.Visit(this);
-            var tempActual = AfterAny(pair.Left.Size);
-            var right = pair.Right.Visit(tempActual);
-            tempActual = tempActual.AfterAny(pair.Right.Size);
-            return tempActual.Pair(pair, left, right);
+            NotImplementedMethod(visitedObject);
+            return default(T);
         }
-
     }
 }

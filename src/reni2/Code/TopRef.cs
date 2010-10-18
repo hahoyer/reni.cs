@@ -14,7 +14,7 @@ namespace Reni.Code
             StopByObjectId(37);
         }
 
-        protected override string Format(StorageDescriptor start)
+        internal override string Format(StorageDescriptor start)
         {
             return start.CreateTopRef(RefAlignParam, Offset);
         }
@@ -36,7 +36,7 @@ namespace Reni.Code
             StopByObjectId(547);
         }
 
-        protected override string Format(StorageDescriptor start)
+        internal override string Format(StorageDescriptor start)
         {
             return start.CreateFrameRef(RefAlignParam, Offset);
         }

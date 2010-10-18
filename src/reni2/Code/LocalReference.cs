@@ -7,7 +7,7 @@ using Reni.Context;
 
 namespace Reni.Code
 {
-    internal class LocalReference : FiberHead, IReferenceInCode
+    internal sealed class LocalReference : FiberHead, IReferenceInCode
     {
         private readonly RefAlignParam _refAlignParam;
 

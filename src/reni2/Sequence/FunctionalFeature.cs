@@ -31,7 +31,7 @@ namespace Reni.Sequence
         private Result Apply(Category category, int objSize, int argsSize)
         {
             var type = _feature.ResultType(objSize, argsSize);
-            return type.Result(category, () => CodeBase.CreateBitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize));
+            return type.Result(category, () => CodeBase.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize));
         }
 
         TypeBase IFeature.DefiningType() { return _parent; }

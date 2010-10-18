@@ -16,32 +16,17 @@ namespace Reni.Code.ReplaceVisitor
         protected Base() { _internalRefs = new DictionaryEx<LocalReference, LocalReference>(ReVisit); }
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
-
+        internal override CodeBase ContextRef(ReferenceCode visitedObject) { return null; }
+        internal override CodeBase FiberHead(FiberHead visitedObject) { return null; }
         internal override CodeBase LocalReference(LocalReference visitedObject) { return _internalRefs.Find(visitedObject); }
+        protected override Visitor<CodeBase> AfterCond() { return this; }
+        protected override Visitor<CodeBase> AfterElse() { return this; }
+        protected override Visitor<CodeBase> AfterThen(Size theSize) { return this; }
 
         protected override CodeBase Fiber(Fiber visitedObject, CodeBase head)
         {
             return head == null ? null : head.CreateFiber(visitedObject.FiberItems);
         }
-
-        internal override CodeBase Pair(Pair visitedObject, CodeBase left, CodeBase right)
-        {
-            if(left == null && right == null)
-                return null;
-            if(left == null)
-                left = visitedObject.Left;
-            if(right == null)
-                right = visitedObject.Right;
-            return left.Sequence(right);
-        }
-
-        protected override Visitor<CodeBase> AfterCond() { return this; }
-
-        protected override Visitor<CodeBase> AfterThen(Size theSize) { return this; }
-
-        protected override Visitor<CodeBase> AfterElse() { return this; }
-
-        internal override CodeBase ContextRef(ReferenceCode visitedObject) { return null; }
 
         internal LocalReference ReVisit(LocalReference visitedObject)
         {

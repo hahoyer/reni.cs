@@ -3,7 +3,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Code
 {
-    internal class Drop : FiberItem
+    internal sealed class Drop : FiberItem
     {
         private readonly Size _beforeSize;
         private readonly Size _afterSize;
@@ -19,7 +19,7 @@ namespace Reni.Code
         internal override Size InputSize { get { return _beforeSize; } }
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _afterSize; } }
-        protected override string Format(StorageDescriptor start) { return ""; }
+
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; } }
     }

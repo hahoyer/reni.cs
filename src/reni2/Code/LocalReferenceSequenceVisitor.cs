@@ -9,7 +9,7 @@ using Reni.Context;
 
 namespace Reni.Code
 {
-    internal class LocalReferenceSequenceVisitor : Base
+    internal sealed class LocalReferenceSequenceVisitor : Base
     {
         private readonly SimpleCache<CodeBase> _codeCache;
 
@@ -61,7 +61,7 @@ namespace Reni.Code
         internal CodeBase LocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
-            var trace = body.ObjectId == 26 || body.ObjectId == -440;
+            var trace = body.ObjectId == 736 || body.ObjectId == -440;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();

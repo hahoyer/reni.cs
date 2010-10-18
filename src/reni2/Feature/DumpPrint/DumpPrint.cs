@@ -9,7 +9,7 @@ namespace Reni.Feature.DumpPrint
 {
     internal abstract class BitFeatureBase : ReniObject
     {
-        protected static Result Apply(Category category, int objSize) { return TypeBase.Void.Result(category, () => CodeBase.CreateBitSequenceDumpPrint(objSize)); }
+        protected static Result Apply(Category category, int objSize) { return TypeBase.Void.Result(category, () => CodeBase.BitSequenceDumpPrint(objSize)); }
     }
 
     internal sealed class BitSequenceFeature :

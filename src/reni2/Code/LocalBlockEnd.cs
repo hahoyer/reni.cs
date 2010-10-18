@@ -27,11 +27,6 @@ namespace Reni.Code
         internal override Size InputSize { get { return _intermediateSize + _size; } }
         internal override Size OutputSize { get { return _intermediateSize + _size; } }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.CreateLocalBlockEnd(_size, _intermediateSize);
-        }
-
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalBlockEnd(OutputSize, _intermediateSize); }
 
         [IsDumpEnabled(false)]

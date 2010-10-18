@@ -197,8 +197,6 @@ namespace Reni.Context
 
         public int FunctionIndex { get { return _functionIndex; } }
 
-        internal override CodeBase PairVisit(Code.Pair pair) { return Pair(pair, null, pair.Right.Visit(this)); }
-
         public FiberItem CallVisit(Call @this) { return @this.TryConvertToRecursiveCall(_functionIndex); }
     }
 }

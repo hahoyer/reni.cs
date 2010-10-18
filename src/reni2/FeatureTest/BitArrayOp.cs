@@ -5,7 +5,7 @@ namespace Reni.FeatureTest.BitArrayOp
     /// <summary>
     /// Operations on bitarrays
     /// </summary>
-    [TestFixture]
+    [TestFixture, Number]
     public class BitArrayOp : CompilerTest
     {
         /// <summary>
@@ -34,7 +34,7 @@ namespace Reni.FeatureTest.BitArrayOp
 
     [TestFixture,
     Target(@"(1, 12)dump_print"),
-    Output("(1, 12)")]
+    Output("(1, 12)"), Number]
     public class TwoPositiveNumbers : CompilerTest
     {
         [Test, Category(Worked)]
@@ -68,35 +68,42 @@ namespace Reni.FeatureTest.BitArrayOp
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(2+4) dump_print"), Output("6")]
-    public class Add2Numbers : CompilerTest
+    [TestFixture, Target(@"3 dump_print"), Output("3")]
+    public class Number : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(40000 - 1  )dump_print"), Output("39999")]
+    [TestFixture, Target(@"(2+4) dump_print"), Output("6"), Number]
+    public class Add2Numbers : CompilerTest
+    {
+        [Test, Category(UnderConstruction)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture, Target(@"(40000 - 1  )dump_print"), Output("39999"), Number]
     public class SubtractOddSizedNumber : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(40000 + 1  )dump_print"), Output("40001")]
+    [TestFixture, Target(@"(40000 + 1  )dump_print"), Output("40001"), Number]
     public class AddOddSizedNumber : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(40000 - 43210)dump_print"), Output("-3210")]
+    [TestFixture, Target(@"(40000 - 43210)dump_print"), Output("-3210"), Number]
     public class SubtractLargeEqualSizedNumber : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(400 - 43210)dump_print"), Output("-42810")]
+    [TestFixture, Target(@"(400 - 43210)dump_print"), Output("-42810"), Number]
     public class SubtractLargerSizedNumber : CompilerTest
     {
         [Test, Category(Worked)]

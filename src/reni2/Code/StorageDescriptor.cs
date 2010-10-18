@@ -8,7 +8,7 @@ using Reni.Type;
 
 namespace Reni.Code
 {
-    internal sealed class StorageDescriptor : ReniObject
+    internal sealed class StorageDescriptor : Visitor<string>
     {
         private Size _start;
         private readonly Size _dataEndAddr;
@@ -191,30 +191,17 @@ namespace Reni.Code
             return null;
         }
 
-        internal string CreateBitsArray(Size size, BitsConst data)
+        internal static string CreateBitsArray(Size size, BitsConst data)
         {
-            if(IsBuildInIntType(size))
-                return
-                    CreateDataRef(Start - size, size)
-                        + " = "
-                            + CreateIntCast(size)
-                                + "("
-                                    + data.CodeDump()
-                                        + ")";
-
-            var result = "";
+            var result = "new DataContainer(";
             for(var i = 0; i < size.ByteCount; i++)
             {
-                result += ", ";
+                if(i > 0)
+                    result += ", ";
                 result += data.Byte(i);
             }
-
-            return "Data.BitsArray("
-                + size.ByteCount
-                    + ", "
-                        + CreateDataPtr(Start - size)
-                            + result
-                                + ")";
+            result += ")";
+            return result;
         }
 
         internal string CreateCall(int index, Size frameSize) { return Generator.FunctionName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
@@ -459,16 +446,17 @@ namespace Reni.Code
 
         private string GetStatements(CodeBase data)
         {
-            NotImplementedMethod(data);
-            var result = "";
-            //for(var index = 0; index < data.Count; index++)
-            //{
-            //    var t = data[index];
-            //    result += t.Statements(this);
-            //    ShiftStartAddress(t.DeltaSize);
-            //}
-            return result;
+            return data.Visit(this) ;
         }
 
+        internal override string Fiber(Fiber visitedObject)
+        {
+            return visitedObject.VisitImplementation(this);
+        }
+
+        internal override string FiberHead(FiberHead visitedObject)
+        {
+            return visitedObject.Format(this);
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace Reni.Runtime
     /// Data class that contains data for a stack layer
     /// </summary>
     [UsedImplicitly]
-    public class Data : ReniObject
+    public sealed class Data : ReniObject
     {
         /// <summary>
         /// Moves the bytes.
@@ -55,6 +55,12 @@ namespace Reni.Runtime
         {
             for(var i = 0; i < count; i++)
                 destination[i + destOffset] = source[i + sourceOffset];
+        }
+
+        private static unsafe void MoveBytes(int count, byte* destination, byte[] source)
+        {
+            for (var i = 0; i < count; i++)
+                destination[i] = source[i];
         }
 
         /// <summary>
@@ -151,23 +157,18 @@ namespace Reni.Runtime
             MoveBytes(count, (byte*) destination, (byte*) source);
         }
 
-        /// <summary>
-        /// Dumps the print.
-        /// </summary>
-        /// <param name="count">The count.</param>
-        /// <param name="source">The source.</param>
-        /// created 02.02.2007 01:10
         [UsedImplicitly]
-        public static unsafe void DumpPrint(int count, sbyte* source)
+        public static unsafe void DumpPrint(byte[] source)
         {
+            var count = source.Length;
             var data = ToInt64(count, source);
             BitsConst.Convert(data).PrintNumber();
         }
 
-        public static unsafe Int64 ToInt64(int count, sbyte* source)
+        public static unsafe Int64 ToInt64(int count, byte[] source)
         {
             Int64 data = source[count - 1] < 0 ? -1 : 0;
-            MoveBytes(count, (byte*) &data, (byte*) source);
+            MoveBytes(count, (byte*) &data, source);
             return data;
         }
 
@@ -356,5 +357,18 @@ namespace Reni.Runtime
         {
             return Greater(count2nd, data2nd, count1st, data1st);
         }
+    }
+    [UsedImplicitly]
+    public sealed class DataContainer
+    {
+        private readonly byte[] _data;
+        public DataContainer(params byte[] data)
+        {
+            _data = data;
+        }
+
+        [UsedImplicitly]
+        public unsafe void DumpPrint(int bits) { Data.DumpPrint(_data); }
+
     }
 }

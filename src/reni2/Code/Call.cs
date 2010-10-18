@@ -27,11 +27,6 @@ namespace Reni.Code
         internal override Size InputSize { get { return ArgsAndRefsSize; } }
         internal override Size OutputSize { get { return ResultSize; } }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.CreateCall(FunctionIndex,ArgsAndRefsSize);
-        }
-
         internal FiberItem Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity)
         {
             return replacePrimitiveRecursivity.CallVisit(this);
@@ -68,8 +63,6 @@ namespace Reni.Code
 
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        protected override string Format(StorageDescriptor start) { throw new NotImplementedException(); }
-
         internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
 
         internal override CodeBase TryToCombineBack(TopFrame precedingElement)
@@ -88,9 +81,9 @@ namespace Reni.Code
     }
 
     [Serializable]
-    internal class RecursiveCall : FiberHead
+    internal sealed class RecursiveCall : FiberHead
     {
         protected override Size GetSize() { return Size.Zero; }
-        protected override string Format(StorageDescriptor start) { return StorageDescriptor.CreateRecursiveCall(); }
+        internal override string Format(StorageDescriptor start) { return StorageDescriptor.CreateRecursiveCall(); }
     }
 }

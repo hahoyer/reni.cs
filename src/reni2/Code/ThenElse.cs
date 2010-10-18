@@ -48,8 +48,6 @@ namespace Reni.Code
         internal override Size InputSize { get { return Size.Create(1); } }
         internal override Size OutputSize { get { return ThenCode.Size; } }
 
-        protected override string Format(StorageDescriptor start) { throw new NotImplementedException(); }
-
         internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
@@ -58,9 +56,6 @@ namespace Reni.Code
     {
         internal override Size InputSize { get { return Size.Zero; } }
         internal override Size OutputSize { get { return Size.Zero; } }
-
-        protected override string Format(StorageDescriptor start) { return StorageDescriptor.CreateEndCondional(); }
-
         internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
@@ -73,7 +68,6 @@ namespace Reni.Code
 
         internal override Size OutputSize { get { return Size.Zero; } }
         internal override Size InputSize { get { return _thenSize; } }
-        protected override string Format(StorageDescriptor start) { return StorageDescriptor.CreateElse(); }
         internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
@@ -83,7 +77,7 @@ namespace Reni.Code
         [Node]
         internal readonly Size CondSize;
 
-        public Then(Size condSize) { CondSize = condSize; }
+        internal Then(Size condSize) { CondSize = condSize; }
 
         internal override Size OutputSize { get { return Size.Zero; } }
         internal override Size InputSize { get { return CondSize; } }
@@ -102,12 +96,11 @@ namespace Reni.Code
             return null;
         }
 
-        protected override string Format(StorageDescriptor start) { return start.CreateThen(CondSize); }
         internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
     [Serializable]
-    internal class BitArrayOpThen : FiberItem
+    internal sealed class BitArrayOpThen : FiberItem
     {
         [Node, IsDumpEnabled(true)]
         private readonly BitArrayBinaryOp _bitArrayBinaryOp;
@@ -122,15 +115,7 @@ namespace Reni.Code
         }
 
         internal override Size InputSize { get { return _bitArrayBinaryOp.DeltaSize + _bitArrayBinaryOp.OutputSize; } }
-
         internal override Size OutputSize { get { return _thenCode.OutputSize; } }
-
-        protected override string Format(StorageDescriptor start)
-        {
-            return start
-                .CreateBitArrayOpThen(_bitArrayBinaryOp.OpToken, _bitArrayBinaryOp.LeftSize, _bitArrayBinaryOp.RightSize);
-        }
-
         internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 }

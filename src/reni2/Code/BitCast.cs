@@ -62,22 +62,16 @@ namespace Reni.Code
         internal override CodeBase TryToCombineBack(TopData precedingElement)
         {
             if(precedingElement.Size == TargetSize && _size >= _significantSize && _size > TargetSize)
-                return new Fiber
-                (
-                    new TopData(precedingElement.RefAlignParam, precedingElement.Offset, _size, _significantSize),
-                    new BitCast(_size, _size, _significantSize)
-                );
+                return (new TopData(precedingElement.RefAlignParam, precedingElement.Offset, _size, _significantSize))
+                    .CreateFiber(new BitCast(_size, _size, _significantSize));
             return null;
         }
 
         internal override CodeBase TryToCombineBack(TopFrame precedingElement)
         {
             if(precedingElement.Size == TargetSize && _size >= _significantSize && _size > TargetSize)
-                return new Fiber
-                (
-                    new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, _size, _significantSize),
-                    new BitCast(_size, _size, _significantSize)
-                );
+                return new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, _size, _significantSize)
+                    .CreateFiber(new BitCast(_size, _size, _significantSize));
             return null;
         }
 
@@ -126,9 +120,5 @@ namespace Reni.Code
             return null;
         }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.CreateBitCast(TargetSize, _size, _significantSize);
-        }
     }
 }

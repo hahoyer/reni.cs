@@ -42,12 +42,6 @@ namespace Reni.Code
         internal override Size InputSize { get { return GetSize(); } }
         internal override Size OutputSize { get { return GetSize(); } }
 
-        protected override string Format(StorageDescriptor start)
-        {
-            return start
-                .CreateRefPlus(GetSize(), _right.SizeToPacketCount(RefAlignParam.AlignBits));
-        }
-
         private Size GetSize() { return RefAlignParam.RefSize; }
 
         internal override CodeBase TryToCombineBack(TopRef precedingElement)

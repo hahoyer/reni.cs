@@ -1,10 +1,8 @@
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
-using JetBrains.Annotations;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
 using Reni.Type;
@@ -15,8 +13,10 @@ namespace Reni.Code
     internal abstract class
         CodeBase : ReniObject, IIconKeyProvider
     {
-        protected CodeBase(int objectId):base(objectId) {  }
-        protected CodeBase(){ }
+        protected CodeBase(int objectId)
+            : base(objectId) { }
+
+        protected CodeBase() { }
 
         [Node]
         [IsDumpEnabled(false)]
@@ -58,7 +58,7 @@ namespace Reni.Code
 
         internal CodeBase CreateThenElse(CodeBase thenCode, CodeBase elseCode) { return CreateFiber(new ThenElse(thenCode, elseCode)); }
 
-        internal static CodeBase TopRef(RefAlignParam refAlignParam, string reason) { return new TopRef(refAlignParam, Size.Zero,reason); }
+        internal static CodeBase TopRef(RefAlignParam refAlignParam, string reason) { return new TopRef(refAlignParam, Size.Zero, reason); }
 
         internal CodeBase LocalReference(RefAlignParam refAlignParam, CodeBase destructorCode) { return new LocalReference(refAlignParam, this, destructorCode); }
 
@@ -68,16 +68,12 @@ namespace Reni.Code
 
         internal abstract CodeBase CreateFiber(FiberItem subsequentElement);
 
-        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right, string reason)
-        {
-            return
-                CreateFiber(new RefPlus(refAlignParam, right, reason));
-        }
+        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right, string reason) { return CreateFiber(new RefPlus(refAlignParam, right, reason)); }
 
         internal CodeBase Dereference(RefAlignParam refAlignParam, Size targetSize)
         {
             Tracer.Assert(Size == refAlignParam.RefSize);
-            return CreateFiber(new Dereference(refAlignParam, targetSize,targetSize));
+            return CreateFiber(new Dereference(refAlignParam, targetSize, targetSize));
         }
 
         internal CodeBase CreateBitCast(Size size)
@@ -87,10 +83,23 @@ namespace Reni.Code
             return CreateFiber(new BitCast(size, Size, Size));
         }
 
-        internal CodeBase Sequence(params CodeBase[] more)
+        internal virtual CodeBase Sequence(params CodeBase[] data)
         {
-            return more.Aggregate(this, (current, t) => current.SequenceOfTwo(t));
+            var resultData = new List<CodeBase>();
+            resultData.AddRange(AsList());
+            foreach(var codeBase in data)
+                resultData.AddRange(codeBase.AsList());
+            switch(resultData.Count)
+            {
+                case 0:
+                    return this;
+                case 1:
+                    return resultData[0];
+            }
+            return new List(resultData);
         }
+
+        protected virtual IEnumerable<CodeBase> AsList() { return new[]{this}; }
 
         internal static CodeBase BitsConst(Size size, BitsConst t) { return new BitArray(size, t); }
         internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
@@ -109,7 +118,7 @@ namespace Reni.Code
             }
             catch(ReplaceArg.SizeException sizeException)
             {
-                DumpWithBreak(true,"this",this,"sizeException",sizeException);
+                DumpWithBreak(true, "this", this, "sizeException", sizeException);
                 throw;
             }
         }
@@ -125,7 +134,8 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal CodeBase ReplaceRelative<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IReferenceInCode
+        internal CodeBase ReplaceRelative<TContext>(TContext context, Func<CodeBase> replacement)
+            where TContext : IReferenceInCode
         {
             var result = Visit(new ReplaceRelativeContextRef<TContext>(context, replacement));
             if(result != null)
@@ -141,7 +151,8 @@ namespace Reni.Code
         /// <param name="context">The context.</param>
         /// <param name="replacement">The replacement.</param>
         /// <returns></returns>
-        internal CodeBase ReplaceAbsolute<TContext>(TContext context, Func<CodeBase> replacement) where TContext : IReferenceInCode
+        internal CodeBase ReplaceAbsolute<TContext>(TContext context, Func<CodeBase> replacement)
+            where TContext : IReferenceInCode
         {
             var result = Visit(new ReplaceAbsoluteContextRef<TContext>(context, replacement));
             if(result != null)
@@ -183,13 +194,11 @@ namespace Reni.Code
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
+
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
-        internal CodeBase LocalBlock(CodeBase copier, RefAlignParam refAlignParam)
-        {
-            return new LocalReferenceSequenceVisitor().LocalBlock(this, copier, refAlignParam);
-        }
+        internal CodeBase LocalBlock(CodeBase copier, RefAlignParam refAlignParam) { return new LocalReferenceSequenceVisitor().LocalBlock(this, copier, refAlignParam); }
 
         internal CodeBase CreateLocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
         {
@@ -199,51 +208,53 @@ namespace Reni.Code
 
             var result = this;
             if(!resultSize.IsZero)
-                result = result
-                    .CreateFiber(new LocalBlockEnd(resultSize, intermediateSize))
-                    .Sequence(
-                    copier.ReplaceArg(LocalReferenceCode(refAlignParam, resultSize, "CreateLocalBlockEnd")));
+                result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize))
+                    .Sequence
+                    (
+                        copier.ReplaceArg(LocalReferenceCode(refAlignParam, resultSize, "CreateLocalBlockEnd")));
 
             return result.CreateFiber(new Drop(Size, resultSize));
         }
 
-        internal static CodeBase CreateBitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
+        internal static CodeBase BitSequenceOperation
+            (Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
         {
             return TypeBase.Bit
                 .Sequence((objSize.ByteAlignedSize).ToInt())
                 .ArgCode()
-                .CreateBitSequenceOperation(feature, size);
+                .BitSequenceOperation(feature, size);
         }
 
-        internal static CodeBase CreateBitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objBits, int argsBits)
+        internal static CodeBase BitSequenceOperation
+            (Size size, ISequenceOfBitBinaryOperation token, int objBits, int argsBits)
         {
             var objSize = Size.Create(objBits);
             var argsSize = Size.Create(argsBits);
             return TypeBase.Bit.Sequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
                 .ArgCode()
-                .CreateBitSequenceOperation(token, size, objSize.ByteAlignedSize);
+                .BitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
-        internal static CodeBase CreateBitSequenceDumpPrint(int objSize)
+        internal static CodeBase BitSequenceDumpPrint(int objSize)
         {
             var alignedSize = Size.Create(objSize).ByteAlignedSize;
             return TypeBase.Bit.Sequence(alignedSize.ToInt())
                 .ArgCode()
-                .CreateDumpPrint(alignedSize);
+                .DumpPrint(alignedSize);
         }
 
-        private CodeBase SequenceOfTwo(CodeBase right)
+        internal CodeBase SequenceOfTwo(CodeBase right)
         {
-            if (IsEmpty)
+            if(IsEmpty)
                 return right;
-            if (right.IsEmpty)
+            if(right.IsEmpty)
                 return this;
-            return new Pair(this, right);
+            return List.Create(this, right);
         }
 
-        private CodeBase CreateBitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize) { return CreateFiber(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
-        private CodeBase CreateDumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
-        private CodeBase CreateBitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
+        private CodeBase BitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize) { return CreateFiber(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
+        private CodeBase DumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
+        private CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
 
         internal static CodeBase LocalReferenceCode(RefAlignParam refAlignParam, Size size, string reason)
         {
@@ -253,9 +264,9 @@ namespace Reni.Code
 
         internal CodeBase CreateFiber(IEnumerable<FiberItem> subsequentElement)
         {
-            return subsequentElement.Aggregate(this, (current, fiberItem) => current.CreateFiber(fiberItem));
+            return subsequentElement
+                .Aggregate(this, (current, fiberItem) => current.CreateFiber(fiberItem));
         }
-
     }
 
     internal abstract class UnexpectedVisitOfPending : Exception

@@ -9,6 +9,7 @@ namespace Reni.Code
     /// <summary>
     /// Pair of code elements, first element can be accessed
     /// </summary>
+    [Obsolete]
     internal sealed class Pair : FiberHead
     {
         private readonly CodeBase _left;
@@ -34,8 +35,6 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         internal override Refs RefsImplementation { get { return _left.RefsImplementation.Sequence(_right.RefsImplementation); } }
-
-        protected override T VisitImplementation<T>(Visitor<T> actual) { return actual.PairVisit(this); }
 
         [IsDumpEnabled(false)]
         protected override Size MaxSizeImplementation
@@ -63,5 +62,25 @@ namespace Reni.Code
             var newHead = ObjectId + "." + head;
             return InternalDumpData(newHead + "L", Left) + "\n" + InternalDumpData(newHead + "R", Right);
         }
+    }
+
+    internal sealed class List : FiberHead
+    {
+        [IsDumpEnabled(true)]
+        private readonly CodeBase[] _data;
+
+        internal static List Create(params CodeBase[] data) { return new List(data); }
+
+        internal List(IEnumerable<CodeBase> data)
+        {
+            _data = data.ToArray();
+            foreach (var codeBase in _data)
+                Tracer.Assert(!(codeBase is List));
+            Tracer.Assert(_data.Length > 1);
+        }
+
+        protected override IEnumerable<CodeBase> AsList() { return _data; }
+
+        protected override Size GetSize() { return _data.Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size); }
     }
 }

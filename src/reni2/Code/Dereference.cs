@@ -30,13 +30,10 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " DataSize=" + DataSize; } }
 
+        [IsDumpEnabled(false)]
         internal override Size InputSize { get { return RefAlignParam.RefSize; } }
+        [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _size; } }
-
-        protected override string Format(StorageDescriptor start)
-        {
-            return start.CreateUnref(RefAlignParam, OutputSize, DataSize);
-        }
 
         internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
         {

@@ -26,7 +26,6 @@
     <Compile Include="Code\BitArray.cs" />
     <Compile Include="Code\BitArrayBinaryOp.cs" />
     <Compile Include="Code\BitCast.cs" />
-    <Compile Include="Code\Child.cs" />
     <Compile Include="Code\CodeBase.cs" />
     <Compile Include="Code\Container.cs" />
     <Compile Include="Code\Call.cs" />
@@ -35,6 +34,8 @@
     <Compile Include="Code\Drop.cs" />
     <Compile Include="Code\Environment.cs" />
     <Compile Include="Code\Fiber.cs" />
+    <Compile Include="Code\FiberHead.cs" />
+    <Compile Include="Code\FiberItem.cs" />
     <Compile Include="Code\FormalMaschine.cs" />
     <Compile Include="Code\FormalValueAccess.cs" />
     <Compile Include="Code\Generator.cs" />
