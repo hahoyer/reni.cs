@@ -1,5 +1,6 @@
 using System;
 using Reni.Context;
+using Reni.Runtime;
 
 namespace Reni.Code
 {
@@ -33,12 +34,11 @@ namespace Reni.Code
         /// <summary>
         /// Formats this instance.
         /// </summary>
-        /// <param name="start">The start.</param>
         /// <returns></returns>
         /// created 07.10.2006 21:11
-        internal override string Format(StorageDescriptor start)
+        protected override string CSharpString()
         {
-            return start.CreateTopData(RefAlignParam, Offset, GetSize(), DataSize);
+            return CSharpGenerator.TopData(RefAlignParam, Offset, GetSize(), DataSize);
         }
     }
 
@@ -73,12 +73,11 @@ namespace Reni.Code
         /// <summary>
         /// Formats this instance.
         /// </summary>
-        /// <param name="start">The start.</param>
         /// <returns></returns>
         /// created 07.10.2006 21:11
-        internal override string Format(StorageDescriptor start)
+        protected override string CSharpString()
         {
-            return start.CreateTopFrame(RefAlignParam, Offset, GetSize(), DataSize);
+            return CSharpGenerator.CreateTopFrame(RefAlignParam, Offset, GetSize(), DataSize);
         }
 
     }

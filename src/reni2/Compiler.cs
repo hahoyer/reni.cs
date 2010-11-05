@@ -42,7 +42,7 @@ namespace Reni
             _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax).Result(_rootContext, Category.Code).Code);
             _mainContainer = new SimpleCache<Container>(() => new Container(Code));
             _functionContainers = new SimpleCache<List<Container>>(()=>_rootContext.CompileFunctions());
-            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
+            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, false));
         }
 
         /// <summary>

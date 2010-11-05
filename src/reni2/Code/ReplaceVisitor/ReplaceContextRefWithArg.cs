@@ -3,22 +3,22 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Code.ReplaceVisitor
 {
-    internal abstract class ReplaceContextRef<Context> : Base
-        where Context : IReferenceInCode
+    internal abstract class ReplaceContextRef<TContext> : Base
+        where TContext : IReferenceInCode
     {
-        protected readonly Context _context;
-        protected readonly Func<CodeBase> _replacement;
+        protected readonly TContext Context;
+        protected readonly Func<CodeBase> Replacement;
 
-        protected ReplaceContextRef(Context context, Func<CodeBase> replacement)
+        protected ReplaceContextRef(TContext context, Func<CodeBase> replacement)
         {
-            _context = context;
-            _replacement = replacement;
+            Context = context;
+            Replacement = replacement;
         }
 
         internal override CodeBase ContextRef(ReferenceCode visitedObject)
         {
-            if(visitedObject.Context == (IReferenceInCode) _context)
-                return _replacement();
+            if(visitedObject.Context == (IReferenceInCode) Context)
+                return Replacement();
             return null;
         }
     }
@@ -27,18 +27,18 @@ namespace Reni.Code.ReplaceVisitor
     /// Replaces appearences of refInCode in code tree. 
     /// Assumes, that replacement requires offset alignment when walking along code tree
     /// </summary>
-    /// <typeparam name="Context"></typeparam>
-    internal sealed class ReplaceRelativeContextRef<Context>: ReplaceContextRef<Context>
-        where Context : IReferenceInCode
+    /// <typeparam name="TContext"></typeparam>
+    internal sealed class ReplaceRelativeContextRef<TContext>: ReplaceContextRef<TContext>
+        where TContext : IReferenceInCode
     {
-        public ReplaceRelativeContextRef(Context context, Func<CodeBase> replacement)
+        public ReplaceRelativeContextRef(TContext context, Func<CodeBase> replacement)
             : base(context, replacement) { }
 
         protected override Visitor<CodeBase> After(Size size)
         {
-            return new ReplaceRelativeContextRef<Context>(
-                _context,
-                ()=>_replacement().AddToReference(_context.RefAlignParam, size, "After"));
+            return new ReplaceRelativeContextRef<TContext>(
+                Context,
+                ()=>Replacement().AddToReference(Context.RefAlignParam, size, "After"));
         }
     }
 
@@ -46,11 +46,11 @@ namespace Reni.Code.ReplaceVisitor
     /// Replaces appearences of refInCode in code tree. 
     /// Assumes, that replacement isn't a reference, that changes when walking along the code tree
     /// </summary>
-    /// <typeparam name="Context"></typeparam>
-    internal sealed class ReplaceAbsoluteContextRef<Context> : ReplaceContextRef<Context>
-        where Context : IReferenceInCode
+    /// <typeparam name="TContext"></typeparam>
+    internal sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>
+        where TContext : IReferenceInCode
     {
-        public ReplaceAbsoluteContextRef(Context context, Func<CodeBase> replacement)
+        public ReplaceAbsoluteContextRef(TContext context, Func<CodeBase> replacement)
             : base(context, replacement) { }
     }
 }

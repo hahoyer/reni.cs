@@ -176,7 +176,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = (defineable.ObjectId == 180 || defineable.ObjectId == -46) && category.HasCode;
+            var trace = (defineable.ObjectId == -17 || defineable.ObjectId == -46) && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -199,7 +199,7 @@ namespace Reni.Context
                 return ReturnMethodDumpWithBreak(trace, suffixResult);
 
             var suffixType = suffixResult.Type;
-            DumpWithBreak(trace, "suffixType", suffixType );
+            DumpWithBreak(trace, "suffixResult", suffixResult );
             var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right),RefAlignParam);
             DumpWithBreak(trace, "result",result);
             return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult));

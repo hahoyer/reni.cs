@@ -17,16 +17,27 @@ namespace Reni.Code.ReplaceVisitor
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
         internal override CodeBase ContextRef(ReferenceCode visitedObject) { return null; }
-        internal override CodeBase FiberHead(FiberHead visitedObject) { return null; }
         internal override CodeBase LocalReference(LocalReference visitedObject) { return _internalRefs.Find(visitedObject); }
+
         protected override Visitor<CodeBase> AfterCond() { return this; }
         protected override Visitor<CodeBase> AfterElse() { return this; }
+
+        protected override CodeBase List(List visitedObject, List<CodeBase> newList)
+        {
+            if (newList.All(x => x == null))
+                return null;
+            return Code.List.Create(newList.Select((x, i) => x ?? visitedObject.Data[i]));
+        }
+
+
         protected override Visitor<CodeBase> AfterThen(Size theSize) { return this; }
 
         protected override CodeBase Fiber(Fiber visitedObject, CodeBase head)
         {
             return head == null ? null : head.CreateFiber(visitedObject.FiberItems);
         }
+
+        internal override CodeBase Default() { return null; }
 
         internal LocalReference ReVisit(LocalReference visitedObject)
         {

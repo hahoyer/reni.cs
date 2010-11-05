@@ -11,12 +11,12 @@ namespace Reni.Code
         public TopRef(RefAlignParam refAlignParam, Size offset, string reason)
             : base(refAlignParam, offset,reason)
         {
-            StopByObjectId(37);
+            StopByObjectId(530);
         }
 
-        internal override string Format(StorageDescriptor start)
+        protected override string CSharpString()
         {
-            return start.CreateTopRef(RefAlignParam, Offset);
+            return CSharpGenerator.CreateTopRef(RefAlignParam, Offset);
         }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
@@ -36,9 +36,9 @@ namespace Reni.Code
             StopByObjectId(547);
         }
 
-        internal override string Format(StorageDescriptor start)
+        protected override string CSharpString()
         {
-            return start.CreateFrameRef(RefAlignParam, Offset);
+            return CSharpGenerator.CreateFrameRef(RefAlignParam, Offset);
         }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)

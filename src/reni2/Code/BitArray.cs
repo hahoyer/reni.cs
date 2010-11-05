@@ -7,7 +7,7 @@ using HWClassLibrary.TreeStructure;
 namespace Reni.Code
 {
     [Serializable]
-    internal class BitArray : FiberHead
+    internal sealed class BitArray : FiberHead
     {
         private readonly Size _size;
 
@@ -34,15 +34,16 @@ namespace Reni.Code
         internal override bool IsEmpty { get { return Data.IsEmpty; } }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+
         internal override BitsConst Evaluate() { return Data.Resize(_size); }
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitsArray(Size, Data); }
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Data=" + Data; } }
 
-        internal override string Format(StorageDescriptor start)
+        protected override string CSharpString()
         {
-            return StorageDescriptor.CreateBitsArray(GetSize(), Data);
+            return CSharpGenerator.CreateBitArray(GetSize(), Data);
         }
 
         internal new static BitArray Void() { return new BitArray(Size.Create(0), Reni.BitsConst.None()); }

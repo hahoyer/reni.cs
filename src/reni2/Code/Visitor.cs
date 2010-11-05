@@ -69,10 +69,26 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual T FiberHead(FiberHead visitedObject)
+        internal virtual T List(List visitedObject)
         {
-            NotImplementedMethod(visitedObject);
+            var visitor = this;
+            var data = visitedObject.Data;
+            var newList = new List<T>();
+            foreach (var element in data)
+            {
+                var newElement = element.Visit(visitor);
+                newList.Add(newElement);
+                visitor = visitor.AfterAny(element.Size);
+            }
+            return visitor.List(visitedObject, newList);
+        }
+
+        protected virtual T List(List visitedObject, List<T> newList) 
+        {
+            NotImplementedMethod(visitedObject, newList);
             return default(T);
         }
+
+        internal abstract T Default();
     }
 }

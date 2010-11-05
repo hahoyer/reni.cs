@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 
@@ -62,25 +60,5 @@ namespace Reni.Code
             var newHead = ObjectId + "." + head;
             return InternalDumpData(newHead + "L", Left) + "\n" + InternalDumpData(newHead + "R", Right);
         }
-    }
-
-    internal sealed class List : FiberHead
-    {
-        [IsDumpEnabled(true)]
-        private readonly CodeBase[] _data;
-
-        internal static List Create(params CodeBase[] data) { return new List(data); }
-
-        internal List(IEnumerable<CodeBase> data)
-        {
-            _data = data.ToArray();
-            foreach (var codeBase in _data)
-                Tracer.Assert(!(codeBase is List));
-            Tracer.Assert(_data.Length > 1);
-        }
-
-        protected override IEnumerable<CodeBase> AsList() { return _data; }
-
-        protected override Size GetSize() { return _data.Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size); }
     }
 }

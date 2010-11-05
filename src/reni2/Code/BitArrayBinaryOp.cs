@@ -33,6 +33,9 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _size; } }
+
+        internal override string CSharpString() { return CSharpGenerator.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
+
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
 
         [IsDumpEnabled(false)]
@@ -91,7 +94,7 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        internal override string Format()
+        internal override string CSharpString()
         {
             return "DumpPrint(" + InputSize + ")";
         }
@@ -114,7 +117,7 @@ namespace Reni.Code
         }
 
         protected override Size GetSize() { return Size.Zero; }
-        internal override string Format(StorageDescriptor start) { return StorageDescriptor.CreateDumpPrintText(_dumpPrintText); }
+        protected override string CSharpString() { return CSharpGenerator.CreateDumpPrintText(_dumpPrintText); }
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(); }
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }

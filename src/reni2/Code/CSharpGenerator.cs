@@ -8,13 +8,13 @@ using Reni.Type;
 
 namespace Reni.Code
 {
-    internal sealed class StorageDescriptor : Visitor<string>
+    internal sealed class CSharpGenerator : ReniObject
     {
         private Size _start;
         private readonly Size _dataEndAddr;
         private readonly Size _frameSize;
 
-        public StorageDescriptor(Size dataEndAddr, Size frameSize)
+        public CSharpGenerator(Size dataEndAddr, Size frameSize)
         {
             if(dataEndAddr == null)
                 throw new ArgumentNullException("dataEndAddr");
@@ -41,13 +41,18 @@ namespace Reni.Code
 
         internal string CreateFunctionBody(CodeBase data, bool isFunction)
         {
-            var result = GetStatements(data);
+            var snippet = data.CSharpCodeSnippet();
             if(isFunction)
-                result =
-                    "StartFunction:\n"
-                        + result
-                            + CreateFunctionReturn();
-            return result;
+            {
+                return "StartFunction:\n"
+                       + snippet.Prerequisites + "\n"
+                       + "return " + snippet.Result + "\n";
+            }
+            return snippet.Prerequisites 
+                + "\n"
+                + snippet.Result 
+                + "\n";
+
         }
 
         internal string CreateAssignment(RefAlignParam refAlignParam, Size size)
@@ -191,7 +196,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal static string CreateBitsArray(Size size, BitsConst data)
+        internal static string CreateBitArray(Size size, BitsConst data)
         {
             var result = "new DataContainer(";
             for(var i = 0; i < size.ByteCount; i++)
@@ -237,12 +242,9 @@ namespace Reni.Code
             return null;
         }
 
-        internal string CreateTopFrame(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+        internal static string CreateTopFrame(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
         {
-            if(refAlignParam.Is_3_32)
-                return CreateMoveBytesFromFrame(dataSize, Start - size, offset * -1);
-
-            NotImplementedFunction(this, refAlignParam, offset, size, dataSize);
+            NotImplementedFunction(null, refAlignParam, offset, size, dataSize);
             return null;
         }
 
@@ -253,36 +255,15 @@ namespace Reni.Code
 
         internal string CreateThen(Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
 
-        internal string CreateTopData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+        internal static string CreateTopRef(RefAlignParam refAlignParam, Size offset)
         {
-            if(refAlignParam.Is_3_32)
-                return CreateMoveBytes(dataSize, Start - size, Start + offset);
-
-            NotImplementedFunction(this, refAlignParam, offset, size, dataSize);
+            NotImplementedFunction(refAlignParam,offset);
             return null;
         }
 
-        internal string CreateTopRef(RefAlignParam refAlignParam, Size offset)
+        internal static string CreateFrameRef(RefAlignParam refAlignParam, Size offset)
         {
-            if(refAlignParam.Is_3_32)
-                return CreateDataRef(Start - refAlignParam.RefSize, refAlignParam.RefSize)
-                    + " = "
-                        + CreateIntCast(refAlignParam.RefSize)
-                            + CreateDataPtr(Start + offset);
-
-            NotImplementedMethod(refAlignParam);
-            return null;
-        }
-
-        internal string CreateFrameRef(RefAlignParam refAlignParam, Size offset)
-        {
-            if(refAlignParam.Is_3_32)
-                return CreateDataRef(Start - refAlignParam.RefSize, refAlignParam.RefSize)
-                    + " = "
-                        + CreateIntCast(refAlignParam.RefSize)
-                            + CreateFrameBackPtr(offset*-1);
-
-            NotImplementedMethod(refAlignParam, offset);
+            NotImplementedFunction(null, refAlignParam, offset);
             return null;
         }
 
@@ -444,19 +425,49 @@ namespace Reni.Code
             return false;
         }
 
-        private string GetStatements(CodeBase data)
+        private static int _nextListId = 0;
+
+        internal static CSharpCodeSnippet CreateList(CodeBase[] data)
         {
-            return data.Visit(this) ;
+            var holder = "list" + _nextListId++;
+            var result = holder + " = new DataContainer();\n";
+            foreach(var codeBase in data)
+            {
+                var snippet = codeBase.CSharpCodeSnippet();
+                if(snippet.Prerequisites != "")
+                    result += snippet.Prerequisites + "\n";
+                result += holder + ".Expand(" + snippet.Result + ");\n";
+            }
+            return new CSharpCodeSnippet(result, holder);
         }
 
-        internal override string Fiber(Fiber visitedObject)
+        internal static string TopData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
         {
-            return visitedObject.VisitImplementation(this);
+            return "DataContainer.TopData(" + offset.SaveByteCount + ", " + size.SaveByteCount + ")";
         }
 
-        internal override string FiberHead(FiberHead visitedObject)
+        internal static string BitCast(Size size, Size significantSize)
         {
-            return visitedObject.Format(this);
+            return "BitCast(" + size.SaveByteCount + ", " + significantSize + ")";
+        }
+
+        public static string BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        {
+            return opToken.DataFunctionName + "(" + size.SaveByteCount + ", " + leftSize.SaveByteCount + ")";
+        }
+
+        public static string Drop(Size size, Size outputSize) { return "Drop(" + outputSize.SaveByteCount + ")"; }
+    }
+
+    internal sealed class CSharpCodeSnippet
+    {
+        internal readonly string Prerequisites;
+        internal readonly string Result;
+
+        internal CSharpCodeSnippet(string prerequisites, string result)
+        {
+            Prerequisites = prerequisites;
+            Result = result;
         }
     }
 }

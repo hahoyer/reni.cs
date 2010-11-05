@@ -19,7 +19,7 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, Type.Sequence>.Convert(Type.Sequence type) { return type.BitDumpPrintFeature; }
     }
 
-    internal class BitSequenceFeatureClass : BitFeatureBase, IFeature
+    internal sealed class BitSequenceFeatureClass : BitFeatureBase, IFeature
     {
         private readonly Type.Sequence _parent;
 
@@ -47,7 +47,7 @@ namespace Reni.Feature.DumpPrint
         TypeBase IFeature.DefiningType() { return TypeBase.Bit; }
     }
 
-    internal class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Reference>, IFeature
+    internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Reference>, IFeature
     {
         [IsDumpEnabled(true)]
         private readonly Struct.Type _type;

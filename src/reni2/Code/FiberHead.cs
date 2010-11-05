@@ -10,12 +10,6 @@ namespace Reni.Code
 
         protected FiberHead() { }
 
-        internal virtual string Format(StorageDescriptor start)
-        {
-            NotImplementedMethod(start);
-            return "";
-        }
-
         internal virtual void Execute(IFormalMaschine formalMaschine) { NotImplementedMethod(formalMaschine); }
 
         protected virtual CodeBase TryToCombine(FiberItem subsequentElement) { return null; }
@@ -28,8 +22,5 @@ namespace Reni.Code
             
             return newResult;
         }
-
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.FiberHead(this); }
-        
     }
 }

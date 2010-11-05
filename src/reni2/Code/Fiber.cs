@@ -75,12 +75,13 @@ namespace Reni.Code
             return actual.Fiber(this);
         }
 
-        internal string VisitImplementation(StorageDescriptor actual)
+        internal override CSharpCodeSnippet CSharpCodeSnippet()
         {
-            return _fiberItems
+            var snippet = _fiberHead.CSharpCodeSnippet();
+            var result = _fiberItems
                 .Aggregate
-                ("(" + _fiberHead.Visit(actual) + ")", (current, fiberItem) => current + ("." + fiberItem.Format()))
-                + ";";
+                ("(" + snippet.Result + ")", (current, fiberItem) => current + ("." + fiberItem.CSharpString()));
+            return new CSharpCodeSnippet(snippet.Prerequisites,result);
         }
 
         public override string DumpData()

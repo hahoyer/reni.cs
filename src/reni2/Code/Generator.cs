@@ -36,10 +36,10 @@ namespace Reni.Code
         /// </summary>
         /// <param name="main">The main.</param>
         /// <param name="functions">The functions.</param>
-        /// <param name="align">if set to <c>true</c> [align].</param>
+        /// <param name="useStatementAligner">if set to <c>true</c> [align].</param>
         /// <returns></returns>
         /// created 08.10.2006 02:35
-        public static string CreateCSharpString(Container main, List<Container> functions, bool align) { return CodeToString(CreateCompileUnit(main, functions, align)); }
+        public static string CreateCSharpString(Container main, List<Container> functions, bool useStatementAligner) { return CodeToString(CreateCompileUnit(main, functions, useStatementAligner)); }
 
         /// <summary>
         /// Creates the C sharp assembly.
@@ -51,10 +51,10 @@ namespace Reni.Code
         /// created 08.10.2006 22:44
         public static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align) { return CodeToAssembly(CreateCompileUnit(main, functions, align)); }
 
-        private static CodeCompileUnit CreateCompileUnit(Container main, List<Container> functions, bool align)
+        private static CodeCompileUnit CreateCompileUnit(Container main, List<Container> functions, bool useStatementAligner)
         {
             var name = CreateName();
-            var ctd = main.GetCSharpTypeCode(functions, name, align);
+            var ctd = main.GetCSharpTypeCode(functions, name, useStatementAligner);
             return CreateCSharpCode(ctd, name);
         }
 

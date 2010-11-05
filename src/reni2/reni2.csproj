@@ -29,7 +29,6 @@
     <Compile Include="Code\CodeBase.cs" />
     <Compile Include="Code\Container.cs" />
     <Compile Include="Code\Call.cs" />
-    <Compile Include="Code\CCode.cs" />
     <Compile Include="Code\ContextRef.cs" />
     <Compile Include="Code\Drop.cs" />
     <Compile Include="Code\Environment.cs" />
@@ -41,6 +40,7 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\HasArgVisitor.cs" />
     <Compile Include="Code\IFormalValue.cs" />
+    <Compile Include="Code\List.cs" />
     <Compile Include="Code\LocalReference.cs" />
     <Compile Include="Code\IReferenceInCode.cs" />
     <Compile Include="Code\LeafElement.cs" />
@@ -57,7 +57,7 @@
     <Compile Include="Code\ReplaceVisitor\ReplaceContextRefWithArg.cs" />
     <Compile Include="Code\Pair.cs" />
     <Compile Include="Code\LocalBlockEnd.cs" />
-    <Compile Include="Code\StorageDescriptor.cs" />
+    <Compile Include="Code\CSharpGenerator.cs" />
     <Compile Include="Code\ThenElse.cs" />
     <Compile Include="Code\Top.cs" />
     <Compile Include="Code\TopData.cs" />

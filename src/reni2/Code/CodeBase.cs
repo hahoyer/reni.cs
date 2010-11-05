@@ -96,7 +96,7 @@ namespace Reni.Code
                 case 1:
                     return resultData[0];
             }
-            return new List(resultData);
+            return List.Create(resultData);
         }
 
         protected virtual IEnumerable<CodeBase> AsList() { return new[]{this}; }
@@ -162,11 +162,7 @@ namespace Reni.Code
 
         internal TResult Visit<TResult>(Visitor<TResult> actual) { return VisitImplementation(actual); }
 
-        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual)
-        {
-            NotImplementedMethod(actual);
-            throw new NotImplementedException();
-        }
+        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Default(); }
 
         internal CodeBase CreateCall(int index, Size resultSize) { return CreateFiber(new Call(index, resultSize, Size)); }
 
@@ -198,7 +194,11 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
-        internal CodeBase LocalBlock(CodeBase copier, RefAlignParam refAlignParam) { return new LocalReferenceSequenceVisitor().LocalBlock(this, copier, refAlignParam); }
+        internal CodeBase LocalBlock(CodeBase copier, RefAlignParam refAlignParam)
+        {
+            return new LocalReferenceSequenceVisitor()
+                .LocalBlock(this, copier, refAlignParam);
+        }
 
         internal CodeBase CreateLocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
         {
@@ -267,6 +267,14 @@ namespace Reni.Code
             return subsequentElement
                 .Aggregate(this, (current, fiberItem) => current.CreateFiber(fiberItem));
         }
+
+        protected virtual string CSharpString()
+        {
+            NotImplementedMethod();
+            return "";
+        }
+
+        internal virtual CSharpCodeSnippet CSharpCodeSnippet() { return new CSharpCodeSnippet("", CSharpString()); }
     }
 
     internal abstract class UnexpectedVisitOfPending : Exception

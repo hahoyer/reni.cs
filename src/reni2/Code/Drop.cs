@@ -14,6 +14,8 @@ namespace Reni.Code
             _afterSize = afterSize;
         }
 
+        internal override string CSharpString() { return CSharpGenerator.Drop(InputSize, OutputSize); }
+
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Drop(_beforeSize, _afterSize); }
         [IsDumpEnabled(false)]
         internal override Size InputSize { get { return _beforeSize; } }

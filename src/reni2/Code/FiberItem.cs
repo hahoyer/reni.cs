@@ -21,7 +21,7 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal Size DeltaSize { get { return OutputSize - InputSize; } }
 
-        internal virtual string Format()
+        internal virtual string CSharpString()
         {
             NotImplementedMethod();
             return null;

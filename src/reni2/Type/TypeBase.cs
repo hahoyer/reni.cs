@@ -328,10 +328,17 @@ namespace Reni.Type
 
         internal Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
         {
-            return FunctionalFeature()
-                .Apply(category, right(Category.Type).Type, refAlignParam)
-                .ReplaceArg(right(category))
+            bool trace = ObjectId == -265 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category, right,refAlignParam);
+            var functionalFeature = FunctionalFeature();
+            var apply = functionalFeature
+                .Apply(category, right(Category.Type).Type, refAlignParam);
+            var replaceArg = apply
+                .ReplaceArg(right(category));
+            var result = replaceArg
                 .ReplaceObjectRefByArg(refAlignParam, ObjectType());
+            DumpWithBreak(trace, "functionalFeature",functionalFeature,"apply",apply,"replaceArg",replaceArg,"result",result);
+            return ReturnMethodDump(trace, result);
         }
 
         internal Result ConvertToAsRef(Category category, Reference target) { 

@@ -26,7 +26,7 @@ namespace Reni.Code
         protected abstract Size GetSize();
         protected abstract Size GetInputSize();
 
-        internal string Statements(StorageDescriptor start)
+        internal string Statements(CSharpGenerator start)
         {
             var result = Format(start);
             if(result != "")
@@ -34,7 +34,7 @@ namespace Reni.Code
             return result;
         }
 
-        protected virtual string Format(StorageDescriptor start)
+        protected virtual string Format(CSharpGenerator start)
         {
             NotImplementedMethod(start);
             throw new NotImplementedException();

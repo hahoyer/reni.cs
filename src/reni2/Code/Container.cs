@@ -59,13 +59,13 @@ namespace Reni.Code
             NotImplementedMethod(leafElement);
         }
 
-        public CodeTypeDeclaration GetCSharpTypeCode(List<Container> functions, string name, bool align)
+        public CodeTypeDeclaration GetCSharpTypeCode(List<Container> functions, string name, bool useStatementAligner)
         {
             var result = new CodeTypeDeclaration(name);
             result.Comments.Add(new CodeCommentStatement(Generator.NotACommentFlag + "unsafe"));
-            result.Members.Add(GetCSharpFunctionCode(Generator.MainFunctionName, false, align));
+            result.Members.Add(GetCSharpFunctionCode(Generator.MainFunctionName, false, useStatementAligner));
             for(var i = 0; i < functions.Count; i++)
-                result.Members.Add(functions[i].GetCSharpFunctionCode(Generator.FunctionName(i), true, align));
+                result.Members.Add(functions[i].GetCSharpFunctionCode(Generator.FunctionName(i), true, useStatementAligner));
             return result;
         }
 
@@ -98,7 +98,7 @@ namespace Reni.Code
             if(IsError)
                 return "throw new Exception(" + Description.Replace("\"", "\"\"") + ")";
 
-            var statements = new StorageDescriptor(MaxSize.ByteAlignedSize, _frameSize).CreateFunctionBody(_data, isFunction);
+            var statements = new CSharpGenerator(MaxSize.ByteAlignedSize, _frameSize).CreateFunctionBody(_data, isFunction);
             if(useStatementAligner)
                 statements = StatementAligner(statements);
             statements = statements.Surround("{", "}");

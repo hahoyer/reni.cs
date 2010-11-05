@@ -24,7 +24,7 @@ namespace Reni.Code.ReplaceVisitor
         protected CodeBase ActualArg { get { return _actualArg; } }
 
         protected abstract CodeBase Actual { get; }
-
+        
         internal override CodeBase Arg(Arg visitedObject)
         {
             if(Actual.Size != visitedObject.Size)

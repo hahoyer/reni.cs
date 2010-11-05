@@ -40,13 +40,14 @@ namespace Reni
         public static Category Refs { get { return new Category(false, false, false, true); } }
         [DebuggerHidden]
         public static Category None { get { return new Category(false, false, false, false); } }
+        [DebuggerHidden]
+        public static Category All { get { return new Category(true, true,true, true); } }
 
         public bool IsNone { get { return !(_code || _type || _refs || _size); } }
         public bool HasCode { get { return _code; } }
         public bool HasType { get { return _type; } }
         public bool HasRefs { get { return _refs; } }
         public bool HasSize { get { return _size; } }
-
         /// <summary>
         /// asis
         /// </summary>

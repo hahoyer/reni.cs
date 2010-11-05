@@ -61,7 +61,7 @@ namespace Reni.Code
         internal CodeBase LocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
-            var trace = body.ObjectId == 736 || body.ObjectId == -440;
+            var trace = body.ObjectId == 471;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();
@@ -69,7 +69,7 @@ namespace Reni.Code
             var alignedInternal = Code.Align();
             // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
             var gap = CodeBase.Void();
-            DumpWithBreak(trace, "newBody", newBody, "alignedBody", alignedBody, "alignedInternal", alignedInternal);
+            DumpWithBreak(trace, "newBody", newBody, "aligned Body", alignedBody, "alignedInternal", alignedInternal);
             if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                 gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
             var statement = alignedInternal

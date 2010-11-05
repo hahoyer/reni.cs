@@ -84,6 +84,6 @@ namespace Reni.Code
     internal sealed class RecursiveCall : FiberHead
     {
         protected override Size GetSize() { return Size.Zero; }
-        internal override string Format(StorageDescriptor start) { return StorageDescriptor.CreateRecursiveCall(); }
+        protected override string CSharpString() { return CSharpGenerator.CreateRecursiveCall(); }
     }
 }
