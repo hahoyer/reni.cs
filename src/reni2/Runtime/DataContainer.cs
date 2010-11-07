@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Linq;
+using System.Numerics;
 using HWClassLibrary.Debug;
 using JetBrains.Annotations;
 
 namespace Reni.Runtime
 {
     [UsedImplicitly]
-    public sealed class DataContainer
+    public sealed class DataContainer: ReniObject
     {
         private byte[] _data;
         public DataContainer(params byte[] data)
@@ -13,17 +15,38 @@ namespace Reni.Runtime
             _data = data;
         }
 
-        [UsedImplicitly]
-        public DataContainer DumpPrint(int bits)
+        public DataContainer(int count, byte[] data)
         {
-            Data.DumpPrint(_data);
+            _data = new byte[count];
+            for(int i = 0; i < count; i++)
+                _data[i] = data[i];
+        }
+
+        [UsedImplicitly]
+        public DataContainer DumpPrint()
+        {
+            Data.DumpPrint(new BigInteger(_data).ToString());
+            return new DataContainer();
+        }
+
+        [UsedImplicitly]
+        public static DataContainer DumpPrint(string text)
+        {
+            Data.DumpPrint(text);
             return new DataContainer();
         }
         [UsedImplicitly]
-        public DataContainer DataPart(int bytes)
+        public DataContainer DataPart(int offset, int bytes)
         {
-            Tracer.Assert(bytes == _data.Length);
-            return this;
+            if(bytes == _data.Length)
+            {
+                Tracer.Assert(offset == 0);
+                return this;
+            }
+            var result = new byte[bytes];
+            for(var i = 0; i < bytes; i++)
+                result[i] = _data[offset + i];
+            return new DataContainer(result);
         }
         [UsedImplicitly]
         public DataContainer BitCast(int bytes, int bits)
@@ -39,17 +62,23 @@ namespace Reni.Runtime
         {
             var oldData = _data;
             _data = new byte[oldData.Length + dataContainer._data.Length];
-            oldData.CopyTo(_data,0);
-            dataContainer._data.CopyTo(_data, oldData.Length);
+            dataContainer._data.CopyTo(_data, 0);
+            oldData.CopyTo(_data, dataContainer._data.Length);
         }
         [UsedImplicitly]
-        public unsafe DataContainer Plus(int bytes, int leftBytes)
+        public DataContainer Plus(int bytes, int leftBytes)
         {
-            var newData = new byte[bytes];
-            Data.Plus(newData, leftBytes, _data);
-            return new DataContainer(newData);
+            var d1 = new BigInteger(DataPart(0, leftBytes)._data);
+            var d2 = new BigInteger(DataPart(leftBytes, _data.Length - leftBytes)._data);
+            return new DataContainer((d1 + d2).ToByteArray());
         }
         [UsedImplicitly]
         public void Drop() { Tracer.Assert(_data.Length == 0); }
+        [UsedImplicitly]
+        public DataContainer Minus(int bytes)
+        {
+            Tracer.Assert(bytes == _data.Length);
+            return new DataContainer((-new BigInteger(_data)).ToByteArray());
+        }
     }
 }

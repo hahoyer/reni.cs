@@ -42,12 +42,17 @@ namespace Reni.Code
 
         internal string CreateCall(int index, Size frameSize) { return Generator.FunctionName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
 
-        internal static string CreateDumpPrintText(string text)
+        internal static string DumpPrintText(string text)
         {
-            return "Data.DumpPrint(" + text.Quote() + ")";
+            return "DataContainer.DumpPrint(" + text.Quote() + ")";
         }
 
-        internal static string CreateElse() { return "} else {" ; }
+        internal static string DumpPrint()
+        {
+            return "DumpPrint()";
+        }
+
+        internal static string CreateElse() { return "} else {"; }
 
         internal static string CreateEndCondional() { return "}"; }
 
@@ -99,21 +104,6 @@ namespace Reni.Code
         private static string CreateFrameBackPtr(Size start) { return "(frame-" + start.SaveByteCount + ")"; }
 
         private static string CreateFrameBackRef(Size start, Size size) { return CreateCastToIntRef(size, CreateFrameBackPtr(start)); }
-
-        private static string CreateIntCast(Size size)
-        {
-            var bits = size.ByteCount*8;
-            switch(bits)
-            {
-                case 8:
-                case 16:
-                case 32:
-                case 64:
-                    return "(" + CreateIntType(size) + ")";
-            }
-            NotImplementedFunction(size, "bits", bits);
-            return null;
-        }
 
         private static string CreateIntPtrCast(Size size) { return "(" + CreateIntType(size) + "*)"; }
 
@@ -206,8 +196,17 @@ namespace Reni.Code
         internal static CSharpCodeSnippet CreateList(CodeBase[] data)
         {
             var holder = "list" + _nextListId++;
-            var result = data.Aggregate("var "+ holder + " = new DataContainer();\n", (current, codeBase) => current + codeBase.CSharpCodeSnippet().Flatten(holder + ".Expand({0});\n"));
+            var result = "var " + holder + " = new DataContainer();\n";
+            result = data.Aggregate(result, (current, codeBase) => current + Flatten(holder, codeBase));
             return new CSharpCodeSnippet(result, holder);
+        }
+
+        private static string Flatten(string holder, CodeBase codeBase)
+        {
+            var resultHeader = codeBase.Size.IsZero ? "{0}.Drop();\n" : holder + ".Expand({0});\n";
+            return codeBase
+                .CSharpCodeSnippet()
+                .Flatten(resultHeader);
         }
 
         internal static string TopData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
@@ -217,7 +216,7 @@ namespace Reni.Code
 
         internal static string BitCast(Size size, Size significantSize)
         {
-            return "BitCast(" + size.SaveByteCount + ", " + significantSize + ")";
+            return "BitCast(" + size.SaveByteCount + ", " + (size - significantSize) + ")";
         }
 
         internal static string BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
@@ -225,14 +224,18 @@ namespace Reni.Code
             return opToken.DataFunctionName + "(" + size.SaveByteCount + ", " + leftSize.SaveByteCount + ")";
         }
 
+        internal static string BitArrayPrefix(ISequenceOfBitPrefixOperation opToken, Size size)
+        {
+            return opToken.DataFunctionName + "(" + size.SaveByteCount + ")";
+        }
         internal static string Drop(Size size, Size outputSize)
         {
             return "Drop(" + outputSize.SaveByteCount + ")";
         }
 
-        internal static string LocalVariableAccess(string holder, Size size, Size dataSize)
+        internal static string LocalVariableAccess(string holder, Size offset, Size size)
         {
-            return holder + ".DataPart(" + size.SaveByteCount + ")";
+            return holder + ".DataPart(" + offset.SaveByteCount + ", " + size.SaveByteCount + ")";
         }
 
         internal static CSharpCodeSnippet LocalVariables(string holderNamePattern, CodeBase[] codeBases)
@@ -243,5 +246,6 @@ namespace Reni.Code
                 prerequisites += snippets[i].Flatten("var " + String.Format(holderNamePattern, i) + " = {0};\n");
             return new CSharpCodeSnippet(prerequisites, "");
         }
+
     }
 }

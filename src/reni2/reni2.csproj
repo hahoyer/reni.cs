@@ -46,6 +46,7 @@
     <Compile Include="Code\IReferenceInCode.cs" />
     <Compile Include="Code\LeafElement.cs" />
     <Compile Include="Code\LocalReferenceSequenceVisitor.cs" />
+    <Compile Include="Code\LocalVariableAccess.cs" />
     <Compile Include="Code\LocalVariables.cs" />
     <Compile Include="Code\LocalVariableReference.cs" />
     <Compile Include="Code\Multiplyop.cs" />
@@ -204,6 +205,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

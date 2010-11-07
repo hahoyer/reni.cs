@@ -67,6 +67,8 @@ namespace Reni.Code
                     lastFiberItems.RemoveAll(x => true);
                 }
             }
+            if(fiberItems.Count <= 0)
+                return _fiberHead;
             return new Fiber(_fiberHead, fiberItems, null);
         }
 

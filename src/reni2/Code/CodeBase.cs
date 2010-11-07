@@ -68,7 +68,12 @@ namespace Reni.Code
 
         internal abstract CodeBase CreateFiber(FiberItem subsequentElement);
 
-        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right, string reason) { return CreateFiber(new RefPlus(refAlignParam, right, reason)); }
+        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right, string reason)
+        {
+            if (right.IsZero)
+                return this;
+            return CreateFiber(new RefPlus(refAlignParam, right, reason));
+        }
 
         internal CodeBase Dereference(RefAlignParam refAlignParam, Size targetSize)
         {
@@ -256,7 +261,7 @@ namespace Reni.Code
 
         internal static CodeBase LocalReferenceCode(RefAlignParam refAlignParam, string holder)
         {
-            return new LocalVariableReference(refAlignParam,holder);
+            return new LocalVariableReference(refAlignParam, holder, Size.Zero);
         }
 
         internal CodeBase CreateFiber(IEnumerable<FiberItem> subsequentElement)
