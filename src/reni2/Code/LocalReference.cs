@@ -36,10 +36,10 @@ namespace Reni.Code
 
         internal CodeBase Code { get { return _unalignedCode.Align(RefAlignParam.AlignBits); } }
 
-        internal CodeBase AccompayningDestructorCode(ref Size size)
+        internal CodeBase AccompayningDestructorCode(ref Size size, string holder)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(LocalReferenceCode(RefAlignParam, size, "AccompayningDestructorCode"));
+            return DestructorCode.ReplaceArg(LocalReferenceCode(RefAlignParam, holder));
         }
 
         [IsDumpEnabled(false)]

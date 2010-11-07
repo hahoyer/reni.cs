@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Type;
@@ -10,190 +9,22 @@ namespace Reni.Code
 {
     internal sealed class CSharpGenerator : ReniObject
     {
-        private Size _start;
-        private readonly Size _dataEndAddr;
-        private readonly Size _frameSize;
+        private readonly Size _start;
 
-        public CSharpGenerator(Size dataEndAddr, Size frameSize)
+        public CSharpGenerator(Size dataEndAddr)
         {
-            if(dataEndAddr == null)
-                throw new ArgumentNullException("dataEndAddr");
-            if(frameSize == null)
-                throw new ArgumentNullException("frameSize");
-
-            _dataEndAddr = dataEndAddr;
-            _frameSize = frameSize;
             _start = dataEndAddr;
         }
 
         private Size Start { get { return _start; } }
-        private Size DataEndAddr { get { return _dataEndAddr; } }
-        private void ShiftStartAddress(Size deltaSize) { _start += deltaSize; }
 
-        private string CreateFunctionReturn()
-        {
-            var resultSize = DataEndAddr - Start;
-            if(_frameSize.IsZero && resultSize.IsZero)
-                return "";
-            return CreateMoveBytesToFrame(resultSize, resultSize, Start)
-                   + "; // FunctionReturn";
-        }
-
-        internal string CreateFunctionBody(CodeBase data, bool isFunction)
+        internal static string CreateFunctionBody(CodeBase data, bool isFunction)
         {
             var snippet = data.CSharpCodeSnippet();
             if(isFunction)
-            {
-                return "StartFunction:\n"
-                       + snippet.Prerequisites + "\n"
-                       + "return " + snippet.Result + "\n";
-            }
-            return snippet.Prerequisites 
-                + "\n"
-                + snippet.Result 
-                + "\n";
+                return "StartFunction:\n" + snippet.Flatten("return {0};\n");
+            return snippet.Flatten("{0}.Drop();\n");
 
-        }
-
-        internal string CreateAssignment(RefAlignParam refAlignParam, Size size)
-        {
-            if(refAlignParam.Is_3_32)
-            {
-                var dest = CreateDataRef(Start + refAlignParam.RefSize, refAlignParam.RefSize);
-                var source = CreateDataRef(Start, refAlignParam.RefSize);
-                if(IsBuildInIntType(size))
-                    return "*("
-                        + CreateIntPtrCast(size)
-                            + dest
-                                + ") = *("
-                                    + CreateIntPtrCast(size) 
-                                    + source 
-                                    + ")";
-
-                return "Data.MoveBytes("
-                    + size.ByteCount
-                        + ", "
-                            + "(sbyte*)" + dest
-                                + ", "
-                                    + "(sbyte*)" + source
-                                        + ")";
-            }
-
-            NotImplementedFunction(this, refAlignParam, size);
-            return null;
-        }
-
-        internal string CreateBitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize)
-        {
-            if(IsBuildInIntType(size))
-                return CreateDataRef(Start, size)
-                    + " = "
-                        + CreateIntCast(size)
-                            + "("
-                                + opToken.CSharpNameOfDefaultOperation
-                                    + " "
-                                        + CreateDataRef(Start, argSize)
-                                            + ")";
-
-            return "Data."
-                + opToken.DataFunctionName
-                    + "("
-                        + size.ByteCount
-                            + ", "
-                                + CreateDataPtr(Start)
-                                    + ", "
-                                        + argSize.ByteCount
-                                            + ")";
-        }
-
-        internal string CreateBitArrayOp(ISequenceOfBitBinaryOperation opToken, Size resultSize, Size leftSize, Size rightSize)
-        {
-            Tracer.Assert(opToken.CSharpNameOfDefaultOperation != "");
-
-            if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
-            {
-                var value = CreateBinaryOperation(leftSize, opToken, rightSize);
-                if(opToken.IsCompareOperator)
-                    value = "(" + value + "? -1:0" + ")";
-                return CreateStoreResult(resultSize, leftSize + rightSize) + value;
-            }
-
-            return "Data."
-                + opToken.DataFunctionName
-                    + "("
-                        + resultSize.ByteCount
-                            + ", "
-                                + CreateDataPtr(Start + leftSize + rightSize - resultSize)
-                                    + ", "
-                                        + leftSize.ByteCount
-                                            + ", "
-                                                + CreateDataPtr(Start + rightSize)
-                                                    + ", "
-                                                        + rightSize.ByteCount
-                                                            + ", "
-                                                                + CreateDataPtr(Start)
-                                                                    + ")";
-        }
-
-        internal string CreateBitArrayOpThen(ISequenceOfBitBinaryOperation opToken, Size leftSize, Size rightSize)
-        {
-            if(IsBuildInIntType(leftSize) && IsBuildInIntType(rightSize))
-                return "if("
-                    + CreateDataRef(Start + rightSize, leftSize)
-                        + " "
-                            + opToken.CSharpNameOfDefaultOperation
-                                + " "
-                                    + CreateDataRef(Start, rightSize)
-                                        + ") {";
-            return "if(Data."
-                + opToken.DataFunctionName
-                + "("
-                  + leftSize.ByteCount
-                  + ", "
-                  + CreateDataPtr(Start + rightSize)
-                  + ", "
-                  + rightSize.ByteCount
-                  + ", "
-                  + CreateDataPtr(Start)
-                + ")) {" ;
-        }
-
-        internal string CreateBitCast(Size targetSize, Size size, Size significantSize)
-        {
-            var targetBytes = targetSize.ByteCount;
-            var bytes = size.ByteCount;
-            if(targetBytes == bytes)
-            {
-                if(significantSize == Size.Byte*bytes)
-                    return "";
-                var bits = (size - significantSize).ToInt();
-                var oldStart = Start;
-                if(IsBuildInIntType(size))
-                {
-                    var result =
-                        CreateDataRef(oldStart, size)
-                            + " = "
-                                + CreateIntCast(size)
-                                    + "("
-                                        + CreateIntCast(size)
-                                            + "("
-                                                + CreateDataRef(oldStart, size) + " << " + bits
-                                                    + ") >> "
-                                                        + bits
-                                                            + ")";
-                    return result;
-                }
-                return "Data.BitCast("
-                    + size.ByteCount
-                        + ", "
-                            + CreateDataPtr(oldStart)
-                                + ", "
-                                    + bits
-                                        + ")";
-            }
-
-            NotImplementedFunction(this, targetSize, size);
-            return null;
         }
 
         internal static string CreateBitArray(Size size, BitsConst data)
@@ -210,14 +41,6 @@ namespace Reni.Code
         }
 
         internal string CreateCall(int index, Size frameSize) { return Generator.FunctionName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
-
-        internal string CreateDumpPrint(Size leftSize, Size rightSize)
-        {
-            if(rightSize.IsZero)
-                return CreateDumpPrintOperation(leftSize);
-            NotImplementedMethod(leftSize, rightSize);
-            return null;
-        }
 
         internal static string CreateDumpPrintText(string text)
         {
@@ -266,53 +89,6 @@ namespace Reni.Code
             NotImplementedFunction(null, refAlignParam, offset);
             return null;
         }
-
-        internal string CreateUnref(RefAlignParam refAlignParam, Size size, Size dataSize)
-        {
-            if(refAlignParam.Is_3_32)
-            {
-                if(IsBuildInIntType(size))
-                    return CreateDataRef(Start + refAlignParam.RefSize - size, size)
-                        + " = "
-                            + CreateCastToIntRef(dataSize, CreateDataRef(Start, refAlignParam.RefSize));
-                return "Data.MoveBytes("
-                    + dataSize.ByteCount
-                        + ", "
-                            + CreateDataPtr(Start + refAlignParam.RefSize - size)
-                                + ", "
-                                    + CreateCastToIntPtr(Size.Byte, CreateDataRef(Start, refAlignParam.RefSize))
-                                        + ")";
-            }
-            NotImplementedMethod(refAlignParam, size, dataSize);
-            return null;
-        }
-
-        private string CreateDumpPrintOperation(Size size)
-        {
-            if(IsBuildInIntType(size))
-                return "Data.DumpPrint(" + CreateDataRef(Start, size) + ")";
-            return "Data.DumpPrint(" + size.ByteCount + ", " + CreateDataPtr(Start) + ")";
-        }
-
-        private string CreateStoreResult(Size resultSize, Size argsSize)
-        {
-            return CreateDataRef(Start + argsSize - resultSize, resultSize)
-                + " = "
-                    + CreateIntCast(resultSize);
-        }
-
-        private string CreateBinaryOperation(Size leftSize, ISequenceOfBitBinaryOperation opToken, Size rightSize)
-        {
-            return "("
-                + CreateDataRef(Start + rightSize, leftSize)
-                    + " "
-                        + opToken.CSharpNameOfDefaultOperation
-                            + " "
-                                + CreateDataRef(Start, rightSize)
-                                    + ")";
-        }
-
-        private static string CreateCastToIntPtr(Size size, string result) { return "(" + CreateIntPtrCast(size) + " " + result + ")"; }
 
         private static string CreateCastToIntRef(Size size, string result) { return "(*" + CreateIntPtrCast(size) + " " + result + ")"; }
 
@@ -430,14 +206,7 @@ namespace Reni.Code
         internal static CSharpCodeSnippet CreateList(CodeBase[] data)
         {
             var holder = "list" + _nextListId++;
-            var result = holder + " = new DataContainer();\n";
-            foreach(var codeBase in data)
-            {
-                var snippet = codeBase.CSharpCodeSnippet();
-                if(snippet.Prerequisites != "")
-                    result += snippet.Prerequisites + "\n";
-                result += holder + ".Expand(" + snippet.Result + ");\n";
-            }
+            var result = data.Aggregate("var "+ holder + " = new DataContainer();\n", (current, codeBase) => current + codeBase.CSharpCodeSnippet().Flatten(holder + ".Expand({0});\n"));
             return new CSharpCodeSnippet(result, holder);
         }
 
@@ -451,23 +220,28 @@ namespace Reni.Code
             return "BitCast(" + size.SaveByteCount + ", " + significantSize + ")";
         }
 
-        public static string BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        internal static string BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
         {
             return opToken.DataFunctionName + "(" + size.SaveByteCount + ", " + leftSize.SaveByteCount + ")";
         }
 
-        public static string Drop(Size size, Size outputSize) { return "Drop(" + outputSize.SaveByteCount + ")"; }
-    }
-
-    internal sealed class CSharpCodeSnippet
-    {
-        internal readonly string Prerequisites;
-        internal readonly string Result;
-
-        internal CSharpCodeSnippet(string prerequisites, string result)
+        internal static string Drop(Size size, Size outputSize)
         {
-            Prerequisites = prerequisites;
-            Result = result;
+            return "Drop(" + outputSize.SaveByteCount + ")";
+        }
+
+        internal static string LocalVariableAccess(string holder, Size size, Size dataSize)
+        {
+            return holder + ".DataPart(" + size.SaveByteCount + ")";
+        }
+
+        internal static CSharpCodeSnippet LocalVariables(string holderNamePattern, CodeBase[] codeBases)
+        {
+            var snippets = codeBases.Select(x => x.CSharpCodeSnippet()).ToArray();
+            var prerequisites = "";
+            for(var i = 0; i < snippets.Length; i++)
+                prerequisites += snippets[i].Flatten("var " + String.Format(holderNamePattern, i) + " = {0};\n");
+            return new CSharpCodeSnippet(prerequisites, "");
         }
     }
 }

@@ -30,6 +30,7 @@
     <Compile Include="Code\Container.cs" />
     <Compile Include="Code\Call.cs" />
     <Compile Include="Code\ContextRef.cs" />
+    <Compile Include="Code\CSharpCodeSnippet.cs" />
     <Compile Include="Code\Drop.cs" />
     <Compile Include="Code\Environment.cs" />
     <Compile Include="Code\Fiber.cs" />
@@ -45,6 +46,8 @@
     <Compile Include="Code\IReferenceInCode.cs" />
     <Compile Include="Code\LeafElement.cs" />
     <Compile Include="Code\LocalReferenceSequenceVisitor.cs" />
+    <Compile Include="Code\LocalVariables.cs" />
+    <Compile Include="Code\LocalVariableReference.cs" />
     <Compile Include="Code\Multiplyop.cs" />
     <Compile Include="Code\Op.cs" />
     <Compile Include="Code\ReferenceCode.cs" />
@@ -86,6 +89,7 @@
     <Compile Include="Feature\IInfixFeature.cs" />
     <Compile Include="Parser\DeclarationTokenFactory.cs" />
     <Compile Include="Parser\MainTokenFactory.cs" />
+    <Compile Include="Runtime\DataContainer.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
     <Compile Include="Sequence\PrefixFeature.cs" />
     <Compile Include="Struct\Field.cs" />

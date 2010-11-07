@@ -99,7 +99,7 @@ namespace Reni.Code
             return List.Create(resultData);
         }
 
-        protected virtual IEnumerable<CodeBase> AsList() { return new[]{this}; }
+        protected virtual IEnumerable<CodeBase> AsList() { return new[] {this}; }
 
         internal static CodeBase BitsConst(Size size, BitsConst t) { return new BitArray(size, t); }
         internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
@@ -200,7 +200,7 @@ namespace Reni.Code
                 .LocalBlock(this, copier, refAlignParam);
         }
 
-        internal CodeBase CreateLocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize)
+        internal CodeBase CreateLocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize, string holder)
         {
             var intermediateSize = Size - resultSize;
             if(intermediateSize.IsZero)
@@ -209,9 +209,7 @@ namespace Reni.Code
             var result = this;
             if(!resultSize.IsZero)
                 result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize))
-                    .Sequence
-                    (
-                        copier.ReplaceArg(LocalReferenceCode(refAlignParam, resultSize, "CreateLocalBlockEnd")));
+                    .Sequence(copier.ReplaceArg(LocalReferenceCode(refAlignParam, holder)));
 
             return result.CreateFiber(new Drop(Size, resultSize));
         }
@@ -256,10 +254,9 @@ namespace Reni.Code
         private CodeBase DumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
         private CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
 
-        internal static CodeBase LocalReferenceCode(RefAlignParam refAlignParam, Size size, string reason)
+        internal static CodeBase LocalReferenceCode(RefAlignParam refAlignParam, string holder)
         {
-            return Arg(refAlignParam.RefSize)
-                .AddToReference(refAlignParam, size*(-1), reason);
+            return new LocalVariableReference(refAlignParam,holder);
         }
 
         internal CodeBase CreateFiber(IEnumerable<FiberItem> subsequentElement)
@@ -283,6 +280,14 @@ namespace Reni.Code
 
     internal static class CodeBaseExtender
     {
-        internal static CodeBase ToSequence(this IEnumerable<CodeBase> x) { return x.Aggregate(CodeBase.Void(), (code, result) => code.Sequence(result)); }
+        internal static CodeBase ToSequence(this IEnumerable<CodeBase> x)
+        {
+            return x.Aggregate(CodeBase.Void(), (code, result) => code.Sequence(result));
+        }
+
+        internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> x, string holderPattern)
+        {
+            return new LocalVariables(holderPattern, x);
+        }
     }
 }

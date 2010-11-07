@@ -46,6 +46,12 @@ namespace Reni.Code
             return new TopData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
+        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement) 
+        {
+            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
+            return new LocalVariableAccess(RefAlignParam, precedingElement.Holder, OutputSize, DataSize);
+        }
+
         internal override CodeBase TryToCombineBack(FrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
@@ -53,5 +59,24 @@ namespace Reni.Code
         }
 
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, OutputSize, DataSize); }
+    }
+
+    internal sealed class LocalVariableAccess : FiberHead
+    {
+        private readonly RefAlignParam _refAlignParam;
+        private readonly string _holder;
+        private readonly Size _size;
+        private readonly Size _dataSize;
+
+        public LocalVariableAccess(RefAlignParam refAlignParam, string holder, Size size, Size dataSize)
+        {
+            _refAlignParam = refAlignParam;
+            _holder = holder;
+            _size = size;
+            _dataSize = dataSize;
+        }
+
+        protected override Size GetSize() { return _size; }
+        protected override string CSharpString() { return CSharpGenerator.LocalVariableAccess(_holder,_size, _dataSize); }
     }
 }

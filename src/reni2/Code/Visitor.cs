@@ -12,6 +12,9 @@ namespace Reni.Code
     [Serializable]
     internal abstract class Visitor<T> : ReniObject
     {
+        protected Visitor(int objectId): base(objectId) {  }
+        protected Visitor(){ }
+
         internal virtual T Arg(Arg visitedObject)
         {
             NotImplementedMethod(visitedObject);

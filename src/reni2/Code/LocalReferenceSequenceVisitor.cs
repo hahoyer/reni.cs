@@ -16,13 +16,15 @@ namespace Reni.Code
         [Node, IsDumpEnabled(true)]
         private readonly List<LocalReference> _data = new List<LocalReference>();
 
-        public LocalReferenceSequenceVisitor() { _codeCache = new SimpleCache<CodeBase>(Convert); }
+        private static int _nextObjectId; 
+
+        public LocalReferenceSequenceVisitor():base(_nextObjectId++) { _codeCache = new SimpleCache<CodeBase>(Convert); }
 
         private CodeBase Convert()
         {
             return _data
                 .Select(localReference => localReference.Code)
-                .ToSequence();
+                .ToLocalVariables(HolderNamePattern);
         }
 
         [IsDumpEnabled(false)]
@@ -34,28 +36,28 @@ namespace Reni.Code
             {
                 var size = Size.Zero;
                 return _data
-                    .Select(localReference => localReference.AccompayningDestructorCode(ref size))
+                    .Select((localReference, i) => localReference.AccompayningDestructorCode(ref size, string.Format(HolderNamePattern, i)))
                     .ToSequence();
             }
         }
 
+        private string HolderNamePattern { get { return "local" + ObjectId + "Index{0}"; } }
+
         internal override CodeBase LocalReference(LocalReference visitedObject)
         {
             var newVisitedObject = ReVisit(visitedObject) ?? visitedObject;
-            var offset = Find(newVisitedObject);
+            var i = Find(newVisitedObject);
             _codeCache.Reset();
-            return CodeBase.LocalReferenceCode(newVisitedObject.RefAlignParam, offset, "LocalReferenceSequenceVisitor.LocalReference");
+            return CodeBase.LocalReferenceCode(newVisitedObject.RefAlignParam, string.Format(HolderNamePattern, i));
         }
 
-        private Size Find(LocalReference localReference)
+        private int Find(LocalReference localReference)
         {
-            var result = Size.Zero;
-            var i = 0;
-            for(; i < _data.Count && _data[i] != localReference; i++)
-                result += _data[i].Code.Size;
-            if(i == _data.Count)
-                _data.Add(localReference);
-            return result + localReference.Code.Size;
+            for(var i = 0; i < _data.Count; i++)
+                if(_data[i] == localReference)
+                    return i;
+            _data.Add(localReference);
+            return _data.Count - 1;
         }
 
         internal CodeBase LocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
@@ -74,9 +76,9 @@ namespace Reni.Code
                 gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
             var statement = alignedInternal
                 .Sequence(gap, alignedBody, DestructorCode)
-                .CreateLocalBlockEnd(copier, refAlignParam, resultSize);
+                .CreateLocalBlockEnd(copier, refAlignParam, resultSize, HolderNamePattern);
             DumpWithBreak(trace, "statement", statement);
-            var result = statement.ReplaceArg(CodeBase.TopRef(refAlignParam, "LocalReferenceSequenceVisitor.LocalBlock"));
+            var result = statement;
             return ReturnMethodDump(trace, result);
         }
     }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
 using JetBrains.Annotations;
 using Reni.Context;
 
@@ -72,7 +71,6 @@ namespace Reni.Runtime
         /// <param name="destination">The destination.</param>
         /// <param name="source">The source.</param>
         /// created 08.10.2006 20:07
-        [UsedImplicitly]
         public static void MoveBytes(int count, byte[] destination, byte[] source)
         {
             for(var i = 0; i < count; i++)
@@ -84,7 +82,6 @@ namespace Reni.Runtime
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        [UsedImplicitly]
         public static void DumpPrint(Int64 x)
         {
             BitsConst.Convert(x).PrintNumber();
@@ -95,7 +92,6 @@ namespace Reni.Runtime
         /// </summary>
         /// <param name="x">The x.</param>
         /// created 11.10.2006 01:12
-        [UsedImplicitly]
         public static void DumpPrint(Int32 x)
         {
             BitsConst.Convert(x).PrintNumber();
@@ -174,27 +170,28 @@ namespace Reni.Runtime
             return data;
         }
 
-        /// <summary>
-        /// Casts x by number of bits given. 
-        /// </summary>
-        /// <param name="count">The count.</param>
-        /// <param name="x">The x.</param>
-        /// <param name="bits">The bits.</param>
-        /// created 03.02.2007 01:39
-        [UsedImplicitly]
-        public static unsafe void BitCast(int count, sbyte* x, int bits)
+        internal static unsafe void BitCast(byte[] x, int bits)
         {
-            var isNegative = x[count - 1] < 0;
+            fixed(byte* xx = x)
+                BitCast(x.Length, xx, bits);
+        }
+
+        internal static unsafe void BitCast(int count, byte* x, int bits)
+        {
+            var isNegative = x[count - 1] >= 0x80;
             while(bits >= 8)
             {
                 count--;
-                x[count] = (sbyte) (isNegative ? -1 : 0);
+                x[count] = (byte) (isNegative ? -1 : 0);
                 bits -= 8;
             }
             if(bits > 0)
             {
                 count--;
-                x[count] = (sbyte) ((sbyte) (x[count] << bits) >> bits);
+                var @sbyte = (int)x[count];
+                var sbyte1 = (@sbyte << bits);
+                var i = (sbyte1 >> bits);
+                x[count] = (byte) i;
             }
             if(bits < 0)
             {
@@ -210,12 +207,12 @@ namespace Reni.Runtime
         /// <param name="data">The data.</param>
         /// <param name="countData">The count data.</param>
         /// created 03.02.2007 01:32
-        public static unsafe void Minus(int countResult, sbyte* data, int countData)
+        internal static unsafe void Minus(int countResult, byte* data, int countData)
         {
             var carry = 1;
             for(var i = 0; i < countData; i++)
             {
-                data[i] = (sbyte) ((sbyte) (~data[i]) + carry);
+                data[i] = (byte) ((byte) (~data[i]) + carry);
                 carry = data[i] == 0 ? 1 : 0;
             }
 
@@ -237,9 +234,9 @@ namespace Reni.Runtime
         /// <param name="data2nd">The data2nd.</param>
         /// created 03.02.2007 20:48
         [UsedImplicitly]
-        public static unsafe void Minus(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
+        public static unsafe void Minus(int countResult, byte* dataResult, int count1st, byte* data1st, int count2nd, byte* data2nd)
         {
-            fixed(sbyte* m = new sbyte[count2nd])
+            fixed(byte* m = new byte[count2nd])
             {
                 MoveBytes(count2nd, m, data2nd);
                 Minus(count2nd, m, count2nd);
@@ -247,18 +244,15 @@ namespace Reni.Runtime
             }
         }
 
-        /// <summary>
-        /// Pluses the specified count result.
-        /// </summary>
-        /// <param name="countResult">The count result.</param>
-        /// <param name="dataResult">The data result.</param>
-        /// <param name="count1st">The count1st.</param>
-        /// <param name="data1st">The data1st.</param>
-        /// <param name="count2nd">The count2nd.</param>
-        /// <param name="data2nd">The data2nd.</param>
-        /// created 03.02.2007 20:48
+        public static unsafe void Plus(byte[] dataResult, int count1st, byte[] data)
+        {
+            fixed(byte* pnewData = dataResult)
+            fixed(byte* poldData = data)
+                Plus(dataResult.Length, pnewData, count1st, poldData, data.Length - count1st, poldData + count1st);
+        }
+        
         [UsedImplicitly]
-        public static unsafe void Plus(int countResult, sbyte* dataResult, int count1st, sbyte* data1st, int count2nd, sbyte* data2nd)
+        public static unsafe void Plus(int countResult, byte* dataResult, int count1st, byte* data1st, int count2nd, byte* data2nd)
         {
             var d = 0;
             var carry = 0;
@@ -274,7 +268,7 @@ namespace Reni.Runtime
                 else if(d < 0)
                     carry += 0xff;
 
-                dataResult[i] = (sbyte) (carry & 0xff);
+                dataResult[i] = (byte) (carry & 0xff);
                 carry >>= 8;
             }
         }
@@ -359,17 +353,5 @@ namespace Reni.Runtime
         {
             return Greater(count2nd, data2nd, count1st, data1st);
         }
-    }
-    [UsedImplicitly]
-    public sealed class DataContainer
-    {
-        private readonly byte[] _data;
-        public DataContainer(params byte[] data)
-        {
-            _data = data;
-        }
-
-        [UsedImplicitly]
-        public unsafe void DumpPrint(int bits) { Data.DumpPrint(_data); }
     }
 }

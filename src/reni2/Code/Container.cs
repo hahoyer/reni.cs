@@ -69,7 +69,7 @@ namespace Reni.Code
             return result;
         }
 
-        public CodeMemberMethod GetCSharpFunctionCode(string name, bool isFunction, bool useStatementAligner)
+        private CodeMemberMethod GetCSharpFunctionCode(string name, bool isFunction, bool useStatementAligner)
         {
             var result = new CodeMemberMethod();
             result.Comments.AddRange(CreateComment(Description));
@@ -98,11 +98,9 @@ namespace Reni.Code
             if(IsError)
                 return "throw new Exception(" + Description.Replace("\"", "\"\"") + ")";
 
-            var statements = new CSharpGenerator(MaxSize.ByteAlignedSize, _frameSize).CreateFunctionBody(_data, isFunction);
+            var statements = CSharpGenerator.CreateFunctionBody(_data, isFunction);
             if(useStatementAligner)
                 statements = StatementAligner(statements);
-            statements = statements.Surround("{", "}");
-            statements = "fixed(sbyte*data=new sbyte[" + MaxSize.ByteCount + "])" + statements;
             statements = statements.Indent(3);
             return statements;
         }
