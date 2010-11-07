@@ -8,7 +8,7 @@ using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
-using Reni.FeatureTest;
+using Reni.FeatureTest;                   
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
@@ -25,8 +25,8 @@ namespace ReniTest
             
             //TestGenerated.Exec();
             //CompilerTest.Run("Test", Target, Output);
-            //RunSpecificTest();
-            Assembly.GetExecutingAssembly().RunTests();
+            RunSpecificTest();
+            //Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
         }
 
