@@ -50,13 +50,6 @@ namespace Reni.Code
 
         private Size GetSize() { return RefAlignParam.RefSize; }
 
-        internal override CodeBase TryToCombineBack(TopRef precedingElement)
-        {
-            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            var reason = _reason + "(" + _right + ") + " + precedingElement.Reason;
-            return new TopRef(RefAlignParam, precedingElement.Offset + _right, reason);
-        }
-
         internal override CodeBase TryToCombineBack(FrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));

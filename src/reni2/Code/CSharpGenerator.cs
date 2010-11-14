@@ -23,7 +23,7 @@ namespace Reni.Code
             var snippet = data.CSharpCodeSnippet();
             if(isFunction)
                 return "StartFunction:\n" + snippet.Flatten("return {0};\n");
-            return snippet.Flatten("{0}.Drop();\n");
+            return "var " + TopName + " = new DataContainer();\n" + snippet.Flatten("{0}.Drop();\n");
 
         }
 
@@ -82,12 +82,6 @@ namespace Reni.Code
         }
 
         internal string CreateThen(Size condSize) { return "if(" + CreateDataRef(Start, condSize) + "!=0) {"; }
-
-        internal static string CreateTopRef(RefAlignParam refAlignParam, Size offset)
-        {
-            NotImplementedFunction(refAlignParam,offset);
-            return null;
-        }
 
         internal static string CreateFrameRef(RefAlignParam refAlignParam, Size offset)
         {
@@ -192,12 +186,17 @@ namespace Reni.Code
         }
 
         private static int _nextListId = 0;
+        private const string TopName = "top";
+
+        internal static string CreateTopRef() { return TopName; }
 
         internal static CSharpCodeSnippet CreateList(CodeBase[] data)
         {
             var holder = "list" + _nextListId++;
-            var result = "var " + holder + " = new DataContainer();\n";
-            result = data.Aggregate(result, (current, codeBase) => current + Flatten(holder, codeBase));
+            var result = "var " + holder + " = " + TopName + ";\n";
+            result += TopName + " = new DataContainer();\n";
+            result = data.Aggregate(result, (current, codeBase) => current + Flatten(TopName, codeBase));
+            result += TopName + " = " + holder + ";\n";
             return new CSharpCodeSnippet(result, holder);
         }
 

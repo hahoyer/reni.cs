@@ -8,15 +8,15 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopRef : Ref
     {
-        public TopRef(RefAlignParam refAlignParam, Size offset, string reason)
-            : base(refAlignParam, offset,reason)
+        public TopRef(RefAlignParam refAlignParam, string reason)
+            : base(refAlignParam, Reni.Size.Zero,reason)
         {
             StopByObjectId(530);
         }
 
         protected override string CSharpString()
         {
-            return CSharpGenerator.CreateTopRef(RefAlignParam, Offset);
+            return CSharpGenerator.CreateTopRef();
         }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)

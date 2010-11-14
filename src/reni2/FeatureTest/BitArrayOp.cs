@@ -64,7 +64,7 @@ namespace Reni.FeatureTest.BitArrayOp
     Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
     public class NegativeNumbers : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -78,7 +78,7 @@ namespace Reni.FeatureTest.BitArrayOp
     [TestFixture, Target(@"(2+4) dump_print"), Output("6"), Number]
     public class Add2Numbers : CompilerTest
     {
-        [Test, Category(UnderConstruction)]
+        [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 

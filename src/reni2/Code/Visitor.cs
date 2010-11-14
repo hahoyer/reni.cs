@@ -93,5 +93,25 @@ namespace Reni.Code
         }
 
         internal abstract T Default();
+
+        internal virtual T LocalVariables(LocalVariables visitedObject)
+        {
+            var visitor = this;
+            var data = visitedObject.Data;
+            var newList = new List<T>();
+            foreach (var element in data)
+            {
+                var newElement = element.Visit(visitor);
+                newList.Add(newElement);
+                visitor = visitor.AfterAny(element.Size);
+            }
+            return visitor.LocalVariables(visitedObject, newList);
+        }
+
+        protected virtual T LocalVariables(LocalVariables visitedObject, List<T> newList)
+        {
+            NotImplementedMethod(visitedObject, newList);
+            return default(T);
+        }
     }
 }

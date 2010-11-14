@@ -49,7 +49,7 @@ namespace Reni.Code
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement) 
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new LocalVariableAccess(RefAlignParam, precedingElement.Holder, precedingElement.Offset, OutputSize, DataSize);
+            return new LocalVariableAccess(RefAlignParam, precedingElement.Holder, precedingElement.Offset, OutputSize);
         }
 
         internal override CodeBase TryToCombineBack(FrameRef precedingElement)

@@ -13,6 +13,7 @@ namespace Reni.Code
         internal override bool ContextRef(ReferenceCode visitedObject) { return false; }
         protected override bool Fiber(Fiber visitedObject, bool head) { return head; }
         internal override bool List(List visitedObject) { return visitedObject.Data.Any(x => x.Visit(this)); }
+        internal override bool LocalVariables(LocalVariables visitedObject) { return visitedObject.Data.Any(x => x.Visit(this)); }
         internal override bool Default() { return false; }
         internal override bool LocalReference(LocalReference visitedObject) { return false; }
     }

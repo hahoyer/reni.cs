@@ -30,6 +30,12 @@ namespace Reni.Code.ReplaceVisitor
             return Code.List.Create(newList.Select((x, i) => x ?? visitedObject.Data[i]));
         }
 
+        protected override CodeBase LocalVariables(LocalVariables visitedObject, List<CodeBase> newList)
+        {
+            if (newList.All(x => x == null))
+                return null;
+            return new LocalVariables(visitedObject.HolderNamePattern,newList.Select((x, i) => x ?? visitedObject.Data[i]));
+        }
 
         protected override Visitor<CodeBase> AfterThen(Size theSize) { return this; }
 

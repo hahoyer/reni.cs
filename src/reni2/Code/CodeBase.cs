@@ -58,11 +58,9 @@ namespace Reni.Code
 
         internal CodeBase CreateThenElse(CodeBase thenCode, CodeBase elseCode) { return CreateFiber(new ThenElse(thenCode, elseCode)); }
 
-        internal static CodeBase TopRef(RefAlignParam refAlignParam, string reason) { return new TopRef(refAlignParam, Size.Zero, reason); }
+        internal static CodeBase TopRef(RefAlignParam refAlignParam, string reason) { return new TopRef(refAlignParam, reason); }
 
         internal CodeBase LocalReference(RefAlignParam refAlignParam, CodeBase destructorCode) { return new LocalReference(refAlignParam, this, destructorCode); }
-
-        internal static CodeBase TopRef(RefAlignParam refAlignParam, Size offset, string reason) { return new TopRef(refAlignParam, offset, reason); }
 
         internal static CodeBase FrameRef(RefAlignParam refAlignParam, string reason) { return new FrameRef(refAlignParam, Size.Create(0), reason); }
 
@@ -246,15 +244,6 @@ namespace Reni.Code
                 .DumpPrint(alignedSize);
         }
 
-        internal CodeBase SequenceOfTwo(CodeBase right)
-        {
-            if(IsEmpty)
-                return right;
-            if(right.IsEmpty)
-                return this;
-            return List.Create(this, right);
-        }
-
         private CodeBase BitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize) { return CreateFiber(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
         private CodeBase DumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
         private CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
@@ -292,6 +281,8 @@ namespace Reni.Code
 
         internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> x, string holderPattern)
         {
+            if (x.ToArray().Length == 0)
+                return CodeBase.Void();
             return new LocalVariables(holderPattern, x);
         }
     }

@@ -13,20 +13,15 @@ namespace Reni
     {
         public static void MainFunction()
         {
-            var list2 = new DataContainer();
-            var list3 = new DataContainer();
-            list3.Expand((new DataContainer(1)).Minus(1).BitCast(1, 2));
-            list3.Expand((new DataContainer(12)).Minus(1).BitCast(1, 5));
-            list3.Expand((new DataContainer(123)).Minus(1));
-            list3.Expand((new DataContainer(210, 4)).Minus(2).BitCast(2, 12));
-            list3.Expand((new DataContainer(57, 48)).Minus(2).BitCast(2, 15));
-            list3.Expand((new DataContainer(64, 226, 1)).Minus(3).BitCast(3, 18));
-            list3.Expand((new DataContainer(135, 214, 18)).Minus(3).BitCast(3, 22));
-            list3.Expand((new DataContainer(78, 97, 188, 0)).Minus(4).BitCast(4, 25));
-            list3.Expand((new DataContainer(21, 205, 91, 7)).Minus(4).BitCast(4, 28));
-            list3.Expand((new DataContainer(210, 2, 150, 73)).Minus(4));
-            var local10Index0 = list3;
-            list2.Drop();
+            DataContainer top = null;
+            var list1 = top;
+            top = new DataContainer();
+            top.Expand(new DataContainer(5));
+            top.Expand(new DataContainer(6));
+            var local2Index0 = top.Ref(0);
+            (local2Index0.DataPart(1, 1)).BitCast(1, 4).DumpPrint().Drop();
+            top = list1;
+            list1.Drop();
             ;
         }
     }
