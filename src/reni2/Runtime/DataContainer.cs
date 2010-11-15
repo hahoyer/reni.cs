@@ -60,6 +60,8 @@ namespace Reni.Runtime
         [UsedImplicitly]
         public void Expand(DataContainer dataContainer)
         {
+            if (dataContainer._data.Length == 0)
+                return;
             var oldData = _data;
             _data = new byte[oldData.Length + dataContainer._data.Length];
             dataContainer._data.CopyTo(_data, 0);
@@ -73,7 +75,9 @@ namespace Reni.Runtime
             return new DataContainer((d1 + d2).ToByteArray());
         }
         [UsedImplicitly]
-        public void Drop() { Tracer.Assert(_data.Length == 0); }
+        public void Drop(int bytes) { Tracer.Assert(_data.Length == bytes); }
+        [UsedImplicitly]
+        public void DropAll() { Drop(_data.Length); }
         [UsedImplicitly]
         public DataContainer Minus(int bytes)
         {

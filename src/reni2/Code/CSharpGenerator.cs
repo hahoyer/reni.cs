@@ -23,7 +23,7 @@ namespace Reni.Code
             var snippet = data.CSharpCodeSnippet();
             if(isFunction)
                 return "StartFunction:\n" + snippet.Flatten("return {0};\n");
-            return "var " + TopName + " = new DataContainer();\n" + snippet.Flatten("{0}.Drop();\n");
+            return "var " + DataName + " = new DataContainer();\n" + snippet.Flatten("{0}.DropAll();\n");
 
         }
 
@@ -186,23 +186,19 @@ namespace Reni.Code
         }
 
         private static int _nextListId = 0;
-        private const string TopName = "top";
+        private const string DataName = "data";
 
-        internal static string CreateTopRef() { return TopName; }
+        internal static string CreateTopRef() { return DataName; }
 
         internal static CSharpCodeSnippet CreateList(CodeBase[] data)
         {
-            var holder = "list" + _nextListId++;
-            var result = "var " + holder + " = " + TopName + ";\n";
-            result += TopName + " = new DataContainer();\n";
-            result = data.Aggregate(result, (current, codeBase) => current + Flatten(TopName, codeBase));
-            result += TopName + " = " + holder + ";\n";
-            return new CSharpCodeSnippet(result, holder);
+            var result = data.Aggregate("", (current, codeBase) => current + Flatten(DataName, codeBase));
+            return new CSharpCodeSnippet(result, DataName);
         }
 
         private static string Flatten(string holder, CodeBase codeBase)
         {
-            var resultHeader = codeBase.Size.IsZero ? "{0}.Drop();\n" : holder + ".Expand({0});\n";
+            var resultHeader = holder + ".Expand({0});\n";
             return codeBase
                 .CSharpCodeSnippet()
                 .Flatten(resultHeader);

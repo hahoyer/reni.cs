@@ -18,10 +18,10 @@ namespace Reni
             top = new DataContainer();
             top.Expand(new DataContainer(5));
             top.Expand(new DataContainer(6));
-            var local2Index0 = top.Ref(0);
-            (local2Index0.DataPart(1, 1)).BitCast(1, 4).DumpPrint().Drop();
+            var local2Index0 = top;
+            (local2Index0.DataPart(1, 1)).BitCast(1, 4).DumpPrint().DropAll();
             top = list1;
-            list1.Drop();
+            list1.DropAll();
             ;
         }
     }
