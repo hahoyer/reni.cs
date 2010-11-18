@@ -203,7 +203,7 @@ namespace Reni.Struct
         private Result AccessResult(Category category, int position)
         {
             var accessType = AccessType(position);
-            var thisResult = ThisReferenceResult(category | Category.Type);
+            var thisResult = ThisReferenceResult(category | Category.Type).AutomaticDereference();
             var accessResult = accessType.Result(category);
             return accessResult.ReplaceArg(thisResult);
         }

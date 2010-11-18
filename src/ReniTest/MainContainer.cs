@@ -24,7 +24,7 @@ namespace ReniTest
             Application.SetCompatibleTextRenderingDefault(false);
             
             //TestGenerated.Exec();
-            //CompilerTest.Run("Test", Target, Output);
+            //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
             RunSpecificTest();
             //Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
@@ -33,10 +33,7 @@ namespace ReniTest
         [Test, Category(CompilerTest.UnderConstruction)]
         private static void RunSpecificTest()
         {
-            new NegativeNumbers().RunFlat();
-            new InnerAccess().RunFlat();
-            new AccessAndAdd().RunFlat();
-            new IntegerPlusNumber().RunFlat();
+            new SimpleFunction().RunFlat();
         }
 
         private const string Target = @"! property x: 11/\; x dump_print";
