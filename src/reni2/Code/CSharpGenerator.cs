@@ -22,8 +22,8 @@ namespace Reni.Code
         {
             var snippet = data.CSharpCodeSnippet();
             if(isFunction)
-                return "StartFunction:\n" + snippet.Flatten("return {0};\n");
-            return "var " + DataName + " = new DataContainer();\n" + snippet.Flatten("{0}.DropAll();\n");
+                return "StartFunction:\n" + VarDataNewDatacontainer + snippet.Flatten("return {0};\n");
+            return VarDataNewDatacontainer + snippet.Flatten("{0}.DropAll();\n");
 
         }
 
@@ -39,8 +39,6 @@ namespace Reni.Code
             result += ")";
             return result;
         }
-
-        internal string CreateCall(int index, Size frameSize) { return Generator.FunctionName(index) + "(" + CreateDataPtr(Start + frameSize) + ")"; }
 
         internal static string DumpPrintText(string text)
         {
@@ -67,12 +65,6 @@ namespace Reni.Code
                 return CreateDataRef(Start, size) + " += " + right;
 
             NotImplementedFunction(this, size, right);
-            return null;
-        }
-
-        internal static string CreateTopFrame(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
-        {
-            NotImplementedFunction(null, refAlignParam, offset, size, dataSize);
             return null;
         }
 
@@ -185,12 +177,12 @@ namespace Reni.Code
             return false;
         }
 
-        private static int _nextListId = 0;
         private const string DataName = "data";
+        internal const string VarDataNewDatacontainer = "var " + DataName + " = new DataContainer();\n";
 
         internal static string CreateTopRef() { return DataName; }
 
-        internal static CSharpCodeSnippet CreateList(CodeBase[] data)
+        internal static CSharpCodeSnippet List(CodeBase[] data)
         {
             var result = data.Aggregate("", (current, codeBase) => current + Flatten(DataName, codeBase));
             return new CSharpCodeSnippet(result, DataName);
@@ -204,7 +196,7 @@ namespace Reni.Code
                 .Flatten(resultHeader);
         }
 
-        internal static string TopData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+        internal static string TopData(Size offset, Size size)
         {
             return "DataContainer.TopData(" + offset.SaveByteCount + ", " + size.SaveByteCount + ")";
         }
@@ -214,7 +206,7 @@ namespace Reni.Code
             return "BitCast(" + size.SaveByteCount + ", " + (size - significantSize) + ")";
         }
 
-        internal static string BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        internal static string BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize)
         {
             return opToken.DataFunctionName + "(" + size.SaveByteCount + ", " + leftSize.SaveByteCount + ")";
         }
@@ -242,5 +234,39 @@ namespace Reni.Code
             return new CSharpCodeSnippet(prerequisites, "");
         }
 
+        internal static string LocalVariableReference(string holder, Size offset)
+        {
+            return holder + ".DataRef(" + offset.SaveByteCount + ")";
+        }
+
+        internal static string Call(int functionIndex)
+        {
+            return "Call(" + Generator.FunctionName(functionIndex) + ")";
+        }
+
+        internal static string TopFrame(Size offset, Size size)
+        {
+            return Generator.FrameArgName + ".DataPartFromBack(" + offset.SaveByteCount + ", " + size.SaveByteCount + ")";
+        }
+
+        internal static string Dereference(Size size) { return "Dereference(" + size.SaveByteCount + ")"; }
+
+        internal static CSharpCodeSnippet Fiber(FiberItem[] fiberItems, FiberHead fiberHead)
+        {
+            var snippet = fiberHead.CSharpCodeSnippet();
+            var prerequisites =
+                "var " + DataName + fiberHead.ObjectId + " = " + DataName + ";\n"
+                + DataName + " = new DataContainer();\n"
+                + snippet.Prerequisites
+                + "var fiber" + fiberHead.ObjectId + " = " + snippet.Result + ";\n"
+                + DataName + " = " + DataName + fiberHead.ObjectId + ";\n";
+            var result1 = "fiber" + fiberHead.ObjectId ;
+
+            var fiberItemStrings = fiberItems.Select(x => x.CSharpString()).ToArray();
+            var result = fiberItemStrings
+                .Aggregate
+                ("(" + result1 + ")", (current, s) => current + ("." + s));
+            return new CSharpCodeSnippet(prerequisites.Indent(), result);
+        }
     }
 }

@@ -34,6 +34,6 @@ namespace Reni.Code
                 .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
         }
 
-        internal override CSharpCodeSnippet CSharpCodeSnippet() { return CSharpGenerator.CreateList(_data); }
+        internal override CSharpCodeSnippet CSharpCodeSnippet() { return CSharpGenerator.List(_data); }
     }
 }

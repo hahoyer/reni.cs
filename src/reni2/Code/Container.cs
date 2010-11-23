@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
+using Reni.Runtime;
 using Reni.Type;
 
 namespace Reni.Code
@@ -78,8 +79,9 @@ namespace Reni.Code
             result.Statements.Add(new CodeSnippetExpression(GetCSharpStatements(useStatementAligner, isFunction)));
             if(isFunction)
             {
-                result.Parameters.Add(new CodeParameterDeclarationExpression(typeof(sbyte*), "frame"));
+                result.Parameters.Add(new CodeParameterDeclarationExpression(typeof(DataContainer), Generator.FrameArgName));
                 result.Attributes = MemberAttributes.Static | MemberAttributes.Private;
+                result.ReturnType = new CodeTypeReference(typeof(DataContainer));
             }
             return result;
         }

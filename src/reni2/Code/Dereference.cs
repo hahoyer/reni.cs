@@ -58,6 +58,8 @@ namespace Reni.Code
             return new TopFrame(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
+        internal override string CSharpString() { return CSharpGenerator.Dereference(OutputSize); }
+
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, OutputSize, DataSize); }
     }
 }

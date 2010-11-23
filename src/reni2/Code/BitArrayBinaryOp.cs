@@ -34,7 +34,7 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _size; } }
 
-        internal override string CSharpString() { return CSharpGenerator.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
+        internal override string CSharpString() { return CSharpGenerator.BitArrayBinaryOp(OpToken, OutputSize, LeftSize); }
 
         internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
 

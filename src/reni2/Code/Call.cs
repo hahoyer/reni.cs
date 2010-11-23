@@ -35,7 +35,12 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " FunctionIndex=" + FunctionIndex + " ArgsAndRefsSize=" + ArgsAndRefsSize; } }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Call(OutputSize, FunctionIndex, ArgsAndRefsSize); }
+        internal override string CSharpString() { return CSharpGenerator.Call(FunctionIndex); }
+
+        internal override void Execute(IFormalMaschine formalMaschine)
+        {
+            formalMaschine.Call(OutputSize, FunctionIndex, ArgsAndRefsSize);
+        }
 
         public FiberItem TryConvertToRecursiveCall(int functionIndex)
         {

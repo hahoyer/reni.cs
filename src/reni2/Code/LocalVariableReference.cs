@@ -22,6 +22,9 @@ namespace Reni.Code
         protected override Size GetSize() { return _refAlignParam.RefSize; }
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Holder=" + _holder + " Offset=" + _offset; } }
+
+        protected override string CSharpString() { return CSharpGenerator.LocalVariableReference(_holder, _offset); }
+
         [IsDumpEnabled(false)]
         internal string Holder { get { return _holder; } }
         [IsDumpEnabled(false)]

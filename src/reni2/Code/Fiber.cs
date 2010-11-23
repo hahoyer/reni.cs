@@ -77,14 +77,7 @@ namespace Reni.Code
             return actual.Fiber(this);
         }
 
-        internal override CSharpCodeSnippet CSharpCodeSnippet()
-        {
-            var snippet = _fiberHead.CSharpCodeSnippet();
-            var result = _fiberItems
-                .Aggregate
-                ("(" + snippet.Result + ")", (current, fiberItem) => current + ("." + fiberItem.CSharpString()));
-            return new CSharpCodeSnippet(snippet.Prerequisites,result);
-        }
+        internal override CSharpCodeSnippet CSharpCodeSnippet() { return CSharpGenerator.Fiber(_fiberItems, _fiberHead); }
 
         public override string DumpData()
         {

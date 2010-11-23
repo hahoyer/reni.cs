@@ -157,6 +157,7 @@ namespace Reni.Code
         }
 
         private static string CreateBaseName() { return Compiler.FormattedNow; }
+        internal const string FrameArgName = "frame";
     }
 
     internal class CompilerErrorException : Exception

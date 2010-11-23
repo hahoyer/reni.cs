@@ -38,7 +38,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string CSharpString()
         {
-            return CSharpGenerator.TopData(RefAlignParam, Offset, GetSize(), DataSize);
+            return CSharpGenerator.TopData(Offset, GetSize());
         }
     }
 
@@ -77,7 +77,7 @@ namespace Reni.Code
         /// created 07.10.2006 21:11
         protected override string CSharpString()
         {
-            return CSharpGenerator.CreateTopFrame(RefAlignParam, Offset, GetSize(), DataSize);
+            return CSharpGenerator.TopFrame(Offset, GetSize());
         }
 
     }
