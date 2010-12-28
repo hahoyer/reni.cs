@@ -33,7 +33,7 @@ namespace ReniTest
         [Test, Category(CompilerTest.UnderConstruction)]
         private static void RunSpecificTest()
         {
-            new SimpleFunction().RunFlat();
+            new AccessMember().RunFlat();
         }
 
         private const string Target = @"! property x: 11/\; x dump_print";
