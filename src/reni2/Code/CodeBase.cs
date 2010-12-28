@@ -11,7 +11,7 @@ namespace Reni.Code
 {
     [Serializable]
     internal abstract class
-        CodeBase : ReniObject, IIconKeyProvider
+        CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
     {
         protected CodeBase(int objectId)
             : base(objectId) { }
@@ -266,6 +266,32 @@ namespace Reni.Code
         }
 
         internal virtual CSharpCodeSnippet CSharpCodeSnippet() { return new CSharpCodeSnippet("", CSharpString()); }
+        
+        internal virtual string ReversePolish(Size top)
+        {
+            return CSharpString(top);
+        }
+
+        protected virtual string CSharpString(Size top)
+        {
+            NotImplementedMethod(top);
+            return "";
+        }
+
+        internal void Execute(CodeBase[] functions)
+        {
+            Execute(new DataStack(functions));
+        }
+
+        protected virtual void Execute(IFormalMaschine formalMaschine)
+        {
+            NotImplementedMethod(formalMaschine);
+        }
+
+        void IFormalCodeItem.Execute(IFormalMaschine formalMaschine)
+        {
+            Execute(formalMaschine);
+        }
     }
 
     internal abstract class UnexpectedVisitOfPending : Exception

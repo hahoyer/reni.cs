@@ -24,6 +24,7 @@ namespace Reni
         public readonly TraceParamters Trace = new TraceParamters();
 
         public bool ParseOnly;
+        public bool RunFromCode;
 
         [Serializable]
         public class TraceParamters

@@ -26,12 +26,15 @@
     <Compile Include="Code\BitArray.cs" />
     <Compile Include="Code\BitArrayBinaryOp.cs" />
     <Compile Include="Code\BitCast.cs" />
+    <Compile Include="Code\BitsStackData.cs" />
     <Compile Include="Code\CodeBase.cs" />
     <Compile Include="Code\Container.cs" />
     <Compile Include="Code\Call.cs" />
     <Compile Include="Code\ContextRef.cs" />
     <Compile Include="Code\CSharpCodeSnippet.cs" />
+    <Compile Include="Code\DataStack.cs" />
     <Compile Include="Code\Drop.cs" />
+    <Compile Include="Code\EmptyStackData.cs" />
     <Compile Include="Code\Environment.cs" />
     <Compile Include="Code\Fiber.cs" />
     <Compile Include="Code\FiberHead.cs" />
@@ -51,6 +54,7 @@
     <Compile Include="Code\LocalVariableReference.cs" />
     <Compile Include="Code\Multiplyop.cs" />
     <Compile Include="Code\Op.cs" />
+    <Compile Include="Code\ListStack.cs" />
     <Compile Include="Code\ReferenceCode.cs" />
     <Compile Include="Code\Ref.cs" />
     <Compile Include="Code\RefPlus.cs" />
@@ -62,6 +66,8 @@
     <Compile Include="Code\Pair.cs" />
     <Compile Include="Code\LocalBlockEnd.cs" />
     <Compile Include="Code\CSharpGenerator.cs" />
+    <Compile Include="Code\StackData.cs" />
+    <Compile Include="Code\StackDataAddress.cs" />
     <Compile Include="Code\ThenElse.cs" />
     <Compile Include="Code\Top.cs" />
     <Compile Include="Code\TopData.cs" />

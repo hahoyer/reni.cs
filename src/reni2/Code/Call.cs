@@ -35,9 +35,9 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " FunctionIndex=" + FunctionIndex + " ArgsAndRefsSize=" + ArgsAndRefsSize; } }
 
-        internal override string CSharpString() { return CSharpGenerator.Call(FunctionIndex); }
+        protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.Call(FunctionIndex); }
 
-        internal override void Execute(IFormalMaschine formalMaschine)
+        protected override void Execute(IFormalMaschine formalMaschine)
         {
             formalMaschine.Call(OutputSize, FunctionIndex, ArgsAndRefsSize);
         }
@@ -68,7 +68,7 @@ namespace Reni.Code
 
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
 
         internal override CodeBase TryToCombineBack(TopFrame precedingElement)
         {

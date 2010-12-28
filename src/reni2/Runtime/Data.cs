@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using HWClassLibrary.Debug;
 using JetBrains.Annotations;
 
 namespace Reni.Runtime
@@ -97,5 +99,70 @@ namespace Reni.Runtime
         }
 
         static bool IsNegative(this byte x) { return x >= 0x80; }
+
+        [UsedImplicitly]
+        public static void Set(byte[] dest, int destStart, params byte[] source)
+        {
+            source.CopyTo(dest,destStart);
+        }
+
+        [UsedImplicitly]
+        public static unsafe void SetFromPointer(byte[] dest, int destStart, int bytes, byte[] source, int sourceStart)
+        {
+            Tracer.Assert(bytes == 4);
+            Tracer.Assert(sizeof(byte*) == 4);
+            Tracer.Assert(sizeof(int) == 4);
+
+            fixed (byte* sourcePointer = source)
+            {
+                var intPointer = (int)(sourcePointer + sourceStart);
+                var bytePointer = (byte*)&intPointer;
+                for (var i = 0; i < bytes; i++)
+                    dest[destStart + i] = bytePointer[i];
+            }
+        }
+
+        [UsedImplicitly]
+        public static byte[] Get(byte[] source, int sourceStart, int bytes)
+        {
+            var result = new byte[bytes];
+            for (var i = 0; i < bytes; i++)
+                result[i] = source[sourceStart];
+            return result;
+        }
+
+        [UsedImplicitly]
+        public static unsafe void Dereference(byte[] data, int dataStart, int pointerSize, int bytes)
+        {
+            Tracer.Assert(pointerSize == 4);
+            Tracer.Assert(sizeof(byte*) == 4);
+
+            var result = new byte[bytes];
+            fixed (byte* sourcePointer = &data[dataStart])
+            {
+                var ipp = (byte**)sourcePointer;
+                for (var i = 0; i < bytes; i++)
+                    result[i] = (*ipp)[i];
+            }
+            for (var i = 0; i < bytes; i++)
+                data[dataStart + pointerSize - bytes] = result[i];
+        }
+
+        [UsedImplicitly]
+        public static unsafe void BitCast(byte[] data, int dataStart, int bytes, int bits)
+        {
+            fixed (byte* dataPointer = &data[dataStart])
+                BitCast(bytes, dataPointer, bits);
+        }
+
+        [UsedImplicitly]
+        public static void DumpPrint(byte[] data, int dataStart, int bytes)
+        {
+            var piece = new byte[bytes];
+            for (var i = 0; i < bytes; i++)
+                piece[i] = data[dataStart + i];
+            BitsConst.OutStream.Add(new BigInteger(piece).ToString());
+        }
+
     }
 }

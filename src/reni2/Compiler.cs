@@ -23,6 +23,7 @@ namespace Reni
         private readonly SimpleCache<Source> _source;
         private readonly SimpleCache<IParsedSyntax> _syntax;
         private readonly SimpleCache<CodeBase> _code;
+        private readonly SimpleCache<CodeBase[]> _functionCode;
         private readonly SimpleCache<Container> _mainContainer;
         private readonly SimpleCache<List<Container>> _functionContainers;
         private readonly SimpleCache<string> _executedCode;
@@ -40,6 +41,7 @@ namespace Reni
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
             _syntax = new SimpleCache<IParsedSyntax>(() => _parser.Compile(Source));
             _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax).Result(_rootContext, Category.Code).Code);
+            _functionCode = new SimpleCache<CodeBase[]>(() => _rootContext.FunctionCode);
             _mainContainer = new SimpleCache<Container>(() => new Container(Code));
             _functionContainers = new SimpleCache<List<Container>>(()=>_rootContext.CompileFunctions());
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, false));
@@ -116,6 +118,12 @@ namespace Reni
                 for(var i = 0; i < Functions.Count; i++)
                     Tracer.FlaggedLine("function index=" + i + "\n" + _rootContext.Functions[i].BodyCode.Dump());
             }
+
+            if (_parameters.RunFromCode)
+            {
+                return GetOutStreamFromCode();
+            }
+
             if(_parameters.Trace.CodeSequence)
             {
                 Tracer.FlaggedLine("main\n" + MainContainer.Dump());
@@ -137,7 +145,7 @@ namespace Reni
                 _rootContext.Functions[i].EnsureBodyCode();
         }
 
-        public OutStream GetOutStream()
+        private OutStream GetOutStream()
         {
             BitsConst.OutStream = new OutStream();
             try
@@ -153,5 +161,13 @@ namespace Reni
             }
             return BitsConst.OutStream;
         }
+
+        private OutStream GetOutStreamFromCode()
+        {
+            BitsConst.OutStream = new OutStream();
+            Code.Execute(_functionCode.Value);
+            return BitsConst.OutStream;
+        }
+
     }
 }

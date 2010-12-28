@@ -10,8 +10,6 @@ namespace Reni.Code
 
         protected FiberHead() { }
 
-        internal virtual void Execute(IFormalMaschine formalMaschine) { NotImplementedMethod(formalMaschine); }
-
         protected virtual CodeBase TryToCombine(FiberItem subsequentElement) { return null; }
 
         internal override CodeBase CreateFiber(FiberItem subsequentElement)

@@ -15,6 +15,6 @@ namespace Reni.Code
         internal Refs GetRefs() { return Refs.Create(Context); }
         internal override Size InputSize { get { return Size.Zero; } }
         internal override Size OutputSize { get { return Context.RefAlignParam.RefSize; } }
-        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 }

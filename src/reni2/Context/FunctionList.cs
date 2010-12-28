@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
+using Reni.Code;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
@@ -25,6 +26,7 @@ namespace Reni.Context
 
         internal FunctionInstance this[int i] { get { return _list[i]; } }
         internal int Count { get { return _list.Count; } }
+        internal CodeBase[] Code { get { return _list.Select(t => t.BodyCode).ToArray(); } }
 
         internal FunctionInstance Find(ICompileSyntax body, Struct.Context context, TypeBase args)
         {

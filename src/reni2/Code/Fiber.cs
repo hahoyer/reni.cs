@@ -10,8 +10,10 @@ namespace Reni.Code
     {
         private readonly FiberHead _fiberHead;
         private readonly FiberItem[] _fiberItems;
+        private static int _nextObjectId = 0;
 
         private Fiber(FiberHead fiberHead, IEnumerable<FiberItem> fiberItems, FiberItem fiberItem)
+            : base(_nextObjectId++)
         {
             _fiberHead = fiberHead;
             var l = new List<FiberItem>();
@@ -77,7 +79,12 @@ namespace Reni.Code
             return actual.Fiber(this);
         }
 
-        internal override CSharpCodeSnippet CSharpCodeSnippet() { return CSharpGenerator.Fiber(_fiberItems, _fiberHead); }
+        protected override string CSharpString(Size top)
+        {
+            return CSharpGenerator.Fiber(top, ObjectId, _fiberItems, _fiberHead);
+        }
+
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Fiber(_fiberHead, _fiberItems); }
 
         public override string DumpData()
         {

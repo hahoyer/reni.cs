@@ -34,9 +34,9 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _size; } }
 
-        internal override string CSharpString() { return CSharpGenerator.BitArrayBinaryOp(OpToken, OutputSize, LeftSize); }
+        protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.BitArrayBinaryOp(OpToken, OutputSize, LeftSize); }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> " + OpToken.DataFunctionName + " <" + RightSize + ">"; } }
@@ -67,8 +67,8 @@ namespace Reni.Code
         internal override Size InputSize { get { return ArgSize; } }
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _size; } }
-        
-        internal override void Execute(IFormalMaschine formalMaschine)
+
+        protected override void Execute(IFormalMaschine formalMaschine)
         {
             NotImplementedMethod(formalMaschine);
             throw new NotImplementedException();
@@ -79,7 +79,7 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBack(this);
         }
 
-        internal override string CSharpString() { return CSharpGenerator.BitArrayPrefix(OpToken, OutputSize); }
+        protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.BitArrayPrefix(OpToken, OutputSize); }
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " " + OpToken.DataFunctionName + " " + ArgSize; } }
@@ -97,8 +97,9 @@ namespace Reni.Code
         internal override Size OutputSize { get { return Size.Zero; } }
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
-        internal override string CSharpString() { return CSharpGenerator.DumpPrint(); }
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintOperation(LeftSize,RightSize); }
+
+        protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.DumpPrint(top, InputSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintOperation(LeftSize,RightSize); }
     }
     [Serializable]
 
@@ -114,7 +115,7 @@ namespace Reni.Code
 
         protected override Size GetSize() { return Size.Zero; }
         protected override string CSharpString() { return CSharpGenerator.DumpPrintText(_dumpPrintText); }
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(); }
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }
     }

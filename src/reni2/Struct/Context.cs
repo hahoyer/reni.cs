@@ -189,7 +189,11 @@ namespace Reni.Struct
 
         internal Result ThisReferenceResult(Category category) { return ContextReferenceType.Result(category, CreateContextCode, CreateContextRefs); }
         internal Result FunctionalResult(Category category, ICompileSyntax body) { return new FunctionDefinitionType(Function(body)).Result(category); }
-        internal Result AccessResultFromArg(Category category, int position) { return ReplaceContextReferenceByArg(AccessResult(category, position)); }
+
+        internal Result AccessResultFromArg(Category category, int position)
+        {
+            return ReplaceContextReferenceByArg(AccessResult(category, position));
+        }
 
         private Result ContextReferenceAsArg(Category category)
         {
@@ -203,7 +207,7 @@ namespace Reni.Struct
         private Result AccessResult(Category category, int position)
         {
             var accessType = AccessType(position);
-            var thisResult = ThisReferenceResult(category | Category.Type).AutomaticDereference();
+            var thisResult = ThisReferenceResult(category | Category.Type);
             var accessResult = accessType.Result(category);
             return accessResult.ReplaceArg(thisResult);
         }

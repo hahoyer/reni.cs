@@ -12,7 +12,7 @@ namespace Reni.Code
         private readonly RefAlignParam _refAlignParam;
 
         public override string NodeDump { get { return base.NodeDump + " TargetSize=" + _targetSize + " RefSize=" + _refAlignParam.RefSize; } }
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Assign(_targetSize, _refAlignParam); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Assign(_targetSize, _refAlignParam); }
 
         [IsDumpEnabled(false), Node]
         private readonly Size _targetSize;

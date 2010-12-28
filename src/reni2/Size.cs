@@ -14,7 +14,7 @@ namespace Reni
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
     [Serializable]
-    internal class Size : ReniObject, IIconKeyProvider
+    internal class Size : ReniObject, IIconKeyProvider, IComparable<Size>
     {
         private static readonly Hashtable _values = new Hashtable();
         private readonly int _data;
@@ -410,6 +410,8 @@ namespace Reni
         {
             return ByteCount.ToString();
         }
+
+        public int CompareTo(Size other) { return LessThan(other) ? -1 : (other.LessThan(this) ? 1 : 0); }
 
         public override string ToString()
         {

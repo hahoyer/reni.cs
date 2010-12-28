@@ -36,7 +36,7 @@ namespace Reni.Code
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         internal override BitsConst Evaluate() { return Data.Resize(_size); }
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitsArray(Size, Data); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitsArray(Size, Data); }
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Data=" + Data; } }
@@ -44,6 +44,11 @@ namespace Reni.Code
         protected override string CSharpString()
         {
             return CSharpGenerator.CreateBitArray(GetSize(), Data);
+        }
+
+        protected override string CSharpString(Size top)
+        {
+            return CSharpGenerator.Push(top, Size, Data);
         }
 
         internal new static BitArray Void() { return new BitArray(Size.Create(0), Reni.BitsConst.None()); }

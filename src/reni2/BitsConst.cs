@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -9,12 +10,12 @@ using Reni.Runtime;
 namespace Reni
 {
     [DumpToString]
-    internal class BitsConst : ReniObject
+    internal sealed class BitsConst : ReniObject
     {
         private const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         internal const int SegmentAlignBits = 3;
         private static OutStream _outStream;
-        private static int _nextObjectId = 0;
+        private static int _nextObjectId;
 
         private readonly Size _size;
         private byte[] _data;
@@ -48,17 +49,7 @@ namespace Reni
         public bool IsEmpty { get { return Size.IsZero; } }
         public Size Size { get { return _size; } }
         public int ByteCount { get { return DataSize(Size); } }
-
-        public bool IsZero
-        {
-            get
-            {
-                for(var i = 0; i < _data.Length; i++)
-                    if(_data[i] != 0)
-                        return false;
-                return true;
-            }
-        }
+        public bool IsZero { get { return _data.All(t => t == 0); } }
 
         private bool IsNegative
         {
@@ -190,7 +181,7 @@ namespace Reni
         public string ToString(int radix)
         {
             if(radix <= 0 || radix > Digits.Length)
-                Tracer.AssertionFailed("radix <= 0 || radix > " + Digits.Length, () => radix.ToString());
+                Tracer.AssertionFailed("radix <= 0 || radix > " + Digits.Length, radix.ToString);
 
             if(IsZero)
                 return "0";
@@ -199,10 +190,10 @@ namespace Reni
 
             var left = this/radix;
             var right = this - left*radix;
-            var Digit = (Digits[(int) right.ToInt64()]).ToString();
+            var digit = (Digits[(int) right.ToInt64()]).ToString();
             if(left.IsZero)
-                return Digit;
-            return left.ToString(radix) + Digit;
+                return digit;
+            return left.ToString(radix) + digit;
         }
 
         public override string ToString() { return DumpValue(); }
@@ -244,7 +235,8 @@ namespace Reni
         private string ToHexString()
         {
             var value = "";
-            for(int i = 0, n = _data.Length; i < n; i++)
+            var n = _data.Length;
+            for(var i = 0; i < n; i++)
                 if(i < 2 || i >= n - 2 || n == 5)
                     value = HexDump(_data[i]) + value;
                 else if(i == 3)
@@ -413,6 +405,16 @@ namespace Reni
                 Tracer.Assert(Convert("-4095").Resize(Size.Create(8)).ToString(10) == "1",
                               () => Convert("-4095").Resize(Size.Create(32)).ToString(10));
             }
+        }
+
+        internal string ByteSequence(Size size) { var result = "";
+            for (var i = 0; i < size.ByteCount; i++)
+            {
+                if (i > 0)
+                    result += ", ";
+                result += Byte(i);
+            }
+            return result;
         }
     }
 }

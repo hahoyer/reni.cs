@@ -63,6 +63,7 @@ namespace Reni.FeatureTest
             if(IsCallerUnderConstruction(1))
                 Parameters.Trace.All();
 
+            Parameters.RunFromCode = true;
             InternalRunCompiler(Parameters, fileName, expectedResult, expectedOutput);
         }
 

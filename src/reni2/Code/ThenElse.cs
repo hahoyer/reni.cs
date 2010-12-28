@@ -48,7 +48,7 @@ namespace Reni.Code
         internal override Size InputSize { get { return Size.Create(1); } }
         internal override Size OutputSize { get { return ThenCode.Size; } }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
     [Serializable]
@@ -56,7 +56,7 @@ namespace Reni.Code
     {
         internal override Size InputSize { get { return Size.Zero; } }
         internal override Size OutputSize { get { return Size.Zero; } }
-        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
     internal sealed class Else : FiberItem
@@ -68,7 +68,7 @@ namespace Reni.Code
 
         internal override Size OutputSize { get { return Size.Zero; } }
         internal override Size InputSize { get { return _thenSize; } }
-        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
     [Serializable]
@@ -96,7 +96,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 
     [Serializable]
@@ -116,6 +116,6 @@ namespace Reni.Code
 
         internal override Size InputSize { get { return _bitArrayBinaryOp.DeltaSize + _bitArrayBinaryOp.OutputSize; } }
         internal override Size OutputSize { get { return _thenCode.OutputSize; } }
-        internal override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 }

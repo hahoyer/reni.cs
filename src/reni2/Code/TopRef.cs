@@ -14,17 +14,14 @@ namespace Reni.Code
             StopByObjectId(530);
         }
 
-        protected override string CSharpString()
-        {
-            return CSharpGenerator.CreateTopRef();
-        }
+        protected override string CSharpString(Size top) { return CSharpGenerator.TopRef(top, Size); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
             return subsequentElement.TryToCombineBack(this);
         }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopRef(RefAlignParam, Offset); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopRef(RefAlignParam, Offset); }
     }
 
     [Serializable]

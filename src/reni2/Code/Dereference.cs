@@ -46,8 +46,9 @@ namespace Reni.Code
             return new TopData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
-        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement) 
+        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
         {
+            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new LocalVariableAccess(RefAlignParam, precedingElement.Holder, precedingElement.Offset, OutputSize);
         }
@@ -58,8 +59,8 @@ namespace Reni.Code
             return new TopFrame(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
-        internal override string CSharpString() { return CSharpGenerator.Dereference(OutputSize); }
+        protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.Dereference(top, InputSize, OutputSize); }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, OutputSize, DataSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, OutputSize, DataSize); }
     }
 }

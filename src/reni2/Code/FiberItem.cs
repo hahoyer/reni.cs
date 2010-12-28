@@ -5,7 +5,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Code
 {
-    internal abstract class FiberItem : ReniObject
+    internal abstract class FiberItem : ReniObject, IFormalCodeItem
     {
         protected FiberItem(int objectId)
             : base(objectId) { }
@@ -21,13 +21,17 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal Size DeltaSize { get { return OutputSize - InputSize; } }
 
-        internal virtual string CSharpString()
+        internal string ReversePolish(Size top)
         {
-            NotImplementedMethod();
+            return CSharpCodeSnippet(top) + ";\n";
+        }
+
+        protected virtual string CSharpCodeSnippet(Size top)
+        {
+            NotImplementedMethod(top);
             return null;
         }
 
-        internal abstract void Execute(IFormalMaschine formalMaschine);
 
         internal virtual FiberItem[] TryToCombine(FiberItem subsequentElement) { return null; }
 
@@ -50,5 +54,17 @@ namespace Reni.Code
             return default(TResult);
         }
 
+        protected abstract void Execute(IFormalMaschine formalMaschine);
+
+        void IFormalCodeItem.Execute(IFormalMaschine formalMaschine)
+        {
+            Execute(formalMaschine);
+        }
+    }
+
+    internal interface IFormalCodeItem
+    {
+        void Execute(IFormalMaschine formalMaschine);
+        string Dump();
     }
 }

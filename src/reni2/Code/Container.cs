@@ -74,6 +74,7 @@ namespace Reni.Code
         {
             var result = new CodeMemberMethod();
             result.Comments.AddRange(CreateComment(Description));
+            result.Comments.Add(new CodeCommentStatement(Generator.NotACommentFlag + "unsafe"));
             result.Name = name;
             result.Attributes = MemberAttributes.Static | MemberAttributes.Public;
             result.Statements.Add(new CodeSnippetExpression(GetCSharpStatements(useStatementAligner, isFunction)));

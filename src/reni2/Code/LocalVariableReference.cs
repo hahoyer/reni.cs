@@ -23,7 +23,8 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Holder=" + _holder + " Offset=" + _offset; } }
 
-        protected override string CSharpString() { return CSharpGenerator.LocalVariableReference(_holder, _offset); }
+        protected override string CSharpString(Size top) { return CSharpGenerator.LocalVariableReference(top, Size, _holder, _offset); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableReference(Size, _holder, _offset); }
 
         [IsDumpEnabled(false)]
         internal string Holder { get { return _holder; } }

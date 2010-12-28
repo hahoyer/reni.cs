@@ -58,12 +58,12 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " TargetSize=" + TargetSize + " SignificantSize=" + _significantSize; } }
 
-        internal override string CSharpString()
+        protected override string CSharpCodeSnippet(Size top)
         {
-            return CSharpGenerator.BitCast(_size, _significantSize);
+            return CSharpGenerator.BitCast(top, _size, _significantSize);
         }
 
-        internal override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(_size, TargetSize, _significantSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(_size, TargetSize, _significantSize); }
 
         internal override CodeBase TryToCombineBack(TopData precedingElement)
         {

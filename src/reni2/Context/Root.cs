@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using Reni.Code;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -14,7 +15,7 @@ namespace Reni.Context
     [Serializable]
     internal sealed class Root : ContextBase
     {
-        private readonly FunctionList _function = new FunctionList();
+        private readonly FunctionList _functions = new FunctionList();
 
         internal override RefAlignParam RefAlignParam { get { return DefaultRefAlignParam; } }
 
@@ -25,11 +26,13 @@ namespace Reni.Context
 
         internal List<Code.Container> CompileFunctions()
         {
-            return _function.Compile();
+            return _functions.Compile();
         }
 
         [Node, IsDumpEnabled(false)]
-        public FunctionList Functions { get { return _function; } }
+        public FunctionList Functions { get { return _functions; } }
+
+        internal CodeBase[] FunctionCode { get { return Functions.Code; } }
 
         public Result CreateFunctionCall(Struct.Context context, Category category, ICompileSyntax body, Result argsResult)
         {

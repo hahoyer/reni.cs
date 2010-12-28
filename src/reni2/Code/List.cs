@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 
@@ -28,12 +29,33 @@ namespace Reni.Code
             return actual.List(this);
         }
 
+        protected override Size MaxSizeImplementation
+        {
+            get
+            {
+                var result = Size.Zero;
+                var sizeSoFar = Size.Zero;
+                foreach (var codeBase in _data)
+                {
+                    var newResult = sizeSoFar + codeBase.MaxSize;
+                    sizeSoFar += codeBase.Size;
+                    result = result.Max(newResult).Max(sizeSoFar);
+                }
+                return result;
+            }
+        }
+
         protected override Size GetSize()
         {
             return _data
                 .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
         }
 
-        internal override CSharpCodeSnippet CSharpCodeSnippet() { return CSharpGenerator.List(_data); }
+        protected override string CSharpString(Size top)
+        {
+            return CSharpGenerator.List(top, ObjectId, _data);
+        }
+
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.List(_data); }
     }
 }

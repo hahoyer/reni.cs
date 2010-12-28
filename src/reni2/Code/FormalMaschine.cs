@@ -24,6 +24,10 @@ namespace Reni.Code
         void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
         void Assign(Size targetSize, RefAlignParam refAlignParam);
         void DumpPrintText();
+        void List(CodeBase[] data);
+        void LocalVariables(string holderNamePattern, CodeBase[] data);
+        void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
+        void LocalVariableReference(Size size, string holder, Size offset);
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
@@ -159,6 +163,10 @@ namespace Reni.Code
         }
 
         void IFormalMaschine.DumpPrintText() { }
+        void IFormalMaschine.List(CodeBase[] data) { NotImplementedMethod(data); }
+        void IFormalMaschine.LocalVariables(string holderNamePattern, CodeBase[] data) { NotImplementedMethod(holderNamePattern,data); }
+        void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead,fiberItems); }
+        public void LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size,holder,offset); }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {

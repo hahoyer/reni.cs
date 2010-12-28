@@ -1,0 +1,8 @@
+﻿namespace Reni.Code
+{
+    internal sealed class EmptyStackData : StackData
+    {
+        internal override StackData Push(StackData stackData) { return stackData; }
+        internal override Size Size { get { return Size.Zero; } }
+    }
+}
