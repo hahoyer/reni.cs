@@ -13,10 +13,11 @@ using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.Struct;
+using Reni.FeatureTest.ThenElse;
 
 namespace ReniTest
 {
-    public static class MainContainer
+    internal static class MainContainer
     {
         public static void Main()
         {
@@ -25,15 +26,15 @@ namespace ReniTest
             
             //TestGenerated.Exec();
             //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
-            RunSpecificTest();
-            //Assembly.GetExecutingAssembly().RunTests();
+            //RunSpecificTest();
+            Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
         }
 
         [Test, Category(CompilerTest.UnderConstruction)]
         private static void RunSpecificTest()
         {
-            new AccessMember().RunFlat();
+            new InnerAccess().RunFlat();
         }
 
         private const string Target = @"! property x: 11/\; x dump_print";
