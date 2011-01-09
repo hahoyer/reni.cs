@@ -30,7 +30,6 @@
     <Compile Include="Code\CodeBase.cs" />
     <Compile Include="Code\Container.cs" />
     <Compile Include="Code\Call.cs" />
-    <Compile Include="Code\ContextRef.cs" />
     <Compile Include="Code\CSharpCodeSnippet.cs" />
     <Compile Include="Code\DataStack.cs" />
     <Compile Include="Code\Drop.cs" />

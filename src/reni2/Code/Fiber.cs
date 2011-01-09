@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Context;
 
 namespace Reni.Code
 {
@@ -22,8 +23,15 @@ namespace Reni.Code
             if (fiberItem != null)
                 l.Add(fiberItem);
             _fiberItems = l.ToArray();
+            AssertValid();
+            StopByObjectId(-20);
+        }
+
+        private void AssertValid()
+        {
+            Tracer.Assert(!_fiberHead.IsNonFiberHeadList);
             Tracer.Assert(_fiberItems.Length > 0);
-            Size lastSize = _fiberHead.Size;
+            var lastSize = _fiberHead.Size;
             foreach(var t in _fiberItems)
             {
                 Tracer.Assert(lastSize == t.InputSize);
@@ -39,7 +47,7 @@ namespace Reni.Code
 
         internal FiberHead FiberHead { get { return _fiberHead; } }
         internal FiberItem[] FiberItems { get { return _fiberItems; } }
-
+        internal override RefAlignParam RefAlignParam { get { return _fiberItems[_fiberItems.Length - 1].RefAlignParam; } }
         protected override Size GetSize() { return _fiberItems[_fiberItems.Length - 1].OutputSize; }
 
         internal override CodeBase CreateFiber(FiberItem subsequentElement)

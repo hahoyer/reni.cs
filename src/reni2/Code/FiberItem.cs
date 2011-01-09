@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Context;
 
 namespace Reni.Code
 {
@@ -43,8 +44,8 @@ namespace Reni.Code
         internal virtual CodeBase TryToCombineBack(LocalVariableReference precedingElement) { return null; }
         internal virtual FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement) { return null; }
         internal virtual FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement) { return null; }
-        internal virtual FiberItem[] TryToCombineBack(BitCast precedingElement) { return null; }
-        internal virtual FiberItem[] TryToCombineBack(Dereference precedingElement) { return null; }
+        internal virtual FiberItem[] TryToCombineBack(BitCast preceding) { return null; }
+        internal virtual FiberItem[] TryToCombineBack(Dereference preceding) { return null; }
         internal virtual FiberItem[] TryToCombineBack(RefPlus precedingElement) { return null; }
 
 
@@ -60,6 +61,15 @@ namespace Reni.Code
         {
             Execute(formalMaschine);
         }
+
+        [IsDumpEnabled(false)]
+        public override string NodeDump { get { return base.NodeDump + DumpSignature; } }
+
+        [IsDumpEnabled(false)]
+        private string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }
+
+        [IsDumpEnabled(false)]
+        internal virtual RefAlignParam RefAlignParam { get { return null; } }
     }
 
     internal interface IFormalCodeItem

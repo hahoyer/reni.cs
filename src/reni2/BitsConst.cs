@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.UnitTest;
+using Reni.Code;
 using Reni.FeatureTest;
 using Reni.Runtime;
 
@@ -142,28 +143,35 @@ namespace Reni
 
         public BitsConst ByteResize(int size) { return Resize(SegmentBits*size); }
 
-        public BitsConst Multiply(BitsConst left, Size size)
+        public BitsConst Multiply(BitsConst right, Size size)
         {
             if(!(Marshal.SizeOf(typeof(Int64))*8 >= size.ToInt()))
-                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "left=" + left + ";size=" + size.Dump());
-            return Convert(ToInt64()*left.ToInt64()).Resize(size);
+                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "right=" + right + ";size=" + size.Dump());
+            return Convert(ToInt64()*right.ToInt64()).Resize(size);
         }
 
-        public BitsConst Divide(BitsConst left, Size size)
+        public BitsConst Divide(BitsConst right, Size size)
         {
             if(!(Marshal.SizeOf(typeof(Int64))*8 >= size.ToInt()))
-                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "left=" + left + ";size=" + size.Dump());
-            return Convert(ToInt64()/left.ToInt64()).Resize(size);
+                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "right=" + right + ";size=" + size.Dump());
+            return Convert(ToInt64()/right.ToInt64()).Resize(size);
         }
 
         public BitsConst BytePlus(BitsConst left, int bytes) { return Plus(left, SegmentBits*bytes); }
 
-        public BitsConst Plus(BitsConst left, Size size)
+        public BitsConst Plus(BitsConst right, Size size)
         {
             var xResult = new BitsConst(this, size);
-            var yResult = new BitsConst(left, size);
+            var yResult = new BitsConst(right, size);
             xResult.AddAndKeepSize(yResult);
             return xResult;
+        }
+
+        public BitsConst Equal(BitsConst right, Size size)
+        {
+            if(this == right)
+                return new BitsConst(new BitsConst(-1), size);
+            return new BitsConst(new BitsConst(0), size);
         }
 
         public void PrintNumber(BitsConst radix)
@@ -293,7 +301,7 @@ namespace Reni
         /// <summary/>
         public static BitsConst Multiply(BitsConst left, BitsConst right) { return left.Multiply(right, MultiplySize(left.Size, right.Size)); }
 
-        public static BitsConst Multiply(BitsConst left, int right) { return left*Convert(right); }
+        public static BitsConst Multiply(BitsConst left, int right) { return left * Convert(right); }
 
         public static BitsConst operator /(BitsConst left, BitsConst right) { return left.Divide(right, DivideSize(left.Size, right.Size)); }
 
@@ -301,7 +309,7 @@ namespace Reni
 
         public static BitsConst Divide(BitsConst left, BitsConst right) { return left.Divide(right, DivideSize(left.Size, right.Size)); }
 
-        public static BitsConst Divide(BitsConst left, int right) { return left/Convert(right); }
+        public static BitsConst Divide(BitsConst left, int right) { return left / Convert(right); }
 
         public override bool Equals(object obj)
         {
@@ -352,7 +360,7 @@ namespace Reni
         public string CodeDump() { return ToInt64().ToString(); }
 
         [TestFixture]
-        public class Test
+        public sealed class Test
         {
             [Test, Category(CompilerTest.Worked)]
             public void All()
@@ -416,5 +424,7 @@ namespace Reni
             }
             return result;
         }
+
+        internal BitsConst BitArrayBinaryOp(string operation, Size size, BitsConst right) { return (BitsConst) typeof(BitsConst).GetMethod(operation).Invoke(this, new object[] {right, size}); }
     }
 }

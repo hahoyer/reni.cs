@@ -1,5 +1,7 @@
-﻿using HWClassLibrary.Debug;
+﻿using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using Reni.Context;
 
 namespace Reni.Code
 {
@@ -8,24 +10,23 @@ namespace Reni.Code
     /// </summary>
     internal sealed class ReferenceCode : FiberHead
     {
-        private readonly ContextRef _leafElement;
+        readonly IReferenceInCode _context;
         private static int _nextObjectId;
+
         internal ReferenceCode(IReferenceInCode context):base(_nextObjectId++)
         {
-            _leafElement = new ContextRef(context);
+            _context = context;
             StopByObjectId(-15);
         }
 
-        [Node]
-        internal IReferenceInCode Context { get { return _leafElement.Context; } }
-        [IsDumpEnabled(false)]
-        internal ContextRef ToLeafElement { get { return _leafElement; } }
-
-        protected override Size GetSize() { return _leafElement.OutputSize; }
+        internal IReferenceInCode Context { get { return _context; } }
 
         [IsDumpEnabled(false)]
-        internal override Refs RefsImplementation { get { return _leafElement.GetRefs(); } }
+        internal override RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        [IsDumpEnabled(false)]
+        internal override Refs RefsImplementation { get { return Refs.Create(_context); } }
 
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }
     }
 }

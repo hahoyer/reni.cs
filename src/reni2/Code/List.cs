@@ -15,18 +15,48 @@ namespace Reni.Code
         internal static List Create(params CodeBase[] data) { return new List(data); }
         internal static List Create(IEnumerable<CodeBase> data) { return new List(data); }
 
-        private List(IEnumerable<CodeBase> data): base(_nextObjectId++)
+        private void AssertValid()
         {
-            _data = data.ToArray();
             foreach (var codeBase in _data)
                 Tracer.Assert(!(codeBase is List));
             Tracer.Assert(_data.Length > 1);
+        }
+
+        private List(IEnumerable<CodeBase> data): base(_nextObjectId++)
+        {
+            _data = data.ToArray();
+            AssertValid();
         }
 
         protected override IEnumerable<CodeBase> AsList() { return _data; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
         {
             return actual.List(this);
+        }
+
+        protected override CodeBase TryToCombine(FiberItem subsequentElement)
+        {
+            if(IsNonFiberHeadList)
+            {
+                var newData = new CodeBase[_data.Length];
+                var i = 0;
+                for (; i < _data.Length - 1; i++)
+                    newData[i] = _data[i];
+                newData[i] = _data[i].CreateFiber(subsequentElement);
+                return List.Create(newData);
+            }
+            return null;
+        }
+
+        internal override bool IsNonFiberHeadList
+        {
+            get
+            {
+                for(var i = 0; i < _data.Length - 1; i++)
+                    if(!_data[i].Size.IsZero)
+                        return false;
+                return true;
+            }
         }
 
         protected override Size MaxSizeImplementation

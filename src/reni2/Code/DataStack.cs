@@ -13,7 +13,12 @@ namespace Reni.Code
         [IsDumpEnabled(true)]
         readonly DictionaryEx<string, StackData> _locals = new DictionaryEx<string, StackData>();
         private readonly CodeBase[] _functions;
-        public DataStack(CodeBase[] functions) { _functions = functions; }
+        private readonly bool _isTraceEnabled;
+        public DataStack(CodeBase[] functions, bool isTraceEnabled)
+        {
+            _functions = functions;
+            _isTraceEnabled = isTraceEnabled;
+        }
 
         internal StackData Data { get { return _data; } }
 
@@ -36,12 +41,14 @@ namespace Reni.Code
 
         void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
         {
-            NotImplementedMethod(size, targetSize, significantSize);
+            Tracer.Assert(size == targetSize);
+            Push(Pull(targetSize).BitCast(significantSize));
         }
 
         void IFormalMaschine.DumpPrintOperation(Size leftSize, Size rightSize)
         {
-            NotImplementedMethod(leftSize, rightSize);
+            Tracer.Assert(rightSize.IsZero);
+            Pull(leftSize).DumpPrintOperation();
         }
 
         void IFormalMaschine.TopFrame(Size offset, Size size, Size dataSize)
@@ -66,19 +73,20 @@ namespace Reni.Code
 
         void IFormalMaschine.RefPlus(Size size, Size right)
         {
-            NotImplementedMethod(size, right);
+            Push(Pull(size).RefPlus(right));
         }
 
         void IFormalMaschine.Dereference(RefAlignParam refAlignParam, Size size, Size dataSize)
         {
-            Tracer.Assert(size == dataSize);
             var value = Pull(refAlignParam.RefSize);
-            Push(value.Dereference(size));
+            Push(value.Dereference(size, dataSize));
         }
 
         void IFormalMaschine.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
         {
-            NotImplementedMethod(opToken, size, leftSize, rightSize);
+            var right = Pull(rightSize);
+            var left = Pull(leftSize);
+            Push(left.BitArrayBinaryOp(opToken, size, right));
         }
 
         void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam)
@@ -104,12 +112,18 @@ namespace Reni.Code
         private void SubExecute(string tag, IFormalCodeItem codeBase)
         {
             const string stars = "\n******************************\n";
-            Tracer.Line(stars + Dump() + stars);
-            Tracer.Line(tag +" " + codeBase.Dump());
-            Tracer.IndentStart();
+            if(IsTraceEnabled)
+            {
+                Tracer.Line(stars + Dump() + stars);
+                Tracer.Line(tag + " " + codeBase.Dump());
+                Tracer.IndentStart();
+            }
             codeBase.Execute(this);
-            Tracer.IndentEnd();
+            if(IsTraceEnabled)
+                Tracer.IndentEnd();
         }
+
+        internal bool IsTraceEnabled { get { return _isTraceEnabled; } }
 
         void IFormalMaschine.LocalVariables(string holderNamePattern, CodeBase[] data)
         {
@@ -140,14 +154,22 @@ namespace Reni.Code
             Push(new StackDataAddress(new LocalStackReference(_locals,holder),size,offset));
         }
 
+        void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
+        {
+            if(Pull(condSize).GetBitsConst().IsZero)
+                SubExecute("else:", elseCode);
+            else
+                SubExecute("then:", thenCode);
+        }
+
         private StackData Pull(Size size)
         {
-            var result = _data.GetTop(size);
-            _data = _data.Pull(size);
+            var result = _data.DoGetTop(size);
+            _data = _data.DoPull(size);
             return result;
         }
 
-        StackData IStackDataAddressBase.GetTop(Size offset, Size size) { return _data.Pull(_data.Size + offset).GetTop(size); }
+        StackData IStackDataAddressBase.GetTop(Size offset, Size size) { return _data.DoPull(_data.Size + offset).DoGetTop(size); }
         string IStackDataAddressBase.Dump() { return "stack"; }
     }
 
@@ -164,7 +186,7 @@ namespace Reni.Code
 
         StackData IStackDataAddressBase.GetTop(Size offset, Size size)
         {
-            return _locals[_holder].Pull(offset).GetTop(size);
+            return _locals[_holder].DoPull(offset).DoGetTop(size);
         }
 
         string IStackDataAddressBase.Dump()

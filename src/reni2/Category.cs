@@ -11,7 +11,7 @@ namespace Reni
     /// </summary>
     [Dump("Dump")]
     [Serializable]
-    internal class Category : ReniObject, IEquatable<Category>
+    sealed internal class Category : ReniObject, IEquatable<Category>
     {
         private readonly bool _code;
         private readonly bool _type;
@@ -48,12 +48,7 @@ namespace Reni
         public bool HasType { get { return _type; } }
         public bool HasRefs { get { return _refs; } }
         public bool HasSize { get { return _size; } }
-        /// <summary>
-        /// asis
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
+
         [DebuggerHidden]
         public static Category operator |(Category x, Category y)
         {

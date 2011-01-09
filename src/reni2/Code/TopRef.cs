@@ -11,7 +11,7 @@ namespace Reni.Code
         public TopRef(RefAlignParam refAlignParam, string reason)
             : base(refAlignParam, Reni.Size.Zero,reason)
         {
-            StopByObjectId(530);
+            StopByObjectId(1160);
         }
 
         protected override string CSharpString(Size top) { return CSharpGenerator.TopRef(top, Size); }

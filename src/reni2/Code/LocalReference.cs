@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Context;
 
@@ -10,6 +9,7 @@ namespace Reni.Code
     internal sealed class LocalReference : FiberHead, IReferenceInCode
     {
         private readonly RefAlignParam _refAlignParam;
+        private static int _nextObjectId;
 
         [Node]
         private readonly CodeBase _unalignedCode;
@@ -18,11 +18,14 @@ namespace Reni.Code
         internal readonly CodeBase DestructorCode;
 
         public LocalReference(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
+            : base(_nextObjectId++)
         {
             _refAlignParam = refAlignParam;
             _unalignedCode = code;
             DestructorCode = destructorCode;
-            StopByObjectId(-1100);
+            StopByObjectId(-1);
+            StopByObjectId(-2);
+            StopByObjectId(-3);
         }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
@@ -39,12 +42,7 @@ namespace Reni.Code
         internal CodeBase AccompayningDestructorCode(ref Size size, string holder)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(LocalReferenceCode(RefAlignParam, holder));
+            return DestructorCode.ReplaceArg(LocalVariableReference(RefAlignParam, holder));
         }
-
-        [IsDumpEnabled(false)]
-        public ContextRef ToLeafElement { get { return new ContextRef(this); } }
-
-
     }
 }

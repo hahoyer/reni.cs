@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest;
 
@@ -14,24 +13,25 @@ namespace Reni
     /// </summary>
     [AdditionalNodeInfo("DebuggerDumpString")]
     [Serializable]
-    internal class Size : ReniObject, IIconKeyProvider, IComparable<Size>
+    internal sealed class Size : ReniObject, IIconKeyProvider, IComparable<Size>
     {
         private static readonly Hashtable _values = new Hashtable();
-        private readonly int _data;
+        private readonly int _value;
+        static private int _nextObjectId;
 
-        private Size(int x)
+        private Size(int value): base(_nextObjectId++)
         {
-            _data = x;
+            _value = value;
         }
 
         /// <summary>
         /// asis
         /// </summary>
-        public bool IsZero { get { return _data == 0; } }
+        public bool IsZero { get { return _value == 0; } }
         public int SaveByteCount { get { return SaveSizeToPacketCount(BitsConst.SegmentAlignBits); } }
         public static Size Zero { get { return Create(0); } }
         public static Size Byte { get { return Create(1).ByteAlignedSize; } }
-        public bool IsPositive { get { return _data > 0; } }
+        public bool IsPositive { get { return _value > 0; } }
         public int ByteCount { get { return SizeToPacketCount(BitsConst.SegmentAlignBits); } }
         public Size ByteAlignedSize { get { return NextPacketSize(BitsConst.SegmentAlignBits); } }
 
@@ -48,20 +48,20 @@ namespace Reni
 
         public override string Dump()
         {
-            return _data.ToString();
+            return _value.ToString();
         }
 
         public Size Align(int alignBits)
         {
             var result = SizeToPacketCount(alignBits) << alignBits;
-            if(result == _data)
+            if(result == _value)
                 return this;
             return Create(result);
         }
 
         public int SizeToPacketCount(int alignBits)
         {
-            return ((_data - 1) >> alignBits) + 1;
+            return ((_value - 1) >> alignBits) + 1;
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Reni
         internal void AssertAlignedSize(int alignBits)
         {
             var result = SizeToPacketCount(alignBits);
-            if((result << alignBits) == _data)
+            if((result << alignBits) == _value)
                 return;
             NotImplementedMethod(alignBits);
 
@@ -102,36 +102,24 @@ namespace Reni
         /// <returns></returns>
         public int ToInt()
         {
-            return _data;
+            return _value;
         }
 
         private bool LessThan(Size x)
         {
-            return _data < x._data;
+            return _value < x._value;
         }
 
         private Size Modulo(Size x)
         {
-            return Create(_data%x._data);
+            return Create(_value%x._value);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static bool operator <(Size x, Size y)
         {
             return x.LessThan(y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static bool operator >(Size x, Size y)
         {
             return y.LessThan(x);
@@ -147,34 +135,16 @@ namespace Reni
             return !(x < y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator -(Size x, Size y)
         {
             return x.Minus(y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator -(Size x, int y)
         {
             return x.Minus(y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator +(int x, Size y)
         {
             return y.Plus(x);
@@ -191,12 +161,6 @@ namespace Reni
             return y.Plus(x);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator +(Size x, int y)
         {
             return x.Plus(y);
@@ -213,12 +177,6 @@ namespace Reni
             return x.Plus(y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator +(Size x, Size y)
         {
             return x.Plus(y);
@@ -235,56 +193,26 @@ namespace Reni
             return x.Plus(y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator *(Size x, int y)
         {
             return x.Times(y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator *(int x, Size y)
         {
             return y.Times(x);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator /(Size x, int y)
         {
             return x.Divide(y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static int operator /(Size x, Size y)
         {
             return x.Divide(y);
         }
 
-        /// <summary>
-        /// Delegate operation to data field
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static Size operator %(Size x, Size y)
         {
             return x.Modulo(y);
@@ -314,57 +242,37 @@ namespace Reni
 
         private Size Plus(int y)
         {
-            return Create(_data + y);
+            return Create(_value + y);
         }
 
         private Size Times(int y)
         {
-            return Create(_data*y);
+            return Create(_value*y);
         }
 
         private Size Minus(int y)
         {
-            return Create(_data - y);
+            return Create(_value - y);
         }
 
         private Size Divide(int y)
         {
-            return Create(_data/y);
+            return Create(_value/y);
         }
 
         private Size Plus(Size y)
         {
-            return Create(_data + y._data);
+            return Create(_value + y._value);
         }
 
         private int Divide(Size y)
         {
-            return _data/y._data;
+            return _value/y._value;
         }
 
         private Size Minus(Size y)
         {
-            return Create(_data - y._data);
-        }
-
-        /// <summary>
-        /// Compares to values (don't know, how to override the default compare operator in a natural way)
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool Equ(int other)
-        {
-            return _data == other;
-        }
-
-        /// <summary>
-        /// Compares to values (don't know, how to override the default compare operator in a natural way)
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool Equ(Size other)
-        {
-            return other.Equ(_data);
+            return Create(_value - y._value);
         }
 
         /// <summary>
@@ -374,7 +282,7 @@ namespace Reni
         /// <returns></returns>
         public Size Max(Size x)
         {
-            if(_data > x._data)
+            if(_value > x._value)
                 return this;
             return x;
         }
@@ -386,7 +294,7 @@ namespace Reni
         /// <returns></returns>
         public Size Min(Size x)
         {
-            if(_data < x._data)
+            if(_value < x._value)
                 return this;
             return x;
         }
@@ -419,7 +327,7 @@ namespace Reni
         }
 
         [TestFixture]
-        private class Tests
+        private sealed class Tests
         {
             private static void TestNextPacketSize(int x, int b)
             {
@@ -468,7 +376,7 @@ namespace Reni
         }
     }
 
-    internal class NotAlignableException : Exception
+    internal sealed class NotAlignableException : Exception
     {
         internal readonly int Bits;
         internal readonly Size Size;

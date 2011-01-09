@@ -60,7 +60,7 @@ namespace Reni.Code
 
         internal static CodeBase TopRef(RefAlignParam refAlignParam, string reason) { return new TopRef(refAlignParam, reason); }
 
-        internal CodeBase LocalReference(RefAlignParam refAlignParam, CodeBase destructorCode) { return new LocalReference(refAlignParam, this, destructorCode); }
+        internal LocalReference LocalReference(RefAlignParam refAlignParam, CodeBase destructorCode) { return new LocalReference(refAlignParam, this, destructorCode); }
 
         internal static CodeBase FrameRef(RefAlignParam refAlignParam, string reason) { return new FrameRef(refAlignParam, Size.Create(0), reason); }
 
@@ -203,7 +203,7 @@ namespace Reni.Code
                 .LocalBlock(this, copier, refAlignParam);
         }
 
-        internal CodeBase CreateLocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize, string holder)
+        internal CodeBase LocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize, string holder)
         {
             var intermediateSize = Size - resultSize;
             if(intermediateSize.IsZero)
@@ -212,7 +212,7 @@ namespace Reni.Code
             var result = this;
             if(!resultSize.IsZero)
                 result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize))
-                    .Sequence(copier.ReplaceArg(LocalReferenceCode(refAlignParam, holder)));
+                    .Sequence(copier.ReplaceArg(LocalVariableReference(refAlignParam, holder)));
 
             return result.CreateFiber(new Drop(Size, resultSize));
         }
@@ -248,9 +248,9 @@ namespace Reni.Code
         private CodeBase DumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
         private CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
 
-        internal static CodeBase LocalReferenceCode(RefAlignParam refAlignParam, string holder)
+        internal static CodeBase LocalVariableReference(RefAlignParam refAlignParam, string holder, Size offset = null)
         {
-            return new LocalVariableReference(refAlignParam, holder, Size.Zero);
+            return new LocalVariableReference(refAlignParam, holder, offset);
         }
 
         internal CodeBase CreateFiber(IEnumerable<FiberItem> subsequentElement)
@@ -278,9 +278,9 @@ namespace Reni.Code
             return "";
         }
 
-        internal void Execute(CodeBase[] functions)
+        internal void Execute(CodeBase[] functions, bool isTraceEnabled)
         {
-            Execute(new DataStack(functions));
+            Execute(new DataStack(functions, isTraceEnabled));
         }
 
         protected virtual void Execute(IFormalMaschine formalMaschine)

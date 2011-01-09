@@ -29,38 +29,20 @@ namespace Reni
         [Serializable]
         public class TraceParamters
         {
-            /// <summary>
-            /// Shows or hides serialize code sequence
-            /// </summary>
             [Node, IsDumpEnabled(true)]
             public bool CodeSequence;
-
-            /// <summary>
-            /// Shows or hides code tree
-            /// </summary>
             [Node, IsDumpEnabled(true)]
             public bool CodeTree;
-
-            /// <summary>
-            /// Shows or hides code code to execute
-            /// </summary>
             [Node, IsDumpEnabled(true)]
             public bool ExecutedCode;
-
             [Node, IsDumpEnabled(true)]
             public bool Functions;
-
-            /// <summary>
-            /// Shows or hides syntax tree
-            /// </summary>
             [Node, IsDumpEnabled(true)]
             public bool Source;
-
-            /// <summary>
-            /// Shows or hides syntax tree
-            /// </summary>
             [Node, IsDumpEnabled(true)]
             public bool Syntax;
+            [Node, IsDumpEnabled(true)]
+            public bool CodeExecutor;
 
             public void None()
             {
@@ -70,6 +52,7 @@ namespace Reni
                 CodeSequence = false;
                 ExecutedCode = false;
                 Functions = false;
+                CodeExecutor = false;
             }
 
             public void All()
@@ -80,6 +63,7 @@ namespace Reni
                 CodeSequence = true;
                 ExecutedCode = true;
                 Functions = true;
+                CodeExecutor = true;
             }
         }
     }

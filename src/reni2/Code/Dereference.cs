@@ -11,19 +11,19 @@ namespace Reni.Code
     internal sealed class Dereference : FiberItem
     {
         private readonly RefAlignParam _refAlignParam;
-        private readonly Size _size;
+        private readonly Size _outputSize;
         private readonly Size _dataSize;
 
-        public Dereference(RefAlignParam refAlignParam, Size size, Size dataSize)
+        public Dereference(RefAlignParam refAlignParam, Size outputSize, Size dataSize)
         {
             _refAlignParam = refAlignParam;
-            _size = size;
+            _outputSize = outputSize;
             _dataSize = dataSize;
-            StopByObjectId(-12);
+            StopByObjectId(-325);
         }
 
         [IsDumpEnabled(false)]
-        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
         [IsDumpEnabled(false)]
         internal Size DataSize { get { return _dataSize; } }
 
@@ -33,7 +33,7 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal override Size InputSize { get { return RefAlignParam.RefSize; } }
         [IsDumpEnabled(false)]
-        internal override Size OutputSize { get { return _size; } }
+        internal override Size OutputSize { get { return _outputSize; } }
 
         internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
         {

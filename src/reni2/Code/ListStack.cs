@@ -37,14 +37,14 @@ namespace Reni.Code
             formerStackData.CopyTo(_data, 1);
         }
 
-        internal override StackData GetTop(Size size)
+        protected override StackData GetTop(Size size)
         {
             if(_data.Length > 0 && _data[0].Size == size)
                 return _data[0];
             return base.GetTop(size);
         }
 
-        internal override StackData Pull(Size size)
+        protected override StackData Pull(Size size)
         {
             var sizeSoFar = Size.Zero;
             var i = 0;

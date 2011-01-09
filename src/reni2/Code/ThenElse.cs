@@ -14,14 +14,21 @@ namespace Reni.Code
         private static int _nextId;
 
         [Node]
+        private readonly Size _condSize;
+
+        [Node]
         internal readonly CodeBase ThenCode;
 
         [Node]
         internal readonly CodeBase ElseCode;
 
-        public ThenElse(CodeBase thenCode, CodeBase elseCode)
+        internal ThenElse(CodeBase thenCode, CodeBase elseCode)
+            : this(Size.Create(1),thenCode,elseCode) { }
+
+        private ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
             : base(_nextId++)
         {
+            _condSize = condSize;
             ThenCode = thenCode;
             ElseCode = elseCode;
         }
@@ -45,10 +52,21 @@ namespace Reni.Code
             }
         }
 
-        internal override Size InputSize { get { return Size.Create(1); } }
+        internal override FiberItem[] TryToCombineBack(BitCast preceding)
+        {
+            if (preceding.InputSize == preceding.OutputSize)
+                return null;
+            return new FiberItem[]
+            {
+                new BitCast(preceding.InputSize, preceding.InputSize, Size.Create(1)),
+                new ThenElse(preceding.InputSize, ThenCode, ElseCode)
+            };
+        }
+
+        internal override Size InputSize { get { return _condSize; } }
         internal override Size OutputSize { get { return ThenCode.Size; } }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.ThenElse(_condSize, ThenCode, ElseCode); }
     }
 
     [Serializable]
@@ -82,10 +100,10 @@ namespace Reni.Code
         internal override Size OutputSize { get { return Size.Zero; } }
         internal override Size InputSize { get { return CondSize; } }
 
-        internal override FiberItem[] TryToCombineBack(BitCast precedingElement)
+        internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {
-            if(precedingElement.OutputSize == CondSize)
-                return new[] {new Then(precedingElement.TargetSize)};
+            if(preceding.OutputSize == CondSize)
+                return new[] {new Then(preceding.InputSize)};
             return null;
         }
 

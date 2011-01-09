@@ -11,117 +11,119 @@ namespace Reni.Code
     internal sealed class BitCast : FiberItem
     {
         private static int _nextId;
-        private readonly Size _size;
+        private readonly Size _outputSize;
+        private readonly Size _inputSize;
         [Node]
-        private readonly Size _significantSize;
-        [Node]
-        [IsDumpEnabled(false)]
-        internal readonly Size TargetSize;
+        private readonly Size _inputDataSize;
 
-        internal BitCast(Size size, Size targetSize, Size significantSize)
+        internal BitCast(Size outputSize, Size inputSize, Size inputDataSize)
             : base(_nextId++)
         {
-            Tracer.Assert(size != targetSize || targetSize != significantSize);
-            _size = size;
-            _significantSize = significantSize.Min(size);
-            TargetSize = targetSize;
-            StopByObjectId(-17);
+            Tracer.Assert(outputSize != inputSize || inputSize != inputDataSize);
+            _outputSize = outputSize;
+            _inputSize = inputSize;
+            _inputDataSize = inputDataSize;
+            StopByObjectId(-5);
         }
 
         [IsDumpEnabled(false)]
-        internal override Size OutputSize { get { return _size; } }
+        internal override Size OutputSize { get { return _outputSize; } }
         [IsDumpEnabled(false)]
-        internal override Size InputSize { get { return TargetSize; } }
+        internal override Size InputSize { get { return _inputSize; } }
 
         internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        internal override FiberItem[] TryToCombineBack(BitCast precedingElement)
+        internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {
-            if(precedingElement._size != TargetSize)
-                return null;
-            var significantSize = _significantSize.Min(precedingElement._significantSize);
-            if (_size == TargetSize && _size == significantSize)
+            var inputDataSize = _inputDataSize.Min(preceding._inputDataSize);
+            if (OutputSize == InputSize && OutputSize == inputDataSize)
                 return new FiberItem[0];
-            if (_size == precedingElement.TargetSize && _size == significantSize)
+            if (OutputSize == preceding.InputSize && OutputSize == inputDataSize)
                 return new FiberItem[0];
-            return new[] { new BitCast(_size, precedingElement.TargetSize, significantSize) };
+            return new[] { new BitCast(OutputSize, preceding.InputSize, inputDataSize) };
         }
 
         internal override CodeBase TryToCombineBack(BitArray precedingElement)
         {
             var bitsConst = precedingElement.Data;
-            if(bitsConst.Size > _significantSize)
-                bitsConst = bitsConst.Resize(_significantSize);
-            return new BitArray(_size, bitsConst);
+            if(bitsConst.Size > _inputDataSize)
+                bitsConst = bitsConst.Resize(_inputDataSize);
+            return new BitArray(OutputSize, bitsConst);
         }
 
         [IsDumpEnabled(false)]
-        public override string NodeDump { get { return base.NodeDump + " TargetSize=" + TargetSize + " SignificantSize=" + _significantSize; } }
+        public override string NodeDump { get { return base.NodeDump + " InputSize=" + InputSize + " InputDataSize=" + _inputDataSize; } }
 
         protected override string CSharpCodeSnippet(Size top)
         {
-            return CSharpGenerator.BitCast(top, _size, _significantSize);
+            return CSharpGenerator.BitCast(top, OutputSize, _inputDataSize);
         }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(_size, TargetSize, _significantSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(OutputSize, InputSize, _inputDataSize); }
 
         internal override CodeBase TryToCombineBack(TopData precedingElement)
         {
-            if(precedingElement.Size == TargetSize && _size >= _significantSize && _size > TargetSize)
-                return (new TopData(precedingElement.RefAlignParam, precedingElement.Offset, _size, _significantSize))
-                    .CreateFiber(new BitCast(_size, _size, _significantSize));
+            if(precedingElement.Size == InputSize && OutputSize >= _inputDataSize && OutputSize > InputSize)
+                return (new TopData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize))
+                    .CreateFiber(new BitCast(OutputSize, OutputSize, _inputDataSize));
             return null;
         }
 
         internal override CodeBase TryToCombineBack(TopFrame precedingElement)
         {
-            if(precedingElement.Size == TargetSize && _size >= _significantSize && _size > TargetSize)
-                return new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, _size, _significantSize)
-                    .CreateFiber(new BitCast(_size, _size, _significantSize));
+            if(precedingElement.Size == InputSize && OutputSize >= _inputDataSize && OutputSize > InputSize)
+                return new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize)
+                    .CreateFiber(new BitCast(OutputSize, OutputSize, _inputDataSize));
             return null;
         }
 
         internal override FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement)
         {
-            if(TargetSize == _size)
+            if(InputSize == OutputSize)
                 return null;
 
             FiberItem bitArrayOp = new BitArrayBinaryOp(
                 precedingElement.OpToken, 
-                precedingElement.OutputSize + _size - TargetSize,
+                precedingElement.OutputSize + OutputSize - InputSize,
                 precedingElement.LeftSize, 
                 precedingElement.RightSize);
 
-            if(_significantSize == _size)
+            if(_inputDataSize == OutputSize)
                 return new[] {bitArrayOp};
 
-            return new[] {bitArrayOp, new BitCast(_size, _size, _significantSize)};
+            return new[] {bitArrayOp, new BitCast(OutputSize, OutputSize, _inputDataSize)};
         }
 
         internal override FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement)
         {
-            if (TargetSize == _size)
+            if (InputSize == OutputSize)
                 return null;
 
             var bitArrayOp = new BitArrayPrefixOp(
                 precedingElement.OpToken, 
-                precedingElement.OutputSize + _size - TargetSize, 
+                precedingElement.OutputSize + OutputSize - InputSize, 
                 precedingElement.ArgSize);
 
-            if (_significantSize == _size)
+            if (_inputDataSize == OutputSize)
                 return new FiberItem[] { bitArrayOp };
 
-            return new FiberItem[] { bitArrayOp, new BitCast(_size, _size, _significantSize) };
+            return new FiberItem[] { bitArrayOp, new BitCast(OutputSize, OutputSize, _inputDataSize) };
         }
 
-        internal override FiberItem[] TryToCombineBack(Dereference precedingElement)
+        internal override FiberItem[] TryToCombineBack(Dereference preceding)
         {
-            if(precedingElement.OutputSize == TargetSize && TargetSize != _size)
+            if(InputSize == OutputSize && _inputDataSize <= preceding.DataSize )
             {
-                var dereference = new Dereference(precedingElement.RefAlignParam, _size,precedingElement.DataSize);
-                if (_size == _significantSize)
+                var dereference = new Dereference(preceding.RefAlignParam, OutputSize, _inputDataSize);
+                return new FiberItem[] { dereference };
+            }
+
+            if(InputSize < OutputSize)
+            {
+                var dereference = new Dereference(preceding.RefAlignParam, OutputSize, preceding.DataSize);
+                if (OutputSize == _inputDataSize)
                     return new FiberItem[] { dereference };
-                return new FiberItem[] { dereference, new BitCast(_size, _size, _significantSize) };
+                return new FiberItem[] { dereference, new BitCast(OutputSize, OutputSize, _inputDataSize) };
             }
             return null;
         }

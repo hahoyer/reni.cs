@@ -48,7 +48,7 @@ namespace Reni.Code
             var newVisitedObject = ReVisit(visitedObject) ?? visitedObject;
             var i = Find(newVisitedObject);
             _codeCache.Reset();
-            return CodeBase.LocalReferenceCode(newVisitedObject.RefAlignParam, string.Format(HolderNamePattern, i));
+            return CodeBase.LocalVariableReference(newVisitedObject.RefAlignParam, string.Format(HolderNamePattern, i));
         }
 
         private int Find(LocalReference localReference)
@@ -63,7 +63,7 @@ namespace Reni.Code
         internal CodeBase LocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
-            var trace = body.ObjectId == 471;
+            var trace = ObjectId == -2;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
             var newBody = body.Visit(this) ?? body;
             var alignedBody = newBody.Align();
@@ -76,7 +76,7 @@ namespace Reni.Code
                 gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
             var statement = alignedInternal
                 .Sequence(gap, alignedBody, DestructorCode)
-                .CreateLocalBlockEnd(copier, refAlignParam, resultSize, HolderNamePattern);
+                .LocalBlockEnd(copier, refAlignParam, resultSize, HolderNamePattern);
             DumpWithBreak(trace, "statement", statement);
             var result = statement;
             return ReturnMethodDump(trace, result);

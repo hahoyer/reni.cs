@@ -234,7 +234,7 @@ namespace Reni.Type
             return IsConvertableToImplementation(dest, conversionParameter.DontUseConverter);
         }
 
-        protected virtual bool IsReferenceTo(TypeBase target) { return false; }
+        protected virtual bool IsReferenceTo(TypeBase value) { return false; }
 
         internal virtual bool HasConverterTo(TypeBase dest) { return false; }
 
@@ -251,6 +251,8 @@ namespace Reni.Type
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
+
+        internal virtual RefAlignParam[] ReferenceChain { get { return new RefAlignParam[0]; } }
 
         internal virtual IAccessType AccessType(Struct.Context context, int position)
         {
@@ -350,21 +352,23 @@ namespace Reni.Type
 
         internal Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
-            return Align(refAlignParam.AlignBits)
-                .Reference(refAlignParam)
+            var align = Align(refAlignParam.AlignBits);
+            var reference = align.Reference(refAlignParam);
+            var localReferenceCode = LocalReferenceCode(refAlignParam);
+            return reference
                 .Result
                 (
                     category,
-                    () => ArgCode().LocalReference
-                              (
-                                  refAlignParam,
-                                  Destructor(Category.Code).Code
-                              ),
+                    () => localReferenceCode,
                     () => Destructor(Category.Refs).Refs
                 );
         }
 
-        internal CodeBase LocalReferenceCode(RefAlignParam refAlignParam) { return ArgCode().LocalReference(refAlignParam, Destructor(Category.Code).Code); }
+        internal CodeBase LocalReferenceCode(RefAlignParam refAlignParam)
+        {
+            return ArgCode()
+                .LocalReference(refAlignParam, Destructor(Category.Code).Code);
+        }
 
         internal Result ObjectRefInCode(Category category, RefAlignParam refAlignParam)
         {

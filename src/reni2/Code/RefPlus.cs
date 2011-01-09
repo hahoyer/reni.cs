@@ -22,7 +22,7 @@ namespace Reni.Code
         private readonly string _reason;
 
         [IsDumpEnabled(false)]
-        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         public RefPlus(RefAlignParam refAlignParam, Size right, string reason)
         {
@@ -46,6 +46,7 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         internal override Size InputSize { get { return GetSize(); } }
+
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return GetSize(); } }
 
@@ -58,27 +59,26 @@ namespace Reni.Code
             return new FrameRef(RefAlignParam, precedingElement.Offset + _right, reason);
         }
 
-        internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
-        {
-            return subsequentElement.TryToCombineBack(this);
-        }
+        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         internal override FiberItem[] TryToCombineBack(RefPlus precedingElement)
         {
-            if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
+            if(RefAlignParam.IsEqual(precedingElement.RefAlignParam))
             {
                 var reason = _reason + "(" + _right + ") + " + precedingElement._reason;
                 var newRight = _right + precedingElement._right;
                 if(newRight.IsZero)
                     return new FiberItem[0];
-                return new[]{new RefPlus(RefAlignParam, newRight, reason)};
+                return new[] {new RefPlus(RefAlignParam, newRight, reason)};
             }
             return base.TryToCombineBack(precedingElement);
         }
 
-        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement) {
+        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
+        {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new LocalVariableReference(RefAlignParam, precedingElement.Holder, precedingElement.Offset + _right);
+            return CodeBase
+                .LocalVariableReference(RefAlignParam, precedingElement.Holder, precedingElement.Offset + _right);
         }
     }
 }

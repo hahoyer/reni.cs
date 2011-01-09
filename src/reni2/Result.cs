@@ -313,6 +313,7 @@ namespace Reni
 
             if(HasRefs && HasCode && !Refs.Contains(Code.RefsImplementation))
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
+
         }
 
         [DebuggerHidden]

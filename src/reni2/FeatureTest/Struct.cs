@@ -100,20 +100,28 @@ namespace Reni.FeatureTest.Struct
     }
 
     [TestFixture]
+    [AccessAndAdd]
+    [TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
+    public sealed class AccessAndAddComplex : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
     [InnerAccess]
     [TargetSet("5, (this _A_T_ 0 + this _A_T_ 0)dump_print", "10")]
-    [TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
-    public class AccessAndAdd : CompilerTest
+    public sealed class AccessAndAdd : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture, BitArrayOp.Number]
-    [TargetSet("5, (this _A_T_ 0) dump_print", "5")]
-    [TargetSet("5,6, (this _A_T_ 0) dump_print", "5")]
-    [TargetSet("5,6, (this _A_T_ 1) dump_print", "6")]
-    public class InnerAccess : CompilerTest
+    [TargetSet("5, (this _A_T_ 0) dump_print, 66", "5")]
+    [TargetSet("5,6, (this _A_T_ 0) dump_print, 66", "5")]
+    [TargetSet("5,6, (this _A_T_ 1) dump_print, 66", "6")]
+    public sealed class InnerAccess : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -127,16 +135,16 @@ x3: 2050;
 x4: x1 + x2 + x3;
 x4 dump_print;
 ","2055")]
-    [AccessAndAdd]
-    public class SomeVariables : CompilerTest
+    [AccessAndAddComplex]
+    public sealed class SomeVariables : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
-    [TargetSet(@"a: (b:222,c:4); a b dump_print","222")]
-    [TargetSet(@"a: (b:222,c:4); a c dump_print", "4")]
+    [TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a b dump_print","222")]
+    [TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a c dump_print", "4")]
     [InnerAccess]
     public class AccessMember : CompilerTest
     {

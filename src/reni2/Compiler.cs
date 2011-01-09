@@ -165,7 +165,7 @@ namespace Reni
         private OutStream GetOutStreamFromCode()
         {
             BitsConst.OutStream = new OutStream();
-            Code.Execute(_functionCode.Value);
+            Code.Execute(_functionCode.Value, _parameters.Trace.CodeExecutor);
             return BitsConst.OutStream;
         }
 

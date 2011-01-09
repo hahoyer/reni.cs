@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using HWClassLibrary.Debug;
 
 namespace Reni.Code
 {
@@ -20,5 +21,8 @@ namespace Reni.Code
             
             return newResult;
         }
+
+        [IsDumpEnabled(false)]
+        internal virtual bool IsNonFiberHeadList { get { return false; } }
     }
 }

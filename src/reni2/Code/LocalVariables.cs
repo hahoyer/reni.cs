@@ -11,12 +11,16 @@ namespace Reni.Code
     {
         private readonly string _holderNamePattern;
         private readonly CodeBase[] _data;
+        private static int _nextObjectId;
 
         internal LocalVariables(string holderNamePattern, IEnumerable<CodeBase> data)
+            : base(_nextObjectId++)
         {
             _holderNamePattern = holderNamePattern;
             _data = data.ToArray();
             Tracer.Assert(_data.Length > 0);
+            StopByObjectId(-1);
+            StopByObjectId(-10);
         }
 
         [IsDumpEnabled(false)]
@@ -48,10 +52,17 @@ namespace Reni.Code
             get
             {
                 var result = base.NodeDump + " Holder=" + _holderNamePattern;
-                var codeBases = _data.DumpLines().Surround("{","}");
+                var codeBases = DumpLines().Surround("{","}");
                 return result + " CodeBases=" + codeBases;
             }
         }
+
+        private string DumpLines()
+        {
+            var i = 0;
+            return _data.Aggregate("", (a, xx) => a + "[" + string.Format(_holderNamePattern,i++) + "] " + xx.Dump() + "\n");
+        }
+
 
         protected override string CSharpString(Size top) { return CSharpGenerator.LocalVariables(top, ObjectId, _holderNamePattern, _data); }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariables(_holderNamePattern, _data); }

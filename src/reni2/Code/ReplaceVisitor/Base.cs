@@ -51,7 +51,7 @@ namespace Reni.Code.ReplaceVisitor
             var newCode = visitedObject.Code.Visit(this);
             if(newCode == null)
                 return null;
-            return new LocalReference(visitedObject.RefAlignParam, newCode, visitedObject.DestructorCode);
+            return newCode.LocalReference(visitedObject.RefAlignParam, visitedObject.DestructorCode);
         }
     }
 }
