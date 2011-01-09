@@ -89,11 +89,14 @@ namespace Reni.Type
         protected override TypeBase Dereference() { return Value; }
         protected override Result DereferenceResult(Category category) { return DereferencedArgResult(category); }
 
+        internal CodeBase LocalReferenceCode() { return LocalReferenceCode(RefAlignParam).Dereference(RefAlignParam, Size); }
+
         [IsDumpEnabled(false)]
         internal TypeType TypeType { get { return _typeTypeCache.Value; } }
 
         private Result DereferencedArgResult(Category category) { return _value.Result(category, DereferencedArgCode); }
         private CodeBase DereferencedArgCode() { return CodeBase.Arg(Size).Dereference(RefAlignParam, _value.Size); }
         private Result ObjectRefInCode(Category category) { return Value.ObjectRefInCode(category, RefAlignParam); }
+
     }
 }
