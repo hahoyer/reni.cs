@@ -26,15 +26,15 @@ namespace ReniTest
             
             //TestGenerated.Exec();
             //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
-            //RunSpecificTest();
-            Assembly.GetExecutingAssembly().RunTests();
+            RunSpecificTest();
+            //Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
         }
 
         [Test, Category(CompilerTest.UnderConstruction)]
         private static void RunSpecificTest()
         {
-            new InnerAccess().RunFlat();
+            new AccessAndAdd().RunFlat();
         }
 
         private const string Target = @"! property x: 11/\; x dump_print";
