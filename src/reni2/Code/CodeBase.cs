@@ -285,7 +285,7 @@ namespace Reni.Code
 
         protected virtual void Execute(IFormalMaschine formalMaschine)
         {
-            NotImplementedMethod(formalMaschine);
+            NotImplementedMethod(formalMaschine);  
         }
 
         void IFormalCodeItem.Execute(IFormalMaschine formalMaschine)

@@ -1,4 +1,5 @@
 ﻿using System;
+using HWClassLibrary.Debug;
 
 namespace Reni.Code
 {
@@ -13,6 +14,7 @@ namespace Reni.Code
             _data = data;
             _refSize = refSize;
             _offset = offset;
+            Tracer.Assert(!_offset.IsPositive);
         }
 
         internal IStackDataAddressBase Data { get { return _data; } }

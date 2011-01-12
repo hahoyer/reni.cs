@@ -103,7 +103,6 @@ namespace Reni.Code
             {
                 var newElement = element.Visit(visitor);
                 newList.Add(newElement);
-                visitor = visitor.AfterAny(element.Size);
             }
             return visitor.LocalVariables(visitedObject, newList);
         }

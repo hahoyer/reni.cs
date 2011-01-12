@@ -29,6 +29,7 @@ namespace Reni.Code
         void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
         void LocalVariableReference(Size size, string holder, Size offset);
         void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
+        void LocalVariableAccess(Size size, string holder, Size offset, Size dataSize);
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
@@ -39,7 +40,6 @@ namespace Reni.Code
         private FormalValueAccess[] _frameData = new FormalValueAccess[0];
         private readonly FormalPointer[] _points;
         private FormalPointer[] _framePoints = new FormalPointer[1];
-        private int _nextPointer;
         private int _nextValue;
         internal const string Names = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -169,6 +169,7 @@ namespace Reni.Code
         void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead,fiberItems); }
         void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size,holder,offset); }
         void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
+        void IFormalMaschine.LocalVariableAccess(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {
