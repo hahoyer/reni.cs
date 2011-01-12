@@ -6,10 +6,12 @@ namespace Reni.Code.ReplaceVisitor
     internal abstract class ReplaceContextRef<TContext> : Base
         where TContext : IReferenceInCode
     {
+        private static int _nextObjectId;
         protected readonly TContext Context;
         protected readonly Func<CodeBase> Replacement;
 
         protected ReplaceContextRef(TContext context, Func<CodeBase> replacement)
+            : base(_nextObjectId++)
         {
             Context = context;
             Replacement = replacement;

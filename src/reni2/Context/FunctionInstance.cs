@@ -190,10 +190,12 @@ namespace Reni.Context
 
     internal sealed class ReplacePrimitiveRecursivity : Base
     {
+        private static int _nextObjectId;
         [IsDumpEnabled(true)]
         private readonly int _functionIndex;
 
-        public ReplacePrimitiveRecursivity(int functionIndex) { _functionIndex = functionIndex; }
+        public ReplacePrimitiveRecursivity(int functionIndex)
+            : base(_nextObjectId++) { _functionIndex = functionIndex; }
 
         public int FunctionIndex { get { return _functionIndex; } }
 

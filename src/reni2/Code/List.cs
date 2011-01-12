@@ -47,7 +47,8 @@ namespace Reni.Code
             }
             return null;
         }
-
+        
+        [IsDumpEnabled(false)]
         internal override bool IsNonFiberHeadList
         {
             get
@@ -59,6 +60,7 @@ namespace Reni.Code
             }
         }
 
+        [IsDumpEnabled(false)]
         protected override Size MaxSizeImplementation
         {
             get

@@ -12,9 +12,11 @@ namespace Reni.Code.ReplaceVisitor
     /// </summary>
     internal abstract class ReplaceArg : Base
     {
+        private static int _nextObjectId;
         private readonly CodeBase _actualArg;
 
         internal ReplaceArg(CodeBase actualArg)
+            : base(_nextObjectId++)
         {
             Tracer.Assert(actualArg != null, () => "actualArg != null");
             _actualArg = actualArg;

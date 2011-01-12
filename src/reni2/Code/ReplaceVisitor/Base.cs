@@ -14,7 +14,6 @@ namespace Reni.Code.ReplaceVisitor
         private readonly DictionaryEx<LocalReference, LocalReference> _internalRefs;
         
         protected Base(int objectId):base(objectId) { _internalRefs = new DictionaryEx<LocalReference, LocalReference>(ReVisit); }
-        protected Base() { _internalRefs = new DictionaryEx<LocalReference, LocalReference>(ReVisit); }
 
         internal override CodeBase Arg(Arg visitedObject) { return null; }
         internal override CodeBase ContextRef(ReferenceCode visitedObject) { return null; }
