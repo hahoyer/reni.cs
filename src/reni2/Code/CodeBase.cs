@@ -35,7 +35,7 @@ namespace Reni.Code
         internal virtual bool IsEmpty { get { return false; } }
 
         [IsDumpEnabled(false)]
-        protected virtual bool IsRelativeReference { get { return RefAlignParam != null; } }
+        internal virtual bool IsRelativeReference { get { return RefAlignParam != null; } }
 
         [IsDumpEnabled(false)]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }

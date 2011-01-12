@@ -33,7 +33,7 @@ namespace Reni.Code
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
-        protected override bool IsRelativeReference { get { return false; } }
+        internal override bool IsRelativeReference { get { return false; } }
 
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 

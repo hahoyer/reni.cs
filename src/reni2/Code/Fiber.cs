@@ -47,6 +47,8 @@ namespace Reni.Code
 
         internal FiberHead FiberHead { get { return _fiberHead; } }
         internal FiberItem[] FiberItems { get { return _fiberItems; } }
+        internal override bool IsRelativeReference { get { return _fiberHead.IsRelativeReference; } }
+
         internal override RefAlignParam RefAlignParam { get { return _fiberItems[_fiberItems.Length - 1].RefAlignParam; } }
         protected override Size GetSize() { return _fiberItems[_fiberItems.Length - 1].OutputSize; }
 
