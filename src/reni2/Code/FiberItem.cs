@@ -37,9 +37,9 @@ namespace Reni.Code
         internal virtual FiberItem[] TryToCombine(FiberItem subsequentElement) { return null; }
 
         internal virtual CodeBase TryToCombineBack(BitArray precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(FrameRef precedingElement) { return null; }
+        internal virtual CodeBase TryToCombineBack(TopFrameRef precedingElement) { return null; }
         internal virtual CodeBase TryToCombineBack(TopData precedingElement) { return null; }
-        internal virtual CodeBase TryToCombineBack(TopFrame precedingElement) { return null; }
+        internal virtual CodeBase TryToCombineBack(TopFrameData precedingElement) { return null; }
         internal virtual CodeBase TryToCombineBack(TopRef precedingElement) { return null; }
         internal virtual CodeBase TryToCombineBack(LocalVariableReference precedingElement) { return null; }
         internal virtual FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement) { return null; }

@@ -32,12 +32,12 @@ namespace Reni.Code
     }
 
     /// <summary>
-    /// Combination of FrameRef and Unref
+    /// Combination of TopFrameRef and Unref
     /// </summary>
     [Serializable]
-    internal sealed class TopFrame : Top
+    internal sealed class TopFrameData : Top
     {
-        public TopFrame(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+        public TopFrameData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
             : base(refAlignParam, offset, size, dataSize)
         {
             StopByObjectId(544);
@@ -51,7 +51,7 @@ namespace Reni.Code
             return fiber;
         }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrame(Offset, Size, DataSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrameData(Offset, Size, DataSize); }
 
         protected override string CSharpString()
         {

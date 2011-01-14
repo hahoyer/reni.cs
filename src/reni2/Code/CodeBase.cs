@@ -62,7 +62,7 @@ namespace Reni.Code
 
         internal LocalReference LocalReference(RefAlignParam refAlignParam, CodeBase destructorCode) { return new LocalReference(refAlignParam, this, destructorCode); }
 
-        internal static CodeBase FrameRef(RefAlignParam refAlignParam, string reason) { return new FrameRef(refAlignParam, Size.Create(0), reason); }
+        internal static CodeBase FrameRef(RefAlignParam refAlignParam, string reason) { return new TopFrameRef(refAlignParam, Size.Create(0), reason); }
 
         internal abstract CodeBase CreateFiber(FiberItem subsequentElement);
 

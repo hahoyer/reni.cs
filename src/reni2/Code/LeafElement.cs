@@ -95,7 +95,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual FiberHead TryToCombineBack(FrameRef precedingElement)
+        internal virtual FiberHead TryToCombineBack(TopFrameRef precedingElement)
         {
             return null;
         }
@@ -110,7 +110,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual FiberHead TryToCombineBack(TopFrame precedingElement)
+        internal virtual FiberHead TryToCombineBack(TopFrameData precedingElement)
         {
             return null;
         }

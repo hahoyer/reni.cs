@@ -69,10 +69,10 @@ namespace Reni.Code
             return null;
         }
 
-        internal override CodeBase TryToCombineBack(TopFrame precedingElement)
+        internal override CodeBase TryToCombineBack(TopFrameData precedingElement)
         {
             if(precedingElement.Size == InputSize && OutputSize >= _inputDataSize && OutputSize > InputSize)
-                return new TopFrame(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize)
+                return new TopFrameData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize)
                     .CreateFiber(new BitCast(OutputSize, OutputSize, _inputDataSize));
             return null;
         }

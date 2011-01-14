@@ -21,13 +21,13 @@ namespace Reni.Code
             return subsequentElement.TryToCombineBack(this);
         }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopRef(RefAlignParam, Offset); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopRef(Offset, Size); }
     }
 
     [Serializable]
-    internal sealed class FrameRef : Ref
+    internal sealed class TopFrameRef : Ref
     {
-        public FrameRef(RefAlignParam refAlignParam, Size offset, string reason)
+        public TopFrameRef(RefAlignParam refAlignParam, Size offset, string reason)
             : base(refAlignParam, offset, reason)
         {
             StopByObjectId(547);

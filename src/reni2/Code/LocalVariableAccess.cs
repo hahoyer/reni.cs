@@ -38,6 +38,6 @@ namespace Reni.Code
         }
         protected override Size GetSize() { return _size; }
         protected override string CSharpString() { return CSharpGenerator.LocalVariableAccess(_holder,_offset, _size); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableAccess(Size, _holder, _offset, _dataSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableData(Size, _holder, _offset, _dataSize); }
     }
 }

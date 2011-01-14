@@ -40,6 +40,7 @@
     <Compile Include="Code\FiberItem.cs" />
     <Compile Include="Code\FormalMaschine.cs" />
     <Compile Include="Code\FormalValueAccess.cs" />
+    <Compile Include="Code\FrameData.cs" />
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\HasArgVisitor.cs" />
     <Compile Include="Code\IFormalValue.cs" />

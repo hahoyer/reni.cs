@@ -11,11 +11,11 @@ namespace Reni.Code
     internal interface IFormalMaschine
     {
         void BitsArray(Size size, BitsConst data);
-        void TopRef(RefAlignParam refAlignParam, Size offset);
+        void TopRef(Size offset, Size size);
         void Call(Size size, int functionIndex, Size argsAndRefsSize);
         void BitCast(Size size, Size targetSize, Size significantSize);
         void DumpPrintOperation(Size leftSize, Size rightSize);
-        void TopFrame(Size offset, Size size, Size dataSize);
+        void TopFrameData(Size offset, Size size, Size dataSize);
         void TopData(Size offset, Size size, Size dataSize);
         void LocalBlockEnd(Size size, Size intermediateSize);
         void Drop(Size beforeSize, Size afterSize);
@@ -29,7 +29,7 @@ namespace Reni.Code
         void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
         void LocalVariableReference(Size size, string holder, Size offset);
         void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
-        void LocalVariableAccess(Size size, string holder, Size offset, Size dataSize);
+        void LocalVariableData(Size size, string holder, Size offset, Size dataSize);
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
@@ -72,11 +72,10 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, size);
         }
 
-        void IFormalMaschine.TopRef(RefAlignParam refAlignParam, Size offset)
+        void IFormalMaschine.TopRef(Size offset, Size size)
         {
             var index = (_startAddress + offset).ToInt();
             FormalPointer.Ensure(_points, index);
-            var size = refAlignParam.RefSize;
             var startAddress = (_startAddress - size).ToInt();
             SetFormalValues(_points[index], startAddress, size);
         }
@@ -103,7 +102,7 @@ namespace Reni.Code
             ResetInputValuesOfData(leftSize);
         }
 
-        void IFormalMaschine.TopFrame(Size offset, Size size, Size dataSize)
+        void IFormalMaschine.TopFrameData(Size offset, Size size, Size dataSize)
         {
             AlignFrame(offset);
             var access = GetInputValuesFromFrame(offset, size).OnlyOne() ?? CreateValuesInFrame(size, offset);
@@ -169,7 +168,7 @@ namespace Reni.Code
         void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead,fiberItems); }
         void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size,holder,offset); }
         void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
-        void IFormalMaschine.LocalVariableAccess(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
+        void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {

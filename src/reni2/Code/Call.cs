@@ -24,7 +24,9 @@ namespace Reni.Code
             ArgsAndRefsSize = argsAndRefsSize;
         }
 
+        [IsDumpEnabled(false)]
         internal override Size InputSize { get { return ArgsAndRefsSize; } }
+        [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return ResultSize; } }
 
         internal FiberItem Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity)
@@ -70,7 +72,7 @@ namespace Reni.Code
 
         protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
 
-        internal override CodeBase TryToCombineBack(TopFrame precedingElement)
+        internal override CodeBase TryToCombineBack(TopFrameData precedingElement)
         {
             if ((DeltaSize + precedingElement.Size).IsZero 
                 && (precedingElement.Offset + _refsSize).IsZero)

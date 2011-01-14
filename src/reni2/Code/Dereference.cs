@@ -52,10 +52,10 @@ namespace Reni.Code
             return new LocalVariableAccess(RefAlignParam, precedingElement.Holder, precedingElement.Offset, OutputSize, _dataSize);
         }
 
-        internal override CodeBase TryToCombineBack(FrameRef precedingElement)
+        internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopFrame(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
+            return new TopFrameData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.Dereference(top, InputSize, OutputSize); }
