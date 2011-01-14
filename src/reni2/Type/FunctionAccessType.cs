@@ -17,7 +17,6 @@ namespace Reni.Type
 
         public FunctionAccessType(TypeBase objectType, IFunctionalFeature functionalFeature)
         {
-            Tracer.Assert(!(objectType is Reference));
             _functionalFeature = functionalFeature;
             _objectType = objectType;
             StopByObjectId(-369);
@@ -41,7 +40,7 @@ namespace Reni.Type
 
     }
 
-    internal class FunctionDefinitionType : TypeBase
+    internal sealed class FunctionDefinitionType : TypeBase
     {
         private readonly FunctionalFeature _functionalFeature;
         public FunctionDefinitionType(FunctionalFeature functionalFeature)
@@ -56,7 +55,7 @@ namespace Reni.Type
         internal override IAccessType AccessType(Struct.Context context, int position)
         {
             return context
-                .ContextType
+                .ContextReferenceType
                 .FunctionalType(_functionalFeature);
         }
 
