@@ -27,6 +27,7 @@ namespace ReniTest
             //TestGenerated.Exec();
             //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
             //RunSpecificTest();
+            TestRunner.IsModeErrorFocus = true;
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
         }
