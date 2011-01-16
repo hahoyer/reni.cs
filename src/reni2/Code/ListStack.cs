@@ -39,34 +39,52 @@ namespace Reni.Code
 
         protected override StackData GetTop(Size size)
         {
-            if(_data.Length > 0 && _data[0].Size == size)
-                return _data[0];
-            return base.GetTop(size);
+            var i = Index(size);
+            if (i == null)
+                return base.GetTop(size);
+
+            return Head(i.Value);
         }
 
-        protected override StackData Pull(Size size)
+        private int? Index(Size size)
         {
             var sizeSoFar = Size.Zero;
             var i = 0;
             for(; i < _data.Length && sizeSoFar < size; i++)
                 sizeSoFar += _data[i].Size;
-            
-            return sizeSoFar == size ? Tail(i) : base.Pull(size);
+            if (sizeSoFar > size)
+                return null;
+            return i;
         }
 
-        private StackData Tail(int i)
+        protected override StackData Pull(Size size)
         {
-            var newLength = _data.Length - i;
-            if(newLength == 0)
-                return new EmptyStackData();
-            if(newLength == 1)
-                return _data[i];
-            var newData = new NonListStackData[newLength];
-            for(var j = 0; j < newLength; j++)
-                newData[j] = _data[i + j];
-            return new ListStack(newData);
+            var i = Index(size);
+            if(i == null)
+                return base.Pull(size);
+            return Tail(i.Value);
         }
 
+        private StackData Head(int value) { return SubString(0, value); }
+        private StackData Tail(int value) { return SubString(value, _data.Length - value); }
+
+        private StackData SubString(int start, int length)
+        {
+            switch (length)
+            {
+                case 0:
+                    return new EmptyStackData();
+                case 1:
+                    return _data[start];
+                default:
+                    {
+                        var newData = new NonListStackData[length];
+                        for (var i = 0; i < length; i++)
+                            newData[i] = _data[start + i];
+                        return new ListStack(newData);
+                    }
+            }
+        }
         internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(_data, formerStack); }
         internal override StackData PushOnto(NonListStackData[] formerStack) { return new ListStack(_data, formerStack); }
         internal override StackData Push(StackData formerStack) { return formerStack.PushOnto(_data); }
