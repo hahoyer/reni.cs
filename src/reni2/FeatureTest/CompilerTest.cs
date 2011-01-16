@@ -13,7 +13,7 @@ namespace Reni.FeatureTest
     /// Helper class for unittests, that compile something
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public abstract class CompilerTest : Attribute
+    public abstract class CompilerTest : DependantAttribute
     {
         [UsedImplicitly]
         public const string Damaged = "Damaged";
@@ -60,7 +60,7 @@ namespace Reni.FeatureTest
         private void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
             Tracer.FlaggedLine(depth + 1, "Position of method tested");
-            if(IsCallerUnderConstruction(1))
+            if (TestRunner.IsModeErrorFocus || IsCallerUnderConstruction(1))
                 Parameters.Trace.All();
 
             Parameters.RunFromCode = true;
@@ -105,11 +105,12 @@ namespace Reni.FeatureTest
             Run();
         }
 
-        public abstract void Run();
+        [Test]
+        public virtual void Run() { BaseRun(); }
 
         public void RunFlat(){BaseRun(true);}
 
-        protected void BaseRun(bool isFlatCall = false)
+        protected void BaseRun(bool isFlatCall = true)
         {
             if(_cache == null)
                 _cache = new Dictionary<System.Type, CompilerTest>();
