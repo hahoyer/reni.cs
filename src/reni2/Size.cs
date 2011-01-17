@@ -46,7 +46,7 @@ namespace Reni
             return result;
         }
 
-        public override string Dump()
+        protected override string Dump(bool isRecursion)
         {
             return _value.ToString();
         }

@@ -26,8 +26,10 @@ namespace Reni.Parser
         [IsDumpEnabled(false), UsedImplicitly]
         public new string NodeDump { get { return base.NodeDump + " " + DumpShort(); } }
 
-        public override sealed string Dump()
+        protected override sealed string Dump(bool isRecursion)
         {
+            if (isRecursion)
+                return "ObjectId="+ObjectId;
             var isInContainerDump = Container.IsInContainerDump;
             Container.IsInContainerDump = false;
             var isInDump = _isInDump;

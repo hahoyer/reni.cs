@@ -36,7 +36,12 @@ namespace Reni.Code
 
         protected override StackDataAddress GetAddress() { return this; }
 
-        public override string Dump() { return _data.Dump() + "[" + _offset.ToInt() + "]"; }
+        protected override string Dump(bool isRecursion)
+        {
+            if (isRecursion)
+                throw new NotImplementedException();
+            return _data.Dump() + "[" + _offset.ToInt() + "]";
+        }
     }
 
     internal interface IStackDataAddressBase

@@ -38,7 +38,12 @@ namespace Reni.Type
 
         internal override Result Copier(Category category) { return Element.ArrayCopier(category, Count); }
 
-        public override string Dump() { return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")"; }
+        protected override string Dump(bool isRecursion)
+        {
+            if (isRecursion)
+                return "ObjectId=" + ObjectId;
+            return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")";
+        }
 
         protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {

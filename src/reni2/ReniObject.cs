@@ -1,46 +1,44 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 
 namespace Reni
 {
-    [AdditionalNodeInfo("NodeDump"),Serializable]
+    [AdditionalNodeInfo("NodeDump"), Serializable]
     public abstract class ReniObject : Dumpable
     {
         private static int _nextObjectId;
         private readonly int _objectId;
 
         protected ReniObject()
-            : this(_nextObjectId++) {}
+            : this(_nextObjectId++) { }
 
-        protected ReniObject(int nextObjectId)
-        {
-            _objectId = nextObjectId;
-        }
+        protected ReniObject(int nextObjectId) { _objectId = nextObjectId; }
 
         [IsDumpEnabled(false)]
         public virtual int ObjectId { get { return _objectId; } }
+
         [IsDumpEnabled(false)]
         public virtual string NodeDump { get { return GetType().FullName + "." + ObjectId; } }
+
         [IsDumpEnabled(false)]
         internal bool IsStopByObjectIdActive { get; private set; }
 
-        public override string Dump()
+        protected override string Dump(bool isRecursion)
         {
-            return NodeDump + DumpData().Surround("{", "}");
+            var result = NodeDump;
+            if(!isRecursion)
+                result += DumpData().Surround("{", "}");
+            return result;
         }
 
-        public override string ToString()
-        {
-            return base.ToString() + " ObjectId=" + ObjectId;
-        }
+        public override string ToString() { return base.ToString() + " ObjectId=" + ObjectId; }
 
-        public override string DebuggerDump()
-        {
-            return base.DebuggerDump() + " ObjectId=" + ObjectId;
-        }
+        public override string DebuggerDump() { return base.DebuggerDump() + " ObjectId=" + ObjectId; }
 
         [DebuggerHidden]
         public void StopByObjectId(int objectId)
@@ -48,7 +46,7 @@ namespace Reni
             var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
             if(ObjectId == objectId)
-                Tracer.ConditionalBreak(1, "", ()=>@"_objectId==" + objectId + "\n" + Dump());
+                Tracer.ConditionalBreak(1, "", () => @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
 
@@ -66,6 +64,6 @@ namespace Reni
             return false;
         }
 
-        internal static bool IsObjectId(object syntax, int objectId) { return ((syntax is ReniObject) && ((ReniObject) syntax) .ObjectId == objectId); }
+        internal static bool IsObjectId(object syntax, int objectId) { return ((syntax is ReniObject) && ((ReniObject) syntax).ObjectId == objectId); }
     }
 }

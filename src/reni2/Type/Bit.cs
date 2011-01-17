@@ -30,7 +30,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        public override string Dump() { return GetType().FullName; }
+        protected override string Dump(bool isRecursion) { return GetType().FullName; }
 
         internal override string DumpShort() { return "bit"; }
     }

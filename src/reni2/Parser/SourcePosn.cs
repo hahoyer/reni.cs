@@ -87,7 +87,7 @@ namespace Reni.Parser
         /// Default dump behaviour
         /// </summary>
         /// <returns>The file position of sourec file</returns>
-        override public string Dump()
+        protected override string Dump(bool isRecursion)
         {
             return FilePosn("see there");
         }

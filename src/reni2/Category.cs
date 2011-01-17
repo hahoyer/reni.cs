@@ -129,7 +129,7 @@ namespace Reni
         /// dump 
         /// </summary>
         /// <returns></returns>
-        public override string Dump()
+        protected override string Dump(bool isRecursion)
         {
             string result = "";
             if(HasSize) result += ".Size.";

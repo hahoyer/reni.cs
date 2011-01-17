@@ -1,11 +1,11 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Runtime;
-using Reni.Type;
 
 namespace Reni.Code
 {
@@ -28,7 +28,7 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         private readonly CodeBase _data;
 
-        public Container(CodeBase data, Size frameSize = null, string description = "", bool isInternal= false)
+        public Container(CodeBase data, Size frameSize = null, string description = "", bool isInternal = false)
         {
             IsInternal = isInternal;
             _frameSize = frameSize ?? Size.Zero;
@@ -47,18 +47,17 @@ namespace Reni.Code
 
         [Node, IsDumpEnabled(true)]
         internal string Description { get { return _description; } }
+
         [Node, IsDumpEnabled(false)]
         internal bool IsError { get { return _frameSize == null; } }
 
         [Node, IsDumpEnabled(false)]
         public Size MaxSize { get { return _data.MaxSize; } }
+
         [Node, IsDumpEnabled(false)]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
 
-        private void DataAdd(FiberItem leafElement)
-        {
-            NotImplementedMethod(leafElement);
-        }
+        private void DataAdd(FiberItem leafElement) { NotImplementedMethod(leafElement); }
 
         public CodeTypeDeclaration GetCSharpTypeCode(List<Container> functions, string name, bool useStatementAligner)
         {
@@ -118,40 +117,11 @@ namespace Reni.Code
             return aligner.Format(statements);
         }
 
-        internal sealed class UnexpectedContextRefInContainer : CodeBaseException
-        {
-            internal UnexpectedContextRefInContainer(Container container, CodeBase visitedObject)
-                : base(container, visitedObject) { }
-        }
-
         internal BitsConst Evaluate()
         {
             NotImplementedMethod();
             return null;
         }
-
-        internal abstract class CodeBaseException : Exception
-        {
-            private readonly Container _container;
-            private readonly CodeBase _visitedObject;
-
-            protected CodeBaseException(Container container,
-                CodeBase visitedObject)
-            {
-                _container = container;
-                _visitedObject = visitedObject;
-            }
-
-            internal Container Container { get { return _container; } }
-            internal CodeBase VisitedObject { get { return _visitedObject; } }
-        }
-
-        internal sealed class UnexpectedInternalRefInContainer : CodeBaseException
-        {
-            public UnexpectedInternalRefInContainer(Container container, CodeBase visitedObject)
-                : base(container, visitedObject) { }
-        }
-
     }
 
     [Serializable]
@@ -159,6 +129,7 @@ namespace Reni.Code
     {
         [Node]
         internal readonly CodeBase CodeBase;
+
         public ErrorElement(CodeBase codeBase) { CodeBase = codeBase; }
         protected override Size GetSize() { return Size.Zero; }
     }

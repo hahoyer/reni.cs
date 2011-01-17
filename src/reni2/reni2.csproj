@@ -28,6 +28,7 @@
     <Compile Include="Code\BitCast.cs" />
     <Compile Include="Code\BitsStackData.cs" />
     <Compile Include="Code\CodeBase.cs" />
+    <Compile Include="Code\CodeBaseException.cs" />
     <Compile Include="Code\Container.cs" />
     <Compile Include="Code\Call.cs" />
     <Compile Include="Code\CSharpCodeSnippet.cs" />

@@ -71,7 +71,7 @@ namespace Reni.Code
 
         protected override char DumpShort() { return _operation[0]; }
 
-        public override string Dump() { return "(" + _leftSubValue + ")" + _operation + "(" + _rightSubValue + ")"; }
+        protected override string Dump(bool isRecursion) { return "(" + _leftSubValue + ")" + _operation + "(" + _rightSubValue + ")"; }
     }
 
     internal class DereferenceValue : NamedValue
@@ -80,7 +80,7 @@ namespace Reni.Code
         public DereferenceValue(IFormalValue formalSubValue) { _formalSubValue = formalSubValue; }
         protected override char DumpShort() { return 'd'; }
 
-        public override string Dump() { return "("+_formalSubValue.Dump()+")d"; }
+        protected override string Dump(bool isRecursion) { return "(" + _formalSubValue.Dump() + ")d"; }
     }
 
     sealed internal class FormalPointer : NamedValue
@@ -99,7 +99,7 @@ namespace Reni.Code
             _index = index;
         }
 
-        public override string Dump() { return _name + " "; }
+        protected override string Dump(bool isRecursion) { return _name + " "; }
 
         protected override IFormalValue RefPlus(int right)
         {
@@ -137,7 +137,7 @@ namespace Reni.Code
 
         string IFormalValue.Dump() { return Dump(); }
 
-        abstract public override string Dump();
+        protected abstract override string Dump(bool isRecursion);
 
         IFormalValue IFormalValue.RefPlus(int right) { return RefPlus(right); }
 
@@ -164,7 +164,8 @@ namespace Reni.Code
         }
 
         protected override char DumpShort() { return 'F'; }
-        public override string Dump()
+
+        protected override string Dump(bool isRecursion)
         {
             return "F" + _functionIndex + "(" + _formalSubValues.Aggregate("", (x,y)=> (x==""?"":x+", ") + y.Dump()) + ")";
         }
@@ -178,7 +179,7 @@ namespace Reni.Code
 
         protected override char DumpShort() { return 'V'; }
 
-        public override string Dump()
+        protected override string Dump(bool isRecursion)
         {
             var result = "V" + _name;
             if (_isPointer)
@@ -207,7 +208,7 @@ namespace Reni.Code
 
         protected override char DumpShort() { return 'P'; }
 
-        public override string Dump() { return _variableValue.Dump() + FormatRight(); }
+        protected override string Dump(bool isRecursion) { return _variableValue.Dump() + FormatRight(); }
 
         private string FormatRight()
         {
@@ -267,7 +268,7 @@ namespace Reni.Code
             }
         }
 
-        public override string Dump() { return _data.DumpValue(); }
+        protected override string Dump(bool isRecursion) { return _data.DumpValue(); }
         void IFormalValue.Check(IEnumerable<FormalValueAccess> accesses) {  }
 
         IFormalValue IFormalValue.RefPlus(int right)
