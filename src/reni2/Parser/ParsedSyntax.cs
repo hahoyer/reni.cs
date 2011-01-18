@@ -30,6 +30,7 @@ namespace Reni.Parser
         {
             if (isRecursion)
                 return "ObjectId="+ObjectId;
+            
             var isInContainerDump = Container.IsInContainerDump;
             Container.IsInContainerDump = false;
             var isInDump = _isInDump;
@@ -40,7 +41,7 @@ namespace Reni.Parser
             if(!isInDump)
                 result += FilePosition();
             if(!isInContainerDump)
-                result += "\n" + base.Dump();
+                result += "\n" + base.Dump(isRecursion);
             Container.IsInContainerDump = isInContainerDump;
             _isInDump = isInDump;
             return result;

@@ -319,7 +319,7 @@ namespace Reni
         [DebuggerHidden]
         internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
-            var trace = context.ObjectId == -17 && category.HasRefs && IsObjectId(syntax, 1192);
+            var trace = context.ObjectId == -17 && category.HasRefs && syntax.GetObjectId() == 1192;
             StartMethodDumpWithBreak(trace, context, category, syntax);
             var localCateogory = category - CompleteCategory - PendingCategory;
             

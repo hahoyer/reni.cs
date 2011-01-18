@@ -41,12 +41,18 @@ namespace Reni
         public override string DebuggerDump() { return base.DebuggerDump() + " ObjectId=" + ObjectId; }
 
         [DebuggerHidden]
-        public void StopByObjectId(int objectId)
+        internal void StopByObjectId(int objectId)
+        {
+            StopByObjectId(1, objectId);
+        }
+
+        [DebuggerHidden]
+        internal void StopByObjectId(int stackFrameDepth, int objectId)
         {
             var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
-            if(ObjectId == objectId)
-                Tracer.ConditionalBreak(1, "", () => @"_objectId==" + objectId + "\n" + Dump());
+            if (ObjectId == objectId)
+                Tracer.ConditionalBreak(stackFrameDepth + 1, "", () => @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
 
@@ -63,7 +69,20 @@ namespace Reni
             DumpMethodWithBreak("Not implemented", other);
             return false;
         }
+    }
 
-        internal static bool IsObjectId(object syntax, int objectId) { return ((syntax is ReniObject) && ((ReniObject) syntax).ObjectId == objectId); }
+    internal static class ReniObjectExtender
+    {
+        [DebuggerHidden]
+        public static void StopByObjectId(this object t, int objectId)
+        {
+            var reniObject = t as ReniObject;
+            if(reniObject == null)
+                return;
+               reniObject.StopByObjectId(1, objectId);
+        }
+
+        // will throw an exception if not a ReniObject
+        internal static int GetObjectId(this object reniObject) { return ((ReniObject) reniObject).ObjectId; }
     }
 }
