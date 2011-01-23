@@ -183,7 +183,8 @@ namespace Reni.Code
 
         void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
         {
-            if(Pull(condSize).GetBitsConst().IsZero)
+            var bitsConst = Pull(condSize).GetBitsConst();
+            if(bitsConst.IsZero)
                 SubExecute("else:", elseCode);
             else
                 SubExecute("then:", thenCode);

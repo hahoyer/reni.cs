@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -21,12 +22,14 @@ namespace Reni
 
         private readonly Size _size;
         private byte[] _data;
+        private readonly SimpleCache<BigInteger> _dataCache;
 
         private BitsConst(Size size)
             : base(_nextObjectId++)
         {
             _size = size;
             CreateDataArray();
+            _dataCache = new SimpleCache<BigInteger>(() => new BigInteger(_data));
             StopByObjectId(-7);
         }
 
@@ -110,6 +113,9 @@ namespace Reni
             return 0xff;
         }
 
+        [IsDumpEnabled(false)]
+        private BigInteger AsInteger { get { return _dataCache.Value; } }
+
         public static BitsConst Convert(int bytes, byte[] data, int position) { return new BitsConst(bytes, data, position); }
 
         private static int DataSize(Size size)
@@ -175,7 +181,7 @@ namespace Reni
 
         public BitsConst Equal(BitsConst right, Size size)
         {
-            if(this == right)
+            if(AsInteger == right.AsInteger)
                 return new BitsConst(new BitsConst(-1), size);
             return new BitsConst(new BitsConst(0), size);
         }
