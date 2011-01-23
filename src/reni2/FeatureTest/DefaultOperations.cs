@@ -10,7 +10,7 @@ namespace Reni.FeatureTest.DefaultOperations
     [TestFixture]
     public class TypeOperator : CompilerTest
     {
-        public override string Target { get { return @"31 type dump_print"; } }
+        protected override string Target { get { return @"31 type dump_print"; } }
         protected override string Output { get { return "(bit)sequence(6)"; } }
 
         [Test, Category(Worked)]
@@ -20,7 +20,7 @@ namespace Reni.FeatureTest.DefaultOperations
     [TestFixture]
     public class TypeOperatorWithVariable : CompilerTest
     {
-        public override string Target { get { return @"x: 0; x type dump_print"; } }
+        protected override string Target { get { return @"x: 0; x type dump_print"; } }
         protected override string Output { get { return "(bit)sequence(1)"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] { typeof(SomeVariables), typeof(TypeOperator) }; } }
 
@@ -31,7 +31,7 @@ namespace Reni.FeatureTest.DefaultOperations
     [TestFixture]
     public class ApplyTypeOperator: CompilerTest
     {
-        public override string Target { get { return @"(31 type (28))dump_print"; } }
+        protected override string Target { get { return @"(31 type (28))dump_print"; } }
         protected override string Output { get { return "28"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(TypeOperator)}; } }
 
@@ -42,7 +42,7 @@ namespace Reni.FeatureTest.DefaultOperations
     [TestFixture]
     public class ApplyTypeOperatorWithCut : CompilerTest
     {
-        public override string Target { get { return @"(31 type (100 enable_cut))dump_print"; } }
+        protected override string Target { get { return @"(31 type (100 enable_cut))dump_print"; } }
         protected override string Output { get { return "-28"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] { typeof(ApplyTypeOperator) }; } }
 
@@ -53,7 +53,7 @@ namespace Reni.FeatureTest.DefaultOperations
     [TestFixture]
     abstract public class ApplyCompareOperator : CompilerTest
     {
-        public override string Target { get { return "(1"+Operator+"100)dump_print"; } }
+        protected override string Target { get { return "(1"+Operator+"100)dump_print"; } }
         protected abstract string Operator { get; }
         protected abstract bool Result { get; }
         protected override string Output { get { return Result ? "-1" : "0"; } }

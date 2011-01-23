@@ -126,7 +126,7 @@ namespace Reni.FeatureTest.Function
     [TestFixture, SimpleFunction]
     public sealed class TwoFunctions : CompilerTest
     {
-        public override string Target
+        protected override string Target
         {
             get
             {

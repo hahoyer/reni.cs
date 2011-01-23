@@ -148,7 +148,7 @@ namespace Reni.FeatureTest
         }
 
         protected virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
-        public virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
+        protected virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
 
         protected virtual IEnumerable<System.Type> DependsOn
         {

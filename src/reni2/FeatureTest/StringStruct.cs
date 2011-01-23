@@ -17,7 +17,7 @@ String:
 
         public override void Run() { }
 
-        public override string Target
+        protected override string Target
         {
             get { return Definition() + "; " + InstanceCode + " dump_print"; }
         }
