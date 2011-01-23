@@ -32,6 +32,7 @@ namespace Reni.Context
         [Node, IsDumpEnabled(false)]
         public FunctionList Functions { get { return _functions; } }
 
+        [Node, IsDumpEnabled(false)]
         internal CodeBase[] FunctionCode { get { return Functions.Code; } }
 
         public Result CreateFunctionCall(Struct.Context context, Category category, ICompileSyntax body, Result argsResult)

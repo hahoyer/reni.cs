@@ -54,15 +54,7 @@ namespace Reni
         public List<IReferenceInCode> Data { get { return _data; } }
 
         [IsDumpEnabled(false)]
-        private SizeArray Sizes
-        {
-            get
-            {
-                if(_sizesCache == null)
-                    _sizesCache = CalculateSizes();
-                return _sizesCache;
-            }
-        }
+        private SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
 
         public int Count { get { return _data.Count; } }
 
@@ -112,24 +104,9 @@ namespace Reni
             return new Refs(r);
         }
 
-        public Refs Without(Refs other)
-        {
-            var result = this;
-            foreach(var refInCode in other._data)
-                result = result.Without(refInCode);
-            return result;
-        }
-
+        public Refs Without(Refs other) { return other._data.Aggregate(this, (current, refInCode) => current.Without(refInCode)); }
         public bool Contains(IReferenceInCode context) { return _data.Contains(context); }
-
-        public bool Contains(Refs other)
-        {
-            foreach(var context in other._data)
-                if(!Contains(context))
-                    return false;
-
-            return true;
-        }
+        public bool Contains(Refs other) { return other._data.All(Contains); }
 
         internal CodeBase ToCode()
         {

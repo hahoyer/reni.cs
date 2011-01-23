@@ -67,7 +67,8 @@ namespace Reni.FeatureTest
             InternalRunCompiler(Parameters, fileName, expectedResult, expectedOutput);
         }
 
-        private static void InternalRunCompiler(CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, string expectedOutput) {
+        private static void InternalRunCompiler(CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, string expectedOutput)
+        {
             var c = new Compiler(compilerParameters, fileName);
 
             if(expectedResult != null)
@@ -106,20 +107,15 @@ namespace Reni.FeatureTest
         }
 
         [Test]
-        public virtual void Run() { BaseRun(); }
+        public virtual void Run() { BaseRun(1); }
 
-        public void RunFlat(){BaseRun(true);}
-
-        protected void BaseRun(bool isFlatCall = true)
+        protected void BaseRun(int depth = 0)
         {
             if(_cache == null)
                 _cache = new Dictionary<System.Type, CompilerTest>();
 
-            if(!isFlatCall)
-                RunDependants();
-
             foreach(var tuple in TargetSet)
-                CreateFileAndRunCompiler(1, GetType().Name, tuple.Item1, AssertValid, tuple.Item2);
+                CreateFileAndRunCompiler(depth + 1, GetType().Name, tuple.Item1, AssertValid, tuple.Item2);
         }
 
 
@@ -139,14 +135,18 @@ namespace Reni.FeatureTest
                 ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
         }
 
-        private IEnumerable<Tuple<string, string>> TargetSet { get
+        private IEnumerable<Tuple<string, string>> TargetSet
         {
-            var result = GetStringPairAttributes<TargetSetAttribute>();
-            if (Target != "")
-                result = result.Concat(new[] {new Tuple<string, string>(Target, Output)}).ToArray();
+            get
+            {
+                var result = GetStringPairAttributes<TargetSetAttribute>();
+                if(Target != "")
+                    result = result.Concat(new[] {new Tuple<string, string>(Target, Output)}).ToArray();
 
-            return result;
-        } }
+                return result;
+            }
+        }
+
         protected virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
         public virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
 
@@ -166,18 +166,18 @@ namespace Reni.FeatureTest
             return attrs.Length == 1 ? ((T) attrs[0]).Value : "";
         }
 
-        private Tuple<string,string >[] GetStringPairAttributes<T>() where T : StringPairAttribute
+        private Tuple<string, string>[] GetStringPairAttributes<T>() where T : StringPairAttribute
         {
             return GetType()
                 .GetCustomAttributes(typeof(T), true)
-                .Select(x => ((StringPairAttribute)x).Value)
+                .Select(x => ((StringPairAttribute) x).Value)
                 .ToArray();
         }
 
         protected virtual void AssertValid(Compiler c) { }
     }
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple= false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     internal abstract class StringAttribute : Attribute
     {
         internal readonly string Value;
@@ -209,9 +209,7 @@ namespace Reni.FeatureTest
     internal sealed class TargetSetAttribute : StringPairAttribute
     {
         internal TargetSetAttribute(string target, string output)
-            :base(new Tuple<string, string>(target,output))
-        {
-        }
+            : base(new Tuple<string, string>(target, output)) { }
     }
 
     internal abstract class StringPairAttribute : Attribute
@@ -219,5 +217,4 @@ namespace Reni.FeatureTest
         public readonly Tuple<string, string> Value;
         protected StringPairAttribute(Tuple<string, string> value) { Value = value; }
     }
-
 }

@@ -176,7 +176,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = (defineable.ObjectId == -17 || defineable.ObjectId == -46) && category.HasCode;
+            var trace = (defineable.ObjectId == -37 || defineable.ObjectId == -46) && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -253,7 +253,7 @@ namespace Reni.Context
     }
 
     [Serializable]
-    internal class Cache : ReniObject, IIconKeyProvider
+    internal sealed class Cache : ReniObject, IIconKeyProvider
     {
         [Node, SmartNode]
         internal readonly DictionaryEx<TypeBase, Function> FunctionInstanceCache;
