@@ -119,9 +119,9 @@ namespace Reni.Code
             NotImplementedMethod(targetSize, refAlignParam);
         }
 
-        void IFormalMaschine.DumpPrintText()
+        void IFormalMaschine.DumpPrintText(string dumpPrintText)
         {
-            NotImplementedMethod();
+            BitsConst.OutStream.Add(dumpPrintText);
         }
 
         void IFormalMaschine.List(CodeBase[] data)

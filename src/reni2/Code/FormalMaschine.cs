@@ -23,7 +23,7 @@ namespace Reni.Code
         void Dereference(RefAlignParam refAlignParam, Size size, Size dataSize);
         void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
         void Assign(Size targetSize, RefAlignParam refAlignParam);
-        void DumpPrintText();
+        void DumpPrintText(string dumpPrintText);
         void List(CodeBase[] data);
         void LocalVariables(string holderNamePattern, CodeBase[] data);
         void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
@@ -157,7 +157,7 @@ namespace Reni.Code
 
         void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam) { ResetInputValuesOfData(refAlignParam.RefSize*2); }
 
-        void IFormalMaschine.DumpPrintText() { }
+        void IFormalMaschine.DumpPrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
         void IFormalMaschine.List(CodeBase[] data) { NotImplementedMethod(data); }
         void IFormalMaschine.LocalVariables(string holderNamePattern, CodeBase[] data) { NotImplementedMethod(holderNamePattern, data); }
         void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }

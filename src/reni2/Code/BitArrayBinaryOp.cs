@@ -115,7 +115,7 @@ namespace Reni.Code
 
         protected override Size GetSize() { return Size.Zero; }
         protected override string CSharpString() { return CSharpGenerator.DumpPrintText(_dumpPrintText); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(_dumpPrintText); }
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }
     }
