@@ -311,7 +311,7 @@ namespace Reni
                     Tracer.AssertionFailed(1, @"Code.Size==size", () => "Code size differs " + Dump());
             }
 
-            if(HasRefs && HasCode && !Refs.Contains(Code.RefsImplementation))
+            if(HasRefs && HasCode && !Refs.Contains(Code.Refs))
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
 
         }

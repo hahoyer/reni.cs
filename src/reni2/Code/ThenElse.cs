@@ -43,14 +43,7 @@ namespace Reni.Code
             }
         }
 
-        internal Refs RefsImplementation
-        {
-            get
-            {
-                return
-                    ThenCode.RefsImplementation.Sequence(ElseCode.RefsImplementation);
-            }
-        }
+        protected override Refs GetRefsImplementation() { return ThenCode.Refs.Sequence(ElseCode.Refs); }
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {

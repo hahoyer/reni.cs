@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Type;
 
 namespace Reni.Code
 {
@@ -10,7 +9,13 @@ namespace Reni.Code
     {
         [IsDumpEnabled(true)]
         private readonly BitsConst _data;
-        public BitsStackData(BitsConst data) { _data = data; }
+
+        public BitsStackData(BitsConst data)
+        {
+            _data = data;
+            Tracer.Assert(!_data.Size.IsZero);
+        }
+
         internal override BitsConst GetBitsConst() { return _data; }
         internal override Size Size { get { return GetBitsConst().Size; } }
     }

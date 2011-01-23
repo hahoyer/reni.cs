@@ -10,8 +10,38 @@ namespace Reni.FeatureTest.Function
 {
     [TestFixture]
     [TargetSet(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;", @"(100, (arg)+(x)/\)")]
-    [SomeVariables, Add2Numbers, AccessMember, FunctionWithNonLocal, SimpleFunction, TwoFunctions, FunctionWithRefArg]
+    [SomeVariables, Add2Numbers, AccessMember, FunctionWithNonLocal, Function, TwoFunctions, FunctionWithRefArg]
     public sealed class FunctionVariable : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [Target(@"f: arg/\;f(2) dump_print;")]
+    [Output("2")]
+    [InnerAccess, SomeVariables]
+    public sealed class Function : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [Target(@"f: 100/\;f() dump_print;")]
+    [Output("100")]
+    [Function]
+    public sealed class ConstantFunction : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() {  BaseRun(); }
+    }
+
+    [TestFixture]
+    [Target(@"x: 100; f: x/\;f() dump_print;")]
+    [Output("100")]
+    [InnerAccess, SomeVariables, ConstantFunction]
+    public sealed class SimpleFunctionWithNonLocal : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -20,7 +50,7 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [Target(@"x: 100;f: arg+x/\;f(2) dump_print;")]
     [Output("102")]
-    [InnerAccess, SomeVariables, Add2Numbers]
+    [InnerAccess, SomeVariables, Add2Numbers, SimpleFunctionWithNonLocal]
     public sealed class FunctionWithNonLocal : CompilerTest
     {
         [Test, Category(Worked)]
@@ -85,8 +115,8 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture,
-    TargetSet(@"f: arg+1/\;f(2) dump_print;","3"), 
-    InnerAccess, Add2Numbers] 
+    TargetSet(@"f: arg+1/\;f(2) dump_print;","3"),
+    InnerAccess, Add2Numbers, Function] 
     public sealed class SimpleFunction : CompilerTest
     {
         [Test, Category(Worked)]
@@ -128,7 +158,7 @@ f1: ((
 ) _A_T_ 2)/\;
 
 f1()dump_print;
-"), Output("3")]
+"), Output("3"), TwoFunctions]
     public sealed class TwoFunctions1 : CompilerTest
     {
         protected override void AssertValid(Compiler c)

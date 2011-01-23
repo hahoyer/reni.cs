@@ -16,17 +16,18 @@ namespace Reni.Code
         internal ReferenceCode(IReferenceInCode context):base(_nextObjectId++)
         {
             _context = context;
-            StopByObjectId(-15);
+            StopByObjectId(-2);
         }
 
         internal IReferenceInCode Context { get { return _context; } }
 
         [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
-        [IsDumpEnabled(false)]
-        internal override Refs RefsImplementation { get { return Refs.Create(_context); } }
+
+        protected override Refs GetRefsImplementation() { return Refs.Create(_context); }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.ReferenceCode(Context); }
     }
 }

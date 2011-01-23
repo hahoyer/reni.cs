@@ -70,6 +70,9 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
+
+        internal Refs Refs { get { return GetRefsImplementation(); } }
+        protected virtual Refs GetRefsImplementation() { return Refs.None(); }
     }
 
     internal interface IFormalCodeItem

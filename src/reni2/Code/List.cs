@@ -83,11 +83,8 @@ namespace Reni.Code
                 .Aggregate(Size.Zero, (size, codeBase) => size + codeBase.Size);
         }
 
-        protected override string CSharpString(Size top)
-        {
-            return CSharpGenerator.List(top, ObjectId, _data);
-        }
-
+        protected override Refs GetRefsImplementation() { return GetRefs(_data); }
+        protected override string CSharpString(Size top) { return CSharpGenerator.List(top, ObjectId, _data); }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.List(_data); }
     }
 }

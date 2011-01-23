@@ -51,6 +51,13 @@ namespace Reni.Code
 
         internal override RefAlignParam RefAlignParam { get { return _fiberItems[_fiberItems.Length - 1].RefAlignParam; } }
         protected override Size GetSize() { return _fiberItems[_fiberItems.Length - 1].OutputSize; }
+        protected override Refs GetRefsImplementation()
+        {
+            var refs = FiberHead.Refs;
+            foreach(var fiberItem in _fiberItems)
+                refs = refs.Sequence(fiberItem.Refs);
+            return refs;
+        }
 
         internal override CodeBase CreateFiber(FiberItem subsequentElement)
         {

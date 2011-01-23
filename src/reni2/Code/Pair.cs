@@ -30,9 +30,7 @@ namespace Reni.Code
         internal CodeBase Right { get { return _right; } }
 
         protected override Size GetSize() { return Left.Size + Right.Size; }
-
-        [IsDumpEnabled(false)]
-        internal override Refs RefsImplementation { get { return _left.RefsImplementation.Sequence(_right.RefsImplementation); } }
+        protected override Refs GetRefsImplementation() { return _left.Refs.Sequence(_right.Refs); }
 
         [IsDumpEnabled(false)]
         protected override Size MaxSizeImplementation

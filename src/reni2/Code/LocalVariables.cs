@@ -39,6 +39,7 @@ namespace Reni.Code
         }
 
         protected override Size GetSize() { return Size.Zero; }
+        protected override Refs GetRefsImplementation() { return GetRefs(_data); }
 
         internal override CodeBase CreateFiber(FiberItem subsequentElement)
         {

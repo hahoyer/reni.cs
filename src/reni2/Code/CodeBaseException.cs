@@ -1,40 +1,21 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 
 namespace Reni.Code
 {
     internal abstract class CodeBaseException : Exception
     {
-        private readonly Container _container;
-        private readonly CodeBase _visitedObject;
-
-        protected CodeBaseException(Container container,
-                                    CodeBase visitedObject)
-        {
-            _container = container;
-            _visitedObject = visitedObject;
-        }
-
-        internal Container Container
-        {
-            get { return _container; }
-        }
-
-        internal CodeBase VisitedObject
-        {
-            get { return _visitedObject; }
-        }
-    }
-
-    internal sealed class UnexpectedInternalRefInContainer : CodeBaseException
-    {
-        public UnexpectedInternalRefInContainer(Container container, CodeBase visitedObject)
-            : base(container, visitedObject) { }
+        private readonly IReferenceInCode _container;
+        protected CodeBaseException(IReferenceInCode container) { _container = container; }
+        internal IReferenceInCode Container { get { return _container; } }
+        public override string Message { get { return Tracer.Dump(this); } }
     }
 
     internal sealed class UnexpectedContextRefInContainer : CodeBaseException
     {
-        internal UnexpectedContextRefInContainer(Container container, CodeBase visitedObject)
-            : base(container, visitedObject) { }
+        internal UnexpectedContextRefInContainer(IReferenceInCode container)
+            : base(container) { }
     }
-
 }

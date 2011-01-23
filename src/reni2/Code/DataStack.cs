@@ -43,6 +43,8 @@ namespace Reni.Code
 
         void IFormalMaschine.BitsArray(Size size, BitsConst data)
         {
+            if (size.IsZero)
+                return;
             Push(new BitsStackData(data.Resize(size)));
         }
                                                                
@@ -131,6 +133,8 @@ namespace Reni.Code
                 index++;
             }
         }
+
+        void IFormalMaschine.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextRefInContainer(context); }
 
         private void SubExecute(string tag, IFormalCodeItem codeBase)
         {

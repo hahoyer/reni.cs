@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.UnitTest;
+using JetBrains.Annotations;
 using Reni.Code;
 using Reni.FeatureTest;
 using Reni.Runtime;
@@ -149,6 +150,11 @@ namespace Reni
                 Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "right=" + right + ";size=" + size.Dump());
             return Convert(ToInt64()*right.ToInt64()).Resize(size);
         }
+
+        [UsedImplicitly]
+        public BitsConst Star(BitsConst right, Size size) { return Multiply(right, size); }
+        [UsedImplicitly]
+        public BitsConst Slash(BitsConst right, Size size) { return Divide(right, size); }
 
         public BitsConst Divide(BitsConst right, Size size)
         {
@@ -425,6 +431,28 @@ namespace Reni
             return result;
         }
 
-        internal BitsConst BitArrayBinaryOp(string operation, Size size, BitsConst right) { return (BitsConst) typeof(BitsConst).GetMethod(operation).Invoke(this, new object[] {right, size}); }
+        internal BitsConst BitArrayBinaryOp(string operation, Size size, BitsConst right)
+        {
+            var methodInfo = typeof(BitsConst).GetMethod(operation);
+            if (methodInfo == null)
+                throw new MissingMethodException(operation);
+            return (BitsConst) methodInfo.Invoke(this, new object[] {right, size});
+        }
+
+        private sealed class MissingMethodException : Exception
+        {
+            [IsDumpEnabled()]
+            private readonly string _operation;
+
+            public MissingMethodException(string operation)
+            {
+                _operation = operation;
+                Tracer.ThrowAssertionFailed(1,"", ()=>Tracer.Dump(this));
+            }
+        }
+
+
     }
+
+
 }

@@ -30,6 +30,7 @@ namespace Reni.Code
         void LocalVariableReference(Size size, string holder, Size offset);
         void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
         void LocalVariableData(Size size, string holder, Size offset, Size dataSize);
+        void ReferenceCode(IReferenceInCode context);
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
@@ -127,10 +128,7 @@ namespace Reni.Code
                 _data[i + (_startAddress + intermediateSize).ToInt()] = accesses[i];
         }
 
-        void IFormalMaschine.Drop(Size beforeSize, Size afterSize)
-        {
-            ResetInputValuesOfData(beforeSize - afterSize);
-        }
+        void IFormalMaschine.Drop(Size beforeSize, Size afterSize) { ResetInputValuesOfData(beforeSize - afterSize); }
 
         void IFormalMaschine.RefPlus(Size size, Size right)
         {
@@ -143,7 +141,7 @@ namespace Reni.Code
         void IFormalMaschine.Dereference(RefAlignParam refAlignParam, Size size, Size dataSize)
         {
             var formalSubValue = PullInputValuesFromData(refAlignParam.RefSize).OnlyOne();
-            var startAddress = (_startAddress+ refAlignParam.RefSize- size).ToInt();
+            var startAddress = (_startAddress + refAlignParam.RefSize - size).ToInt();
             var element = FormalValueAccess.Dereference(formalSubValue);
             SetFormalValues(element, startAddress, dataSize);
         }
@@ -152,30 +150,28 @@ namespace Reni.Code
         {
             var formalLeftSubValue = PullInputValuesFromData(leftSize).OnlyOne();
             var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).OnlyOne();
-            var startAddress = (_startAddress + leftSize+rightSize - size).ToInt();
-            var element = FormalValueAccess.BitArrayBinaryOp(opToken.DataFunctionName, formalLeftSubValue,formalRightSubValue);
+            var startAddress = (_startAddress + leftSize + rightSize - size).ToInt();
+            var element = FormalValueAccess.BitArrayBinaryOp(opToken.DataFunctionName, formalLeftSubValue, formalRightSubValue);
             SetFormalValues(element, startAddress, size);
         }
 
-        void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam)
-        {
-            ResetInputValuesOfData(refAlignParam.RefSize*2);
-        }
+        void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam) { ResetInputValuesOfData(refAlignParam.RefSize*2); }
 
         void IFormalMaschine.DumpPrintText() { }
         void IFormalMaschine.List(CodeBase[] data) { NotImplementedMethod(data); }
-        void IFormalMaschine.LocalVariables(string holderNamePattern, CodeBase[] data) { NotImplementedMethod(holderNamePattern,data); }
-        void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead,fiberItems); }
-        void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size,holder,offset); }
+        void IFormalMaschine.LocalVariables(string holderNamePattern, CodeBase[] data) { NotImplementedMethod(holderNamePattern, data); }
+        void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }
+        void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size, holder, offset); }
         void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
         void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
+        void IFormalMaschine.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {
-            IFormalValue element= FormalValueAccess.Variable(Names[_nextValue++]);
+            var element = FormalValueAccess.Variable(Names[_nextValue++]);
             var size1 = size.ToInt();
             var start = _frameData.Length + offset.ToInt();
-            for (var i = 0; i < size1; i++)
+            for(var i = 0; i < size1; i++)
                 _frameData[i + start] = new FormalValueAccess(element, i, size1);
             return element;
         }
@@ -194,9 +190,9 @@ namespace Reni.Code
 
             var delta = _frameData.Length - frameData.Length;
 
-            for(int i = 0; i < frameData.Length; i++)
+            for(var i = 0; i < frameData.Length; i++)
                 _frameData[i + delta] = frameData[i];
-            for (int i = 0; i < framePoints.Length; i++)
+            for(var i = 0; i < framePoints.Length; i++)
                 _framePoints[i + delta] = framePoints[i];
         }
 
@@ -212,14 +208,15 @@ namespace Reni.Code
         private IFormalValue[] PullInputValuesFromData(Size offset, Size inputSize)
         {
             var accesses = new List<FormalValueAccess>();
-            var start = (_startAddress+offset).ToInt();
-            for (var i = 0; i < inputSize.ToInt(); i++)
+            var start = (_startAddress + offset).ToInt();
+            for(var i = 0; i < inputSize.ToInt(); i++)
             {
                 accesses.Add(_data[i + start]);
                 _data[i + start] = null;
             }
             return FormalValueAccess.Transpose(accesses);
         }
+
         private IFormalValue[] GetInputValuesFromData(Size inputSize) { return GetInputValuesFromData(Size.Zero, inputSize); }
 
         private IFormalValue[] GetInputValuesFromData(Size offset, Size inputSize)
@@ -239,13 +236,12 @@ namespace Reni.Code
             for(var i = 0; i < inputSize.ToInt(); i++)
                 _data[i + start] = null;
         }
+
         private void SetFormalValues(IFormalValue element, int startAddress, Size size)
         {
             var size1 = size.ToInt();
-            for (var i = 0; i < size1; i++)
+            for(var i = 0; i < size1; i++)
                 _data[i + startAddress] = new FormalValueAccess(element, i, size1);
         }
-
     }
-
 }

@@ -29,7 +29,7 @@ namespace Reni.Code
         internal List<IReferenceInCode> RefsData { get { return Refs.Data; } }
 
         [IsDumpEnabled(false)]
-        internal Refs Refs { get { return RefsImplementation; } }
+        internal Refs Refs { get { return GetRefsImplementation(); } }
 
         [IsDumpEnabled(false)]
         internal virtual bool IsEmpty { get { return false; } }
@@ -45,8 +45,7 @@ namespace Reni.Code
 
         protected abstract Size GetSize();
 
-        [IsDumpEnabled(false)]
-        internal virtual Refs RefsImplementation { get { return Refs.None(); } }
+        protected virtual Refs GetRefsImplementation() { return Refs.None(); }
 
         internal CodeBase CreateAssignment(RefAlignParam refAlignParam, Size size)
         {
@@ -280,7 +279,14 @@ namespace Reni.Code
 
         internal void Execute(CodeBase[] functions, bool isTraceEnabled)
         {
-            Execute(new DataStack(functions, isTraceEnabled));
+            try
+            {
+                Execute(new DataStack(functions, isTraceEnabled));
+            }
+            catch(CodeBaseException e)
+            {
+                Tracer.AssertionFailed("", ()=>e.Message);
+            }
         }
 
         protected virtual void Execute(IFormalMaschine formalMaschine)
@@ -291,6 +297,11 @@ namespace Reni.Code
         void IFormalCodeItem.Execute(IFormalMaschine formalMaschine)
         {
             Execute(formalMaschine);
+        }
+
+        protected static Refs GetRefs(CodeBase[] codeBases) {
+            var refs = codeBases.Select(code => code.Refs).ToArray();
+            return refs.Aggregate(Refs.None(), (r1,r2)=>r1.Sequence(r2));
         }
     }
 
