@@ -25,12 +25,12 @@ namespace Reni.Code
         void Assign(Size targetSize, RefAlignParam refAlignParam);
         void DumpPrintText(string dumpPrintText);
         void List(CodeBase[] data);
-        void LocalVariables(string holderNamePattern, CodeBase[] data);
         void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
         void LocalVariableReference(Size size, string holder, Size offset);
         void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
         void LocalVariableData(Size size, string holder, Size offset, Size dataSize);
         void ReferenceCode(IReferenceInCode context);
+        void LocalVariableDefinition(string holderName, Size valueSize);
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
@@ -159,12 +159,12 @@ namespace Reni.Code
 
         void IFormalMaschine.DumpPrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
         void IFormalMaschine.List(CodeBase[] data) { NotImplementedMethod(data); }
-        void IFormalMaschine.LocalVariables(string holderNamePattern, CodeBase[] data) { NotImplementedMethod(holderNamePattern, data); }
         void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }
         void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size, holder, offset); }
         void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
         void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
         void IFormalMaschine.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }
+        void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName,valueSize); }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {

@@ -36,12 +36,16 @@ namespace Reni.Code
         internal virtual T Fiber(Fiber visitedObject)
         {
             var newHead = visitedObject.FiberHead.Visit(this);
-            return Fiber(visitedObject, newHead);
+            var data = visitedObject.FiberItems;
+            var newItems = new FiberItem[data.Length];
+            for (var index = 0; index < data.Length; index++)
+                newItems[index] = data[index].Visit(this);
+            return Fiber(visitedObject, newHead, newItems);
         }
 
-        protected virtual T Fiber(Fiber visitedObject, T head)
+        protected virtual T Fiber(Fiber visitedObject, T newHead, FiberItem[] newItems)
         {
-            NotImplementedMethod(visitedObject, head);
+            NotImplementedMethod(visitedObject, newHead, newItems);
             return default(T);
         }
 
@@ -54,39 +58,21 @@ namespace Reni.Code
 
         protected virtual Visitor<T> After(Size size) { return this; }
 
-        protected virtual Visitor<T> AfterCond()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
-        protected virtual Visitor<T> AfterThen(Size theSize)
-        {
-            NotImplementedMethod(theSize);
-            return null;
-        }
-
-        protected virtual Visitor<T> AfterElse()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
         internal virtual T List(List visitedObject)
         {
             var visitor = this;
             var data = visitedObject.Data;
-            var newList = new List<T>();
-            foreach (var element in data)
+            var newList = new T[data.Length];
+            for(var index = 0; index < data.Length; index++)
             {
-                var newElement = element.Visit(visitor);
-                newList.Add(newElement);
-                visitor = visitor.AfterAny(element.Size);
+                var codeBase = data[index];
+                newList[index] = codeBase.Visit(visitor);
+                visitor = visitor.AfterAny(codeBase.Size);
             }
             return visitor.List(visitedObject, newList);
         }
 
-        protected virtual T List(List visitedObject, List<T> newList) 
+        protected virtual T List(List visitedObject, IEnumerable<T> newList) 
         {
             NotImplementedMethod(visitedObject, newList);
             return default(T);
@@ -94,23 +80,17 @@ namespace Reni.Code
 
         internal abstract T Default();
 
-        internal virtual T LocalVariables(LocalVariables visitedObject)
+        internal virtual FiberItem ThenElse(ThenElse visitedObject)
         {
-            var visitor = this;
-            var data = visitedObject.Data;
-            var newList = new List<T>();
-            foreach (var element in data)
-            {
-                var newElement = element.Visit(visitor);
-                newList.Add(newElement);
-            }
-            return visitor.LocalVariables(visitedObject, newList);
+            var newThen = visitedObject.ThenCode.Visit(this);
+            var newElse = visitedObject.ElseCode.Visit(this);
+            return ThenElse(visitedObject, newThen, newElse);
         }
 
-        protected virtual T LocalVariables(LocalVariables visitedObject, List<T> newList)
+        protected virtual FiberItem ThenElse(ThenElse visitedObject, T newThen, T newElse)
         {
-            NotImplementedMethod(visitedObject, newList);
-            return default(T);
+            NotImplementedMethod(visitedObject, newThen, newElse);
+            return null;
         }
     }
 }

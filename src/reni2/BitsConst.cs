@@ -179,6 +179,8 @@ namespace Reni
             return xResult;
         }
 
+        public BitsConst Minus(BitsConst right, Size size) { return Plus(right*-1, size); }
+
         public BitsConst Equal(BitsConst right, Size size)
         {
             if(AsInteger == right.AsInteger)

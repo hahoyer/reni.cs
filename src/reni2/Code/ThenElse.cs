@@ -58,8 +58,9 @@ namespace Reni.Code
 
         internal override Size InputSize { get { return _condSize; } }
         internal override Size OutputSize { get { return ThenCode.Size; } }
-
+        protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ThenElse(this); }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.ThenElse(_condSize, ThenCode, ElseCode); }
+        internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse) { return new ThenElse(_condSize, newThen ?? ThenCode, newElse ?? ElseCode); }
     }
 
     [Serializable]
@@ -123,6 +124,7 @@ namespace Reni.Code
         {
             _thenCode = thenCode;
             _bitArrayBinaryOp = bitArrayBinaryOp;
+
         }
 
         internal override Size InputSize { get { return _bitArrayBinaryOp.DeltaSize + _bitArrayBinaryOp.OutputSize; } }

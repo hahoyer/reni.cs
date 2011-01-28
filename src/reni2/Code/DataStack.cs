@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using JetBrains.Annotations;
@@ -136,6 +137,11 @@ namespace Reni.Code
 
         void IFormalMaschine.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextRefInContainer(context); }
 
+        void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize)
+        {
+            Locals.Add(holderName, Pull(valueSize));
+        }
+
         private void SubExecute(string tag, IFormalCodeItem codeBase)
         {
             const string stars = "\n******************************\n";
@@ -151,19 +157,6 @@ namespace Reni.Code
         }
 
         private bool IsTraceEnabled { get { return _isTraceEnabled; } }
-
-        void IFormalMaschine.LocalVariables(string holderNamePattern, CodeBase[] data)
-        {
-            var index = 0;
-            foreach (var codeBase in data)
-            {
-                var holderName = string.Format(holderNamePattern, index);
-                SubExecute(holderName + " =", codeBase);
-                var top = Pull(codeBase.Size);
-                Locals.Add(holderName, top);
-                index++;
-            }
-        }
 
         void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
         {

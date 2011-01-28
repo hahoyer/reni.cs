@@ -19,28 +19,26 @@ namespace Reni.Code.ReplaceVisitor
         internal override CodeBase ContextRef(ReferenceCode visitedObject) { return null; }
         internal override CodeBase LocalReference(LocalReference visitedObject) { return _internalRefs.Find(visitedObject); }
 
-        protected override Visitor<CodeBase> AfterCond() { return this; }
-        protected override Visitor<CodeBase> AfterElse() { return this; }
-
-        protected override CodeBase List(List visitedObject, List<CodeBase> newList)
+        protected override CodeBase List(List visitedObject, IEnumerable<CodeBase> newList)
         {
             if (newList.All(x => x == null))
                 return null;
             return Code.List.Create(newList.Select((x, i) => x ?? visitedObject.Data[i]));
         }
 
-        protected override CodeBase LocalVariables(LocalVariables visitedObject, List<CodeBase> newList)
+        protected override FiberItem ThenElse(ThenElse visitedObject, CodeBase newThen, CodeBase newElse)
         {
-            if (newList.All(x => x == null))
+            if (newThen == null && newElse == null)
                 return null;
-            return new LocalVariables(visitedObject.HolderNamePattern,newList.Select((x, i) => x ?? visitedObject.Data[i]));
+            return visitedObject.ReCreate(newThen, newElse);
         }
 
-        protected override Visitor<CodeBase> AfterThen(Size theSize) { return this; }
-
-        protected override CodeBase Fiber(Fiber visitedObject, CodeBase head)
+        protected override CodeBase Fiber(Fiber visitedObject, CodeBase newHead, FiberItem[] newItems)
         {
-            return head == null ? null : head.CreateFiber(visitedObject.FiberItems);
+            if (newHead == null && newItems.All(x => x == null))
+                return null;
+
+            return visitedObject.ReCreate(newHead, newItems);
         }
 
         internal override CodeBase Default() { return null; }

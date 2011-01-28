@@ -52,7 +52,7 @@
     <Compile Include="Code\LocalReferenceSequenceVisitor.cs" />
     <Compile Include="Code\LocalStackReference.cs" />
     <Compile Include="Code\LocalVariableAccess.cs" />
-    <Compile Include="Code\LocalVariables.cs" />
+    <Compile Include="Code\LocalVariableDefinition.cs" />
     <Compile Include="Code\LocalVariableReference.cs" />
     <Compile Include="Code\Multiplyop.cs" />
     <Compile Include="Code\Op.cs" />

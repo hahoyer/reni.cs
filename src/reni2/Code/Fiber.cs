@@ -95,7 +95,16 @@ namespace Reni.Code
         {
             return actual.Fiber(this);
         }
-
+        [IsDumpEnabled(false)]
+        internal new bool HasArg
+        {
+            get
+            {
+                if (FiberHead.HasArg)
+                    return true;
+                return FiberItems.Any(x=>x.HasArg);
+            }
+        }
         protected override string CSharpString(Size top)
         {
             return CSharpGenerator.Fiber(top, ObjectId, _fiberItems, _fiberHead);
@@ -112,5 +121,12 @@ namespace Reni.Code
         }
 
         internal CodeBase List() { return Code.List.Create(this); }
+        
+        internal CodeBase ReCreate(CodeBase newHead, FiberItem[] newItems)
+        {
+            return (newHead ?? FiberHead)
+                .CreateFiber(newItems.Select((x, i) => x ?? FiberItems[i]));
+        }
+
     }
 }

@@ -43,7 +43,7 @@ namespace Reni.Code
                 for (; i < _data.Length - 1; i++)
                     newData[i] = _data[i];
                 newData[i] = _data[i].CreateFiber(subsequentElement);
-                return List.Create(newData);
+                return List(newData);
             }
             return null;
         }

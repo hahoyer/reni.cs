@@ -87,18 +87,25 @@ namespace Reni.Code
 
         internal virtual CodeBase Sequence(params CodeBase[] data)
         {
+            var extendedData = new CodeBase[data.Length + 1];
+            extendedData[0] = this;
+            data.CopyTo(extendedData,1);
+            return List(extendedData);
+        }
+
+        internal static CodeBase List(IEnumerable<CodeBase> data)
+        {
             var resultData = new List<CodeBase>();
-            resultData.AddRange(AsList());
             foreach(var codeBase in data)
                 resultData.AddRange(codeBase.AsList());
             switch(resultData.Count)
             {
                 case 0:
-                    return this;
+                    return Void();
                 case 1:
                     return resultData[0];
             }
-            return List.Create(resultData);
+            return Code.List.Create(resultData);
         }
 
         protected virtual IEnumerable<CodeBase> AsList() { return new[] {this}; }
@@ -316,11 +323,19 @@ namespace Reni.Code
             return x.Aggregate(CodeBase.Void(), (code, result) => code.Sequence(result));
         }
 
-        internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> x, string holderPattern)
+        internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern)
         {
-            if (x.ToArray().Length == 0)
+            if (codeBases.ToArray().Length == 0)
                 return CodeBase.Void();
-            return new LocalVariables(holderPattern, x);
+
+            return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x)));
+        }
+
+        private static CodeBase LocalVariableDefinition(string holderName, CodeBase value)
+        {
+            return value.CreateFiber(new LocalVariableDefinition(holderName, value.Size));
         }
     }
+
+
 }

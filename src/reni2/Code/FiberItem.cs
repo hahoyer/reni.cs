@@ -22,6 +22,21 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal Size DeltaSize { get { return OutputSize - InputSize; } }
 
+        [IsDumpEnabled(false)]
+        public override string NodeDump { get { return base.NodeDump + DumpSignature; } }
+
+        [IsDumpEnabled(false)]
+        private string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }
+
+        [IsDumpEnabled(false)]
+        internal virtual RefAlignParam RefAlignParam { get { return null; } }
+
+        [IsDumpEnabled(false)]
+        internal Refs Refs { get { return GetRefsImplementation(); } }
+
+        [IsDumpEnabled(false)]
+        internal virtual bool HasArg { get { return false; } }
+
         internal string ReversePolish(Size top)
         {
             return CSharpCodeSnippet(top) + ";\n";
@@ -32,7 +47,6 @@ namespace Reni.Code
             NotImplementedMethod(top);
             return null;
         }
-
 
         internal virtual FiberItem[] TryToCombine(FiberItem subsequentElement) { return null; }
 
@@ -48,12 +62,9 @@ namespace Reni.Code
         internal virtual FiberItem[] TryToCombineBack(Dereference preceding) { return null; }
         internal virtual FiberItem[] TryToCombineBack(RefPlus precedingElement) { return null; }
 
+        internal FiberItem Visit<TResult>(Visitor<TResult> actual) { return VisitImplementation(actual); }
 
-        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual)
-        {
-            NotImplementedMethod(actual);
-            return default(TResult);
-        }
+        protected virtual FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return null; }
 
         protected abstract void Execute(IFormalMaschine formalMaschine);
 
@@ -62,16 +73,6 @@ namespace Reni.Code
             Execute(formalMaschine);
         }
 
-        [IsDumpEnabled(false)]
-        public override string NodeDump { get { return base.NodeDump + DumpSignature; } }
-
-        [IsDumpEnabled(false)]
-        private string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }
-
-        [IsDumpEnabled(false)]
-        internal virtual RefAlignParam RefAlignParam { get { return null; } }
-
-        internal Refs Refs { get { return GetRefsImplementation(); } }
         protected virtual Refs GetRefsImplementation() { return Refs.None(); }
     }
 
