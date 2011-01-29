@@ -466,7 +466,7 @@ namespace Reni
 
         internal Result ReplaceObjectRefByArg(RefAlignParam refAlignParam, TypeBase objectType)
         {
-            return objectType.ReplaceObjectRefByArg(this, refAlignParam);
+            return objectType.ReplaceObjectReferenceByArg(this, refAlignParam);
         }
 
         internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, CodeBase replacement)
@@ -617,10 +617,16 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        public Result LocalReferenceResult(RefAlignParam refAlignParam) {
+        internal Result LocalReferenceResult(RefAlignParam refAlignParam)
+        {
             return Type
                 .LocalReferenceResult(CompleteCategory, refAlignParam)
                 .ReplaceArg(this);
+        }
+
+        internal Result ReplaceContextReferenceByArg(Struct.Context context)
+        {
+            return ReplaceAbsolute(context.ForCode, () => context.ContextReferenceAsArg(CompleteCategory));
         }
     }
 

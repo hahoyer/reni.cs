@@ -9,7 +9,7 @@ using Reni.Context;
 namespace Reni.Struct
 {
     [Serializable]
-    internal sealed class FullContext : Context
+    internal sealed class FullContext : Context, IReferenceInCode
     {
         private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache;
 
@@ -19,8 +19,11 @@ namespace Reni.Struct
             _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>(position => new ContextAtPosition(Context, position));
         }
 
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        bool IReferenceInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }
+
         [IsDumpEnabled(false)]
-        protected override IReferenceInCode ForCode { get { return this; } }
+        internal override IReferenceInCode ForCode { get { return this; } }
 
         protected override int Position { get { return StatementList.Count; } }
 
@@ -31,5 +34,7 @@ namespace Reni.Struct
 
         [IsDumpEnabled(false)]
         private FullContext Context { get { return this; } }
+        
+
     }
 }

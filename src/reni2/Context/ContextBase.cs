@@ -151,7 +151,7 @@ namespace Reni.Context
             if(result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
                 return Result(category, syntax);
 
-            return result.Type.LocalReferenceResult(category, RefAlignParam).ReplaceArg(result);
+            return result.LocalReferenceResult(RefAlignParam);
         }
 
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Type.Reference target)
@@ -207,7 +207,7 @@ namespace Reni.Context
 
         private Result SuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
-            var trace = ObjectId == -14 && defineable.ObjectId == 52 && category.HasType;
+            var trace = ObjectId == -5 && defineable.ObjectId == 4 && category.HasCode;
             StartMethodDumpWithBreak(trace,category,left,defineable);
             var suffixResult = Type(left)
                 .GetSuffixResult(category, defineable);
@@ -219,7 +219,8 @@ namespace Reni.Context
 
             var leftResult = Result(category, left);
             DumpWithBreak(trace,"suffixResult",suffixResult,"leftResult",leftResult);
-            return ReturnMethodDumpWithBreak(trace, suffixResult.ReplaceArg(leftResult));
+            var result = suffixResult.ReplaceArg(leftResult);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
 
         private IContextFeature SearchDefinable(Defineable defineable)

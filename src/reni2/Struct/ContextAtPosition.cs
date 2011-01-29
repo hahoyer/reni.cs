@@ -21,7 +21,7 @@ namespace Reni.Struct
         }
 
         [IsDumpEnabled(false)]
-        protected override IReferenceInCode ForCode { get { return _context; } }
+        internal override IReferenceInCode ForCode { get { return _context; } }
 
         [Node]
         protected override int Position { get { return _position; } }

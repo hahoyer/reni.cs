@@ -13,9 +13,9 @@ namespace Reni.Code
         public override string Message { get { return Tracer.Dump(this); } }
     }
 
-    internal sealed class UnexpectedContextRefInContainer : CodeBaseException
+    internal sealed class UnexpectedContextReference : CodeBaseException
     {
-        internal UnexpectedContextRefInContainer(IReferenceInCode container)
+        internal UnexpectedContextReference(IReferenceInCode container)
             : base(container) { }
     }
 }

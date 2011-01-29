@@ -4,10 +4,10 @@ using Reni.Context;
 
 namespace Reni.Type
 {
-    internal class ObjectReference: ReniObject, IReferenceInCode
+    internal sealed class ObjectReference: ReniObject, IReferenceInCode
     {
         private static int _nextObjectId;
-        [IsDumpEnabled(true)]
+        [IsDumpEnabled]
         private readonly TypeBase _objectType;
         [IsDumpEnabled(false)]
         private readonly RefAlignParam _refAlignParam;
@@ -17,7 +17,7 @@ namespace Reni.Type
         {
             _objectType = objectType;
             _refAlignParam = refAlignParam;
-            StopByObjectId(-4);
+            StopByObjectId(-1);
         }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return _refAlignParam; } }

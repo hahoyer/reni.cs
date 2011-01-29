@@ -9,14 +9,14 @@ namespace Reni.Struct
 {
     internal sealed class AssignmentFeature : ReniObject, IFunctionalFeature
     {
-        [IsDumpEnabled(true)]
-        private readonly Field _type;
+        [IsDumpEnabled]
+        private readonly Reference _referenceType;
 
-        public AssignmentFeature(Field type) { _type = type; }
+        internal AssignmentFeature(Reference referenceType) { _referenceType = referenceType; }
 
         Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
-        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _type.ApplyAssignment(category, argsType); }
-        string IDumpShortProvider.DumpShort() { return _type.DumpShort() + " :="; }
+        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _referenceType.ApplyAssignment(category, argsType); }
+        string IDumpShortProvider.DumpShort() { return _referenceType.DumpShort() + " :="; }
     }
 }

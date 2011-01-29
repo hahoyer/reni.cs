@@ -8,7 +8,7 @@ namespace Reni.FeatureTest.Struct
     /// Structure, that is all between brackets
     /// </summary>
     [TestFixture]
-    public class OldStyle : CompilerTest
+    public sealed class OldStyle : CompilerTest
     {
         /// <summary>
         /// Access to elements of a structure.
@@ -72,7 +72,7 @@ namespace Reni.FeatureTest.Struct
     }
 
     [TestFixture, InnerAccess]
-    public class PropertyVariable: CompilerTest{
+    public sealed class PropertyVariable: CompilerTest{
         protected override string Target { get { return @"! property x: 11/\; x dump_print"; } }
         protected override string Output { get { return "11"; } }
     
@@ -82,6 +82,13 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture, InnerAccess]
     [TargetSet(@"(10, (this _A_T_ 0) := 4) dump_print", "(4, )")]
+    public sealed class SimpleAssignment : CompilerTest
+    {
+        [Test, Category(Worked)]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
     [TargetSet(@"(10,20, (this _A_T_ 0) := 4) dump_print", "(4, 20, )")]
     [TargetSet(@"(10,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
     [TargetSet(@"(10,20, (this _A_T_ 1) := 4) dump_print", "(10, 4, )")]
@@ -93,7 +100,8 @@ namespace Reni.FeatureTest.Struct
     [TargetSet(@"(10,2000,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
     [TargetSet(@"(10,2000,30, (this _A_T_ 2) := 4) dump_print", "(10, 2000, 4, )")]
     [TargetSet(@"(3, (this _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
-    public class Assignment : CompilerTest
+    [SimpleAssignment]
+    public sealed class Assignment : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
@@ -146,7 +154,7 @@ x4 dump_print;
     [TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a b dump_print","222")]
     [TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a c dump_print", "4")]
     [InnerAccess]
-    public class AccessMember : CompilerTest
+    public sealed class AccessMember : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }

@@ -7,7 +7,7 @@ using Reni.Parser.TokenClass;
 
 namespace Reni
 {
-    internal class ChildSearchVisitor<TFeature, TType> : SearchVisitor<ISearchPath<TFeature, TType>>
+    internal sealed class ChildSearchVisitor<TFeature, TType> : SearchVisitor<ISearchPath<TFeature, TType>>
         where TFeature : class
         where TType : IDumpShortProvider
     {

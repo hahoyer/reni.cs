@@ -135,7 +135,7 @@ namespace Reni.Code
             }
         }
 
-        void IFormalMaschine.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextRefInContainer(context); }
+        void IFormalMaschine.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextReference(context); }
 
         void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize)
         {

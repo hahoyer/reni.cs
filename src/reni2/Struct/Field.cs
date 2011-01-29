@@ -11,19 +11,17 @@ namespace Reni.Struct
 {
     internal sealed class Field : TypeBase, IAccessType
     {
-        [IsDumpEnabled(true)]
+        [IsDumpEnabled]
         private readonly Context _context;
-        [IsDumpEnabled(true)]
+        [IsDumpEnabled]
         private readonly int _position;
         private readonly SimpleCache<TypeBase> _valueTypeCache;
-        private readonly AssignmentFeature _assignmentFeature;
 
         public Field(Context context, int position)
         {
             _context = context;
             _position = position;
             _valueTypeCache = new SimpleCache<TypeBase>(GetValueType);
-            _assignmentFeature = new AssignmentFeature(this);
         }
 
         internal Result DumpPrintResult(Category category)
@@ -70,31 +68,6 @@ namespace Reni.Struct
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
-        internal Result ApplyAssignment(Category category, TypeBase argsType)
-        {
-            var result = Void
-                .Result
-                (
-                    category,
-                    () => CodeBase.Arg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, ValueType.Size)
-                );
-
-            if (!category.HasCode && !category.HasRefs)
-                return result;
-
-            var sourceResult = argsType.ConvertTo(category | Category.Type, ValueType).LocalReferenceResult(RefAlignParam);
-            var destinationResult = TargetReferenceResult(category);
-            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
-            return result.ReplaceArg(objectAndSourceRefs);
-        }
-
-        internal Result ApplyAssignment(Category category)
-        {
-            return ValueTypeReference
-                .FunctionalType(_assignmentFeature)
-                .ArgResult(category);
-        }
-
         private Result AccessResult(Category category)
         {
             return ValueTypeReference
@@ -112,12 +85,6 @@ namespace Reni.Struct
                 .ContextReferenceType
                 .LocalReferenceCode()
                 .AddToReference(RefAlignParam, Offset, "GetAccessCode");
-        }
-
-        private Result TargetReferenceResult(Category category)
-        {
-            return ObjectRefInCode(category | Category.Type, RefAlignParam)
-                       .ConvertTo(ValueTypeReference) & category;
         }
 
         Result IAccessType.Result(Category category) { return AccessResult(category); }

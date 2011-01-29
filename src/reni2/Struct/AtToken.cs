@@ -13,7 +13,7 @@ namespace Reni.Struct
         public override Result Result(ContextBase callContext, Category category, ICompileSyntax left,
                                       ICompileSyntax right)
         {
-            var trace = left != null && left.GetObjectId() == 16822 && category.HasCode;
+            var trace = left != null && left.GetObjectId() == -24 && category.HasType;
             StartMethodDumpWithBreak(trace, callContext, category, left, right);
 
             var typeBase = callContext.Type(left);

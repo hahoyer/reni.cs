@@ -16,7 +16,7 @@ namespace Reni.Code
         internal ReferenceCode(IReferenceInCode context):base(_nextObjectId++)
         {
             _context = context;
-            StopByObjectId(-2);
+            StopByObjectId(2);
         }
 
         internal IReferenceInCode Context { get { return _context; } }

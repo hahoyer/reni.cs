@@ -16,6 +16,8 @@ namespace Reni.Code
             Tracer.Assert(!_data.Size.IsZero);
         }
 
+        protected override string Dump(bool isRecursion) { return _data.DumpValue(); }
+
         internal override BitsConst GetBitsConst() { return _data; }
         internal override Size Size { get { return GetBitsConst().Size; } }
     }

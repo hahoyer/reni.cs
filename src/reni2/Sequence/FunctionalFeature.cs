@@ -38,7 +38,7 @@ namespace Reni.Sequence
 
         Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            var objectResult = _parent.ObjectRefInCode(category|Category.Type,refAlignParam);
+            var objectResult = _parent.ObjectReferenceInCode(category|Category.Type,refAlignParam);
             var result = Apply(category, objectResult.Type.SequenceCount(_parent.Element), argsType.SequenceCount(_parent.Element));
             var convertedObjectResult = objectResult.ConvertToBitSequence(category);
             var convertedArgsResult = argsType.ConvertToBitSequence(category);

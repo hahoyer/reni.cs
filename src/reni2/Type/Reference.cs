@@ -5,31 +5,34 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
+using Reni.Struct;
 
 namespace Reni.Type
 {
     internal sealed class Reference: TypeBase
     {
         private static int _nextObjectId;
-        private readonly TypeBase _value;
+        private readonly TypeBase _valueType;
         private readonly RefAlignParam _refAlignParam;
         private readonly SimpleCache<TypeType> _typeTypeCache;
+        private readonly AssignmentFeature _assignmentFeature;
 
-        internal Reference(TypeBase value, RefAlignParam refAlignParam)
+        internal Reference(TypeBase valueType, RefAlignParam refAlignParam)
             :base(_nextObjectId++)
         {
-            Tracer.Assert(!(value is Reference));
-            _value = value;
+            Tracer.Assert(!(valueType is Reference));
+            _valueType = valueType;
             _refAlignParam = refAlignParam;
             _typeTypeCache = new SimpleCache<TypeType>(() => new TypeType(this));
+            _assignmentFeature = new AssignmentFeature(this);
         }
 
         internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        internal TypeBase Value { get { return _value; } }
+        internal TypeBase ValueType { get { return _valueType; } }
 
         [IsDumpEnabled(false)]
-        internal TypeBase AlignedTarget { get { return _value.Align(RefAlignParam.AlignBits); } }
+        internal TypeBase AlignedTarget { get { return _valueType.Align(RefAlignParam.AlignBits); } }
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
@@ -40,28 +43,29 @@ namespace Reni.Type
         }
 
         internal override string DumpPrintText { get { return DumpShort(); } }
-        internal override string DumpShort() { return "reference(" + _value.DumpShort() + ")"; }
-        internal override int SequenceCount(TypeBase elementType) { return _value.SequenceCount(elementType); }
-        internal override IFunctionalFeature FunctionalFeature() { return Value.FunctionalFeature(); }
-        internal override TypeBase ObjectType() { return Value.ObjectType(); }
-        internal override bool IsRefLike(Reference target) { return Value == target.Value && RefAlignParam == target.RefAlignParam; }
+        internal override string DumpShort() { return "reference(" + _valueType.DumpShort() + ")"; }
+        internal override int SequenceCount(TypeBase elementType) { return _valueType.SequenceCount(elementType); }
+        internal override IFunctionalFeature FunctionalFeature() { return ValueType.FunctionalFeature(); }
+        internal override TypeBase ObjectType() { return ValueType.ObjectType(); }
+        protected override bool IsRefLike(Reference target) { return ValueType == target.ValueType && RefAlignParam == target.RefAlignParam; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            _value.Search(searchVisitor.Child(this));
-            _value.Search(searchVisitor);
+            _valueType.Search(searchVisitor.Child(this));
+            _valueType.Search(searchVisitor);
             base.Search(searchVisitor);
         }
 
-        internal override Struct.Context GetStruct() { return _value.GetStruct(); }
+        internal override Struct.Context GetStruct() { return _valueType.GetStruct(); }
 
-        protected override bool IsReferenceTo(TypeBase value) { return Value == value; }
+        protected override bool IsReferenceTo(TypeBase value) { return ValueType == value; }
 
+        [IsDumpEnabled(false)]
         internal override RefAlignParam[] ReferenceChain
         {
             get
             {
-                var subResult = Value.ReferenceChain;
+                var subResult = ValueType.ReferenceChain;
                 var result = new RefAlignParam[subResult.Length + 1];
                 result[0] = RefAlignParam;
                 subResult.CopyTo(result, 1);
@@ -71,22 +75,22 @@ namespace Reni.Type
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
-            return _value.IsConvertableTo(dest, conversionParameter);
+            return _valueType.IsConvertableTo(dest, conversionParameter);
         }
 
         protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             var trace = ObjectId == -13 && category.HasCode && dest.ObjectId == 464;
             StartMethodDump(trace,category,dest);
-            var convertTo = _value.ConvertTo(category, dest);
+            var convertTo = _valueType.ConvertTo(category, dest);
             var dereferencedArgResult = DereferencedArgResult(category);
             DumpWithBreak(trace,"convertTo",convertTo,"dereferencedArgResult",dereferencedArgResult);
             return ReturnMethodDump(trace, convertTo.ReplaceArg(dereferencedArgResult));
         }
 
-        internal override TypeBase AutomaticDereference() { return _value.AutomaticDereference(); }
-        internal override TypeBase TypeForTypeOperator() { return _value.TypeForTypeOperator(); }
-        protected override TypeBase Dereference() { return Value; }
+        internal override TypeBase AutomaticDereference() { return _valueType.AutomaticDereference(); }
+        internal override TypeBase TypeForTypeOperator() { return _valueType.TypeForTypeOperator(); }
+        protected override TypeBase Dereference() { return ValueType; }
         protected override Result DereferenceResult(Category category) { return DereferencedArgResult(category); }
 
         internal CodeBase LocalReferenceCode() { return LocalReferenceCode(RefAlignParam).Dereference(RefAlignParam, Size); }
@@ -94,9 +98,45 @@ namespace Reni.Type
         [IsDumpEnabled(false)]
         internal TypeType TypeType { get { return _typeTypeCache.Value; } }
 
-        private Result DereferencedArgResult(Category category) { return _value.Result(category, DereferencedArgCode); }
-        private CodeBase DereferencedArgCode() { return CodeBase.Arg(Size).Dereference(RefAlignParam, _value.Size); }
-        private Result ObjectRefInCode(Category category) { return Value.ObjectRefInCode(category, RefAlignParam); }
+        private Result DereferencedArgResult(Category category) { return _valueType.Result(category, DereferencedArgCode); }
+        private CodeBase DereferencedArgCode() { return CodeBase.Arg(Size).Dereference(RefAlignParam, _valueType.Size); }
 
+        internal Result ApplyAssignment(Category category)
+        {
+            return FunctionalType(_assignmentFeature)
+                .ArgResult(category);
+        }
+
+        internal Result ApplyAssignment(Category category, TypeBase argsType)
+        {
+            var result = Void
+                .Result
+                (
+                    category,
+                    () => CodeBase.Arg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, ValueType.Size)
+                );
+
+            if (!category.HasCode && !category.HasRefs)
+                return result;
+
+            var sourceResult = argsType
+                .ConvertTo(category | Category.Type, ValueType)
+                .LocalReferenceResult(RefAlignParam);
+            var destinationResult = ObjectReferenceInCode(category | Category.Type, RefAlignParam)
+                & category;
+            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
+            return result.ReplaceArg(objectAndSourceRefs);
+        }
+
+        internal override Result ReferenceInCode(Function function, Category category)
+        {
+            return Result
+                (
+                    category,
+                    () => CodeBase.ReferenceInCode(function).Dereference(function.RefAlignParam, function.RefAlignParam.RefSize),
+                    () => Refs.Create(function)
+                )
+                ;
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace Reni.Type
         {
             _functionalFeature = functionalFeature;
             _objectType = objectType;
-            StopByObjectId(-369);
+            StopByObjectId(-325);
         }
 
         Result IAccessType.Result(Category category) { return ArgResult(category); }
