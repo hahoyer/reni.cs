@@ -14,7 +14,6 @@ namespace Reni.TokenClasses
         internal LeftParenthesis(int level)
         {
             _level = level;
-            Name = "^{[(";
         }
 
         [IsDumpEnabled(false)]
@@ -25,7 +24,5 @@ namespace Reni.TokenClasses
             Tracer.Assert(left == null);
             return new Syntax.LeftParenthesis(_level, token, right);
         }
-
-        protected override string PrioTableName(string name) { return _level == 0 ? "<frame>" : base.PrioTableName(name); }
     }
 }

@@ -11,8 +11,6 @@ namespace Reni.TokenClasses
 {
     internal sealed class Number : Terminal
     {
-        internal Number() { Name = "<number>"; }
-
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
             var bitsConst = BitsConst.Convert(token.Name);

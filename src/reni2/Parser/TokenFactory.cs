@@ -11,29 +11,75 @@ namespace Reni.Parser
     {
         private readonly SimpleCache<Dictionary<string, TTokenClass>> _tokenClasses;
         private readonly SimpleCache<PrioTable> _prioTable;
+        private readonly SimpleCache<TTokenClass> _listClass;
+        private readonly SimpleCache<TTokenClass> _numberClass;
+        private readonly DictionaryEx<int, TTokenClass> _leftParenthesis;
+        private readonly DictionaryEx<int, TTokenClass> _righParenthesis;
 
         internal TokenFactory()
         {
+            _leftParenthesis = new DictionaryEx<int, TTokenClass>(InternalGetLeftParenthesisClass);
+            _righParenthesis = new DictionaryEx<int, TTokenClass>(InternalGetRightParenthesisClass);
+            _numberClass = new SimpleCache<TTokenClass>(InternalGetNumberClass);
+            _listClass = new SimpleCache<TTokenClass>(InternalGetListClass);
             _prioTable = new SimpleCache<PrioTable>(GetPrioTable);
-            _tokenClasses = new SimpleCache<Dictionary<string, TTokenClass>>(GetTokenClasses);
-            foreach(var pair in _tokenClasses.Value)
+            _tokenClasses = new SimpleCache<Dictionary<string, TTokenClass>>(InternalGetTokenClasses);
+        }
+
+        private Dictionary<string, TTokenClass> InternalGetTokenClasses()
+        {
+            var result = GetTokenClasses();
+            foreach (var pair in result)
                 pair.Value.Name = pair.Key;
+            return result;
+        }
+
+        private TTokenClass InternalGetListClass()
+        {
+            var result = GetListClass();
+            result.Name = ",";
+            return result;
+        }
+
+        private TTokenClass InternalGetNumberClass()
+        {
+            var result = GetNumberClass();
+            result.Name = "<number>";
+            return result;
+        }
+
+        private TTokenClass InternalGetRightParenthesisClass(int i)
+        {
+            var result = GetRightParenthesisClass(i);
+            result.Name = i == 0 ? "<end>" : " }])".Substring(i,1);
+            return result;
+        }
+
+        private TTokenClass InternalGetLeftParenthesisClass(int i)
+        {
+            var result = GetLeftParenthesisClass(i);
+            result.Name = i == 0 ? "<frame>" : " {[(".Substring(i, 1);
+            return result;
         }
 
         ParserInst ITokenFactory.Parser { get { return new ParserInst(new Scanner(), this); } }
         PrioTable ITokenFactory.PrioTable { get { return _prioTable.Value; } }
+        
         ITokenClass ITokenFactory.TokenClass(string name)
         {
             TTokenClass result;
             if(TokenClasses.TryGetValue(name, out result))
                 return result;
-            return NewTokenClass(name);
+            result = NewTokenClass(name);
+            result.Name = name;
+            TokenClasses.Add(name,result);
+            return result;
         }
-        ITokenClass ITokenFactory.ListClass { get { return GetListClass(); } }
-        ITokenClass ITokenFactory.NumberClass { get { return GetNumberClass(); } }
 
-        ITokenClass ITokenFactory.RightParenthesisClass(int level) { return GetRightParenthesisClass(level);}
-        ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return GetLeftParenthesisClass(level); }
+        ITokenClass ITokenFactory.ListClass { get { return _listClass.Value; } }
+        ITokenClass ITokenFactory.NumberClass { get { return _numberClass.Value; } }
+        ITokenClass ITokenFactory.RightParenthesisClass(int level) { return _righParenthesis.Find(level);}
+        ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return _leftParenthesis.Find(level); }
 
         protected abstract TTokenClass NewTokenClass(string name);
         protected abstract PrioTable GetPrioTable();

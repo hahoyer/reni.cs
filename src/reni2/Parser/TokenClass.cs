@@ -16,7 +16,6 @@ namespace Reni.Parser
         protected TokenClass():base(_nextObjectId++) {  }
 
         string ITokenClass.Name { set { _name = value; } }
-        bool ITokenClass.IsEnd { get { return IsEnd; } }
         string ITokenClass.PrioTableName(string name) { return PrioTableName(name); }
         ITokenFactory ITokenClass.NewTokenFactory { get { return NewTokenFactory; } }
         IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return Syntax(left, token, right); }
@@ -28,8 +27,7 @@ namespace Reni.Parser
             return null;
         }
 
-        protected virtual bool IsEnd { get { return false; } }
-        protected virtual string PrioTableName(string name) { return name; }
+        protected virtual string PrioTableName(string name) { return Name; }
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
 
         [IsDumpEnabled(false)]

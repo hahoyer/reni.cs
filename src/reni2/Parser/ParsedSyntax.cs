@@ -28,12 +28,18 @@ namespace Reni.Parser
 
         string IParsedSyntax.DumpShort() { return DumpShort(); }
 
+        [IsDumpEnabled(false)]
         TokenData IParsedSyntax.Token { get { return Token; } }
+        [IsDumpEnabled(false)]
         TokenData IParsedSyntax.FirstToken { get { return GetFirstToken(); } }
+        [IsDumpEnabled(false)]
         TokenData IParsedSyntax.LastToken { get { return GetLastToken(); } }
 
+        [IsDumpEnabled(false)]
         internal TokenData Token { get { return _token; } }
+        [IsDumpEnabled(false)]
         internal TokenData FirstToken { get { return GetFirstToken(); } }
+        [IsDumpEnabled(false)]
         internal TokenData LastToken { get { return GetLastToken(); } }
 
         protected virtual TokenData GetFirstToken() { return Token; }

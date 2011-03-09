@@ -14,11 +14,7 @@ namespace Reni.TokenClasses
         internal RightParenthesis(int level)
         {
             _level = level;
-            Name = "$}])";
         }
-
-        protected override bool IsEnd { get { return _level == 0; } }
-        protected override string PrioTableName(string name) { return _level == 0 ? "<end>" : base.PrioTableName(name); }
 
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -27,7 +23,5 @@ namespace Reni.TokenClasses
                 return left.RightParenthesis(_level, token);
             return base.Syntax(left, token, right);
         }
-
-        internal int Level { get { return _level; } }
     }
 }

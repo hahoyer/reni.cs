@@ -43,7 +43,7 @@ namespace Reni.Parser
 
                     if(relation != '-')
                     {
-                        if(token.TokenClass.IsEnd)
+                        if(token.TokenClass == _tokenFactory.RightParenthesisClass(0))
                             return token.Syntax(result, null);
                         stack.Push(new PushedSyntax(result, token, token.TokenClass.NewTokenFactory ?? stack.Peek().TokenFactory));
                         result = null;
