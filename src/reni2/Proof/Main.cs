@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using HWClassLibrary.Debug;
-using Reni.Feature;
+using HWClassLibrary.Helper;
 using Reni.Parser;
-using Reni.Sequence;
 
 namespace Reni.Proof
 {
@@ -13,120 +13,259 @@ namespace Reni.Proof
         public static void Run()
         {
             var statement = new Holder(@"
-a € Integer & 
-b € Integer & 
-c € Integer & 
+a elem Integer & 
+b elem Integer & 
+c elem Integer & 
 a^2 + b^2 = c^2 &
-a ggt b = 1
+a gcd b = 1
 ");
             statement.Replace("a", "x+y");
         }
     }
 
-    internal sealed class Holder
+    internal abstract class ParsedSyntax : Parser.ParsedSyntax
     {
-        private static readonly ParserInst _parser = new ParserInst(new Scanner(), TokenFactory.Instance);
-        private readonly string _text;
+        protected ParsedSyntax(TokenData token)
+            : base(token) { }
 
-        public Holder(string text) { _text = text; }
+        protected ParsedSyntax(TokenData token, int nextObjectId)
+            : base(token, nextObjectId) { }
 
-        public void Replace(string target, string value) { throw new NotImplementedException(); }
-    }
-
-    internal abstract class TokenClass : Parser.TokenClass
-    {}
-
-    internal sealed class TokenFactory : TokenFactory<TokenClass>
-    {
-        internal static ITokenFactory Instance { get { return new TokenFactory(); } }
-
-        protected override TokenClass NewTokenClass(string name) { throw new NotImplementedException(); }
-
-        protected override PrioTable GetPrioTable()
+        internal ParsedSyntax Associative<TOperation>(TOperation operation, TokenData token, ParsedSyntax other)
+            where TOperation : IAssociative
         {
-            var x = PrioTable.Left("<common>");
-
-            x += PrioTable.Right("^");
-            x += PrioTable.Left("*", "/", "\\", "ggt", "kgv");
-            x += PrioTable.Left("+", "-");
-
-            x += PrioTable.Left("<", ">", "<=", ">=");
-            x += PrioTable.Left("=", "<>");
-
-            x += PrioTable.Left("€");
-            x += PrioTable.Left("&");
-            x += PrioTable.Left("|");
-
-            x = x.Level
-                (new[]
-                 {
-                     "++-",
-                     "+?-",
-                     "?--"
-                 },
-                 new[] {"(", "[", "{", "<frame>"},
-                 new[] {")", "]", "}", "<end>"}
-                );
-            return x;
+            var x1 = AssociativeSyntax.ListOf(operation, this);
+            var x2 = AssociativeSyntax.ListOf(operation, other);
+            if(x1.Apply(x => x2.Apply(y => !IsDistinct(x,y)).Contains(true)).Contains(true))
+            {
+                NotImplementedMethod(operation, token, other);
+                return null;
+            }
+            return new AssociativeSyntax(operation, token, x1 | x2);
         }
 
-        protected override Dictionary<string, TokenClass> GetTokenClasses()
+        internal static bool IsDistinct(ParsedSyntax x, ParsedSyntax y)
         {
-            var result =
-                new Dictionary<string, TokenClass>
-                {
-                    {"=", new Equal()},
-                    {">", new CompareOperator()},
-                    {">=", new CompareOperator()},
-                    {"<", new CompareOperator()},
-                    {"<=", new CompareOperator()},
-                    {"<>", new NotEqual()},
-                    {"-", new Sign()},
-                    {"!", new Exclamation()},
-                    {"+", new Sign()},
-                    {"/", new Slash()},
-                    {"*", new Star()},
-                    {"^", new Caret()},
-                    {"€", new EuroSign()},
-                    {"ggt", new GGT()},
-                    {"kgv", new KGV()},
-                    {"Integer", new Integer()},
-                    {"type", new TypeOperator()}
-                };
+            if(x.GetType() != y.GetType())
+                return true;
+            return x.IsDistinct(y);
+        }
+
+        protected virtual bool IsDistinct(ParsedSyntax other)
+        {
+            NotImplementedMethod(other);
+            return false;
+        }
+
+    }
+
+    internal sealed class AssociativeSyntax : ParsedSyntax
+    {
+        internal readonly IAssociative Operator;
+        internal readonly Set<ParsedSyntax> Set;
+
+        public AssociativeSyntax(IAssociative @operator, TokenData token, Set<ParsedSyntax> set)
+            : base(token)
+        {
+            Operator = @operator;
+            Set = set;
+        }
+
+        internal static Set<ParsedSyntax> ListOf(IAssociative associativeOperator, ParsedSyntax parsedSyntax)
+        {
+            var commutative = parsedSyntax as AssociativeSyntax;
+            if(commutative != null && commutative.Operator == associativeOperator)
+                return commutative.Set;
+            var result = new Set<ParsedSyntax>();
+            result.Add(parsedSyntax);
             return result;
         }
-
-        protected override TokenClass GetListClass() { throw new NotImplementedException(); }
-        protected override TokenClass GetRightParenthesisClass(int level) { throw new NotImplementedException(); }
-        protected override TokenClass GetLeftParenthesisClass(int level) { throw new NotImplementedException(); }
-        protected override TokenClass GetNumberClass() { throw new NotImplementedException(); }
     }
 
-    internal class EuroSign : TokenClass
+    internal interface IAssociative
     {}
+
+
+    internal sealed class Element : TokenClass, IPair
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            Tracer.Assert(left != null);
+            Tracer.Assert(right != null);
+
+            return new PairSyntax(this, left, token, right);
+        }
+    }
+
+    internal sealed class And : TokenClass, IAssociative
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            Tracer.Assert(left != null);
+            Tracer.Assert(right != null);
+
+            return left.Associative(this, token, right);
+        }
+    }
+
+    internal sealed class Sign : TokenClass, IAssociative
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            Tracer.Assert(left != null);
+            Tracer.Assert(right != null);
+
+            return left.Associative(this, token, right);
+        }
+    }
+
+    internal sealed class PairSyntax : ParsedSyntax
+    {
+        internal readonly IPair Operator;
+        internal readonly ParsedSyntax Left;
+        internal readonly ParsedSyntax Right;
+
+        internal PairSyntax(IPair @operator, ParsedSyntax left, TokenData token, ParsedSyntax right)
+            : base(token)
+        {
+            Operator = @operator;
+            Left = left;
+            Right = right;
+        }
+
+        protected override bool IsDistinct(ParsedSyntax other) { return IsDistinct((PairSyntax)other); }
+        private bool IsDistinct(PairSyntax other) { return other.Operator != Operator || IsDistinct(other.Left, Left) || IsDistinct(other.Right,Right); }
+    }
+
+    internal interface IPair
+    {}
+
+    internal sealed class UserSymbol : TokenClass
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            if(left != null || right != null)
+                return base.Syntax(left, token, right);
+            return new UserSymbolSyntax(token, Name);
+        }
+    }
+
+    internal sealed class UserSymbolSyntax : ParsedSyntax
+    {
+        internal readonly string Name;
+
+        public UserSymbolSyntax(TokenData token, string name)
+            : base(token) { Name = name; }
+
+        protected override bool IsDistinct(ParsedSyntax other) { return IsDistinct((UserSymbolSyntax)other); }
+        private bool IsDistinct(UserSymbolSyntax other) { return Name != other.Name; }
+    }
+
+    internal sealed class LeftParenthesis : TokenClass
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            Tracer.Assert(left == null);
+            return new LeftParenthesisSyntax(token, right);
+        }
+    }
+
+    internal sealed class RightParenthesis : TokenClass
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            Tracer.Assert(right == null);
+            var leftParenthesisSyntax = left as LeftParenthesisSyntax;
+            Tracer.Assert(leftParenthesisSyntax != null);
+            Tracer.Assert(leftParenthesisSyntax.Right != null);
+            return leftParenthesisSyntax.Right;
+        }
+    }
+
+    internal sealed class LeftParenthesisSyntax : ParsedSyntax
+    {
+        public readonly ParsedSyntax Right;
+
+        public LeftParenthesisSyntax(TokenData token, ParsedSyntax right)
+            : base(token) { Right = right; }
+
+    }
 
     internal class TypeOperator : TokenClass
     {}
 
-    internal class Integer : TokenClass
-    {}
+    internal sealed class Integer : TokenClass
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            if(left != null || right != null)
+                return base.Syntax(left, token, right);
+            return new IntegerSyntax(token);
+        }
+    }
+
+    internal sealed class IntegerSyntax : ParsedSyntax
+    {
+        public IntegerSyntax(TokenData token)
+            : base(token) { }
+    }
+
+    internal sealed class Number : TokenClass
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            if(left != null || right != null)
+                return base.Syntax(left, token, right);
+            return new NumberSyntax(token);
+        }
+    }
+
+    internal sealed class NumberSyntax : ParsedSyntax
+    {
+        internal BigInteger Value;
+
+        internal NumberSyntax(TokenData token)
+            : base(token) { Value = BigInteger.Parse(token.Name); }
+    }
+
+    internal sealed class Equal : TokenClass, IPair
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            Tracer.Assert(left != null);
+            Tracer.Assert(right != null);
+
+            return new PairSyntax(this, left, token, right);
+        }
+    }
+    internal sealed class GreatesCommonDenominator : TokenClass, IPair
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            Tracer.Assert(left != null);
+            Tracer.Assert(right != null);
+
+            return new PairSyntax(this, left, token, right);
+        }
+    }
+
+    internal sealed class Caret : TokenClass, IPair
+    {
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            if(left == null || right == null)
+                return base.Syntax(left, token, right);
+            return new PairSyntax(this, left, token, right);
+        }
+    }
 
     internal class KGV : TokenClass
-    {}
-
-    internal class GGT : TokenClass
-    {}
-
-    internal class Caret : TokenClass
-    {}
+    { }
 
     internal class Star : TokenClass
     {}
 
     internal class Slash : TokenClass
-    {}
-
-    internal class Sign : TokenClass
     {}
 
     internal class Exclamation : TokenClass
@@ -138,6 +277,4 @@ a ggt b = 1
     internal class CompareOperator : TokenClass
     {}
 
-    internal class Equal : TokenClass
-    {}
 }
