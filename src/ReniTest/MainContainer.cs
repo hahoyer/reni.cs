@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using HWClassLibrary.Helper;
+using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
-using Reni.FeatureTest;                   
-using Reni.FeatureTest.BitArrayOp;
+using Reni.FeatureTest;
 using Reni.FeatureTest.Function;
-using Reni.FeatureTest.Integer;
-using Reni.FeatureTest.Struct;
-using Reni.FeatureTest.ThenElse;
 
 namespace ReniTest
 {
@@ -23,24 +19,23 @@ namespace ReniTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            
+
             //TestGenerated.Exec();
+
             //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
             //RunSpecificTest();
-            TestRunner.IsModeErrorFocus = true;
-            Assembly.GetExecutingAssembly().RunTests();
+            //TestRunner.IsModeErrorFocus = true;
+            //Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
+            Reni.Proof.Main.Run();
         }
 
         [Test, Category(CompilerTest.UnderConstruction)]
-        private static void RunSpecificTest()
-        {
-            new FunctionWithNonLocal().Run();
-        }
+        private static void RunSpecificTest() { new FunctionWithNonLocal().Run(); }
 
         private const string Target = @"! property x: 11/\; x dump_print";
-        const string Output = "11";
-        private static void InspectCompiler() { Application.Run(new TreeForm { Target = CreateCompiler(Target) }); }
+        private const string Output = "11";
+        private static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
 
         private static Compiler CreateCompiler(string text)
         {
