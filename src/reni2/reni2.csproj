@@ -225,8 +225,6 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Parser\TokenClass\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="sys.targets" />
 </Project>
