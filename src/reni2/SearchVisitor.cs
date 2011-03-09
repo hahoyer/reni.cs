@@ -3,7 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using JetBrains.Annotations;
-using Reni.Parser.TokenClass;
+using Reni.ReniParser.TokenClasses;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni
@@ -13,7 +14,7 @@ namespace Reni
         void ISearchVisitor.Search() { SearchTypeBase(); }
         void ISearchVisitor.ChildSearch<TType>(TType target) { InternalChild(target).Search(); }
         ISearchVisitor ISearchVisitor.Child(Type.Sequence target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Struct.Field target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(Field target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Reference target) { return InternalChild(target); }
         internal abstract void SearchTypeBase();
         protected abstract ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider;
@@ -34,7 +35,7 @@ namespace Reni
             var searchResult = new SearchResult<TFeature>(typeBase, this);
             _searchResults.Add(searchResult);
 
-            if (IsSuccessFull)
+            if(IsSuccessFull)
                 return;
 
             searchResult.SetSearchMode();

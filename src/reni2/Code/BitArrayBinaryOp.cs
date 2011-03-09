@@ -3,7 +3,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.Helper;
 using Reni.Context;
-using Reni.Parser.TokenClass;
+using Reni.Parser.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Code

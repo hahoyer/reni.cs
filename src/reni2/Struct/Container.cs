@@ -8,19 +8,20 @@ using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
+using Reni.ReniParser;
+using Reni.ReniParser.TokenClasses;
 using Reni.Syntax;
 
 namespace Reni.Struct
 {
     /// <summary>
-    /// Structured data, context free version
+    ///     Structured data, context free version
     /// </summary>
     [Serializable]
     internal sealed class Container : CompileSyntax, IDumpShortProvider
     {
-        private readonly Token _firstToken;
-        private readonly Token _lastToken;
+        private readonly TokenData _firstToken;
+        private readonly TokenData _lastToken;
         private static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
         private static bool _isInsideFileDump;
@@ -39,11 +40,11 @@ namespace Reni.Struct
         [Node, SmartNode]
         internal readonly List<string> Properties = new List<string>();
 
-        protected override Token GetFirstToken() { return _firstToken; }
+        protected override TokenData GetFirstToken() { return _firstToken; }
 
-        protected override Token GetLastToken() { return _lastToken; }
+        protected override TokenData GetLastToken() { return _lastToken; }
 
-        private Container(Token leftToken, Token rightToken)
+        private Container(TokenData leftToken, TokenData rightToken)
             : base(leftToken, _nextObjectId++)
         {
             _firstToken = leftToken;
@@ -61,20 +62,14 @@ namespace Reni.Struct
             }
         }
 
-        protected internal override Result Result(ContextBase context, Category category)
-        {
-            return context.CreateStruct(this).ConstructorResult(category);
-        }
+        protected internal override Result Result(ContextBase context, Category category) { return context.CreateStruct(this).ConstructorResult(category); }
 
-        protected override ICompileSyntax ToCompiledSyntax() { return this; }
+        internal override ICompileSyntax ToCompiledSyntax() { return this; }
 
         [IsDumpEnabled(false)]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
 
-        protected internal override string DumpShort()
-        {
-            return "container." + ObjectId;
-        }
+        internal override string DumpShort() { return "container." + ObjectId; }
 
         private void CreateReverseDictionary()
         {
@@ -83,45 +78,42 @@ namespace Reni.Struct
                 _reverseDictionaryCache[pair.Value] = pair.Key;
         }
 
-        internal static Container Create(Token leftToken, Token rightToken, List<IParsedSyntax> parsed)
+        internal static Container Create(TokenData leftToken, TokenData rightToken, List<IParsedSyntax> parsed)
         {
             var result = new Container(leftToken, rightToken);
-            for(var index = 0; index < parsed.Count; index++)
-                result.Add(parsed[index]);
+            foreach(var parsedSyntax in parsed)
+                result.Add(parsedSyntax);
             return result;
         }
 
-        internal static Container Create(Token leftToken, Token rightToken, IParsedSyntax parsedSyntax)
+        internal static Container Create(TokenData leftToken, TokenData rightToken, ReniParser.ParsedSyntax parsedSyntax)
         {
             var result = new Container(leftToken, rightToken);
             result.Add(parsedSyntax);
             return result;
         }
 
-        internal static Container Create(IParsedSyntax parsedSyntax)
-        {
-            return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax);
-        }
+        internal static Container Create(ReniParser.ParsedSyntax parsedSyntax) { return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax); }
 
         private void Add(IParsedSyntax parsedSyntax)
         {
             while(parsedSyntax is DeclarationSyntax)
             {
                 var d = (DeclarationSyntax) parsedSyntax;
-                Dictionary.Add(d.Name.Name, List.Count);
+                Dictionary.Add(d.Defineable.Name, List.Count);
                 parsedSyntax = d.Definition;
                 if(d.IsProperty)
-                    Properties.Add(d.Name.Name);
+                    Properties.Add(d.Defineable.Name);
             }
 
             if(parsedSyntax is ConverterSyntax)
             {
                 var body = ((ConverterSyntax) parsedSyntax).Body;
-                parsedSyntax = (IParsedSyntax) body;
+                parsedSyntax = (ReniParser.ParsedSyntax) body;
                 Converters.Add(List.Count);
             }
 
-            List.Add(parsedSyntax.ToCompiledSyntax());
+            List.Add(((ReniParser.ParsedSyntax) parsedSyntax).ToCompiledSyntax());
         }
 
         public override string DumpData()
@@ -157,37 +149,26 @@ namespace Reni.Struct
             return result;
         }
 
-        string IDumpShortProvider.DumpShort()
-        {
-            return DumpShort();
-        }
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         private IStructFeature FindStructFeature(string name)
         {
-            if (Dictionary.ContainsKey(name))
+            if(Dictionary.ContainsKey(name))
                 return new StructFeature(Dictionary[name], Properties.Contains(name));
             return null;
         }
 
-        internal ISearchPath<IFeature, Type> SearchFromRefToStruct(Defineable defineable)
-        {
-            return FindStructFeature(defineable.Name);
-        }
+        internal ISearchPath<IFeature, Type> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
 
-        internal ISearchPath<IContextFeature, Context> SearchFromStructContext(Defineable defineable)
-        {
-            return FindStructFeature(defineable.Name);
-        }
-
+        internal ISearchPath<IContextFeature, Context> SearchFromStructContext(Defineable defineable) { return FindStructFeature(defineable.Name); }
     }
 
     internal interface IStructFeature
         : ISearchPath<IContextFeature, Context>, ISearchPath<IFeature, Type>
-    {
-    }
+    {}
 
     [Serializable]
-    internal class StructFeature : ReniObject, IStructFeature
+    internal sealed class StructFeature : ReniObject, IStructFeature
     {
         private readonly int _index;
         private readonly bool _isProperty;

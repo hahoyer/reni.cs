@@ -1,4 +1,5 @@
 using Reni.Parser;
+using Reni.ReniParser;
 
 namespace Reni.Syntax
 {
@@ -21,7 +22,7 @@ namespace Reni.Syntax
         public string FilePosition()
         {
             if(DefineableToken != null)
-                return DefineableToken.FilePosition;
+                return DefineableToken.Data.FilePosition;
             return Args.FilePosition();
         }
 
@@ -29,7 +30,7 @@ namespace Reni.Syntax
         {
             var result = "";
             if(DefineableToken != null)
-                result = DefineableToken.Name;
+                result = DefineableToken.Data.Name;
             if(DefineableToken != null && Args != null)
                 result += "(";
             if(Args != null)

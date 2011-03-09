@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Parser.TokenClass;
+using Reni.Parser.TokenClasses;
+using Reni.ReniParser.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature.DumpPrint

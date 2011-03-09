@@ -1,71 +1,66 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Parser.TokenClass;
 
 namespace Reni.Parser
 {
-    [Serializable]
-    internal sealed class Token : ReniObject
+    sealed internal class Token : ReniObject
     {
-        private static int _nextObjectId;
-        private readonly int _length;
-        private readonly SourcePosn _source;
-        private readonly TokenClassBase _tokenClass;
+        private readonly TokenData _data;
+        private readonly ITokenClass _tokenClass;
 
-        internal Token(SourcePosn source, int length, TokenClassBase tokenClass) : base(_nextObjectId++)
+        internal Token(SourcePosn source, int length, ITokenClass tokenClass)
         {
-            _source = source.Clone();
-            _length = length;
-            source.Incr(length);
+            _data = new TokenData(source.Clone(),length);
             _tokenClass = tokenClass;
+            source.Incr(length);
         }
 
-        public TokenClassBase TokenClass { get { return _tokenClass; } }
+        internal TokenData Data { get { return _data; } }
 
-        /// <summary>
-        /// the source position the token starts
-        /// </summary>
-        [IsDumpEnabled(false)]
-        public SourcePosn Source { get { return _source; } }
-
-        /// <summary>
-        /// the length in characters
-        /// </summary>
-        [IsDumpEnabled(false)]
-        public int Length { get { return _length; } }
-
-        /// <summary>
-        /// the text of the token
-        /// </summary>
-        [IsDumpEnabled(false)]
-        public string Name { get { return _source.SubString(0, _length); } }
+        internal ITokenClass TokenClass { get { return _tokenClass; } }
 
         [IsDumpEnabled(false)]
         public new string NodeDump { get { return ToString(); } }
 
-        public string FilePosition { get { return "\n" + Source.FilePosn(Name); } }
+        public override string ToString() { return Data.Source.FilePosn(Data.Name); }
 
-        /// <summary>
-        /// Normally Name except for some spacial cases
-        /// </summary>
-        [IsDumpEnabled(false)]
-        public string PrioTableName { get { return TokenClass.PrioTableName(Name); } }
-
-        public override string ToString()
-        {
-            return Source.FilePosn(Name);
-        }
-
-        /// <summary>
-        /// Returns just the name of the token
-        /// </summary>
-        /// <returns></returns>
-        public string ShortDump()
-        {
-            return Name;
-        }
+        public string ShortDump() { return Data.Name; }
+        public override string DumpData() { return Data.Name; }
 
         [IsDumpEnabled(false)]
-        internal TokenFactory NewTokenFactory { get { return TokenClass.NewTokenFactory; } }
+        internal string PrioTableName { get { return TokenClass.PrioTableName(Data.Name); } }
+
+        internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right)
+        {
+            return TokenClass.Syntax(left, Data, right);
+        }
+    }
+
+    internal sealed class TokenData : ReniObject
+    {
+        private static int _nextObjectId;
+        private readonly int _length;
+        private readonly SourcePosn _source;
+
+        internal TokenData(SourcePosn source, int length)
+            : base(_nextObjectId++)
+        {
+            _source = source;
+            _length = length;
+        }
+
+        [IsDumpEnabled(false)]
+        internal SourcePosn Source { get { return _source; } }
+
+        [IsDumpEnabled(false)]
+        internal int Length { get { return _length; } }
+
+        [IsDumpEnabled(false)]
+        internal string Name { get { return _source.SubString(0, _length); } }
+
+        internal string FilePosition { get { return "\n" + Source.FilePosn(Name); } }
+
     }
 }

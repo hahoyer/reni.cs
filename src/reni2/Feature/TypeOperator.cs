@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Parser.TokenClass;
+using Reni.ReniParser;
+using Reni.ReniParser.TokenClasses;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -9,9 +13,9 @@ namespace Reni.Feature
 {
     internal sealed class TypeOperator : Special, ISuffix, IInfix
     {
-        internal override IParsedSyntax CreateSyntax(IParsedSyntax left, Token token, IParsedSyntax right)
+        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
-            if (right == null)
+            if(right == null)
                 return new SuffixSyntax(token, left.CheckedToCompiledSyntax(), this);
             return new InfixSyntax(token, left.CheckedToCompiledSyntax(), this, right.CheckedToCompiledSyntax());
         }
@@ -20,11 +24,13 @@ namespace Reni.Feature
         {
             var result = TypeBase.VoidResult(category).Clone();
             if(category.HasType)
+            {
                 result.Type = context
                     .Type(left)
                     .TypeForTypeOperator()
                     .Reference(context.RefAlignParam)
                     .TypeType;
+            }
             return result;
         }
 
@@ -32,7 +38,7 @@ namespace Reni.Feature
         {
             var leftType = context.Type(left).AutomaticDereference();
             if(category.HasCode || category.HasRefs)
-                return context.ResultAsRef(category|Category.Type, right).ConvertTo(leftType) & category;
+                return context.ResultAsRef(category | Category.Type, right).ConvertTo(leftType) & category;
             return leftType.Result(category);
         }
     }

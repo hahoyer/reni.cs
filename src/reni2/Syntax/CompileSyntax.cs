@@ -4,27 +4,29 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Parser;
+using Reni.ReniParser;
+using Reni.ReniParser.TokenClasses;
 
 namespace Reni.Syntax
 {
     [Serializable]
-    internal abstract class CompileSyntax : ParsedSyntax, ICompileSyntax
+    internal abstract class CompileSyntax : ReniParser.ParsedSyntax, ICompileSyntax
     {
         // Used for debug only
         [IsDumpEnabled(false), Node("Cache")]
         internal readonly DictionaryEx<ContextBase, object> ResultCache = new DictionaryEx<ContextBase, object>();
 
-        internal CompileSyntax(Token token)
+        internal CompileSyntax(TokenData token)
             : base(token) { }
 
-        internal CompileSyntax(Token token, int objectId)
+        internal CompileSyntax(TokenData token, int objectId)
             : base(token, objectId) { }
 
         string ICompileSyntax.DumpShort() { return DumpShort(); }
         string ICompileSyntax.FilePosition() { return FilePosition(); }
         void ICompileSyntax.AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
-        Token ICompileSyntax.FirstToken { get { return GetFirstToken(); } }
-        Token ICompileSyntax.LastToken { get { return GetLastToken(); } }
+        TokenData ICompileSyntax.FirstToken { get { return GetFirstToken(); } }
+        TokenData ICompileSyntax.LastToken { get { return GetLastToken(); } }
 
         Result ICompileSyntax.Result(ContextBase context, Category category)
         {
@@ -37,10 +39,10 @@ namespace Reni.Syntax
             return null;
         }
 
-        protected override IParsedSyntax SurroundedByParenthesis(Token token, Token rightToken) { return this; }
+        internal override ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData token, TokenData rightToken) { return this; }
 
-        protected override ICompileSyntax ToCompiledSyntax() { return this; }
-        protected override IParsedSyntax CreateSyntaxOrDeclaration(Token token, IParsedSyntax right) { return new ExpressionSyntax(this, token, right.ToCompiledSyntaxOrNull()); }
+        internal override ICompileSyntax ToCompiledSyntax() { return this; }
+        internal override ReniParser.ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ReniParser.ParsedSyntax right) { return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull()); }
     }
 
 }

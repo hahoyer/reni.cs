@@ -27,12 +27,6 @@ namespace Reni.Parser
             return _token == x._token && _data == x._data;
         }
 
-        /// <summary>
-        /// asis
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static bool operator ==(PrioTable x, PrioTable y)
         {
             if(ReferenceEquals(x, null))
@@ -46,12 +40,6 @@ namespace Reni.Parser
         /// <returns></returns>
         public override int GetHashCode() { return _token.GetHashCode() + _data.GetHashCode(); }
 
-        /// <summary>
-        /// asis
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public static bool operator !=(PrioTable x, PrioTable y)
         {
             if(ReferenceEquals(x, null))
@@ -230,12 +218,6 @@ namespace Reni.Parser
         /// <returns></returns>
         public PrioTable Level(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
 
-        /// <summary>
-        /// Combines two prioritity tables. The tokens contained in left operand are considered as higher priority operands
-        /// </summary>
-        /// <param name="x">higher priority tokens</param>
-        /// <param name="y">lower priority tokens</param>
-        /// <returns></returns>
         public static PrioTable operator +(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
 
         /// <summary>

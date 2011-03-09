@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using System;
-using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -34,7 +34,7 @@ namespace Reni.FeatureTest.Structure
             return new Struct(list, declarations, converters, properties);
         }
 
-        public abstract void AssertLike(IParsedSyntax syntax);
+        public abstract void AssertLike(Parser.IParsedSyntax syntax);
 
         public static LikeSyntax operator +(LikeSyntax x, LikeSyntax y) { return x.Expression("+", y); }
         public static LikeSyntax operator -(LikeSyntax x, LikeSyntax y) { return x.Expression("-", y); }
@@ -64,7 +64,7 @@ namespace Reni.FeatureTest.Structure
 
     internal class Empty : LikeSyntax
     {
-        public override void AssertLike(IParsedSyntax syntax)
+        public override void AssertLike(Parser.IParsedSyntax syntax)
         {
             Tracer.Assert(syntax is EmptyList);
         }
@@ -103,12 +103,12 @@ namespace Reni.FeatureTest.Structure
             _properties = properties;
         }
 
-        public override void AssertLike(IParsedSyntax syntax)
+        public override void AssertLike(Parser.IParsedSyntax syntax)
         {
             var co = (Container)syntax;
             Tracer.Assert(_list.Length == co.List.Count);
             for (var i = 0; i < _list.Length; i++)
-                _list[i].AssertLike((IParsedSyntax) co.List[i]);
+                _list[i].AssertLike((Parser.IParsedSyntax) co.List[i]);
             Tracer.Assert(_declarations.Length == co.Dictionary.Count);
             var coi = co.Dictionary.GetEnumerator();
             coi.MoveNext();
@@ -136,7 +136,7 @@ namespace Reni.FeatureTest.Structure
             _s3 = s3;
         }
 
-        public override void AssertLike(IParsedSyntax syntax)
+        public override void AssertLike(Parser.IParsedSyntax syntax)
         {
             var ex = (ExpressionSyntax)syntax;
             AssertLike(_s1, ex.Left);
@@ -149,7 +149,7 @@ namespace Reni.FeatureTest.Structure
             if (s3 == null)
                 Tracer.Assert(right == null);
             else
-                s3.AssertLike((IParsedSyntax)right);
+                s3.AssertLike((Parser.IParsedSyntax)right);
         }
     }
 
@@ -162,11 +162,11 @@ namespace Reni.FeatureTest.Structure
             _i = i;
         }
 
-        public override void AssertLike(IParsedSyntax syntax)
+        public override void AssertLike(Parser.IParsedSyntax syntax)
         {
             var terminalSyntax = (TerminalSyntax)syntax;
-            Tracer.Assert(terminalSyntax.Terminal is Parser.TokenClass.Number);
-            Tracer.Assert(Parser.TokenClass.Number.ToInt64(terminalSyntax.Token) == _i);
+            Tracer.Assert(terminalSyntax.Terminal is ReniParser.TokenClasses.Number);
+            Tracer.Assert(ReniParser.TokenClasses.Number.ToInt64(terminalSyntax.Token) == _i);
         }
     }
 }

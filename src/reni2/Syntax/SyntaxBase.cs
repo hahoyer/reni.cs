@@ -11,7 +11,7 @@ namespace Reni.Syntax
         string DumpShort();
         string FilePosition();
         void AddToCacheForDebug(ContextBase context, object cacheItem);
-        Token FirstToken { get; }
-        Token LastToken { get; }
+        TokenData FirstToken { get; }
+        TokenData LastToken { get; }
     }
 }

@@ -1,23 +1,26 @@
 using Reni.Parser;
+using Reni.ReniParser;
+using Reni.ReniParser.TokenClasses;
 using Reni.Struct;
 
 namespace Reni.Syntax
 {
-    internal sealed class ConverterSyntax : ParsedSyntax
+    internal sealed class ConverterSyntax : ReniParser.ParsedSyntax
     {
         internal readonly ICompileSyntax Body;
 
-        internal ConverterSyntax(Token token, ICompileSyntax body) : base(token)
+        internal ConverterSyntax(TokenData token, ICompileSyntax body)
+            : base(token)
         {
             Body = body;
         }
 
-        internal protected override string DumpShort()
+        internal override string DumpShort()
         {
             return "converter (" + Body.DumpShort() + ")";
         }
 
-        protected override IParsedSyntax SurroundedByParenthesis(Token leftToken, Token rightToken)
+        internal override ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData leftToken, TokenData rightToken)
         {
             return Container.Create(leftToken, rightToken, this);
         }

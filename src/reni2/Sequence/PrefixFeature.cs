@@ -2,7 +2,8 @@
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser.TokenClass;
+using Reni.Parser.TokenClasses;
+using Reni.ReniParser.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -12,7 +13,7 @@ namespace Reni.Sequence
         private readonly Type.Sequence _parent;
         private readonly ISequenceOfBitPrefixOperation _definable;
 
-        protected internal PrefixFeature(Type.Sequence parent, ISequenceOfBitPrefixOperation definable)
+        internal PrefixFeature(Type.Sequence parent, ISequenceOfBitPrefixOperation definable)
         {
             _parent = parent;
             _definable = definable;
@@ -36,7 +37,7 @@ namespace Reni.Sequence
         }
     }
 
-    internal class Feature : FeatureBase
+    internal sealed class Feature : FeatureBase
     {
         public Feature(ISequenceOfBitBinaryOperation definable)
             : base(definable)
@@ -48,7 +49,7 @@ namespace Reni.Sequence
             return TypeBase.Number(Definable.ResultSize(objSize, argsSize));
         }
     }
-    internal class CompareFeature : FeatureBase
+    internal sealed class CompareFeature : FeatureBase
     {
         public CompareFeature(ISequenceOfBitBinaryOperation definable)
             : base(definable)

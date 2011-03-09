@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Reni.Parser.TokenClass;
+using Reni.Parser.TokenClasses;
+using Reni.ReniParser.TokenClasses;
 
 namespace Reni.Parser
 {
     [Serializable]
-    internal class Scanner : ReniObject, IScanner
+    internal sealed class Scanner : ReniObject, IScanner
     {
         private readonly char[] _charType = new char[256];
 
@@ -63,49 +64,49 @@ namespace Reni.Parser
         {
             for(;;)
             {
-                JumpWhiteSpace(sp);
+                WhiteSpace(sp);
 
                 if(sp.IsEnd())
-                    return new Token(sp, 0, RPar.Frame);
+                    return Token(sp, 0, tokenFactory.RightParentethesisClass(0));
                 if(IsDigit(sp.Current))
-                    return CreateNumberToken(sp);
+                    return Number(sp);
                 if(IsAlpha(sp.Current))
-                    return CreateNameToken(sp, tokenFactory);
+                    return Name(sp, tokenFactory);
                 if(IsSymbol(sp.Current))
-                    return CreateSymbolToken(sp, tokenFactory);
+                    return Symbol(sp, tokenFactory);
 
                 switch(sp.Current)
                 {
                     case '#':
                         {
-                            var error = JumpComment(sp);
+                            var error = Comment(sp);
                             if(error != null)
                                 return error;
                             break;
                         }
 
                     case '"':
-                        return CreateStringToken(sp);
+                        return String(sp);
                     case '\'':
-                        return CreateStringToken(sp);
+                        return String(sp);
 
                     case '(':
-                        return new Token(sp, 1, LPar.Parenthesis);
+                        return Token(sp, 1, tokenFactory.LeftParentethesisClass(3));
                     case '[':
-                        return new Token(sp, 1, LPar.Bracket);
+                        return Token(sp, 1, tokenFactory.LeftParentethesisClass(2));
                     case '{':
-                        return new Token(sp, 1, LPar.Brace);
+                        return Token(sp, 1, tokenFactory.LeftParentethesisClass(1));
 
                     case ')':
-                        return new Token(sp, 1, RPar.Parenthesis);
+                        return Token(sp, 1, tokenFactory.RightParentethesisClass(3));
                     case ']':
-                        return new Token(sp, 1, RPar.Bracket);
+                        return Token(sp, 1, tokenFactory.RightParentethesisClass(2));
                     case '}':
-                        return new Token(sp, 1, RPar.Brace);
+                        return Token(sp, 1, tokenFactory.RightParentethesisClass(1));
 
                     case ';':
                     case ',':
-                        return new Token(sp, 1, List.Instance);
+                        return Token(sp, 1, tokenFactory.ListClass);
                     default:
                         DumpMethodWithBreak("not implemented", sp);
                         throw new NotImplementedException();
@@ -113,7 +114,12 @@ namespace Reni.Parser
             }
         }
 
-        private void JumpWhiteSpace(SourcePosn sp)
+        private static Token Token(SourcePosn sp, int length, ITokenClass tokenClass)
+        {
+            return new Token(sp, length, tokenClass);
+        }
+
+        private void WhiteSpace(SourcePosn sp)
         {
             var i = 0;
             while(IsWhiteSpace(sp[i]))
@@ -121,37 +127,37 @@ namespace Reni.Parser
             sp.Incr(i);
         }
 
-        private Token CreateNumberToken(SourcePosn sp)
+        private Token Number(SourcePosn sp)
         {
             var i = 1;
             while(IsDigit(sp[i]))
                 i++;
-            return new Token(sp, i, Number.Instance);
+            return Token(sp, i, ReniParser.TokenClasses.Number.Instance);
         }
 
-        private Token CreateNameToken(SourcePosn sp, ITokenFactory tokenFactory)
+        private Token Name(SourcePosn sp, ITokenFactory tokenFactory)
         {
             var i = 1;
             while(IsAlphaNum(sp[i]))
                 i++;
-            return new Token(sp,i, tokenFactory.CreateTokenClass(sp.SubString(0, i)));
+            return Token(sp,i, tokenFactory.TokenClass(sp.SubString(0, i)));
         }
 
-        private Token CreateSymbolToken(SourcePosn sp, ITokenFactory tokenFactory)
+        private Token Symbol(SourcePosn sp, ITokenFactory tokenFactory)
         {
             var i = 1;
             while(IsSymbol(sp[i]))
                 i++;
-            return new Token(sp, i, tokenFactory.CreateTokenClass(sp.SubString(0, i)));
+            return Token(sp, i, tokenFactory.TokenClass(sp.SubString(0, i)));
         }
 
-        private Token JumpComment(SourcePosn sp)
+        private Token Comment(SourcePosn sp)
         {
             var closingParenthesis = "?)}]"["({[".IndexOf(sp[1]) + 1];
 
             if(closingParenthesis == '?')
             {
-                JumpSingleLineComment(sp);
+                SingleLineComment(sp);
                 return null;
             }
 
@@ -173,15 +179,15 @@ namespace Reni.Parser
             while(sp[i] != '\0' && IsWhiteSpace(sp[i]) && sp.SubString(i+1, endOfComment.Length) != endOfComment)
                 i++ ;
             if(sp[i] == '\0')
-                return new Token(sp, i, _syntaxErrorEOFComment);
+                return Token(sp, i, _syntaxErrorEOFComment);
 
             sp.Incr(i + 1 + endOfComment.Length);
             if (errorPosition == null)
                 return null;
-            return new Token(sp, i, _syntaxErrorBeginComment);
+            return Token(sp, i, _syntaxErrorBeginComment);
         }
 
-        private static void JumpSingleLineComment(SourcePosn sp)
+        private static void SingleLineComment(SourcePosn sp)
         {
             var i = 2;
             while (sp[i - 1] != '\0' && sp[i - 1] != '\n')
@@ -192,7 +198,7 @@ namespace Reni.Parser
         private static readonly SyntaxError _syntaxErrorEOFComment = new SyntaxError("unexpected end of file in comment");
         private static readonly SyntaxError _syntaxErrorBeginComment = new SyntaxError("invalid opening character for comment");
 
-        private static Token CreateStringToken(SourcePosn sp)
+        private static Token String(SourcePosn sp)
         {
             NotImplementedFunction(sp);
             return null;

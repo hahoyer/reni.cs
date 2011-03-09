@@ -11,17 +11,17 @@ namespace Reni.Syntax
     [Serializable]
     internal abstract class SpecialSyntax : CompileSyntax
     {
-        protected SpecialSyntax(Token token)
+        protected SpecialSyntax(TokenData token)
             : base(token) { }
     }
 
     [Serializable]
     internal sealed class TerminalSyntax : SpecialSyntax
     {
-        [Node, IsDumpEnabled(true)]
+        [Node, IsDumpEnabled]
         internal readonly ITerminal Terminal;
 
-        public TerminalSyntax(Token token, ITerminal terminal)
+        public TerminalSyntax(TokenData token, ITerminal terminal)
             : base(token) { Terminal = terminal; }
 
         protected internal override Result Result(ContextBase context, Category category)
@@ -30,8 +30,8 @@ namespace Reni.Syntax
                 .Result(context, category, Token);
         }
 
-        protected override Token GetFirstToken() { return Token; }
-        protected override Token GetLastToken() { return Token; }
+        protected override TokenData GetFirstToken() { return Token; }
+        protected override TokenData GetLastToken() { return Token; }
     }
 
     [Serializable]
@@ -43,7 +43,7 @@ namespace Reni.Syntax
         [Node, IsDumpEnabled(true)]
         private readonly ICompileSyntax _right;
 
-        public PrefixSyntax(Token token, IPrefix prefix, ICompileSyntax right)
+        public PrefixSyntax(TokenData token, IPrefix prefix, ICompileSyntax right)
             : base(token)
         {
             _prefix = prefix;
@@ -56,9 +56,9 @@ namespace Reni.Syntax
                 .Result(context, category, _right);
         }
 
-        protected internal override string DumpShort() { return base.DumpShort() + "(" + _right.DumpShort() + ")"; }
-        protected override Token GetFirstToken() { return Token; }
-        protected override Token GetLastToken() { return _right.LastToken; }
+        internal override string DumpShort() { return base.DumpShort() + "(" + _right.DumpShort() + ")"; }
+        protected override TokenData GetFirstToken() { return Token; }
+        protected override TokenData GetLastToken() { return _right.LastToken; }
     }
 
     [Serializable]
@@ -73,7 +73,7 @@ namespace Reni.Syntax
         [Node, IsDumpEnabled(true)]
         private readonly ICompileSyntax _right;
 
-        public InfixSyntax(Token token, ICompileSyntax left, IInfix infix, ICompileSyntax right)
+        public InfixSyntax(TokenData token, ICompileSyntax left, IInfix infix, ICompileSyntax right)
             : base(token)
         {
             _left = left;
@@ -87,12 +87,12 @@ namespace Reni.Syntax
                 .Result(context, category, _left, _right);
         }
 
-        protected internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort() + "(" + _right.DumpShort() + ")"; }
-        protected override Token GetFirstToken() { return _left.FirstToken; }
-        protected override Token GetLastToken() { return _right.LastToken; }
+        internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort() + "(" + _right.DumpShort() + ")"; }
+        protected override TokenData GetFirstToken() { return _left.FirstToken; }
+        protected override TokenData GetLastToken() { return _right.LastToken; }
     }
 
-    internal class SuffixSyntax : SpecialSyntax
+    internal sealed class SuffixSyntax : SpecialSyntax
     {
         [Node, IsDumpEnabled(true)]
         private readonly ICompileSyntax _left;
@@ -100,7 +100,7 @@ namespace Reni.Syntax
         [Node, IsDumpEnabled(true)]
         private readonly ISuffix _suffix;
 
-        internal SuffixSyntax(Token token, ICompileSyntax left, ISuffix suffix)
+        internal SuffixSyntax(TokenData token, ICompileSyntax left, ISuffix suffix)
             : base(token)
         {
             _left = left;
@@ -113,15 +113,15 @@ namespace Reni.Syntax
                 .Result(context, category, _left);
         }
 
-        protected internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort(); }
+        internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort(); }
 
-        protected override Token GetFirstToken() { return _left.FirstToken; }
-        protected override Token GetLastToken() { return Token; }
+        protected override TokenData GetFirstToken() { return _left.FirstToken; }
+        protected override TokenData GetLastToken() { return Token; }
     }
 
     internal interface ITerminal
     {
-        Result Result(ContextBase context, Category category, Token token);
+        Result Result(ContextBase context, Category category, TokenData token);
     }
 
     internal interface IPrefix

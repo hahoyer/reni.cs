@@ -10,7 +10,8 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Parser.TokenClass;
+using Reni.Parser.TokenClasses;
+using Reni.ReniParser.TokenClasses;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -381,7 +382,7 @@ namespace Reni.Type
                 .ReplaceAbsolute(ObjectReference(refAlignParam), () => LocalReferenceResult(result.CompleteCategory, refAlignParam));
         }
 
-        internal virtual Result ReferenceInCode(Function function, Category category)
+        internal virtual Result ReferenceInCode(Context.Function function, Category category)
         {
             return Reference(function.RefAlignParam)
                 .Result

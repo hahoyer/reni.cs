@@ -1,10 +1,10 @@
 using HWClassLibrary.TreeStructure;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
+using Reni.ReniParser;
+using Reni.ReniParser.TokenClasses;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -22,7 +22,7 @@ namespace Reni
         [Node]
         internal readonly ICompileSyntax Else;
 
-        protected CondSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax,
+        protected CondSyntax(ICompileSyntax condSyntax, TokenData thenToken, ICompileSyntax thenSyntax,
                              ICompileSyntax elseSyntax)
             : base(thenToken)
         {
@@ -109,30 +109,33 @@ namespace Reni
             return result;
         }
 
-        internal protected override string DumpShort() { return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")"; }
+        internal override string DumpShort() { return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")"; }
 
     }
 
     [Serializable]
     internal sealed class ThenSyntax : CondSyntax
     {
-        internal ThenSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax)
+        internal ThenSyntax(ICompileSyntax condSyntax, TokenData thenToken, ICompileSyntax thenSyntax)
             : base(condSyntax, thenToken, thenSyntax, null) { }
 
-        protected override IParsedSyntax CreateElseSyntax(Token token, ICompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
+        internal override ReniParser.ParsedSyntax CreateElseSyntax(TokenData token, ICompileSyntax elseSyntax)
+        {
+            return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax);
+        }
     }
 
     [Serializable]
     internal sealed class ThenElseSyntax : CondSyntax
     {
         [Node]
-        private readonly Token ElseToken;
+        private readonly TokenData _elseToken;
 
-        public ThenElseSyntax(ICompileSyntax condSyntax, Token thenToken, ICompileSyntax thenSyntax, Token elseToken,
+        public ThenElseSyntax(ICompileSyntax condSyntax, TokenData thenToken, ICompileSyntax thenSyntax, TokenData elseToken,
                               ICompileSyntax elseSyntax)
-            : base(condSyntax, thenToken, thenSyntax, elseSyntax) { ElseToken = elseToken; }
+            : base(condSyntax, thenToken, thenSyntax, elseSyntax) { _elseToken = elseToken; }
 
-        internal protected override string DumpShort()
+        internal override string DumpShort()
         {
             return base.DumpShort() + "else(" +
                    Else.DumpShort() + ")";

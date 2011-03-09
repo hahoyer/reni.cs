@@ -8,6 +8,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Runtime;
 
 namespace Reni
@@ -17,11 +18,11 @@ namespace Reni
     {
         private readonly string _fileName;
         private readonly CompilerParameters _parameters;
-        private readonly ParserInst _parser;
+        private readonly ITokenFactory _tokenFactory;
         private readonly Root _rootContext = ContextBase.CreateRoot();
 
         private readonly SimpleCache<Source> _source;
-        private readonly SimpleCache<IParsedSyntax> _syntax;
+        private readonly SimpleCache<ReniParser.ParsedSyntax> _syntax;
         private readonly SimpleCache<CodeBase> _code;
         private readonly SimpleCache<CodeBase[]> _functionCode;
         private readonly SimpleCache<Container> _mainContainer;
@@ -37,9 +38,9 @@ namespace Reni
         {
             _fileName = fileName;
             _parameters = parameters;
-            _parser = new ParserInst(new Scanner(), MainTokenFactory.Instance);
+            _tokenFactory = new MainTokenFactory();
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
-            _syntax = new SimpleCache<IParsedSyntax>(() => _parser.Compile(Source));
+            _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
             _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax).Result(_rootContext, Category.Code).Code);
             _functionCode = new SimpleCache<CodeBase[]>(() => _rootContext.FunctionCode);
             _mainContainer = new SimpleCache<Container>(() => new Container(Code));
@@ -62,7 +63,7 @@ namespace Reni
         [IsDumpEnabled(false)]
         public Source Source { get { return _source.Value; } }
         [Node, IsDumpEnabled(false)]
-        internal IParsedSyntax Syntax { get { return _syntax.Value; } }
+        internal ReniParser.ParsedSyntax Syntax { get { return _syntax.Value; } }
         [IsDumpEnabled(false)]
         public string ExecutedCode { get { return _executedCode.Value; } }
 
