@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Context;
-using Reni.Parser.TokenClasses;
-using Reni.ReniParser.TokenClasses;
+using Reni.Parser;
+using Reni.TokenClasses;
 using Reni.Syntax;
 
 namespace Reni.Struct

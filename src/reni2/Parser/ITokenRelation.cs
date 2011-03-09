@@ -11,7 +11,8 @@ namespace Reni.Parser
         ParserInst Parser { get; }
         PrioTable PrioTable { get; }
         ITokenClass ListClass { get; }
-        ITokenClass RightParentethesisClass(int level);
-        ITokenClass LeftParentethesisClass(int level);
+        ITokenClass NumberClass { get; }
+        ITokenClass RightParenthesisClass(int level);
+        ITokenClass LeftParenthesisClass(int level);
     }
 }

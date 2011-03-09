@@ -22,7 +22,7 @@ namespace Reni.Parser
         }
 
         internal PushedSyntax(SourcePosn sourcePosn, ITokenFactory tokenFactory)
-            : this(null, new Token(sourcePosn, 0, tokenFactory.LeftParentethesisClass(0)), tokenFactory)
+            : this(null, new Token(sourcePosn, 0, tokenFactory.LeftParenthesisClass(0)), tokenFactory)
         {
         }
 

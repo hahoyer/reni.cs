@@ -9,7 +9,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 using Reni.Syntax;
 
 namespace Reni.Struct

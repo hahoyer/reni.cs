@@ -165,8 +165,8 @@ namespace Reni.FeatureTest.Structure
         public override void AssertLike(Parser.IParsedSyntax syntax)
         {
             var terminalSyntax = (TerminalSyntax)syntax;
-            Tracer.Assert(terminalSyntax.Terminal is ReniParser.TokenClasses.Number);
-            Tracer.Assert(ReniParser.TokenClasses.Number.ToInt64(terminalSyntax.Token) == _i);
+            Tracer.Assert(terminalSyntax.Terminal is TokenClasses.Number);
+            Tracer.Assert(TokenClasses.Number.ToInt64(terminalSyntax.Token) == _i);
         }
     }
 }

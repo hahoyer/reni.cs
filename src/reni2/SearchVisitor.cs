@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using JetBrains.Annotations;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 using Reni.Struct;
 using Reni.Type;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Reni.Parser.TokenClasses;
-using Reni.ReniParser.TokenClasses;
+using Reni.Parser;
+using Reni.TokenClasses;
 
 namespace Reni.Parser
 {
@@ -67,9 +67,9 @@ namespace Reni.Parser
                 WhiteSpace(sp);
 
                 if(sp.IsEnd())
-                    return Token(sp, 0, tokenFactory.RightParentethesisClass(0));
+                    return Token(sp, 0, tokenFactory.RightParenthesisClass(0));
                 if(IsDigit(sp.Current))
-                    return Number(sp);
+                    return Number(sp, tokenFactory);
                 if(IsAlpha(sp.Current))
                     return Name(sp, tokenFactory);
                 if(IsSymbol(sp.Current))
@@ -91,18 +91,18 @@ namespace Reni.Parser
                         return String(sp);
 
                     case '(':
-                        return Token(sp, 1, tokenFactory.LeftParentethesisClass(3));
+                        return Token(sp, 1, tokenFactory.LeftParenthesisClass(3));
                     case '[':
-                        return Token(sp, 1, tokenFactory.LeftParentethesisClass(2));
+                        return Token(sp, 1, tokenFactory.LeftParenthesisClass(2));
                     case '{':
-                        return Token(sp, 1, tokenFactory.LeftParentethesisClass(1));
+                        return Token(sp, 1, tokenFactory.LeftParenthesisClass(1));
 
                     case ')':
-                        return Token(sp, 1, tokenFactory.RightParentethesisClass(3));
+                        return Token(sp, 1, tokenFactory.RightParenthesisClass(3));
                     case ']':
-                        return Token(sp, 1, tokenFactory.RightParentethesisClass(2));
+                        return Token(sp, 1, tokenFactory.RightParenthesisClass(2));
                     case '}':
-                        return Token(sp, 1, tokenFactory.RightParentethesisClass(1));
+                        return Token(sp, 1, tokenFactory.RightParenthesisClass(1));
 
                     case ';':
                     case ',':
@@ -127,12 +127,12 @@ namespace Reni.Parser
             sp.Incr(i);
         }
 
-        private Token Number(SourcePosn sp)
+        private Token Number(SourcePosn sp, ITokenFactory tokenFactory)
         {
             var i = 1;
             while(IsDigit(sp[i]))
                 i++;
-            return Token(sp, i, ReniParser.TokenClasses.Number.Instance);
+            return Token(sp, i, tokenFactory.NumberClass);
         }
 
         private Token Name(SourcePosn sp, ITokenFactory tokenFactory)

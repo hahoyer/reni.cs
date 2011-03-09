@@ -1,6 +1,6 @@
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 using Reni.Struct;
 
 namespace Reni.Syntax

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Parser;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    internal sealed class DeclarationTokenFactory : TokenFactory<TokenClass>
+    internal sealed class DeclarationTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
         internal static DeclarationTokenFactory Instance { get { return new DeclarationTokenFactory(); } }
 
@@ -29,18 +29,19 @@ namespace Reni.ReniParser
             return prioTable;
         }
 
-        protected override Dictionary<string, TokenClass> GetTokenClasses()
+        protected override Dictionary<string, TokenClasses.TokenClass> GetTokenClasses()
         {
-            return new Dictionary<string, TokenClass>
+            return new Dictionary<string, TokenClasses.TokenClass>
                    {
                        {"converter", new Converter()},
                        {"property", new Property()}
                    };
         }
 
-        protected override TokenClass GetListClass() { throw new NotImplementedException(); }
-        protected override TokenClass RightParentethesisClass(int level) { throw new NotImplementedException(); }
-        protected override TokenClass LeftParentethesisClass(int level) { throw new NotImplementedException(); }
-        protected override TokenClass NewTokenClass(string name) { throw new NotImplementedException(); }
+        protected override TokenClasses.TokenClass GetListClass() { throw new NotImplementedException(); }
+        protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { throw new NotImplementedException(); }
+        protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { throw new NotImplementedException(); }
+        protected override TokenClasses.TokenClass GetNumberClass() { throw new NotImplementedException(); }
+        protected override TokenClasses.TokenClass NewTokenClass(string name) { throw new NotImplementedException(); }
     }
 }

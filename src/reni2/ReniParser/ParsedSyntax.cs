@@ -5,7 +5,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Parser;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -54,6 +54,28 @@ namespace Reni.ReniParser
             return new ExpressionSyntax(tokenClass, ToCompiledSyntax(), token, right.ToCompiledSyntaxOrNull());
         }
 
+        private static bool _isInDump;
+
+        protected override sealed string Dump(bool isRecursion)
+        {
+            if (isRecursion)
+                return "ObjectId=" + ObjectId;
+
+            var isInContainerDump = Container.IsInContainerDump;
+            Container.IsInContainerDump = false;
+            var isInDump = _isInDump;
+            _isInDump = true;
+            var result = DumpShort();
+            if (!IsDetailedDumpRequired)
+                return result;
+            if (!isInDump)
+                result += FilePosition();
+            if (!isInContainerDump)
+                result += "\n" + base.Dump(false);
+            Container.IsInContainerDump = isInContainerDump;
+            _isInDump = isInDump;
+            return result;
+        }
     }
 
     internal static class ParsedSyntaxExtender

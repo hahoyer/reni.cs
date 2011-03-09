@@ -5,7 +5,7 @@ using System.Linq;
 using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.Parser;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 using Reni.Syntax;
 
 namespace Reni.ReniParser

@@ -2,8 +2,8 @@
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser.TokenClasses;
-using Reni.ReniParser.TokenClasses;
+using Reni.Parser;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence

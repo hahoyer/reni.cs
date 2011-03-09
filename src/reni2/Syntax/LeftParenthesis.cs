@@ -6,14 +6,14 @@ using Reni.Parser;
 
 namespace Reni.Syntax
 {
-    internal sealed class LeftParSyntax : ReniParser.ParsedSyntax
+    internal sealed class LeftParenthesis : ReniParser.ParsedSyntax
     {
         private readonly int _leftLevel;
 
         [IsDumpEnabled(true)]
         private readonly ReniParser.ParsedSyntax _right;
 
-        public LeftParSyntax(int leftLevel, TokenData token, ReniParser.ParsedSyntax right)
+        public LeftParenthesis(int leftLevel, TokenData token, ReniParser.ParsedSyntax right)
             : base(token)
         {
             _leftLevel = leftLevel;
@@ -33,13 +33,13 @@ namespace Reni.Syntax
 
         private sealed class ParenthesisMissmatchException : Exception
         {
-            private readonly LeftParSyntax _leftParSyntax;
+            private readonly LeftParenthesis _leftParenthesis;
             private readonly int _level;
             private readonly TokenData _token;
 
-            public ParenthesisMissmatchException(LeftParSyntax leftParSyntax, int level, TokenData token)
+            public ParenthesisMissmatchException(LeftParenthesis leftParenthesis, int level, TokenData token)
             {
-                _leftParSyntax = leftParSyntax;
+                _leftParenthesis = leftParenthesis;
                 _level = level;
                 _token = token;
             }

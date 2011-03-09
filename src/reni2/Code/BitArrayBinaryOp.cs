@@ -1,21 +1,22 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
 using HWClassLibrary.Helper;
-using Reni.Context;
-using Reni.Parser.TokenClasses;
+using HWClassLibrary.TreeStructure;
 using Reni.Type;
 
 namespace Reni.Code
 {
     /// <summary>
-    /// Bit array operation
+    ///     Bit array operation
     /// </summary>
     [Serializable]
     internal sealed class BitArrayBinaryOp : BinaryOp
     {
         [Node, IsDumpEnabled(false)]
         internal readonly ISequenceOfBitBinaryOperation OpToken;
+
         private readonly Size _size;
 
         internal BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
@@ -26,10 +27,7 @@ namespace Reni.Code
             StopByObjectId(-381);
         }
 
-        internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
-        {
-            return subsequentElement.TryToCombineBack(this);
-        }
+        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _size; } }
@@ -43,7 +41,7 @@ namespace Reni.Code
     }
 
     /// <summary>
-    /// Bit array prefix operation
+    ///     Bit array prefix operation
     /// </summary>
     [Serializable]
     internal sealed class BitArrayPrefixOp : FiberItem
@@ -51,7 +49,9 @@ namespace Reni.Code
         [Node]
         [IsDumpEnabled(false)]
         internal readonly ISequenceOfBitPrefixOperation OpToken;
+
         private readonly Size _size;
+
         [Node]
         [IsDumpEnabled(false)]
         internal readonly Size ArgSize;
@@ -65,6 +65,7 @@ namespace Reni.Code
 
         [IsDumpEnabled(false)]
         internal override Size InputSize { get { return ArgSize; } }
+
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _size; } }
 
@@ -74,10 +75,7 @@ namespace Reni.Code
             throw new NotImplementedException();
         }
 
-        internal override FiberItem[] TryToCombine(FiberItem subsequentElement)
-        {
-            return subsequentElement.TryToCombineBack(this);
-        }
+        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.BitArrayPrefix(OpToken, OutputSize); }
 
@@ -86,36 +84,36 @@ namespace Reni.Code
     }
 
     /// <summary>
-    /// Dump and print
+    ///     Dump and print
     /// </summary>
     [Serializable]
     internal sealed class DumpPrintOperation : BinaryOp
     {
-        internal DumpPrintOperation(Size leftSize, Size rightSize) : base(leftSize, rightSize) {}
+        internal DumpPrintOperation(Size leftSize, Size rightSize)
+            : base(leftSize, rightSize) { }
 
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return Size.Zero; } }
+
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
 
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.DumpPrint(top, InputSize); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintOperation(LeftSize,RightSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintOperation(LeftSize, RightSize); }
     }
-    [Serializable]
 
+    [Serializable]
     internal sealed class DumpPrintText : FiberHead
     {
         [Node, IsDumpEnabled(true)]
         private readonly string _dumpPrintText;
 
-        internal DumpPrintText(string dumpPrintText)
-        {
-            _dumpPrintText = dumpPrintText;
-        }
+        internal DumpPrintText(string dumpPrintText) { _dumpPrintText = dumpPrintText; }
 
         protected override Size GetSize() { return Size.Zero; }
         protected override string CSharpString() { return CSharpGenerator.DumpPrintText(_dumpPrintText); }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(_dumpPrintText); }
+
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }
     }

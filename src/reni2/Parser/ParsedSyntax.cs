@@ -10,8 +10,6 @@ namespace Reni.Parser
 {
     internal class ParsedSyntax : ReniObject, IParsedSyntax
     {
-        private static bool _isInDump;
-
         [UsedImplicitly]
         internal static bool IsDetailedDumpRequired = true;
 
@@ -43,27 +41,6 @@ namespace Reni.Parser
 
         internal virtual string DumpShort() { return Token.Name; }
         protected virtual string FilePosition() { return Token.FilePosition; }
-
-        protected override sealed string Dump(bool isRecursion)
-        {
-            if (isRecursion)
-                return "ObjectId=" + ObjectId;
-
-            var isInContainerDump = Container.IsInContainerDump;
-            Container.IsInContainerDump = false;
-            var isInDump = _isInDump;
-            _isInDump = true;
-            var result = DumpShort();
-            if (!IsDetailedDumpRequired)
-                return result;
-            if (!isInDump)
-                result += FilePosition();
-            if (!isInContainerDump)
-                result += "\n" + base.Dump(isRecursion);
-            Container.IsInContainerDump = isInContainerDump;
-            _isInDump = isInDump;
-            return result;
-        }
 
         [IsDumpEnabled(false), UsedImplicitly]
         public new string NodeDump { get { return base.NodeDump + " " + DumpShort(); } }

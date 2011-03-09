@@ -5,8 +5,7 @@ using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
-using Reni.Parser.TokenClasses;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 using Reni.Sequence;
 using Reni.Struct;
 
@@ -101,20 +100,20 @@ namespace Reni.ReniParser
                        {"/\\", new TokenClasses.Function()},
                        {"*", new Star()},
                        {"_A_T_", new AtToken()},
-                       {"arg", new TargT()},
+                       {"arg", new ArgToken()},
                        {"dump_print", new Feature.DumpPrint.Token()},
                        {"else", new ElseToken()},
                        {"enable_cut", new EnableCut()},
                        {"then", new ThenToken()},
-                       {"this", new TthisT()},
+                       {"this", new ThisToken()},
                        {"type", new TypeOperator()}
                    };
         }
 
         protected override TokenClasses.TokenClass GetListClass() { return new List(); }
-        protected override TokenClasses.TokenClass RightParentethesisClass(int level) { return new RPar(level); }
-        protected override TokenClasses.TokenClass LeftParentethesisClass(int level) { return new LPar(level); }
-
-        protected override TokenClasses.TokenClass NewTokenClass(string name) { return UserSymbol.Instance(name); }
+        protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
+        protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
+        protected override TokenClasses.TokenClass GetNumberClass() { return new Number(); }
+        protected override TokenClasses.TokenClass NewTokenClass(string name) { return new UserSymbol(name); }
     }
 }

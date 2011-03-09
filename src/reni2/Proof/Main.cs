@@ -33,7 +33,7 @@ a ggt b = 1
         public void Replace(string target, string value) { throw new NotImplementedException(); }
     }
 
-    internal abstract class TokenClass : Parser.TokenClasses.TokenClass
+    internal abstract class TokenClass : Parser.TokenClass
     {}
 
     internal sealed class TokenFactory : TokenFactory<TokenClass>
@@ -97,8 +97,9 @@ a ggt b = 1
         }
 
         protected override TokenClass GetListClass() { throw new NotImplementedException(); }
-        protected override TokenClass RightParentethesisClass(int level) { throw new NotImplementedException(); }
-        protected override TokenClass LeftParentethesisClass(int level) { throw new NotImplementedException(); }
+        protected override TokenClass GetRightParenthesisClass(int level) { throw new NotImplementedException(); }
+        protected override TokenClass GetLeftParenthesisClass(int level) { throw new NotImplementedException(); }
+        protected override TokenClass GetNumberClass() { throw new NotImplementedException(); }
     }
 
     internal class EuroSign : TokenClass

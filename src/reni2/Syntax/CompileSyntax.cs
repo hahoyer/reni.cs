@@ -5,7 +5,7 @@ using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 
 namespace Reni.Syntax
 {

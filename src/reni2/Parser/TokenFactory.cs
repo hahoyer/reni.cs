@@ -30,15 +30,18 @@ namespace Reni.Parser
             return NewTokenClass(name);
         }
         ITokenClass ITokenFactory.ListClass { get { return GetListClass(); } }
-        ITokenClass ITokenFactory.RightParentethesisClass(int level) { return RightParentethesisClass(level);}
-        ITokenClass ITokenFactory.LeftParentethesisClass(int level) { return LeftParentethesisClass(level); }
+        ITokenClass ITokenFactory.NumberClass { get { return GetNumberClass(); } }
+
+        ITokenClass ITokenFactory.RightParenthesisClass(int level) { return GetRightParenthesisClass(level);}
+        ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return GetLeftParenthesisClass(level); }
 
         protected abstract TTokenClass NewTokenClass(string name);
         protected abstract PrioTable GetPrioTable();
         protected abstract Dictionary<string, TTokenClass> GetTokenClasses();
         protected abstract TTokenClass GetListClass();
-        protected abstract TTokenClass RightParentethesisClass(int level);
-        protected abstract TTokenClass LeftParentethesisClass(int level);
+        protected abstract TTokenClass GetRightParenthesisClass(int level);
+        protected abstract TTokenClass GetLeftParenthesisClass(int level);
+        protected abstract TTokenClass GetNumberClass();
 
         private Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
     }

@@ -2,8 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using Reni.Parser.TokenClasses;
-using Reni.ReniParser.TokenClasses;
+using Reni.TokenClasses;
 
 namespace Reni
 {

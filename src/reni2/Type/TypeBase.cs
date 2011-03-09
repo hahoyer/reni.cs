@@ -10,8 +10,8 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Parser.TokenClasses;
-using Reni.ReniParser.TokenClasses;
+using Reni.Parser;
+using Reni.TokenClasses;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -132,7 +132,7 @@ namespace Reni.Type
         internal Result ArgResult(Category category) { return Result(category, ArgCode); }
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
-        internal Result GenericDumpPrint(Category category) { return GetSuffixResult(category, new Token()); }
+        internal Result GenericDumpPrint(Category category) { return GetSuffixResult(category, new Feature.DumpPrint.Token()); }
         internal CodeBase ArgCode() { return CodeBase.Arg(Size); }
 
         internal Result AutomaticDereferenceResult(Category category)
