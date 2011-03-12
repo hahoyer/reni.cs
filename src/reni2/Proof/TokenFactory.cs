@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Parser;
+using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    internal sealed class TokenFactory : TokenFactory<TokenClass>
+    internal sealed class TokenFactory : TokenFactory<TokenClasses.TokenClass>
     {
         internal static ITokenFactory Instance { get { return new TokenFactory(); } }
 
-        protected override TokenClass NewTokenClass(string name) { return new UserSymbol(); }
+        protected override TokenClasses.TokenClass NewTokenClass(string name) { return new UserSymbol(); }
 
         protected override PrioTable GetPrioTable()
         {
@@ -41,10 +42,10 @@ namespace Reni.Proof
             return x;
         }
 
-        protected override Dictionary<string, TokenClass> GetTokenClasses()
+        protected override Dictionary<string, TokenClasses.TokenClass> GetTokenClasses()
         {
             var result =
-                new Dictionary<string, TokenClass>
+                new Dictionary<string, TokenClasses.TokenClass>
                 {
                     {"=", new Equal()},
                     {">", new CompareOperator()},
@@ -66,21 +67,10 @@ namespace Reni.Proof
             return result;
         }
 
-        protected override TokenClass GetListClass() { throw new NotImplementedException(); }
-
-        protected override TokenClass GetRightParenthesisClass(int level)
-        {
-            Tracer.Assert(level == 0);
-            return new RightParenthesis();
-        }
-
-        protected override TokenClass GetLeftParenthesisClass(int level)
-        {
-            Tracer.Assert(level == 0);
-            return new LeftParenthesis();
-        }
-
-        protected override TokenClass GetNumberClass() { return new Proof.Number(); }
+        protected override TokenClasses.TokenClass GetListClass() { throw new NotImplementedException(); }
+        protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
+        protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
+        protected override TokenClasses.TokenClass GetNumberClass() { return new Number(); }
     }
 
 }

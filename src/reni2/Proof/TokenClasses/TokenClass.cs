@@ -4,7 +4,7 @@ using System.Linq;
 using System;
 using Reni.Parser;
 
-namespace Reni.Proof
+namespace Reni.Proof.TokenClasses
 {
     internal abstract class TokenClass : Parser.TokenClass
     {
