@@ -11,10 +11,7 @@ namespace Reni.TokenClasses
     {
         private readonly int _level;
 
-        internal RightParenthesis(int level)
-        {
-            _level = level;
-        }
+        internal RightParenthesis(int level) { _level = level; }
 
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {

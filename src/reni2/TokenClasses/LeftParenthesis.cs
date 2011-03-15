@@ -11,10 +11,7 @@ namespace Reni.TokenClasses
     {
         private readonly int _level;
 
-        internal LeftParenthesis(int level)
-        {
-            _level = level;
-        }
+        internal LeftParenthesis(int level) { _level = level; }
 
         [IsDumpEnabled(false)]
         internal int Level { get { return _level; } }

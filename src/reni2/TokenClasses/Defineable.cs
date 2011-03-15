@@ -18,10 +18,7 @@ namespace Reni.TokenClasses
             return left.CreateSyntaxOrDeclaration(this, token, right);
         }
 
-        internal override ReniParser.ParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, TokenData token)
-        {
-            return new DeclarationPartSyntax(this, extensionSyntax, token);
-        }
+        internal override ReniParser.ParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, TokenData token) { return new DeclarationPartSyntax(this, extensionSyntax, token); }
 
         internal TFeatureType Check<TFeatureType>()
             where TFeatureType : class { return this as TFeatureType; }
