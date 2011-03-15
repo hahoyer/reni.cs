@@ -10,7 +10,7 @@ using Reni.Runtime;
 namespace Reni.Code
 {
     /// <summary>
-    /// base class for all compiled code items
+    ///     base class for all compiled code items
     /// </summary>
     internal sealed class Container : ReniObject
     {
@@ -18,7 +18,7 @@ namespace Reni.Code
         private readonly string _description;
 
         /// <summary>
-        /// When set, some exceptions for unserialisable elements are not thrown. 
+        ///     When set, some exceptions for unserialisable elements are not thrown.
         /// </summary>
         internal readonly bool IsInternal;
 
@@ -135,14 +135,14 @@ namespace Reni.Code
     }
 
     /// <summary>
-    /// Nothing, since void cannot be used for this purpose
+    ///     Nothing, since void cannot be used for this purpose
     /// </summary>
     public class none
     {
         private static readonly none _instance = new none();
 
         /// <summary>
-        /// Gets the instance.
+        ///     Gets the instance.
         /// </summary>
         /// <value>The instance.</value>
         /// created 03.10.2006 01:24

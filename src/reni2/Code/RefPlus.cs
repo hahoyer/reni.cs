@@ -8,7 +8,7 @@ using Reni.Context;
 namespace Reni.Code
 {
     /// <summary>
-    /// Reference shift
+    ///     Reference shift
     /// </summary>
     [Serializable]
     internal sealed class RefPlus : FiberItem

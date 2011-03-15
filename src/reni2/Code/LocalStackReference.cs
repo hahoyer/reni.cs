@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
 namespace Reni.Code
@@ -13,14 +17,8 @@ namespace Reni.Code
             _holder = holder;
         }
 
-        StackData IStackDataAddressBase.GetTop(Size offset, Size size)
-        {
-            return _locals[_holder].DoPull(offset).DoGetTop(size);
-        }
+        StackData IStackDataAddressBase.GetTop(Size offset, Size size) { return _locals[_holder].DoPull(offset).DoGetTop(size); }
 
-        string IStackDataAddressBase.Dump()
-        {
-            return _holder;
-        }
+        string IStackDataAddressBase.Dump() { return _holder; }
     }
 }

@@ -7,7 +7,7 @@ using Reni.Context;
 namespace Reni.Code
 {
     /// <summary>
-    /// Dereferencing operation
+    ///     Dereferencing operation
     /// </summary>
     [Serializable]
     internal sealed class Dereference : FiberItem

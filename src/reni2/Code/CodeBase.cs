@@ -18,8 +18,8 @@ namespace Reni.Code
 
         protected CodeBase() { }
 
-        [Node]
-        [IsDumpEnabled(false)]
+        [Node, IsDumpEnabled(false)]
+        
         internal Size Size { get { return GetSize(); } }
 
         [Node, IsDumpEnabled(false)]
@@ -67,7 +67,7 @@ namespace Reni.Code
 
         internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right, string reason)
         {
-            if (right.IsZero)
+            if(right.IsZero)
                 return this;
             return CreateFiber(new RefPlus(refAlignParam, right, reason));
         }
@@ -89,7 +89,7 @@ namespace Reni.Code
         {
             var extendedData = new CodeBase[data.Length + 1];
             extendedData[0] = this;
-            data.CopyTo(extendedData,1);
+            data.CopyTo(extendedData, 1);
             return List(extendedData);
         }
 
@@ -136,12 +136,12 @@ namespace Reni.Code
         internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
 
         /// <summary>
-        /// Replaces appearences of context in code tree.                                                               
-        /// Assumes, that replacement requires offset alignment when walking along code tree
+        ///     Replaces appearences of context in code tree.                                                               
+        ///     Assumes, that replacement requires offset alignment when walking along code tree
         /// </summary>
-        /// <typeparam name="TContext"></typeparam>
-        /// <param name="context">The context.</param>
-        /// <param name="replacement">The replacement.</param>
+        /// <typeparam name = "TContext"></typeparam>
+        /// <param name = "context">The context.</param>
+        /// <param name = "replacement">The replacement.</param>
         /// <returns></returns>
         internal CodeBase ReplaceRelative<TContext>(TContext context, Func<CodeBase> replacement)
             where TContext : IReferenceInCode
@@ -153,12 +153,12 @@ namespace Reni.Code
         }
 
         /// <summary>
-        /// Replaces appearences of context in code tree. 
-        /// Assumes, that replacement isn't a reference, that changes when walking along the code tree
+        ///     Replaces appearences of context in code tree. 
+        ///     Assumes, that replacement isn't a reference, that changes when walking along the code tree
         /// </summary>
-        /// <typeparam name="TContext"></typeparam>
-        /// <param name="context">The context.</param>
-        /// <param name="replacement">The replacement.</param>
+        /// <typeparam name = "TContext"></typeparam>
+        /// <param name = "context">The context.</param>
+        /// <param name = "replacement">The replacement.</param>
         /// <returns></returns>
         internal CodeBase ReplaceAbsolute<TContext>(TContext context, Func<CodeBase> replacement)
             where TContext : IReferenceInCode
@@ -195,7 +195,7 @@ namespace Reni.Code
         internal CodeBase Align(int alignBits = Reni.BitsConst.SegmentAlignBits) { return CreateBitCast(Size.NextPacketSize(alignBits)); }
 
         /// <summary>
-        /// Gets the icon key.
+        ///     Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
@@ -217,8 +217,10 @@ namespace Reni.Code
 
             var result = this;
             if(!resultSize.IsZero)
+            {
                 result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize))
                     .Sequence(copier.ReplaceArg(LocalVariableReference(refAlignParam, holder)));
+            }
 
             return result.CreateFiber(new Drop(Size, resultSize));
         }
@@ -254,10 +256,7 @@ namespace Reni.Code
         private CodeBase DumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
         private CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
 
-        internal static CodeBase LocalVariableReference(RefAlignParam refAlignParam, string holder, Size offset = null)
-        {
-            return new LocalVariableReference(refAlignParam, holder, offset);
-        }
+        internal static CodeBase LocalVariableReference(RefAlignParam refAlignParam, string holder, Size offset = null) { return new LocalVariableReference(refAlignParam, holder, offset); }
 
         internal CodeBase CreateFiber(IEnumerable<FiberItem> subsequentElement)
         {
@@ -272,11 +271,8 @@ namespace Reni.Code
         }
 
         internal virtual CSharpCodeSnippet CSharpCodeSnippet() { return new CSharpCodeSnippet("", CSharpString()); }
-        
-        internal virtual string ReversePolish(Size top)
-        {
-            return CSharpString(top);
-        }
+
+        internal virtual string ReversePolish(Size top) { return CSharpString(top); }
 
         protected virtual string CSharpString(Size top)
         {
@@ -292,50 +288,36 @@ namespace Reni.Code
             }
             catch(CodeBaseException e)
             {
-                Tracer.AssertionFailed("", ()=>e.Message);
+                Tracer.AssertionFailed("", () => e.Message);
             }
         }
 
-        protected virtual void Execute(IFormalMaschine formalMaschine)
-        {
-            NotImplementedMethod(formalMaschine);  
-        }
+        protected virtual void Execute(IFormalMaschine formalMaschine) { NotImplementedMethod(formalMaschine); }
 
-        void IFormalCodeItem.Execute(IFormalMaschine formalMaschine)
-        {
-            Execute(formalMaschine);
-        }
+        void IFormalCodeItem.Execute(IFormalMaschine formalMaschine) { Execute(formalMaschine); }
 
-        protected static Refs GetRefs(CodeBase[] codeBases) {
+        protected static Refs GetRefs(CodeBase[] codeBases)
+        {
             var refs = codeBases.Select(code => code.Refs).ToArray();
-            return refs.Aggregate(Refs.None(), (r1,r2)=>r1.Sequence(r2));
+            return refs.Aggregate(Refs.None(), (r1, r2) => r1.Sequence(r2));
         }
     }
 
     internal abstract class UnexpectedVisitOfPending : Exception
-    {
-    }
+    {}
 
     internal static class CodeBaseExtender
     {
-        internal static CodeBase ToSequence(this IEnumerable<CodeBase> x)
-        {
-            return x.Aggregate(CodeBase.Void(), (code, result) => code.Sequence(result));
-        }
+        internal static CodeBase ToSequence(this IEnumerable<CodeBase> x) { return x.Aggregate(CodeBase.Void(), (code, result) => code.Sequence(result)); }
 
         internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern)
         {
-            if (codeBases.ToArray().Length == 0)
+            if(codeBases.ToArray().Length == 0)
                 return CodeBase.Void();
 
             return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x)));
         }
 
-        private static CodeBase LocalVariableDefinition(string holderName, CodeBase value)
-        {
-            return value.CreateFiber(new LocalVariableDefinition(holderName, value.Size));
-        }
+        private static CodeBase LocalVariableDefinition(string holderName, CodeBase value) { return value.CreateFiber(new LocalVariableDefinition(holderName, value.Size)); }
     }
-
-
 }

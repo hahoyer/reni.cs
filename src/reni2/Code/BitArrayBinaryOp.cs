@@ -46,14 +46,14 @@ namespace Reni.Code
     [Serializable]
     internal sealed class BitArrayPrefixOp : FiberItem
     {
-        [Node]
-        [IsDumpEnabled(false)]
+        [Node, IsDumpEnabled(false)]
+        
         internal readonly ISequenceOfBitPrefixOperation OpToken;
 
         private readonly Size _size;
 
-        [Node]
-        [IsDumpEnabled(false)]
+        [Node, IsDumpEnabled(false)]
+        
         internal readonly Size ArgSize;
 
         internal BitArrayPrefixOp(ISequenceOfBitPrefixOperation name, Size size, Size argSize)

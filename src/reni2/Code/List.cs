@@ -17,22 +17,20 @@ namespace Reni.Code
 
         private void AssertValid()
         {
-            foreach (var codeBase in _data)
+            foreach(var codeBase in _data)
                 Tracer.Assert(!(codeBase is List));
             Tracer.Assert(_data.Length > 1);
         }
 
-        private List(IEnumerable<CodeBase> data): base(_nextObjectId++)
+        private List(IEnumerable<CodeBase> data)
+            : base(_nextObjectId++)
         {
             _data = data.ToArray();
             AssertValid();
         }
 
         protected override IEnumerable<CodeBase> AsList() { return _data; }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual)
-        {
-            return actual.List(this);
-        }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.List(this); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
@@ -40,22 +38,24 @@ namespace Reni.Code
             {
                 var newData = new CodeBase[_data.Length];
                 var i = 0;
-                for (; i < _data.Length - 1; i++)
+                for(; i < _data.Length - 1; i++)
                     newData[i] = _data[i];
                 newData[i] = _data[i].CreateFiber(subsequentElement);
                 return List(newData);
             }
             return null;
         }
-        
+
         [IsDumpEnabled(false)]
         internal override bool IsNonFiberHeadList
         {
             get
             {
                 for(var i = 0; i < _data.Length - 1; i++)
+                {
                     if(!_data[i].Size.IsZero)
                         return false;
+                }
                 return true;
             }
         }
@@ -67,7 +67,7 @@ namespace Reni.Code
             {
                 var result = Size.Zero;
                 var sizeSoFar = Size.Zero;
-                foreach (var codeBase in _data)
+                foreach(var codeBase in _data)
                 {
                     var newResult = sizeSoFar + codeBase.MaxSize;
                     sizeSoFar += codeBase.Size;

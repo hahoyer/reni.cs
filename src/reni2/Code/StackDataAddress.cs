@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code
@@ -20,24 +22,21 @@ namespace Reni.Code
         internal Size Offset { get { return _offset; } }
 
         internal override Size Size { get { return _refSize; } }
-        
-        internal new StackData Dereference(Size size, Size dataSize)
-        {
-            return _data.GetTop(_offset, size).BitCast(dataSize);
-        }
+
+        internal new StackData Dereference(Size size, Size dataSize) { return _data.GetTop(_offset, size).BitCast(dataSize); }
 
         internal new StackData RefPlus(Size offset)
         {
-            if (offset.IsZero)
+            if(offset.IsZero)
                 return this;
-            return new StackDataAddress(_data,_refSize,offset+_offset);
+            return new StackDataAddress(_data, _refSize, offset + _offset);
         }
 
         protected override StackDataAddress GetAddress() { return this; }
 
         protected override string Dump(bool isRecursion)
         {
-            if (isRecursion)
+            if(isRecursion)
                 throw new NotImplementedException();
             return _data.Dump() + "[" + _offset.ToInt() + "]";
         }

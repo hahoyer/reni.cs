@@ -6,14 +6,16 @@ using HWClassLibrary.Debug;
 namespace Reni.Code
 {
     /// <summary>
-    /// General visitor template for code
+    ///     General visitor template for code
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name = "T"></typeparam>
     [Serializable]
     internal abstract class Visitor<T> : ReniObject
     {
-        protected Visitor(int objectId): base(objectId) {  }
-        protected Visitor(){ }
+        protected Visitor(int objectId)
+            : base(objectId) { }
+
+        protected Visitor() { }
 
         internal virtual T Arg(Arg visitedObject)
         {
@@ -38,7 +40,7 @@ namespace Reni.Code
             var newHead = visitedObject.FiberHead.Visit(this);
             var data = visitedObject.FiberItems;
             var newItems = new FiberItem[data.Length];
-            for (var index = 0; index < data.Length; index++)
+            for(var index = 0; index < data.Length; index++)
                 newItems[index] = data[index].Visit(this);
             return Fiber(visitedObject, newHead, newItems);
         }
@@ -72,7 +74,7 @@ namespace Reni.Code
             return visitor.List(visitedObject, newList);
         }
 
-        protected virtual T List(List visitedObject, IEnumerable<T> newList) 
+        protected virtual T List(List visitedObject, IEnumerable<T> newList)
         {
             NotImplementedMethod(visitedObject, newList);
             return default(T);

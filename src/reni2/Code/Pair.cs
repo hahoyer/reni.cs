@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 
 namespace Reni.Code
 {
     /// <summary>
-    /// Pair of code elements, first element can be accessed
+    ///     Pair of code elements, first element can be accessed
     /// </summary>
     [Obsolete]
     internal sealed class Pair : FiberHead

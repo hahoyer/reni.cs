@@ -1,7 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
 using System;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Context;
 
 namespace Reni.Code
@@ -10,7 +11,8 @@ namespace Reni.Code
     internal abstract class Top : FiberHead
     {
         [Node, IsDumpEnabled(false)]
-        internal protected readonly Size Offset;
+        protected internal readonly Size Offset;
+
         private readonly RefAlignParam _refAlignParam;
         private readonly Size _size;
         private readonly Size _dataSize;
@@ -24,18 +26,15 @@ namespace Reni.Code
             StopByObjectId(-945);
         }
 
-        protected override Size GetSize()
-        {
-            return _size;
-        }
+        protected override Size GetSize() { return _size; }
 
         [IsDumpEnabled(false)]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+
         [IsDumpEnabled(false)]
         protected Size DataSize { get { return _dataSize; } }
 
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset + " DataSize=" + _dataSize; } }
-
     }
 }

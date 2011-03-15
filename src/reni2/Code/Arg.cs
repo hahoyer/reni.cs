@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 
 namespace Reni.Code
 {
     /// <summary>
-    /// Arg is is used as a placeholder.
+    ///     Arg is is used as a placeholder.
     /// </summary>
     internal sealed class Arg : FiberHead
     {
@@ -11,7 +14,7 @@ namespace Reni.Code
         private readonly Size _size;
 
         internal Arg(Size size)
-            :base(_nextObjectId++)
+            : base(_nextObjectId++)
         {
             _size = size;
             StopByObjectId(-10);

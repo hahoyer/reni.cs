@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Context;
 
@@ -29,15 +31,16 @@ namespace Reni.Code
             get
             {
                 return base.NodeDump
-                       + " Holder=" + _holder 
+                       + " Holder=" + _holder
                        + " Offset=" + _offset
                        + " Size=" + _size
                        + " DataSize=" + _dataSize
-                       ;
+                    ;
             }
         }
+
         protected override Size GetSize() { return _size; }
-        protected override string CSharpString() { return CSharpGenerator.LocalVariableAccess(_holder,_offset, _size); }
+        protected override string CSharpString() { return CSharpGenerator.LocalVariableAccess(_holder, _offset, _size); }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableData(Size, _holder, _offset, _dataSize); }
     }
 }

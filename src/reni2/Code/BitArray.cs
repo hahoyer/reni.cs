@@ -27,7 +27,7 @@ namespace Reni.Code
         {
             if(Size.IsZero)
                 return new CodeBase[0];
-            return new[]{this};
+            return new[] {this};
         }
 
         [IsDumpEnabled(false)]
@@ -41,15 +41,9 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         public override string NodeDump { get { return base.NodeDump + " Data=" + Data; } }
 
-        protected override string CSharpString()
-        {
-            return CSharpGenerator.CreateBitArray(GetSize(), Data);
-        }
+        protected override string CSharpString() { return CSharpGenerator.CreateBitArray(GetSize(), Data); }
 
-        protected override string CSharpString(Size top)
-        {
-            return CSharpGenerator.Push(top, Size, Data);
-        }
+        protected override string CSharpString(Size top) { return CSharpGenerator.Push(top, Size, Data); }
 
         internal new static BitArray Void() { return new BitArray(Size.Create(0), Reni.BitsConst.None()); }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code
@@ -18,7 +19,7 @@ namespace Reni.Code
             var newResult = TryToCombine(subsequentElement);
             if(newResult == null)
                 return new Fiber(this, subsequentElement);
-            
+
             return newResult;
         }
 

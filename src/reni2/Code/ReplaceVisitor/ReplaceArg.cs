@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 namespace Reni.Code.ReplaceVisitor
 {
     /// <summary>
-    /// Handle argument replaces
+    ///     Handle argument replaces
     /// </summary>
     internal abstract class ReplaceArg : Base
     {
@@ -26,7 +26,7 @@ namespace Reni.Code.ReplaceVisitor
         protected CodeBase ActualArg { get { return _actualArg; } }
 
         protected abstract CodeBase Actual { get; }
-        
+
         internal override CodeBase Arg(Arg visitedObject)
         {
             if(Actual.Size != visitedObject.Size)
@@ -49,10 +49,10 @@ namespace Reni.Code.ReplaceVisitor
             [UsedImplicitly]
             public string Dump()
             {
-                var data = "\nActual=" 
-                    + Tracer.Dump(_actual) 
-                    + "\nVisitedObject=" 
-                    + Tracer.Dump(_visitedObject);
+                var data = "\nActual="
+                           + Tracer.Dump(_actual)
+                           + "\nVisitedObject="
+                           + Tracer.Dump(_visitedObject);
 
                 return "SizeException\n{"
                        + data.Indent()

@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using HWClassLibrary.Debug;
 using Microsoft.CSharp;
@@ -17,36 +18,36 @@ namespace Reni.Code
         public static string NotACommentFlag { get { return "<notacomment> "; } }
 
         /// <summary>
-        /// Gets the name of the main method.
+        ///     Gets the name of the main method.
         /// </summary>
         /// <value>The name of the main method.</value>
         /// created 15.11.2006 22:04
         public static string MainFunctionName { get { return "MainFunction"; } }
 
         /// <summary>
-        /// Functions the name of the method.
+        ///     Functions the name of the method.
         /// </summary>
-        /// <param name="i">The i.</param>
+        /// <param name = "i">The i.</param>
         /// <returns></returns>
         /// created 15.11.2006 22:04
         public static string FunctionName(int i) { return "Function" + i; }
 
         /// <summary>
-        /// Creates the C sharp code.
+        ///     Creates the C sharp code.
         /// </summary>
-        /// <param name="main">The main.</param>
-        /// <param name="functions">The functions.</param>
-        /// <param name="useStatementAligner">if set to <c>true</c> [align].</param>
+        /// <param name = "main">The main.</param>
+        /// <param name = "functions">The functions.</param>
+        /// <param name = "useStatementAligner">if set to <c>true</c> [align].</param>
         /// <returns></returns>
         /// created 08.10.2006 02:35
         public static string CreateCSharpString(Container main, List<Container> functions, bool useStatementAligner) { return CodeToString(CreateCompileUnit(main, functions, useStatementAligner)); }
 
         /// <summary>
-        /// Creates the C sharp assembly.
+        ///     Creates the C sharp assembly.
         /// </summary>
-        /// <param name="main">The main.</param>
-        /// <param name="functions">The functions.</param>
-        /// <param name="align">if set to <c>true</c> [align].</param>
+        /// <param name = "main">The main.</param>
+        /// <param name = "functions">The functions.</param>
+        /// <param name = "align">if set to <c>true</c> [align].</param>
         /// <returns></returns>
         /// created 08.10.2006 22:44
         public static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align) { return CodeToAssembly(CreateCompileUnit(main, functions, align)); }
@@ -109,16 +110,16 @@ namespace Reni.Code
 
             // Build the parameters for source compilation.
             var cp = new System.CodeDom.Compiler.CompilerParameters
-                         {
-                             GenerateInMemory = true,
-                             CompilerOptions = "/unsafe /debug",
-                             IncludeDebugInformation = true,
-                             TempFiles = new TempFileCollection(null, true)
-                         };
+                     {
+                         GenerateInMemory = true,
+                         CompilerOptions = "/unsafe /debug",
+                         IncludeDebugInformation = true,
+                         TempFiles = new TempFileCollection(null, true)
+                     };
             cp.ReferencedAssemblies.AddRange(GetReferencesAssemblies(cu));
             var cr = _provider.CompileAssemblyFromFile(cp, name);
 
-            if (cr.Errors.Count > 0)
+            if(cr.Errors.Count > 0)
                 HandleErrors(cr.Errors);
 
             return cr.CompiledAssembly;
@@ -133,20 +134,20 @@ namespace Reni.Code
 
         private static void HandleErrors(CompilerErrorCollection cr)
         {
-            for (var i = 0; i < cr.Count; i++)
+            for(var i = 0; i < cr.Count; i++)
                 Tracer.Line(cr[i].ToString());
 
             throw new CompilerErrorException(cr);
         }
 
         /// <summary>
-        /// Creates the name of the class.
+        ///     Creates the name of the class.
         /// </summary>
         /// <returns></returns>
         /// created 08.10.2006 02:35
         private static string CreateName()
         {
-            if (_baseName == "")
+            if(_baseName == "")
                 _baseName = CreateBaseName();
 
             var result = _baseName;

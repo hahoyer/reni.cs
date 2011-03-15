@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code.ReplaceVisitor
@@ -26,11 +28,11 @@ namespace Reni.Code.ReplaceVisitor
     }
 
     /// <summary>
-    /// Replaces appearences of refInCode in code tree. 
-    /// Assumes, that replacement requires offset alignment when walking along code tree
+    ///     Replaces appearences of refInCode in code tree. 
+    ///     Assumes, that replacement requires offset alignment when walking along code tree
     /// </summary>
-    /// <typeparam name="TContext"></typeparam>
-    internal sealed class ReplaceRelativeContextRef<TContext>: ReplaceContextRef<TContext>
+    /// <typeparam name = "TContext"></typeparam>
+    internal sealed class ReplaceRelativeContextRef<TContext> : ReplaceContextRef<TContext>
         where TContext : IReferenceInCode
     {
         public ReplaceRelativeContextRef(TContext context, Func<CodeBase> replacement)
@@ -40,15 +42,15 @@ namespace Reni.Code.ReplaceVisitor
         {
             return new ReplaceRelativeContextRef<TContext>(
                 Context,
-                ()=>Replacement().AddToReference(Context.RefAlignParam, size, "After"));
+                () => Replacement().AddToReference(Context.RefAlignParam, size, "After"));
         }
     }
 
     /// <summary>
-    /// Replaces appearences of refInCode in code tree. 
-    /// Assumes, that replacement isn't a reference, that changes when walking along the code tree
+    ///     Replaces appearences of refInCode in code tree. 
+    ///     Assumes, that replacement isn't a reference, that changes when walking along the code tree
     /// </summary>
-    /// <typeparam name="TContext"></typeparam>
+    /// <typeparam name = "TContext"></typeparam>
     internal sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>
         where TContext : IReferenceInCode
     {

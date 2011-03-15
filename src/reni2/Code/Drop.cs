@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 
 namespace Reni.Code
@@ -17,8 +19,10 @@ namespace Reni.Code
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.Drop(InputSize, OutputSize); }
 
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Drop(_beforeSize, _afterSize); }
+
         [IsDumpEnabled(false)]
         internal override Size InputSize { get { return _beforeSize; } }
+
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _afterSize; } }
 

@@ -1,7 +1,8 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Context;
 
 namespace Reni.Code
@@ -10,16 +11,24 @@ namespace Reni.Code
     internal abstract class LeafElement : ReniObject, IIconKeyProvider
     {
         private static int _nextId;
-        protected LeafElement(int objectId) : base(objectId) { }
-        protected LeafElement(): base(_nextId++) {}
+
+        protected LeafElement(int objectId)
+            : base(objectId) { }
+
+        protected LeafElement()
+            : base(_nextId++) { }
 
         [Node, IsDumpEnabled(false)]
         internal Size DeltaSize { get { return GetInputSize() - GetSize(); } }
+
         [IsDumpEnabled(false)]
         internal virtual bool IsEmpty { get { return false; } }
+
         [Node, IsDumpEnabled(false)]
         internal Size Size { get { return GetSize(); } }
+
         private string CommentDump { get { return GetType().Name + " " + ObjectId; } }
+
         [IsDumpEnabled(false)]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
@@ -43,97 +52,64 @@ namespace Reni.Code
         internal virtual LeafElement[] TryToCombineBackN(TopData precedingElement)
         {
             var result = TryToCombineBack(precedingElement);
-            if (result == null)
+            if(result == null)
                 return null;
-            return new[] { result };
+            return new[] {result};
         }
 
         internal virtual LeafElement[] TryToCombineBackN(BitArrayBinaryOp precedingElement)
         {
             var result = TryToCombineBack(precedingElement);
-            if (result == null)
+            if(result == null)
                 return null;
-            return new[] { result };
+            return new[] {result};
         }
 
         internal virtual LeafElement[] TryToCombineBackN(BitArrayPrefixOp precedingElement)
         {
             var result = TryToCombineBack(precedingElement);
-            if (result == null)
+            if(result == null)
                 return null;
-            return new[] { result };
+            return new[] {result};
         }
 
         internal virtual LeafElement[] TryToCombineBackN(Dereference precedingElement)
         {
             var result = TryToCombineBack(precedingElement);
-            if (result == null)
+            if(result == null)
                 return null;
-            return new[] { result };
+            return new[] {result};
         }
 
         internal virtual LeafElement[] TryToCombineBackN(BitCast precedingElement)
         {
             var result = TryToCombineBack(precedingElement);
-            if (result == null)
+            if(result == null)
                 return null;
-            return new[] { result };
+            return new[] {result};
         }
 
-        internal virtual LeafElement TryToCombineBack(Dereference precedingElement)
-        {
-            return null;
-        }
+        internal virtual LeafElement TryToCombineBack(Dereference precedingElement) { return null; }
 
-        internal virtual LeafElement TryToCombineBack(TopRef precedingElement)
-        {
-            return null;
-        }
+        internal virtual LeafElement TryToCombineBack(TopRef precedingElement) { return null; }
 
-        internal virtual LeafElement TryToCombineBack(BitCast precedingElement)
-        {
-            return null;
-        }
+        internal virtual LeafElement TryToCombineBack(BitCast precedingElement) { return null; }
 
-        internal virtual FiberHead TryToCombineBack(TopFrameRef precedingElement)
-        {
-            return null;
-        }
+        internal virtual FiberHead TryToCombineBack(TopFrameRef precedingElement) { return null; }
 
-        internal virtual LeafElement TryToCombineBack(BitArray precedingElement)
-        {
-            return null;
-        }
+        internal virtual LeafElement TryToCombineBack(BitArray precedingElement) { return null; }
 
-        internal virtual LeafElement TryToCombineBack(TopData precedingElement)
-        {
-            return null;
-        }
+        internal virtual LeafElement TryToCombineBack(TopData precedingElement) { return null; }
 
-        internal virtual FiberHead TryToCombineBack(TopFrameData precedingElement)
-        {
-            return null;
-        }
+        internal virtual FiberHead TryToCombineBack(TopFrameData precedingElement) { return null; }
 
-        internal virtual LeafElement TryToCombineBack(BitArrayBinaryOp precedingElement)
-        {
-            return null;
-        }
+        internal virtual LeafElement TryToCombineBack(BitArrayBinaryOp precedingElement) { return null; }
 
-        internal virtual LeafElement TryToCombineBack(BitArrayPrefixOp precedingElement)
-        {
-            return null;
-        }
+        internal virtual LeafElement TryToCombineBack(BitArrayPrefixOp precedingElement) { return null; }
 
-        internal virtual LeafElement TryToCombineBack(RefPlus precedingElement)
-        {
-            return null;
-        }
+        internal virtual LeafElement TryToCombineBack(RefPlus precedingElement) { return null; }
 
-        internal virtual LeafElement Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity)
-        {
-            return this;
-        }
+        internal virtual LeafElement Visit(ReplacePrimitiveRecursivity replacePrimitiveRecursivity) { return this; }
 
         internal virtual BitsConst Evaluate()
         {
@@ -142,17 +118,16 @@ namespace Reni.Code
         }
 
         /// <summary>
-        /// Gets the icon key.
+        ///     Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
-        string IIconKeyProvider.IconKey { get { return IsError? "CodeError": "Code"; } }
+        string IIconKeyProvider.IconKey { get { return IsError ? "CodeError" : "Code"; } }
+
         [DumpExcept(false)]
         protected virtual bool IsError { get { return false; } }
+
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
-        
-        internal virtual void Execute(IFormalMaschine formalMaschine)
-        {
-            NotImplementedMethod(formalMaschine);
-        }
+
+        internal virtual void Execute(IFormalMaschine formalMaschine) { NotImplementedMethod(formalMaschine); }
     }
 }

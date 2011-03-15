@@ -18,7 +18,7 @@ namespace Reni.Code
         {
             _refAlignParam = refAlignParam;
             _holder = holder;
-            _offset = offset??Size.Zero;
+            _offset = offset ?? Size.Zero;
             //StopByObjectId(0);
         }
 

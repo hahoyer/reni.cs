@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Context;
 
@@ -25,7 +27,7 @@ namespace Reni.Code.ReplaceVisitor
         {
             get
             {
-                if (_offset.IsZero)
+                if(_offset.IsZero)
                     return ActualArg;
                 return ActualArg.AddToReference(RefAlignParam, Offset, "ReplaceRelRefArg.Actual");
             }
@@ -33,10 +35,6 @@ namespace Reni.Code.ReplaceVisitor
 
         private Size Offset { get { return _offset; } }
 
-        protected override Visitor<CodeBase> After(Size size)
-        {
-            return new ReplaceRelRefArg(ActualArg, Offset + size);
-        }
+        protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelRefArg(ActualArg, Offset + size); }
     }
-
 }

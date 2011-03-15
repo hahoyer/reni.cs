@@ -1,4 +1,9 @@
-﻿namespace Reni.Code
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
+
+namespace Reni.Code
 {
     internal sealed class CSharpCodeSnippet
     {
@@ -13,7 +18,7 @@
 
         internal string Flatten(string resultHeader)
         {
-            if (Result == "")
+            if(Result == "")
                 return Prerequisites;
             return Prerequisites + string.Format(resultHeader, Result);
         }

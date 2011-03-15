@@ -7,7 +7,7 @@ using HWClassLibrary.TreeStructure;
 namespace Reni.Code
 {
     /// <summary>
-    /// Then-Else construct
+    ///     Then-Else construct
     /// </summary>
     internal sealed class ThenElse : FiberItem
     {
@@ -23,7 +23,7 @@ namespace Reni.Code
         internal readonly CodeBase ElseCode;
 
         internal ThenElse(CodeBase thenCode, CodeBase elseCode)
-            : this(Size.Create(1),thenCode,elseCode) { }
+            : this(Size.Create(1), thenCode, elseCode) { }
 
         private ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
             : base(_nextId++)
@@ -47,13 +47,13 @@ namespace Reni.Code
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {
-            if (preceding.InputSize == preceding.OutputSize)
+            if(preceding.InputSize == preceding.OutputSize)
                 return null;
             return new FiberItem[]
-            {
-                new BitCast(preceding.InputSize, preceding.InputSize, Size.Create(1)),
-                new ThenElse(preceding.InputSize, ThenCode, ElseCode)
-            };
+                   {
+                       new BitCast(preceding.InputSize, preceding.InputSize, Size.Create(1)),
+                       new ThenElse(preceding.InputSize, ThenCode, ElseCode)
+                   };
         }
 
         internal override Size InputSize { get { return _condSize; } }
@@ -124,7 +124,6 @@ namespace Reni.Code
         {
             _thenCode = thenCode;
             _bitArrayBinaryOp = bitArrayBinaryOp;
-
         }
 
         internal override Size InputSize { get { return _bitArrayBinaryOp.DeltaSize + _bitArrayBinaryOp.OutputSize; } }

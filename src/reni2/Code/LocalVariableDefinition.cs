@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 
@@ -17,10 +19,13 @@ namespace Reni.Code
 
         [Node, IsDumpEnabled(false)]
         internal override Size InputSize { get { return _valueSize; } }
+
         [Node, IsDumpEnabled(false)]
         internal override Size OutputSize { get { return Size.Zero; } }
+
         [Node, IsDumpEnabled(false)]
         internal string HolderName { get { return _holderName; } }
+
         [Node, IsDumpEnabled(false)]
         public Size ValueSize { get { return _valueSize; } }
 

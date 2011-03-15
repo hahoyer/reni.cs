@@ -37,10 +37,7 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal virtual bool HasArg { get { return false; } }
 
-        internal string ReversePolish(Size top)
-        {
-            return CSharpCodeSnippet(top) + ";\n";
-        }
+        internal string ReversePolish(Size top) { return CSharpCodeSnippet(top) + ";\n"; }
 
         protected virtual string CSharpCodeSnippet(Size top)
         {
@@ -68,10 +65,7 @@ namespace Reni.Code
 
         protected abstract void Execute(IFormalMaschine formalMaschine);
 
-        void IFormalCodeItem.Execute(IFormalMaschine formalMaschine)
-        {
-            Execute(formalMaschine);
-        }
+        void IFormalCodeItem.Execute(IFormalMaschine formalMaschine) { Execute(formalMaschine); }
 
         protected virtual Refs GetRefsImplementation() { return Refs.None(); }
     }

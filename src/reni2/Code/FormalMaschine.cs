@@ -164,7 +164,7 @@ namespace Reni.Code
         void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
         void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
         void IFormalMaschine.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }
-        void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName,valueSize); }
+        void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName, valueSize); }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.Type;
 
 namespace Reni.Code
 {
-    internal abstract class StackData: ReniObject
+    internal abstract class StackData : ReniObject
     {
         internal virtual StackData Push(StackData stackData)
         {
@@ -30,37 +33,34 @@ namespace Reni.Code
         }
 
         internal abstract Size Size { get; }
-        
-        internal virtual StackData PushOnto(NonListStackData [] formerStack)
+
+        internal virtual StackData PushOnto(NonListStackData[] formerStack)
         {
             NotImplementedMethod(formerStack);
             return null;
         }
 
-        internal void DumpPrintOperation()
-        {
-            GetBitsConst().PrintNumber();
-        }
+        internal void DumpPrintOperation() { GetBitsConst().PrintNumber(); }
 
         internal StackData DoGetTop(Size size)
         {
-            if (size == Size)
+            if(size == Size)
                 return this;
             return GetTop(size);
         }
 
         internal StackData DoPull(Size size)
         {
-            if (size.IsZero)
+            if(size.IsZero)
                 return this;
-            if (size == Size)
+            if(size == Size)
                 return new EmptyStackData();
             return Pull(size);
         }
 
         internal StackData BitCast(Size dataSize)
         {
-            if (Size == dataSize)
+            if(Size == dataSize)
                 return this;
 
             return new BitsStackData(GetBitsConst().Resize(dataSize).Resize(Size));
@@ -74,27 +74,20 @@ namespace Reni.Code
             return new BitsStackData(resultData);
         }
 
-        internal StackData RefPlus(Size offset)
-        {
-            return GetAddress().RefPlus(offset);
-        }
+        internal StackData RefPlus(Size offset) { return GetAddress().RefPlus(offset); }
 
-        internal StackData Dereference(Size size, Size dataSize)
-        {
-            return GetAddress().Dereference(size,dataSize);
-        }
+        internal StackData Dereference(Size size, Size dataSize) { return GetAddress().Dereference(size, dataSize); }
 
         protected virtual StackDataAddress GetAddress()
         {
             NotImplementedMethod();
             return null;
         }
-        
+
         internal virtual BitsConst GetBitsConst()
         {
             NotImplementedMethod();
             return null;
         }
-
     }
 }

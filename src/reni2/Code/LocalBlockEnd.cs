@@ -1,18 +1,20 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 
 namespace Reni.Code
 {
     /// <summary>
-    /// Code for end of statement
+    ///     Code for end of statement
     /// </summary>
     [Serializable]
     internal sealed class LocalBlockEnd : FiberItem
     {
         [Node]
         private readonly Size _intermediateSize;
+
         private readonly Size _size;
 
         public LocalBlockEnd(Size size, Size intermediateSize)

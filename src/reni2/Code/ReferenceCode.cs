@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
 using Reni.Context;
 
 namespace Reni.Code
 {
     /// <summary>
-    /// ContextAtPosition reference, should be replaced
+    ///     ContextAtPosition reference, should be replaced
     /// </summary>
     internal sealed class ReferenceCode : FiberHead
     {
-        readonly IReferenceInCode _context;
+        private readonly IReferenceInCode _context;
         private static int _nextObjectId;
 
-        internal ReferenceCode(IReferenceInCode context):base(_nextObjectId++)
+        internal ReferenceCode(IReferenceInCode context)
+            : base(_nextObjectId++)
         {
             _context = context;
             StopByObjectId(2);

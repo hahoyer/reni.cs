@@ -16,9 +16,10 @@ namespace Reni.Code
         [Node, IsDumpEnabled(true)]
         private readonly List<LocalReference> _data = new List<LocalReference>();
 
-        private static int _nextObjectId; 
+        private static int _nextObjectId;
 
-        public LocalReferenceSequenceVisitor():base(_nextObjectId++) { _codeCache = new SimpleCache<CodeBase>(Convert); }
+        public LocalReferenceSequenceVisitor()
+            : base(_nextObjectId++) { _codeCache = new SimpleCache<CodeBase>(Convert); }
 
         private CodeBase Convert()
         {
@@ -54,8 +55,10 @@ namespace Reni.Code
         private int Find(LocalReference localReference)
         {
             for(var i = 0; i < _data.Count; i++)
+            {
                 if(_data[i] == localReference)
                     return i;
+            }
             _data.Add(localReference);
             return _data.Count - 1;
         }

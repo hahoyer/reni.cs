@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Context;
@@ -24,7 +26,8 @@ namespace Reni.Code
         }
 
         [IsDumpEnabled(false)]
-        internal override Size InputSize { get { return _refAlignParam.RefSize * 2; } }
+        internal override Size InputSize { get { return _refAlignParam.RefSize*2; } }
+
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return Size.Zero; } }
     }
