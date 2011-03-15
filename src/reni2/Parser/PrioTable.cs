@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
     /// <summary>
-    /// Priority table used in parsing to create the syntax tree.
+    ///     Priority table used in parsing to create the syntax tree.
     /// </summary>
     [Serializable]
     internal sealed class PrioTable
@@ -15,9 +17,9 @@ namespace Reni.Parser
         private char[,] _data;
 
         /// <summary>
-        /// asis
+        ///     asis
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name = "obj"></param>
         /// <returns></returns>
         public override bool Equals(object obj)
         {
@@ -35,7 +37,7 @@ namespace Reni.Parser
         }
 
         /// <summary>
-        /// asis
+        ///     asis
         /// </summary>
         /// <returns></returns>
         public override int GetHashCode() { return _token.GetHashCode() + _data.GetHashCode(); }
@@ -48,19 +50,21 @@ namespace Reni.Parser
         }
 
         /// <summary>
-        /// shows the table in table form.
-        /// The characters have the following meaning:
-        /// Plus: New token is higher the found token, 
-        /// Minus: Found token is higher than new token
-        /// Equal sign: New token and found token are matching
+        ///     shows the table in table form.
+        ///     The characters have the following meaning:
+        ///     Plus: New token is higher the found token, 
+        ///     Minus: Found token is higher than new token
+        ///     Equal sign: New token and found token are matching
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
             var maxlen = 0;
             for(var i = 0; i < Length; i++)
+            {
                 if(maxlen < _token[i].Length)
                     maxlen = _token[i].Length;
+            }
             var head0 = "";
             head0 = head0.PadLeft(maxlen);
             head0 += "    ";
@@ -85,19 +89,23 @@ namespace Reni.Parser
             _token = new string[l];
             var k = 0;
             foreach(var tokenArray in tokenArrayList)
+            {
                 foreach(var token in tokenArray)
                 {
                     _token[k] = token;
                     k++;
                 }
+            }
             _data = new char[Length,Length];
             for(var i = 0; i < Length; i++)
+            {
                 for(var j = 0; j < Length; j++)
                     _data[i, j] = ' ';
+            }
         }
 
         /// <summary>
-        /// Returns number of token in table
+        ///     Returns number of token in table
         /// </summary>
         private int Length { get { return _token.Length; } }
 
@@ -105,28 +113,36 @@ namespace Reni.Parser
         {
             AllocData(token);
             for(var i = 0; i < Length; i++)
+            {
                 for(var j = 0; j < Length; j++)
                     _data[i, j] = data;
+            }
         }
 
         private PrioTable(PrioTable x, PrioTable y)
         {
             AllocData(x._token, y._token);
             for(var i = 0; i < Length; i++)
+            {
                 if(i < x.Length)
+                {
                     for(var j = 0; j < Length; j++)
                     {
                         _data[i, j] = '+';
                         if(j < x.Length)
                             _data[i, j] = x._data[i, j];
                     }
+                }
                 else
+                {
                     for(var j = 0; j < Length; j++)
                     {
                         _data[i, j] = '-';
                         if(j >= x.Length)
                             _data[i, j] = y._data[i - x.Length, j - x.Length];
                     }
+                }
+            }
         }
 
         private static int Find(int i, params string[][] x)
@@ -144,6 +160,7 @@ namespace Reni.Parser
         {
             AllocData(left, x._token, right);
             for(var i = 0; i < Length; i++)
+            {
                 for(var j = 0; j < Length; j++)
                 {
                     var iData = Find(i, left, x._token);
@@ -153,93 +170,100 @@ namespace Reni.Parser
                     if(iData == 1 && jData == 1)
                         _data[i, j] = x._data[i - left.Length, j - left.Length];
                     else if(iData == 2 && jData == 0)
+                    {
                         if(j < i - left.Length - x.Length)
                             _data[i, j] = '-';
                         else if(j == i - left.Length - x.Length)
                             _data[i, j] = '=';
                         else
                             _data[i, j] = '+';
+                    }
                 }
+            }
         }
 
         /// <summary>
-        /// Obtain the index in token list. 
-        /// Empty string is considered as "end" in angle brackets. 
-        /// If name is not found the entry "common" in angle brackets is used
+        ///     Obtain the index in token list. 
+        ///     Empty string is considered as "end" in angle brackets. 
+        ///     If name is not found the entry "common" in angle brackets is used
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name = "name"></param>
         /// <returns></returns>
         public int Index(string name)
         {
             for(var i = 0; i < Length; i++)
+            {
                 if(_token[i] == name)
                     return (i);
+            }
 
             for(var i = 0; i < Length; i++)
+            {
                 if(_token[i] == "<common>")
                     return (i);
-            
+            }
+
             throw new NotImplementedException("missing <common> entry in priority table");
         }
 
         /// <summary>
-        /// Define a prio table with tokens that have the sam priority and are left associative
+        ///     Define a prio table with tokens that have the sam priority and are left associative
         /// </summary>
-        /// <param name="x"></param>
+        /// <param name = "x"></param>
         /// <returns></returns>
         public static PrioTable Left(params string[] x) { return new PrioTable('-', x); }
 
         /// <summary>
-        /// Define a prio table with tokens that have the sam priority and are right associative
+        ///     Define a prio table with tokens that have the sam priority and are right associative
         /// </summary>
-        /// <param name="x"></param>
+        /// <param name = "x"></param>
         /// <returns></returns>
         public static PrioTable Right(params string[] x) { return new PrioTable('+', x); }
 
         /// <summary>
-        /// Define a prio table that adds a parenthesis level. 
-        /// LToken and RToken should have the same number of elements. 
-        /// Elements of these lists that have the same index are consiedered as matching
+        ///     Define a prio table that adds a parenthesis level. 
+        ///     LToken and RToken should have the same number of elements. 
+        ///     Elements of these lists that have the same index are consiedered as matching
         /// </summary>
-        /// <param name="data">contains a 3 by 3 character table.
-        /// The characters have the following meaning: 
-        /// 0,0: left TokenClass finds left TokenClass;
-        /// 0,1: left TokenClass finds TokenClass defined so far;
-        /// 0,2: left TokenClass finds right TokenClass;
-        /// 1,0: TokenClass defined so far finds left TokenClass;
-        /// 1,1: ignored, Table for already defined Tokens used (use '?');
-        /// 1,2: TokenClass defined so far finds right TokenClass;
-        /// 2,0: ignored, "-=+"-Table generated (use '?');
-        /// 2,1: right TokenClass finds TokenClass defined so far;
-        /// 2,2: right TokenClass finds right TokenClass
+        /// <param name = "data">contains a 3 by 3 character table.
+        ///     The characters have the following meaning: 
+        ///     0,0: left TokenClass finds left TokenClass;
+        ///     0,1: left TokenClass finds TokenClass defined so far;
+        ///     0,2: left TokenClass finds right TokenClass;
+        ///     1,0: TokenClass defined so far finds left TokenClass;
+        ///     1,1: ignored, Table for already defined Tokens used (use '?');
+        ///     1,2: TokenClass defined so far finds right TokenClass;
+        ///     2,0: ignored, "-=+"-Table generated (use '?');
+        ///     2,1: right TokenClass finds TokenClass defined so far;
+        ///     2,2: right TokenClass finds right TokenClass
         /// </param>
-        /// <param name="lToken">list of strings that play the role of left parenthesis</param>
-        /// <param name="rToken">list of strings that play the role of right parenthesis</param>
+        /// <param name = "lToken">list of strings that play the role of left parenthesis</param>
+        /// <param name = "rToken">list of strings that play the role of right parenthesis</param>
         /// <returns></returns>
         public PrioTable Level(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
 
         public static PrioTable operator +(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
 
         /// <summary>
-        /// Combines two prioritity tables. The tokens contained in left operand are considered as higher priority operands
+        ///     Combines two prioritity tables. The tokens contained in left operand are considered as higher priority operands
         /// </summary>
-        /// <param name="x">higher priority tokens</param>
-        /// <param name="y">lower priority tokens</param>
+        /// <param name = "x">higher priority tokens</param>
+        /// <param name = "y">lower priority tokens</param>
         /// <returns></returns>
         [UsedImplicitly]
         public static PrioTable Add(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
 
         /// <summary>
-        /// Manual correction of table entries
+        ///     Manual correction of table entries
         /// </summary>
-        /// <param name="n"></param>
-        /// <param name="t"></param>
-        /// <param name="d"></param>
+        /// <param name = "n"></param>
+        /// <param name = "t"></param>
+        /// <param name = "d"></param>
         [UsedImplicitly]
         public void Correct(string n, string t, char d) { _data[Index(n), Index(t)] = d; }
 
         /// <summary>
-        /// List of names, without the special tokens "frame", "end" and "else" in angle brackets
+        ///     List of names, without the special tokens "frame", "end" and "else" in angle brackets
         /// </summary>
         [UsedImplicitly]
         public string[] GetNameList()
@@ -247,8 +271,10 @@ namespace Reni.Parser
             var result = new string[NormalNameLength()];
             var k = 0;
             for(var i = 0; i < Length; i++)
+            {
                 if(IsNormalName(_token[i]))
                     result[k++] = _token[i];
+            }
             return result;
         }
 
@@ -256,22 +282,24 @@ namespace Reni.Parser
         {
             var n = 0;
             for(var i = 0; i < Length; i++)
+            {
                 if(IsNormalName(_token[i]))
                     n++;
+            }
             return n;
         }
 
         private static bool IsNormalName(string name) { return name != "<frame>" && name != "<end>" && name != "<common>"; }
 
         /// <summary>
-        /// Returns the priority information of a pair of tokens
-        /// The characters have the following meaning:
-        /// Plus: New token is higher the recent token, 
-        /// Minus: Recent token is higher than new token
-        /// Equal sign: New token and recent token are matching
+        ///     Returns the priority information of a pair of tokens
+        ///     The characters have the following meaning:
+        ///     Plus: New token is higher the recent token, 
+        ///     Minus: Recent token is higher than new token
+        ///     Equal sign: New token and recent token are matching
         /// </summary>
-        /// <param name="newTokenName"></param>
-        /// <param name="recentTokenName"></param>
+        /// <param name = "newTokenName"></param>
+        /// <param name = "recentTokenName"></param>
         /// <returns></returns>
         public char Relation(string newTokenName, string recentTokenName)
         {

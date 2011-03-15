@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Reni.Parser;
-using Reni.TokenClasses;
+using System.Linq;
+using HWClassLibrary.Debug;
 
 namespace Reni.Parser
 {
@@ -11,12 +11,9 @@ namespace Reni.Parser
         private readonly char[] _charType = new char[256];
 
         /// <summary>
-        /// ctor
+        ///     ctor
         /// </summary>
-        public Scanner()
-        {
-            InitCharType();
-        }
+        public Scanner() { InitCharType(); }
 
         private void InitCharType()
         {
@@ -29,36 +26,21 @@ namespace Reni.Parser
             SetCharType('?', "#'\"({[)}];,");
         }
 
-        private bool IsDigit(char @char)
-        {
-            return _charType[@char] == '0';
-        }
+        private bool IsDigit(char @char) { return _charType[@char] == '0'; }
 
-        private bool IsAlpha(char @char)
-        {
-            return _charType[@char] == 'a';
-        }
+        private bool IsAlpha(char @char) { return _charType[@char] == 'a'; }
 
-        private bool IsSymbol(char @char)
-        {
-            return _charType[@char] == '*';
-        }
+        private bool IsSymbol(char @char) { return _charType[@char] == '*'; }
 
-        private bool IsWhiteSpace(char @char)
-        {
-            return _charType[@char] == ' ';
-        }
+        private bool IsWhiteSpace(char @char) { return _charType[@char] == ' '; }
 
-        private bool IsAlphaNum(char @char)
-        {
-            return IsAlpha(@char) || IsDigit(@char);
-        }
+        private bool IsAlphaNum(char @char) { return IsAlpha(@char) || IsDigit(@char); }
 
         /// <summary>
-        /// Scans source for begin of next token, advances and returns the new token.
+        ///     Scans source for begin of next token, advances and returns the new token.
         /// </summary>
-        /// <param name="sp">Source position, is advanced during create token</param>
-        /// <param name="tokenFactory">The token factory.</param>
+        /// <param name = "sp">Source position, is advanced during create token</param>
+        /// <param name = "tokenFactory">The token factory.</param>
         /// <returns>the next token</returns>
         Token IScanner.CreateToken(SourcePosn sp, ITokenFactory tokenFactory)
         {
@@ -78,12 +60,12 @@ namespace Reni.Parser
                 switch(sp.Current)
                 {
                     case '#':
-                        {
-                            var error = Comment(sp);
-                            if(error != null)
-                                return error;
-                            break;
-                        }
+                    {
+                        var error = Comment(sp);
+                        if(error != null)
+                            return error;
+                        break;
+                    }
 
                     case '"':
                         return String(sp);
@@ -114,10 +96,7 @@ namespace Reni.Parser
             }
         }
 
-        private static Token Token(SourcePosn sp, int length, ITokenClass tokenClass)
-        {
-            return new Token(sp, length, tokenClass);
-        }
+        private static Token Token(SourcePosn sp, int length, ITokenClass tokenClass) { return new Token(sp, length, tokenClass); }
 
         private void WhiteSpace(SourcePosn sp)
         {
@@ -140,7 +119,7 @@ namespace Reni.Parser
             var i = 1;
             while(IsAlphaNum(sp[i]))
                 i++;
-            return Token(sp,i, tokenFactory.TokenClass(sp.SubString(0, i)));
+            return Token(sp, i, tokenFactory.TokenClass(sp.SubString(0, i)));
         }
 
         private Token Symbol(SourcePosn sp, ITokenFactory tokenFactory)
@@ -164,11 +143,11 @@ namespace Reni.Parser
             int? errorPosition = null;
             var i = 3;
             var endOfComment = closingParenthesis + "#";
-            if (IsSymbol(sp[2]))
+            if(IsSymbol(sp[2]))
                 endOfComment = sp[2] + endOfComment;
             else if(IsAlpha(sp[2]))
             {
-                while (IsAlphaNum(sp[i]))
+                while(IsAlphaNum(sp[i]))
                     i++;
                 endOfComment = sp.SubString(2, i - 2) + endOfComment;
             }
@@ -176,13 +155,13 @@ namespace Reni.Parser
                 errorPosition = 2;
 
 
-            while(sp[i] != '\0' && IsWhiteSpace(sp[i]) && sp.SubString(i+1, endOfComment.Length) != endOfComment)
-                i++ ;
+            while(sp[i] != '\0' && IsWhiteSpace(sp[i]) && sp.SubString(i + 1, endOfComment.Length) != endOfComment)
+                i++;
             if(sp[i] == '\0')
                 return Token(sp, i, _syntaxErrorEOFComment);
 
             sp.Incr(i + 1 + endOfComment.Length);
-            if (errorPosition == null)
+            if(errorPosition == null)
                 return null;
             return Token(sp, i, _syntaxErrorBeginComment);
         }
@@ -190,7 +169,7 @@ namespace Reni.Parser
         private static void SingleLineComment(SourcePosn sp)
         {
             var i = 2;
-            while (sp[i - 1] != '\0' && sp[i - 1] != '\n')
+            while(sp[i - 1] != '\0' && sp[i - 1] != '\n')
                 i++;
             sp.Incr(i);
         }

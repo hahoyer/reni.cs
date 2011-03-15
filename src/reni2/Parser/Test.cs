@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest;
@@ -9,11 +11,10 @@ namespace Reni.Parser
     [TestFixture]
     public class ParserTest : CompilerTest
     {
-        public override void Run() { 
-        }
+        public override void Run() { }
 
         /// <summary>
-        /// Special test, will not work automatically.
+        ///     Special test, will not work automatically.
         /// </summary>
         /// created 18.07.2007 01:27 on HAHOYER-DELL by hh
         [Test, Explicit]
@@ -84,7 +85,7 @@ namespace Reni.Parser
                 );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3; !property x: 4",
-                        c => syntaxPrototype.AssertLike(c.Syntax));
+                                     c => syntaxPrototype.AssertLike(c.Syntax));
         }
     }
 }

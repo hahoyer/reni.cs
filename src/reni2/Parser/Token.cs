@@ -5,14 +5,14 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Parser
 {
-    sealed internal class Token : ReniObject
+    internal sealed class Token : ReniObject
     {
         private readonly TokenData _data;
         private readonly ITokenClass _tokenClass;
 
         internal Token(SourcePosn source, int length, ITokenClass tokenClass)
         {
-            _data = new TokenData(source.Clone(),length);
+            _data = new TokenData(source.Clone(), length);
             _tokenClass = tokenClass;
             source.Incr(length);
         }
@@ -32,10 +32,7 @@ namespace Reni.Parser
         [IsDumpEnabled(false)]
         internal string PrioTableName { get { return TokenClass.PrioTableName(Data.Name); } }
 
-        internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right)
-        {
-            return TokenClass.Syntax(left, Data, right);
-        }
+        internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
     }
 
     internal sealed class TokenData : ReniObject
@@ -61,6 +58,5 @@ namespace Reni.Parser
         internal string Name { get { return _source.SubString(0, _length); } }
 
         internal string FilePosition { get { return "\n" + Source.FilePosn(Name); } }
-
     }
 }

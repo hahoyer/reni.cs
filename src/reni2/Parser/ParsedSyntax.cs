@@ -4,7 +4,6 @@ using System.Linq;
 using System;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
-using Reni.Struct;
 
 namespace Reni.Parser
 {
@@ -16,11 +15,9 @@ namespace Reni.Parser
         private readonly TokenData _token;
 
         protected ParsedSyntax(TokenData token) { _token = token; }
+
         protected ParsedSyntax(TokenData token, int nextObjectId)
-            : base(nextObjectId)
-        {
-            _token = token;
-        }
+            : base(nextObjectId) { _token = token; }
 
 
         [IsDumpEnabled(false)]
@@ -30,15 +27,19 @@ namespace Reni.Parser
 
         [IsDumpEnabled(false)]
         TokenData IParsedSyntax.Token { get { return Token; } }
+
         [IsDumpEnabled(false)]
         TokenData IParsedSyntax.FirstToken { get { return GetFirstToken(); } }
+
         [IsDumpEnabled(false)]
         TokenData IParsedSyntax.LastToken { get { return GetLastToken(); } }
 
         [IsDumpEnabled(false)]
         internal TokenData Token { get { return _token; } }
+
         [IsDumpEnabled(false)]
         internal TokenData FirstToken { get { return GetFirstToken(); } }
+
         [IsDumpEnabled(false)]
         internal TokenData LastToken { get { return GetLastToken(); } }
 
@@ -50,6 +51,5 @@ namespace Reni.Parser
 
         [IsDumpEnabled(false), UsedImplicitly]
         public new string NodeDump { get { return base.NodeDump + " " + DumpShort(); } }
-
     }
 }

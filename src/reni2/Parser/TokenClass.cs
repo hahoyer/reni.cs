@@ -12,8 +12,9 @@ namespace Reni.Parser
     {
         private static int _nextObjectId;
         private string _name;
-        
-        protected TokenClass():base(_nextObjectId++) {  }
+
+        protected TokenClass()
+            : base(_nextObjectId++) { }
 
         string ITokenClass.Name { set { _name = value; } }
         string ITokenClass.PrioTableName(string name) { return PrioTableName(name); }
@@ -35,8 +36,8 @@ namespace Reni.Parser
 
         public override string ToString() { return base.ToString() + " Name=" + _name.Quote(); }
 
-        [Node]
-        [IsDumpEnabled(false)]
+        [Node, IsDumpEnabled(false)]
+        
         internal string Name { get { return _name; } set { _name = value; } }
     }
 
@@ -47,7 +48,7 @@ namespace Reni.Parser
 
         private static string SymbolizeChar(Char @char)
         {
-            switch (@char)
+            switch(@char)
             {
                 case '&':
                     return "And";
@@ -80,9 +81,9 @@ namespace Reni.Parser
                 case '_':
                     return "__";
                 default:
-                    if (Char.IsLetter(@char))
+                    if(Char.IsLetter(@char))
                         return "_" + @char;
-                    if (Char.IsDigit(@char))
+                    if(Char.IsDigit(@char))
                         return @char.ToString();
                     throw new NotImplementedException("Symbolize(" + @char + ")");
             }
