@@ -1,14 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 
 namespace Reni.Context
 {
     /// <summary>
-    /// Parameter to describe alignment for references
+    ///     Parameter to describe alignment for references
     /// </summary>
-    [Dump("Dump")]
-    [Serializable]
-    sealed internal class RefAlignParam : IEquatable<RefAlignParam>
+    [Dump("Dump"), Serializable]
+    
+    internal sealed class RefAlignParam : IEquatable<RefAlignParam>
     {
         private readonly int _alignBits;
         private readonly Size _refSize;
@@ -51,15 +53,9 @@ namespace Reni.Context
             return true;
         }
 
-        public string Dump()
-        {
-            return "[A:" + AlignBits + ",S:" + RefSize.Dump() + "]";
-        }
+        public string Dump() { return "[A:" + AlignBits + ",S:" + RefSize.Dump() + "]"; }
 
-        public string CodeDump()
-        {
-            return AlignBits + "_" + RefSize.ToInt();
-        }
+        public string CodeDump() { return AlignBits + "_" + RefSize.ToInt(); }
 
         public override int GetHashCode()
         {
@@ -89,15 +85,8 @@ namespace Reni.Context
             return Equals((RefAlignParam) obj);
         }
 
-        public static bool operator ==(RefAlignParam left, RefAlignParam right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(RefAlignParam left, RefAlignParam right) { return Equals(left, right); }
 
-        public static bool operator !=(RefAlignParam left, RefAlignParam right)
-        {
-            return !Equals(left, right);
-        }
-
+        public static bool operator !=(RefAlignParam left, RefAlignParam right) { return !Equals(left, right); }
     }
 }

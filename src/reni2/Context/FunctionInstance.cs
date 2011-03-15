@@ -6,28 +6,27 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Code.ReplaceVisitor;
-using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Context
 {
     /// <summary>
-    /// Instance of a function to compile
+    ///     Instance of a function to compile
     /// </summary>
     [Serializable]
     internal sealed class FunctionInstance : ReniObject
     {
-        [Node]
-        [IsDumpEnabled(true)]
+        [Node, IsDumpEnabled(true)]
+        
         private readonly TypeBase _args;
 
-        [Node]
-        [IsDumpEnabled(true)]
+        [Node, IsDumpEnabled(true)]
+        
         private readonly ICompileSyntax _body;
 
-        [Node]
-        [IsDumpEnabled(true)]
+        [Node, IsDumpEnabled(true)]
+        
         private readonly Struct.Context _context;
 
         [IsDumpEnabled(true)]
@@ -37,12 +36,12 @@ namespace Reni.Context
         private readonly SimpleCache<CodeBase> _bodyCodeCache;
 
         /// <summary>
-        /// Initializes a new instance of the FunctionInstance class.
+        ///     Initializes a new instance of the FunctionInstance class.
         /// </summary>
-        /// <param name="index">The index.</param>
-        /// <param name="body">The body.</param>
-        /// <param name="context">The context.</param>
-        /// <param name="args">The args.</param>
+        /// <param name = "index">The index.</param>
+        /// <param name = "body">The body.</param>
+        /// <param name = "context">The context.</param>
+        /// <param name = "args">The args.</param>
         /// created 03.01.2007 21:19
         internal FunctionInstance(int index, ICompileSyntax body, Struct.Context context, TypeBase args)
             : base(index)
@@ -71,12 +70,12 @@ namespace Reni.Context
 
         internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
 
-        [Node]
-        [IsDumpEnabled(false)]
+        [Node, IsDumpEnabled(false)]
+        
         private Size FrameSize { get { return _args.Size + ForeignRefs.Size; } }
 
-        [Node]
-        [IsDumpEnabled(false)]
+        [Node, IsDumpEnabled(false)]
+        
         private string Description { get { return _body.DumpShort(); } }
 
         public Result CreateCall(Category category, Result args)
@@ -101,7 +100,7 @@ namespace Reni.Context
 
         private CodeBase CreateBodyCode()
         {
-            if (IsStopByObjectIdActive)
+            if(IsStopByObjectIdActive)
                 return null;
             var category = Category.Code;
             var refAlignParam = _context.RefAlignParam;
@@ -109,7 +108,7 @@ namespace Reni.Context
             var visitResult = Result(category);
             var result = visitResult
                 .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
-            if (_args.Size.IsZero)
+            if(_args.Size.IsZero)
                 result.Code = result.Code.TryReplacePrimitiveRecursivity(_index);
             return result.Code;
         }
@@ -136,16 +135,16 @@ namespace Reni.Context
             var result =
                 postProcessedResult
                     .ReplaceAbsolute(functionContext,
-                                               ()=>CreateContextRef(postProcessedResult.CompleteCategory));
+                                     () => CreateContextRef(postProcessedResult.CompleteCategory));
             return ReturnMethodDump(trace, result);
         }
 
         private Result CreateContextRef(Category category)
         {
             return new Result(
-                category, 
-                () => _context.RefAlignParam.RefSize, 
-                CreateContextRefCode, 
+                category,
+                () => _context.RefAlignParam.RefSize,
+                CreateContextRefCode,
                 Refs.None);
         }
 
@@ -154,20 +153,20 @@ namespace Reni.Context
             var refAlignParam = _context.RefAlignParam;
             return CodeBase
                 .FrameRef(refAlignParam, "FunctionInstance.CreateContextRefCode")
-                .AddToReference(refAlignParam, FrameSize * -1, "FunctionInstance.CreateContextRefCode");
+                .AddToReference(refAlignParam, FrameSize*-1, "FunctionInstance.CreateContextRefCode");
         }
 
         private TypeBase Type() { return Result(Category.Type).Type; }
 
-        internal Code.Container Serialize(bool isInternal)
+        internal Container Serialize(bool isInternal)
         {
             try
             {
-                return new Code.Container(BodyCode, FrameSize, Description, isInternal);
+                return new Container(BodyCode, FrameSize, Description, isInternal);
             }
             catch(UnexpectedVisitOfPending)
             {
-                return Code.Container.UnexpectedVisitOfPending;
+                return Container.UnexpectedVisitOfPending;
             }
         }
 
@@ -191,6 +190,7 @@ namespace Reni.Context
     internal sealed class ReplacePrimitiveRecursivity : Base
     {
         private static int _nextObjectId;
+
         [IsDumpEnabled(true)]
         private readonly int _functionIndex;
 

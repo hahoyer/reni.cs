@@ -8,16 +8,15 @@ using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser;
-using Reni.TokenClasses;
 using Reni.Struct;
 using Reni.Syntax;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Context
 {
     /// <summary>
-    /// Base class for compiler environments
+    ///     Base class for compiler environments
     /// </summary>
     [Serializable]
     internal abstract class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
@@ -128,7 +127,7 @@ namespace Reni.Context
                 CheckRef(@ref);
         }
 
-        private void CheckRef(IReferenceInCode reference) { Tracer.Assert(!reference.IsChildOf(this), ()=>"context=" + Dump() + "\nref=" + reference.Dump()); }
+        private void CheckRef(IReferenceInCode reference) { Tracer.Assert(!reference.IsChildOf(this), () => "context=" + Dump() + "\nref=" + reference.Dump()); }
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
         {
@@ -155,7 +154,7 @@ namespace Reni.Context
             return result.LocalReferenceResult(RefAlignParam);
         }
 
-        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Type.Reference target)
+        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Reference target)
         {
             var result = Result(category | Category.Type, syntax);
             return result.ConvertToAsRef(category, target);
@@ -164,7 +163,7 @@ namespace Reni.Context
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         /// <summary>
-        /// Gets the icon key.
+        ///     Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Context"; } }
@@ -200,16 +199,16 @@ namespace Reni.Context
                 return ReturnMethodDumpWithBreak(trace, suffixResult);
 
             var suffixType = suffixResult.Type;
-            DumpWithBreak(trace, "suffixResult", suffixResult );
-            var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right),RefAlignParam);
-            DumpWithBreak(trace, "result",result);
+            DumpWithBreak(trace, "suffixResult", suffixResult);
+            var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right), RefAlignParam);
+            DumpWithBreak(trace, "result", result);
             return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult));
         }
 
         private Result SuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
             var trace = ObjectId == -5 && defineable.ObjectId == 4 && category.HasCode;
-            StartMethodDumpWithBreak(trace,category,left,defineable);
+            StartMethodDumpWithBreak(trace, category, left, defineable);
             var suffixResult = Type(left)
                 .GetSuffixResult(category, defineable);
             if(suffixResult == null)
@@ -219,7 +218,7 @@ namespace Reni.Context
             }
 
             var leftResult = Result(category, left);
-            DumpWithBreak(trace,"suffixResult",suffixResult,"leftResult",leftResult);
+            DumpWithBreak(trace, "suffixResult", suffixResult, "leftResult", leftResult);
             var result = suffixResult.ReplaceArg(leftResult);
             return ReturnMethodDumpWithBreak(trace, result);
         }
@@ -275,11 +274,11 @@ namespace Reni.Context
             StructContainerCache = new DictionaryEx<Struct.Container, FullContext>(container => new FullContext(contextBase, container));
             FunctionInstanceCache = new DictionaryEx<TypeBase, Function>(args => new Function(contextBase, args));
             PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(contextBase)
-);
+                );
         }
 
         /// <summary>
-        /// Gets the icon key.
+        ///     Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
         [IsDumpEnabled(false)]
@@ -304,10 +303,10 @@ namespace Reni.Context
             {
                 return condSyntax.CommonResult
                     (
-                    this,
-                    category,
-                    category <= Parent.PendingCategory(condSyntax.Then),
-                    condSyntax.Else != null && category <= Parent.PendingCategory(condSyntax.Else)
+                        this,
+                        category,
+                        category <= Parent.PendingCategory(condSyntax.Then),
+                        condSyntax.Else != null && category <= Parent.PendingCategory(condSyntax.Else)
                     );
             }
             return base.CommonResult(category, condSyntax);

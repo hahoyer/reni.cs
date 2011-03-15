@@ -4,13 +4,12 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
-using Reni.Struct;
 using Reni.Syntax;
 
 namespace Reni.Context
 {
     /// <summary>
-    /// Root environment of compilation process
+    ///     Root environment of compilation process
     /// </summary>
     [Serializable]
     internal sealed class Root : ContextBase
@@ -24,10 +23,7 @@ namespace Reni.Context
         [IsDumpEnabled(false)]
         internal override Root RootContext { get { return this; } }
 
-        internal List<Code.Container> CompileFunctions()
-        {
-            return _functions.Compile();
-        }
+        internal List<Container> CompileFunctions() { return _functions.Compile(); }
 
         [Node, IsDumpEnabled(false)]
         public FunctionList Functions { get { return _functions; } }

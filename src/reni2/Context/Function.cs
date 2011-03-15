@@ -1,6 +1,8 @@
-using HWClassLibrary.TreeStructure;
 using System;
-using HWClassLibrary.Helper;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Type;
 
@@ -13,10 +15,7 @@ namespace Reni.Context
         internal readonly TypeBase ArgsType;
 
         internal Function(ContextBase parent, TypeBase argsType)
-            : base(parent)
-        {
-            ArgsType = argsType;
-        }
+            : base(parent) { ArgsType = argsType; }
 
         internal override Result CreateArgsReferenceResult(Category category) { return ArgsType.ReferenceInCode(this, category); }
 
