@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
+
 namespace Reni.FeatureTest
 {
     public class StrinStruct : CompilerTest
@@ -17,12 +22,8 @@ String:
 
         public override void Run() { }
 
-        protected override string Target
-        {
-            get { return Definition() + "; " + InstanceCode + " dump_print"; }
-        }
+        protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print"; } }
 
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
-
-}                                                                
+}

@@ -9,8 +9,8 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.TokenClasses;
 using Reni.Syntax;
+using Reni.TokenClasses;
 
 namespace Reni.Struct
 {

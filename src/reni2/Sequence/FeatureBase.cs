@@ -1,4 +1,7 @@
-﻿using HWClassLibrary.Debug;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.Feature;
 using Reni.Type;
 
@@ -9,10 +12,7 @@ namespace Reni.Sequence
         [IsDumpEnabled(true)]
         protected internal readonly ISequenceOfBitBinaryOperation Definable;
 
-        protected FeatureBase(ISequenceOfBitBinaryOperation definable)
-        {
-            Definable = definable;
-        }
+        protected FeatureBase(ISequenceOfBitBinaryOperation definable) { Definable = definable; }
 
         IFeature ISearchPath<IFeature, Type.Sequence>.Convert(Type.Sequence type) { return type.Feature(this); }
 

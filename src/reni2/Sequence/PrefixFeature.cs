@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -33,33 +34,24 @@ namespace Reni.Sequence
         {
             var type = TypeBase.Number(objSize.ToInt());
             return type.Result(category,
-                                     () => CodeBase.BitSequenceOperation(type.Size, _definable, objSize));
+                               () => CodeBase.BitSequenceOperation(type.Size, _definable, objSize));
         }
     }
 
     internal sealed class Feature : FeatureBase
     {
         public Feature(ISequenceOfBitBinaryOperation definable)
-            : base(definable)
-        {
-        }
+            : base(definable) { }
 
-        internal override TypeBase ResultType(int objSize, int argsSize)
-        {
-            return TypeBase.Number(Definable.ResultSize(objSize, argsSize));
-        }
+        internal override TypeBase ResultType(int objSize, int argsSize) { return TypeBase.Number(Definable.ResultSize(objSize, argsSize)); }
     }
+
     internal sealed class CompareFeature : FeatureBase
     {
         public CompareFeature(ISequenceOfBitBinaryOperation definable)
-            : base(definable)
-        {
-        }
+            : base(definable) { }
 
-        internal override TypeBase ResultType(int objSize, int argsSize)
-        {
-            return TypeBase.Bit;
-        }
+        internal override TypeBase ResultType(int objSize, int argsSize) { return TypeBase.Bit; }
     }
 
     internal abstract class SequenceOfBitOperation :
@@ -69,15 +61,17 @@ namespace Reni.Sequence
     {
         ISearchPath<IFeature, Type.Sequence> ISearchPath<ISearchPath<IFeature, Type.Sequence>, Bit>.Convert(Bit type)
         {
-            if (IsCompareOperator)
+            if(IsCompareOperator)
                 return new CompareFeature(this);
             return new Feature(this);
         }
 
         [DumpExcept(true)]
         bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
+
         [IsDumpEnabled(false)]
         string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }
+
         [IsDumpEnabled(false)]
         string ISequenceOfBitBinaryOperation.CSharpNameOfDefaultOperation { get { return CSharpNameOfDefaultOperation; } }
 
@@ -87,6 +81,7 @@ namespace Reni.Sequence
 
         [IsDumpEnabled(false)]
         protected virtual string CSharpNameOfDefaultOperation { get { return Name; } }
+
         [DumpExcept(true)]
         protected virtual bool IsCompareOperator { get { return false; } }
     }
@@ -100,8 +95,10 @@ namespace Reni.Sequence
 
         [IsDumpEnabled(false)]
         string ISequenceOfBitPrefixOperation.CSharpNameOfDefaultOperation { get { return Name; } }
+
         [IsDumpEnabled(false)]
         string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
+
         public Result SequenceOperationResult(Category category, Size objSize) { throw new NotImplementedException(); }
 
         protected override int ResultSize(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }

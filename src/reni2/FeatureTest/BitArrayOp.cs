@@ -1,15 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 
-namespace Reni.FeatureTest.BitArrayOp 
+namespace Reni.FeatureTest.BitArrayOp
 {
     /// <summary>
-    /// Operations on bitarrays
+    ///     Operations on bitarrays
     /// </summary>
     [TestFixture, Number]
     public class BitArrayOp : CompilerTest
     {
         /// <summary>
-        /// Compares the operators.
+        ///     Compares the operators.
         /// </summary>
         /// created 08.01.2007 00:05
         [Test, Category(Worked)]
@@ -26,15 +30,13 @@ namespace Reni.FeatureTest.BitArrayOp
             CreateFileAndRunCompiler("Negative number", @"(-123456789)dump_print", "-123456789");
             CreateFileAndRunCompiler("Negative number", @"(-1234567890)dump_print", "-1234567890");
         }
-        public override void Run()
-        {
-        }
 
+        public override void Run() { }
     }
 
     [TestFixture,
-    Target(@"(1, 12)dump_print"),
-    Output("(1, 12)"), Number]
+     Target(@"(1, 12)dump_print"),
+     Output("(1, 12)"), Number]
     public class TwoPositiveNumbers : CompilerTest
     {
         [Test, Category(Worked)]
@@ -42,8 +44,8 @@ namespace Reni.FeatureTest.BitArrayOp
     }
 
     [TestFixture, TwoPositiveNumbers,
-    Target(@"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print"),
-    Output("(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)")]
+     Target(@"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print"),
+     Output("(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)")]
     public class PositiveNumbers : CompilerTest
     {
         [Test, Category(Worked)]
@@ -51,8 +53,8 @@ namespace Reni.FeatureTest.BitArrayOp
     }
 
     [TestFixture, TwoPositiveNumbers,
-    Target(@"(-1, -12)dump_print"),
-    Output("(-1, -12)")]
+     Target(@"(-1, -12)dump_print"),
+     Output("(-1, -12)")]
     public class TwoNegativeNumbers : CompilerTest
     {
         [Test, Category(Worked)]
@@ -60,8 +62,8 @@ namespace Reni.FeatureTest.BitArrayOp
     }
 
     [TestFixture, TwoNegativeNumbers,
-    Target(@"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print"),
-    Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
+     Target(@"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print"),
+     Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
     public class NegativeNumbers : CompilerTest
     {
         [Test, Category(Worked)]
@@ -109,5 +111,4 @@ namespace Reni.FeatureTest.BitArrayOp
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
-
 }

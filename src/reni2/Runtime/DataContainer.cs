@@ -20,9 +20,10 @@ namespace Reni.Runtime
                 _data[i] = data[i];
         }
 
-        private unsafe DataContainer(int count, byte* data) {
+        private unsafe DataContainer(int count, byte* data)
+        {
             _data = new byte[count];
-            for (var i = 0; i < count; i++)
+            for(var i = 0; i < count; i++)
                 _data[i] = data[i];
         }
 
@@ -102,27 +103,26 @@ namespace Reni.Runtime
         [UsedImplicitly]
         public unsafe DataContainer DataRef(int offset)
         {
-            fixed (byte* p = &_data[offset])
+            fixed(byte* p = &_data[offset])
             {
                 var ip = (int) p;
                 var ipp = (byte*) &ip;
-                return new DataContainer(sizeof(int),ipp);
+                return new DataContainer(sizeof(int), ipp);
             }
         }
 
         [UsedImplicitly]
         public unsafe DataContainer Dereference(int bytes)
         {
-            fixed (byte* p = _data)
+            fixed(byte* p = _data)
             {
-                var ip = (int*)p;
-                var ipp = (byte*)*ip;
+                var ip = (int*) p;
+                var ipp = (byte*) *ip;
                 return new DataContainer(bytes, ipp);
             }
         }
 
         [UsedImplicitly]
         public DataContainer Call(Func<DataContainer, DataContainer> func) { return func(this); }
-
     }
 }

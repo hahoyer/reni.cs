@@ -28,10 +28,11 @@ namespace Reni.Struct
 
         internal override ContextAtPosition CreatePosition(int position)
         {
-            if (position < _position)
+            if(position < _position)
                 return this;
             return _context.CreatePosition(position);
         }
+
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }
 
         [IsDumpEnabled(false)]

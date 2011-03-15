@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Parser;
+using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -16,7 +16,7 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<IFeature, Bit>,
         ISearchPath<IFeature, Type.Void>,
         ISearchPath<IFeature, Struct.Type>,
-        ISearchPath<IFeature, Struct.Field>,
+        ISearchPath<IFeature, Field>,
         ISearchPath<ISearchPath<IFeature, Type.Sequence>, Bit>,
         ISearchPath<IFeature, FunctionDefinitionType>
     {
@@ -27,7 +27,7 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, Bit>.Convert(Bit type) { return _bitFeature; }
         IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new Feature(type.Result); }
         IFeature ISearchPath<IFeature, Struct.Type>.Convert(Struct.Type type) { return new Feature(type.CreateDumpPrintResult); }
-        IFeature ISearchPath<IFeature, Struct.Field>.Convert(Struct.Field type) { return new Feature(type.DumpPrintResult); }
+        IFeature ISearchPath<IFeature, Field>.Convert(Field type) { return new Feature(type.DumpPrintResult); }
         IFeature ISearchPath<IFeature, FunctionDefinitionType>.Convert(FunctionDefinitionType type) { return new Feature(type.CreateDumpPrintResult); }
 
         ISearchPath<IFeature, Type.Sequence> ISearchPath<ISearchPath<IFeature, Type.Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }

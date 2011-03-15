@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 
 namespace Reni.Struct

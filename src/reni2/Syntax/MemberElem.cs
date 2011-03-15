@@ -1,10 +1,13 @@
-using Reni.Parser;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using Reni.ReniParser;
 
 namespace Reni.Syntax
 {
     /// <summary>
-    /// Mamber name and in case of function call an argument list
+    ///     Mamber name and in case of function call an argument list
     /// </summary>
     internal sealed class MemberElem : ReniObject
     {
@@ -12,7 +15,8 @@ namespace Reni.Syntax
         internal readonly ICompileSyntax Args;
         internal readonly DefineableToken DefineableToken;
 
-        public MemberElem(DefineableToken defineableToken, ICompileSyntax args) : base(_nextObjectId++)
+        public MemberElem(DefineableToken defineableToken, ICompileSyntax args)
+            : base(_nextObjectId++)
         {
             DefineableToken = defineableToken;
             Args = args;

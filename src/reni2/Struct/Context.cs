@@ -41,12 +41,12 @@ namespace Reni.Struct
         protected Context(ContextBase parent, Container container)
             : base(parent)
         {
-            _featuresCache    = new SimpleCache<ContextPosition[]>(CreateFeaturesCache);
-            Container           = container;
-            _internalResult       = new Result[StatementList.Count];
-            _type                   = new Type(this);
-            _referenceType           = _type.Reference(parent.RefAlignParam);
-            _function                 = new DictionaryEx<ICompileSyntax, FunctionalFeature>(body => new FunctionalFeature(this, body));
+            _featuresCache = new SimpleCache<ContextPosition[]>(CreateFeaturesCache);
+            Container = container;
+            _internalResult = new Result[StatementList.Count];
+            _type = new Type(this);
+            _referenceType = _type.Reference(parent.RefAlignParam);
+            _function = new DictionaryEx<ICompileSyntax, FunctionalFeature>(body => new FunctionalFeature(this, body));
             _internalConstructorResult = new Result();
             _constructorResult = new Result();
         }
@@ -100,8 +100,8 @@ namespace Reni.Struct
 
         internal Size InternalSize()
         {
-            if (_isFunctionInternalSizeActive) 
-                Tracer.ThrowAssertionFailed("", ()=>"");
+            if(_isFunctionInternalSizeActive)
+                Tracer.ThrowAssertionFailed("", () => "");
             _isFunctionInternalSizeActive = true;
             var result = InternalResult(Category.Size).Size;
             _isFunctionInternalSizeActive = false;
@@ -140,10 +140,12 @@ namespace Reni.Struct
         {
             AssertValid();
             if(!searchVisitor.IsSuccessFull)
+            {
                 searchVisitor.InternalResult =
                     Container
                         .SearchFromStructContext(searchVisitor.Defineable)
                         .CheckedConvert(this);
+            }
             Parent.Search(searchVisitor);
             base.Search(searchVisitor);
         }
@@ -185,7 +187,7 @@ namespace Reni.Struct
         internal override sealed Context FindStruct() { return this; }
 
         internal Result ThisReferenceResult(Category category) { return ContextReferenceType.Result(category, CreateContextCode, CreateContextRefs); }
-        
+
         internal Result FunctionalResult(Category category, ICompileSyntax body) { return new FunctionDefinitionType(Function(body)).Result(category); }
 
         internal Result AccessResultFromArg(Category category, int position)
@@ -213,7 +215,7 @@ namespace Reni.Struct
         {
             return CodeBase
                 .ReferenceInCode(ForCode)
-                .AddToReference(RefAlignParam, InternalSize() * -1, "CreateContextCode");
+                .AddToReference(RefAlignParam, InternalSize()*-1, "CreateContextCode");
         }
 
         private Refs CreateContextRefs() { return Refs.Create(ForCode); }
@@ -232,7 +234,7 @@ namespace Reni.Struct
             var reference = type.Reference(RefAlignParam);
             var result = reference
                 .Result(category, () => CreateRefArgCode().AddToReference(RefAlignParam, offset, "AutomaticDereference"));
-            return result.AutomaticDereference()& category;
+            return result.AutomaticDereference() & category;
         }
 
         private CodeBase CreateRefArgCode() { return ContextType.Reference(RefAlignParam).ArgCode(); }
@@ -264,9 +266,11 @@ namespace Reni.Struct
         private Result AccessResult(bool isProperty, int position, Category category)
         {
             if(isProperty)
+            {
                 return AccessResult(Category.Type, position)
                     .Type
                     .Apply(category, TypeBase.VoidResult, RefAlignParam);
+            }
             return AccessResult(category, position);
         }
     }

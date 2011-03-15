@@ -5,8 +5,8 @@ using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.TokenClasses;
 using Reni.Syntax;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature

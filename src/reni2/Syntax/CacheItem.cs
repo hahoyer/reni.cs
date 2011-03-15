@@ -35,7 +35,7 @@ namespace Reni.Syntax
         }
 
         /// <summary>
-        /// Gets the icon key.
+        ///     Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
         public string IconKey { get { return "Cache"; } }

@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 namespace Reni.FeatureTest
 {
     /// <summary>
-    /// Helper class for unittests, that compile something
+    ///     Helper class for unittests, that compile something
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public abstract class CompilerTest : DependantAttribute
@@ -34,10 +34,7 @@ namespace Reni.FeatureTest
         private static Dictionary<System.Type, CompilerTest> _cache;
         private bool _needToRunDependants = true;
 
-        protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput)
-        {
-            CreateFileAndRunCompiler(1, name, text, null, expectedOutput);
-        }
+        protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
         protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
 
@@ -60,7 +57,7 @@ namespace Reni.FeatureTest
         private void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
             Tracer.FlaggedLine(depth + 1, "Position of method tested");
-            if (TestRunner.IsModeErrorFocus || IsCallerUnderConstruction(1))
+            if(TestRunner.IsModeErrorFocus || IsCallerUnderConstruction(1))
                 Parameters.Trace.All();
 
             Parameters.RunFromCode = true;
@@ -93,9 +90,11 @@ namespace Reni.FeatureTest
             {
                 var x = new StackTrace(true).GetFrame(depth + i).GetMethod();
                 if(x.GetCustomAttributes(typeof(TestAttribute), true).Length > 0)
+                {
                     return x
                         .GetCustomAttributes(typeof(CategoryAttribute), true)
                         .Any(t => ((CategoryAttribute) t).Name == UnderConstruction);
+                }
             }
             return false;
         }

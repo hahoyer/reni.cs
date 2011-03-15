@@ -8,18 +8,18 @@ using JetBrains.Annotations;
 namespace Reni.Runtime
 {
     /// <summary>
-    /// Data class that contains data for a stack layer
+    ///     Data class that contains data for a stack layer
     /// </summary>
     [UsedImplicitly]
-    public static class Data 
+    public static class Data
     {
         /// <summary>
-        /// Moves the bytes.
+        ///     Moves the bytes.
         /// </summary>
-        /// <param name="count">The count.</param>
-        /// <param name="destination">The destination.</param>
-        /// <param name="destByte">The destination byte.</param>
-        /// <param name="source">The source.</param>
+        /// <param name = "count">The count.</param>
+        /// <param name = "destination">The destination.</param>
+        /// <param name = "destByte">The destination byte.</param>
+        /// <param name = "source">The source.</param>
         /// created 08.10.2006 17:43
         internal static unsafe void MoveBytes(int count, byte[] destination, int destByte, Int64 source)
         {
@@ -28,30 +28,34 @@ namespace Reni.Runtime
         }
 
         /// <summary>
-        /// Moves the bytes.
+        ///     Moves the bytes.
         /// </summary>
-        /// <param name="count">The count.</param>
-        /// <param name="destination">The destination.</param>
-        /// <param name="source">The source.</param>
+        /// <param name = "count">The count.</param>
+        /// <param name = "destination">The destination.</param>
+        /// <param name = "source">The source.</param>
         /// created 08.10.2006 17:43
         private static unsafe void MoveBytes(int count, byte* destination, byte* source)
         {
             if(destination < source)
+            {
                 for(var i = 0; i < count; i++)
                     destination[i] = source[i];
+            }
             else if(destination > source)
+            {
                 for(var i = count - 1; i >= 0; i--)
                     destination[i] = source[i];
+            }
         }
 
         /// <summary>
-        /// Moves the bytes with offset.
+        ///     Moves the bytes with offset.
         /// </summary>
-        /// <param name="count">The count.</param>
-        /// <param name="destination">The destination.</param>
-        /// <param name="destOffset">The destination offset.</param>
-        /// <param name="source">The source.</param>
-        /// <param name="sourceOffset">The source offset.</param>
+        /// <param name = "count">The count.</param>
+        /// <param name = "destination">The destination.</param>
+        /// <param name = "destOffset">The destination offset.</param>
+        /// <param name = "source">The source.</param>
+        /// <param name = "sourceOffset">The source offset.</param>
         /// created 08.10.2006 20:07
         internal static void MoveBytes(int count, byte[] destination, int destOffset, byte[] source, int sourceOffset)
         {
@@ -60,14 +64,11 @@ namespace Reni.Runtime
         }
 
         /// <summary>
-        /// Dumps the print.
+        ///     Dumps the print.
         /// </summary>
-        /// <param name="s">The s.</param>
+        /// <param name = "s">The s.</param>
         /// created 08.01.2007 18:42
-        internal static void DumpPrint(string s)
-        {
-            BitsConst.OutStream.Add(s);
-        }
+        internal static void DumpPrint(string s) { BitsConst.OutStream.Add(s); }
 
         internal static unsafe void BitCast(byte[] x, int bits)
         {
@@ -87,24 +88,19 @@ namespace Reni.Runtime
             if(bitsToCast > 0)
             {
                 count--;
-                var @sbyte = (int)(sbyte)x[count];
+                var @sbyte = (int) (sbyte) x[count];
                 var sbyte1 = (@sbyte << bitsToCast);
                 var i = (sbyte1 >> bitsToCast);
                 x[count] = (byte) i;
             }
             if(bitsToCast < 0)
-            {
                 throw new NotImplementedException();
-            }
         }
 
-        static bool IsNegative(this byte x) { return x >= 0x80; }
+        private static bool IsNegative(this byte x) { return x >= 0x80; }
 
         [UsedImplicitly]
-        public static void Set(byte[] dest, int destStart, params byte[] source)
-        {
-            source.CopyTo(dest,destStart);
-        }
+        public static void Set(byte[] dest, int destStart, params byte[] source) { source.CopyTo(dest, destStart); }
 
         [UsedImplicitly]
         public static unsafe void SetFromPointer(byte[] dest, int destStart, int bytes, byte[] source, int sourceStart)
@@ -113,11 +109,11 @@ namespace Reni.Runtime
             Tracer.Assert(sizeof(byte*) == 4);
             Tracer.Assert(sizeof(int) == 4);
 
-            fixed (byte* sourcePointer = source)
+            fixed(byte* sourcePointer = source)
             {
-                var intPointer = (int)(sourcePointer + sourceStart);
-                var bytePointer = (byte*)&intPointer;
-                for (var i = 0; i < bytes; i++)
+                var intPointer = (int) (sourcePointer + sourceStart);
+                var bytePointer = (byte*) &intPointer;
+                for(var i = 0; i < bytes; i++)
                     dest[destStart + i] = bytePointer[i];
             }
         }
@@ -126,7 +122,7 @@ namespace Reni.Runtime
         public static byte[] Get(byte[] source, int sourceStart, int bytes)
         {
             var result = new byte[bytes];
-            for (var i = 0; i < bytes; i++)
+            for(var i = 0; i < bytes; i++)
                 result[i] = source[sourceStart];
             return result;
         }
@@ -138,20 +134,20 @@ namespace Reni.Runtime
             Tracer.Assert(sizeof(byte*) == 4);
 
             var result = new byte[bytes];
-            fixed (byte* sourcePointer = &data[dataStart])
+            fixed(byte* sourcePointer = &data[dataStart])
             {
-                var ipp = (byte**)sourcePointer;
-                for (var i = 0; i < bytes; i++)
+                var ipp = (byte**) sourcePointer;
+                for(var i = 0; i < bytes; i++)
                     result[i] = (*ipp)[i];
             }
-            for (var i = 0; i < bytes; i++)
+            for(var i = 0; i < bytes; i++)
                 data[dataStart + pointerSize - bytes] = result[i];
         }
 
         [UsedImplicitly]
         public static unsafe void BitCast(byte[] data, int dataStart, int bytes, int bits)
         {
-            fixed (byte* dataPointer = &data[dataStart])
+            fixed(byte* dataPointer = &data[dataStart])
                 BitCast(bytes, dataPointer, bits);
         }
 
@@ -159,10 +155,9 @@ namespace Reni.Runtime
         public static void DumpPrint(byte[] data, int dataStart, int bytes)
         {
             var piece = new byte[bytes];
-            for (var i = 0; i < bytes; i++)
+            for(var i = 0; i < bytes; i++)
                 piece[i] = data[dataStart + i];
             BitsConst.OutStream.Add(new BigInteger(piece).ToString());
         }
-
     }
 }

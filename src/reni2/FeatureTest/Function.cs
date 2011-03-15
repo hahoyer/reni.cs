@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
@@ -8,68 +10,68 @@ using Reni.FeatureTest.ThenElse;
 
 namespace Reni.FeatureTest.Function
 {
-    [TestFixture]
-    [TargetSet(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;", @"(100, (arg)+(x)/\)")]
-    [SomeVariables, Add2Numbers, AccessMember, FunctionWithNonLocal, Function, TwoFunctions, FunctionWithRefArg]
+    [TestFixture, TargetSet(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;", @"(100, (arg)+(x)/\)"), SomeVariables, Add2Numbers, AccessMember, FunctionWithNonLocal, Function, TwoFunctions, FunctionWithRefArg]
+    
+    
     public sealed class FunctionVariable : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
-    [Target(@"f: arg/\;f(2) dump_print;")]
-    [Output("2")]
-    [InnerAccess, SomeVariables]
+    [TestFixture, Target(@"f: arg/\;f(2) dump_print;"), Output("2"), InnerAccess, SomeVariables]
+    
+    
+    
     public sealed class Function : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
-    [Target(@"f: 100/\;f() dump_print;")]
-    [Output("100")]
-    [Function]
+    [TestFixture, Target(@"f: 100/\;f() dump_print;"), Output("100"), Function]
+    
+    
+    
     public sealed class ConstantFunction : CompilerTest
     {
         [Test, Category(Worked)]
-        public override void Run() {  BaseRun(); }
+        public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
-    [Target(@"x: 100; f: x/\;f() dump_print;")]
-    [Output("100")]
-    [InnerAccess, SomeVariables, ConstantFunction]
+    [TestFixture, Target(@"x: 100; f: x/\;f() dump_print;"), Output("100"), InnerAccess, SomeVariables, ConstantFunction]
+    
+    
+    
     public sealed class SimpleFunctionWithNonLocal : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
-    [Target(@"x: 100;f: arg+x/\;f(2) dump_print;")]
-    [Output("102")]
-    [InnerAccess, SomeVariables, Add2Numbers, SimpleFunctionWithNonLocal]
+    [TestFixture, Target(@"x: 100;f: arg+x/\;f(2) dump_print;"), Output("102"), InnerAccess, SomeVariables, Add2Numbers, SimpleFunctionWithNonLocal]
+    
+    
+    
     public sealed class FunctionWithNonLocal : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccess, Add2Numbers, UseThen, UseElse, Assignment, SimpleFunction, RecursiveFunction]
-    [Target(@"i: 10; f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()")]
-    [Output("9876543210")]
+    [TestFixture, InnerAccess, Add2Numbers, UseThen, UseElse, Assignment, SimpleFunction, RecursiveFunction, Target(@"i: 10; f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()"), Output("9876543210")]
+    
+    
     public sealed class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
-    [Target(@"i: 400000; f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()")]
-    [Output("")]
-    [PrimitiveRecursiveFunctionSmall]
+    [TestFixture, Target(@"i: 400000; f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()"), Output(""), PrimitiveRecursiveFunctionSmall]
+    
+    
+    
     public sealed class PrimitiveRecursiveFunctionHuge : CompilerTest
     {
         [Test, Category(Worked)]
@@ -77,30 +79,28 @@ namespace Reni.FeatureTest.Function
     }
 
     /// <summary>
-    /// Recursive function that will result in a stack overflow, except when compiled as a loop
+    ///     Recursive function that will result in a stack overflow, except when compiled as a loop
     /// </summary>
-    [TestFixture]
-    [Target(@"i: 400000 type(400); f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()")]
-    [Output("")]
-    [PrimitiveRecursiveFunctionByteWithDump]
+    [TestFixture, Target(@"i: 400000 type(400); f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()"), Output(""), PrimitiveRecursiveFunctionByteWithDump]
+    
     public sealed class PrimitiveRecursiveFunctionSmall : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture]
-    [TargetSet(@"i: 400000 type(10); f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()", "9876543210")]
-    [PrimitiveRecursiveFunctionByteWithDump, UseThen, UseElse]
+    [TestFixture, TargetSet(@"i: 400000 type(10); f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()", "9876543210"), PrimitiveRecursiveFunctionByteWithDump, UseThen, UseElse]
+    
+    
     public sealed class PrimitiveRecursiveFunctionWithDump : CompilerTest
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccess, Add2Numbers, UseThen, UseElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction]
-    [Target(@"f: {1000 type({arg = 1 then 1 else (arg * f[arg type((arg-1)enable_cut)])}enable_cut)}/\;f(4)dump_print")]
-    [Output("24")]
+    [TestFixture, InnerAccess, Add2Numbers, UseThen, UseElse, ApplyTypeOperator, Equal, ApplyTypeOperatorWithCut, SimpleFunction, Target(@"f: {1000 type({arg = 1 then 1 else (arg * f[arg type((arg-1)enable_cut)])}enable_cut)}/\;f(4)dump_print"), Output("24")]
+    
+    
     public sealed class RecursiveFunction : CompilerTest
     {
         [Test, Category(Worked)]
@@ -115,8 +115,8 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture,
-    TargetSet(@"f: arg+1/\;f(2) dump_print;","3"),
-    InnerAccess, Add2Numbers, Function] 
+     TargetSet(@"f: arg+1/\;f(2) dump_print;", "3"),
+     InnerAccess, Add2Numbers, Function]
     public sealed class SimpleFunction : CompilerTest
     {
         [Test, Category(Worked)]

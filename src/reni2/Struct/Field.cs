@@ -13,8 +13,10 @@ namespace Reni.Struct
     {
         [IsDumpEnabled]
         private readonly Context _context;
+
         [IsDumpEnabled]
         private readonly int _position;
+
         private readonly SimpleCache<TypeBase> _valueTypeCache;
 
         public Field(Context context, int position)
@@ -54,7 +56,7 @@ namespace Reni.Struct
 
         private Result LocalReference(Category category)
         {
-            return ArgResult(category|Category.Type)
+            return ArgResult(category | Category.Type)
                 .LocalReferenceResult(RefAlignParam);
         }
 
@@ -79,6 +81,7 @@ namespace Reni.Struct
         private Reference ValueTypeReference { get { return ValueType.Reference(RefAlignParam); } }
 
         private TypeBase GetValueType() { return _context.RawType(_position); }
+
         private CodeBase GetAccessCode()
         {
             return _context

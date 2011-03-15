@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
@@ -10,6 +12,7 @@ namespace Reni.Sequence
     internal class FunctionalFeature : ReniObject, IFeature, IFunctionalFeature
     {
         private readonly Type.Sequence _parent;
+
         [IsDumpEnabled(true)]
         private readonly FeatureBase _feature;
 
@@ -38,7 +41,7 @@ namespace Reni.Sequence
 
         Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            var objectResult = _parent.ObjectReferenceInCode(category|Category.Type,refAlignParam);
+            var objectResult = _parent.ObjectReferenceInCode(category | Category.Type, refAlignParam);
             var result = Apply(category, objectResult.Type.SequenceCount(_parent.Element), argsType.SequenceCount(_parent.Element));
             var convertedObjectResult = objectResult.ConvertToBitSequence(category);
             var convertedArgsResult = argsType.ConvertToBitSequence(category);
@@ -48,5 +51,4 @@ namespace Reni.Sequence
         Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
     }
-
 }

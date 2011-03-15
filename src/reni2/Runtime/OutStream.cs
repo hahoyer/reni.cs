@@ -1,26 +1,26 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 
 namespace Reni.Runtime
 {
     /// <summary>
-    /// Handle printouts
+    ///     Handle printouts
     /// </summary>
-    public class OutStream: ReniObject
+    public class OutStream : ReniObject
     {
-        string _data = "";
+        private string _data = "";
 
         /// <summary>
-        /// Content so far
+        ///     Content so far
         /// </summary>
-        public string Data
-        {
-            get { return _data; }
-        }
+        public string Data { get { return _data; } }
 
         /// <summary>
-        /// Adds some text
+        ///     Adds some text
         /// </summary>
-        /// <param name="x"></param>
+        /// <param name = "x"></param>
         public void Add(string x)
         {
             _data += x;
@@ -29,11 +29,8 @@ namespace Reni.Runtime
         }
 
         /// <summary>
-        /// put it out
+        ///     put it out
         /// </summary>
-        public void Exec()
-        {
-            Tracer.Line("---------------------\n" + _data + "\n---------------------");
-        }
+        public void Exec() { Tracer.Line("---------------------\n" + _data + "\n---------------------"); }
     }
 }

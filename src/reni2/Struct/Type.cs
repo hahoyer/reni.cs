@@ -18,7 +18,7 @@ namespace Reni.Struct
         private readonly Context _context;
 
         [IsDumpEnabled(false)]
-        internal readonly ISearchPath<IFeature, Reni.Type.Reference> DumpPrintReferenceFeature;
+        internal readonly ISearchPath<IFeature, Reference> DumpPrintReferenceFeature;
 
         internal Type(Context context)
             : base(_nextObjectId++)
@@ -29,6 +29,7 @@ namespace Reni.Struct
 
         [IsDumpEnabled(false)]
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+
         internal Context Context { get { return _context; } }
 
         protected override Size GetSize() { return _context.InternalSize(); }
@@ -60,11 +61,12 @@ namespace Reni.Struct
                     () => Context.ConstructorRefs()
                 );
         }
+
         internal override Context GetStruct() { return _context; }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
-            if (dest.IsVoid)
+            if(dest.IsVoid)
                 return Size.IsZero;
             NotImplementedMethod(dest, conversionParameter);
             return false;

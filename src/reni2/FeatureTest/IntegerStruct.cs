@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 
 namespace Reni.FeatureTest.Integer
 {
     /// <summary>
-    /// Structure, that is all between brackets
+    ///     Structure, that is all between brackets
     /// </summary>
     public class IntegerStruct : CompilerTest
     {
@@ -32,40 +34,37 @@ Integer8:
 
         public override void Run() { }
 
-        protected override string Target
-        {
-            get { return Definition() + "; " + InstanceCode + " dump_print"; }
-        }
+        protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print"; } }
 
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
-    [TestFixture, Output("3"), InstanceCode("(Integer8(1)+Integer8(2))")]
-    [IntegerPlusNumber]
+    [TestFixture, Output("3"), InstanceCode("(Integer8(1)+Integer8(2))"), IntegerPlusNumber]
+    
     public class IntegerPlusInteger : IntegerStruct
     {
         [Test, Category(UnderConstruction)]
-        public override void Run() { BaseRun();}
+        public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("3"), InstanceCode("(Integer8(1)+2)")]
-    [Create]
+    [TestFixture, Output("3"), InstanceCode("(Integer8(1)+2)"), Create]
+    
     public class IntegerPlusNumber : IntegerStruct
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("23"), InstanceCode("Integer8(23) clone")]
-    [Create]
+    [TestFixture, Output("23"), InstanceCode("Integer8(23) clone"), Create]
+    
     public class Clone : IntegerStruct
     {
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("23"), InstanceCode("Integer8(0) create(23)")]
-    [DumpPrint1, DumpPrint2, DumpPrint127]
+    [TestFixture, Output("23"), InstanceCode("Integer8(0) create(23)"), DumpPrint1, DumpPrint2, DumpPrint127]
+    
     public class Create : IntegerStruct
     {
         [Test, Category(Worked)]
@@ -92,5 +91,4 @@ Integer8:
         [Test, Category(Worked)]
         public override void Run() { BaseRun(); }
     }
-
 }
