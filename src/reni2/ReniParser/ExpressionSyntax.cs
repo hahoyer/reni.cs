@@ -5,8 +5,8 @@ using System.Linq;
 using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.Parser;
-using Reni.TokenClasses;
 using Reni.Syntax;
+using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
@@ -44,15 +44,9 @@ namespace Reni.ReniParser
             return result;
         }
 
-        protected override TokenData GetFirstToken()
-        {
-            return Left == null ? Token : Left.FirstToken;
-        }
+        protected override TokenData GetFirstToken() { return Left == null ? Token : Left.FirstToken; }
 
-        protected override TokenData GetLastToken()
-        {
-            return Right == null ? Token : Right.LastToken;
-        }
+        protected override TokenData GetLastToken() { return Right == null ? Token : Right.LastToken; }
 
         protected internal override Result Result(ContextBase context, Category category)
         {

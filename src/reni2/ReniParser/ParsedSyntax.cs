@@ -2,20 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
-using JetBrains.Annotations;
 using Reni.Parser;
-using Reni.TokenClasses;
 using Reni.Struct;
 using Reni.Syntax;
+using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
     [Serializable]
     internal abstract class ParsedSyntax : Parser.ParsedSyntax
     {
-        protected ParsedSyntax(TokenData token):base(token) { }
-        protected ParsedSyntax(TokenData token, int nextObjectId): base(token,nextObjectId) { }
+        protected ParsedSyntax(TokenData token)
+            : base(token) { }
+
+        protected ParsedSyntax(TokenData token, int nextObjectId)
+            : base(token, nextObjectId) { }
 
         internal virtual ICompileSyntax ToCompiledSyntax()
         {
@@ -49,16 +50,13 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ParsedSyntax right)
-        {
-            return new ExpressionSyntax(tokenClass, ToCompiledSyntax(), token, right.ToCompiledSyntaxOrNull());
-        }
+        internal virtual ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ParsedSyntax right) { return new ExpressionSyntax(tokenClass, ToCompiledSyntax(), token, right.ToCompiledSyntaxOrNull()); }
 
         private static bool _isInDump;
 
         protected override sealed string Dump(bool isRecursion)
         {
-            if (isRecursion)
+            if(isRecursion)
                 return "ObjectId=" + ObjectId;
 
             var isInContainerDump = Container.IsInContainerDump;
@@ -66,11 +64,11 @@ namespace Reni.ReniParser
             var isInDump = _isInDump;
             _isInDump = true;
             var result = DumpShort();
-            if (!IsDetailedDumpRequired)
+            if(!IsDetailedDumpRequired)
                 return result;
-            if (!isInDump)
+            if(!isInDump)
                 result += FilePosition();
-            if (!isInContainerDump)
+            if(!isInContainerDump)
                 result += "\n" + base.Dump(false);
             Container.IsInContainerDump = isInContainerDump;
             _isInDump = isInDump;

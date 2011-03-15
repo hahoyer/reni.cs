@@ -5,13 +5,13 @@ using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
-using Reni.TokenClasses;
 using Reni.Sequence;
 using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    internal sealed class MainTokenFactory : TokenFactory<TokenClasses.TokenClass>
+    internal sealed class MainTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
         protected override PrioTable GetPrioTable()
         {
