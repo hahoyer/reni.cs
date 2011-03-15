@@ -12,7 +12,7 @@ namespace Reni.Proof.TokenClasses
         {
             if(left != null || right != null)
                 return base.Syntax(left, token, right);
-            return new UserSymbolSyntax(token, Name);
+            return new VariableSyntax(token, Name);
         }
     }
 }

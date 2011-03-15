@@ -3,8 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using JetBrains.Annotations;
-using Reni.TokenClasses;
 using Reni.Struct;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni

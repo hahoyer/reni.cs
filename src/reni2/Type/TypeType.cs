@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
-using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -34,9 +33,6 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal Result DumpPrintResult(Category category)
-        {
-            return Void.Result(category, () => CodeBase.DumpPrintText(_value.DumpPrintText));
-        }
+        internal Result DumpPrintResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(_value.DumpPrintText)); }
     }
 }

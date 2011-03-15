@@ -7,7 +7,7 @@ using Reni.Parser;
 
 namespace Reni.Proof
 {
-    internal sealed class AssociativeSyntax : ParsedSyntax
+    internal abstract class AssociativeSyntax : ParsedSyntax
     {
         internal readonly IAssociative Operator;
         internal readonly Set<ParsedSyntax> Set;
@@ -19,17 +19,8 @@ namespace Reni.Proof
             Set = set;
         }
 
-        internal static Set<ParsedSyntax> ListOf(IAssociative associativeOperator, ParsedSyntax parsedSyntax)
-        {
-            var commutative = parsedSyntax as AssociativeSyntax;
-            if(commutative != null && commutative.Operator == associativeOperator)
-                return commutative.Set;
-            var result = new Set<ParsedSyntax> {parsedSyntax};
-            return result;
-        }
-
         [IsDumpEnabled(false)]
-        internal override Set<string> Variables
+        internal override sealed Set<string> Variables
         {
             get
             {
@@ -39,7 +30,9 @@ namespace Reni.Proof
             }
         }
 
-        internal override bool IsDistinct(ParsedSyntax other) { return IsDistinct((AssociativeSyntax)other); }
+        internal override sealed bool IsDistinct(ParsedSyntax other) { return IsDistinct((AssociativeSyntax) other); }
+        internal override string SmartDump(ISmartDumpToken @operator) { return Operator.SmartDump(Set); }
+
         private bool IsDistinct(AssociativeSyntax other)
         {
             if(other.Operator != Operator)
@@ -48,9 +41,19 @@ namespace Reni.Proof
         }
     }
 
+    internal interface ISmartDumpToken
+    {
+        string SmartDumpListDelim(ParsedSyntax parsedSyntax, bool isFirst);
+        bool IsIgnoreSignSituation { get; }
+    }
+
     internal interface IAssociative
     {
         bool IsVariablesProvider { get; }
+        ParsedSyntax Empty { get; }
+        string SmartDump(Set<ParsedSyntax> set);
+        AssociativeSyntax Syntax(TokenData token, Set<ParsedSyntax> x);
+        ParsedSyntax Combine(ParsedSyntax left, ParsedSyntax right);
+        bool IsEmpty(ParsedSyntax parsedSyntax);
     }
-
 }

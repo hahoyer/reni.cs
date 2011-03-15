@@ -6,15 +6,13 @@ using Reni.Parser;
 
 namespace Reni.Proof.TokenClasses
 {
-    internal sealed class Sign : TokenClass, IAssociative
+    internal sealed class Minus : PairToken
     {
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            Tracer.Assert(left != null);
-            Tracer.Assert(right != null);
-
-            return left.Associative(this, token, right);
+            if(left == null || right == null)
+                return base.Syntax(left, token, right);
+            return left.Minus(token, right);
         }
-        bool IAssociative.IsVariablesProvider { get { return true; } }
     }
 }

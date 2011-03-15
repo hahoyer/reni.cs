@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -6,7 +7,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.UnitTest;
 using JetBrains.Annotations;
-using Reni.Code;
 using Reni.FeatureTest;
 using Reni.Runtime;
 
@@ -37,16 +37,10 @@ namespace Reni
             : this(Size.Create(AutoSize(value))) { Data.MoveBytes(DataSize(_size), _data, 0, value); }
 
         private BitsConst(BitsConst value, Size size)
-            : this(size)
-        {
-            MoveData(_data, Size, value._data, value.Size);
-        }
+            : this(size) { MoveData(_data, Size, value._data, value.Size); }
 
         private BitsConst(int bytes, byte[] value, int start)
-            : this(Size.Create(bytes*8))
-        {
-            Data.MoveBytes(DataSize(_size), _data, 0, value, start);
-        }
+            : this(Size.Create(bytes*8)) { Data.MoveBytes(DataSize(_size), _data, 0, value, start); }
 
         private static Size SegmentBits { get { return Size.Create(1 << SegmentAlignBits); } }
         private static int SegmentValues { get { return 1 << SegmentBits.ToInt(); } }
@@ -98,10 +92,12 @@ namespace Reni
                 return;
 
             for(i++; i < size.ByteCount; i++)
+            {
                 unchecked
                 {
                     data[i] = (byte) -1;
                 }
+            }
         }
 
         public byte Byte(int index)
@@ -159,6 +155,7 @@ namespace Reni
 
         [UsedImplicitly]
         public BitsConst Star(BitsConst right, Size size) { return Multiply(right, size); }
+
         [UsedImplicitly]
         public BitsConst Slash(BitsConst right, Size size) { return Divide(right, size); }
 
@@ -219,7 +216,7 @@ namespace Reni
         }
 
         public override string ToString() { return DumpValue(); }
-        public override string NodeDump { get{return base.NodeDump + " " + ToString();} }
+        public override string NodeDump { get { return base.NodeDump + " " + ToString(); } }
 
         public unsafe Int64 ToInt64()
         {
@@ -259,10 +256,12 @@ namespace Reni
             var value = "";
             var n = _data.Length;
             for(var i = 0; i < n; i++)
+            {
                 if(i < 2 || i >= n - 2 || n == 5)
                     value = HexDump(_data[i]) + value;
                 else if(i == 3)
                     value = "..." + value;
+            }
             return value;
         }
 
@@ -312,10 +311,10 @@ namespace Reni
         /// <summary/>
         public static BitsConst operator *(BitsConst left, int right) { return left*Convert(right); }
 
-        /// <summary/>
+        /// <summary />
         public static BitsConst Multiply(BitsConst left, BitsConst right) { return left.Multiply(right, MultiplySize(left.Size, right.Size)); }
 
-        public static BitsConst Multiply(BitsConst left, int right) { return left * Convert(right); }
+        public static BitsConst Multiply(BitsConst left, int right) { return left*Convert(right); }
 
         public static BitsConst operator /(BitsConst left, BitsConst right) { return left.Divide(right, DivideSize(left.Size, right.Size)); }
 
@@ -323,7 +322,7 @@ namespace Reni
 
         public static BitsConst Divide(BitsConst left, BitsConst right) { return left.Divide(right, DivideSize(left.Size, right.Size)); }
 
-        public static BitsConst Divide(BitsConst left, int right) { return left / Convert(right); }
+        public static BitsConst Divide(BitsConst left, int right) { return left/Convert(right); }
 
         public override bool Equals(object obj)
         {
@@ -347,9 +346,9 @@ namespace Reni
 
         public bool? Access(Size start)
         {
-            if (start.IsNegative)
+            if(start.IsNegative)
                 return null;
-            if (start >= Size)
+            if(start >= Size)
                 return null;
             return GetBit(start) != 0;
         }
@@ -429,10 +428,12 @@ namespace Reni
             }
         }
 
-        internal string ByteSequence(Size size) { var result = "";
-            for (var i = 0; i < size.ByteCount; i++)
+        internal string ByteSequence(Size size)
+        {
+            var result = "";
+            for(var i = 0; i < size.ByteCount; i++)
             {
-                if (i > 0)
+                if(i > 0)
                     result += ", ";
                 result += Byte(i);
             }
@@ -442,25 +443,21 @@ namespace Reni
         internal BitsConst BitArrayBinaryOp(string operation, Size size, BitsConst right)
         {
             var methodInfo = typeof(BitsConst).GetMethod(operation);
-            if (methodInfo == null)
+            if(methodInfo == null)
                 throw new MissingMethodException(operation);
             return (BitsConst) methodInfo.Invoke(this, new object[] {right, size});
         }
 
         private sealed class MissingMethodException : Exception
         {
-            [IsDumpEnabled()]
+            [IsDumpEnabled]
             private readonly string _operation;
 
             public MissingMethodException(string operation)
             {
                 _operation = operation;
-                Tracer.ThrowAssertionFailed(1,"", ()=>Tracer.Dump(this));
+                Tracer.ThrowAssertionFailed(1, "", () => Tracer.Dump(this));
             }
         }
-
-
     }
-
-
 }

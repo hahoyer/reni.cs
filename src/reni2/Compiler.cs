@@ -30,10 +30,10 @@ namespace Reni
         private readonly SimpleCache<string> _executedCode;
 
         /// <summary>
-        /// ctor from file
+        ///     ctor from file
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <param name="parameters"></param>
+        /// <param name = "fileName">Name of the file.</param>
+        /// <param name = "parameters"></param>
         public Compiler(CompilerParameters parameters, string fileName)
         {
             _fileName = fileName;
@@ -41,17 +41,17 @@ namespace Reni
             _tokenFactory = new MainTokenFactory();
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
-            _code = new SimpleCache<CodeBase> (()=>Struct.Container.Create(Syntax).Result(_rootContext, Category.Code).Code);
+            _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Result(_rootContext, Category.Code).Code);
             _functionCode = new SimpleCache<CodeBase[]>(() => _rootContext.FunctionCode);
             _mainContainer = new SimpleCache<Container>(() => new Container(Code));
-            _functionContainers = new SimpleCache<List<Container>>(()=>_rootContext.CompileFunctions());
+            _functionContainers = new SimpleCache<List<Container>>(() => _rootContext.CompileFunctions());
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, false));
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Compiler"/> class.
+        ///     Initializes a new instance of the <see cref = "Compiler" /> class.
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
+        /// <param name = "fileName">Name of the file.</param>
         /// created 14.07.2007 15:59 on HAHOYER-DELL by hh
         public Compiler(string fileName)
             : this(new CompilerParameters(), fileName) { }
@@ -60,17 +60,22 @@ namespace Reni
 
         [IsDumpEnabled(false)]
         public string FileName { get { return _fileName; } }
+
         [IsDumpEnabled(false)]
         public Source Source { get { return _source.Value; } }
+
         [Node, IsDumpEnabled(false)]
         internal ReniParser.ParsedSyntax Syntax { get { return _syntax.Value; } }
+
         [IsDumpEnabled(false)]
         public string ExecutedCode { get { return _executedCode.Value; } }
 
         [Node, IsDumpEnabled(false)]
         private CodeBase Code { get { return _code.Value; } }
+
         [IsDumpEnabled(false)]
         private Container MainContainer { get { return _mainContainer.Value; } }
+
         [Node, IsDumpEnabled(false)]
         private List<Container> FunctionContainers { get { return _functionContainers.Value; } }
 
@@ -93,7 +98,7 @@ namespace Reni
         }
 
         /// <summary>
-        /// Performs compilation
+        ///     Performs compilation
         /// </summary>
         public OutStream Exec()
         {
@@ -120,10 +125,8 @@ namespace Reni
                     Tracer.FlaggedLine("function index=" + i + "\n" + _rootContext.Functions[i].BodyCode.Dump());
             }
 
-            if (_parameters.RunFromCode)
-            {
+            if(_parameters.RunFromCode)
                 return GetOutStreamFromCode();
-            }
 
             if(_parameters.Trace.CodeSequence)
             {
@@ -139,10 +142,10 @@ namespace Reni
 
         internal void Materialize()
         {
-            if (_parameters.ParseOnly)
+            if(_parameters.ParseOnly)
                 return;
             _code.Ensure();
-            for (var i = 0; i < _rootContext.Functions.Count; i++)
+            for(var i = 0; i < _rootContext.Functions.Count; i++)
                 _rootContext.Functions[i].EnsureBodyCode();
         }
 
@@ -169,6 +172,5 @@ namespace Reni
             Code.Execute(_functionCode.Value, _parameters.Trace.CodeExecutor);
             return BitsConst.OutStream;
         }
-
     }
 }

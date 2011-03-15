@@ -7,11 +7,15 @@ using Reni.Parser;
 
 namespace Reni.Proof
 {
-    internal sealed class IntegerSyntax : ParsedSyntax
+    internal sealed class IntegerSyntax : ParsedSyntax, IComparableEx<IntegerSyntax>
     {
         public IntegerSyntax(TokenData token)
             : base(token) { }
 
+        [IsDumpEnabled(false)]
         internal override Set<string> Variables { get { return new Set<string>(); } }
+
+        internal override string SmartDump(ISmartDumpToken @operator) { return Token.Name; }
+        public int CompareToEx(IntegerSyntax other) { return 0; }
     }
 }

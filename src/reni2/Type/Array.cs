@@ -10,7 +10,7 @@ using Reni.Syntax;
 namespace Reni.Type
 {
     /// <summary>
-    /// Fixed sized array of a type
+    ///     Fixed sized array of a type
     /// </summary>
     [Serializable]
     internal sealed class Array : Child
@@ -40,7 +40,7 @@ namespace Reni.Type
 
         protected override string Dump(bool isRecursion)
         {
-            if (isRecursion)
+            if(isRecursion)
                 return "ObjectId=" + ObjectId;
             return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")";
         }
@@ -118,16 +118,16 @@ namespace Reni.Type
 
             return resultType.Result
                 (
-                category,
-                () => rightResult.Code.Sequence(leftResult.Code),
-                () => leftResult.Refs + rightResult.Refs
+                    category,
+                    () => rightResult.Code.Sequence(leftResult.Code),
+                    () => leftResult.Refs + rightResult.Refs
                 );
         }
     }
 
     internal class CreateArrayFeature : ConcatArrayWithObjectFeatureBase, IFeature
     {
-        Result ApplyResult(
+        private Result ApplyResult(
             ContextBase callContext,
             Category category,
             ICompileSyntax @object,
@@ -162,7 +162,7 @@ namespace Reni.Type
             return null;
         }
 
-        Result ApplyResult(
+        private Result ApplyResult(
             ContextBase callContext,
             Category category,
             ICompileSyntax @object,

@@ -9,7 +9,7 @@ using Reni.Context;
 namespace Reni
 {
     /// <summary>
-    /// Contains list of references to compiler environemnts.
+    ///     Contains list of references to compiler environemnts.
     /// </summary>
     [Serializable]
     internal sealed class Refs : ReniObject
@@ -116,7 +116,7 @@ namespace Reni
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)
         {
-            var p = endOfRefsCode.AddToReference(refAlignParam, refAlignParam.RefSize * -_data.Count, "ReplaceRefsForFunctionBody");
+            var p = endOfRefsCode.AddToReference(refAlignParam, refAlignParam.RefSize*-_data.Count, "ReplaceRefsForFunctionBody");
             var result = code;
             for(var i = 0; i < _data.Count; i++)
             {
@@ -124,7 +124,7 @@ namespace Reni
                 Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
                 var unrefPtrAlignment = refAlignParam;
                 var replacement = p.Dereference(unrefPtrAlignment, unrefAlignment.RefSize);
-                result = result.ReplaceAbsolute(_data[i], ()=>replacement);
+                result = result.ReplaceAbsolute(_data[i], () => replacement);
                 p = p.AddToReference(unrefPtrAlignment, unrefPtrAlignment.RefSize, "." + i);
             }
             return result;

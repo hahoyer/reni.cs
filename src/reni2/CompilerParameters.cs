@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 
 namespace Reni
 {
     /// <summary>
-    /// Parameters for compilation
+    ///     Parameters for compilation
     /// </summary>
     [Serializable]
     public class CompilerParameters
     {
-        static public CompilerParameters CreateTraceAll()
+        public static CompilerParameters CreateTraceAll()
         {
             var result = new CompilerParameters();
             result.Trace.All();
@@ -18,7 +20,7 @@ namespace Reni
         }
 
         /// <summary>
-        /// Shows or hides syntax tree
+        ///     Shows or hides syntax tree
         /// </summary>
         [Node, IsDumpEnabled(true)]
         public readonly TraceParamters Trace = new TraceParamters();
@@ -31,16 +33,22 @@ namespace Reni
         {
             [Node, IsDumpEnabled(true)]
             public bool CodeSequence;
+
             [Node, IsDumpEnabled(true)]
             public bool CodeTree;
+
             [Node, IsDumpEnabled(true)]
             public bool ExecutedCode;
+
             [Node, IsDumpEnabled(true)]
             public bool Functions;
+
             [Node, IsDumpEnabled(true)]
             public bool Source;
+
             [Node, IsDumpEnabled(true)]
             public bool Syntax;
+
             [Node, IsDumpEnabled(true)]
             public bool CodeExecutor;
 

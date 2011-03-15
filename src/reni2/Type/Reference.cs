@@ -9,7 +9,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    internal sealed class Reference: TypeBase
+    internal sealed class Reference : TypeBase
     {
         private static int _nextObjectId;
         private readonly TypeBase _valueType;
@@ -18,7 +18,7 @@ namespace Reni.Type
         private readonly AssignmentFeature _assignmentFeature;
 
         internal Reference(TypeBase valueType, RefAlignParam refAlignParam)
-            :base(_nextObjectId++)
+            : base(_nextObjectId++)
         {
             Tracer.Assert(!(valueType is Reference));
             _valueType = valueType;
@@ -73,18 +73,15 @@ namespace Reni.Type
             }
         }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
-        {
-            return _valueType.IsConvertableTo(dest, conversionParameter);
-        }
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return _valueType.IsConvertableTo(dest, conversionParameter); }
 
         protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             var trace = ObjectId == -13 && category.HasCode && dest.ObjectId == 464;
-            StartMethodDump(trace,category,dest);
+            StartMethodDump(trace, category, dest);
             var convertTo = _valueType.ConvertTo(category, dest);
             var dereferencedArgResult = DereferencedArgResult(category);
-            DumpWithBreak(trace,"convertTo",convertTo,"dereferencedArgResult",dereferencedArgResult);
+            DumpWithBreak(trace, "convertTo", convertTo, "dereferencedArgResult", dereferencedArgResult);
             return ReturnMethodDump(trace, convertTo.ReplaceArg(dereferencedArgResult));
         }
 
@@ -113,17 +110,17 @@ namespace Reni.Type
                 .Result
                 (
                     category,
-                    () => CodeBase.Arg(RefAlignParam.RefSize * 2).CreateAssignment(RefAlignParam, ValueType.Size)
+                    () => CodeBase.Arg(RefAlignParam.RefSize*2).CreateAssignment(RefAlignParam, ValueType.Size)
                 );
 
-            if (!category.HasCode && !category.HasRefs)
+            if(!category.HasCode && !category.HasRefs)
                 return result;
 
             var sourceResult = argsType
                 .ConvertTo(category | Category.Type, ValueType)
                 .LocalReferenceResult(RefAlignParam);
             var destinationResult = ObjectReferenceInCode(category | Category.Type, RefAlignParam)
-                & category;
+                                    & category;
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
             return result.ReplaceArg(objectAndSourceRefs);
         }

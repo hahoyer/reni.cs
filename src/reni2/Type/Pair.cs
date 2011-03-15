@@ -12,18 +12,12 @@ namespace Reni.Type
         private readonly TypeBase _second;
 
         internal Pair(TypeBase first, TypeBase second)
-            : base(first)
-        {
-            _second = second;
-        }
+            : base(first) { _second = second; }
 
         internal TypeBase First { get { return Parent; } }
         internal TypeBase Second { get { return _second; } }
 
-        protected override Size GetSize()
-        {
-            return First.Size + Second.Size;
-        }
+        protected override Size GetSize() { return First.Size + Second.Size; }
 
         [IsDumpEnabled(false)]
         internal override string DumpPrintText
@@ -64,10 +58,7 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        internal override string DumpShort()
-        {
-            return "pair." + ObjectId;
-        }
+        internal override string DumpShort() { return "pair." + ObjectId; }
 
         protected override bool IsInheritor { get { return false; } }
     }

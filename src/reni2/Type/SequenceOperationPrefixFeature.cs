@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using Reni.Code;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -12,6 +11,7 @@ namespace Reni.Type
     {
         [IsDumpEnabled(true)]
         private readonly ISequenceOfBitPrefixOperation _definable;
+
         private readonly Bit _bit;
 
         public SequenceOperationPrefixFeature(Bit bit, ISequenceOfBitPrefixOperation definable)
@@ -21,6 +21,5 @@ namespace Reni.Type
         }
 
         IPrefixFeature ISearchPath<IPrefixFeature, Sequence>.Convert(Sequence type) { return type.PrefixFeature(_definable); }
-
     }
 }

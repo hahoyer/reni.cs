@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Code;
-using Reni.Context;
-using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -35,12 +32,14 @@ namespace Reni.Type
         internal override string DumpShort() { return "bit"; }
     }
 
-    internal interface ISequenceOfBitPrefixOperation 
+    internal interface ISequenceOfBitPrefixOperation
     {
         [IsDumpEnabled(false)]
         string CSharpNameOfDefaultOperation { get; }
+
         [IsDumpEnabled(false)]
         string DataFunctionName { get; }
+
         Result SequenceOperationResult(Category category, Size objSize);
     }
 

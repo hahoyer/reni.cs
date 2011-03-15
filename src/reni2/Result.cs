@@ -23,7 +23,8 @@ namespace Reni
         private Refs _refs;
         internal readonly PostProcessorForResult PostProcessor;
 
-        public Result(): base(_nextObjectId++)
+        public Result()
+            : base(_nextObjectId++)
         {
             PostProcessor = new PostProcessorForResult(this);
             PendingCategory = new Category();
@@ -39,8 +40,8 @@ namespace Reni
 
         public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
 
-        [Node]
-        [DebuggerHidden]
+        [Node, DebuggerHidden]
+        
         public Size Size
         {
             get { return _size; }
@@ -51,8 +52,8 @@ namespace Reni
             }
         }
 
-        [Node]
-        [DebuggerHidden]
+        [Node, DebuggerHidden]
+        
         public TypeBase Type
         {
             get { return _type; }
@@ -76,8 +77,8 @@ namespace Reni
             }
         }
 
-        [Node]
-        [DebuggerHidden]
+        [Node, DebuggerHidden]
+        
         public Refs Refs
         {
             get { return _refs; }
@@ -110,9 +111,9 @@ namespace Reni
             {
                 if(HasSize)
                     return Size;
-                if (HasCode)
+                if(HasCode)
                     return Code.Size;
-                if (HasType)
+                if(HasType)
                     return Type.Size;
                 return null;
             }
@@ -241,9 +242,9 @@ namespace Reni
         private Result Filter(Category category)
         {
             var result = new Result
-                             {
-                                 PendingCategory = PendingCategory & category
-                             };
+                         {
+                             PendingCategory = PendingCategory & category
+                         };
 
             if(category.HasSize)
                 result._size = Size;
@@ -304,7 +305,7 @@ namespace Reni
             if(size != null)
             {
                 if(HasSize && Size != size)
-                    Tracer.AssertionFailed(1, @"Size==size", ()=>"Size differs " + Dump());
+                    Tracer.AssertionFailed(1, @"Size==size", () => "Size differs " + Dump());
                 if(HasType && Type.Size != size)
                     Tracer.AssertionFailed(1, @"Type.Size==size", () => "Type size differs " + Dump());
                 if(HasCode && Code.Size != size)
@@ -313,7 +314,6 @@ namespace Reni
 
             if(HasRefs && HasCode && !Refs.Contains(Code.Refs))
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
-
         }
 
         [DebuggerHidden]
@@ -322,14 +322,14 @@ namespace Reni
             var trace = context.ObjectId == -17 && category.HasRefs && syntax.GetObjectId() == 1192;
             StartMethodDumpWithBreak(trace, context, category, syntax);
             var localCateogory = category - CompleteCategory - PendingCategory;
-            
+
             if(localCateogory.HasSize && FindSize != null)
             {
                 _size = FindSize;
                 localCateogory -= Category.Size;
             }
 
-            if (localCateogory.HasRefs && FindRefs != null)
+            if(localCateogory.HasRefs && FindRefs != null)
             {
                 _refs = FindRefs;
                 localCateogory -= Category.Refs;
@@ -370,9 +370,9 @@ namespace Reni
         {
             Tracer.Assert
                 (
-                1,
-                category <= (CompleteCategory | PendingCategory),
-                () => string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort())
+                    1,
+                    category <= (CompleteCategory | PendingCategory),
+                    () => string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort())
                 );
         }
 
@@ -422,11 +422,11 @@ namespace Reni
 
 
         /// <summary>
-        /// Replaces the absolute refInCode ref.
+        ///     Replaces the absolute refInCode ref.
         /// </summary>
-        /// <typeparam name="TRefInCode"></typeparam>
-        /// <param name="refInCode">The refInCode.</param>
-        /// <param name="replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
+        /// <typeparam name = "TRefInCode"></typeparam>
+        /// <param name = "refInCode">The refInCode.</param>
+        /// <param name = "replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
         /// <returns></returns>
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Result> replacement)
             where TRefInCode : IReferenceInCode
@@ -436,7 +436,7 @@ namespace Reni
 
             var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
-                result.Code = Code.ReplaceAbsolute(refInCode, ()=>replacement().Code);
+                result.Code = Code.ReplaceAbsolute(refInCode, () => replacement().Code);
             if(HasRefs)
                 result.Refs = Refs.Without(refInCode).Sequence(replacement().Refs);
             result.IsDirty = false;
@@ -444,11 +444,11 @@ namespace Reni
         }
 
         /// <summary>
-        /// Replaces the relative refInCode ref.
+        ///     Replaces the relative refInCode ref.
         /// </summary>
-        /// <typeparam name="TRefInCode"></typeparam>
-        /// <param name="refInCode">The refInCode.</param>
-        /// <param name="replacement">The replacement. Should be a reference that varies when walking along code tree.</param>
+        /// <typeparam name = "TRefInCode"></typeparam>
+        /// <param name = "refInCode">The refInCode.</param>
+        /// <param name = "replacement">The replacement. Should be a reference that varies when walking along code tree.</param>
         /// <returns></returns>
         internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacement)
             where TRefInCode : IReferenceInCode
@@ -464,10 +464,7 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceObjectRefByArg(RefAlignParam refAlignParam, TypeBase objectType)
-        {
-            return objectType.ReplaceObjectReferenceByArg(this, refAlignParam);
-        }
+        internal Result ReplaceObjectRefByArg(RefAlignParam refAlignParam, TypeBase objectType) { return objectType.ReplaceObjectReferenceByArg(this, refAlignParam); }
 
         internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, CodeBase replacement)
         {
@@ -515,18 +512,15 @@ namespace Reni
             return result;
         }
 
-        internal Result ConvertTo(TypeBase target)
-        {
-            return Type.Conversion(CompleteCategory, target).ReplaceArg(this);
-        }
+        internal Result ConvertTo(TypeBase target) { return Type.Conversion(CompleteCategory, target).ReplaceArg(this); }
 
         internal Result Dereference(TypeBase type, RefAlignParam refAlignParam)
         {
             return type.Result
                 (
-                CompleteCategory,
-                () => Code.Dereference(refAlignParam, type.Size),
-                () => Refs
+                    CompleteCategory,
+                    () => Code.Dereference(refAlignParam, type.Size),
+                    () => Refs
                 );
         }
 
@@ -541,7 +535,7 @@ namespace Reni
             if(CompleteCategory == Category.Refs)
                 return this;
 
-            Tracer.Assert(HasType, ()=>"Dereference requires type category:\n " + DebuggerDumpString );
+            Tracer.Assert(HasType, () => "Dereference requires type category:\n " + DebuggerDumpString);
             return Type.AutomaticDereferenceResult(CompleteCategory).ReplaceArg(this);
         }
 
@@ -595,11 +589,11 @@ namespace Reni
         internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<Refs> getRefs)
             : this()
         {
-            if (category.HasSize)
+            if(category.HasSize)
                 _size = getSize();
-            if (category.HasCode)
+            if(category.HasCode)
                 _code = getCode();
-            if (category.HasRefs)
+            if(category.HasRefs)
                 _refs = getRefs();
         }
 
@@ -624,10 +618,7 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result ReplaceContextReferenceByArg(Struct.Context context)
-        {
-            return ReplaceAbsolute(context.ForCode, () => context.ContextReferenceAsArg(CompleteCategory));
-        }
+        internal Result ReplaceContextReferenceByArg(Struct.Context context) { return ReplaceAbsolute(context.ForCode, () => context.ContextReferenceAsArg(CompleteCategory)); }
     }
 
     internal sealed class Error
@@ -653,6 +644,4 @@ namespace Reni
         internal ContextBase Context { get { return _context; } }
         internal ICompileSyntax Syntax { get { return _syntax; } }
     }
-
-
 }

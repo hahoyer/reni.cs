@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
 using System;
+using HWClassLibrary.TreeStructure;
 
 namespace Reni.Type
 {
@@ -9,16 +11,10 @@ namespace Reni.Type
     {
         private readonly TypeBase _parent;
 
-        protected Child(TypeBase parent)
-        {
-            _parent = parent;
-        }
+        protected Child(TypeBase parent) { _parent = parent; }
 
         protected Child(int objectId, TypeBase parent)
-            : base(objectId)
-        {
-            _parent = parent;
-        }
+            : base(objectId) { _parent = parent; }
 
         [Node, IsDumpEnabled(true)]
         public TypeBase Parent { get { return _parent; } }

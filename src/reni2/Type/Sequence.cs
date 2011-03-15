@@ -12,7 +12,7 @@ using Reni.Sequence;
 namespace Reni.Type
 {
     /// <summary>
-    /// Special array 
+    ///     Special array
     /// </summary>
     [Serializable]
     internal sealed class Sequence : TypeBase
@@ -22,7 +22,7 @@ namespace Reni.Type
         [IsDumpEnabled(false)]
         internal readonly IFeature BitDumpPrintFeature;
 
-        internal Result EnableCutFeature(Category category){ return new EnableCut(this).ArgResult(category);}
+        internal Result EnableCutFeature(Category category) { return new EnableCut(this).ArgResult(category); }
 
         internal IFeature Feature(FeatureBase featureBase) { return new Reni.Sequence.FunctionalFeature(this, featureBase); }
 

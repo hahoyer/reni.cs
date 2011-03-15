@@ -1,10 +1,10 @@
-using HWClassLibrary.TreeStructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.Parser;
-using Reni.ReniParser;
-using Reni.TokenClasses;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -31,7 +31,7 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        internal protected override Result Result(ContextBase context, Category category)
+        protected internal override Result Result(ContextBase context, Category category)
         {
             var trace = false;
             StartMethodDump(trace, context, category);
@@ -51,9 +51,9 @@ namespace Reni
 
         private Result ElseResult(ContextBase context, Category category)
         {
-            if (Else == null)
+            if(Else == null)
                 return TypeBase.Void.Result(category);
-            return CondBranchResult(context,category, Else);
+            return CondBranchResult(context, category, Else);
         }
 
         private Result ThenResult(ContextBase context, Category category) { return CondBranchResult(context, category, Then); }
@@ -61,7 +61,7 @@ namespace Reni
         private Result CondBranchResult(ContextBase context, Category category, ICompileSyntax syntax)
         {
             var branchResult = context.Result(category | Category.Type, syntax).AutomaticDereference();
-            if ((category - Category.Type).IsNone)
+            if((category - Category.Type).IsNone)
                 return branchResult.Align(context.RefAlignParam.AlignBits);
 
             var commonType = context.CommonType(this);
@@ -80,37 +80,36 @@ namespace Reni
             var condResult = CondResult(context, category);
             return commonType.Result
                 (
-                category,
-                () => condResult.Code.CreateThenElse(ThenResult(context, Category.Code).Code, ElseResult(context, Category.Code).Code),
-                () => condResult.Refs + context.CommonRefs(this)
+                    category,
+                    () => condResult.Code.CreateThenElse(ThenResult(context, Category.Code).Code, ElseResult(context, Category.Code).Code),
+                    () => condResult.Refs + context.CommonRefs(this)
                 );
         }
 
         internal Result CommonResult(ContextBase context, Category category, bool thenIsPending, bool elseIsPending)
         {
             if(!thenIsPending)
-                return ThenResult(context,category);
+                return ThenResult(context, category);
             if(!elseIsPending)
-                return ElseResult(context,category);
-            NotImplementedMethod(context,category, thenIsPending,elseIsPending);
-            return null;                   
+                return ElseResult(context, category);
+            NotImplementedMethod(context, category, thenIsPending, elseIsPending);
+            return null;
         }
 
         internal Result CommonResult(ContextBase context, Category category)
         {
-            Tracer.Assert(category <= (Category.Type|Category.Refs));
+            Tracer.Assert(category <= (Category.Type | Category.Refs));
             var thenResult = ThenResult(context, category);
             var elseResult = ElseResult(context, category);
             var result = new Result();
-            if (category.HasType)
-                result.Type = TypeBase.CommonType(thenResult.Type,elseResult.Type);
-            if (category.HasRefs)
+            if(category.HasType)
+                result.Type = TypeBase.CommonType(thenResult.Type, elseResult.Type);
+            if(category.HasRefs)
                 result.Refs = thenResult.Refs + elseResult.Refs;
             return result;
         }
 
         internal override string DumpShort() { return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")"; }
-
     }
 
     [Serializable]
@@ -119,10 +118,7 @@ namespace Reni
         internal ThenSyntax(ICompileSyntax condSyntax, TokenData thenToken, ICompileSyntax thenSyntax)
             : base(condSyntax, thenToken, thenSyntax, null) { }
 
-        internal override ReniParser.ParsedSyntax CreateElseSyntax(TokenData token, ICompileSyntax elseSyntax)
-        {
-            return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax);
-        }
+        internal override ReniParser.ParsedSyntax CreateElseSyntax(TokenData token, ICompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
     }
 
     [Serializable]

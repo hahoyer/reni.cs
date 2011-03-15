@@ -7,9 +7,9 @@ using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    internal sealed class TokenFactory : TokenFactory<TokenClasses.TokenClass>
+    internal sealed class TokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
-        internal static ITokenFactory Instance { get { return new TokenFactory(); } }
+        internal static TokenFactory Instance { get { return new TokenFactory(); } }
 
         protected override TokenClasses.TokenClass NewTokenClass(string name) { return new UserSymbol(); }
 
@@ -48,17 +48,9 @@ namespace Reni.Proof
                 new Dictionary<string, TokenClasses.TokenClass>
                 {
                     {"=", new Equal()},
-                    {">", new CompareOperator()},
-                    {">=", new CompareOperator()},
-                    {"<", new CompareOperator()},
-                    {"<=", new CompareOperator()},
-                    {"<>", new NotEqual()},
-                    {"-", new Sign()},
+                    {"-", new Minus()},
                     {"&", new And()},
-                    {"!", new Exclamation()},
-                    {"+", new Sign()},
-                    {"/", new Slash()},
-                    {"*", new Star()},
+                    {"+", new Plus()},
                     {"^", new Caret()},
                     {"Integer", new Integer()},
                     {"gcd", new GreatesCommonDenominator()},
@@ -71,6 +63,9 @@ namespace Reni.Proof
         protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
         protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
         protected override TokenClasses.TokenClass GetNumberClass() { return new Number(); }
-    }
 
+        internal Minus Minus { get { return (Minus) TokenClass("-"); } }
+        internal Equal Equal { get { return (Equal) TokenClass("="); } }
+        internal Plus Plus { get { return (Plus) TokenClass("+"); } }
+    }
 }

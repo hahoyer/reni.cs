@@ -10,9 +10,8 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Parser;
-using Reni.TokenClasses;
 using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -28,7 +27,7 @@ namespace Reni.Type
             public readonly DictionaryEx<int, Sequence> Sequences;
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
             public readonly DictionaryEx<RefAlignParam, Reference> References;
-            public readonly DictionaryEx<RefAlignParam,ObjectReference> ObjectReferences;
+            public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
             public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes;
             public readonly DictionaryEx<Struct.Context, DictionaryEx<int, Field>> Fields;
 
@@ -132,13 +131,13 @@ namespace Reni.Type
         internal Result ArgResult(Category category) { return Result(category, ArgCode); }
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
-        internal Result GenericDumpPrint(Category category) { return GetSuffixResult(category, new Feature.DumpPrint.Token()); }
+        internal Result GenericDumpPrint(Category category) { return GetSuffixResult(category, new Token()); }
         internal CodeBase ArgCode() { return CodeBase.Arg(Size); }
 
         internal Result AutomaticDereferenceResult(Category category)
         {
             var type = Dereference();
-            if (type == null)
+            if(type == null)
                 return ArgResult(category);
             return DereferenceResult(category).AutomaticDereference();
         }
@@ -152,7 +151,7 @@ namespace Reni.Type
         internal Result Result(Category category)
         {
             return Result(category,
-                                () => CodeBase.BitsConst(Size, BitsConst.Convert(0).Resize(Size)));
+                          () => CodeBase.BitsConst(Size, BitsConst.Convert(0).Resize(Size)));
         }
 
         internal Result Result(Category category, Result codeAndRefs)
@@ -207,8 +206,8 @@ namespace Reni.Type
         {
             if(this == dest)
                 return ConvertToItself(category);
-            if (dest.IsReferenceTo(this))
-                return LocalReferenceResult(category, ((Reference)dest).RefAlignParam);
+            if(dest.IsReferenceTo(this))
+                return LocalReferenceResult(category, ((Reference) dest).RefAlignParam);
             return ConvertToImplementation(category, dest);
         }
 
@@ -228,7 +227,7 @@ namespace Reni.Type
         {
             if(this == dest)
                 return IsConvertableToItself(conversionParameter);
-            if (dest.IsReferenceTo(this))
+            if(dest.IsReferenceTo(this))
                 return true;
             if(conversionParameter.IsUseConverter && HasConverterTo(dest))
                 return true;
@@ -248,7 +247,7 @@ namespace Reni.Type
         private bool IsConvertableToItself(ConversionParameter conversionParameter) { return true; }
 
         /// <summary>
-        /// Gets the icon key.
+        ///     Gets the icon key.
         /// </summary>
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
@@ -256,10 +255,7 @@ namespace Reni.Type
         [IsDumpEnabled(false)]
         internal virtual RefAlignParam[] ReferenceChain { get { return new RefAlignParam[0]; } }
 
-        internal virtual IAccessType AccessType(Struct.Context context, int position)
-        {
-            return Field(context, position);
-        }
+        internal virtual IAccessType AccessType(Struct.Context context, int position) { return Field(context, position); }
 
         internal virtual IFunctionalFeature FunctionalFeature()
         {
@@ -292,7 +288,7 @@ namespace Reni.Type
         private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            var trace = ObjectId == -5 && defineable.ObjectId == 4;// && category.HasCode;
+            var trace = ObjectId == -5 && defineable.ObjectId == 4; // && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
@@ -302,7 +298,7 @@ namespace Reni.Type
             DumpWithBreak(trace, "feature", feature);
             var result = feature.Apply(category);
             DumpWithBreak(trace, "result", result);
-            if (this != feature.DefiningType())
+            if(this != feature.DefiningType())
             {
                 DumpWithBreak(trace, "feature.DefiningType()", feature.DefiningType());
                 var conversion = Conversion(category, feature.DefiningType());
@@ -314,10 +310,7 @@ namespace Reni.Type
 
         internal Result GetSuffixResult(Category category, Defineable defineable) { return GetUnaryResult<IFeature>(category, defineable); }
 
-        internal Result PrefixResult(Category category, Defineable defineable)
-        {
-            return GetUnaryResult<IPrefixFeature>(category, defineable);
-        }
+        internal Result PrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
 
         internal virtual Struct.Context GetStruct()
         {
@@ -327,8 +320,8 @@ namespace Reni.Type
 
         internal Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
         {
-            bool trace = ObjectId == -325 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category, right,refAlignParam);
+            var trace = ObjectId == -325 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category, right, refAlignParam);
             var functionalFeature = FunctionalFeature();
             var apply = functionalFeature
                 .Apply(category, right(Category.Type).Type, refAlignParam);
@@ -336,11 +329,12 @@ namespace Reni.Type
                 .ReplaceArg(right(category));
             var result = replaceArg
                 .ReplaceObjectRefByArg(refAlignParam, ObjectType());
-            DumpWithBreak(trace, "functionalFeature",functionalFeature,"apply",apply,"replaceArg",replaceArg,"result",result);
+            DumpWithBreak(trace, "functionalFeature", functionalFeature, "apply", apply, "replaceArg", replaceArg, "result", result);
             return ReturnMethodDump(trace, result);
         }
 
-        internal Result ConvertToAsRef(Category category, Reference target) { 
+        internal Result ConvertToAsRef(Category category, Reference target)
+        {
             if(IsRefLike(target))
                 return target.ArgResult(category);
 
@@ -370,9 +364,9 @@ namespace Reni.Type
             var objectRef = ObjectReference(refAlignParam);
             return Reference(refAlignParam)
                 .Result(
-                category, 
-                () => CodeBase.ReferenceInCode(objectRef),
-                () => Refs.Create(objectRef)
+                    category,
+                    () => CodeBase.ReferenceInCode(objectRef),
+                    () => Refs.Create(objectRef)
                 );
         }
 

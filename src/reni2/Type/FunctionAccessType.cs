@@ -6,7 +6,7 @@ using Reni.Code;
 
 namespace Reni.Type
 {
-    sealed internal class FunctionAccessType : TypeBase, IAccessType
+    internal sealed class FunctionAccessType : TypeBase, IAccessType
     {
         [IsDumpEnabled(true)]
         private readonly TypeBase _objectType;
@@ -37,12 +37,12 @@ namespace Reni.Type
         }
 
         internal Result ContextOperatorFeatureApply(Category category) { return _functionalFeature.ContextOperatorFeatureApply(category); }
-
     }
 
     internal sealed class FunctionDefinitionType : TypeBase
     {
         private readonly FunctionalFeature _functionalFeature;
+
         public FunctionDefinitionType(FunctionalFeature functionalFeature)
         {
             _functionalFeature = functionalFeature;
@@ -65,10 +65,6 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        public Result CreateDumpPrintResult(Category category)
-        {
-            return Void.Result(category, () => CodeBase.DumpPrintText(_functionalFeature.DumpPrintText));
-        }
+        public Result CreateDumpPrintResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(_functionalFeature.DumpPrintText)); }
     }
-
 }

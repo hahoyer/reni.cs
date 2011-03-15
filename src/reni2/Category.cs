@@ -1,26 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 
 namespace Reni
 {
     /// <summary>
-    /// Used for the compiler visitor and the result objects to choose the categories.
-    /// Categories are: <see cref="Size"/>Size, <see cref="Type"/>Type, <see cref="Refs"/>References and <see cref="CodeBase"/>Code
+    ///     Used for the compiler visitor and the result objects to choose the categories.
+    ///     Categories are: <see cref = "Size" />Size, <see cref = "Type" />Type, <see cref = "Refs" />References and <see
+    ///      cref = "CodeBase" />Code
     /// </summary>
-    [Dump("Dump")]
-    [Serializable]
-    sealed internal class Category : ReniObject, IEquatable<Category>
+    [Dump("Dump"), Serializable]
+    
+    internal sealed class Category : ReniObject, IEquatable<Category>
     {
         private readonly bool _code;
         private readonly bool _type;
         private readonly bool _refs;
         private readonly bool _size;
 
-        public Category()
-        {
-        }
+        public Category() { }
 
         internal Category(bool size, bool type, bool code, bool refs)
         {
@@ -32,16 +33,21 @@ namespace Reni
 
         [DebuggerHidden]
         public static Category Size { get { return new Category(true, false, false, false); } }
+
         [DebuggerHidden]
         public static Category Type { get { return new Category(false, true, false, false); } }
+
         [DebuggerHidden]
         public static Category Code { get { return new Category(false, false, true, false); } }
+
         [DebuggerHidden]
         public static Category Refs { get { return new Category(false, false, false, true); } }
+
         [DebuggerHidden]
         public static Category None { get { return new Category(false, false, false, false); } }
+
         [DebuggerHidden]
-        public static Category All { get { return new Category(true, true,true, true); } }
+        public static Category All { get { return new Category(true, true, true, true); } }
 
         public bool IsNone { get { return !(_code || _type || _refs || _size); } }
         public bool HasCode { get { return _code; } }
@@ -74,7 +80,7 @@ namespace Reni
         {
             unchecked
             {
-                int result = _code.GetHashCode();
+                var result = _code.GetHashCode();
                 result = (result*397) ^ _type.GetHashCode();
                 result = (result*397) ^ _refs.GetHashCode();
                 result = (result*397) ^ _size.GetHashCode();
@@ -104,13 +110,13 @@ namespace Reni
 
         private bool IsLessThanOrEqual(Category x)
         {
-            if (HasCode && !x.HasCode)
+            if(HasCode && !x.HasCode)
                 return false;
-            if (HasRefs && !x.HasRefs)
+            if(HasRefs && !x.HasRefs)
                 return false;
-            if (HasSize && !x.HasSize)
+            if(HasSize && !x.HasSize)
                 return false;
-            if (HasType && !x.HasType)
+            if(HasType && !x.HasType)
                 return false;
             return true;
         }
@@ -126,21 +132,24 @@ namespace Reni
         }
 
         /// <summary>
-        /// dump 
+        ///     dump
         /// </summary>
         /// <returns></returns>
         protected override string Dump(bool isRecursion)
         {
-            string result = "";
-            if(HasSize) result += ".Size.";
-            if(HasType) result += ".Type.";
-            if(HasRefs) result += ".Refs.";
-            if(HasCode) result += ".Code.";
+            var result = "";
+            if(HasSize)
+                result += ".Size.";
+            if(HasType)
+                result += ".Type.";
+            if(HasRefs)
+                result += ".Refs.";
+            if(HasCode)
+                result += ".Code.";
             result = result.Replace("..", ",").Replace(".", "");
-            if (result == "")
+            if(result == "")
                 return "none";
             return result;
-
         }
 
         public bool Equals(Category obj)
@@ -175,25 +184,12 @@ namespace Reni
             return left.IsLessThanOrEqual(right);
         }
 
-        public static bool operator >=(Category left, Category right)
-        {
-            return right <= left;
-        }
+        public static bool operator >=(Category left, Category right) { return right <= left; }
 
-        public static bool operator >(Category left, Category right)
-        {
-            return right < left;
-        }
+        public static bool operator >(Category left, Category right) { return right < left; }
 
-        public static bool operator ==(Category left, Category right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(Category left, Category right) { return Equals(left, right); }
 
-        public static bool operator !=(Category left, Category right)
-        {
-            return !Equals(left, right);
-        }
-
+        public static bool operator !=(Category left, Category right) { return !Equals(left, right); }
     }
 }

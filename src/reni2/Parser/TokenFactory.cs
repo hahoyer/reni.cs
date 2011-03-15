@@ -7,7 +7,7 @@ using HWClassLibrary.Helper;
 namespace Reni.Parser
 {
     internal abstract class TokenFactory<TTokenClass> : ReniObject, ITokenFactory
-        where TTokenClass: ITokenClass
+        where TTokenClass : ITokenClass
     {
         private readonly SimpleCache<Dictionary<string, TTokenClass>> _tokenClasses;
         private readonly SimpleCache<PrioTable> _prioTable;
@@ -29,7 +29,7 @@ namespace Reni.Parser
         private Dictionary<string, TTokenClass> InternalGetTokenClasses()
         {
             var result = GetTokenClasses();
-            foreach (var pair in result)
+            foreach(var pair in result)
                 pair.Value.Name = pair.Key;
             return result;
         }
@@ -51,7 +51,7 @@ namespace Reni.Parser
         private TTokenClass InternalGetRightParenthesisClass(int i)
         {
             var result = GetRightParenthesisClass(i);
-            result.Name = i == 0 ? "<end>" : " }])".Substring(i,1);
+            result.Name = i == 0 ? "<end>" : " }])".Substring(i, 1);
             return result;
         }
 
@@ -64,7 +64,7 @@ namespace Reni.Parser
 
         ParserInst ITokenFactory.Parser { get { return new ParserInst(new Scanner(), this); } }
         PrioTable ITokenFactory.PrioTable { get { return _prioTable.Value; } }
-        
+
         ITokenClass ITokenFactory.TokenClass(string name)
         {
             TTokenClass result;
@@ -72,13 +72,13 @@ namespace Reni.Parser
                 return result;
             result = NewTokenClass(name);
             result.Name = name;
-            TokenClasses.Add(name,result);
+            TokenClasses.Add(name, result);
             return result;
         }
 
         ITokenClass ITokenFactory.ListClass { get { return _listClass.Value; } }
         ITokenClass ITokenFactory.NumberClass { get { return _numberClass.Value; } }
-        ITokenClass ITokenFactory.RightParenthesisClass(int level) { return _righParenthesis.Find(level);}
+        ITokenClass ITokenFactory.RightParenthesisClass(int level) { return _righParenthesis.Find(level); }
         ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return _leftParenthesis.Find(level); }
 
         protected abstract TTokenClass NewTokenClass(string name);
@@ -90,5 +90,6 @@ namespace Reni.Parser
         protected abstract TTokenClass GetNumberClass();
 
         private Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
+        protected ITokenClass TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }
     }
 }

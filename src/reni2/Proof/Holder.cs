@@ -9,25 +9,18 @@ namespace Reni.Proof
 {
     internal sealed class Holder : ReniObject
     {
-        private static readonly ParserInst _parser = new ParserInst(new Scanner(), TokenFactory.Instance);
+        private static readonly ParserInst _parser = new ParserInst(new Scanner(), Main.TokenFactory);
         private readonly string _text;
-        private readonly ParsedSyntax _syntax;
+        private readonly AndSyntax _statement;
 
         public Holder(string text)
         {
             _text = text;
-            _syntax = (ParsedSyntax) _parser.Compile(new Source(_text));
+            var parsedSyntax = _parser.Compile(new Source(_text));
+            _statement = (AndSyntax) parsedSyntax;
         }
 
-        internal Set<string> Variables
-        {
-            get { return _syntax.Variables; }
-        }
-
-        public void Replace(string target, string value)
-        {
-            var newClause = _parser.Compile(new Source("(" +target + ")=(" + value + ")" ));
-            DumpDataWithBreak("","newClause",newClause);
-        }
+        internal Set<string> Variables { get { return _statement.Variables; } }
+        internal AndSyntax Statement { get { return _statement; } }
     }
 }

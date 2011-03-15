@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest;
 using Reni.Runtime;
@@ -11,7 +12,7 @@ namespace Reni
     public class TestGenerated
     {
         /// <summary>
-        /// Special test, will not work automatically.
+        ///     Special test, will not work automatically.
         /// </summary>
         /// created 18.07.2007 01:29 on HAHOYER-DELL by hh
         [Test, Explicit, Category(CompilerTest.Rare)]
@@ -25,10 +26,10 @@ namespace Reni
 #pragma warning restore 168
             BitsConst.OutStream = os;
         }
-
     }
-struct raw
-{
-    public sbyte[] _data;
-}
+
+    internal struct raw
+    {
+        public sbyte[] _data;
+    }
 }

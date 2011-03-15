@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
@@ -18,32 +16,15 @@ c elem Integer &
 a^2 + b^2 = c^2 &
 a gcd b = 1 &
 c + a = x &
-c - a = y
-");
-            var xx = statement.Variables;
-            Tracer.FlaggedLine("Variables: " + xx.Format(", "));
+c - a = y 
+").Statement;
+            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
+            statement = statement.Isolate();
+            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
+            statement = statement.Replace();
+            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
         }
+
+        internal static readonly TokenFactory TokenFactory = TokenFactory.Instance;
     }
-
-
-    internal class TypeOperator : TokenClass
-    {}
-
-    internal class KGV : TokenClass
-    {}
-
-    internal class Star : TokenClass
-    {}
-
-    internal class Slash : TokenClass
-    {}
-
-    internal class Exclamation : TokenClass
-    {}
-
-    internal class NotEqual : TokenClass
-    {}
-
-    internal class CompareOperator : TokenClass
-    {}
 }

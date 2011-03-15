@@ -7,11 +7,12 @@ using Reni.Runtime;
 namespace Reni
 {
     /// <summary>
-    /// sss
+    ///     sss
     /// </summary>
-    public static unsafe class ReniTest
+    public static class ReniTest
     {
-        public static unsafe void MainFunction() {
+        public static void MainFunction()
+        {
             var data = new byte[7];
             //List 7
             /* Reni.Code.BitArray.180 Size=16 Data="00DE"[9] */

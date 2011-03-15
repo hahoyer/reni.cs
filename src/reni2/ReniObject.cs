@@ -5,7 +5,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
-using Reni.Parser;
 
 namespace Reni
 {
@@ -42,17 +41,14 @@ namespace Reni
         public override string DebuggerDump() { return base.DebuggerDump() + " ObjectId=" + ObjectId; }
 
         [DebuggerHidden]
-        internal void StopByObjectId(int objectId)
-        {
-            StopByObjectId(1, objectId);
-        }
+        internal void StopByObjectId(int objectId) { StopByObjectId(1, objectId); }
 
         [DebuggerHidden]
         internal void StopByObjectId(int stackFrameDepth, int objectId)
         {
             var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
-            if (ObjectId == objectId)
+            if(ObjectId == objectId)
                 Tracer.ConditionalBreak(stackFrameDepth + 1, "", () => @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
@@ -80,7 +76,7 @@ namespace Reni
             var reniObject = t as ReniObject;
             if(reniObject == null)
                 return;
-               reniObject.StopByObjectId(1, objectId);
+            reniObject.StopByObjectId(1, objectId);
         }
 
         // will throw an exception if not a ReniObject
