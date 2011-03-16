@@ -22,7 +22,12 @@ namespace Reni.Proof
 
         internal override bool IsDistinct(ParsedSyntax other) { return IsDistinct((VariableSyntax) other); }
         internal override ParsedSyntax IsolateFromEquation(string variable, ParsedSyntax otherSite) { return Equal(Token, otherSite); }
-        internal override ParsedSyntax IsolateFromSum(string variable, ParsedSyntax otherSite) { return Equal(Token, otherSite); }
+        internal override ParsedSyntax IsolateFromSum(string variable, ParsedSyntax other)
+        {
+            if (Name == variable)
+                return other;
+            return null;
+        }
         internal override Set<ParsedSyntax> Replace(IEnumerable<KeyValuePair<string, ParsedSyntax>> definitions)
         {
             var result = definitions.Where(d => d.Key == Name).Select(d => d.Value).ToSet();

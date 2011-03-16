@@ -42,6 +42,7 @@ namespace Reni.Proof
         [UsedImplicitly]
         internal string SmartDumpText { get { return SmartDump(null); } }
 
+        [IsDumpEnabled(false)]
         internal virtual BigRational Factor { get { return 1; } }
 
         internal virtual string SmartDump(ISmartDumpToken @operator)
@@ -50,7 +51,7 @@ namespace Reni.Proof
             return DumpShort();
         }
 
-        internal virtual ParsedSyntax IsolateClause(string variable)
+        protected virtual ParsedSyntax IsolateClause(string variable)
         {
             NotImplementedMethod(variable);
             return null;
@@ -74,7 +75,7 @@ namespace Reni.Proof
             return new FactorSyntax(this, value);
         }
 
-        internal virtual ParsedSyntax IsolateFromSum(string variable, ParsedSyntax otherSite) { return null; }
+        internal virtual ParsedSyntax IsolateFromSum(string variable, ParsedSyntax other) { return null; }
 
         internal ParsedSyntax Equal(TokenData token, ParsedSyntax other)
         {
@@ -116,8 +117,6 @@ namespace Reni.Proof
             NotImplementedMethod(other);
             return 0;
         }
-
-        internal virtual KeyValuePair<string, ParsedSyntax>? ToDefinition() { return null; }
 
         internal virtual Set<ParsedSyntax> Replace(IEnumerable<KeyValuePair<string, ParsedSyntax>> definitions)
         {
@@ -174,6 +173,12 @@ namespace Reni.Proof
             return null;
         }
 
+        internal virtual ParsedSyntax CombineForPlus(PowerSyntax other)
+        {
+            NotImplementedMethod(other);
+            return null;
+        }
+
         internal virtual ParsedSyntax CombineForPlus(VariableSyntax other)
         {
             NotImplementedMethod(other);
@@ -192,6 +197,12 @@ namespace Reni.Proof
             return null;
         }
 
+        internal virtual ParsedSyntax CombineForPlus(PowerSyntax other, BigRational thisValue)
+        {
+            NotImplementedMethod(other, thisValue);
+            return null;
+        }
+
         internal virtual ParsedSyntax CombineForPlus(ParsedSyntax other, BigRational otherValue, BigRational thisValue)
         {
             NotImplementedMethod(other, otherValue, thisValue);
@@ -203,6 +214,8 @@ namespace Reni.Proof
             NotImplementedMethod(other, otherValue, thisValue);
             return null;
         }
+
+        internal KeyValuePair<string, ParsedSyntax> GetDefinition(string variable) { return new KeyValuePair<string, ParsedSyntax>(variable, IsolateClause(variable)); }
     }
 
     internal interface IComparableEx<in T>

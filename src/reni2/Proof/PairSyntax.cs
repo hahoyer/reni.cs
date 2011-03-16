@@ -45,16 +45,17 @@ namespace Reni.Proof
         internal override bool IsDistinct(ParsedSyntax other) { return IsDistinct((PairSyntax) other); }
         private bool IsDistinct(PairSyntax other) { return other.Operator != Operator || ParsedSyntaxExtender.IsDistinct(other.Left, Left) || ParsedSyntaxExtender.IsDistinct(other.Right, Right); }
         internal override string SmartDump(ISmartDumpToken @operator) { return Operator.SmartDump(Left, Right); }
-        internal override ParsedSyntax IsolateClause(string variable) { return Operator.IsolateClause(variable, Left, Right); }
 
         internal override Set<ParsedSyntax> Replace(IEnumerable<KeyValuePair<string, ParsedSyntax>> definitions)
         {
+            bool trace = false;
             var leftResults = Left.Replace(definitions);
             var rightResults = Right.Replace(definitions);
+            StartMethodDump(trace, definitions,"leftResults",leftResults,"rightResults",rightResults);
             var result = leftResults
                 .SelectMany(left => rightResults.Select(syntax => left.Pair(Operator, syntax)))
                 .ToSet();
-            return result;
+            return ReturnMethodDump(trace, result);
         }
     }
 

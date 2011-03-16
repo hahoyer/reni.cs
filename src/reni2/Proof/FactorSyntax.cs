@@ -1,10 +1,9 @@
-using System.Numerics;
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
-using Reni.Parser;
+using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
@@ -35,32 +34,19 @@ namespace Reni.Proof
         [IsDumpEnabled(false)]
         internal override bool IsNegative { get { return Target.IsNegative != Value.IsNegative; } }
 
+        [IsDumpEnabled(false)]
         internal override BigRational Factor { get { return Value*Target.Factor; } }
 
         internal override string SmartDump(ISmartDumpToken @operator) { return SmartDumpFactor(@operator) + Target.SmartDump(@operator); }
-        internal override ParsedSyntax Times(BigRational value)
-        {
-            return Target.Times(value*Value);
-        }
+        internal override ParsedSyntax Times(BigRational value) { return Target.Times(value*Value); }
 
-        internal override ParsedSyntax IsolateFromSum(string variable, ParsedSyntax otherSite)
-        {
-            return Target.IsolateFromSum(variable, otherSite.Times(1 / Value));
-        }
-        internal override Set<ParsedSyntax> Replace(IEnumerable<KeyValuePair<string, ParsedSyntax>> definitions)
-        {
-            return Target.Replace(definitions).Select(x => x.Times(Value)).ToSet();
-        }
+        internal override ParsedSyntax IsolateFromSum(string variable, ParsedSyntax other) { return Target.IsolateFromSum(variable, other.Times(1/Value)); }
+        internal override Set<ParsedSyntax> Replace(IEnumerable<KeyValuePair<string, ParsedSyntax>> definitions) { return Target.Replace(definitions).Select(x => x.Times(Value)).ToSet(); }
+
         internal override ParsedSyntax CombineForPlus(ParsedSyntax other) { return other.CombineForPlus(Target, Value); }
-        internal override ParsedSyntax CombineForPlus(VariableSyntax other)
-        {
-            return Target.CombineForPlus(other, Value);
-        }
-
-        internal override ParsedSyntax CombineForPlus(ParsedSyntax other, BigRational otherValue)
-        {
-            return other.CombineForPlus(Target, Value, otherValue);
-        }
+        internal override ParsedSyntax CombineForPlus(VariableSyntax other) { return Target.CombineForPlus(other, Value); }
+        internal override ParsedSyntax CombineForPlus(ParsedSyntax other, BigRational otherValue) { return other.CombineForPlus(Target, Value, otherValue); }
+        internal override ParsedSyntax CombineForPlus(PowerSyntax other) { return Target.CombineForPlus(other, Value); }
 
         private string SmartDumpFactor(ISmartDumpToken @operator)
         {
@@ -75,6 +61,5 @@ namespace Reni.Proof
                 result = "(" + result + ")";
             return result + "*";
         }
-
     }
 }

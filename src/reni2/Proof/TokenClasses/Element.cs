@@ -22,6 +22,7 @@ namespace Reni.Proof.TokenClasses
         public ElementSyntax(IPair @operator, ParsedSyntax left, TokenData token, ParsedSyntax right)
             : base(@operator, left, token, right) { }
 
+        protected override ParsedSyntax IsolateClause(string variable) { return null; }
         internal override Set<ParsedSyntax> Replace(IEnumerable<KeyValuePair<string, ParsedSyntax>> definitions) { return DefaultReplace(); }
     }
 }

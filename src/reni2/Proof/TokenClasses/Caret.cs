@@ -2,6 +2,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Helper;
 using Reni.Parser;
 
 namespace Reni.Proof.TokenClasses
@@ -26,5 +27,15 @@ namespace Reni.Proof.TokenClasses
             NotImplementedMethod(other);
             return 0;
         }
+
+        internal override ParsedSyntax CombineForPlus(ParsedSyntax other, BigRational otherValue) { return other.CombineForPlus(this, otherValue); }
+        internal override ParsedSyntax CombineForPlus(ParsedSyntax other) { return other.CombineForPlus(this); }
+        internal override ParsedSyntax CombineForPlus(PowerSyntax other, BigRational thisValue)
+        {
+            if (Left.CompareTo(other.Left) == 0 && Right.CompareTo(other.Right) == 0)
+                return Times(thisValue + 1);
+            return null;
+        }
+
     }
 }

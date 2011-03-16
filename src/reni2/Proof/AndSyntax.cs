@@ -17,43 +17,32 @@ namespace Reni.Proof
             get
             {
                 return Set
-                    .Select(parsedSyntax => parsedSyntax.ToDefinition())
-                    .Where(pair => pair != null)
-                    .Select(pair => pair.Value);
+                    .SelectMany(GetDefinitions)
+                    .Where(pair => pair.Value != null);
             }
         }
 
-        internal AndSyntax Isolate() { return Apply(new IsolationStrategy()); }
+        private static IEnumerable<KeyValuePair<string, ParsedSyntax>> GetDefinitions(ParsedSyntax parsedSyntax) { return parsedSyntax.Variables.Select(parsedSyntax.GetDefinition); }
 
         private AndSyntax Apply(IStrategy strategy) { return (AndSyntax) Operator.CombineAssosiative(Token, Set | Set.SelectMany(strategy.Apply).ToSet()); }
 
-        internal AndSyntax Replace() { return Apply(new ReplaceStrategy(this)); }
         public string SmartDump() { return SmartDump(null); }
+        public AndSyntax IsolateAndReplace() { return Apply(new IsolateAndReplaceStrategy(this)); }
     }
 
-    internal sealed class ReplaceStrategy : ReniObject, IStrategy
+    internal sealed class IsolateAndReplaceStrategy : ReniObject, IStrategy
     {
         private readonly IEnumerable<KeyValuePair<string, ParsedSyntax>> _definitions;
-        internal ReplaceStrategy(AndSyntax andSyntax) { _definitions = andSyntax.Definitions; }
+        internal IsolateAndReplaceStrategy(AndSyntax andSyntax) { _definitions = andSyntax.Definitions; }
 
         Set<ParsedSyntax> IStrategy.Apply(ParsedSyntax parsedSyntax)
         {
-            return
+            var trace = false;
+            StartMethodDump(trace,parsedSyntax);
+            return ReturnMethodDump(trace,
                 parsedSyntax
                     .Replace(_definitions)
-                - parsedSyntax;
-        }
-    }
-
-    internal sealed class IsolationStrategy : ReniObject, IStrategy
-    {
-        Set<ParsedSyntax> IStrategy.Apply(ParsedSyntax parsedSyntax)
-        {
-            return parsedSyntax
-                .Variables
-                .Select(parsedSyntax.IsolateClause)
-                .Where(x => x != null)
-                .ToSet();
+                - parsedSyntax);
         }
     }
 

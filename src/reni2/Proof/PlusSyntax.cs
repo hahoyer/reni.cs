@@ -14,7 +14,6 @@ namespace Reni.Proof
             : base(@operator, token, set)
         {
             Tracer.Assert(set.All(x => !(x is PlusSyntax)));
-            Tracer.Assert(set.HasDistinctElements());
         }
 
         internal override ParsedSyntax IsolateFromEquation(string variable, ParsedSyntax otherSite)

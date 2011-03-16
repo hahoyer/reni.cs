@@ -19,9 +19,7 @@ c + a = x &
 c - a = y 
 ").Statement;
             Tracer.FlaggedLine("Statement: " + statement.SmartDump());
-            statement = statement.Isolate();
-            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
-            statement = statement.Replace();
+            statement = statement.IsolateAndReplace();
             Tracer.FlaggedLine("Statement: " + statement.SmartDump());
         }
 

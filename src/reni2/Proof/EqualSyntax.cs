@@ -9,7 +9,10 @@ namespace Reni.Proof
     internal sealed class EqualSyntax : PairSyntax, IComparableEx<EqualSyntax>
     {
         public EqualSyntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
-            : base(Main.TokenFactory.Equal, left, token, right) { }
+            : base(Main.TokenFactory.Equal, left, token, right)
+        {
+            StopByObjectId(461);
+        }
 
         int IComparableEx<EqualSyntax>.CompareToEx(EqualSyntax other)
         {
@@ -24,17 +27,15 @@ namespace Reni.Proof
             return result;
         }
 
-        internal override KeyValuePair<string, ParsedSyntax>? ToDefinition()
+        protected override ParsedSyntax IsolateClause(string variable)
         {
-            if(Left.IsSimpleVariable)
+            if(Left.Variables.Contains(variable))
             {
-                Tracer.Assert(!Right.IsSimpleVariable);
-                return new KeyValuePair<string, ParsedSyntax>(Left.Variables.First(), Right);
+                Tracer.Assert(!Right.Variables.Contains(variable));
+                return Left.IsolateFromEquation(variable, Right);
             }
-            if(Right.IsSimpleVariable)
-                return new KeyValuePair<string, ParsedSyntax>(Right.Variables.First(), Left);
-
-            return null;
+            Tracer.Assert(Right.Variables.Contains(variable));
+            return Right.IsolateFromEquation(variable, Left);
         }
     }
 }
