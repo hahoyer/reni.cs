@@ -10,16 +10,20 @@ namespace Reni.Proof
         public static void Run()
         {
             var statement = new Holder(@"
-a elem Integer & 
-b elem Integer & 
-c elem Integer & 
-a^2 + b^2 = c^2 &
-a gcd b = 1 &
-c + a = x &
+a elem Integer;
+b elem Integer; 
+c elem Integer; 
+a^2 + b^2 = c^2;
+a gcd b = 1;
+c + a = x;
 c - a = y 
 ").Statement;
             Tracer.FlaggedLine("Statement: " + statement.SmartDump());
-            statement = statement.IsolateAndReplace();
+            statement = statement.IsolateAndReplace(3);
+            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
+            statement = statement.IsolateAndReplace(3);
+            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
+            statement = statement.IsolateAndReplace(3);
             Tracer.FlaggedLine("Statement: " + statement.SmartDump());
         }
 

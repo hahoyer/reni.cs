@@ -4,6 +4,8 @@
     <ProjectGuid>{EBB73C84-6622-4183-A28F-B0DFF606006B}</ProjectGuid>
     <AssemblyName>Reni</AssemblyName>
     <TargetTypeEx>CSharp.Library.UnitTest</TargetTypeEx>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <PlatformTarget>x86</PlatformTarget>
@@ -101,13 +103,16 @@
     <Compile Include="Parser\ParsedSyntax.cs" />
     <Compile Include="Parser\SyntaxError.cs" />
     <Compile Include="Parser\TokenClass.cs" />
+    <Compile Include="Proof\AndSyntax.cs" />
     <Compile Include="Proof\EqualSyntax.cs" />
     <Compile Include="Proof\FactorSyntax.cs" />
+    <Compile Include="Proof\IsolateAndReplaceStrategy.cs" />
+    <Compile Include="Proof\IStrategy.cs" />
     <Compile Include="Proof\MinusSyntax.cs" />
     <Compile Include="Proof\ParsedSyntaxExtender.cs" />
     <Compile Include="Proof\TokenClasses\And.cs" />
     <Compile Include="Proof\AssociativeSyntax.cs" />
-    <Compile Include="Proof\AndSyntax.cs" />
+    <Compile Include="Proof\ClauseSyntax.cs" />
     <Compile Include="Proof\TokenClasses\Caret.cs" />
     <Compile Include="Proof\TokenClasses\Element.cs" />
     <Compile Include="Proof\TokenClasses\Equal.cs" />
@@ -118,6 +123,7 @@
     <Compile Include="Proof\TokenClasses\LeftParenthesis.cs" />
     <Compile Include="Proof\LeftParenthesisSyntax.cs" />
     <Compile Include="Proof\Main.cs" />
+    <Compile Include="Proof\TokenClasses\List.cs" />
     <Compile Include="Proof\TokenClasses\Minus.cs" />
     <Compile Include="Proof\TokenClasses\Number.cs" />
     <Compile Include="Proof\NumberSyntax.cs" />

@@ -55,7 +55,7 @@ namespace Reni.Proof
                 .SelectMany(parsedSyntax => ToList(@operator, parsedSyntax))
                 .ToArray();
             var parsedSyntaxs = selectMany
-                .OrderBy(parsedSyntax=>parsedSyntax.Variables.OrderBy(name=>name),_comparer)
+                .OrderBy(parsedSyntax=>parsedSyntax,ParsedSyntax.Comparer)
                 .ToArray();
             var result = new List<ParsedSyntax>();
             var current = parsedSyntaxs.First();

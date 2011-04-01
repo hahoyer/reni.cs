@@ -28,6 +28,9 @@ namespace Reni.Proof
             x += PrioTable.Left("&");
             x += PrioTable.Left("|");
 
+            x += PrioTable.Right(",");
+            x += PrioTable.Right(";");
+            
             x = x.Level
                 (new[]
                  {
@@ -59,7 +62,7 @@ namespace Reni.Proof
             return result;
         }
 
-        protected override TokenClasses.TokenClass GetListClass() { throw new NotImplementedException(); }
+        protected override TokenClasses.TokenClass GetListClass() { return new List(); }
         protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
         protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
         protected override TokenClasses.TokenClass GetNumberClass() { return new Number(); }
@@ -68,4 +71,5 @@ namespace Reni.Proof
         internal Equal Equal { get { return (Equal) TokenClass("="); } }
         internal Plus Plus { get { return (Plus) TokenClass("+"); } }
     }
+
 }

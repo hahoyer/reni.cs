@@ -22,8 +22,9 @@ namespace Reni.Proof
             var notContains = Set.Where(x => !x.Variables.Contains(variable));
             if(contains.Count() != 1)
             {
-                StartMethodDumpWithBreak(true, variable, otherSite, "contains", contains, "notContains", notContains);
                 return null;
+                StartMethodDumpWithBreak(true, variable, otherSite, "contains", contains, "notContains", notContains);
+                return ReturnMethodDump<ParsedSyntax>(true, null);
             }
 
             return contains.First().IsolateFromSum(variable, otherSite.Minus(notContains));
