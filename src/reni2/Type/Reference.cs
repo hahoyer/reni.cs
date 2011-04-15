@@ -119,8 +119,13 @@ namespace Reni.Type
             var sourceResult = argsType
                 .ConvertTo(category | Category.Type, ValueType)
                 .LocalReferenceResult(RefAlignParam);
-            var destinationResult = ObjectReferenceInCode(category | Category.Type, RefAlignParam)
-                                    & category;
+            var objectRef = ObjectReference(RefAlignParam);
+            var destinationResult = Result
+                (
+                    category,
+                    () => CodeBase.ReferenceInCode(objectRef),
+                    () => Refs.Create(objectRef)
+                );
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
             return result.ReplaceArg(objectAndSourceRefs);
         }

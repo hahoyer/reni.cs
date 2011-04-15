@@ -80,7 +80,7 @@ namespace Reni.Code
         void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
         {
             Tracer.Assert(size == targetSize);
-            Push(Pull(targetSize).BitCast(significantSize));
+            Push(Pull(targetSize).BitCast(significantSize).BitCast(size));
         }
 
         void IFormalMaschine.DumpPrintOperation(Size leftSize, Size rightSize)
@@ -171,7 +171,7 @@ namespace Reni.Code
 
         private DictionaryEx<string, StackData> Locals { get { return _localData.Locals; } }
 
-        void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { Push(Locals[holder].DoPull(offset).DoGetTop(size).BitCast(dataSize)); }
+        void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { Push(Locals[holder].DoPull(offset).DoGetTop(dataSize).BitCast(size)); }
 
         private StackData Pull(Size size)
         {

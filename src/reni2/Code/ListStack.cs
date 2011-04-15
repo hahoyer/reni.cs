@@ -21,22 +21,24 @@ namespace Reni.Code
             _data[data.Length] = formerStackData;
         }
 
-        private ListStack(NonListStackData[] data, NonListStackData[] formerStackData)
+        private ListStack(NonListStackData[] data, ListStack formerStack)
         {
-            _data = new NonListStackData[data.Length + formerStackData.Length];
+            _data = new NonListStackData[data.Length + formerStack._data.Length];
             data.CopyTo(_data, 0);
-            formerStackData.CopyTo(_data, data.Length);
+            formerStack._data.CopyTo(_data, data.Length);
         }
 
-        public ListStack(NonListStackData data, NonListStackData[] formerStackData)
+        public ListStack(NonListStackData data, ListStack formerStack)
         {
-            _data = new NonListStackData[formerStackData.Length + 1];
+            _data = new NonListStackData[formerStack._data.Length + 1];
             _data[0] = data;
-            formerStackData.CopyTo(_data, 1);
+            formerStack._data.CopyTo(_data, 1);
         }
 
         protected override StackData GetTop(Size size)
         {
+            if (_data.Length > 0 && _data[0].Size >= size)
+                return _data[0].DoGetTop(size);
             var i = Index(size);
             if(i == null)
                 return base.GetTop(size);
@@ -85,8 +87,8 @@ namespace Reni.Code
         }
 
         internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(_data, formerStack); }
-        internal override StackData PushOnto(NonListStackData[] formerStack) { return new ListStack(_data, formerStack); }
-        internal override StackData Push(StackData formerStack) { return formerStack.PushOnto(_data); }
+        internal override StackData PushOnto(ListStack formerStack) { return new ListStack(_data, formerStack); }
+        internal override StackData Push(StackData formerStack){return formerStack.PushOnto(this);}
         internal override Size Size { get { return _data.Aggregate(Size.Zero, (current, data) => current + data.Size); } }
     }
 
@@ -94,6 +96,6 @@ namespace Reni.Code
     {
         internal override StackData Push(StackData stackData) { return stackData.PushOnto(this); }
         internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(this, formerStack); }
-        internal override StackData PushOnto(NonListStackData[] formerStack) { return new ListStack(this, formerStack); }
+        internal override StackData PushOnto(ListStack formerStack) { return new ListStack(this, formerStack); }
     }
 }

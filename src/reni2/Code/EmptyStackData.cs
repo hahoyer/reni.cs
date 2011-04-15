@@ -9,6 +9,7 @@ namespace Reni.Code
     {
         internal override StackData Push(StackData stackData) { return stackData; }
         internal override StackData PushOnto(NonListStackData formerStack) { return formerStack; }
+        internal override StackData PushOnto(ListStack formerStack) { return formerStack; }
         internal override Size Size { get { return Size.Zero; } }
         internal override BitsConst GetBitsConst() { return BitsConst.None(); }
     }

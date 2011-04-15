@@ -23,7 +23,7 @@ namespace Reni.Code
 
         internal override Size Size { get { return _refSize; } }
 
-        internal new StackData Dereference(Size size, Size dataSize) { return _data.GetTop(_offset, size).BitCast(dataSize); }
+        internal new StackData Dereference(Size size, Size dataSize) { return _data.GetTop(_offset, size).BitCast(dataSize).BitCast(size); }
 
         internal new void Assign(Size size, StackData right) { _data.SetTop(_offset, right.Dereference(size,size)); }
 

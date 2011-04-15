@@ -34,7 +34,7 @@ namespace Reni.Code
 
         internal abstract Size Size { get; }
 
-        internal virtual StackData PushOnto(NonListStackData[] formerStack)
+        internal virtual StackData PushOnto(ListStack formerStack)
         {
             NotImplementedMethod(formerStack);
             return null;
@@ -65,7 +65,7 @@ namespace Reni.Code
             if(Size == dataSize)
                 return this;
 
-            return new BitsStackData(GetBitsConst().Resize(dataSize).Resize(Size));
+            return new BitsStackData(GetBitsConst().Resize(dataSize));
         }
 
         internal StackData BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, StackData right)

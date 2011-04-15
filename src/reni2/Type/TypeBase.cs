@@ -115,7 +115,7 @@ namespace Reni.Type
         private Field Field(Struct.Context context, int position) { return _cache.Fields.Find(context).Find(position); }
         internal Sequence Sequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         internal FunctionAccessType FunctionalType(IFunctionalFeature feature) { return _cache.FunctionalTypes.Find(feature); }
-        private ObjectReference ObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
+        protected ObjectReference ObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
         internal static TypeBase Number(int bitCount) { return Bit.Sequence(bitCount); }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
@@ -370,19 +370,6 @@ namespace Reni.Type
         internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam)
         {
             var objectRef = ObjectReference(refAlignParam);
-            return Result(
-                    category,
-                    () => CodeBase.ReferenceInCode(objectRef),
-                    () => Refs.Create(objectRef)
-                );
-        }
-
-#if false
-        // Testcase (C:\data\develop\Reni\src\reni2\FeatureTest\Struct.cs(92,38): SimpleAssignment)
-        // Does not work because of duplicate references 
-        internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam)
-        {
-            var objectRef = ObjectReference(refAlignParam);
             return Reference(refAlignParam)
                 .Result(
                     category,
@@ -390,7 +377,6 @@ namespace Reni.Type
                     () => Refs.Create(objectRef)
                 );
         }
-#endif
 
         internal Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
