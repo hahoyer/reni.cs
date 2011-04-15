@@ -420,14 +420,6 @@ namespace Reni
             return ReturnMethodDump(trace, result);
         }
 
-
-        /// <summary>
-        ///     Replaces the absolute refInCode ref.
-        /// </summary>
-        /// <typeparam name = "TRefInCode"></typeparam>
-        /// <param name = "refInCode">The refInCode.</param>
-        /// <param name = "replacement">The replacement. Must not contain a reference that varies when walking along code tree.</param>
-        /// <returns></returns>
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Result> replacement)
             where TRefInCode : IReferenceInCode
         {
@@ -443,13 +435,6 @@ namespace Reni
             return result;
         }
 
-        /// <summary>
-        ///     Replaces the relative refInCode ref.
-        /// </summary>
-        /// <typeparam name = "TRefInCode"></typeparam>
-        /// <param name = "refInCode">The refInCode.</param>
-        /// <param name = "replacement">The replacement. Should be a reference that varies when walking along code tree.</param>
-        /// <returns></returns>
         internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacement)
             where TRefInCode : IReferenceInCode
         {

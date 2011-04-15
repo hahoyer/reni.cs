@@ -17,21 +17,24 @@ namespace Reni.FeatureTest.Struct
         ///     Access to elements of a structure.
         /// </summary>
         /// created 17.11.2006 20:43
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public void AccessSimple() { CreateFileAndRunCompiler("AccessSimple", @"((0, 1) _A_T_ 0) dump_print;", "0"); }
 
         /// <summary>
         ///     Access to elements of a structure.
         /// </summary>
         /// created 17.11.2006 20:43
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public void AccessSimpleAdditionalColon() { CreateFileAndRunCompiler("AccessSimpleAdditionalColon", @"((0, 1,) _A_T_ 0) dump_print;", "0"); }
 
         /// <summary>
         ///     Access to elements of a structure.
         /// </summary>
         /// created 17.11.2006 20:43
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public void StrangeStructs()
         {
             CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((one: 1) one) dump_print;", "1");
@@ -44,7 +47,8 @@ namespace Reni.FeatureTest.Struct
         ///     Access to elements of a structure.
         /// </summary>
         /// created 17.11.2006 20:43
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public void Access()
         {
             CreateFileAndRunCompiler("Access",
@@ -62,7 +66,8 @@ namespace Reni.FeatureTest.Struct
         ///     Declaration and access to variables
         /// </summary>
         /// created 17.11.2006 20:44
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public void DumpPrint()
         {
             CreateFileAndRunCompiler("DumpPrint",
@@ -74,93 +79,104 @@ namespace Reni.FeatureTest.Struct
         public override void Run() { }
     }
 
-    [TestFixture, InnerAccess]
+    [TestFixture]
+    [InnerAccess]
     public sealed class PropertyVariable : CompilerTest
     {
         protected override string Target { get { return @"! property x: 11/\; x dump_print"; } }
         protected override string Output { get { return "11"; } }
 
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccess, TargetSet(@"(10, (this _A_T_ 0) := 4) dump_print", "(4, )")]
-    
+    [TestFixture]
+    [InnerAccess]
+    [TargetSet(@"(10, (this _A_T_ 0) := 4) dump_print", "(4, )")]
     public sealed class SimpleAssignment : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, TargetSet(@"(10,20, (this _A_T_ 0) := 4) dump_print", "(4, 20, )"), TargetSet(@"(10,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )"), TargetSet(@"(10,20, (this _A_T_ 1) := 4) dump_print", "(10, 4, )"), TargetSet(@"(10,20,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )"), TargetSet(@"(10,20,30, (this _A_T_ 2) := 4) dump_print", "(10, 20, 4, )"), TargetSet(@"(1000,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )"), TargetSet(@"(1000,20,30, (this _A_T_ 1) := 4) dump_print", "(1000, 4, 30, )"), TargetSet(@"(10,2000,30, (this _A_T_ 0) := 4) dump_print", "(4, 2000, 30, )"), TargetSet(@"(10,2000,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )"), TargetSet(@"(10,2000,30, (this _A_T_ 2) := 4) dump_print", "(10, 2000, 4, )"), TargetSet(@"(3, (this _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )"), SimpleAssignment]
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    [TestFixture]
+    [TargetSet(@"(10,20, (this _A_T_ 0) := 4) dump_print", "(4, 20, )")]
+    [TargetSet(@"(10,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
+    [TargetSet(@"(10,20, (this _A_T_ 1) := 4) dump_print", "(10, 4, )")]
+    [TargetSet(@"(10,20,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
+    [TargetSet(@"(10,20,30, (this _A_T_ 2) := 4) dump_print", "(10, 20, 4, )")]
+    [TargetSet(@"(1000,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
+    [TargetSet(@"(1000,20,30, (this _A_T_ 1) := 4) dump_print", "(1000, 4, 30, )")]
+    [TargetSet(@"(10,2000,30, (this _A_T_ 0) := 4) dump_print", "(4, 2000, 30, )")]
+    [TargetSet(@"(10,2000,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
+    [TargetSet(@"(10,2000,30, (this _A_T_ 2) := 4) dump_print", "(10, 2000, 4, )")]
+    [TargetSet(@"(3, (this _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
+    [SimpleAssignment]
     public sealed class Assignment : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, AccessAndAdd, TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
-    
-    
+    [TestFixture]
+    [AccessAndAdd]
+    [TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
     public sealed class AccessAndAddComplex : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, InnerAccess, TargetSet("5, (this _A_T_ 0 + this _A_T_ 0)dump_print", "10")]
-    
-    
+    [TestFixture]
+    [InnerAccess]
+    [TargetSet("5, (this _A_T_ 0 + this _A_T_ 0)dump_print", "10")]
     public sealed class AccessAndAdd : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Number, TargetSet("5, (this _A_T_ 0) dump_print, 66", "5"), TargetSet("5,6, (this _A_T_ 0) dump_print, 66", "5"), TargetSet("5,6, (this _A_T_ 1) dump_print, 66", "6")]
-    
-    
-    
+    [TestFixture]
+    [Number]
+    [TargetSet("5, (this _A_T_ 0) dump_print, 66", "5")]
+    [TargetSet("5,6, (this _A_T_ 0) dump_print, 66", "5")]
+    [TargetSet("5,6, (this _A_T_ 1) dump_print, 66", "6")]
     public sealed class InnerAccess : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, TargetSet(@"
+    [TestFixture]
+    [TargetSet(@"
 x1: 1;
 x2: 4;
 x3: 2050;
 x4: x1 + x2 + x3;
 x4 dump_print;
-", "2055"), AccessAndAddComplex]
-    
-    
+", "2055")]
+    [AccessAndAddComplex]
     public sealed class SomeVariables : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a b dump_print", "222"), TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a c dump_print", "4"), InnerAccess]
-    
-    
-    
+    [TestFixture]
+    [TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a b dump_print", "222")]
+    [TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a c dump_print", "4")]
+    [InnerAccess]
     public sealed class AccessMember : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 }

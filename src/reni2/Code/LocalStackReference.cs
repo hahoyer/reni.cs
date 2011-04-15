@@ -18,6 +18,11 @@ namespace Reni.Code
         }
 
         StackData IStackDataAddressBase.GetTop(Size offset, Size size) { return _locals[_holder].DoPull(offset).DoGetTop(size); }
+        void IStackDataAddressBase.SetTop(Size offset, StackData right)
+        {
+            var l = ((IStackDataAddressBase)this).GetTop(offset, right.Size);
+            NotImplementedMethod(offset, right);
+        }
 
         string IStackDataAddressBase.Dump() { return _holder; }
     }

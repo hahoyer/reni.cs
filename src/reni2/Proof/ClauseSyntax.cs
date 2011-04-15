@@ -25,7 +25,7 @@ namespace Reni.Proof
         public string SmartDump() { return SmartDump(null); }
         public ClauseSyntax IsolateAndReplace(int variableCount) { return Apply(new IsolateAndReplaceStrategy(this,variableCount)); }
 
-        protected ClauseSyntax Apply(IStrategy strategy)
+        private ClauseSyntax Apply(IStrategy strategy)
         {
             return (ClauseSyntax) 
                    Operator

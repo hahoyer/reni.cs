@@ -20,7 +20,7 @@ namespace Reni.Type
         internal Reference(TypeBase valueType, RefAlignParam refAlignParam)
             : base(_nextObjectId++)
         {
-            Tracer.Assert(!(valueType is Reference));
+            Tracer.Assert(!(valueType is Reference), valueType.Dump);
             _valueType = valueType;
             _refAlignParam = refAlignParam;
             _typeTypeCache = new SimpleCache<TypeType>(() => new TypeType(this));

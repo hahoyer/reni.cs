@@ -33,6 +33,9 @@ namespace Reni
             StopByObjectId(-7);
         }
 
+        private BitsConst(Int64 value, Size size)
+            : this(new BitsConst(value), size) { }
+
         private BitsConst(Int64 value)
             : this(Size.Create(AutoSize(value))) { Data.MoveBytes(DataSize(_size), _data, 0, value); }
 
@@ -177,12 +180,16 @@ namespace Reni
         }
 
         public BitsConst Minus(BitsConst right, Size size) { return Plus(right*-1, size); }
+        public BitsConst Equal(BitsConst right, Size size) { return ToBitsConst(AsInteger == right.AsInteger, size); }
+        public BitsConst Greater(BitsConst right, Size size) { return ToBitsConst(AsInteger > right.AsInteger, size); }
+        public BitsConst GreaterEqual(BitsConst right, Size size) { return ToBitsConst(AsInteger >= right.AsInteger, size); }
+        public BitsConst Less(BitsConst right, Size size) { return ToBitsConst(AsInteger < right.AsInteger, size); }
+        public BitsConst LessEqual(BitsConst right, Size size) { return ToBitsConst(AsInteger <= right.AsInteger, size); }
+        public BitsConst LessGreater(BitsConst right, Size size) { return ToBitsConst(AsInteger != right.AsInteger, size); }
 
-        public BitsConst Equal(BitsConst right, Size size)
+        private static BitsConst ToBitsConst(bool value, Size size)
         {
-            if(AsInteger == right.AsInteger)
-                return new BitsConst(new BitsConst(-1), size);
-            return new BitsConst(new BitsConst(0), size);
+            return new BitsConst(value ? -1 : 0, size);
         }
 
         public void PrintNumber(BitsConst radix)

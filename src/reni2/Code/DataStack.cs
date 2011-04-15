@@ -16,8 +16,21 @@ namespace Reni.Code
             public readonly DictionaryEx<string, StackData> Locals = new DictionaryEx<string, StackData>();
             public FrameData Frame;
 
-            StackData IStackDataAddressBase.GetTop(Size offset, Size size) { return Data.DoPull(Data.Size + offset).DoGetTop(size); }
             string IStackDataAddressBase.Dump() { return "stack"; }
+
+            StackData IStackDataAddressBase.GetTop(Size offset, Size size)
+            {
+                return Data.DoPull(Data.Size + offset).DoGetTop(size);
+            }
+
+            void IStackDataAddressBase.SetTop(Size offset, StackData right)
+            {
+                var oldTop = Data.DoGetTop(Data.Size + offset);
+                Data = Data
+                    .DoPull(Data.Size + offset + right.Size)
+                    .Push(right)
+                    .Push(oldTop);
+            }
             internal StackDataAddress Address(Size offset, Size size) { return new StackDataAddress(this, size, offset - Data.Size); }
 
             internal StackData FrameAddress(Size offset, Size size, Size dataSize) { return new StackDataAddress(Frame, size, offset); }
@@ -95,7 +108,12 @@ namespace Reni.Code
             Push(left.BitArrayBinaryOp(opToken, size, right));
         }
 
-        void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam) { NotImplementedMethod(targetSize, refAlignParam); }
+        void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam)
+        {
+            var right = Pull(refAlignParam.RefSize);
+            var left = Pull(refAlignParam.RefSize);
+            left.Assign(targetSize, right);
+        }
 
         void IFormalMaschine.DumpPrintText(string dumpPrintText) { BitsConst.OutStream.Add(dumpPrintText); }
 

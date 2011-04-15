@@ -27,11 +27,6 @@ namespace Reni.Code.ReplaceVisitor
         }
     }
 
-    /// <summary>
-    ///     Replaces appearences of refInCode in code tree. 
-    ///     Assumes, that replacement requires offset alignment when walking along code tree
-    /// </summary>
-    /// <typeparam name = "TContext"></typeparam>
     internal sealed class ReplaceRelativeContextRef<TContext> : ReplaceContextRef<TContext>
         where TContext : IReferenceInCode
     {
@@ -46,11 +41,6 @@ namespace Reni.Code.ReplaceVisitor
         }
     }
 
-    /// <summary>
-    ///     Replaces appearences of refInCode in code tree. 
-    ///     Assumes, that replacement isn't a reference, that changes when walking along the code tree
-    /// </summary>
-    /// <typeparam name = "TContext"></typeparam>
     internal sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>
         where TContext : IReferenceInCode
     {

@@ -46,6 +46,8 @@ namespace Reni.Code
         {
             if(size == Size)
                 return this;
+            if (size.IsZero)
+                return new EmptyStackData();
             return GetTop(size);
         }
 
@@ -88,6 +90,12 @@ namespace Reni.Code
         {
             NotImplementedMethod();
             return null;
+        }
+
+        internal void Assign(Size size, StackData right)
+        {
+            GetAddress().Assign(size,right);
+
         }
     }
 }

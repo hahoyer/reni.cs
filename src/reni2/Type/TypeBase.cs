@@ -343,6 +343,14 @@ namespace Reni.Type
 
         internal Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
+            if(this is Reference)
+                return Align(refAlignParam.AlignBits)
+                    .Result
+                    (
+                        category,
+                        () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam,refAlignParam.RefSize),
+                        () => Destructor(Category.Refs).Refs
+                    );
             return Align(refAlignParam.AlignBits)
                 .Reference(refAlignParam)
                 .Result
@@ -362,6 +370,19 @@ namespace Reni.Type
         internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam)
         {
             var objectRef = ObjectReference(refAlignParam);
+            return Result(
+                    category,
+                    () => CodeBase.ReferenceInCode(objectRef),
+                    () => Refs.Create(objectRef)
+                );
+        }
+
+#if false
+        // Testcase (C:\data\develop\Reni\src\reni2\FeatureTest\Struct.cs(92,38): SimpleAssignment)
+        // Does not work because of duplicate references 
+        internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam)
+        {
+            var objectRef = ObjectReference(refAlignParam);
             return Reference(refAlignParam)
                 .Result(
                     category,
@@ -369,11 +390,13 @@ namespace Reni.Type
                     () => Refs.Create(objectRef)
                 );
         }
+#endif
 
         internal Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
+            var objectReference = ObjectReference(refAlignParam);
             return result
-                .ReplaceAbsolute(ObjectReference(refAlignParam), () => LocalReferenceResult(result.CompleteCategory, refAlignParam));
+                .ReplaceAbsolute(objectReference, () => LocalReferenceResult(result.CompleteCategory, refAlignParam));
         }
 
         internal virtual Result ReferenceInCode(Context.Function function, Category category)

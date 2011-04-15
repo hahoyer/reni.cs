@@ -25,6 +25,8 @@ namespace Reni.Code
 
         internal new StackData Dereference(Size size, Size dataSize) { return _data.GetTop(_offset, size).BitCast(dataSize); }
 
+        internal new void Assign(Size size, StackData right) { _data.SetTop(_offset, right.Dereference(size,size)); }
+
         internal new StackData RefPlus(Size offset)
         {
             if(offset.IsZero)
@@ -46,5 +48,6 @@ namespace Reni.Code
     {
         StackData GetTop(Size offset, Size size);
         string Dump();
+        void SetTop(Size offset, StackData right);
     }
 }
