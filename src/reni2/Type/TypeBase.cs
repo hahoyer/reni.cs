@@ -30,6 +30,7 @@ namespace Reni.Type
             public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
             public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes;
             public readonly DictionaryEx<Struct.Context, DictionaryEx<int, Field>> Fields;
+            public readonly SimpleCache<TypeType> TypeTypeCache;
 
             public Cache(TypeBase parent)
             {
@@ -41,6 +42,7 @@ namespace Reni.Type
                 Sequences = new DictionaryEx<int, Sequence>(elementCount => new Sequence(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
+                TypeTypeCache = new SimpleCache<TypeType>(() => new TypeType(parent));
             }
         }
 
@@ -48,6 +50,7 @@ namespace Reni.Type
 
         [UsedImplicitly]
         private static ReniObject _lastSearchVisitor;
+
 
         protected TypeBase(int objectId)
             : base(objectId) { _cache = new Cache(this); }
@@ -254,6 +257,9 @@ namespace Reni.Type
 
         [IsDumpEnabled(false)]
         internal virtual RefAlignParam[] ReferenceChain { get { return new RefAlignParam[0]; } }
+
+        [IsDumpEnabled(false)]
+        internal TypeType TypeType { get { return _cache.TypeTypeCache.Value; } }
 
         internal virtual IAccessType AccessType(Struct.Context context, int position) { return Field(context, position); }
 

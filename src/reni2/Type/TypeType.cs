@@ -10,11 +10,11 @@ namespace Reni.Type
     internal sealed class TypeType : TypeBase
     {
         [IsDumpEnabled(true)]
-        private readonly Reference _value;
+        private readonly TypeBase _value;
 
         private readonly IFunctionalFeature _functionalFeature;
 
-        public TypeType(Reference value)
+        public TypeType(TypeBase value)
         {
             _functionalFeature = new ConversionFeature(value.AutomaticDereference());
             _value = value;

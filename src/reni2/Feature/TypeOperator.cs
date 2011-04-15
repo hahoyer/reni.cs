@@ -28,7 +28,6 @@ namespace Reni.Feature
                 result.Type = context
                     .Type(left)
                     .TypeForTypeOperator()
-                    .Reference(context.RefAlignParam)
                     .TypeType;
             }
             return result;

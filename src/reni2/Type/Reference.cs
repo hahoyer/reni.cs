@@ -14,7 +14,6 @@ namespace Reni.Type
         private static int _nextObjectId;
         private readonly TypeBase _valueType;
         private readonly RefAlignParam _refAlignParam;
-        private readonly SimpleCache<TypeType> _typeTypeCache;
         private readonly AssignmentFeature _assignmentFeature;
 
         internal Reference(TypeBase valueType, RefAlignParam refAlignParam)
@@ -23,7 +22,6 @@ namespace Reni.Type
             Tracer.Assert(!(valueType is Reference), valueType.Dump);
             _valueType = valueType;
             _refAlignParam = refAlignParam;
-            _typeTypeCache = new SimpleCache<TypeType>(() => new TypeType(this));
             _assignmentFeature = new AssignmentFeature(this);
         }
 
@@ -91,9 +89,6 @@ namespace Reni.Type
         protected override Result DereferenceResult(Category category) { return DereferencedArgResult(category); }
 
         internal CodeBase LocalReferenceCode() { return LocalReferenceCode(RefAlignParam).Dereference(RefAlignParam, Size); }
-
-        [IsDumpEnabled(false)]
-        internal TypeType TypeType { get { return _typeTypeCache.Value; } }
 
         private Result DereferencedArgResult(Category category) { return _valueType.Result(category, DereferencedArgCode); }
         private CodeBase DereferencedArgCode() { return CodeBase.Arg(Size).Dereference(RefAlignParam, _valueType.Size); }
