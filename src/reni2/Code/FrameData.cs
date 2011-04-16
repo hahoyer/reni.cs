@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 
 namespace Reni.Code
 {
     internal sealed class FrameData : ReniObject, IStackDataAddressBase
     {
         private readonly StackData _data;
+        internal readonly DictionaryEx<string, StackData> Locals = new DictionaryEx<string, StackData>();
+        internal bool IsRepeatRequired = false;
 
         public FrameData(StackData data) { _data = data; }
 

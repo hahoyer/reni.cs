@@ -94,5 +94,7 @@ namespace Reni.Code
             NotImplementedMethod(visitedObject, newThen, newElse);
             return null;
         }
+
+        internal virtual FiberItem Call(Call visitedObject) { return null; }
     }
 }

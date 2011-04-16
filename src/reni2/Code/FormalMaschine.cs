@@ -10,27 +10,29 @@ namespace Reni.Code
 {
     internal interface IFormalMaschine
     {
-        void BitsArray(Size size, BitsConst data);
-        void TopRef(Size offset, Size size);
-        void Call(Size size, int functionIndex, Size argsAndRefsSize);
-        void BitCast(Size size, Size targetSize, Size significantSize);
-        void DumpPrintOperation(Size leftSize, Size rightSize);
-        void TopFrameData(Size offset, Size size, Size dataSize);
-        void TopData(Size offset, Size size, Size dataSize);
-        void LocalBlockEnd(Size size, Size intermediateSize);
-        void Drop(Size beforeSize, Size afterSize);
-        void RefPlus(Size size, Size right);
-        void Dereference(RefAlignParam refAlignParam, Size size, Size dataSize);
-        void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
         void Assign(Size targetSize, RefAlignParam refAlignParam);
+        void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
+        void BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize);
+        void BitCast(Size size, Size targetSize, Size significantSize);
+        void BitsArray(Size size, BitsConst data);
+        void Call(Size size, int functionIndex, Size argsAndRefsSize);
+        void Dereference(RefAlignParam refAlignParam, Size size, Size dataSize);
+        void Drop(Size beforeSize, Size afterSize);
+        void DumpPrintOperation(Size leftSize, Size rightSize);
         void DumpPrintText(string dumpPrintText);
-        void List(CodeBase[] data);
         void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
-        void LocalVariableReference(Size size, string holder, Size offset);
-        void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
+        void List(CodeBase[] data);
+        void LocalBlockEnd(Size size, Size intermediateSize);
         void LocalVariableData(Size size, string holder, Size offset, Size dataSize);
-        void ReferenceCode(IReferenceInCode context);
         void LocalVariableDefinition(string holderName, Size valueSize);
+        void LocalVariableReference(Size size, string holder, Size offset);
+        void RecursiveCall();
+        void ReferenceCode(IReferenceInCode context);
+        void RefPlus(Size size, Size right);
+        void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
+        void TopData(Size offset, Size size, Size dataSize);
+        void TopFrameData(Size offset, Size size, Size dataSize);
+        void TopRef(Size offset, Size size);
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
@@ -156,11 +158,12 @@ namespace Reni.Code
         }
 
         void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam) { ResetInputValuesOfData(refAlignParam.RefSize*2); }
-
+        void IFormalMaschine.BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize) { NotImplementedMethod(opToken, size, argSize); }
         void IFormalMaschine.DumpPrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
         void IFormalMaschine.List(CodeBase[] data) { NotImplementedMethod(data); }
         void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }
         void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size, holder, offset); }
+        void IFormalMaschine.RecursiveCall() { throw new NotImplementedException(); }
         void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
         void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
         void IFormalMaschine.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }

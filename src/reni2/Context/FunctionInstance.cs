@@ -5,7 +5,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
-using Reni.Code.ReplaceVisitor;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -17,16 +16,16 @@ namespace Reni.Context
     [Serializable]
     internal sealed class FunctionInstance : ReniObject
     {
-        [Node, IsDumpEnabled(true)]
-        
+        [Node]
+        [IsDumpEnabled(true)]
         private readonly TypeBase _args;
 
-        [Node, IsDumpEnabled(true)]
-        
+        [Node]
+        [IsDumpEnabled(true)]
         private readonly ICompileSyntax _body;
 
-        [Node, IsDumpEnabled(true)]
-        
+        [Node]
+        [IsDumpEnabled(true)]
         private readonly Struct.Context _context;
 
         [IsDumpEnabled(true)]
@@ -70,12 +69,12 @@ namespace Reni.Context
 
         internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
 
-        [Node, IsDumpEnabled(false)]
-        
+        [Node]
+        [IsDumpEnabled(false)]
         private Size FrameSize { get { return _args.Size + ForeignRefs.Size; } }
 
-        [Node, IsDumpEnabled(false)]
-        
+        [Node]
+        [IsDumpEnabled(false)]
         private string Description { get { return _body.DumpShort(); } }
 
         public Result CreateCall(Category category, Result args)
@@ -185,20 +184,5 @@ namespace Reni.Context
             result += "\n";
             return result;
         }
-    }
-
-    internal sealed class ReplacePrimitiveRecursivity : Base
-    {
-        private static int _nextObjectId;
-
-        [IsDumpEnabled(true)]
-        private readonly int _functionIndex;
-
-        public ReplacePrimitiveRecursivity(int functionIndex)
-            : base(_nextObjectId++) { _functionIndex = functionIndex; }
-
-        public int FunctionIndex { get { return _functionIndex; } }
-
-        public FiberItem CallVisit(Call @this) { return @this.TryConvertToRecursiveCall(_functionIndex); }
     }
 }

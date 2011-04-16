@@ -156,6 +156,8 @@ namespace Reni
             return Convert(ToInt64()*right.ToInt64()).Resize(size);
         }
 
+        public BitsConst Multiply(int right, Size size) { return Convert(ToInt64()*right).Resize(size); }
+
         [UsedImplicitly]
         public BitsConst Star(BitsConst right, Size size) { return Multiply(right, size); }
 
@@ -179,13 +181,23 @@ namespace Reni
             return xResult;
         }
 
-        public BitsConst Minus(BitsConst right, Size size) { return Plus(right*-1, size); }
+        [UsedImplicitly]
+        public BitsConst Minus(BitsConst right, Size size) { return Plus(right * -1, size); }
+        [UsedImplicitly]
         public BitsConst Equal(BitsConst right, Size size) { return ToBitsConst(AsInteger == right.AsInteger, size); }
+        [UsedImplicitly]
         public BitsConst Greater(BitsConst right, Size size) { return ToBitsConst(AsInteger > right.AsInteger, size); }
+        [UsedImplicitly]
         public BitsConst GreaterEqual(BitsConst right, Size size) { return ToBitsConst(AsInteger >= right.AsInteger, size); }
+        [UsedImplicitly]
         public BitsConst Less(BitsConst right, Size size) { return ToBitsConst(AsInteger < right.AsInteger, size); }
+        [UsedImplicitly]
         public BitsConst LessEqual(BitsConst right, Size size) { return ToBitsConst(AsInteger <= right.AsInteger, size); }
+        [UsedImplicitly]
         public BitsConst LessGreater(BitsConst right, Size size) { return ToBitsConst(AsInteger != right.AsInteger, size); }
+
+        [UsedImplicitly]
+        public BitsConst Minus_Prefix(Size size) { return Multiply(-1, size); }
 
         private static BitsConst ToBitsConst(bool value, Size size)
         {
@@ -455,6 +467,14 @@ namespace Reni
             return (BitsConst) methodInfo.Invoke(this, new object[] {right, size});
         }
 
+        internal BitsConst BitArrayPrefixOp(string operation, Size size)
+        {
+            var methodInfo = typeof(BitsConst).GetMethod(operation + "_Prefix");
+            if (methodInfo == null)
+                throw new MissingMethodException(operation);
+            return (BitsConst)methodInfo.Invoke(this, new object[] { size });
+        }
+
         private sealed class MissingMethodException : Exception
         {
             [IsDumpEnabled]
@@ -466,5 +486,6 @@ namespace Reni
                 Tracer.ThrowAssertionFailed(1, "", () => Tracer.Dump(this));
             }
         }
+
     }
 }

@@ -22,9 +22,20 @@ namespace Reni.Code.ReplaceVisitor
 
         protected override CodeBase List(List visitedObject, IEnumerable<CodeBase> newList)
         {
-            if(newList.All(x => x == null))
+            var newListAsArray = newList.ToArray();
+            if(newListAsArray.All(x => x == null))
                 return null;
-            return Code.List.Create(newList.Select((x, i) => x ?? visitedObject.Data[i]));
+            var newListCompleted = newListAsArray.Select((x, i) => x ?? visitedObject.Data[i]).Where(x=>!x.IsEmpty).ToArray();
+
+            switch(newListCompleted.Length)
+            {
+                case 0:
+                    return CodeBase.Void();
+                case 1:
+                    return newListCompleted[0];
+            }
+            
+            return Code.List.Create(newListCompleted);
         }
 
         protected override FiberItem ThenElse(ThenElse visitedObject, CodeBase newThen, CodeBase newElse)

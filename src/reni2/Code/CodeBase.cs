@@ -286,7 +286,7 @@ namespace Reni.Code
             {
                 Execute(new DataStack(functions, isTraceEnabled));
             }
-            catch(CodeBaseException e)
+            catch (UnexpectedContextReference e)
             {
                 Tracer.AssertionFailed("", () => e.Message);
             }

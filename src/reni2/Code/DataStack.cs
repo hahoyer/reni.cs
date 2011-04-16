@@ -13,8 +13,7 @@ namespace Reni.Code
         private sealed class LocalData : ReniObject, IStackDataAddressBase
         {
             public StackData Data = new EmptyStackData();
-            public readonly DictionaryEx<string, StackData> Locals = new DictionaryEx<string, StackData>();
-            public FrameData Frame;
+            public FrameData Frame = new FrameData(null);
 
             string IStackDataAddressBase.Dump() { return "stack"; }
 
@@ -48,6 +47,21 @@ namespace Reni.Code
             _isTraceEnabled = isTraceEnabled;
         }
 
+        void IFormalMaschine.Call(Size size, int functionIndex, Size argsAndRefsSize)
+        {
+            var oldFrame = _localData.Frame;
+            var argsAndRefs = Pull(argsAndRefsSize);
+            do
+            {
+                _localData.Frame = new FrameData(argsAndRefs);
+                SubExecute("call " + functionIndex, _functions[functionIndex]);
+            }
+            while (_localData.Frame.IsRepeatRequired);
+            _localData.Frame = oldFrame;
+        }
+
+        void IFormalMaschine.RecursiveCall() { _localData.Frame.IsRepeatRequired = true; }
+
         private StackData Data { get { return _localData.Data; } set { _localData.Data = value; } }
 
         void IFormalMaschine.BitsArray(Size size, BitsConst data)
@@ -68,14 +82,6 @@ namespace Reni.Code
         void IFormalMaschine.TopFrameData(Size offset, Size size, Size dataSize) { Push(_localData.Frame.Data.DoPull(_localData.Frame.Data.Size + offset).DoGetTop(size).BitCast(dataSize)); }
 
         void IFormalMaschine.TopData(Size offset, Size size, Size dataSize) { NotImplementedMethod(offset, size, dataSize); }
-
-        void IFormalMaschine.Call(Size size, int functionIndex, Size argsAndRefsSize)
-        {
-            var oldFrame = _localData.Frame;
-            _localData.Frame = new FrameData(Pull(argsAndRefsSize));
-            SubExecute("call " + functionIndex, _functions[functionIndex]);
-            _localData.Frame = oldFrame;
-        }
 
         void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
         {
@@ -106,6 +112,12 @@ namespace Reni.Code
             var right = Pull(rightSize);
             var left = Pull(leftSize);
             Push(left.BitArrayBinaryOp(opToken, size, right));
+        }
+
+        public void BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize)
+        {
+            var arg = Pull(argSize);
+            Push(arg.BitArrayPrefixOp(opToken, size));
         }
 
         void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam)
@@ -169,7 +181,7 @@ namespace Reni.Code
                 SubExecute("then:", thenCode);
         }
 
-        private DictionaryEx<string, StackData> Locals { get { return _localData.Locals; } }
+        private DictionaryEx<string, StackData> Locals { get { return _localData.Frame.Locals; } }
 
         void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { Push(Locals[holder].DoPull(offset).DoGetTop(dataSize).BitCast(size)); }
 

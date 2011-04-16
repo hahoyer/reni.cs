@@ -16,6 +16,7 @@ namespace Reni.Code
 
         public BitArray(Size size, BitsConst data)
         {
+            //Tracer.Assert(size.IsPositive);
             _size = size;
             Data = data;
             StopByObjectId(-527);
@@ -31,7 +32,7 @@ namespace Reni.Code
         }
 
         [IsDumpEnabled(false)]
-        internal override bool IsEmpty { get { return Data.IsEmpty; } }
+        internal override bool IsEmpty { get { return Size.IsZero; } }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 

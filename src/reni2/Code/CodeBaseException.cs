@@ -9,13 +9,13 @@ namespace Reni.Code
     {
         private readonly IReferenceInCode _container;
         protected CodeBaseException(IReferenceInCode container) { _container = container; }
-        internal IReferenceInCode Container { get { return _container; } }
-        public override string Message { get { return Tracer.Dump(this); } }
+        public override string Message { get { return _container.ToString(); } }
     }
 
     internal sealed class UnexpectedContextReference : CodeBaseException
     {
         internal UnexpectedContextReference(IReferenceInCode container)
             : base(container) { }
+
     }
 }

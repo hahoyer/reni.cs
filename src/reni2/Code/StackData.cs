@@ -76,6 +76,13 @@ namespace Reni.Code
             return new BitsStackData(resultData);
         }
 
+        internal StackData BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size)
+        {
+            var argData = GetBitsConst();
+            var resultData = argData.BitArrayPrefixOp(opToken.DataFunctionName, size);
+            return new BitsStackData(resultData);
+        }
+
         internal StackData RefPlus(Size offset) { return GetAddress().RefPlus(offset); }
 
         internal StackData Dereference(Size size, Size dataSize) { return GetAddress().Dereference(size, dataSize); }
@@ -97,5 +104,6 @@ namespace Reni.Code
             GetAddress().Assign(size,right);
 
         }
+
     }
 }

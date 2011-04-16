@@ -18,7 +18,10 @@ namespace Reni.Code
         private void AssertValid()
         {
             foreach(var codeBase in _data)
+            {
                 Tracer.Assert(!(codeBase is List));
+                Tracer.Assert(!(codeBase.IsEmpty));
+            }
             Tracer.Assert(_data.Length > 1);
         }
 

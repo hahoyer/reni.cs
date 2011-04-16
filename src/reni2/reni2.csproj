@@ -59,6 +59,8 @@
     <Compile Include="Code\Multiplyop.cs" />
     <Compile Include="Code\Op.cs" />
     <Compile Include="Code\ListStack.cs" />
+    <Compile Include="Code\RecursiveCall.cs" />
+    <Compile Include="Code\RecursiveCallCandidate.cs" />
     <Compile Include="Code\ReferenceCode.cs" />
     <Compile Include="Code\Ref.cs" />
     <Compile Include="Code\RefPlus.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\FunctionInstance.cs" />
     <Compile Include="Context\FunctionList.cs" />
+    <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
     <Compile Include="FeatureTest\Array.cs" />

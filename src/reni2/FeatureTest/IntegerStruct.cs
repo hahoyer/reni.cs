@@ -11,7 +11,7 @@ namespace Reni.FeatureTest.Integer
     /// </summary>
     public class IntegerStruct : CompilerTest
     {
-        protected static string Definition()
+        private static string Definition()
         {
             return
                 @"
@@ -39,56 +39,79 @@ Integer8:
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
-    [TestFixture, Output("3"), InstanceCode("(Integer8(1)+Integer8(2))"), IntegerPlusNumber]
-    
-    public class IntegerPlusInteger : IntegerStruct
+    [TestFixture]
+    [Output("3")]
+    [InstanceCode("(Integer8(1)+Integer8(2))")]
+    [IntegerPlusNumber]
+    public sealed class IntegerPlusInteger : IntegerStruct
     {
-        [Test, Category(UnderConstruction)]
+        [Test]
+        [Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("3"), InstanceCode("(Integer8(1)+2)"), Create]
-    
-    public class IntegerPlusNumber : IntegerStruct
+    [TestFixture]
+    [Output("3")]
+    [InstanceCode("(Integer8(1)+2)")]
+    [Create]
+    public sealed class IntegerPlusNumber : IntegerStruct
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("23"), InstanceCode("Integer8(23) clone"), Create]
-    
-    public class Clone : IntegerStruct
+    [TestFixture]
+    [Output("23")]
+    [InstanceCode("Integer8(23) clone")]
+    [Create]
+    public sealed class Clone : IntegerStruct
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("23"), InstanceCode("Integer8(0) create(23)"), DumpPrint1, DumpPrint2, DumpPrint127]
-    
-    public class Create : IntegerStruct
+    [TestFixture]
+    [Output("23")]
+    [InstanceCode("Integer8(0) create(23)")]
+    [DumpPrint1]
+    [DumpPrint2]
+    [DumpPrint127]
+    public sealed class Create : IntegerStruct
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("1"), InstanceCode("Integer8(1)")]
-    public class DumpPrint1 : IntegerStruct
+    [TestFixture]
+    [Output("1")]
+    [InstanceCode("Integer8(1)")]
+    public sealed class DumpPrint1 : IntegerStruct
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("2"), InstanceCode("Integer8(2)")]
-    public class DumpPrint2 : IntegerStruct
+    [TestFixture]
+    [Output("2")]
+    [InstanceCode("Integer8(2)")]
+    public sealed class DumpPrint2 : IntegerStruct
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Output("127"), InstanceCode("Integer8(127)")]
-    public class DumpPrint127 : IntegerStruct
+    [TestFixture]
+    [Output("127")]
+    [InstanceCode("Integer8(127)")]
+    public sealed class DumpPrint127 : IntegerStruct
     {
-        [Test, Category(Worked)]
+        [Test]
+        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 }

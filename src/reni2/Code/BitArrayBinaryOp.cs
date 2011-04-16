@@ -69,11 +69,7 @@ namespace Reni.Code
         [IsDumpEnabled(false)]
         internal override Size OutputSize { get { return _size; } }
 
-        protected override void Execute(IFormalMaschine formalMaschine)
-        {
-            NotImplementedMethod(formalMaschine);
-            throw new NotImplementedException();
-        }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayPrefixOp(OpToken, OutputSize, ArgSize); }
 
         internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
