@@ -9,14 +9,15 @@ namespace Reni.FeatureTest.BitArrayOp
     /// <summary>
     ///     Operations on bitarrays
     /// </summary>
-    [TestFixture, Number]
-    public class BitArrayOp : CompilerTest
+    [TestFixture]
+    [Number]
+    public sealed class BitArrayOp : CompilerTest
     {
         /// <summary>
         ///     Compares the operators.
         /// </summary>
         /// created 08.01.2007 00:05
-        [Test, Category(Worked)]
+        [Test]
         public void NegativeNumber()
         {
             CreateFileAndRunCompiler("Negative number", @"(-1)dump_print", "-1");
@@ -34,81 +35,102 @@ namespace Reni.FeatureTest.BitArrayOp
         public override void Run() { }
     }
 
-    [TestFixture,
-     Target(@"(1, 12)dump_print"),
-     Output("(1, 12)"), Number]
-    public class TwoPositiveNumbers : CompilerTest
+    [TestFixture]
+    [Target(@"(1, 12)dump_print")]
+    [Output("(1, 12)")]
+    [Number]
+    public sealed class TwoPositiveNumbers : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, TwoPositiveNumbers,
-     Target(@"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print"),
-     Output("(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)")]
-    public class PositiveNumbers : CompilerTest
+    [TestFixture]
+    [TwoPositiveNumbers]
+    [Target(@"(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)dump_print")]
+    [Output("(1, 12, 123, 1234, 12345, 123456, 1234567, 12345678, 123456789, 1234567890)")]
+    public sealed class PositiveNumbers : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, TwoPositiveNumbers,
-     Target(@"(-1, -12)dump_print"),
-     Output("(-1, -12)")]
-    public class TwoNegativeNumbers : CompilerTest
+    [TestFixture]
+    [TwoPositiveNumbers]
+    [Target(@"(-1, -12)dump_print")]
+    [Output("(-1, -12)")]
+    public sealed class TwoNegativeNumbers : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, TwoNegativeNumbers,
-     Target(@"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print"),
-     Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
-    public class NegativeNumbers : CompilerTest
+    [TestFixture]
+    [TwoNegativeNumbers]
+    [Target(@"(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)dump_print")]
+    [Output("(-1, -12, -123, -1234, -12345, -123456, -1234567, -12345678, -123456789, -1234567890)")]
+    public sealed class NegativeNumbers : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"3 dump_print"), Output("3")]
-    public class Number : CompilerTest
+    [TestFixture]
+    [Target(@"3 dump_print")]
+    [Output("3")]
+    public sealed class Number : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(2+4) dump_print"), Output("6"), Number]
-    public class Add2Numbers : CompilerTest
+    [TestFixture]
+    [Target(@"(2+4) dump_print")]
+    [Output("6")]
+    [Number]
+    public sealed class Add2Numbers : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(40000 - 1  )dump_print"), Output("39999"), Number]
-    public class SubtractOddSizedNumber : CompilerTest
+    [TestFixture]
+    [Target(@"(40000 - 1  )dump_print")]
+    [Output("39999")]
+    [Number]
+    public sealed class SubtractOddSizedNumber : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(40000 + 1  )dump_print"), Output("40001"), Number]
-    public class AddOddSizedNumber : CompilerTest
+    [TestFixture]
+    [Target(@"(40000 + 1  )dump_print")]
+    [Output("40001")]
+    [Number]
+    public sealed class AddOddSizedNumber : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(40000 - 43210)dump_print"), Output("-3210"), Number]
-    public class SubtractLargeEqualSizedNumber : CompilerTest
+    [TestFixture]
+    [Target(@"(40000 - 43210)dump_print")]
+    [Output("-3210")]
+    [Number]
+    public sealed class SubtractLargeEqualSizedNumber : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"(400 - 43210)dump_print"), Output("-42810"), Number]
-    public class SubtractLargerSizedNumber : CompilerTest
+    [TestFixture]
+    [Target(@"(400 - 43210)dump_print")]
+    [Output("-42810")]
+    [Number]
+    public sealed class SubtractLargerSizedNumber : CompilerTest
     {
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 }

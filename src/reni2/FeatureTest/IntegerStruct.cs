@@ -33,9 +33,7 @@ Integer8:
         }
 
         public override void Run() { }
-
         protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print"; } }
-
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
@@ -46,7 +44,6 @@ Integer8:
     public sealed class IntegerPlusInteger : IntegerStruct
     {
         [Test]
-        [Category(UnderConstruction)]
         public override void Run() { BaseRun(); }
     }
 
@@ -57,7 +54,6 @@ Integer8:
     public sealed class IntegerPlusNumber : IntegerStruct
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -68,7 +64,6 @@ Integer8:
     public sealed class Clone : IntegerStruct
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -81,7 +76,6 @@ Integer8:
     public sealed class Create : IntegerStruct
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -91,7 +85,6 @@ Integer8:
     public sealed class DumpPrint1 : IntegerStruct
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -101,7 +94,6 @@ Integer8:
     public sealed class DumpPrint2 : IntegerStruct
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -111,7 +103,6 @@ Integer8:
     public sealed class DumpPrint127 : IntegerStruct
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 }

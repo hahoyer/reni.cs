@@ -15,20 +15,10 @@ namespace Reni.FeatureTest
     [AttributeUsage(AttributeTargets.Class)]
     public abstract class CompilerTest : DependantAttribute
     {
-        [UsedImplicitly]
-        public const string Damaged = "Damaged";
-
-        [UsedImplicitly]
-        public const string Rare = "Rare";
-
-        [UsedImplicitly]
-        public const string UnderConstruction = "Under Construction";
-
-        [UsedImplicitly]
-        public const string UnderConstructionNoAutoTrace = "Under Construction (No auto trace)";
-
-        [UsedImplicitly]
-        public const string Worked = "Worked";
+        [Obsolete("Use IsUnderConstruction",true)]
+        internal const string UnderConstruction = "Under Construction";
+        [Obsolete("Remove it",true)]
+        internal const string Worked = "Worked";
 
         internal readonly CompilerParameters Parameters = new CompilerParameters();
         private static Dictionary<System.Type, CompilerTest> _cache;
@@ -89,12 +79,7 @@ namespace Reni.FeatureTest
             for(var i = 0; i < 100; i++)
             {
                 var x = new StackTrace(true).GetFrame(depth + i).GetMethod();
-                if(x.GetCustomAttributes(typeof(TestAttribute), true).Length > 0)
-                {
-                    return x
-                        .GetCustomAttributes(typeof(CategoryAttribute), true)
-                        .Any(t => ((CategoryAttribute) t).Name == UnderConstruction);
-                }
+                return (x.GetCustomAttributes(typeof(IsUnderConstructionAttribute), true).Length > 0);
             }
             return false;
         }
@@ -175,6 +160,9 @@ namespace Reni.FeatureTest
 
         protected virtual void AssertValid(Compiler c) { }
     }
+
+    internal sealed class IsUnderConstructionAttribute
+    {}
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     internal abstract class StringAttribute : Attribute

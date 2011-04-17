@@ -18,7 +18,6 @@ namespace Reni.FeatureTest.Struct
         /// </summary>
         /// created 17.11.2006 20:43
         [Test]
-        [Category(Worked)]
         public void AccessSimple() { CreateFileAndRunCompiler("AccessSimple", @"((0, 1) _A_T_ 0) dump_print;", "0"); }
 
         /// <summary>
@@ -26,7 +25,6 @@ namespace Reni.FeatureTest.Struct
         /// </summary>
         /// created 17.11.2006 20:43
         [Test]
-        [Category(Worked)]
         public void AccessSimpleAdditionalColon() { CreateFileAndRunCompiler("AccessSimpleAdditionalColon", @"((0, 1,) _A_T_ 0) dump_print;", "0"); }
 
         /// <summary>
@@ -34,7 +32,6 @@ namespace Reni.FeatureTest.Struct
         /// </summary>
         /// created 17.11.2006 20:43
         [Test]
-        [Category(Worked)]
         public void StrangeStructs()
         {
             CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((one: 1) one) dump_print;", "1");
@@ -48,7 +45,6 @@ namespace Reni.FeatureTest.Struct
         /// </summary>
         /// created 17.11.2006 20:43
         [Test]
-        [Category(Worked)]
         public void Access()
         {
             CreateFileAndRunCompiler("Access",
@@ -67,7 +63,6 @@ namespace Reni.FeatureTest.Struct
         /// </summary>
         /// created 17.11.2006 20:44
         [Test]
-        [Category(Worked)]
         public void DumpPrint()
         {
             CreateFileAndRunCompiler("DumpPrint",
@@ -87,7 +82,6 @@ namespace Reni.FeatureTest.Struct
         protected override string Output { get { return "11"; } }
 
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -97,7 +91,6 @@ namespace Reni.FeatureTest.Struct
     public sealed class SimpleAssignment : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -117,7 +110,6 @@ namespace Reni.FeatureTest.Struct
     public sealed class Assignment : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -127,7 +119,6 @@ namespace Reni.FeatureTest.Struct
     public sealed class AccessAndAddComplex : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -137,7 +128,6 @@ namespace Reni.FeatureTest.Struct
     public sealed class AccessAndAdd : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -149,7 +139,6 @@ namespace Reni.FeatureTest.Struct
     public sealed class InnerAccess : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -165,7 +154,6 @@ x4 dump_print;
     public sealed class SomeVariables : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -176,7 +164,6 @@ x4 dump_print;
     public sealed class AccessMember : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 }

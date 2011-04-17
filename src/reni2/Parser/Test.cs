@@ -9,7 +9,7 @@ using Reni.FeatureTest.Structure;
 namespace Reni.Parser
 {
     [TestFixture]
-    public class ParserTest : CompilerTest
+    public sealed class ParserTest : CompilerTest
     {
         public override void Run() { }
 
@@ -17,7 +17,8 @@ namespace Reni.Parser
         ///     Special test, will not work automatically.
         /// </summary>
         /// created 18.07.2007 01:27 on HAHOYER-DELL by hh
-        [Test, Explicit]
+        [Test]
+        [Explicit]
         public void SimpleFunction()
         {
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
@@ -26,7 +27,7 @@ namespace Reni.Parser
             CreateFileAndRunCompiler("SimpleFunction", @"f()", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
-        [Test, Category(Worked)]
+        [Test]
         public void Add2Numbers()
         {
             var syntaxPrototype =
@@ -35,7 +36,7 @@ namespace Reni.Parser
             CreateFileAndRunCompiler("Add2Numbers", @"(2+4) dump_print", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
-        [Test, Category(Worked)]
+        [Test]
         public void AlternativePrioTableProperty1()
         {
             var syntaxPrototype = LikeSyntax.Struct(
@@ -48,7 +49,7 @@ namespace Reni.Parser
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!property x: 3", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
-        [Test, Category(Worked)]
+        [Test]
         public void AlternativePrioTableProperty2()
         {
             var syntaxPrototype = LikeSyntax.Struct(
@@ -61,7 +62,7 @@ namespace Reni.Parser
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!property property: 3", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
-        [Test, Category(Worked)]
+        [Test]
         public void AlternativePrioTableConverter()
         {
             var syntaxPrototype = LikeSyntax.Struct(
@@ -74,7 +75,7 @@ namespace Reni.Parser
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3", c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
-        [Test, Category(Worked)]
+        [Test]
         public void AlternativePrioTableConverterAndProperty()
         {
             var syntaxPrototype = LikeSyntax.Struct(

@@ -9,45 +9,45 @@ using Reni.FeatureTest.Struct;
 namespace Reni.FeatureTest.DefaultOperations
 {
     [TestFixture]
-    public class TypeOperator : CompilerTest
+    public sealed class TypeOperator : CompilerTest
     {
         protected override string Target { get { return @"31 type dump_print"; } }
         protected override string Output { get { return "(bit)sequence(6)"; } }
 
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
-    public class TypeOperatorWithVariable : CompilerTest
+    public sealed class TypeOperatorWithVariable : CompilerTest
     {
         protected override string Target { get { return @"x: 0; x type dump_print"; } }
         protected override string Output { get { return "(bit)sequence(1)"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(SomeVariables), typeof(TypeOperator)}; } }
 
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
-    public class ApplyTypeOperator : CompilerTest
+    public sealed class ApplyTypeOperator : CompilerTest
     {
         protected override string Target { get { return @"(31 type (28))dump_print"; } }
         protected override string Output { get { return "28"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(TypeOperator)}; } }
 
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
-    public class ApplyTypeOperatorWithCut : CompilerTest
+    public sealed class ApplyTypeOperatorWithCut : CompilerTest
     {
         protected override string Target { get { return @"(31 type (100 enable_cut))dump_print"; } }
         protected override string Output { get { return "-28"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(ApplyTypeOperator)}; } }
 
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
@@ -60,41 +60,41 @@ namespace Reni.FeatureTest.DefaultOperations
         protected override string Output { get { return Result ? "-1" : "0"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(Add2Numbers)}; } }
 
-        [Test, Category(Worked)]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 
-    public class Equal : ApplyCompareOperator
+    public sealed class Equal : ApplyCompareOperator
     {
         protected override string Operator { get { return "="; } }
         protected override bool Result { get { return false; } }
     }
 
-    public class NotEqual : ApplyCompareOperator
+    public sealed class NotEqual : ApplyCompareOperator
     {
         protected override string Operator { get { return "<>"; } }
         protected override bool Result { get { return true; } }
     }
 
-    public class GreaterThan : ApplyCompareOperator
+    public sealed class GreaterThan : ApplyCompareOperator
     {
         protected override string Operator { get { return ">"; } }
         protected override bool Result { get { return false; } }
     }
 
-    public class LessThan : ApplyCompareOperator
+    public sealed class LessThan : ApplyCompareOperator
     {
         protected override string Operator { get { return "<"; } }
         protected override bool Result { get { return true; } }
     }
 
-    public class LessOrEqual : ApplyCompareOperator
+    public sealed class LessOrEqual : ApplyCompareOperator
     {
         protected override string Operator { get { return "<="; } }
         protected override bool Result { get { return true; } }
     }
 
-    public class GreaterOrEqual : ApplyCompareOperator
+    public sealed class GreaterOrEqual : ApplyCompareOperator
     {
         protected override string Operator { get { return ">="; } }
         protected override bool Result { get { return false; } }

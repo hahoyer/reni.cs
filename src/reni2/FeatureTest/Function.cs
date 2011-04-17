@@ -22,7 +22,6 @@ namespace Reni.FeatureTest.Function
     public sealed class FunctionVariable : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -34,7 +33,6 @@ namespace Reni.FeatureTest.Function
     public sealed class Function : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -45,7 +43,6 @@ namespace Reni.FeatureTest.Function
     public sealed class ConstantFunction : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -58,7 +55,6 @@ namespace Reni.FeatureTest.Function
     public sealed class SimpleFunctionWithNonLocal : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -72,7 +68,6 @@ namespace Reni.FeatureTest.Function
     public sealed class FunctionWithNonLocal : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -89,7 +84,6 @@ namespace Reni.FeatureTest.Function
     public sealed class PrimitiveRecursiveFunctionByteWithDump : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -100,7 +94,6 @@ namespace Reni.FeatureTest.Function
     public sealed class PrimitiveRecursiveFunctionHuge : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -114,7 +107,6 @@ namespace Reni.FeatureTest.Function
     public sealed class PrimitiveRecursiveFunctionSmall : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -126,7 +118,6 @@ namespace Reni.FeatureTest.Function
     public sealed class PrimitiveRecursiveFunctionWithDump : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -144,7 +135,6 @@ namespace Reni.FeatureTest.Function
     public sealed class RecursiveFunction : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -157,7 +147,6 @@ namespace Reni.FeatureTest.Function
     public sealed class FunctionWithRefArg : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -169,7 +158,6 @@ namespace Reni.FeatureTest.Function
     public sealed class SimpleFunction : CompilerTest
     {
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -198,7 +186,6 @@ f1()dump_print;
         protected override string Output { get { return "106"; } }
 
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 
@@ -225,7 +212,6 @@ f1()dump_print;
         }
 
         [Test]
-        [Category(Worked)]
         public override void Run() { BaseRun(); }
     }
 }

@@ -5,15 +5,12 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
-using Reni.FeatureTest;
+using JetBrains.Annotations;
 
 namespace Reni
 {
-    /// <summary>
-    ///     Compiler visitor category that contains the size of any sytax element
-    /// </summary>
-    [AdditionalNodeInfo("DebuggerDumpString"), Serializable]
-    
+    [AdditionalNodeInfo("DebuggerDumpString")]
+    [Serializable]
     internal sealed class Size : ReniObject, IIconKeyProvider, IComparable<Size>
     {
         private static readonly Hashtable _values = new Hashtable();
@@ -23,9 +20,6 @@ namespace Reni
         private Size(int value)
             : base(_nextObjectId++) { _value = value; }
 
-        /// <summary>
-        ///     asis
-        /// </summary>
         public bool IsZero { get { return _value == 0; } }
 
         public int SaveByteCount { get { return SaveSizeToPacketCount(BitsConst.SegmentAlignBits); } }
@@ -58,19 +52,8 @@ namespace Reni
 
         public int SizeToPacketCount(int alignBits) { return ((_value - 1) >> alignBits) + 1; }
 
-        /// <summary>
-        ///     Nexts the size of the packet.
-        /// </summary>
-        /// <param name = "alignBits">The align bits.</param>
-        /// <returns></returns>
-        /// created 15.10.2006 13:24
         public Size NextPacketSize(int alignBits) { return Create(SizeToPacketCount(alignBits) << alignBits); }
 
-        /// <summary>
-        ///     Convert size into packets by use of align bits, must not cut anything.
-        /// </summary>
-        /// <param name = "alignBits"></param>
-        /// <returns></returns>
         internal void AssertAlignedSize(int alignBits)
         {
             var result = SizeToPacketCount(alignBits);
@@ -87,10 +70,6 @@ namespace Reni
             return SizeToPacketCount(alignBits);
         }
 
-        /// <summary>
-        ///     asis
-        /// </summary>
-        /// <returns></returns>
         public int ToInt() { return _value; }
 
         private bool LessThan(Size x) { return _value < x._value; }
@@ -111,32 +90,14 @@ namespace Reni
 
         public static Size operator +(int x, Size y) { return y.Plus(x); }
 
-        /// <summary>
-        ///     Delegate operation to data field
-        /// </summary>
-        /// <param name = "x"></param>
-        /// <param name = "y"></param>
-        /// <returns></returns>
         public static Size Add(int x, Size y) { return y.Plus(x); }
 
         public static Size operator +(Size x, int y) { return x.Plus(y); }
 
-        /// <summary>
-        ///     Delegate operation to data field
-        /// </summary>
-        /// <param name = "x"></param>
-        /// <param name = "y"></param>
-        /// <returns></returns>
         public static Size Add(Size x, int y) { return x.Plus(y); }
 
         public static Size operator +(Size x, Size y) { return x.Plus(y); }
 
-        /// <summary>
-        ///     Delegate operation to data field
-        /// </summary>
-        /// <param name = "x"></param>
-        /// <param name = "y"></param>
-        /// <returns></returns>
         public static Size Add(Size x, Size y) { return x.Plus(y); }
 
         public static Size operator *(Size x, int y) { return x.Times(y); }
@@ -149,20 +110,8 @@ namespace Reni
 
         public static Size operator %(Size x, Size y) { return x.Modulo(y); }
 
-        /// <summary>
-        ///     Delegate operation to data field
-        /// </summary>
-        /// <param name = "x"></param>
-        /// <param name = "y"></param>
-        /// <returns></returns>
         public static Size Multiply(Size x, int y) { return x.Times(y); }
 
-        /// <summary>
-        ///     Delegate operation to data field
-        /// </summary>
-        /// <param name = "x"></param>
-        /// <param name = "y"></param>
-        /// <returns></returns>
         public static Size Multiply(int x, Size y) { return y.Times(x); }
 
         private Size Plus(int y) { return Create(_value + y); }
@@ -179,11 +128,6 @@ namespace Reni
 
         private Size Minus(Size y) { return Create(_value - y._value); }
 
-        /// <summary>
-        ///     Return the maximum
-        /// </summary>
-        /// <param name = "x"></param>
-        /// <returns></returns>
         public Size Max(Size x)
         {
             if(_value > x._value)
@@ -191,11 +135,6 @@ namespace Reni
             return x;
         }
 
-        /// <summary>
-        ///     Return the minimum
-        /// </summary>
-        /// <param name = "x"></param>
-        /// <returns></returns>
         public Size Min(Size x)
         {
             if(_value < x._value)
@@ -203,18 +142,9 @@ namespace Reni
             return x;
         }
 
-        /// <summary>
-        ///     Toes the type of the C code byte.
-        /// </summary>
-        /// <returns></returns>
-        /// [created 18.07.2006 23:03]
         public string ToCCodeByteType() { return "byte<" + ByteCount + ">"; }
 
-        /// <summary>
-        ///     Codes the dump.
-        /// </summary>
-        /// <returns></returns>
-        /// created 23.09.2006 14:13
+        [UsedImplicitly]
         public string CodeDump() { return ByteCount.ToString(); }
 
         public int CompareTo(Size other) { return LessThan(other) ? -1 : (other.LessThan(this) ? 1 : 0); }
@@ -230,7 +160,7 @@ namespace Reni
                 Tracer.Assert(xs.NextPacketSize(BitsConst.SegmentAlignBits) == Create(b));
             }
 
-            [Test, Category(CompilerTest.Worked)]
+            [Test]
             public void NextPacketSize()
             {
                 TestNextPacketSize(0, 0);

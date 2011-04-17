@@ -15,7 +15,7 @@ namespace Reni
         ///     Special test, will not work automatically.
         /// </summary>
         /// created 18.07.2007 01:29 on HAHOYER-DELL by hh
-        [Test, Explicit, Category(CompilerTest.Rare)]
+        [Test, Explicit]
         public static void Exec()
         {
             var os = BitsConst.OutStream;
