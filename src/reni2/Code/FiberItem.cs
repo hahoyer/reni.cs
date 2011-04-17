@@ -8,10 +8,13 @@ namespace Reni.Code
 {
     internal abstract class FiberItem : ReniObject, IFormalCodeItem
     {
+        private static int _nextObjectId;
+
         protected FiberItem(int objectId)
             : base(objectId) { }
 
-        protected FiberItem() { }
+        protected FiberItem()
+            : this(_nextObjectId++) { }
 
         [IsDumpEnabled(false)]
         internal abstract Size InputSize { get; }

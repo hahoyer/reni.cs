@@ -7,10 +7,13 @@ namespace Reni.Code
 {
     internal abstract class FiberHead : CodeBase
     {
+        private static int _nextObjectId;
+
         protected FiberHead(int objectId)
             : base(objectId) { }
 
-        protected FiberHead() { }
+        protected FiberHead()
+            : this(_nextObjectId++) { }
 
         protected virtual CodeBase TryToCombine(FiberItem subsequentElement) { return null; }
 
