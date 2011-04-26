@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
 using HWClassLibrary.IO;
@@ -23,13 +25,14 @@ namespace ReniTest
 
             //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
             //RunSpecificTest();
-            //TestRunner.IsModeErrorFocus = true;
-            //Assembly.GetExecutingAssembly().RunTests();
+            if(Debugger.IsAttached)
+                TestRunner.IsModeErrorFocus = true;
+            Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
-            Reni.Proof.Main.Run();
+            //Reni.Proof.Main.Run();
         }
 
-        [Test, Category(CompilerTest.UnderConstruction)]
+        [Test]
         private static void RunSpecificTest() { new FunctionWithNonLocal().Run(); }
 
         private const string Target = @"! property x: 11/\; x dump_print";

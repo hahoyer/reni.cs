@@ -241,12 +241,15 @@ namespace Reni.Struct
 
         internal Result ConstructorResult(Category category)
         {
+            var trace = ObjectId == 3 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category);
             var internalResult = InternalResult(category - Category.Type);
             _internalConstructorResult.Update(internalResult);
-            var result = ContextType.Result(category, internalResult);
-            var constructorResult = result.ReplaceRelative(ForCode, () => CodeBase.TopRef(RefAlignParam, "Context.ConstructorResult"));
-            _constructorResult.Update(constructorResult);
-            return constructorResult;
+            var rawResult = ContextType.Result(category, internalResult);
+            var result = rawResult.ReplaceRelative(ForCode, () => CodeBase.TopRef(RefAlignParam, "Context.ConstructorResult"));
+            Dump(trace, "rawResult", rawResult, "result.Code", result.Code);
+            _constructorResult.Update(result);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
 
         internal Refs ConstructorRefs() { return ConstructorResult(Category.Refs).Refs; }

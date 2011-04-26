@@ -7,7 +7,7 @@ using Reni.Context;
 namespace Reni
 {
     [Serializable]
-    internal class PostProcessorForResult : ReniObject
+    internal sealed class PostProcessorForResult : ReniObject
     {
         private readonly Result _result;
 
