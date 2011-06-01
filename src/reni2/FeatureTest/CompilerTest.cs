@@ -79,7 +79,7 @@ namespace Reni.FeatureTest
             for(var i = 0; i < 100; i++)
             {
                 var x = new StackTrace(true).GetFrame(depth + i).GetMethod();
-                return (x.GetCustomAttributes(typeof(IsUnderConstructionAttribute), true).Length > 0);
+                if(x.GetCustomAttributes(typeof(IsUnderConstructionAttribute), true).Length > 0) return true;
             }
             return false;
         }
@@ -161,7 +161,8 @@ namespace Reni.FeatureTest
         protected virtual void AssertValid(Compiler c) { }
     }
 
-    internal sealed class IsUnderConstructionAttribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+    internal sealed class IsUnderConstructionAttribute : Attribute
     {}
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

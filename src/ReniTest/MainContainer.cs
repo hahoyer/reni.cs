@@ -24,7 +24,7 @@ namespace ReniTest
             //TestGenerated.Exec();
 
             //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
-            //RunSpecificTest();
+            RunSpecificTest();
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
             Assembly.GetExecutingAssembly().RunTests();
@@ -33,7 +33,7 @@ namespace ReniTest
         }
 
         [Test]
-        private static void RunSpecificTest() { new FunctionWithNonLocal().Run(); }
+        private static void RunSpecificTest() { new ObjectFunction().Run(); }
 
         private const string Target = @"! property x: 11/\; x dump_print";
         private const string Output = "11";

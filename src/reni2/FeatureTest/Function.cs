@@ -72,6 +72,16 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
+    [FunctionWithNonLocal]
+    [Target(@"f: (value: arg, + : value + arg/\)/\;(f(2)+3) dump_print")]
+    [Output("5")]
+    public sealed class ObjectFunction : CompilerTest
+    {
+        [Test, IsUnderConstruction]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
     [InnerAccess]
     [Add2Numbers]
     [UseThen]

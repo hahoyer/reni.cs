@@ -42,7 +42,7 @@ namespace Reni.Code
             }
         }
 
-        private string HolderNamePattern { get { return "local" + ObjectId + "Index{0}"; } }
+        private string HolderNamePattern { get { return "h_" + ObjectId + "_{0}"; } }
 
         internal override CodeBase LocalReference(LocalReference visitedObject)
         {

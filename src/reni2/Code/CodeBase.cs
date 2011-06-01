@@ -312,9 +312,6 @@ namespace Reni.Code
 
         internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern)
         {
-            if(codeBases.ToArray().Length == 0)
-                return CodeBase.Void();
-
             return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x)));
         }
 

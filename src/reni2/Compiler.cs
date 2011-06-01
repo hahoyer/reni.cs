@@ -103,10 +103,10 @@ namespace Reni
         public OutStream Exec()
         {
             if(_parameters.Trace.Source)
-                Tracer.Line(Source.Dump());
+                Tracer.Line("Dump Source\n" + Source.Dump());
 
             if(_parameters.Trace.Syntax)
-                Tracer.FlaggedLine(Syntax.Dump());
+                Tracer.FlaggedLine("Dump Syntax\n"+Syntax.Dump());
 
             if(_parameters.ParseOnly)
                 return null;
@@ -114,12 +114,14 @@ namespace Reni
             if(_parameters.Trace.Functions)
             {
                 Materialize();
-                for(var i = 0; i < _rootContext.Functions.Count; i++)
+                Tracer.FlaggedLine("Dump functions, Count = " + _rootContext.Functions.Count);
+                for (var i = 0; i < _rootContext.Functions.Count; i++)
                     Tracer.FlaggedLine(_rootContext.Functions[i].DumpFunction());
             }
 
             if(_parameters.Trace.CodeTree)
             {
+                Tracer.FlaggedLine("Dump CodeTree");
                 Tracer.FlaggedLine("main\n" + Code.Dump());
                 for(var i = 0; i < Functions.Count; i++)
                     Tracer.FlaggedLine("function index=" + i + "\n" + _rootContext.Functions[i].BodyCode.Dump());

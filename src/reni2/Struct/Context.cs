@@ -110,9 +110,12 @@ namespace Reni.Struct
 
         private Result InternalResult(Category category, int position)
         {
-            //Tracer.ConditionalBreak(Container.ObjectId == 2 && position == 3 && category.HasSize, ()=>"");
+            //Tracer.ConditionalBreak(Container.ObjectId == 0 && position == 0, ()=>"");
             var result = CreatePosition(position)
-                .Result(category | Category.Type, StatementList[position]);
+                .Result(category | Category.Type, StatementList[position])
+                .PostProcessor
+                .InternalResultForStruct(category, RefAlignParam);
+            Tracer.Assert(!(category.HasType && result.Type is Reference));
             if(_internalResult[position] == null)
                 _internalResult[position] = new Result();
             _internalResult[position].Update(result);
@@ -125,15 +128,8 @@ namespace Reni.Struct
         {
             var result = TypeBase.VoidResult(category);
             for(var i = fromPosition; i < fromNotPosition; i++)
-                result = result.CreateSequence(InternalAlignedResult(category, i));
+                result = result.CreateSequence(InternalResult(category, i));
             return result;
-        }
-
-        private Result InternalAlignedResult(Category category, int i)
-        {
-            return InternalResult(category, i)
-                .PostProcessor
-                .InternalResultForStruct(category, RefAlignParam);
         }
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
@@ -241,7 +237,7 @@ namespace Reni.Struct
 
         internal Result ConstructorResult(Category category)
         {
-            var trace = ObjectId == 3 && category.HasCode;
+            var trace = ObjectId == -3 && category.HasCode;
             StartMethodDumpWithBreak(trace, category);
             var internalResult = InternalResult(category - Category.Type);
             _internalConstructorResult.Update(internalResult);
