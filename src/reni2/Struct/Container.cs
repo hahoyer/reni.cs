@@ -22,6 +22,10 @@ namespace Reni.Struct
     {
         private readonly TokenData _firstToken;
         private readonly TokenData _lastToken;
+        private readonly ICompileSyntax[] _list;
+        private readonly DictionaryEx<string, int> _dictionary;
+        private readonly int[] _converters;
+        private readonly string[] _properties;
         private static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
         private static bool _isInsideFileDump;
@@ -29,27 +33,30 @@ namespace Reni.Struct
         private DictionaryEx<int, string> _reverseDictionaryCache;
 
         [Node]
-        internal readonly List<ICompileSyntax> List = new List<ICompileSyntax>();
+        internal ICompileSyntax[] List { get { return _list; } }
 
         [Node, SmartNode]
-        internal readonly DictionaryEx<string, int> Dictionary;
+        internal DictionaryEx<string, int> Dictionary { get { return _dictionary; } }
 
         [Node, SmartNode]
-        internal readonly List<int> Converters = new List<int>();
+        internal int[] Converters { get { return _converters; } }
 
         [Node, SmartNode]
-        internal readonly List<string> Properties = new List<string>();
-
+        internal string[] Properties { get { return _properties; } }
+        
         protected override TokenData GetFirstToken() { return _firstToken; }
 
         protected override TokenData GetLastToken() { return _lastToken; }
 
-        private Container(TokenData leftToken, TokenData rightToken)
-            : base(leftToken, _nextObjectId++)
+        private Container(TokenData leftToken, TokenData rightToken, ICompileSyntax[] list, DictionaryEx<string, int> dictionary, int[] converters, string[] properties)
+            : base(leftToken,_nextObjectId++)
         {
             _firstToken = leftToken;
             _lastToken = rightToken;
-            Dictionary = new DictionaryEx<string, int>();
+            _list = list;
+            _dictionary = dictionary;
+            _converters = converters;
+            _properties = properties;
         }
 
         internal DictionaryEx<int, string> ReverseDictionary
@@ -67,7 +74,7 @@ namespace Reni.Struct
         internal override ICompileSyntax ToCompiledSyntax() { return this; }
 
         [IsDumpEnabled(false)]
-        internal int IndexSize { get { return BitsConst.AutoSize(List.Count); } }
+        internal int IndexSize { get { return BitsConst.AutoSize(List.Length); } }
 
         internal override string DumpShort() { return "container." + ObjectId; }
 
@@ -78,43 +85,57 @@ namespace Reni.Struct
                 _reverseDictionaryCache[pair.Value] = pair.Key;
         }
 
+        sealed class PreContainer: ReniObject
+        {
+            private readonly List<ICompileSyntax> _list = new List<ICompileSyntax>();
+            private readonly DictionaryEx<string, int> _dictionary = new DictionaryEx<string, int>();
+            private readonly List<int> _converters = new List<int>();
+            private readonly List<string> _properties = new List<string>();
+
+            public void Add(IParsedSyntax parsedSyntax)
+            {
+                while (parsedSyntax is DeclarationSyntax)
+                {
+                    var d = (DeclarationSyntax)parsedSyntax;
+                    _dictionary.Add(d.Defineable.Name, _list.Count);
+                    parsedSyntax = d.Definition;
+                    if (d.IsProperty)
+                        _properties.Add(d.Defineable.Name);
+                }
+
+                if (parsedSyntax is ConverterSyntax)
+                {
+                    var body = ((ConverterSyntax)parsedSyntax).Body;
+                    parsedSyntax = (ReniParser.ParsedSyntax)body;
+                    _converters.Add(_list.Count);
+                }
+
+                _list.Add(((ReniParser.ParsedSyntax)parsedSyntax).ToCompiledSyntax());
+            }
+
+            public Container ToContainer(TokenData leftToken, TokenData rightToken) 
+            { 
+                return new Container(leftToken,rightToken,_list.ToArray(),_dictionary,_converters.ToArray(),_properties.ToArray());
+            }
+        }
+
+
         internal static Container Create(TokenData leftToken, TokenData rightToken, List<IParsedSyntax> parsed)
         {
-            var result = new Container(leftToken, rightToken);
+            var result = new PreContainer();
             foreach(var parsedSyntax in parsed)
                 result.Add(parsedSyntax);
-            return result;
+            return result.ToContainer(leftToken, rightToken);
         }
 
         internal static Container Create(TokenData leftToken, TokenData rightToken, ReniParser.ParsedSyntax parsedSyntax)
         {
-            var result = new Container(leftToken, rightToken);
+            var result = new PreContainer();
             result.Add(parsedSyntax);
-            return result;
+            return result.ToContainer(leftToken, rightToken);
         }
 
         internal static Container Create(ReniParser.ParsedSyntax parsedSyntax) { return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax); }
-
-        private void Add(IParsedSyntax parsedSyntax)
-        {
-            while(parsedSyntax is DeclarationSyntax)
-            {
-                var d = (DeclarationSyntax) parsedSyntax;
-                Dictionary.Add(d.Defineable.Name, List.Count);
-                parsedSyntax = d.Definition;
-                if(d.IsProperty)
-                    Properties.Add(d.Defineable.Name);
-            }
-
-            if(parsedSyntax is ConverterSyntax)
-            {
-                var body = ((ConverterSyntax) parsedSyntax).Body;
-                parsedSyntax = (ReniParser.ParsedSyntax) body;
-                Converters.Add(List.Count);
-            }
-
-            List.Add(((ReniParser.ParsedSyntax) parsedSyntax).ToCompiledSyntax());
-        }
 
         public override string DumpData()
         {

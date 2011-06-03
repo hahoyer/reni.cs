@@ -43,7 +43,7 @@ namespace Reni.Struct
         {
             _featuresCache = new SimpleCache<ContextPosition[]>(CreateFeaturesCache);
             Container = container;
-            _internalResult = new Result[StatementList.Count];
+            _internalResult = new Result[StatementList.Length];
             _type = new Type(this);
             _referenceType = _type.Reference(parent.RefAlignParam);
             _function = new DictionaryEx<ICompileSyntax, FunctionalFeature>(body => new FunctionalFeature(this, body));
@@ -75,7 +75,7 @@ namespace Reni.Struct
         protected abstract int Position { get; }
 
         [IsDumpEnabled(false)]
-        internal List<ICompileSyntax> StatementList { get { return Container.List; } }
+        internal ICompileSyntax[] StatementList { get { return Container.List; } }
 
         [IsDumpEnabled(false)]
         private int IndexSize { get { return Container.IndexSize; } }

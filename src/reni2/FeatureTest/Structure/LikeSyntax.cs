@@ -77,7 +77,7 @@ namespace Reni.FeatureTest.Structure
         public override void AssertLike(IParsedSyntax syntax)
         {
             var co = (Container) syntax;
-            Tracer.Assert(_list.Length == co.List.Count);
+            Tracer.Assert(_list.Length == co.List.Length);
             for(var i = 0; i < _list.Length; i++)
                 _list[i].AssertLike((IParsedSyntax) co.List[i]);
             Tracer.Assert(_declarations.Length == co.Dictionary.Count);
@@ -85,10 +85,10 @@ namespace Reni.FeatureTest.Structure
             coi.MoveNext();
             for(var i = 0; i < _declarations.Length; i++, coi.MoveNext())
                 _declarations[i].AssertLike(coi.Current);
-            Tracer.Assert(_converters.Length == co.Converters.Count);
+            Tracer.Assert(_converters.Length == co.Converters.Length);
             for(var i = 0; i < _converters.Length; i++)
                 Tracer.Assert(_converters[i] == co.Converters[i]);
-            Tracer.Assert(_properties.Length == co.Properties.Count);
+            Tracer.Assert(_properties.Length == co.Properties.Length);
             for(var i = 0; i < _properties.Length; i++)
                 Tracer.Assert(_properties[i] == co.Properties[i]);
         }

@@ -22,7 +22,7 @@ namespace Reni.Struct
         [IsDumpEnabled(false)]
         internal override IReferenceInCode ForCode { get { return this; } }
 
-        protected override int Position { get { return StatementList.Count; } }
+        protected override int Position { get { return StatementList.Length; } }
 
         internal override ContextAtPosition CreatePosition(int position) { return _contextAtPositionCache.Find(position); }
 

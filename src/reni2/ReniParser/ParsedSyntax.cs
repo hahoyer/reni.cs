@@ -68,7 +68,9 @@ namespace Reni.ReniParser
                 return result;
             if(!isInDump)
                 result += FilePosition();
-            if(!isInContainerDump)
+            if(isInContainerDump)
+                result += " ObjectId=" + ObjectId;
+            else
                 result += "\n" + base.Dump(false);
             Container.IsInContainerDump = isInContainerDump;
             _isInDump = isInDump;
