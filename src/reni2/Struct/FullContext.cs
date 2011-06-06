@@ -9,7 +9,7 @@ using Reni.Context;
 namespace Reni.Struct
 {
     [Serializable]
-    internal sealed class FullContext : Context, IReferenceInCode
+    internal sealed class FullContext : OldContext, IReferenceInCode
     {
         private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache;
 

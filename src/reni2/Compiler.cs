@@ -18,8 +18,7 @@ namespace Reni
     {
         private readonly string _fileName;
         private readonly CompilerParameters _parameters;
-        private readonly ITokenFactory _tokenFactory;
-        private readonly Root _rootContext = ContextBase.CreateRoot();
+        private readonly ITokenFactory _tokenFactory = new MainTokenFactory();
 
         private readonly SimpleCache<Source> _source;
         private readonly SimpleCache<ReniParser.ParsedSyntax> _syntax;
@@ -28,6 +27,8 @@ namespace Reni
         private readonly SimpleCache<Container> _mainContainer;
         private readonly SimpleCache<List<Container>> _functionContainers;
         private readonly SimpleCache<string> _executedCode;
+        private readonly SimpleCache<FunctionList> _functions;
+        private readonly SimpleCache<ContextBase> _rootContext;
 
         /// <summary>
         ///     ctor from file
@@ -38,14 +39,15 @@ namespace Reni
         {
             _fileName = fileName;
             _parameters = parameters;
-            _tokenFactory = new MainTokenFactory();
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
-            _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Result(_rootContext, Category.Code).Code);
-            _functionCode = new SimpleCache<CodeBase[]>(() => _rootContext.FunctionCode);
+            _functionCode = new SimpleCache<CodeBase[]>(() => Functions.Code);
             _mainContainer = new SimpleCache<Container>(() => new Container(Code));
-            _functionContainers = new SimpleCache<List<Container>>(() => _rootContext.CompileFunctions());
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, false));
+            _functions = new SimpleCache<FunctionList>(() => new FunctionList());
+            _functionContainers = new SimpleCache<List<Container>>(() => Functions.Compile());
+            _rootContext = new SimpleCache<ContextBase>(() => ContextBase.CreateRoot(Functions));
+            _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Result(RootContext, Category.Code).Code);
         }
 
         /// <summary>
@@ -56,7 +58,7 @@ namespace Reni
         public Compiler(string fileName)
             : this(new CompilerParameters(), fileName) { }
 
-        internal FunctionList Functions { get { return _rootContext.Functions; } }
+        internal FunctionList Functions { get { return _functions.Value; } }
 
         [IsDumpEnabled(false)]
         public string FileName { get { return _fileName; } }
@@ -78,6 +80,10 @@ namespace Reni
 
         [Node, IsDumpEnabled(false)]
         private List<Container> FunctionContainers { get { return _functionContainers.Value; } }
+
+        [IsDumpEnabled(false)]
+        private ContextBase RootContext{ get { return _rootContext.Value; } }
+
 
         public static string FormattedNow
         {
@@ -114,9 +120,9 @@ namespace Reni
             if(_parameters.Trace.Functions)
             {
                 Materialize();
-                Tracer.FlaggedLine("Dump functions, Count = " + _rootContext.Functions.Count);
-                for (var i = 0; i < _rootContext.Functions.Count; i++)
-                    Tracer.FlaggedLine(_rootContext.Functions[i].DumpFunction());
+                Tracer.FlaggedLine("Dump functions, Count = " + Functions.Count);
+                for (var i = 0; i < Functions.Count; i++)
+                    Tracer.FlaggedLine(Functions[i].DumpFunction());
             }
 
             if(_parameters.Trace.CodeTree)
@@ -124,7 +130,7 @@ namespace Reni
                 Tracer.FlaggedLine("Dump CodeTree");
                 Tracer.FlaggedLine("main\n" + Code.Dump());
                 for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + _rootContext.Functions[i].BodyCode.Dump());
+                    Tracer.FlaggedLine("function index=" + i + "\n" + Functions[i].BodyCode.Dump());
             }
 
             if(_parameters.RunFromCode)
@@ -147,8 +153,8 @@ namespace Reni
             if(_parameters.ParseOnly)
                 return;
             _code.Ensure();
-            for(var i = 0; i < _rootContext.Functions.Count; i++)
-                _rootContext.Functions[i].EnsureBodyCode();
+            for(var i = 0; i < Functions.Count; i++)
+                Functions[i].EnsureBodyCode();
         }
 
         private OutStream GetOutStream()

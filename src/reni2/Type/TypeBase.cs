@@ -318,7 +318,7 @@ namespace Reni.Type
 
         internal Result PrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
 
-        internal virtual Struct.Context GetStruct()
+        internal virtual StructContext GetStruct()
         {
             NotImplementedMethod();
             return null;
@@ -326,7 +326,7 @@ namespace Reni.Type
 
         internal Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -325 && category.HasCode;
+            var trace = ObjectId == 1 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, right, refAlignParam);
             var functionalFeature = FunctionalFeature();
             var apply = functionalFeature
@@ -391,7 +391,7 @@ namespace Reni.Type
                 .ReplaceAbsolute(objectReference, () => LocalReferenceResult(result.CompleteCategory, refAlignParam));
         }
 
-        internal virtual Result ReferenceInCode(Context.Function function, Category category)
+        internal virtual Result ReferenceInCode(ContextBase function, Category category)
         {
             return Reference(function.RefAlignParam)
                 .Result

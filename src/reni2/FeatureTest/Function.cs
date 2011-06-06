@@ -73,7 +73,7 @@ namespace Reni.FeatureTest.Function
 
     [TestFixture]
     [FunctionWithNonLocal]
-    [Target(@"f: (value: arg, x: value/\)/\;f(2)x()dump_print")]
+    [Target(@"f: (value: arg, !property x: value/\)/\;f(2) x dump_print")]
     [Output("2")]
     public sealed class ObjectFunction : CompilerTest
     {

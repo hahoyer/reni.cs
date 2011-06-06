@@ -603,7 +603,7 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result ReplaceContextReferenceByArg(Struct.Context context) { return ReplaceAbsolute(context.ForCode, () => context.ContextReferenceAsArg(CompleteCategory)); }
+        internal Result ReplaceContextReferenceByArg(StructContext context) { return ReplaceAbsolute(context.ReferenceInCode, () => context.ContextReferenceAsArg(CompleteCategory)); }
     }
 
     internal sealed class Error

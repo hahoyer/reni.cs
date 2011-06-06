@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Context;
+using Reni.Struct;
 
 namespace Reni
 {
-    /// <summary>
-    ///     Class for additional checks after compilation
-    /// </summary>
     internal sealed class ExpectedCompilationResult
     {
         private readonly Compiler _compiler;

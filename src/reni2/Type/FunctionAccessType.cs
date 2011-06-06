@@ -14,8 +14,11 @@ namespace Reni.Type
         [IsDumpEnabled(true)]
         private readonly IFunctionalFeature _functionalFeature;
 
+        private static int _nextObjectId;
+
 
         public FunctionAccessType(TypeBase objectType, IFunctionalFeature functionalFeature)
+            : base(_nextObjectId++)
         {
             _functionalFeature = functionalFeature;
             _objectType = objectType;
@@ -37,34 +40,5 @@ namespace Reni.Type
         }
 
         internal Result ContextOperatorFeatureApply(Category category) { return _functionalFeature.ContextOperatorFeatureApply(category); }
-    }
-
-    internal sealed class FunctionDefinitionType : TypeBase
-    {
-        private readonly FunctionalFeature _functionalFeature;
-
-        public FunctionDefinitionType(FunctionalFeature functionalFeature)
-        {
-            _functionalFeature = functionalFeature;
-            StopByObjectId(-191);
-        }
-
-        protected override Size GetSize() { return Size.Zero; }
-        internal override string DumpShort() { return _functionalFeature.DumpShort(); }
-
-        internal override IAccessType AccessType(Struct.Context context, int position)
-        {
-            return context
-                .ContextReferenceType
-                .FunctionalType(_functionalFeature);
-        }
-
-        internal override void Search(ISearchVisitor searchVisitor)
-        {
-            searchVisitor.ChildSearch(this);
-            base.Search(searchVisitor);
-        }
-
-        public Result CreateDumpPrintResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(_functionalFeature.DumpPrintText)); }
     }
 }

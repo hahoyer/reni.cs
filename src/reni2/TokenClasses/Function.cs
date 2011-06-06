@@ -10,6 +10,11 @@ namespace Reni.TokenClasses
     [Serializable]
     internal sealed class Function : Suffix
     {
-        public override Result Result(ContextBase context, Category category, ICompileSyntax target) { return context.FindStruct().FunctionalResult(category, target); }
+        public override Result Result(ContextBase context, Category category, ICompileSyntax target)
+        {
+            return context
+                .StructContext
+                .FunctionalResult(category, target);
+        }
     }
 }

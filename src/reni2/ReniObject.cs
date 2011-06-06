@@ -23,7 +23,9 @@ namespace Reni
         public virtual int ObjectId { get { return _objectId; } }
 
         [IsDumpEnabled(false)]
-        public virtual string NodeDump { get { return GetType().FullName + "." + ObjectId; } }
+        public virtual string NodeDump { get { return DumpShort(); } }
+
+        internal string DumpShort() { return GetType().FullName + "." + ObjectId; }
 
         [IsDumpEnabled(false)]
         internal bool IsStopByObjectIdActive { get; private set; }

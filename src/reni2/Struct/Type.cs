@@ -10,17 +10,17 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal class Type : TypeBase
+    internal sealed class Type : TypeBase
     {
         private static int _nextObjectId;
 
         [IsDumpEnabled(false)]
-        private readonly Context _context;
+        private readonly StructContext _context;
 
         [IsDumpEnabled(false)]
         internal readonly ISearchPath<IFeature, Reference> DumpPrintReferenceFeature;
 
-        internal Type(Context context)
+        internal Type(StructContext context)
             : base(_nextObjectId++)
         {
             _context = context;
@@ -30,9 +30,9 @@ namespace Reni.Struct
         [IsDumpEnabled(false)]
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
 
-        internal Context Context { get { return _context; } }
+        internal StructContext Context { get { return _context; } }
 
-        protected override Size GetSize() { return _context.InternalSize(); }
+        protected override Size GetSize() { return _context.StructSize; }
         internal override string DumpShort() { return "type(" + _context.DumpShort() + ")"; }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -42,7 +42,6 @@ namespace Reni.Struct
             {
                 searchVisitorChild.InternalResult =
                     _context
-                        .Container
                         .SearchFromRefToStruct(searchVisitorChild.Defineable)
                         .CheckedConvert(this);
             }
@@ -62,7 +61,7 @@ namespace Reni.Struct
                 );
         }
 
-        internal override Context GetStruct() { return _context; }
+        internal override StructContext GetStruct() { return _context; }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {

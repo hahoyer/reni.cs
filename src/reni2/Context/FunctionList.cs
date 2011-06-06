@@ -5,6 +5,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
+using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -34,10 +35,10 @@ namespace Reni.Context
             return _list[index];
         }
 
-        internal List<Container> Compile() { return _list.Select((t, i) => this[i].Serialize(false)).ToList(); }
+        internal List<Code.Container> Compile() { return _list.Select(t => t.Serialize(false)).ToList(); }
 
         [Serializable]
-        private class ContextArgsVariant : ReniObject
+        private sealed class ContextArgsVariant : ReniObject
         {
             [Node]
             private readonly DictionaryEx<Struct.Context, ArgsVariant> _data;

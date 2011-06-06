@@ -19,74 +19,104 @@ namespace Reni.Context
     ///     Base class for compiler environments
     /// </summary>
     [Serializable]
-    internal abstract class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
+    internal sealed class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider, IReferenceInCode
     {
         private static int _nextId;
 
         [IsDumpEnabled(false)]
-        private readonly Cache _cache;
+        private readonly CacheItems _cache;
 
-        [Node, IsDumpEnabled(false), UsedImplicitly]
-        internal Cache Cache { get { return _cache; } }
+        [IsDumpEnabled(false)]
+        private readonly ContextBase _parent;
 
-        private ContextBase[] _childChainCache;
+        [IsDumpEnabled(false)]
+        private readonly IContextItem _contextItem;
 
-        protected ContextBase()
+        private ContextBase(ContextBase parent, IContextItem contextItem)
             : base(_nextId++)
         {
-            _cache = new Cache
-                (
-                this
-                );
+            _parent = parent;
+            _contextItem = contextItem;
+            _cache = new CacheItems(this);
         }
 
-        [Node, IsDumpEnabled(false)]
-        internal abstract RefAlignParam RefAlignParam { get; }
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        bool IReferenceInCode.IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
+
+        internal static ContextBase CreateRoot(FunctionList functions) { return new ContextBase(null, new Root(functions)); }
+
+        [Node]
+        [IsDumpEnabled(false)]
+        [UsedImplicitly]
+        internal CacheItems Cache { get { return _cache; } }
+
+        [Node]
+        [IsDumpEnabled(false)]
+        internal RefAlignParam RefAlignParam { get { return _contextItem.RefAlignParam ?? Parent.RefAlignParam; } }
+
+        [Node]
+        internal ContextBase Parent { get { return _parent; } }
 
         [IsDumpEnabled(false)]
-        public int AlignBits { get { return RefAlignParam.AlignBits; } }
+        internal int AlignBits { get { return RefAlignParam.AlignBits; } }
 
         [IsDumpEnabled(false)]
-        public Size RefSize { get { return RefAlignParam.RefSize; } }
+        internal Size RefSize { get { return RefAlignParam.RefSize; } }
 
         [IsDumpEnabled(false)]
-        internal abstract Root RootContext { get; }
+        internal Root RootContext { get { return _contextItem as Root ?? _parent.RootContext; } }
 
         [IsDumpEnabled(false)]
-        internal ContextBase[] ChildChain { get { return _childChainCache ?? (_childChainCache = ObtainChildChain()); } }
+        internal ContextBase[] ChildChain { get { return Cache.ChildChain ?? (Cache.ChildChain = ObtainChildChain()); } }
 
-        protected virtual ContextBase[] ObtainChildChain() { return new[] {this}; }
+        [IsDumpEnabled(false)]
+        internal StructContext StructContext { get { return Cache.StructContext.Value; } }
 
-        internal virtual string DumpShort() { return base.ToString(); }
+        private ContextBase[] ObtainChildChain()
+        {
+            if(Parent == null)
+                return new[] {this};
+            return Parent.ChildChain.Concat(new[] {this}).ToArray();
+        }
+
+        internal string DumpShort() { return base.ToString(); }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal static Root CreateRoot() { return new Root(); }
-
-        internal Function CreateFunction(TypeBase args)
+        internal ContextBase CreateFunction(TypeBase args)
         {
             return _cache
-                .FunctionInstanceCache
+                .FunctionInstance
                 .Find(args);
         }
 
-        private PendingContext CreatePendingContext() { return _cache.PendingContext.Value; }
+        private ContextBase PendingContext { get { return _cache.PendingContext.Value; } }
 
         internal FullContext CreateStruct(Struct.Container container)
         {
             return _cache
-                .StructContainerCache
+                .StructContainer
                 .Find(container);
         }
 
-        internal virtual Result CreateArgsReferenceResult(Category category)
+        internal Result CreateArgsReferenceResult(Category category)
         {
-            NotImplementedMethod(category);
-            return null;
+            var result = _contextItem.CreateArgsReferenceResult(this, category);
+            return result ?? Parent.CreateArgsReferenceResult(category);
         }
 
-        internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
+        internal void Search(SearchVisitor<IContextFeature> searchVisitor)
+        {
+            _contextItem.Search(searchVisitor);
+            if(searchVisitor.IsSuccessFull)
+                return;
+            if(Parent != null)
+                Parent.Search(searchVisitor);
+            if(searchVisitor.IsSuccessFull)
+                return;
+            searchVisitor.SearchTypeBase();
+        }
 
         internal TypeBase Type(ICompileSyntax syntax)
         {
@@ -110,8 +140,6 @@ namespace Reni.Context
             syntax.AddToCacheForDebug(this, result);
             return result;
         }
-
-        internal bool IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
 
         internal void AssertCorrectRefs(Result result)
         {
@@ -168,10 +196,12 @@ namespace Reni.Context
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Context"; } }
 
-        internal virtual Struct.Context FindStruct()
+        private StructContext FindStruct()
         {
-            NotImplementedMethod();
-            return null;
+            var result = _contextItem as Struct.Context;
+            if(result != null)
+                return new StructContext(result, Parent);
+            return Parent.FindStruct();
         }
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
@@ -242,63 +272,22 @@ namespace Reni.Context
             return feature.Apply(category) & category;
         }
 
-        internal virtual Result PendingResult(Category category, ICompileSyntax syntax) { return CreatePendingContext().PendingResult(category, syntax); }
-
-        internal virtual Result CommonResult(Category category, CondSyntax condSyntax) { return condSyntax.CommonResult(this, category); }
-
-        internal Category PendingCategory(ICompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
-
-        internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
-
-        internal Refs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.Refs, condSyntax).Refs; }
-    }
-
-    [Serializable]
-    internal sealed class Cache : ReniObject, IIconKeyProvider
-    {
-        [Node, SmartNode]
-        internal readonly DictionaryEx<TypeBase, Function> FunctionInstanceCache;
-
-        [Node, SmartNode]
-        internal readonly DictionaryEx<Struct.Container, FullContext> StructContainerCache;
-
-        [Node, SmartNode]
-        internal readonly DictionaryEx<ICompileSyntax, CacheItem> ResultCache;
-
-        [Node, SmartNode]
-        internal readonly SimpleCache<PendingContext> PendingContext;
-
-        public Cache(ContextBase contextBase)
+        internal Result PendingResult(Category category, ICompileSyntax syntax)
         {
-            ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(contextBase.CreateCacheElement);
-            StructContainerCache = new DictionaryEx<Struct.Container, FullContext>(container => new FullContext(contextBase, container));
-            FunctionInstanceCache = new DictionaryEx<TypeBase, Function>(args => new Function(contextBase, args));
-            PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(contextBase)
-                );
+            if(_contextItem is PendingContext)
+            {
+                var result = syntax.Result(this, category);
+                Tracer.Assert(result.CompleteCategory == category);
+                return result;
+            }
+            return PendingContext.PendingResult(category, syntax);
         }
 
-        /// <summary>
-        ///     Gets the icon key.
-        /// </summary>
-        /// <value>The icon key.</value>
-        [IsDumpEnabled(false)]
-        public string IconKey { get { return "Cache"; } }
-    }
-
-    internal class PendingContext : Child
-    {
-        public PendingContext(ContextBase parent)
-            : base(parent) { }
-
-        internal override Result PendingResult(Category category, ICompileSyntax syntax)
+        internal Result CommonResult(Category category, CondSyntax condSyntax)
         {
-            var result = syntax.Result(this, category);
-            Tracer.Assert(result.CompleteCategory == category);
-            return result;
-        }
+            if(!(_contextItem is PendingContext))
+                return condSyntax.CommonResult(this, category);
 
-        internal override Result CommonResult(Category category, CondSyntax condSyntax)
-        {
             if(category <= Parent.PendingCategory(condSyntax))
             {
                 return condSyntax.CommonResult
@@ -309,12 +298,63 @@ namespace Reni.Context
                         condSyntax.Else != null && category <= Parent.PendingCategory(condSyntax.Else)
                     );
             }
-            return base.CommonResult(category, condSyntax);
+            NotImplementedMethod(category, condSyntax);
+            return null;
+        }
+
+        internal Category PendingCategory(ICompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
+
+        internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
+
+        internal Refs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.Refs, condSyntax).Refs; }
+
+        internal sealed class CacheItems : ReniObject, IIconKeyProvider
+        {
+            [IsDumpEnabled(false)]
+            internal readonly SimpleCache<StructContext> StructContext;
+
+            [IsDumpEnabled(false)]
+            internal ContextBase[] ChildChain;
+
+            [Node]
+            [SmartNode]
+            internal readonly DictionaryEx<TypeBase, ContextBase> FunctionInstance;
+
+            [Node]
+            [SmartNode]
+            internal readonly DictionaryEx<Struct.Container, FullContext> StructContainer;
+
+            [Node]
+            [SmartNode]
+            internal readonly DictionaryEx<ICompileSyntax, CacheItem> ResultCache;
+
+            [Node]
+            [SmartNode]
+            internal readonly SimpleCache<ContextBase> PendingContext;
+
+            public CacheItems(ContextBase contextBase)
+            {
+                ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(contextBase.CreateCacheElement);
+                StructContainer = new DictionaryEx<Struct.Container, FullContext>(container => new FullContext(contextBase, container));
+                FunctionInstance = new DictionaryEx<TypeBase, ContextBase>(args => new ContextBase(contextBase, new Function(args)));
+                PendingContext = new SimpleCache<ContextBase>(() => new ContextBase(contextBase, new PendingContext()));
+                StructContext = new SimpleCache<StructContext>(contextBase.FindStruct);
+            }
+
+            /// <summary>
+            ///     Gets the icon key.
+            /// </summary>
+            /// <value>The icon key.</value>
+            [IsDumpEnabled(false)]
+            public string IconKey { get { return "Cache"; } }
         }
     }
 
-    internal class ContextOperator : Defineable, ISearchPath<IFeature, FunctionAccessType>
+    internal sealed class ContextOperator : Defineable, ISearchPath<IFeature, FunctionAccessType>
     {
         IFeature ISearchPath<IFeature, FunctionAccessType>.Convert(FunctionAccessType type) { return new Feature.Feature(type.ContextOperatorFeatureApply); }
     }
+
+    internal sealed class PendingContext : Child
+    {}
 }

@@ -84,9 +84,11 @@
     <Compile Include="CompilerParameters.cs" />
     <Compile Include="ContextSearchVisitor.cs" />
     <Compile Include="Context\ContextBase.cs" />
-    <Compile Include="Context\FunctionInstance.cs" />
     <Compile Include="Context\FunctionList.cs" />
+    <Compile Include="Context\IContextItem.cs" />
+    <Compile Include="Context\IRootContext.cs" />
     <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
+    <Compile Include="Context\StructContext.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
     <Compile Include="FeatureTest\Array.cs" />
@@ -150,7 +152,9 @@
     <Compile Include="Runtime\DataContainer.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
     <Compile Include="Sequence\PrefixFeature.cs" />
+    <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\Field.cs" />
+    <Compile Include="Struct\FunctionInstance.cs" />
     <Compile Include="Struct\Type.cs" />
     <Compile Include="Syntax\LeftParenthesis.cs" />
     <Compile Include="Syntax\ListSyntax.cs" />
@@ -181,7 +185,7 @@
     <Compile Include="Parser\Test.cs" />
     <Compile Include="StructAccess.cs" />
     <Compile Include="Struct\PositionFeature.cs" />
-    <Compile Include="Struct\Context.cs" />
+    <Compile Include="Struct\OldContext.cs" />
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Syntax\IResultProvider.cs" />
@@ -238,7 +242,7 @@
     <Compile Include="Type\Aligner.cs" />
     <Compile Include="Type\Array.cs" />
     <Compile Include="Type\Bit.cs" />
-    <Compile Include="Type\FunctionalFeature.cs" />
+    <Compile Include="Type\FunctionalFeatureType.cs" />
     <Compile Include="Type\List.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\Reference.cs" />

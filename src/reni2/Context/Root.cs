@@ -4,38 +4,36 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
+using Reni.Feature;
 using Reni.Syntax;
 
 namespace Reni.Context
 {
-    /// <summary>
-    ///     Root environment of compilation process
-    /// </summary>
-    [Serializable]
-    internal sealed class Root : ContextBase
+    internal sealed class Root : ReniObject, IContextItem
     {
-        private readonly FunctionList _functions = new FunctionList();
+        private readonly FunctionList _functions;
 
-        internal override RefAlignParam RefAlignParam { get { return DefaultRefAlignParam; } }
+        internal Root(FunctionList functions) { _functions = functions; }
+
+        RefAlignParam IContextItem.RefAlignParam { get { return DefaultRefAlignParam; } }
+        Result IContextItem.CreateArgsReferenceResult(ContextBase contextBase, Category category) { return null; }
+        void IContextItem.Search(SearchVisitor<IContextFeature> searchVisitor) { }
 
         private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
         [IsDumpEnabled(false)]
-        internal override Root RootContext { get { return this; } }
+        internal FunctionList Functions { get { return _functions; } }
 
-        internal List<Container> CompileFunctions() { return _functions.Compile(); }
-
-        [Node, IsDumpEnabled(false)]
-        public FunctionList Functions { get { return _functions; } }
-
-        [Node, IsDumpEnabled(false)]
+        [IsDumpEnabled(false)]
         internal CodeBase[] FunctionCode { get { return Functions.Code; } }
 
-        public Result CreateFunctionCall(Struct.Context context, Category category, ICompileSyntax body, Result argsResult)
+        internal Result CreateFunctionCall(Struct.Context context, Category category, ICompileSyntax body, Result argsResult)
         {
             Tracer.Assert(argsResult.HasType);
             var functionInstance = Functions.Find(body, context, argsResult.Type);
             return functionInstance.CreateCall(category, argsResult);
         }
+
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
     }
 }

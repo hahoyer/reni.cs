@@ -8,7 +8,7 @@ using Reni.Code;
 namespace Reni.Struct
 {
     [Serializable]
-    internal sealed class ContextAtPosition : Context
+    internal sealed class ContextAtPosition : OldContext
     {
         private readonly int _position;
         private readonly FullContext _context;

@@ -10,6 +10,11 @@ namespace Reni.TokenClasses
     [Serializable]
     internal sealed class ThisToken : Terminal
     {
-        public override Result Result(ContextBase context, Category category, TokenData token) { return context.FindStruct().ThisReferenceResult(category); }
+        public override Result Result(ContextBase context, Category category, TokenData token)
+        {
+            return context
+                .StructContext
+                .ThisReferenceResult(category);
+        }
     }
 }

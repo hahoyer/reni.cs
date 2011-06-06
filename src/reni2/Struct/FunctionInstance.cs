@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
@@ -8,7 +6,7 @@ using Reni.Code;
 using Reni.Syntax;
 using Reni.Type;
 
-namespace Reni.Context
+namespace Reni.Struct
 {
     /// <summary>
     ///     Instance of a function to compile
@@ -91,7 +89,7 @@ namespace Reni.Context
             if(category.HasCode)
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(_index, result.Size);
 
-            _context.CreateFunction(_args).AssertCorrectRefs(result);
+            _context.ToContext.CreateFunction(_args).AssertCorrectRefs(result);
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
@@ -102,7 +100,7 @@ namespace Reni.Context
             if(IsStopByObjectIdActive)
                 return null;
             var category = Category.Code;
-            var refAlignParam = _context.RefAlignParam;
+            var refAlignParam = _context.ToContext.RefAlignParam;
             var foreignRefsRef = CodeBase.FrameRef(refAlignParam, "FunctionInstance.CreateBodyCode");
             var visitResult = Result(category);
             var result = visitResult
@@ -117,7 +115,7 @@ namespace Reni.Context
             if(IsStopByObjectIdActive)
                 return null;
 
-            var functionContext = _context.CreateFunction(_args);
+            var functionContext = _context.ToContext.CreateFunction(_args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category | Category.Type;
@@ -142,14 +140,14 @@ namespace Reni.Context
         {
             return new Result(
                 category,
-                () => _context.RefAlignParam.RefSize,
+                () => _context.ToContext.RefAlignParam.RefSize,
                 CreateContextRefCode,
                 Refs.None);
         }
 
         private CodeBase CreateContextRefCode()
         {
-            var refAlignParam = _context.RefAlignParam;
+            var refAlignParam = _context.ToContext.RefAlignParam;
             return CodeBase
                 .FrameRef(refAlignParam, "FunctionInstance.CreateContextRefCode")
                 .AddToReference(refAlignParam, FrameSize*-1, "FunctionInstance.CreateContextRefCode");
@@ -157,15 +155,15 @@ namespace Reni.Context
 
         private TypeBase Type() { return Result(Category.Type).Type; }
 
-        internal Container Serialize(bool isInternal)
+        internal Code.Container Serialize(bool isInternal)
         {
             try
             {
-                return new Container(BodyCode, FrameSize, Description, isInternal);
+                return new Code.Container(BodyCode, FrameSize, Description, isInternal);
             }
             catch(UnexpectedVisitOfPending)
             {
-                return Container.UnexpectedVisitOfPending;
+                return Code.Container.UnexpectedVisitOfPending;
             }
         }
 

@@ -8,24 +8,20 @@ using Reni.Feature;
 namespace Reni.Context
 {
     [Serializable]
-    internal abstract class Child : ContextBase
+    internal abstract class Child : ReniObject, IContextItem
     {
-        private readonly ContextBase _parent;
+        RefAlignParam IContextItem.RefAlignParam { get { return null; } }
+        Result IContextItem.CreateArgsReferenceResult(ContextBase contextBase, Category category) { return CreateArgsReferenceResult(contextBase, category); }
+        void IContextItem.Search(SearchVisitor<IContextFeature> searchVisitor) {  }
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        protected Child(ContextBase parent) { _parent = parent; }
+        protected virtual Result CreateArgsReferenceResult(ContextBase contextBase, Category category)
+        {
+            NotImplementedMethod(contextBase, category);
+            return null;
+        }
 
-        [Node]
-        internal ContextBase Parent { get { return _parent; } }
+        protected new virtual string DumpShort() { return base.DumpData(); }
 
-        [IsDumpEnabled(false)]
-        internal override sealed RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
-
-        [IsDumpEnabled(false)]
-        internal override sealed Root RootContext { get { return Parent.RootContext; } }
-
-        protected override sealed ContextBase[] ObtainChildChain() { return Parent.ChildChain.Concat(new[] {this}).ToArray(); }
-        internal override Result CreateArgsReferenceResult(Category category) { return Parent.CreateArgsReferenceResult(category); }
-        internal override void Search(SearchVisitor<IContextFeature> searchVisitor) { Parent.Search(searchVisitor); }
-        internal override Struct.Context FindStruct() { return Parent.FindStruct(); }
     }
 }
