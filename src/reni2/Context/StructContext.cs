@@ -32,16 +32,24 @@ namespace Reni.Context
         }
 
         [IsDumpEnabled(false)]
+        internal int Position
+        {
+            get { return _context.Position; }
+        }
+        [IsDumpEnabled(false)]
         internal Struct.Type ContextType { get { return _typeCache.Value; } }
 
         [IsDumpEnabled(false)]
-        internal TypeBase ContextReferenceType { get { return ContextType.Reference(RefAlignParam); } }
+        internal Reference ContextReferenceType { get { return ContextType.Reference(RefAlignParam); } }
 
         [IsDumpEnabled(false)]
-        internal Size StructSize { get { return _context.Size(_parent); } }
+        internal Size StructSize { get { return _context.InnerSize(_parent); } }
 
         [IsDumpEnabled(false)]
-        internal TypeBase InnerType { get { return _context.Type(_parent); } }
+        internal TypeBase InnerType { get { return _context.InnerType(_parent); } }
+
+        [IsDumpEnabled(false)]
+        internal Size InnerOffset { get { throw new NotImplementedException(); } }
 
         [IsDumpEnabled(false)]
         internal RefAlignParam RefAlignParam { get { return _parent.RefAlignParam; } }
@@ -70,10 +78,9 @@ namespace Reni.Context
             return _context.SearchFromRefToStruct(defineable);
         }
 
-        internal IReferenceInCode ReferenceInCode { get { throw new NotImplementedException(); } }
+        internal IReferenceInCode ReferenceInCode { get { return _parent.SpawnStruct(_context); } }
 
-
-        internal Result ContextReferenceAsArg(Category category) { return _context.ContextReferenceAsArg(_parent,category); }
+        internal Result ContextReferenceAsArg(Category category) { return _context.ContextReferenceAsArg(_parent, category); }
 
         internal Result AccessResultFromArg(Category category, int position)
         {
@@ -83,10 +90,11 @@ namespace Reni.Context
 
         private Result AccessResult(Category category, int position)
         {
-            var accessType = AccessType(position);
             var thisResult = ThisReferenceResult(category | Category.Type);
-            var accessResult = accessType.Result(category);
-            return accessResult.ReplaceArg(thisResult);
+            return _context
+                .SpawnField(_parent)
+                .Result(category)
+                .ReplaceArg(thisResult);
         }
 
         private Result AccessResult(bool isProperty, int position, Category category)
@@ -108,8 +116,5 @@ namespace Reni.Context
         }
 
         private Refs ContextRefs() { return Refs.Create(ReferenceInCode); }
-        
-        private IAccessType AccessType(int position) { return InnerType(position).AccessType(this, position); }
-
     }
 }

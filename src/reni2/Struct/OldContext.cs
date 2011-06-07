@@ -21,10 +21,6 @@ namespace Reni.Struct
 
         [Node]
         [IsDumpEnabled(false)]
-        private readonly Result[] _internalResult;
-
-        [Node]
-        [IsDumpEnabled(false)]
         private Result _internalConstructorResult;
 
         [Node]
@@ -33,7 +29,6 @@ namespace Reni.Struct
 
         protected OldContext(Container container)
         {
-            _internalResult = new Result[StatementList.Length];
             _internalConstructorResult = new Result();
             _constructorResult = new Result();
         }
@@ -54,40 +49,6 @@ namespace Reni.Struct
         internal TypeBase RawType(int position) { return InternalType(position); }
 
         private TypeBase InternalType(int position) { return InternalResult(Category.Type, position).Type; }
-
-        internal Size InternalSize()
-        {
-            if(_isFunctionInternalSizeActive)
-                Tracer.ThrowAssertionFailed("", () => "");
-            _isFunctionInternalSizeActive = true;
-            var result = InternalResult(Category.Size).Size;
-            _isFunctionInternalSizeActive = false;
-            return result;
-        }
-
-        private Result InternalResult(Category category, int position)
-        {
-            //Tracer.ConditionalBreak(Container.ObjectId == 0 && position == 0, ()=>"");
-            var result = CreatePosition(position)
-                .Result(category | Category.Type, StatementList[position])
-                .PostProcessor
-                .InternalResultForStruct(category, RefAlignParam);
-            Tracer.Assert(!(category.HasType && result.Type is Reference));
-            if(_internalResult[position] == null)
-                _internalResult[position] = new Result();
-            _internalResult[position].Update(result);
-            return result;
-        }
-
-        private Result InternalResult(Category category) { return InternalResult(category, 0, Position); }
-
-        private Result InternalResult(Category category, int fromPosition, int fromNotPosition)
-        {
-            var result = TypeBase.VoidResult(category);
-            for(var i = fromPosition; i < fromNotPosition; i++)
-                result = result.CreateSequence(InternalResult(category, i));
-            return result;
-        }
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
         {

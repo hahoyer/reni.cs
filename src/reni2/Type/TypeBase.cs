@@ -29,12 +29,10 @@ namespace Reni.Type
             public readonly DictionaryEx<RefAlignParam, Reference> References;
             public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
             public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes;
-            public readonly DictionaryEx<Struct.Context, DictionaryEx<int, Field>> Fields;
             public readonly SimpleCache<TypeType> TypeTypeCache;
 
             public Cache(TypeBase parent)
             {
-                Fields = new DictionaryEx<Struct.Context, DictionaryEx<int, Field>>(context => new DictionaryEx<int, Field>(position => new Field(context, position)));
                 ObjectReferences = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(parent, refAlignParam));
                 FunctionalTypes = new DictionaryEx<IFunctionalFeature, FunctionAccessType>(feature => new FunctionAccessType(parent, feature));
                 References = new DictionaryEx<RefAlignParam, Reference>(refAlignParam => new Reference(parent, refAlignParam));

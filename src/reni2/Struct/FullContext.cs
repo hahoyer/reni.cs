@@ -14,7 +14,10 @@ namespace Reni.Struct
         private readonly DictionaryEx<int, ContextAtPosition> _contextAtPositionCache;
 
         internal FullContext(ContextBase contextBase, Container container)
-            : base(contextBase, container) { _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>(position => new ContextAtPosition(Context, position)); }
+            : base(contextBase, container)
+        {
+            _contextAtPositionCache = new DictionaryEx<int, ContextAtPosition>(position => new ContextAtPosition(Context, position));
+        }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IReferenceInCode.IsChildOf(ContextBase contextBase) { return IsChildOf(contextBase); }

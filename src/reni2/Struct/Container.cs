@@ -31,6 +31,7 @@ namespace Reni.Struct
         private static bool _isInsideFileDump;
         private static int _nextObjectId;
         private DictionaryEx<int, string> _reverseDictionaryCache;
+        private readonly DictionaryEx<int, Context> _contextCache;
 
         [Node]
         internal ICompileSyntax[] List { get { return _list; } }
@@ -57,6 +58,7 @@ namespace Reni.Struct
             _dictionary = dictionary;
             _converters = converters;
             _properties = properties;
+            _contextCache = new DictionaryEx<int, Context>(position => new Context(this, position));
         }
 
         internal DictionaryEx<int, string> ReverseDictionary
@@ -69,7 +71,10 @@ namespace Reni.Struct
             }
         }
 
-        protected internal override Result Result(ContextBase context, Category category) { return context.CreateStruct(this).ConstructorResult(category); }
+        protected internal override Result Result(ContextBase context, Category category)
+        {
+            return context.SpawnStruct(this, List.Length).ConstructorResult(category);
+        }
 
         internal override ICompileSyntax ToCompiledSyntax() { return this; }
 
@@ -182,6 +187,16 @@ namespace Reni.Struct
         internal ISearchPath<IFeature, Type> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
 
         internal ISearchPath<IContextFeature, Context> SearchFromStructContext(Defineable defineable) { return FindStructFeature(defineable.Name); }
+
+        internal Result InternalResultForStruct(Category category, ContextBase parent, int position)
+        {
+            return parent.SpawnStruct(this, position)
+                .Result(category | Category.Type, List[position])
+                .PostProcessor
+                .InternalResultForStruct(category, parent.RefAlignParam);
+        }
+
+        internal Context SpawnContext(int position) { return _contextCache.Find(position); }
     }
 
     internal interface IStructFeature

@@ -26,13 +26,6 @@ namespace Reni.Struct
         [Node]
         protected override int Position { get { return _position; } }
 
-        internal override ContextAtPosition CreatePosition(int position)
-        {
-            if(position < _position)
-                return this;
-            return _context.CreatePosition(position);
-        }
-
         internal override string DumpShort() { return base.DumpShort() + "@" + Position; }
 
         [IsDumpEnabled(false)]

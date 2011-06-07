@@ -7,7 +7,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal class PositionFeature :
+    internal sealed class PositionFeature :
         ReniObject,
         IContextFeature,
         IFeature

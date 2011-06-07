@@ -12,19 +12,17 @@ namespace Reni.Struct
     internal sealed class Field : TypeBase, IAccessType
     {
         [IsDumpEnabled]
-        private readonly Context _context;
-
-        [IsDumpEnabled]
-        private readonly int _position;
+        private readonly StructContext _structContext;
 
         private readonly SimpleCache<TypeBase> _valueTypeCache;
 
-        public Field(Context context, int position)
+        internal Field(StructContext structContext)
         {
-            _context = context;
-            _position = position;
+            _structContext = structContext;
             _valueTypeCache = new SimpleCache<TypeBase>(GetValueType);
         }
+
+        private int Position { get { return _structContext.Position; } }
 
         internal Result DumpPrintResult(Category category)
         {
@@ -63,8 +61,9 @@ namespace Reni.Struct
         protected override TypeBase Dereference() { return ValueType; }
         protected override Result DereferenceResult(Category category) { return AccessResult(category); }
         protected override Size GetSize() { return ValueType.Size; }
-        internal override string DumpShort() { return String.Format("type(this at {0})", _position); }
-        internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + _position; } }
+        internal override string DumpShort() { return String.Format("type(this at {0})", Position); }
+
+        internal override string DumpPrintText { get { return _structContext.DumpShort() + " AT " + Position; } }
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return ValueType.IsConvertableTo(dest, conversionParameter); }
         internal override IFunctionalFeature FunctionalFeature() { return ValueType.FunctionalFeature(); }
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
@@ -76,15 +75,15 @@ namespace Reni.Struct
                 .Result(category, GetAccessCode);
         }
 
-        private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
-        private Size Offset { get { return _context.Offset(_position); } }
+        private RefAlignParam RefAlignParam { get { return _structContext.RefAlignParam; } }
+        private Size Offset { get { return _structContext.InnerOffset; } }
         private Reference ValueTypeReference { get { return ValueType.Reference(RefAlignParam); } }
 
-        private TypeBase GetValueType() { return _context.RawType(_position); }
+        private TypeBase GetValueType() { return _structContext.InnerType; }
 
         private CodeBase GetAccessCode()
         {
-            return _context
+            return _structContext
                 .ContextReferenceType
                 .LocalReferenceCode()
                 .AddToReference(RefAlignParam, Offset, "GetAccessCode");

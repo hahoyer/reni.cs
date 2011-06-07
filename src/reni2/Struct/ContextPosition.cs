@@ -6,17 +6,17 @@ using HWClassLibrary.Helper;
 
 namespace Reni.Struct
 {
-    internal class ContextPosition : ReniObject
+    internal sealed class ContextPosition : ReniObject
     {
-        private readonly SimpleCache<PositionFeature> _trueFeature;
-        private readonly SimpleCache<PositionFeature> _falseFeature;
+        private readonly SimpleCache<PositionFeature> _propertyFeature;
+        private readonly SimpleCache<PositionFeature> _nonPropertyFeature;
 
         internal ContextPosition(Context structContext, int position)
         {
-            _trueFeature = new SimpleCache<PositionFeature>(() => new PositionFeature(structContext, position, true));
-            _falseFeature = new SimpleCache<PositionFeature>(() => new PositionFeature(structContext, position, false));
+            _propertyFeature = new SimpleCache<PositionFeature>(() => new PositionFeature(structContext, position, true));
+            _nonPropertyFeature = new SimpleCache<PositionFeature>(() => new PositionFeature(structContext, position, false));
         }
 
-        public PositionFeature ToProperty(bool isProperty) { return isProperty ? _trueFeature.Value : _falseFeature.Value; }
+        public PositionFeature ToProperty(bool isProperty) { return isProperty ? _propertyFeature.Value : _nonPropertyFeature.Value; }
     }
 }
