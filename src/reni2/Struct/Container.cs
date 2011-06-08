@@ -34,7 +34,7 @@ namespace Reni.Struct
         private static int _nextObjectId;
         private DictionaryEx<int, string> _reverseDictionaryCache;
         private readonly DictionaryEx<int, Context> _contextCache;
-        private DictionaryEx<ContextBase, ContainerContext> _containerContextCache;
+        private readonly DictionaryEx<ContextBase, ContainerContext> _containerContextCache;
 
         [Node]
         internal ICompileSyntax[] List { get { return _list; } }
@@ -233,12 +233,6 @@ namespace Reni.Struct
 
         internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, position).Size; }
         internal TypeBase InnerType(ContextBase parent, int position) { return InnerResult(Category.Type, parent, position).Type; }
-
-        internal ContextPosition[] CreateFeaturesCache(ContextBase contextBase)
-        {
-            return List.Select((t, i) => new ContextPosition(this, contextBase, i)).ToArray();
-        }
-
     }
 
     internal interface IStructFeature
@@ -260,14 +254,15 @@ namespace Reni.Struct
         IContextFeature ISearchPath<IContextFeature, ContainerContext>.Convert(ContainerContext context)
         {
             return context
-                .Features[_index]
+                .SpawnPositionContainerContext(_index)
                 .ToProperty(_isProperty);
         }
 
         IFeature ISearchPath<IFeature, Type>.Convert(Type type)
         {
             return type
-                .Features[_index]
+                .ContainerContext
+                .SpawnPositionContainerContext(_index)
                 .ToProperty(_isProperty);
         }
     }

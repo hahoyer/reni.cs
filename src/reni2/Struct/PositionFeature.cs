@@ -14,28 +14,20 @@ namespace Reni.Struct
         IFeature
     {
         [IsDumpEnabled(true)]
-        private readonly Container _container;
-
-        [IsDumpEnabled(true)]
-        private readonly ContextBase _parent;
-
-        [IsDumpEnabled(true)]
-        private readonly int _position;
+        private readonly PositionContainerContext _context;
 
         [IsDumpEnabled(true)]
         private readonly bool _isProperty;
 
-        internal PositionFeature(Container container, ContextBase parent, int position, bool isProperty)
+        internal PositionFeature(PositionContainerContext context, bool isProperty)
         {
-            _container = container;
-            _parent = parent;
-            _position = position;
+            _context = context;
             _isProperty = isProperty;
         }
 
-        TypeBase IFeature.DefiningType() { return _structContext.ContextReferenceType; }
+        TypeBase IFeature.DefiningType() { return _context.ContextReferenceType; }
 
-        Result IFeature.Apply(Category category) { return _structContext.PositionFeatureApply(category, _position, _isProperty, false); }
-        Result IContextFeature.Apply(Category category) { return _structContext.PositionFeatureApply(category, _position, _isProperty, true); }
+        Result IFeature.Apply(Category category) { return _context.PositionFeatureApply(category, _isProperty, false); }
+        Result IContextFeature.Apply(Category category) { return _context.PositionFeatureApply(category, _isProperty, true); }
     }
 }

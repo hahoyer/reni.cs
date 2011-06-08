@@ -61,7 +61,7 @@ namespace Reni.Feature.DumpPrint
             return this;
         }
 
-        Result IFeature.Apply(Category category) { return _type.CreateDumpPrintResult(category); }
+        Result IFeature.Apply(Category category) { return _type.DumpPrintResult(category); }
 
         TypeBase IFeature.DefiningType() { return _type; }
     }

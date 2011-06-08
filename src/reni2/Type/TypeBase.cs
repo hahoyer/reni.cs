@@ -258,8 +258,6 @@ namespace Reni.Type
         [IsDumpEnabled(false)]
         internal TypeType TypeType { get { return _cache.TypeTypeCache.Value; } }
 
-        internal virtual IAccessType AccessType(Struct.Context context, int position) { return Field(context, position); }
-
         internal virtual IFunctionalFeature FunctionalFeature()
         {
             NotImplementedMethod();

@@ -6,6 +6,7 @@ using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -13,26 +14,30 @@ namespace Reni.Struct
     internal sealed class Type : TypeBase
     {
         private static int _nextObjectId;
-        private readonly PositionContainerContext _context;
+        private readonly PositionContainerContext _positionContainerContext;
 
         [IsDumpEnabled(false)]
         internal readonly ISearchPath<IFeature, Reference> DumpPrintReferenceFeature;
 
-        internal Type(PositionContainerContext context)
+        internal Type(PositionContainerContext positionContainerContext)
             : base(_nextObjectId++)
         {
-            _context = context;
+            _positionContainerContext = positionContainerContext;
+            DumpPrintReferenceFeature = new StructReferenceFeature(this);
         }
 
         [IsDumpEnabled(false)]
-        internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        internal RefAlignParam RefAlignParam { get { return PositionContainerContext.RefAlignParam; } }
 
         [IsDumpEnabled(false)]
-        internal ContextPosition[] Features { get { return _context.Features; } }
+        internal ContainerContext ContainerContext { get { return PositionContainerContext.ContainerContext; } }
 
-        protected override Size GetSize() { return _context.StructSize; }
+        [IsDumpEnabled(false)]
+        private PositionContainerContext PositionContainerContext { get { return _positionContainerContext; } }
 
-        internal override string DumpShort() { return "type(" + _context.DumpShort() + ")"; }
+        protected override Size GetSize() { return PositionContainerContext.StructSize; }
+
+        internal override string DumpShort() { return "type(" + PositionContainerContext.DumpShort() + ")"; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -40,7 +45,7 @@ namespace Reni.Struct
             if(searchVisitorChild != null && !searchVisitorChild.IsSuccessFull)
             {
                 searchVisitorChild.InternalResult =
-                    _context
+                    PositionContainerContext
                         .SearchFromRefToStruct(searchVisitorChild.Defineable)
                         .CheckedConvert(this);
             }
@@ -56,11 +61,11 @@ namespace Reni.Struct
                 (
                     category,
                     () => CodeBase.Arg(Size.Zero),
-                    () => Context.ConstructorRefs()
+                    () => PositionContainerContext.ConstructorRefs
                 );
         }
 
-        internal override PositionContainerContext GetStruct() { return _context; }
+        internal override PositionContainerContext GetStruct() { return PositionContainerContext; }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
@@ -70,14 +75,18 @@ namespace Reni.Struct
             return false;
         }
 
-        internal Result CreateDumpPrintResult(Category category)
+        internal Result DumpPrintResult(Category category)
         {
-            var argCodes = Context.CreateArgCodes(category);
+            var argCodes = PositionContainerContext.CreateArgCodes(category);
+            var containerContext = PositionContainerContext.ContainerContext;
             var dumpPrint =
-                Context.Types
-                    .Select((type, i) => type.GenericDumpPrint(category).ReplaceArg(argCodes[i]))
+                argCodes
+                    .Select((code, i) => containerContext
+                        .InnerType(i)
+                        .GenericDumpPrint(category)
+                        .ReplaceArg(code))
                     .ToArray();
-            var thisRef = LocalReferenceResult(category, Context.RefAlignParam);
+            var thisRef = LocalReferenceResult(category, RefAlignParam);
             var result = Reni.Result
                 .ConcatPrintResult(category, dumpPrint)
                 .ReplaceArg(thisRef);

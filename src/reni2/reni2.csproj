@@ -173,8 +173,6 @@
     <Compile Include="SearchVisitor.cs" />
     <Compile Include="Struct\AtToken.cs" />
     <Compile Include="Struct\ContextPosition.cs" />
-    <Compile Include="Struct\FullContext.cs" />
-    <Compile Include="Struct\ContextAtPosition.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />
     <Compile Include="FeatureTest\Function.cs" />
     <Compile Include="FeatureTest\IntegerStruct.cs" />
@@ -186,7 +184,6 @@
     <Compile Include="Parser\Test.cs" />
     <Compile Include="StructAccess.cs" />
     <Compile Include="Struct\PositionFeature.cs" />
-    <Compile Include="Struct\OldContext.cs" />
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Syntax\IResultProvider.cs" />

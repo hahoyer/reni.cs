@@ -27,9 +27,9 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, TypeType>.Convert(TypeType type) { return new Feature(type.DumpPrintResult); }
         IFeature ISearchPath<IFeature, Bit>.Convert(Bit type) { return _bitFeature; }
         IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new Feature(type.Result); }
-        IFeature ISearchPath<IFeature, Struct.Type>.Convert(Struct.Type type) { return new Feature(type.CreateDumpPrintResult); }
+        IFeature ISearchPath<IFeature, Struct.Type>.Convert(Struct.Type type) { return new Feature(type.DumpPrintResult); }
         IFeature ISearchPath<IFeature, Field>.Convert(Field type) { return new Feature(type.DumpPrintResult); }
-        IFeature ISearchPath<IFeature, FunctionalFeatureType>.Convert(FunctionalFeatureType type) { return new Feature(type.CreateDumpPrintResult); }
+        IFeature ISearchPath<IFeature, FunctionalFeatureType>.Convert(FunctionalFeatureType type) { return new Feature(type.DumpPrintResult); }
 
         ISearchPath<IFeature, Type.Sequence> ISearchPath<ISearchPath<IFeature, Type.Sequence>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<IFeature, Reference> ISearchPath<ISearchPath<IFeature, Reference>, Struct.Type>.Convert(Struct.Type type) { return type.DumpPrintReferenceFeature; }

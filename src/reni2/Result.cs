@@ -7,6 +7,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
+using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -602,6 +603,8 @@ namespace Reni
                 .LocalReferenceResult(CompleteCategory, refAlignParam)
                 .ReplaceArg(this);
         }
+
+        internal Result ReplaceContextReferenceByArg(PositionContainerContext context) { return ReplaceAbsolute(context.ReferenceInCode, () => context.ContextReferenceAsArg(CompleteCategory)); }
     }
 
     internal sealed class Error

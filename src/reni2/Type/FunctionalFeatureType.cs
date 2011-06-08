@@ -52,19 +52,16 @@ namespace Reni.Type
 
         internal string DumpPrintText { get { return _body.DumpShort() + "/\\"; } }
 
-        internal override IAccessType AccessType(Struct.Context context, int position)
-        {
-            return context
-                .ContextReferenceType
-                .FunctionalType(_functionalFeature);
-        }
-
         internal override void Search(ISearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
 
-        public Result CreateDumpPrintResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(_functionalFeature.DumpPrintText)); }
+        internal Result DumpPrintResult(Category category)
+        {
+            return Void
+                .Result(category, () => CodeBase.DumpPrintText("_functionalFeature.DumpPrintText"));
+        }
     }
 }

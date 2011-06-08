@@ -54,7 +54,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override StructContext GetStruct() { return _valueType.GetStruct(); }
+        internal override PositionContainerContext GetStruct() { return _valueType.GetStruct(); }
 
         protected override bool IsReferenceTo(TypeBase value) { return ValueType == value; }
 
