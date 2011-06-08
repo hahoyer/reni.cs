@@ -88,7 +88,6 @@
     <Compile Include="Context\IContextItem.cs" />
     <Compile Include="Context\IRootContext.cs" />
     <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
-    <Compile Include="Context\StructContext.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
     <Compile Include="FeatureTest\Array.cs" />
@@ -152,9 +151,11 @@
     <Compile Include="Runtime\DataContainer.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
     <Compile Include="Sequence\PrefixFeature.cs" />
+    <Compile Include="Struct\ContainerContext.cs" />
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\Field.cs" />
     <Compile Include="Struct\FunctionInstance.cs" />
+    <Compile Include="Struct\PositionContainerContext.cs" />
     <Compile Include="Struct\Type.cs" />
     <Compile Include="Syntax\LeftParenthesis.cs" />
     <Compile Include="Syntax\ListSyntax.cs" />

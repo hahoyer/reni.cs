@@ -18,6 +18,6 @@ namespace Reni.Syntax
         protected override TokenData GetLastToken() { return _rightToken; }
         internal override string DumpShort() { return "()"; }
 
-        protected internal override Result Result(ContextBase context, Category category) { return TypeBase.VoidResult(category); }
+        internal override Result Result(ContextBase context, Category category) { return TypeBase.VoidResult(category); }
     }
 }

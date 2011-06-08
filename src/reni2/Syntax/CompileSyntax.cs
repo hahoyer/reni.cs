@@ -32,7 +32,7 @@ namespace Reni.Syntax
 
         Result ICompileSyntax.Result(ContextBase context, Category category) { return Result(context, category); }
 
-        protected internal virtual Result Result(ContextBase context, Category category)
+        internal virtual Result Result(ContextBase context, Category category)
         {
             NotImplementedMethod(context, category);
             return null;

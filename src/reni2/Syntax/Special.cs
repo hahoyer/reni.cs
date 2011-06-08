@@ -24,7 +24,7 @@ namespace Reni.Syntax
         public TerminalSyntax(TokenData token, ITerminal terminal)
             : base(token) { Terminal = terminal; }
 
-        protected internal override Result Result(ContextBase context, Category category)
+        internal override Result Result(ContextBase context, Category category)
         {
             return Terminal
                 .Result(context, category, Token);
@@ -50,7 +50,7 @@ namespace Reni.Syntax
             _right = right;
         }
 
-        protected internal override Result Result(ContextBase context, Category category)
+        internal override Result Result(ContextBase context, Category category)
         {
             return _prefix
                 .Result(context, category, _right);
@@ -81,7 +81,7 @@ namespace Reni.Syntax
             _right = right;
         }
 
-        protected internal override Result Result(ContextBase context, Category category)
+        internal override Result Result(ContextBase context, Category category)
         {
             return _infix
                 .Result(context, category, _left, _right);
@@ -107,7 +107,7 @@ namespace Reni.Syntax
             _suffix = suffix;
         }
 
-        protected internal override Result Result(ContextBase context, Category category)
+        internal override Result Result(ContextBase context, Category category)
         {
             return _suffix
                 .Result(context, category, _left);

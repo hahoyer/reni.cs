@@ -13,7 +13,7 @@ namespace Reni
 
         internal PostProcessorForResult(Result result) { _result = result; }
 
-        internal Result InternalResultForStruct(Category category, RefAlignParam refAlignParam)
+        internal Result InnerResultForStruct(Category category, RefAlignParam refAlignParam)
         {
             return _result
                 .AutomaticDereference()

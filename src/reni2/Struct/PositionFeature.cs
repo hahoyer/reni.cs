@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -13,7 +14,10 @@ namespace Reni.Struct
         IFeature
     {
         [IsDumpEnabled(true)]
-        private readonly Context _structContext;
+        private readonly Container _container;
+
+        [IsDumpEnabled(true)]
+        private readonly ContextBase _parent;
 
         [IsDumpEnabled(true)]
         private readonly int _position;
@@ -21,11 +25,12 @@ namespace Reni.Struct
         [IsDumpEnabled(true)]
         private readonly bool _isProperty;
 
-        public PositionFeature(Context structContext, int position, bool isProperty)
+        internal PositionFeature(Container container, ContextBase parent, int position, bool isProperty)
         {
-            _isProperty = isProperty;
-            _structContext = structContext;
+            _container = container;
+            _parent = parent;
             _position = position;
+            _isProperty = isProperty;
         }
 
         TypeBase IFeature.DefiningType() { return _structContext.ContextReferenceType; }

@@ -50,20 +50,6 @@ namespace Reni.Struct
 
         private TypeBase InternalType(int position) { return InternalResult(Category.Type, position).Type; }
 
-        internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
-        {
-            AssertValid();
-            if(!searchVisitor.IsSuccessFull)
-            {
-                searchVisitor.InternalResult =
-                    Container
-                        .SearchFromStructContext(searchVisitor.Defineable)
-                        .CheckedConvert(this);
-            }
-            Parent.Search(searchVisitor);
-            base.Search(searchVisitor);
-        }
-
         internal Size Offset(int position) { return InternalResult(Category.Size, position + 1, Position).Size; }
 
         [IsDumpEnabled(false)]
@@ -118,19 +104,6 @@ namespace Reni.Struct
         }
 
         private CodeBase CreateRefArgCode() { return ContextType.Reference(RefAlignParam).ArgCode(); }
-
-        internal Result ConstructorResult(Category category)
-        {
-            var trace = ObjectId == -3 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category);
-            var internalResult = InternalResult(category - Category.Type);
-            _internalConstructorResult.Update(internalResult);
-            var rawResult = ContextType.Result(category, internalResult);
-            var result = rawResult.ReplaceRelative(ForCode, () => CodeBase.TopRef(RefAlignParam, "Context.ConstructorResult"));
-            Dump(trace, "rawResult", rawResult, "result.Code", result.Code);
-            _constructorResult.Update(result);
-            return ReturnMethodDumpWithBreak(trace, result);
-        }
 
         internal Refs ConstructorRefs() { return ConstructorResult(Category.Refs).Refs; }
 

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -13,26 +13,25 @@ namespace Reni.Struct
     internal sealed class Type : TypeBase
     {
         private static int _nextObjectId;
-
-        [IsDumpEnabled(false)]
-        private readonly StructContext _context;
+        private readonly PositionContainerContext _context;
 
         [IsDumpEnabled(false)]
         internal readonly ISearchPath<IFeature, Reference> DumpPrintReferenceFeature;
 
-        internal Type(StructContext context)
+        internal Type(PositionContainerContext context)
             : base(_nextObjectId++)
         {
             _context = context;
-            DumpPrintReferenceFeature = new StructReferenceFeature(this);
         }
 
         [IsDumpEnabled(false)]
         internal RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
 
-        internal StructContext Context { get { return _context; } }
+        [IsDumpEnabled(false)]
+        internal ContextPosition[] Features { get { return _context.Features; } }
 
         protected override Size GetSize() { return _context.StructSize; }
+
         internal override string DumpShort() { return "type(" + _context.DumpShort() + ")"; }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -61,7 +60,7 @@ namespace Reni.Struct
                 );
         }
 
-        internal override StructContext GetStruct() { return _context; }
+        internal override PositionContainerContext GetStruct() { return _context; }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
@@ -84,5 +83,6 @@ namespace Reni.Struct
                 .ReplaceArg(thisRef);
             return result;
         }
+
     }
 }

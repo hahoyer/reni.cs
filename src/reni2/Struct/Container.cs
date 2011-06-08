@@ -5,12 +5,14 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -32,6 +34,7 @@ namespace Reni.Struct
         private static int _nextObjectId;
         private DictionaryEx<int, string> _reverseDictionaryCache;
         private readonly DictionaryEx<int, Context> _contextCache;
+        private DictionaryEx<ContextBase, ContainerContext> _containerContextCache;
 
         [Node]
         internal ICompileSyntax[] List { get { return _list; } }
@@ -59,6 +62,7 @@ namespace Reni.Struct
             _converters = converters;
             _properties = properties;
             _contextCache = new DictionaryEx<int, Context>(position => new Context(this, position));
+            _containerContextCache = new DictionaryEx<ContextBase, ContainerContext>(parent => new ContainerContext(this, parent));
         }
 
         internal DictionaryEx<int, string> ReverseDictionary
@@ -69,11 +73,6 @@ namespace Reni.Struct
                     CreateReverseDictionary();
                 return _reverseDictionaryCache;
             }
-        }
-
-        protected internal override Result Result(ContextBase context, Category category)
-        {
-            return context.SpawnStruct(this, List.Length).ConstructorResult(category);
         }
 
         internal override ICompileSyntax ToCompiledSyntax() { return this; }
@@ -186,21 +185,64 @@ namespace Reni.Struct
 
         internal ISearchPath<IFeature, Type> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
 
-        internal ISearchPath<IContextFeature, Context> SearchFromStructContext(Defineable defineable) { return FindStructFeature(defineable.Name); }
-
-        internal Result InternalResultForStruct(Category category, ContextBase parent, int position)
+        internal ISearchPath<IContextFeature, ContainerContext> SearchFromStructContext(Defineable defineable)
         {
-            return parent.SpawnStruct(this, position)
+            return FindStructFeature(defineable.Name);
+        }
+
+        internal override Result Result(ContextBase context, Category category)
+        {
+            var structContext = SpawnContext(context);
+            var internalResult = InnerResult(category - Category.Type, context, 0, List.Length)
+                .ReplaceRelative(structContext, () => CodeBase.TopRef(context.RefAlignParam, "Struct.Container.Result"));
+            return structContext
+                .FindRecentStructContext
+                .ContextType
+                .Result(category, internalResult);
+        }
+
+        internal Result InnerResult(Category category, ContextBase parent, int position)
+        {
+            var result = SpawnContext(parent, position)
                 .Result(category | Category.Type, List[position])
                 .PostProcessor
-                .InternalResultForStruct(category, parent.RefAlignParam);
+                .InnerResultForStruct(category, parent.RefAlignParam);
+            Tracer.Assert(!(category.HasType && result.Type is Reference));
+            return result;
         }
 
         internal Context SpawnContext(int position) { return _contextCache.Find(position); }
+        internal ContextBase SpawnContext(ContextBase parent, int position) { return parent.SpawnStruct(this, position); }
+        internal ContextBase SpawnContext(ContextBase parent) { return parent.SpawnStruct(this, List.Length); }
+
+        internal ContainerContext SpawnContainerContext(ContextBase parent)
+        {
+            return _containerContextCache.Find(parent);
+        }
+        internal Result InnerResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
+        {
+            var result = TypeBase.VoidResult(category);
+            for (var i = fromPosition; i < fromNotPosition; i++)
+            {
+                //Tracer.ConditionalBreak(Container.ObjectId == 0 && position == 0, ()=>"");
+                var result1 = InnerResult(category, parent, i);
+                result = result.CreateSequence(result1);
+            }
+            return result;
+        }
+
+        internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, position).Size; }
+        internal TypeBase InnerType(ContextBase parent, int position) { return InnerResult(Category.Type, parent, position).Type; }
+
+        internal ContextPosition[] CreateFeaturesCache(ContextBase contextBase)
+        {
+            return List.Select((t, i) => new ContextPosition(this, contextBase, i)).ToArray();
+        }
+
     }
 
     internal interface IStructFeature
-        : ISearchPath<IContextFeature, Context>, ISearchPath<IFeature, Type>
+        : ISearchPath<IContextFeature, ContainerContext>, ISearchPath<IFeature, Type>
     {}
 
     [Serializable]
@@ -215,9 +257,8 @@ namespace Reni.Struct
             _isProperty = isProperty;
         }
 
-        IContextFeature ISearchPath<IContextFeature, Context>.Convert(Context context)
+        IContextFeature ISearchPath<IContextFeature, ContainerContext>.Convert(ContainerContext context)
         {
-            context.AssertValid();
             return context
                 .Features[_index]
                 .ToProperty(_isProperty);
@@ -226,7 +267,6 @@ namespace Reni.Struct
         IFeature ISearchPath<IFeature, Type>.Convert(Type type)
         {
             return type
-                .Context
                 .Features[_index]
                 .ToProperty(_isProperty);
         }

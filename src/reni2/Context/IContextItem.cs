@@ -10,6 +10,6 @@ namespace Reni.Context
     {
         RefAlignParam RefAlignParam { get; }
         Result CreateArgsReferenceResult(ContextBase contextBase, Category category);
-        void Search(SearchVisitor<IContextFeature> searchVisitor);
+        void Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent);
     }
 }

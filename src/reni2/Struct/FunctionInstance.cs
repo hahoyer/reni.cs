@@ -24,7 +24,7 @@ namespace Reni.Struct
 
         [Node]
         [IsDumpEnabled(true)]
-        private readonly Struct.Context _context;
+        private readonly PositionContainerContext _context;
 
         [IsDumpEnabled(true)]
         private readonly int _index;
@@ -40,7 +40,7 @@ namespace Reni.Struct
         /// <param name = "context">The context.</param>
         /// <param name = "args">The args.</param>
         /// created 03.01.2007 21:19
-        internal FunctionInstance(int index, ICompileSyntax body, Struct.Context context, TypeBase args)
+        internal FunctionInstance(int index, ICompileSyntax body, PositionContainerContext context, TypeBase args)
             : base(index)
         {
             StopByObjectId(-1);
@@ -89,7 +89,7 @@ namespace Reni.Struct
             if(category.HasCode)
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(_index, result.Size);
 
-            _context.ToContext.CreateFunction(_args).AssertCorrectRefs(result);
+            _context.SpawnContext.SpawnFunction(_args).AssertCorrectRefs(result);
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
@@ -100,7 +100,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
             var category = Category.Code;
-            var refAlignParam = _context.ToContext.RefAlignParam;
+            var refAlignParam = _context.SpawnContext.RefAlignParam;
             var foreignRefsRef = CodeBase.FrameRef(refAlignParam, "FunctionInstance.CreateBodyCode");
             var visitResult = Result(category);
             var result = visitResult
@@ -115,7 +115,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var functionContext = _context.ToContext.CreateFunction(_args);
+            var functionContext = _context.SpawnContext.SpawnFunction(_args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category | Category.Type;
@@ -140,14 +140,14 @@ namespace Reni.Struct
         {
             return new Result(
                 category,
-                () => _context.ToContext.RefAlignParam.RefSize,
+                () => _context.SpawnContext.RefAlignParam.RefSize,
                 CreateContextRefCode,
                 Refs.None);
         }
 
         private CodeBase CreateContextRefCode()
         {
-            var refAlignParam = _context.ToContext.RefAlignParam;
+            var refAlignParam = _context.SpawnContext.RefAlignParam;
             return CodeBase
                 .FrameRef(refAlignParam, "FunctionInstance.CreateContextRefCode")
                 .AddToReference(refAlignParam, FrameSize*-1, "FunctionInstance.CreateContextRefCode");

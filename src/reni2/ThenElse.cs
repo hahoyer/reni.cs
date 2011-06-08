@@ -31,7 +31,7 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        protected internal override Result Result(ContextBase context, Category category)
+        internal override Result Result(ContextBase context, Category category)
         {
             var trace = false;
             StartMethodDump(trace, context, category);

@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
+using Reni.Struct;
 using Reni.Syntax;
 
 namespace Reni.Type
@@ -12,10 +13,10 @@ namespace Reni.Type
     internal sealed class FunctionalFeatureType : TypeBase, IFunctionalFeature
     {
         private readonly ICompileSyntax _body;
-        private readonly StructContext _context;
+        private readonly PositionContainerContext _context;
         private static int _nextObjectId;
 
-        internal FunctionalFeatureType(StructContext context, ICompileSyntax body)
+        internal FunctionalFeatureType(PositionContainerContext context, ICompileSyntax body)
             : base(_nextObjectId++)
         {
             _context = context;

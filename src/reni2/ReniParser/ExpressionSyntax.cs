@@ -48,7 +48,7 @@ namespace Reni.ReniParser
 
         protected override TokenData GetLastToken() { return Right == null ? Token : Right.LastToken; }
 
-        protected internal override Result Result(ContextBase context, Category category)
+        internal override Result Result(ContextBase context, Category category)
         {
             var trace = ObjectId == -103 && category.HasCode;
             StartMethodDumpWithBreak(trace, context, category);

@@ -13,7 +13,7 @@ namespace Reni.Context
 
         Result IContextItem.CreateArgsReferenceResult
             (ContextBase contextBase, Category category) { return CreateArgsReferenceResult(contextBase, category); }
-        void IContextItem.Search(SearchVisitor<IContextFeature> searchVisitor) { }
+        void IContextItem.Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent) { Search(searchVisitor, parent); }
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         protected virtual Result CreateArgsReferenceResult(ContextBase contextBase, Category category)
@@ -23,5 +23,6 @@ namespace Reni.Context
         }
 
         protected new virtual string DumpShort() { return base.DumpData(); }
+        protected virtual void Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent) { }
     }
 }

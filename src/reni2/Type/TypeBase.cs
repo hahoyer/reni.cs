@@ -113,7 +113,6 @@ namespace Reni.Type
         internal Array Array(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
         internal Reference Reference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
-        private Field Field(Struct.Context context, int position) { return _cache.Fields.Find(context).Find(position); }
         internal Sequence Sequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         internal FunctionAccessType FunctionalType(IFunctionalFeature feature) { return _cache.FunctionalTypes.Find(feature); }
         protected ObjectReference ObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
@@ -316,7 +315,7 @@ namespace Reni.Type
 
         internal Result PrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
 
-        internal virtual StructContext GetStruct()
+        internal virtual PositionContainerContext GetStruct()
         {
             NotImplementedMethod();
             return null;
