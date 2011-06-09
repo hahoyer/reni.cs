@@ -78,7 +78,10 @@ namespace Reni.FeatureTest
         {
             for(var i = 0; i < 100; i++)
             {
-                var x = new StackTrace(true).GetFrame(depth + i).GetMethod();
+                var stackFrame = new StackTrace(true).GetFrame(depth + i);
+                if (stackFrame == null)
+                    return false;
+                var x = stackFrame.GetMethod();
                 if(x.GetCustomAttributes(typeof(IsUnderConstructionAttribute), true).Length > 0) return true;
             }
             return false;

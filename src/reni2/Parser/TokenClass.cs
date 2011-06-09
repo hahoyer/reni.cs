@@ -29,6 +29,7 @@ namespace Reni.Parser
         }
 
         protected virtual string PrioTableName(string name) { return Name; }
+        [DisableDump]
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
 
         [DisableDump]
@@ -37,7 +38,6 @@ namespace Reni.Parser
         public override string ToString() { return base.ToString() + " Name=" + _name.Quote(); }
 
         [Node, DisableDump]
-        
         internal string Name { get { return _name; } set { _name = value; } }
     }
 

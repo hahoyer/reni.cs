@@ -4,10 +4,8 @@ using System.Linq;
 using System;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -24,14 +22,6 @@ namespace Reni.Struct
         }
 
         internal int Position { get { return _position; } }
-
-        [DisableDump]
-        internal int IndexSize { get { return Container.IndexSize; } }
-
-        [DisableDump]
-        internal IReferenceInCode ForCode { get { throw new NotImplementedException(); } }
-
-        internal TypeBase ContextReferenceType(ContextBase context) { throw new NotImplementedException(); }
 
         protected override void Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent)
         {
