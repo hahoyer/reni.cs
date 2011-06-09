@@ -26,7 +26,7 @@ namespace Reni.Code
             return newResult;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual bool IsNonFiberHeadList { get { return false; } }
     }
 }

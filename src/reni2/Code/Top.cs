@@ -10,7 +10,7 @@ namespace Reni.Code
     [Serializable]
     internal abstract class Top : FiberHead
     {
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         protected internal readonly Size Offset;
 
         private readonly RefAlignParam _refAlignParam;
@@ -28,13 +28,13 @@ namespace Reni.Code
 
         protected override Size GetSize() { return _size; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected Size DataSize { get { return _dataSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset + " DataSize=" + _dataSize; } }
     }
 }

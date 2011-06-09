@@ -60,28 +60,28 @@ namespace Reni
 
         internal FunctionList Functions { get { return _functions.Value; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public string FileName { get { return _fileName; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public Source Source { get { return _source.Value; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal ReniParser.ParsedSyntax Syntax { get { return _syntax.Value; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public string ExecutedCode { get { return _executedCode.Value; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         private CodeBase Code { get { return _code.Value; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private Container MainContainer { get { return _mainContainer.Value; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         private List<Container> FunctionContainers { get { return _functionContainers.Value; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private ContextBase RootContext{ get { return _rootContext.Value; } }
 
 

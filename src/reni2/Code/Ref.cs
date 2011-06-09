@@ -15,10 +15,10 @@ namespace Reni.Code
     {
         private readonly RefAlignParam _refAlignParam;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal readonly string Reason;
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal readonly Size Offset;
 
         protected Ref(RefAlignParam refAlignParam, Size offset, string reason)
@@ -30,10 +30,10 @@ namespace Reni.Code
 
         protected override sealed Size GetSize() { return _refAlignParam.RefSize; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset + " Reason=" + Reason; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
     }
 }

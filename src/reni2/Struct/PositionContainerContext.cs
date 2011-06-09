@@ -36,25 +36,25 @@ namespace Reni.Struct
             _nonPropertyFeatureCache = new SimpleCache<PositionFeature>(() => new PositionFeature(this, false));
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal int Position { get { return _position; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal ContainerContext ContainerContext { get { return _containerContext; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal ContextBase SpawnContext { get { return ContainerContext.SpawnContext(_position); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Type ContextType { get { return _typeCache.Value; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Reference ContextReferenceType { get { return ContextType.Reference(RefAlignParam); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Size StructSize { get { return ContainerContext.InnerOffset(Position); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Refs ConstructorRefs
         {
             get
@@ -65,13 +65,13 @@ namespace Reni.Struct
             }
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal TypeBase InnerType { get { return ContainerContext.InnerType(_position); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal RefAlignParam RefAlignParam { get { return ContainerContext.RefAlignParam; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal TypeBase IndexType { get { return TypeBase.Number(ContainerContext.IndexSize); } }
 
         internal PositionFeature ToProperty(bool isProperty) { return isProperty ? _propertyFeatureCache.Value : _nonPropertyFeatureCache.Value; }

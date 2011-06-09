@@ -16,7 +16,7 @@ namespace Reni.Struct
         private static int _nextObjectId;
         private readonly PositionContainerContext _positionContainerContext;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal readonly ISearchPath<IFeature, Reference> DumpPrintReferenceFeature;
 
         internal Type(PositionContainerContext positionContainerContext)
@@ -26,13 +26,13 @@ namespace Reni.Struct
             DumpPrintReferenceFeature = new StructReferenceFeature(this);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal RefAlignParam RefAlignParam { get { return PositionContainerContext.RefAlignParam; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal ContainerContext ContainerContext { get { return PositionContainerContext.ContainerContext; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private PositionContainerContext PositionContainerContext { get { return _positionContainerContext; } }
 
         protected override Size GetSize() { return PositionContainerContext.StructSize; }

@@ -18,29 +18,29 @@ namespace Reni.Code
 
         protected CodeBase() { }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         
         internal Size Size { get { return GetSize(); } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal Size MaxSize { get { return MaxSizeImplementation; } }
 
-        [Node, IsDumpEnabled(false), SmartNode]
+        [Node, DisableDump, SmartNode]
         internal List<IReferenceInCode> RefsData { get { return Refs.Data; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Refs Refs { get { return GetRefsImplementation(); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual bool IsEmpty { get { return false; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual bool IsRelativeReference { get { return RefAlignParam != null; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected virtual Size MaxSizeImplementation { get { return Size; } }
 
         protected abstract Size GetSize();
@@ -132,7 +132,7 @@ namespace Reni.Code
             }
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Reni.Code
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
         internal CodeBase LocalBlock(CodeBase copier, RefAlignParam refAlignParam)

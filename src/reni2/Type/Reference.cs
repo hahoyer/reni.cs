@@ -29,7 +29,7 @@ namespace Reni.Type
 
         internal TypeBase ValueType { get { return _valueType; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal TypeBase AlignedTarget { get { return _valueType.Align(RefAlignParam.AlignBits); } }
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
@@ -58,7 +58,7 @@ namespace Reni.Type
 
         protected override bool IsReferenceTo(TypeBase value) { return ValueType == value; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override RefAlignParam[] ReferenceChain
         {
             get

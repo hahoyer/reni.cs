@@ -13,7 +13,7 @@ namespace Reni.Sequence
     {
         private readonly Type.Sequence _parent;
 
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly FeatureBase _feature;
 
         protected internal FunctionalFeature(Type.Sequence parent, FeatureBase feature)

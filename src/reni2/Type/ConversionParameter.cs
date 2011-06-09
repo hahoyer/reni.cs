@@ -17,10 +17,10 @@ namespace Reni.Type
             _isDisableCut = isDisableCut;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal ConversionParameter EnableCut { get { return new ConversionParameter(IsUseConverter, false); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal ConversionParameter DontUseConverter { get { return new ConversionParameter(false, IsDisableCut); } }
 
         internal bool IsDisableCut { get { return _isDisableCut; } }

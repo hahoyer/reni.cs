@@ -9,7 +9,7 @@ namespace Reni.Struct
 {
     internal sealed class AssignmentFeature : ReniObject, IFunctionalFeature
     {
-        [IsDumpEnabled]
+        [EnableDump]
         private readonly Reference _referenceType;
 
         internal AssignmentFeature(Reference referenceType) { _referenceType = referenceType; }

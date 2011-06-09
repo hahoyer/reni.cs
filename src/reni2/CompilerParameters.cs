@@ -22,7 +22,7 @@ namespace Reni
         /// <summary>
         ///     Shows or hides syntax tree
         /// </summary>
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         public readonly TraceParamters Trace = new TraceParamters();
 
         public bool ParseOnly;
@@ -31,25 +31,25 @@ namespace Reni
         [Serializable]
         public class TraceParamters
         {
-            [Node, IsDumpEnabled(true)]
+            [Node, EnableDump]
             public bool CodeSequence;
 
-            [Node, IsDumpEnabled(true)]
+            [Node, EnableDump]
             public bool CodeTree;
 
-            [Node, IsDumpEnabled(true)]
+            [Node, EnableDump]
             public bool ExecutedCode;
 
-            [Node, IsDumpEnabled(true)]
+            [Node, EnableDump]
             public bool Functions;
 
-            [Node, IsDumpEnabled(true)]
+            [Node, EnableDump]
             public bool Source;
 
-            [Node, IsDumpEnabled(true)]
+            [Node, EnableDump]
             public bool Syntax;
 
-            [Node, IsDumpEnabled(true)]
+            [Node, EnableDump]
             public bool CodeExecutor;
 
             public void None()

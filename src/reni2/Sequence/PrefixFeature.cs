@@ -70,17 +70,17 @@ namespace Reni.Sequence
         [DumpExcept(true)]
         bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         string ISequenceOfBitBinaryOperation.CSharpNameOfDefaultOperation { get { return CSharpNameOfDefaultOperation; } }
 
         int ISequenceOfBitBinaryOperation.ResultSize(int objBitCount, int argBitCount) { return ResultSize(objBitCount, argBitCount); }
 
         protected abstract int ResultSize(int objSize, int argSize);
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected virtual string CSharpNameOfDefaultOperation { get { return Name; } }
 
         [DumpExcept(true)]
@@ -94,10 +94,10 @@ namespace Reni.Sequence
     {
         ISearchPath<IPrefixFeature, Type.Sequence> ISearchPath<ISearchPath<IPrefixFeature, Type.Sequence>, Bit>.Convert(Bit type) { return new SequenceOperationPrefixFeature(type, this); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         string ISequenceOfBitPrefixOperation.CSharpNameOfDefaultOperation { get { return Name; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
 
         public Result SequenceOperationResult(Category category, Size objSize) { throw new NotImplementedException(); }

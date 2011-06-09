@@ -94,7 +94,7 @@ namespace Reni.Code
 
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Fiber(this); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal new bool HasArg
         {
             get

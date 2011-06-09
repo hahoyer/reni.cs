@@ -49,7 +49,7 @@ namespace Reni.Code
             return null;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override bool IsNonFiberHeadList
         {
             get
@@ -63,7 +63,7 @@ namespace Reni.Code
             }
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected override Size MaxSizeImplementation
         {
             get

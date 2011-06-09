@@ -24,7 +24,7 @@ namespace Reni.TokenClasses
     {
         private static readonly ITokenFactory _tokenFactory = DeclarationTokenFactory.Instance;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected override ITokenFactory NewTokenFactory { get { return _tokenFactory; } }
 
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)

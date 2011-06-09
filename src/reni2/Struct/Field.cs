@@ -11,7 +11,7 @@ namespace Reni.Struct
 {
     internal sealed class Field : TypeBase, IAccessType
     {
-        [IsDumpEnabled]
+        [EnableDump]
         private readonly PositionContainerContext _context;
 
         private readonly SimpleCache<TypeBase> _valueTypeCache;

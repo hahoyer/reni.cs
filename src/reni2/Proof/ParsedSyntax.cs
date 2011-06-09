@@ -14,7 +14,7 @@ namespace Reni.Proof
         protected ParsedSyntax(TokenData token)
             : base(token) { }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual Set<string> Variables
         {
             get
@@ -24,10 +24,10 @@ namespace Reni.Proof
             }
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal bool IsSimpleVariable { get { return this is VariableSyntax; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual bool IsNegative { get { return false; } }
 
         internal ParsedSyntax Associative<TOperation>(TOperation operation, TokenData token, ParsedSyntax other)
@@ -42,7 +42,7 @@ namespace Reni.Proof
         [UsedImplicitly]
         internal string SmartDumpText { get { return SmartDump(null); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual BigRational Factor { get { return 1; } }
 
         internal virtual string SmartDump(ISmartDumpToken @operator)

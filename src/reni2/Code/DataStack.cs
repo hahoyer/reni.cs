@@ -35,7 +35,7 @@ namespace Reni.Code
             internal StackData FrameAddress(Size offset, Size size, Size dataSize) { return new StackDataAddress(Frame, size, offset); }
         }
 
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private LocalData _localData = new LocalData();
 
         private readonly CodeBase[] _functions;

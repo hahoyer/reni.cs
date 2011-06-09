@@ -25,10 +25,10 @@ namespace Reni.Struct
 
         internal int Position { get { return _position; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal int IndexSize { get { return Container.IndexSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal IReferenceInCode ForCode { get { throw new NotImplementedException(); } }
 
         internal TypeBase ContextReferenceType(ContextBase context) { throw new NotImplementedException(); }

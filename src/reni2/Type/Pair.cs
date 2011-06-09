@@ -19,7 +19,7 @@ namespace Reni.Type
 
         protected override Size GetSize() { return First.Size + Second.Size; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override string DumpPrintText
         {
             get
@@ -35,7 +35,7 @@ namespace Reni.Type
             }
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected internal override TypeBase[] ToList
         {
             get

@@ -7,7 +7,7 @@ namespace Reni.Code
 {
     internal sealed class BitsStackData : NonListStackData
     {
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly BitsConst _data;
 
         public BitsStackData(BitsConst data)

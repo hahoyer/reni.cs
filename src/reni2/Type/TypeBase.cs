@@ -65,20 +65,20 @@ namespace Reni.Type
 
         internal virtual bool IsRef(RefAlignParam refAlignParam) { return false; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual bool IsVoid { get { return false; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual Size UnrefSize { get { return Size; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected internal virtual TypeBase[] ToList { get { return new[] {this}; } }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         internal abstract string DumpShort();
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual string DumpPrintText
         {
             get
@@ -100,7 +100,7 @@ namespace Reni.Type
             return 0;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected internal virtual int IndexSize { get { return 0; } }
 
         internal TypeBase Align(int alignBits)
@@ -252,10 +252,10 @@ namespace Reni.Type
         /// <value>The icon key.</value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual RefAlignParam[] ReferenceChain { get { return new RefAlignParam[0]; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal TypeType TypeType { get { return _cache.TypeTypeCache.Value; } }
 
         internal virtual IFunctionalFeature FunctionalFeature()

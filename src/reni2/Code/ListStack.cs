@@ -7,7 +7,7 @@ namespace Reni.Code
 {
     internal sealed class ListStack : StackData
     {
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly NonListStackData[] _data;
 
         public ListStack(NonListStackData top, NonListStackData formerStackData) { _data = new NonListStackData[2] {top, formerStackData}; }

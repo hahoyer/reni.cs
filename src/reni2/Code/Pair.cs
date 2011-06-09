@@ -34,7 +34,7 @@ namespace Reni.Code
         protected override Size GetSize() { return Left.Size + Right.Size; }
         protected override Refs GetRefsImplementation() { return _left.Refs.Sequence(_right.Refs); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected override Size MaxSizeImplementation
         {
             get

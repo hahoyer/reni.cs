@@ -7,14 +7,14 @@ namespace Reni.Proof.TokenClasses
 {
     internal class PairToken : TokenClass, IPair, ISmartDumpToken
     {
-        [IsDumpEnabled(false)]
+        [DisableDump]
         bool IPair.IsVariablesProvider { get { return true; } }
 
         string IPair.SmartDump(ParsedSyntax left, ParsedSyntax right) { return SmartDump(left, right); }
         ParsedSyntax IPair.IsolateClause(string variable, ParsedSyntax left, ParsedSyntax right) { return IsolateClause(variable, left, right); }
         ParsedSyntax IPair.Pair(ParsedSyntax left, ParsedSyntax right) { return Syntax(left, null, right); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         bool ISmartDumpToken.IsIgnoreSignSituation { get { return false; } }
 
         string ISmartDumpToken.SmartDumpListDelim(ParsedSyntax parsedSyntax, bool isFirst)

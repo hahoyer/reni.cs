@@ -22,7 +22,7 @@ namespace Reni.Code.ReplaceVisitor
             _actualArg = actualArg;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected CodeBase ActualArg { get { return _actualArg; } }
 
         protected abstract CodeBase Actual { get; }

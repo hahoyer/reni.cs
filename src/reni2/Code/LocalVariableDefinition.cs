@@ -17,16 +17,16 @@ namespace Reni.Code
             _valueSize = valueSize;
         }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal override Size InputSize { get { return _valueSize; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal string HolderName { get { return _holderName; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         public Size ValueSize { get { return _valueSize; } }
 
         public override string NodeDump { get { return base.NodeDump + " Holder=" + _holderName + " ValueSize=" + _valueSize; } }

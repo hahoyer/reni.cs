@@ -18,10 +18,10 @@ namespace Reni.Proof.TokenClasses
             return left.Associative(this, token, right);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         bool IAssociative.IsVariablesProvider { get { return true; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         ParsedSyntax IAssociative.Empty { get { return TrueSyntax.Instance; } }
 
         string IAssociative.SmartDump(Set<ParsedSyntax> set)
@@ -41,7 +41,7 @@ namespace Reni.Proof.TokenClasses
             return null;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         bool ISmartDumpToken.IsIgnoreSignSituation { get { return false; } }
 
         private string SmartDump(ParsedSyntax x, bool isWatched)

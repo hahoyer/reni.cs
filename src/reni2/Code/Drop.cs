@@ -20,13 +20,13 @@ namespace Reni.Code
 
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Drop(_beforeSize, _afterSize); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size InputSize { get { return _beforeSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size OutputSize { get { return _afterSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; } }
     }
 }

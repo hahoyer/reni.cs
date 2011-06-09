@@ -28,13 +28,13 @@ namespace Reni.Proof
             return result;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Set<string> Variables { get { return Target.Variables; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override bool IsNegative { get { return Target.IsNegative != Value.IsNegative; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override BigRational Factor { get { return Value*Target.Factor; } }
 
         internal override string SmartDump(ISmartDumpToken @operator) { return SmartDumpFactor(@operator) + Target.SmartDump(@operator); }

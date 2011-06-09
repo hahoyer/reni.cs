@@ -10,13 +10,13 @@ namespace Reni.Code
     [Serializable]
     internal sealed class Assign : FiberItem
     {
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private readonly RefAlignParam _refAlignParam;
 
         public override string NodeDump { get { return base.NodeDump + " TargetSize=" + _targetSize + " RefSize=" + _refAlignParam.RefSize; } }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Assign(_targetSize, _refAlignParam); }
 
-        [IsDumpEnabled(false), Node]
+        [DisableDump, Node]
         private readonly Size _targetSize;
 
         public Assign(RefAlignParam refAlignParam, Size targetSize)
@@ -25,10 +25,10 @@ namespace Reni.Code
             _targetSize = targetSize;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size InputSize { get { return _refAlignParam.RefSize*2; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
     }
 }

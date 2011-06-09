@@ -53,7 +53,7 @@ namespace Reni
         [Node]
         public List<IReferenceInCode> Data { get { return _data; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
 
         public int Count { get { return _data.Count; } }

@@ -11,7 +11,7 @@ namespace Reni.Code
     {
         private readonly Size _size;
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal readonly BitsConst Data;
 
         public BitArray(Size size, BitsConst data)
@@ -31,7 +31,7 @@ namespace Reni.Code
             return new[] {this};
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override bool IsEmpty { get { return Size.IsZero; } }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
@@ -39,7 +39,7 @@ namespace Reni.Code
         internal override BitsConst Evaluate() { return Data.Resize(_size); }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitsArray(Size, Data); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Data=" + Data; } }
 
         protected override string CSharpString() { return CSharpGenerator.CreateBitArray(GetSize(), Data); }

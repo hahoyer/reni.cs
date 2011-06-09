@@ -17,7 +17,7 @@ namespace Reni.Proof
 
         int IComparableEx<VariableSyntax>.CompareToEx(VariableSyntax other) { return Name.CompareTo(other.Name); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Set<string> Variables { get { return new Set<string> {Name}; } }
 
         internal override bool IsDistinct(ParsedSyntax other) { return IsDistinct((VariableSyntax) other); }

@@ -29,10 +29,10 @@ namespace Reni.Code
             StopByObjectId(-5);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size OutputSize { get { return _outputSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size InputSize { get { return _inputSize; } }
 
         internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
@@ -55,7 +55,7 @@ namespace Reni.Code
             return new BitArray(OutputSize, bitsConst);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " InputSize=" + InputSize + " InputDataSize=" + _inputDataSize; } }
 
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.BitCast(top, OutputSize, _inputDataSize); }

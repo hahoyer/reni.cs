@@ -13,7 +13,7 @@ namespace Reni.TokenClasses
 
         internal LeftParenthesis(int level) { _level = level; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal int Level { get { return _level; } }
 
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)

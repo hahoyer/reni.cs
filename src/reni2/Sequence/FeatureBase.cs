@@ -10,7 +10,7 @@ namespace Reni.Sequence
 {
     internal abstract class FeatureBase : ReniObject, ISearchPath<IFeature, Type.Sequence>
     {
-        [IsDumpEnabled(true)]
+        [EnableDump]
         protected internal readonly ISequenceOfBitBinaryOperation Definable;
 
         protected FeatureBase(ISequenceOfBitBinaryOperation definable) { Definable = definable; }

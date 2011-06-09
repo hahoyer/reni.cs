@@ -15,18 +15,18 @@ namespace Reni.Struct
     internal sealed class FunctionInstance : ReniObject
     {
         [Node]
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly TypeBase _args;
 
         [Node]
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly ICompileSyntax _body;
 
         [Node]
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly PositionContainerContext _context;
 
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly int _index;
 
         [Node]
@@ -51,7 +51,7 @@ namespace Reni.Struct
             _bodyCodeCache = new SimpleCache<CodeBase>(CreateBodyCode);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private Refs ForeignRefs
         {
             get
@@ -62,17 +62,17 @@ namespace Reni.Struct
             }
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
 
         internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
 
         [Node]
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private Size FrameSize { get { return _args.Size + ForeignRefs.Size; } }
 
         [Node]
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private string Description { get { return _body.DumpShort(); } }
 
         public Result CreateCall(Category category, Result args)

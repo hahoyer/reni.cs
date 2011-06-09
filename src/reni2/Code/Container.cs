@@ -22,10 +22,10 @@ namespace Reni.Code
         /// </summary>
         internal readonly bool IsInternal;
 
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly Size _frameSize;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private readonly CodeBase _data;
 
         public Container(CodeBase data, Size frameSize = null, string description = "", bool isInternal = false)
@@ -42,19 +42,19 @@ namespace Reni.Code
             IsInternal = false;
         }
 
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         internal CodeBase Data { get { return _data; } }
 
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         internal string Description { get { return _description; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal bool IsError { get { return _frameSize == null; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         public Size MaxSize { get { return _data.MaxSize; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
 
         private void DataAdd(FiberItem leafElement) { NotImplementedMethod(leafElement); }

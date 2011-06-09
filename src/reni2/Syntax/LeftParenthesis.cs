@@ -10,7 +10,7 @@ namespace Reni.Syntax
     {
         private readonly int _leftLevel;
 
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly ReniParser.ParsedSyntax _right;
 
         public LeftParenthesis(int leftLevel, TokenData token, ReniParser.ParsedSyntax right)

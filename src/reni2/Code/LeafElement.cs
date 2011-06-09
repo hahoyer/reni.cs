@@ -18,18 +18,18 @@ namespace Reni.Code
         protected LeafElement()
             : base(_nextId++) { }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal Size DeltaSize { get { return GetInputSize() - GetSize(); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual bool IsEmpty { get { return false; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal Size Size { get { return GetSize(); } }
 
         private string CommentDump { get { return GetType().Name + " " + ObjectId; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
         protected abstract Size GetSize();

@@ -16,28 +16,28 @@ namespace Reni.Code
         protected FiberItem()
             : this(_nextObjectId++) { }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal abstract Size InputSize { get; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal abstract Size OutputSize { get; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Size DeltaSize { get { return OutputSize - InputSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + DumpSignature; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Refs Refs { get { return GetRefsImplementation(); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal virtual bool HasArg { get { return false; } }
 
         internal string ReversePolish(Size top) { return CSharpCodeSnippet(top) + ";\n"; }

@@ -25,7 +25,7 @@ namespace Reni.Code
 
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump
         {
             get

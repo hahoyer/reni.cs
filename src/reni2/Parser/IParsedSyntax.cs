@@ -10,7 +10,7 @@ namespace Reni.Parser
     {
         // Helper methods
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         TokenData Token { get; }
 
         TokenData FirstToken { get; }

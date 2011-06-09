@@ -17,9 +17,9 @@ namespace Reni.Proof.TokenClasses
             return left.Associative(this, token, right);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         bool IAssociative.IsVariablesProvider { get { return true; } }
-        [IsDumpEnabled(false)]
+        [DisableDump]
         ParsedSyntax IAssociative.Empty { get { return TrueSyntax.Instance; } }
         AssociativeSyntax IAssociative.Syntax(TokenData token, Set<ParsedSyntax> x) { return new AndSyntax(this, token, x); }
         ParsedSyntax IAssociative.Combine(ParsedSyntax left, ParsedSyntax right) { return null; }
@@ -27,7 +27,7 @@ namespace Reni.Proof.TokenClasses
         string IAssociative.SmartDump(Set<ParsedSyntax> set) { return SmartDump(this, set); }
 
         string ISmartDumpToken.SmartDumpListDelim(ParsedSyntax parsedSyntax, bool isFirst) { return isFirst ? "" : " & "; }
-        [IsDumpEnabled(false)]
+        [DisableDump]
         bool ISmartDumpToken.IsIgnoreSignSituation { get { return false; } }
 
     }

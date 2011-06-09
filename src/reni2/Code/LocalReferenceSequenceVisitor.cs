@@ -13,7 +13,7 @@ namespace Reni.Code
     {
         private readonly SimpleCache<CodeBase> _codeCache;
 
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly List<LocalReference> _data = new List<LocalReference>();
 
         private static int _nextObjectId;
@@ -28,7 +28,7 @@ namespace Reni.Code
                 .ToLocalVariables(HolderNamePattern);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private CodeBase Code { get { return _codeCache.Value; } }
 
         private CodeBase DestructorCode

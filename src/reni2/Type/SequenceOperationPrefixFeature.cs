@@ -10,7 +10,7 @@ namespace Reni.Type
     [Serializable]
     internal class SequenceOperationPrefixFeature : ReniObject, ISearchPath<IPrefixFeature, Sequence>
     {
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly ISequenceOfBitPrefixOperation _definable;
 
         private readonly Bit _bit;

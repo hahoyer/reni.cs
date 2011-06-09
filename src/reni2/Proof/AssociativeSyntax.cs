@@ -19,7 +19,7 @@ namespace Reni.Proof
             Set = set;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override sealed Set<string> Variables
         {
             get

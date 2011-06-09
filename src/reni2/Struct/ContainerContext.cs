@@ -26,13 +26,13 @@ namespace Reni.Struct
         internal Container Container { get { return _container; } }
         internal ContextBase Parent { get { return _parent; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal RefAlignParam RefAlignParam { get { return _parent.RefAlignParam; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal int IndexSize { get { return _container.IndexSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Root RootContext { get { return _parent.RootContext; } }
 
         internal PositionContainerContext SpawnPositionContainerContext(int position) { return _positionContainerContextsCache.Find(position); }

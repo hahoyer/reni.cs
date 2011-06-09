@@ -12,7 +12,7 @@ namespace Reni.Proof
         public IntegerSyntax(TokenData token)
             : base(token) { }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Set<string> Variables { get { return new Set<string>(); } }
 
         internal override string SmartDump(ISmartDumpToken @operator) { return Token.Name; }

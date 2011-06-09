@@ -9,7 +9,7 @@ namespace Reni.Type
     [Serializable]
     internal sealed class TypeType : TypeBase
     {
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly TypeBase _value;
 
         private readonly IFunctionalFeature _functionalFeature;

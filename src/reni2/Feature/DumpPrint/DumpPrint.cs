@@ -50,7 +50,7 @@ namespace Reni.Feature.DumpPrint
 
     internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Reference>, IFeature
     {
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly Struct.Type _type;
 
         public StructReferenceFeature(Struct.Type type) { _type = type; }

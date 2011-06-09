@@ -26,10 +26,10 @@ namespace Reni.ReniParser
         [Node]
         internal Defineable TokenClass { get { return _tokenClass; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public string IconKey { get { return "Symbol"; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return Data.Name.Quote() + "." + ObjectId; } }
     }
 }

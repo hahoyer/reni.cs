@@ -18,7 +18,7 @@ namespace Reni.Proof
         internal NumberSyntax(BigRational value)
             : base(null) { Value = value; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Set<string> Variables { get { return new Set<string>(); } }
 
         internal override bool IsDistinct(ParsedSyntax other) { throw new NotImplementedException(); }

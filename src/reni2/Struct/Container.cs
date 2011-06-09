@@ -77,7 +77,7 @@ namespace Reni.Struct
 
         internal override ICompileSyntax ToCompiledSyntax() { return this; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal int IndexSize { get { return BitsConst.AutoSize(List.Length); } }
 
         internal override string DumpShort() { return "container." + ObjectId; }

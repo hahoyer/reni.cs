@@ -8,7 +8,7 @@ namespace Reni.Code.ReplaceVisitor
 {
     internal sealed class ReplaceRelRefArg : ReplaceArg
     {
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly Size _offset;
 
         private ReplaceRelRefArg(CodeBase actual, Size offset)

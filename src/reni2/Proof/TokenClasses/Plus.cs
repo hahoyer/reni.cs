@@ -18,7 +18,7 @@ namespace Reni.Proof.TokenClasses
 
         bool IAssociative.IsVariablesProvider { get { return true; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         ParsedSyntax IAssociative.Empty { get { return new NumberSyntax(0); } }
 
         string IAssociative.SmartDump(Set<ParsedSyntax> set) { return SmartDump(this, set); }
@@ -31,7 +31,7 @@ namespace Reni.Proof.TokenClasses
             return numberSyntax != null && numberSyntax.Value == 0;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         bool ISmartDumpToken.IsIgnoreSignSituation { get { return true; } }
 
         string ISmartDumpToken.SmartDumpListDelim(ParsedSyntax parsedSyntax, bool isFirst)

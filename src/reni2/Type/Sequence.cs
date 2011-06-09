@@ -19,7 +19,7 @@ namespace Reni.Type
     {
         private readonly Array _inheritedType;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal readonly IFeature BitDumpPrintFeature;
 
         internal Result EnableCutFeature(Category category) { return new EnableCut(this).ArgResult(category); }
@@ -36,7 +36,7 @@ namespace Reni.Type
             StopByObjectId(-172);
         }
 
-        [IsDumpEnabled(false), UsedImplicitly]
+        [DisableDump, UsedImplicitly]
         internal Array InheritedType { get { return _inheritedType; } }
 
         protected override Size GetSize() { return _inheritedType.Size; }
@@ -45,10 +45,10 @@ namespace Reni.Type
 
         internal override int SequenceCount(TypeBase elementType) { return elementType == Element ? Count : 1; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal int Count { get { return _inheritedType.Count; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
         internal override string DumpShort() { return "(" + Element.DumpShort() + ")sequence(" + Count + ")"; }

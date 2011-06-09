@@ -22,21 +22,21 @@ namespace Reni.Code
             //StopByObjectId(0);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Holder=" + _holder + " Offset=" + _offset; } }
 
         protected override string CSharpString(Size top) { return CSharpGenerator.LocalVariableReference(top, Size, _holder, _offset); }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableReference(Size, _holder, _offset); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal string Holder { get { return _holder; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Size Offset { get { return _offset; } }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }

@@ -26,19 +26,19 @@ namespace Reni.Code
             StopByObjectId(-5);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Size DataSize { get { return _dataSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " DataSize=" + DataSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size InputSize { get { return RefAlignParam.RefSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size OutputSize { get { return _outputSize; } }
 
         internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }

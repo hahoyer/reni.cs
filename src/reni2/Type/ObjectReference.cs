@@ -11,10 +11,10 @@ namespace Reni.Type
     {
         private static int _nextObjectId;
 
-        [IsDumpEnabled]
+        [EnableDump]
         private readonly TypeBase _objectType;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private readonly RefAlignParam _refAlignParam;
 
         public ObjectReference(TypeBase objectType, RefAlignParam refAlignParam)

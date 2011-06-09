@@ -22,10 +22,10 @@ namespace Reni.Context
 
         private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal FunctionList Functions { get { return _functions; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal CodeBase[] FunctionCode { get { return Functions.Code; } }
 
         internal Result CreateFunctionCall(PositionContainerContext context, Category category, ICompileSyntax body, Result argsResult)

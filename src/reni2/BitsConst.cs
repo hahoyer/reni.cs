@@ -112,7 +112,7 @@ namespace Reni
             return 0xff;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private BigInteger AsInteger { get { return _dataCache.Value; } }
 
         public static BitsConst Convert(int bytes, byte[] data, int position) { return new BitsConst(bytes, data, position); }
@@ -478,7 +478,7 @@ namespace Reni
 
         private sealed class MissingMethodException : Exception
         {
-            [IsDumpEnabled]
+            [EnableDump]
             private readonly string _operation;
 
             public MissingMethodException(string operation)

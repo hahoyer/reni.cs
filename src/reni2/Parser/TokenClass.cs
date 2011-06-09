@@ -31,12 +31,12 @@ namespace Reni.Parser
         protected virtual string PrioTableName(string name) { return Name; }
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return Name.Quote() + "." + ObjectId; } }
 
         public override string ToString() { return base.ToString() + " Name=" + _name.Quote(); }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         
         internal string Name { get { return _name; } set { _name = value; } }
     }

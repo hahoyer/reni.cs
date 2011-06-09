@@ -21,7 +21,7 @@ namespace Reni.Parser
 
         internal ITokenClass TokenClass { get { return _tokenClass; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public new string NodeDump { get { return ToString(); } }
 
         public override string ToString() { return Data.Source.FilePosn(Data.Name); }
@@ -29,7 +29,7 @@ namespace Reni.Parser
         public string ShortDump() { return Data.Name; }
         public override string DumpData() { return Data.Name; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal string PrioTableName { get { return TokenClass.PrioTableName(Data.Name); } }
 
         internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
@@ -48,13 +48,13 @@ namespace Reni.Parser
             _length = length;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal SourcePosn Source { get { return _source; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal int Length { get { return _length; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal string Name { get { return _source.SubString(0, _length); } }
 
         internal string FilePosition { get { return "\n" + Source.FilePosn(Name); } }

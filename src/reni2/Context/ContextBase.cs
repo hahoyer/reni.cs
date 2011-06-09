@@ -23,13 +23,13 @@ namespace Reni.Context
     {
         private static int _nextId;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private readonly CacheItems _cache;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private readonly ContextBase _parent;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private readonly IContextItem _contextItem;
 
         private ContextBase(ContextBase parent, IContextItem contextItem)
@@ -55,30 +55,30 @@ namespace Reni.Context
         internal ContextBase Parent { get { return _parent; } }
 
         [Node]
-        [IsDumpEnabled(false)]
+        [DisableDump]
         [UsedImplicitly]
         internal CacheItems Cache { get { return _cache; } }
 
         [Node]
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal RefAlignParam RefAlignParam { get { return ContextItem.RefAlignParam ?? Parent.RefAlignParam; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal int AlignBits { get { return RefAlignParam.AlignBits; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Size RefSize { get { return RefAlignParam.RefSize; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Root RootContext { get { return ContextItem as Root ?? Parent.RootContext; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private ContextBase[] ChildChain { get { return Cache.ChildChain ?? (Cache.ChildChain = ObtainChildChain()); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal PositionContainerContext FindRecentStructContext { get { return Cache.RecentStructContext.Value; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         private FunctionContext FindRecentFunctionContext { get { return Cache.RecentFunctionContext.Value; } }
 
         private ContextBase[] ObtainChildChain()
@@ -327,13 +327,13 @@ namespace Reni.Context
 
         internal sealed class CacheItems : ReniObject, IIconKeyProvider
         {
-            [IsDumpEnabled(false)]
+            [DisableDump]
             internal readonly SimpleCache<PositionContainerContext> RecentStructContext;
 
-            [IsDumpEnabled(false)]
+            [DisableDump]
             internal readonly SimpleCache<FunctionContext> RecentFunctionContext;
 
-            [IsDumpEnabled(false)]
+            [DisableDump]
             internal ContextBase[] ChildChain;
 
             [Node]
@@ -368,7 +368,7 @@ namespace Reni.Context
             ///     Gets the icon key.
             /// </summary>
             /// <value>The icon key.</value>
-            [IsDumpEnabled(false)]
+            [DisableDump]
             public string IconKey { get { return "Cache"; } }
         }
 

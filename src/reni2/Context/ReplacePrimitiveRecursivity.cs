@@ -11,7 +11,7 @@ namespace Reni.Context
     {
         private static int _nextObjectId;
 
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly int _functionIndex;
 
         public ReplacePrimitiveRecursivity(int functionIndex)

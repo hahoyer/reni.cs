@@ -21,7 +21,7 @@ namespace Reni.Proof
             Right = right;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Set<string> Variables
         {
             get

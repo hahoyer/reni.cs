@@ -36,7 +36,7 @@ namespace Reni
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         internal Category PendingCategory;
 
         public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
@@ -146,7 +146,7 @@ namespace Reni
             }
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal Refs SmartRefs
         {
             get

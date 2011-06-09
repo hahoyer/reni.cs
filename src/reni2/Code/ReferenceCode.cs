@@ -23,7 +23,7 @@ namespace Reni.Code
 
         internal IReferenceInCode Context { get { return _context; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
 
         protected override Refs GetRefsImplementation() { return Refs.Create(_context); }

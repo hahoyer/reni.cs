@@ -19,15 +19,15 @@ namespace Reni
 
         protected ReniObject(int nextObjectId) { _objectId = nextObjectId; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public virtual int ObjectId { get { return _objectId; } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public virtual string NodeDump { get { return DumpShort(); } }
 
         internal string DumpShort() { return GetType().FullName + "." + ObjectId; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal bool IsStopByObjectIdActive { get; private set; }
 
         protected override string Dump(bool isRecursion)

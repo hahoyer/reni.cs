@@ -34,10 +34,10 @@ namespace Reni.Type
 
     internal interface ISequenceOfBitPrefixOperation
     {
-        [IsDumpEnabled(false)]
+        [DisableDump]
         string CSharpNameOfDefaultOperation { get; }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         string DataFunctionName { get; }
 
         Result SequenceOperationResult(Category category, Size objSize);

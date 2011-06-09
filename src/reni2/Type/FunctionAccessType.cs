@@ -8,10 +8,10 @@ namespace Reni.Type
 {
     internal sealed class FunctionAccessType : TypeBase, IAccessType
     {
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly TypeBase _objectType;
 
-        [IsDumpEnabled(true)]
+        [EnableDump]
         private readonly IFunctionalFeature _functionalFeature;
 
         private static int _nextObjectId;

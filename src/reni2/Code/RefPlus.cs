@@ -15,13 +15,13 @@ namespace Reni.Code
     {
         private readonly RefAlignParam _refAlignParam;
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         private readonly Size _right;
 
-        [Node, IsDumpEnabled(false)]
+        [Node, DisableDump]
         private readonly string _reason;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         public RefPlus(RefAlignParam refAlignParam, Size right, string reason)
@@ -39,15 +39,15 @@ namespace Reni.Code
             Tracer.Assert(!_right.IsZero);
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Right=" + _right + " Reason=" + _reason; } }
 
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.RefPlus(GetSize(), _right); }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size InputSize { get { return GetSize(); } }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size OutputSize { get { return GetSize(); } }
 
         private Size GetSize() { return RefAlignParam.RefSize; }

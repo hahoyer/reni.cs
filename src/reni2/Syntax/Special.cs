@@ -18,7 +18,7 @@ namespace Reni.Syntax
     [Serializable]
     internal sealed class TerminalSyntax : SpecialSyntax
     {
-        [Node, IsDumpEnabled]
+        [Node, EnableDump]
         internal readonly ITerminal Terminal;
 
         public TerminalSyntax(TokenData token, ITerminal terminal)
@@ -37,10 +37,10 @@ namespace Reni.Syntax
     [Serializable]
     internal sealed class PrefixSyntax : SpecialSyntax
     {
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly IPrefix _prefix;
 
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly ICompileSyntax _right;
 
         public PrefixSyntax(TokenData token, IPrefix prefix, ICompileSyntax right)
@@ -64,13 +64,13 @@ namespace Reni.Syntax
     [Serializable]
     internal sealed class InfixSyntax : SpecialSyntax
     {
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly ICompileSyntax _left;
 
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly IInfix _infix;
 
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly ICompileSyntax _right;
 
         public InfixSyntax(TokenData token, ICompileSyntax left, IInfix infix, ICompileSyntax right)
@@ -94,10 +94,10 @@ namespace Reni.Syntax
 
     internal sealed class SuffixSyntax : SpecialSyntax
     {
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly ICompileSyntax _left;
 
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly ISuffix _suffix;
 
         internal SuffixSyntax(TokenData token, ICompileSyntax left, ISuffix suffix)

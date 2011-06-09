@@ -11,10 +11,10 @@ namespace Reni.Code
     [Serializable]
     internal abstract class BinaryOp : FiberItem
     {
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected internal readonly Size LeftSize;
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         protected internal readonly Size RightSize;
 
         protected BinaryOp(Size leftSize, Size rightSize)
@@ -23,7 +23,7 @@ namespace Reni.Code
             RightSize = rightSize;
         }
 
-        [IsDumpEnabled(false)]
+        [DisableDump]
         internal override Size InputSize { get { return LeftSize + RightSize; } }
     }
 }

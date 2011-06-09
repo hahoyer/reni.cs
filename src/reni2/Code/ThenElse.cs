@@ -73,7 +73,7 @@ namespace Reni.Code
 
     internal sealed class Else : FiberItem
     {
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly Size _thenSize;
 
         public Else(Size thenSize) { _thenSize = thenSize; }
@@ -114,10 +114,10 @@ namespace Reni.Code
     [Serializable]
     internal sealed class BitArrayOpThen : FiberItem
     {
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly BitArrayBinaryOp _bitArrayBinaryOp;
 
-        [Node, IsDumpEnabled(true)]
+        [Node, EnableDump]
         private readonly Then _thenCode;
 
         public BitArrayOpThen(Then thenCode, BitArrayBinaryOp bitArrayBinaryOp)
