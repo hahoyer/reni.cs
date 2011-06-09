@@ -50,7 +50,9 @@ namespace Reni.Type
 
         private ICompileSyntax Body { get { return _body; } }
 
-        internal string DumpPrintText { get { return _body.DumpShort() + "/\\"; } }
+        private new string DumpPrintText { get { return _body.DumpShort() + "/\\"; } }
+
+        internal override IFunctionalFeature FunctionalFeature() { return this; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -61,7 +63,7 @@ namespace Reni.Type
         internal Result DumpPrintResult(Category category)
         {
             return Void
-                .Result(category, () => CodeBase.DumpPrintText("_functionalFeature.DumpPrintText"));
+                .Result(category, () => CodeBase.DumpPrintText(DumpPrintText));
         }
     }
 }

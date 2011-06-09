@@ -17,7 +17,7 @@ namespace Reni.Context
         internal Root(FunctionList functions) { _functions = functions; }
 
         RefAlignParam IContextItem.RefAlignParam { get { return DefaultRefAlignParam; } }
-        Result IContextItem.CreateArgsReferenceResult(ContextBase contextBase, Category category) { return null; }
+        public Result CreateArgsReferenceResult(ContextBase contextBase, Category category) { return null; }
         void IContextItem.Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent) { }
 
         private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }

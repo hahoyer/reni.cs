@@ -9,7 +9,6 @@ namespace Reni.Context
     internal interface IContextItem  : IDumpShortProvider
     {
         RefAlignParam RefAlignParam { get; }
-        Result CreateArgsReferenceResult(ContextBase contextBase, Category category);
         void Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent);
     }
 }

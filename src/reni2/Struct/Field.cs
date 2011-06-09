@@ -76,7 +76,7 @@ namespace Reni.Struct
         }
 
         private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
-        private Size Offset { get { return _context.InnerOffset; } }
+        private Size Offset { get { return _context.StructSize; } }
         private Reference ValueTypeReference { get { return ValueType.Reference(RefAlignParam); } }
 
         private TypeBase GetValueType() { return _context.InnerType; }

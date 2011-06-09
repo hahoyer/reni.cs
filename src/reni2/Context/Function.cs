@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
+using HWClassLibrary.Helper;
 using Reni.Type;
 
 namespace Reni.Context
@@ -10,11 +10,17 @@ namespace Reni.Context
     [Serializable]
     internal sealed class Function : Child
     {
-        [Node]
-        internal readonly TypeBase ArgsType;
+        private readonly DictionaryEx<ContextBase, FunctionContext> _functionContexts;
+        private readonly TypeBase _argsType;
 
-        internal Function(TypeBase argsType) { ArgsType = argsType; }
+        internal Function(TypeBase argsType)
+        {
+            _argsType = argsType;
+            _functionContexts = new DictionaryEx<ContextBase, FunctionContext>(parent => new FunctionContext(this, parent));
+        }
 
-        protected override Result CreateArgsReferenceResult(ContextBase contextBase, Category category) { return ArgsType.ReferenceInCode(contextBase, category); }
+        internal TypeBase ArgsType { get { return _argsType; } }
+
+        internal FunctionContext SpawnFunctionContext(ContextBase parent) { return _functionContexts.Find(parent); }
     }
 }

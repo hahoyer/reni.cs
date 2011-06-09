@@ -46,16 +46,13 @@ namespace Reni.Struct
         internal ContextBase SpawnContext { get { return ContainerContext.SpawnContext(_position); } }
 
         [IsDumpEnabled(false)]
-        internal Root RootContext { get { return ContainerContext.RootContext; } }
-
-        [IsDumpEnabled(false)]
         internal Type ContextType { get { return _typeCache.Value; } }
 
         [IsDumpEnabled(false)]
         internal Reference ContextReferenceType { get { return ContextType.Reference(RefAlignParam); } }
 
         [IsDumpEnabled(false)]
-        internal Size StructSize { get { return ContainerContext.InnerSize(_position); } }
+        internal Size StructSize { get { return ContainerContext.InnerOffset(Position); } }
 
         [IsDumpEnabled(false)]
         internal Refs ConstructorRefs
@@ -75,13 +72,7 @@ namespace Reni.Struct
         internal RefAlignParam RefAlignParam { get { return ContainerContext.RefAlignParam; } }
 
         [IsDumpEnabled(false)]
-        internal TypeBase IndexType { get { return TypeBase.Number(IndexSize); } }
-
-        [IsDumpEnabled(false)]
-        private int IndexSize { get { return ContainerContext.IndexSize; } }
-
-        [IsDumpEnabled(false)]
-        internal Size InnerOffset { get { return ContainerContext.InnerOffset(Position); } }
+        internal TypeBase IndexType { get { return TypeBase.Number(ContainerContext.IndexSize); } }
 
         internal PositionFeature ToProperty(bool isProperty) { return isProperty ? _propertyFeatureCache.Value : _nonPropertyFeatureCache.Value; }
 
@@ -153,7 +144,7 @@ namespace Reni.Struct
 
         private Refs ContextRefs() { return Refs.Create(ReferenceInCode); }
 
-        internal Result CreateFunctionCall(Category category, ICompileSyntax body, Result argsResult) { return RootContext.CreateFunctionCall(this, category, body, argsResult); }
+        internal Result CreateFunctionCall(Category category, ICompileSyntax body, Result argsResult) { return ContainerContext.RootContext.CreateFunctionCall(this, category, body, argsResult); }
 
         internal Result PositionFeatureApply(Category category, bool isProperty, bool isContextFeature)
         {

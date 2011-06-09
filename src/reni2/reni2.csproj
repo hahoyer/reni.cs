@@ -84,6 +84,7 @@
     <Compile Include="CompilerParameters.cs" />
     <Compile Include="ContextSearchVisitor.cs" />
     <Compile Include="Context\ContextBase.cs" />
+    <Compile Include="Context\FunctionContext.cs" />
     <Compile Include="Context\FunctionList.cs" />
     <Compile Include="Context\IContextItem.cs" />
     <Compile Include="Context\IRootContext.cs" />

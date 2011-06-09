@@ -49,6 +49,11 @@ namespace Reni.Context
 
         internal static ContextBase CreateRoot(FunctionList functions) { return new ContextBase(null, new Root(functions)); }
 
+        [UsedImplicitly]
+        internal IContextItem ContextItem { get { return _contextItem; } }
+        [UsedImplicitly]
+        internal ContextBase Parent { get { return _parent; } }
+
         [Node]
         [IsDumpEnabled(false)]
         [UsedImplicitly]
@@ -56,10 +61,7 @@ namespace Reni.Context
 
         [Node]
         [IsDumpEnabled(false)]
-        internal RefAlignParam RefAlignParam { get { return _contextItem.RefAlignParam ?? Parent.RefAlignParam; } }
-
-        [Node]
-        internal ContextBase Parent { get { return _parent; } }
+        internal RefAlignParam RefAlignParam { get { return ContextItem.RefAlignParam ?? Parent.RefAlignParam; } }
 
         [IsDumpEnabled(false)]
         internal int AlignBits { get { return RefAlignParam.AlignBits; } }
@@ -68,13 +70,16 @@ namespace Reni.Context
         internal Size RefSize { get { return RefAlignParam.RefSize; } }
 
         [IsDumpEnabled(false)]
-        internal Root RootContext { get { return _contextItem as Root ?? _parent.RootContext; } }
+        internal Root RootContext { get { return ContextItem as Root ?? Parent.RootContext; } }
 
         [IsDumpEnabled(false)]
-        internal ContextBase[] ChildChain { get { return Cache.ChildChain ?? (Cache.ChildChain = ObtainChildChain()); } }
+        private ContextBase[] ChildChain { get { return Cache.ChildChain ?? (Cache.ChildChain = ObtainChildChain()); } }
 
         [IsDumpEnabled(false)]
         internal PositionContainerContext FindRecentStructContext { get { return Cache.RecentStructContext.Value; } }
+
+        [IsDumpEnabled(false)]
+        private FunctionContext FindRecentFunctionContext { get { return Cache.RecentFunctionContext.Value; } }
 
         private ContextBase[] ObtainChildChain()
         {
@@ -103,18 +108,14 @@ namespace Reni.Context
                 .Find(position);
         }
 
-        internal ContextBase SpawnStruct(Struct.Context context) { return SpawnStruct(context.Container, context.Position); }
-        internal ContextBase SpawnStruct(Struct.Container container) { return SpawnStruct(container, container.List.Length); }
-
         internal Result CreateArgsReferenceResult(Category category)
         {
-            var result = _contextItem.CreateArgsReferenceResult(this, category);
-            return result ?? Parent.CreateArgsReferenceResult(category);
+            return FindRecentFunctionContext.CreateArgsReferenceResult(category);
         }
 
         internal void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
-            _contextItem.Search(searchVisitor, Parent);
+            ContextItem.Search(searchVisitor, Parent);
             if(searchVisitor.IsSuccessFull)
                 return;
             if(Parent != null)
@@ -196,10 +197,18 @@ namespace Reni.Context
 
         private PositionContainerContext ObtainRecentStructContext()
         {
-            var result = _contextItem as Struct.Context;
+            var result = ContextItem as Struct.Context;
             if(result != null)
                 return result.Container.SpawnContainerContext(Parent).SpawnPositionContainerContext(result.Position);
             return Parent.ObtainRecentStructContext();
+        }
+
+        private FunctionContext ObtainRecentFunctionContext()
+        {
+            var result = ContextItem as Function;
+            if (result != null)
+                return result.SpawnFunctionContext(Parent);
+            return Parent.ObtainRecentFunctionContext();
         }
 
         internal Result AtTokenResult(Category category, ICompileSyntax left, ICompileSyntax right)
@@ -282,7 +291,7 @@ namespace Reni.Context
 
         internal Result PendingResult(Category category, ICompileSyntax syntax)
         {
-            if(_contextItem is PendingContext)
+            if(ContextItem is PendingContext)
             {
                 var result = syntax.Result(this, category);
                 Tracer.Assert(result.CompleteCategory == category);
@@ -293,7 +302,7 @@ namespace Reni.Context
 
         private Result CommonResult(Category category, CondSyntax condSyntax)
         {
-            if(!(_contextItem is PendingContext))
+            if(!(ContextItem is PendingContext))
                 return condSyntax.CommonResult(this, category);
 
             if(category <= Parent.PendingCategory(condSyntax))
@@ -320,6 +329,9 @@ namespace Reni.Context
         {
             [IsDumpEnabled(false)]
             internal readonly SimpleCache<PositionContainerContext> RecentStructContext;
+
+            [IsDumpEnabled(false)]
+            internal readonly SimpleCache<FunctionContext> RecentFunctionContext;
 
             [IsDumpEnabled(false)]
             internal ContextBase[] ChildChain;
@@ -349,6 +361,7 @@ namespace Reni.Context
                 FunctionInstances = new DictionaryEx<TypeBase, ContextBase>(args => new ContextBase(parent, new Function(args)));
                 PendingContext = new SimpleCache<ContextBase>(() => new ContextBase(parent, new PendingContext()));
                 RecentStructContext = new SimpleCache<PositionContainerContext>(parent.ObtainRecentStructContext);
+                RecentFunctionContext = new SimpleCache<FunctionContext>(parent.ObtainRecentFunctionContext);
             }
 
             /// <summary>
