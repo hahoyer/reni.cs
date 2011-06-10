@@ -254,10 +254,10 @@ namespace Reni.Context
 
         private Result SuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
-            var trace = ObjectId == -5 && defineable.ObjectId == 4 && category.HasCode;
+            var trace = ObjectId == 4 && defineable.ObjectId == 25 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, left, defineable);
             var suffixResult = Type(left)
-                .GetSuffixResult(category, defineable);
+                .SuffixResult(category, defineable);
             if(suffixResult == null)
             {
                 NotImplementedMethod(category, left, defineable);

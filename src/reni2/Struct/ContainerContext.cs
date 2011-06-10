@@ -40,5 +40,6 @@ namespace Reni.Struct
         internal Size InnerSize(int position) { return _container.InnerSize(_parent, position); }
         internal TypeBase InnerType(int position) { return _container.InnerType(_parent, position); }
         internal Size InnerOffset(int position) { return Container.InnerResult(Category.Size, Parent, 0, position).Size; }
+        internal bool IsLambda(int position) { return Container.IsLambda(position); }
     }
 }

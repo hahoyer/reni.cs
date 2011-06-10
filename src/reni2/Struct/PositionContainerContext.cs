@@ -23,7 +23,7 @@ namespace Reni.Struct
 
         private readonly SimpleCache<Type> _typeCache;
 
-        private readonly SimpleCache<Field> _fieldCache;
+        private readonly SimpleCache<IAccessObject> _accessObjectCache;
 
         internal PositionContainerContext(ContainerContext containerContext, int position)
         {
@@ -31,7 +31,7 @@ namespace Reni.Struct
             _position = position;
             _functionalFeatureCache = new DictionaryEx<ICompileSyntax, FunctionalFeatureType>(body => new FunctionalFeatureType(this, body));
             _typeCache = new SimpleCache<Type>(() => new Type(this));
-            _fieldCache = new SimpleCache<Field>(() => new Field(this));
+            _accessObjectCache = new SimpleCache<IAccessObject>(GetAccessObject);
             _propertyFeatureCache = new SimpleCache<PositionFeature>(() => new PositionFeature(this, true));
             _nonPropertyFeatureCache = new SimpleCache<PositionFeature>(() => new PositionFeature(this, false));
         }
@@ -76,6 +76,8 @@ namespace Reni.Struct
 
         internal PositionFeature ToProperty(bool isProperty) { return isProperty ? _propertyFeatureCache.Value : _nonPropertyFeatureCache.Value; }
 
+        private IAccessObject SpawnAccessObject { get { return _accessObjectCache.Value; } }
+
         internal Result FunctionalResult(Category category, ICompileSyntax body)
         {
             return _functionalFeatureCache
@@ -100,6 +102,7 @@ namespace Reni.Struct
                 .AddToReference(category, RefAlignParam, StructSize, "ContextReferenceAsArg");
         }
 
+        [Obsolete("", true)]
         internal Result AccessResultFromArg(Category category, int position)
         {
             return ContainerContext.SpawnContext(position)
@@ -107,19 +110,19 @@ namespace Reni.Struct
                 .AccessResultFromArg(category);
         }
 
-        internal Result AccessResultFromArg(Category category)
+        [Obsolete("",true)]
+        private Result AccessResultFromArg(Category category)
         {
             var accessResult = AccessResult(category);
             return accessResult
                 .ReplaceAbsolute(ReferenceInCode, () => ContextReferenceAsArg(accessResult.CompleteCategory));
         }
 
-        private Field SpawnField { get { return _fieldCache.Value; } }
-
         private Result AccessResult(Category category)
         {
             var thisResult = ThisReferenceResult(category | Category.Type);
-            return SpawnField
+            return SpawnAccessObject
+                .ValueTypeReference
                 .Result(category)
                 .ReplaceArg(thisResult);
         }
@@ -180,5 +183,33 @@ namespace Reni.Struct
 
         private CodeBase CreateRefArgCode() { return ContextType.Reference(RefAlignParam).ArgCode(); }
 
+        private IAccessObject GetAccessObject()
+        {
+            if(IsLambda)
+                return new Functional(this);
+            if (ContainerContext.InnerSize(Position).IsZero)
+                return null;
+            return new Field(this);
+        }
+
+        private bool IsLambda
+        {
+            get { return ContainerContext.IsLambda(Position); } }
+    }
+
+    internal sealed class Functional : ReniObject, IAccessObject
+    {
+        private readonly PositionContainerContext _positionContainerContext;
+
+        public Functional(PositionContainerContext positionContainerContext)
+        {
+            _positionContainerContext = positionContainerContext;
+        }
+
+        Result IAccessObject.Result(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
     }
 }

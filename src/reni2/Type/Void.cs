@@ -21,6 +21,7 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "void"; } }
         internal override string DumpShort() { return "void"; }
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return false; }
+        [DisableDump]
         internal override bool IsVoid { get { return true; } }
     }
 }

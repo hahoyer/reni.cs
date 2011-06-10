@@ -107,6 +107,8 @@ namespace Reni.Syntax
             _suffix = suffix;
         }
 
+        protected override bool GetIsLambda() { return _suffix is TokenClasses.Function; }
+
         internal override Result Result(ContextBase context, Category category)
         {
             return _suffix

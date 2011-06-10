@@ -93,5 +93,11 @@ namespace Reni.Struct
             return result;
         }
 
+        internal CodeBase LocalCode()
+        {
+            return LocalReferenceCode(RefAlignParam)
+                .Dereference(RefAlignParam, Size);
+        }
+
     }
 }

@@ -29,6 +29,9 @@ namespace Reni.Syntax
         void ICompileSyntax.AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         TokenData ICompileSyntax.FirstToken { get { return GetFirstToken(); } }
         TokenData ICompileSyntax.LastToken { get { return GetLastToken(); } }
+        bool ICompileSyntax.IsLambda { get { return GetIsLambda(); } }
+
+        protected virtual bool GetIsLambda() { return false; }
 
         Result ICompileSyntax.Result(ContextBase context, Category category) { return Result(context, category); }
 

@@ -15,7 +15,7 @@ namespace Reni.Code
         [Node]
         private readonly CodeBase _unalignedCode;
 
-        [Node]
+        [Node, DisableDump]
         internal readonly CodeBase DestructorCode;
 
         public LocalReference(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
@@ -32,13 +32,16 @@ namespace Reni.Code
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
         bool IReferenceInCode.IsChildOf(ContextBase contextBase) { return false; }
 
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
+        [DisableDump]
         internal override bool IsRelativeReference { get { return false; } }
 
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         internal CodeBase Code { get { return _unalignedCode.Align(RefAlignParam.AlignBits); } }
+
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
 
         internal CodeBase AccompayningDestructorCode(ref Size size, string holder)
         {

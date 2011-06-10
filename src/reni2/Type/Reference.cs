@@ -88,8 +88,6 @@ namespace Reni.Type
         protected override TypeBase Dereference() { return ValueType; }
         protected override Result DereferenceResult(Category category) { return DereferencedArgResult(category); }
 
-        internal CodeBase LocalReferenceCode() { return LocalReferenceCode(RefAlignParam).Dereference(RefAlignParam, Size); }
-
         private Result DereferencedArgResult(Category category) { return _valueType.Result(category, DereferencedArgCode); }
         private CodeBase DereferencedArgCode() { return CodeBase.Arg(Size).Dereference(RefAlignParam, _valueType.Size); }
 

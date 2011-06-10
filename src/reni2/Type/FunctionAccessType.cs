@@ -6,7 +6,7 @@ using Reni.Code;
 
 namespace Reni.Type
 {
-    internal sealed class FunctionAccessType : TypeBase, IAccessType
+    internal sealed class FunctionAccessType : TypeBase, IAccessObject
     {
         [EnableDump]
         private readonly TypeBase _objectType;
@@ -25,7 +25,7 @@ namespace Reni.Type
             StopByObjectId(-325);
         }
 
-        Result IAccessType.Result(Category category) { return ArgResult(category); }
+        Result IAccessObject.Result(Category category) { return ArgResult(category); }
 
         protected override Size GetSize() { return _objectType.Size; }
         internal override string DumpPrintText { get { return _functionalFeature.DumpShort(); } }

@@ -131,7 +131,7 @@ namespace Reni.Type
         internal Result ArgResult(Category category) { return Result(category, ArgCode); }
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
-        internal Result GenericDumpPrint(Category category) { return GetSuffixResult(category, new Token()); }
+        internal Result GenericDumpPrint(Category category) { return SuffixResult(category, new Token()); }
         internal CodeBase ArgCode() { return CodeBase.Arg(Size); }
 
         internal Result AutomaticDereferenceResult(Category category)
@@ -286,7 +286,7 @@ namespace Reni.Type
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        private Result GetUnaryResult<TFeature>(Category category, Defineable defineable)
+        private Result UnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
             var trace = ObjectId == -5 && defineable.ObjectId == 4; // && category.HasCode;
@@ -309,9 +309,9 @@ namespace Reni.Type
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
-        internal Result GetSuffixResult(Category category, Defineable defineable) { return GetUnaryResult<IFeature>(category, defineable); }
+        internal Result SuffixResult(Category category, Defineable defineable) { return UnaryResult<IFeature>(category, defineable); }
 
-        internal Result PrefixResult(Category category, Defineable defineable) { return GetUnaryResult<IPrefixFeature>(category, defineable); }
+        internal Result PrefixResult(Category category, Defineable defineable) { return UnaryResult<IPrefixFeature>(category, defineable); }
 
         internal virtual PositionContainerContext GetStruct()
         {
@@ -399,7 +399,7 @@ namespace Reni.Type
         }
     }
 
-    internal interface IAccessType
+    internal interface IAccessObject
     {
         Result Result(Category category);
     }

@@ -9,7 +9,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Field : TypeBase, IAccessType
+    internal sealed class Field : ReniObject, IAccessObject, IDumpShortProvider
     {
         [EnableDump]
         private readonly PositionContainerContext _context;
@@ -22,52 +22,57 @@ namespace Reni.Struct
             _valueTypeCache = new SimpleCache<TypeBase>(GetValueType);
         }
 
-        private int Position { get { return _context.Position; } }
+        Result IAccessObject.Result(Category category) { return AccessResult(category); }
+        string IDumpShortProvider.DumpShort() { return String.Format("type(this at {0})", Position); }
+
+        private PositionContainerContext Context { get { return _context; } }
+        private int Position { get { return Context.Position; } }
+        private TypeBase ValueType { get { return _valueTypeCache.Value; } }
+        internal Reference ValueTypeReference { get { return ValueType.Reference(RefAlignParam); } }
+        private RefAlignParam RefAlignParam { get { return Context.RefAlignParam; } }
+        private Size Offset { get { return Context.StructSize; } }
+
+        internal void Search(ISearchVisitor searchVisitor)
+        {
+            ValueType.Search(searchVisitor.Child(this));
+            ValueType.Search(searchVisitor);
+        }
+
+        protected Result ConvertToImplementation(Category category, TypeBase dest)
+        {
+            var trace = ObjectId == -1 && category.HasCode;
+            StartMethodDump(trace, category, dest);
+            var resultForArg = AccessResult(category).ReplaceArg(LocalReference(category));
+            var result = ValueType
+                .Conversion(category, dest)
+                .ReplaceArg(resultForArg);
+            return ReturnMethodDumpWithBreak(trace, result);
+        }
+
+        protected TypeBase Dereference() { return ValueType; }
+        protected Result DereferenceResult(Category category) { return AccessResult(category); }
+        protected Size GetSize() { return RefAlignParam.RefSize; }
+        internal string DumpPrintText { get { return Context.DumpShort() + " AT " + Position; } }
+
+        internal bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return ValueType.IsConvertableTo(dest, conversionParameter); }
+        internal IFunctionalFeature FunctionalFeature() { return ValueType.FunctionalFeature(); }
+        internal int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
+        internal TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
         internal Result DumpPrintResult(Category category)
         {
             var refType = ValueTypeReference;
             var result = refType.GenericDumpPrint(category);
-            if(result.HasArg)
+            if (result.HasArg)
                 result = result.ReplaceArg(AccessResult(category));
             return result;
         }
 
-        private TypeBase ValueType { get { return _valueTypeCache.Value; } }
-
-        internal override void Search(ISearchVisitor searchVisitor)
-        {
-            ValueType.Search(searchVisitor.Child(this));
-            ValueType.Search(searchVisitor);
-            base.Search(searchVisitor);
-        }
-
-        protected override Result ConvertToImplementation(Category category, TypeBase dest)
-        {
-            var trace = ObjectId == -1 && category.HasCode;
-            StartMethodDump(trace, category, dest);
-            var resultForArg = AccessResult(category).ReplaceArg(LocalReference(category));
-            return ReturnMethodDumpWithBreak(trace, ValueType
-                                                        .Conversion(category, dest)
-                                                        .ReplaceArg(resultForArg));
-        }
-
         private Result LocalReference(Category category)
         {
-            return ArgResult(category | Category.Type)
+            return ValueType.ArgResult(category | Category.Type)
                 .LocalReferenceResult(RefAlignParam);
         }
-
-        protected override TypeBase Dereference() { return ValueType; }
-        protected override Result DereferenceResult(Category category) { return AccessResult(category); }
-        protected override Size GetSize() { return ValueType.Size; }
-        internal override string DumpShort() { return String.Format("type(this at {0})", Position); }
-
-        internal override string DumpPrintText { get { return _context.DumpShort() + " AT " + Position; } }
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return ValueType.IsConvertableTo(dest, conversionParameter); }
-        internal override IFunctionalFeature FunctionalFeature() { return ValueType.FunctionalFeature(); }
-        internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
-        internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
         private Result AccessResult(Category category)
         {
@@ -75,20 +80,15 @@ namespace Reni.Struct
                 .Result(category, GetAccessCode);
         }
 
-        private RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
-        private Size Offset { get { return _context.StructSize; } }
-        private Reference ValueTypeReference { get { return ValueType.Reference(RefAlignParam); } }
-
-        private TypeBase GetValueType() { return _context.InnerType; }
+        private TypeBase GetValueType() { return Context.InnerType; }
 
         private CodeBase GetAccessCode()
         {
-            return _context
-                .ContextReferenceType
-                .LocalReferenceCode()
+            return Context
+                .ContextType
+                .LocalCode()
                 .AddToReference(RefAlignParam, Offset, "GetAccessCode");
         }
 
-        Result IAccessType.Result(Category category) { return AccessResult(category); }
     }
 }

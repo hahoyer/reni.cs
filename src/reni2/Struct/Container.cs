@@ -233,6 +233,7 @@ namespace Reni.Struct
 
         internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, position).Size; }
         internal TypeBase InnerType(ContextBase parent, int position) { return InnerResult(Category.Type, parent, position).Type; }
+        public bool IsLambda(int position) { return List[position].IsLambda; }
     }
 
     internal interface IStructFeature

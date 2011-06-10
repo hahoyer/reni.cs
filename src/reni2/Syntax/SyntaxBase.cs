@@ -15,5 +15,6 @@ namespace Reni.Syntax
         void AddToCacheForDebug(ContextBase context, object cacheItem);
         TokenData FirstToken { get; }
         TokenData LastToken { get; }
+        bool IsLambda{ get; }
     }
 }
