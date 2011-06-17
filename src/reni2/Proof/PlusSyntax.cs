@@ -23,8 +23,6 @@ namespace Reni.Proof
             if(contains.Count() != 1)
             {
                 return null;
-                StartMethodDumpWithBreak(true, variable, otherSite, "contains", contains, "notContains", notContains);
-                return ReturnMethodDump<ParsedSyntax>(true, null);
             }
 
             return contains.First().IsolateFromSum(variable, otherSite.Minus(notContains));

@@ -21,6 +21,7 @@ namespace Reni.Code
             _offset = offset;
             _size = size;
             _dataSize = dataSize;
+            StopByObjectId(-48);
         }
 
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }

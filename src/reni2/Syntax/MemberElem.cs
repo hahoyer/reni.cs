@@ -30,7 +30,7 @@ namespace Reni.Syntax
             return Args.FilePosition();
         }
 
-        public string DumpShort()
+        internal override string DumpShort()
         {
             var result = "";
             if(DefineableToken != null)

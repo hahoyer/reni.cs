@@ -30,7 +30,7 @@ namespace Reni.Code
             _right = right;
             _reason = reason;
             AssertValid();
-            StopByObjectId(-124);
+            StopByObjectId(-10);
         }
 
         private void AssertValid()

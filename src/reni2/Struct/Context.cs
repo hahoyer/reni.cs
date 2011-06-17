@@ -2,16 +2,16 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.Feature;
 
 namespace Reni.Struct
 {
-    internal sealed class Context : Reni.Context.Child
+    internal sealed class Context : Child
     {
         private readonly int _position;
+
         [Node]
         internal readonly Container Container;
 
@@ -25,7 +25,7 @@ namespace Reni.Struct
 
         protected override void Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent)
         {
-            if (!searchVisitor.IsSuccessFull)
+            if(!searchVisitor.IsSuccessFull)
             {
                 searchVisitor.InternalResult =
                     Container
@@ -34,6 +34,5 @@ namespace Reni.Struct
             }
             base.Search(searchVisitor, parent);
         }
-
     }
 }

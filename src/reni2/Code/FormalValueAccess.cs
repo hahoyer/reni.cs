@@ -128,7 +128,7 @@ namespace Reni.Code
             return " " + (DumpShort() + "").Repeat(2*size - 1);
         }
 
-        protected abstract char DumpShort();
+        protected new abstract char DumpShort();
 
         string IFormalValue.Dump(int index, int size)
         {

@@ -33,7 +33,7 @@ namespace Reni.Struct
         internal ContainerContextObject ContainerContextObject { get { return AccessPoint.ContainerContextObject; } }
 
         [DisableDump]
-        private AccessPoint AccessPoint { get { return _accessPoint; } }
+        internal AccessPoint AccessPoint { get { return _accessPoint; } }
 
         protected override Size GetSize() { return AccessPoint.StructSize; }
 

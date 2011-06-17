@@ -75,8 +75,6 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        internal abstract string DumpShort();
-
         [DisableDump]
         internal virtual string DumpPrintText
         {

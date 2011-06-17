@@ -9,7 +9,7 @@ using Reni.Runtime;
 namespace Reni
 {
     [TestFixture]
-    public class TestGenerated
+    public sealed class TestGenerated
     {
         /// <summary>
         ///     Special test, will not work automatically.
@@ -26,10 +26,5 @@ namespace Reni
 #pragma warning restore 168
             BitsConst.OutStream = os;
         }
-    }
-
-    internal struct raw
-    {
-        public sbyte[] _data;
     }
 }

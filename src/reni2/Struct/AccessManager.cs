@@ -11,7 +11,7 @@ namespace Reni.Struct
         internal interface IAccessObject
         {
             Result AccessFromThisReference(Category category, AccessPoint accessPoint, int position);
-            AccessFeature ToProperty(ContainerContextObject containerContextObject, int position, bool isProperty);
+            Result AccessFromContextReference(Category category, AccessPoint accessPoint, int position);
         }
 
         private sealed class FunctionAccessObject: ReniObject, IAccessObject{
@@ -20,10 +20,9 @@ namespace Reni.Struct
                 NotImplementedMethod(category,accessPoint,position);
                 return null;
             }
-
-            AccessFeature IAccessObject.ToProperty(ContainerContextObject containerContextObject, int position, bool isProperty)
+            Result IAccessObject.AccessFromContextReference(Category category, AccessPoint accessPoint, int position)
             {
-                NotImplementedMethod(containerContextObject, position, isProperty);
+                NotImplementedMethod(category, accessPoint, position);
                 return null;
             }
         }
@@ -34,10 +33,9 @@ namespace Reni.Struct
             {
                 return accessPoint.ContainerContextObject.AccessFromThisReference(category, accessPoint.Position, position);
             }
-
-            AccessFeature IAccessObject.ToProperty(ContainerContextObject containerContextObject, int position, bool isProperty)
+            Result IAccessObject.AccessFromContextReference(Category category, AccessPoint accessPoint, int position)
             {
-                NotImplementedMethod(containerContextObject, position, isProperty);
+                NotImplementedMethod(category, accessPoint, position);
                 return null;
             }
         }
@@ -49,9 +47,9 @@ namespace Reni.Struct
                 NotImplementedMethod(category, accessPoint, position);
                 return null;
             }
-            AccessFeature IAccessObject.ToProperty(ContainerContextObject containerContextObject, int position, bool isProperty)
+            Result IAccessObject.AccessFromContextReference(Category category, AccessPoint accessPoint, int position)
             {
-                NotImplementedMethod(containerContextObject, position, isProperty);
+                NotImplementedMethod(category, accessPoint, position);
                 return null;
             }
         }
@@ -63,9 +61,9 @@ namespace Reni.Struct
                 NotImplementedMethod(category, accessPoint, position);
                 return null;
             }
-            AccessFeature IAccessObject.ToProperty(ContainerContextObject containerContextObject, int position, bool isProperty)
+            Result IAccessObject.AccessFromContextReference(Category category, AccessPoint accessPoint, int position)
             {
-                NotImplementedMethod(containerContextObject, position, isProperty);
+                NotImplementedMethod(category, accessPoint, position);
                 return null;
             }
         }

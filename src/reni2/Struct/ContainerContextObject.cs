@@ -42,6 +42,9 @@ namespace Reni.Struct
         [DisableDump]
         internal Root RootContext { get { return _parent.RootContext; } }
 
+        [DisableDump]
+        internal AccessPoint ToAccessPoint { get { return SpawnAccessPoint(_container.EndPosition); } }
+
         private int IndexSize { get { return _container.IndexSize; } }
 
         internal Result AccessFromThisReference(Category category, int accessPosition, int position)

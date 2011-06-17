@@ -80,6 +80,8 @@ namespace Reni
         {
             _typeBase = typeBase;
             _searchVisitor = searchVisitor;
+            if (_isFoundMode == true)
+                _isFoundMode = false;
         }
 
         public void SetSearchMode() { _isFoundMode = false; }

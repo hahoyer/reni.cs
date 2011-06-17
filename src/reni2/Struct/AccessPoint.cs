@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.TreeStructure;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -73,31 +72,38 @@ namespace Reni.Struct
                 .Result(category);
         }
 
-        internal ISearchPath<IFeature, AccessPointType> SearchFromRefToStruct(Defineable defineable) { return ContainerContextObject.Container.SearchFromRefToStruct(defineable); }
+        internal ISearchPath<IFeature, AccessPointType> SearchFromRefToStruct(Defineable defineable)
+        {
+            return ContainerContextObject
+                .Container
+                .SearchFromRefToStruct(defineable);
+        }
 
-        internal Result CreateFunctionCall(Category category, ICompileSyntax body, Result argsResult) { return ContainerContextObject.RootContext.CreateFunctionCall(this, category, body, argsResult); }
+        internal Result CreateFunctionCall(Category category, ICompileSyntax body, Result argsResult)
+        {
+            return ContainerContextObject
+                .RootContext
+                .CreateFunctionCall(this, category, body, argsResult);
+        }
 
         internal Result[] CreateArgCodes(Category category)
         {
             var result = new Result[Position];
-            var size = Size.Zero;
+            var offset = StructSize;
             for(var i = 0; i < Position; i++)
             {
-                result[i] = AutomaticDereference(ContainerContextObject.InnerType(i), size, category);
-                size += ContainerContextObject.InnerSize(i).Align(RefAlignParam.AlignBits);
+                offset -= ContainerContextObject.InnerSize(i).Align(RefAlignParam.AlignBits);
+                result[i] = AutomaticDereference(ContainerContextObject.InnerType(i), offset, category);
             }
             return result;
         }
 
-        internal Result Access(Category category, Result thisReferenceResult, Result rightResult)
-        {
-            return AccessFromThisReference(category, thisReferenceResult, rightResult.ConvertTo(IndexType).Evaluate().ToInt32());
-        }
+        internal Result Access(Category category, Result thisReferenceResult, Result rightResult) { return AccessFromThisReference(category, thisReferenceResult, rightResult.ConvertTo(IndexType).Evaluate().ToInt32()); }
 
         internal Result Access(Category category, int position, bool isProperty, bool isContextFeature)
         {
             var result = AccessFromContextReference(category, position, isProperty);
-            if (isContextFeature)
+            if(isContextFeature)
                 return result;
             return result.ReplaceAbsolute(ContainerContextObject, () => ContextReferenceFromThisReference(result.CompleteCategory - Category.Type));
         }
@@ -133,16 +139,13 @@ namespace Reni.Struct
                 .ReplaceArg(thisReferenceResult);
         }
 
-        private Result ContextReferenceFromThisReference(Category category)
-        {
-            return new Result(category, () => RefAlignParam.RefSize, ContextReferenceFromThisReferenceCode, Refs.None);
-        }
+        private Result ContextReferenceFromThisReference(Category category) { return new Result(category, () => RefAlignParam.RefSize, ContextReferenceFromThisReferenceCode, Refs.None); }
 
         private CodeBase ThisReferenceFromContextReferenceCode()
         {
             return CodeBase
                 .ReferenceInCode(ContainerContextObject)
-                .AddToReference(RefAlignParam, StructSize * -1, "ContextCode");
+                .AddToReference(RefAlignParam, StructSize*-1, "ContextCode");
         }
 
         private CodeBase ContextReferenceFromThisReferenceCode()

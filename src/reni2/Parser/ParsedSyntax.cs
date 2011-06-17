@@ -46,7 +46,7 @@ namespace Reni.Parser
         protected virtual TokenData GetFirstToken() { return Token; }
         protected virtual TokenData GetLastToken() { return Token; }
 
-        internal virtual string DumpShort() { return Token.Name; }
+        internal override string DumpShort() { return Token.Name; }
         protected virtual string FilePosition() { return Token.FilePosition; }
 
         [DisableDump, UsedImplicitly]

@@ -184,12 +184,15 @@ namespace Reni.Struct
             if(Dictionary.ContainsKey(name))
             {
                 var position = Dictionary[name];
-                return new StructFeature(position, Properties.Contains(position));
+                return new StructFeature(position);
             }
             return null;
         }
 
-        internal ISearchPath<IFeature, AccessPointType> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
+        internal ISearchPath<IFeature, AccessPointType> SearchFromRefToStruct(Defineable defineable)
+        {
+            return FindStructFeature(defineable.Name);
+        }
 
         internal ISearchPath<IContextFeature, ContainerContextObject> SearchFromStructContext(Defineable defineable)
         {
@@ -250,30 +253,23 @@ namespace Reni.Struct
     [Serializable]
     internal sealed class StructFeature : ReniObject, IStructFeature
     {
-        private readonly int _index;
-        private readonly bool _isProperty;
+        private readonly int _position;
 
-        public StructFeature(int index, bool isProperty)
+        public StructFeature(int position)
         {
-            _index = index;
-            _isProperty = isProperty;
+            _position = position;
         }
 
         IContextFeature ISearchPath<IContextFeature, ContainerContextObject>.Convert(ContainerContextObject contextObject)
         {
-            return Convert(contextObject);
+            return Convert(contextObject.ToAccessPoint);
         }
 
-        private AccessFeature Convert(ContainerContextObject contextObject)
-        {
-            return contextObject
-                .SpawnAccessObject(_index)
-                .ToProperty(contextObject, _index, _isProperty);
-        }
+        private AccessFeature Convert(AccessPoint contextObject) { return new AccessFeature(contextObject.ContainerContextObject.SpawnAccessObject(_position), contextObject, _position); }
 
         IFeature ISearchPath<IFeature, AccessPointType>.Convert(AccessPointType accessPointType)
         {
-            return Convert(accessPointType.ContainerContextObject);
+            return Convert(accessPointType.AccessPoint);
         }
     }
 }

@@ -7,71 +7,51 @@ using Reni.FeatureTest.BitArrayOp;
 
 namespace Reni.FeatureTest.Struct
 {
-    /// <summary>
-    ///     Structure, that is all between brackets
-    /// </summary>
     [TestFixture]
-    public sealed class OldStyle : CompilerTest
+    [TargetSet(@"((0, 1) _A_T_ 0) dump_print;", "0")]
+    [TargetSet(@"((0, 1, ) _A_T_ 0) dump_print;", "0")]
+    public sealed class AccessSimple : CompilerTest
     {
-        /// <summary>
-        ///     Access to elements of a structure.
-        /// </summary>
-        /// created 17.11.2006 20:43
         [Test]
-        public void AccessSimple() { CreateFileAndRunCompiler("AccessSimple", @"((0, 1) _A_T_ 0) dump_print;", "0"); }
+        public override void Run() { BaseRun(); }
+    }
 
-        /// <summary>
-        ///     Access to elements of a structure.
-        /// </summary>
-        /// created 17.11.2006 20:43
+    [TestFixture]
+    [AccessSimple]
+    [InnerAccess]
+    [TargetSet(@"((one: 1) one) dump_print;", "1")]
+    [TargetSet(@"((one: 1,) one) dump_print;", "1")]
+    [TargetSet(@"((0,one: 1) one) dump_print;", "1")]
+    [TargetSet(@"((0,one: 1,) one) dump_print;", "1")]
+    public sealed class StrangeStructs : CompilerTest
+    {
         [Test]
-        public void AccessSimpleAdditionalColon() { CreateFileAndRunCompiler("AccessSimpleAdditionalColon", @"((0, 1,) _A_T_ 0) dump_print;", "0"); }
+        public override void Run() { BaseRun(); }
+    }
 
-        /// <summary>
-        ///     Access to elements of a structure.
-        /// </summary>
-        /// created 17.11.2006 20:43
-        [Test]
-        public void StrangeStructs()
-        {
-            CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((one: 1) one) dump_print;", "1");
-            CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((one: 1,) one) dump_print;", "1");
-            CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((0,one: 1) one) dump_print;", "1");
-            CreateFileAndRunCompiler("AccessVarAdditionalColon", @"((0,one: 1,) one) dump_print;", "1");
-        }
-
-        /// <summary>
-        ///     Access to elements of a structure.
-        /// </summary>
-        /// created 17.11.2006 20:43
-        [Test]
-        public void Access()
-        {
-            CreateFileAndRunCompiler("Access",
-                                     @"
+    [TestFixture]
+    [AccessSimple]
+    [Target(@"
 ((0;1;2;300;) _A_T_ 0) dump_print;
 ((0;1;2;300;) _A_T_ 1) dump_print;
 ((0;1;2;300;) _A_T_ 2) dump_print;
 ((0;1;2;300;) _A_T_ 3) dump_print;
-"
-                                     , "012300"
-                );
-        }
-
-        /// <summary>
-        ///     Declaration and access to variables
-        /// </summary>
-        /// created 17.11.2006 20:44
+")]
+    [Output("012300")]
+    public sealed class Access : CompilerTest
+    {
         [Test]
-        public void DumpPrint()
-        {
-            CreateFileAndRunCompiler("DumpPrint",
-                                     @"(1, 2, 3, 4, 5, 6) dump_print",
-                                     "(1, 2, 3, 4, 5, 6)"
-                );
-        }
+        public override void Run() { BaseRun(); }
+    }
 
-        public override void Run() { }
+    [TestFixture]
+    [AccessSimple]
+    [Target(@"(1, 2, 3, 4, 5, 6) dump_print")]
+    [Output("(1, 2, 3, 4, 5, 6)")]
+    public sealed class DumpPrint : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
