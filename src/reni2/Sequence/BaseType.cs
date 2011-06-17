@@ -1,43 +1,45 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Sequence;
+using Reni.Type;
 
-namespace Reni.Type
+namespace Reni.Sequence
 {
-    /// <summary>
-    ///     Special array
-    /// </summary>
     [Serializable]
-    internal sealed class Sequence : TypeBase
+    internal sealed class BaseType : TypeBase
     {
-        private readonly Array _inheritedType;
+        private readonly Type.Array _inheritedType;
 
         [DisableDump]
         internal readonly IFeature BitDumpPrintFeature;
 
+        private readonly DictionaryEx<FunctionalFeature, TypeBase> _functionalTypeCache;
+
         internal Result EnableCutFeature(Category category) { return new EnableCut(this).ArgResult(category); }
 
-        internal IFeature Feature(FeatureBase featureBase) { return new Reni.Sequence.FunctionalFeature(this, featureBase); }
+        internal IFeature Feature(FeatureBase featureBase) { return new FunctionalFeature(this, featureBase); }
 
         internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
 
-        public Sequence(TypeBase elementType, int count)
+        public BaseType(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0, () => "count=" + count);
             _inheritedType = elementType.Array(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             StopByObjectId(-172);
+            _functionalTypeCache = new DictionaryEx<FunctionalFeature, TypeBase>(functionalFeature => new FunctionalType(this, functionalFeature));
         }
 
-        [DisableDump, UsedImplicitly]
-        internal Array InheritedType { get { return _inheritedType; } }
+        [DisableDump]
+        [UsedImplicitly]
+        internal Type.Array InheritedType { get { return _inheritedType; } }
+
+        internal TypeBase SpawnFunctionalType(FunctionalFeature functionalFeature) { return _functionalTypeCache.Find(functionalFeature); }
 
         protected override Size GetSize() { return _inheritedType.Size; }
 
@@ -48,14 +50,15 @@ namespace Reni.Type
         [DisableDump]
         internal int Count { get { return _inheritedType.Count; } }
 
-        [Node, DisableDump]
+        [Node]
+        [DisableDump]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
         internal override string DumpShort() { return "(" + Element.DumpShort() + ")sequence(" + Count + ")"; }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
-            var destSequence = dest as Sequence;
+            var destSequence = dest as BaseType;
             if(destSequence != null)
             {
                 if(conversionParameter.IsDisableCut && Count > destSequence.Count)
@@ -78,7 +81,7 @@ namespace Reni.Type
 
         protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
-            var result = ConvertTo(category, dest as Sequence);
+            var result = ConvertTo(category, dest as BaseType);
             if(result != null)
                 return result;
 
@@ -94,7 +97,7 @@ namespace Reni.Type
             return null;
         }
 
-        private Result ConvertTo(Category category, Sequence dest)
+        private Result ConvertTo(Category category, BaseType dest)
         {
             if(dest == null)
                 return null;
@@ -163,4 +166,5 @@ namespace Reni.Type
 
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
     }
+
 }

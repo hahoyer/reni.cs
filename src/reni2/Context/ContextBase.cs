@@ -45,8 +45,7 @@ namespace Reni.Context
         string IIconKeyProvider.IconKey { get { return "Context"; } }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        bool IReferenceInCode.IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
-
+        bool IReferenceInCode.IsChildOf(ContextBase parentCandidate) { return IsChildOf(parentCandidate); }
         internal static ContextBase CreateRoot(FunctionList functions) { return new ContextBase(null, new Root(functions)); }
 
         [UsedImplicitly]
@@ -67,19 +66,16 @@ namespace Reni.Context
         internal int AlignBits { get { return RefAlignParam.AlignBits; } }
 
         [DisableDump]
-        internal Size RefSize { get { return RefAlignParam.RefSize; } }
-
-        [DisableDump]
         internal Root RootContext { get { return ContextItem as Root ?? Parent.RootContext; } }
 
         [DisableDump]
         private ContextBase[] ChildChain { get { return Cache.ChildChain ?? (Cache.ChildChain = ObtainChildChain()); } }
 
         [DisableDump]
-        internal PositionContainerContext FindRecentStructContext { get { return Cache.RecentStructContext.Value; } }
+        internal AccessPoint FindRecentAccessPoint { get { return Cache.RecentAccessPoint.Value; } }
 
         [DisableDump]
-        private FunctionContext FindRecentFunctionContext { get { return Cache.RecentFunctionContext.Value; } }
+        private FunctionContextObject FindRecentFunctionContextObject { get { return Cache.RecentFunctionContextObject.Value; } }
 
         private ContextBase[] ObtainChildChain()
         {
@@ -91,6 +87,7 @@ namespace Reni.Context
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
+        internal bool IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
         internal ContextBase SpawnFunction(TypeBase args)
         {
             return _cache
@@ -110,7 +107,7 @@ namespace Reni.Context
 
         internal Result CreateArgsReferenceResult(Category category)
         {
-            return FindRecentFunctionContext.CreateArgsReferenceResult(category);
+            return FindRecentFunctionContextObject.CreateArgsReferenceResult(category);
         }
 
         internal void Search(SearchVisitor<IContextFeature> searchVisitor)
@@ -195,15 +192,15 @@ namespace Reni.Context
             return result.ConvertToAsRef(category, target);
         }
 
-        private PositionContainerContext ObtainRecentStructContext()
+        private AccessPoint ObtainRecentStructContext()
         {
             var result = ContextItem as Struct.Context;
             if(result != null)
-                return result.Container.SpawnContainerContext(Parent).SpawnPositionContainerContext(result.Position);
+                return result.Container.SpawnContainerContext(Parent).SpawnAccessPoint(result.Position);
             return Parent.ObtainRecentStructContext();
         }
 
-        private FunctionContext ObtainRecentFunctionContext()
+        private FunctionContextObject ObtainRecentFunctionContext()
         {
             var result = ContextItem as Function;
             if (result != null)
@@ -213,12 +210,12 @@ namespace Reni.Context
 
         internal Result AtTokenResult(Category category, ICompileSyntax left, ICompileSyntax right)
         {
-            var context = Type(left).GetStruct();
-            var position = Evaluate(right, context.IndexType).ToInt32();
-            var atResult = context.AccessResultFromArg(category, position);
-            var leftResult = ResultAsRef(category, left);
-            var result = atResult.ReplaceArg(leftResult);
-            return result;
+            var leftResultAsRef = ResultAsRef(category | Category.Type, left);
+            var rightResult = Result(Category.All, right);
+            return leftResultAsRef
+                .Type
+                .GetStructAccessPoint()
+                .Access(category, leftResultAsRef, rightResult);
         }
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
@@ -254,7 +251,7 @@ namespace Reni.Context
 
         private Result SuffixResult(Category category, ICompileSyntax left, Defineable defineable)
         {
-            var trace = ObjectId == 4 && defineable.ObjectId == 25 && category.HasCode;
+            var trace = ObjectId == -4 && defineable.ObjectId == 25 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, left, defineable);
             var suffixResult = Type(left)
                 .SuffixResult(category, defineable);
@@ -328,10 +325,10 @@ namespace Reni.Context
         internal sealed class CacheItems : ReniObject, IIconKeyProvider
         {
             [DisableDump]
-            internal readonly SimpleCache<PositionContainerContext> RecentStructContext;
+            internal readonly SimpleCache<AccessPoint> RecentAccessPoint;
 
             [DisableDump]
-            internal readonly SimpleCache<FunctionContext> RecentFunctionContext;
+            internal readonly SimpleCache<FunctionContextObject> RecentFunctionContextObject;
 
             [DisableDump]
             internal ContextBase[] ChildChain;
@@ -360,8 +357,8 @@ namespace Reni.Context
                         position => new ContextBase(parent, container.SpawnContext(position))));
                 FunctionInstances = new DictionaryEx<TypeBase, ContextBase>(args => new ContextBase(parent, new Function(args)));
                 PendingContext = new SimpleCache<ContextBase>(() => new ContextBase(parent, new PendingContext()));
-                RecentStructContext = new SimpleCache<PositionContainerContext>(parent.ObtainRecentStructContext);
-                RecentFunctionContext = new SimpleCache<FunctionContext>(parent.ObtainRecentFunctionContext);
+                RecentAccessPoint = new SimpleCache<AccessPoint>(parent.ObtainRecentStructContext);
+                RecentFunctionContextObject = new SimpleCache<FunctionContextObject>(parent.ObtainRecentFunctionContext);
             }
 
             /// <summary>
@@ -374,9 +371,12 @@ namespace Reni.Context
 
     }
 
-    internal sealed class ContextOperator : Defineable, ISearchPath<IFeature, FunctionAccessType>
+    internal sealed class ContextOperator : Defineable, ISearchPath<IFeature, TypeBase>
     {
-        IFeature ISearchPath<IFeature, FunctionAccessType>.Convert(FunctionAccessType type) { return new Feature.Feature(type.ContextOperatorFeatureApply); }
+        IFeature ISearchPath<IFeature, TypeBase>.Convert(TypeBase type)
+        {
+            return new Feature.Feature(type.ContextOperatorFeatureApply);
+        }
     }
 
     internal sealed class PendingContext : Child

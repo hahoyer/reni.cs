@@ -43,7 +43,7 @@ namespace Reni.Parser
                 new[] {LikeSyntax.Number(3)},
                 new[] {LikeSyntax.Declaration("x", 0)},
                 new int[] {},
-                new[] {"x"}
+                new[] {0}
                 );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!property x: 3", c => syntaxPrototype.AssertLike(c.Syntax));
@@ -56,7 +56,7 @@ namespace Reni.Parser
                 new[] {LikeSyntax.Number(3)},
                 new[] {LikeSyntax.Declaration("property", 0)},
                 new int[] {},
-                new[] {"property"}
+                new[] {0}
                 );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!property property: 3", c => syntaxPrototype.AssertLike(c.Syntax));
@@ -69,7 +69,7 @@ namespace Reni.Parser
                 new[] {LikeSyntax.Number(3)},
                 new Declaration[] {},
                 new[] {0},
-                new string[] {}
+                new int[] {}
                 );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3", c => syntaxPrototype.AssertLike(c.Syntax));
@@ -82,7 +82,7 @@ namespace Reni.Parser
                 new[] {LikeSyntax.Number(3), LikeSyntax.Number(4)},
                 new[] {LikeSyntax.Declaration("x", 1)},
                 new[] {0},
-                new[] {"x"}
+                new[] {1}
                 );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3; !property x: 4",

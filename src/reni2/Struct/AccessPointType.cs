@@ -11,33 +11,33 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Type : TypeBase
+    internal sealed class AccessPointType : TypeBase
     {
         private static int _nextObjectId;
-        private readonly PositionContainerContext _positionContainerContext;
+        private readonly AccessPoint _accessPoint;
 
         [DisableDump]
         internal readonly ISearchPath<IFeature, Reference> DumpPrintReferenceFeature;
 
-        internal Type(PositionContainerContext positionContainerContext)
+        internal AccessPointType(AccessPoint accessPoint)
             : base(_nextObjectId++)
         {
-            _positionContainerContext = positionContainerContext;
+            _accessPoint = accessPoint;
             DumpPrintReferenceFeature = new StructReferenceFeature(this);
         }
 
         [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return PositionContainerContext.RefAlignParam; } }
+        internal RefAlignParam RefAlignParam { get { return AccessPoint.RefAlignParam; } }
 
         [DisableDump]
-        internal ContainerContext ContainerContext { get { return PositionContainerContext.ContainerContext; } }
+        internal ContainerContextObject ContainerContextObject { get { return AccessPoint.ContainerContextObject; } }
 
         [DisableDump]
-        private PositionContainerContext PositionContainerContext { get { return _positionContainerContext; } }
+        private AccessPoint AccessPoint { get { return _accessPoint; } }
 
-        protected override Size GetSize() { return PositionContainerContext.StructSize; }
+        protected override Size GetSize() { return AccessPoint.StructSize; }
 
-        internal override string DumpShort() { return "type(" + PositionContainerContext.DumpShort() + ")"; }
+        internal override string DumpShort() { return "type(" + AccessPoint.DumpShort() + ")"; }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -45,7 +45,7 @@ namespace Reni.Struct
             if(searchVisitorChild != null && !searchVisitorChild.IsSuccessFull)
             {
                 searchVisitorChild.InternalResult =
-                    PositionContainerContext
+                    AccessPoint
                         .SearchFromRefToStruct(searchVisitorChild.Defineable)
                         .CheckedConvert(this);
             }
@@ -61,11 +61,11 @@ namespace Reni.Struct
                 (
                     category,
                     () => CodeBase.Arg(Size.Zero),
-                    () => PositionContainerContext.ConstructorRefs
+                    () => AccessPoint.ConstructorRefs
                 );
         }
 
-        internal override PositionContainerContext GetStruct() { return PositionContainerContext; }
+        internal override AccessPoint GetStructAccessPoint() { return AccessPoint; }
 
         internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
         {
@@ -77,8 +77,8 @@ namespace Reni.Struct
 
         internal Result DumpPrintResult(Category category)
         {
-            var argCodes = PositionContainerContext.CreateArgCodes(category);
-            var containerContext = PositionContainerContext.ContainerContext;
+            var argCodes = AccessPoint.CreateArgCodes(category);
+            var containerContext = AccessPoint.ContainerContextObject;
             var dumpPrint =
                 argCodes
                     .Select((code, i) => containerContext

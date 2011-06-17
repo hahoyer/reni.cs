@@ -5,12 +5,12 @@ using System;
 
 namespace Reni.Context
 {
-    internal sealed class FunctionContext
+    internal sealed class FunctionContextObject: ReniObject
     {
         private readonly Function _function;
         private readonly ContextBase _parent;
 
-        public FunctionContext(Function function, ContextBase parent)
+        public FunctionContextObject(Function function, ContextBase parent)
         {
             _function = function;
             _parent = parent;

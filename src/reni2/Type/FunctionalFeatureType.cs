@@ -13,10 +13,10 @@ namespace Reni.Type
     internal sealed class FunctionalFeatureType : TypeBase, IFunctionalFeature
     {
         private readonly ICompileSyntax _body;
-        private readonly PositionContainerContext _context;
+        private readonly AccessPoint _context;
         private static int _nextObjectId;
 
-        internal FunctionalFeatureType(PositionContainerContext context, ICompileSyntax body)
+        internal FunctionalFeatureType(AccessPoint context, ICompileSyntax body)
             : base(_nextObjectId++)
         {
             _context = context;
@@ -26,13 +26,6 @@ namespace Reni.Type
         protected override Size GetSize() { return Size.Zero; }
 
         internal override string DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _context.ObjectId + "#)#"; }
-
-        Result IFunctionalFeature.ContextOperatorFeatureApply(Category category)
-        {
-            return _context
-                .ContextReferenceType
-                .ArgResult(category);
-        }
 
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category)
         {

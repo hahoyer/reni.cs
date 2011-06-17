@@ -9,14 +9,14 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    internal class FunctionalFeature : ReniObject, IFeature, IFunctionalFeature
+    internal sealed class FunctionalFeature : ReniObject, IFeature, IFunctionalFeature
     {
-        private readonly Type.Sequence _parent;
+        private readonly BaseType _parent;
 
         [EnableDump]
         private readonly FeatureBase _feature;
 
-        protected internal FunctionalFeature(Type.Sequence parent, FeatureBase feature)
+        internal FunctionalFeature(BaseType parent, FeatureBase feature)
         {
             _parent = parent;
             _feature = feature;
@@ -25,7 +25,7 @@ namespace Reni.Sequence
         Result IFeature.Apply(Category category)
         {
             return _parent
-                .FunctionalType(this)
+                .SpawnFunctionalType(this)
                 .ArgResult(category);
         }
 
@@ -48,7 +48,6 @@ namespace Reni.Sequence
             return result.ReplaceArg(convertedObjectResult.CreateSequence(convertedArgsResult));
         }
 
-        Result IFunctionalFeature.ContextOperatorFeatureApply(Category category) { throw new NotImplementedException(); }
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
     }
 }

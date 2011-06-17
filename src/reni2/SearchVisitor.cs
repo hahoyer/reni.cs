@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using JetBrains.Annotations;
+using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -13,8 +14,7 @@ namespace Reni
     {
         void ISearchVisitor.Search() { SearchTypeBase(); }
         void ISearchVisitor.ChildSearch<TType>(TType target) { InternalChild(target).Search(); }
-        ISearchVisitor ISearchVisitor.Child(Type.Sequence target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Field target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(BaseType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(Reference target) { return InternalChild(target); }
         internal abstract void SearchTypeBase();
         protected abstract ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider;

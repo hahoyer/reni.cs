@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
-    internal class PrefixFeature : ReniObject, IFeature, IPrefixFeature
+    internal sealed class PrefixFeature : ReniObject, IFeature, IPrefixFeature
     {
-        private readonly Type.Sequence _parent;
+        private readonly BaseType _parent;
         private readonly ISequenceOfBitPrefixOperation _definable;
 
-        internal PrefixFeature(Type.Sequence parent, ISequenceOfBitPrefixOperation definable)
+        internal PrefixFeature(BaseType parent, ISequenceOfBitPrefixOperation definable)
         {
             _parent = parent;
             _definable = definable;
@@ -37,81 +35,5 @@ namespace Reni.Sequence
             return type.Result(category,
                                () => CodeBase.BitSequenceOperation(type.Size, _definable, objSize));
         }
-    }
-
-    internal sealed class Feature : FeatureBase
-    {
-        public Feature(ISequenceOfBitBinaryOperation definable)
-            : base(definable) { }
-
-        internal override TypeBase ResultType(int objSize, int argsSize) { return TypeBase.Number(Definable.ResultSize(objSize, argsSize)); }
-    }
-
-    internal sealed class CompareFeature : FeatureBase
-    {
-        public CompareFeature(ISequenceOfBitBinaryOperation definable)
-            : base(definable) { }
-
-        internal override TypeBase ResultType(int objSize, int argsSize) { return TypeBase.Bit; }
-    }
-
-    internal abstract class SequenceOfBitOperation :
-        Defineable,
-        ISearchPath<ISearchPath<IFeature, Type.Sequence>, Bit>,
-        ISequenceOfBitBinaryOperation
-    {
-        ISearchPath<IFeature, Type.Sequence> ISearchPath<ISearchPath<IFeature, Type.Sequence>, Bit>.Convert(Bit type)
-        {
-            if(IsCompareOperator)
-                return new CompareFeature(this);
-            return new Feature(this);
-        }
-
-        [DumpExcept(true)]
-        bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
-
-        [DisableDump]
-        string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }
-
-        [DisableDump]
-        string ISequenceOfBitBinaryOperation.CSharpNameOfDefaultOperation { get { return CSharpNameOfDefaultOperation; } }
-
-        int ISequenceOfBitBinaryOperation.ResultSize(int objBitCount, int argBitCount) { return ResultSize(objBitCount, argBitCount); }
-
-        protected abstract int ResultSize(int objSize, int argSize);
-
-        [DisableDump]
-        protected virtual string CSharpNameOfDefaultOperation { get { return Name; } }
-
-        [DumpExcept(true)]
-        protected virtual bool IsCompareOperator { get { return false; } }
-    }
-
-    internal sealed class Sign :
-        SequenceOfBitOperation,
-        ISearchPath<ISearchPath<IPrefixFeature, Type.Sequence>, Bit>,
-        ISequenceOfBitPrefixOperation
-    {
-        ISearchPath<IPrefixFeature, Type.Sequence> ISearchPath<ISearchPath<IPrefixFeature, Type.Sequence>, Bit>.Convert(Bit type) { return new SequenceOperationPrefixFeature(type, this); }
-
-        [DisableDump]
-        string ISequenceOfBitPrefixOperation.CSharpNameOfDefaultOperation { get { return Name; } }
-
-        [DisableDump]
-        string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
-
-        public Result SequenceOperationResult(Category category, Size objSize) { throw new NotImplementedException(); }
-
-        protected override int ResultSize(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
-    }
-
-    internal sealed class Star : SequenceOfBitOperation
-    {
-        protected override int ResultSize(int objSize, int argSize) { return BitsConst.MultiplySize(objSize, argSize); }
-    }
-
-    internal sealed class Slash : SequenceOfBitOperation
-    {
-        protected override int ResultSize(int objSize, int argSize) { return BitsConst.DivideSize(objSize, argSize); }
     }
 }

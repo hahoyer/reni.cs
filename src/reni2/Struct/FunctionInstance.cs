@@ -24,7 +24,7 @@ namespace Reni.Struct
 
         [Node]
         [EnableDump]
-        private readonly PositionContainerContext _context;
+        private readonly AccessPoint _context;
 
         [EnableDump]
         private readonly int _index;
@@ -40,7 +40,7 @@ namespace Reni.Struct
         /// <param name = "context">The context.</param>
         /// <param name = "args">The args.</param>
         /// created 03.01.2007 21:19
-        internal FunctionInstance(int index, ICompileSyntax body, PositionContainerContext context, TypeBase args)
+        internal FunctionInstance(int index, ICompileSyntax body, AccessPoint context, TypeBase args)
             : base(index)
         {
             StopByObjectId(-1);

@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
 using Reni.Context;
+using Reni.Sequence;
 using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
@@ -15,16 +16,16 @@ namespace Reni.Feature.DumpPrint
 
     internal sealed class BitSequenceFeature :
         ReniObject,
-        ISearchPath<IFeature, Type.Sequence>
+        ISearchPath<IFeature, BaseType>
     {
-        IFeature ISearchPath<IFeature, Type.Sequence>.Convert(Type.Sequence type) { return type.BitDumpPrintFeature; }
+        IFeature ISearchPath<IFeature, BaseType>.Convert(BaseType type) { return type.BitDumpPrintFeature; }
     }
 
     internal sealed class BitSequenceFeatureClass : BitFeatureBase, IFeature
     {
-        private readonly Type.Sequence _parent;
+        private readonly BaseType _parent;
 
-        public BitSequenceFeatureClass(Type.Sequence parent) { _parent = parent; }
+        public BitSequenceFeatureClass(BaseType parent) { _parent = parent; }
 
         Result IFeature.Apply(Category category)
         {
@@ -51,18 +52,18 @@ namespace Reni.Feature.DumpPrint
     internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Reference>, IFeature
     {
         [EnableDump]
-        private readonly Struct.Type _type;
+        private readonly Struct.AccessPointType _accessPointType;
 
-        public StructReferenceFeature(Struct.Type type) { _type = type; }
+        public StructReferenceFeature(Struct.AccessPointType accessPointType) { _accessPointType = accessPointType; }
 
         IFeature ISearchPath<IFeature, Reference>.Convert(Reference type)
         {
-            Tracer.Assert(type.RefAlignParam == _type.RefAlignParam);
+            Tracer.Assert(type.RefAlignParam == _accessPointType.RefAlignParam);
             return this;
         }
 
-        Result IFeature.Apply(Category category) { return _type.DumpPrintResult(category); }
+        Result IFeature.Apply(Category category) { return _accessPointType.DumpPrintResult(category); }
 
-        TypeBase IFeature.DefiningType() { return _type; }
+        TypeBase IFeature.DefiningType() { return _accessPointType; }
     }
 }

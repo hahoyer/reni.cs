@@ -31,23 +31,4 @@ namespace Reni.Type
 
         internal override string DumpShort() { return "bit"; }
     }
-
-    internal interface ISequenceOfBitPrefixOperation
-    {
-        [DisableDump]
-        string CSharpNameOfDefaultOperation { get; }
-
-        [DisableDump]
-        string DataFunctionName { get; }
-
-        Result SequenceOperationResult(Category category, Size objSize);
-    }
-
-    internal interface ISequenceOfBitBinaryOperation
-    {
-        int ResultSize(int objBitCount, int argBitCount);
-        bool IsCompareOperator { get; }
-        string DataFunctionName { get; }
-        string CSharpNameOfDefaultOperation { get; }
-    }
 }

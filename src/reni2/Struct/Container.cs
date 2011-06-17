@@ -27,17 +27,20 @@ namespace Reni.Struct
         private readonly ICompileSyntax[] _list;
         private readonly DictionaryEx<string, int> _dictionary;
         private readonly int[] _converters;
-        private readonly string[] _properties;
+        private readonly int[] _properties;
         private static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
         private static bool _isInsideFileDump;
         private static int _nextObjectId;
         private DictionaryEx<int, string> _reverseDictionaryCache;
         private readonly DictionaryEx<int, Context> _contextCache;
-        private readonly DictionaryEx<ContextBase, ContainerContext> _containerContextCache;
+        private readonly DictionaryEx<ContextBase, ContainerContextObject> _containerContextCache;
 
         [Node]
         internal ICompileSyntax[] List { get { return _list; } }
+
+        [DisableDump]
+        internal int EndPosition { get { return List.Length; } }
 
         [Node, SmartNode]
         internal DictionaryEx<string, int> Dictionary { get { return _dictionary; } }
@@ -46,13 +49,13 @@ namespace Reni.Struct
         internal int[] Converters { get { return _converters; } }
 
         [Node, SmartNode]
-        internal string[] Properties { get { return _properties; } }
+        internal int[] Properties { get { return _properties; } }
         
         protected override TokenData GetFirstToken() { return _firstToken; }
 
         protected override TokenData GetLastToken() { return _lastToken; }
 
-        private Container(TokenData leftToken, TokenData rightToken, ICompileSyntax[] list, DictionaryEx<string, int> dictionary, int[] converters, string[] properties)
+        private Container(TokenData leftToken, TokenData rightToken, ICompileSyntax[] list, DictionaryEx<string, int> dictionary, int[] converters, int[] properties)
             : base(leftToken,_nextObjectId++)
         {
             _firstToken = leftToken;
@@ -62,7 +65,7 @@ namespace Reni.Struct
             _converters = converters;
             _properties = properties;
             _contextCache = new DictionaryEx<int, Context>(position => new Context(this, position));
-            _containerContextCache = new DictionaryEx<ContextBase, ContainerContext>(parent => new ContainerContext(this, parent));
+            _containerContextCache = new DictionaryEx<ContextBase, ContainerContextObject>(parent => new ContainerContextObject(this, parent));
         }
 
         internal DictionaryEx<int, string> ReverseDictionary
@@ -94,7 +97,7 @@ namespace Reni.Struct
             private readonly List<ICompileSyntax> _list = new List<ICompileSyntax>();
             private readonly DictionaryEx<string, int> _dictionary = new DictionaryEx<string, int>();
             private readonly List<int> _converters = new List<int>();
-            private readonly List<string> _properties = new List<string>();
+            private readonly List<int> _properties = new List<int>();
 
             public void Add(IParsedSyntax parsedSyntax)
             {
@@ -104,7 +107,7 @@ namespace Reni.Struct
                     _dictionary.Add(d.Defineable.Name, _list.Count);
                     parsedSyntax = d.Definition;
                     if (d.IsProperty)
-                        _properties.Add(d.Defineable.Name);
+                        _properties.Add(_list.Count);
                 }
 
                 if (parsedSyntax is ConverterSyntax)
@@ -179,13 +182,16 @@ namespace Reni.Struct
         private IStructFeature FindStructFeature(string name)
         {
             if(Dictionary.ContainsKey(name))
-                return new StructFeature(Dictionary[name], Properties.Contains(name));
+            {
+                var position = Dictionary[name];
+                return new StructFeature(position, Properties.Contains(position));
+            }
             return null;
         }
 
-        internal ISearchPath<IFeature, Type> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
+        internal ISearchPath<IFeature, AccessPointType> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
 
-        internal ISearchPath<IContextFeature, ContainerContext> SearchFromStructContext(Defineable defineable)
+        internal ISearchPath<IContextFeature, ContainerContextObject> SearchFromStructContext(Defineable defineable)
         {
             return FindStructFeature(defineable.Name);
         }
@@ -193,11 +199,11 @@ namespace Reni.Struct
         internal override Result Result(ContextBase context, Category category)
         {
             var structContext = SpawnContext(context);
-            var internalResult = InnerResult(category - Category.Type, context, 0, List.Length)
+            var internalResult = InnerResult(category - Category.Type, context, 0, EndPosition)
                 .ReplaceRelative(structContext, () => CodeBase.TopRef(context.RefAlignParam, "Struct.Container.Result"));
             return structContext
-                .FindRecentStructContext
-                .ContextType
+                .FindRecentAccessPoint
+                .Type
                 .Result(category, internalResult);
         }
 
@@ -213,9 +219,9 @@ namespace Reni.Struct
 
         internal Context SpawnContext(int position) { return _contextCache.Find(position); }
         internal ContextBase SpawnContext(ContextBase parent, int position) { return parent.SpawnStruct(this, position); }
-        internal ContextBase SpawnContext(ContextBase parent) { return parent.SpawnStruct(this, List.Length); }
+        internal ContextBase SpawnContext(ContextBase parent) { return parent.SpawnStruct(this, EndPosition); }
 
-        internal ContainerContext SpawnContainerContext(ContextBase parent)
+        internal ContainerContextObject SpawnContainerContext(ContextBase parent)
         {
             return _containerContextCache.Find(parent);
         }
@@ -233,11 +239,12 @@ namespace Reni.Struct
 
         internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, position).Size; }
         internal TypeBase InnerType(ContextBase parent, int position) { return InnerResult(Category.Type, parent, position).Type; }
-        public bool IsLambda(int position) { return List[position].IsLambda; }
+        internal bool IsLambda(int position) { return List[position].IsLambda; }
+        internal bool IsProperty(int position) { return Properties.Contains(position); }
     }
 
     internal interface IStructFeature
-        : ISearchPath<IContextFeature, ContainerContext>, ISearchPath<IFeature, Type>
+        : ISearchPath<IContextFeature, ContainerContextObject>, ISearchPath<IFeature, AccessPointType>
     {}
 
     [Serializable]
@@ -252,19 +259,21 @@ namespace Reni.Struct
             _isProperty = isProperty;
         }
 
-        IContextFeature ISearchPath<IContextFeature, ContainerContext>.Convert(ContainerContext context)
+        IContextFeature ISearchPath<IContextFeature, ContainerContextObject>.Convert(ContainerContextObject contextObject)
         {
-            return context
-                .SpawnPositionContainerContext(_index)
-                .ToProperty(_isProperty);
+            return Convert(contextObject);
         }
 
-        IFeature ISearchPath<IFeature, Type>.Convert(Type type)
+        private AccessFeature Convert(ContainerContextObject contextObject)
         {
-            return type
-                .ContainerContext
-                .SpawnPositionContainerContext(_index)
-                .ToProperty(_isProperty);
+            return contextObject
+                .SpawnAccessObject(_index)
+                .ToProperty(contextObject, _index, _isProperty);
+        }
+
+        IFeature ISearchPath<IFeature, AccessPointType>.Convert(AccessPointType accessPointType)
+        {
+            return Convert(accessPointType.ContainerContextObject);
         }
     }
 }

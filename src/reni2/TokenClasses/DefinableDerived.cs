@@ -4,14 +4,15 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Sequence;
 using Reni.Type;
 
 
 namespace Reni.TokenClasses
 {
-    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, Type.Sequence>
+    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, BaseType>
     {
-        IFeature ISearchPath<IFeature, Type.Sequence>.Convert(Type.Sequence type) { return new Feature.Feature(type.EnableCutFeature); }
+        IFeature ISearchPath<IFeature, BaseType>.Convert(BaseType type) { return new Feature.Feature(type.EnableCutFeature); }
     }
 
     internal sealed class ConcatArrays : Defineable, ISearchPath<IFeature, Type.Array>

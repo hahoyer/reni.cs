@@ -28,7 +28,7 @@ namespace Reni.Context
         [DisableDump]
         internal CodeBase[] FunctionCode { get { return Functions.Code; } }
 
-        internal Result CreateFunctionCall(PositionContainerContext context, Category category, ICompileSyntax body, Result argsResult)
+        internal Result CreateFunctionCall(AccessPoint context, Category category, ICompileSyntax body, Result argsResult)
         {
             Tracer.Assert(argsResult.HasType);
             var functionInstance = Functions.Find(body, context, argsResult.Type);

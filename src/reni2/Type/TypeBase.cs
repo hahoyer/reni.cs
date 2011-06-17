@@ -10,6 +10,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
 
@@ -24,20 +25,18 @@ namespace Reni.Type
             public static readonly Void Void = new Void();
             public readonly DictionaryEx<int, Aligner> Aligners;
             public readonly DictionaryEx<int, Array> Arrays;
-            public readonly DictionaryEx<int, Sequence> Sequences;
+            public readonly DictionaryEx<int, BaseType> Sequences;
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
             public readonly DictionaryEx<RefAlignParam, Reference> References;
             public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
-            public readonly DictionaryEx<IFunctionalFeature, FunctionAccessType> FunctionalTypes;
             public readonly SimpleCache<TypeType> TypeTypeCache;
 
             public Cache(TypeBase parent)
             {
                 ObjectReferences = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(parent, refAlignParam));
-                FunctionalTypes = new DictionaryEx<IFunctionalFeature, FunctionAccessType>(feature => new FunctionAccessType(parent, feature));
                 References = new DictionaryEx<RefAlignParam, Reference>(refAlignParam => new Reference(parent, refAlignParam));
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
-                Sequences = new DictionaryEx<int, Sequence>(elementCount => new Sequence(parent, elementCount));
+                Sequences = new DictionaryEx<int, BaseType>(elementCount => new BaseType(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeTypeCache = new SimpleCache<TypeType>(() => new TypeType(parent));
@@ -113,8 +112,7 @@ namespace Reni.Type
         internal Array Array(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
         internal Reference Reference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
-        internal Sequence Sequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
-        internal FunctionAccessType FunctionalType(IFunctionalFeature feature) { return _cache.FunctionalTypes.Find(feature); }
+        internal BaseType Sequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         protected ObjectReference ObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
         internal static TypeBase Number(int bitCount) { return Bit.Sequence(bitCount); }
         internal virtual TypeBase AutomaticDereference() { return this; }
@@ -313,7 +311,7 @@ namespace Reni.Type
 
         internal Result PrefixResult(Category category, Defineable defineable) { return UnaryResult<IPrefixFeature>(category, defineable); }
 
-        internal virtual PositionContainerContext GetStruct()
+        internal virtual AccessPoint GetStructAccessPoint()
         {
             NotImplementedMethod();
             return null;
@@ -397,10 +395,11 @@ namespace Reni.Type
                 )
                 ;
         }
-    }
 
-    internal interface IAccessObject
-    {
-        Result Result(Category category);
+        virtual internal Result ContextOperatorFeatureApply(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
     }
 }

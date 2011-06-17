@@ -13,8 +13,8 @@ namespace Reni.TokenClasses
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
             return context
-                .FindRecentStructContext
-                .ThisReferenceResult(category);
+                .FindRecentAccessPoint
+                .ThisReferenceFromContextReferenceResult(category);
         }
     }
 }

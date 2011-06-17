@@ -603,8 +603,6 @@ namespace Reni
                 .LocalReferenceResult(CompleteCategory, refAlignParam)
                 .ReplaceArg(this);
         }
-
-        internal Result ReplaceContextReferenceByArg(PositionContainerContext context) { return ReplaceAbsolute(context.ReferenceInCode, () => context.ContextReferenceAsArg(CompleteCategory)); }
     }
 
     internal sealed class Error

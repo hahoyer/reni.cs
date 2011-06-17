@@ -15,6 +15,7 @@ namespace Reni.Type
         private readonly TypeBase _valueType;
         private readonly RefAlignParam _refAlignParam;
         private readonly AssignmentFeature _assignmentFeature;
+        private readonly DictionaryEx<AssignmentFeature, TypeBase> _functionalTypeCache;
 
         internal Reference(TypeBase valueType, RefAlignParam refAlignParam)
             : base(_nextObjectId++)
@@ -23,6 +24,7 @@ namespace Reni.Type
             _valueType = valueType;
             _refAlignParam = refAlignParam;
             _assignmentFeature = new AssignmentFeature(this);
+            _functionalTypeCache = new DictionaryEx<AssignmentFeature, TypeBase>(assignmentFeature => new FunctionalType(this, assignmentFeature));
         }
 
         internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
@@ -54,7 +56,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override PositionContainerContext GetStruct() { return _valueType.GetStruct(); }
+        internal override AccessPoint GetStructAccessPoint() { return _valueType.GetStructAccessPoint(); }
 
         protected override bool IsReferenceTo(TypeBase value) { return ValueType == value; }
 
@@ -97,6 +99,8 @@ namespace Reni.Type
                 .ArgResult(category);
         }
 
+        private TypeBase FunctionalType(AssignmentFeature assignmentFeature) { return _functionalTypeCache.Find(assignmentFeature); }
+
         internal Result ApplyAssignment(Category category, TypeBase argsType)
         {
             var result = Void
@@ -134,4 +138,27 @@ namespace Reni.Type
                 ;
         }
     }
+
+    internal sealed class FunctionalType : TypeBase
+    {
+        private readonly Reference _parent;
+        private readonly AssignmentFeature _functionalFeature;
+
+        public FunctionalType(Reference parent, AssignmentFeature functionalFeature) 
+        {
+            _parent = parent;
+            _functionalFeature = functionalFeature;
+        }
+
+        protected override Size GetSize()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
+        internal override string DumpShort() { return "(" + _parent.DumpShort() + " " + _functionalFeature.DumpShort() + ")"; }
+    }
+    
+    internal class FunctionalFeature
+    {}
 }
