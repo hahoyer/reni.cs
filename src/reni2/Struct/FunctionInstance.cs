@@ -101,7 +101,7 @@ namespace Reni.Struct
                 return null;
             var category = Category.Code;
             var refAlignParam = _context.SpawnContext.RefAlignParam;
-            var foreignRefsRef = CodeBase.FrameRef(refAlignParam, "FunctionInstance.CreateBodyCode");
+            var foreignRefsRef = CodeBase.FrameRef(refAlignParam);
             var visitResult = Result(category);
             var result = visitResult
                 .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
@@ -149,8 +149,8 @@ namespace Reni.Struct
         {
             var refAlignParam = _context.SpawnContext.RefAlignParam;
             return CodeBase
-                .FrameRef(refAlignParam, "FunctionInstance.CreateContextRefCode")
-                .AddToReference(refAlignParam, FrameSize*-1, "FunctionInstance.CreateContextRefCode");
+                .FrameRef(refAlignParam)
+                .AddToReference(refAlignParam, FrameSize*-1);
         }
 
         private TypeBase Type() { return Result(Category.Type).Type; }

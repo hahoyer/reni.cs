@@ -37,7 +37,7 @@ namespace Reni.Code.ReplaceVisitor
         {
             return new ReplaceRelativeContextRef<TContext>(
                 Context,
-                () => Replacement().AddToReference(Context.RefAlignParam, size, "After"));
+                () => Replacement().AddToReference(Context.RefAlignParam, size));
         }
     }
 

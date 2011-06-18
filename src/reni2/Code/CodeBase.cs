@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
@@ -10,22 +11,24 @@ using Reni.Type;
 namespace Reni.Code
 {
     [Serializable]
-    internal abstract class
-        CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
+    internal abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
     {
         protected CodeBase(int objectId)
             : base(objectId) { }
 
         protected CodeBase() { }
 
-        [Node, DisableDump]
-        
+        [Node]
+        [DisableDump]
         internal Size Size { get { return GetSize(); } }
 
-        [Node, DisableDump]
+        [Node]
+        [DisableDump]
         internal Size MaxSize { get { return MaxSizeImplementation; } }
 
-        [Node, DisableDump, SmartNode]
+        [Node]
+        [DisableDump]
+        [SmartNode]
         internal List<IReferenceInCode> RefsData { get { return Refs.Data; } }
 
         [DisableDump]
@@ -57,19 +60,31 @@ namespace Reni.Code
 
         internal CodeBase CreateThenElse(CodeBase thenCode, CodeBase elseCode) { return CreateFiber(new ThenElse(thenCode, elseCode)); }
 
-        internal static CodeBase TopRef(RefAlignParam refAlignParam, string reason) { return new TopRef(refAlignParam, reason); }
+        internal static CodeBase TopRef(RefAlignParam refAlignParam) { return new TopRef(refAlignParam, CallingMethodName); }
+
+        private static string CallingMethodName
+        {
+            get
+            {
+                if(Debugger.IsAttached)
+                    return Tracer.CallingMethodName(2);
+                return "";
+            }
+        }
 
         internal LocalReference LocalReference(RefAlignParam refAlignParam, CodeBase destructorCode) { return new LocalReference(refAlignParam, this, destructorCode); }
 
-        internal static CodeBase FrameRef(RefAlignParam refAlignParam, string reason) { return new TopFrameRef(refAlignParam, Size.Create(0), reason); }
+        internal static CodeBase FrameRef(RefAlignParam refAlignParam) { return new TopFrameRef(refAlignParam, Size.Create(0), CallingMethodName); }
 
         internal abstract CodeBase CreateFiber(FiberItem subsequentElement);
 
-        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right, string reason)
+        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right, string reason = "")
         {
             if(right.IsZero)
                 return this;
-            return CreateFiber(new RefPlus(refAlignParam, right, reason));
+            if (reason != "")
+                reason = "(" + reason + ")";
+            return CreateFiber(new RefPlus(refAlignParam, right, CallingMethodName + reason));
         }
 
         internal CodeBase Dereference(RefAlignParam refAlignParam, Size targetSize)
@@ -286,7 +301,7 @@ namespace Reni.Code
             {
                 Execute(new DataStack(functions, isTraceEnabled));
             }
-            catch (UnexpectedContextReference e)
+            catch(UnexpectedContextReference e)
             {
                 Tracer.AssertionFailed("", () => e.Message);
             }
@@ -310,10 +325,7 @@ namespace Reni.Code
     {
         internal static CodeBase ToSequence(this IEnumerable<CodeBase> x) { return x.Aggregate(CodeBase.Void(), (code, result) => code.Sequence(result)); }
 
-        internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern)
-        {
-            return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x)));
-        }
+        internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern) { return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x))); }
 
         private static CodeBase LocalVariableDefinition(string holderName, CodeBase value) { return value.CreateFiber(new LocalVariableDefinition(holderName, value.Size)); }
     }

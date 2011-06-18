@@ -81,5 +81,13 @@ namespace Reni.Struct
                 );
             return result;
         }
+
+        internal Result Result(Category category, Result innerResult)
+        {
+            var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam));
+            if (category.HasType)
+                result.Type = ToAccessPoint.Type;
+            return result;
+        }
     }
 }
