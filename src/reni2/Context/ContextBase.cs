@@ -205,6 +205,8 @@ namespace Reni.Context
             var result = ContextItem as Function;
             if (result != null)
                 return result.SpawnFunctionContext(Parent);
+            if (Parent == null)
+                return null;
             return Parent.ObtainRecentFunctionContext();
         }
 
@@ -220,7 +222,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -20 && category.HasCode;
+            var trace = defineable.ObjectId == 18 && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -228,28 +230,29 @@ namespace Reni.Context
 
             if(left == null && right != null)
             {
-                var prefixResult = Type(right)
-                    .PrefixResult(category, defineable);
-                if(prefixResult != null)
-                    return prefixResult.ReplaceArg(Result(category | Category.Type, right));
+                var prefixOperationResult = Type(right)
+                    .PrefixOperationResult(category, defineable);
+                if(prefixOperationResult != null)
+                    return prefixOperationResult.ReplaceArg(Result(category | Category.Type, right));
             }
 
-            var suffixResult =
+            var suffixOperationResult =
                 left == null
-                    ? ContextResult(categoryForFunctionals, defineable)
-                    : SuffixResult(categoryForFunctionals, left, defineable);
+                    ? ContextOperationResult(categoryForFunctionals, defineable)
+                    : SuffixOperationResult(categoryForFunctionals, left, defineable);
 
             if(right == null)
-                return ReturnMethodDumpWithBreak(trace, suffixResult);
+                return ReturnMethodDumpWithBreak(trace, suffixOperationResult);
 
-            var suffixType = suffixResult.Type;
-            DumpWithBreak(trace, "suffixResult", suffixResult);
-            var result = suffixType.Apply(category, rightCategory => ResultAsRef(rightCategory, right), RefAlignParam);
+            var suffixOperationType = suffixOperationResult.Type;
+            var rightResult = ResultAsRef(categoryForFunctionals, right);
+            DumpWithBreak(trace, "suffixOperationResult", suffixOperationResult, "rightResult", rightResult);
+            var result = suffixOperationType.Apply(category, rightResult, RefAlignParam);
             DumpWithBreak(trace, "result", result);
-            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixResult));
+            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixOperationResult));
         }
 
-        private Result SuffixResult(Category category, ICompileSyntax left, Defineable defineable)
+        private Result SuffixOperationResult(Category category, ICompileSyntax left, Defineable defineable)
         {
             var trace = ObjectId == -4 && defineable.ObjectId == 25 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, left, defineable);
@@ -274,7 +277,7 @@ namespace Reni.Context
             return visitor.Result;
         }
 
-        private Result ContextResult(Category category, Defineable defineable)
+        private Result ContextOperationResult(Category category, Defineable defineable)
         {
             var feature = SearchDefinable(defineable);
             if(feature == null)

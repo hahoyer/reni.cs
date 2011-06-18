@@ -13,10 +13,12 @@ namespace Reni.Type
         where TObjectType: TypeBase
         where TFeature: IFunctionalFeature
     {
+        private static int _nextObjectId;
         private readonly TObjectType _objectType;
         private readonly TFeature _functionalFeature;
 
         internal FunctionalFeatureType(TObjectType objectType, TFeature functionalFeature)
+            : base(_nextObjectId++)
         {
             _objectType = objectType;
             _functionalFeature = functionalFeature;

@@ -118,7 +118,7 @@ namespace Reni.Struct
         {
             return AccessFromContextReference(Category.Type, position)
                 .Type
-                .Apply(category, TypeBase.VoidResult, RefAlignParam);
+                .Apply(category, TypeBase.VoidResult(category), RefAlignParam);
         }
 
         private Result AccessFromContextReference(Category category, int position)
@@ -144,7 +144,7 @@ namespace Reni.Struct
         private CodeBase ThisReferenceFromContextReferenceCode()
         {
             return CodeBase
-                .ReferenceInCode(ContainerContextObject)
+                .ReferenceCode(ContainerContextObject)
                 .AddToReference(RefAlignParam, StructSize*-1, "ContextCode");
         }
 

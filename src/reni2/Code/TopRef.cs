@@ -9,8 +9,10 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopRef : Ref
     {
-        public TopRef(RefAlignParam refAlignParam, string reason)
-            : base(refAlignParam, Size.Zero, reason) { StopByObjectId(1160); }
+        public TopRef(RefAlignParam refAlignParam, string reason): base(refAlignParam, Size.Zero, reason)
+        {
+            StopByObjectId(21);
+        }
 
         protected override string CSharpString(Size top) { return CSharpGenerator.TopRef(top, Size); }
 

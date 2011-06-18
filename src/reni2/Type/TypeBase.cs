@@ -307,7 +307,7 @@ namespace Reni.Type
 
         internal Result SuffixResult(Category category, Defineable defineable) { return UnaryResult<IFeature>(category, defineable); }
 
-        internal Result PrefixResult(Category category, Defineable defineable) { return UnaryResult<IPrefixFeature>(category, defineable); }
+        internal Result PrefixOperationResult(Category category, Defineable defineable) { return UnaryResult<IPrefixFeature>(category, defineable); }
 
         internal virtual AccessPoint GetStructAccessPoint()
         {
@@ -315,17 +315,14 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result Apply(Category category, Func<Category, Result> right, RefAlignParam refAlignParam)
+        internal Result Apply(Category category, Result rightResult, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == 1 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category, right, refAlignParam);
+            StartMethodDumpWithBreak(trace, category, rightResult, refAlignParam);
             var functionalFeature = FunctionalFeature();
-            var apply = functionalFeature
-                .Apply(category, right(Category.Type).Type, refAlignParam);
-            var replaceArg = apply
-                .ReplaceArg(right(category));
-            var result = replaceArg
-                .ReplaceObjectRefByArg(refAlignParam, ObjectType());
+            var apply = functionalFeature.Apply(category, rightResult.Type, refAlignParam);
+            var replaceArg = apply.ReplaceArg(rightResult);
+            var result = replaceArg.ReplaceObjectRefByArg(refAlignParam, ObjectType());
             DumpWithBreak(trace, "functionalFeature", functionalFeature, "apply", apply, "replaceArg", replaceArg, "result", result);
             return ReturnMethodDump(trace, result);
         }
@@ -370,7 +367,7 @@ namespace Reni.Type
             return Reference(refAlignParam)
                 .Result(
                     category,
-                    () => CodeBase.ReferenceInCode(objectRef),
+                    () => CodeBase.ReferenceCode(objectRef),
                     () => Refs.Create(objectRef)
                 );
         }
@@ -388,7 +385,7 @@ namespace Reni.Type
                 .Result
                 (
                     category,
-                    () => CodeBase.ReferenceInCode(function),
+                    () => CodeBase.ReferenceCode(function),
                     () => Refs.Create(function)
                 )
                 ;

@@ -129,7 +129,7 @@ namespace Reni.Code
         internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
         internal static CodeBase Void() { return BitArray.Void(); }
         internal static CodeBase Arg(Size size) { return new Arg(size); }
-        internal static CodeBase ReferenceInCode(IReferenceInCode reference) { return new ReferenceCode(reference); }
+        internal static CodeBase ReferenceCode(IReferenceInCode reference) { return new ReferenceCode(reference); }
 
         internal CodeBase ReplaceArg(CodeBase argCode)
         {

@@ -121,7 +121,7 @@ namespace Reni.Type
             var destinationResult = Result
                 (
                     category,
-                    () => CodeBase.ReferenceInCode(objectRef),
+                    () => CodeBase.ReferenceCode(objectRef),
                     () => Refs.Create(objectRef)
                 );
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
@@ -133,7 +133,7 @@ namespace Reni.Type
             return Result
                 (
                     category,
-                    () => CodeBase.ReferenceInCode(function).Dereference(function.RefAlignParam, function.RefAlignParam.RefSize),
+                    () => CodeBase.ReferenceCode(function).Dereference(function.RefAlignParam, function.RefAlignParam.RefSize),
                     () => Refs.Create(function)
                 )
                 ;
