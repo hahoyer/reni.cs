@@ -30,7 +30,7 @@ namespace Reni.Struct
 
         TypeBase IFeature.DefiningType() { return _accessPoint.Type; }
 
-        Result IFeature.Apply(Category category) { return _accessObject.AccessFromThisReference(category, _accessPoint, _position); }
-        Result IContextFeature.Apply(Category category) { return _accessObject.AccessFromContextReference(category, _accessPoint, _position); }
+        Result IFeature.Apply(Category category) { return _accessObject.Access(category, _accessPoint, _position, false); }
+        Result IContextFeature.Apply(Category category) { return _accessObject.Access(category, _accessPoint, _position, true); }
     }
 }

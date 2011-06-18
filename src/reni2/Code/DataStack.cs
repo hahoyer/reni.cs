@@ -79,9 +79,24 @@ namespace Reni.Code
             Data = Data.Push(address);
         }
 
-        void IFormalMaschine.TopFrameData(Size offset, Size size, Size dataSize) { Push(_localData.Frame.Data.DoPull(_localData.Frame.Data.Size + offset).DoGetTop(size).BitCast(dataSize)); }
+        void IFormalMaschine.TopFrameData(Size offset, Size size, Size dataSize)
+        {
+            var frame = _localData.Frame.Data;
+            var value = frame
+                .DoPull(frame.Size + offset)
+                .DoGetTop(size)
+                .BitCast(dataSize);
+            Push(value);
+        }
 
-        void IFormalMaschine.TopData(Size offset, Size size, Size dataSize) { NotImplementedMethod(offset, size, dataSize); }
+        void IFormalMaschine.TopData(Size offset, Size size, Size dataSize)
+        {
+            var value = Data
+                .DoPull(offset)
+                .DoGetTop(dataSize)
+                .BitCast(size);
+            Push(value);
+        }
 
         void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
         {

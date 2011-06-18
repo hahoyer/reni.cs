@@ -10,60 +10,39 @@ namespace Reni.Struct
     {
         internal interface IAccessObject
         {
-            Result AccessFromThisReference(Category category, AccessPoint accessPoint, int position);
-            Result AccessFromContextReference(Category category, AccessPoint accessPoint, int position);
+            Result Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference);
         }
 
         private sealed class FunctionAccessObject: ReniObject, IAccessObject{
-            Result IAccessObject.AccessFromThisReference(Category category, AccessPoint accessPoint, int position)
+            Result IAccessObject.Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference)
             {
-                NotImplementedMethod(category,accessPoint,position);
-                return null;
-            }
-            Result IAccessObject.AccessFromContextReference(Category category, AccessPoint accessPoint, int position)
-            {
-                NotImplementedMethod(category, accessPoint, position);
+                NotImplementedMethod(category, accessPoint, position, isFromContextReference);
                 return null;
             }
         }
 
         private sealed class FieldAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.AccessFromThisReference(Category category, AccessPoint accessPoint, int position)
+            Result IAccessObject.Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference)
             {
-                return accessPoint.ContainerContextObject.AccessFromThisReference(category, accessPoint.Position, position);
-            }
-            Result IAccessObject.AccessFromContextReference(Category category, AccessPoint accessPoint, int position)
-            {
-                NotImplementedMethod(category, accessPoint, position);
-                return null;
+                return accessPoint.FieldAccess(category, position, isFromContextReference);
             }
         }
 
         private sealed class ProcedureCallAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.AccessFromThisReference(Category category, AccessPoint accessPoint, int position)
+            Result IAccessObject.Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference)
             {
-                NotImplementedMethod(category, accessPoint, position);
-                return null;
-            }
-            Result IAccessObject.AccessFromContextReference(Category category, AccessPoint accessPoint, int position)
-            {
-                NotImplementedMethod(category, accessPoint, position);
+                NotImplementedMethod(category, accessPoint, position, isFromContextReference);
                 return null;
             }
         }
 
         private sealed class PropertyAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.AccessFromThisReference(Category category, AccessPoint accessPoint, int position)
+            Result IAccessObject.Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference)
             {
-                NotImplementedMethod(category, accessPoint, position);
-                return null;
-            }
-            Result IAccessObject.AccessFromContextReference(Category category, AccessPoint accessPoint, int position)
-            {
-                NotImplementedMethod(category, accessPoint, position);
+                NotImplementedMethod(category, accessPoint, position, isFromContextReference);
                 return null;
             }
         }

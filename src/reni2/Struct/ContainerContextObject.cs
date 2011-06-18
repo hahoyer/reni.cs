@@ -47,24 +47,12 @@ namespace Reni.Struct
 
         private int IndexSize { get { return _container.IndexSize; } }
 
-        internal Result AccessFromThisReference(Category category, int accessPosition, int position)
-        {
-            return InnerType(position)
-                .Reference(RefAlignParam)
-                .Result
-                (category
-                , () => CodeBase.Arg(RefAlignParam.RefSize).AddToReference(RefAlignParam, InnerOffset(accessPosition, position), "")
-                , () => Container.InnerResult(Category.Refs, Parent, position).Refs
-                );
-        }
-
         internal AccessPoint SpawnAccessPoint(int position) { return _accessPointsCache.Find(position); }
         internal ContextBase SpawnContext(int position) { return _container.SpawnContext(_parent, position); }
         internal AccessManager.IAccessObject SpawnAccessObject(int position) { return _accessObjectsCache.Find(position); }
         internal Size InnerSize(int position) { return _container.InnerSize(_parent, position); }
         internal TypeBase InnerType(int position) { return _container.InnerType(_parent, position); }
         internal Size InnerOffset(int position) { return Container.InnerResult(Category.Size, Parent, 0, position).Size; }
-
         private Size InnerOffset(int accessPosition, int position) { return Container.InnerResult(Category.Size, Parent, position + 1, accessPosition).Size; }
         private bool IsLambda(int position) { return Container.IsLambda(position); }
         private bool IsPoperty(int position) { return Container.IsProperty(position); }
@@ -82,5 +70,16 @@ namespace Reni.Struct
             return AccessManager.Field;
         }
 
+        internal Result FieldAccessFromThisReference(Category category, int accessPosition, int position)
+        {
+            var result = new Result
+                (category
+                 , () => RefAlignParam.RefSize
+                 , () => InnerType(position).Reference(RefAlignParam)
+                 , () => CodeBase.Arg(RefAlignParam.RefSize).AddToReference(RefAlignParam, InnerOffset(accessPosition, position), "FieldAccessFromThisReference")
+                 , () => Container.InnerResult(Category.Refs, Parent, position).Refs
+                );
+            return result;
+        }
     }
 }

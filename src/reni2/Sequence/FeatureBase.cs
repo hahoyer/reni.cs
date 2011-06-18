@@ -30,12 +30,10 @@ namespace Reni.Sequence
             _functionalFeature = functionalFeature;
         }
 
-        protected override Size GetSize()
-        {
-            NotImplementedMethod();
-            return null;
-        }
+        protected override Size GetSize() { return _parent.Size; }
 
         internal override string DumpShort() { return "(" + _parent.DumpShort() + " " + _functionalFeature.DumpShort() + ")"; }
+        internal override IFunctionalFeature FunctionalFeature() { return _functionalFeature; }
+        internal override TypeBase ObjectType() { return _parent; }
     }
 }

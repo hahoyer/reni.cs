@@ -201,11 +201,11 @@ namespace Reni.Struct
 
         internal override Result Result(ContextBase context, Category category)
         {
-            var structContext = SpawnContext(context);
+            var containerContextObject = SpawnContainerContext(context);
             var internalResult = InnerResult(category - Category.Type, context, 0, EndPosition)
-                .ReplaceRelative(structContext, () => CodeBase.TopRef(context.RefAlignParam, "Struct.Container.Result"));
-            return structContext
-                .FindRecentAccessPoint
+                .ReplaceRelative(containerContextObject, () => CodeBase.TopRef(context.RefAlignParam, "Struct.Container.Result"));
+            return containerContextObject
+                .ToAccessPoint
                 .Type
                 .Result(category, internalResult);
         }

@@ -100,25 +100,18 @@ namespace Reni.Struct
 
         internal Result Access(Category category, Result thisReferenceResult, Result rightResult) { return AccessFromThisReference(category, thisReferenceResult, rightResult.ConvertTo(IndexType).Evaluate().ToInt32()); }
 
-        internal Result Access(Category category, int position, bool isProperty, bool isContextFeature)
+        internal Result FieldAccess(Category category, int position, bool isContextFeature)
         {
-            var result = AccessFromContextReference(category, position, isProperty);
+            var result = ContainerContextObject.FieldAccessFromThisReference(category, Position, position);
             if(isContextFeature)
-                return result;
-            return result.ReplaceAbsolute(ContainerContextObject, () => ContextReferenceFromThisReference(result.CompleteCategory - Category.Type));
+                return result.ReplaceArg(ThisReferenceFromContextReferenceResult(category - Category.Type));
+            return result;
         }
 
         internal Result ThisReferenceFromContextReferenceResult(Category category)
         {
             return ReferenceType
                 .Result(category, ThisReferenceFromContextReferenceCode, () => Refs.Create(ContainerContextObject));
-        }
-
-        private Result AccessFromContextReference(Category category, int position, bool isProperty)
-        {
-            if(isProperty)
-                return AccessPropertyFromContextReference(category, position);
-            return AccessFromContextReference(category, position);
         }
 
         private Result AccessPropertyFromContextReference(Category category, int position)
@@ -128,15 +121,22 @@ namespace Reni.Struct
                 .Apply(category, TypeBase.VoidResult, RefAlignParam);
         }
 
-        private Result AccessFromContextReference(Category category, int position) { return AccessFromThisReference(category, ThisReferenceFromContextReferenceResult(category | Category.Type), position); }
+        private Result AccessFromContextReference(Category category, int position)
+        {
+            return AccessFromThisReference(category, ThisReferenceFromContextReferenceResult(category | Category.Type), position);
+        }
 
-        private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position)
+        internal Result AccessFromThisReference(Category category, int position)
         {
             Tracer.Assert(_position > position);
             return ContainerContextObject
                 .SpawnAccessObject(position)
-                .AccessFromThisReference(category, this, position)
-                .ReplaceArg(thisReferenceResult);
+                .Access(category, this, position,false);
+        }
+
+        private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position)
+        {
+            return AccessFromThisReference(category, position).ReplaceArg(thisReferenceResult);
         }
 
         private Result ContextReferenceFromThisReference(Category category) { return new Result(category, () => RefAlignParam.RefSize, ContextReferenceFromThisReferenceCode, Refs.None); }
