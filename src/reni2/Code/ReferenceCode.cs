@@ -25,6 +25,8 @@ namespace Reni.Code
 
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        [DisableDump]
+        internal override bool IsRelativeReference { get { return false; } }
 
         protected override Refs GetRefsImplementation() { return Refs.Create(_context); }
 
