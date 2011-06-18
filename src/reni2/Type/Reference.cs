@@ -5,6 +5,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
+using Reni.Sequence;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -24,7 +25,7 @@ namespace Reni.Type
             _valueType = valueType;
             _refAlignParam = refAlignParam;
             _assignmentFeature = new AssignmentFeature(this);
-            _functionalTypeCache = new DictionaryEx<AssignmentFeature, TypeBase>(assignmentFeature => new FunctionalType(this, assignmentFeature));
+            _functionalTypeCache = new DictionaryEx<AssignmentFeature, TypeBase>(assignmentFeature => new FunctionalFeatureType<Reference, AssignmentFeature>(this, assignmentFeature));
         }
 
         internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
@@ -138,27 +139,4 @@ namespace Reni.Type
                 ;
         }
     }
-
-    internal sealed class FunctionalType : TypeBase
-    {
-        private readonly Reference _parent;
-        private readonly AssignmentFeature _functionalFeature;
-
-        public FunctionalType(Reference parent, AssignmentFeature functionalFeature) 
-        {
-            _parent = parent;
-            _functionalFeature = functionalFeature;
-        }
-
-        protected override Size GetSize()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
-        internal override string DumpShort() { return "(" + _parent.DumpShort() + " " + _functionalFeature.DumpShort() + ")"; }
-    }
-    
-    internal class FunctionalFeature
-    {}
 }

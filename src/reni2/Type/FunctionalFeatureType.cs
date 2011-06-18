@@ -9,6 +9,26 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
+    internal sealed class FunctionalFeatureType<TObjectType, TFeature> : TypeBase
+        where TObjectType: TypeBase
+        where TFeature: IFunctionalFeature
+    {
+        private readonly TObjectType _objectType;
+        private readonly TFeature _functionalFeature;
+
+        internal FunctionalFeatureType(TObjectType objectType, TFeature functionalFeature)
+        {
+            _objectType = objectType;
+            _functionalFeature = functionalFeature;
+        }
+
+        protected override Size GetSize() { return _objectType.Size; }
+
+        internal override string DumpShort() { return "(" + _objectType.DumpShort() + " " + _functionalFeature.DumpShort() + ")"; }
+        internal override IFunctionalFeature FunctionalFeature() { return _functionalFeature; }
+        internal override TypeBase ObjectType() { return _objectType; }
+    }
+
     [Serializable]
     internal sealed class FunctionalFeatureType : TypeBase, IFunctionalFeature
     {

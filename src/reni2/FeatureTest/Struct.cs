@@ -19,6 +19,7 @@ namespace Reni.FeatureTest.Struct
     [TestFixture]
     [AccessSimple]
     [InnerAccess]
+    [AccessAndAdd]
     [TargetSet(@"((one: 1) one) dump_print;", "1")]
     [TargetSet(@"((one: 1,) one) dump_print;", "1")]
     [TargetSet(@"((0,one: 1) one) dump_print;", "1")]
@@ -56,6 +57,7 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture]
     [InnerAccess]
+    [Function.Function]
     public sealed class PropertyVariable : CompilerTest
     {
         protected override string Target { get { return @"! property x: 11/\; x dump_print"; } }

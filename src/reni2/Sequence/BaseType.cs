@@ -32,7 +32,7 @@ namespace Reni.Sequence
             _inheritedType = elementType.Array(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             StopByObjectId(-172);
-            _functionalTypeCache = new DictionaryEx<FunctionalFeature, TypeBase>(functionalFeature => new FunctionalType(this, functionalFeature));
+            _functionalTypeCache = new DictionaryEx<FunctionalFeature, TypeBase>(functionalFeature => new FunctionalFeatureType<BaseType, FunctionalFeature>(this, functionalFeature));
         }
 
         [DisableDump]
