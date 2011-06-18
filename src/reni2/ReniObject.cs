@@ -8,7 +8,7 @@ using HWClassLibrary.TreeStructure;
 
 namespace Reni
 {
-    [AdditionalNodeInfo("NodeDump"), Serializable]
+    [AdditionalNodeInfo("NodeDump"), DebuggerDisplay("{NodeDump}")]
     public abstract class ReniObject : Dumpable
     {
         private static int _nextObjectId;

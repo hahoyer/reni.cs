@@ -131,23 +131,21 @@ namespace Reni
                 x.HasRefs && !y.HasRefs);
         }
 
-        /// <summary>
-        ///     dump
-        /// </summary>
-        /// <returns></returns>
-        protected override string Dump(bool isRecursion)
+        protected override string Dump(bool isRecursion) { return DumpShort(); }
+
+        internal override string DumpShort()
         {
             var result = "";
-            if(HasSize)
+            if (HasSize)
                 result += ".Size.";
-            if(HasType)
+            if (HasType)
                 result += ".Type.";
-            if(HasRefs)
+            if (HasRefs)
                 result += ".Refs.";
-            if(HasCode)
+            if (HasCode)
                 result += ".Code.";
             result = result.Replace("..", ",").Replace(".", "");
-            if(result == "")
+            if (result == "")
                 return "none";
             return result;
         }

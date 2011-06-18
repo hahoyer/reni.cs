@@ -521,7 +521,7 @@ namespace Reni
             if(CompleteCategory == Category.Refs)
                 return this;
 
-            Tracer.Assert(HasType, () => "Dereference requires type category:\n " + DebuggerDumpString);
+            Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
             return Type.AutomaticDereferenceResult(CompleteCategory).ReplaceArg(this);
         }
 
