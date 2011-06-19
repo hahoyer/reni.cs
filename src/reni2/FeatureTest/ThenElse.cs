@@ -7,14 +7,22 @@ using Reni.FeatureTest.Struct;
 
 namespace Reni.FeatureTest.ThenElse
 {
-    [TestFixture, Target(@"x: 1=1 then 1 else 100;x dump_print;"), Output("1"), InnerAccess]
+    [TestFixture]
+    [Target(@"x: 1=1 then 1 else 100;x dump_print;")]
+    [Output("1")]
+    [InnerAccess]
+    [SomeVariables]
     public sealed class UseThen : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
 
-    [TestFixture, Target(@"x: 1=0 then 1 else 100;x dump_print;"), Output("100"), InnerAccess]
+    [TestFixture]
+    [Target(@"x: 1=0 then 1 else 100;x dump_print;")]
+    [Output("100")]
+    [InnerAccess]
+    [SomeVariables]
     public sealed class UseElse : CompilerTest
     {
         [Test]
