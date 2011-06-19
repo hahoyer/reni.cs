@@ -8,6 +8,7 @@ namespace Reni.Code
 {
     internal sealed class LocalVariableAccess : FiberHead
     {
+        private static int _nextObjectId;
         private readonly RefAlignParam _refAlignParam;
         private readonly string _holder;
         private readonly Size _offset;
@@ -15,13 +16,14 @@ namespace Reni.Code
         private readonly Size _dataSize;
 
         public LocalVariableAccess(RefAlignParam refAlignParam, string holder, Size offset, Size size, Size dataSize)
+            : base(_nextObjectId++)
         {
             _refAlignParam = refAlignParam;
             _holder = holder;
             _offset = offset;
             _size = size;
             _dataSize = dataSize;
-            StopByObjectId(-48);
+            StopByObjectId(-10);
         }
 
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }

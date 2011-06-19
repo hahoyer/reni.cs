@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 
@@ -8,7 +9,7 @@ namespace Reni.Context
     /// <summary>
     ///     Parameter to describe alignment for references
     /// </summary>
-    [Dump("Dump"), Serializable]
+    [Dump("Dump"), DebuggerDisplay("{CodeDump,nq}")]
     
     internal sealed class RefAlignParam : IEquatable<RefAlignParam>
     {
@@ -55,7 +56,7 @@ namespace Reni.Context
 
         public string Dump() { return "[A:" + AlignBits + ",S:" + RefSize.Dump() + "]"; }
 
-        public string CodeDump() { return AlignBits + "_" + RefSize.ToInt(); }
+        internal string CodeDump { get { return AlignBits + "/" + RefSize.ToInt(); } }
 
         public override int GetHashCode()
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
@@ -10,7 +11,7 @@ using JetBrains.Annotations;
 namespace Reni
 {
     [AdditionalNodeInfo("DebuggerDumpString")]
-    [Serializable]
+    [DebuggerDisplay("{NodeDump,nq}")]
     internal sealed class Size : ReniObject, IIconKeyProvider, IComparable<Size>
     {
         private static readonly Hashtable _values = new Hashtable();
@@ -40,7 +41,9 @@ namespace Reni
             return result;
         }
 
-        protected override string Dump(bool isRecursion) { return _value.ToString(); }
+        protected override string Dump(bool isRecursion) { return DumpShort(); }
+
+        internal override string DumpShort() { return _value.ToString(); }
 
         public Size Align(int alignBits)
         {
