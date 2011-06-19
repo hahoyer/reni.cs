@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Code.ReplaceVisitor;
@@ -67,7 +68,7 @@ namespace Reni.Code
             get
             {
                 if(Debugger.IsAttached)
-                    return Tracer.CallingMethodName(2);
+                    return Tracer.CallingMethodName(2, Assembly.GetCallingAssembly());
                 return "";
             }
         }

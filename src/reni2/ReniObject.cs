@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
@@ -51,7 +52,7 @@ namespace Reni
             var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
             if(ObjectId == objectId)
-                Tracer.ConditionalBreak(stackFrameDepth + 1, "", () => @"_objectId==" + objectId + "\n" + Dump());
+                Tracer.ConditionalBreak(stackFrameDepth + 1, Assembly.GetCallingAssembly(), "", () => @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
 
