@@ -2,7 +2,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Code;
+using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -10,39 +10,29 @@ namespace Reni.Struct
     {
         internal interface IAccessObject
         {
-            Result Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference);
+            Result AccessViaContextReference(Category category, AccessPoint accessPoint, int position);
         }
 
-        private sealed class FunctionAccessObject: ReniObject, IAccessObject{
-            Result IAccessObject.Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference)
-            {
-                NotImplementedMethod(category, accessPoint, position, isFromContextReference);
-                return null;
-            }
+        private sealed class FunctionAccessObject : ReniObject, IAccessObject
+        {
+            Result IAccessObject.AccessViaContextReference(Category category, AccessPoint accessPoint, int position) { return accessPoint.FunctionAccess(category, position); }
         }
 
         private sealed class FieldAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference)
-            {
-                return accessPoint.FieldAccess(category, position, isFromContextReference);
-            }
+            Result IAccessObject.AccessViaContextReference(Category category, AccessPoint accessPoint, int position) { return accessPoint.FieldAccess(category, position); }
         }
 
         private sealed class ProcedureCallAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference)
-            {
-                NotImplementedMethod(category, accessPoint, position, isFromContextReference);
-                return null;
-            }
+            Result IAccessObject.AccessViaContextReference(Category category, AccessPoint accessPoint, int position) { return TypeBase.VoidResult(category); }
         }
 
         private sealed class PropertyAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.Access(Category category, AccessPoint accessPoint, int position, bool isFromContextReference)
+            Result IAccessObject.AccessViaContextReference(Category category, AccessPoint accessPoint, int position)
             {
-                NotImplementedMethod(category, accessPoint, position, isFromContextReference);
+                NotImplementedMethod(category, accessPoint, position);
                 return null;
             }
         }
@@ -51,6 +41,5 @@ namespace Reni.Struct
         internal static readonly IAccessObject Field = new FieldAccessObject();
         internal static readonly IAccessObject ProcedureCall = new ProcedureCallAccessObject();
         internal static readonly IAccessObject Property = new PropertyAccessObject();
-
     }
 }

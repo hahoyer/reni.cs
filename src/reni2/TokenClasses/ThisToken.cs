@@ -14,7 +14,7 @@ namespace Reni.TokenClasses
         {
             return context
                 .FindRecentAccessPoint
-                .ThisReferenceFromContextReferenceResult(category);
+                .ThisReferenceFromContextReference(category);
         }
     }
 }

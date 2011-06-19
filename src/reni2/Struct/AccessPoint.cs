@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Syntax;
@@ -43,9 +42,6 @@ namespace Reni.Struct
         private Reference ReferenceType { get { return Type.Reference(RefAlignParam); } }
 
         [DisableDump]
-        internal Size StructSize { get { return ContainerContextObject.InnerOffset(Position); } }
-
-        [DisableDump]
         internal Refs ConstructorRefs
         {
             get
@@ -57,13 +53,20 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal TypeBase InnerType { get { return ContainerContextObject.InnerType(_position); } }
+        internal TypeBase InnerType { get { return ContainerContextObject.InnerType(Position); } }
+
+        [DisableDump]
+        internal Size InnerSize { get { return ContainerContextObject.InnerSize(Position); } }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return ContainerContextObject.RefAlignParam; } }
 
         [DisableDump]
         internal TypeBase IndexType { get { return ContainerContextObject.IndexType; } }
+
+        [DisableDump]
+        internal Size StructSize { get { return ContainerContextObject.StructSize(Position); } }
+
 
         internal Result FunctionalResult(Category category, ICompileSyntax body)
         {
@@ -86,83 +89,62 @@ namespace Reni.Struct
                 .CreateFunctionCall(this, category, body, argsResult);
         }
 
-        internal Result[] CreateArgCodes(Category category)
-        {
-            var result = new Result[Position];
-            var offset = StructSize;
-            for(var i = 0; i < Position; i++)
-            {
-                offset -= ContainerContextObject.InnerSize(i).Align(RefAlignParam.AlignBits);
-                result[i] = AutomaticDereference(ContainerContextObject.InnerType(i), offset, category);
-            }
-            return result;
-        }
-
         internal Result Access(Category category, Result thisReferenceResult, Result rightResult) { return AccessFromThisReference(category, thisReferenceResult, rightResult.ConvertTo(IndexType).Evaluate().ToInt32()); }
 
-        internal Result FieldAccess(Category category, int position, bool isContextFeature)
+        internal Result FieldAccess(Category category, int position)
         {
-            var result = ContainerContextObject.FieldAccessFromThisReference(category, Position, position);
-            if(isContextFeature)
-                return result.ReplaceArg(ThisReferenceFromContextReferenceResult(category - Category.Type));
+            Tracer.Assert(position < Position);
+            return ContainerContextObject.FieldAccessFromContextReference(category, position);
+        }
+
+        internal Result FunctionAccess(Category category, int position)
+        {
+            return ContainerContextObject.FunctionAccessFromContextReference(category, position);
+        }
+
+        internal Result DumpPrintResult(Category category, Result thisRef)
+        {
+            var containerContextObject = ContainerContextObject;
+            var result = Result
+                .ConcatPrintResult(category, Position, position => DumpPrintResultFromThisReference(category, containerContextObject, position))
+                .ReplaceArg(thisRef);
             return result;
         }
 
-        internal Result ThisReferenceFromContextReferenceResult(Category category)
+        private Result DumpPrintResultFromThisReference(Category category, ContainerContextObject containerContextObject, int i)
         {
-            return ReferenceType
-                .Result(category, ThisReferenceFromContextReferenceCode, () => Refs.Create(ContainerContextObject));
-        }
-
-        private Result AccessPropertyFromContextReference(Category category, int position)
-        {
-            return AccessFromContextReference(Category.Type, position)
-                .Type
-                .Apply(category, TypeBase.VoidResult(category), RefAlignParam);
-        }
-
-        private Result AccessFromContextReference(Category category, int position)
-        {
-            return AccessFromThisReference(category, ThisReferenceFromContextReferenceResult(category | Category.Type), position);
-        }
-
-        internal Result AccessFromThisReference(Category category, int position)
-        {
-            Tracer.Assert(_position > position);
-            return ContainerContextObject
-                .SpawnAccessObject(position)
-                .Access(category, this, position,false);
+            return containerContextObject
+                .InnerType(i)
+                .GenericDumpPrint(category)
+                .ReplaceArg(AccessViaThisReference(category, i).AutomaticDereference());
         }
 
         private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position)
         {
-            return AccessFromThisReference(category, position).ReplaceArg(thisReferenceResult);
+            return AccessViaThisReference(category, position).ReplaceArg(thisReferenceResult);
         }
 
-        private Result ContextReferenceFromThisReference(Category category) { return new Result(category, () => RefAlignParam.RefSize, ContextReferenceFromThisReferenceCode, Refs.None); }
-
-        private CodeBase ThisReferenceFromContextReferenceCode()
+        internal Result ReplaceContextReferenceByThisReference(Result result)
         {
-            return CodeBase
-                .ReferenceCode(ContainerContextObject)
-                .AddToReference(RefAlignParam, StructSize*-1, "ContextCode");
+            return ContainerContextObject.ReplaceContextReferenceByThisReference(Position, result);
         }
 
-        private CodeBase ContextReferenceFromThisReferenceCode()
+        internal Result AccessViaThisReference(Category category, int position)
         {
-            return CodeBase
-                .Arg(RefAlignParam.RefSize)
-                .AddToReference(RefAlignParam, StructSize, "ContextReferenceAsArg");
+            return ReplaceContextReferenceByThisReference(AccessViaContextReference(category, position));
         }
 
-        private Result AutomaticDereference(TypeBase type, Size offset, Category category)
+        internal Result AccessViaContextReference(Category category, int position)
         {
-            var reference = type.Reference(RefAlignParam);
-            var result = reference
-                .Result(category, () => CreateRefArgCode().AddToReference(RefAlignParam, offset, "AutomaticDereference"));
-            return result.AutomaticDereference() & category;
+            return ContainerContextObject
+                .SpawnAccessObject(position)
+                .AccessViaContextReference(category, this, position);
         }
 
-        private CodeBase CreateRefArgCode() { return Type.Reference(RefAlignParam).ArgCode(); }
+        internal Result ThisReferenceFromContextReference(Category category)
+        {
+            return ContainerContextObject
+                .AccessFromContextReference(category, Position, () => Type.Reference(RefAlignParam));
+        }
     }
 }

@@ -342,7 +342,7 @@ namespace Reni.Type
                     .Result
                     (
                         category,
-                        () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam,refAlignParam.RefSize),
+                        () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize),
                         () => Destructor(Category.Refs).Refs
                     );
             return Align(refAlignParam.AlignBits)
@@ -376,7 +376,11 @@ namespace Reni.Type
         {
             var objectReference = ObjectReference(refAlignParam);
             return result
-                .ReplaceAbsolute(objectReference, () => LocalReferenceResult(result.CompleteCategory, refAlignParam));
+                .ReplaceAbsolute
+                (objectReference
+                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
+                 , () => Destructor(Category.Refs).Refs
+                );
         }
 
         internal virtual Result ReferenceInCode(ContextBase function, Category category)
@@ -391,7 +395,7 @@ namespace Reni.Type
                 ;
         }
 
-        virtual internal Result ContextOperatorFeatureApply(Category category)
+        internal virtual Result ContextOperatorFeatureApply(Category category)
         {
             NotImplementedMethod(category);
             return null;

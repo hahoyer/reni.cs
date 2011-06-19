@@ -75,29 +75,16 @@ namespace Reni.Struct
             return false;
         }
 
-        internal Result DumpPrintResult(Category category)
-        {
-            var argCodes = AccessPoint.CreateArgCodes(category);
-            var containerContext = AccessPoint.ContainerContextObject;
-            var dumpPrint =
-                argCodes
-                    .Select((code, i) => containerContext
-                        .InnerType(i)
-                        .GenericDumpPrint(category)
-                        .ReplaceArg(code))
-                    .ToArray();
-            var thisRef = LocalReferenceResult(category, RefAlignParam);
-            var result = Reni.Result
-                .ConcatPrintResult(category, dumpPrint)
-                .ReplaceArg(thisRef);
-            return result;
-        }
-
         internal CodeBase LocalCode()
         {
             return LocalReferenceCode(RefAlignParam)
                 .Dereference(RefAlignParam, Size);
         }
 
+        internal Result DumpPrintResult(Category category)
+        {
+            return AccessPoint
+                .DumpPrintResult(category, LocalReferenceResult(category, RefAlignParam));
+        }
     }
 }

@@ -26,11 +26,12 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, TypeType>.Convert(TypeType type) { return new Feature(type.DumpPrintResult); }
         IFeature ISearchPath<IFeature, Bit>.Convert(Bit type) { return _bitFeature; }
         IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new Feature(type.Result); }
-        IFeature ISearchPath<IFeature, AccessPointType>.Convert(AccessPointType accessPointType) { return new Feature(accessPointType.DumpPrintResult); }
+        IFeature ISearchPath<IFeature, AccessPointType>.Convert(AccessPointType type) { return new Feature(type.DumpPrintResult); }
+
         IFeature ISearchPath<IFeature, FunctionalFeatureType>.Convert(FunctionalFeatureType type) { return new Feature(type.DumpPrintResult); }
 
         ISearchPath<IFeature, BaseType> ISearchPath<ISearchPath<IFeature, BaseType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
-        ISearchPath<IFeature, Reference> ISearchPath<ISearchPath<IFeature, Reference>, AccessPointType>.Convert(AccessPointType accessPointType) { return accessPointType.DumpPrintReferenceFeature; }
+        ISearchPath<IFeature, Reference> ISearchPath<ISearchPath<IFeature, Reference>, AccessPointType>.Convert(AccessPointType type) { return type.DumpPrintReferenceFeature; }
 
         Result IFeature.Apply(Category category)
         {

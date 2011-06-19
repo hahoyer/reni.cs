@@ -131,18 +131,8 @@ namespace Reni.Struct
             DumpWithBreak(trace, "postProcessedResult", postProcessedResult);
             var result =
                 postProcessedResult
-                    .ReplaceAbsolute(functionContext,
-                                     () => CreateContextRef(postProcessedResult.CompleteCategory));
+                    .ReplaceAbsolute(functionContext, CreateContextRefCode, Refs.None);
             return ReturnMethodDump(trace, result);
-        }
-
-        private Result CreateContextRef(Category category)
-        {
-            return new Result(
-                category,
-                () => _context.SpawnContext.RefAlignParam.RefSize,
-                CreateContextRefCode,
-                Refs.None);
         }
 
         private CodeBase CreateContextRefCode()

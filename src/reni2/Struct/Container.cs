@@ -260,7 +260,7 @@ namespace Reni.Struct
             return Convert(contextObject.ToAccessPoint);
         }
 
-        private AccessFeature Convert(AccessPoint contextObject) { return new AccessFeature(contextObject.ContainerContextObject.SpawnAccessObject(_position), contextObject, _position); }
+        private AccessFeature Convert(AccessPoint contextObject) { return new AccessFeature(contextObject, _position); }
 
         IFeature ISearchPath<IFeature, AccessPointType>.Convert(AccessPointType accessPointType)
         {

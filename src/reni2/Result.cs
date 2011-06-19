@@ -421,7 +421,7 @@ namespace Reni
             return ReturnMethodDump(trace, result);
         }
 
-        internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Result> replacement)
+        internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Refs> replacementRefs)
             where TRefInCode : IReferenceInCode
         {
             if(HasRefs && !Refs.Contains(refInCode))
@@ -429,14 +429,14 @@ namespace Reni
 
             var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
-                result.Code = Code.ReplaceAbsolute(refInCode, () => replacement().Code);
+                result.Code = Code.ReplaceAbsolute(refInCode, replacementCode);
             if(HasRefs)
-                result.Refs = Refs.Without(refInCode).Sequence(replacement().Refs);
+                result.Refs = Refs.Without(refInCode).Sequence(replacementRefs());
             result.IsDirty = false;
             return result;
         }
 
-        internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacement)
+        internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Refs> replacementRefs)
             where TRefInCode : IReferenceInCode
         {
             if(HasRefs && !Refs.Contains(refInCode))
@@ -444,9 +444,9 @@ namespace Reni
 
             var result = new Result {Size = Size, Type = Type};
             if(HasCode)
-                result.Code = Code.ReplaceRelative(refInCode, replacement);
+                result.Code = Code.ReplaceRelative(refInCode, replacementCode);
             if(HasRefs)
-                result.Refs = Refs.Without(refInCode);
+                result.Refs = Refs.Without(refInCode).Sequence(replacementRefs());
             return result;
         }
 
@@ -474,14 +474,6 @@ namespace Reni
 
             NotImplementedMethod(result, category);
             throw new NotImplementedException();
-        }
-
-        internal Result AddToReference(Category c, RefAlignParam refAlignParam, Size value, string reason)
-        {
-            var result = Clone();
-            if(c.HasCode)
-                result.Code = Code.AddToReference(refAlignParam, value, reason);
-            return result;
         }
 
         internal Result LocalBlock(Category category, RefAlignParam refAlignParam)
@@ -525,22 +517,23 @@ namespace Reni
             return Type.AutomaticDereferenceResult(CompleteCategory).ReplaceArg(this);
         }
 
-        internal static Result ConcatPrintResult(Category category, IList<Result> elemResults)
+        internal static Result ConcatPrintResult(Category category, int count, Func<int,Result> elemResults)
         {
             var result = TypeBase.VoidResult(category);
             if(category.HasCode)
                 result.Code = CodeBase.DumpPrintText("(");
 
-            for(var i = 0; i < elemResults.Count; i++)
+            for(var i = 0; i < count; i++)
             {
+                var elemResult = elemResults(i);
                 if(category.HasCode)
                 {
                     if(i > 0)
                         result.Code = result.Code.Sequence(CodeBase.DumpPrintText(", "));
-                    result.Code = result.Code.Sequence(elemResults[i].Code);
+                    result.Code = result.Code.Sequence(elemResult.Code);
                 }
                 if(category.HasRefs)
-                    result.Refs = result.Refs.Sequence(elemResults[i].Refs);
+                    result.Refs = result.Refs.Sequence(elemResult.Refs);
             }
             if(category.HasCode)
                 result.Code = result.Code.Sequence(CodeBase.DumpPrintText(")"));
@@ -572,6 +565,11 @@ namespace Reni
                 _refs = getRefs();
         }
 
+        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
+            : this(category, getSize, getType, getCode, Refs.None)
+        {
+        }
+
         internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<Refs> getRefs)
             : this()
         {
@@ -581,6 +579,11 @@ namespace Reni
                 _code = getCode();
             if(category.HasRefs)
                 _refs = getRefs();
+        }
+
+        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode)
+            : this(category, getSize, getCode, Refs.None)
+        {
         }
 
         internal Result ConvertToBitSequence(Category category)

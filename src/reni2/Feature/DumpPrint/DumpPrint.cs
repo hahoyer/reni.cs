@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
-using Reni.Context;
 using Reni.Sequence;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
@@ -52,9 +52,9 @@ namespace Reni.Feature.DumpPrint
     internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Reference>, IFeature
     {
         [EnableDump]
-        private readonly Struct.AccessPointType _accessPointType;
+        private readonly AccessPointType _accessPointType;
 
-        public StructReferenceFeature(Struct.AccessPointType accessPointType) { _accessPointType = accessPointType; }
+        public StructReferenceFeature(AccessPointType accessPointType) { _accessPointType = accessPointType; }
 
         IFeature ISearchPath<IFeature, Reference>.Convert(Reference type)
         {
@@ -62,7 +62,12 @@ namespace Reni.Feature.DumpPrint
             return this;
         }
 
-        Result IFeature.Apply(Category category) { return _accessPointType.DumpPrintResult(category); }
+        Result IFeature.Apply(Category category)
+        {
+            return _accessPointType
+                .AccessPoint
+                .DumpPrintResult(category, _accessPointType.LocalReferenceResult(category, _accessPointType.RefAlignParam));
+        }
 
         TypeBase IFeature.DefiningType() { return _accessPointType; }
     }
