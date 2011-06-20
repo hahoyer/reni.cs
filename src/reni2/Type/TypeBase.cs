@@ -285,7 +285,7 @@ namespace Reni.Type
         private Result UnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            var trace = ObjectId == -5 && defineable.ObjectId == 4; // && category.HasCode;
+            var trace = ObjectId == 0 && defineable.ObjectId == 28 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
@@ -378,7 +378,7 @@ namespace Reni.Type
             return result
                 .ReplaceAbsolute
                 (objectReference
-                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
+                 , () => LocalReferenceCode(refAlignParam)
                  , () => Destructor(Category.Refs).Refs
                 );
         }
