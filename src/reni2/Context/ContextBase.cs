@@ -254,7 +254,7 @@ namespace Reni.Context
 
         private Result SuffixOperationResult(Category category, ICompileSyntax left, Defineable defineable)
         {
-            var trace = ObjectId == 2 && defineable.ObjectId == 28 && category.HasCode;
+            var trace = ObjectId == -2 && defineable.ObjectId == 28 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, left, defineable);
             var suffixResult = Type(left)
                 .SuffixResult(category, defineable);
@@ -264,7 +264,7 @@ namespace Reni.Context
                 return null;
             }
 
-            var leftResult = Result(category|Category.Type, left);
+            var leftResult = ResultAsRef(category|Category.Type, left);
             DumpWithBreak(trace, "suffixResult", suffixResult, "leftResult", leftResult);
             var result = suffixResult.ReplaceArg(leftResult);
             return ReturnMethodDumpWithBreak(trace, result);
