@@ -26,7 +26,7 @@ namespace Reni
         [DisableDump]
         public virtual string NodeDump { get { return DumpShort(); } }
 
-        internal virtual string DumpShort() { return GetType().FullName + "." + ObjectId; }
+        internal virtual string DumpShort() { return GetType().PrettyName()+ "." + ObjectId; }
 
         [DisableDump]
         internal bool IsStopByObjectIdActive { get; private set; }
@@ -52,7 +52,7 @@ namespace Reni
             var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
             if(ObjectId == objectId)
-                Tracer.ConditionalBreak(stackFrameDepth + 1, Assembly.GetCallingAssembly(), "", () => @"_objectId==" + objectId + "\n" + Dump());
+                Tracer.ConditionalBreak(stackFrameDepth + 1, "", () => @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
 

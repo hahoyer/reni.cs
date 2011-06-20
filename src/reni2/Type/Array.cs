@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.Feature;
@@ -42,7 +43,7 @@ namespace Reni.Type
         {
             if(isRecursion)
                 return "ObjectId=" + ObjectId;
-            return GetType().FullName + "(" + Element.Dump() + ", " + Count + ")";
+            return GetType().PrettyName() + "(" + Element.Dump() + ", " + Count + ")";
         }
 
         protected override Result ConvertToImplementation(Category category, TypeBase dest)

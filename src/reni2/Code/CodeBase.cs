@@ -68,7 +68,7 @@ namespace Reni.Code
             get
             {
                 if(Debugger.IsAttached)
-                    return Tracer.CallingMethodName(2, Assembly.GetCallingAssembly());
+                    return Tracer.CallingMethodName(2);
                 return "";
             }
         }

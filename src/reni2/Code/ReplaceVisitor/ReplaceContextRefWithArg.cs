@@ -33,12 +33,9 @@ namespace Reni.Code.ReplaceVisitor
         public ReplaceRelativeContextRef(TContext context, Func<CodeBase> replacement)
             : base(context, replacement) { }
 
-        protected override Visitor<CodeBase> After(Size size)
-        {
-            return new ReplaceRelativeContextRef<TContext>(
-                Context,
-                () => Replacement().AddToReference(Context.RefAlignParam, size));
-        }
+        protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelativeContextRef<TContext>(Context, () => AfterCode(size)); }
+
+        private CodeBase AfterCode(Size size) { return Replacement().AddToReference(Context.RefAlignParam, size); }
     }
 
     internal sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>

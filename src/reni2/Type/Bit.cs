@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 
 namespace Reni.Type
 {
@@ -27,7 +28,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        protected override string Dump(bool isRecursion) { return GetType().FullName; }
+        protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
 
         internal override string DumpShort() { return "bit"; }
     }

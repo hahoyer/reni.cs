@@ -17,7 +17,7 @@ namespace Reni.Proof.TokenClasses
             return null;
         }
 
-        public override string NodeDump { get { return GetType().FullName + " " + Name; } }
+        public override string NodeDump { get { return GetType().PrettyName() + " " + Name; } }
 
         protected static string SmartDump(ISmartDumpToken @operator, Set<ParsedSyntax> set)
         {

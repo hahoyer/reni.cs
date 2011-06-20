@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.UnitTest;
 using JetBrains.Annotations;
@@ -102,7 +103,7 @@ namespace Reni.FeatureTest
                 _cache = new Dictionary<System.Type, CompilerTest>();
 
             foreach(var tuple in TargetSet)
-                CreateFileAndRunCompiler(depth + 1, GetType().Name, tuple.Item1, AssertValid, tuple.Item2);
+                CreateFileAndRunCompiler(depth + 1, GetType().PrettyName(), tuple.Item1, AssertValid, tuple.Item2);
         }
 
 
