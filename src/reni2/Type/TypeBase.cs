@@ -285,7 +285,7 @@ namespace Reni.Type
         private Result UnaryResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            var trace = ObjectId == 0 && defineable.ObjectId == 28 && category.HasCode;
+            var trace = ObjectId == -10 && defineable.ObjectId == 28 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
