@@ -24,7 +24,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _unalignedCode = code;
             DestructorCode = destructorCode;
-            StopByObjectId(-1);
+            StopByObjectId(-10);
             StopByObjectId(-2);
             StopByObjectId(-3);
         }

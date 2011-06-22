@@ -50,7 +50,7 @@ namespace Reni.ReniParser
 
         internal override Result Result(ContextBase context, Category category)
         {
-            var trace = ObjectId == -60 && category.HasCode;
+            var trace = ObjectId == -51 && category.HasCode;
             StartMethodDumpWithBreak(trace, context, category);
             var result = context.Result(category, Left, _tokenClass, Right);
             return ReturnMethodDumpWithBreak(trace, result);

@@ -288,7 +288,7 @@ namespace Reni.Type
 
         internal Result Apply(Category category, Result rightResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -1 && category.HasCode;
+            var trace = ObjectId == -10 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, rightResult, refAlignParam);
             var functionalFeature = FunctionalFeature();
             var apply = functionalFeature.Apply(category, rightResult.Type, refAlignParam);
