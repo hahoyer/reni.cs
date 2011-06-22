@@ -124,7 +124,7 @@ namespace Reni.Type
             var destinationResult = Result
                 (
                     category,
-                    () => CodeBase.ReferenceCode(objectRef),
+                    () => CodeBase.ReferenceCode(objectRef).Dereference(RefAlignParam,Size),
                     () => Refs.Create(objectRef)
                 );
             var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
@@ -144,9 +144,9 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            var trace = ObjectId == 0 && defineable.ObjectId == -25 && category.HasCode;
+            var trace = defineable.ObjectId == -7 && category.HasType;
             StartMethodDumpWithBreak(trace, category, defineable);
-            var searchResult = ValueType.SearchDefineable<TFeature>(defineable);
+            var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
             if (feature == null)
                 return ReturnMethodDump<Result>(trace, null);
