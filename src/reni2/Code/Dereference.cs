@@ -23,7 +23,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _outputSize = outputSize;
             _dataSize = dataSize;
-            StopByObjectId(-6);
+            StopByObjectId(-3);
         }
 
         [DisableDump]
