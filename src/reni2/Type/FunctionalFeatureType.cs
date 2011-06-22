@@ -35,19 +35,19 @@ namespace Reni.Type
     internal sealed class FunctionalFeatureType : TypeBase, IFunctionalFeature
     {
         private readonly ICompileSyntax _body;
-        private readonly AccessPoint _context;
+        private readonly Structure _structure;
         private static int _nextObjectId;
 
-        internal FunctionalFeatureType(AccessPoint context, ICompileSyntax body)
+        internal FunctionalFeatureType(Structure structure, ICompileSyntax body)
             : base(_nextObjectId++)
         {
-            _context = context;
+            _structure = structure;
             _body = body;
         }
 
         protected override Size GetSize() { return Size.Zero; }
 
-        internal override string DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _context.ObjectId + "#)#"; }
+        internal override string DumpShort() { return "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
 
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category)
         {
@@ -59,7 +59,7 @@ namespace Reni.Type
         Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
             var argsResult = argsType.ArgResult(category | Category.Type);
-            return _context
+            return _structure
                 .CreateFunctionCall(category, Body, argsResult);
         }
 

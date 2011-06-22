@@ -13,14 +13,14 @@ namespace Reni.Struct
     {
         private readonly Container _container;
         private readonly ContextBase _parent;
-        private readonly DictionaryEx<int, AccessPoint> _accessPointsCache;
+        private readonly DictionaryEx<int, Structure> _structuresCache;
         private readonly DictionaryEx<int, AccessManager.IAccessObject> _accessObjectsCache;
 
         internal ContainerContextObject(Container container, ContextBase parent)
         {
             _container = container;
             _parent = parent;
-            _accessPointsCache = new DictionaryEx<int, AccessPoint>(position => new AccessPoint(this, position));
+            _structuresCache = new DictionaryEx<int, Structure>(position => new Structure(this, position));
             _accessObjectsCache = new DictionaryEx<int, AccessManager.IAccessObject>(GetAccessObject);
         }
 
@@ -43,11 +43,11 @@ namespace Reni.Struct
         internal Root RootContext { get { return _parent.RootContext; } }
 
         [DisableDump]
-        internal AccessPoint ToAccessPoint { get { return SpawnAccessPoint(_container.EndPosition); } }
+        internal Structure ToStructure { get { return SpawnStructure(_container.EndPosition); } }
 
         private int IndexSize { get { return _container.IndexSize; } }
 
-        internal AccessPoint SpawnAccessPoint(int position) { return _accessPointsCache.Find(position); }
+        internal Structure SpawnStructure(int position) { return _structuresCache.Find(position); }
         internal ContextBase SpawnContext(int position) { return _container.SpawnContext(_parent, position); }
         internal AccessManager.IAccessObject SpawnAccessObject(int position) { return _accessObjectsCache.Find(position); }
         internal Size InnerSize(int position) { return _container.InnerSize(_parent, position); }
@@ -73,7 +73,7 @@ namespace Reni.Struct
         {
             var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam), Refs.None);
             if (category.HasType)
-                result.Type = ToAccessPoint.Type;
+                result.Type = ToStructure.Type;
             return result;
         }
 

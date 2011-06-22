@@ -29,9 +29,9 @@ namespace Reni.Context
         internal int Count { get { return _list.Count; } }
         internal CodeBase[] Code { get { return _list.Select(t => t.BodyCode).ToArray(); } }
 
-        internal FunctionInstance Find(ICompileSyntax body, AccessPoint context, TypeBase args)
+        internal FunctionInstance Find(ICompileSyntax body, Structure structure, TypeBase args)
         {
-            var index = _data.Find(body).Find(context, args);
+            var index = _data.Find(body).Find(structure, args);
             return _list[index];
         }
 
@@ -41,10 +41,10 @@ namespace Reni.Context
         private sealed class ContextArgsVariant : ReniObject
         {
             [Node]
-            private readonly DictionaryEx<AccessPoint, ArgsVariant> _data;
+            private readonly DictionaryEx<Structure, ArgsVariant> _data;
 
-            public ContextArgsVariant(FunctionList fl, ICompileSyntax body) { _data = new DictionaryEx<AccessPoint, ArgsVariant>(context => new ArgsVariant(fl, body, context)); }
-            public int Find(AccessPoint context, TypeBase args) { return _data.Find(context).Find(args); }
+            public ContextArgsVariant(FunctionList fl, ICompileSyntax body) { _data = new DictionaryEx<Structure, ArgsVariant>(structure => new ArgsVariant(fl, body, structure)); }
+            public int Find(Structure structure, TypeBase args) { return _data.Find(structure).Find(args); }
         }
 
         [Serializable]
@@ -53,17 +53,17 @@ namespace Reni.Context
             [Node]
             private readonly DictionaryEx<TypeBase, int> _data;
 
-            public ArgsVariant(FunctionList fl, ICompileSyntax body, AccessPoint context)
+            public ArgsVariant(FunctionList fl, ICompileSyntax body, Structure structure)
             {
-                _data = new DictionaryEx<TypeBase, int>(-1, args => CreateFunctionInstance(fl, args, body, context));
+                _data = new DictionaryEx<TypeBase, int>(-1, args => CreateFunctionInstance(fl, args, body, structure));
             }
 
             public int Find(TypeBase args) { return _data.Find(args); }
 
-            private static int CreateFunctionInstance(FunctionList fl, TypeBase args, ICompileSyntax body, AccessPoint context)
+            private static int CreateFunctionInstance(FunctionList fl, TypeBase args, ICompileSyntax body, Structure structure)
             {
                 var index = fl._list.Count;
-                var f = new FunctionInstance(index, body, context, args);
+                var f = new FunctionInstance(index, body, structure, args);
                 fl._list.Add(f);
                 return index;
             }

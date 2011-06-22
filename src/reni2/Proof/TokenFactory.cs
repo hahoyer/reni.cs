@@ -11,7 +11,7 @@ namespace Reni.Proof
     {
         internal static TokenFactory Instance { get { return new TokenFactory(); } }
 
-        protected override TokenClasses.TokenClass NewTokenClass(string name) { return new UserSymbol(); }
+        protected override TokenClasses.TokenClass GetNewTokenClass(string name) { return new UserSymbol(); }
 
         protected override PrioTable GetPrioTable()
         {

@@ -22,7 +22,7 @@ namespace Reni.Sequence
             _feature = feature;
         }
 
-        Result IFeature.Apply(Category category)
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
             return _parent
                 .SpawnFunctionalType(this)

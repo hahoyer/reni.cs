@@ -24,7 +24,7 @@ namespace Reni.Struct
 
         [Node]
         [EnableDump]
-        private readonly AccessPoint _context;
+        private readonly Structure _structure;
 
         [EnableDump]
         private readonly int _index;
@@ -37,16 +37,16 @@ namespace Reni.Struct
         /// </summary>
         /// <param name = "index">The index.</param>
         /// <param name = "body">The body.</param>
-        /// <param name = "context">The context.</param>
+        /// <param name = "structure">The context.</param>
         /// <param name = "args">The args.</param>
         /// created 03.01.2007 21:19
-        internal FunctionInstance(int index, ICompileSyntax body, AccessPoint context, TypeBase args)
+        internal FunctionInstance(int index, ICompileSyntax body, Structure structure, TypeBase args)
             : base(index)
         {
             StopByObjectId(-1);
             _index = index;
             _body = body;
-            _context = context;
+            _structure = structure;
             _args = args;
             _bodyCodeCache = new SimpleCache<CodeBase>(CreateBodyCode);
         }
@@ -89,7 +89,7 @@ namespace Reni.Struct
             if(category.HasCode)
                 result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(_index, result.Size);
 
-            _context.SpawnContext.SpawnFunction(_args).AssertCorrectRefs(result);
+            _structure.SpawnContext.SpawnFunction(_args).AssertCorrectRefs(result);
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
@@ -100,7 +100,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
             var category = Category.Code;
-            var refAlignParam = _context.SpawnContext.RefAlignParam;
+            var refAlignParam = _structure.SpawnContext.RefAlignParam;
             var foreignRefsRef = CodeBase.FrameRef(refAlignParam);
             var visitResult = Result(category);
             var result = visitResult
@@ -115,7 +115,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var functionContext = _context.SpawnContext.SpawnFunction(_args);
+            var functionContext = _structure.SpawnContext.SpawnFunction(_args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category | Category.Type;
@@ -137,7 +137,7 @@ namespace Reni.Struct
 
         private CodeBase CreateContextRefCode()
         {
-            var refAlignParam = _context.SpawnContext.RefAlignParam;
+            var refAlignParam = _structure.SpawnContext.RefAlignParam;
             return CodeBase
                 .FrameRef(refAlignParam)
                 .AddToReference(refAlignParam, FrameSize*-1);
@@ -166,7 +166,7 @@ namespace Reni.Struct
             result += "\n";
             result += "args=" + _args.Dump();
             result += "\n";
-            result += "context=" + _context.Dump();
+            result += "context=" + _structure.Dump();
             result += "\n";
             result += "type=" + Type().Dump();
             result += "\n";

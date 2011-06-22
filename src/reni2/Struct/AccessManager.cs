@@ -10,27 +10,27 @@ namespace Reni.Struct
     {
         internal interface IAccessObject
         {
-            Result AccessViaContextReference(Category category, AccessPoint accessPoint, int position);
+            Result AccessViaContextReference(Category category, Structure accessPoint, int position);
         }
 
         private sealed class FunctionAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.AccessViaContextReference(Category category, AccessPoint accessPoint, int position) { return accessPoint.FunctionAccess(category, position); }
+            Result IAccessObject.AccessViaContextReference(Category category, Structure accessPoint, int position) { return accessPoint.FunctionAccess(category, position); }
         }
 
         private sealed class FieldAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.AccessViaContextReference(Category category, AccessPoint accessPoint, int position) { return accessPoint.FieldAccess(category, position); }
+            Result IAccessObject.AccessViaContextReference(Category category, Structure accessPoint, int position) { return accessPoint.FieldAccess(category, position); }
         }
 
         private sealed class ProcedureCallAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.AccessViaContextReference(Category category, AccessPoint accessPoint, int position) { return TypeBase.VoidResult(category); }
+            Result IAccessObject.AccessViaContextReference(Category category, Structure accessPoint, int position) { return TypeBase.VoidResult(category); }
         }
 
         private sealed class PropertyAccessObject : ReniObject, IAccessObject
         {
-            Result IAccessObject.AccessViaContextReference(Category category, AccessPoint accessPoint, int position)
+            Result IAccessObject.AccessViaContextReference(Category category, Structure accessPoint, int position)
             {
                 NotImplementedMethod(category, accessPoint, position);
                 return null;

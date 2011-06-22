@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -23,7 +24,7 @@ namespace Reni.Sequence
 
         TypeBase IFeature.DefiningType() { return _parent; }
 
-        Result IFeature.Apply(Category category)
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
             return Apply(category, _parent.UnrefSize)
                 .ReplaceArg(_parent.ConvertToBitSequence(category));

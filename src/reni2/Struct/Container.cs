@@ -184,12 +184,12 @@ namespace Reni.Struct
             if(Dictionary.ContainsKey(name))
             {
                 var position = Dictionary[name];
-                return new StructFeature(position);
+                return new StructureFeature(position);
             }
             return null;
         }
 
-        internal ISearchPath<IFeature, AccessPointType> SearchFromRefToStruct(Defineable defineable)
+        internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable)
         {
             return FindStructFeature(defineable.Name);
         }
@@ -242,29 +242,29 @@ namespace Reni.Struct
     }
 
     internal interface IStructFeature
-        : ISearchPath<IContextFeature, ContainerContextObject>, ISearchPath<IFeature, AccessPointType>
+        : ISearchPath<IContextFeature, ContainerContextObject>, ISearchPath<IFeature, StructureType>
     {}
 
     [Serializable]
-    internal sealed class StructFeature : ReniObject, IStructFeature
+    internal sealed class StructureFeature : ReniObject, IStructFeature
     {
         private readonly int _position;
 
-        public StructFeature(int position)
+        public StructureFeature(int position)
         {
             _position = position;
         }
 
         IContextFeature ISearchPath<IContextFeature, ContainerContextObject>.Convert(ContainerContextObject contextObject)
         {
-            return Convert(contextObject.ToAccessPoint);
+            return Convert(contextObject.ToStructure);
         }
 
-        private AccessFeature Convert(AccessPoint contextObject) { return new AccessFeature(contextObject, _position); }
+        private AccessFeature Convert(Structure contextObject) { return new AccessFeature(contextObject, _position); }
 
-        IFeature ISearchPath<IFeature, AccessPointType>.Convert(AccessPointType accessPointType)
+        IFeature ISearchPath<IFeature, StructureType>.Convert(StructureType structureType)
         {
-            return Convert(accessPointType.AccessPoint);
+            return Convert(structureType.Structure);
         }
     }
 }

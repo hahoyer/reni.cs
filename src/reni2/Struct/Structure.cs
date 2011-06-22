@@ -15,28 +15,45 @@ namespace Reni.Struct
     {
         private readonly ContainerContextObject _containerContextObject;
         private readonly int _position;
-        private readonly DictionaryEx<ICompileSyntax, FunctionalFeatureType> _functionalFeatureCache;
-        private readonly SimpleCache<AccessPointType> _typeCache;
 
         internal AccessPoint(ContainerContextObject containerContextObject, int position)
         {
             _containerContextObject = containerContextObject;
             _position = position;
-            _functionalFeatureCache = new DictionaryEx<ICompileSyntax, FunctionalFeatureType>(body => new FunctionalFeatureType(this, body));
-            _typeCache = new SimpleCache<AccessPointType>(() => new AccessPointType(this));
         }
 
         [EnableDump]
         internal int Position { get { return _position; } }
 
+        internal ContainerContextObject ContainerContextObject { get { return _containerContextObject; } }
+    }
+
+    internal sealed class Structure : ReniObject
+    {
+        private readonly ContainerContextObject _containerContextObject;
+        private readonly int _endPosition;
+        private readonly DictionaryEx<ICompileSyntax, FunctionalFeatureType> _functionalFeatureCache;
+        private readonly SimpleCache<StructureType> _typeCache;
+
+        internal Structure(ContainerContextObject containerContextObject, int endPosition)
+        {
+            _containerContextObject = containerContextObject;
+            _endPosition = endPosition;
+            _functionalFeatureCache = new DictionaryEx<ICompileSyntax, FunctionalFeatureType>(body => new FunctionalFeatureType(this, body));
+            _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
+        }
+
+        [EnableDump]
+        internal int EndPosition { get { return _endPosition; } }
+
         [EnableDump]
         internal ContainerContextObject ContainerContextObject { get { return _containerContextObject; } }
 
         [DisableDump]
-        internal ContextBase SpawnContext { get { return ContainerContextObject.SpawnContext(_position); } }
+        internal ContextBase SpawnContext { get { return ContainerContextObject.SpawnContext(_endPosition); } }
 
         [DisableDump]
-        internal AccessPointType Type { get { return _typeCache.Value; } }
+        internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
         private Reference ReferenceType { get { return Type.Reference(RefAlignParam); } }
@@ -48,15 +65,15 @@ namespace Reni.Struct
             {
                 return ContainerContextObject
                     .Container
-                    .InnerResult(Category.Refs, ContainerContextObject.Parent, Position).Refs;
+                    .InnerResult(Category.Refs, ContainerContextObject.Parent, EndPosition).Refs;
             }
         }
 
         [DisableDump]
-        internal TypeBase InnerType { get { return ContainerContextObject.InnerType(Position); } }
+        internal TypeBase InnerType { get { return ContainerContextObject.InnerType(EndPosition); } }
 
         [DisableDump]
-        internal Size InnerSize { get { return ContainerContextObject.InnerSize(Position); } }
+        internal Size InnerSize { get { return ContainerContextObject.InnerSize(EndPosition); } }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return ContainerContextObject.RefAlignParam; } }
@@ -65,7 +82,7 @@ namespace Reni.Struct
         internal TypeBase IndexType { get { return ContainerContextObject.IndexType; } }
 
         [DisableDump]
-        internal Size StructSize { get { return ContainerContextObject.StructSize(Position); } }
+        internal Size StructSize { get { return ContainerContextObject.StructSize(EndPosition); } }
 
 
         internal Result FunctionalResult(Category category, ICompileSyntax body)
@@ -75,7 +92,7 @@ namespace Reni.Struct
                 .Result(category);
         }
 
-        internal ISearchPath<IFeature, AccessPointType> SearchFromRefToStruct(Defineable defineable)
+        internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable)
         {
             return ContainerContextObject
                 .Container
@@ -93,7 +110,7 @@ namespace Reni.Struct
 
         internal Result FieldAccess(Category category, int position)
         {
-            Tracer.Assert(position < Position);
+            Tracer.Assert(position < EndPosition);
             return ContainerContextObject.FieldAccessFromContextReference(category, position);
         }
 
@@ -102,21 +119,19 @@ namespace Reni.Struct
             return ContainerContextObject.FunctionAccessFromContextReference(category, position);
         }
 
-        internal Result DumpPrintResult(Category category, Result thisRef)
+        internal Result DumpPrintResultFromContextReference(Category category)
         {
-            var containerContextObject = ContainerContextObject;
             var result = Result
-                .ConcatPrintResult(category, Position, position => DumpPrintResultFromThisReference(category, containerContextObject, position))
-                .ReplaceArg(thisRef);
+                .ConcatPrintResult(category, EndPosition, position => DumpPrintResultFromThisReference(category, position));
             return result;
         }
 
-        private Result DumpPrintResultFromThisReference(Category category, ContainerContextObject containerContextObject, int i)
+        private Result DumpPrintResultFromThisReference(Category category, int position)
         {
-            return containerContextObject
-                .InnerType(i)
-                .GenericDumpPrint(category)
-                .ReplaceArg(AccessViaThisReference(category, i).AutomaticDereference());
+            return ContainerContextObject
+                .InnerType(position)
+                .GenericDumpPrint(category,RefAlignParam)
+                .ReplaceArg(AccessViaThisReference(category, position));
         }
 
         private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position)
@@ -126,7 +141,7 @@ namespace Reni.Struct
 
         internal Result ReplaceContextReferenceByThisReference(Result result)
         {
-            return ContainerContextObject.ReplaceContextReferenceByThisReference(Position, result);
+            return ContainerContextObject.ReplaceContextReferenceByThisReference(EndPosition, result);
         }
 
         internal Result AccessViaThisReference(Category category, int position)
@@ -144,7 +159,12 @@ namespace Reni.Struct
         internal Result ThisReferenceFromContextReference(Category category)
         {
             return ContainerContextObject
-                .AccessFromContextReference(category, Position, () => Type.Reference(RefAlignParam));
+                .AccessFromContextReference(category, EndPosition, () => Type.Reference(RefAlignParam));
+        }
+
+        internal Result ReplaceContextReferenceByThisReference(Category category)
+        {
+            return ReplaceContextReferenceByThisReference(DumpPrintResultFromContextReference(category));
         }
     }
 }

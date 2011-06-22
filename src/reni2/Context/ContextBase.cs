@@ -72,7 +72,7 @@ namespace Reni.Context
         private ContextBase[] ChildChain { get { return Cache.ChildChain ?? (Cache.ChildChain = ObtainChildChain()); } }
 
         [DisableDump]
-        internal AccessPoint FindRecentAccessPoint { get { return Cache.RecentAccessPoint.Value; } }
+        internal Structure FindRecentStructure { get { return Cache.RecentStructure.Value; } }
 
         [DisableDump]
         private FunctionContextObject FindRecentFunctionContextObject { get { return Cache.RecentFunctionContextObject.Value; } }
@@ -177,7 +177,7 @@ namespace Reni.Context
         [UsedImplicitly]
         internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
 
-        internal Result ResultAsRef(Category category, ICompileSyntax syntax)
+        internal Result ResultAsReference(Category category, ICompileSyntax syntax)
         {
             var result = Result(category | Category.Type, syntax);
             if(result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
@@ -186,18 +186,27 @@ namespace Reni.Context
             return result.LocalReferenceResult(RefAlignParam);
         }
 
+        private Reference TypeAsReference(ICompileSyntax syntax)
+        {
+            var type = Type(syntax);
+            if (type is Reference)
+                return (Reference) type;
+
+            return type.Align(RefAlignParam.AlignBits).Reference(RefAlignParam);
+        }
+
         internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Reference target)
         {
             var result = Result(category | Category.Type, syntax);
             return result.ConvertToAsRef(category, target);
         }
 
-        private AccessPoint ObtainRecentStructContext()
+        private Structure ObtainRecentStructure()
         {
             var result = ContextItem as Struct.Context;
             if(result != null)
-                return result.Container.SpawnContainerContext(Parent).SpawnAccessPoint(result.Position);
-            return Parent.ObtainRecentStructContext();
+                return result.Container.SpawnContainerContext(Parent).SpawnStructure(result.Position);
+            return Parent.ObtainRecentStructure();
         }
 
         private FunctionContextObject ObtainRecentFunctionContext()
@@ -212,11 +221,11 @@ namespace Reni.Context
 
         internal Result AtTokenResult(Category category, ICompileSyntax left, ICompileSyntax right)
         {
-            var leftResultAsRef = ResultAsRef(category | Category.Type, left);
+            var leftResultAsRef = ResultAsReference(category | Category.Type, left);
             var rightResult = Result(Category.All, right);
             return leftResultAsRef
                 .Type
-                .GetStructAccessPoint()
+                .GetStructure()
                 .Access(category, leftResultAsRef, rightResult);
         }
 
@@ -230,43 +239,45 @@ namespace Reni.Context
 
             if(left == null && right != null)
             {
-                var prefixOperationResult = Type(right)
-                    .PrefixOperationResult(category, defineable);
+                var prefixOperationResult = OperationResult<IPrefixFeature>(category, right, defineable);
                 if(prefixOperationResult != null)
-                    return prefixOperationResult.ReplaceArg(Result(category | Category.Type, right));
+                    return prefixOperationResult;
             }
 
             var suffixOperationResult =
                 left == null
                     ? ContextOperationResult(categoryForFunctionals, defineable)
-                    : SuffixOperationResult(categoryForFunctionals, left, defineable);
+                    : OperationResult<IFeature>(categoryForFunctionals, left, defineable);
 
-            if(right == null)
+            if (suffixOperationResult == null)
+            {
+                NotImplementedMethod(category, left, defineable, right);
+                return null;
+            }
+
+            if (right == null)
                 return ReturnMethodDumpWithBreak(trace, suffixOperationResult);
 
             var suffixOperationType = suffixOperationResult.Type;
-            var rightResult = ResultAsRef(categoryForFunctionals, right);
+            var rightResult = ResultAsReference(categoryForFunctionals, right);
             DumpWithBreak(trace, "suffixOperationResult", suffixOperationResult, "rightResult", rightResult);
             var result = suffixOperationType.Apply(category, rightResult, RefAlignParam);
             DumpWithBreak(trace, "result", result);
             return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixOperationResult));
         }
 
-        private Result SuffixOperationResult(Category category, ICompileSyntax left, Defineable defineable)
+        private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
+            where TFeature : class
         {
-            var trace = ObjectId == -2 && defineable.ObjectId == 28 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category, left, defineable);
-            var suffixResult = Type(left)
-                .SuffixResult(category, defineable);
-            if(suffixResult == null)
-            {
-                NotImplementedMethod(category, left, defineable);
+            var trace = ObjectId == -2 && defineable.ObjectId == 25 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category, target, defineable);
+            var operationResult = TypeAsReference(target).OperationResult<TFeature>(category, defineable);
+            if(operationResult == null)
                 return null;
-            }
 
-            var leftResult = ResultAsRef(category|Category.Type, left);
-            DumpWithBreak(trace, "suffixResult", suffixResult, "leftResult", leftResult);
-            var result = suffixResult.ReplaceArg(leftResult);
+            var targetResult = ResultAsReference(category|Category.Type, target);
+            DumpWithBreak(trace, "operationResult", operationResult, "targetResult", targetResult);
+            var result = operationResult.ReplaceArg(targetResult);
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
@@ -328,7 +339,7 @@ namespace Reni.Context
         internal sealed class CacheItems : ReniObject, IIconKeyProvider
         {
             [DisableDump]
-            internal readonly SimpleCache<AccessPoint> RecentAccessPoint;
+            internal readonly SimpleCache<Structure> RecentStructure;
 
             [DisableDump]
             internal readonly SimpleCache<FunctionContextObject> RecentFunctionContextObject;
@@ -360,7 +371,7 @@ namespace Reni.Context
                         position => new ContextBase(parent, container.SpawnContext(position))));
                 FunctionInstances = new DictionaryEx<TypeBase, ContextBase>(args => new ContextBase(parent, new Function(args)));
                 PendingContext = new SimpleCache<ContextBase>(() => new ContextBase(parent, new PendingContext()));
-                RecentAccessPoint = new SimpleCache<AccessPoint>(parent.ObtainRecentStructContext);
+                RecentStructure = new SimpleCache<Structure>(parent.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<FunctionContextObject>(parent.ObtainRecentFunctionContext);
             }
 

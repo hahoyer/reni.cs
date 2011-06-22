@@ -100,7 +100,7 @@
     <Compile Include="Context\Root.cs" />
     <Compile Include="FeatureTest\StringStruct.cs" />
     <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
-    <Compile Include="Feature\DumpPrint\Token.cs" />
+    <Compile Include="Feature\DumpPrint\DumpPrintToken.cs" />
     <Compile Include="Feature\IInfixFeature.cs" />
     <Compile Include="Parser\ITokenClass.cs" />
     <Compile Include="Parser\ITokenRelation.cs" />
@@ -163,8 +163,8 @@
     <Compile Include="Struct\ContainerContextObject.cs" />
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\FunctionInstance.cs" />
-    <Compile Include="Struct\AccessPoint.cs" />
-    <Compile Include="Struct\AccessPointType.cs" />
+    <Compile Include="Struct\Structure.cs" />
+    <Compile Include="Struct\StructureType.cs" />
     <Compile Include="Syntax\LeftParenthesis.cs" />
     <Compile Include="Syntax\ListSyntax.cs" />
     <Compile Include="TestGenerated.cs" />

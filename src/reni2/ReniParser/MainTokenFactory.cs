@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Parser;
 using Reni.Sequence;
 using Reni.Struct;
@@ -101,7 +102,7 @@ namespace Reni.ReniParser
                        {"*", new Star()},
                        {"_A_T_", new AtToken()},
                        {"arg", new ArgToken()},
-                       {"dump_print", new Feature.DumpPrint.Token()},
+                       {"dump_print", new DumpPrintToken()},
                        {"else", new ElseToken()},
                        {"enable_cut", new EnableCut()},
                        {"then", new ThenToken()},
@@ -114,6 +115,6 @@ namespace Reni.ReniParser
         protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
         protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
         protected override TokenClasses.TokenClass GetNumberClass() { return new Number(); }
-        protected override TokenClasses.TokenClass NewTokenClass(string name) { return new UserSymbol(name); }
+        protected override TokenClasses.TokenClass GetNewTokenClass(string name) { return new UserSymbol(name); }
     }
 }

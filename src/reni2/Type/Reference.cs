@@ -5,8 +5,10 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Code;
 using Reni.Context;
-using Reni.Sequence;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -43,6 +45,7 @@ namespace Reni.Type
             return true;
         }
 
+        internal Result GenericDumpPrint(Category category) { return OperationResult<IFeature>(category, new DumpPrintToken()); }
         internal override string DumpPrintText { get { return DumpShort(); } }
         internal override string DumpShort() { return "reference(" + _valueType.DumpShort() + ")"; }
         internal override int SequenceCount(TypeBase elementType) { return _valueType.SequenceCount(elementType); }
@@ -57,7 +60,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override AccessPoint GetStructAccessPoint() { return _valueType.GetStructAccessPoint(); }
+        internal override Structure GetStructure() { return _valueType.GetStructure(); }
 
         protected override bool IsReferenceTo(TypeBase value) { return ValueType == value; }
 
@@ -135,8 +138,31 @@ namespace Reni.Type
                     category,
                     () => CodeBase.ReferenceCode(function).Dereference(function.RefAlignParam, function.RefAlignParam.RefSize),
                     () => Refs.Create(function)
-                )
-                ;
+                );
         }
+
+        internal Result OperationResult<TFeature>(Category category, Defineable defineable)
+            where TFeature : class
+        {
+            var trace = ObjectId == 0 && defineable.ObjectId == -25 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category, defineable);
+            var searchResult = ValueType.SearchDefineable<TFeature>(defineable);
+            var feature = searchResult.ConvertToFeature();
+            if (feature == null)
+                return ReturnMethodDump<Result>(trace, null);
+
+            DumpWithBreak(trace, "feature", feature);
+            var result = feature.Apply(category, RefAlignParam);
+            DumpWithBreak(trace, "result", result);
+            if (this != feature.DefiningType())
+            {
+                DumpWithBreak(trace, "feature.DefiningType()", feature.DefiningType());
+                var conversion = Conversion(category, feature.DefiningType().Reference(RefAlignParam));
+                DumpWithBreak(trace, "conversion", conversion);
+                result = result.ReplaceArg(conversion);
+            }
+            return ReturnMethodDumpWithBreak(trace, result);
+        }
+
     }
 }

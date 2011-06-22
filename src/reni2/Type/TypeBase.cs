@@ -8,8 +8,6 @@ using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -127,8 +125,8 @@ namespace Reni.Type
         internal Result ArgResult(Category category) { return Result(category, ArgCode); }
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
-        internal Result GenericDumpPrint(Category category) { return SuffixResult(category, new Token()); }
         internal CodeBase ArgCode() { return CodeBase.Arg(Size); }
+        internal Result GenericDumpPrint(Category category, RefAlignParam refAlignParam) { return Reference(refAlignParam).GenericDumpPrint(category); }
 
         internal Result AutomaticDereferenceResult(Category category)
         {
@@ -270,7 +268,7 @@ namespace Reni.Type
 
         private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.Sequence(SequenceCount(elementType)); }
 
-        private TFeature SearchDefineable<TFeature>(Defineable defineable)
+        internal TFeature SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class
         {
             var searchVisitor = new RootSearchVisitor<TFeature>(defineable);
@@ -282,34 +280,7 @@ namespace Reni.Type
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        private Result UnaryResult<TFeature>(Category category, Defineable defineable)
-            where TFeature : class
-        {
-            var trace = ObjectId == -10 && defineable.ObjectId == 28 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category, defineable);
-            var searchResult = SearchDefineable<TFeature>(defineable);
-            var feature = searchResult.ConvertToFeature();
-            if(feature == null)
-                return ReturnMethodDump<Result>(trace, null);
-
-            DumpWithBreak(trace, "feature", feature);
-            var result = feature.Apply(category);
-            DumpWithBreak(trace, "result", result);
-            if(this != feature.DefiningType())
-            {
-                DumpWithBreak(trace, "feature.DefiningType()", feature.DefiningType());
-                var conversion = Conversion(category, feature.DefiningType());
-                DumpWithBreak(trace, "conversion", conversion);
-                result = result.ReplaceArg(conversion);
-            }
-            return ReturnMethodDumpWithBreak(trace, result);
-        }
-
-        internal Result SuffixResult(Category category, Defineable defineable) { return UnaryResult<IFeature>(category, defineable); }
-
-        internal Result PrefixOperationResult(Category category, Defineable defineable) { return UnaryResult<IPrefixFeature>(category, defineable); }
-
-        internal virtual AccessPoint GetStructAccessPoint()
+        internal virtual Structure GetStructure()
         {
             NotImplementedMethod();
             return null;
@@ -338,6 +309,7 @@ namespace Reni.Type
         internal Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
             if(this is Reference)
+            {
                 return Align(refAlignParam.AlignBits)
                     .Result
                     (
@@ -345,6 +317,7 @@ namespace Reni.Type
                         () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize),
                         () => Destructor(Category.Refs).Refs
                     );
+            }
             return Align(refAlignParam.AlignBits)
                 .Reference(refAlignParam)
                 .Result

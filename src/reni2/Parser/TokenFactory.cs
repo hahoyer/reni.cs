@@ -70,7 +70,7 @@ namespace Reni.Parser
             TTokenClass result;
             if(TokenClasses.TryGetValue(name, out result))
                 return result;
-            result = NewTokenClass(name);
+            result = GetNewTokenClass(name);
             result.Name = name;
             TokenClasses.Add(name, result);
             return result;
@@ -81,7 +81,7 @@ namespace Reni.Parser
         ITokenClass ITokenFactory.RightParenthesisClass(int level) { return _righParenthesis.Find(level); }
         ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return _leftParenthesis.Find(level); }
 
-        protected abstract TTokenClass NewTokenClass(string name);
+        protected abstract TTokenClass GetNewTokenClass(string name);
         protected abstract PrioTable GetPrioTable();
         protected abstract Dictionary<string, TTokenClass> GetTokenClasses();
         protected abstract TTokenClass GetListClass();

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -13,20 +14,20 @@ namespace Reni.Struct
         IFeature
     {
         [EnableDump]
-        private readonly AccessPoint _accessPoint;
+        private readonly Structure _structure;
 
         [EnableDump]
         private readonly int _position;
 
-        internal AccessFeature(AccessPoint accessPoint, int position)
+        internal AccessFeature(Structure structure, int position)
         {
-            _accessPoint = accessPoint;
+            _structure = structure;
             _position = position;
         }
 
-        TypeBase IFeature.DefiningType() { return _accessPoint.Type; }
+        TypeBase IFeature.DefiningType() { return _structure.Type; }
 
-        Result IFeature.Apply(Category category) { return _accessPoint.AccessViaThisReference(category, _position); }
-        Result IContextFeature.Apply(Category category) { return _accessPoint.AccessViaContextReference(category, _position); }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return _structure.AccessViaThisReference(category, _position); }
+        Result IContextFeature.Apply(Category category) { return _structure.AccessViaContextReference(category, _position); }
     }
 }

@@ -42,6 +42,6 @@ namespace Reni.ReniParser
         protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { throw new NotImplementedException(); }
         protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { throw new NotImplementedException(); }
         protected override TokenClasses.TokenClass GetNumberClass() { throw new NotImplementedException(); }
-        protected override TokenClasses.TokenClass NewTokenClass(string name) { throw new NotImplementedException(); }
+        protected override TokenClasses.TokenClass GetNewTokenClass(string name) { throw new NotImplementedException(); }
     }
 }

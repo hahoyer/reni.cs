@@ -260,11 +260,13 @@ namespace Reni.Code
                 .BitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
-        internal static CodeBase BitSequenceDumpPrint(int objSize)
+        internal static CodeBase BitSequenceDumpPrint(int objSize, RefAlignParam refAlignParam)
         {
-            var alignedSize = Size.Create(objSize).ByteAlignedSize;
+            var alignedSize = Size.Create(objSize).Align(refAlignParam.AlignBits);
             return TypeBase.Bit.Sequence(alignedSize.ToInt())
-                .ArgCode()
+                .Reference(refAlignParam)
+                .ArgCode()              
+                .Dereference(refAlignParam,alignedSize)
                 .DumpPrint(alignedSize);
         }
 

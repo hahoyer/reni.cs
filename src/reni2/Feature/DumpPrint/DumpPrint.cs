@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Code;
+using Reni.Context;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.Type;
@@ -11,7 +12,7 @@ namespace Reni.Feature.DumpPrint
 {
     internal abstract class BitFeatureBase : ReniObject
     {
-        protected static Result Apply(Category category, int objSize) { return TypeBase.Void.Result(category, () => CodeBase.BitSequenceDumpPrint(objSize)); }
+        protected static Result Apply(Category category, int objSize, RefAlignParam refAlignParam) { return TypeBase.Void.Result(category, () => CodeBase.BitSequenceDumpPrint(objSize, refAlignParam)); }
     }
 
     internal sealed class BitSequenceFeature :
@@ -25,50 +26,38 @@ namespace Reni.Feature.DumpPrint
     {
         private readonly BaseType _parent;
 
-        public BitSequenceFeatureClass(BaseType parent) { _parent = parent; }
+        internal BitSequenceFeatureClass(BaseType parent) { _parent = parent; }
 
-        Result IFeature.Apply(Category category)
-        {
-            return
-                Apply(category, _parent.SequenceCount(TypeBase.Bit))
-                    .ReplaceArg(_parent.ArgResult(category).Align(BitsConst.SegmentAlignBits));
-        }
-
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.SequenceCount(TypeBase.Bit), refAlignParam); }
         TypeBase IFeature.DefiningType() { return _parent; }
     }
 
     internal sealed class BitFeature : BitFeatureBase, IFeature
     {
-        Result IFeature.Apply(Category category)
-        {
-            return
-                Apply(category, 1)
-                    .ReplaceArg(TypeBase.Bit.ArgResult(category).Align(BitsConst.SegmentAlignBits));
-        }
-
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, 1, refAlignParam); }
         TypeBase IFeature.DefiningType() { return TypeBase.Bit; }
     }
 
     internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Reference>, IFeature
     {
         [EnableDump]
-        private readonly AccessPointType _accessPointType;
+        private readonly StructureType _structureType;
 
-        public StructReferenceFeature(AccessPointType accessPointType) { _accessPointType = accessPointType; }
+        public StructReferenceFeature(StructureType structureType) { _structureType = structureType; }
 
         IFeature ISearchPath<IFeature, Reference>.Convert(Reference type)
         {
-            Tracer.Assert(type.RefAlignParam == _accessPointType.RefAlignParam);
+            Tracer.Assert(type.RefAlignParam == _structureType.RefAlignParam);
             return this;
         }
 
-        Result IFeature.Apply(Category category)
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
-            return _accessPointType
-                .AccessPoint
-                .DumpPrintResult(category, _accessPointType.LocalReferenceResult(category, _accessPointType.RefAlignParam));
+            return _structureType
+                .Structure
+                .DumpPrintResultFromContextReference(category);
         }
 
-        TypeBase IFeature.DefiningType() { return _accessPointType; }
+        TypeBase IFeature.DefiningType() { return _structureType; }
     }
 }
