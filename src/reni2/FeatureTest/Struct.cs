@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
+using Reni.FeatureTest.DefaultOperations;
 
 namespace Reni.FeatureTest.Struct
 {
@@ -87,9 +88,17 @@ namespace Reni.FeatureTest.Struct
     [TargetSet(@"(10,2000,30, (this _A_T_ 0) := 4) dump_print", "(4, 2000, 30, )")]
     [TargetSet(@"(10,2000,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
     [TargetSet(@"(10,2000,30, (this _A_T_ 2) := 4) dump_print", "(10, 2000, 4, )")]
-    [TargetSet(@"(3, (this _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
     [SimpleAssignment]
     public sealed class Assignment : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [TargetSet(@"(3, (this _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
+    [Assignment, ApplyTypeOperatorWithCut]
+    public sealed class AssignmentWithCut : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
