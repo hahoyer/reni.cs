@@ -35,7 +35,7 @@ namespace Reni.Code.ReplaceVisitor
         }
 
         [Dump("Dump")]
-        internal class SizeException : Exception
+        internal sealed class SizeException : Exception
         {
             private readonly CodeBase _actual;
             private readonly Arg _visitedObject;
