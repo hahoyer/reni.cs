@@ -87,7 +87,7 @@ namespace Reni.Struct
                 result.Refs = result.Refs.Sequence(args.Refs);
 
             if(category.HasCode)
-                result.Code = CreateArgsAndRefForFunction(args.Code).CreateCall(_index, result.Size);
+                result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
 
             _structure.SpawnContext.SpawnFunction(_args).AssertCorrectRefs(result);
             return ReturnMethodDumpWithBreak(trace, result);

@@ -81,7 +81,7 @@ namespace Reni
             return commonType.Result
                 (
                     category,
-                    () => condResult.Code.CreateThenElse(ThenResult(context, Category.Code).Code, ElseResult(context, Category.Code).Code),
+                    () => condResult.Code.ThenElse(ThenResult(context, Category.Code).Code, ElseResult(context, Category.Code).Code),
                     () => condResult.Refs + context.CommonRefs(this)
                 );
         }

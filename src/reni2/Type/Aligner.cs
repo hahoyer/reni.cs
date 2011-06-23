@@ -52,7 +52,7 @@ namespace Reni.Type
             return Parent.Result
                 (
                     category,
-                    () => CodeBase.Arg(Size).CreateBitCast(Parent.Size)
+                    () => CodeBase.Arg(Size).BitCast(Parent.Size)
                 );
         }
 

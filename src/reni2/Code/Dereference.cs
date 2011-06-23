@@ -46,7 +46,8 @@ namespace Reni.Code
         internal override CodeBase TryToCombineBack(TopRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
+            var reason = base.NodeDump + " <= " + precedingElement.Reason;
+            return new TopData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize, reason);
         }
 
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
@@ -58,7 +59,8 @@ namespace Reni.Code
         internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopFrameData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
+            var reason = base.NodeDump + " <= " + precedingElement.Reason;
+            return new TopFrameData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize, reason);
         }
 
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.Dereference(top, InputSize, OutputSize); }

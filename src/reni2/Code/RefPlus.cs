@@ -52,10 +52,17 @@ namespace Reni.Code
 
         private Size GetSize() { return RefAlignParam.RefSize; }
 
+        internal override CodeBase TryToCombineBack(TopRef precedingElement)
+        {
+            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
+            var reason = _reason + "(" + _right + ") <= " + precedingElement.Reason;
+            return new TopRef(RefAlignParam, precedingElement.Offset + _right, reason);
+        }
+
         internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            var reason = _reason + "(" + _right + ") + " + precedingElement.Reason;
+            var reason = _reason + "(" + _right + ") <= " + precedingElement.Reason;
             return new TopFrameRef(RefAlignParam, precedingElement.Offset + _right, reason);
         }
 
@@ -65,7 +72,7 @@ namespace Reni.Code
         {
             if(RefAlignParam.IsEqual(precedingElement.RefAlignParam))
             {
-                var reason = _reason + "(" + _right + ") + " + precedingElement._reason;
+                var reason = _reason + "(" + _right + ") <= " + precedingElement._reason;
                 var newRight = _right + precedingElement._right;
                 if(newRight.IsZero)
                     return new FiberItem[0];

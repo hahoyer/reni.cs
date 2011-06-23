@@ -66,7 +66,8 @@ namespace Reni.Code
         {
             if(precedingElement.Size == InputSize && OutputSize >= _inputDataSize && OutputSize > InputSize)
             {
-                return (new TopData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize))
+                var result = new TopData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize, precedingElement.Reason);
+                return result
                     .CreateFiber(new BitCast(OutputSize, OutputSize, _inputDataSize));
             }
             return null;
@@ -76,7 +77,7 @@ namespace Reni.Code
         {
             if(precedingElement.Size == InputSize && OutputSize >= _inputDataSize && OutputSize > InputSize)
             {
-                return new TopFrameData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize)
+                return new TopFrameData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize, precedingElement.Reason)
                     .CreateFiber(new BitCast(OutputSize, OutputSize, _inputDataSize));
             }
             return null;

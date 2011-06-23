@@ -275,7 +275,7 @@ namespace Reni
             if(HasType)
                 r.Type = Type.Align(alignBits);
             if(HasCode)
-                r.Code = Code.CreateBitCast(alignedSize);
+                r.Code = Code.BitCast(alignedSize);
             if(HasRefs)
                 r.Refs = Refs;
             return r;

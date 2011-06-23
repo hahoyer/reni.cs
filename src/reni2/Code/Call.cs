@@ -46,7 +46,7 @@ namespace Reni.Code
             if(FunctionIndex != functionIndex)
                 return this;
             Tracer.Assert(_resultSize.IsZero);
-            return CodeBase.CreateRecursiveCall(ArgsAndRefsSize);
+            return CodeBase.RecursiveCall(ArgsAndRefsSize);
         }
     }
 }

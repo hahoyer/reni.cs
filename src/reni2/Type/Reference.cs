@@ -111,7 +111,7 @@ namespace Reni.Type
                 .Result
                 (
                     category,
-                    () => CodeBase.Arg(RefAlignParam.RefSize*2).CreateAssignment(RefAlignParam, ValueType.Size)
+                    () => CodeBase.Arg(RefAlignParam.RefSize*2).Assignment(RefAlignParam, ValueType.Size)
                 );
 
             if(!category.HasCode && !category.HasRefs)

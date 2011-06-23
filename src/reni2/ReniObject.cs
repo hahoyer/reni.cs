@@ -31,6 +31,16 @@ namespace Reni
         [DisableDump]
         internal bool IsStopByObjectIdActive { get; private set; }
 
+        protected static string CallingMethodName
+        {
+            get
+            {
+                if(Debugger.IsAttached)
+                    return Tracer.CallingMethodName(2);
+                return "";
+            }
+        }
+
         protected override string Dump(bool isRecursion)
         {
             var result = NodeDump;
