@@ -57,7 +57,7 @@ namespace Reni.Struct
         internal Result FunctionAccessFromContextReference(Category category, int fieldPosition) { return AccessFromContextReference(category, 0, () => InnerType(fieldPosition)); }
         internal Result ReplaceContextReferenceByThisReference(int position, Result result) { return result.ReplaceAbsolute(this, () => ReplaceContextReferenceByThisReferenceCode(position), Refs.None); }
 
-        internal Result AccessFromContextReference(Category category, int fieldPosition, Func<TypeBase> getType)
+        private Result AccessFromContextReference(Category category, int fieldPosition, Func<TypeBase> getType)
         {
             var result = new Result
                 (category
@@ -101,6 +101,7 @@ namespace Reni.Struct
                 .ReferenceCode(this)
                 .AddToReference(RefAlignParam, FieldOffsetFromContextReference(position));
         }
+
 
         private CodeBase ReplaceContextReferenceByThisReferenceCode(int accessPosition)
         {

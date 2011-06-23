@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Syntax;
@@ -84,6 +85,10 @@ namespace Reni.Struct
         [DisableDump]
         internal Size StructSize { get { return ContainerContextObject.StructSize(EndPosition); } }
 
+        internal Result Access(Category category, Result thisReferenceResult, Result rightResult) { return AccessFromThisReference(category, thisReferenceResult, rightResult.ConvertTo(IndexType).Evaluate().ToInt32()); }
+        internal Result FunctionAccess(Category category, int position) { return ContainerContextObject.FunctionAccessFromContextReference(category, position); }
+        internal Result AccessViaThisReference(Category category, int position) { return ReplaceContextReferenceByThisReference(AccessViaContextReference(category, position)); }
+        internal Result ReplaceContextReferenceByThisReference(Category category) { return ReplaceContextReferenceByThisReference(DumpPrintResultFromContextReference(category)); }
 
         internal Result FunctionalResult(Category category, ICompileSyntax body)
         {
@@ -106,47 +111,16 @@ namespace Reni.Struct
                 .CreateFunctionCall(this, category, body, argsResult);
         }
 
-        internal Result Access(Category category, Result thisReferenceResult, Result rightResult) { return AccessFromThisReference(category, thisReferenceResult, rightResult.ConvertTo(IndexType).Evaluate().ToInt32()); }
-
         internal Result FieldAccess(Category category, int position)
         {
             Tracer.Assert(position < EndPosition);
             return ContainerContextObject.FieldAccessFromContextReference(category, position);
         }
 
-        internal Result FunctionAccess(Category category, int position)
-        {
-            return ContainerContextObject.FunctionAccessFromContextReference(category, position);
-        }
-
         internal Result DumpPrintResultFromContextReference(Category category)
         {
-            var result = Result
-                .ConcatPrintResult(category, EndPosition, position => DumpPrintResultFromThisReference(category, position));
+            var result = Result.ConcatPrintResult(category, EndPosition, position => DumpPrintResultFromThisReference(category, position));
             return result;
-        }
-
-        private Result DumpPrintResultFromThisReference(Category category, int position)
-        {
-            return ContainerContextObject
-                .InnerType(position)
-                .GenericDumpPrint(category,RefAlignParam)
-                .ReplaceArg(AccessViaThisReference(category, position));
-        }
-
-        private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position)
-        {
-            return AccessViaThisReference(category, position).ReplaceArg(thisReferenceResult);
-        }
-
-        internal Result ReplaceContextReferenceByThisReference(Result result)
-        {
-            return ContainerContextObject.ReplaceContextReferenceByThisReference(EndPosition, result);
-        }
-
-        internal Result AccessViaThisReference(Category category, int position)
-        {
-            return ReplaceContextReferenceByThisReference(AccessViaContextReference(category, position));
         }
 
         internal Result AccessViaContextReference(Category category, int position)
@@ -156,15 +130,26 @@ namespace Reni.Struct
                 .AccessViaContextReference(category, this, position);
         }
 
-        internal Result ThisReferenceFromContextReference(Category category)
+        internal Result ThisReferenceViaContextReference(Category category)
         {
-            return ContainerContextObject
-                .AccessFromContextReference(category, EndPosition, () => Type.Reference(RefAlignParam));
+            var result = Type.Reference(RefAlignParam).Result
+                (category
+                 , ThisReferenceViaContextReferenceCode
+                 , () => Refs.Create(ContainerContextObject)
+                );
+            return result;
         }
 
-        internal Result ReplaceContextReferenceByThisReference(Category category)
+        private Result DumpPrintResultFromThisReference(Category category, int position)
         {
-            return ReplaceContextReferenceByThisReference(DumpPrintResultFromContextReference(category));
+            return ContainerContextObject
+                .InnerType(position)
+                .GenericDumpPrint(category, RefAlignParam)
+                .ReplaceArg(AccessViaThisReference(category, position));
         }
+
+        private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position) { return AccessViaThisReference(category, position).ReplaceArg(thisReferenceResult); }
+        private Result ReplaceContextReferenceByThisReference(Result result) { return ContainerContextObject.ReplaceContextReferenceByThisReference(EndPosition, result); }
+        private CodeBase ThisReferenceViaContextReferenceCode() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize * -1); }
     }
 }
