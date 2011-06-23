@@ -4,6 +4,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Type;
@@ -165,6 +166,9 @@ namespace Reni.Sequence
         internal override Result Destructor(Category category) { return _inheritedType.Destructor(category); }
 
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
+
+        internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam) { return Reference(refAlignParam).ObjectReferenceInCode(category); }
+
     }
 
 }

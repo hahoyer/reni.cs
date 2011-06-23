@@ -334,17 +334,6 @@ namespace Reni.Type
                 .LocalReference(refAlignParam, Destructor(Category.Code).Code);
         }
 
-        internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam)
-        {
-            var objectRef = ObjectReference(refAlignParam);
-            return Reference(refAlignParam)
-                .Result(
-                    category,
-                    () => CodeBase.ReferenceCode(objectRef),
-                    () => Refs.Create(objectRef)
-                );
-        }
-
         internal Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
             var objectReference = ObjectReference(refAlignParam);

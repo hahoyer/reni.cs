@@ -231,7 +231,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -7 && category.HasCode;
+            var trace = defineable.ObjectId == -18 && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -277,8 +277,9 @@ namespace Reni.Context
             if(operationResult == null)
                 return null;
 
-            var targetResult = ResultAsReference(category|Category.Type, target);
-            DumpWithBreak(trace, "operationResult", operationResult, "targetResult", targetResult);
+            DumpWithBreak(trace, "operationResult", operationResult);
+            var targetResult = ResultAsReference(category | Category.Type, target);
+            DumpWithBreak(trace, "targetResult", targetResult);
             var result = operationResult.ReplaceArg(targetResult);
             return ReturnMethodDumpWithBreak(trace, result);
         }

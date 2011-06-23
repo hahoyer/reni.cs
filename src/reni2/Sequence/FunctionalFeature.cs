@@ -25,7 +25,8 @@ namespace Reni.Sequence
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
             return _parent
-                .SpawnFunctionalType(this)
+                .Reference(refAlignParam)
+                .FunctionalType(this)
                 .ArgResult(category);
         }
 
@@ -41,8 +42,8 @@ namespace Reni.Sequence
 
         Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
+            var result = Apply(category, _parent.Count, argsType.SequenceCount(_parent.Element));
             var objectResult = _parent.ObjectReferenceInCode(category | Category.Type, refAlignParam);
-            var result = Apply(category, objectResult.Type.SequenceCount(_parent.Element), argsType.SequenceCount(_parent.Element));
             var convertedObjectResult = objectResult.ConvertToBitSequence(category);
             var convertedArgsResult = argsType.ConvertToBitSequence(category);
             return result.ReplaceArg(convertedObjectResult.CreateSequence(convertedArgsResult));

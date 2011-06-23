@@ -18,7 +18,7 @@ namespace Reni.Type
         private readonly TypeBase _valueType;
         private readonly RefAlignParam _refAlignParam;
         private readonly AssignmentFeature _assignmentFeature;
-        private readonly DictionaryEx<AssignmentFeature, TypeBase> _functionalTypeCache;
+        private readonly DictionaryEx<IFunctionalFeature, TypeBase> _functionalTypeCache;
 
         internal Reference(TypeBase valueType, RefAlignParam refAlignParam)
             : base(_nextObjectId++)
@@ -27,7 +27,7 @@ namespace Reni.Type
             _valueType = valueType;
             _refAlignParam = refAlignParam;
             _assignmentFeature = new AssignmentFeature(this);
-            _functionalTypeCache = new DictionaryEx<AssignmentFeature, TypeBase>(assignmentFeature => new FunctionalFeatureType<Reference, AssignmentFeature>(this, assignmentFeature));
+            _functionalTypeCache = new DictionaryEx<IFunctionalFeature, TypeBase>(feature => new FunctionalFeatureType<Reference, IFunctionalFeature>(this, feature));
         }
 
         internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
@@ -103,7 +103,7 @@ namespace Reni.Type
                 .ArgResult(category);
         }
 
-        private TypeBase FunctionalType(AssignmentFeature assignmentFeature) { return _functionalTypeCache.Find(assignmentFeature); }
+        internal TypeBase FunctionalType(IFunctionalFeature functionalFeature) { return _functionalTypeCache.Find(functionalFeature); }
 
         internal Result ApplyAssignment(Category category, TypeBase argsType)
         {
@@ -120,15 +120,21 @@ namespace Reni.Type
             var sourceResult = argsType
                 .ConvertTo(category | Category.Type, ValueType)
                 .LocalReferenceResult(RefAlignParam);
+            var destinationResult = ObjectReferenceInCode(category);
+            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
+            return result.ReplaceArg(objectAndSourceRefs);
+        }
+
+        internal Result ObjectReferenceInCode(Category category)
+        {
             var objectRef = ObjectReference(RefAlignParam);
             var destinationResult = Result
                 (
                     category,
-                    () => CodeBase.ReferenceCode(objectRef).Dereference(RefAlignParam,Size),
+                    () => CodeBase.ReferenceCode(objectRef).Dereference(RefAlignParam, Size),
                     () => Refs.Create(objectRef)
                 );
-            var objectAndSourceRefs = destinationResult.CreateSequence(sourceResult);
-            return result.ReplaceArg(objectAndSourceRefs);
+            return destinationResult;
         }
 
         internal override Result ReferenceInCode(ContextBase function, Category category)
@@ -144,7 +150,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -7 && category.HasType;
+            var trace = defineable.ObjectId == -18 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
