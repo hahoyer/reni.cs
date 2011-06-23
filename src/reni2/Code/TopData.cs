@@ -12,8 +12,8 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopData : Top
     {
-        public TopData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize, string reason)
-            : base(refAlignParam, offset, size, dataSize, reason) { StopByObjectId(-110); }
+        public TopData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+            : base(refAlignParam, offset, size, dataSize) { StopByObjectId(-110); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {
@@ -34,8 +34,8 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopFrameData : Top
     {
-        public TopFrameData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize, string reason)
-            : base(refAlignParam, offset, size, dataSize, reason) { StopByObjectId(544); }
+        public TopFrameData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+            : base(refAlignParam, offset, size, dataSize) { StopByObjectId(544); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {

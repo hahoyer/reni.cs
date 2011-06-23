@@ -35,7 +35,7 @@ namespace Reni.Code
         [DisableDump]
         internal override Size InputSize { get { return _inputSize; } }
 
-        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {
@@ -66,7 +66,7 @@ namespace Reni.Code
         {
             if(precedingElement.Size == InputSize && OutputSize >= _inputDataSize && OutputSize > InputSize)
             {
-                var result = new TopData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize, precedingElement.Reason);
+                var result = new TopData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize);
                 return result
                     .CreateFiber(new BitCast(OutputSize, OutputSize, _inputDataSize));
             }
@@ -77,7 +77,7 @@ namespace Reni.Code
         {
             if(precedingElement.Size == InputSize && OutputSize >= _inputDataSize && OutputSize > InputSize)
             {
-                return new TopFrameData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize, precedingElement.Reason)
+                return new TopFrameData(precedingElement.RefAlignParam, precedingElement.Offset, OutputSize, _inputDataSize)
                     .CreateFiber(new BitCast(OutputSize, OutputSize, _inputDataSize));
             }
             return null;

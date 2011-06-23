@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
@@ -13,10 +12,37 @@ namespace Reni.Code
     [Serializable]
     internal abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
     {
-        protected CodeBase(int objectId)
-            : base(objectId) { }
+        private static string _newCombinedReason;
+        private readonly string _reason;
 
-        protected CodeBase() { }
+        [DisableDump]
+        internal string ReasonForCombine { get { return _reason == "" ? DumpShortForDebug() : _reason; } }
+
+        [DisableDump]
+        internal string NewCombinedReason
+        {
+            private get
+            {
+                if(_newCombinedReason == null)
+                    return "";
+                var result = _newCombinedReason;
+                _newCombinedReason = null;
+                return result;
+            }
+            set
+            {
+                Tracer.Assert(_newCombinedReason == null);
+                _newCombinedReason = value;
+                ;
+            }
+        }
+
+        [DumpExcept("")]
+        [EnableDump]
+        internal string Reason { get { return _reason; } }
+
+        protected CodeBase(int objectId)
+            : base(objectId) { _reason = NewCombinedReason; }
 
         [Node]
         [DisableDump]
@@ -53,18 +79,18 @@ namespace Reni.Code
         internal static CodeBase BitsConst(Size size, BitsConst t) { return new BitArray(size, t); }
         internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
         internal static CodeBase DumpPrintText(string dumpPrintText) { return new DumpPrintText(dumpPrintText); }
-        internal static CodeBase FrameRef(RefAlignParam refAlignParam) { return new TopFrameRef(refAlignParam, CallingMethodName); }
+        internal static CodeBase FrameRef(RefAlignParam refAlignParam) { return new TopFrameRef(refAlignParam); }
         internal static FiberItem RecursiveCall(Size refsSize) { return new RecursiveCallCandidate(refsSize); }
         internal static CodeBase ReferenceCode(IReferenceInCode reference) { return new ReferenceCode(reference); }
         internal static CodeBase Void() { return BitArray.Void(); }
-        internal static CodeBase TopRef(RefAlignParam refAlignParam) { return new TopRef(refAlignParam, CallingMethodName); }
+        internal static CodeBase TopRef(RefAlignParam refAlignParam) { return new TopRef(refAlignParam); }
 
         internal static CodeBase List(IEnumerable<CodeBase> data)
         {
             var resultData = new List<CodeBase>();
-            foreach (var codeBase in data)
+            foreach(var codeBase in data)
                 resultData.AddRange(codeBase.AsList());
-            switch (resultData.Count)
+            switch(resultData.Count)
             {
                 case 0:
                     return Void();
@@ -118,13 +144,11 @@ namespace Reni.Code
 
         internal abstract CodeBase CreateFiber(FiberItem subsequentElement);
 
-        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right, string reason = "")
+        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right)
         {
             if(right.IsZero)
                 return this;
-            if(reason != "")
-                reason = "(" + reason + ")";
-            return CreateFiber(new RefPlus(refAlignParam, right, CallingMethodName + reason));
+            return CreateFiber(new RefPlus(refAlignParam, right,CallingMethodName));
         }
 
         internal CodeBase Dereference(RefAlignParam refAlignParam, Size targetSize)

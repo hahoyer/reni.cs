@@ -12,22 +12,18 @@ namespace Reni.Code
     {
         private readonly RefAlignParam _refAlignParam;
 
-        [DisableDump]
-        internal readonly string Reason;
-
         [Node, DisableDump]
         internal readonly Size Offset;
 
         private readonly Size _size;
         private readonly Size _dataSize;
 
-        protected Top(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize, string reason)
+        protected Top(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
         {
             _refAlignParam = refAlignParam;
             Offset = offset;
             _size = size;
             _dataSize = dataSize;
-            Reason = reason;
             StopByObjectId(-945);
         }
 
@@ -40,6 +36,6 @@ namespace Reni.Code
         protected Size DataSize { get { return _dataSize; } }
 
         [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset + " DataSize=" + _dataSize + " Reason = " + Reason; } }
+        public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset + " DataSize=" + _dataSize; } }
     }
 }

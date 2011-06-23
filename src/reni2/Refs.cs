@@ -125,7 +125,7 @@ namespace Reni
                 var unrefPtrAlignment = refAlignParam;
                 var replacement = p.Dereference(unrefPtrAlignment, unrefAlignment.RefSize);
                 result = result.ReplaceAbsolute(_data[i], () => replacement);
-                p = p.AddToReference(unrefPtrAlignment, unrefPtrAlignment.RefSize, i.ToString());
+                p = p.AddToReference(unrefPtrAlignment, unrefPtrAlignment.RefSize);
             }
             return result;
         }

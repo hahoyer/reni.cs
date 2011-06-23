@@ -27,7 +27,7 @@ namespace Reni.Code
             StopByObjectId(-381);
         }
 
-        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         [DisableDump]
         internal override Size OutputSize { get { return _size; } }
@@ -71,7 +71,7 @@ namespace Reni.Code
 
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitArrayPrefixOp(OpToken, OutputSize, ArgSize); }
 
-        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.BitArrayPrefix(OpToken, OutputSize); }
 

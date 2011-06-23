@@ -41,13 +41,12 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize { get { return _outputSize; } }
 
-        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         internal override CodeBase TryToCombineBack(TopRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            var reason = base.NodeDump + " <= " + precedingElement.Reason;
-            return new TopData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize, reason);
+            return new TopData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
@@ -59,8 +58,7 @@ namespace Reni.Code
         internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            var reason = base.NodeDump + " <= " + precedingElement.Reason;
-            return new TopFrameData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize, reason);
+            return new TopFrameData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.Dereference(top, InputSize, OutputSize); }

@@ -9,12 +9,38 @@ namespace Reni.Code
     internal abstract class FiberItem : ReniObject, IFormalCodeItem
     {
         private static int _nextObjectId;
+        private static string _newCombinedReason;
+        private readonly string _reason;
 
-        protected FiberItem(int objectId)
-            : base(objectId) { }
+        [DisableDump]
+        internal string ReasonForCombine { get { return _reason == "" ? DumpShortForDebug() : _reason; } }
 
-        protected FiberItem()
-            : this(_nextObjectId++) { }
+        [DisableDump]
+        private string NewCombinedReason
+        {
+            get
+            {
+                if(_newCombinedReason == null)
+                    return "";
+                return _newCombinedReason;
+            }
+            set
+            {
+                Tracer.Assert((_newCombinedReason == null) != (value == null));
+                _newCombinedReason = value;
+                ;
+            }
+        }
+
+        [DumpExcept("")]
+        [EnableDump]
+        internal string Reason { get { return _reason; } }
+
+        protected FiberItem(int objectId, string reason = null)
+            : base(objectId) { _reason = reason ?? NewCombinedReason; }
+
+        protected FiberItem(string reason = null)
+            : this(_nextObjectId++,reason) { }
 
         [DisableDump]
         internal abstract Size InputSize { get; }
@@ -48,7 +74,15 @@ namespace Reni.Code
             return null;
         }
 
-        internal virtual FiberItem[] TryToCombine(FiberItem subsequentElement) { return null; }
+        internal FiberItem[] TryToCombine(FiberItem subsequentElement)
+        {
+            NewCombinedReason = ReasonForCombine + " " + subsequentElement.ReasonForCombine;
+            var result = TryToCombineImplementation(subsequentElement);
+            NewCombinedReason = null;
+            return result;
+        }
+
+        protected virtual FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return null; }
 
         internal virtual CodeBase TryToCombineBack(BitArray precedingElement) { return null; }
         internal virtual CodeBase TryToCombineBack(TopFrameRef precedingElement) { return null; }

@@ -28,6 +28,13 @@ namespace Reni
 
         internal virtual string DumpShort() { return GetType().PrettyName()+ "." + ObjectId; }
 
+        internal string DumpShortForDebug()
+        {
+            if (Debugger.IsAttached)
+                return DumpShort();
+            return "";
+        }
+
         [DisableDump]
         internal bool IsStopByObjectIdActive { get; private set; }
 

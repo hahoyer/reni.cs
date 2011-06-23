@@ -9,11 +9,11 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopRef : Ref
     {
-        public TopRef(RefAlignParam refAlignParam, Size size, string reason)
-            : base(refAlignParam, size, reason) { StopByObjectId(21); }
+        public TopRef(RefAlignParam refAlignParam, Size size)
+            : base(refAlignParam, size) { StopByObjectId(64); }
 
-        public TopRef(RefAlignParam refAlignParam, string reason)
-            : this(refAlignParam, Size.Zero, reason) { }
+        public TopRef(RefAlignParam refAlignParam)
+            : this(refAlignParam, Size.Zero) { }
 
         protected override string CSharpString(Size top) { return CSharpGenerator.TopRef(top, Size); }
 
@@ -25,11 +25,11 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopFrameRef : Ref
     {
-        public TopFrameRef(RefAlignParam refAlignParam, string reason)
-            : this(refAlignParam, Size.Zero, reason) { StopByObjectId(547); }
+        public TopFrameRef(RefAlignParam refAlignParam)
+            : this(refAlignParam, Size.Zero) { }
 
-        public TopFrameRef(RefAlignParam refAlignParam, Size offset, string reason)
-            : base(refAlignParam, offset, reason) { StopByObjectId(547); }
+        public TopFrameRef(RefAlignParam refAlignParam, Size offset)
+            : base(refAlignParam, offset) { StopByObjectId(547); }
 
         protected override string CSharpString() { return CSharpGenerator.CreateFrameRef(RefAlignParam, Offset); }
 

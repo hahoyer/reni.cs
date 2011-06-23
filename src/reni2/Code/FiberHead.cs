@@ -13,12 +13,13 @@ namespace Reni.Code
             : base(objectId) { }
 
         protected FiberHead()
-            : this(_nextObjectId++) { }
+            : this(_nextObjectId++) {}
 
         protected virtual CodeBase TryToCombine(FiberItem subsequentElement) { return null; }
 
         internal override CodeBase CreateFiber(FiberItem subsequentElement)
         {
+            NewCombinedReason = ReasonForCombine + " " + subsequentElement.ReasonForCombine;
             var newResult = TryToCombine(subsequentElement);
             if(newResult == null)
                 return new Fiber(this, subsequentElement);
@@ -29,4 +30,4 @@ namespace Reni.Code
         [DisableDump]
         internal virtual bool IsNonFiberHeadList { get { return false; } }
     }
-}
+}                                                

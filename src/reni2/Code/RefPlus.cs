@@ -18,17 +18,13 @@ namespace Reni.Code
         [Node, DisableDump]
         private readonly Size _right;
 
-        [Node, DisableDump]
-        private readonly string _reason;
-
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        public RefPlus(RefAlignParam refAlignParam, Size right, string reason)
+        public RefPlus(RefAlignParam refAlignParam, Size right, string reason = null): base(reason)
         {
             _refAlignParam = refAlignParam;
             _right = right;
-            _reason = reason;
             AssertValid();
             StopByObjectId(-10);
         }
@@ -40,7 +36,7 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " Right=" + _right + " Reason=" + _reason; } }
+        public override string NodeDump { get { return base.NodeDump + " Right=" + _right; } }
 
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.RefPlus(GetSize(), _right); }
 
@@ -54,29 +50,27 @@ namespace Reni.Code
 
         internal override CodeBase TryToCombineBack(TopRef precedingElement)
         {
+            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            var reason = _reason + "(" + _right + ") <= " + precedingElement.Reason;
-            return new TopRef(RefAlignParam, precedingElement.Offset + _right, reason);
+            return new TopRef(RefAlignParam, precedingElement.Offset + _right);
         }
 
         internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
         {
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            var reason = _reason + "(" + _right + ") <= " + precedingElement.Reason;
-            return new TopFrameRef(RefAlignParam, precedingElement.Offset + _right, reason);
+            return new TopFrameRef(RefAlignParam, precedingElement.Offset + _right);
         }
 
-        internal override FiberItem[] TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         internal override FiberItem[] TryToCombineBack(RefPlus precedingElement)
         {
-            if(RefAlignParam.IsEqual(precedingElement.RefAlignParam))
+            if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
             {
-                var reason = _reason + "(" + _right + ") <= " + precedingElement._reason;
                 var newRight = _right + precedingElement._right;
-                if(newRight.IsZero)
-                    return new FiberItem[0];
-                return new[] {new RefPlus(RefAlignParam, newRight, reason)};
+                if (newRight.IsZero)
+                    return null;
+                return new[] { new RefPlus(RefAlignParam, newRight) };
             }
             return base.TryToCombineBack(precedingElement);
         }
