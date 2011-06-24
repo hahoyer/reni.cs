@@ -28,6 +28,7 @@ namespace Reni.Type
             _refAlignParam = refAlignParam;
             _assignmentFeature = new AssignmentFeature(this);
             _functionalTypeCache = new DictionaryEx<IFunctionalFeature, TypeBase>(feature => new FunctionalFeatureType<Reference, IFunctionalFeature>(this, feature));
+            StopByObjectId(-2);
         }
 
         internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
@@ -47,7 +48,6 @@ namespace Reni.Type
 
         internal Result GenericDumpPrint(Category category) { return OperationResult<IFeature>(category, new DumpPrintToken()); }
         internal override string DumpPrintText { get { return DumpShort(); } }
-        internal override string DumpShort() { return "reference(" + _valueType.DumpShort() + ")"; }
         internal override int SequenceCount(TypeBase elementType) { return _valueType.SequenceCount(elementType); }
         internal override IFunctionalFeature FunctionalFeature() { return ValueType.FunctionalFeature(); }
         internal override TypeBase ObjectType() { return ValueType.ObjectType(); }
@@ -137,20 +137,20 @@ namespace Reni.Type
             return destinationResult;
         }
 
-        internal override Result ReferenceInCode(ContextBase function, Category category)
+        internal override Result ReferenceInCode(IReferenceInCode target, Category category)
         {
             return Result
                 (
                     category,
-                    () => CodeBase.ReferenceCode(function).Dereference(function.RefAlignParam, function.RefAlignParam.RefSize),
-                    () => Refs.Create(function)
+                    () => CodeBase.ReferenceCode(target).Dereference(target.RefAlignParam, target.RefAlignParam.RefSize),
+                    () => Refs.Create(target)
                 );
         }
 
         internal Result OperationResult<TFeature>(Category category, Defineable defineable)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -18 && category.HasCode;
+            var trace = defineable.ObjectId == -20 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();

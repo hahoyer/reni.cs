@@ -19,7 +19,7 @@ namespace Reni.Context
     ///     Base class for compiler environments
     /// </summary>
     [Serializable]
-    internal sealed class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider, IReferenceInCode
+    internal sealed class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         private static int _nextId;
 
@@ -44,8 +44,6 @@ namespace Reni.Context
 
         string IIconKeyProvider.IconKey { get { return "Context"; } }
 
-        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        bool IReferenceInCode.IsChildOf(ContextBase parentCandidate) { return IsChildOf(parentCandidate); }
         internal static ContextBase CreateRoot(FunctionList functions) { return new ContextBase(null, new Root(functions)); }
 
         [UsedImplicitly]
@@ -75,34 +73,31 @@ namespace Reni.Context
         internal Structure FindRecentStructure { get { return Cache.RecentStructure.Value; } }
 
         [DisableDump]
-        private FunctionContextObject FindRecentFunctionContextObject { get { return Cache.RecentFunctionContextObject.Value; } }
-
-        private ContextBase[] ObtainChildChain()
-        {
-            if(Parent == null)
-                return new[] {this};
-            return Parent.ChildChain.Concat(new[] {this}).ToArray();
-        }
+        internal FunctionContextObject FindRecentFunctionContextObject { get { return Cache.RecentFunctionContextObject.Value; } }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal bool IsChildOf(ContextBase parentCandidate) { return ChildChain.StartsWithAndNotEqual(parentCandidate.ChildChain); }
-        internal ContextBase SpawnFunction(TypeBase args)
+        internal FunctionContextObject SpawnFunction(TypeBase args)
         {
             return _cache
-                .FunctionInstances
+                .FunctionContextObjects
                 .Find(args);
         }
 
-        private ContextBase SpawnPendingContext { get { return _cache.PendingContext.Value; } }
-
-        internal ContextBase SpawnStruct(Struct.Container container, int position)
+        internal ContextBase SpawnChildContext(Struct.Container container, int position)
         {
             return _cache
                 .StructContexts
                 .Find(container)
                 .Find(position);
+        }
+
+        internal ContextBase SpawnChildContext(TypeBase args)
+        {
+            return _cache
+                .FunctionContexts
+                .Find(args);
         }
 
         internal Result CreateArgsReferenceResult(Category category)
@@ -138,28 +133,7 @@ namespace Reni.Context
                 .Result(category);
         }
 
-        private CacheItem CreateCacheElement(ICompileSyntax syntax)
-        {
-            var result = new CacheItem(syntax, this);
-            syntax.AddToCacheForDebug(this, result);
-            return result;
-        }
-
-        internal void AssertCorrectRefs(Result result)
-        {
-            if(result.HasRefs)
-                AssertCorrectRefs(result.Refs.Data);
-            else if(result.HasCode)
-                AssertCorrectRefs(result.Code.RefsData);
-        }
-
-        private void AssertCorrectRefs(IEnumerable<IReferenceInCode> refs)
-        {
-            foreach(var @ref in refs)
-                CheckRef(@ref);
-        }
-
-        private void CheckRef(IReferenceInCode reference) { Tracer.Assert(!reference.IsChildOf(this), () => "context=" + Dump() + "\nref=" + reference.Dump()); }
+        internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
 
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
         {
@@ -174,8 +148,27 @@ namespace Reni.Context
                 .Evaluate();
         }
 
-        [UsedImplicitly]
-        internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
+        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Reference target)
+        {
+            var result = Result(category | Category.Type, syntax);
+            return result.ConvertToAsRef(category, target);
+        }
+
+        private ContextBase[] ObtainChildChain()
+        {
+            if (Parent == null)
+                return new[] { this };
+            return Parent.ChildChain.Concat(new[] { this }).ToArray();
+        }
+
+        private ContextBase SpawnPendingContext { get { return _cache.PendingContext.Value; } }
+
+        private CacheItem CreateCacheElement(ICompileSyntax syntax)
+        {
+            var result = new CacheItem(syntax, this);
+            syntax.AddToCacheForDebug(this, result);
+            return result;
+        }
 
         internal Result ResultAsReference(Category category, ICompileSyntax syntax)
         {
@@ -195,25 +188,23 @@ namespace Reni.Context
             return type.Align(RefAlignParam.AlignBits).Reference(RefAlignParam);
         }
 
-        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Reference target)
-        {
-            var result = Result(category | Category.Type, syntax);
-            return result.ConvertToAsRef(category, target);
-        }
-
         private Structure ObtainRecentStructure()
         {
             var result = ContextItem as Struct.Context;
-            if(result != null)
-                return result.Container.SpawnContainerContext(Parent).SpawnStructure(result.Position);
+            if (result != null)
+                return Parent.SpawnStructure(result);
             return Parent.ObtainRecentStructure();
         }
+
+        internal Structure SpawnStructure(Struct.Context context) { return Cache.Structures.Find(context.Container).Find(context.Position); }
+        internal Structure SpawnStructure(Struct.Container container) { return Cache.Structures.Find(container).Find(container.EndPosition); }
+        internal ContainerContextObject SpawnContainerContext(Struct.Container context) { return Cache.ContainerContextObjects.Find(context); }
 
         private FunctionContextObject ObtainRecentFunctionContext()
         {
             var result = ContextItem as Function;
             if (result != null)
-                return result.SpawnFunctionContext(Parent);
+                return Parent.SpawnFunction(result.ArgsType);
             if (Parent == null)
                 return null;
             return Parent.ObtainRecentFunctionContext();
@@ -231,7 +222,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -18 && category.HasCode;
+            var trace = defineable.ObjectId == -26 && category.HasType;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -269,7 +260,7 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -24 && category.HasCode;
+            var trace = defineable.ObjectId == -20 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, target, defineable);
             var reference = TypeAsReference(target);
             DumpWithBreak(trace, "reference", reference);
@@ -352,12 +343,23 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<TypeBase, ContextBase> FunctionInstances;
+            internal readonly DictionaryEx<TypeBase, FunctionContextObject> FunctionContextObjects;
 
             [Node]
             [SmartNode]
             internal readonly DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>> StructContexts;
 
+            [Node]
+            [SmartNode]
+            internal readonly DictionaryEx<Struct.Container, DictionaryEx<int, Structure>> Structures;
+
+            [Node]
+            [SmartNode]
+            internal readonly DictionaryEx<Struct.Container, ContainerContextObject> ContainerContextObjects;
+
+            [Node]
+            [SmartNode]
+            internal readonly DictionaryEx<TypeBase, ContextBase> FunctionContexts;
             [Node]
             [SmartNode]
             internal readonly DictionaryEx<ICompileSyntax, CacheItem> ResultCache;
@@ -366,16 +368,22 @@ namespace Reni.Context
             [SmartNode]
             internal readonly SimpleCache<ContextBase> PendingContext;
 
+
             public CacheItems(ContextBase parent)
             {
                 ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(parent.CreateCacheElement);
                 StructContexts = new DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>>(
                     container => new DictionaryEx<int, ContextBase>(
                         position => new ContextBase(parent, container.SpawnContext(position))));
-                FunctionInstances = new DictionaryEx<TypeBase, ContextBase>(args => new ContextBase(parent, new Function(args)));
+                FunctionContexts = new DictionaryEx<TypeBase, ContextBase>(argsType => new ContextBase(parent, argsType.SpawnFunction()));
+                FunctionContextObjects = new DictionaryEx<TypeBase, FunctionContextObject>(args => new FunctionContextObject(args, parent));
                 PendingContext = new SimpleCache<ContextBase>(() => new ContextBase(parent, new PendingContext()));
                 RecentStructure = new SimpleCache<Structure>(parent.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<FunctionContextObject>(parent.ObtainRecentFunctionContext);
+                Structures = new DictionaryEx<Struct.Container, DictionaryEx<int, Structure>>(
+                    container => new DictionaryEx<int, Structure>(
+                        position => new Structure(ContainerContextObjects.Find(container),position)));
+                ContainerContextObjects = new DictionaryEx<Struct.Container, ContainerContextObject>(container => new ContainerContextObject(container, parent));
             }
 
             /// <summary>
@@ -386,6 +394,11 @@ namespace Reni.Context
             public string IconKey { get { return "Cache"; } }
         }
 
+    }
+
+    internal interface IFunctionContext : IReferenceInCode
+    {
+        Result Result(Category category, ICompileSyntax body);
     }
 
     internal sealed class ContextOperator : Defineable, ISearchPath<IFeature, TypeBase>

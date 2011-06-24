@@ -30,7 +30,7 @@ namespace Reni.Code
         }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        bool IReferenceInCode.IsChildOf(ContextBase contextBase) { return false; }
+        public bool IsChildOf(ContextBase contextBase) { return false; }
 
         [DisableDump]
         internal override bool IsRelativeReference { get { return false; } }

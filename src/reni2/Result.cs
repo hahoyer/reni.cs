@@ -24,11 +24,47 @@ namespace Reni
         private Refs _refs;
         internal readonly PostProcessorForResult PostProcessor;
 
-        public Result()
+        internal Result()
             : base(_nextObjectId++)
         {
             PostProcessor = new PostProcessorForResult(this);
             PendingCategory = new Category();
+        }
+
+        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs)
+            : this()
+        {
+            if (category.HasSize)
+                _size = getSize();
+            if (category.HasType)
+                _type = getType();
+            if (category.HasCode)
+                _code = getCode();
+            if (category.HasRefs)
+                _refs = getRefs();
+            AssertValid();
+        }
+
+        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
+            : this(category, getSize, getType, getCode, Refs.None)
+        {
+        }
+
+        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<Refs> getRefs)
+            : this()
+        {
+            if (category.HasSize)
+                _size = getSize();
+            if (category.HasCode)
+                _code = getCode();
+            if (category.HasRefs)
+                _refs = getRefs();
+            AssertValid();
+        }
+
+        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode)
+            : this(category, getSize, getCode, Refs.None)
+        {
         }
 
         private bool HasSize { get { return Size != null; } }
@@ -361,7 +397,6 @@ namespace Reni
             PendingCategory |= category;
 
             var result = syntax.Result(context, category);
-            context.AssertCorrectRefs(this);
             result.AssertComplete(category, syntax);
             Update(result);
             PendingCategory = oldPendingCategory;
@@ -550,40 +585,6 @@ namespace Reni
             var result = aResult.Clone();
             result.Update(bResult);
             return result;
-        }
-
-        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs)
-            : this()
-        {
-            if(category.HasSize)
-                _size = getSize();
-            if(category.HasType)
-                _type = getType();
-            if(category.HasCode)
-                _code = getCode();
-            if(category.HasRefs)
-                _refs = getRefs();
-        }
-
-        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
-            : this(category, getSize, getType, getCode, Refs.None)
-        {
-        }
-
-        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<Refs> getRefs)
-            : this()
-        {
-            if(category.HasSize)
-                _size = getSize();
-            if(category.HasCode)
-                _code = getCode();
-            if(category.HasRefs)
-                _refs = getRefs();
-        }
-
-        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode)
-            : this(category, getSize, getCode, Refs.None)
-        {
         }
 
         internal Result ConvertToBitSequence(Category category)

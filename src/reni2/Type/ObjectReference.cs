@@ -26,7 +26,6 @@ namespace Reni.Type
         }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return _refAlignParam; } }
-        bool IReferenceInCode.IsChildOf(ContextBase contextBase) { return false; }
-        string IReferenceInCode.Dump() { return "ObjectReference(" + _objectType.DumpShort() + ")"; }
+        internal override string DumpShort() { return base.DumpShort() + "(" + _objectType.DumpShort() + ")"; }
     }
 }

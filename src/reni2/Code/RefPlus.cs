@@ -50,7 +50,6 @@ namespace Reni.Code
 
         internal override CodeBase TryToCombineBack(TopRef precedingElement)
         {
-            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new TopRef(RefAlignParam, precedingElement.Offset + _right);
         }

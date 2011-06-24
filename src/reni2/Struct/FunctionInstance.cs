@@ -43,12 +43,12 @@ namespace Reni.Struct
         internal FunctionInstance(int index, ICompileSyntax body, Structure structure, TypeBase args)
             : base(index)
         {
-            StopByObjectId(-1);
             _index = index;
             _body = body;
             _structure = structure;
             _args = args;
             _bodyCodeCache = new SimpleCache<CodeBase>(CreateBodyCode);
+            StopByObjectId(-10);
         }
 
         [DisableDump]
@@ -89,7 +89,6 @@ namespace Reni.Struct
             if(category.HasCode)
                 result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
 
-            _structure.SpawnContext.SpawnFunction(_args).AssertCorrectRefs(result);
             return ReturnMethodDumpWithBreak(trace, result);
         }
 
@@ -115,7 +114,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var functionContext = _structure.SpawnContext.SpawnFunction(_args);
+            var functionContext = _structure.SpawnContext.SpawnChildContext(_args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category | Category.Type;
@@ -126,12 +125,12 @@ namespace Reni.Struct
             var postProcessedResult =
                 rawResult
                     .PostProcessor
-                    .FunctionResult(category, functionContext.RefAlignParam);
+                    .FunctionResult(category, _structure.RefAlignParam);
 
             DumpWithBreak(trace, "postProcessedResult", postProcessedResult);
             var result =
                 postProcessedResult
-                    .ReplaceAbsolute(functionContext, CreateContextRefCode, Refs.None);
+                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
             return ReturnMethodDump(trace, result);
         }
 

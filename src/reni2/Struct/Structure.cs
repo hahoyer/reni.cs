@@ -12,35 +12,18 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class AccessPoint : ReniObject
-    {
-        private readonly ContainerContextObject _containerContextObject;
-        private readonly int _position;
-
-        internal AccessPoint(ContainerContextObject containerContextObject, int position)
-        {
-            _containerContextObject = containerContextObject;
-            _position = position;
-        }
-
-        [EnableDump]
-        internal int Position { get { return _position; } }
-
-        internal ContainerContextObject ContainerContextObject { get { return _containerContextObject; } }
-    }
-
     internal sealed class Structure : ReniObject
     {
         private readonly ContainerContextObject _containerContextObject;
         private readonly int _endPosition;
-        private readonly DictionaryEx<ICompileSyntax, FunctionalFeatureType> _functionalFeatureCache;
+        private readonly DictionaryEx<ICompileSyntax, FunctionalBody> _functionalFeatureCache;
         private readonly SimpleCache<StructureType> _typeCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
         {
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
-            _functionalFeatureCache = new DictionaryEx<ICompileSyntax, FunctionalFeatureType>(body => new FunctionalFeatureType(this, body));
+            _functionalFeatureCache = new DictionaryEx<ICompileSyntax, FunctionalBody>(body => new FunctionalBody(this, body));
             _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
         }
 
@@ -51,13 +34,21 @@ namespace Reni.Struct
         internal ContainerContextObject ContainerContextObject { get { return _containerContextObject; } }
 
         [DisableDump]
-        internal ContextBase SpawnContext { get { return ContainerContextObject.SpawnContext(_endPosition); } }
+        internal ContextBase SpawnContext
+        {
+            get
+            {
+                return ContainerContextObject
+                    .Parent
+                    .SpawnChildContext(ContainerContextObject.Container, EndPosition);
+            }
+        }
 
         [DisableDump]
         internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
-        private Reference ReferenceType { get { return Type.Reference(RefAlignParam); } }
+        internal Reference ReferenceType { get { return Type.Reference(RefAlignParam); } }
 
         [DisableDump]
         internal Refs ConstructorRefs
@@ -71,12 +62,6 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal TypeBase InnerType { get { return ContainerContextObject.InnerType(EndPosition); } }
-
-        [DisableDump]
-        internal Size InnerSize { get { return ContainerContextObject.InnerSize(EndPosition); } }
-
-        [DisableDump]
         internal RefAlignParam RefAlignParam { get { return ContainerContextObject.RefAlignParam; } }
 
         [DisableDump]
@@ -86,7 +71,15 @@ namespace Reni.Struct
         internal Size StructSize { get { return ContainerContextObject.StructSize(EndPosition); } }
 
         internal Result Access(Category category, Result thisReferenceResult, Result rightResult) { return AccessFromThisReference(category, thisReferenceResult, rightResult.ConvertTo(IndexType).Evaluate().ToInt32()); }
-        internal Result FunctionAccess(Category category, int position) { return ContainerContextObject.FunctionAccessFromContextReference(category, position); }
+
+        internal Result FunctionAccess(Category category, int position)
+        {
+            Func<TypeBase> getFunctionalType = () => ReferenceType.FunctionalType(ContainerContextObject.InnerType(position).FunctionalFeature());
+            return ContainerContextObject.FunctionAccessFromContextReference(category, getFunctionalType);
+        }
+
+        private ICompileSyntax[] Statements { get { return ContainerContextObject.Statements; } }
+
         internal Result AccessViaThisReference(Category category, int position) { return ReplaceContextReferenceByThisReference(AccessViaContextReference(category, position)); }
         internal Result ReplaceContextReferenceByThisReference(Category category) { return ReplaceContextReferenceByThisReference(DumpPrintResultFromContextReference(category)); }
 
@@ -150,6 +143,6 @@ namespace Reni.Struct
 
         private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position) { return AccessViaThisReference(category, position).ReplaceArg(thisReferenceResult); }
         private Result ReplaceContextReferenceByThisReference(Result result) { return ContainerContextObject.ReplaceContextReferenceByThisReference(EndPosition, result); }
-        private CodeBase ThisReferenceViaContextReferenceCode() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize * -1); }
+        private CodeBase ThisReferenceViaContextReferenceCode() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize*-1); }
     }
 }

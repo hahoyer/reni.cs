@@ -24,7 +24,7 @@ namespace Reni.Struct
     {
         private readonly TokenData _firstToken;
         private readonly TokenData _lastToken;
-        private readonly ICompileSyntax[] _list;
+        private readonly ICompileSyntax[] _statements;
         private readonly DictionaryEx<string, int> _dictionary;
         private readonly int[] _converters;
         private readonly int[] _properties;
@@ -37,10 +37,10 @@ namespace Reni.Struct
         private readonly DictionaryEx<ContextBase, ContainerContextObject> _containerContextCache;
 
         [Node]
-        internal ICompileSyntax[] List { get { return _list; } }
+        internal ICompileSyntax[] Statements { get { return _statements; } }
 
         [DisableDump]
-        internal int EndPosition { get { return List.Length; } }
+        internal int EndPosition { get { return Statements.Length; } }
 
         [Node, SmartNode]
         internal DictionaryEx<string, int> Dictionary { get { return _dictionary; } }
@@ -55,12 +55,12 @@ namespace Reni.Struct
 
         protected override TokenData GetLastToken() { return _lastToken; }
 
-        private Container(TokenData leftToken, TokenData rightToken, ICompileSyntax[] list, DictionaryEx<string, int> dictionary, int[] converters, int[] properties)
+        private Container(TokenData leftToken, TokenData rightToken, ICompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters, int[] properties)
             : base(leftToken,_nextObjectId++)
         {
             _firstToken = leftToken;
             _lastToken = rightToken;
-            _list = list;
+            _statements = statements;
             _dictionary = dictionary;
             _converters = converters;
             _properties = properties;
@@ -81,7 +81,7 @@ namespace Reni.Struct
         internal override ICompileSyntax ToCompiledSyntax() { return this; }
 
         [DisableDump]
-        internal int IndexSize { get { return BitsConst.AutoSize(List.Length); } }
+        internal int IndexSize { get { return BitsConst.AutoSize(Statements.Length); } }
 
         internal override string DumpShort() { return "container." + ObjectId; }
 
@@ -202,13 +202,13 @@ namespace Reni.Struct
         internal override Result Result(ContextBase context, Category category)
         {
             var innerResult = InnerResult(category - Category.Type, context, 0, EndPosition);
-            return SpawnContainerContext(context).Result(category, innerResult);
+            return context.SpawnContainerContext(this).Result(category, innerResult);
         }
 
         internal Result InnerResult(Category category, ContextBase parent, int position)
         {
-            var result = SpawnContext(parent, position)
-                .Result(category | Category.Type, List[position])
+            var result = parent.SpawnChildContext(this, position)
+                .Result(category | Category.Type, Statements[position])
                 .PostProcessor
                 .InnerResultForStruct(category, parent.RefAlignParam);
             Tracer.Assert(!(category.HasType && result.Type is Reference));
@@ -216,8 +216,6 @@ namespace Reni.Struct
         }
 
         internal Context SpawnContext(int position) { return _contextCache.Find(position); }
-        internal ContextBase SpawnContext(ContextBase parent, int position) { return parent.SpawnStruct(this, position); }
-        internal ContextBase SpawnContext(ContextBase parent) { return parent.SpawnStruct(this, EndPosition); }
 
         internal ContainerContextObject SpawnContainerContext(ContextBase parent)
         {
@@ -237,7 +235,7 @@ namespace Reni.Struct
 
         internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, position).Size; }
         internal TypeBase InnerType(ContextBase parent, int position) { return InnerResult(Category.Type, parent, position).Type; }
-        internal bool IsLambda(int position) { return List[position].IsLambda; }
+        internal bool IsLambda(int position) { return Statements[position].IsLambda; }
         internal bool IsProperty(int position) { return Properties.Contains(position); }
     }
 

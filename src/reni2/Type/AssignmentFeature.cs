@@ -1,11 +1,10 @@
-using System;
+using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
+using System;
 using Reni.Context;
-using Reni.Type;
 
-namespace Reni.Struct
+namespace Reni.Type
 {
     internal sealed class AssignmentFeature : ReniObject, IFunctionalFeature
     {

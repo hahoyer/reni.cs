@@ -27,7 +27,8 @@ namespace Reni.Type
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
             public readonly DictionaryEx<RefAlignParam, Reference> References;
             public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
-            public readonly SimpleCache<TypeType> TypeTypeCache;
+            public readonly SimpleCache<TypeType> TypeType;
+            public readonly SimpleCache<Context.Function> Function;
 
             public Cache(TypeBase parent)
             {
@@ -37,7 +38,8 @@ namespace Reni.Type
                 Sequences = new DictionaryEx<int, BaseType>(elementCount => new BaseType(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
-                TypeTypeCache = new SimpleCache<TypeType>(() => new TypeType(parent));
+                TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
+                Function = new SimpleCache<Context.Function>(()=> new Context.Function(parent));
             }
         }
 
@@ -250,7 +252,7 @@ namespace Reni.Type
         internal virtual RefAlignParam[] ReferenceChain { get { return new RefAlignParam[0]; } }
 
         [DisableDump]
-        internal TypeType TypeType { get { return _cache.TypeTypeCache.Value; } }
+        internal TypeType TypeType { get { return _cache.TypeType.Value; } }
 
         internal virtual IFunctionalFeature FunctionalFeature()
         {
@@ -288,7 +290,7 @@ namespace Reni.Type
 
         internal Result Apply(Category category, Result rightResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -10 && category.HasCode;
+            var trace = ObjectId == -10 && category.HasType;
             StartMethodDumpWithBreak(trace, category, rightResult, refAlignParam);
             var functionalFeature = FunctionalFeature();
             var apply = functionalFeature.Apply(category, rightResult.Type, refAlignParam);
@@ -345,14 +347,14 @@ namespace Reni.Type
                 );
         }
 
-        internal virtual Result ReferenceInCode(ContextBase function, Category category)
+        internal virtual Result ReferenceInCode(IReferenceInCode target, Category category)
         {
-            return Reference(function.RefAlignParam)
+            return Reference(target.RefAlignParam)
                 .Result
                 (
                     category,
-                    () => CodeBase.ReferenceCode(function),
-                    () => Refs.Create(function)
+                    () => CodeBase.ReferenceCode(target),
+                    () => Refs.Create(target)
                 )
                 ;
         }
@@ -362,5 +364,7 @@ namespace Reni.Type
             NotImplementedMethod(category);
             return null;
         }
+
+        public IContextItem SpawnFunction() { return _cache.Function.Value; }
     }
 }

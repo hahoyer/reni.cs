@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
@@ -33,7 +34,7 @@ namespace ReniTest
         }
 
         [Test]
-        private static void RunSpecificTest() { new ObjectFunction().Run(); }
+        private static void RunSpecificTest() { new TypeNameExtenderTest().TestMethod(); }
 
         private const string Target = @"! property x: 11/\; x dump_print";
         private const string Output = "11";
@@ -48,6 +49,26 @@ namespace ReniTest
             //Profiler.Measure(()=>compiler.Exec());
             //Tracer.FlaggedLine(Profiler.Format(10,0.0));
             return compiler;
+        }
+    }
+
+    [TestFixture]
+    public sealed class TypeNameExtenderTest
+    {
+        [Test]
+        public void TestMethod()
+        {
+            InternalTest(typeof(int), "int");
+            InternalTest(typeof(List<int>), "List<int>");
+            InternalTest(typeof(List<List<int>>), "List<List<int>>");
+            InternalTest(typeof(Dictionary<int, string>), "Dictionary<int,string>");
+            InternalTest(typeof(Reni.FeatureTest.DefaultOperations.TypeOperator), "DefaultOperations.TypeOperator");
+        }
+
+        [DebuggerHidden]
+        private static void InternalTest(Type type, string expectedTypeName)
+        {
+            Tracer.Assert(1, type.PrettyName() == expectedTypeName, () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName);
         }
     }
 }

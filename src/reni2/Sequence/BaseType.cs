@@ -19,8 +19,6 @@ namespace Reni.Sequence
         [DisableDump]
         internal readonly IFeature BitDumpPrintFeature;
 
-        private readonly DictionaryEx<FunctionalFeature, TypeBase> _functionalTypeCache;
-
         internal Result EnableCutFeature(Category category) { return new EnableCut(this).ArgResult(category); }
 
         internal IFeature Feature(FeatureBase featureBase) { return new FunctionalFeature(this, featureBase); }
@@ -33,14 +31,11 @@ namespace Reni.Sequence
             _inheritedType = elementType.Array(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             StopByObjectId(-172);
-            _functionalTypeCache = new DictionaryEx<FunctionalFeature, TypeBase>(functionalFeature => new FunctionalFeatureType<BaseType, FunctionalFeature>(this, functionalFeature));
         }
 
         [DisableDump]
         [UsedImplicitly]
         internal Type.Array InheritedType { get { return _inheritedType; } }
-
-        internal TypeBase SpawnFunctionalType(FunctionalFeature functionalFeature) { return _functionalTypeCache.Find(functionalFeature); }
 
         protected override Size GetSize() { return _inheritedType.Size; }
 
