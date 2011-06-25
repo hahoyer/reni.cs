@@ -13,12 +13,7 @@ namespace Reni.Parser
     {
         public override void Run() { }
 
-        /// <summary>
-        ///     Special test, will not work automatically.
-        /// </summary>
-        /// created 18.07.2007 01:27 on HAHOYER-DELL by hh
-        [Test]
-        [Explicit]
+        //[Test]
         public void SimpleFunction()
         {
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
