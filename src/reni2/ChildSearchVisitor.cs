@@ -11,16 +11,17 @@ namespace Reni
         where TFeature : class
         where TType : IDumpShortProvider
     {
-        [EnableDump]
+        [DisableDump]
         private readonly SearchVisitor<TFeature> _parent;
 
+        [EnableDump]
         private readonly TType _target;
 
         public ChildSearchVisitor(SearchVisitor<TFeature> parent, TType target)
         {
             _parent = parent;
             _target = target;
-            _parent.AddChild(this);
+            _parent.Add(this);
         }
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }

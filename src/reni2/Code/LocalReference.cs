@@ -25,8 +25,6 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _unalignedCode = code;
             DestructorCode = destructorCode;
-            StopByObjectId(-10);
-            StopByObjectId(-2);
             StopByObjectId(-3);
         }
 
@@ -47,7 +45,7 @@ namespace Reni.Code
         internal CodeBase AccompayningDestructorCode(ref Size size, string holder)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(LocalVariableReference(RefAlignParam, holder));
+            return DestructorCode.ReplaceArg(LocalVariableReference(RefAlignParam, holder),null);
         }
     }
 }

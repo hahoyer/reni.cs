@@ -52,7 +52,6 @@ namespace Reni.Code
 
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
         {
-            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new LocalVariableAccess(RefAlignParam, precedingElement.Holder, precedingElement.Offset, OutputSize, _dataSize);
         }

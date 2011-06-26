@@ -6,6 +6,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -75,7 +76,7 @@ namespace Reni.Code
         [DisableDump]
         internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
 
-        internal static CodeBase Arg(Size size) { return new Arg(size); }
+        internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
         internal static CodeBase BitsConst(Size size, BitsConst t) { return new BitArray(size, t); }
         internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
         internal static CodeBase DumpPrintText(string dumpPrintText) { return new DumpPrintText(dumpPrintText); }
@@ -100,10 +101,10 @@ namespace Reni.Code
             return Code.List.Create(resultData);
         }
 
-        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize, RefAlignParam refAlignParam)
+        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, AutomaticReferenceType objectType)
         {
-            return Arg(refAlignParam.RefSize)
-                .Dereference(refAlignParam, objSize.ByteAlignedSize)
+            return Arg(objectType)
+                .Dereference(objectType.RefAlignParam, objectType.ValueType.Size.ByteAlignedSize)
                 .BitSequenceOperation(feature, size);
         }
 
@@ -111,16 +112,17 @@ namespace Reni.Code
         {
             var objSize = Size.Create(objBits);
             var argsSize = Size.Create(argsBits);
-            return Arg(refAlignParam.RefSize)
-                .Dereference(refAlignParam, objSize.ByteAlignedSize + argsSize.ByteAlignedSize)
+            var operandsSize = objSize.ByteAlignedSize + argsSize.ByteAlignedSize;
+            return Arg(TypeBase.Number(operandsSize.ToInt()).SpawnReference(refAlignParam))
+                .Dereference(refAlignParam, operandsSize)
                 .BitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
-        internal static CodeBase BitSequenceDumpPrint(int objSize, RefAlignParam refAlignParam)
+        internal static CodeBase BitSequenceDumpPrint(AutomaticReferenceType objectType)
         {
-            var alignedSize = Size.Create(objSize).Align(refAlignParam.AlignBits);
-            return Arg(refAlignParam.RefSize)
-                .Dereference(refAlignParam, alignedSize)
+            var alignedSize = objectType.ValueType.Size.Align(objectType.RefAlignParam.AlignBits);
+            return Arg(objectType)
+                .Dereference(objectType.RefAlignParam, alignedSize)
                 .DumpPrint(alignedSize);
         }
 
@@ -171,18 +173,18 @@ namespace Reni.Code
 
         protected virtual IEnumerable<CodeBase> AsList() { return new[] {this}; }
 
-        internal CodeBase ReplaceArg(CodeBase argCode)
+        internal CodeBase ReplaceArg(CodeBase argCode, TypeBase argType)
         {
             try
             {
                 var result = argCode.IsRelativeReference
-                                 ? Visit(new ReplaceRelRefArg(argCode))
-                                 : Visit(new ReplaceAbsoluteArg(argCode));
+                                 ? Visit(new ReplaceRelRefArg(argCode,argType))
+                                 : Visit(new ReplaceAbsoluteArg(argCode, argType));
                 return result ?? this;
             }
             catch(ReplaceArg.SizeException sizeException)
             {
-                DumpWithBreak(true, "this", this, "sizeException", sizeException);
+                DumpWithBreak(true, "this", this, "argType", argType, "sizeException", sizeException);
                 throw;
             }
         }
@@ -269,7 +271,7 @@ namespace Reni.Code
             if(!resultSize.IsZero)
             {
                 result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize))
-                    .Sequence(copier.ReplaceArg(LocalVariableReference(refAlignParam, holder)));
+                    .Sequence(copier.ReplaceArg(LocalVariableReference(refAlignParam, holder),null));
             }
 
             return result.CreateFiber(new Drop(Size, resultSize));

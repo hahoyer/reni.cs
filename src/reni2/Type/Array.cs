@@ -114,7 +114,7 @@ namespace Reni.Type
                 .AutomaticDereference();
 
             var rightResult = callContext
-                .ConvertedRefResult(categoryWithType, args, elementType.Reference(callContext.RefAlignParam))
+                .ConvertedRefResult(categoryWithType, args, elementType.SpawnReference(callContext.RefAlignParam))
                 .AutomaticDereference()
                 .Align(callContext.AlignBits);
 

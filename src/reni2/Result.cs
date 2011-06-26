@@ -451,7 +451,7 @@ namespace Reni
             StartMethodDump(trace, resultForArg);
             var result = new Result {Size = Size, Type = Type};
             if(HasCode && resultForArg.HasCode)
-                result.Code = Code.ReplaceArg(resultForArg.Code);
+                result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
             if(HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.Sequence(resultForArg.Refs);
             return ReturnMethodDump(trace, result);

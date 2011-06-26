@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Type;
 
 namespace Reni.Code.ReplaceVisitor
 {
@@ -12,15 +13,15 @@ namespace Reni.Code.ReplaceVisitor
         [EnableDump]
         private readonly Size _offset;
 
-        private ReplaceRelRefArg(CodeBase actual, Size offset)
-            : base(actual)
+        private ReplaceRelRefArg(CodeBase actual, TypeBase actualArgType, Size offset)
+            : base(actual, actualArgType)
         {
             _offset = offset;
             StopByObjectId(-22);
         }
 
-        internal ReplaceRelRefArg(CodeBase actualArg)
-            : this(actualArg, Size.Create(0)) { }
+        internal ReplaceRelRefArg(CodeBase actualArg, TypeBase actualArgType)
+            : this(actualArg, actualArgType, Size.Create(0)) { }
 
         private RefAlignParam RefAlignParam { get { return ActualArg.RefAlignParam; } }
 
@@ -36,6 +37,6 @@ namespace Reni.Code.ReplaceVisitor
 
         private Size Offset { get { return _offset; } }
 
-        protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelRefArg(ActualArg, Offset + size); }
+        protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelRefArg(ActualArg, ActualArgType, Offset + size); }
     }
 }

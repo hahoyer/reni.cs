@@ -10,23 +10,28 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    internal sealed class AutomaticReferenceType : ReferenceType
+    internal sealed class AutomaticReferenceType : TypeBase, IReference
     {
+        private static int _nextObjectId;
         private readonly RefAlignParam _refAlignParam;
         private readonly AssignmentFeature _assignmentFeature;
         private readonly DictionaryEx<IFunctionalFeature, TypeBase> _functionalTypeCache;
+        private readonly TypeBase _valueType;
 
         internal AutomaticReferenceType(TypeBase valueType, RefAlignParam refAlignParam)
-            : base(valueType)
+            : base(_nextObjectId++)
         {
+            Tracer.Assert(!valueType.Size.IsZero, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
+            _valueType = valueType;
             _refAlignParam = refAlignParam;
             _assignmentFeature = new AssignmentFeature(this);
             _functionalTypeCache = new DictionaryEx<IFunctionalFeature, TypeBase>(feature => new FunctionalFeatureType<AutomaticReferenceType, IFunctionalFeature>(this, feature));
             StopByObjectId(-2);
         }
 
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        [DisableDump]
+        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         protected override bool IsReferenceTo(TypeBase value) { return ValueType == value; }
 
@@ -43,6 +48,9 @@ namespace Reni.Type
             }
         }
 
+        internal TypeBase ValueType { get { return _valueType; } }
+        internal override string DumpPrintText { get { return DumpShort(); } }
+
         internal Result ApplyAssignment(Category category)
         {
             return FunctionalType(_assignmentFeature)
@@ -57,7 +65,7 @@ namespace Reni.Type
                 .Result
                 (
                     category,
-                    () => CodeBase.Arg(RefAlignParam.RefSize*2).Assignment(RefAlignParam, ValueType.Size)
+                    () => CodeBase.Arg(argsType.Pair(argsType).SpawnReference(RefAlignParam)).Assignment(RefAlignParam, ValueType.Size)
                 );
 
             if(!category.HasCode && !category.HasRefs)
@@ -94,5 +102,24 @@ namespace Reni.Type
                     () => Refs.Create(target)
                 );
         }
+
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
+
+        internal override bool IsRef(RefAlignParam refAlignParam)
+        {
+            Tracer.Assert(RefAlignParam == refAlignParam);
+            return true;
+        }
+
+        internal override void Search(ISearchVisitor searchVisitor)
+        {
+            _valueType.Search(searchVisitor.Child(this));
+            _valueType.Search(searchVisitor);
+            base.Search(searchVisitor);
+        }
+
+        internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return ValueType.IsConvertableTo(dest, conversionParameter); }
+        internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
     }
 }

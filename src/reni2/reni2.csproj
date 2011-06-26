@@ -234,7 +234,7 @@
     <Compile Include="Type\EnableCut.cs" />
     <Compile Include="Type\EnableCutFeature.cs" />
     <Compile Include="Sequence\FunctionalFeature.cs" />
-    <Compile Include="Type\FieldAccessType.cs" />
+    <Compile Include="Type\AccessType.cs" />
     <Compile Include="Type\IFunctionalFeature.cs" />
     <Compile Include="Type\ObjectReference.cs" />
     <Compile Include="Type\Pending.cs" />
@@ -253,7 +253,6 @@
     <Compile Include="Type\List.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\AutomaticReferenceType.cs" />
-    <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />

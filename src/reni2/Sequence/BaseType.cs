@@ -29,7 +29,7 @@ namespace Reni.Sequence
         public BaseType(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0, () => "count=" + count);
-            _inheritedType = elementType.Array(count);
+            _inheritedType = elementType.SpawnArray(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             StopByObjectId(-172);
         }
@@ -135,7 +135,7 @@ namespace Reni.Sequence
             var result = Result
                 (
                     category,
-                    () => CodeBase.Arg(oldSize).BitCast(Size)
+                    () => CodeBase.Arg(Element.SpawnSequence(oldCount)).BitCast(Size)
                 );
             return result;
         }
@@ -149,12 +149,12 @@ namespace Reni.Sequence
                 return null;
             }
             var tempNewCount = Math.Min(Count, newCount);
-            var newType = Element.Sequence(tempNewCount);
+            var newType = Element.SpawnSequence(tempNewCount);
             var result = newType
                 .Result
                 (
                     category,
-                    () => CodeBase.Arg(Size).BitCast(newType.Size)
+                    () => CodeBase.Arg(this).BitCast(newType.Size)
                 );
             return result;
         }
@@ -163,7 +163,7 @@ namespace Reni.Sequence
 
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
-        internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam) { return Reference(refAlignParam).ObjectReferenceInCode(category); }
+        internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam) { return SpawnReference(refAlignParam).ObjectReferenceInCode(category); }
 
     }
 

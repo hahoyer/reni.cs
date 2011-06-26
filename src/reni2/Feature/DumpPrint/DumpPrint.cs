@@ -12,11 +12,11 @@ namespace Reni.Feature.DumpPrint
 {
     internal abstract class BitFeatureBase : ReniObject
     {
-        protected static Result Apply(Category category, int objSize, RefAlignParam refAlignParam)
+        protected static Result Apply(Category category, AutomaticReferenceType objectType)
         {
             return TypeBase
                 .Void
-                .Result(category, () => CodeBase.BitSequenceDumpPrint(objSize, refAlignParam));
+                .Result(category, () => CodeBase.BitSequenceDumpPrint(objectType));
         }
     }
 
@@ -33,17 +33,17 @@ namespace Reni.Feature.DumpPrint
 
         internal BitSequenceFeatureClass(BaseType parent) { _parent = parent; }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.SequenceCount(TypeBase.Bit), refAlignParam); }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.SpawnReference(refAlignParam)); }
         TypeBase IFeature.DefiningType() { return _parent; }
     }
 
     internal sealed class BitFeature : BitFeatureBase, IFeature
     {
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, 1, refAlignParam); }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.SpawnReference(refAlignParam)); }
         TypeBase IFeature.DefiningType() { return TypeBase.Bit; }
     }
 
-    internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, ReferenceType>,
+    internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, AutomaticReferenceType>,
                                                    IFeature
     {
         [EnableDump]
@@ -51,7 +51,7 @@ namespace Reni.Feature.DumpPrint
 
         public StructReferenceFeature(StructureType structureType) { _structureType = structureType; }
 
-        IFeature ISearchPath<IFeature, ReferenceType>.Convert(ReferenceType type)
+        IFeature ISearchPath<IFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type)
         {
             Tracer.Assert(type.RefAlignParam == _structureType.RefAlignParam);
             return this;

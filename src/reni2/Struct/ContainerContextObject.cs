@@ -53,7 +53,7 @@ namespace Reni.Struct
         internal Size InnerSize(int position) { return Container.InnerSize(_parent, position); }
         internal TypeBase InnerType(int position) { return Container.InnerType(_parent, position); }
         internal Size StructSize(int position) { return Container.InnerResult(Category.Size, Parent, 0, position).Size; }
-        internal Result AccessFromContextReference(Category category, FieldAccessType typeBase, int endPosition)
+        internal Result AccessFromContextReference(Category category, AccessType typeBase, int endPosition)
         {
             var result = typeBase
                 .Result
@@ -74,8 +74,17 @@ namespace Reni.Struct
             return result;
         }
 
-        private Size FieldOffsetFromContextReference(int position) { return Container.InnerResult(Category.Size, Parent, 0, position + 1).Size*-1; }
-        private Size ContextReferenceOffsetFromAccessPoint(int position) { return Container.InnerResult(Category.Size, Parent, 0, position).Size; }
+        private Size FieldOffsetFromContextReference(int position)
+        {
+            return Container
+                       .InnerResult(Category.Size, Parent, 0, position + 1).Size*-1;
+        }
+
+        private Size ContextReferenceOffsetFromAccessPoint(int position)
+        {
+            return Container
+                .InnerResult(Category.Size, Parent, 0, position).Size;
+        }
         private bool IsLambda(int position) { return Container.IsLambda(position); }
         private bool IsPoperty(int position) { return Container.IsProperty(position); }
 
@@ -102,8 +111,10 @@ namespace Reni.Struct
         private CodeBase ReplaceContextReferenceByThisReferenceCode(int accessPosition)
         {
             return CodeBase
-                .Arg(RefAlignParam.RefSize)
+                .Arg(Parent.SpawnStructure(Container).StructureReferenceType)
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
+
+        internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition) { return Container.InnerSize(Parent, fieldPosition + 1, accessPosition); }
     }
 }

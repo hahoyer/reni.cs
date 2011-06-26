@@ -60,7 +60,7 @@ namespace Reni.Struct
             return dest.Result
                 (
                     category,
-                    () => CodeBase.Arg(Size.Zero),
+                    () => CodeBase.Arg(dest),
                     () => Structure.ConstructorRefs
                 );
         }

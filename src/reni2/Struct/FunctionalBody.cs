@@ -44,7 +44,7 @@ namespace Reni.Struct
         internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
         internal override string DumpPrintText { get { return _body.DumpShort() + "/\\"; } }
         internal override IFunctionalFeature FunctionalFeature() { return this; }
-        internal override TypeBase ObjectType() { return _structure.AutomaticReferenceTypeType; }
+        internal override TypeBase ObjectType() { return _structure.StructureReferenceType; }
 
         private ICompileSyntax Body { get { return _body; } }
 

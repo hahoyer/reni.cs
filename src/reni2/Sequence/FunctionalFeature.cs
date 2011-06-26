@@ -26,7 +26,7 @@ namespace Reni.Sequence
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
             return _parent
-                .Reference(refAlignParam)
+                .SpawnReference(refAlignParam)
                 .FunctionalType(this)
                 .ArgResult(category);
         }

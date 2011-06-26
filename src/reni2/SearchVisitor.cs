@@ -13,8 +13,8 @@ namespace Reni
         void ISearchVisitor.Search() { SearchTypeBase(); }
         void ISearchVisitor.ChildSearch<TType>(TType target) { InternalChild(target).Search(); }
         ISearchVisitor ISearchVisitor.Child(BaseType target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(ReferenceType target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(FieldAccessType target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(AutomaticReferenceType target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(AccessType target) { return InternalChild(target); }
         internal abstract void SearchTypeBase();
 
         protected abstract ISearchVisitor InternalChild<TType>(TType target)

@@ -65,7 +65,6 @@ namespace Reni.Code
 
         internal override FiberItem[] TryToCombineBack(RefPlus precedingElement)
         {
-            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
             {
                 var newRight = _right + precedingElement._right;
@@ -78,7 +77,6 @@ namespace Reni.Code
 
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
         {
-            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return CodeBase
                 .LocalVariableReference(RefAlignParam, precedingElement.Holder, precedingElement.Offset + _right);

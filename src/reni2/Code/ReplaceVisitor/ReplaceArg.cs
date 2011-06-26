@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using JetBrains.Annotations;
+using Reni.Type;
 
 namespace Reni.Code.ReplaceVisitor
 {
@@ -14,12 +15,14 @@ namespace Reni.Code.ReplaceVisitor
     {
         private static int _nextObjectId;
         private readonly CodeBase _actualArg;
+        private readonly TypeBase _actualArgType;
 
-        internal ReplaceArg(CodeBase actualArg)
+        internal ReplaceArg(CodeBase actualArg, TypeBase actualArgType)
             : base(_nextObjectId++)
         {
             Tracer.Assert(actualArg != null, () => "actualArg != null");
             _actualArg = actualArg;
+            _actualArgType = actualArgType;
         }
 
         [DisableDump]
@@ -29,10 +32,12 @@ namespace Reni.Code.ReplaceVisitor
 
         internal override CodeBase Arg(Arg visitedObject)
         {
-            if(Actual.Size != visitedObject.Size)
+            if(ActualArgType != visitedObject.Type)
                 throw new SizeException(Actual, visitedObject);
             return Actual;
         }
+
+        protected TypeBase ActualArgType { get { return _actualArgType; } }
 
         [Dump("Dump")]
         internal sealed class SizeException : Exception

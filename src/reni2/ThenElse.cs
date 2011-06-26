@@ -46,8 +46,7 @@ namespace Reni
                 .ConvertTo(TypeBase.Bit)
                 .Align(context.AlignBits)
                 .LocalBlock(category | Category.Type, context.RefAlignParam)
-                .ConvertTo(TypeBase.Bit)
-                ;
+                .ConvertTo(TypeBase.Bit);
         }
 
         private Result ElseResult(ContextBase context, Category category)

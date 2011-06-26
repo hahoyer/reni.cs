@@ -50,7 +50,7 @@ namespace Reni.Feature
         {
             return feature
                 .DefiningType()
-                .Reference(refAlignParam);
+                .SpawnReference(refAlignParam);
         }
 
         internal static IFeature ConvertToFeature(this object feature)

@@ -2,33 +2,34 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Helper;
 using Reni.Basics;
-using Reni.Context;
+using Reni.Code;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Struct;
 
 namespace Reni.Type
 {
-    internal sealed class FieldAccessType : TypeBase
+    internal sealed class AccessType : TypeBase
     {
         private static int _nextObjectId;
         private readonly TypeBase _valueType;
-        private readonly ContainerContextObject _containerContextObject;
+        private readonly Structure _accessPoint;
         private readonly int _position;
 
-        public FieldAccessType(TypeBase valueType, ContainerContextObject containerContextObject, int position)
+        public AccessType(TypeBase valueType, Structure accessPoint, int position)
             : base(_nextObjectId++)
         {
             _valueType = valueType;
-            _containerContextObject = containerContextObject;
+            _accessPoint = accessPoint;
             _position = position;
         }
 
         [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return _containerContextObject.RefAlignParam; } }
+        internal RefAlignParam RefAlignParam { get { return _accessPoint.RefAlignParam; } }
 
-        internal ContainerContextObject ContainerContextObject { get { return _containerContextObject; } }
+        internal Structure AccessPoint { get { return _accessPoint; } }
         internal TypeBase ValueType { get { return _valueType; } }
         internal int Position { get { return _position; } }
 
@@ -43,17 +44,28 @@ namespace Reni.Type
 
         protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
-            var result = ValueType.Conversion(category, dest);
-            NotImplementedMethod(category, dest);
-            return null;
+            return ValueType
+                .SpawnReference(RefAlignParam)
+                .Conversion(category, dest)
+                .ReplaceArg(ValueReferenceViaFieldReference(category));
         }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
+        private Result ValueReferenceViaFieldReference(Category category)
         {
-            return ValueType.IsConvertableTo(dest, conversionParameter);
+            var result = new Result
+                (category
+                 , () => RefAlignParam.RefSize
+                 , () => ValueType.SpawnReference(RefAlignParam)
+                 , () => CodeBase.Arg(this).AddToReference(RefAlignParam, AccessPoint.FieldOffsetFromThisReference(Position))
+                 , Refs.None
+                );
+            return result;
         }
 
-        protected override Size GetSize() { return _containerContextObject.RefAlignParam.RefSize; }
+        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return ValueType.IsConvertableTo(dest, conversionParameter); }
+
+        protected override Size GetSize() { return _accessPoint.RefAlignParam.RefSize; }
+        internal override bool IsRef(RefAlignParam refAlignParam) { return refAlignParam == RefAlignParam; }
 
         internal override TypeBase AutomaticDereference()
         {

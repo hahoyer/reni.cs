@@ -34,8 +34,10 @@ namespace Reni.Sequence
         private Result Apply(Category category, Size objSize, RefAlignParam refAlignParam)
         {
             var type = TypeBase.Number(objSize.ToInt());
-            return type.Result(category,
-                               () => CodeBase.BitSequenceOperation(type.Size, _definable, objSize, refAlignParam));
+            return type
+                .Result
+                (category
+                , () => CodeBase.BitSequenceOperation(type.Size, _definable, type.SpawnReference(refAlignParam)));
         }
     }
 }

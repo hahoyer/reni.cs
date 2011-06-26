@@ -187,7 +187,7 @@ namespace Reni.Context
             if (type is IReference)
                 return (IReference) type;
 
-            return type.Align(RefAlignParam.AlignBits).Reference(RefAlignParam);
+            return type.Align(RefAlignParam.AlignBits).SpawnReference(RefAlignParam);
         }
 
         private Structure ObtainRecentStructure()
@@ -262,11 +262,11 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -20 && category.HasCode;
+            var trace = defineable.ObjectId == -25 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, target, defineable);
-            var leftType = Type(target);
-            DumpWithBreak(trace, "leftType", leftType);
-            var operationResult = leftType.OperationResult<TFeature>(category, defineable, RefAlignParam);
+            var targetType = Type(target);
+            DumpWithBreak(trace, "targetType", targetType);
+            var operationResult = targetType.OperationResult<TFeature>(category, defineable, RefAlignParam);
             if(operationResult == null)
                 return null;
 

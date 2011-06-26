@@ -7,7 +7,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -50,7 +49,7 @@ namespace Reni.Struct
         internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
-        internal AutomaticReferenceType AutomaticReferenceTypeType { get { return Type.Reference(RefAlignParam); } }
+        internal AutomaticReferenceType StructureReferenceType { get { return Type.SpawnReference(RefAlignParam); } }
 
         [DisableDump]
         internal Refs ConstructorRefs
@@ -95,11 +94,11 @@ namespace Reni.Struct
                 .CreateFunctionCall(this, category, body, argsResult);
         }
 
-        private FieldAccessType AccessType(int position)
+        private AccessType AccessType(int position)
         {
             return ContainerContextObject
                 .InnerType(position)
-                .AccessType(ContainerContextObject, position);
+                .AccessType(this, position);
         }
 
         internal Result DumpPrintResultFromContextReference(Category category)
@@ -110,14 +109,14 @@ namespace Reni.Struct
 
         internal Result AccessViaContextReference(Category category, int position)
         {
-            FieldAccessType functionalType = AccessType(position);
+            var accessType = AccessType(position);
             return ContainerContextObject
-                .AccessFromContextReference(category, functionalType, EndPosition);
+                .AccessFromContextReference(category, accessType, EndPosition);
         }
 
         internal Result ThisReferenceResultViaContextReference(Category category)
         {
-            var result = Type.Reference(RefAlignParam).Result
+            var result = Type.SpawnReference(RefAlignParam).Result
                 (category
                  , ThisReferenceViaContextReferenceCode
                  , () => Refs.Create(ContainerContextObject)
@@ -129,7 +128,7 @@ namespace Reni.Struct
         {
             return ContainerContextObject
                 .InnerType(position)
-                .SpawnAccessType(ContainerContextObject, position)
+                .SpawnAccessType(this, position)
                 .DumpPrintOperationResult(category)
                 .ReplaceArg(AccessViaThisReference(category, position));
         }
@@ -137,5 +136,7 @@ namespace Reni.Struct
         private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position) { return AccessViaThisReference(category, position).ReplaceArg(thisReferenceResult); }
         private Result ReplaceContextReferenceByThisReference(Result result) { return ContainerContextObject.ReplaceContextReferenceByThisReference(EndPosition, result); }
         private CodeBase ThisReferenceViaContextReferenceCode() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize*-1); }
+
+        internal Size FieldOffsetFromThisReference(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
     }
 }

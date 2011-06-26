@@ -31,15 +31,20 @@ namespace Reni.Type
             public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<Context.Function> Function;
-            public readonly DictionaryEx<ContainerContextObject, DictionaryEx<int,FieldAccessType>> AccessTypes;
+
+            public readonly DictionaryEx<Structure, DictionaryEx<int, AccessType>> AccessTypes;
 
             public Cache(TypeBase parent)
             {
-                AccessTypes =new DictionaryEx<ContainerContextObject, DictionaryEx<int, FieldAccessType>>(
-                    containerContextObject=>new DictionaryEx<int, FieldAccessType>(
-                        position=>new FieldAccessType(parent,containerContextObject,position)));
+                AccessTypes = new DictionaryEx<Structure, DictionaryEx<int, AccessType>>
+                (
+                    accessPoint => new DictionaryEx<int, AccessType>
+                    (
+                        position => new AccessType(parent, accessPoint, position)
+                    )
+                );
                 ObjectReferences = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(parent, refAlignParam));
-                References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(refAlignParam => new AutomaticReferenceType(parent, refAlignParam));
+                References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Sequences = new DictionaryEx<int, BaseType>(elementCount => new BaseType(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
@@ -113,12 +118,12 @@ namespace Reni.Type
             return _cache.Aligners.Find(alignBits);
         }
 
-        internal Array Array(int count) { return _cache.Arrays.Find(count); }
+        internal Array SpawnArray(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
-        internal AutomaticReferenceType Reference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
-        internal BaseType Sequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
+        internal virtual AutomaticReferenceType SpawnReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
+        internal BaseType SpawnSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         protected ObjectReference ObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
-        internal static TypeBase Number(int bitCount) { return Bit.Sequence(bitCount); }
+        internal static TypeBase Number(int bitCount) { return Bit.SpawnSequence(bitCount); }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         internal virtual TypeBase TypeForTypeOperator() { return this; }
@@ -133,7 +138,7 @@ namespace Reni.Type
         internal Result ArgResult(Category category) { return Result(category, ArgCode); }
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
-        internal CodeBase ArgCode() { return CodeBase.Arg(Size); }
+        internal CodeBase ArgCode() { return CodeBase.Arg(this); }
 
         internal Result AutomaticDereferenceResult(Category category)
         {
@@ -151,8 +156,10 @@ namespace Reni.Type
 
         internal Result Result(Category category)
         {
-            return Result(category,
-                          () => CodeBase.BitsConst(Size, BitsConst.Convert(0).Resize(Size)));
+            return Result
+                (
+                    category,
+                    () => CodeBase.BitsConst(Size, BitsConst.Convert(0).Resize(Size)));
         }
 
         internal Result Result(Category category, Result codeAndRefs)
@@ -239,7 +246,8 @@ namespace Reni.Type
 
         internal virtual bool HasConverterTo(TypeBase dest) { return false; }
 
-        internal virtual bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
+        internal virtual bool IsConvertableToImplementation
+            (TypeBase dest, ConversionParameter conversionParameter)
         {
             NotImplementedMethod(dest, conversionParameter);
             return false;
@@ -273,7 +281,7 @@ namespace Reni.Type
 
         protected virtual bool IsRefLike(AutomaticReferenceType target) { return false; }
 
-        private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.Sequence(SequenceCount(elementType)); }
+        private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.SpawnSequence(SequenceCount(elementType)); }
 
         internal TFeature SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class
@@ -301,7 +309,10 @@ namespace Reni.Type
             var apply = functionalFeature.Apply(category, rightResult.Type, refAlignParam);
             var replaceArg = apply.ReplaceArg(rightResult);
             var result = replaceArg.ReplaceObjectRefByArg(refAlignParam, ObjectType());
-            DumpWithBreak(trace, "functionalFeature", functionalFeature, "apply", apply, "replaceArg", replaceArg, "result", result);
+            DumpWithBreak
+                (
+                    trace, "functionalFeature", functionalFeature, "apply", apply, "replaceArg",
+                    replaceArg, "result", result);
             return ReturnMethodDump(trace, result);
         }
 
@@ -321,12 +332,14 @@ namespace Reni.Type
                     .Result
                     (
                         category,
-                        () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize),
+                        () =>
+                        LocalReferenceCode(refAlignParam).Dereference
+                            (refAlignParam, refAlignParam.RefSize),
                         () => Destructor(Category.Refs).Refs
                     );
             }
             return Align(refAlignParam.AlignBits)
-                .Reference(refAlignParam)
+                .SpawnReference(refAlignParam)
                 .Result
                 (
                     category,
@@ -346,15 +359,16 @@ namespace Reni.Type
             var objectReference = ObjectReference(refAlignParam);
             return result
                 .ReplaceAbsolute
-                (objectReference
-                 , () => LocalReferenceCode(refAlignParam)
-                 , () => Destructor(Category.Refs).Refs
+                (
+                    objectReference
+                    , () => LocalReferenceCode(refAlignParam)
+                    , () => Destructor(Category.Refs).Refs
                 );
         }
 
         internal virtual Result ReferenceInCode(IReferenceInCode target, Category category)
         {
-            return Reference(target.RefAlignParam)
+            return SpawnReference(target.RefAlignParam)
                 .Result
                 (
                     category,
@@ -372,27 +386,35 @@ namespace Reni.Type
             return null;
         }
 
-        virtual internal FieldAccessType AccessType(ContainerContextObject containerContextObject, int position)
+        internal virtual AccessType AccessType(Structure accessPoint, int position)
         {
-            return SpawnAccessType(containerContextObject, position);
+            return 
+                SpawnAccessType(accessPoint, position);
         }
 
-        internal FieldAccessType SpawnAccessType(ContainerContextObject containerContextObject, int position) { return _cache.AccessTypes.Find(containerContextObject).Find(position); }
-
-        internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam) where TFeature : class
+        internal AccessType SpawnAccessType(Structure accessPoint, int position)
         {
-            var trace = defineable.ObjectId == 25 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category, defineable,refAlignParam);
+            return _cache
+                .AccessTypes
+                .Find(accessPoint)
+                .Find(position);
+        }
+
+        internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
+            where TFeature : class
+        {
+            var trace = defineable.ObjectId == -25 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category, defineable, refAlignParam);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
-            if (feature == null)
+            if(feature == null)
                 return ReturnMethodDump<Result>(trace, null);
 
             DumpWithBreak(trace, "feature", feature);
             var result = feature.Apply(category, refAlignParam);
             DumpWithBreak(trace, "result", result);
             var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
-            if (this != typeOfArgInApplyResult)
+            if(this != typeOfArgInApplyResult)
             {
                 DumpWithBreak(trace, "typeOfArgInApplyResult", typeOfArgInApplyResult);
                 var conversion = Conversion(category, typeOfArgInApplyResult);
@@ -401,5 +423,7 @@ namespace Reni.Type
             }
             return ReturnMethodDumpWithBreak(trace, result);
         }
+
+        private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
     }
 }

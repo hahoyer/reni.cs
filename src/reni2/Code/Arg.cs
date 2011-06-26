@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Type;
 
 namespace Reni.Code
 {
@@ -12,16 +13,18 @@ namespace Reni.Code
     internal sealed class Arg : FiberHead
     {
         private static int _nextObjectId;
-        private readonly Size _size;
+        private readonly TypeBase _type;
 
-        internal Arg(Size size)
+        internal Arg(TypeBase type)
             : base(_nextObjectId++)
         {
-            _size = size;
-            StopByObjectId(-9);
+            _type = type;
+            StopByObjectId(-3);
         }
 
-        protected override Size GetSize() { return _size; }
+        internal TypeBase Type { get { return _type; } }
+
+        protected override Size GetSize() { return _type.Size; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Arg(this); }
     }
 }
