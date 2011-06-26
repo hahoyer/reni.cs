@@ -5,6 +5,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -211,7 +212,7 @@ namespace Reni.Struct
                 .Result(category | Category.Type, Statements[position])
                 .PostProcessor
                 .InnerResultForStruct(category, parent.RefAlignParam);
-            Tracer.Assert(!(category.HasType && result.Type is Reference));
+            Tracer.Assert(!(category.HasType && result.Type is AutomaticReferenceType));
             return result;
         }
 

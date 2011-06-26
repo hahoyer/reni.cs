@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Struct;
@@ -594,7 +595,7 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result ConvertToAsRef(Category category, Reference target)
+        internal Result ConvertToAsRef(Category category, AutomaticReferenceType target)
         {
             return Type
                 .ConvertToAsRef(category, target)

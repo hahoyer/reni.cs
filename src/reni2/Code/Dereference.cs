@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Context;
 
 namespace Reni.Code
@@ -51,6 +52,7 @@ namespace Reni.Code
 
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
         {
+            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return new LocalVariableAccess(RefAlignParam, precedingElement.Holder, precedingElement.Offset, OutputSize, _dataSize);
         }

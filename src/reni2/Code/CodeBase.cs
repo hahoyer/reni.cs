@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
-using Reni.Type;
 
 namespace Reni.Code
 {
@@ -100,29 +100,26 @@ namespace Reni.Code
             return Code.List.Create(resultData);
         }
 
-        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize)
+        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, Size objSize, RefAlignParam refAlignParam)
         {
-            return TypeBase.Bit
-                .Sequence((objSize.ByteAlignedSize).ToInt())
-                .ArgCode()
+            return Arg(refAlignParam.RefSize)
+                .Dereference(refAlignParam, objSize.ByteAlignedSize)
                 .BitSequenceOperation(feature, size);
         }
 
-        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objBits, int argsBits)
+        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objBits, int argsBits, RefAlignParam refAlignParam)
         {
             var objSize = Size.Create(objBits);
             var argsSize = Size.Create(argsBits);
-            return TypeBase.Bit.Sequence((objSize.ByteAlignedSize + argsSize.ByteAlignedSize).ToInt())
-                .ArgCode()
+            return Arg(refAlignParam.RefSize)
+                .Dereference(refAlignParam, objSize.ByteAlignedSize + argsSize.ByteAlignedSize)
                 .BitSequenceOperation(token, size, objSize.ByteAlignedSize);
         }
 
         internal static CodeBase BitSequenceDumpPrint(int objSize, RefAlignParam refAlignParam)
         {
             var alignedSize = Size.Create(objSize).Align(refAlignParam.AlignBits);
-            return TypeBase.Bit.Sequence(alignedSize.ToInt())
-                .Reference(refAlignParam)
-                .ArgCode()
+            return Arg(refAlignParam.RefSize)
                 .Dereference(refAlignParam, alignedSize)
                 .DumpPrint(alignedSize);
         }
@@ -245,7 +242,7 @@ namespace Reni.Code
             return null;
         }
 
-        internal CodeBase Align(int alignBits = Reni.BitsConst.SegmentAlignBits) { return BitCast(Size.NextPacketSize(alignBits)); }
+        internal CodeBase Align(int alignBits = Basics.BitsConst.SegmentAlignBits) { return BitCast(Size.NextPacketSize(alignBits)); }
 
         /// <summary>
         ///     Gets the icon key.

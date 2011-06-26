@@ -11,7 +11,7 @@ using Reni.FeatureTest.ThenElse;
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
-    [TargetSet(@"a:(x: 100;f: arg+x/\);g: a f; g \|/ dump_print;", @"(100, (arg)+(x)/\)")]
+    [TargetSet(@"a:(x: 100;f: arg+x/\);g: a f; g ^ dump_print;", @"(100, (arg)+(x)/\)")]
     [SomeVariables]
     [Add2Numbers]
     [AccessMember]

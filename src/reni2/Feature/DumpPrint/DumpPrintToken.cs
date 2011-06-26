@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Sequence;
 using Reni.Struct;
@@ -13,7 +14,7 @@ namespace Reni.Feature.DumpPrint
     internal sealed class DumpPrintToken :
         Defineable,
         IFeature,
-        ISearchPath<ISearchPath<IFeature, Reference>, StructureType>,
+        ISearchPath<ISearchPath<IFeature, AutomaticReferenceType>, StructureType>,
         ISearchPath<IFeature, TypeType>,
         ISearchPath<IFeature, Bit>,
         ISearchPath<IFeature, Type.Void>,
@@ -32,7 +33,7 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, FunctionalBody>.Convert(FunctionalBody type) { return new Feature(type.DumpPrintResult); }
 
         ISearchPath<IFeature, BaseType> ISearchPath<ISearchPath<IFeature, BaseType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
-        ISearchPath<IFeature, Reference> ISearchPath<ISearchPath<IFeature, Reference>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
+        ISearchPath<IFeature, AutomaticReferenceType> ISearchPath<ISearchPath<IFeature, AutomaticReferenceType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {

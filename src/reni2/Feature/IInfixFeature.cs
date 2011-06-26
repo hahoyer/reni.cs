@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Context;
+using Reni.Basics;
 using Reni.Type;
 
 namespace Reni.Feature
@@ -24,16 +24,6 @@ namespace Reni.Feature
     }
 
 
-    internal static class Extender
-    {
-        internal static IFeature ConvertToFeature(this object feature)
-        {
-            if(feature is IPrefixFeature)
-                return ((IPrefixFeature) feature).Feature;
-            return (IFeature) feature;
-        }
-    }
-
     internal interface IContextFeature
     {
         Result Apply(Category category);
@@ -52,5 +42,22 @@ namespace Reni.Feature
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return _func(category); }
         TypeBase IFeature.DefiningType() { return (TypeBase) _func.Target; }
+    }
+
+    internal static class FeatureExtender
+    {
+        internal static TypeBase TypeOfArgInApplyResult(this IFeature feature, RefAlignParam refAlignParam)
+        {
+            return feature
+                .DefiningType()
+                .Reference(refAlignParam);
+        }
+
+        internal static IFeature ConvertToFeature(this object feature)
+        {
+            if (feature is IPrefixFeature)
+                return ((IPrefixFeature)feature).Feature;
+            return (IFeature)feature;
+        }
     }
 }

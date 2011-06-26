@@ -13,6 +13,7 @@ namespace Reni
         void Search();
         void ChildSearch<TType>(TType target) where TType : IDumpShortProvider;
         ISearchVisitor Child(BaseType target);
-        ISearchVisitor Child(Reference target);
+        ISearchVisitor Child(ReferenceType target);
+        ISearchVisitor Child(FieldAccessType target);
     }
 }

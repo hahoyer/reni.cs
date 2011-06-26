@@ -9,7 +9,7 @@ using HWClassLibrary.UnitTest;
 using JetBrains.Annotations;
 using Reni.Runtime;
 
-namespace Reni
+namespace Reni.Basics
 {
     [DumpToString]
     internal sealed class BitsConst : ReniObject
@@ -152,7 +152,12 @@ namespace Reni
         public BitsConst Multiply(BitsConst right, Size size)
         {
             if(!(Marshal.SizeOf(typeof(Int64))*8 >= size.ToInt()))
-                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "right=" + right + ";size=" + size.Dump());
+            {
+                Tracer.AssertionFailed
+                    (
+                        @"sizeof(Int64)*8 >= size.ToInt()",
+                        () => "right=" + right + ";size=" + size.Dump());
+            }
             return Convert(ToInt64()*right.ToInt64()).Resize(size);
         }
 
@@ -167,7 +172,12 @@ namespace Reni
         public BitsConst Divide(BitsConst right, Size size)
         {
             if(!(Marshal.SizeOf(typeof(Int64))*8 >= size.ToInt()))
-                Tracer.AssertionFailed(@"sizeof(Int64)*8 >= size.ToInt()", () => "right=" + right + ";size=" + size.Dump());
+            {
+                Tracer.AssertionFailed
+                    (
+                        @"sizeof(Int64)*8 >= size.ToInt()",
+                        () => "right=" + right + ";size=" + size.Dump());
+            }
             return Convert(ToInt64()/right.ToInt64()).Resize(size);
         }
 
@@ -356,8 +366,6 @@ namespace Reni
 
         public override int GetHashCode() { return _data.GetHashCode(); }
 
-        internal BitsConst Access(Intervall<Size> region) { return Access(region.Start, region.End - region.Start); }
-
         public BitsConst Access(Size start, Size size)
         {
             NotImplementedMethod(start, size);
@@ -437,14 +445,20 @@ namespace Reni
                 Tracer.Assert(Convert("1").Resize(Size.Create(3)).ToString(10) == "1");
 
                 Tracer.Assert(Convert("2").Resize(Size.Create(1)).ToString(10) == "0");
-                Tracer.Assert(Convert("2").Resize(Size.Create(2)).ToString(10) == "-2",
-                              () => Convert("2").Resize(Size.Create(2)).ToString(10));
+                Tracer.Assert
+                    (
+                        Convert("2").Resize(Size.Create(2)).ToString(10) == "-2",
+                        () => Convert("2").Resize(Size.Create(2)).ToString(10));
                 Tracer.Assert(Convert("2").Resize(Size.Create(3)).ToString(10) == "2");
 
-                Tracer.Assert(Convert("-4").Resize(Size.Create(32)).ToString(10) == "-4",
-                              () => Convert("-4").Resize(Size.Create(32)).ToString(10));
-                Tracer.Assert(Convert("-4095").Resize(Size.Create(8)).ToString(10) == "1",
-                              () => Convert("-4095").Resize(Size.Create(32)).ToString(10));
+                Tracer.Assert
+                    (
+                        Convert("-4").Resize(Size.Create(32)).ToString(10) == "-4",
+                        () => Convert("-4").Resize(Size.Create(32)).ToString(10));
+                Tracer.Assert
+                    (
+                        Convert("-4095").Resize(Size.Create(8)).ToString(10) == "1",
+                        () => Convert("-4095").Resize(Size.Create(32)).ToString(10));
             }
         }
 

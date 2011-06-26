@@ -18,6 +18,14 @@ namespace Reni.FeatureTest.Struct
     }
 
     [TestFixture]
+    [TargetSet(@"((0, 1) _A_T_ 1) dump_print;", "1")]
+    public sealed class AccessSimple1 : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
     [AccessSimple]
     [InnerAccess]
     [AccessAndAdd]
@@ -33,6 +41,7 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture]
     [AccessSimple]
+    [AccessSimple1]
     [Target(@"
 ((0;1;2;300;) _A_T_ 0) dump_print;
 ((0;1;2;300;) _A_T_ 1) dump_print;
@@ -70,7 +79,7 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture]
     [InnerAccess]
-    [TargetSet(@"(10, (this _A_T_ 0) := 4) dump_print", "(4, )")]
+    [TargetSet(@"(10, (^ _A_T_ 0) := 4) dump_print", "(4, )")]
     public sealed class SimpleAssignment : CompilerTest
     {
         [Test]
@@ -78,16 +87,16 @@ namespace Reni.FeatureTest.Struct
     }
 
     [TestFixture]
-    [TargetSet(@"(10,20, (this _A_T_ 0) := 4) dump_print", "(4, 20, )")]
-    [TargetSet(@"(10,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
-    [TargetSet(@"(10,20, (this _A_T_ 1) := 4) dump_print", "(10, 4, )")]
-    [TargetSet(@"(10,20,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
-    [TargetSet(@"(10,20,30, (this _A_T_ 2) := 4) dump_print", "(10, 20, 4, )")]
-    [TargetSet(@"(1000,20,30, (this _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
-    [TargetSet(@"(1000,20,30, (this _A_T_ 1) := 4) dump_print", "(1000, 4, 30, )")]
-    [TargetSet(@"(10,2000,30, (this _A_T_ 0) := 4) dump_print", "(4, 2000, 30, )")]
-    [TargetSet(@"(10,2000,30, (this _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
-    [TargetSet(@"(10,2000,30, (this _A_T_ 2) := 4) dump_print", "(10, 2000, 4, )")]
+    [TargetSet(@"(10,20, (^ _A_T_ 0) := 4) dump_print", "(4, 20, )")]
+    [TargetSet(@"(10,20,30, (^ _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
+    [TargetSet(@"(10,20, (^ _A_T_ 1) := 4) dump_print", "(10, 4, )")]
+    [TargetSet(@"(10,20,30, (^ _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
+    [TargetSet(@"(10,20,30, (^ _A_T_ 2) := 4) dump_print", "(10, 20, 4, )")]
+    [TargetSet(@"(1000,20,30, (^ _A_T_ 0) := 4) dump_print", "(4, 20, 30, )")]
+    [TargetSet(@"(1000,20,30, (^ _A_T_ 1) := 4) dump_print", "(1000, 4, 30, )")]
+    [TargetSet(@"(10,2000,30, (^ _A_T_ 0) := 4) dump_print", "(4, 2000, 30, )")]
+    [TargetSet(@"(10,2000,30, (^ _A_T_ 1) := 4) dump_print", "(10, 4, 30, )")]
+    [TargetSet(@"(10,2000,30, (^ _A_T_ 2) := 4) dump_print", "(10, 2000, 4, )")]
     [SimpleAssignment]
     public sealed class Assignment : CompilerTest
     {
@@ -96,7 +105,7 @@ namespace Reni.FeatureTest.Struct
     }
 
     [TestFixture]
-    [TargetSet(@"(3, (this _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
+    [TargetSet(@"(3, (^ _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
     [Assignment, ApplyTypeOperatorWithCut]
     public sealed class AssignmentWithCut : CompilerTest
     {
@@ -106,7 +115,7 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture]
     [AccessAndAdd]
-    [TargetSet(" 1; 4;2050; (this _A_T_ 0) + (this _A_T_ 1) + (this _A_T_ 2);(this _A_T_ 3) dump_print;", "2055")]
+    [TargetSet(" 1; 4;2050; (^ _A_T_ 0) + (^ _A_T_ 1) + (^ _A_T_ 2);(^ _A_T_ 3) dump_print;", "2055")]
     public sealed class AccessAndAddComplex : CompilerTest
     {
         [Test]
@@ -115,7 +124,7 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture]
     [InnerAccess]
-    [TargetSet("5, (this _A_T_ 0 + this _A_T_ 0)dump_print", "10")]
+    [TargetSet("5, (^ _A_T_ 0 + ^ _A_T_ 0)dump_print", "10")]
     public sealed class AccessAndAdd : CompilerTest
     {
         [Test]
@@ -124,9 +133,9 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture]
     [Number]
-    [TargetSet("5, (this _A_T_ 0) dump_print, 66", "5")]
-    [TargetSet("5,6, (this _A_T_ 0) dump_print, 66", "5")]
-    [TargetSet("5,6, (this _A_T_ 1) dump_print, 66", "6")]
+    [TargetSet("5, (^ _A_T_ 0) dump_print, 66", "5")]
+    [TargetSet("5,6, (^ _A_T_ 0) dump_print, 66", "5")]
+    [TargetSet("5,6, (^ _A_T_ 1) dump_print, 66", "6")]
     public sealed class InnerAccess : CompilerTest
     {
         [Test]

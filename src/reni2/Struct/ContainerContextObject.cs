@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
@@ -33,6 +34,7 @@ namespace Reni.Struct
 
         [DisableDump]
         internal ICompileSyntax[] Statements { get { return Container.Statements; } }
+
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
 
@@ -51,33 +53,29 @@ namespace Reni.Struct
         internal Size InnerSize(int position) { return Container.InnerSize(_parent, position); }
         internal TypeBase InnerType(int position) { return Container.InnerType(_parent, position); }
         internal Size StructSize(int position) { return Container.InnerResult(Category.Size, Parent, 0, position).Size; }
-        internal Result FieldAccessFromContextReference(Category category, int fieldPosition) { return AccessFromContextReference(category, fieldPosition, () => InnerType(fieldPosition).Reference(RefAlignParam)); }
-        internal Result FunctionAccessFromContextReference(Category category, Func<TypeBase> getFunctionalType) { return AccessFromContextReference(category, 0, getFunctionalType); }
-
-        internal Result ReplaceContextReferenceByThisReference(int position, Result result) { return result.ReplaceAbsolute(this, () => ReplaceContextReferenceByThisReferenceCode(position), Refs.None); }
-
-        private Result AccessFromContextReference(Category category, int fieldPosition, Func<TypeBase> getType)
+        internal Result AccessFromContextReference(Category category, FieldAccessType typeBase, int endPosition)
         {
-            var result = new Result
+            var result = typeBase
+                .Result
                 (category
-                 , () => RefAlignParam.RefSize
-                 , getType
-                 , () => AccessFromContextReferenceCode(fieldPosition)
+                 , () => AccessPointCodeFromContextReference(endPosition)
                  , () => Refs.Create(this)
                 );
             return result;
         }
 
+        internal Result ReplaceContextReferenceByThisReference(int position, Result result) { return result.ReplaceAbsolute(this, () => ReplaceContextReferenceByThisReferenceCode(position), Refs.None); }
+
         internal Result Result(Category category, Result innerResult)
         {
             var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam), Refs.None);
-            if (category.HasType)
+            if(category.HasType)
                 result.Type = ToStructure.Type;
             return result;
         }
 
-        private Size FieldOffsetFromContextReference(int position) { return Container.InnerResult(Category.Size, Parent, 0, position + 1).Size * -1; }
-        private Size ContextReferenceFromAccessPoint(int position) { return Container.InnerResult(Category.Size, Parent, 0, position).Size; }
+        private Size FieldOffsetFromContextReference(int position) { return Container.InnerResult(Category.Size, Parent, 0, position + 1).Size*-1; }
+        private Size ContextReferenceOffsetFromAccessPoint(int position) { return Container.InnerResult(Category.Size, Parent, 0, position).Size; }
         private bool IsLambda(int position) { return Container.IsLambda(position); }
         private bool IsPoperty(int position) { return Container.IsProperty(position); }
 
@@ -94,19 +92,18 @@ namespace Reni.Struct
             return AccessManager.Field;
         }
 
-        private CodeBase AccessFromContextReferenceCode(int position)
+        private CodeBase AccessPointCodeFromContextReference(int endPosition)
         {
             return CodeBase
                 .ReferenceCode(this)
-                .AddToReference(RefAlignParam, FieldOffsetFromContextReference(position));
+                .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(endPosition)* -1);
         }
-
 
         private CodeBase ReplaceContextReferenceByThisReferenceCode(int accessPosition)
         {
             return CodeBase
                 .Arg(RefAlignParam.RefSize)
-                .AddToReference(RefAlignParam, ContextReferenceFromAccessPoint(accessPosition));
+                .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
     }
 }

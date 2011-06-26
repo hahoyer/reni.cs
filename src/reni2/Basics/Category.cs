@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Diagnostics;
-using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Code;
 
-namespace Reni
+namespace Reni.Basics
 {
-    /// <summary>
-    ///     Used for the compiler visitor and the result objects to choose the categories.
-    ///     Categories are: <see cref = "Size" />Size, <see cref = "Type" />Type, <see cref = "Refs" />References and <see
-    ///      cref = "CodeBase" />Code
-    /// </summary>
     [Dump("Dump"), Serializable]
     
     internal sealed class Category : ReniObject, IEquatable<Category>

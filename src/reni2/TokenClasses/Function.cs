@@ -2,6 +2,7 @@ using HWClassLibrary.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Syntax;
 
@@ -13,8 +14,8 @@ namespace Reni.TokenClasses
         public override Result Result(ContextBase context, Category category, ICompileSyntax target)
         {
             return context
-                .FindRecentStructure
-                .FunctionalResult(category, target);
+                .FindRecentStructure.SpawnFunctionalFeature(target)
+                .Result(category);
         }
     }
 }

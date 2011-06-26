@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Context;
 
 namespace Reni.Code
@@ -26,6 +27,7 @@ namespace Reni.Code
             StopByObjectId(-10);
         }
 
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         [DisableDump]

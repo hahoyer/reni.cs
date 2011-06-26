@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
@@ -43,7 +44,7 @@ namespace Reni.Struct
         internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
         internal override string DumpPrintText { get { return _body.DumpShort() + "/\\"; } }
         internal override IFunctionalFeature FunctionalFeature() { return this; }
-        internal override TypeBase ObjectType() { return _structure.ReferenceType; }
+        internal override TypeBase ObjectType() { return _structure.AutomaticReferenceTypeType; }
 
         private ICompileSyntax Body { get { return _body; } }
 

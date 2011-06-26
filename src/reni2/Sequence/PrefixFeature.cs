@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -26,15 +27,15 @@ namespace Reni.Sequence
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
-            return Apply(category, _parent.UnrefSize)
+            return Apply(category, _parent.UnrefSize, refAlignParam)
                 .ReplaceArg(_parent.ConvertToBitSequence(category));
         }
 
-        private Result Apply(Category category, Size objSize)
+        private Result Apply(Category category, Size objSize, RefAlignParam refAlignParam)
         {
             var type = TypeBase.Number(objSize.ToInt());
             return type.Result(category,
-                               () => CodeBase.BitSequenceOperation(type.Size, _definable, objSize));
+                               () => CodeBase.BitSequenceOperation(type.Size, _definable, objSize, refAlignParam));
         }
     }
 }

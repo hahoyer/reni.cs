@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 
 namespace Reni.Code
 {
@@ -46,6 +47,6 @@ namespace Reni.Code
 
         protected override string CSharpString(Size top) { return CSharpGenerator.Push(top, Size, Data); }
 
-        internal new static BitArray Void() { return new BitArray(Size.Create(0), Reni.BitsConst.None()); }
+        internal new static BitArray Void() { return new BitArray(Size.Create(0), Basics.BitsConst.None()); }
     }
 }

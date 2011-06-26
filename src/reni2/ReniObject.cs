@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 
 namespace Reni
 {
-    [AdditionalNodeInfo("NodeDump"), DebuggerDisplay("{NodeDump}")]
+    [AdditionalNodeInfo("NodeDump")]
+    [DebuggerDisplay("{NodeDump}")]
     public abstract class ReniObject : Dumpable
     {
         private static int _nextObjectId;
@@ -26,11 +26,11 @@ namespace Reni
         [DisableDump]
         public virtual string NodeDump { get { return DumpShort(); } }
 
-        internal virtual string DumpShort() { return GetType().PrettyName()+ "." + ObjectId; }
+        internal virtual string DumpShort() { return GetType().PrettyName() + "." + ObjectId; }
 
         internal string DumpShortForDebug()
         {
-            if (Debugger.IsAttached)
+            if(Debugger.IsAttached)
                 return DumpShort();
             return "";
         }
@@ -69,7 +69,8 @@ namespace Reni
             var isStopByObjectIdActive = IsStopByObjectIdActive;
             IsStopByObjectIdActive = true;
             if(ObjectId == objectId)
-                Tracer.ConditionalBreak(stackFrameDepth + 1, "", () => @"_objectId==" + objectId + "\n" + Dump());
+                Tracer.ConditionalBreak
+                    (stackFrameDepth + 1, "", () => @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
         }
 
@@ -101,5 +102,10 @@ namespace Reni
 
         // will throw an exception if not a ReniObject
         internal static int GetObjectId(this object reniObject) { return ((ReniObject) reniObject).ObjectId; }
+    }
+
+    internal interface IDumpShortProvider
+    {
+        string DumpShort();
     }
 }

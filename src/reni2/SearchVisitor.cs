@@ -2,9 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using JetBrains.Annotations;
 using Reni.Sequence;
-using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -15,25 +13,30 @@ namespace Reni
         void ISearchVisitor.Search() { SearchTypeBase(); }
         void ISearchVisitor.ChildSearch<TType>(TType target) { InternalChild(target).Search(); }
         ISearchVisitor ISearchVisitor.Child(BaseType target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Child(Reference target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(ReferenceType target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(FieldAccessType target) { return InternalChild(target); }
         internal abstract void SearchTypeBase();
-        protected abstract ISearchVisitor InternalChild<TType>(TType target) where TType : IDumpShortProvider;
+
+        protected abstract ISearchVisitor InternalChild<TType>(TType target)
+            where TType : IDumpShortProvider;
     }
 
     internal abstract class SearchVisitor<TFeature> : SearchVisitor
         where TFeature : class
     {
-        private readonly List<ISearchVisitor> _children = new List<ISearchVisitor>();
-        private readonly List<SearchResult<TFeature>> _searchResults = new List<SearchResult<TFeature>>();
+        private ISearchVisitor[] _children = new ISearchVisitor[0];
+        private SearchResult<TFeature>[] _searchResults = new SearchResult<TFeature>[0];
 
+        internal ISearchVisitor[] Children { get { return _children; } }
+        internal SearchResult<TFeature>[] SearchResults { get { return _searchResults; } }
         internal abstract bool IsSuccessFull { get; }
         internal abstract TFeature InternalResult { set; }
         internal abstract Defineable Defineable { get; }
 
         internal void Search(TypeBase typeBase)
         {
-            var searchResult = new SearchResult<TFeature>(typeBase, this);
-            _searchResults.Add(searchResult);
+            var searchResult = new SearchResult<TFeature>(this, typeBase);
+            Add(searchResult);
 
             if(IsSuccessFull)
                 return;
@@ -45,8 +48,8 @@ namespace Reni
 
         internal override void SearchTypeBase()
         {
-            var searchResult = new SearchResult<TFeature>(null, this);
-            _searchResults.Add(searchResult);
+            var searchResult = new SearchResult<TFeature>(this);
+            Add(searchResult);
 
             if(IsSuccessFull)
                 return;
@@ -61,30 +64,11 @@ namespace Reni
 
         protected override ISearchVisitor InternalChild<TType>(TType target) { return new ChildSearchVisitor<TFeature, TType>(this, target); }
 
-        public void AddChild(ISearchVisitor child) { _children.Add(child); }
-    }
-
-    internal sealed class SearchResult<TFeature> : ReniObject
-        where TFeature : class
-    {
-        [UsedImplicitly]
-        private readonly TypeBase _typeBase;
-
-        [UsedImplicitly]
-        private readonly SearchVisitor<TFeature> _searchVisitor;
-
-        [UsedImplicitly]
-        private bool? _isFoundMode;
-
-        public SearchResult(TypeBase typeBase, SearchVisitor<TFeature> searchVisitor)
+        private void Add(SearchResult<TFeature> searchResult)
         {
-            _typeBase = typeBase;
-            _searchVisitor = searchVisitor;
-            if (_isFoundMode == true)
-                _isFoundMode = false;
+            _searchResults = new List<SearchResult<TFeature>>(_searchResults) {searchResult}.ToArray();
         }
 
-        public void SetSearchMode() { _isFoundMode = false; }
-        public void SetFoundMode() { _isFoundMode = true; }
+        internal void Add(ISearchVisitor child) { _children = new List<ISearchVisitor>(_children) {child}.ToArray(); }
     }
 }

@@ -83,7 +83,7 @@ namespace Reni.ReniParser
         {
             return new Dictionary<string, TokenClasses.TokenClass>
                    {
-                       {"\\|/", new ContextOperator()},
+                       {"^", new ContextOperator()},
                        {":", new Colon()},
                        {":=", new Assignment()},
                        {"=", new Equal()},
@@ -106,7 +106,6 @@ namespace Reni.ReniParser
                        {"else", new ElseToken()},
                        {"enable_cut", new EnableCut()},
                        {"then", new ThenToken()},
-                       {"this", new ThisToken()},
                        {"type", new TypeOperator()}
                    };
         }

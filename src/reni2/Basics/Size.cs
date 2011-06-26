@@ -1,14 +1,13 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using JetBrains.Annotations;
 
-namespace Reni
+namespace Reni.Basics
 {
     [AdditionalNodeInfo("DebuggerDumpString")]
     [DebuggerDisplay("{NodeDump,nq}")]

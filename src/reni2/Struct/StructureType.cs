@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -16,7 +17,7 @@ namespace Reni.Struct
         private readonly Structure _structure;
 
         [DisableDump]
-        internal readonly ISearchPath<IFeature, Reference> DumpPrintReferenceFeature;
+        internal readonly ISearchPath<IFeature, AutomaticReferenceType> DumpPrintReferenceFeature;
 
         internal StructureType(Structure structure)
             : base(_nextObjectId++)

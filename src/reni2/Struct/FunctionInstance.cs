@@ -2,6 +2,7 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Syntax;
 using Reni.Type;

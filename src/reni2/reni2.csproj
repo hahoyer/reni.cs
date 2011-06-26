@@ -19,8 +19,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BitsConst.cs" />
-    <Compile Include="Category.cs" />
+    <Compile Include="Basics\BitsConst.cs" />
+    <Compile Include="Basics\Category.cs" />
+    <Compile Include="Basics\RefAlignParam.cs" />
+    <Compile Include="Basics\Size.cs" />
     <Compile Include="ChildSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />
@@ -47,6 +49,8 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\HasArgVisitor.cs" />
     <Compile Include="Code\IFormalValue.cs" />
+    <Compile Include="Code\ISequenceOfBitBinaryOperation.cs" />
+    <Compile Include="Code\ISequenceOfBitPrefixOperation.cs" />
     <Compile Include="Code\List.cs" />
     <Compile Include="Code\LocalReference.cs" />
     <Compile Include="Code\IReferenceInCode.cs" />
@@ -97,7 +101,6 @@
     <Compile Include="Context\ContextCache.cs" />
     <Compile Include="Context\Function.cs" />
     <Compile Include="Context\Number.cs" />
-    <Compile Include="Context\RefAlignParam.cs" />
     <Compile Include="Context\Root.cs" />
     <Compile Include="FeatureTest\StringStruct.cs" />
     <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
@@ -150,6 +153,7 @@
     <Compile Include="ReniParser\MainTokenFactory.cs" />
     <Compile Include="ReniParser\ParsedSyntax.cs" />
     <Compile Include="Runtime\DataContainer.cs" />
+    <Compile Include="SearchResult.cs" />
     <Compile Include="Sequence\CompareFeature.cs" />
     <Compile Include="Sequence\Feature.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
@@ -178,7 +182,6 @@
     <Compile Include="Parser\TokenFactory.cs" />
     <Compile Include="RootSearchVisitor.cs" />
     <Compile Include="SearchResultExtender.cs" />
-    <Compile Include="SearchTrial.cs" />
     <Compile Include="SearchVisitor.cs" />
     <Compile Include="Struct\AtToken.cs" />
     <Compile Include="Struct\ContextPosition.cs" />
@@ -189,7 +192,6 @@
     <Compile Include="FeatureTest\Struct.cs" />
     <Compile Include="FeatureTest\ThenElse.cs" />
     <Compile Include="ReniTest.cs" />
-    <Compile Include="Intervall.cs" />
     <Compile Include="Parser\Test.cs" />
     <Compile Include="StructAccess.cs" />
     <Compile Include="Struct\AccessFeature.cs" />
@@ -223,7 +225,6 @@
     <Compile Include="TokenClasses\Number.cs" />
     <Compile Include="TokenClasses\RightParenthesis.cs" />
     <Compile Include="TokenClasses\ThenToken.cs" />
-    <Compile Include="TokenClasses\ThisToken.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="Type\AssignmentFeature.cs" />
@@ -233,9 +234,8 @@
     <Compile Include="Type\EnableCut.cs" />
     <Compile Include="Type\EnableCutFeature.cs" />
     <Compile Include="Sequence\FunctionalFeature.cs" />
+    <Compile Include="Type\FieldAccessType.cs" />
     <Compile Include="Type\IFunctionalFeature.cs" />
-    <Compile Include="Type\ISequenceOfBitBinaryOperation.cs" />
-    <Compile Include="Type\ISequenceOfBitPrefixOperation.cs" />
     <Compile Include="Type\ObjectReference.cs" />
     <Compile Include="Type\Pending.cs" />
     <Compile Include="Refs.cs" />
@@ -243,7 +243,6 @@
     <Compile Include="ReniObject.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Runtime\Data.cs" />
-    <Compile Include="Size.cs" />
     <Compile Include="Struct\Container.cs" />
     <Compile Include="Syntax\CacheItem.cs" />
     <Compile Include="ThenElse.cs" />
@@ -253,7 +252,8 @@
     <Compile Include="Type\FunctionalFeatureType.cs" />
     <Compile Include="Type\List.cs" />
     <Compile Include="Type\Pair.cs" />
-    <Compile Include="Type\Reference.cs" />
+    <Compile Include="Type\AutomaticReferenceType.cs" />
+    <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />

@@ -6,8 +6,10 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -25,21 +27,25 @@ namespace Reni.Type
             public readonly DictionaryEx<int, Array> Arrays;
             public readonly DictionaryEx<int, BaseType> Sequences;
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
-            public readonly DictionaryEx<RefAlignParam, Reference> References;
+            public readonly DictionaryEx<RefAlignParam, AutomaticReferenceType> References;
             public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<Context.Function> Function;
+            public readonly DictionaryEx<ContainerContextObject, DictionaryEx<int,FieldAccessType>> AccessTypes;
 
             public Cache(TypeBase parent)
             {
+                AccessTypes =new DictionaryEx<ContainerContextObject, DictionaryEx<int, FieldAccessType>>(
+                    containerContextObject=>new DictionaryEx<int, FieldAccessType>(
+                        position=>new FieldAccessType(parent,containerContextObject,position)));
                 ObjectReferences = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(parent, refAlignParam));
-                References = new DictionaryEx<RefAlignParam, Reference>(refAlignParam => new Reference(parent, refAlignParam));
+                References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(refAlignParam => new AutomaticReferenceType(parent, refAlignParam));
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Sequences = new DictionaryEx<int, BaseType>(elementCount => new BaseType(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
-                Function = new SimpleCache<Context.Function>(()=> new Context.Function(parent));
+                Function = new SimpleCache<Context.Function>(() => new Context.Function(parent));
             }
         }
 
@@ -109,7 +115,7 @@ namespace Reni.Type
 
         internal Array Array(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
-        internal Reference Reference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
+        internal AutomaticReferenceType Reference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
         internal BaseType Sequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         protected ObjectReference ObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
         internal static TypeBase Number(int bitCount) { return Bit.Sequence(bitCount); }
@@ -128,7 +134,6 @@ namespace Reni.Type
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
         internal CodeBase ArgCode() { return CodeBase.Arg(Size); }
-        internal Result GenericDumpPrint(Category category, RefAlignParam refAlignParam) { return Reference(refAlignParam).GenericDumpPrint(category); }
 
         internal Result AutomaticDereferenceResult(Category category)
         {
@@ -203,7 +208,7 @@ namespace Reni.Type
             if(this == dest)
                 return ConvertToItself(category);
             if(dest.IsReferenceTo(this))
-                return LocalReferenceResult(category, ((Reference) dest).RefAlignParam);
+                return LocalReferenceResult(category, ((AutomaticReferenceType) dest).RefAlignParam);
             return ConvertToImplementation(category, dest);
         }
 
@@ -266,7 +271,7 @@ namespace Reni.Type
             return null;
         }
 
-        protected virtual bool IsRefLike(Reference target) { return false; }
+        protected virtual bool IsRefLike(AutomaticReferenceType target) { return false; }
 
         private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.Sequence(SequenceCount(elementType)); }
 
@@ -300,7 +305,7 @@ namespace Reni.Type
             return ReturnMethodDump(trace, result);
         }
 
-        internal Result ConvertToAsRef(Category category, Reference target)
+        internal Result ConvertToAsRef(Category category, AutomaticReferenceType target)
         {
             if(IsRefLike(target))
                 return target.ArgResult(category);
@@ -310,7 +315,7 @@ namespace Reni.Type
 
         internal Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
-            if(this is Reference)
+            if(this is AutomaticReferenceType)
             {
                 return Align(refAlignParam.AlignBits)
                     .Result
@@ -359,12 +364,42 @@ namespace Reni.Type
                 ;
         }
 
-        internal virtual Result ContextOperatorFeatureApply(Category category)
+        internal IContextItem SpawnFunction() { return _cache.Function.Value; }
+
+        internal virtual Result ThisReferenceResult(Category category)
         {
             NotImplementedMethod(category);
             return null;
         }
 
-        public IContextItem SpawnFunction() { return _cache.Function.Value; }
+        virtual internal FieldAccessType AccessType(ContainerContextObject containerContextObject, int position)
+        {
+            return SpawnAccessType(containerContextObject, position);
+        }
+
+        internal FieldAccessType SpawnAccessType(ContainerContextObject containerContextObject, int position) { return _cache.AccessTypes.Find(containerContextObject).Find(position); }
+
+        internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam) where TFeature : class
+        {
+            var trace = defineable.ObjectId == 25 && category.HasCode;
+            StartMethodDumpWithBreak(trace, category, defineable,refAlignParam);
+            var searchResult = SearchDefineable<TFeature>(defineable);
+            var feature = searchResult.ConvertToFeature();
+            if (feature == null)
+                return ReturnMethodDump<Result>(trace, null);
+
+            DumpWithBreak(trace, "feature", feature);
+            var result = feature.Apply(category, refAlignParam);
+            DumpWithBreak(trace, "result", result);
+            var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
+            if (this != typeOfArgInApplyResult)
+            {
+                DumpWithBreak(trace, "typeOfArgInApplyResult", typeOfArgInApplyResult);
+                var conversion = Conversion(category, typeOfArgInApplyResult);
+                DumpWithBreak(trace, "conversion", conversion);
+                result = result.ReplaceArg(conversion);
+            }
+            return ReturnMethodDumpWithBreak(trace, result);
+        }
     }
 }

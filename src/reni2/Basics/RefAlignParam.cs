@@ -1,16 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using HWClassLibrary.Debug;
 
-namespace Reni.Context
+namespace Reni.Basics
 {
-    /// <summary>
-    ///     Parameter to describe alignment for references
-    /// </summary>
     [Dump("Dump"), DebuggerDisplay("{CodeDump,nq}")]
-    
     internal sealed class RefAlignParam : IEquatable<RefAlignParam>
     {
         private readonly int _alignBits;

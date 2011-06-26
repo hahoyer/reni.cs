@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
@@ -13,7 +14,6 @@ namespace Reni.TokenClasses
     internal abstract class Special : TokenClass
     {}
 
-    [Serializable]
     internal abstract class Terminal : Special, ITerminal
     {
         protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
@@ -24,6 +24,20 @@ namespace Reni.TokenClasses
         }
 
         public abstract Result Result(ContextBase context, Category category, TokenData token);
+    }
+
+    internal abstract class NonPrefix: Special, ITerminal, ISuffix
+    {
+        protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        {
+            right.AssertIsNull();
+            if(left == null)
+                return new TerminalSyntax(token, this);
+            return new SuffixSyntax(token, left.CheckedToCompiledSyntax(), this);
+        }
+
+        public abstract Result Result(ContextBase context, Category category, TokenData token);
+        public abstract Result Result(ContextBase context, Category category, ICompileSyntax left);
     }
 
     [Serializable]

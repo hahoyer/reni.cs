@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 using Reni.Context;
 
 namespace Reni.Code
@@ -26,7 +27,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _right = right;
             AssertValid();
-            StopByObjectId(-10);
+            StopByObjectId(-1);
         }
 
         private void AssertValid()
@@ -64,6 +65,7 @@ namespace Reni.Code
 
         internal override FiberItem[] TryToCombineBack(RefPlus precedingElement)
         {
+            return null;
             if (RefAlignParam.IsEqual(precedingElement.RefAlignParam))
             {
                 var newRight = _right + precedingElement._right;
@@ -76,6 +78,7 @@ namespace Reni.Code
 
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
         {
+            return null;
             Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return CodeBase
                 .LocalVariableReference(RefAlignParam, precedingElement.Holder, precedingElement.Offset + _right);

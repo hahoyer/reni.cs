@@ -6,8 +6,10 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.Parser;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.TokenClasses;
@@ -148,7 +150,7 @@ namespace Reni.Context
                 .Evaluate();
         }
 
-        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, Reference target)
+        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticReferenceType target)
         {
             var result = Result(category | Category.Type, syntax);
             return result.ConvertToAsRef(category, target);
@@ -179,11 +181,11 @@ namespace Reni.Context
             return result.LocalReferenceResult(RefAlignParam);
         }
 
-        private Reference TypeAsReference(ICompileSyntax syntax)
+        private IReference TypeAsReference(ICompileSyntax syntax)
         {
             var type = Type(syntax);
-            if (type is Reference)
-                return (Reference) type;
+            if (type is IReference)
+                return (IReference) type;
 
             return type.Align(RefAlignParam.AlignBits).Reference(RefAlignParam);
         }
@@ -262,9 +264,9 @@ namespace Reni.Context
         {
             var trace = defineable.ObjectId == -20 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, target, defineable);
-            var reference = TypeAsReference(target);
-            DumpWithBreak(trace, "reference", reference);
-            var operationResult = reference.OperationResult<TFeature>(category, defineable);
+            var leftType = Type(target);
+            DumpWithBreak(trace, "leftType", leftType);
+            var operationResult = leftType.OperationResult<TFeature>(category, defineable, RefAlignParam);
             if(operationResult == null)
                 return null;
 
@@ -386,26 +388,30 @@ namespace Reni.Context
                 ContainerContextObjects = new DictionaryEx<Struct.Container, ContainerContextObject>(container => new ContainerContextObject(container, parent));
             }
 
-            /// <summary>
-            ///     Gets the icon key.
-            /// </summary>
-            /// <value>The icon key.</value>
             [DisableDump]
             public string IconKey { get { return "Cache"; } }
         }
 
     }
 
-    internal interface IFunctionContext : IReferenceInCode
-    {
-        Result Result(Category category, ICompileSyntax body);
-    }
+    internal interface IReference
+    {}
 
-    internal sealed class ContextOperator : Defineable, ISearchPath<IFeature, TypeBase>
+    internal sealed class ContextOperator : NonPrefix
     {
-        IFeature ISearchPath<IFeature, TypeBase>.Convert(TypeBase type)
+        public override Result Result(ContextBase context, Category category, TokenData token)
         {
-            return new Feature.Feature(type.ContextOperatorFeatureApply);
+            return context
+                .FindRecentStructure
+                .ThisReferenceResultViaContextReference(category);
+        }
+
+        public override Result Result(ContextBase context, Category category, ICompileSyntax left)
+        {
+            return context
+                .Type(left)
+                .ThisReferenceResult(category)
+                .ReplaceArg(context.Result(category, left));
         }
     }
 

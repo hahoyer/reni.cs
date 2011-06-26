@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.Type;
@@ -12,7 +12,12 @@ namespace Reni.Feature.DumpPrint
 {
     internal abstract class BitFeatureBase : ReniObject
     {
-        protected static Result Apply(Category category, int objSize, RefAlignParam refAlignParam) { return TypeBase.Void.Result(category, () => CodeBase.BitSequenceDumpPrint(objSize, refAlignParam)); }
+        protected static Result Apply(Category category, int objSize, RefAlignParam refAlignParam)
+        {
+            return TypeBase
+                .Void
+                .Result(category, () => CodeBase.BitSequenceDumpPrint(objSize, refAlignParam));
+        }
     }
 
     internal sealed class BitSequenceFeature :
@@ -38,14 +43,15 @@ namespace Reni.Feature.DumpPrint
         TypeBase IFeature.DefiningType() { return TypeBase.Bit; }
     }
 
-    internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, Reference>, IFeature
+    internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, ReferenceType>,
+                                                   IFeature
     {
         [EnableDump]
         private readonly StructureType _structureType;
 
         public StructReferenceFeature(StructureType structureType) { _structureType = structureType; }
 
-        IFeature ISearchPath<IFeature, Reference>.Convert(Reference type)
+        IFeature ISearchPath<IFeature, ReferenceType>.Convert(ReferenceType type)
         {
             Tracer.Assert(type.RefAlignParam == _structureType.RefAlignParam);
             return this;

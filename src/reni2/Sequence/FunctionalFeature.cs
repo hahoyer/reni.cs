@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
@@ -32,17 +33,17 @@ namespace Reni.Sequence
 
         string IDumpShortProvider.DumpShort() { return _feature.Definable.DataFunctionName; }
 
-        private Result Apply(Category category, int objSize, int argsSize)
+        private Result Apply(Category category, int objSize, int argsSize, RefAlignParam refAlignParam)
         {
             var type = _feature.ResultType(objSize, argsSize);
-            return type.Result(category, () => CodeBase.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize));
+            return type.Result(category, () => CodeBase.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize,refAlignParam));
         }
 
         TypeBase IFeature.DefiningType() { return _parent; }
 
         Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            var result = Apply(category, _parent.Count, argsType.SequenceCount(_parent.Element));
+            var result = Apply(category, _parent.Count, argsType.SequenceCount(_parent.Element),refAlignParam);
             var objectResult = _parent.ObjectReferenceInCode(category | Category.Type, refAlignParam);
             var convertedObjectResult = objectResult.ConvertToBitSequence(category);
             var convertedArgsResult = argsType.ConvertToBitSequence(category);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace Reni.Type
+namespace Reni.Code
 {
     internal interface ISequenceOfBitBinaryOperation
     {
