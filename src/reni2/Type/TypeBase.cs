@@ -37,12 +37,12 @@ namespace Reni.Type
             public Cache(TypeBase parent)
             {
                 AccessTypes = new DictionaryEx<Structure, DictionaryEx<int, AccessType>>
-                (
-                    accessPoint => new DictionaryEx<int, AccessType>
                     (
-                        position => new AccessType(parent, accessPoint, position)
-                    )
-                );
+                    accessPoint => new DictionaryEx<int, AccessType>
+                                       (
+                                       position => new AccessType(parent, accessPoint, position)
+                                       )
+                    );
                 ObjectReferences = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(parent, refAlignParam));
                 References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
@@ -388,7 +388,7 @@ namespace Reni.Type
 
         internal virtual AccessType AccessType(Structure accessPoint, int position)
         {
-            return 
+            return
                 SpawnAccessType(accessPoint, position);
         }
 
@@ -414,10 +414,10 @@ namespace Reni.Type
             var result = feature.Apply(category, refAlignParam);
             DumpWithBreak(trace, "result", result);
             var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
-            if(this != typeOfArgInApplyResult)
+            if(ToReference(refAlignParam) != typeOfArgInApplyResult)
             {
                 DumpWithBreak(trace, "typeOfArgInApplyResult", typeOfArgInApplyResult);
-                var conversion = Conversion(category, typeOfArgInApplyResult);
+                var conversion = ToReference(refAlignParam).Conversion(category, typeOfArgInApplyResult);
                 DumpWithBreak(trace, "conversion", conversion);
                 result = result.ReplaceArg(conversion);
             }
@@ -425,5 +425,7 @@ namespace Reni.Type
         }
 
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
+
+        protected virtual TypeBase ToReference(RefAlignParam refAlignParam) { return SpawnReference(refAlignParam); }
     }
 }

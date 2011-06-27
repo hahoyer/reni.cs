@@ -25,7 +25,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _unalignedCode = code;
             DestructorCode = destructorCode;
-            StopByObjectId(-3);
+            StopByObjectId(-10);
         }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }

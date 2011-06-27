@@ -181,15 +181,6 @@ namespace Reni.Context
             return result.LocalReferenceResult(RefAlignParam);
         }
 
-        private IReference TypeAsReference(ICompileSyntax syntax)
-        {
-            var type = Type(syntax);
-            if (type is IReference)
-                return (IReference) type;
-
-            return type.Align(RefAlignParam.AlignBits).SpawnReference(RefAlignParam);
-        }
-
         private Structure ObtainRecentStructure()
         {
             var result = ContextItem as Struct.Context;

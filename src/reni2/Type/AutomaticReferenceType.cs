@@ -103,6 +103,8 @@ namespace Reni.Type
                 );
         }
 
+        protected override TypeBase ToReference(RefAlignParam refAlignParam) { return this; }
+
         protected override Size GetSize() { return RefAlignParam.RefSize; }
 
         internal override bool IsRef(RefAlignParam refAlignParam)

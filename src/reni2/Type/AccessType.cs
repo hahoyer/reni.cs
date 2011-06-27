@@ -42,6 +42,8 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
+        protected override TypeBase ToReference(RefAlignParam refAlignParam) { return this; }
+
         protected override Result ConvertToImplementation(Category category, TypeBase dest)
         {
             return ValueType
