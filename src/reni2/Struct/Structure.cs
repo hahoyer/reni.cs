@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,6 +80,8 @@ namespace Reni.Struct
             }
         }
 
+        internal override string DumpShort() { return base.DumpShort() + "(" + ContainerContextObject.DumpShort() + "@" + EndPosition + ")"; }
+
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return ContainerContextObject.RefAlignParam; } }
 
@@ -73,11 +93,22 @@ namespace Reni.Struct
 
         internal FunctionalBody SpawnFunctionalFeature(ICompileSyntax body) { return _functionalFeatureCache.Find(body); }
 
-        internal Result Access(Category category, Result thisReferenceResult, Result rightResult) { return AccessFromThisReference(category, thisReferenceResult, rightResult.ConvertTo(IndexType).Evaluate().ToInt32()); }
+        internal Result AccessViaThisReference(Category category, Result rightResult)
+        {
+            var position = rightResult
+                .ConvertTo(IndexType)
+                .Evaluate()
+                .ToInt32();
+            return AccessViaThisReference(category, position);
+        }
 
         private ICompileSyntax[] Statements { get { return ContainerContextObject.Statements; } }
 
-        internal Result AccessViaThisReference(Category category, int position) { return ReplaceContextReferenceByThisReference(AccessViaContextReference(category, position)); }
+        internal Result AccessViaThisReference(Category category, int position)
+        {
+            return AccessType(position)
+                .Result(category, ()=> StructureReferenceType.ArgCode());
+        }
         internal Result ReplaceContextReferenceByThisReference(Category category) { return ReplaceContextReferenceByThisReference(DumpPrintResultFromContextReference(category)); }
 
         internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable)
@@ -94,7 +125,7 @@ namespace Reni.Struct
                 .CreateFunctionCall(this, category, body, argsResult);
         }
 
-        private AccessType AccessType(int position)
+        internal AccessType AccessType(int position)
         {
             return ContainerContextObject
                 .InnerType(position)
@@ -133,7 +164,6 @@ namespace Reni.Struct
                 .ReplaceArg(AccessViaThisReference(category, position));
         }
 
-        private Result AccessFromThisReference(Category category, Result thisReferenceResult, int position) { return AccessViaThisReference(category, position).ReplaceArg(thisReferenceResult); }
         private Result ReplaceContextReferenceByThisReference(Result result) { return ContainerContextObject.ReplaceContextReferenceByThisReference(EndPosition, result); }
         private CodeBase ThisReferenceViaContextReferenceCode() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize*-1); }
 

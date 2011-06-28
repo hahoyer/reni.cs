@@ -210,7 +210,8 @@ namespace Reni.Context
             return leftResultAsRef
                 .Type
                 .GetStructure()
-                .Access(category, leftResultAsRef, rightResult);
+                .AccessViaThisReference(category, rightResult)
+                .ReplaceArg(leftResultAsRef);
         }
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)

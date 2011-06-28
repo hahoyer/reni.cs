@@ -36,13 +36,11 @@ namespace Reni.Type
 
             public Cache(TypeBase parent)
             {
-                AccessTypes = new DictionaryEx<Structure, DictionaryEx<int, AccessType>>
-                    (
-                    accessPoint => new DictionaryEx<int, AccessType>
-                                       (
-                                       position => new AccessType(parent, accessPoint, position)
-                                       )
-                    );
+                AccessTypes = new DictionaryEx<Structure, DictionaryEx<int, AccessType>>(
+                    accessPoint => new DictionaryEx<int, AccessType>(
+                        position => new AccessType(parent, accessPoint, position)
+                    )
+                );
                 ObjectReferences = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(parent, refAlignParam));
                 References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
