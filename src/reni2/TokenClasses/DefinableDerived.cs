@@ -26,8 +26,8 @@ namespace Reni.TokenClasses
         IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new CreateArrayFeature(); }
     }
 
-    internal sealed class Assignment : Defineable, ISearchPath<IFeature, AutomaticReferenceType>
+    internal sealed class Assignment : Defineable, ISearchPath<IFeature, AccessType>
     {
-        IFeature ISearchPath<IFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type) { return new Feature.Feature(type.ApplyAssignment); }
+        IFeature ISearchPath<IFeature, AccessType>.Convert(AccessType type) { return new Feature.Feature(type.ApplyAssignment); }
     }
 }

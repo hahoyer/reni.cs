@@ -160,8 +160,7 @@ namespace Reni.Struct
             return ContainerContextObject
                 .InnerType(position)
                 .SpawnAccessType(this, position)
-                .DumpPrintOperationResult(category)
-                .ReplaceArg(AccessViaThisReference(category, position));
+                .DumpPrintOperationResult(category);
         }
 
         private Result ReplaceContextReferenceByThisReference(Result result) { return ContainerContextObject.ReplaceContextReferenceByThisReference(EndPosition, result); }

@@ -254,7 +254,7 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -25 && category.HasCode;
+            var trace = defineable.ObjectId == -7 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, target, defineable);
             var targetType = Type(target);
             DumpWithBreak(trace, "targetType", targetType);

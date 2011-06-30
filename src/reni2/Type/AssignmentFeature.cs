@@ -10,12 +10,12 @@ namespace Reni.Type
     internal sealed class AssignmentFeature : ReniObject, IFunctionalFeature
     {
         [EnableDump]
-        private readonly AutomaticReferenceType _automaticReferenceTypeType;
+        private readonly AccessType _type;
 
-        internal AssignmentFeature(AutomaticReferenceType automaticReferenceTypeType) { _automaticReferenceTypeType = automaticReferenceTypeType; }
+        internal AssignmentFeature(AccessType type) { _type = type; }
 
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
-        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _automaticReferenceTypeType.ApplyAssignment(category, argsType); }
-        string IDumpShortProvider.DumpShort() { return _automaticReferenceTypeType.DumpShort() + " :="; }
+        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _type.ApplyAssignment(category, argsType); }
+        string IDumpShortProvider.DumpShort() { return _type.DumpShort() + " :="; }
     }
 }

@@ -31,6 +31,8 @@ namespace Reni.Type
             public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<Context.Function> Function;
+            public readonly DictionaryEx<IFunctionalFeature, TypeBase> FunctionalTypes;
+
 
             public readonly DictionaryEx<Structure, DictionaryEx<int, AccessType>> AccessTypes;
 
@@ -49,6 +51,7 @@ namespace Reni.Type
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
                 Function = new SimpleCache<Context.Function>(() => new Context.Function(parent));
+                FunctionalTypes = new DictionaryEx<IFunctionalFeature, TypeBase>(feature => new FunctionalFeatureType<IFunctionalFeature>(parent, feature));
             }
         }
 
@@ -401,7 +404,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -25 && category.HasCode;
+            var trace = defineable.ObjectId == 7 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable, refAlignParam);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
@@ -424,6 +427,7 @@ namespace Reni.Type
 
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
 
-        protected virtual TypeBase ToReference(RefAlignParam refAlignParam) { return SpawnReference(refAlignParam); }
+        internal virtual TypeBase ToReference(RefAlignParam refAlignParam) { return SpawnReference(refAlignParam); }
+        internal TypeBase SpawnFunctionalType(IFunctionalFeature functionalFeature) { return _cache.FunctionalTypes.Find(functionalFeature); }
     }
 }

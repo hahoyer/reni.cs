@@ -27,7 +27,7 @@ namespace Reni.Sequence
         {
             return _parent
                 .SpawnReference(refAlignParam)
-                .FunctionalType(this)
+                .SpawnFunctionalType(this)
                 .ArgResult(category);
         }
 
