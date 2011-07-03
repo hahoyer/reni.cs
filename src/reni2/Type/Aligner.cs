@@ -1,9 +1,27 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
+using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -20,10 +38,13 @@ namespace Reni.Type
 
         [DisableDump]
         protected override bool IsInheritor { get { return true; } }
+
         [DisableDump]
         internal int AlignBits { get { return _alignBits; } }
+
         [DisableDump]
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }
+
         [DisableDump]
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
 
@@ -33,21 +54,25 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return Parent.IsConvertableTo(dest, conversionParameter); }
-        internal override bool HasConverterTo(TypeBase dest) { return Parent.HasConverterTo(dest); }
+
+        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
+        internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
+        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
+
+        internal override bool HasConverterTo(TypeBase destination) { return Parent.HasConverterTo(destination); }
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
 
         internal override AutomaticReferenceType SpawnReference(RefAlignParam refAlignParam)
         {
-            if (_alignBits == refAlignParam.AlignBits)
+            if(_alignBits == refAlignParam.AlignBits)
                 return Parent.SpawnReference(refAlignParam);
             return base.SpawnReference(refAlignParam);
         }
 
-        protected override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected Result VirtualForceConversion(Category category, TypeBase destination)
         {
             return Parent
-                .ConvertTo(category, dest)
+                .ForceConversion(category, destination)
                 .ReplaceArg(CreateUnalignedArgResult(category));
         }
 
@@ -59,6 +84,5 @@ namespace Reni.Type
                     () => ArgCode().BitCast(Parent.Size)
                 );
         }
-
     }
 }

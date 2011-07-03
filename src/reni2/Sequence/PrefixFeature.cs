@@ -12,10 +12,10 @@ namespace Reni.Sequence
 {
     internal sealed class PrefixFeature : ReniObject, IFeature, IPrefixFeature
     {
-        private readonly BaseType _parent;
+        private readonly SequenceType _parent;
         private readonly ISequenceOfBitPrefixOperation _definable;
 
-        internal PrefixFeature(BaseType parent, ISequenceOfBitPrefixOperation definable)
+        internal PrefixFeature(SequenceType parent, ISequenceOfBitPrefixOperation definable)
         {
             _parent = parent;
             _definable = definable;

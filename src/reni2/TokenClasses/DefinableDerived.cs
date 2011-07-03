@@ -10,9 +10,9 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, BaseType>
+    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, Sequence.SequenceType>
     {
-        IFeature ISearchPath<IFeature, BaseType>.Convert(BaseType type) { return new Feature.Feature(type.EnableCutFeature); }
+        IFeature ISearchPath<IFeature, Sequence.SequenceType>.Convert(Sequence.SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
     }
 
     internal sealed class ConcatArrays : Defineable, ISearchPath<IFeature, Type.Array>

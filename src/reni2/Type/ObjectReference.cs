@@ -18,7 +18,7 @@ namespace Reni.Type
         [DisableDump]
         private readonly RefAlignParam _refAlignParam;
 
-        public ObjectReference(TypeBase objectType, RefAlignParam refAlignParam)
+        internal ObjectReference(TypeBase objectType, RefAlignParam refAlignParam)
             : base(_nextObjectId++)
         {
             _objectType = objectType;

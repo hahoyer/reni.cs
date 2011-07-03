@@ -526,7 +526,7 @@ namespace Reni
             return result;
         }
 
-        internal Result ConvertTo(TypeBase target) { return Type.Conversion(CompleteCategory, target).ReplaceArg(this); }
+        internal Result Conversion(TypeBase target) { return Type.Conversion(CompleteCategory, target).ReplaceArg(this); }
 
         internal Result Dereference(TypeBase type, RefAlignParam refAlignParam)
         {
@@ -592,13 +592,6 @@ namespace Reni
         {
             return Type
                 .ConvertToBitSequence(category)
-                .ReplaceArg(this);
-        }
-
-        internal Result ConvertToAsRef(Category category, AutomaticReferenceType target)
-        {
-            return Type
-                .ConvertToAsRef(category, target)
                 .ReplaceArg(this);
         }
 

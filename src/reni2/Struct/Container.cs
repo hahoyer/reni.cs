@@ -202,40 +202,46 @@ namespace Reni.Struct
 
         internal override Result Result(ContextBase context, Category category)
         {
-            var innerResult = InnerResult(category - Category.Type, context, 0, EndPosition);
+            var innerResult = ConstructionResult(category - Category.Type, context, 0, EndPosition);
             return context.SpawnContainerContext(this).Result(category, innerResult);
+        }
+
+        internal Result InternalInnerResult(Category category, ContextBase parent, int position)
+        {
+            return parent
+                .SpawnChildContext(this, position)
+                .Result(category | Category.Type, Statements[position])
+                .AutomaticDereference();
         }
 
         internal Result InnerResult(Category category, ContextBase parent, int position)
         {
-            var result = parent.SpawnChildContext(this, position)
-                .Result(category | Category.Type, Statements[position])
-                .PostProcessor
-                .InnerResultForStruct(category, parent.RefAlignParam);
-            Tracer.Assert(!(category.HasType && result.Type is AutomaticReferenceType));
-            return result;
+            Tracer.Assert(!(category.HasCode));
+            return InternalInnerResult(category, parent, position);
         }
-
         internal Context SpawnContext(int position) { return _contextCache.Find(position); }
 
         internal ContainerContextObject SpawnContainerContext(ContextBase parent)
         {
             return _containerContextCache.Find(parent);
         }
-        internal Result InnerResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
+        
+        internal Result ConstructionResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
             var result = TypeBase.VoidResult(category);
             for (var i = fromPosition; i < fromNotPosition; i++)
             {
                 //Tracer.ConditionalBreak(Container.ObjectId == 0 && position == 0, ()=>"");
-                var result1 = InnerResult(category, parent, i);
+                var result1 = InternalInnerResult(category, parent, i)
+                    .Align(parent.RefAlignParam.AlignBits)
+                    .LocalBlock(category, parent.RefAlignParam);
                 result = result.CreateSequence(result1);
             }
             return result;
         }
 
         internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, position).Size; }
-        internal Size InnerSize(ContextBase parent, int fromPosition, int fromNotPosition) { return InnerResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
+        internal Size ConstructionSize(ContextBase parent, int fromPosition, int fromNotPosition) { return ConstructionResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
         internal TypeBase InnerType(ContextBase parent, int position) { return InnerResult(Category.Type, parent, position).Type; }
         internal bool IsLambda(int position) { return Statements[position].IsLambda; }
         internal bool IsProperty(int position) { return Properties.Contains(position); }

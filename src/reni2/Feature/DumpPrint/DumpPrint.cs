@@ -22,16 +22,16 @@ namespace Reni.Feature.DumpPrint
 
     internal sealed class BitSequenceFeature :
         ReniObject,
-        ISearchPath<IFeature, BaseType>
+        ISearchPath<IFeature, Sequence.SequenceType>
     {
-        IFeature ISearchPath<IFeature, BaseType>.Convert(BaseType type) { return type.BitDumpPrintFeature; }
+        IFeature ISearchPath<IFeature, Sequence.SequenceType>.Convert(Sequence.SequenceType type) { return type.BitDumpPrintFeature; }
     }
 
     internal sealed class BitSequenceFeatureClass : BitFeatureBase, IFeature
     {
-        private readonly BaseType _parent;
+        private readonly Sequence.SequenceType _parent;
 
-        internal BitSequenceFeatureClass(BaseType parent) { _parent = parent; }
+        internal BitSequenceFeatureClass(Sequence.SequenceType parent) { _parent = parent; }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.SpawnReference(refAlignParam)); }
         TypeBase IFeature.DefiningType() { return _parent; }

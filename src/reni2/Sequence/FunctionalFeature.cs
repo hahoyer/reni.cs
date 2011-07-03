@@ -12,12 +12,12 @@ namespace Reni.Sequence
 {
     internal sealed class FunctionalFeature : ReniObject, IFeature, IFunctionalFeature
     {
-        private readonly BaseType _parent;
+        private readonly SequenceType _parent;
 
         [EnableDump]
         private readonly FeatureBase _feature;
 
-        internal FunctionalFeature(BaseType parent, FeatureBase feature)
+        internal FunctionalFeature(SequenceType parent, FeatureBase feature)
         {
             _parent = parent;
             _feature = feature;

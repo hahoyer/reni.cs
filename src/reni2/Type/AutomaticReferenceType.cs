@@ -1,35 +1,44 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Struct;
 
 namespace Reni.Type
 {
-    internal sealed class AutomaticReferenceType : TypeBase, IReference
+    internal sealed class AutomaticReferenceType : ReferenceType
     {
-        private static int _nextObjectId;
         private readonly RefAlignParam _refAlignParam;
-        private readonly TypeBase _valueType;
 
         internal AutomaticReferenceType(TypeBase valueType, RefAlignParam refAlignParam)
-            : base(_nextObjectId++)
+            : base(valueType)
         {
+            _refAlignParam = refAlignParam;
             Tracer.Assert(!valueType.Size.IsZero, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
-            _valueType = valueType;
-            _refAlignParam = refAlignParam;
             StopByObjectId(-2);
         }
 
-        [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
-
-        protected override bool IsReferenceTo(TypeBase value) { return ValueType == value; }
 
         [DisableDump]
         internal override RefAlignParam[] ReferenceChain
@@ -44,12 +53,14 @@ namespace Reni.Type
             }
         }
 
-        internal TypeBase ValueType { get { return _valueType; } }
         internal override string DumpPrintText { get { return DumpShort(); } }
+
+        [DisableDump]
+        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         internal Result ObjectReferenceInCode(Category category)
         {
-            var objectRef = ObjectReference(RefAlignParam);
+            var objectRef = SpawnObjectReference(RefAlignParam);
             var destinationResult = Result
                 (
                     category,
@@ -71,25 +82,16 @@ namespace Reni.Type
                 );
         }
 
-        internal override TypeBase ToReference(RefAlignParam refAlignParam) { return this; }
-
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
-
-        internal override bool IsRef(RefAlignParam refAlignParam)
-        {
-            Tracer.Assert(RefAlignParam == refAlignParam);
-            return true;
-        }
-
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            _valueType.Search(searchVisitor.Child(this));
-            _valueType.Search(searchVisitor);
+            ValueType.Search(searchVisitor.Child(this));
+            ValueType.Search(searchVisitor);
             base.Search(searchVisitor);
         }
 
-        internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return ValueType.IsConvertableTo(dest, conversionParameter); }
-        internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
+        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter) { return ValueType.IsConvertable(destination, conversionParameter); }
+        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
+        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
+
     }
 }

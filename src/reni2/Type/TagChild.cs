@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,34 +24,21 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    [Serializable]
     internal abstract class TagChild : Child
     {
         protected TagChild(TypeBase parent)
             : base(parent) { }
 
-        protected TagChild(int objectId, TypeBase parent)
-            : base(objectId, parent) { }
-
         protected abstract string TagTitle { get; }
-
         protected override Size GetSize() { return Parent.Size; }
-
         internal override string DumpShort() { return Parent.DumpShort() + "[" + TagTitle + "]"; }
-
         internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
-
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
-
         internal override Result ArrayDestructor(Category category, int count) { return Parent.ArrayDestructor(category, count); }
-
         internal override Result Copier(Category category) { return Parent.Copier(category); }
-
         internal override Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
-
-        protected override Result ConvertToImplementation(Category category, TypeBase dest) { return Parent.ConvertTo(category, dest); }
-
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return Parent.IsConvertableTo(dest, conversionParameter); }
+        protected virtual Result VirtualForceConversion(Category category, TypeBase destination) { return Parent.ForceConversion(category, destination); }
+        internal virtual bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
         protected override bool IsInheritor { get { return true; } }
     }
 }

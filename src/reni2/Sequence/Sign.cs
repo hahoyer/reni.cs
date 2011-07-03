@@ -11,10 +11,10 @@ namespace Reni.Sequence
 {
     internal sealed class Sign :
         SequenceOfBitOperation,
-        ISearchPath<ISearchPath<IPrefixFeature, BaseType>, Bit>,
+        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Bit>,
         ISequenceOfBitPrefixOperation
     {
-        ISearchPath<IPrefixFeature, BaseType> ISearchPath<ISearchPath<IPrefixFeature, BaseType>, Bit>.Convert(Bit type) { return new OperationPrefixFeature(type, this); }
+        ISearchPath<IPrefixFeature, SequenceType> ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Bit>.Convert(Bit type) { return new OperationPrefixFeature(type, this); }
 
         [DisableDump]
         string ISequenceOfBitPrefixOperation.CSharpNameOfDefaultOperation { get { return Name; } }

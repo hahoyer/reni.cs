@@ -13,12 +13,10 @@ namespace Reni.Type
     internal sealed class FunctionalFeatureType<TFeature> : TypeBase
         where TFeature: IFunctionalFeature
     {
-        private static int _nextObjectId;
         private readonly TypeBase _objectType;
         private readonly TFeature _functionalFeature;
 
         internal FunctionalFeatureType(TypeBase objectType, TFeature functionalFeature)
-            : base(_nextObjectId++)
         {
             _objectType = objectType;
             _functionalFeature = functionalFeature;

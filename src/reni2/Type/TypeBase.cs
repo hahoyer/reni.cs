@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,7 +43,7 @@ namespace Reni.Type
             public static readonly Void Void = new Void();
             public readonly DictionaryEx<int, Aligner> Aligners;
             public readonly DictionaryEx<int, Array> Arrays;
-            public readonly DictionaryEx<int, BaseType> Sequences;
+            public readonly DictionaryEx<int, SequenceType> Sequences;
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
             public readonly DictionaryEx<RefAlignParam, AutomaticReferenceType> References;
             public readonly DictionaryEx<RefAlignParam, ObjectReference> ObjectReferences;
@@ -40,13 +58,13 @@ namespace Reni.Type
             {
                 AccessTypes = new DictionaryEx<Structure, DictionaryEx<int, AccessType>>(
                     accessPoint => new DictionaryEx<int, AccessType>(
-                        position => new AccessType(parent, accessPoint, position)
-                    )
-                );
+                                       position => new AccessType(parent, accessPoint, position)
+                                       )
+                    );
                 ObjectReferences = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(parent, refAlignParam));
                 References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
-                Sequences = new DictionaryEx<int, BaseType>(elementCount => new BaseType(parent, elementCount));
+                Sequences = new DictionaryEx<int, SequenceType>(elementCount => new SequenceType(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
@@ -55,16 +73,15 @@ namespace Reni.Type
             }
         }
 
+        private static int _nextObjectId;
         private readonly Cache _cache;
 
         [UsedImplicitly]
         private static ReniObject _lastSearchVisitor;
 
 
-        protected TypeBase(int objectId)
-            : base(objectId) { _cache = new Cache(this); }
-
-        protected TypeBase() { _cache = new Cache(this); }
+        protected TypeBase()
+            : base(_nextObjectId++) { _cache = new Cache(this); }
 
         internal static TypeBase Void { get { return Cache.Void; } }
         internal static TypeBase Bit { get { return Cache.Bit; } }
@@ -122,8 +139,8 @@ namespace Reni.Type
         internal Array SpawnArray(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
         internal virtual AutomaticReferenceType SpawnReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
-        internal BaseType SpawnSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
-        protected ObjectReference ObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
+        internal SequenceType SpawnSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
+        protected ObjectReference SpawnObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
         internal static TypeBase Number(int bitCount) { return Bit.SpawnSequence(bitCount); }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
@@ -135,24 +152,14 @@ namespace Reni.Type
         internal virtual Result Copier(Category category) { return VoidCodeAndRefs(category); }
         internal virtual Result ArrayCopier(Category category, int count) { return VoidCodeAndRefs(category); }
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
-        protected virtual TypeBase Dereference() { return null; }
         internal Result ArgResult(Category category) { return Result(category, ArgCode); }
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
 
-        internal Result AutomaticDereferenceResult(Category category)
+        internal virtual Result AutomaticDereferenceResult(Category category)
         {
-            var type = Dereference();
-            if(type == null)
-                return ArgResult(category);
-            return DereferenceResult(category).AutomaticDereference();
-        }
-
-        protected virtual Result DereferenceResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
+            return ArgResult(category);
         }
 
         internal Result Result(Category category)
@@ -193,9 +200,9 @@ namespace Reni.Type
 
         internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
         {
-            if(thenType.IsConvertableTo(elseType, ConversionParameter.Instance))
+            if(thenType.IsConvertable(elseType, ConversionParameter.Instance))
                 return elseType;
-            if(elseType.IsConvertableTo(thenType, ConversionParameter.Instance))
+            if(elseType.IsConvertable(thenType, ConversionParameter.Instance))
                 return thenType;
             thenType.NotImplementedMethod(elseType);
             return null;
@@ -205,54 +212,45 @@ namespace Reni.Type
         {
             if(category <= (Category.Size | Category.Type))
                 return dest.Result(category);
-            if(IsConvertableTo(dest, ConversionParameter.Instance))
-                return ConvertTo(category, dest);
+            if(IsConvertable(dest, ConversionParameter.Instance))
+                return ForceConversion(category, dest);
             NotImplementedMethod(category, dest);
             return null;
         }
 
-        internal Result ConvertTo(Category category, TypeBase dest)
+        internal Result ForceConversion(Category category, TypeBase destination)
         {
-            if(this == dest)
-                return ConvertToItself(category);
-            if(dest.IsReferenceTo(this))
-                return LocalReferenceResult(category, ((AutomaticReferenceType) dest).RefAlignParam);
-            return ConvertToImplementation(category, dest);
+            if(this == destination)
+                return InternalConversionToItself(category);
+            return destination.VirtualForceConversionFrom(category, this);
+        }
+
+        internal bool IsConvertable(TypeBase destination, ConversionParameter conversionParameter)
+        {
+            if(this == destination)
+                return IsConvertableToItself(conversionParameter);
+            return destination.VirtualIsConvertableFrom(this, conversionParameter);
         }
 
         private Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
 
         internal Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, Bit).Align(BitsConst.SegmentAlignBits); }
 
-        protected internal virtual Result ConvertToItself(Category category) { return ArgResult(category); }
+        protected virtual Result InternalConversionToItself(Category category) { return ArgResult(category); }
 
-        protected virtual Result ConvertToImplementation(Category category, TypeBase dest)
+        protected virtual Result VirtualForceConversionFrom(Category category, TypeBase source)
         {
-            NotImplementedMethod(category, dest);
+            NotImplementedMethod(category, source);
             return null;
         }
 
-        internal bool IsConvertableTo(TypeBase dest, ConversionParameter conversionParameter)
+        protected virtual bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter)
         {
-            if(this == dest)
-                return IsConvertableToItself(conversionParameter);
-            if(dest.IsReferenceTo(this))
-                return true;
-            if(conversionParameter.IsUseConverter && HasConverterTo(dest))
-                return true;
-            return IsConvertableToImplementation(dest, conversionParameter.DontUseConverter);
-        }
-
-        protected virtual bool IsReferenceTo(TypeBase value) { return false; }
-
-        internal virtual bool HasConverterTo(TypeBase dest) { return false; }
-
-        internal virtual bool IsConvertableToImplementation
-            (TypeBase dest, ConversionParameter conversionParameter)
-        {
-            NotImplementedMethod(dest, conversionParameter);
+            NotImplementedMethod(source, conversionParameter);
             return false;
         }
+
+        internal virtual bool HasConverterTo(TypeBase destination) { return false; }
 
         private bool IsConvertableToItself(ConversionParameter conversionParameter) { return true; }
 
@@ -280,7 +278,7 @@ namespace Reni.Type
             return null;
         }
 
-        protected virtual bool IsRefLike(AutomaticReferenceType target) { return false; }
+        protected bool IsRefLike(AutomaticReferenceType target) { return false; }
 
         private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.SpawnSequence(SequenceCount(elementType)); }
 
@@ -304,25 +302,16 @@ namespace Reni.Type
 
         internal Result Apply(Category category, Result rightResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -10 && category.HasType;
+            var trace = ObjectId == -12 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, rightResult, refAlignParam);
             var functionalFeature = FunctionalFeature();
+            DumpWithBreak(trace, "functionalFeature", functionalFeature);
             var apply = functionalFeature.Apply(category, rightResult.Type, refAlignParam);
+            DumpWithBreak(trace, "apply", apply);
             var replaceArg = apply.ReplaceArg(rightResult);
+            DumpWithBreak(trace, "replaceArg", replaceArg);
             var result = replaceArg.ReplaceObjectRefByArg(refAlignParam, ObjectType());
-            DumpWithBreak
-                (
-                    trace, "functionalFeature", functionalFeature, "apply", apply, "replaceArg",
-                    replaceArg, "result", result);
             return ReturnMethodDump(trace, result);
-        }
-
-        internal Result ConvertToAsRef(Category category, AutomaticReferenceType target)
-        {
-            if(IsRefLike(target))
-                return target.ArgResult(category);
-
-            return LocalReferenceResult(category, target.RefAlignParam);
         }
 
         internal Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
@@ -357,7 +346,7 @@ namespace Reni.Type
 
         internal Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
-            var objectReference = ObjectReference(refAlignParam);
+            var objectReference = SpawnObjectReference(refAlignParam);
             return result
                 .ReplaceAbsolute
                 (
@@ -404,7 +393,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == 7 && category.HasCode;
+            var trace = defineable.ObjectId == -7 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable, refAlignParam);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
@@ -429,5 +418,35 @@ namespace Reni.Type
 
         internal virtual TypeBase ToReference(RefAlignParam refAlignParam) { return SpawnReference(refAlignParam); }
         internal TypeBase SpawnFunctionalType(IFunctionalFeature functionalFeature) { return _cache.FunctionalTypes.Find(functionalFeature); }
+
+        internal virtual bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
+        {
+            NotImplementedMethod(destination, conversionParameter);
+            return false;
+        }
+
+        internal virtual bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
+        {
+            NotImplementedMethod(destination, conversionParameter);
+            return false;
+        }
+
+        internal virtual bool VirtualIsConvertable(Aligner destination, ConversionParameter conversionParameter)
+        {
+            NotImplementedMethod(destination, conversionParameter);
+            return false;
+        }
+
+        internal virtual Result VirtualForceConversion(Category category, SequenceType destination)
+        {
+            NotImplementedMethod(category,destination);
+            return null;
+        }
+
+        internal virtual Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
+        {
+            NotImplementedMethod(category,destination);
+            return null;
+        }
     }
 }

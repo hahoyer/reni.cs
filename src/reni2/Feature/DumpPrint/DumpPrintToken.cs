@@ -36,7 +36,7 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<IFeature, Bit>,
         ISearchPath<IFeature, Type.Void>,
         ISearchPath<IFeature, StructureType>,
-        ISearchPath<ISearchPath<IFeature, BaseType>, Bit>,
+        ISearchPath<ISearchPath<IFeature, Sequence.SequenceType>, Bit>,
         ISearchPath<IFeature, FunctionalBody>
     {
         private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
@@ -49,7 +49,7 @@ namespace Reni.Feature.DumpPrint
 
         IFeature ISearchPath<IFeature, FunctionalBody>.Convert(FunctionalBody type) { return new Feature(type.DumpPrintResult); }
 
-        ISearchPath<IFeature, BaseType> ISearchPath<ISearchPath<IFeature, BaseType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
+        ISearchPath<IFeature, Sequence.SequenceType> ISearchPath<ISearchPath<IFeature, Sequence.SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<IFeature, AutomaticReferenceType> ISearchPath<ISearchPath<IFeature, AutomaticReferenceType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)

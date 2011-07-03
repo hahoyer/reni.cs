@@ -12,12 +12,10 @@ namespace Reni.Struct
 {
     internal sealed class FunctionalBody : TypeBase, IFunctionalFeature
     {
-        private static int _nextObjectId;
         private readonly ICompileSyntax _body;
         private readonly Structure _structure;
 
         internal FunctionalBody(Structure structure, ICompileSyntax body)
-            : base(_nextObjectId++)
         {
             _structure = structure;
             _body = body;

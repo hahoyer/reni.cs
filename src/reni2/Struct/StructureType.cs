@@ -13,14 +13,12 @@ namespace Reni.Struct
 {
     internal sealed class StructureType : TypeBase
     {
-        private static int _nextObjectId;
         private readonly Structure _structure;
 
         [DisableDump]
         internal readonly ISearchPath<IFeature, AutomaticReferenceType> DumpPrintReferenceFeature;
 
         internal StructureType(Structure structure)
-            : base(_nextObjectId++)
         {
             _structure = structure;
             DumpPrintReferenceFeature = new StructReferenceFeature(this);
@@ -53,25 +51,25 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        protected override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected Result VirtualForceConversion(Category category, TypeBase destination)
         {
-            Tracer.Assert(dest.IsVoid);
+            Tracer.Assert(destination.IsVoid);
             Tracer.Assert(Size.IsZero);
-            return dest.Result
+            return destination.Result
                 (
                     category,
-                    () => CodeBase.Arg(dest),
+                    () => CodeBase.Arg(destination),
                     () => Structure.ConstructorRefs
                 );
         }
 
         internal override Structure GetStructure() { return Structure; }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
+        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
         {
-            if(dest.IsVoid)
+            if(destination.IsVoid)
                 return Size.IsZero;
-            NotImplementedMethod(dest, conversionParameter);
+            NotImplementedMethod(destination, conversionParameter);
             return false;
         }
 

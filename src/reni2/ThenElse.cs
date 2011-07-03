@@ -43,10 +43,10 @@ namespace Reni
         {
             return context
                 .Result(category | Category.Type, Cond)
-                .ConvertTo(TypeBase.Bit)
+                .Conversion(TypeBase.Bit)
                 .Align(context.AlignBits)
                 .LocalBlock(category | Category.Type, context.RefAlignParam)
-                .ConvertTo(TypeBase.Bit);
+                .Conversion(TypeBase.Bit);
         }
 
         private Result ElseResult(ContextBase context, Category category)

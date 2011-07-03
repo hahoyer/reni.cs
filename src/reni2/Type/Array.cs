@@ -47,26 +47,26 @@ namespace Reni.Type
             return GetType().PrettyName() + "(" + Element.Dump() + ", " + Count + ")";
         }
 
-        protected override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected Result VirtualForceConversion(Category category, TypeBase destination)
         {
-            var destArray = dest as Array;
+            var destArray = destination as Array;
             if(destArray != null)
             {
-                var result = Element.ConvertTo(category, destArray.Element);
-                NotImplementedMethod(category, dest, "result", result);
+                var result = Element.ForceConversion(category, destArray.Element);
+                NotImplementedMethod(category, destination, "result", result);
                 return null;
             }
-            NotImplementedMethod(category, dest);
+            NotImplementedMethod(category, destination);
             return null;
         }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
+        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
         {
-            var destArray = dest as Array;
+            var destArray = destination as Array;
             if(destArray != null)
             {
                 if(Count == destArray.Count)
-                    return Element.IsConvertableTo(destArray.Element, conversionParameter.DontUseConverter);
+                    return Element.IsConvertable(destArray.Element, conversionParameter.DontUseConverter);
                 return false;
             }
             return false;
@@ -105,6 +105,7 @@ namespace Reni.Type
     {
         protected static Result ApplyResult(ContextBase callContext, Category category, ICompileSyntax @object, ICompileSyntax args, TypeBase elementType, int count)
         {
+            /*
             var resultType = new Array(elementType, count);
 
             var categoryWithType = category | Category.Type;
@@ -124,6 +125,8 @@ namespace Reni.Type
                     () => rightResult.Code.Sequence(leftResult.Code),
                     () => leftResult.Refs + rightResult.Refs
                 );
+             */
+            return null;
         }
     }
 

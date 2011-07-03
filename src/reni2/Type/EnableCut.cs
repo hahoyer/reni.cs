@@ -13,6 +13,6 @@ namespace Reni.Type
 
         protected override string TagTitle { get { return "enable_cut"; } }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return base.IsConvertableToImplementation(dest, conversionParameter.EnableCut); }
+        internal override bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter) { return base.VirtualIsConvertable(destination, conversionParameter.EnableCut); }
     }
 }

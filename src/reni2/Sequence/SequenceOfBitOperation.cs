@@ -11,10 +11,10 @@ namespace Reni.Sequence
 {
     internal abstract class SequenceOfBitOperation :
         Defineable,
-        ISearchPath<ISearchPath<IFeature, BaseType>, Bit>,
+        ISearchPath<ISearchPath<IFeature, SequenceType>, Bit>,
         ISequenceOfBitBinaryOperation
     {
-        ISearchPath<IFeature, BaseType> ISearchPath<ISearchPath<IFeature, BaseType>, Bit>.Convert(Bit type)
+        ISearchPath<IFeature, SequenceType> ISearchPath<ISearchPath<IFeature, SequenceType>, Bit>.Convert(Bit type)
         {
             if(IsCompareOperator)
                 return new CompareFeature(this);

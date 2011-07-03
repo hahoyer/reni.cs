@@ -13,7 +13,7 @@ using Reni.Type;
 namespace Reni.Sequence
 {
     [Serializable]
-    internal sealed class BaseType : TypeBase
+    internal sealed class SequenceType : TypeBase
     {
         private readonly Type.Array _inheritedType;
 
@@ -26,7 +26,7 @@ namespace Reni.Sequence
 
         internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
 
-        public BaseType(TypeBase elementType, int count)
+        public SequenceType(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0, () => "count=" + count);
             _inheritedType = elementType.SpawnArray(count);
@@ -51,24 +51,26 @@ namespace Reni.Sequence
         [DisableDump]
         public TypeBase Element { get { return _inheritedType.Element; } }
 
-        internal override string DumpShort() { return "(" + Element.DumpShort() + ")sequence(" + Count + ")"; }
+        internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + "*" + Count + ")"; }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
+        internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
         {
-            var destSequence = dest as BaseType;
-            if(destSequence != null)
-            {
-                if(conversionParameter.IsDisableCut && Count > destSequence.Count)
-                    return false;
-                return Element.IsConvertableTo(destSequence.Element, conversionParameter.DontUseConverter);
-            }
-
-            var destAligner = dest as Aligner;
-            if(destAligner != null)
-                return IsConvertableTo(destAligner.Parent, conversionParameter);
-
-            return base.IsConvertableToImplementation(dest, conversionParameter);
+            if (conversionParameter.IsDisableCut && Count > destination.Count)
+                return false;
+            return Element.IsConvertable(destination.Element, conversionParameter.DontUseConverter);
         }
+
+        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
+        {
+            var destAligner = destination as Aligner;
+            if(destAligner != null)
+                return IsConvertable(destAligner.Parent, conversionParameter);
+
+            NotImplementedMethod(destination,conversionParameter);
+            return false;
+        }
+
+        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -76,56 +78,49 @@ namespace Reni.Sequence
             base.Search(searchVisitor);
         }
 
-        protected override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected Result VirtualForceConversion(Category category, TypeBase destination)
         {
-            var result = ConvertTo(category, dest as BaseType);
+            var result = ForceConversion(category, destination as Aligner);
             if(result != null)
                 return result;
 
-            result = ConvertTo(category, dest as Aligner);
+            result = ForceConversion(category, destination as EnableCut);
             if(result != null)
                 return result;
 
-            result = ConvertTo(category, dest as EnableCut);
-            if(result != null)
-                return result;
-
-            NotImplementedMethod(category, dest);
+            NotImplementedMethod(category, destination);
             return null;
         }
 
-        private Result ConvertTo(Category category, BaseType dest)
+        internal override Result VirtualForceConversion(Category category, SequenceType destination)
         {
-            if(dest == null)
-                return null;
+            var result = ArgResult(category | Category.Type);
+            if(Count > destination.Count)
+                result = RemoveElementsAtEnd(category, destination.Count);
 
-            var result = ArgResult(category);
-            if(Count > dest.Count)
-                result = RemoveElementsAtEnd(category, dest.Count);
-
-            if(Element != dest.Element)
+            if(Element != destination.Element)
             {
-                var elementResult = Element.ConvertTo(category, dest.Element);
-                NotImplementedMethod(category, dest, "result", result, "elementResult", elementResult);
+                var elementResult = Element.ForceConversion(category, destination.Element);
+                NotImplementedMethod(category, destination, "result", result, "elementResult", elementResult);
                 return null;
             }
-            if(Count < dest.Count)
-                result = dest.ExtendFrom(category, Count).ReplaceArg(result);
+            if(Count < destination.Count)
+                result = destination.ExtendFrom(category, Count).ReplaceArg(result);
             return result;
         }
 
-        private Result ConvertTo(Category category, Aligner dest)
+        private Result ForceConversion(Category category, Aligner dest)
         {
             if(dest == null)
                 return null;
-            return ConvertTo(category, dest.Parent).Align(dest.AlignBits);
+            return ForceConversion(category, dest.Parent).Align(dest.AlignBits);
         }
 
-        private Result ConvertTo(Category category, EnableCut dest)
+        private Result ForceConversion(Category category, EnableCut dest)
         {
             if(dest == null)
                 return null;
-            var result = ConvertTo(category, dest.Parent);
+            var result = ForceConversion(category, dest.Parent);
             return dest.Result(category, () => result.Code, () => result.Refs);
         }
 
@@ -165,6 +160,7 @@ namespace Reni.Sequence
 
         internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam) { return SpawnReference(refAlignParam).ObjectReferenceInCode(category); }
 
+        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
     }
 
 }

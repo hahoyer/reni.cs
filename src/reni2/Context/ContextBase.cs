@@ -140,7 +140,7 @@ namespace Reni.Context
         internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
         {
             return Result(Category.Code | Category.Type | Category.Refs, syntax)
-                .ConvertTo(resultType)
+                .Conversion(resultType)
                 .Evaluate();
         }
 
@@ -148,12 +148,6 @@ namespace Reni.Context
         {
             return Result(Category.Code | Category.Type | Category.Refs, syntax)
                 .Evaluate();
-        }
-
-        internal Result ConvertedRefResult(Category category, ICompileSyntax syntax, AutomaticReferenceType target)
-        {
-            var result = Result(category | Category.Type, syntax);
-            return result.ConvertToAsRef(category, target);
         }
 
         private ContextBase[] ObtainChildChain()
@@ -216,7 +210,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -26 && category.HasType;
+            var trace = defineable.ObjectId == -7 && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -387,7 +381,10 @@ namespace Reni.Context
     }
 
     internal interface IReference
-    {}
+    {
+        TypeBase ValueType{ get; }
+        RefAlignParam RefAlignParam { get; }
+    }
 
     internal sealed class ContextOperator : NonPrefix
     {

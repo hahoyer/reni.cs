@@ -15,10 +15,10 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount(TypeBase elementType) { return 1; }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter)
+        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
         {
             if(conversionParameter.IsUseConverter)
-                return dest.HasConverterFromBit();
+                return destination.HasConverterFromBit();
 
             return false;
         }

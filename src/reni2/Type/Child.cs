@@ -13,9 +13,6 @@ namespace Reni.Type
 
         protected Child(TypeBase parent) { _parent = parent; }
 
-        protected Child(int objectId, TypeBase parent)
-            : base(objectId) { _parent = parent; }
-
         [Node, EnableDump]
         public TypeBase Parent { get { return _parent; } }
 

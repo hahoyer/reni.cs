@@ -29,19 +29,17 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    internal sealed class AccessType : TypeBase
+    internal sealed class AccessType : ReferenceType
     {
-        private static int _nextObjectId;
-        private readonly TypeBase _valueType;
         private readonly Structure _accessPoint;
         private readonly int _position;
         private readonly AssignmentFeature _assignmentFeature;
         private readonly SimpleCache<AccessManager.IAccessObject> _accessObjectCache;
 
         public AccessType(TypeBase valueType, Structure accessPoint, int position)
-            : base(_nextObjectId++)
+            : base(valueType)
         {
-            _valueType = valueType;
+            Tracer.Assert(!(valueType is Aligner));
             _accessPoint = accessPoint;
             _position = position;
             _assignmentFeature = new AssignmentFeature(this);
@@ -50,17 +48,14 @@ namespace Reni.Type
 
         private AccessManager.IAccessObject SpawnAccessObject() { return _accessPoint.ContainerContextObject.SpawnAccessObject(_position); }
 
-        [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return _accessPoint.RefAlignParam; } }
-
         [EnableDump]
         internal Structure AccessPoint { get { return _accessPoint; } }
 
         [EnableDump]
-        internal TypeBase ValueType { get { return _valueType; } }
-
-        [EnableDump]
         internal int Position { get { return _position; } }
+
+        [DisableDump]
+        internal override RefAlignParam RefAlignParam { get { return AccessPoint.RefAlignParam; } }
 
         [DisableDump]
         private AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
@@ -71,18 +66,16 @@ namespace Reni.Type
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            _valueType.Search(searchVisitor.Child(this));
-            _valueType.Search(searchVisitor);
+            ValueType.Search(searchVisitor.Child(this));
+            ValueType.Search(searchVisitor);
             base.Search(searchVisitor);
         }
 
-        internal override TypeBase ToReference(RefAlignParam refAlignParam) { return this; }
-
-        protected override Result ConvertToImplementation(Category category, TypeBase dest)
+        protected Result VirtualForceConversion(Category category, TypeBase destination)
         {
             return ValueType
                 .ToReference(RefAlignParam)
-                .Conversion(category, dest)
+                .ForceConversion(category, destination)
                 .ReplaceArg(ValueReferenceViaFieldReference(category));
         }
 
@@ -100,34 +93,39 @@ namespace Reni.Type
 
         internal Result ApplyAssignment(Category category, TypeBase argsType)
         {
+            return AssignmentResult(category)
+                .ReplaceArg(argsType.Conversion(category, ValueType.ToReference(RefAlignParam)));
+        }
+
+        private Result AssignmentResult(Category category)
+        {
             return new Result
                 (category
                  , () => Size.Zero
                  , () => Void
-                 , () => AssignmentCode(argsType)
+                 , AssignmentCode
                 );
         }
 
-        private CodeBase AssignmentCode(TypeBase argsType)
+        private CodeBase AssignmentCode()
         {
-            var sourceResult = argsType
-                .ConvertTo(Category.Code | Category.Type, ValueType).Code;
-            return CodeBase
-                .Arg(argsType.SpawnReference(RefAlignParam))
-                .Sequence(sourceResult)
+            return _accessPoint
+                .AccessPointCodeFromContextReference()
+                .Sequence(CodeBase.Arg(ValueType.SpawnReference(RefAlignParam)))
                 .Assignment(RefAlignParam, ValueType.Size);
         }
 
+        internal Result ConvertToAutomaticReference(Category category) { return ValueReferenceViaFieldReference(category); }
+
         private Result ValueReferenceViaFieldReference(Category category)
         {
-            var result = new Result
+            return new Result
                 (category
                  , () => RefAlignParam.RefSize
                  , () => ValueType.ToReference(RefAlignParam)
                  , ValueReferenceViaFieldReferenceCode
                  , Refs.None
                 );
-            return result;
         }
 
         private CodeBase ValueReferenceViaFieldReferenceCode()
@@ -137,30 +135,14 @@ namespace Reni.Type
                 .AddToReference(RefAlignParam, AccessPoint.FieldOffsetFromThisReference(Position));
         }
 
-        internal override bool IsConvertableToImplementation(TypeBase dest, ConversionParameter conversionParameter) { return ValueType.IsConvertableTo(dest, conversionParameter); }
+        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => CodeBase.Arg(AccessPoint.StructureReferenceType)); }
 
-        protected override Size GetSize() { return _accessPoint.RefAlignParam.RefSize; }
-        internal override bool IsRef(RefAlignParam refAlignParam) { return refAlignParam == RefAlignParam; }
-
-        internal override TypeBase AutomaticDereference()
+        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
         {
-            NotImplementedMethod();
-            return null;
-            ;
+            return ValueType
+                .IsConvertable(destination, conversionParameter);
         }
 
-        protected override TypeBase Dereference()
-        {
-            NotImplementedMethod();
-            return null;
-            ;
-        }
-
-        protected override Result DereferenceResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-            ;
-        }
+        internal override TypeBase AutomaticDereference() { return ValueType; }
     }
 }

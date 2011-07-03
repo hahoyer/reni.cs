@@ -158,7 +158,7 @@
     <Compile Include="Sequence\Feature.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
     <Compile Include="Sequence\PrefixFeature.cs" />
-    <Compile Include="Sequence\BaseType.cs" />
+    <Compile Include="Sequence\SequenceType.cs" />
     <Compile Include="Sequence\OperationPrefixFeature.cs" />
     <Compile Include="Sequence\SequenceOfBitOperation.cs" />
     <Compile Include="Sequence\Sign.cs" />
@@ -253,6 +253,7 @@
     <Compile Include="Type\List.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\AutomaticReferenceType.cs" />
+    <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
