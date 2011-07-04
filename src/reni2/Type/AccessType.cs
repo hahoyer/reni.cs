@@ -138,12 +138,11 @@ namespace Reni.Type
 
         private CodeBase ValueReferenceViaFieldReferenceCode()
         {
-            return CodeBase
-                .Arg(this)
+            return ArgCode()
                 .AddToReference(RefAlignParam, AccessPoint.FieldOffsetFromThisReference(Position));
         }
 
-        private CodeBase FieldReferenceCodeViaStructReference() { return CodeBase.Arg(AccessPoint.ReferenceType); }
+        private CodeBase FieldReferenceCodeViaStructReference() { return AccessPoint.ReferenceType.ArgCode(); }
 
         internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
         {

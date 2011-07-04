@@ -54,10 +54,10 @@ namespace Reni.Code.ReplaceVisitor
             [UsedImplicitly]
             public string Dump()
             {
-                var data = "\nActual="
-                           + Tracer.Dump(_actual)
-                           + "\nVisitedObject="
-                           + Tracer.Dump(_visitedObject);
+                var data = "\nVisitedObject="
+                           + Tracer.Dump(_visitedObject)
+                           + "\nActual="
+                           + Tracer.Dump(_actual);
 
                 return "SizeException\n{"
                        + data.Indent()

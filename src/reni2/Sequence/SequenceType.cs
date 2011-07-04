@@ -130,7 +130,7 @@ namespace Reni.Sequence
             var result = Result
                 (
                     category,
-                    () => CodeBase.Arg(Element.SpawnSequence(oldCount)).BitCast(Size)
+                    () => Element.SpawnSequence(oldCount).ArgCode().BitCast(Size)
                 );
             return result;
         }
@@ -149,7 +149,7 @@ namespace Reni.Sequence
                 .Result
                 (
                     category,
-                    () => CodeBase.Arg(this).BitCast(newType.Size)
+                    () => ArgCode().BitCast(newType.Size)
                 );
             return result;
         }

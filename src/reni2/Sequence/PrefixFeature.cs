@@ -37,7 +37,15 @@ namespace Reni.Sequence
             return type
                 .Result
                 (category
-                , () => CodeBase.BitSequenceOperation(type.Size, _definable, type.SpawnReference(refAlignParam)));
+                , () => BitSequenceOperation(type.Size, _definable, type.SpawnReference(refAlignParam)));
+        }
+
+        private static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, AutomaticReferenceType objectType)
+        {
+            return objectType
+                .ArgCode()
+                .Dereference(objectType.RefAlignParam, objectType.ValueType.Size.ByteAlignedSize)
+                .BitSequenceOperation(feature, size);
         }
     }
 }

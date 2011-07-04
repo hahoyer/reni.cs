@@ -76,7 +76,6 @@ namespace Reni.Code
         [DisableDump]
         internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
 
-        internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
         internal static CodeBase BitsConst(Size size, BitsConst t) { return new BitArray(size, t); }
         internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
         internal static CodeBase DumpPrintText(string dumpPrintText) { return new DumpPrintText(dumpPrintText); }
@@ -99,31 +98,6 @@ namespace Reni.Code
                     return resultData[0];
             }
             return Code.List.Create(resultData);
-        }
-
-        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, AutomaticReferenceType objectType)
-        {
-            return Arg(objectType)
-                .Dereference(objectType.RefAlignParam, objectType.ValueType.Size.ByteAlignedSize)
-                .BitSequenceOperation(feature, size);
-        }
-
-        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objBits, int argsBits, RefAlignParam refAlignParam)
-        {
-            var objSize = Size.Create(objBits);
-            var argsSize = Size.Create(argsBits);
-            var operandsSize = objSize.ByteAlignedSize + argsSize.ByteAlignedSize;
-            return Arg(TypeBase.Number(operandsSize.ToInt()).SpawnReference(refAlignParam))
-                .Dereference(refAlignParam, operandsSize)
-                .BitSequenceOperation(token, size, objSize.ByteAlignedSize);
-        }
-
-        internal static CodeBase BitSequenceDumpPrint(AutomaticReferenceType objectType)
-        {
-            var alignedSize = objectType.ValueType.Size.Align(objectType.RefAlignParam.AlignBits);
-            return Arg(objectType)
-                .Dereference(objectType.RefAlignParam, alignedSize)
-                .DumpPrint(alignedSize);
         }
 
         protected abstract Size GetSize();
@@ -277,9 +251,9 @@ namespace Reni.Code
             return result.CreateFiber(new Drop(Size, resultSize));
         }
 
-        private CodeBase BitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize) { return CreateFiber(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
-        private CodeBase DumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
-        private CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
+        internal CodeBase BitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize) { return CreateFiber(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
+        internal CodeBase DumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
+        internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
 
         internal static CodeBase LocalVariableReference(RefAlignParam refAlignParam, string holder, Size offset = null) { return new LocalVariableReference(refAlignParam, holder, offset); }
 
@@ -326,6 +300,8 @@ namespace Reni.Code
             var refs = codeBases.Select(code => code.Refs).ToArray();
             return refs.Aggregate(Refs.None(), (r1, r2) => r1.Sequence(r2));
         }
+
+        internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
     }
 
     internal abstract class UnexpectedVisitOfPending : Exception

@@ -14,9 +14,17 @@ namespace Reni.Feature.DumpPrint
     {
         protected static Result Apply(Category category, AutomaticReferenceType objectType)
         {
-            return TypeBase
-                .Void
-                .Result(category, () => CodeBase.BitSequenceDumpPrint(objectType));
+            return TypeBase.Void
+                .Result(category, () => BitSequenceDumpPrint(objectType));
+        }
+
+        private static CodeBase BitSequenceDumpPrint(AutomaticReferenceType objectType)
+        {
+            var alignedSize = objectType.ValueType.Size.Align(objectType.RefAlignParam.AlignBits);
+            return objectType
+                .ArgCode()
+                .Dereference(objectType.RefAlignParam, alignedSize)
+                .DumpPrint(alignedSize);
         }
     }
 

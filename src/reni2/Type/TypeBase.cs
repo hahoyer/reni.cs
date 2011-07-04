@@ -393,7 +393,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -7 && category.HasCode;
+            var trace = defineable.ObjectId == -18 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable, refAlignParam);
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();

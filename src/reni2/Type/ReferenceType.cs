@@ -23,6 +23,7 @@ using System;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -49,6 +50,12 @@ namespace Reni.Type
         internal override bool IsRef(RefAlignParam refAlignParam) { return (RefAlignParam == refAlignParam); }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
+        internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
+        {
+            return ValueType == destination
+                   || ValueType.IsConvertable(destination, conversionParameter);
+        }
+
         internal override bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
         {
             return
@@ -57,7 +64,7 @@ namespace Reni.Type
         }
 
         private Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
-        private CodeBase DereferenceCode() { return CodeBase.Arg(this).Dereference(RefAlignParam, ValueType.Size); }
+        private CodeBase DereferenceCode() { return ArgCode().Dereference(RefAlignParam, ValueType.Size); }
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
         {
@@ -72,6 +79,17 @@ namespace Reni.Type
                 .ForceConversion(typedCategory, destination.ValueType)
                 .ReplaceArg(DereferenceResult(typedCategory))
                 .LocalReferenceResult(RefAlignParam);
+        }
+
+        internal override Result VirtualForceConversion(Category category, SequenceType destination)
+        {
+            if(ValueType == destination)
+                return DereferenceResult(category);
+
+            var typedCategory = category | Category.Type;
+            return ValueType
+                .ForceConversion(typedCategory, destination)
+                .ReplaceArg(DereferenceResult(typedCategory));
         }
 
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }

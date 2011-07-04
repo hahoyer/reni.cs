@@ -56,10 +56,9 @@ namespace Reni.Struct
             Tracer.Assert(destination.IsVoid);
             Tracer.Assert(Size.IsZero);
             return destination.Result
-                (
-                    category,
-                    () => CodeBase.Arg(destination),
-                    () => Structure.ConstructorRefs
+                (category
+                , destination.ArgCode
+                , () => Structure.ConstructorRefs
                 );
         }
 
