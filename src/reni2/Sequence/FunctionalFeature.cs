@@ -47,7 +47,7 @@ namespace Reni.Sequence
             var objectResult = _parent.ObjectReferenceInCode(category | Category.Type, refAlignParam);
             var convertedObjectResult = objectResult.ConvertToBitSequence(category);
             var convertedArgsResult = argsType.ConvertToBitSequence(category);
-            return result.ReplaceArg(convertedObjectResult.CreateSequence(convertedArgsResult));
+            return result.ReplaceArg(convertedObjectResult.Pair(convertedArgsResult));
         }
 
         Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }

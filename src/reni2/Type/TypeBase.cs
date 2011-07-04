@@ -302,7 +302,7 @@ namespace Reni.Type
 
         internal Result Apply(Category category, Result rightResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -12 && category.HasCode;
+            var trace = ObjectId == -15 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, rightResult, refAlignParam);
             var functionalFeature = FunctionalFeature();
             DumpWithBreak(trace, "functionalFeature", functionalFeature);

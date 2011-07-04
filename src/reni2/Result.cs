@@ -438,7 +438,7 @@ namespace Reni
             return result;
         }
 
-        public Result CreateSequence(Result second)
+        public Result Pair(Result second)
         {
             var result = Clone();
             result.Add(second);

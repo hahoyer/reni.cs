@@ -392,7 +392,7 @@ namespace Reni.Context
         {
             return context
                 .FindRecentStructure
-                .ThisReferenceResultViaContextReference(category);
+                .StructReferenceViaContextReference(category);
         }
 
         public override Result Result(ContextBase context, Category category, ICompileSyntax left)

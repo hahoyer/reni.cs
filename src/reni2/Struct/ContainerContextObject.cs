@@ -111,7 +111,7 @@ namespace Reni.Struct
         private CodeBase ReplaceContextReferenceByThisReferenceCode(int accessPosition)
         {
             return CodeBase
-                .Arg(Parent.SpawnStructure(Container).StructureReferenceType)
+                .Arg(Parent.SpawnStructure(Container).ReferenceType)
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 

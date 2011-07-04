@@ -93,8 +93,13 @@ namespace Reni.Type
 
         internal Result ApplyAssignment(Category category, TypeBase argsType)
         {
-            return AssignmentResult(category)
-                .ReplaceArg(argsType.Conversion(category, ValueType.ToReference(RefAlignParam)));
+            var typedCategory = category|Category.Type;
+            var sourceResult = argsType.Conversion(typedCategory, ValueTypeReference);
+            var destinationResult = ValueReferenceViaFieldReference(typedCategory)
+                .ReplaceArg(FieldReferenceViaStructReference(typedCategory))
+                .ReplaceArg(AccessPoint.StructReferenceViaContextReference(typedCategory));
+            var resultForArg = destinationResult.Pair(sourceResult);
+            return AssignmentResult(category).ReplaceArg(resultForArg);
         }
 
         private Result AssignmentResult(Category category)
@@ -109,13 +114,16 @@ namespace Reni.Type
 
         private CodeBase AssignmentCode()
         {
-            return _accessPoint
-                .AccessPointCodeFromContextReference()
-                .Sequence(CodeBase.Arg(ValueType.SpawnReference(RefAlignParam)))
+            return ValueTypeReference
+                .Pair(ValueTypeReference)
+                .ArgCode()
                 .Assignment(RefAlignParam, ValueType.Size);
         }
 
+        private TypeBase ValueTypeReference { get { return ValueType.ToReference(RefAlignParam); } }
+
         internal Result ConvertToAutomaticReference(Category category) { return ValueReferenceViaFieldReference(category); }
+        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, FieldReferenceCodeViaStructReference); }
 
         private Result ValueReferenceViaFieldReference(Category category)
         {
@@ -135,7 +143,7 @@ namespace Reni.Type
                 .AddToReference(RefAlignParam, AccessPoint.FieldOffsetFromThisReference(Position));
         }
 
-        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => CodeBase.Arg(AccessPoint.StructureReferenceType)); }
+        private CodeBase FieldReferenceCodeViaStructReference() { return CodeBase.Arg(AccessPoint.ReferenceType); }
 
         internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
         {

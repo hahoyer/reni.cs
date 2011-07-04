@@ -235,7 +235,7 @@ namespace Reni.Struct
                 var result1 = InternalInnerResult(category, parent, i)
                     .Align(parent.RefAlignParam.AlignBits)
                     .LocalBlock(category, parent.RefAlignParam);
-                result = result.CreateSequence(result1);
+                result = result.Pair(result1);
             }
             return result;
         }
