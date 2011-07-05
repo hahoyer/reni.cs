@@ -64,7 +64,7 @@ namespace Reni.Type
         }
 
         private Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
-        private CodeBase DereferenceCode() { return ArgCode().Dereference(RefAlignParam, ValueType.Size); }
+        protected abstract CodeBase DereferenceCode();
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
         {

@@ -58,18 +58,7 @@ namespace Reni.Type
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        internal Result ObjectReferenceInCode(Category category)
-        {
-            var objectRef = UniqueObjectReference(RefAlignParam);
-            var destinationResult = Result
-                (
-                    category,
-                    () => CodeBase.ReferenceCode(objectRef).Dereference(RefAlignParam, Size),
-                    () => Refs.Create(objectRef)
-                );
-            return destinationResult;
-        }
-
+        protected override CodeBase DereferenceCode() { return ArgCode().Dereference(RefAlignParam, ValueType.Size); }
         internal override Structure GetStructure() { return ValueType.GetStructure(); }
 
         internal override Result ReferenceInCode(IReferenceInCode target, Category category)

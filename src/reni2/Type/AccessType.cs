@@ -149,5 +149,6 @@ namespace Reni.Type
         }
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
+        protected override CodeBase DereferenceCode() { return ValueReferenceViaFieldReferenceCode().Dereference(RefAlignParam, ValueType.Size); }
     }
 }
