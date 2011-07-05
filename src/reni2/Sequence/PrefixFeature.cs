@@ -37,7 +37,7 @@ namespace Reni.Sequence
             return type
                 .Result
                 (category
-                , () => BitSequenceOperation(type.Size, _definable, type.SpawnAutomaticReference(refAlignParam)));
+                , () => BitSequenceOperation(type.Size, _definable, type.UniqueAutomaticReference(refAlignParam)));
         }
 
         private static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, AutomaticReferenceType objectType)

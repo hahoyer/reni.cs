@@ -41,13 +41,13 @@ namespace Reni.Feature.DumpPrint
 
         internal BitSequenceFeatureClass(Sequence.SequenceType parent) { _parent = parent; }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.SpawnAutomaticReference(refAlignParam)); }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.UniqueAutomaticReference(refAlignParam)); }
         TypeBase IFeature.ObjectType { get { return _parent; } }
     }
 
     internal sealed class BitFeature : BitFeatureBase, IFeature
     {
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.SpawnAutomaticReference(refAlignParam)); }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.UniqueAutomaticReference(refAlignParam)); }
         TypeBase IFeature.ObjectType { get { return TypeBase.Bit; } }
     }
 

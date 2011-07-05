@@ -30,7 +30,7 @@ namespace Reni.Struct
                 searchVisitor.InternalResult =
                     Container
                         .SearchFromStructContext(searchVisitor.Defineable)
-                        .CheckedConvert(parent.SpawnContainerContext(Container));
+                        .CheckedConvert(parent.UniqueContainerContext(Container));
             }
             base.Search(searchVisitor, parent);
         }

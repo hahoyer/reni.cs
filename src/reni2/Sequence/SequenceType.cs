@@ -29,7 +29,7 @@ namespace Reni.Sequence
         public SequenceType(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0, () => "count=" + count);
-            _inheritedType = elementType.SpawnArray(count);
+            _inheritedType = elementType.UniqueArray(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             StopByObjectId(-172);
         }
@@ -130,7 +130,7 @@ namespace Reni.Sequence
             var result = Result
                 (
                     category,
-                    () => Element.SpawnSequence(oldCount).ArgCode().BitCast(Size)
+                    () => Element.UniqueSequence(oldCount).ArgCode().BitCast(Size)
                 );
             return result;
         }
@@ -144,7 +144,7 @@ namespace Reni.Sequence
                 return null;
             }
             var tempNewCount = Math.Min(Count, newCount);
-            var newType = Element.SpawnSequence(tempNewCount);
+            var newType = Element.UniqueSequence(tempNewCount);
             var result = newType
                 .Result
                 (

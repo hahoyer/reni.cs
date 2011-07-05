@@ -31,7 +31,7 @@ namespace Reni.Type
 
         internal Result Result(Category category)
         {
-            return _objectType.SpawnAutomaticReference(_refAlignParam)
+            return _objectType.UniqueAutomaticReference(_refAlignParam)
                 .Result
                 (category
                  , () => CodeBase.ReferenceCode(this)

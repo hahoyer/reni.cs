@@ -43,7 +43,7 @@ namespace Reni.Type
             _accessPoint = accessPoint;
             _position = position;
             _assignmentFeatureCache = new SimpleCache<AssignmentFeature>(() => new AssignmentFeature(this));
-            _accessObjectCache = new SimpleCache<AccessManager.IAccessObject>(() => _accessPoint.ContainerContextObject.SpawnAccessObject(_position));
+            _accessObjectCache = new SimpleCache<AccessManager.IAccessObject>(() => _accessPoint.ContainerContextObject.UniqueAccessObject(_position));
         }
 
         [EnableDump]
@@ -82,7 +82,7 @@ namespace Reni.Type
             var result = new Result
                 (category
                  , () => RefAlignParam.RefSize
-                 , () => SpawnFunctionalType(_assignmentFeatureCache.Value,RefAlignParam)
+                 , () => UniqueFunctionalType(_assignmentFeatureCache.Value,RefAlignParam)
                  , ArgCode
                  , Refs.None
                 );

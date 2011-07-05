@@ -45,11 +45,11 @@ namespace Reni.Struct
         internal Root RootContext { get { return Parent.RootContext; } }
 
         [DisableDump]
-        internal Structure ToStructure { get { return _parent.SpawnStructure(Container); } }
+        internal Structure ToStructure { get { return _parent.UniqueStructure(Container); } }
 
         private int IndexSize { get { return Container.IndexSize; } }
 
-        internal AccessManager.IAccessObject SpawnAccessObject(int position) { return _accessObjectsCache.Find(position); }
+        internal AccessManager.IAccessObject UniqueAccessObject(int position) { return _accessObjectsCache.Find(position); }
         internal Size InnerSize(int position) { return Container.InnerSize(_parent, position); }
         internal TypeBase InnerType(int position) { return Container.InnerType(_parent, position); }
         internal Size StructSize(int position) { return Container.ConstructionResult(Category.Size, Parent, 0, position).Size; }
@@ -111,7 +111,7 @@ namespace Reni.Struct
         private CodeBase ReplaceContextReferenceByThisReferenceCode(int accessPosition)
         {
             return Parent
-                .SpawnStructure(Container)
+                .UniqueStructure(Container)
                 .ReferenceType.ArgCode()
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
         }

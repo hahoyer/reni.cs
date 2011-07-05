@@ -138,12 +138,12 @@ namespace Reni.Type
             return _cache.Aligners.Find(alignBits);
         }
 
-        internal Array SpawnArray(int count) { return _cache.Arrays.Find(count); }
+        internal Array UniqueArray(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
-        internal virtual AutomaticReferenceType SpawnAutomaticReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
-        internal SequenceType SpawnSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
-        internal ObjectReference SpawnObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
-        internal static TypeBase Number(int bitCount) { return Bit.SpawnSequence(bitCount); }
+        internal virtual AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
+        internal SequenceType UniqueSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
+        internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _cache.ObjectReferences.Find(refAlignParam); }
+        internal static TypeBase Number(int bitCount) { return Bit.UniqueSequence(bitCount); }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         internal virtual TypeBase TypeForTypeOperator() { return this; }
@@ -290,7 +290,7 @@ namespace Reni.Type
 
         protected bool IsRefLike(AutomaticReferenceType target) { return false; }
 
-        private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.SpawnSequence(SequenceCount(elementType)); }
+        private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
         internal TFeature SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class
@@ -325,7 +325,7 @@ namespace Reni.Type
                     );
             }
             return Align(refAlignParam.AlignBits)
-                .SpawnAutomaticReference(refAlignParam)
+                .UniqueAutomaticReference(refAlignParam)
                 .Result
                 (
                     category,
@@ -342,19 +342,19 @@ namespace Reni.Type
 
         internal Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
-            var objectReference = SpawnObjectReference(refAlignParam);
+            var objectReference = UniqueObjectReference(refAlignParam);
             return result
                 .ReplaceAbsolute
                 (
                     objectReference
-                    , () => SpawnAutomaticReference(refAlignParam).ArgCode()
+                    , () => UniqueAutomaticReference(refAlignParam).ArgCode()
                     , Refs.None
                 );
         }
 
         internal virtual Result ReferenceInCode(IReferenceInCode target, Category category)
         {
-            return SpawnAutomaticReference(target.RefAlignParam)
+            return UniqueAutomaticReference(target.RefAlignParam)
                 .Result
                 (
                     category,
@@ -364,7 +364,7 @@ namespace Reni.Type
                 ;
         }
 
-        internal IContextItem SpawnFunction() { return _cache.Function.Value; }
+        internal IContextItem UniqueFunction() { return _cache.Function.Value; }
 
         internal virtual Result ThisReferenceResult(Category category)
         {
@@ -375,10 +375,10 @@ namespace Reni.Type
         internal virtual AccessType AccessType(Structure accessPoint, int position)
         {
             return
-                SpawnAccessType(accessPoint, position);
+                UniqueAccessType(accessPoint, position);
         }
 
-        internal AccessType SpawnAccessType(Structure accessPoint, int position)
+        internal AccessType UniqueAccessType(Structure accessPoint, int position)
         {
             return _cache
                 .AccessTypes
@@ -412,9 +412,9 @@ namespace Reni.Type
 
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
 
-        internal virtual TypeBase ToReference(RefAlignParam refAlignParam) { return SpawnAutomaticReference(refAlignParam); }
+        internal virtual TypeBase ToReference(RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam); }
         
-        internal TypeBase SpawnFunctionalType(IFunctionalFeature functionalFeature, RefAlignParam refAlignParam) { return _cache.FunctionalTypes.Find(refAlignParam).Find(functionalFeature); }
+        internal TypeBase UniqueFunctionalType(IFunctionalFeature functionalFeature, RefAlignParam refAlignParam) { return _cache.FunctionalTypes.Find(refAlignParam).Find(functionalFeature); }
 
         internal virtual bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
         {

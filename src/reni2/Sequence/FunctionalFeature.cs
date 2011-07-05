@@ -51,8 +51,8 @@ namespace Reni.Sequence
             return new Result
                 (category
                  , () => refAlignParam.RefSize
-                 , () => _objectType.SpawnFunctionalType(this, refAlignParam)
-                 , () => _objectType.SpawnAutomaticReference(refAlignParam).ArgCode()
+                 , () => _objectType.UniqueFunctionalType(this, refAlignParam)
+                 , () => _objectType.UniqueAutomaticReference(refAlignParam).ArgCode()
                 );
         }
 
@@ -61,7 +61,7 @@ namespace Reni.Sequence
             Tracer.Assert(_objectType.Element == TypeBase.Bit);
             var typedCategory = category | Category.Type;
             var result = Apply(category, _objectType.Count, argsType.SequenceCount(_objectType.Element));
-            var objectResult = _objectType.SpawnObjectReference(refAlignParam).Result(typedCategory);
+            var objectResult = _objectType.UniqueObjectReference(refAlignParam).Result(typedCategory);
             var convertedObjectResult = objectResult.ConvertToBitSequence(typedCategory);
             var convertedArgsResult = argsType.ConvertToBitSequence(typedCategory);
             return result.ReplaceArg(convertedObjectResult.Pair(convertedArgsResult));

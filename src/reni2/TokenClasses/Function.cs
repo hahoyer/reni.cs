@@ -14,7 +14,7 @@ namespace Reni.TokenClasses
         public override Result Result(ContextBase context, Category category, ICompileSyntax target)
         {
             return context
-                .FindRecentStructure.SpawnFunctionalFeature(target)
+                .FindRecentStructure.UniqueFunctionalFeature(target)
                 .Result(category);
         }
     }

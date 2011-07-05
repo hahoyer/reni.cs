@@ -80,14 +80,14 @@ namespace Reni.Context
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal FunctionContextObject SpawnFunction(TypeBase args)
+        internal FunctionContextObject UniqueFunction(TypeBase args)
         {
             return _cache
                 .FunctionContextObjects
                 .Find(args);
         }
 
-        internal ContextBase SpawnChildContext(Struct.Container container, int position)
+        internal ContextBase UniqueChildContext(Struct.Container container, int position)
         {
             return _cache
                 .StructContexts
@@ -95,7 +95,7 @@ namespace Reni.Context
                 .Find(position);
         }
 
-        internal ContextBase SpawnChildContext(TypeBase args)
+        internal ContextBase UniqueChildContext(TypeBase args)
         {
             return _cache
                 .FunctionContexts
@@ -157,7 +157,7 @@ namespace Reni.Context
             return Parent.ChildChain.Concat(new[] { this }).ToArray();
         }
 
-        private ContextBase SpawnPendingContext { get { return _cache.PendingContext.Value; } }
+        private ContextBase UniquePendingContext { get { return _cache.PendingContext.Value; } }
 
         private CacheItem CreateCacheElement(ICompileSyntax syntax)
         {
@@ -179,19 +179,19 @@ namespace Reni.Context
         {
             var result = ContextItem as Struct.Context;
             if (result != null)
-                return Parent.SpawnStructure(result);
+                return Parent.UniqueStructure(result);
             return Parent.ObtainRecentStructure();
         }
 
-        internal Structure SpawnStructure(Struct.Context context) { return Cache.Structures.Find(context.Container).Find(context.Position); }
-        internal Structure SpawnStructure(Struct.Container container) { return Cache.Structures.Find(container).Find(container.EndPosition); }
-        internal ContainerContextObject SpawnContainerContext(Struct.Container context) { return Cache.ContainerContextObjects.Find(context); }
+        internal Structure UniqueStructure(Struct.Context context) { return Cache.Structures.Find(context.Container).Find(context.Position); }
+        internal Structure UniqueStructure(Struct.Container container) { return Cache.Structures.Find(container).Find(container.EndPosition); }
+        internal ContainerContextObject UniqueContainerContext(Struct.Container context) { return Cache.ContainerContextObjects.Find(context); }
 
         private FunctionContextObject ObtainRecentFunctionContext()
         {
             var result = ContextItem as Function;
             if (result != null)
-                return Parent.SpawnFunction(result.ArgsType);
+                return Parent.UniqueFunction(result.ArgsType);
             if (Parent == null)
                 return null;
             return Parent.ObtainRecentFunctionContext();
@@ -290,7 +290,7 @@ namespace Reni.Context
                 Tracer.Assert(result.CompleteCategory == category);
                 return result;
             }
-            return SpawnPendingContext.PendingResult(category, syntax);
+            return UniquePendingContext.PendingResult(category, syntax);
         }
 
         private Result CommonResult(Category category, CondSyntax condSyntax)
@@ -362,8 +362,8 @@ namespace Reni.Context
                 ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(parent.CreateCacheElement);
                 StructContexts = new DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>>(
                     container => new DictionaryEx<int, ContextBase>(
-                        position => new ContextBase(parent, container.SpawnContext(position))));
-                FunctionContexts = new DictionaryEx<TypeBase, ContextBase>(argsType => new ContextBase(parent, argsType.SpawnFunction()));
+                        position => new ContextBase(parent, container.UniqueContext(position))));
+                FunctionContexts = new DictionaryEx<TypeBase, ContextBase>(argsType => new ContextBase(parent, argsType.UniqueFunction()));
                 FunctionContextObjects = new DictionaryEx<TypeBase, FunctionContextObject>(args => new FunctionContextObject(args, parent));
                 PendingContext = new SimpleCache<ContextBase>(() => new ContextBase(parent, new PendingContext()));
                 RecentStructure = new SimpleCache<Structure>(parent.ObtainRecentStructure);

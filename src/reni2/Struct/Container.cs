@@ -203,13 +203,13 @@ namespace Reni.Struct
         internal override Result Result(ContextBase context, Category category)
         {
             var innerResult = ConstructionResult(category - Category.Type, context, 0, EndPosition);
-            return context.SpawnContainerContext(this).Result(category, innerResult);
+            return context.UniqueContainerContext(this).Result(category, innerResult);
         }
 
         internal Result InternalInnerResult(Category category, ContextBase parent, int position)
         {
             return parent
-                .SpawnChildContext(this, position)
+                .UniqueChildContext(this, position)
                 .Result(category | Category.Type, Statements[position])
                 .AutomaticDereference();
         }
@@ -219,9 +219,9 @@ namespace Reni.Struct
             Tracer.Assert(!(category.HasCode));
             return InternalInnerResult(category, parent, position);
         }
-        internal Context SpawnContext(int position) { return _contextCache.Find(position); }
+        internal Context UniqueContext(int position) { return _contextCache.Find(position); }
 
-        internal ContainerContextObject SpawnContainerContext(ContextBase parent)
+        internal ContainerContextObject UniqueContainerContext(ContextBase parent)
         {
             return _containerContextCache.Find(parent);
         }

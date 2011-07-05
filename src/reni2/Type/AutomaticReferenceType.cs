@@ -60,7 +60,7 @@ namespace Reni.Type
 
         internal Result ObjectReferenceInCode(Category category)
         {
-            var objectRef = SpawnObjectReference(RefAlignParam);
+            var objectRef = UniqueObjectReference(RefAlignParam);
             var destinationResult = Result
                 (
                     category,

@@ -100,7 +100,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
             var category = Category.Code;
-            var refAlignParam = _structure.SpawnContext.RefAlignParam;
+            var refAlignParam = _structure.UniqueContext.RefAlignParam;
             var foreignRefsRef = CodeBase.FrameRef(refAlignParam);
             var visitResult = Result(category);
             var result = visitResult
@@ -115,7 +115,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var functionContext = _structure.SpawnContext.SpawnChildContext(_args);
+            var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
             var categoryEx = category | Category.Type;
@@ -137,7 +137,7 @@ namespace Reni.Struct
 
         private CodeBase CreateContextRefCode()
         {
-            var refAlignParam = _structure.SpawnContext.RefAlignParam;
+            var refAlignParam = _structure.UniqueContext.RefAlignParam;
             return CodeBase
                 .FrameRef(refAlignParam)
                 .AddToReference(refAlignParam, FrameSize*-1);

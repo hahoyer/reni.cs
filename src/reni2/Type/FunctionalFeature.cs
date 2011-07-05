@@ -34,7 +34,7 @@ namespace Reni.Type
             var applyResult = Apply(category, argsResult.Type, refAlignParam)
                 .ReplaceArg(argsResult);
             var objectResult = ObjectType
-                .SpawnAutomaticReference(refAlignParam)
+                .UniqueAutomaticReference(refAlignParam)
                 .Result(category.Typed, operationResult);
             return applyResult
                 .ReplaceObjectRefByArg(refAlignParam, ObjectType)

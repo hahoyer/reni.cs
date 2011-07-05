@@ -53,13 +53,13 @@ namespace Reni.Struct
         internal ContainerContextObject ContainerContextObject { get { return _containerContextObject; } }
 
         [DisableDump]
-        internal ContextBase SpawnContext
+        internal ContextBase UniqueContext
         {
             get
             {
                 return ContainerContextObject
                     .Parent
-                    .SpawnChildContext(ContainerContextObject.Container, EndPosition);
+                    .UniqueChildContext(ContainerContextObject.Container, EndPosition);
             }
         }
 
@@ -67,7 +67,7 @@ namespace Reni.Struct
         internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
-        internal AutomaticReferenceType ReferenceType { get { return Type.SpawnAutomaticReference(RefAlignParam); } }
+        internal AutomaticReferenceType ReferenceType { get { return Type.UniqueAutomaticReference(RefAlignParam); } }
 
         [DisableDump]
         internal Refs ConstructorRefs
@@ -91,7 +91,7 @@ namespace Reni.Struct
         [DisableDump]
         internal Size StructSize { get { return ContainerContextObject.StructSize(EndPosition); } }
 
-        internal FunctionalBody SpawnFunctionalFeature(ICompileSyntax body) { return _functionalFeatureCache.Find(body); }
+        internal FunctionalBody UniqueFunctionalFeature(ICompileSyntax body) { return _functionalFeatureCache.Find(body); }
 
         internal Result AccessViaThisReference(Category category, Result rightResult)
         {
@@ -150,7 +150,7 @@ namespace Reni.Struct
         {
             var accessType = ContainerContextObject
                 .InnerType(position)
-                .SpawnAccessType(this, position);
+                .UniqueAccessType(this, position);
             return accessType
                 .DumpPrintOperationResult(category)
                 .ReplaceArg(accessType.FieldReferenceViaStructReference(category | Category.Type));
