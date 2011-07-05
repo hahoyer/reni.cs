@@ -16,36 +16,31 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
-using System;
+using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
-using HWClassLibrary.Debug;
+using System;
 using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal sealed class FunctionalFeatureType<TFeature> : TypeBase
-        where TFeature : IFunctionalFeature
+    internal abstract class FunctionalFeature : ReniObject, IFunctionalFeature
     {
-        private readonly TypeBase _objectType;
-        private readonly TFeature _functionalFeature;
-        private readonly RefAlignParam _refAlignParam;
+        protected abstract Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        protected abstract TypeBase ObjectType { get; }
 
-        internal FunctionalFeatureType(TypeBase objectType, TFeature functionalFeature, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.Apply(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
-            _objectType = objectType;
-            _functionalFeature = functionalFeature;
-            _refAlignParam = refAlignParam;
+            var applyResult = Apply(category, argsResult.Type, refAlignParam)
+                .ReplaceArg(argsResult);
+            var objectResult = ObjectType
+                .SpawnAutomaticReference(refAlignParam)
+                .Result(category.Typed, operationResult);
+            return applyResult
+                .ReplaceObjectRefByArg(refAlignParam, ObjectType)
+                .ReplaceArg(objectResult);
         }
 
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
-
-        internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
-
-        [DisableDump]
-        internal override IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }
-
-        [DisableDump]
-        internal override TypeBase ObjectType { get { return _objectType; } }
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
     }
 }

@@ -33,7 +33,7 @@ namespace Reni.Type
     {
         private readonly Structure _accessPoint;
         private readonly int _position;
-        private readonly AssignmentFeature _assignmentFeature;
+        private readonly SimpleCache<AssignmentFeature> _assignmentFeatureCache;
         private readonly SimpleCache<AccessManager.IAccessObject> _accessObjectCache;
 
         public AccessType(TypeBase valueType, Structure accessPoint, int position)
@@ -42,11 +42,9 @@ namespace Reni.Type
             Tracer.Assert(!(valueType is Aligner));
             _accessPoint = accessPoint;
             _position = position;
-            _assignmentFeature = new AssignmentFeature(this);
-            _accessObjectCache = new SimpleCache<AccessManager.IAccessObject>(SpawnAccessObject);
+            _assignmentFeatureCache = new SimpleCache<AssignmentFeature>(() => new AssignmentFeature(this));
+            _accessObjectCache = new SimpleCache<AccessManager.IAccessObject>(() => _accessPoint.ContainerContextObject.SpawnAccessObject(_position));
         }
-
-        private AccessManager.IAccessObject SpawnAccessObject() { return _accessPoint.ContainerContextObject.SpawnAccessObject(_position); }
 
         [EnableDump]
         internal Structure AccessPoint { get { return _accessPoint; } }
@@ -84,7 +82,7 @@ namespace Reni.Type
             var result = new Result
                 (category
                  , () => RefAlignParam.RefSize
-                 , () => SpawnFunctionalType(_assignmentFeature)
+                 , () => SpawnFunctionalType(_assignmentFeatureCache.Value,RefAlignParam)
                  , ArgCode
                  , Refs.None
                 );

@@ -1,16 +1,32 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
-using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class FunctionalBody : TypeBase, IFunctionalFeature
+    internal sealed class FunctionalBody : FunctionalFeature
     {
         private readonly ICompileSyntax _body;
         private readonly Structure _structure;
@@ -22,34 +38,31 @@ namespace Reni.Struct
             StopByObjectId(1);
         }
 
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
+        [DisableDump]
+        internal ICompileSyntax Body { get { return _body; } }
 
-        Result IFunctionalFeature.DumpPrintFeatureApply(Category category)
-        {
-            return TypeBase
-                .Void
-                .Result(category, () => CodeBase.DumpPrintText(DumpPrintText));
-        }
+        [DisableDump]
+        protected override TypeBase ObjectType { get { return _structure.ReferenceType; } }
 
-        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
+
+        protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
             var argsResult = argsType.ArgResult(category | Category.Type);
             return _structure
                 .CreateFunctionCall(category, Body, argsResult);
         }
 
-        protected override Size GetSize() { return Size.Zero; }
-        internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
-        internal override string DumpPrintText { get { return _body.DumpShort() + "/\\"; } }
-        internal override IFunctionalFeature FunctionalFeature() { return this; }
-        internal override TypeBase ObjectType() { return _structure.ReferenceType; }
-
-        private ICompileSyntax Body { get { return _body; } }
-
         internal Result DumpPrintResult(Category category)
         {
-            return TypeBase.Void
-                .Result(category, () => CodeBase.DumpPrintText(DumpPrintText));
+            NotImplementedMethod(category);
+            return null;
+        }
+
+        internal Result Result(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
     }
 }

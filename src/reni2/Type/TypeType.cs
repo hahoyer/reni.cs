@@ -24,9 +24,13 @@ namespace Reni.Type
         protected override Size GetSize() { return Size.Zero; }
         internal override string DumpPrintText { get { return "(" + _value.DumpPrintText + "()) type"; } }
         protected override Result InternalConversionToItself(Category category) { return VoidResult(category); }
-        internal override IFunctionalFeature FunctionalFeature() { return _functionalFeature; }
+
+        [DisableDump]
+        internal override IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }
+
         internal override string DumpShort() { return "(" + _value.DumpShort() + ") type"; }
-        internal override TypeBase ObjectType() { return _value; }
+        [DisableDump]
+        internal override TypeBase ObjectType { get { return _value; } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {

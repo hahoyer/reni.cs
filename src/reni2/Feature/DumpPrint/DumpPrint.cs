@@ -41,14 +41,14 @@ namespace Reni.Feature.DumpPrint
 
         internal BitSequenceFeatureClass(Sequence.SequenceType parent) { _parent = parent; }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.SpawnReference(refAlignParam)); }
-        TypeBase IFeature.DefiningType() { return _parent; }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.SpawnAutomaticReference(refAlignParam)); }
+        TypeBase IFeature.ObjectType { get { return _parent; } }
     }
 
     internal sealed class BitFeature : BitFeatureBase, IFeature
     {
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.SpawnReference(refAlignParam)); }
-        TypeBase IFeature.DefiningType() { return TypeBase.Bit; }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.SpawnAutomaticReference(refAlignParam)); }
+        TypeBase IFeature.ObjectType { get { return TypeBase.Bit; } }
     }
 
     internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, AutomaticReferenceType>,
@@ -72,6 +72,6 @@ namespace Reni.Feature.DumpPrint
                 .DumpPrintResultFromContextReference(category);
         }
 
-        TypeBase IFeature.DefiningType() { return _structureType; }
+        TypeBase IFeature.ObjectType { get { return _structureType; } }
     }
 }

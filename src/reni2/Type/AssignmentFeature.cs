@@ -24,21 +24,15 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal sealed class AssignmentFeature : ReniObject, IFunctionalFeature
+    internal sealed class AssignmentFeature : FunctionalFeature
     {
         [EnableDump]
         private readonly AccessType _type;
 
         internal AssignmentFeature(AccessType type) { _type = type; }
 
-        Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
-
-        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
-        {
-            return _type
-                .ApplyAssignment(category, argsType);
-        }
-
-        string IDumpShortProvider.DumpShort() { return _type.DumpShort() + " :="; }
+        protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _type.ApplyAssignment(category, argsType); }
+        protected override TypeBase ObjectType { get { return _type; } }
+        internal override string DumpShort() { return base.DumpShort() + "(" + _type.DumpShort() + " :=)"; }
     }
 }

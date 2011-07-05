@@ -26,7 +26,7 @@ namespace Reni.Struct
             _position = position;
         }
 
-        TypeBase IFeature.DefiningType() { return _structure.Type; }
+        TypeBase IFeature.ObjectType { get { return _structure.Type; } }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return _structure.AccessViaThisReference(category, _position); }
         Result IContextFeature.Apply(Category category) { return _structure.AccessViaContextReference(category, _position); }

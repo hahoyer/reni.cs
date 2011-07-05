@@ -28,5 +28,16 @@ namespace Reni.Type
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return _refAlignParam; } }
         internal override string DumpShort() { return base.DumpShort() + "(" + _objectType.DumpShort() + ")"; }
+
+        internal Result Result(Category category)
+        {
+            return _objectType.SpawnAutomaticReference(_refAlignParam)
+                .Result
+                (category
+                 , () => CodeBase.ReferenceCode(this)
+                 , () => Refs.Create(this)
+                );
+        }
+
     }
 }

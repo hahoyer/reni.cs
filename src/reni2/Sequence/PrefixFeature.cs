@@ -23,7 +23,7 @@ namespace Reni.Sequence
 
         IFeature IPrefixFeature.Feature { get { return this; } }
 
-        TypeBase IFeature.DefiningType() { return _parent; }
+        TypeBase IFeature.ObjectType { get { return _parent; } }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
@@ -37,7 +37,7 @@ namespace Reni.Sequence
             return type
                 .Result
                 (category
-                , () => BitSequenceOperation(type.Size, _definable, type.SpawnReference(refAlignParam)));
+                , () => BitSequenceOperation(type.Size, _definable, type.SpawnAutomaticReference(refAlignParam)));
         }
 
         private static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, AutomaticReferenceType objectType)

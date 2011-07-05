@@ -62,11 +62,11 @@ namespace Reni.Type
         internal override bool HasConverterTo(TypeBase destination) { return Parent.HasConverterTo(destination); }
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
 
-        internal override AutomaticReferenceType SpawnReference(RefAlignParam refAlignParam)
+        internal override AutomaticReferenceType SpawnAutomaticReference(RefAlignParam refAlignParam)
         {
             if(_alignBits == refAlignParam.AlignBits)
-                return Parent.SpawnReference(refAlignParam);
-            return base.SpawnReference(refAlignParam);
+                return Parent.SpawnAutomaticReference(refAlignParam);
+            return base.SpawnAutomaticReference(refAlignParam);
         }
 
         protected Result VirtualForceConversion(Category category, TypeBase destination)

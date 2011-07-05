@@ -210,7 +210,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -7 && category.HasCode;
+            var trace = defineable.ObjectId == -18 && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -237,12 +237,12 @@ namespace Reni.Context
             if (right == null)
                 return ReturnMethodDumpWithBreak(trace, suffixOperationResult);
 
-            var suffixOperationType = suffixOperationResult.Type;
             var rightResult = ResultAsReference(categoryForFunctionals, right);
             DumpWithBreak(trace, "suffixOperationResult", suffixOperationResult, "rightResult", rightResult);
-            var result = suffixOperationType.Apply(category, rightResult, RefAlignParam);
-            DumpWithBreak(trace, "result", result);
-            return ReturnMethodDumpWithBreak(trace, result.ReplaceArg(suffixOperationResult));
+            var result = suffixOperationResult
+                .Type
+                .FunctionalFeature.Apply(category, suffixOperationResult, rightResult, RefAlignParam);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
 
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 

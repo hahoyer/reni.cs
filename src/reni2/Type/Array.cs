@@ -88,10 +88,13 @@ namespace Reni.Type
         private Array _type;
         public ConcatArraysFeature(Array type) { _type = type; }
 
-        TypeBase IFeature.DefiningType()
+        TypeBase IFeature.ObjectType
         {
-            NotImplementedMethod();
-            return null;
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
@@ -142,10 +145,13 @@ namespace Reni.Type
             return ApplyResult(callContext, category, @object, args, elementType, 1);
         }
 
-        TypeBase IFeature.DefiningType()
+        TypeBase IFeature.ObjectType
         {
-            NotImplementedMethod();
-            return null;
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
@@ -161,10 +167,13 @@ namespace Reni.Type
 
         public ConcatArrayWithObjectFeature(Array type) { _type = type; }
 
-        TypeBase IFeature.DefiningType()
+        TypeBase IFeature.ObjectType
         {
-            NotImplementedMethod();
-            return null;
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
         private Result ApplyResult(

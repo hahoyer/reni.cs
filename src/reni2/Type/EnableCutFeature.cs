@@ -14,7 +14,7 @@ namespace Reni.Type
     {
         private readonly Sequence.SequenceType _sequenceType;
         public EnableCutFeature(Sequence.SequenceType sequenceType) { _sequenceType = sequenceType; }
-        TypeBase IFeature.DefiningType() { return _sequenceType; }
+        TypeBase IFeature.ObjectType { get { return _sequenceType; } }
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return new EnableCut(_sequenceType).ArgResult(category); }
     }
 }

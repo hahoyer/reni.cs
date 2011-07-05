@@ -7,14 +7,14 @@ using Reni.Context;
 
 namespace Reni.Type
 {
-    internal sealed class ConversionFeature : IFunctionalFeature
+    internal sealed class ConversionFeature : FunctionalFeature
     {
-        private readonly TypeBase _typeBase;
+        private readonly TypeBase _objectType;
 
-        public ConversionFeature(TypeBase typeBase) { _typeBase = typeBase; }
+        public ConversionFeature(TypeBase objectType) { _objectType = objectType; }
 
-        string IDumpShortProvider.DumpShort() { return _typeBase.DumpShort() + " type"; }
-        Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
-        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return argsType.Conversion(category, _typeBase); }
+        internal override string DumpShort() { return _objectType.DumpShort() + " type"; }
+        protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return argsType.Conversion(category, _objectType); }
+        protected override TypeBase ObjectType { get { return _objectType; } }
     }
 }

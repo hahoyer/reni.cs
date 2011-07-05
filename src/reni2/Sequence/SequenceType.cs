@@ -158,8 +158,6 @@ namespace Reni.Sequence
 
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
-        internal Result ObjectReferenceInCode(Category category, RefAlignParam refAlignParam) { return SpawnReference(refAlignParam).ObjectReferenceInCode(category); }
-
         protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
     }
 

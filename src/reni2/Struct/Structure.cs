@@ -67,7 +67,7 @@ namespace Reni.Struct
         internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
-        internal AutomaticReferenceType ReferenceType { get { return Type.SpawnReference(RefAlignParam); } }
+        internal AutomaticReferenceType ReferenceType { get { return Type.SpawnAutomaticReference(RefAlignParam); } }
 
         [DisableDump]
         internal Refs ConstructorRefs

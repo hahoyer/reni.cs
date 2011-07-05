@@ -15,7 +15,7 @@ namespace Reni.Feature
     internal interface IFeature
     {
         Result Apply(Category category, RefAlignParam refAlignParam);
-        TypeBase DefiningType();
+        TypeBase ObjectType { get; }
     }
 
     internal interface IPrefixFeature
@@ -32,16 +32,16 @@ namespace Reni.Feature
     internal sealed class Feature : IFeature
     {
         [EnableDump]
-        private readonly Func<Category, Result> _func;
+        private readonly Func<Category, Result> _function;
 
-        public Feature(Func<Category, Result> func)
+        public Feature(Func<Category, Result> function)
         {
-            _func = func;
-            Tracer.Assert(_func.Target is TypeBase);
+            _function = function;
+            Tracer.Assert(_function.Target is TypeBase);
         }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return _func(category); }
-        TypeBase IFeature.DefiningType() { return (TypeBase) _func.Target; }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return _function(category); }
+        TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
     }
 
     internal static class FeatureExtender
@@ -49,7 +49,7 @@ namespace Reni.Feature
         internal static TypeBase TypeOfArgInApplyResult(this IFeature feature, RefAlignParam refAlignParam)
         {
             return feature
-                .DefiningType()
+                .ObjectType
                 .ToReference(refAlignParam);
         }
 

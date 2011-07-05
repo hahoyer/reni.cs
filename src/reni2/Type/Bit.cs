@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Code;
 
 namespace Reni.Type
 {
@@ -32,5 +33,15 @@ namespace Reni.Type
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
 
         internal override string DumpShort() { return "bit"; }
+
+        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objectBits, int argsBits)
+        {
+            var objectType = Number(objectBits).Align(BitsConst.SegmentAlignBits);
+            var argsType = Number(argsBits).Align(BitsConst.SegmentAlignBits);
+            return objectType
+                .Pair(argsType)
+                .ArgCode()
+                .BitSequenceOperation(token, size, Size.Create(objectBits).ByteAlignedSize);
+        }
     }
 }

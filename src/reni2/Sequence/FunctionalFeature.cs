@@ -27,62 +27,50 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    internal sealed class FunctionalFeature : ReniObject, IFeature, IFunctionalFeature
+    internal sealed class FunctionalFeature : Type.FunctionalFeature, IFeature
     {
-        private readonly SequenceType _parent;
+        [EnableDump]
+        private readonly SequenceType _objectType;
 
         [EnableDump]
         private readonly FeatureBase _feature;
 
-        internal FunctionalFeature(SequenceType parent, FeatureBase feature)
+        internal FunctionalFeature(SequenceType objectType, FeatureBase feature)
         {
-            _parent = parent;
+            _objectType = objectType;
             _feature = feature;
         }
+
+        TypeBase IFeature.ObjectType { get { return _objectType; } }
+        protected override TypeBase ObjectType { get { return _objectType; } }
+
+        internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
             return new Result
                 (category
                  , () => refAlignParam.RefSize
-                 , () => _parent.SpawnReference(refAlignParam).SpawnFunctionalType(this)
-                 , () => _parent.SpawnReference(refAlignParam).ArgCode()
+                 , () => _objectType.SpawnFunctionalType(this, refAlignParam)
+                 , () => _objectType.SpawnAutomaticReference(refAlignParam).ArgCode()
                 );
         }
 
-        string IDumpShortProvider.DumpShort() { return _feature.Definable.DataFunctionName; }
-
-        private Result Apply(Category category, int objSize, int argsSize, RefAlignParam refAlignParam)
+        protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            var type = _feature.ResultType(objSize, argsSize);
-            return type.Result(category, () => BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize, refAlignParam));
-        }
-
-        TypeBase IFeature.DefiningType() { return _parent; }
-
-        Result IFunctionalFeature.Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
-        {
-            var typeedCategory = category | Category.Type;
-            var result = Apply(category, _parent.Count, argsType.SequenceCount(_parent.Element), refAlignParam);
-            var objectResult = _parent.ObjectReferenceInCode(typeedCategory, refAlignParam);
-            var convertedObjectResult = objectResult.ConvertToBitSequence(typeedCategory);
-            var convertedArgsResult = argsType.ConvertToBitSequence(typeedCategory);
+            Tracer.Assert(_objectType.Element == TypeBase.Bit);
+            var typedCategory = category | Category.Type;
+            var result = Apply(category, _objectType.Count, argsType.SequenceCount(_objectType.Element));
+            var objectResult = _objectType.SpawnObjectReference(refAlignParam).Result(typedCategory);
+            var convertedObjectResult = objectResult.ConvertToBitSequence(typedCategory);
+            var convertedArgsResult = argsType.ConvertToBitSequence(typedCategory);
             return result.ReplaceArg(convertedObjectResult.Pair(convertedArgsResult));
         }
 
-        Result IFunctionalFeature.DumpPrintFeatureApply(Category category) { throw new NotImplementedException(); }
-
-        private static CodeBase BitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objBits, int argsBits, RefAlignParam refAlignParam)
+        private Result Apply(Category category, int objSize, int argsSize)
         {
-            var objSize = Size.Create(objBits);
-            var argsSize = Size.Create(argsBits);
-            var operandsSize = objSize.ByteAlignedSize + argsSize.ByteAlignedSize;
-            return TypeBase
-                .Number(operandsSize.ToInt())
-                .SpawnReference(refAlignParam)
-                .ArgCode()
-                .Dereference(refAlignParam, operandsSize)
-                .BitSequenceOperation(token, size, objSize.ByteAlignedSize);
+            var type = _feature.ResultType(objSize, argsSize);
+            return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize));
         }
     }
 }

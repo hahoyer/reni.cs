@@ -58,10 +58,13 @@ namespace Reni.Feature.DumpPrint
             return null;
         }
 
-        TypeBase IFeature.DefiningType()
+        TypeBase IFeature.ObjectType
         {
-            NotImplementedMethod();
-            return null;
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }

@@ -48,6 +48,10 @@ namespace Reni.Basics
         public bool HasSize { get { return _size; } }
 
         [DebuggerHidden]
+        [DisableDump]
+        public Category Typed { get { return this | Type; } }
+
+        [DebuggerHidden]
         public static Category operator |(Category x, Category y)
         {
             return new Category(

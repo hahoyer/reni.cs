@@ -9,7 +9,6 @@ namespace Reni.Type
 {
     internal interface IFunctionalFeature : IDumpShortProvider
     {
-        Result DumpPrintFeatureApply(Category category);
-        Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        Result Apply(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam);
     }
 }

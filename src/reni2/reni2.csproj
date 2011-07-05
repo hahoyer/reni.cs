@@ -235,6 +235,7 @@
     <Compile Include="Type\EnableCutFeature.cs" />
     <Compile Include="Sequence\FunctionalFeature.cs" />
     <Compile Include="Type\AccessType.cs" />
+    <Compile Include="Type\FunctionalFeature.cs" />
     <Compile Include="Type\IFunctionalFeature.cs" />
     <Compile Include="Type\ObjectReference.cs" />
     <Compile Include="Type\Pending.cs" />
