@@ -210,7 +210,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -18 && category.HasCode;
+            var trace = defineable.ObjectId == 32 && (category.HasType || category.HasCode);
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)

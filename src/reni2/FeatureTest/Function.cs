@@ -73,6 +73,7 @@ namespace Reni.FeatureTest.Function
 
     [TestFixture]
     [FunctionWithNonLocal]
+    [PropertyVariable]
     [Target(@"f: (value: arg, !property x: value/\)/\;f(2) x dump_print")]
     [Output("2")]
     public sealed class ObjectFunction : CompilerTest
@@ -173,6 +174,7 @@ namespace Reni.FeatureTest.Function
 
     [TestFixture]
     [SimpleFunction]
+    [TwoFunctions1]
     public sealed class TwoFunctions : CompilerTest
     {
         protected override string Target
@@ -210,7 +212,7 @@ f1: ((
 f1()dump_print;
 ")]
     [Output("3")]
-    [TwoFunctions]
+    [SimpleFunction]
     public sealed class TwoFunctions1 : CompilerTest
     {
         protected override void AssertValid(Compiler c)
