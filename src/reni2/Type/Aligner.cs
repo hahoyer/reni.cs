@@ -22,6 +22,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Sequence;
+using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -33,7 +34,7 @@ namespace Reni.Type
             : base(target)
         {
             _alignBits = alignBits;
-            StopByObjectId(-130);
+            StopByObjectId(-6);
         }
 
         [DisableDump]
@@ -56,6 +57,7 @@ namespace Reni.Type
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
 
         internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
+        internal override AccessType AccessType(Structure accessPoint, int position) { return Parent.AccessType(accessPoint, position); }
         internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
         protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
 
