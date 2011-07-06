@@ -445,5 +445,19 @@ namespace Reni.Type
             NotImplementedMethod(category,destination);
             return null;
         }
+
+        internal virtual bool VirtualIsConvertable(Bit destination, ConversionParameter conversionParameter)
+        {
+            NotImplementedMethod(destination,conversionParameter);
+            return false;
+
+        }
+
+        internal virtual Result VirtualForceConversion(Category category, Bit destination)
+        {
+            NotImplementedMethod(category, destination);
+            return null;
+        }
+
     }
 }

@@ -24,6 +24,9 @@ namespace Reni.Type
             return false;
         }
 
+        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
+        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
+
         internal override void Search(ISearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
