@@ -1,11 +1,27 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
-using Reni.Context;
-using Reni.Type;
 
 namespace Reni.Code
 {
@@ -34,11 +50,12 @@ namespace Reni.Code
         void TopData(Size offset, Size size, Size dataSize);
         void TopFrameData(Size offset, Size size, Size dataSize);
         void TopRef(Size offset, Size size);
+        void TopFrameRef(Size offset, Size size);
     }
 
     internal class FormalMaschine : ReniObject, IFormalMaschine
     {
-        private Size _startAddress;
+        private readonly Size _startAddress;
 
         private readonly FormalValueAccess[] _data;
         private FormalValueAccess[] _frameData = new FormalValueAccess[0];
@@ -60,13 +77,6 @@ namespace Reni.Code
                    _frameData.Aggregate("", (current, t) => current + (t == null ? " ?" : t.Dump())) + "\n" +
                    _points.Aggregate("", (current, t) => current + (t == null ? "  " : t.Dump())) + "|" +
                    _framePoints.Aggregate("", (current, t) => current + (t == null ? "  " : t.Dump())) + "\n";
-        }
-
-        internal void ShiftStartAddress(Size deltaSize)
-        {
-            _startAddress += deltaSize;
-            for(var i = 0; i < _startAddress.ToInt(); i++)
-                _data[i] = null;
         }
 
         void IFormalMaschine.BitsArray(Size size, BitsConst data)
@@ -169,6 +179,8 @@ namespace Reni.Code
         void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
         void IFormalMaschine.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }
         void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName, valueSize); }
+        void IFormalMaschine.TopFrameRef(Size offset, Size size) { NotImplementedMethod(offset,size); }
+
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {

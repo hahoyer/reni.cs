@@ -27,8 +27,8 @@ namespace Reni.Code
     [Serializable]
     internal sealed class TopRef : Ref
     {
-        public TopRef(RefAlignParam refAlignParam, Size size)
-            : base(refAlignParam, size) { StopByObjectId(-64); }
+        public TopRef(RefAlignParam refAlignParam, Size offset)
+            : base(refAlignParam, offset) { StopByObjectId(-64); }
 
         public TopRef(RefAlignParam refAlignParam)
             : this(refAlignParam, Size.Zero) { }
@@ -52,5 +52,6 @@ namespace Reni.Code
         protected override string CSharpString() { return CSharpGenerator.CreateFrameRef(RefAlignParam, Offset); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrameRef(Offset, Size); }
     }
 }

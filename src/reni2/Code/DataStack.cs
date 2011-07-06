@@ -1,11 +1,27 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
-using Reni.Context;
-using Reni.Type;
 
 namespace Reni.Code
 {
@@ -18,10 +34,7 @@ namespace Reni.Code
 
             string IStackDataAddressBase.Dump() { return "stack"; }
 
-            StackData IStackDataAddressBase.GetTop(Size offset, Size size)
-            {
-                return Data.DoPull(Data.Size + offset).DoGetTop(size);
-            }
+            StackData IStackDataAddressBase.GetTop(Size offset, Size size) { return Data.DoPull(Data.Size + offset).DoGetTop(size); }
 
             void IStackDataAddressBase.SetTop(Size offset, StackData right)
             {
@@ -31,9 +44,10 @@ namespace Reni.Code
                     .Push(right)
                     .Push(oldTop);
             }
+
             internal StackDataAddress Address(Size offset, Size size) { return new StackDataAddress(this, size, offset - Data.Size); }
 
-            internal StackData FrameAddress(Size offset, Size size, Size dataSize) { return new StackDataAddress(Frame, size, offset); }
+            internal StackData FrameAddress(Size offset, Size size) { return new StackDataAddress(Frame, size, offset); }
         }
 
         [EnableDump]
@@ -56,8 +70,7 @@ namespace Reni.Code
             {
                 _localData.Frame = new FrameData(argsAndRefs);
                 SubExecute("call " + functionIndex, _functions[functionIndex]);
-            }
-            while (_localData.Frame.IsRepeatRequired);
+            } while(_localData.Frame.IsRepeatRequired);
             _localData.Frame = oldFrame;
         }
 
@@ -74,11 +87,8 @@ namespace Reni.Code
 
         private void Push(StackData value) { Data = Data.Push(value); }
 
-        void IFormalMaschine.TopRef(Size offset, Size size)
-        {
-            var address = _localData.Address(offset, size);
-            Data = Data.Push(address);
-        }
+        void IFormalMaschine.TopRef(Size offset, Size size) { Push(_localData.Address(offset, size)); }
+        void IFormalMaschine.TopFrameRef(Size offset, Size size) { Push(_localData.FrameAddress(offset, size)); }
 
         void IFormalMaschine.TopFrameData(Size offset, Size size, Size dataSize)
         {
