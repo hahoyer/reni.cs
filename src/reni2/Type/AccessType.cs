@@ -48,15 +48,14 @@ namespace Reni.Type
 
         [EnableDump]
         internal Structure AccessPoint { get { return _accessPoint; } }
-
         [EnableDump]
         internal int Position { get { return _position; } }
-
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return AccessPoint.RefAlignParam; } }
-
         [DisableDump]
         private AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
+        [DisableDump]
+        internal override IFunctionalFeature FunctionalFeature { get { return ValueType.FunctionalFeature; } }
 
         internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
         internal Result DumpPrintFieldResult(Category category) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), RefAlignParam); }
@@ -77,12 +76,12 @@ namespace Reni.Type
                 .ReplaceArg(ValueReferenceViaFieldReference(category));
         }
 
-        internal Result ApplyAssignment(Category category)
+        internal Result AssignmentFeatureResult(Category category)
         {
             var result = new Result
                 (category
                  , () => RefAlignParam.RefSize
-                 , () => UniqueFunctionalType(_assignmentFeatureCache.Value,RefAlignParam)
+                 , () => UniqueFunctionalType(_assignmentFeatureCache.Value, RefAlignParam)
                  , ArgCode
                  , Refs.None
                 );
@@ -91,7 +90,7 @@ namespace Reni.Type
 
         internal Result ApplyAssignment(Category category, TypeBase argsType)
         {
-            var typedCategory = category|Category.Type;
+            var typedCategory = category | Category.Type;
             var sourceResult = argsType.Conversion(typedCategory, ValueTypeReference);
             var destinationResult = ValueReferenceViaFieldReference(typedCategory)
                 .ReplaceArg(FieldReferenceViaStructReference(typedCategory))

@@ -20,7 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -30,19 +32,29 @@ namespace Reni.Struct
     {
         private readonly ICompileSyntax _body;
         private readonly Structure _structure;
+        private readonly SimpleCache<Type> _typeCache;
 
         internal FunctionalBody(Structure structure, ICompileSyntax body)
         {
             _structure = structure;
             _body = body;
+            _typeCache = new SimpleCache<Type>(() => new Type(this));
             StopByObjectId(1);
+        }
+
+        private sealed class Type : TypeBase
+        {
+            private readonly FunctionalBody _functionalBody;
+            public Type(FunctionalBody functionalBody) { _functionalBody = functionalBody; }
+            protected override Size GetSize() { return Size.Zero; }
+            internal override IFunctionalFeature FunctionalFeature { get { return _functionalBody; } }
         }
 
         [DisableDump]
         internal ICompileSyntax Body { get { return _body; } }
 
         [DisableDump]
-        protected override TypeBase ObjectType { get { return _structure.ReferenceType; } }
+        protected override TypeBase ObjectType { get { return _structure.Type; } }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
 
@@ -61,8 +73,15 @@ namespace Reni.Struct
 
         internal Result Result(Category category)
         {
-            NotImplementedMethod(category);
-            return null;
+            return new Result
+                (category
+                 , () => Size.Zero
+                 , ToType
+                 , CodeBase.Void
+                 , Refs.None
+                );
         }
+
+        private Type ToType() { return _typeCache.Value; }
     }
 }

@@ -28,6 +28,6 @@ namespace Reni.TokenClasses
 
     internal sealed class Assignment : Defineable, ISearchPath<IFeature, AccessType>
     {
-        IFeature ISearchPath<IFeature, AccessType>.Convert(AccessType type) { return new Feature.Feature(type.ApplyAssignment); }
+        IFeature ISearchPath<IFeature, AccessType>.Convert(AccessType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
     }
 }

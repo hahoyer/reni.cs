@@ -31,14 +31,21 @@ namespace Reni.Type
 
         Result IFunctionalFeature.Apply(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
+            var trace = ObjectId == -98;
+            StartMethodDump(trace, category, operationResult, argsResult, refAlignParam);
             var applyResult = Apply(category, argsResult.Type, refAlignParam)
-                .ReplaceArg(argsResult);
+                .ReplaceArg(argsResult)
+                .ReplaceObjectRefByArg(refAlignParam, ObjectType);
+
+            if(!category.HasCode && !category.HasRefs || ObjectType.Size.IsZero)
+                return ReturnMethodDump(trace, applyResult);
+
+            DumpWithBreak(trace, "applyResult", applyResult);
             var objectResult = ObjectType
                 .UniqueAutomaticReference(refAlignParam)
                 .Result(category.Typed, operationResult);
-            return applyResult
-                .ReplaceObjectRefByArg(refAlignParam, ObjectType)
-                .ReplaceArg(objectResult);
+            var result = applyResult.ReplaceArg(objectResult);
+            return ReturnMethodDumpWithBreak(trace, result);
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
