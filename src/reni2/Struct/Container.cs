@@ -245,6 +245,14 @@ namespace Reni.Struct
         internal TypeBase InnerType(ContextBase parent, int position) { return InnerResult(Category.Type, parent, position).Type; }
         internal bool IsLambda(int position) { return Statements[position].IsLambda; }
         internal bool IsProperty(int position) { return Properties.Contains(position); }
+
+        internal bool IsZeroSized(ContextBase parent, int fromPosition, int fromNotPosition)
+        {
+            for(var i = fromPosition; i < fromNotPosition; i++)
+                if (!IsLambda(i) && !InnerSize(parent, i).IsZero)
+                    return false;
+            return true;
+        }
     }
 
     internal interface IStructFeature

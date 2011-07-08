@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Parser;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.TokenClasses;
@@ -203,14 +202,14 @@ namespace Reni.Context
             var rightResult = Result(Category.All, right);
             return leftResultAsRef
                 .Type
-                .GetStructure()
+                .FindRecentStructure
                 .AccessViaThisReference(category, rightResult)
                 .ReplaceArg(leftResultAsRef);
         }
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == 32 && (category.HasType || category.HasCode);
+            var trace = defineable.ObjectId == -20;
             StartMethodDump(trace, category, left, defineable, right);
             var categoryForFunctionals = category;
             if(right != null)
@@ -248,7 +247,7 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -18 && category.HasCode;
+            var trace = defineable.ObjectId == -20;
             StartMethodDumpWithBreak(trace, category, target, defineable);
             var targetType = Type(target);
             DumpWithBreak(trace, "targetType", targetType);
@@ -384,24 +383,6 @@ namespace Reni.Context
     {
         TypeBase ValueType{ get; }
         RefAlignParam RefAlignParam { get; }
-    }
-
-    internal sealed class ContextOperator : NonPrefix
-    {
-        public override Result Result(ContextBase context, Category category, TokenData token)
-        {
-            return context
-                .FindRecentStructure
-                .StructReferenceViaContextReference(category);
-        }
-
-        public override Result Result(ContextBase context, Category category, ICompileSyntax left)
-        {
-            return context
-                .Type(left)
-                .ThisReferenceResult(category)
-                .ReplaceArg(context.Result(category, left));
-        }
     }
 
     internal sealed class PendingContext : Child

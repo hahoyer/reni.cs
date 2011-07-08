@@ -117,5 +117,6 @@ namespace Reni.Struct
         }
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition) { return Container.ConstructionSize(Parent, fieldPosition + 1, accessPosition); }
+        internal bool IsZeroSized(int accessPosition) { return Container.IsZeroSized(Parent, 0, accessPosition); }
     }
 }

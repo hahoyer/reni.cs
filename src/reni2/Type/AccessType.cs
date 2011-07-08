@@ -56,10 +56,13 @@ namespace Reni.Type
         private AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return ValueType.FunctionalFeature; } }
+        [DisableDump]
+        internal override Structure FindRecentStructure { get { return _accessPoint; } }
 
         internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
         internal Result DumpPrintFieldResult(Category category) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), RefAlignParam); }
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
+        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(ValueType.DumpPrintText)); }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {

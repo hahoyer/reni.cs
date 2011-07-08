@@ -556,6 +556,9 @@ namespace Reni
         internal static Result ConcatPrintResult(Category category, int count, Func<int,Result> elemResults)
         {
             var result = TypeBase.VoidResult(category);
+            if (!(category.HasCode || category.HasRefs))
+                return result;
+
             if(category.HasCode)
                 result.Code = CodeBase.DumpPrintText("(");
 

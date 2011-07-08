@@ -69,9 +69,9 @@ namespace Reni.Type
                 Function = new SimpleCache<Context.Function>(() => new Context.Function(parent));
                 FunctionalTypes = new DictionaryEx<RefAlignParam, DictionaryEx<IFunctionalFeature, TypeBase>>(
                     refAlignParam => new DictionaryEx<IFunctionalFeature, TypeBase>(
-                        feature => new FunctionalFeatureType<IFunctionalFeature>(parent, feature, refAlignParam)
-                        )
-                    ); 
+                                         feature => new FunctionalFeatureType<IFunctionalFeature>(parent, feature, refAlignParam)
+                                         )
+                    );
             }
         }
 
@@ -159,10 +159,7 @@ namespace Reni.Type
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
 
-        internal virtual Result AutomaticDereferenceResult(Category category)
-        {
-            return ArgResult(category);
-        }
+        internal virtual Result AutomaticDereferenceResult(Category category) { return ArgResult(category); }
 
         internal Result Result(Category category)
         {
@@ -288,6 +285,19 @@ namespace Reni.Type
             }
         }
 
+        [DisableDump]
+        internal virtual Structure FindRecentStructure
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        [DisableDump]
+        internal virtual bool IsZeroSized { get { return Size.IsZero; } }
+
         protected bool IsRefLike(AutomaticReferenceType target) { return false; }
 
         private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
@@ -304,12 +314,6 @@ namespace Reni.Type
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        internal virtual Structure GetStructure()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
         internal Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
             if(this is AutomaticReferenceType)
@@ -324,8 +328,7 @@ namespace Reni.Type
                         () => Destructor(Category.Refs).Refs
                     );
             }
-            return Align(refAlignParam.AlignBits)
-                .UniqueAutomaticReference(refAlignParam)
+            return UniqueAutomaticReference(refAlignParam)
                 .Result
                 (
                     category,
@@ -365,12 +368,6 @@ namespace Reni.Type
         }
 
         internal IContextItem UniqueFunction() { return _cache.Function.Value; }
-
-        internal virtual Result ThisReferenceResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
 
         internal virtual AccessType AccessType(Structure accessPoint, int position)
         {
@@ -413,7 +410,7 @@ namespace Reni.Type
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
 
         internal virtual TypeBase ToReference(RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam); }
-        
+
         internal TypeBase UniqueFunctionalType(IFunctionalFeature functionalFeature, RefAlignParam refAlignParam) { return _cache.FunctionalTypes.Find(refAlignParam).Find(functionalFeature); }
 
         internal virtual bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
@@ -436,21 +433,20 @@ namespace Reni.Type
 
         internal virtual Result VirtualForceConversion(Category category, SequenceType destination)
         {
-            NotImplementedMethod(category,destination);
+            NotImplementedMethod(category, destination);
             return null;
         }
 
         internal virtual Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
         {
-            NotImplementedMethod(category,destination);
+            NotImplementedMethod(category, destination);
             return null;
         }
 
         internal virtual bool VirtualIsConvertable(Bit destination, ConversionParameter conversionParameter)
         {
-            NotImplementedMethod(destination,conversionParameter);
+            NotImplementedMethod(destination, conversionParameter);
             return false;
-
         }
 
         internal virtual Result VirtualForceConversion(Category category, Bit destination)
@@ -458,6 +454,5 @@ namespace Reni.Type
             NotImplementedMethod(category, destination);
             return null;
         }
-
     }
 }

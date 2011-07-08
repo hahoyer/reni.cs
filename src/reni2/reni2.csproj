@@ -87,6 +87,7 @@
     <Compile Include="CompilerParameters.cs" />
     <Compile Include="ContextSearchVisitor.cs" />
     <Compile Include="Context\ContextBase.cs" />
+    <Compile Include="Context\ContextOperator.cs" />
     <Compile Include="Context\FunctionContext.cs" />
     <Compile Include="Context\FunctionContextObject.cs" />
     <Compile Include="Context\FunctionList.cs" />

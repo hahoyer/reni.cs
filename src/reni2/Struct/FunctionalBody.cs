@@ -22,7 +22,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -44,10 +43,15 @@ namespace Reni.Struct
 
         private sealed class Type : TypeBase
         {
-            private readonly FunctionalBody _functionalBody;
-            public Type(FunctionalBody functionalBody) { _functionalBody = functionalBody; }
+            private readonly FunctionalBody _parent;
+            public Type(FunctionalBody parent) { _parent = parent; }
+
+            [DisableDump]
+            internal override Structure FindRecentStructure { get { return _parent._structure; } }
+
             protected override Size GetSize() { return Size.Zero; }
-            internal override IFunctionalFeature FunctionalFeature { get { return _functionalBody; } }
+            internal override string DumpPrintText { get { return _parent._body.DumpShort() + "/\\"; } }
+            internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
         }
 
         [DisableDump]
@@ -71,17 +75,7 @@ namespace Reni.Struct
             return null;
         }
 
-        internal Result Result(Category category)
-        {
-            return new Result
-                (category
-                 , () => Size.Zero
-                 , ToType
-                 , CodeBase.Void
-                 , Refs.None
-                );
-        }
-
+        internal Result Result(Category category) { return ToType().Result(category); }
         private Type ToType() { return _typeCache.Value; }
     }
 }

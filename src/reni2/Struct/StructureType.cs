@@ -62,7 +62,10 @@ namespace Reni.Struct
                 );
         }
 
-        internal override Structure GetStructure() { return Structure; }
+        [DisableDump]
+        internal override Structure FindRecentStructure { get { return Structure; } }
+        [DisableDump]
+        internal override bool IsZeroSized { get { return Structure.IsZeroSized; } }
 
         internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
         {

@@ -34,7 +34,7 @@ namespace Reni.Type
             : base(valueType)
         {
             _refAlignParam = refAlignParam;
-            Tracer.Assert(!valueType.Size.IsZero, valueType.Dump);
+            Tracer.Assert(!valueType.IsZeroSized, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
             StopByObjectId(-2);
         }
@@ -58,8 +58,10 @@ namespace Reni.Type
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
+        [DisableDump]
+        internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
+
         protected override CodeBase DereferenceCode() { return ArgCode().Dereference(RefAlignParam, ValueType.Size); }
-        internal override Structure GetStructure() { return ValueType.GetStructure(); }
 
         internal override Result ReferenceInCode(IReferenceInCode target, Category category)
         {
