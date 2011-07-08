@@ -234,14 +234,14 @@ namespace Reni.Context
             }
 
             if (right == null)
-                return ReturnMethodDumpWithBreak(trace, suffixOperationResult);
+                return ReturnMethodDumpWithBreak(suffixOperationResult);
 
             var rightResult = ResultAsReference(categoryForFunctionals, right);
-            DumpWithBreak(trace, "suffixOperationResult", suffixOperationResult, "rightResult", rightResult);
+            DumpWithBreak("suffixOperationResult", suffixOperationResult, "rightResult", rightResult);
             var result = suffixOperationResult
                 .Type
                 .FunctionalFeature.Apply(category, suffixOperationResult, rightResult, RefAlignParam);
-            return ReturnMethodDumpWithBreak(trace, result);
+            return ReturnMethodDumpWithBreak(result);
         }
 
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
@@ -250,16 +250,16 @@ namespace Reni.Context
             var trace = defineable.ObjectId == -20;
             StartMethodDumpWithBreak(trace, category, target, defineable);
             var targetType = Type(target);
-            DumpWithBreak(trace, "targetType", targetType);
+            DumpWithBreak("targetType", targetType);
             var operationResult = targetType.OperationResult<TFeature>(category, defineable, RefAlignParam);
             if(operationResult == null)
                 return null;
 
-            DumpWithBreak(trace, "operationResult", operationResult);
+            DumpWithBreak("operationResult", operationResult);
             var targetResult = ResultAsReference(category | Category.Type, target);
-            DumpWithBreak(trace, "targetResult", targetResult);
+            DumpWithBreak("targetResult", targetResult);
             var result = operationResult.ReplaceArg(targetResult);
-            return ReturnMethodDumpWithBreak(trace, result);
+            return ReturnMethodDumpWithBreak(result);
         }
 
         private IContextFeature SearchDefinable(Defineable defineable)

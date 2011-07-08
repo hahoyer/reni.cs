@@ -391,20 +391,20 @@ namespace Reni.Type
             var searchResult = SearchDefineable<TFeature>(defineable);
             var feature = searchResult.ConvertToFeature();
             if(feature == null)
-                return ReturnMethodDump<Result>(trace, null);
+                return ReturnMethodDump<Result>(null);
 
-            DumpWithBreak(trace, "feature", feature);
+            DumpWithBreak("feature", feature);
             var result = feature.Apply(category, refAlignParam);
-            DumpWithBreak(trace, "result", result);
+            DumpWithBreak("result", result);
             var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
             if(ToReference(refAlignParam) != typeOfArgInApplyResult)
             {
-                DumpWithBreak(trace, "typeOfArgInApplyResult", typeOfArgInApplyResult);
+                DumpWithBreak("typeOfArgInApplyResult", typeOfArgInApplyResult);
                 var conversion = ToReference(refAlignParam).Conversion(category.Typed, typeOfArgInApplyResult);
-                DumpWithBreak(trace, "conversion", conversion);
+                DumpWithBreak("conversion", conversion);
                 result = result.ReplaceArg(conversion);
             }
-            return ReturnMethodDumpWithBreak(trace, result);
+            return ReturnMethodDumpWithBreak(result);
         }
 
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }

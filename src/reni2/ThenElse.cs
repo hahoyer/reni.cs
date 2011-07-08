@@ -36,7 +36,7 @@ namespace Reni
         {
             var trace = false;
             StartMethodDump(trace, context, category);
-            return ReturnMethodDump(trace, InternalResult(context, category));
+            return ReturnMethodDump(InternalResult(context, category));
         }
 
         internal Result CondResult(ContextBase context, Category category)

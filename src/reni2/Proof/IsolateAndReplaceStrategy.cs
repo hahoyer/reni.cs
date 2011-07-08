@@ -22,8 +22,7 @@ namespace Reni.Proof
                 return Set<ParsedSyntax>.Empty;
             var trace = false;
             StartMethodDump(trace,parsedSyntax);
-            return ReturnMethodDump(trace,
-                                    parsedSyntax
+            return ReturnMethodDump(parsedSyntax
                                         .Replace(_definitions)
                                     - parsedSyntax);
         }

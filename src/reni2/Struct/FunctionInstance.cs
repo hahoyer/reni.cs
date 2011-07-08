@@ -90,7 +90,7 @@ namespace Reni.Struct
             if(category.HasCode)
                 result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
 
-            return ReturnMethodDumpWithBreak(trace, result);
+            return ReturnMethodDumpWithBreak(result);
         }
 
         private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return ForeignRefs.ToCode().Sequence(argsCode); }
@@ -121,18 +121,18 @@ namespace Reni.Struct
             var categoryEx = category | Category.Type;
             var rawResult = functionContext.Result(categoryEx, _body).Clone();
 
-            DumpWithBreak(trace, "functionContext", functionContext, "rawResult", rawResult);
+            DumpWithBreak("functionContext", functionContext, "rawResult", rawResult);
 
             var postProcessedResult =
                 rawResult
                     .PostProcessor
                     .FunctionResult(category, _structure.RefAlignParam);
 
-            DumpWithBreak(trace, "postProcessedResult", postProcessedResult);
+            DumpWithBreak("postProcessedResult", postProcessedResult);
             var result =
                 postProcessedResult
                     .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
-            return ReturnMethodDump(trace, result);
+            return ReturnMethodDump(result);
         }
 
         private CodeBase CreateContextRefCode()

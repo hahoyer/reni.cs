@@ -38,14 +38,14 @@ namespace Reni.Type
                 .ReplaceObjectRefByArg(refAlignParam, ObjectType);
 
             if(!category.HasCode && !category.HasRefs || ObjectType.Size.IsZero)
-                return ReturnMethodDump(trace, applyResult);
+                return ReturnMethodDump(applyResult);
 
-            DumpWithBreak(trace, "applyResult", applyResult);
+            DumpWithBreak("applyResult", applyResult);
             var objectResult = ObjectType
                 .UniqueAutomaticReference(refAlignParam)
                 .Result(category.Typed, operationResult);
             var result = applyResult.ReplaceArg(objectResult);
-            return ReturnMethodDumpWithBreak(trace, result);
+            return ReturnMethodDumpWithBreak(result);
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }

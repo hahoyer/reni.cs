@@ -54,7 +54,7 @@ namespace Reni.ReniParser
             var trace = ObjectId == -51 && category.HasCode;
             StartMethodDumpWithBreak(trace, context, category);
             var result = context.Result(category, Left, _tokenClass, Right);
-            return ReturnMethodDumpWithBreak(trace, result);
+            return ReturnMethodDumpWithBreak(result);
         }
     }
 }

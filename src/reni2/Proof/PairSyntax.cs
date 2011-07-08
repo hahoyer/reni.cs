@@ -55,7 +55,7 @@ namespace Reni.Proof
             var result = leftResults
                 .SelectMany(left => rightResults.Select(syntax => left.Pair(Operator, syntax)))
                 .ToSet();
-            return ReturnMethodDump(trace, result);
+            return ReturnMethodDump(result);
         }
     }
 

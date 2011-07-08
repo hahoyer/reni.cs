@@ -375,7 +375,7 @@ namespace Reni
 
             InternalAddCategories(context, localCateogory, syntax);
             TreatPendingCategories(context, category - CompleteCategory, syntax);
-            ReturnMethodDumpWithBreak(trace);
+            ReturnMethodDumpWithBreak();
         }
 
         private void TreatPendingCategories(ContextBase context, Category category, ICompileSyntax syntax)
@@ -454,7 +454,7 @@ namespace Reni
                 result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
             if(HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.Sequence(resultForArg.Refs);
-            return ReturnMethodDump(trace, result);
+            return ReturnMethodDump(result);
         }
 
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Refs> replacementRefs)

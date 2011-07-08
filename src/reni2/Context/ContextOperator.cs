@@ -41,9 +41,9 @@ namespace Reni.Context
             var trace = false;
             StartMethodDumpWithBreak(trace, context, category, left);
             var leftResult = context.Result(category.Typed, left);
-            DumpWithBreak(trace, "leftResult", leftResult);
+            DumpWithBreak("leftResult", leftResult);
             var structureType = leftResult.Type.FindRecentStructure;
-            DumpWithBreak(trace, "structureType", structureType);
+            DumpWithBreak("structureType", structureType);
             if(structureType.StructSize.IsZero)
             {
                 NotImplementedMethod(context,category,left);
@@ -51,7 +51,7 @@ namespace Reni.Context
 
             }
             var result = structureType.ReferenceType.Result(category, leftResult);
-            return ReturnMethodDump(trace, result);
+            return ReturnMethodDump(result);
         }
     }
 }
