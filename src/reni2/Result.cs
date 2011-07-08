@@ -358,7 +358,7 @@ namespace Reni
         internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
             var trace = context.ObjectId == -17 && category.HasRefs && syntax.GetObjectId() == 1192;
-            StartMethodDumpWithBreak(trace, context, category, syntax);
+            StartMethodDump(true, trace, context);
             try
             {
                 var localCateogory = category - CompleteCategory - PendingCategory;
@@ -377,7 +377,7 @@ namespace Reni
 
                 InternalAddCategories(context, localCateogory, syntax);
                 TreatPendingCategories(context, category - CompleteCategory, syntax);
-                ReturnMethodDumpWithBreak();
+                ReturnMethodDump(true);
             }
             finally
             {
@@ -455,7 +455,7 @@ namespace Reni
         internal Result ReplaceArg(Result resultForArg)
         {
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
-            StartMethodDump(trace, resultForArg);
+            StartMethodDump(false, trace, resultForArg);
             try
             {
                 var result = new Result {Size = Size, Type = Type};
@@ -463,7 +463,7 @@ namespace Reni
                     result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
                 if(HasRefs && resultForArg.HasRefs)
                     result.Refs = Refs.Sequence(resultForArg.Refs);
-                return ReturnMethodDump(result);
+                return ReturnMethodDump(true, result);
             }
             finally
             {

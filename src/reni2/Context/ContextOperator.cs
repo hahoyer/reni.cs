@@ -39,13 +39,13 @@ namespace Reni.Context
         public override Result Result(ContextBase context, Category category, ICompileSyntax left)
         {
             var trace = false;
-            StartMethodDumpWithBreak(trace, context, category, left);
+            StartMethodDump(true, trace, context);
             try
             {
                 var leftResult = context.Result(category.Typed, left);
-                DumpWithBreak("leftResult", leftResult);
+                Dump(true, "leftResult", leftResult);
                 var structureType = leftResult.Type.FindRecentStructure;
-                DumpWithBreak("structureType", structureType);
+                Dump(true, "structureType", structureType);
                 if(structureType.StructSize.IsZero)
                 {
                     NotImplementedMethod(context,category,left);
@@ -53,7 +53,7 @@ namespace Reni.Context
 
                 }
                 var result = structureType.ReferenceType.Result(category, leftResult);
-                return ReturnMethodDump(result);
+                return ReturnMethodDump(true, result);
             }
             finally
             {

@@ -79,7 +79,7 @@ namespace Reni.Struct
         public Result CreateCall(Category category, Result args)
         {
             var trace = ObjectId == -10 && (category.HasRefs || category.HasRefs);
-            StartMethodDumpWithBreak(trace, category, args);
+            StartMethodDump(true, trace, category);
             try
             {
                 var localCategory = category;
@@ -92,7 +92,7 @@ namespace Reni.Struct
                 if(category.HasCode)
                     result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
 
-                return ReturnMethodDumpWithBreak(result);
+                return ReturnMethodDump(true, result);
             }
             finally
             {
@@ -124,24 +124,24 @@ namespace Reni.Struct
 
             var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
-            StartMethodDumpWithBreak(trace, category);
+            StartMethodDump(true, trace, category);
             try
             {
                 var categoryEx = category | Category.Type;
                 var rawResult = functionContext.Result(categoryEx, _body).Clone();
 
-                DumpWithBreak("functionContext", functionContext, "rawResult", rawResult);
+                Dump(true, "functionContext", functionContext, "rawResult", rawResult);
 
                 var postProcessedResult =
                     rawResult
                         .PostProcessor
                         .FunctionResult(category, _structure.RefAlignParam);
 
-                DumpWithBreak("postProcessedResult", postProcessedResult);
+                Dump(true, "postProcessedResult", postProcessedResult);
                 var result =
                     postProcessedResult
                         .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
-                return ReturnMethodDump(result);
+                return ReturnMethodDump(false, result);
             }
             finally
             {

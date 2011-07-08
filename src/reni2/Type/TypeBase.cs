@@ -387,26 +387,26 @@ namespace Reni.Type
             where TFeature : class
         {
             var trace = defineable.ObjectId == -18 && category.HasCode;
-            StartMethodDumpWithBreak(trace, category, defineable, refAlignParam);
+            StartMethodDump(true, trace, category);
             try
             {
                 var searchResult = SearchDefineable<TFeature>(defineable);
                 var feature = searchResult.ConvertToFeature();
                 if(feature == null)
-                    return ReturnMethodDump<Result>(null);
+                    return ReturnMethodDump<Result>(false,null);
 
-                DumpWithBreak("feature", feature);
+                Dump(true, "feature", feature);
                 var result = feature.Apply(category, refAlignParam);
-                DumpWithBreak("result", result);
+                Dump(true, "result", result);
                 var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
                 if(ToReference(refAlignParam) != typeOfArgInApplyResult)
                 {
-                    DumpWithBreak("typeOfArgInApplyResult", typeOfArgInApplyResult);
+                    Dump(true, "typeOfArgInApplyResult", typeOfArgInApplyResult);
                     var conversion = ToReference(refAlignParam).Conversion(category.Typed, typeOfArgInApplyResult);
-                    DumpWithBreak("conversion", conversion);
+                    Dump(true, "conversion", conversion);
                     result = result.ReplaceArg(conversion);
                 }
-                return ReturnMethodDumpWithBreak(result);
+                return ReturnMethodDump(true, result);
             }
             finally
             {
