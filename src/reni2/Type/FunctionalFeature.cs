@@ -33,19 +33,26 @@ namespace Reni.Type
         {
             var trace = ObjectId == -98;
             StartMethodDump(trace, category, operationResult, argsResult, refAlignParam);
-            var applyResult = Apply(category, argsResult.Type, refAlignParam)
-                .ReplaceArg(argsResult)
-                .ReplaceObjectRefByArg(refAlignParam, ObjectType);
+            try
+            {
+                var applyResult = Apply(category, argsResult.Type, refAlignParam)
+                    .ReplaceArg(argsResult)
+                    .ReplaceObjectRefByArg(refAlignParam, ObjectType);
 
-            if(!category.HasCode && !category.HasRefs || ObjectType.Size.IsZero)
-                return ReturnMethodDump(applyResult);
+                if(!category.HasCode && !category.HasRefs || ObjectType.Size.IsZero)
+                    return ReturnMethodDump(applyResult);
 
-            DumpWithBreak("applyResult", applyResult);
-            var objectResult = ObjectType
-                .UniqueAutomaticReference(refAlignParam)
-                .Result(category.Typed, operationResult);
-            var result = applyResult.ReplaceArg(objectResult);
-            return ReturnMethodDumpWithBreak(result);
+                DumpWithBreak("applyResult", applyResult);
+                var objectResult = ObjectType
+                    .UniqueAutomaticReference(refAlignParam)
+                    .Result(category.Typed, operationResult);
+                var result = applyResult.ReplaceArg(objectResult);
+                return ReturnMethodDumpWithBreak(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }

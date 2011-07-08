@@ -80,17 +80,24 @@ namespace Reni.Struct
         {
             var trace = ObjectId == -10 && (category.HasRefs || category.HasRefs);
             StartMethodDumpWithBreak(trace, category, args);
-            var localCategory = category;
-            if(category.HasCode)
-                localCategory = (localCategory - Category.Code) | Category.Size;
-            var result = Result(localCategory).Clone();
-            if(category.HasRefs)
-                result.Refs = result.Refs.Sequence(args.Refs);
+            try
+            {
+                var localCategory = category;
+                if(category.HasCode)
+                    localCategory = (localCategory - Category.Code) | Category.Size;
+                var result = Result(localCategory).Clone();
+                if(category.HasRefs)
+                    result.Refs = result.Refs.Sequence(args.Refs);
 
-            if(category.HasCode)
-                result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
+                if(category.HasCode)
+                    result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
 
-            return ReturnMethodDumpWithBreak(result);
+                return ReturnMethodDumpWithBreak(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return ForeignRefs.ToCode().Sequence(argsCode); }
@@ -118,21 +125,28 @@ namespace Reni.Struct
             var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDumpWithBreak(trace, category);
-            var categoryEx = category | Category.Type;
-            var rawResult = functionContext.Result(categoryEx, _body).Clone();
+            try
+            {
+                var categoryEx = category | Category.Type;
+                var rawResult = functionContext.Result(categoryEx, _body).Clone();
 
-            DumpWithBreak("functionContext", functionContext, "rawResult", rawResult);
+                DumpWithBreak("functionContext", functionContext, "rawResult", rawResult);
 
-            var postProcessedResult =
-                rawResult
-                    .PostProcessor
-                    .FunctionResult(category, _structure.RefAlignParam);
+                var postProcessedResult =
+                    rawResult
+                        .PostProcessor
+                        .FunctionResult(category, _structure.RefAlignParam);
 
-            DumpWithBreak("postProcessedResult", postProcessedResult);
-            var result =
-                postProcessedResult
-                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
-            return ReturnMethodDump(result);
+                DumpWithBreak("postProcessedResult", postProcessedResult);
+                var result =
+                    postProcessedResult
+                        .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         private CodeBase CreateContextRefCode()

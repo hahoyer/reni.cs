@@ -359,23 +359,30 @@ namespace Reni
         {
             var trace = context.ObjectId == -17 && category.HasRefs && syntax.GetObjectId() == 1192;
             StartMethodDumpWithBreak(trace, context, category, syntax);
-            var localCateogory = category - CompleteCategory - PendingCategory;
-
-            if(localCateogory.HasSize && FindSize != null)
+            try
             {
-                _size = FindSize;
-                localCateogory -= Category.Size;
-            }
+                var localCateogory = category - CompleteCategory - PendingCategory;
 
-            if(localCateogory.HasRefs && FindRefs != null)
+                if(localCateogory.HasSize && FindSize != null)
+                {
+                    _size = FindSize;
+                    localCateogory -= Category.Size;
+                }
+
+                if(localCateogory.HasRefs && FindRefs != null)
+                {
+                    _refs = FindRefs;
+                    localCateogory -= Category.Refs;
+                }
+
+                InternalAddCategories(context, localCateogory, syntax);
+                TreatPendingCategories(context, category - CompleteCategory, syntax);
+                ReturnMethodDumpWithBreak();
+            }
+            finally
             {
-                _refs = FindRefs;
-                localCateogory -= Category.Refs;
+                EndMethodDump();
             }
-
-            InternalAddCategories(context, localCateogory, syntax);
-            TreatPendingCategories(context, category - CompleteCategory, syntax);
-            ReturnMethodDumpWithBreak();
         }
 
         private void TreatPendingCategories(ContextBase context, Category category, ICompileSyntax syntax)
@@ -449,12 +456,19 @@ namespace Reni
         {
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
             StartMethodDump(trace, resultForArg);
-            var result = new Result {Size = Size, Type = Type};
-            if(HasCode && resultForArg.HasCode)
-                result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
-            if(HasRefs && resultForArg.HasRefs)
-                result.Refs = Refs.Sequence(resultForArg.Refs);
-            return ReturnMethodDump(result);
+            try
+            {
+                var result = new Result {Size = Size, Type = Type};
+                if(HasCode && resultForArg.HasCode)
+                    result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
+                if(HasRefs && resultForArg.HasRefs)
+                    result.Refs = Refs.Sequence(resultForArg.Refs);
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Refs> replacementRefs)

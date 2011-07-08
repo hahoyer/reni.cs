@@ -40,18 +40,25 @@ namespace Reni.Context
         {
             var trace = false;
             StartMethodDumpWithBreak(trace, context, category, left);
-            var leftResult = context.Result(category.Typed, left);
-            DumpWithBreak("leftResult", leftResult);
-            var structureType = leftResult.Type.FindRecentStructure;
-            DumpWithBreak("structureType", structureType);
-            if(structureType.StructSize.IsZero)
+            try
             {
-                NotImplementedMethod(context,category,left);
-                return null;
+                var leftResult = context.Result(category.Typed, left);
+                DumpWithBreak("leftResult", leftResult);
+                var structureType = leftResult.Type.FindRecentStructure;
+                DumpWithBreak("structureType", structureType);
+                if(structureType.StructSize.IsZero)
+                {
+                    NotImplementedMethod(context,category,left);
+                    return null;
 
+                }
+                var result = structureType.ReferenceType.Result(category, leftResult);
+                return ReturnMethodDump(result);
             }
-            var result = structureType.ReferenceType.Result(category, leftResult);
-            return ReturnMethodDump(result);
+            finally
+            {
+                EndMethodDump();
+            }
         }
     }
 }

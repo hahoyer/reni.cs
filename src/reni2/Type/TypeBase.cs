@@ -388,23 +388,30 @@ namespace Reni.Type
         {
             var trace = defineable.ObjectId == -18 && category.HasCode;
             StartMethodDumpWithBreak(trace, category, defineable, refAlignParam);
-            var searchResult = SearchDefineable<TFeature>(defineable);
-            var feature = searchResult.ConvertToFeature();
-            if(feature == null)
-                return ReturnMethodDump<Result>(null);
-
-            DumpWithBreak("feature", feature);
-            var result = feature.Apply(category, refAlignParam);
-            DumpWithBreak("result", result);
-            var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
-            if(ToReference(refAlignParam) != typeOfArgInApplyResult)
+            try
             {
-                DumpWithBreak("typeOfArgInApplyResult", typeOfArgInApplyResult);
-                var conversion = ToReference(refAlignParam).Conversion(category.Typed, typeOfArgInApplyResult);
-                DumpWithBreak("conversion", conversion);
-                result = result.ReplaceArg(conversion);
+                var searchResult = SearchDefineable<TFeature>(defineable);
+                var feature = searchResult.ConvertToFeature();
+                if(feature == null)
+                    return ReturnMethodDump<Result>(null);
+
+                DumpWithBreak("feature", feature);
+                var result = feature.Apply(category, refAlignParam);
+                DumpWithBreak("result", result);
+                var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
+                if(ToReference(refAlignParam) != typeOfArgInApplyResult)
+                {
+                    DumpWithBreak("typeOfArgInApplyResult", typeOfArgInApplyResult);
+                    var conversion = ToReference(refAlignParam).Conversion(category.Typed, typeOfArgInApplyResult);
+                    DumpWithBreak("conversion", conversion);
+                    result = result.ReplaceArg(conversion);
+                }
+                return ReturnMethodDumpWithBreak(result);
             }
-            return ReturnMethodDumpWithBreak(result);
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }

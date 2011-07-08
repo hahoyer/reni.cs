@@ -211,37 +211,44 @@ namespace Reni.Context
         {
             var trace = defineable.ObjectId == -20;
             StartMethodDump(trace, category, left, defineable, right);
-            var categoryForFunctionals = category;
-            if(right != null)
-                categoryForFunctionals |= Category.Type;
-
-            if(left == null && right != null)
+            try
             {
-                var prefixOperationResult = OperationResult<IPrefixFeature>(category, right, defineable);
-                if(prefixOperationResult != null)
-                    return prefixOperationResult;
+                var categoryForFunctionals = category;
+                if(right != null)
+                    categoryForFunctionals |= Category.Type;
+
+                if(left == null && right != null)
+                {
+                    var prefixOperationResult = OperationResult<IPrefixFeature>(category, right, defineable);
+                    if(prefixOperationResult != null)
+                        return prefixOperationResult;
+                }
+
+                var suffixOperationResult =
+                    left == null
+                        ? ContextOperationResult(categoryForFunctionals, defineable)
+                        : OperationResult<IFeature>(categoryForFunctionals, left, defineable);
+
+                if (suffixOperationResult == null)
+                {
+                    NotImplementedMethod(category, left, defineable, right);
+                    return null;
+                }
+
+                if (right == null)
+                    return ReturnMethodDumpWithBreak(suffixOperationResult);
+
+                var rightResult = ResultAsReference(categoryForFunctionals, right);
+                DumpWithBreak("suffixOperationResult", suffixOperationResult, "rightResult", rightResult);
+                var result = suffixOperationResult
+                    .Type
+                    .FunctionalFeature.Apply(category, suffixOperationResult, rightResult, RefAlignParam);
+                return ReturnMethodDumpWithBreak(result);
             }
-
-            var suffixOperationResult =
-                left == null
-                    ? ContextOperationResult(categoryForFunctionals, defineable)
-                    : OperationResult<IFeature>(categoryForFunctionals, left, defineable);
-
-            if (suffixOperationResult == null)
+            finally
             {
-                NotImplementedMethod(category, left, defineable, right);
-                return null;
+                EndMethodDump();
             }
-
-            if (right == null)
-                return ReturnMethodDumpWithBreak(suffixOperationResult);
-
-            var rightResult = ResultAsReference(categoryForFunctionals, right);
-            DumpWithBreak("suffixOperationResult", suffixOperationResult, "rightResult", rightResult);
-            var result = suffixOperationResult
-                .Type
-                .FunctionalFeature.Apply(category, suffixOperationResult, rightResult, RefAlignParam);
-            return ReturnMethodDumpWithBreak(result);
         }
 
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
@@ -249,17 +256,24 @@ namespace Reni.Context
         {
             var trace = defineable.ObjectId == -20;
             StartMethodDumpWithBreak(trace, category, target, defineable);
-            var targetType = Type(target);
-            DumpWithBreak("targetType", targetType);
-            var operationResult = targetType.OperationResult<TFeature>(category, defineable, RefAlignParam);
-            if(operationResult == null)
-                return null;
+            try
+            {
+                var targetType = Type(target);
+                DumpWithBreak("targetType", targetType);
+                var operationResult = targetType.OperationResult<TFeature>(category, defineable, RefAlignParam);
+                if(operationResult == null)
+                    return null;
 
-            DumpWithBreak("operationResult", operationResult);
-            var targetResult = ResultAsReference(category | Category.Type, target);
-            DumpWithBreak("targetResult", targetResult);
-            var result = operationResult.ReplaceArg(targetResult);
-            return ReturnMethodDumpWithBreak(result);
+                DumpWithBreak("operationResult", operationResult);
+                var targetResult = ResultAsReference(category | Category.Type, target);
+                DumpWithBreak("targetResult", targetResult);
+                var result = operationResult.ReplaceArg(targetResult);
+                return ReturnMethodDumpWithBreak(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         private IContextFeature SearchDefinable(Defineable defineable)

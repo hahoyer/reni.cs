@@ -69,21 +69,28 @@ namespace Reni.Code
             Tracer.Assert(!body.HasArg, body.Dump);
             var trace = ObjectId == -2;
             StartMethodDumpWithBreak(trace, body, copier, refAlignParam);
-            var newBody = body.Visit(this) ?? body;
-            var alignedBody = newBody.Align();
-            var resultSize = alignedBody.Size;
-            var alignedInternal = Code.Align();
-            // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
-            var gap = CodeBase.Void();
-            DumpWithBreak("newBody", newBody, "aligned Body", alignedBody, "alignedInternal", alignedInternal);
-            if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
-                gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
-            var statement = alignedInternal
-                .Sequence(gap, alignedBody, DestructorCode)
-                .LocalBlockEnd(copier, refAlignParam, resultSize, HolderNamePattern);
-            DumpWithBreak("statement", statement);
-            var result = statement;
-            return ReturnMethodDump(result);
+            try
+            {
+                var newBody = body.Visit(this) ?? body;
+                var alignedBody = newBody.Align();
+                var resultSize = alignedBody.Size;
+                var alignedInternal = Code.Align();
+                // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
+                var gap = CodeBase.Void();
+                DumpWithBreak("newBody", newBody, "aligned Body", alignedBody, "alignedInternal", alignedInternal);
+                if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
+                    gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
+                var statement = alignedInternal
+                    .Sequence(gap, alignedBody, DestructorCode)
+                    .LocalBlockEnd(copier, refAlignParam, resultSize, HolderNamePattern);
+                DumpWithBreak("statement", statement);
+                var result = statement;
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
     }
 }

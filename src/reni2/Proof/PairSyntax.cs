@@ -48,14 +48,12 @@ namespace Reni.Proof
 
         internal override Set<ParsedSyntax> Replace(IEnumerable<KeyValuePair<string, ParsedSyntax>> definitions)
         {
-            bool trace = false;
             var leftResults = Left.Replace(definitions);
             var rightResults = Right.Replace(definitions);
-            StartMethodDump(trace, definitions,"leftResults",leftResults,"rightResults",rightResults);
             var result = leftResults
                 .SelectMany(left => rightResults.Select(syntax => left.Pair(Operator, syntax)))
                 .ToSet();
-            return ReturnMethodDump(result);
+            return result;
         }
     }
 

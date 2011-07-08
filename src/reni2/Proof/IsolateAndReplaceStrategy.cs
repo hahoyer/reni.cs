@@ -20,11 +20,7 @@ namespace Reni.Proof
         {
             if (parsedSyntax.Variables.Count() > _variableCount)
                 return Set<ParsedSyntax>.Empty;
-            var trace = false;
-            StartMethodDump(trace,parsedSyntax);
-            return ReturnMethodDump(parsedSyntax
-                                        .Replace(_definitions)
-                                    - parsedSyntax);
+            return parsedSyntax.Replace(_definitions)- parsedSyntax;
         }
     }
 }
