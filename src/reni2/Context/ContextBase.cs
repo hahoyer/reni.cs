@@ -209,8 +209,8 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -20;
-            StartMethodDump(false, trace, category);
+            var trace = defineable.ObjectId == -22;
+            StartMethodDump(true, trace, category, left, defineable, right);
             try
             {
                 var categoryForFunctionals = category;
@@ -254,8 +254,8 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == 22;
-            StartMethodDump(true, trace, category);
+            var trace = defineable.ObjectId == 26;
+            StartMethodDump(true, trace, category, target, defineable);
             try
             {
                 var targetType = Type(target);

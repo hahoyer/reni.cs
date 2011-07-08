@@ -102,7 +102,7 @@ namespace Reni.Struct
                 _isObtainStructSizeActive = false;
                 return result;
             }
-            catch(RecursionWhileObtainingStructSizeException e)
+            catch(RecursionWhileObtainingStructSizeException)
             {
                 _isObtainStructSizeActive = false;
                 return null;

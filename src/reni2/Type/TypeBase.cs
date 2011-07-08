@@ -386,8 +386,8 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -18 && category.HasCode;
-            StartMethodDump(true, trace, category);
+            var trace = defineable.ObjectId == -22;
+            StartMethodDump(true, trace, category, defineable, refAlignParam);
             try
             {
                 var searchResult = SearchDefineable<TFeature>(defineable);
@@ -398,13 +398,17 @@ namespace Reni.Type
                 Dump(true, "feature", feature);
                 var result = feature.Apply(category, refAlignParam);
                 Dump(true, "result", result);
-                var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
-                if(ToReference(refAlignParam) != typeOfArgInApplyResult)
+                if(result.HasArg)
                 {
-                    Dump(true, "typeOfArgInApplyResult", typeOfArgInApplyResult);
-                    var conversion = ToReference(refAlignParam).Conversion(category.Typed, typeOfArgInApplyResult);
-                    Dump(true, "conversion", conversion);
-                    result = result.ReplaceArg(conversion);
+                    var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
+                    if (ToReference(refAlignParam) != typeOfArgInApplyResult)
+                    {
+                        Dump(true, "typeOfArgInApplyResult", typeOfArgInApplyResult);
+                        var conversion = ToReference(refAlignParam).Conversion(category.Typed, typeOfArgInApplyResult);
+                        Dump(true, "conversion", conversion);
+                        result = result.ReplaceArg(conversion);
+                    }
+                    
                 }
                 return ReturnMethodDump(true, result);
             }
