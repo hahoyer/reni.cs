@@ -158,7 +158,7 @@ namespace Reni.Code
             }
             catch(ReplaceArg.SizeException sizeException)
             {
-                Dump(true, "this", this, "argType", argType, "sizeException", sizeException);
+                DumpDataWithBreak("", "this", this, "argType", argType, "sizeException", sizeException);
                 throw;
             }
         }

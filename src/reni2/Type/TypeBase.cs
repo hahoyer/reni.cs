@@ -395,17 +395,17 @@ namespace Reni.Type
                 if(feature == null)
                     return ReturnMethodDump<Result>(false,null);
 
-                Dump(true, "feature", feature);
+                Dump("feature", feature, true);
                 var result = feature.Apply(category, refAlignParam);
-                Dump(true, "result", result);
+                Dump("result", result, true);
                 if(result.HasArg)
                 {
                     var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
                     if (ToReference(refAlignParam) != typeOfArgInApplyResult)
                     {
-                        Dump(true, "typeOfArgInApplyResult", typeOfArgInApplyResult);
+                        Dump("typeOfArgInApplyResult", typeOfArgInApplyResult, true);
                         var conversion = ToReference(refAlignParam).Conversion(category.Typed, typeOfArgInApplyResult);
-                        Dump(true, "conversion", conversion);
+                        Dump("conversion", conversion, true);
                         result = result.ReplaceArg(conversion);
                     }
                     

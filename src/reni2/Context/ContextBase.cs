@@ -239,7 +239,8 @@ namespace Reni.Context
                     return ReturnMethodDump(true, suffixOperationResult);
 
                 var rightResult = ResultAsReference(categoryForFunctionals, right);
-                Dump(true, "suffixOperationResult", suffixOperationResult, "rightResult", rightResult);
+                Dump("suffixOperationResult", suffixOperationResult);
+                Dump("rightResult", rightResult, true);
                 var result = suffixOperationResult
                     .Type
                     .FunctionalFeature.Apply(category, suffixOperationResult, rightResult, RefAlignParam);
@@ -254,19 +255,19 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == 26;
+            var trace = defineable.ObjectId == 25;
             StartMethodDump(true, trace, category, target, defineable);
             try
             {
                 var targetType = Type(target);
-                Dump(true, "targetType", targetType);
+                Dump("targetType", targetType, true);
                 var operationResult = targetType.OperationResult<TFeature>(category, defineable, RefAlignParam);
                 if(operationResult == null)
                     return ReturnMethodDump<Result>(false, null);
 
-                Dump(true, "operationResult", operationResult);
+                Dump("operationResult", operationResult, true);
                 var targetResult = ResultAsReference(category | Category.Type, target);
-                Dump(true, "targetResult", targetResult);
+                Dump("targetResult", targetResult, true);
                 var result = operationResult.ReplaceArg(targetResult);
                 return ReturnMethodDump(true, result);
             }

@@ -42,7 +42,7 @@ namespace Reni.Type
                 if(!category.HasCode && !category.HasRefs || ObjectType.Size.IsZero)
                     return ReturnMethodDump(true, applyResult);
 
-                Dump(true, "applyResult", applyResult);
+                Dump("applyResult", applyResult, true);
                 var objectResult = ObjectType
                     .UniqueAutomaticReference(refAlignParam)
                     .Result(category.Typed, operationResult);

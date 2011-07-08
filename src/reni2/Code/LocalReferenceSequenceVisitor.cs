@@ -77,13 +77,15 @@ namespace Reni.Code
                 var alignedInternal = Code.Align();
                 // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
                 var gap = CodeBase.Void();
-                Dump(true, "newBody", newBody, "aligned Body", alignedBody, "alignedInternal", alignedInternal);
-                if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
+                Dump("newBody", newBody);
+                Dump("aligned Body", alignedBody);
+                Dump("alignedInternal", alignedInternal, true);
+                if (!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                     gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
                 var statement = alignedInternal
                     .Sequence(gap, alignedBody, DestructorCode)
                     .LocalBlockEnd(copier, refAlignParam, resultSize, HolderNamePattern);
-                Dump(true, "statement", statement);
+                Dump("statement", statement, true);
                 var result = statement;
                 return ReturnMethodDump(false, result);
             }

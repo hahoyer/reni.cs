@@ -122,22 +122,22 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
             StartMethodDump(true, trace, category);
             try
             {
                 var categoryEx = category | Category.Type;
+                var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
+                Dump("functionContext", functionContext);
                 var rawResult = functionContext.Result(categoryEx, _body).Clone();
-
-                Dump(true, "functionContext", functionContext, "rawResult", rawResult);
+                Dump("rawResult", rawResult, true);
 
                 var postProcessedResult =
                     rawResult
                         .PostProcessor
                         .FunctionResult(category, _structure.RefAlignParam);
 
-                Dump(true, "postProcessedResult", postProcessedResult);
+                Dump("postProcessedResult", postProcessedResult, true);
                 var result =
                     postProcessedResult
                         .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);

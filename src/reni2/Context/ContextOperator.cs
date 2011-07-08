@@ -43,9 +43,9 @@ namespace Reni.Context
             try
             {
                 var leftResult = context.Result(category.Typed, left);
-                Dump(true, "leftResult", leftResult);
+                Dump("leftResult", leftResult, true);
                 var structureType = leftResult.Type.FindRecentStructure;
-                Dump(true, "structureType", structureType);
+                Dump("structureType", structureType, true);
                 if(structureType.StructSize.IsZero)
                 {
                     NotImplementedMethod(context,category,left);
