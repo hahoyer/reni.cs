@@ -112,6 +112,7 @@
     <Compile Include="Parser\ParsedSyntax.cs" />
     <Compile Include="Parser\SyntaxError.cs" />
     <Compile Include="Parser\TokenClass.cs" />
+    <Compile Include="Parser\TokenClassExtender.cs" />
     <Compile Include="Proof\AndSyntax.cs" />
     <Compile Include="Proof\EqualSyntax.cs" />
     <Compile Include="Proof\FactorSyntax.cs" />

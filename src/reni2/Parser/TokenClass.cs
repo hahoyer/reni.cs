@@ -1,10 +1,27 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
-using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
@@ -16,11 +33,27 @@ namespace Reni.Parser
         protected TokenClass()
             : base(_nextObjectId++) { }
 
+        [DisableDump]
         string ITokenClass.Name { set { _name = value; } }
-        string ITokenClass.PrioTableName(string name) { return PrioTableName(name); }
+
+        [DisableDump]
         ITokenFactory ITokenClass.NewTokenFactory { get { return NewTokenFactory; } }
-        IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return Syntax(left, token, right); }
+
+        [DisableDump]
         string IIconKeyProvider.IconKey { get { return "Symbol"; } }
+
+        [DisableDump]
+        protected virtual ITokenFactory NewTokenFactory { get { return null; } }
+
+        [DisableDump]
+        public override string NodeDump { get { return Name.Quote() + "." + ObjectId; } }
+
+        [Node]
+        [DisableDump]
+        internal string Name { get { return _name; } set { _name = value; } }
+
+        string ITokenClass.PrioTableName(string name) { return PrioTableName(name); }
+        IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return Syntax(left, token, right); }
 
         protected virtual IParsedSyntax Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right)
         {
@@ -29,64 +62,7 @@ namespace Reni.Parser
         }
 
         protected virtual string PrioTableName(string name) { return Name; }
-        [DisableDump]
-        protected virtual ITokenFactory NewTokenFactory { get { return null; } }
-
-        [DisableDump]
-        public override string NodeDump { get { return Name.Quote() + "." + ObjectId; } }
 
         public override string ToString() { return base.ToString() + " Name=" + _name.Quote(); }
-
-        [Node, DisableDump]
-        internal string Name { get { return _name; } set { _name = value; } }
-    }
-
-    internal static class TokenClassExtender
-    {
-        [UsedImplicitly]
-        internal static string Symbolize(this string token) { return token.Aggregate("", (current, tokenChar) => current + SymbolizeChar(tokenChar)); }
-
-        private static string SymbolizeChar(Char @char)
-        {
-            switch(@char)
-            {
-                case '&':
-                    return "And";
-                case '\\':
-                    return "Backslash";
-                case ':':
-                    return "Colon";
-                case '.':
-                    return "Dot";
-                case '=':
-                    return "Equal";
-                case '>':
-                    return "Greater";
-                case '<':
-                    return "Less";
-                case '-':
-                    return "Minus";
-                case '!':
-                    return "Not";
-                case '|':
-                    return "Or";
-                case '+':
-                    return "Plus";
-                case '/':
-                    return "Slash";
-                case '*':
-                    return "Star";
-                case '~':
-                    return "Tilde";
-                case '_':
-                    return "__";
-                default:
-                    if(Char.IsLetter(@char))
-                        return "_" + @char;
-                    if(Char.IsDigit(@char))
-                        return @char.ToString();
-                    throw new NotImplementedException("Symbolize(" + @char + ")");
-            }
-        }
     }
 }
