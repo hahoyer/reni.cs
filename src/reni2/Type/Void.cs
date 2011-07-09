@@ -44,5 +44,8 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsVoid { get { return true; } }
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Result(category); }
+
+        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.IsZeroSized; }
+        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return Result(category, source.ArgResult(category)); }
     }
 }
