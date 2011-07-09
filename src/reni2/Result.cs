@@ -358,9 +358,10 @@ namespace Reni
         internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
             var trace = context.ObjectId == -17 && category.HasRefs && syntax.GetObjectId() == 1192;
-            BreakNext();StartMethodDump(trace, context);
+            StartMethodDump(trace, context);
             try
             {
+                BreakExecution();
                 var localCateogory = category - CompleteCategory - PendingCategory;
 
                 if(localCateogory.HasSize && FindSize != null)
@@ -377,7 +378,7 @@ namespace Reni
 
                 InternalAddCategories(context, localCateogory, syntax);
                 TreatPendingCategories(context, category - CompleteCategory, syntax);
-                BreakNext(); ReturnVoidMethodDump();
+                ReturnVoidMethodDump(true);
             }
             finally
             {
@@ -455,16 +456,16 @@ namespace Reni
         internal Result ReplaceArg(Result resultForArg)
         {
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
-            BreakNext(); StartMethodDump(trace, resultForArg);
+            StartMethodDump(trace, resultForArg);
             try
             {
-                var result = new Result {Size = Size, Type = Type};
+                BreakExecution();
+                var result = new Result { Size = Size, Type = Type };
                 if(HasCode && resultForArg.HasCode)
                     result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
                 if(HasRefs && resultForArg.HasRefs)
                     result.Refs = Refs.Sequence(resultForArg.Refs);
-                BreakNext(); 
-                return ReturnMethodDump(result);
+                return ReturnMethodDump(result, true);
             }
             finally
             {
@@ -610,6 +611,8 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
+        internal Result ContextReferenceViaStructReference(Structure accessPoint) { return accessPoint
+            .ContextReferenceViaStructReference(this); }
     }
 
     internal sealed class Error

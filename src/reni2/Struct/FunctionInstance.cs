@@ -1,4 +1,24 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
@@ -78,10 +98,11 @@ namespace Reni.Struct
 
         public Result CreateCall(Category category, Result args)
         {
-            var trace = ObjectId == -10 && (category.HasRefs || category.HasRefs);
-            BreakNext(); StartMethodDump(trace, category);
+            var trace = ObjectId == -1 && (category.HasCode || category.HasRefs);
+            StartMethodDump(trace, category, args);
             try
             {
+                BreakExecution();
                 var localCategory = category;
                 if(category.HasCode)
                     localCategory = (localCategory - Category.Code) | Category.Size;
@@ -92,7 +113,7 @@ namespace Reni.Struct
                 if(category.HasCode)
                     result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
 
-                BreakNext(); return ReturnMethodDump(result);
+                return ReturnMethodDump(result, true);
             }
             finally
             {
@@ -123,24 +144,25 @@ namespace Reni.Struct
                 return null;
 
             var trace = ObjectId == -1 && (category.HasCode || category.HasRefs);
-            BreakNext(); StartMethodDump(trace, category);
+            StartMethodDump(trace, category);
             try
             {
+                BreakExecution();
                 var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
                 Dump("functionContext", functionContext);
                 var rawResult = functionContext.Result(category.Typed, _body).Clone();
-                BreakNext(); Dump("rawResult", rawResult);
+                Dump("rawResult", rawResult);
+                BreakExecution();
+                var postProcessedResult = rawResult
+                    .AutomaticDereference()
+                    .Align(_structure.RefAlignParam.AlignBits)
+                    .LocalBlock(category, _structure.RefAlignParam);
 
-                var postProcessedResult =
-                    rawResult
-                        .PostProcessor
-                        .FunctionResult(category, _structure.RefAlignParam);
-
-                BreakNext(); Dump("postProcessedResult", postProcessedResult);
-                var result =
-                    postProcessedResult
-                        .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
-                BreakNext(); return ReturnMethodDump(result);
+                Dump("postProcessedResult", postProcessedResult);
+                BreakExecution();
+                var result = postProcessedResult
+                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
+                return ReturnMethodDump(result, true);
             }
             finally
             {

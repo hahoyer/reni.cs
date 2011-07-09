@@ -38,22 +38,24 @@ namespace Reni.Context
 
         public override Result Result(ContextBase context, Category category, ICompileSyntax left)
         {
-            var trace = false;
-            BreakNext(); StartMethodDump(trace, context);
+            StartMethodDump(false, context);
             try
             {
+                BreakExecution();
                 var leftResult = context.Result(category.Typed, left);
-                BreakNext(); Dump("leftResult", leftResult);
+                Dump("leftResult", leftResult);
+                BreakExecution();
                 var structureType = leftResult.Type.FindRecentStructure;
-                BreakNext(); Dump("structureType", structureType);
-                if(structureType.StructSize.IsZero)
+                Dump("structureType", structureType);
+                BreakExecution();
+                if (structureType.StructSize.IsZero)
                 {
                     NotImplementedMethod(context,category,left);
                     return null;
 
                 }
                 var result = structureType.ReferenceType.Result(category, leftResult);
-                BreakNext(); return ReturnMethodDump(result);
+                return ReturnMethodDump(result, true);
             }
             finally
             {

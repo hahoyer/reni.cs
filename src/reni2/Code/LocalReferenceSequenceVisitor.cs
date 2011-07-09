@@ -68,9 +68,10 @@ namespace Reni.Code
         {
             Tracer.Assert(!body.HasArg, body.Dump);
             var trace = ObjectId == -2;
-            BreakNext(); StartMethodDump(trace, body);
+            StartMethodDump(trace, body);
             try
             {
+                BreakExecution();
                 var newBody = body.Visit(this) ?? body;
                 var alignedBody = newBody.Align();
                 var resultSize = alignedBody.Size;
@@ -79,13 +80,15 @@ namespace Reni.Code
                 var gap = CodeBase.Void();
                 Dump("newBody", newBody);
                 Dump("aligned Body", alignedBody);
-                BreakNext(); Dump("alignedInternal", alignedInternal);
+                Dump("alignedInternal", alignedInternal);
+                BreakExecution();
                 if (!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                     gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
                 var statement = alignedInternal
                     .Sequence(gap, alignedBody, DestructorCode)
                     .LocalBlockEnd(copier, refAlignParam, resultSize, HolderNamePattern);
-                BreakNext(); Dump("statement", statement);
+                Dump("statement", statement);
+                BreakExecution();
                 var result = statement;
                 return ReturnMethodDump(result);
             }

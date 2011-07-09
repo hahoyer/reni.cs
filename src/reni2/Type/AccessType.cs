@@ -123,7 +123,23 @@ namespace Reni.Type
         internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(ValueType.DumpPrintText)); }
 
         private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
-        internal Result ValueReferenceViaFieldReferenceProperty(Category category) { return ValueType.PropertyResult(category).LocalReferenceResult(RefAlignParam); }
+        internal Result ValueReferenceViaFieldReferenceProperty(Category category)
+        {
+            StartMethodDump(true, category);
+            try
+            {
+                BreakExecution();
+                var result = ValueType
+                    .PropertyResult(category - Category.Type)
+                    .LocalReferenceResult(RefAlignParam)
+                    .ContextReferenceViaStructReference(AccessPoint);
+                return ReturnMethodDump(result, true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
         internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode); }
 
         internal Result FieldReferenceViaStructReference(Category category) { return Result(category, FieldReferenceCodeViaStructReference); }
@@ -144,15 +160,14 @@ namespace Reni.Type
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
         {
-            BreakNext();
-            StartMethodDump(ObjectId == -3, category, destination);
+            StartMethodDump(ObjectId == 11, category, destination);
             try
             {
+                BreakExecution();
                 var fieldAsValue = ValueReferenceViaFieldReference(category.Typed);
                 Dump("fieldAsValue", fieldAsValue);
                 var result = fieldAsValue.Conversion(destination);
-                BreakNext();
-                return ReturnMethodDump(result);
+                return ReturnMethodDump(result, true);
             }
             finally
             {
