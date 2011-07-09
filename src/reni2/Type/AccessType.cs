@@ -63,6 +63,8 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase ValueTypeProperty { get { return ValueType.PropertyResult(Category.Type).Type; } }
         [DisableDump]
+        internal TypeBase ValueTypeField { get { return ValueType; } }
+        [DisableDump]
         private TypeBase ValueTypeReference { get { return AccessValueType.ToReference(RefAlignParam); } }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -120,21 +122,11 @@ namespace Reni.Type
 
         private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category) { return ValueType.PropertyResult(category).LocalReferenceResult(RefAlignParam); }
+        internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode); }
 
         internal Result FieldReferenceViaStructReference(Category category) { return Result(category, FieldReferenceCodeViaStructReference); }
 
-        //return new Result
-        //    (category
-        //     , () => RefAlignParam.RefSize
-        //     , () => AccessValueType.ToReference(RefAlignParam)
-        //     , () => AccessObject.ValueReferenceViaFieldReference(this)
-        //     , Refs.None
-        //    );
-
-        private CodeBase ValueReferenceViaFieldReferenceCode()
-        {
-            return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffsetFromThisReference(Position));
-        }
+        private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 
         private CodeBase FieldReferenceCodeViaStructReference() { return AccessPoint.ReferenceType.ArgCode(); }
 
@@ -150,13 +142,15 @@ namespace Reni.Type
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
         {
-            BreakNext(); StartMethodDump(ObjectId == -3, category, destination);
+            BreakNext();
+            StartMethodDump(ObjectId == -3, category, destination);
             try
             {
                 var fieldAsValue = ValueReferenceViaFieldReference(category.Typed);
                 Dump("fieldAsValue", fieldAsValue);
                 var result = fieldAsValue.Conversion(destination);
-                BreakNext(); return ReturnMethodDump(result);
+                BreakNext();
+                return ReturnMethodDump(result);
             }
             finally
             {

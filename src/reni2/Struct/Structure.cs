@@ -136,7 +136,7 @@ namespace Reni.Struct
         private ICompileSyntax[] Statements { get { return ContainerContextObject.Statements; } }
 
 
-        internal Size FieldOffsetFromThisReference(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
+        internal Size FieldOffset(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
 
         internal Result DumpPrintResultViaStructReference(Category category) { return ContextReferenceViaStructReference(DumpPrintResultViaContextReference(category)); }
 

@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -55,18 +54,8 @@ namespace Reni.Struct
         private sealed class FieldAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFieldResult(category); }
-
-            TypeBase IAccessObject.ValueType(AccessType accessType)
-            {
-                NotImplementedMethod(accessType);
-                return null;
-            }
-
-            Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType)
-            {
-                NotImplementedMethod(category, accessType);
-                return null;
-            }
+            TypeBase IAccessObject.ValueType(AccessType accessType) { return accessType.ValueTypeField; }
+            Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType) { return accessType.ValueReferenceViaFieldReferenceField(category); }
         }
 
         private sealed class ProcedureCallAccessObject : ReniObject, IAccessObject
