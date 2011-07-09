@@ -125,15 +125,15 @@ namespace Reni.Type
         private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
-            StartMethodDump(false, category);
+            StartMethodDump(ObjectId == -3, category);
             try
             {
                 BreakExecution();
                 var result = ValueType
-                    .PropertyResult(category - Category.Type)
+                    .PropertyResult(category)
                     .LocalReferenceResult(RefAlignParam)
                     .ContextReferenceViaStructReference(AccessPoint)
-                    .ReplaceArg(StructReferenceViaFieldReference(category));
+                    .ReplaceArg(()=>StructReferenceViaFieldReference(category));
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -160,7 +160,7 @@ namespace Reni.Type
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
         {
-            StartMethodDump(ObjectId == -11, category, destination);
+            StartMethodDump(ObjectId == -3, category, destination);
             try
             {
                 BreakExecution();

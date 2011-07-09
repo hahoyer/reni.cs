@@ -1,4 +1,22 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -35,43 +53,37 @@ namespace Reni
         internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs)
             : this()
         {
-            if (category.HasSize)
+            if(category.HasSize)
                 _size = getSize();
-            if (category.HasType)
+            if(category.HasType)
                 _type = getType();
-            if (category.HasCode)
+            if(category.HasCode)
                 _code = getCode();
-            if (category.HasRefs)
+            if(category.HasRefs)
                 _refs = getRefs();
             AssertValid();
         }
 
         internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
-            : this(category, getSize, getType, getCode, Refs.None)
-        {
-        }
+            : this(category, getSize, getType, getCode, Refs.None) { }
 
         internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<Refs> getRefs)
             : this()
         {
-            if (category.HasSize)
+            if(category.HasSize)
                 _size = getSize();
-            if (category.HasCode)
+            if(category.HasCode)
                 _code = getCode();
-            if (category.HasRefs)
+            if(category.HasRefs)
                 _refs = getRefs();
             AssertValid();
         }
 
         internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode)
-            : this(category, getSize, getCode, Refs.None)
-        {
-        }
+            : this(category, getSize, getCode, Refs.None) { }
 
         internal Result(Category category)
-            : this(category, ()=>Size.Zero, ()=>CodeBase.Void(), Refs.None)
-        {
-        }
+            : this(category, () => Size.Zero, () => CodeBase.Void(), Refs.None) { }
 
         private bool HasSize { get { return Size != null; } }
         internal bool HasType { get { return Type != null; } }
@@ -84,8 +96,8 @@ namespace Reni
 
         public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
 
-        [Node, DebuggerHidden]
-        
+        [Node]
+        [DebuggerHidden]
         public Size Size
         {
             get { return _size; }
@@ -96,8 +108,8 @@ namespace Reni
             }
         }
 
-        [Node, DebuggerHidden]
-        
+        [Node]
+        [DebuggerHidden]
         public TypeBase Type
         {
             get { return _type; }
@@ -121,8 +133,8 @@ namespace Reni
             }
         }
 
-        [Node, DebuggerHidden]
-        
+        [Node]
+        [DebuggerHidden]
         public Refs Refs
         {
             get { return _refs; }
@@ -459,24 +471,21 @@ namespace Reni
             return result;
         }
 
+        internal Result ReplaceArg(Func<Result> getResultForArg)
+        {
+            if(HasArg)
+                return ReplaceArg(getResultForArg());
+            return this;
+        }
+
         internal Result ReplaceArg(Result resultForArg)
         {
-            var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
-            StartMethodDump(trace, resultForArg);
-            try
-            {
-                BreakExecution();
-                var result = new Result { Size = Size, Type = Type };
-                if(HasCode && resultForArg.HasCode)
-                    result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
-                if(HasRefs && resultForArg.HasRefs)
-                    result.Refs = Refs.Sequence(resultForArg.Refs);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            var result = new Result { Size = Size, Type = Type };
+            if (HasCode && resultForArg.HasCode)
+                result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
+            if (HasRefs && resultForArg.HasRefs)
+                result.Refs = Refs.Sequence(resultForArg.Refs);
+            return result;
         }
 
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Refs> replacementRefs)
@@ -524,16 +533,6 @@ namespace Reni
             return result;
         }
 
-        internal Result SafeList(Result result, Category category)
-        {
-            var destructorResult = Type.Destructor(category);
-            if(destructorResult.IsEmpty)
-                return CreateSequence(result, category);
-
-            NotImplementedMethod(result, category);
-            throw new NotImplementedException();
-        }
-
         internal Result LocalBlock(Category category, RefAlignParam refAlignParam)
         {
             if(!category.HasCode && !category.HasRefs)
@@ -565,10 +564,10 @@ namespace Reni
             return Type.AutomaticDereferenceResult(CompleteCategory).ReplaceArg(this);
         }
 
-        internal static Result ConcatPrintResult(Category category, int count, Func<int,Result> elemResults)
+        internal static Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)
         {
             var result = TypeBase.VoidResult(category);
-            if (!(category.HasCode || category.HasRefs))
+            if(!(category.HasCode || category.HasRefs))
                 return result;
 
             if(category.HasCode)
@@ -617,8 +616,11 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result ContextReferenceViaStructReference(Structure accessPoint) { return accessPoint
-            .ContextReferenceViaStructReference(this); }
+        internal Result ContextReferenceViaStructReference(Structure accessPoint)
+        {
+            return accessPoint
+                .ContextReferenceViaStructReference(this);
+        }
     }
 
     internal sealed class Error

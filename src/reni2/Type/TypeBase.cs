@@ -406,28 +406,24 @@ namespace Reni.Type
                     return ReturnMethodDump<Result>(null);
 
                 Dump("feature", feature);
-                var result = feature.Apply(category, refAlignParam);
-                Dump("result", result);
-                if(result.HasArg)
-                {
-                    var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
-                    var reference = ToReference(refAlignParam);
-                    Dump("reference", reference);
-                    if (reference != typeOfArgInApplyResult)
-                    {
-                        Dump("typeOfArgInApplyResult", typeOfArgInApplyResult);
-                        BreakExecution();
-                        var conversion = reference.Conversion(category.Typed, typeOfArgInApplyResult);
-                        Dump("conversion", conversion);
-                        result = result.ReplaceArg(conversion);
-                    }
-                }
+                var result = feature
+                    .Apply(category, refAlignParam)
+                    .ReplaceArg(()=>ConvertObject(category, refAlignParam, feature));
                 return ReturnMethodDump(result,true);
             }
             finally
             {
                 EndMethodDump();
             }
+        }
+
+        private Result ConvertObject(Category category, RefAlignParam refAlignParam, IFeature feature)
+        {
+            var featureObject = feature.TypeOfArgInApplyResult(refAlignParam);
+            var reference = ToReference(refAlignParam);
+            if(reference == featureObject)
+                return featureObject.ArgResult(category);
+            return reference.Conversion(category.Typed, featureObject);
         }
 
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
