@@ -65,6 +65,8 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase ValueTypeField { get { return ValueType; } }
         [DisableDump]
+        internal TypeBase ValueTypeFunction { get { return ValueType; } }
+        [DisableDump]
         private TypeBase ValueTypeReference { get { return AccessValueType.ToReference(RefAlignParam); } }
 
         internal override void Search(ISearchVisitor searchVisitor)

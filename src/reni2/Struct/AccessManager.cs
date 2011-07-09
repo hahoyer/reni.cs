@@ -37,12 +37,7 @@ namespace Reni.Struct
         private sealed class FunctionAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFunctionResult(category); }
-
-            TypeBase IAccessObject.ValueType(AccessType accessType)
-            {
-                NotImplementedMethod(accessType);
-                return null;
-            }
+            TypeBase IAccessObject.ValueType(AccessType accessType) { return accessType.ValueTypeFunction; }
 
             Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType)
             {
