@@ -209,7 +209,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == 28 && category.HasCode;
+            var trace = defineable.ObjectId == -28 && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             try
             {
@@ -257,7 +257,7 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == 20 && category.HasCode;
+            var trace = defineable.ObjectId == -20 && category.HasCode;
             StartMethodDump(trace, category, target, defineable);
             try
             {
