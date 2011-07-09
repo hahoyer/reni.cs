@@ -19,7 +19,7 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _type = type;
-            StopByObjectId(-2);
+            StopByObjectId(-3);
         }
 
         internal TypeBase Type { get { return _type; } }
