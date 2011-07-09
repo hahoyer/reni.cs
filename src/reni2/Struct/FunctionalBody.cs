@@ -22,6 +22,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -66,7 +67,9 @@ namespace Reni.Struct
 
         protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            var argsResult = argsType.ArgResult(category | Category.Type);
+            var argsResult = argsType.ArgResult(category.Typed);
+            if(argsType.IsZeroSized && category.HasCode)
+                argsResult.Code = CodeBase.Void();
             return _structure
                 .CreateFunctionCall(category, Body, argsResult);
         }
