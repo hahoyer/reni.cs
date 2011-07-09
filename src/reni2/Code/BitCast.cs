@@ -27,7 +27,8 @@ namespace Reni.Code
             _outputSize = outputSize;
             _inputSize = inputSize;
             _inputDataSize = inputDataSize;
-            StopByObjectId(-5);
+            StopByObjectId(-35);
+            StopByObjectId(-32);
         }
 
         [DisableDump]
@@ -37,6 +38,17 @@ namespace Reni.Code
         internal override Size InputSize { get { return _inputSize; } }
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
+
+        internal override CodeBase TryToCombineBack(LocalVariableAccess precedingElement)
+        {
+            return new LocalVariableAccess
+                (precedingElement.RefAlignParam
+                 , precedingElement.Holder
+                 , precedingElement.Offset
+                 , OutputSize
+                 , _inputDataSize.Min(precedingElement.DataSize)
+                );
+        }
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {

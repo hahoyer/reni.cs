@@ -91,6 +91,7 @@ namespace Reni.Code
         internal virtual CodeBase TryToCombineBack(TopFrameData precedingElement) { return null; }
         internal virtual CodeBase TryToCombineBack(TopRef precedingElement) { return null; }
         internal virtual CodeBase TryToCombineBack(LocalVariableReference precedingElement) { return null; }
+        internal virtual CodeBase TryToCombineBack(LocalVariableAccess precedingElement) { return null; }
         internal virtual FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement) { return null; }
         internal virtual FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement) { return null; }
         internal virtual FiberItem[] TryToCombineBack(BitCast preceding) { return null; }

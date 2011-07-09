@@ -306,6 +306,8 @@ namespace Reni.Context
         {
             if(ContextItem is PendingContext)
             {
+                if(category == Category.Refs)
+                    return new Result(category);
                 var result = syntax.Result(this, category);
                 Tracer.Assert(result.CompleteCategory == category);
                 return result;
@@ -318,7 +320,8 @@ namespace Reni.Context
             if(!(ContextItem is PendingContext))
                 return condSyntax.CommonResult(this, category);
 
-            if(category <= Parent.PendingCategory(condSyntax))
+            var pendingCategory = Parent.PendingCategory(condSyntax);
+            if(category <= pendingCategory)
             {
                 return condSyntax.CommonResult
                     (

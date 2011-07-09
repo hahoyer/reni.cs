@@ -11,19 +11,19 @@ namespace Reni.Code
     {
         private static int _nextObjectId;
         private readonly RefAlignParam _refAlignParam;
-        private readonly string _holder;
-        private readonly Size _offset;
+        internal readonly string Holder;
+        internal readonly Size Offset;
         private readonly Size _size;
-        private readonly Size _dataSize;
+        internal readonly Size DataSize;
 
         public LocalVariableAccess(RefAlignParam refAlignParam, string holder, Size offset, Size size, Size dataSize)
             : base(_nextObjectId++)
         {
             _refAlignParam = refAlignParam;
-            _holder = holder;
-            _offset = offset;
+            Holder = holder;
+            Offset = offset;
             _size = size;
-            _dataSize = dataSize;
+            DataSize = dataSize;
             StopByObjectId(-10);
         }
 
@@ -36,16 +36,17 @@ namespace Reni.Code
             get
             {
                 return base.NodeDump
-                       + " Holder=" + _holder
-                       + " Offset=" + _offset
+                       + " Holder=" + Holder
+                       + " Offset=" + Offset
                        + " Size=" + _size
-                       + " DataSize=" + _dataSize
+                       + " DataSize=" + DataSize
                     ;
             }
         }
 
         protected override Size GetSize() { return _size; }
-        protected override string CSharpString() { return CSharpGenerator.LocalVariableAccess(_holder, _offset, _size); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableData(Size, _holder, _offset, _dataSize); }
+        protected override string CSharpString() { return CSharpGenerator.LocalVariableAccess(Holder, Offset, _size); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableData(Size, Holder, Offset, DataSize); }
+        protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
     }
 }

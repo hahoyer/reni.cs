@@ -55,9 +55,12 @@ namespace Reni.Type
             return ValueType == destination
                    || ValueType.IsConvertable(destination, conversionParameter);
         }
-
-        protected Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
-        protected abstract CodeBase DereferenceCode();
+        
+        internal override bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
+        {
+            return ValueType == destination.ValueType
+                   || ValueType.IsConvertable(destination.ValueType, conversionParameter);
+        }
 
         internal override Result VirtualForceConversion(Category category, SequenceType destination)
         {
@@ -70,6 +73,10 @@ namespace Reni.Type
                 .ReplaceArg(DereferenceResult(typedCategory));
         }
 
+        internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination) { return ForceConversion(category, destination.ValueType).LocalReferenceResult(destination.RefAlignParam); }
+
+        protected Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
+        protected abstract CodeBase DereferenceCode();
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
     }
 }

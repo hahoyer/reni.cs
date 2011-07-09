@@ -68,12 +68,18 @@ namespace Reni
         {
         }
 
+        internal Result(Category category)
+            : this(category, ()=>Size.Zero, ()=>CodeBase.Void(), Refs.None)
+        {
+        }
+
         private bool HasSize { get { return Size != null; } }
         internal bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
         internal bool HasRefs { get { return Refs != null; } }
 
-        [Node, DisableDump]
+        [Node]
+        [EnableDumpWithExceptions]
         internal Category PendingCategory;
 
         public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }

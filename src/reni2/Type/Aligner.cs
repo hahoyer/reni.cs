@@ -62,9 +62,11 @@ namespace Reni.Type
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
         internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
         internal override bool VirtualIsConvertable(Bit destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
+        internal override bool VirtualIsConvertable(Aligner destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
         protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
         internal override Result VirtualForceConversion(Category category, Bit destination) { return ForceConversion(category, destination); }
         internal override Result VirtualForceConversion(Category category, SequenceType destination) { return ForceConversion(category, destination); }
+        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.ForceConversion(category, Parent).Align(AlignBits); }
 
         internal override AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam)
         {

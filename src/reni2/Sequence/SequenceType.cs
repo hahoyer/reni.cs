@@ -86,15 +86,7 @@ namespace Reni.Sequence
             return Element.IsConvertable(destination.Element, conversionParameter.DontUseConverter);
         }
 
-        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
-        {
-            var destAligner = destination as Aligner;
-            if(destAligner != null)
-                return IsConvertable(destAligner.Parent, conversionParameter);
-
-            NotImplementedMethod(destination, conversionParameter);
-            return false;
-        }
+        internal override bool VirtualIsConvertable(Aligner destination, ConversionParameter conversionParameter) { return IsConvertable(destination.Parent, conversionParameter); }
 
         protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
 
