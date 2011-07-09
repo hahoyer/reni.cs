@@ -1,11 +1,29 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Type;
@@ -20,7 +38,15 @@ namespace Reni.Sequence
         [DisableDump]
         internal readonly IFeature BitDumpPrintFeature;
 
-        internal Result EnableCutFeature(Category category) { return new EnableCut(this).ArgResult(category); }
+        internal Result EnableCutFeature(Category category, RefAlignParam refAlignParam)
+        {
+            return new Result
+                (category
+                 , () => Size
+                 , () => new EnableCut(this)
+                 , () => ToReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size)
+                );
+        }
 
         internal IFeature Feature(FeatureBase featureBase) { return new FunctionalFeature(this, featureBase); }
 
@@ -55,7 +81,7 @@ namespace Reni.Sequence
 
         internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
         {
-            if (conversionParameter.IsDisableCut && Count > destination.Count)
+            if(conversionParameter.IsDisableCut && Count > destination.Count)
                 return false;
             return Element.IsConvertable(destination.Element, conversionParameter.DontUseConverter);
         }
@@ -66,7 +92,7 @@ namespace Reni.Sequence
             if(destAligner != null)
                 return IsConvertable(destAligner.Parent, conversionParameter);
 
-            NotImplementedMethod(destination,conversionParameter);
+            NotImplementedMethod(destination, conversionParameter);
             return false;
         }
 
@@ -160,5 +186,4 @@ namespace Reni.Sequence
 
         protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
     }
-
 }
