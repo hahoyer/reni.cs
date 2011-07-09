@@ -80,7 +80,6 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter) { return ValueType.IsConvertable(destination, conversionParameter); }
         protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
         protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
 

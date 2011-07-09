@@ -150,7 +150,7 @@ namespace Reni.Type
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
         {
-            BreakNext(); StartMethodDump(ObjectId == 3, category, destination);
+            BreakNext(); StartMethodDump(ObjectId == -3, category, destination);
             try
             {
                 var fieldAsValue = ValueReferenceViaFieldReference(category.Typed);
