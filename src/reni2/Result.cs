@@ -482,7 +482,7 @@ namespace Reni
         {
             var result = new Result { Size = Size, Type = Type };
             if (HasCode && resultForArg.HasCode)
-                result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
+                result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
             if (HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.Sequence(resultForArg.Refs);
             return result;

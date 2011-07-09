@@ -165,7 +165,7 @@ namespace Reni.Code
 
         protected virtual IEnumerable<CodeBase> AsList() { return new[] {this}; }
 
-        internal CodeBase ReplaceArg(CodeBase argCode, TypeBase argType)
+        internal CodeBase ReplaceArg(TypeBase argType, CodeBase argCode)
         {
             try
             {
@@ -263,7 +263,7 @@ namespace Reni.Code
             if(!resultSize.IsZero)
             {
                 result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize))
-                    .Sequence(copier.ReplaceArg(LocalVariableReference(refAlignParam, holder), null));
+                    .Sequence(copier.ReplaceArg(null, LocalVariableReference(refAlignParam, holder)));
             }
 
             return result.CreateFiber(new Drop(Size, resultSize));

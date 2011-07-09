@@ -45,7 +45,7 @@ namespace Reni.Code
         internal CodeBase AccompayningDestructorCode(ref Size size, string holder)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(LocalVariableReference(RefAlignParam, holder),null);
+            return DestructorCode.ReplaceArg(null, LocalVariableReference(RefAlignParam, holder));
         }
     }
 }
