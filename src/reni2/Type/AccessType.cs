@@ -74,12 +74,12 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal Result AssignmentFeatureResult(Category category)
+        internal Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
         {
             var result = new Result
                 (category
-                 , () => RefAlignParam.RefSize
-                 , () => UniqueFunctionalType(_assignmentFeatureCache.Value, RefAlignParam)
+                 , () => refAlignParam.RefSize
+                 , () => UniqueFunctionalType(_assignmentFeatureCache.Value, refAlignParam)
                  , ArgCode
                  , Refs.None
                 );

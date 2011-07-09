@@ -38,6 +38,6 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal Result DumpPrintResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(_value.DumpPrintText)); }
+        internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Void.Result(category, () => CodeBase.DumpPrintText(_value.DumpPrintText)); }
     }
 }

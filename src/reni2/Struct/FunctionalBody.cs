@@ -74,7 +74,7 @@ namespace Reni.Struct
                 .CreateFunctionCall(category, Body, argsResult);
         }
 
-        internal Result DumpPrintResult(Category category)
+        internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category);
             return null;

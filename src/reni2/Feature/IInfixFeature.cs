@@ -32,15 +32,15 @@ namespace Reni.Feature
     internal sealed class Feature : IFeature
     {
         [EnableDump]
-        private readonly Func<Category, Result> _function;
+        private readonly Func<Category, RefAlignParam, Result> _function;
 
-        public Feature(Func<Category, Result> function)
+        public Feature(Func<Category, RefAlignParam, Result> function)
         {
             _function = function;
             Tracer.Assert(_function.Target is TypeBase);
         }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return _function(category); }
+        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
         TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
     }
 
