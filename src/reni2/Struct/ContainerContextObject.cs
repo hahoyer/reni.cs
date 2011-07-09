@@ -77,12 +77,6 @@ namespace Reni.Struct
             return result;
         }
 
-        private Size FieldOffsetFromContextReference(int position)
-        {
-            return Container
-                       .ConstructionResult(Category.Size, Parent, 0, position + 1).Size*-1;
-        }
-
         private Size ContextReferenceOffsetFromAccessPoint(int position)
         {
             return Container

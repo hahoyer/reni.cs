@@ -138,7 +138,11 @@ namespace Reni.Struct
 
         internal Size FieldOffset(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
 
-        internal Result DumpPrintResultViaStructReference(Category category) { return ContextReferenceViaStructReference(DumpPrintResultViaContextReference(category)); }
+        internal Result DumpPrintResultViaStructReference(Category category)
+        {
+            return DumpPrintResultViaContextReference(category)
+                .ContextReferenceViaStructReference(this);
+        }
 
         internal Result DumpPrintResultViaContextReference(Category category)
         {
@@ -192,7 +196,7 @@ namespace Reni.Struct
                 .ReplaceArg(accessType.FieldReferenceViaStructReference(category | Category.Type));
         }
 
-        private Result ContextReferenceViaStructReference(Result result) { return ContainerContextObject.ContextReferenceViaStructReference(EndPosition, result); }
+        internal Result ContextReferenceViaStructReference(Result result) { return ContainerContextObject.ContextReferenceViaStructReference(EndPosition, result); }
         private CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize*-1); }
         private AccessType AccessType(int position) { return ContainerContextObject.InnerType(position).AccessType(this, position); }
     }
