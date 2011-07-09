@@ -271,7 +271,7 @@ namespace Reni.Context
                 if (operationResult == null)
                     return ReturnMethodDump<Result>(null);
 
-                var targetResult = ResultAsReference(category | Category.Type, target);
+                var targetResult = ResultAsReference(category.Typed, target);
                 Dump("targetResult", targetResult);
                 BreakExecution();
                 var result = operationResult.ReplaceArg(targetResult);

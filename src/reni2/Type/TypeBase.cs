@@ -408,7 +408,7 @@ namespace Reni.Type
                 Dump("feature", feature);
                 var result = feature
                     .Apply(category, refAlignParam)
-                    .ReplaceArg(()=>ConvertObject(category, refAlignParam, feature));
+                    .ReplaceArg(()=>ConvertObject(category.Typed, refAlignParam, feature));
                 return ReturnMethodDump(result,true);
             }
             finally
