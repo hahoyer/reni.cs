@@ -12,40 +12,29 @@ namespace Reni.Sequence
 {
     internal sealed class PrefixFeature : ReniObject, IFeature, IPrefixFeature
     {
-        private readonly SequenceType _parent;
+        private readonly SequenceType _objectType;
         private readonly ISequenceOfBitPrefixOperation _definable;
 
-        internal PrefixFeature(SequenceType parent, ISequenceOfBitPrefixOperation definable)
+        internal PrefixFeature(SequenceType objectType, ISequenceOfBitPrefixOperation definable)
         {
-            _parent = parent;
+            _objectType = objectType;
             _definable = definable;
         }
 
         IFeature IPrefixFeature.Feature { get { return this; } }
 
-        TypeBase IFeature.ObjectType { get { return _parent; } }
+        TypeBase IFeature.ObjectType { get { return _objectType; } }
 
         Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
         {
-            return Apply(category, _parent.UnrefSize, refAlignParam)
-                .ReplaceArg(_parent.ConvertToBitSequence(category));
-        }
-
-        private Result Apply(Category category, Size objSize, RefAlignParam refAlignParam)
-        {
-            var type = TypeBase.Number(objSize.ToInt());
-            return type
-                .Result
-                (category
-                , () => BitSequenceOperation(type.Size, _definable, type.UniqueAutomaticReference(refAlignParam)));
-        }
-
-        private static CodeBase BitSequenceOperation(Size size, ISequenceOfBitPrefixOperation feature, AutomaticReferenceType objectType)
-        {
-            return objectType
-                .ArgCode()
-                .Dereference(objectType.RefAlignParam, objectType.ValueType.Size.ByteAlignedSize)
-                .BitSequenceOperation(feature, size);
+            var resultForArg = _objectType
+                .UniqueAutomaticReference(refAlignParam)
+                .ArgResult(category.Typed)
+                .AutomaticDereference()
+                .Align(refAlignParam.AlignBits);
+            return _objectType
+                .Result(category, () => _objectType.BitSequenceOperation(_definable))
+                .ReplaceArg(resultForArg);
         }
     }
 }

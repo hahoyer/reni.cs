@@ -395,19 +395,20 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -20 && category.HasCode;
+            var trace = defineable.ObjectId == 14 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
                 BreakExecution();
                 var searchResult = SearchDefineable<TFeature>(defineable);
                 var feature = searchResult.ConvertToFeature();
-                if(feature == null)
-                    return ReturnMethodDump<Result>(null);
-
                 Dump("feature", feature);
-                var result = feature
-                    .Apply(category, refAlignParam)
+                if (feature == null)
+                    return ReturnMethodDump<Result>(null);
+                var apply = feature.Apply(category, refAlignParam);
+                Dump("apply", apply);
+                BreakExecution();
+                var result = apply
                     .ReplaceArg(()=>ConvertObject(category.Typed, refAlignParam, feature));
                 return ReturnMethodDump(result,true);
             }
@@ -472,6 +473,12 @@ namespace Reni.Type
         {
             NotImplementedMethod(category, destination);
             return null;
+        }
+        internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
+        {
+            return Align(BitsConst.SegmentAlignBits)
+                .ArgCode()
+                .BitSequenceOperation(token, Size);
         }
     }
 }
