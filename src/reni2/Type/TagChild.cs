@@ -29,16 +29,17 @@ namespace Reni.Type
         protected TagChild(TypeBase parent)
             : base(parent) { }
 
+        [DisableDump]
         protected abstract string TagTitle { get; }
+        [DisableDump]
+        protected override bool IsInheritor { get { return true; } }
+        internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
+
         protected override Size GetSize() { return Parent.Size; }
         internal override string DumpShort() { return Parent.DumpShort() + "[" + TagTitle + "]"; }
-        internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
         internal override Result ArrayDestructor(Category category, int count) { return Parent.ArrayDestructor(category, count); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
-        protected virtual Result VirtualForceConversion(Category category, TypeBase destination) { return Parent.ForceConversion(category, destination); }
-        internal virtual bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
-        protected override bool IsInheritor { get { return true; } }
     }
 }

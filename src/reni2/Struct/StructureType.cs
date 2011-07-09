@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
@@ -51,36 +50,11 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        protected Result VirtualForceConversion(Category category, TypeBase destination)
-        {
-            Tracer.Assert(destination.IsVoid);
-            Tracer.Assert(Size.IsZero);
-            return destination.Result
-                (category
-                , destination.ArgCode
-                , () => Structure.ConstructorRefs
-                );
-        }
-
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
         [DisableDump]
         internal override bool IsZeroSized { get { return Structure.IsZeroSized; } }
 
-        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
-        {
-            if(destination.IsVoid)
-                return Size.IsZero;
-            NotImplementedMethod(destination, conversionParameter);
-            return false;
-        }
-
-        internal CodeBase LocalCode()
-        {
-            return LocalReferenceCode(RefAlignParam)
-                .Dereference(RefAlignParam, Size);
-        }
-
-        internal Result DumpPrintResult(Category category) { return Structure.DumpPrintResultViaStructReference(category); }
+        internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Structure.DumpPrintResultViaStructReference(category); }
     }
 }
