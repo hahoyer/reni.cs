@@ -79,7 +79,7 @@ namespace Reni.Struct
         public Result CreateCall(Category category, Result args)
         {
             var trace = ObjectId == -10 && (category.HasRefs || category.HasRefs);
-            StartMethodDump(true, trace, category);
+            BreakNext(); StartMethodDump(trace, category);
             try
             {
                 var localCategory = category;
@@ -92,7 +92,7 @@ namespace Reni.Struct
                 if(category.HasCode)
                     result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
 
-                return ReturnMethodDump(true, result);
+                BreakNext(); return ReturnMethodDump(result);
             }
             finally
             {
@@ -123,25 +123,25 @@ namespace Reni.Struct
                 return null;
 
             var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
-            StartMethodDump(true, trace, category);
+            BreakNext(); StartMethodDump(trace, category);
             try
             {
                 var categoryEx = category | Category.Type;
                 var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
                 Dump("functionContext", functionContext);
                 var rawResult = functionContext.Result(categoryEx, _body).Clone();
-                Dump("rawResult", rawResult, true);
+                BreakNext(); Dump("rawResult", rawResult);
 
                 var postProcessedResult =
                     rawResult
                         .PostProcessor
                         .FunctionResult(category, _structure.RefAlignParam);
 
-                Dump("postProcessedResult", postProcessedResult, true);
+                BreakNext(); Dump("postProcessedResult", postProcessedResult);
                 var result =
                     postProcessedResult
                         .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
-                return ReturnMethodDump(false, result);
+                BreakNext(); return ReturnMethodDump(result);
             }
             finally
             {

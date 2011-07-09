@@ -209,8 +209,8 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -22;
-            StartMethodDump(true, trace, category, left, defineable, right);
+            var trace = defineable.ObjectId == -20 && category.HasCode;
+            BreakNext(); StartMethodDump(trace, category, left, defineable, right);
             try
             {
                 var categoryForFunctionals = category;
@@ -236,15 +236,15 @@ namespace Reni.Context
                 }
 
                 if (right == null)
-                    return ReturnMethodDump(true, suffixOperationResult);
+                    return ReturnMethodDump(suffixOperationResult);
 
                 var rightResult = ResultAsReference(categoryForFunctionals, right);
                 Dump("suffixOperationResult", suffixOperationResult);
-                Dump("rightResult", rightResult, true);
+                BreakNext(); Dump("rightResult", rightResult);
                 var result = suffixOperationResult
                     .Type
                     .FunctionalFeature.Apply(category, suffixOperationResult, rightResult, RefAlignParam);
-                return ReturnMethodDump(true, result);
+                BreakNext(); return ReturnMethodDump(result);
             }
             finally
             {
@@ -255,21 +255,21 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == 25;
-            StartMethodDump(true, trace, category, target, defineable);
+            var trace = defineable.ObjectId == -20 && category.HasCode;
+            BreakNext(); StartMethodDump(trace, category, target, defineable);
             try
             {
                 var targetType = Type(target);
-                Dump("targetType", targetType, true);
+                BreakNext(); Dump("targetType", targetType);
                 var operationResult = targetType.OperationResult<TFeature>(category, defineable, RefAlignParam);
                 if(operationResult == null)
-                    return ReturnMethodDump<Result>(false, null);
+                    return ReturnMethodDump<Result>(null);
 
-                Dump("operationResult", operationResult, true);
+                BreakNext(); Dump("operationResult", operationResult);
                 var targetResult = ResultAsReference(category | Category.Type, target);
-                Dump("targetResult", targetResult, true);
+                BreakNext(); Dump("targetResult", targetResult);
                 var result = operationResult.ReplaceArg(targetResult);
-                return ReturnMethodDump(true, result);
+                BreakNext(); return ReturnMethodDump(result);
             }
             finally
             {

@@ -32,7 +32,7 @@ namespace Reni.Type
         Result IFunctionalFeature.Apply(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == -98;
-            StartMethodDump(false, trace, category);
+            BreakNext(); StartMethodDump(trace, category);
             try
             {
                 var applyResult = Apply(category, argsResult.Type, refAlignParam)
@@ -40,14 +40,14 @@ namespace Reni.Type
                     .ReplaceObjectRefByArg(refAlignParam, ObjectType);
 
                 if(!category.HasCode && !category.HasRefs || ObjectType.Size.IsZero)
-                    return ReturnMethodDump(true, applyResult);
+                    return ReturnMethodDump(applyResult);
 
-                Dump("applyResult", applyResult, true);
+                BreakNext(); Dump("applyResult", applyResult);
                 var objectResult = ObjectType
                     .UniqueAutomaticReference(refAlignParam)
                     .Result(category.Typed, operationResult);
                 var result = applyResult.ReplaceArg(objectResult);
-                return ReturnMethodDump(true, result);
+                BreakNext(); return ReturnMethodDump(result);
             }
             finally
             {
