@@ -209,7 +209,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -20 && category.HasCode;
+            var trace = defineable.ObjectId == 28 && category.HasCode;
             BreakNext(); StartMethodDump(trace, category, left, defineable, right);
             try
             {
@@ -221,7 +221,7 @@ namespace Reni.Context
                 {
                     var prefixOperationResult = OperationResult<IPrefixFeature>(category, right, defineable);
                     if(prefixOperationResult != null)
-                        return prefixOperationResult;
+                        return ReturnMethodDump(prefixOperationResult);
                 }
 
                 var suffixOperationResult =

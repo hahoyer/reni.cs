@@ -23,7 +23,7 @@ namespace Reni
             : base(_nextId++)
         {
             _data = new List<IReferenceInCode>();
-            StopByObjectId(-49);
+            StopByObjectId(-10);
         }
 
         private Refs(IReferenceInCode context)

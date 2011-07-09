@@ -19,7 +19,7 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _context = context;
-            StopByObjectId(-2);
+            StopByObjectId(-10);
         }
 
         internal IReferenceInCode Context { get { return _context; } }

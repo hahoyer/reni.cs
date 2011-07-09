@@ -122,14 +122,13 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = ObjectId == -10 && (category.HasCode || category.HasRefs);
+            var trace = ObjectId == -1 && (category.HasCode || category.HasRefs);
             BreakNext(); StartMethodDump(trace, category);
             try
             {
-                var categoryEx = category | Category.Type;
                 var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
                 Dump("functionContext", functionContext);
-                var rawResult = functionContext.Result(categoryEx, _body).Clone();
+                var rawResult = functionContext.Result(category.Typed, _body).Clone();
                 BreakNext(); Dump("rawResult", rawResult);
 
                 var postProcessedResult =
