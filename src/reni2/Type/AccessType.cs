@@ -125,14 +125,15 @@ namespace Reni.Type
         private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
-            StartMethodDump(true, category);
+            StartMethodDump(false, category);
             try
             {
                 BreakExecution();
                 var result = ValueType
                     .PropertyResult(category - Category.Type)
                     .LocalReferenceResult(RefAlignParam)
-                    .ContextReferenceViaStructReference(AccessPoint);
+                    .ContextReferenceViaStructReference(AccessPoint)
+                    .ReplaceArg(StructReferenceViaFieldReference(category));
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -140,13 +141,12 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
+        private Result StructReferenceViaFieldReference(Category category) { return AccessPoint.ReferenceType.Result(category, ArgCode); }
         internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode); }
 
-        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, FieldReferenceCodeViaStructReference); }
+        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode()); }
 
         private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
-
-        private CodeBase FieldReferenceCodeViaStructReference() { return AccessPoint.ReferenceType.ArgCode(); }
 
         internal override TypeBase AutomaticDereference() { return AccessValueType; }
         protected override CodeBase DereferenceCode() { return ValueReferenceViaFieldReferenceCode().Dereference(RefAlignParam, AccessValueType.Size); }
@@ -160,7 +160,7 @@ namespace Reni.Type
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
         {
-            StartMethodDump(ObjectId == 11, category, destination);
+            StartMethodDump(ObjectId == -11, category, destination);
             try
             {
                 BreakExecution();
