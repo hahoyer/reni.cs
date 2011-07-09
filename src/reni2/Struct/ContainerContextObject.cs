@@ -64,7 +64,10 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Result ReplaceContextReferenceByThisReference(int position, Result result) { return result.ReplaceAbsolute(this, () => ReplaceContextReferenceByThisReferenceCode(position), Refs.None); }
+        internal Result ContextReferenceViaStructReference(int position, Result result)
+        {
+            return result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), Refs.None);
+        }
 
         internal Result Result(Category category, Result innerResult)
         {
@@ -108,7 +111,7 @@ namespace Reni.Struct
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(endPosition)* -1);
         }
 
-        private CodeBase ReplaceContextReferenceByThisReferenceCode(int accessPosition)
+        private CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)
         {
             return Parent
                 .UniqueStructure(Container)

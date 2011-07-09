@@ -48,6 +48,8 @@ namespace Reni.Type
 
         [DisableDump]
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
+        [DisableDump]
+        internal override TypeBase UnAlignedType { get { return Parent; } }
 
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
         protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
@@ -62,6 +64,7 @@ namespace Reni.Type
         internal override bool VirtualIsConvertable(Bit destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
         protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
         internal override Result VirtualForceConversion(Category category, Bit destination) { return ForceConversion(category, destination); }
+        internal override Result VirtualForceConversion(Category category, SequenceType destination) { return ForceConversion(category, destination); }
 
         internal override AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam)
         {

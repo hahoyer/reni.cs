@@ -81,6 +81,6 @@ namespace Reni.Struct
                 .Dereference(RefAlignParam, Size);
         }
 
-        internal Result DumpPrintResult(Category category) { return Structure.ReplaceContextReferenceByThisReference(category); }
+        internal Result DumpPrintResult(Category category) { return Structure.DumpPrintResultViaStructReference(category); }
     }
 }

@@ -49,6 +49,8 @@ namespace Reni.Struct
             [DisableDump]
             internal override Structure FindRecentStructure { get { return _parent._structure; } }
 
+            internal override Result PropertyResult(Category category) { return _parent.Apply(category, Void, _parent._structure.RefAlignParam); }
+
             protected override Size GetSize() { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpShort() + "/\\"; } }
             internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }

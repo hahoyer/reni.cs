@@ -55,28 +55,21 @@ namespace Reni.Type
         [DisableDump]
         private AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
         [DisableDump]
-        internal override IFunctionalFeature FunctionalFeature { get { return ValueType.FunctionalFeature; } }
+        internal override IFunctionalFeature FunctionalFeature { get { return AccessValueType.FunctionalFeature; } }
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _accessPoint; } }
-
-        internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
-        internal Result DumpPrintFieldResult(Category category) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), RefAlignParam); }
-        internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
-        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(ValueType.DumpPrintText)); }
+        [DisableDump]
+        private TypeBase AccessValueType { get { return AccessObject.ValueType(this); } }
+        [DisableDump]
+        internal TypeBase ValueTypeProperty { get { return ValueType.PropertyResult(Category.Type).Type; } }
+        [DisableDump]
+        private TypeBase ValueTypeReference { get { return AccessValueType.ToReference(RefAlignParam); } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            ValueType.Search(searchVisitor.Child(this));
-            ValueType.Search(searchVisitor);
+            AccessValueType.Search(searchVisitor.Child(this));
+            AccessValueType.Search(searchVisitor);
             base.Search(searchVisitor);
-        }
-
-        protected Result VirtualForceConversion(Category category, TypeBase destination)
-        {
-            return ValueType
-                .ToReference(RefAlignParam)
-                .ForceConversion(category, destination)
-                .ReplaceArg(ValueReferenceViaFieldReference(category));
         }
 
         internal Result AssignmentFeatureResult(Category category)
@@ -117,40 +110,58 @@ namespace Reni.Type
             return ValueTypeReference
                 .Pair(ValueTypeReference)
                 .ArgCode()
-                .Assignment(RefAlignParam, ValueType.Size);
+                .Assignment(RefAlignParam, AccessValueType.Size);
         }
 
-        private TypeBase ValueTypeReference { get { return ValueType.ToReference(RefAlignParam); } }
+        internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
+        internal Result DumpPrintFieldResult(Category category) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), RefAlignParam); }
+        internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
+        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(ValueType.DumpPrintText)); }
 
-        internal Result ConvertToAutomaticReference(Category category) { return ValueReferenceViaFieldReference(category); }
+        private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
+        internal Result ValueReferenceViaFieldReferenceProperty(Category category) { return ValueType.PropertyResult(category).LocalReferenceResult(RefAlignParam); }
+
         internal Result FieldReferenceViaStructReference(Category category) { return Result(category, FieldReferenceCodeViaStructReference); }
 
-        private Result ValueReferenceViaFieldReference(Category category)
-        {
-            return new Result
-                (category
-                 , () => RefAlignParam.RefSize
-                 , () => ValueType.ToReference(RefAlignParam)
-                 , ValueReferenceViaFieldReferenceCode
-                 , Refs.None
-                );
-        }
+        //return new Result
+        //    (category
+        //     , () => RefAlignParam.RefSize
+        //     , () => AccessValueType.ToReference(RefAlignParam)
+        //     , () => AccessObject.ValueReferenceViaFieldReference(this)
+        //     , Refs.None
+        //    );
 
         private CodeBase ValueReferenceViaFieldReferenceCode()
         {
-            return ArgCode()
-                .AddToReference(RefAlignParam, AccessPoint.FieldOffsetFromThisReference(Position));
+            return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffsetFromThisReference(Position));
         }
 
         private CodeBase FieldReferenceCodeViaStructReference() { return AccessPoint.ReferenceType.ArgCode(); }
 
-        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
+        internal override TypeBase AutomaticDereference() { return AccessValueType; }
+        protected override CodeBase DereferenceCode() { return ValueReferenceViaFieldReferenceCode().Dereference(RefAlignParam, AccessValueType.Size); }
+
+        internal override bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
         {
-            return ValueType
-                .IsConvertable(destination, conversionParameter);
+            return
+                AccessValueType == destination.ValueType
+                || AccessValueType.IsConvertable(destination.ValueType, conversionParameter);
         }
 
-        internal override TypeBase AutomaticDereference() { return ValueType; }
-        protected override CodeBase DereferenceCode() { return ValueReferenceViaFieldReferenceCode().Dereference(RefAlignParam, ValueType.Size); }
+        internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
+        {
+            BreakNext(); StartMethodDump(ObjectId == 3, category, destination);
+            try
+            {
+                var fieldAsValue = ValueReferenceViaFieldReference(category.Typed);
+                Dump("fieldAsValue", fieldAsValue);
+                var result = fieldAsValue.Conversion(destination);
+                BreakNext(); return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
     }
 }

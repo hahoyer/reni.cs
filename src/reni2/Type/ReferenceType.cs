@@ -56,30 +56,8 @@ namespace Reni.Type
                    || ValueType.IsConvertable(destination, conversionParameter);
         }
 
-        internal override bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
-        {
-            return
-                ValueType == destination.ValueType
-                || ValueType.IsConvertable(destination.ValueType, conversionParameter);
-        }
-
-        private Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
+        protected Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
         protected abstract CodeBase DereferenceCode();
-
-        internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
-        {
-            if(ValueType == destination.ValueType)
-            {
-                Tracer.Assert(this is AccessType);
-                return ((AccessType) this).ConvertToAutomaticReference(category);
-            }
-
-            var typedCategory = category | Category.Type;
-            return ValueType
-                .ForceConversion(typedCategory, destination.ValueType)
-                .ReplaceArg(DereferenceResult(typedCategory))
-                .LocalReferenceResult(RefAlignParam);
-        }
 
         internal override Result VirtualForceConversion(Category category, SequenceType destination)
         {

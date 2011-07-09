@@ -298,6 +298,9 @@ namespace Reni.Type
         [DisableDump]
         internal virtual bool IsZeroSized { get { return Size.IsZero; } }
 
+        [DisableDump]
+        internal virtual TypeBase UnAlignedType { get { return this; } }
+
         protected bool IsRefLike(AutomaticReferenceType target) { return false; }
 
         private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
@@ -313,6 +316,12 @@ namespace Reni.Type
         }
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
+
+        internal virtual Result PropertyResult(Category category)
+        {
+            NotImplementedMethod();
+            return null;
+        }
 
         internal Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
@@ -386,31 +395,32 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -22;
-            StartMethodDump(true, trace, category, defineable, refAlignParam);
+            var trace = defineable.ObjectId == -20 && category.HasCode;
+            BreakNext(); StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
                 var searchResult = SearchDefineable<TFeature>(defineable);
                 var feature = searchResult.ConvertToFeature();
                 if(feature == null)
-                    return ReturnMethodDump<Result>(false,null);
+                    return ReturnMethodDump<Result>(null);
 
-                Dump("feature", feature, true);
+                Dump("feature", feature);
                 var result = feature.Apply(category, refAlignParam);
-                Dump("result", result, true);
+                Dump("result", result);
                 if(result.HasArg)
                 {
                     var typeOfArgInApplyResult = feature.TypeOfArgInApplyResult(refAlignParam);
-                    if (ToReference(refAlignParam) != typeOfArgInApplyResult)
+                    var reference = ToReference(refAlignParam);
+                    Dump("reference", reference);
+                    if (reference != typeOfArgInApplyResult)
                     {
-                        Dump("typeOfArgInApplyResult", typeOfArgInApplyResult, true);
-                        var conversion = ToReference(refAlignParam).Conversion(category.Typed, typeOfArgInApplyResult);
-                        Dump("conversion", conversion, true);
+                        Dump("typeOfArgInApplyResult", typeOfArgInApplyResult);
+                        var conversion = reference.Conversion(category.Typed, typeOfArgInApplyResult);
+                        Dump("conversion", conversion);
                         result = result.ReplaceArg(conversion);
                     }
-                    
                 }
-                return ReturnMethodDump(true, result);
+                BreakNext(); return ReturnMethodDump(result);
             }
             finally
             {

@@ -358,7 +358,7 @@ namespace Reni
         internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
         {
             var trace = context.ObjectId == -17 && category.HasRefs && syntax.GetObjectId() == 1192;
-            StartMethodDump(true, trace, context);
+            BreakNext();StartMethodDump(trace, context);
             try
             {
                 var localCateogory = category - CompleteCategory - PendingCategory;
@@ -377,7 +377,7 @@ namespace Reni
 
                 InternalAddCategories(context, localCateogory, syntax);
                 TreatPendingCategories(context, category - CompleteCategory, syntax);
-                ReturnMethodDump(true);
+                BreakNext(); ReturnVoidMethodDump();
             }
             finally
             {
@@ -455,7 +455,7 @@ namespace Reni
         internal Result ReplaceArg(Result resultForArg)
         {
             var trace = ObjectId == 1490 && resultForArg.ObjectId == 1499;
-            StartMethodDump(false, trace, resultForArg);
+            BreakNext(); StartMethodDump(trace, resultForArg);
             try
             {
                 var result = new Result {Size = Size, Type = Type};
@@ -463,7 +463,8 @@ namespace Reni
                     result.Code = Code.ReplaceArg(resultForArg.Code, resultForArg.Type);
                 if(HasRefs && resultForArg.HasRefs)
                     result.Refs = Refs.Sequence(resultForArg.Refs);
-                return ReturnMethodDump(true, result);
+                BreakNext(); 
+                return ReturnMethodDump(result);
             }
             finally
             {
@@ -542,16 +543,6 @@ namespace Reni
 
         internal Result Conversion(TypeBase target) { return Type.Conversion(CompleteCategory, target).ReplaceArg(this); }
 
-        internal Result Dereference(TypeBase type, RefAlignParam refAlignParam)
-        {
-            return type.Result
-                (
-                    CompleteCategory,
-                    () => Code.Dereference(refAlignParam, type.Size),
-                    () => Refs
-                );
-        }
-
         internal BitsConst Evaluate()
         {
             Tracer.Assert(Refs.IsNone);
@@ -618,6 +609,7 @@ namespace Reni
                 .LocalReferenceResult(CompleteCategory, refAlignParam)
                 .ReplaceArg(this);
         }
+
     }
 
     internal sealed class Error

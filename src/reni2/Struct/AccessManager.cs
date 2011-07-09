@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -30,21 +31,59 @@ namespace Reni.Struct
         internal interface IAccessObject
         {
             Result DumpPrintOperationResult(AccessType accessType, Category category);
+            TypeBase ValueType(AccessType accessType);
+            Result ValueReferenceViaFieldReference(Category category, AccessType accessType);
         }
 
         private sealed class FunctionAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFunctionResult(category); }
+
+            TypeBase IAccessObject.ValueType(AccessType accessType)
+            {
+                NotImplementedMethod(accessType);
+                return null;
+            }
+
+            Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType)
+            {
+                NotImplementedMethod(category, accessType);
+                return null;
+            }
         }
 
         private sealed class FieldAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFieldResult(category); }
+
+            TypeBase IAccessObject.ValueType(AccessType accessType)
+            {
+                NotImplementedMethod(accessType);
+                return null;
+            }
+
+            Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType)
+            {
+                NotImplementedMethod(category, accessType);
+                return null;
+            }
         }
 
         private sealed class ProcedureCallAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintProcedureCallResult(category); }
+
+            TypeBase IAccessObject.ValueType(AccessType accessType)
+            {
+                NotImplementedMethod(accessType);
+                return null;
+            }
+
+            Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType)
+            {
+                NotImplementedMethod(category, accessType);
+                return null;
+            }
         }
 
         private sealed class PropertyAccessObject : ReniObject, IAccessObject
@@ -54,6 +93,9 @@ namespace Reni.Struct
                 NotImplementedMethod(accessType, category);
                 return null;
             }
+
+            TypeBase IAccessObject.ValueType(AccessType accessType) { return accessType.ValueTypeProperty; }
+            Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType) { return accessType.ValueReferenceViaFieldReferenceProperty(category); }
         }
 
         internal static readonly IAccessObject Function = new FunctionAccessObject();

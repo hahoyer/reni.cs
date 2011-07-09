@@ -69,7 +69,7 @@ namespace Reni.Feature.DumpPrint
         {
             return _structureType
                 .Structure
-                .DumpPrintResultFromContextReference(category);
+                .DumpPrintResultViaContextReference(category);
         }
 
         TypeBase IFeature.ObjectType { get { return _structureType; } }

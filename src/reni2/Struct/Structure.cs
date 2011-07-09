@@ -89,25 +89,29 @@ namespace Reni.Struct
         internal TypeBase IndexType { get { return ContainerContextObject.IndexType; } }
 
         private bool _isObtainStructSizeActive;
-        [DisableDump]
-        internal Size StructSize { get
-        {
-            if (_isObtainStructSizeActive)
-                throw new RecursionWhileObtainingStructSizeException(this);
 
-            try
+        [DisableDump]
+        internal Size StructSize
+        {
+            get
             {
-                _isObtainStructSizeActive = true;
-                var result = ContainerContextObject.StructSize(EndPosition);
-                _isObtainStructSizeActive = false;
-                return result;
+                if(_isObtainStructSizeActive)
+                    throw new RecursionWhileObtainingStructSizeException(this);
+
+                try
+                {
+                    _isObtainStructSizeActive = true;
+                    var result = ContainerContextObject.StructSize(EndPosition);
+                    _isObtainStructSizeActive = false;
+                    return result;
+                }
+                catch(RecursionWhileObtainingStructSizeException)
+                {
+                    _isObtainStructSizeActive = false;
+                    return null;
+                }
             }
-            catch(RecursionWhileObtainingStructSizeException)
-            {
-                _isObtainStructSizeActive = false;
-                return null;
-            }
-        } }
+        }
 
         private sealed class RecursionWhileObtainingStructSizeException : Exception
         {
@@ -133,8 +137,13 @@ namespace Reni.Struct
 
 
         internal Size FieldOffsetFromThisReference(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
-        internal Result ReplaceContextReferenceByThisReference(Category category) { return ReplaceContextReferenceByThisReference(DumpPrintResultFromContextReference(category)); }
-        internal Result DumpPrintResultFromContextReference(Category category) { return Result.ConcatPrintResult(category, EndPosition, position => DumpPrintResultFromThisReference(category, position)); }
+
+        internal Result DumpPrintResultViaStructReference(Category category) { return ContextReferenceViaStructReference(DumpPrintResultViaContextReference(category)); }
+
+        internal Result DumpPrintResultViaContextReference(Category category)
+        {
+            return Result.ConcatPrintResult(category, EndPosition, position => DumpPrintResultViaAccessReference(category, position));
+        }
 
         internal Result AccessViaThisReference(Category category, int position)
         {
@@ -173,7 +182,7 @@ namespace Reni.Struct
                 );
         }
 
-        private Result DumpPrintResultFromThisReference(Category category, int position)
+        private Result DumpPrintResultViaAccessReference(Category category, int position)
         {
             var accessType = ContainerContextObject
                 .InnerType(position)
@@ -183,7 +192,7 @@ namespace Reni.Struct
                 .ReplaceArg(accessType.FieldReferenceViaStructReference(category | Category.Type));
         }
 
-        private Result ReplaceContextReferenceByThisReference(Result result) { return ContainerContextObject.ReplaceContextReferenceByThisReference(EndPosition, result); }
+        private Result ContextReferenceViaStructReference(Result result) { return ContainerContextObject.ContextReferenceViaStructReference(EndPosition, result); }
         private CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize*-1); }
         private AccessType AccessType(int position) { return ContainerContextObject.InnerType(position).AccessType(this, position); }
     }
