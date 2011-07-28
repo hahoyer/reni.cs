@@ -1,0 +1,3 @@
+[submodule "src/HWClassLibrary"]
+	path = src/HWClassLibrary
+	url = git@github.com:hahoyer/HWClassLibrary.cs.git
