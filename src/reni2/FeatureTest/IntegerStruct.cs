@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.DefaultOperations;
+using Reni.FeatureTest.Struct;
 
 namespace Reni.FeatureTest.Integer
 {
@@ -80,6 +82,7 @@ Integer8:
     }
 
     [TestFixture]
+    [PropertyVariable, ApplyTypeOperatorWithCut]
     [Output("1")]
     [InstanceCode("Integer8(1)")]
     public sealed class DumpPrint1 : IntegerStruct
@@ -90,6 +93,7 @@ Integer8:
 
     [TestFixture]
     [Output("2")]
+    [DumpPrint1]
     [InstanceCode("Integer8(2)")]
     public sealed class DumpPrint2 : IntegerStruct
     {
@@ -98,6 +102,7 @@ Integer8:
     }
 
     [TestFixture]
+    [DumpPrint2]
     [Output("127")]
     [InstanceCode("Integer8(127)")]
     public sealed class DumpPrint127 : IntegerStruct

@@ -11,9 +11,12 @@ namespace Reni.Code
     {
         private static int _nextObjectId;
         private readonly RefAlignParam _refAlignParam;
+        [DisableDump]
         internal readonly string Holder;
+        [DisableDump]
         internal readonly Size Offset;
         private readonly Size _size;
+        [DisableDump]
         internal readonly Size DataSize;
 
         public LocalVariableAccess(RefAlignParam refAlignParam, string holder, Size offset, Size size, Size dataSize)
