@@ -41,12 +41,10 @@ namespace Reni
         private TypeBase _type;
         private CodeBase _code;
         private Refs _refs;
-        internal readonly PostProcessorForResult PostProcessor;
 
         internal Result()
             : base(_nextObjectId++)
         {
-            PostProcessor = new PostProcessorForResult(this);
             PendingCategory = new Category();
         }
 
