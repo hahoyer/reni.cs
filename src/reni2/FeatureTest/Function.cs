@@ -76,9 +76,40 @@ namespace Reni.FeatureTest.Function
     [PropertyVariable]
     [Target(@"f: (value: arg, !property x: value/\)/\;f(2) x dump_print")]
     [Output("2")]
+    public sealed class ObjectProperty : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [ObjectProperty]
+    [Target(@"f: (value: arg, x: value/\)/\;f(2) x(100) dump_print")]
+    [Output("2")]
+    public sealed class ObjectFunction1 : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [ObjectProperty]
+    [Target(@"f: (value: arg, x: arg/\)/\;f(2) x(100) dump_print")]
+    [Output("100")]
+    public sealed class ObjectFunction2 : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [ObjectFunction1]
+    [ObjectFunction2]
+    [Target(@"f: (value: arg, x: arg+value/\)/\;f(2) x(100) dump_print")]
+    [Output("102")]
     public sealed class ObjectFunction : CompilerTest
     {
-        [Test, IsUnderConstruction]
+        [Test]
         public override void Run() { BaseRun(); }
     }
 

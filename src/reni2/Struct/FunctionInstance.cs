@@ -143,7 +143,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = ObjectId == -1 && (category.HasCode || category.HasRefs);
+            var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {

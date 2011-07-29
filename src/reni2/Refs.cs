@@ -117,18 +117,29 @@ namespace Reni
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)
         {
-            var p = endOfRefsCode.AddToReference(refAlignParam, refAlignParam.RefSize*-_data.Count);
-            var result = code;
-            for(var i = 0; i < _data.Count; i++)
+            StartMethodDump(false, code, refAlignParam, endOfRefsCode);
+            try
             {
-                var unrefAlignment = _data[i].RefAlignParam;
-                Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
-                var unrefPtrAlignment = refAlignParam;
-                var replacement = p.Dereference(unrefPtrAlignment, unrefAlignment.RefSize);
-                result = result.ReplaceAbsolute(_data[i], () => replacement);
-                p = p.AddToReference(unrefPtrAlignment, unrefPtrAlignment.RefSize);
+                var reference = endOfRefsCode.AddToReference(refAlignParam, refAlignParam.RefSize*-_data.Count);
+                var result = code;
+                foreach(var referenceInCode in _data)
+                {
+                    Dump("reference", reference);
+                    BreakExecution();
+                    var unrefAlignment = referenceInCode.RefAlignParam;
+                    Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
+                    var unrefPtrAlignment = refAlignParam;
+                    var replacement = reference.Dereference(unrefPtrAlignment, unrefAlignment.RefSize);
+                    result = result.ReplaceAbsolute(referenceInCode, () => replacement);
+                    Dump("result", result);
+                    reference = reference.AddToReference(unrefPtrAlignment, unrefPtrAlignment.RefSize);
+                }
+                return ReturnMethodDump(result,true);
             }
-            return result;
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         public static Refs operator +(Refs x, Refs y) { return x.Sequence(y); }

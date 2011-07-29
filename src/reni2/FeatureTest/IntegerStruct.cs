@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.DefaultOperations;
+using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Struct;
 
 namespace Reni.FeatureTest.Integer
@@ -52,7 +53,7 @@ Integer8:
     [TestFixture]
     [Output("3")]
     [InstanceCode("(Integer8(1)+2)")]
-    [Create]
+    [Create, ObjectFunction]
     public sealed class IntegerPlusNumber : IntegerStruct
     {
         [Test]

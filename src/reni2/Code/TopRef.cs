@@ -47,7 +47,7 @@ namespace Reni.Code
             : this(refAlignParam, Size.Zero) { }
 
         public TopFrameRef(RefAlignParam refAlignParam, Size offset)
-            : base(refAlignParam, offset) { StopByObjectId(547); }
+            : base(refAlignParam, offset) { StopByObjectId(-46); }
 
         protected override string CSharpString() { return CSharpGenerator.CreateFrameRef(RefAlignParam, Offset); }
 
