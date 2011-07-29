@@ -42,7 +42,7 @@ namespace Reni.Type
         [DisableDump]
         internal abstract RefAlignParam RefAlignParam { get; }
 
-        internal TypeBase ValueType { get { return _valueType; } }
+        virtual internal TypeBase ValueType { get { return _valueType; } }
 
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         internal override TypeBase ToReference(RefAlignParam refAlignParam) { return this; }
@@ -75,8 +75,15 @@ namespace Reni.Type
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination) { return ForceConversion(category, destination.ValueType).LocalReferenceResult(destination.RefAlignParam); }
 
-        protected Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
+        private Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
         protected abstract CodeBase DereferenceCode();
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
+
+        internal override void Search(ISearchVisitor searchVisitor)
+        {
+            ValueType.Search(searchVisitor);
+            base.Search(searchVisitor);
+        }
+
     }
 }

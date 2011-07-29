@@ -55,24 +55,23 @@ namespace Reni.Type
         [DisableDump]
         private AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
         [DisableDump]
-        internal override IFunctionalFeature FunctionalFeature { get { return AccessValueType.FunctionalFeature; } }
+        internal override IFunctionalFeature FunctionalFeature { get { return ValueType.FunctionalFeature; } }
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _accessPoint; } }
         [DisableDump]
-        private TypeBase AccessValueType { get { return AccessObject.ValueType(this); } }
+        internal override TypeBase ValueType { get { return AccessObject.ValueType(this); } }
         [DisableDump]
-        internal TypeBase ValueTypeProperty { get { return ValueType.PropertyResult(Category.Type).Type; } }
+        internal TypeBase ValueTypeProperty { get { return base.ValueType.PropertyResult(Category.Type).Type; } }
         [DisableDump]
-        internal TypeBase ValueTypeField { get { return ValueType; } }
+        internal TypeBase ValueTypeField { get { return base.ValueType; } }
         [DisableDump]
-        internal TypeBase ValueTypeFunction { get { return ValueType; } }
+        internal TypeBase ValueTypeFunction { get { return base.ValueType; } }
         [DisableDump]
-        private TypeBase ValueTypeReference { get { return AccessValueType.ToReference(RefAlignParam); } }
+        private TypeBase ValueTypeReference { get { return ValueType.ToReference(RefAlignParam); } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            AccessValueType.Search(searchVisitor.Child(this));
-            AccessValueType.Search(searchVisitor);
+            ValueType.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);
         }
 
@@ -114,13 +113,13 @@ namespace Reni.Type
             return ValueTypeReference
                 .Pair(ValueTypeReference)
                 .ArgCode()
-                .Assignment(RefAlignParam, AccessValueType.Size);
+                .Assignment(RefAlignParam, ValueType.Size);
         }
 
         internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
         internal Result DumpPrintFieldResult(Category category) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), RefAlignParam); }
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
-        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(ValueType.DumpPrintText)); }
+        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText)); }
 
         private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
@@ -129,11 +128,11 @@ namespace Reni.Type
             try
             {
                 BreakExecution();
-                var result = ValueType
+                var result = base.ValueType
                     .PropertyResult(category)
                     .LocalReferenceResult(RefAlignParam)
                     .ContextReferenceViaStructReference(AccessPoint)
-                    .ReplaceArg(()=>StructReferenceViaFieldReference(category));
+                    .ReplaceArg(()=>StructReferenceViaFieldReference(category.Typed));
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -148,14 +147,14 @@ namespace Reni.Type
 
         private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 
-        internal override TypeBase AutomaticDereference() { return AccessValueType; }
-        protected override CodeBase DereferenceCode() { return ValueReferenceViaFieldReferenceCode().Dereference(RefAlignParam, AccessValueType.Size); }
+        internal override TypeBase AutomaticDereference() { return ValueType; }
+        protected override CodeBase DereferenceCode() { return ValueReferenceViaFieldReference(Category.Code).Code.Dereference(RefAlignParam, ValueType.Size); }
 
         internal override bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
         {
             return
-                AccessValueType == destination.ValueType
-                || AccessValueType.IsConvertable(destination.ValueType, conversionParameter);
+                ValueType == destination.ValueType
+                || ValueType.IsConvertable(destination.ValueType, conversionParameter);
         }
 
         internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)

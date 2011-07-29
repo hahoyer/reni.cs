@@ -34,7 +34,7 @@ namespace Reni.Type
             : base(valueType)
         {
             _refAlignParam = refAlignParam;
-            Tracer.Assert(!valueType.IsZeroSized, valueType.Dump);
+            //Tracer.Assert(!valueType.IsZeroSized, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
             StopByObjectId(-2);
         }
@@ -76,7 +76,6 @@ namespace Reni.Type
         internal override void Search(ISearchVisitor searchVisitor)
         {
             ValueType.Search(searchVisitor.Child(this));
-            ValueType.Search(searchVisitor);
             base.Search(searchVisitor);
         }
 
