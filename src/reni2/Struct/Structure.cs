@@ -136,7 +136,7 @@ namespace Reni.Struct
         private ICompileSyntax[] Statements { get { return ContainerContextObject.Statements; } }
 
 
-        internal Size FieldOffset(int position) { return ContainerContextObject.ContextReferenceOffsetFromAccessPoint(position + 1)*-1; }
+        internal Size FieldOffset(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
 
         internal Result DumpPrintResultViaStructReference(Category category)
         {
@@ -144,12 +144,15 @@ namespace Reni.Struct
                 .ContextReferenceViaStructReference(this);
         }
 
-        internal Result DumpPrintResultViaContextReference(Category category) { return Result.ConcatPrintResult(category, EndPosition, position => DumpPrintResultViaAccessReference(category, position)); }
+        internal Result DumpPrintResultViaContextReference(Category category)
+        {
+            return Result.ConcatPrintResult(category, EndPosition, position => DumpPrintResultViaAccessReference(category, position));
+        }
 
         internal Result AccessViaThisReference(Category category, int position)
         {
             return AccessType(position)
-                .Result(category, () => ReferenceType.ArgCode().AddToReference(RefAlignParam, StructSize));
+                .Result(category, () => ReferenceType.ArgCode());
         }
 
         internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable)

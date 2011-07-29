@@ -70,10 +70,8 @@ namespace Reni.Struct
             var argsResult = argsType.ArgResult(category.Typed);
             if(argsType.IsZeroSized && category.HasCode)
                 argsResult.Code = CodeBase.Void();
-            var objectReferenceResult = _structure.Type.UniqueObjectReference(refAlignParam).Result(category);
             return _structure
-                .CreateFunctionCall(category, Body, argsResult)
-                .ReplaceAbsolute(_structure.ContainerContextObject, () => objectReferenceResult.Code, () => objectReferenceResult.Refs);
+                .CreateFunctionCall(category, Body, argsResult);
         }
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam)

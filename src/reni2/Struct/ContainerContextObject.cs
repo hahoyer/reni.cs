@@ -77,7 +77,7 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Size ContextReferenceOffsetFromAccessPoint(int position)
+        private Size ContextReferenceOffsetFromAccessPoint(int position)
         {
             return Container
                 .ConstructionResult(Category.Size, Parent, 0, position).Size;
@@ -113,6 +113,7 @@ namespace Reni.Struct
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 
+        internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition) { return Container.ConstructionSize(Parent, fieldPosition + 1, accessPosition); }
         internal bool IsZeroSized(int accessPosition) { return Container.IsZeroSized(Parent, 0, accessPosition); }
     }
 }
