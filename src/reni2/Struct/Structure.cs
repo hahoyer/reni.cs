@@ -152,7 +152,7 @@ namespace Reni.Struct
         internal Result AccessViaThisReference(Category category, int position)
         {
             return AccessType(position)
-                .Result(category, () => ReferenceType.ArgCode());
+                .Result(category, () => ReferenceType.ArgCode().AddToReference(RefAlignParam,StructSize));
         }
 
         internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable)
