@@ -14,7 +14,7 @@ namespace Reni.Type
         public ConversionFeature(TypeBase objectType) { _objectType = objectType; }
 
         internal override string DumpShort() { return _objectType.DumpShort() + " type"; }
-        protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return argsType.Conversion(category, _objectType); }
+        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return argsType.Conversion(category, _objectType); }
         protected override TypeBase ObjectType { get { return _objectType; } }
     }
 }

@@ -52,7 +52,7 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<IFeature, Sequence.SequenceType> ISearchPath<ISearchPath<IFeature, Sequence.SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<IFeature, AutomaticReferenceType> ISearchPath<ISearchPath<IFeature, AutomaticReferenceType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
+        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category, refAlignParam);
             return null;

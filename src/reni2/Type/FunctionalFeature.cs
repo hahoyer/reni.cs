@@ -26,17 +26,20 @@ namespace Reni.Type
 {
     internal abstract class FunctionalFeature : ReniObject, IFunctionalFeature
     {
-        protected abstract Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        private static int _nextObjectId;
+        protected FunctionalFeature()
+            : base(_nextObjectId++) {}
+        protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         protected abstract TypeBase ObjectType { get; }
 
-        Result IFunctionalFeature.Apply(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -98;
-            StartMethodDump(trace, category);
+            var trace = ObjectId < 0 && category.HasCode;
+            StartMethodDump(trace, category,operationResult,argsResult,refAlignParam);
             try
             {
                 BreakExecution();
-                var applyResult = Apply(category, argsResult.Type, refAlignParam)
+                var applyResult = ObtainApplyResult(category, argsResult.Type, refAlignParam)
                     .ReplaceArg(argsResult)
                     .ReplaceObjectRefByArg(refAlignParam, ObjectType);
 
@@ -48,6 +51,8 @@ namespace Reni.Type
                 var objectResult = ObjectType
                     .UniqueAutomaticReference(refAlignParam)
                     .Result(category.Typed, operationResult);
+                Dump("objectResult", objectResult);
+                BreakExecution();
                 var result = applyResult.ReplaceArg(objectResult);
                 return ReturnMethodDump(result, true);
             }

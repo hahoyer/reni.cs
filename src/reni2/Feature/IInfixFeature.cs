@@ -14,7 +14,7 @@ namespace Reni.Feature
 
     internal interface IFeature
     {
-        Result Apply(Category category, RefAlignParam refAlignParam);
+        Result ObtainResult(Category category, RefAlignParam refAlignParam);
         TypeBase ObjectType { get; }
     }
 
@@ -26,7 +26,7 @@ namespace Reni.Feature
 
     internal interface IContextFeature
     {
-        Result Apply(Category category);
+        Result ObtainResult(Category category);
     }
 
     internal sealed class Feature : IFeature
@@ -40,7 +40,7 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is TypeBase);
         }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
+        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
         TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
     }
 

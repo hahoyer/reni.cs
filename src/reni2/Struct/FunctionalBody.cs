@@ -39,7 +39,7 @@ namespace Reni.Struct
             _structure = structure;
             _body = body;
             _typeCache = new SimpleCache<Type>(() => new Type(this));
-            StopByObjectId(1);
+            StopByObjectId(-1);
         }
 
         private sealed class Type : TypeBase
@@ -50,7 +50,7 @@ namespace Reni.Struct
             [DisableDump]
             internal override Structure FindRecentStructure { get { return _parent._structure; } }
 
-            internal override Result PropertyResult(Category category) { return _parent.Apply(category, Void, _parent._structure.RefAlignParam); }
+            internal override Result PropertyResult(Category category) { return _parent.ObtainApplyResult(category, Void, _parent._structure.RefAlignParam); }
 
             protected override Size GetSize() { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpShort() + "/\\"; } }
@@ -65,7 +65,7 @@ namespace Reni.Struct
 
         internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
 
-        protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
             var argsResult = argsType.ArgResult(category.Typed);
             if(argsType.IsZeroSized && category.HasCode)

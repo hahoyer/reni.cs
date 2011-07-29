@@ -25,7 +25,7 @@ namespace Reni.Sequence
 
         TypeBase IFeature.ObjectType { get { return _objectType; } }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
+        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
         {
             var resultForArg = _objectType
                 .UniqueAutomaticReference(refAlignParam)

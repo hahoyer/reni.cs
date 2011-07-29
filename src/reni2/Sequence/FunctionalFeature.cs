@@ -46,7 +46,7 @@ namespace Reni.Sequence
 
         internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
+        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
         {
             return new Result
                 (category
@@ -56,7 +56,7 @@ namespace Reni.Sequence
                 );
         }
 
-        protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
             Tracer.Assert(_objectType.Element == TypeBase.Bit);
             var typedCategory = category | Category.Type;

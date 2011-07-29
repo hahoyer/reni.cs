@@ -97,7 +97,7 @@ namespace Reni.Type
             }
         }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
+        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category);
             return null;
@@ -154,7 +154,7 @@ namespace Reni.Type
             }
         }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
+        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category);
             return null;
@@ -182,7 +182,7 @@ namespace Reni.Type
             ICompileSyntax @object,
             ICompileSyntax args) { return ApplyResult(callContext, category, @object, args, _type.Element, _type.Count + 1); }
 
-        Result IFeature.Apply(Category category, RefAlignParam refAlignParam)
+        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(category);
             return null;

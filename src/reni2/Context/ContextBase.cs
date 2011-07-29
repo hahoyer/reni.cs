@@ -209,7 +209,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -28 && category.HasCode;
+            var trace = defineable.ObjectId == -30 && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             try
             {
@@ -245,7 +245,7 @@ namespace Reni.Context
                 BreakExecution();
                 var result = suffixOperationResult
                     .Type
-                    .FunctionalFeature.Apply(category, suffixOperationResult, rightResult, RefAlignParam);
+                    .FunctionalFeature.ObtainApplyResult(category, suffixOperationResult, rightResult, RefAlignParam);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -257,7 +257,7 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -20 && category.HasCode;
+            var trace = defineable.ObjectId == -30 && category.HasCode;
             StartMethodDump(trace, category, target, defineable);
             try
             {
@@ -299,7 +299,7 @@ namespace Reni.Context
                 return null;
             }
 
-            return feature.Apply(category) & category;
+            return feature.ObtainResult(category) & category;
         }
 
         internal Result PendingResult(Category category, ICompileSyntax syntax)

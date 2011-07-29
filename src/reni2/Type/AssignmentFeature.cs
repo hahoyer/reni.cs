@@ -31,7 +31,7 @@ namespace Reni.Type
 
         internal AssignmentFeature(AccessType type) { _type = type; }
 
-        protected override Result Apply(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _type.ApplyAssignment(category, argsType); }
+        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _type.ApplyAssignment(category, argsType); }
         protected override TypeBase ObjectType { get { return _type; } }
         internal override string DumpShort() { return base.DumpShort() + "(" + _type.DumpShort() + " :=)"; }
     }
