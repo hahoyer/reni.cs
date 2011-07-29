@@ -229,10 +229,10 @@ namespace Reni.Struct
         internal Result ConstructionResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
             var result = TypeBase.VoidResult(category);
-            for (var i = fromPosition; i < fromNotPosition; i++)
+            for (var position = fromPosition; position < fromNotPosition; position++)
             {
-                //Tracer.ConditionalBreak(Container.ObjectId == 0 && position == 0, ()=>"");
-                var result1 = InternalInnerResult(category, parent, i)
+                //Tracer.ConditionalBreak(ObjectId == 0 && position == 0, ()=>"");
+                var result1 = InternalInnerResult(category, parent, position)
                     .Align(parent.RefAlignParam.AlignBits)
                     .LocalBlock(category, parent.RefAlignParam);
                 result = result.Pair(result1);
