@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +71,8 @@ Integer8:
     [TestFixture]
     [Output("3")]
     [InstanceCode("(Integer8(1)+2)")]
-    [Create, ObjectFunction]
+    [Create]
+    [ObjectFunction]
     public sealed class IntegerPlusNumber : IntegerStruct
     {
         [Test]
@@ -73,9 +92,9 @@ Integer8:
     [TestFixture]
     [Output("23")]
     [InstanceCode("Integer8(0) create(23)")]
-    [DumpPrint1]
-    [DumpPrint2]
-    [DumpPrint127]
+    [Integer1]
+    [Integer2]
+    [Integer127]
     public sealed class Create : IntegerStruct
     {
         [Test]
@@ -83,10 +102,13 @@ Integer8:
     }
 
     [TestFixture]
-    [PropertyVariable, ApplyTypeOperatorWithCut]
+    [PropertyVariable]
+    [ApplyTypeOperatorWithCut]
+    [SimpleFunctionWithNonLocal]
+    [ObjectProperty]
     [Output("1")]
     [InstanceCode("Integer8(1)")]
-    public sealed class DumpPrint1 : IntegerStruct
+    public sealed class Integer1 : IntegerStruct
     {
         [Test]
         public override void Run() { BaseRun(); }
@@ -94,19 +116,19 @@ Integer8:
 
     [TestFixture]
     [Output("2")]
-    [DumpPrint1]
+    [Integer1]
     [InstanceCode("Integer8(2)")]
-    public sealed class DumpPrint2 : IntegerStruct
+    public sealed class Integer2 : IntegerStruct
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
 
     [TestFixture]
-    [DumpPrint2]
+    [Integer2]
     [Output("127")]
     [InstanceCode("Integer8(127)")]
-    public sealed class DumpPrint127 : IntegerStruct
+    public sealed class Integer127 : IntegerStruct
     {
         [Test]
         public override void Run() { BaseRun(); }
