@@ -57,7 +57,6 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
-        internal override AccessType AccessType(Structure accessPoint, int position) { return Parent.AccessType(accessPoint, position); }
         internal override bool HasConverterTo(TypeBase destination) { return Parent.HasConverterTo(destination); }
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
         internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }

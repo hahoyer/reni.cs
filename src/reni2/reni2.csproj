@@ -159,6 +159,7 @@
     <Compile Include="Sequence\CompareFeature.cs" />
     <Compile Include="Sequence\Feature.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
+    <Compile Include="Sequence\ObjectReference.cs" />
     <Compile Include="Sequence\PrefixFeature.cs" />
     <Compile Include="Sequence\SequenceType.cs" />
     <Compile Include="Sequence\OperationPrefixFeature.cs" />
@@ -239,7 +240,6 @@
     <Compile Include="Type\AccessType.cs" />
     <Compile Include="Type\FunctionalFeature.cs" />
     <Compile Include="Type\IFunctionalFeature.cs" />
-    <Compile Include="Type\ObjectReference.cs" />
     <Compile Include="Type\Pending.cs" />
     <Compile Include="Refs.cs" />
     <Compile Include="ReniException.cs" />

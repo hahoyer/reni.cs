@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -37,6 +38,7 @@ namespace Reni.Sequence
 
         [DisableDump]
         internal readonly IFeature BitDumpPrintFeature;
+        private readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
         internal Result EnableCutFeature(Category category, RefAlignParam refAlignParam)
         {
@@ -44,7 +46,7 @@ namespace Reni.Sequence
                 (category
                  , () => Size
                  , () => new EnableCut(this)
-                 , () => ToReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size)
+                 , () => ForceReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size)
                 );
         }
 
@@ -57,6 +59,7 @@ namespace Reni.Sequence
             Tracer.Assert(count > 0, () => "count=" + count);
             _inheritedType = elementType.UniqueArray(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
+            _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(this, refAlignParam));
             StopByObjectId(-172);
         }
 
@@ -177,5 +180,6 @@ namespace Reni.Sequence
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
         protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
+        internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache.Find(refAlignParam); }
     }
 }

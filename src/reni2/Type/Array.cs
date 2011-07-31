@@ -156,7 +156,7 @@ namespace Reni.Type
 
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
         {
-            NotImplementedMethod(category);
+            NotImplementedMethod(category, refAlignParam);
             return null;
         }
     }

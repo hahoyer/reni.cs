@@ -44,6 +44,11 @@ namespace Reni.Sequence
         TypeBase IFeature.ObjectType { get { return _objectType; } }
         protected override TypeBase ObjectType { get { return _objectType; } }
 
+        protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
+        {
+            return result.ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), () => _objectType.UniqueAutomaticReference(refAlignParam).ArgCode(), Refs.None);
+        }
+        
         internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
 
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)

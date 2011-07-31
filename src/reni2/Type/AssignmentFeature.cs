@@ -33,6 +33,17 @@ namespace Reni.Type
 
         protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _type.ApplyAssignment(category, argsType); }
         protected override TypeBase ObjectType { get { return _type; } }
+        protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
+        {
+            var resultForArg = _type
+                .AccessPoint
+                .ReferenceType
+                .Result(result.CompleteCategory.Typed, _type.ArgResult(result.CompleteCategory.Typed));
+            return _type
+                .AccessPoint
+                .ContextReferenceViaStructReference(result)
+                .ReplaceArg(resultForArg);
+        }
         internal override string DumpShort() { return base.DumpShort() + "(" + _type.DumpShort() + " :=)"; }
     }
 }

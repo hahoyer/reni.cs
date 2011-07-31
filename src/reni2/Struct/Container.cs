@@ -206,19 +206,20 @@ namespace Reni.Struct
             return context.UniqueContainerContext(this).Result(category, innerResult);
         }
 
-        internal Result InternalInnerResult(Category category, ContextBase parent, int position)
+        internal Result InternalInnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
             return parent
-                .UniqueChildContext(this, position)
+                .UniqueChildContext(this, accessPosition)
                 .Result(category | Category.Type, Statements[position])
                 .AutomaticDereference();
         }
 
-        internal Result InnerResult(Category category, ContextBase parent, int position)
+        internal Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
             Tracer.Assert(!(category.HasCode));
-            return InternalInnerResult(category, parent, position);
+            return InternalInnerResult(category, parent, accessPosition, position);
         }
+
         internal Context UniqueContext(int position) { return _contextCache.Find(position); }
 
         internal ContainerContextObject UniqueContainerContext(ContextBase parent)
@@ -232,7 +233,7 @@ namespace Reni.Struct
             for (var position = fromPosition; position < fromNotPosition; position++)
             {
                 //Tracer.ConditionalBreak(ObjectId == 0 && position == 0, ()=>"");
-                var result1 = InternalInnerResult(category, parent, position)
+                var result1 = InternalInnerResult(category, parent, position+1, position)
                     .Align(parent.RefAlignParam.AlignBits)
                     .LocalBlock(category, parent.RefAlignParam);
                 result = result.Pair(result1);
@@ -240,9 +241,10 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, position).Size; }
+        internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, EndPosition, position).Size; }
         internal Size ConstructionSize(ContextBase parent, int fromPosition, int fromNotPosition) { return ConstructionResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
-        internal TypeBase InnerType(ContextBase parent, int position) { return InnerResult(Category.Type, parent, position).Type; }
+        internal TypeBase InnerType(ContextBase parent, int accessPosition, int position) { return InnerResult(Category.Type, parent, accessPosition, position).Type; }
+        
         internal bool IsLambda(int position) { return Statements[position].IsLambda; }
         internal bool IsProperty(int position) { return Properties.Contains(position); }
 

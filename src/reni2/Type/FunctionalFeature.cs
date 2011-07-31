@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
+using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -34,32 +35,52 @@ namespace Reni.Type
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId < 0 && category.HasCode;
+            var trace = ObjectId == 0 && category.HasCode;
             StartMethodDump(trace, category,operationResult,argsResult,refAlignParam);
             try
             {
                 BreakExecution();
-                var applyResult = ObtainApplyResult(category, argsResult.Type, refAlignParam)
-                    .ReplaceArg(argsResult)
-                    .ReplaceObjectRefByArg(refAlignParam, ObjectType);
-
-                if(!category.HasCode && !category.HasRefs || ObjectType.Size.IsZero)
+                var applyResult = ObtainApplyResult(category, argsResult.Type, refAlignParam);
+                if(!category.HasCode && !category.HasRefs)
                     return ReturnMethodDump(applyResult);
 
                 Dump("applyResult", applyResult);
                 BreakExecution();
+                var replaceArgResult = applyResult.ReplaceArg(argsResult);
+                if (ObjectType.Size.IsZero)
+                    return ReturnMethodDump(replaceArgResult);
+
+                var replaceObjectResult = ReplaceObjectReferenceByArg(replaceArgResult, refAlignParam);
+                Dump("replaceObjectResult", replaceObjectResult);
+                BreakExecution();
                 var objectResult = ObjectType
-                    .UniqueAutomaticReference(refAlignParam)
+                    .ForceReference(refAlignParam)
                     .Result(category.Typed, operationResult);
                 Dump("objectResult", objectResult);
-                BreakExecution();
-                var result = applyResult.ReplaceArg(objectResult);
+                var result = replaceObjectResult.ReplaceArg(objectResult);
                 return ReturnMethodDump(result, true);
             }
             finally
             {
                 EndMethodDump();
             }
+        }
+
+        protected virtual Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(result,refAlignParam);
+            return result;
+        }
+
+        private Structure FindAccessPoint(Result result)
+        {
+            if (!result.HasType)
+                return null;
+            var accessType = result.Type as AccessType;
+            if (accessType == null)
+                return null;
+
+            return accessType.AccessPoint;
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }

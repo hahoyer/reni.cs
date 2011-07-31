@@ -37,6 +37,7 @@ namespace Reni.Struct
         private readonly int _endPosition;
         private readonly DictionaryEx<ICompileSyntax, FunctionalBody> _functionalFeatureCache;
         private readonly SimpleCache<StructureType> _typeCache;
+        private readonly DictionaryEx<int, AccessType> _accessTypesCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
         {
@@ -44,6 +45,7 @@ namespace Reni.Struct
             _endPosition = endPosition;
             _functionalFeatureCache = new DictionaryEx<ICompileSyntax, FunctionalBody>(body => new FunctionalBody(this, body));
             _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
+            _accessTypesCache = new DictionaryEx<int, AccessType>(position => new AccessType(this, position));
         }
 
         [EnableDump]
@@ -68,17 +70,6 @@ namespace Reni.Struct
 
         [DisableDump]
         internal AutomaticReferenceType ReferenceType { get { return Type.UniqueAutomaticReference(RefAlignParam); } }
-
-        [DisableDump]
-        internal Refs ConstructorRefs
-        {
-            get
-            {
-                return ContainerContextObject
-                    .Container
-                    .InnerResult(Category.Refs, ContainerContextObject.Parent, EndPosition).Refs;
-            }
-        }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + ContainerContextObject.DumpShort() + "@" + EndPosition + ")"; }
 
@@ -123,6 +114,7 @@ namespace Reni.Struct
         internal bool IsZeroSized { get { return ContainerContextObject.IsZeroSized(EndPosition); } }
 
         internal FunctionalBody UniqueFunctionalFeature(ICompileSyntax body) { return _functionalFeatureCache.Find(body); }
+        internal AccessType UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
 
         internal Result AccessViaThisReference(Category category, Result rightResult)
         {
@@ -151,7 +143,7 @@ namespace Reni.Struct
 
         internal Result AccessViaThisReference(Category category, int position)
         {
-            return AccessType(position)
+            return UniqueAccessType(position)
                 .Result(category, () => ReferenceType.ArgCode());
         }
 
@@ -164,14 +156,14 @@ namespace Reni.Struct
 
         internal Result CreateFunctionCall(Category category, ICompileSyntax body, Result argsResult)
         {
-            return ContainerContextObject
+            return (ContainerContextObject
                 .RootContext
-                .CreateFunctionCall(this, category, body, argsResult);
+                .CreateFunctionCall(this, category, body, argsResult));
         }
 
         internal Result AccessViaContextReference(Category category, int position)
         {
-            var accessType = AccessType(position);
+            var accessType = UniqueAccessType(position);
             return ContainerContextObject
                 .AccessFromContextReference(category, accessType, EndPosition);
         }
@@ -188,16 +180,14 @@ namespace Reni.Struct
 
         private Result DumpPrintResultViaAccessReference(Category category, int position)
         {
-            var accessType = ContainerContextObject
-                .InnerType(position)
-                .UniqueAccessType(this, position);
+            var accessType = UniqueAccessType(position);
             return accessType
                 .DumpPrintOperationResult(category)
                 .ReplaceArg(accessType.FieldReferenceViaStructReference(category | Category.Type));
         }
 
         internal Result ContextReferenceViaStructReference(Result result) { return ContainerContextObject.ContextReferenceViaStructReference(EndPosition, result); }
-        private CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize*-1); }
-        private AccessType AccessType(int position) { return ContainerContextObject.InnerType(position).AccessType(this, position); }
+        private CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize * -1); }
+        internal TypeBase ValueType(int position) { return ContainerContextObject.InnerType(EndPosition,position).UnAlignedType; }
     }
 }

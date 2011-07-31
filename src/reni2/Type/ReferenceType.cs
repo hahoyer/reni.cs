@@ -45,7 +45,7 @@ namespace Reni.Type
         virtual internal TypeBase ValueType { get { return _valueType; } }
 
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
-        internal override TypeBase ToReference(RefAlignParam refAlignParam) { return this; }
+        internal override TypeBase ForceReference(RefAlignParam refAlignParam) { return this; }
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override bool IsRef(RefAlignParam refAlignParam) { return (RefAlignParam == refAlignParam); }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }

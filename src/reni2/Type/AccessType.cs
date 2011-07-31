@@ -36,10 +36,10 @@ namespace Reni.Type
         private readonly SimpleCache<AssignmentFeature> _assignmentFeatureCache;
         private readonly SimpleCache<AccessManager.IAccessObject> _accessObjectCache;
 
-        public AccessType(TypeBase valueType, Structure accessPoint, int position)
-            : base(valueType)
+        public AccessType(Structure accessPoint, int position)
+            : base(accessPoint.ValueType(position))
         {
-            Tracer.Assert(!(valueType is Aligner));
+            Tracer.Assert(!(accessPoint.ValueType(position) is Aligner));
             _accessPoint = accessPoint;
             _position = position;
             _assignmentFeatureCache = new SimpleCache<AssignmentFeature>(() => new AssignmentFeature(this));
@@ -67,7 +67,7 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase ValueTypeFunction { get { return base.ValueType; } }
         [DisableDump]
-        private TypeBase ValueTypeReference { get { return ValueType.ToReference(RefAlignParam); } }
+        private TypeBase ValueTypeReference { get { return ValueType.ForceReference(RefAlignParam); } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -124,15 +124,22 @@ namespace Reni.Type
         private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
-            StartMethodDump(ObjectId == -3, category);
+            StartMethodDump(ObjectId > -3, category);
             try
             {
                 BreakExecution();
-                var result = base.ValueType
+                var localReferenceResult = base.ValueType
                     .PropertyResult(category)
-                    .LocalReferenceResult(RefAlignParam)
-                    .ContextReferenceViaStructReference(AccessPoint)
-                    .ReplaceArg(()=>StructReferenceViaFieldReference(category.Typed));
+                    .LocalReferenceResult(RefAlignParam);
+                Dump("localReferenceResult", localReferenceResult);
+                var replaceObjectRefByArg = localReferenceResult
+                    .ContextReferenceViaStructReference(AccessPoint);
+                Dump("replaceObjectRefByArg", replaceObjectRefByArg);
+                var structReferenceViaFieldReference = StructReferenceViaFieldReference(category.Typed);
+                Dump("structReferenceViaFieldReference", structReferenceViaFieldReference);
+                BreakExecution();
+                var result = replaceObjectRefByArg
+                    .ReplaceArg(structReferenceViaFieldReference);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -140,7 +147,14 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
-        private Result StructReferenceViaFieldReference(Category category) { return AccessPoint.ReferenceType.Result(category, ArgCode); }
+
+        private Result StructReferenceViaFieldReference(Category category)
+        {
+            return AccessPoint
+                .ReferenceType
+                .Result(category, ArgCode);
+        }
+        
         internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode); }
 
         internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode()); }

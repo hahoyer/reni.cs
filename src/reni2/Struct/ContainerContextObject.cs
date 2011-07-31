@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,9 +68,10 @@ namespace Reni.Struct
         private int IndexSize { get { return Container.IndexSize; } }
 
         internal AccessManager.IAccessObject UniqueAccessObject(int position) { return _accessObjectsCache.Find(position); }
-        internal Size InnerSize(int position) { return Container.InnerSize(_parent, position); }
-        internal TypeBase InnerType(int position) { return Container.InnerType(_parent, position); }
-        internal Size StructSize(int position) { return Container.ConstructionResult(Category.Size, Parent, 0, position).Size; }
+        private Size InnerSize(int position) { return Container.InnerSize(_parent, position); }
+        internal TypeBase InnerType(int accessPosition, int position) { return Container.InnerType(_parent, accessPosition, position); }
+
+        internal Size StructSize(int position) { return ContextReferenceOffsetFromAccessPoint(position); }
         internal Result AccessFromContextReference(Category category, AccessType typeBase, int endPosition)
         {
             var result = typeBase
@@ -64,10 +83,7 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Result ContextReferenceViaStructReference(int position, Result result)
-        {
-            return result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), Refs.None);
-        }
+        internal Result ContextReferenceViaStructReference(int position, Result result) { return result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), Refs.None); }
 
         internal Result Result(Category category, Result innerResult)
         {
@@ -98,11 +114,11 @@ namespace Reni.Struct
             return AccessManager.Field;
         }
 
-        internal CodeBase AccessPointCodeFromContextReference(int endPosition)
+        private CodeBase AccessPointCodeFromContextReference(int endPosition)
         {
             return CodeBase
                 .ReferenceCode(this)
-                .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(endPosition)* -1);
+                .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(endPosition)*-1);
         }
 
         private CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)

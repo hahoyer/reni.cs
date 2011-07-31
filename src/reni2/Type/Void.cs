@@ -33,7 +33,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override TypeBase ToReference(RefAlignParam refAlignParam) { return this; }
+        internal override TypeBase ForceReference(RefAlignParam refAlignParam) { return this; }
 
         protected override TypeBase ReversePair(TypeBase first) { return first; }
         protected override Size GetSize() { return Size.Zero; }

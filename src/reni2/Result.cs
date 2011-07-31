@@ -515,8 +515,6 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceObjectRefByArg(RefAlignParam refAlignParam, TypeBase objectType) { return objectType.ReplaceObjectReferenceByArg(this, refAlignParam); }
-
         internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, CodeBase replacement)
         {
             if(!HasCode)

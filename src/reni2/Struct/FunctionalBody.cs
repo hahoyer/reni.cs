@@ -28,6 +28,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
+
     internal sealed class FunctionalBody : FunctionalFeature
     {
         private readonly ICompileSyntax _body;
@@ -50,11 +51,13 @@ namespace Reni.Struct
             [DisableDump]
             internal override Structure FindRecentStructure { get { return _parent._structure; } }
 
-            internal override Result PropertyResult(Category category) { return _parent.ObtainApplyResult(category, Void, _parent._structure.RefAlignParam); }
+            internal override Result PropertyResult(Category category) { return _parent.ObtainApplyResult(category, Void); }
 
             protected override Size GetSize() { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpShort() + "/\\"; } }
             internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
+            [DisableDump]
+            internal override TypeBase ObjectType { get { return _parent.ObjectType; } }
         }
 
         [DisableDump]
@@ -63,15 +66,31 @@ namespace Reni.Struct
         [DisableDump]
         protected override TypeBase ObjectType { get { return _structure.Type; } }
 
+        protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
+        {
+            Tracer.Assert(refAlignParam == _structure.RefAlignParam);
+            return _structure.ContextReferenceViaStructReference(result);
+        }
+
         internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
 
-        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return ObtainApplyResult(category, argsType); }
+
+        private Result ObtainApplyResult(Category category, TypeBase argsType)
         {
-            var argsResult = argsType.ArgResult(category.Typed);
-            if(argsType.IsZeroSized && category.HasCode)
-                argsResult.Code = CodeBase.Void();
-            return _structure
-                .CreateFunctionCall(category, Body, argsResult);
+            StartMethodDump(ObjectId < 0 && category.HasCode, category, argsType);
+            try
+            {
+                var argsResult = argsType.ArgResult(category.Typed);
+                if(argsType.IsZeroSized && category.HasCode)
+                    argsResult.Code = CodeBase.Void();
+                var result = _structure.CreateFunctionCall(category, Body, argsResult);
+                return ReturnMethodDump(result, true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam)
