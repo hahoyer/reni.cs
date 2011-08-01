@@ -99,20 +99,6 @@ namespace Reni.Sequence
             base.Search(searchVisitor);
         }
 
-        protected Result VirtualForceConversion(Category category, TypeBase destination)
-        {
-            var result = ForceConversion(category, destination as Aligner);
-            if(result != null)
-                return result;
-
-            result = ForceConversion(category, destination as EnableCut);
-            if(result != null)
-                return result;
-
-            NotImplementedMethod(category, destination);
-            return null;
-        }
-
         internal override Result VirtualForceConversion(Category category, SequenceType destination)
         {
             var result = ArgResult(category | Category.Type);
@@ -130,24 +116,8 @@ namespace Reni.Sequence
             return result;
         }
 
-        private Result ForceConversion(Category category, Aligner dest)
-        {
-            if(dest == null)
-                return null;
-            return ForceConversion(category, dest.Parent).Align(dest.AlignBits);
-        }
-
-        private Result ForceConversion(Category category, EnableCut dest)
-        {
-            if(dest == null)
-                return null;
-            var result = ForceConversion(category, dest.Parent);
-            return dest.Result(category, () => result.Code, () => result.Refs);
-        }
-
         private Result ExtendFrom(Category category, int oldCount)
         {
-            var oldSize = Element.Size*oldCount;
             var result = Result
                 (
                     category,

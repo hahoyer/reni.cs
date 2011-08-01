@@ -47,31 +47,6 @@ namespace Reni.Type
             return GetType().PrettyName() + "(" + Element.Dump() + ", " + Count + ")";
         }
 
-        protected Result VirtualForceConversion(Category category, TypeBase destination)
-        {
-            var destArray = destination as Array;
-            if(destArray != null)
-            {
-                var result = Element.ForceConversion(category, destArray.Element);
-                NotImplementedMethod(category, destination, "result", result);
-                return null;
-            }
-            NotImplementedMethod(category, destination);
-            return null;
-        }
-
-        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
-        {
-            var destArray = destination as Array;
-            if(destArray != null)
-            {
-                if(Count == destArray.Count)
-                    return Element.IsConvertable(destArray.Element, conversionParameter.DontUseConverter);
-                return false;
-            }
-            return false;
-        }
-
         internal override void Search(ISearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
@@ -83,7 +58,7 @@ namespace Reni.Type
         protected override bool IsInheritor { get { return false; } }
     }
 
-    internal class ConcatArraysFeature : ReniObject, IFeature
+    internal sealed class ConcatArraysFeature : ReniObject, IFeature
     {
         private Array _type;
         public ConcatArraysFeature(Array type) { _type = type; }
