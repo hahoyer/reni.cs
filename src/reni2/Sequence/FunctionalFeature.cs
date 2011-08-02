@@ -46,7 +46,7 @@ namespace Reni.Sequence
 
         protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
-            return result.ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), () => _objectType.UniqueAutomaticReference(refAlignParam).ArgCode(), Refs.None);
+            return result.ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), () => _objectType.ReferenceArgCode(refAlignParam), Refs.None);
         }
         
         internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
@@ -57,7 +57,7 @@ namespace Reni.Sequence
                 (category
                  , () => refAlignParam.RefSize
                  , () => _objectType.UniqueFunctionalType(this, refAlignParam)
-                 , () => _objectType.UniqueAutomaticReference(refAlignParam).ArgCode()
+                 , () => _objectType.ReferenceArgCode(refAlignParam)
                 );
         }
 

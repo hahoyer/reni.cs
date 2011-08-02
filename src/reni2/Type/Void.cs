@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 
 namespace Reni.Type
@@ -27,6 +28,8 @@ namespace Reni.Type
     [Serializable]
     internal sealed class Void : TypeBase
     {
+        private readonly SimpleCache<CreateArrayFeature> _createArrayFeatureCache = new SimpleCache<CreateArrayFeature>(() => new CreateArrayFeature());
+
         internal override void Search(ISearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
@@ -47,5 +50,6 @@ namespace Reni.Type
 
         protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.IsZeroSized; }
         protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return Result(category, source.ArgResult(category)); }
+        internal Result CreateArray(Category category, RefAlignParam refAlignParam) { return _createArrayFeatureCache.Value.Result(category); }
     }
 }

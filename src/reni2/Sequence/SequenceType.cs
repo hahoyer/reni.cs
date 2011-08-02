@@ -89,8 +89,6 @@ namespace Reni.Sequence
             return Element.IsConvertable(destination.Element, conversionParameter.DontUseConverter);
         }
 
-        internal override bool VirtualIsConvertable(Aligner destination, ConversionParameter conversionParameter) { return IsConvertable(destination.Parent, conversionParameter); }
-
         protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
 
         internal override void Search(ISearchVisitor searchVisitor)

@@ -1,8 +1,25 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Feature;
 using Reni.Sequence;
 using Reni.Type;
@@ -10,20 +27,20 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, Sequence.SequenceType>
+    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, SequenceType>
     {
-        IFeature ISearchPath<IFeature, Sequence.SequenceType>.Convert(Sequence.SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
+        IFeature ISearchPath<IFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
     }
 
     internal sealed class ConcatArrays : Defineable, ISearchPath<IFeature, Type.Array>
     {
-        IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArraysFeature(type); }
+        IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrays); }
     }
 
     internal sealed class ConcatArrayWithObject : Defineable, ISearchPath<IFeature, Type.Array>, ISearchPath<IFeature, Type.Void>
     {
-        IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new ConcatArrayWithObjectFeature(type); }
-        IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new CreateArrayFeature(); }
+        IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrayWithObject); }
+        IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new Feature.Feature(type.CreateArray); }
     }
 
     internal sealed class Assignment : Defineable, ISearchPath<IFeature, AccessType>

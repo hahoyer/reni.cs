@@ -117,7 +117,7 @@ namespace Reni.Type
         }
 
         internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
-        internal Result DumpPrintFieldResult(Category category) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), RefAlignParam); }
+        internal Result DumpPrintFieldResult(Category category) { return GenericDumpPrintResult(category, RefAlignParam); }
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
         internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText)); }
 

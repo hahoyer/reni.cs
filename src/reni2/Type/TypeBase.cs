@@ -28,6 +28,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -149,6 +150,7 @@ namespace Reni.Type
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
+        internal CodeBase ReferenceArgCode(RefAlignParam refAlignParam) { return CodeBase.Arg(UniqueAutomaticReference(refAlignParam)); }
 
         internal virtual Result AutomaticDereferenceResult(Category category) { return ArgResult(category); }
 
@@ -360,7 +362,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -30 && category.HasCode;
+            var trace = ObjectId == -16 &&  defineable.ObjectId == 14 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -370,10 +372,11 @@ namespace Reni.Type
                 Dump("feature", feature);
                 if (feature == null)
                     return ReturnMethodDump<Result>(null);
-                var obtainResult = feature.ObtainResult(category, refAlignParam);
-                Dump("obtainResult", obtainResult);
                 BreakExecution();
-                var result = obtainResult
+                var featureResult = feature.ObtainResult(category, refAlignParam);
+                Dump("featureResult", featureResult);
+                BreakExecution();
+                var result = featureResult
                     .ReplaceArg(()=>ConvertObject(category.Typed, refAlignParam, feature));
                 return ReturnMethodDump(result,true);
             }
@@ -385,11 +388,22 @@ namespace Reni.Type
 
         private Result ConvertObject(Category category, RefAlignParam refAlignParam, IFeature feature)
         {
-            var featureObject = feature.TypeOfArgInApplyResult(refAlignParam);
-            var reference = ForceReference(refAlignParam);
-            if(reference == featureObject)
-                return featureObject.ArgResult(category);
-            return reference.Conversion(category.Typed, featureObject);
+            var trace = feature.GetObjectId() == -5;
+            StartMethodDump(trace, category, refAlignParam, feature);
+            try
+            {
+                var featureObject = feature.TypeOfArgInApplyResult(refAlignParam);
+                Dump("featureObject", featureObject);
+                BreakExecution();
+                var reference = ForceReference(refAlignParam);
+                if(reference == featureObject)
+                    return ReturnMethodDump(featureObject.ArgResult(category),true);
+                return ReturnMethodDump(reference.Conversion(category.Typed, featureObject),true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
@@ -405,12 +419,6 @@ namespace Reni.Type
         }
 
         internal virtual bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
-        {
-            NotImplementedMethod(destination, conversionParameter);
-            return false;
-        }
-
-        internal virtual bool VirtualIsConvertable(Aligner destination, ConversionParameter conversionParameter)
         {
             NotImplementedMethod(destination, conversionParameter);
             return false;
@@ -446,5 +454,6 @@ namespace Reni.Type
                 .BitSequenceOperation(token, Size);
         }
 
+        internal Result GenericDumpPrintResult(Category category, RefAlignParam refAlignParam) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), refAlignParam); }
     }
 }
