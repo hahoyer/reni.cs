@@ -232,7 +232,7 @@ namespace Reni
             {
                 if(CompleteCategory.HasSize && !Size.IsZero)
                     return false;
-                if(CompleteCategory.HasType && !Type.IsVoid)
+                if(CompleteCategory.HasType && !(Type is Type.Void))
                     return false;
                 if(CompleteCategory.HasCode && !Code.IsEmpty)
                     return false;
@@ -326,7 +326,7 @@ namespace Reni
             if(HasSize)
                 r.Size = alignedSize;
             if(HasType)
-                r.Type = Type.Align(alignBits);
+                r.Type = Type.UniqueAlign(alignBits);
             if(HasCode)
                 r.Code = Code.BitCast(alignedSize);
             if(HasRefs)
