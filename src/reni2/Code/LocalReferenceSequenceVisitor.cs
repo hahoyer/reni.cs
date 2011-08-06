@@ -16,11 +16,17 @@ namespace Reni.Code
 
         [Node, EnableDump]
         private readonly List<LocalReference> _data = new List<LocalReference>();
+        [Node, EnableDump]
+        private readonly DictionaryEx<LocalReference, int> _localReferences;
 
         private static int _nextObjectId;
 
         public LocalReferenceSequenceVisitor()
-            : base(_nextObjectId++) { _codeCache = new SimpleCache<CodeBase>(Convert); }
+            : base(_nextObjectId++)
+        {
+            _localReferences = new DictionaryEx<LocalReference, int>(-1, ObtainHolderIndex);
+            _codeCache = new SimpleCache<CodeBase>(Convert);
+        }
 
         private CodeBase Convert()
         {
@@ -38,7 +44,7 @@ namespace Reni.Code
             {
                 var size = Size.Zero;
                 return _data
-                    .Select((localReference, i) => localReference.AccompayningDestructorCode(ref size, string.Format(HolderNamePattern, i)))
+                    .Select((localReference, i) => localReference.AccompayningDestructorCode(ref size,HolderName(i)))
                     .ToSequence();
             }
         }
@@ -47,28 +53,33 @@ namespace Reni.Code
 
         internal override CodeBase LocalReference(LocalReference visitedObject)
         {
-            var newVisitedObject = ReVisit(visitedObject) ?? visitedObject;
-            var i = Find(newVisitedObject);
-            _codeCache.Reset();
-            return CodeBase.LocalVariableReference(newVisitedObject.RefAlignParam, string.Format(HolderNamePattern, i));
-        }
-
-        private int Find(LocalReference localReference)
-        {
-            for(var i = 0; i < _data.Count; i++)
+            StartMethodDump(ObjectId == -10, visitedObject);
+            try
             {
-                if(_data[i] == localReference)
-                    return i;
+                BreakExecution();
+                var holderIndex = _localReferences.Find(visitedObject);
+                Dump("holderIndex", holderIndex);
+                _codeCache.Reset();
+                return ReturnMethodDump(CodeBase.LocalVariableReference(visitedObject.RefAlignParam, HolderName(holderIndex)),true);
             }
-            _data.Add(localReference);
-            return _data.Count - 1;
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+        private string HolderName(int holderIndex) { return string.Format(HolderNamePattern, holderIndex); }
+
+        private int ObtainHolderIndex(LocalReference visitedObject)
+        {
+            _data.Add(ReVisit(visitedObject) ?? visitedObject);
+            return _data.Count-1;
         }
 
         internal CodeBase LocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
-            var trace = ObjectId == -2;
-            StartMethodDump(trace, body);
+            var trace = ObjectId == -6;
+            StartMethodDump(trace, body, copier, refAlignParam);
             try
             {
                 BreakExecution();
