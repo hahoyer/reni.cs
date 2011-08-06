@@ -23,8 +23,6 @@ using System;
 using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -121,10 +119,10 @@ namespace Reni.Type
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
         internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText)); }
 
-        private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
+        internal Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
-            StartMethodDump(ObjectId > -3, category);
+            StartMethodDump(ObjectId == -3, category);
             try
             {
                 BreakExecution();
@@ -154,7 +152,7 @@ namespace Reni.Type
                 .ReferenceType
                 .Result(category, ArgCode);
         }
-        
+
         internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode); }
 
         internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode()); }
@@ -162,30 +160,10 @@ namespace Reni.Type
         private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
+
         protected override CodeBase DereferenceCode() { return ValueReferenceViaFieldReference(Category.Code).Code.Dereference(RefAlignParam, ValueType.Size); }
 
-        internal override bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
-        {
-            return
-                ValueType == destination.ValueType
-                || ValueType.IsConvertable(destination.ValueType, conversionParameter);
-        }
+        internal override Result ToAutomaticReferenceResult(Category category) { return ValueReferenceViaFieldReference(category); }
 
-        internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
-        {
-            StartMethodDump(ObjectId == -3, category, destination);
-            try
-            {
-                BreakExecution();
-                var fieldAsValue = ValueReferenceViaFieldReference(category.Typed);
-                Dump("fieldAsValue", fieldAsValue);
-                var result = fieldAsValue.Conversion(destination);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
     }
 }

@@ -61,7 +61,25 @@ namespace Reni.Feature
         }
 
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
-        TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
+        TypeBase IFeature.ObjectType { get { return (TypeBase)_function.Target; } }
+    }
+
+    internal sealed class PrefixFeature : ReniObject, IPrefixFeature, IFeature
+    {
+        [EnableDump]
+        private readonly Func<Category, RefAlignParam, Result> _function;
+        private static int _nextObjectId;
+
+        public PrefixFeature(Func<Category, RefAlignParam, Result> function)
+            : base(_nextObjectId++)
+        {
+            _function = function;
+            Tracer.Assert(_function.Target is TypeBase);
+        }
+
+        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
+        TypeBase IFeature.ObjectType { get { return (TypeBase)_function.Target; } }
+        IFeature IPrefixFeature.Feature { get { return this; } }
     }
 
     internal static class FeatureExtender

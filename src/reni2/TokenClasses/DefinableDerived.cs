@@ -32,15 +32,10 @@ namespace Reni.TokenClasses
         IFeature ISearchPath<IFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
     }
 
-    internal sealed class ConcatArrays : Defineable, ISearchPath<IFeature, Type.Array>
+    internal sealed class ConcatArrays : Defineable, ISearchPath<IPrefixFeature, TypeBase>, ISearchPath<IFeature, Type.Array>
     {
         IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrays); }
-    }
-
-    internal sealed class ConcatArrayWithObject : Defineable, ISearchPath<IFeature, Type.Array>, ISearchPath<IFeature, Type.Void>
-    {
-        IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrayWithObject); }
-        IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new Feature.Feature(type.CreateArray); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new Feature.PrefixFeature(type.CreateArray); }
     }
 
     internal sealed class Assignment : Defineable, ISearchPath<IFeature, AccessType>

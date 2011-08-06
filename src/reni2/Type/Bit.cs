@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +34,6 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount(TypeBase elementType) { return 1; }
 
-        internal bool VirtualIsConvertable(TypeBase destination, ConversionParameter conversionParameter)
-        {
-            if(conversionParameter.IsUseConverter)
-                return destination.HasConverterFromBit();
-
-            return false;
-        }
-
-        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
-        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
-
         internal override void Search(ISearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
@@ -39,8 +46,8 @@ namespace Reni.Type
 
         internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objectBits, int argsBits)
         {
-            var objectType = Number(objectBits).Align(BitsConst.SegmentAlignBits);
-            var argsType = Number(argsBits).Align(BitsConst.SegmentAlignBits);
+            var objectType = Number(objectBits).UniqueAlign(BitsConst.SegmentAlignBits);
+            var argsType = Number(argsBits).UniqueAlign(BitsConst.SegmentAlignBits);
             return objectType
                 .Pair(argsType)
                 .ArgCode()

@@ -69,7 +69,7 @@ namespace Reni.Type
         }
 
         private static int _nextObjectId;
-        readonly Cache _cache;
+        private readonly Cache _cache;
 
         [UsedImplicitly]
         private static ReniObject _lastSearchVisitor;
@@ -78,7 +78,7 @@ namespace Reni.Type
         protected TypeBase()
             : base(_nextObjectId++) { _cache = new Cache(this); }
 
-        internal static TypeBase Void { get { return Cache.Void; } }
+        internal static Void Void { get { return Cache.Void; } }
         internal static TypeBase Bit { get { return Cache.Bit; } }
 
         [Node]
@@ -87,9 +87,6 @@ namespace Reni.Type
         protected abstract Size GetSize();
 
         internal virtual bool IsRef(RefAlignParam refAlignParam) { return false; }
-
-        [DisableDump]
-        internal virtual bool IsVoid { get { return false; } }
 
         [DisableDump]
         internal virtual Size UnrefSize { get { return Size; } }
@@ -109,12 +106,6 @@ namespace Reni.Type
             }
         }
 
-        internal virtual bool HasConverterFromBit()
-        {
-            NotImplementedMethod();
-            return false;
-        }
-
         internal virtual int SequenceCount(TypeBase elementType)
         {
             NotImplementedMethod(elementType);
@@ -124,7 +115,7 @@ namespace Reni.Type
         [DisableDump]
         protected internal virtual int IndexSize { get { return 0; } }
 
-        internal TypeBase Align(int alignBits)
+        internal TypeBase UniqueAlign(int alignBits)
         {
             if(Size.Align(alignBits) == Size)
                 return this;
@@ -192,59 +183,17 @@ namespace Reni.Type
 
         internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
         {
-            if(thenType.IsConvertable(elseType, ConversionParameter.Instance))
+            if(thenType.IsConvertable(elseType))
                 return elseType;
-            if(elseType.IsConvertable(thenType, ConversionParameter.Instance))
+            if(elseType.IsConvertable(thenType))
                 return thenType;
             thenType.NotImplementedMethod(elseType);
             return null;
         }
 
-        internal Result Conversion(Category category, TypeBase dest)
-        {
-            if(category <= (Category.Size | Category.Type))
-                return dest.Result(category);
-            if(IsConvertable(dest, ConversionParameter.Instance))
-                return ForceConversion(category, dest);
-            NotImplementedMethod(category, dest);
-            return null;
-        }
-
-        internal Result ForceConversion(Category category, TypeBase destination)
-        {
-            if(this == destination)
-                return InternalConversionToItself(category);
-            return destination.VirtualForceConversionFrom(category, this);
-        }
-
-        internal bool IsConvertable(TypeBase destination, ConversionParameter conversionParameter)
-        {
-            if(this == destination)
-                return IsConvertableToItself(conversionParameter);
-            return destination.VirtualIsConvertableFrom(this, conversionParameter);
-        }
-
         private Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
 
         internal Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, Bit).Align(BitsConst.SegmentAlignBits); }
-
-        protected virtual Result InternalConversionToItself(Category category) { return ArgResult(category); }
-
-        protected virtual Result VirtualForceConversionFrom(Category category, TypeBase source)
-        {
-            NotImplementedMethod(category, source);
-            return null;
-        }
-
-        protected virtual bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter)
-        {
-            NotImplementedMethod(source, conversionParameter);
-            return false;
-        }
-
-        internal virtual bool HasConverterTo(TypeBase destination) { return false; }
-
-        private bool IsConvertableToItself(ConversionParameter conversionParameter) { return true; }
 
         /// <summary>
         ///     Gets the icon key.
@@ -293,6 +242,10 @@ namespace Reni.Type
 
         [DisableDump]
         internal virtual TypeBase UnAlignedType { get { return this; } }
+        [DisableDump]
+        internal virtual int ArrayElementCount { get { return 1; } }
+        [DisableDump]
+        internal virtual bool IsArray { get { return false; } }
 
         protected bool IsRefLike(AutomaticReferenceType target) { return false; }
 
@@ -320,7 +273,7 @@ namespace Reni.Type
         {
             if(this is AutomaticReferenceType)
             {
-                return Align(refAlignParam.AlignBits)
+                return UniqueAlign(refAlignParam.AlignBits)
                     .Result
                     (
                         category,
@@ -362,7 +315,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = ObjectId == -16 &&  defineable.ObjectId == 14 && category.HasCode;
+            var trace = defineable.ObjectId == -24 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -370,15 +323,15 @@ namespace Reni.Type
                 var searchResult = SearchDefineable<TFeature>(defineable);
                 var feature = searchResult.ConvertToFeature();
                 Dump("feature", feature);
-                if (feature == null)
+                if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
                 var featureResult = feature.ObtainResult(category, refAlignParam);
                 Dump("featureResult", featureResult);
                 BreakExecution();
                 var result = featureResult
-                    .ReplaceArg(()=>ConvertObject(category.Typed, refAlignParam, feature));
-                return ReturnMethodDump(result,true);
+                    .ReplaceArg(() => ConvertObject(category.Typed, refAlignParam, feature));
+                return ReturnMethodDump(result, true);
             }
             finally
             {
@@ -388,7 +341,7 @@ namespace Reni.Type
 
         private Result ConvertObject(Category category, RefAlignParam refAlignParam, IFeature feature)
         {
-            var trace = feature.GetObjectId() == -5;
+            var trace = feature.GetObjectId() == -127;
             StartMethodDump(trace, category, refAlignParam, feature);
             try
             {
@@ -397,8 +350,8 @@ namespace Reni.Type
                 BreakExecution();
                 var reference = ForceReference(refAlignParam);
                 if(reference == featureObject)
-                    return ReturnMethodDump(featureObject.ArgResult(category),true);
-                return ReturnMethodDump(reference.Conversion(category.Typed, featureObject),true);
+                    return ReturnMethodDump(featureObject.ArgResult(category), true);
+                return ReturnMethodDump(reference.Conversion(category.Typed, featureObject), true);
             }
             finally
             {
@@ -412,48 +365,94 @@ namespace Reni.Type
 
         internal TypeBase UniqueFunctionalType(IFunctionalFeature functionalFeature, RefAlignParam refAlignParam) { return _cache.FunctionalTypes.Find(refAlignParam).Find(functionalFeature); }
 
-        internal virtual bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
-        {
-            NotImplementedMethod(destination, conversionParameter);
-            return false;
-        }
-
-        internal virtual bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
-        {
-            NotImplementedMethod(destination, conversionParameter);
-            return false;
-        }
-
-        internal virtual Result VirtualForceConversion(Category category, SequenceType destination)
-        {
-            NotImplementedMethod(category, destination);
-            return null;
-        }
-
-        internal virtual Result VirtualForceConversion(Category category, AutomaticReferenceType destination)
-        {
-            NotImplementedMethod(category, destination);
-            return null;
-        }
-
-        internal virtual bool VirtualIsConvertable(Bit destination, ConversionParameter conversionParameter)
-        {
-            NotImplementedMethod(destination, conversionParameter);
-            return false;
-        }
-
-        internal virtual Result VirtualForceConversion(Category category, Bit destination)
-        {
-            NotImplementedMethod(category, destination);
-            return null;
-        }
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
         {
-            return Align(BitsConst.SegmentAlignBits)
+            return UniqueAlign(BitsConst.SegmentAlignBits)
                 .ArgCode()
                 .BitSequenceOperation(token, Size);
         }
 
         internal Result GenericDumpPrintResult(Category category, RefAlignParam refAlignParam) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), refAlignParam); }
+
+        internal Result CreateArray(Category category, RefAlignParam refAlignParam)
+        {
+            return UniqueAlign(refAlignParam.AlignBits)
+                .UniqueArray(1)
+                .UniqueAutomaticReference(refAlignParam)
+                .Result(category, () => ReferenceArgCode(refAlignParam));
+        }
+
+        internal Result Conversion(Category category, TypeBase destination)
+        {
+            if(category <= (Category.Size | Category.Type))
+                return destination.Result(category);
+
+            var result = Converter(destination).Result(category);
+            if(category.HasType && result.Type != destination)
+                DumpDataWithBreak("Wrong conversion result type", "this", this, "destination", destination, "result", result);
+            return result;
+        }
+
+        private Converter Converter(TypeBase destination) { return Converter(ConversionParameter.Instance, destination); }
+
+        private bool IsConvertable(TypeBase destination) { return Converter(destination).IsValid; }
+
+        internal Converter Converter(ConversionParameter conversionParameter, TypeBase destination)
+        {
+            if(this == destination)
+                return new FunctionalConverter(ArgResult);
+
+            var referenceSource = this as ReferenceType;
+            if(referenceSource != null)
+            {
+                var referenceDestination = destination as AutomaticReferenceType;
+                if(referenceDestination != null)
+                    return AutomaticReferenceType.Converter(referenceSource, conversionParameter, referenceDestination);
+
+                return
+                    referenceSource.DereferenceResult
+                    *referenceSource.ValueType.Converter(conversionParameter, destination);
+            }
+
+            var alignerSource = this as Aligner;
+            if(alignerSource != null)
+            {
+                return
+                    alignerSource.UnalignedResult
+                    *alignerSource.Parent.Converter(conversionParameter, destination);
+            }
+
+            var alignerDestination = destination as Aligner;
+            if(alignerDestination != null)
+            {
+                return
+                    Converter(conversionParameter, alignerDestination.Parent)
+                    *alignerDestination.ParentToAlignedResult;
+            }
+
+            var sequenceSource = this as SequenceType;
+            if(sequenceSource != null)
+            {
+                var sequenceDestination = destination as SequenceType;
+                if(sequenceDestination != null)
+                    return SequenceType.Converter(sequenceSource, conversionParameter, sequenceDestination);
+                NotImplementedMethod(conversionParameter, destination);
+                return null;
+            }
+
+            var enableCutSource = this as EnableCut;
+            if(enableCutSource != null)
+            {
+                return
+                    enableCutSource.StripTagResult
+                    *enableCutSource.Parent.Converter(conversionParameter.EnableCut, destination);
+            }
+
+            if(IsZeroSized && destination is Void)
+                return new FunctionalConverter(c => Void.Result(c, ArgResult(c)));
+
+            NotImplementedMethod(conversionParameter, destination);
+            return null;
+        }
     }
 }

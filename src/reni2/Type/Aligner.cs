@@ -22,7 +22,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Sequence;
-using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -57,14 +56,7 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
-        internal override bool HasConverterTo(TypeBase destination) { return Parent.HasConverterTo(destination); }
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
-        internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
-        internal override bool VirtualIsConvertable(Bit destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter); }
-        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.IsConvertable(Parent, conversionParameter); }
-        internal override Result VirtualForceConversion(Category category, Bit destination) { return ForceConversion(category, destination); }
-        internal override Result VirtualForceConversion(Category category, SequenceType destination) { return ForceConversion(category, destination); }
-        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.ForceConversion(category, Parent).Align(AlignBits); }
 
         internal override AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam)
         {
@@ -73,14 +65,7 @@ namespace Reni.Type
             return base.UniqueAutomaticReference(refAlignParam);
         }
 
-        private new Result ForceConversion(Category category, TypeBase destination)
-        {
-            return Parent
-                .ForceConversion(category, destination)
-                .ReplaceArg(CreateUnalignedArgResult(category));
-        }
-
-        private Result CreateUnalignedArgResult(Category category)
+        internal Result UnalignedResult(Category category)
         {
             return Parent.Result
                 (
@@ -88,5 +73,7 @@ namespace Reni.Type
                     () => ArgCode().BitCast(Parent.Size)
                 );
         }
+
+        internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
     }
 }

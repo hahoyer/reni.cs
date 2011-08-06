@@ -25,7 +25,7 @@ namespace Reni.ReniParser
                 "bit_address", "bit_align"
                 );
 
-            x += PrioTable.Left("<<", "<*");
+            x += PrioTable.Left("<<");
 
             x += PrioTable.Left("~");
             x += PrioTable.Left("&");
@@ -93,7 +93,6 @@ namespace Reni.ReniParser
                        {"<=", new CompareOperator()},
                        {"<>", new NotEqual()},
                        {"<<", new ConcatArrays()},
-                       {"<*", new ConcatArrayWithObject()},
                        {"-", new Sign()},
                        {"!", new Exclamation()},
                        {"+", new Sign()},

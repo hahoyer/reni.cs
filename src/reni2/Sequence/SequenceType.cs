@@ -82,36 +82,10 @@ namespace Reni.Sequence
 
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + "*" + Count + ")"; }
 
-        internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
-        {
-            if(conversionParameter.IsDisableCut && Count > destination.Count)
-                return false;
-            return Element.IsConvertable(destination.Element, conversionParameter.DontUseConverter);
-        }
-
-        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
-
         internal override void Search(ISearchVisitor searchVisitor)
         {
             Element.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);
-        }
-
-        internal override Result VirtualForceConversion(Category category, SequenceType destination)
-        {
-            var result = ArgResult(category | Category.Type);
-            if(Count > destination.Count)
-                result = RemoveElementsAtEnd(category, destination.Count);
-
-            if(Element != destination.Element)
-            {
-                var elementResult = Element.ForceConversion(category, destination.Element);
-                NotImplementedMethod(category, destination, "result", result, "elementResult", elementResult);
-                return null;
-            }
-            if(Count < destination.Count)
-                result = destination.ExtendFrom(category, Count).ReplaceArg(result);
-            return result;
         }
 
         private Result ExtendFrom(Category category, int oldCount)
@@ -142,12 +116,34 @@ namespace Reni.Sequence
                 );
             return result;
         }
-
         internal override Result Destructor(Category category) { return _inheritedType.Destructor(category); }
 
         internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
-        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
         internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache.Find(refAlignParam); }
+
+        private static Result Conversion(Category category, SequenceType source, SequenceType destination)
+        {
+            var result = source.ArgResult(category | Category.Type);
+            if(source.Count > destination.Count)
+                result = source.RemoveElementsAtEnd(category, destination.Count);
+
+            if(source.Element != destination.Element)
+            {
+                DumpDataWithBreak("Element type dismatch", "category", category, "source", source, "destination", destination, "result", result);
+                return null;
+            }
+
+            if(source.Count < destination.Count)
+                result = destination.ExtendFrom(category, source.Count).ReplaceArg(result);
+            return result;
+        }
+
+        internal static Converter Converter(SequenceType source, ConversionParameter conversionParameter, SequenceType destination)
+        {
+            if(source.Count > destination.Count && conversionParameter.IsDisableCut)
+                destination.NotImplementedMethod(source, conversionParameter);
+            return new FunctionalConverter(category => Conversion(category, source, destination));
+        }
     }
 }

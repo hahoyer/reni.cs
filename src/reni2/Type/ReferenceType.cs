@@ -23,7 +23,6 @@ using System;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -31,7 +30,10 @@ namespace Reni.Type
     {
         private readonly TypeBase _valueType;
 
-        protected ReferenceType(TypeBase valueType) { _valueType = valueType; }
+        protected ReferenceType(TypeBase valueType)
+        {
+            _valueType = valueType;
+        }
 
         [DisableDump]
         TypeBase IReference.ValueType { get { return ValueType; } }
@@ -42,7 +44,12 @@ namespace Reni.Type
         [DisableDump]
         internal abstract RefAlignParam RefAlignParam { get; }
 
-        virtual internal TypeBase ValueType { get { return _valueType; } }
+        internal virtual TypeBase ValueType { get { return _valueType; } }
+
+        [DisableDump]
+        internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
+        [DisableDump]
+        internal override bool IsArray { get { return ValueType.IsArray; } }
 
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         internal override TypeBase ForceReference(RefAlignParam refAlignParam) { return this; }
@@ -50,32 +57,7 @@ namespace Reni.Type
         internal override bool IsRef(RefAlignParam refAlignParam) { return (RefAlignParam == refAlignParam); }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
-        internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter)
-        {
-            return ValueType == destination
-                   || ValueType.IsConvertable(destination, conversionParameter);
-        }
-        
-        internal override bool VirtualIsConvertable(AutomaticReferenceType destination, ConversionParameter conversionParameter)
-        {
-            return ValueType == destination.ValueType
-                   || ValueType.IsConvertable(destination.ValueType, conversionParameter);
-        }
-
-        internal override Result VirtualForceConversion(Category category, SequenceType destination)
-        {
-            if(ValueType == destination)
-                return DereferenceResult(category);
-
-            var typedCategory = category | Category.Type;
-            return ValueType
-                .ForceConversion(typedCategory, destination)
-                .ReplaceArg(DereferenceResult(typedCategory));
-        }
-
-        internal override Result VirtualForceConversion(Category category, AutomaticReferenceType destination) { return ForceConversion(category, destination.ValueType).LocalReferenceResult(destination.RefAlignParam); }
-
-        private Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
+        internal Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
         protected abstract CodeBase DereferenceCode();
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
 
@@ -85,5 +67,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
+        internal abstract Result ToAutomaticReferenceResult(Category category);
     }
+
 }

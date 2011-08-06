@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -34,7 +33,10 @@ namespace Reni.Type
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
 
-        internal override bool VirtualIsConvertable(SequenceType destination, ConversionParameter conversionParameter) { return Parent.IsConvertable(destination, conversionParameter.EnableCut); }
-        internal override Result VirtualForceConversion(Category category, SequenceType destination) { return Parent.ForceConversion(category, destination).ReplaceArg(Parent.Result(category, ArgCode)); }
+        internal Converter SourceConverter(ConversionParameter conversionParameter, TypeBase destination)
+        {
+            return StripTagResult
+                * Parent.Converter(conversionParameter.EnableCut, destination);
+        }
     }
 }

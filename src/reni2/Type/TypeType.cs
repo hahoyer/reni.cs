@@ -23,7 +23,6 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Size.Zero; }
         internal override string DumpPrintText { get { return "(" + _value.DumpPrintText + "()) type"; } }
-        protected override Result InternalConversionToItself(Category category) { return VoidResult(category); }
 
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }

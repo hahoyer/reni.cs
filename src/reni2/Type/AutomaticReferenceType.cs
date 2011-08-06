@@ -79,8 +79,17 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        protected override bool VirtualIsConvertableFrom(TypeBase source, ConversionParameter conversionParameter) { return source.VirtualIsConvertable(this, conversionParameter); }
-        protected override Result VirtualForceConversionFrom(Category category, TypeBase source) { return source.VirtualForceConversion(category, this); }
+        internal override Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
 
+        internal static Converter Converter(ReferenceType source, ConversionParameter conversionParameter, AutomaticReferenceType destination)
+        {
+            if(source.ValueType == destination.ValueType && destination.RefAlignParam == source.RefAlignParam)
+                return new FunctionalConverter(source.ToAutomaticReferenceResult);
+            return
+                source.DereferenceResult
+                *source.ValueType.Converter(conversionParameter, destination.ValueType)
+                *destination.ValueTypeToLocalReferenceResult;
+        }
+        private Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.LocalReferenceResult(category, RefAlignParam); }
     }
 }
