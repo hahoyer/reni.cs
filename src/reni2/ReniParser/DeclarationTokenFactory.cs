@@ -33,8 +33,8 @@ namespace Reni.ReniParser
         {
             return new Dictionary<string, TokenClasses.TokenClass>
                    {
-                       {"converter", new Converter()},
-                       {"property", new Property()}
+                       {"converter", new ConverterToken()},
+                       {"property", new PropertyToken()}
                    };
         }
 

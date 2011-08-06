@@ -36,7 +36,7 @@ namespace Reni.TokenClasses
     }
 
     [Serializable]
-    internal sealed class Property : TokenClass
+    internal sealed class PropertyToken : TokenClass
     {
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -46,7 +46,7 @@ namespace Reni.TokenClasses
     }
 
     [Serializable]
-    internal sealed class Converter : TokenClass
+    internal sealed class ConverterToken : TokenClass
     {
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
