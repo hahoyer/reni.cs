@@ -26,8 +26,7 @@ using Reni.FeatureTest.Integer;
 namespace Reni.FeatureTest.Array
 {
     [TestFixture]
-    [IntegerPlusInteger]
-    [Target("(()<*5<*3<*5<*1) dump_print")]
+    [Target("(<<5<<3<<5<<1) dump_print")]
     [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
     public sealed class ArrayFromPieces : CompilerTest
     {
@@ -36,9 +35,8 @@ namespace Reni.FeatureTest.Array
     }
 
     [TestFixture]
-    [IntegerPlusInteger]
-    [Target("(()<*5<*3)<<(()<*5<*1) dump_print")]
-    [Output("array(array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
+    [Target("((<<5<<3) << (<<5<<1<<3)) dump_print")]
+    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1, 3))")]
     public sealed class CombineArraysFromPieces : CompilerTest
     {
         [Test]
@@ -46,7 +44,6 @@ namespace Reni.FeatureTest.Array
     }
 
     [TestFixture]
-    [IntegerPlusInteger]
     [Target("(5 type * 5)(arg/\\) array dump_print")]
     [Output("array(array(#(#align3#)# (bit)sequence(4),(0, 1, 2, 3, 4))")]
     public sealed class FromTypeAndFunction : CompilerTest
