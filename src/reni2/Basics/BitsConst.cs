@@ -38,7 +38,7 @@ namespace Reni.Basics
         private static int _nextObjectId;
 
         private readonly Size _size;
-        private readonly byte[] _data;
+        private byte[] _data;
         private readonly SimpleCache<BigInteger> _dataCache;
 
         private BitsConst(Size size)
