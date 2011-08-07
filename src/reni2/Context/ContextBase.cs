@@ -25,7 +25,6 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
 using Reni.Struct;
 using Reni.Syntax;
@@ -104,7 +103,7 @@ namespace Reni.Context
                 .Find(args);
         }
 
-        internal ContextBase UniqueChildContext(Struct.Container container, int position)
+        internal ContextBase UniqueChildContext(Container container, int position)
         {
             return _cache
                 .StructContexts
@@ -149,21 +148,6 @@ namespace Reni.Context
                 .Result(category);
         }
 
-        internal CodeBase Code(ICompileSyntax syntax) { return Result(Category.Code, syntax).Code; }
-
-        internal BitsConst Evaluate(ICompileSyntax syntax, TypeBase resultType)
-        {
-            return Result(Category.Code | Category.Type | Category.Refs, syntax)
-                .Conversion(resultType)
-                .Evaluate();
-        }
-
-        internal BitsConst Evaluate(ICompileSyntax syntax)
-        {
-            return Result(Category.Code | Category.Type | Category.Refs, syntax)
-                .Evaluate();
-        }
-
         private ContextBase[] ObtainChildChain()
         {
             if(Parent == null)
@@ -191,8 +175,8 @@ namespace Reni.Context
         }
 
         internal Structure UniqueStructure(Struct.Context context) { return Cache.Structures.Find(context.Container).Find(context.Position); }
-        internal Structure UniqueStructure(Struct.Container container) { return Cache.Structures.Find(container).Find(container.EndPosition); }
-        internal ContainerContextObject UniqueContainerContext(Struct.Container context) { return Cache.ContainerContextObjects.Find(context); }
+        internal Structure UniqueStructure(Container container) { return Cache.Structures.Find(container).Find(container.EndPosition); }
+        internal ContainerContextObject UniqueContainerContext(Container context) { return Cache.ContainerContextObjects.Find(context); }
 
         private FunctionContextObject ObtainRecentFunctionContext()
         {
@@ -377,15 +361,15 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>> StructContexts;
+            internal readonly DictionaryEx<Container, DictionaryEx<int, ContextBase>> StructContexts;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Struct.Container, DictionaryEx<int, Structure>> Structures;
+            internal readonly DictionaryEx<Container, DictionaryEx<int, Structure>> Structures;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Struct.Container, ContainerContextObject> ContainerContextObjects;
+            internal readonly DictionaryEx<Container, ContainerContextObject> ContainerContextObjects;
 
             [Node]
             [SmartNode]
@@ -402,7 +386,7 @@ namespace Reni.Context
             public CacheItems(ContextBase parent)
             {
                 ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(parent.CreateCacheElement);
-                StructContexts = new DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>>(
+                StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>(
                     container => new DictionaryEx<int, ContextBase>(
                                      position => new ContextBase(parent, container.UniqueContext(position))));
                 FunctionContexts = new DictionaryEx<TypeBase, ContextBase>(argsType => new ContextBase(parent, argsType.UniqueFunction()));
@@ -410,21 +394,15 @@ namespace Reni.Context
                 PendingContext = new SimpleCache<ContextBase>(() => new ContextBase(parent, new PendingContext()));
                 RecentStructure = new SimpleCache<Structure>(parent.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<FunctionContextObject>(parent.ObtainRecentFunctionContext);
-                Structures = new DictionaryEx<Struct.Container, DictionaryEx<int, Structure>>(
+                Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(
                     container => new DictionaryEx<int, Structure>(
                                      position => new Structure(ContainerContextObjects.Find(container), position)));
-                ContainerContextObjects = new DictionaryEx<Struct.Container, ContainerContextObject>(container => new ContainerContextObject(container, parent));
+                ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>(container => new ContainerContextObject(container, parent));
             }
 
             [DisableDump]
             public string IconKey { get { return "Cache"; } }
         }
-    }
-
-    internal interface IReference
-    {
-        TypeBase ValueType { get; }
-        RefAlignParam RefAlignParam { get; }
     }
 
     internal sealed class PendingContext : Child

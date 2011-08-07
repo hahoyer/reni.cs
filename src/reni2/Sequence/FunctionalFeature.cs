@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
 using Reni.Type;
 
@@ -46,9 +45,10 @@ namespace Reni.Sequence
 
         protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
-            return result.ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), () => _objectType.ReferenceArgCode(refAlignParam), Refs.None);
+            return result
+                .ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), () => _objectType.ReferenceArgCode(refAlignParam), Refs.None);
         }
-        
+
         internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
 
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
@@ -56,7 +56,7 @@ namespace Reni.Sequence
             return new Result
                 (category
                  , () => refAlignParam.RefSize
-                 , () => _objectType.UniqueFunctionalType(this, refAlignParam)
+                 , () => UniqueFunctionalType(refAlignParam)
                  , () => _objectType.ReferenceArgCode(refAlignParam)
                 );
         }
@@ -69,7 +69,7 @@ namespace Reni.Sequence
             var objectResult = _objectType.UniqueObjectReference(refAlignParam).Result(typedCategory);
             var convertedObjectResult = objectResult.ConvertToBitSequence(typedCategory);
             var convertedArgsResult = argsType.ConvertToBitSequence(typedCategory);
-            return result.ReplaceArg(convertedObjectResult.Pair(convertedArgsResult));
+            return result.ReplaceArg(convertedObjectResult.Sequence(convertedArgsResult));
         }
 
         private Result Apply(Category category, int objSize, int argsSize)

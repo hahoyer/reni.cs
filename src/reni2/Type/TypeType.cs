@@ -49,7 +49,7 @@ namespace Reni.Type
 
         internal override string DumpShort() { return "(" + _value.DumpShort() + ") type"; }
         [DisableDump]
-        internal override TypeBase ObjectType { get { return _value; } }
+        private TypeBase Value { get { return _value; } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -67,7 +67,7 @@ namespace Reni.Type
             private readonly TypeType _typeType;
             public RepeaterType(TypeType typeType) { _typeType = typeType; }
             protected override Size GetSize() { return Size.Zero; }
-            
+
             Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
             {
                 var count = argsResult
@@ -75,7 +75,7 @@ namespace Reni.Type
                     .Evaluate()
                     .ToInt32();
                 return _typeType
-                    .ObjectType
+                    .Value
                     .UniqueAlign(refAlignParam.AlignBits)
                     .UniqueArray(count)
                     .UniqueTypeType

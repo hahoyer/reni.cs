@@ -22,24 +22,14 @@ using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 
 namespace Reni.Type
 {
-    internal abstract class ReferenceType : TypeBase, IReference
+    internal abstract class ReferenceType : TypeBase
     {
         private readonly TypeBase _valueType;
 
-        protected ReferenceType(TypeBase valueType)
-        {
-            _valueType = valueType;
-        }
-
-        [DisableDump]
-        TypeBase IReference.ValueType { get { return ValueType; } }
-
-        [DisableDump]
-        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+        protected ReferenceType(TypeBase valueType) { _valueType = valueType; }
 
         [DisableDump]
         internal abstract RefAlignParam RefAlignParam { get; }
@@ -54,7 +44,6 @@ namespace Reni.Type
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         internal override TypeBase ForceReference(RefAlignParam refAlignParam) { return this; }
         protected override Size GetSize() { return RefAlignParam.RefSize; }
-        internal override bool IsRef(RefAlignParam refAlignParam) { return (RefAlignParam == refAlignParam); }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
         internal Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
@@ -66,7 +55,7 @@ namespace Reni.Type
             ValueType.Search(searchVisitor);
             base.Search(searchVisitor);
         }
-        
+
         internal override Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
             return UniqueAlign(refAlignParam.AlignBits)
@@ -82,5 +71,4 @@ namespace Reni.Type
 
         internal abstract Result ToAutomaticReferenceResult(Category category);
     }
-
 }

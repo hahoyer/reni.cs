@@ -28,7 +28,6 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-
     internal sealed class FunctionalBody : FunctionalFeature
     {
         private readonly ICompileSyntax _body;
@@ -56,12 +55,10 @@ namespace Reni.Struct
             protected override Size GetSize() { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpShort() + "/\\"; } }
             internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
-            [DisableDump]
-            internal override TypeBase ObjectType { get { return _parent.ObjectType; } }
         }
 
         [DisableDump]
-        internal ICompileSyntax Body { get { return _body; } }
+        private ICompileSyntax Body { get { return _body; } }
 
         [DisableDump]
         protected override TypeBase ObjectType { get { return _structure.Type; } }

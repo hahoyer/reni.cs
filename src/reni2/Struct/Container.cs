@@ -231,7 +231,7 @@ namespace Reni.Struct
         {
             var result = TypeBase.VoidResult(category);
             for(var position = fromPosition; position < fromNotPosition; position++)
-                result = result.Pair(ConstructorResult(category, parent, position));
+                result = result.Sequence(ConstructorResult(category, parent, position));
             return result;
         }
 

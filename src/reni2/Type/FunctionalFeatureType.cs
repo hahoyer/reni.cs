@@ -27,13 +27,11 @@ namespace Reni.Type
     internal sealed class FunctionalFeatureType<TFeature> : TypeBase
         where TFeature : IFunctionalFeature
     {
-        private readonly TypeBase _objectType;
         private readonly TFeature _functionalFeature;
         private readonly RefAlignParam _refAlignParam;
 
-        internal FunctionalFeatureType(TypeBase objectType, TFeature functionalFeature, RefAlignParam refAlignParam)
+        internal FunctionalFeatureType(TFeature functionalFeature, RefAlignParam refAlignParam)
         {
-            _objectType = objectType;
             _functionalFeature = functionalFeature;
             _refAlignParam = refAlignParam;
         }
@@ -44,8 +42,5 @@ namespace Reni.Type
 
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }
-
-        [DisableDump]
-        internal override TypeBase ObjectType { get { return _objectType; } }
     }
 }

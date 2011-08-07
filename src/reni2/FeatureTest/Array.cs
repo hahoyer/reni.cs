@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
-using Reni.FeatureTest.Integer;
 
 namespace Reni.FeatureTest.Array
 {

@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Basics;
 
 namespace Reni.Type
 {
@@ -32,11 +31,5 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
-
-        internal Converter SourceConverter(ConversionParameter conversionParameter, TypeBase destination)
-        {
-            return StripTagResult
-                * Parent.Converter(conversionParameter.EnableCut, destination);
-        }
     }
 }

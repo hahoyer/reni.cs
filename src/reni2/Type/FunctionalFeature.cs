@@ -20,6 +20,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 
 namespace Reni.Type
@@ -27,8 +28,12 @@ namespace Reni.Type
     internal abstract class FunctionalFeature : ReniObject, IFunctionalFeature
     {
         private static int _nextObjectId;
+        private readonly DictionaryEx<RefAlignParam, TypeBase> _functionalTypesCache;
+
         protected FunctionalFeature()
-            : base(_nextObjectId++) {}
+            : base(_nextObjectId++) { _functionalTypesCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new FunctionalFeatureType<IFunctionalFeature>(this, refAlignParam)); }
+
+        internal TypeBase UniqueFunctionalType(RefAlignParam refAlignParam) { return _functionalTypesCache.Find(refAlignParam); }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
         bool IFunctionalFeature.IsRegular { get { return true; } }
@@ -36,7 +41,7 @@ namespace Reni.Type
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == -1 && category.HasCode;
-            StartMethodDump(trace, category,operationResult,argsResult,refAlignParam);
+            StartMethodDump(trace, category, operationResult, argsResult, refAlignParam);
             try
             {
                 BreakExecution();
@@ -54,7 +59,7 @@ namespace Reni.Type
                 Dump("replaceObjectResult", replaceObjectResult);
                 if(!replaceObjectResult.HasArg)
                     return ReturnMethodDump(replaceObjectResult, true);
-                
+
                 BreakExecution();
                 var objectResult = ObjectType
                     .ForceReference(refAlignParam)
@@ -72,6 +77,5 @@ namespace Reni.Type
         protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         protected abstract TypeBase ObjectType { get; }
         protected abstract Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam);
-
     }
 }

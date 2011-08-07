@@ -52,7 +52,6 @@ namespace Reni.Code
             {
                 Tracer.Assert(_newCombinedReason == null);
                 _newCombinedReason = value;
-                ;
             }
         }
 
@@ -144,7 +143,7 @@ namespace Reni.Code
 
         internal CodeBase Dereference(RefAlignParam refAlignParam, Size targetSize)
         {
-            if (Size.IsZero && targetSize.IsZero)
+            if(Size.IsZero && targetSize.IsZero)
                 return this;
             Tracer.Assert(Size == refAlignParam.RefSize);
             return CreateFiber(new Dereference(refAlignParam, targetSize, targetSize));
@@ -237,8 +236,6 @@ namespace Reni.Code
             var dataStack = new DataStack(new CodeBase[0], false);
             Execute(dataStack);
             return dataStack.Value;
-            NotImplementedMethod();
-            return null;
         }
 
         internal CodeBase Align(int alignBits = Basics.BitsConst.SegmentAlignBits) { return BitCast(Size.NextPacketSize(alignBits)); }

@@ -49,7 +49,6 @@ namespace Reni.Type
             public readonly DictionaryEx<RefAlignParam, AutomaticReferenceType> References;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<Context.Function> Function;
-            public readonly DictionaryEx<RefAlignParam, DictionaryEx<IFunctionalFeature, TypeBase>> FunctionalTypes;
 
             public Cache(TypeBase parent)
             {
@@ -60,11 +59,6 @@ namespace Reni.Type
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
                 Function = new SimpleCache<Context.Function>(() => new Context.Function(parent));
-                FunctionalTypes = new DictionaryEx<RefAlignParam, DictionaryEx<IFunctionalFeature, TypeBase>>(
-                    refAlignParam => new DictionaryEx<IFunctionalFeature, TypeBase>(
-                                         feature => new FunctionalFeatureType<IFunctionalFeature>(parent, feature, refAlignParam)
-                                         )
-                    );
             }
         }
 
@@ -85,8 +79,6 @@ namespace Reni.Type
         internal Size Size { get { return GetSize(); } }
 
         protected abstract Size GetSize();
-
-        internal virtual bool IsRef(RefAlignParam refAlignParam) { return false; }
 
         [DisableDump]
         internal virtual Size UnrefSize { get { return Size; } }
@@ -218,16 +210,6 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual TypeBase ObjectType
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        [DisableDump]
         internal virtual Structure FindRecentStructure
         {
             get
@@ -247,11 +229,9 @@ namespace Reni.Type
         [DisableDump]
         internal virtual bool IsArray { get { return false; } }
 
-        protected bool IsRefLike(AutomaticReferenceType target) { return false; }
-
         private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
-        internal TFeature SearchDefineable<TFeature>(Defineable defineable)
+        private TFeature SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class
         {
             var searchVisitor = new RootSearchVisitor<TFeature>(defineable);
@@ -350,8 +330,6 @@ namespace Reni.Type
         private AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
 
         internal virtual TypeBase ForceReference(RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam); }
-
-        internal TypeBase UniqueFunctionalType(IFunctionalFeature functionalFeature, RefAlignParam refAlignParam) { return _cache.FunctionalTypes.Find(refAlignParam).Find(functionalFeature); }
 
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
         {

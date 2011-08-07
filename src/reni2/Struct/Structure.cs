@@ -106,6 +106,7 @@ namespace Reni.Struct
 
         private sealed class RecursionWhileObtainingStructSizeException : Exception
         {
+            [EnableDump]
             private readonly Structure _structure;
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
@@ -136,10 +137,7 @@ namespace Reni.Struct
                 .ContextReferenceViaStructReference(this);
         }
 
-        internal Result DumpPrintResultViaContextReference(Category category)
-        {
-            return Result.ConcatPrintResult(category, EndPosition, position => DumpPrintResultViaAccessReference(category, position));
-        }
+        internal Result DumpPrintResultViaContextReference(Category category) { return Result.ConcatPrintResult(category, EndPosition, position => DumpPrintResultViaAccessReference(category, position)); }
 
         internal Result AccessViaThisReference(Category category, int position)
         {
@@ -187,7 +185,7 @@ namespace Reni.Struct
         }
 
         internal Result ContextReferenceViaStructReference(Result result) { return ContainerContextObject.ContextReferenceViaStructReference(EndPosition, result); }
-        private CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize * -1); }
-        internal TypeBase ValueType(int position) { return ContainerContextObject.InnerType(EndPosition,position).UnAlignedType; }
+        private CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize*-1); }
+        internal TypeBase ValueType(int position) { return ContainerContextObject.InnerType(EndPosition, position).UnAlignedType; }
     }
 }

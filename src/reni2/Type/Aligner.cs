@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -40,7 +39,7 @@ namespace Reni.Type
         protected override bool IsInheritor { get { return true; } }
 
         [DisableDump]
-        internal int AlignBits { get { return _alignBits; } }
+        private int AlignBits { get { return _alignBits; } }
 
         [DisableDump]
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }

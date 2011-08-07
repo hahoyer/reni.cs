@@ -78,7 +78,7 @@ namespace Reni.Type
             var result = new Result
                 (category
                  , () => refAlignParam.RefSize
-                 , () => UniqueFunctionalType(_assignmentFeatureCache.Value, refAlignParam)
+                 , () => _assignmentFeatureCache.Value.UniqueFunctionalType(refAlignParam)
                  , ArgCode
                  , Refs.None
                 );
@@ -92,7 +92,7 @@ namespace Reni.Type
             var destinationResult = ValueReferenceViaFieldReference(typedCategory)
                 .ReplaceArg(FieldReferenceViaStructReference(typedCategory))
                 .ReplaceArg(AccessPoint.StructReferenceViaContextReference(typedCategory));
-            var resultForArg = destinationResult.Pair(sourceResult);
+            var resultForArg = destinationResult.Sequence(sourceResult);
             return AssignmentResult(category).ReplaceArg(resultForArg);
         }
 
@@ -168,6 +168,5 @@ namespace Reni.Type
         }
 
         internal override Result ToAutomaticReferenceResult(Category category) { return ValueReferenceViaFieldReference(category); }
-
     }
 }

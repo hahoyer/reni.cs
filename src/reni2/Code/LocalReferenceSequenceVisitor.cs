@@ -1,4 +1,22 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -6,7 +24,6 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
-using Reni.Context;
 
 namespace Reni.Code
 {
@@ -14,9 +31,11 @@ namespace Reni.Code
     {
         private readonly SimpleCache<CodeBase> _codeCache;
 
-        [Node, EnableDump]
+        [Node]
+        [EnableDump]
         private readonly List<LocalReference> _data = new List<LocalReference>();
-        [Node, EnableDump]
+        [Node]
+        [EnableDump]
         private readonly DictionaryEx<LocalReference, int> _localReferences;
 
         private static int _nextObjectId;
@@ -44,7 +63,7 @@ namespace Reni.Code
             {
                 var size = Size.Zero;
                 return _data
-                    .Select((localReference, i) => localReference.AccompayningDestructorCode(ref size,HolderName(i)))
+                    .Select((localReference, i) => localReference.AccompayningDestructorCode(ref size, HolderName(i)))
                     .ToSequence();
             }
         }
@@ -60,7 +79,7 @@ namespace Reni.Code
                 var holderIndex = _localReferences.Find(visitedObject);
                 Dump("holderIndex", holderIndex);
                 _codeCache.Reset();
-                return ReturnMethodDump(CodeBase.LocalVariableReference(visitedObject.RefAlignParam, HolderName(holderIndex)),true);
+                return ReturnMethodDump(CodeBase.LocalVariableReference(visitedObject.RefAlignParam, HolderName(holderIndex)), true);
             }
             finally
             {
@@ -72,7 +91,7 @@ namespace Reni.Code
         private int ObtainHolderIndex(LocalReference visitedObject)
         {
             _data.Add(ReVisit(visitedObject) ?? visitedObject);
-            return _data.Count-1;
+            return _data.Count - 1;
         }
 
         internal CodeBase LocalBlock(CodeBase body, CodeBase copier)
@@ -93,7 +112,7 @@ namespace Reni.Code
                 Dump("aligned Body", alignedBody);
                 Dump("alignedInternal", alignedInternal);
                 BreakExecution();
-                if (!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
+                if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                     gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
                 var statement = alignedInternal
                     .Sequence(gap, alignedBody, DestructorCode)

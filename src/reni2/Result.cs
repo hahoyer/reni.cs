@@ -43,10 +43,7 @@ namespace Reni
         private Refs _refs;
 
         internal Result()
-            : base(_nextObjectId++)
-        {
-            PendingCategory = new Category();
-        }
+            : base(_nextObjectId++) { PendingCategory = new Category(); }
 
         internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs)
             : this()
@@ -455,14 +452,7 @@ namespace Reni
             IsDirty = false;
         }
 
-        private Result CreateSequence(Result second, Category category)
-        {
-            var result = Clone(category);
-            result.Add(second);
-            return result;
-        }
-
-        public Result Pair(Result second)
+        public Result Sequence(Result second)
         {
             var result = Clone();
             result.Add(second);
@@ -478,10 +468,10 @@ namespace Reni
 
         internal Result ReplaceArg(Result resultForArg)
         {
-            var result = new Result { Size = Size, Type = Type };
-            if (HasCode && resultForArg.HasCode)
+            var result = new Result {Size = Size, Type = Type};
+            if(HasCode && resultForArg.HasCode)
                 result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
-            if (HasRefs && resultForArg.HasRefs)
+            if(HasRefs && resultForArg.HasRefs)
                 result.Refs = Refs.Sequence(resultForArg.Refs);
             return result;
         }

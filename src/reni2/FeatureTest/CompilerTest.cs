@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +24,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.UnitTest;
-using JetBrains.Annotations;
 
 namespace Reni.FeatureTest
 {
@@ -16,9 +33,9 @@ namespace Reni.FeatureTest
     [AttributeUsage(AttributeTargets.Class)]
     public abstract class CompilerTest : DependantAttribute
     {
-        [Obsolete("Use IsUnderConstruction",true)]
+        [Obsolete("Use IsUnderConstruction", true)]
         internal const string UnderConstruction = "Under Construction";
-        [Obsolete("Remove it",true)]
+        [Obsolete("Remove it", true)]
         internal const string Worked = "Worked";
 
         internal readonly CompilerParameters Parameters = new CompilerParameters();
@@ -80,10 +97,11 @@ namespace Reni.FeatureTest
             for(var i = 0; i < 100; i++)
             {
                 var stackFrame = new StackTrace(true).GetFrame(depth + i);
-                if (stackFrame == null)
+                if(stackFrame == null)
                     return false;
                 var x = stackFrame.GetMethod();
-                if(x.GetCustomAttributes(typeof(IsUnderConstructionAttribute), true).Length > 0) return true;
+                if(x.GetCustomAttributes(typeof(IsUnderConstructionAttribute), true).Length > 0)
+                    return true;
             }
             return false;
         }

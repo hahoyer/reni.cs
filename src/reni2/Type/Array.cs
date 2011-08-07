@@ -33,7 +33,6 @@ namespace Reni.Type
     [Serializable]
     internal sealed class Array : Child
     {
-        private readonly DictionaryEx<Size, ConcatArrayWithObjectFeature> _concatArrayWithObjectFeatureCache;
         private readonly DictionaryEx<Size, ConcatArraysFeature> _concatArraysFeatureCache;
 
         private readonly int _count;
@@ -43,7 +42,6 @@ namespace Reni.Type
         {
             _count = count;
             Tracer.Assert(count > 0);
-            _concatArrayWithObjectFeatureCache = new DictionaryEx<Size, ConcatArrayWithObjectFeature>(size => new ConcatArrayWithObjectFeature(this, size));
             _concatArraysFeatureCache = new DictionaryEx<Size, ConcatArraysFeature>(size => new ConcatArraysFeature(this, size));
         }
 
@@ -125,39 +123,9 @@ namespace Reni.Type
                     .Result(category.Typed, () => CodeBase.BitsConst(index));
                 var rawResult = functionalFeature.ObtainApplyResult(category, operationResult, argsResult, null);
                 var convertedResult = rawResult.Conversion(Element) & result.CompleteCategory;
-                result = convertedResult.Pair(result);
+                result = convertedResult.Sequence(result);
             }
             return Result(category, result);
-        }
-    }
-
-    internal sealed class ConcatArrayWithObjectFeature : TypeBase, IFunctionalFeature
-    {
-        [EnableDump]
-        private Array _type;
-        private readonly Size _refSize;
-
-        public ConcatArrayWithObjectFeature(Array type, Size refSize)
-        {
-            _type = type;
-            _refSize = refSize;
-        }
-
-        protected override Size GetSize() { return _refSize; }
-        internal override IFunctionalFeature FunctionalFeature { get { return this; } }
-        bool IFunctionalFeature.IsRegular { get { return true; } }
-
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
-        {
-            var newElementResult = argsResult.Conversion(_type.Element);
-            return _type
-                .Element
-                .UniqueArray(_type.Count + 1)
-                .Result
-                (category
-                 , () => newElementResult.Code.Sequence(operationResult.Code.Dereference(refAlignParam, _type.Size))
-                 , () => newElementResult.Refs + operationResult.Refs
-                );
         }
     }
 

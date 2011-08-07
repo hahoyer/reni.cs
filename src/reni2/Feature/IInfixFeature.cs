@@ -61,7 +61,7 @@ namespace Reni.Feature
         }
 
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
-        TypeBase IFeature.ObjectType { get { return (TypeBase)_function.Target; } }
+        TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
     }
 
     internal sealed class PrefixFeature : ReniObject, IPrefixFeature, IFeature
@@ -78,7 +78,7 @@ namespace Reni.Feature
         }
 
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
-        TypeBase IFeature.ObjectType { get { return (TypeBase)_function.Target; } }
+        TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
         IFeature IPrefixFeature.Feature { get { return this; } }
     }
 
