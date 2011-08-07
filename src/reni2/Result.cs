@@ -529,7 +529,7 @@ namespace Reni
             return result;
         }
 
-        internal Result LocalBlock(Category category, RefAlignParam refAlignParam)
+        internal Result LocalBlock(Category category)
         {
             if(!category.HasCode && !category.HasRefs)
                 return this;
@@ -537,7 +537,7 @@ namespace Reni
             var result = Clone(category);
             var copier = Type.Copier(category);
             if(category.HasCode)
-                result.Code = Code.LocalBlock(copier.Code, refAlignParam);
+                result.Code = Code.LocalBlock(copier.Code);
             if(category.HasRefs)
                 result.Refs = Refs.Sequence(copier.Refs);
             return result;
@@ -548,7 +548,8 @@ namespace Reni
         internal BitsConst Evaluate()
         {
             Tracer.Assert(Refs.IsNone);
-            return Code.Evaluate();
+            var result = Align(3).LocalBlock(CompleteCategory);
+            return result.Code.Evaluate();
         }
 
         internal Result AutomaticDereference()

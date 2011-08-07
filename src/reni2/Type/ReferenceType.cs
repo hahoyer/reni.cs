@@ -66,6 +66,19 @@ namespace Reni.Type
             ValueType.Search(searchVisitor);
             base.Search(searchVisitor);
         }
+        
+        internal override Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
+        {
+            return UniqueAlign(refAlignParam.AlignBits)
+                .Result
+                (
+                    category,
+                    () =>
+                    LocalReferenceCode(refAlignParam).Dereference
+                        (refAlignParam, refAlignParam.RefSize),
+                    () => Destructor(Category.Refs).Refs
+                );
+        }
 
         internal abstract Result ToAutomaticReferenceResult(Category category);
     }

@@ -24,7 +24,6 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -44,7 +43,7 @@ namespace Reni.Type
         {
             _count = count;
             Tracer.Assert(count > 0);
-            _concatArrayWithObjectFeatureCache = new DictionaryEx<Size, ConcatArrayWithObjectFeature>(size => new ConcatArrayWithObjectFeature(this,size));
+            _concatArrayWithObjectFeatureCache = new DictionaryEx<Size, ConcatArrayWithObjectFeature>(size => new ConcatArrayWithObjectFeature(this, size));
             _concatArraysFeatureCache = new DictionaryEx<Size, ConcatArraysFeature>(size => new ConcatArraysFeature(this, size));
         }
 
@@ -87,12 +86,6 @@ namespace Reni.Type
                 .Find(refAlignParam.RefSize)
                 .Result(category, () => ReferenceArgCode(refAlignParam));
         }
-        internal Result ConcatArrayWithObject(Category category, RefAlignParam refAlignParam)
-        {
-            return _concatArrayWithObjectFeatureCache
-                .Find(refAlignParam.RefSize)
-                .Result(category, () => ReferenceArgCode(refAlignParam));
-        }
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam)
         {
@@ -120,23 +113,21 @@ namespace Reni.Type
             code = code.Sequence(CodeBase.DumpPrintText("))"));
             return code;
         }
-    }
 
-    internal sealed class CreateArrayFeature : TypeBase, IFunctionalFeature
-    {
-        protected override Size GetSize() { return Size.Zero; }
-        internal override IFunctionalFeature FunctionalFeature { get { return this; } }
-
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
+        internal Result Result(Category category, IFunctionalFeature functionalFeature)
         {
-            var result = argsResult.AutomaticDereference().Align(refAlignParam.AlignBits);
-            return new Result
-                (category
-                 , () => result.Size
-                 , () => result.Type.UniqueArray(1)
-                 , () => result.Code
-                 , () => result.Refs
-                );
+            var operationResult = VoidResult(category);
+            var result = VoidResult(category);
+            for(var i = 0; i < Count; i++)
+            {
+                var index = BitsConst.Convert(i);
+                var argsResult = UniqueNumber(index.Size.ToInt())
+                    .Result(category.Typed, () => CodeBase.BitsConst(index));
+                var rawResult = functionalFeature.ObtainApplyResult(category, operationResult, argsResult, null);
+                var convertedResult = rawResult.Conversion(Element) & result.CompleteCategory;
+                result = convertedResult.Pair(result);
+            }
+            return Result(category, result);
         }
     }
 
@@ -154,6 +145,7 @@ namespace Reni.Type
 
         protected override Size GetSize() { return _refSize; }
         internal override IFunctionalFeature FunctionalFeature { get { return this; } }
+        bool IFunctionalFeature.IsRegular { get { return true; } }
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
@@ -163,7 +155,7 @@ namespace Reni.Type
                 .UniqueArray(_type.Count + 1)
                 .Result
                 (category
-                 , () => newElementResult.Code.Sequence(operationResult.Code.Dereference(refAlignParam,_type.Size))
+                 , () => newElementResult.Code.Sequence(operationResult.Code.Dereference(refAlignParam, _type.Size))
                  , () => newElementResult.Refs + operationResult.Refs
                 );
         }
@@ -183,19 +175,20 @@ namespace Reni.Type
 
         protected override Size GetSize() { return _refSize; }
         internal override IFunctionalFeature FunctionalFeature { get { return this; } }
+        bool IFunctionalFeature.IsRegular { get { return true; } }
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
             var newCount = argsResult.Type.ArrayElementCount;
             var newElementResult = argsResult.Conversion(argsResult.Type.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);
             return _type
-                    .Element
-                    .UniqueArray(_type.Count+newCount)
-                    .Result
-                    (category
+                .Element
+                .UniqueArray(_type.Count + newCount)
+                .Result
+                (category
                  , () => newElementResult.Code.Sequence(operationResult.Code.Dereference(refAlignParam, _type.Size))
                  , () => newElementResult.Refs + operationResult.Refs
-                    );
+                );
         }
     }
 }

@@ -44,8 +44,8 @@ namespace Reni.FeatureTest.Array
     }
 
     [TestFixture]
-    [Target("(5 type * 5)(arg/\\) array dump_print")]
-    [Output("array(array(#(#align3#)# (bit)sequence(4),(0, 1, 2, 3, 4))")]
+    [Target("(5 type * 5)(arg/\\) dump_print")]
+    [Output("array(#(#align3#)# (bit)sequence(4),(0, 1, 2, 3, 4))")]
     public sealed class FromTypeAndFunction : CompilerTest
     {
         [Test]

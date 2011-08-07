@@ -126,7 +126,7 @@ namespace Reni.Type
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
         internal virtual AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
         internal SequenceType UniqueSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
-        internal static TypeBase Number(int bitCount) { return Bit.UniqueSequence(bitCount); }
+        internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueSequence(bitCount); }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         internal virtual TypeBase TypeForTypeOperator() { return this; }
@@ -205,7 +205,7 @@ namespace Reni.Type
         internal virtual RefAlignParam[] ReferenceChain { get { return new RefAlignParam[0]; } }
 
         [DisableDump]
-        internal TypeType TypeType { get { return _cache.TypeType.Value; } }
+        internal TypeType UniqueTypeType { get { return _cache.TypeType.Value; } }
 
         [DisableDump]
         internal virtual IFunctionalFeature FunctionalFeature
@@ -269,20 +269,8 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
+        internal virtual Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
-            if(this is AutomaticReferenceType)
-            {
-                return UniqueAlign(refAlignParam.AlignBits)
-                    .Result
-                    (
-                        category,
-                        () =>
-                        LocalReferenceCode(refAlignParam).Dereference
-                            (refAlignParam, refAlignParam.RefSize),
-                        () => Destructor(Category.Refs).Refs
-                    );
-            }
             return UniqueAutomaticReference(refAlignParam)
                 .Result
                 (
@@ -315,7 +303,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -24 && category.HasCode;
+            var trace = defineable.ObjectId == -22 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -451,6 +439,15 @@ namespace Reni.Type
             if(IsZeroSized && destination is Void)
                 return new FunctionalConverter(c => Void.Result(c, ArgResult(c)));
 
+            var functionalSource = this as FunctionalBody.Type;
+            if(functionalSource != null)
+            {
+                var arrayDestination = destination as Array;
+                if(arrayDestination != null)
+                    return new FunctionalConverter(category => arrayDestination.Result(category, functionalSource.FunctionalFeature));
+                NotImplementedMethod(conversionParameter, destination);
+                return null;
+            }
             NotImplementedMethod(conversionParameter, destination);
             return null;
         }

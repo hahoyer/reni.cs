@@ -58,7 +58,7 @@ namespace Reni
                 .Result(category | Category.Type, Cond)
                 .Conversion(TypeBase.Bit)
                 .Align(context.AlignBits)
-                .LocalBlock(category | Category.Type, context.RefAlignParam)
+                .LocalBlock(category | Category.Type)
                 .Conversion(TypeBase.Bit);
         }
 
@@ -81,7 +81,7 @@ namespace Reni
             var result = branchResult.Type
                 .Conversion(category | Category.Type, commonType)
                 .ReplaceArg(branchResult);
-            return result.LocalBlock(category, context.RefAlignParam);
+            return result.LocalBlock(category);
         }
 
         private Result InternalResult(ContextBase context, Category category)

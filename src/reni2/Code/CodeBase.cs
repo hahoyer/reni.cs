@@ -144,6 +144,8 @@ namespace Reni.Code
 
         internal CodeBase Dereference(RefAlignParam refAlignParam, Size targetSize)
         {
+            if (Size.IsZero && targetSize.IsZero)
+                return this;
             Tracer.Assert(Size == refAlignParam.RefSize);
             return CreateFiber(new Dereference(refAlignParam, targetSize, targetSize));
         }
@@ -230,8 +232,11 @@ namespace Reni.Code
             return newResult ?? this;
         }
 
-        internal virtual BitsConst Evaluate()
+        internal BitsConst Evaluate()
         {
+            var dataStack = new DataStack(new CodeBase[0], false);
+            Execute(dataStack);
+            return dataStack.Value;
             NotImplementedMethod();
             return null;
         }
@@ -247,24 +252,23 @@ namespace Reni.Code
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
-        internal CodeBase LocalBlock(CodeBase copier, RefAlignParam refAlignParam)
+        internal CodeBase LocalBlock(CodeBase copier)
         {
             return new LocalReferenceSequenceVisitor()
-                .LocalBlock(this, copier, refAlignParam);
+                .LocalBlock(this, copier);
         }
 
-        internal CodeBase LocalBlockEnd(CodeBase copier, RefAlignParam refAlignParam, Size resultSize, string holder)
+        internal CodeBase LocalBlockEnd(CodeBase copier, Size resultSize)
         {
             var intermediateSize = Size - resultSize;
             if(intermediateSize.IsZero)
                 return this;
 
+            Tracer.Assert(copier.IsEmpty);
+
             var result = this;
             if(!resultSize.IsZero)
-            {
-                result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize))
-                    .Sequence(copier.ReplaceArg(null, LocalVariableReference(refAlignParam, holder)));
-            }
+                result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize));
 
             return result.CreateFiber(new Drop(Size, resultSize));
         }

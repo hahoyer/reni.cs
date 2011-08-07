@@ -230,15 +230,28 @@ namespace Reni.Struct
         internal Result ConstructionResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
             var result = TypeBase.VoidResult(category);
-            for (var position = fromPosition; position < fromNotPosition; position++)
-            {
-                //Tracer.ConditionalBreak(ObjectId == 0 && position == 0, ()=>"");
-                var result1 = InternalInnerResult(category, parent, position+1, position)
-                    .Align(parent.RefAlignParam.AlignBits)
-                    .LocalBlock(category, parent.RefAlignParam);
-                result = result.Pair(result1);
-            }
+            for(var position = fromPosition; position < fromNotPosition; position++)
+                result = result.Pair(ConstructorResult(category, parent, position));
             return result;
+        }
+
+        private Result ConstructorResult(Category category, ContextBase parent, int position)
+        {
+            StartMethodDump(ObjectId == -1 && position == 1 && category.HasCode, category, parent, position);
+            try
+            {
+                var internalInnerResult = InternalInnerResult(category, parent, position + 1, position);
+                Dump("internalInnerResult", internalInnerResult);
+                var alignedResult = internalInnerResult.Align(parent.RefAlignParam.AlignBits);
+                Dump("alignedResult", alignedResult);
+                BreakExecution();
+                var result = alignedResult.LocalBlock(category);
+                return ReturnMethodDump(result,true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, EndPosition, position).Size; }

@@ -16,7 +16,7 @@ namespace Reni.TokenClasses
         {
             var bitsConst = BitsConst.Convert(token.Name);
             return TypeBase
-                .Number(bitsConst.Size.ToInt())
+                .UniqueNumber(bitsConst.Size.ToInt())
                 .Result(category, () => CodeBase.BitsConst(bitsConst));
         }
 

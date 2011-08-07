@@ -57,7 +57,7 @@ namespace Reni.Struct
         internal RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
 
         [DisableDump]
-        internal TypeBase IndexType { get { return TypeBase.Number(IndexSize); } }
+        internal TypeBase IndexType { get { return TypeBase.UniqueNumber(IndexSize); } }
 
         [DisableDump]
         internal Root RootContext { get { return Parent.RootContext; } }

@@ -46,8 +46,8 @@ namespace Reni.Type
 
         internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objectBits, int argsBits)
         {
-            var objectType = Number(objectBits).UniqueAlign(BitsConst.SegmentAlignBits);
-            var argsType = Number(argsBits).UniqueAlign(BitsConst.SegmentAlignBits);
+            var objectType = UniqueNumber(objectBits).UniqueAlign(BitsConst.SegmentAlignBits);
+            var argsType = UniqueNumber(argsBits).UniqueAlign(BitsConst.SegmentAlignBits);
             return objectType
                 .Pair(argsType)
                 .ArgCode()

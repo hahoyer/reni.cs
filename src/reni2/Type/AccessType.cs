@@ -122,13 +122,13 @@ namespace Reni.Type
         internal Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
-            StartMethodDump(ObjectId == -3, category);
+            StartMethodDump(ObjectId == -18 && category.HasCode, category);
             try
             {
                 BreakExecution();
-                var localReferenceResult = base.ValueType
-                    .PropertyResult(category)
-                    .LocalReferenceResult(RefAlignParam);
+                var propertyResult = base.ValueType.PropertyResult(category);
+                Dump("propertyResult", propertyResult);
+                var localReferenceResult = propertyResult.LocalReferenceResult(RefAlignParam);
                 Dump("localReferenceResult", localReferenceResult);
                 var replaceObjectRefByArg = localReferenceResult
                     .ContextReferenceViaStructReference(AccessPoint);
@@ -161,7 +161,11 @@ namespace Reni.Type
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
 
-        protected override CodeBase DereferenceCode() { return ValueReferenceViaFieldReference(Category.Code).Code.Dereference(RefAlignParam, ValueType.Size); }
+        protected override CodeBase DereferenceCode()
+        {
+            var code = ValueReferenceViaFieldReference(Category.Code).Code;
+            return code.Dereference(RefAlignParam, ValueType.Size);
+        }
 
         internal override Result ToAutomaticReferenceResult(Category category) { return ValueReferenceViaFieldReference(category); }
 

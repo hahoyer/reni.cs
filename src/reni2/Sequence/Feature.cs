@@ -12,6 +12,6 @@ namespace Reni.Sequence
         public Feature(ISequenceOfBitBinaryOperation definable)
             : base(definable) { }
 
-        internal override TypeBase ResultType(int objSize, int argsSize) { return TypeBase.Number(Definable.ResultSize(objSize, argsSize)); }
+        internal override TypeBase ResultType(int objSize, int argsSize) { return TypeBase.UniqueNumber(Definable.ResultSize(objSize, argsSize)); }
     }
 }

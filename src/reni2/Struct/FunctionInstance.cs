@@ -156,7 +156,7 @@ namespace Reni.Struct
                 var postProcessedResult = rawResult
                     .AutomaticDereference()
                     .Align(_structure.RefAlignParam.AlignBits)
-                    .LocalBlock(category, _structure.RefAlignParam);
+                    .LocalBlock(category);
 
                 Dump("postProcessedResult", postProcessedResult);
                 BreakExecution();

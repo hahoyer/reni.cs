@@ -32,6 +32,7 @@ namespace Reni.Type
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
+        internal override Result LocalReferenceResult(Category category, RefAlignParam refAlignParam) { return ArgResult(category); }
 
         internal override TypeBase ForceReference(RefAlignParam refAlignParam) { return this; }
 

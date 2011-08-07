@@ -62,6 +62,9 @@ namespace Reni.Code
             _isTraceEnabled = isTraceEnabled;
         }
 
+        [DisableDump]
+        internal BitsConst Value { get { return Data.GetBitsConst(); } }
+
         void IFormalMaschine.Call(Size size, int functionIndex, Size argsAndRefsSize)
         {
             var oldFrame = _localData.Frame;
@@ -96,7 +99,8 @@ namespace Reni.Code
             var value = frame
                 .DoPull(frame.Size + offset)
                 .DoGetTop(size)
-                .BitCast(dataSize);
+                .BitCast(dataSize)
+                .BitCast(size);
             Push(value);
         }
 
@@ -167,7 +171,11 @@ namespace Reni.Code
 
         void IFormalMaschine.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextReference(context); }
 
-        void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize) { Locals.Add(holderName, Pull(valueSize)); }
+        void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize)
+        {
+            Locals
+                .Add(holderName, Pull(valueSize));
+        }
 
         private void SubExecute(string tag, IFormalCodeItem codeBase)
         {

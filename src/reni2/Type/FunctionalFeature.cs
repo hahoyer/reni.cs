@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
-using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -30,12 +29,13 @@ namespace Reni.Type
         private static int _nextObjectId;
         protected FunctionalFeature()
             : base(_nextObjectId++) {}
-        protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
-        protected abstract TypeBase ObjectType { get; }
+
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
+        bool IFunctionalFeature.IsRegular { get { return true; } }
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -10 && category.HasCode;
+            var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category,operationResult,argsResult,refAlignParam);
             try
             {
@@ -47,11 +47,14 @@ namespace Reni.Type
                 Dump("applyResult", applyResult);
                 BreakExecution();
                 var replaceArgResult = applyResult.ReplaceArg(argsResult);
-                if (ObjectType.Size.IsZero)
+                if(ObjectType.Size.IsZero)
                     return ReturnMethodDump(replaceArgResult);
 
                 var replaceObjectResult = ReplaceObjectReferenceByArg(replaceArgResult, refAlignParam);
                 Dump("replaceObjectResult", replaceObjectResult);
+                if(!replaceObjectResult.HasArg)
+                    return ReturnMethodDump(replaceObjectResult, true);
+                
                 BreakExecution();
                 var objectResult = ObjectType
                     .ForceReference(refAlignParam)
@@ -66,23 +69,9 @@ namespace Reni.Type
             }
         }
 
-        protected virtual Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(result,refAlignParam);
-            return result;
-        }
+        protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        protected abstract TypeBase ObjectType { get; }
+        protected abstract Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam);
 
-        private Structure FindAccessPoint(Result result)
-        {
-            if (!result.HasType)
-                return null;
-            var accessType = result.Type as AccessType;
-            if (accessType == null)
-                return null;
-
-            return accessType.AccessPoint;
-        }
-
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
     }
 }

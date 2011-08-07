@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -101,10 +119,7 @@ namespace Reni.Context
                 .Find(args);
         }
 
-        internal Result CreateArgsReferenceResult(Category category)
-        {
-            return FindRecentFunctionContextObject.CreateArgsReferenceResult(category);
-        }
+        internal Result CreateArgsReferenceResult(Category category) { return FindRecentFunctionContextObject.CreateArgsReferenceResult(category); }
 
         internal void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
@@ -151,9 +166,9 @@ namespace Reni.Context
 
         private ContextBase[] ObtainChildChain()
         {
-            if (Parent == null)
-                return new[] { this };
-            return Parent.ChildChain.Concat(new[] { this }).ToArray();
+            if(Parent == null)
+                return new[] {this};
+            return Parent.ChildChain.Concat(new[] {this}).ToArray();
         }
 
         private ContextBase UniquePendingContext { get { return _cache.PendingContext.Value; } }
@@ -165,19 +180,12 @@ namespace Reni.Context
             return result;
         }
 
-        internal Result ResultAsReference(Category category, ICompileSyntax syntax)
-        {
-            var result = Result(category | Category.Type, syntax);
-            if(result.Type.IsRef(RefAlignParam) || result.SmartSize.IsZero)
-                return Result(category, syntax);
-
-            return result.LocalReferenceResult(RefAlignParam);
-        }
+        internal Result ResultAsReference(Category category, ICompileSyntax syntax) { return Result(category.Typed, syntax).LocalReferenceResult(RefAlignParam); }
 
         private Structure ObtainRecentStructure()
         {
             var result = ContextItem as Struct.Context;
-            if (result != null)
+            if(result != null)
                 return Parent.UniqueStructure(result);
             return Parent.ObtainRecentStructure();
         }
@@ -189,9 +197,9 @@ namespace Reni.Context
         private FunctionContextObject ObtainRecentFunctionContext()
         {
             var result = ContextItem as Function;
-            if (result != null)
+            if(result != null)
                 return Parent.UniqueFunction(result.ArgsType);
-            if (Parent == null)
+            if(Parent == null)
                 return null;
             return Parent.ObtainRecentFunctionContext();
         }
@@ -207,9 +215,19 @@ namespace Reni.Context
                 .ReplaceArg(leftResultAsRef);
         }
 
+        internal Result CallResult(Category category, ICompileSyntax left, ICompileSyntax right)
+        {
+            var leftResult = Result(category.Typed, left);
+            var rightResult = Result(category.Typed, right);
+            return leftResult
+                .Type
+                .FunctionalFeature
+                .ObtainApplyResult(category, leftResult, rightResult, RefAlignParam);
+        }
+
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -12 && category.HasCode;
+            var trace = defineable.ObjectId == -19 && category.HasCode;
             StartMethodDump(trace, category, left, defineable, right);
             try
             {
@@ -230,7 +248,7 @@ namespace Reni.Context
                         ? ContextOperationResult(categoryForFunctionals, defineable)
                         : OperationResult<IFeature>(categoryForFunctionals, left, defineable);
 
-                if (suffixOperationResult == null)
+                if(suffixOperationResult == null)
                 {
                     NotImplementedMethod(category, left, defineable, right);
                     return null;
@@ -239,13 +257,14 @@ namespace Reni.Context
                 if(right == null)
                     return ReturnMethodDump(suffixOperationResult, true);
 
-                var rightResult = ResultAsReference(categoryForFunctionals, right);
+                var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
+                var rightCategory = functionalFeature.IsRegular ? category.Typed : Category.All;
+                var rightResult = Result(rightCategory, right).LocalReferenceResult(RefAlignParam);
                 Dump("suffixOperationResult", suffixOperationResult);
                 Dump("rightResult", rightResult);
                 BreakExecution();
-                var result = suffixOperationResult
-                    .Type
-                    .FunctionalFeature.ObtainApplyResult(category, suffixOperationResult, rightResult, RefAlignParam);
+                var result = functionalFeature
+                    .ObtainApplyResult(category, suffixOperationResult, rightResult, RefAlignParam);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -254,7 +273,7 @@ namespace Reni.Context
             }
         }
 
-        private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable) 
+        private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable)
             where TFeature : class
         {
             var trace = defineable.ObjectId == -24;
@@ -268,7 +287,7 @@ namespace Reni.Context
                 var operationResult = targetType.OperationResult<TFeature>(category, defineable, RefAlignParam);
                 Dump("operationResult", operationResult);
                 BreakExecution();
-                if (operationResult == null)
+                if(operationResult == null)
                     return ReturnMethodDump<Result>(null);
 
                 var targetResult = ResultAsReference(category.Typed, target);
@@ -385,7 +404,7 @@ namespace Reni.Context
                 ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(parent.CreateCacheElement);
                 StructContexts = new DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>>(
                     container => new DictionaryEx<int, ContextBase>(
-                        position => new ContextBase(parent, container.UniqueContext(position))));
+                                     position => new ContextBase(parent, container.UniqueContext(position))));
                 FunctionContexts = new DictionaryEx<TypeBase, ContextBase>(argsType => new ContextBase(parent, argsType.UniqueFunction()));
                 FunctionContextObjects = new DictionaryEx<TypeBase, FunctionContextObject>(args => new FunctionContextObject(args, parent));
                 PendingContext = new SimpleCache<ContextBase>(() => new ContextBase(parent, new PendingContext()));
@@ -393,19 +412,18 @@ namespace Reni.Context
                 RecentFunctionContextObject = new SimpleCache<FunctionContextObject>(parent.ObtainRecentFunctionContext);
                 Structures = new DictionaryEx<Struct.Container, DictionaryEx<int, Structure>>(
                     container => new DictionaryEx<int, Structure>(
-                        position => new Structure(ContainerContextObjects.Find(container),position)));
+                                     position => new Structure(ContainerContextObjects.Find(container), position)));
                 ContainerContextObjects = new DictionaryEx<Struct.Container, ContainerContextObject>(container => new ContainerContextObject(container, parent));
             }
 
             [DisableDump]
             public string IconKey { get { return "Cache"; } }
         }
-
     }
 
     internal interface IReference
     {
-        TypeBase ValueType{ get; }
+        TypeBase ValueType { get; }
         RefAlignParam RefAlignParam { get; }
     }
 

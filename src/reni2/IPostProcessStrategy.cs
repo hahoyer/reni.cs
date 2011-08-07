@@ -19,7 +19,7 @@ namespace Reni
             return _result
                 .AutomaticDereference()
                 .Align(refAlignParam.AlignBits)
-                .LocalBlock(category, refAlignParam);
+                .LocalBlock(category);
         }
     }
 }

@@ -75,11 +75,11 @@ namespace Reni.Code
             return _data.Count-1;
         }
 
-        internal CodeBase LocalBlock(CodeBase body, CodeBase copier, RefAlignParam refAlignParam)
+        internal CodeBase LocalBlock(CodeBase body, CodeBase copier)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
             var trace = ObjectId == -6;
-            StartMethodDump(trace, body, copier, refAlignParam);
+            StartMethodDump(trace, body, copier);
             try
             {
                 BreakExecution();
@@ -97,7 +97,7 @@ namespace Reni.Code
                     gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
                 var statement = alignedInternal
                     .Sequence(gap, alignedBody, DestructorCode)
-                    .LocalBlockEnd(copier, refAlignParam, resultSize, HolderNamePattern);
+                    .LocalBlockEnd(copier, resultSize);
                 Dump("statement", statement);
                 BreakExecution();
                 var result = statement;

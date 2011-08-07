@@ -37,7 +37,6 @@ namespace Reni.Code
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        internal override BitsConst Evaluate() { return Data.Resize(_size); }
         protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitsArray(Size, Data); }
 
         [DisableDump]

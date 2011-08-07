@@ -36,7 +36,7 @@ namespace Reni.Type
             _refAlignParam = refAlignParam;
             //Tracer.Assert(!valueType.IsZeroSized, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
-            StopByObjectId(-2);
+            StopByObjectId(8);
         }
 
 
@@ -90,6 +90,11 @@ namespace Reni.Type
                 *source.ValueType.Converter(conversionParameter, destination.ValueType)
                 *destination.ValueTypeToLocalReferenceResult;
         }
-        private Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.LocalReferenceResult(category, RefAlignParam); }
+
+        private Result ValueTypeToLocalReferenceResult(Category category)
+        {
+            return ValueType
+                .LocalReferenceResult(category, RefAlignParam);
+        }
     }
 }

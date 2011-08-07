@@ -43,7 +43,7 @@ namespace Reni.Struct
             StopByObjectId(-1);
         }
 
-        private sealed class Type : TypeBase
+        internal sealed class Type : TypeBase
         {
             private readonly FunctionalBody _parent;
             public Type(FunctionalBody parent) { _parent = parent; }
