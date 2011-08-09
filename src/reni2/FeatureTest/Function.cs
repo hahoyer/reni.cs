@@ -269,9 +269,7 @@ f1()dump_print;
     {
         protected override void AssertValid(Compiler c)
         {
-#pragma warning disable 168
             var x = new ExpectedCompilationResult(c);
-#pragma warning restore 168
             //Tracer.Assert(x.FunctionCount() == 2);
         }
 

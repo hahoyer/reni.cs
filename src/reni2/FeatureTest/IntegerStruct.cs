@@ -73,6 +73,7 @@ Integer8:
     [InstanceCode("(Integer8(1)+2)")]
     [Create]
     [ObjectFunction]
+    [TwoFunctions1]
     public sealed class IntegerPlusNumber : IntegerStruct
     {
         [Test]
@@ -83,6 +84,7 @@ Integer8:
     [Output("23")]
     [InstanceCode("Integer8(23) clone")]
     [Create]
+    [TwoFunctions1]
     public sealed class Clone : IntegerStruct
     {
         [Test]
