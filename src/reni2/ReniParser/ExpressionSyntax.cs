@@ -16,6 +16,7 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+using System.Diagnostics;
 using HWClassLibrary.Debug;
 using System;
 using System.Collections.Generic;
@@ -79,6 +80,7 @@ namespace Reni.ReniParser
                 return result;
             }
         }
+        [DebuggerHidden]
         internal override Result Result(ContextBase context, Category category) { return context.Result(category, Left, _tokenClass, Right); }
     }
 }

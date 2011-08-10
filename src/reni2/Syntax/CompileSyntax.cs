@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -63,6 +64,7 @@ namespace Reni.Syntax
 
         protected virtual bool GetIsLambda() { return false; }
 
+        [DebuggerHidden]
         Result ICompileSyntax.Result(ContextBase context, Category category) { return Result(context, category); }
 
         internal virtual Result Result(ContextBase context, Category category)

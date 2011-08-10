@@ -150,7 +150,7 @@ namespace Reni.Context
 
         internal Result ObtainResult(Category category, ICompileSyntax syntax)
         {
-            StartMethodDump(syntax.GetObjectId() == -78 && category.HasRefs, category, syntax);
+            StartMethodDump(ObjectId == -1 && syntax.GetObjectId() == 25 && (category.HasType || category.HasCode), category, syntax);
             try
             {
                 return ReturnMethodDump(syntax.Result(this, category), true);
@@ -216,7 +216,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -30 && right != null && right.GetObjectId() == 73 && category.HasRefs;
+            var trace = defineable.ObjectId == -12 && right != null && right.GetObjectId() == 24 && (category.HasCode || category.HasType);
             StartMethodDump(trace, category, left, defineable, right);
             try
             {
@@ -265,7 +265,7 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == 22 && target.GetObjectId() == 133;
+            var trace = defineable.ObjectId == -12 && target.GetObjectId() == 24 && (category.HasCode || category.HasType);
             StartMethodDump(trace, category, target, defineable);
             try
             {
