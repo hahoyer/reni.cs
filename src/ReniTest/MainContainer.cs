@@ -45,20 +45,29 @@ namespace ReniTest
             //RunSpecificTest();
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
-            Assembly.GetExecutingAssembly().RunTests();
-            //InspectCompiler();
+            //Assembly.GetExecutingAssembly().RunTests();
+            InspectCompiler();
             //Reni.Proof.Main.Run();
         }
 
         [Test]
         private static void RunSpecificTest() { new TypeNameExtenderTest().TestMethod(); }
 
-        private const string Target = @"! property x: 11/\; x dump_print";
-        private const string Output = "11";
+        private const string Target = @"
+f1: ((
+  y: 3;
+  f: y/\;
+  f(2)
+) _A_T_ 2)/\;
+
+f1()dump_print;
+";
+        private const string Output = "3";
         private static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
 
         private static Compiler CreateCompiler(string text)
         {
+            Tracer.IsBreakDisabled = false;
             const string fileName = "temptest.reni";
             var f = File.m(fileName);
             f.String = text;

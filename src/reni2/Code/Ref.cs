@@ -30,7 +30,7 @@ namespace Reni.Code
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset; } }
 
-        [DisableDump]
+        [Node, DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
     }
 }

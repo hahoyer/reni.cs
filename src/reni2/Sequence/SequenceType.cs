@@ -47,6 +47,7 @@ namespace Reni.Sequence
                  , () => Size
                  , () => new EnableCut(this)
                  , () => ForceReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size)
+                 , Refs.Arg
                 );
         }
 
@@ -94,6 +95,7 @@ namespace Reni.Sequence
                 (
                     category,
                     () => Element.UniqueSequence(oldCount).ArgCode().BitCast(Size)
+                    , Refs.Arg
                 );
             return result;
         }
@@ -113,6 +115,7 @@ namespace Reni.Sequence
                 (
                     category,
                     () => ArgCode().BitCast(newType.Size)
+                    , Refs.Arg
                 );
             return result;
         }

@@ -48,8 +48,5 @@ namespace Reni.Parser
 
         internal override string DumpShort() { return Token.Name; }
         protected virtual string FilePosition() { return Token.FilePosition; }
-
-        [DisableDump, UsedImplicitly]
-        public new string NodeDump { get { return base.NodeDump + " " + DumpShort(); } }
     }
 }

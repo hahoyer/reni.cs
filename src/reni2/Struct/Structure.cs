@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -35,8 +36,11 @@ namespace Reni.Struct
     {
         private readonly ContainerContextObject _containerContextObject;
         private readonly int _endPosition;
+        [Node]
         private readonly DictionaryEx<ICompileSyntax, FunctionalBody> _functionalFeatureCache;
+        [Node]
         private readonly SimpleCache<StructureType> _typeCache;
+        [Node]
         private readonly DictionaryEx<int, AccessType> _accessTypesCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
@@ -49,9 +53,11 @@ namespace Reni.Struct
         }
 
         [EnableDump]
+        [Node]
         internal int EndPosition { get { return _endPosition; } }
 
         [EnableDump]
+        [Node]
         internal ContainerContextObject ContainerContextObject { get { return _containerContextObject; } }
 
         [DisableDump]
@@ -142,7 +148,7 @@ namespace Reni.Struct
         internal Result AccessViaThisReference(Category category, int position)
         {
             return UniqueAccessType(position)
-                .Result(category, () => ReferenceType.ArgCode());
+                .Result(category, ReferenceType.ArgResult(category));
         }
 
         internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable)

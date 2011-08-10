@@ -42,6 +42,7 @@ namespace Reni.Context
         private static int _nextId;
 
         [DisableDump]
+        [Node]
         private readonly CacheItems _cache;
 
         [DisableDump]
@@ -65,8 +66,10 @@ namespace Reni.Context
         internal static ContextBase CreateRoot(FunctionList functions) { return new ContextBase(null, new Root(functions)); }
 
         [UsedImplicitly]
+        [Node]
         internal IContextItem ContextItem { get { return _contextItem; } }
         [UsedImplicitly]
+        [Node]
         internal ContextBase Parent { get { return _parent; } }
 
         [Node]
@@ -83,9 +86,6 @@ namespace Reni.Context
 
         [DisableDump]
         internal Root RootContext { get { return ContextItem as Root ?? Parent.RootContext; } }
-
-        [DisableDump]
-        private ContextBase[] ChildChain { get { return Cache.ChildChain ?? (Cache.ChildChain = ObtainChildChain()); } }
 
         [DisableDump]
         internal Structure FindRecentStructure { get { return Cache.RecentStructure.Value; } }
@@ -148,13 +148,18 @@ namespace Reni.Context
                 .Result(category);
         }
 
-        private ContextBase[] ObtainChildChain()
+        internal Result ObtainResult(Category category, ICompileSyntax syntax)
         {
-            if(Parent == null)
-                return new[] {this};
-            return Parent.ChildChain.Concat(new[] {this}).ToArray();
+            StartMethodDump(syntax.GetObjectId() == -78 && category.HasRefs, category, syntax);
+            try
+            {
+                return ReturnMethodDump(syntax.Result(this, category), true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
-
         private ContextBase UniquePendingContext { get { return _cache.PendingContext.Value; } }
 
         private CacheItem CreateCacheElement(ICompileSyntax syntax)
@@ -211,7 +216,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -19 && category.HasCode;
+            var trace = defineable.ObjectId == -30 && right != null && right.GetObjectId() == 73 && category.HasRefs;
             StartMethodDump(trace, category, left, defineable, right);
             try
             {
@@ -260,7 +265,7 @@ namespace Reni.Context
         private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == -24;
+            var trace = defineable.ObjectId == 22 && target.GetObjectId() == 133;
             StartMethodDump(trace, category, target, defineable);
             try
             {
@@ -310,7 +315,7 @@ namespace Reni.Context
             if(ContextItem is PendingContext)
             {
                 if(category == Category.Refs)
-                    return new Result(category);
+                    return new Result(category, Refs.ArgLess);
                 var result = syntax.Result(this, category);
                 Tracer.Assert(result.CompleteCategory == category);
                 return result;
@@ -346,14 +351,13 @@ namespace Reni.Context
 
         internal sealed class CacheItems : ReniObject, IIconKeyProvider
         {
+            [Node]
             [DisableDump]
             internal readonly SimpleCache<Structure> RecentStructure;
 
+            [Node]
             [DisableDump]
             internal readonly SimpleCache<FunctionContextObject> RecentFunctionContextObject;
-
-            [DisableDump]
-            internal ContextBase[] ChildChain;
 
             [Node]
             [SmartNode]
@@ -374,6 +378,7 @@ namespace Reni.Context
             [Node]
             [SmartNode]
             internal readonly DictionaryEx<TypeBase, ContextBase> FunctionContexts;
+
             [Node]
             [SmartNode]
             internal readonly DictionaryEx<ICompileSyntax, CacheItem> ResultCache;
@@ -403,6 +408,7 @@ namespace Reni.Context
             [DisableDump]
             public string IconKey { get { return "Cache"; } }
         }
+
     }
 
     internal sealed class PendingContext : Child

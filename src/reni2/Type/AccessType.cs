@@ -80,7 +80,7 @@ namespace Reni.Type
                  , () => refAlignParam.RefSize
                  , () => _assignmentFeatureCache.Value.UniqueFunctionalType(refAlignParam)
                  , ArgCode
-                 , Refs.None
+                 , Refs.Arg
                 );
             return result;
         }
@@ -103,6 +103,7 @@ namespace Reni.Type
                  , () => Size.Zero
                  , () => Void
                  , AssignmentCode
+                 , Refs.Arg
                 );
         }
 
@@ -117,7 +118,7 @@ namespace Reni.Type
         internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
         internal Result DumpPrintFieldResult(Category category) { return GenericDumpPrintResult(category, RefAlignParam); }
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
-        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText)); }
+        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText), Refs.ArgLess); }
 
         internal Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
@@ -150,12 +151,12 @@ namespace Reni.Type
         {
             return AccessPoint
                 .ReferenceType
-                .Result(category, ArgCode);
+                .Result(category, ArgResult(category));
         }
 
-        internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode); }
+        internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode, Refs.Arg); }
 
-        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode()); }
+        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode(), Refs.Arg); }
 
         private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 

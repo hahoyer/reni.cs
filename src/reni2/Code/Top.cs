@@ -33,7 +33,7 @@ namespace Reni.Code
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
-        [DisableDump]
+        [Node, DisableDump]
         protected Size DataSize { get { return _dataSize; } }
 
         [DisableDump]

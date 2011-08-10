@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
 
@@ -22,6 +23,7 @@ namespace Reni.Code
             StopByObjectId(-10);
         }
 
+        [Node]
         internal IReferenceInCode Context { get { return _context; } }
 
         [DisableDump]

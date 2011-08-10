@@ -50,7 +50,6 @@ namespace Reni.Struct
         [EnableDump]
         private readonly int _index;
 
-        [Node]
         private readonly SimpleCache<CodeBase> _bodyCodeCache;
 
         /// <summary>
@@ -72,25 +71,34 @@ namespace Reni.Struct
             StopByObjectId(-10);
         }
 
+        [Node]
+        private TypeBase Type { get { return Result(Category.Type).Type; } }
+
+        [Node]
         [DisableDump]
-        private Refs ForeignRefs
+        internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
+
+        [Node]
+        [DisableDump]
+        internal CodeBase CallCode { get { return CreateCall(Category.Code, _args.ArgResult(Category.Code)).Code; } }
+
+        [Node]
+        [DisableDump]
+        private Refs Refs
         {
             get
             {
-                if(IsStopByObjectIdActive)
+                if (IsStopByObjectIdActive)
                     return null;
                 return Result(Category.Refs).Refs;
             }
         }
 
-        [DisableDump]
-        internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
-
         internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
 
         [Node]
         [DisableDump]
-        private Size FrameSize { get { return _args.Size + ForeignRefs.Size; } }
+        private Size FrameSize { get { return _args.Size + Refs.Size; } }
 
         [Node]
         [DisableDump]
@@ -121,7 +129,7 @@ namespace Reni.Struct
             }
         }
 
-        private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return ForeignRefs.ToCode().Sequence(argsCode); }
+        private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return Refs.ToCode().Sequence(argsCode); }
 
         private CodeBase CreateBodyCode()
         {
@@ -143,7 +151,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = ObjectId == -1 && category.HasCode;
+            var trace = ObjectId == -1 && category.HasRefs;
             StartMethodDump(trace, category);
             try
             {
@@ -161,7 +169,7 @@ namespace Reni.Struct
                 Dump("postProcessedResult", postProcessedResult);
                 BreakExecution();
                 var result = postProcessedResult
-                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.None);
+                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.ArgLess);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -177,8 +185,6 @@ namespace Reni.Struct
                 .FrameRef(refAlignParam)
                 .AddToReference(refAlignParam, FrameSize*-1);
         }
-
-        private TypeBase Type() { return Result(Category.Type).Type; }
 
         internal Code.Container Serialize(bool isInternal)
         {
@@ -203,7 +209,7 @@ namespace Reni.Struct
             result += "\n";
             result += "context=" + _structure.Dump();
             result += "\n";
-            result += "type=" + Type().Dump();
+            result += "type=" + Type.Dump();
             result += "\n";
             return result;
         }

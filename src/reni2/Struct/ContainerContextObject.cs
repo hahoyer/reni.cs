@@ -83,11 +83,15 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Result ContextReferenceViaStructReference(int position, Result result) { return result.ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), Refs.None); }
+        internal Result ContextReferenceViaStructReference(int position, Result result)
+        {
+            return result
+                .ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), Refs.Arg);
+        }
 
         internal Result Result(Category category, Result innerResult)
         {
-            var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam), Refs.None);
+            var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam), Refs.ArgLess);
             if(category.HasType)
                 result.Type = ToStructure.Type;
             return result;

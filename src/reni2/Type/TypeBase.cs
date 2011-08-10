@@ -129,11 +129,10 @@ namespace Reni.Type
         internal virtual Result Copier(Category category) { return VoidCodeAndRefs(category); }
         internal virtual Result ArrayCopier(Category category, int count) { return VoidCodeAndRefs(category); }
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
-        internal Result ArgResult(Category category) { return Result(category, ArgCode); }
+        internal Result ArgResult(Category category) { return Result(category, ArgCode, Refs.Arg); }
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
-        internal Result Result(Category category, Func<CodeBase> getCode) { return Result(category, getCode, Refs.None); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
-        internal CodeBase ReferenceArgCode(RefAlignParam refAlignParam) { return CodeBase.Arg(UniqueAutomaticReference(refAlignParam)); }
+        internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgResult(category); }
 
         internal virtual Result AutomaticDereferenceResult(Category category) { return ArgResult(category); }
 
@@ -142,7 +141,8 @@ namespace Reni.Type
             return Result
                 (
                     category,
-                    () => CodeBase.BitsConst(Size, BitsConst.Convert(0).Resize(Size)));
+                    () => CodeBase.BitsConst(Size, BitsConst.Convert(0).Resize(Size))
+                    , Refs.ArgLess);
         }
 
         internal Result Result(Category category, Result codeAndRefs)
@@ -294,7 +294,7 @@ namespace Reni.Type
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
-                var featureResult = feature.ObtainResult(category, refAlignParam);
+                var featureResult = feature.ObtainResult(category.Refsd, refAlignParam);
                 Dump("featureResult", featureResult);
                 BreakExecution();
                 var result = featureResult
@@ -344,8 +344,7 @@ namespace Reni.Type
         {
             return UniqueAlign(refAlignParam.AlignBits)
                 .UniqueArray(1)
-                .UniqueAutomaticReference(refAlignParam)
-                .Result(category, () => ReferenceArgCode(refAlignParam));
+                .ReferenceArgResult(category, refAlignParam);
         }
 
         internal Result Conversion(Category category, TypeBase destination)

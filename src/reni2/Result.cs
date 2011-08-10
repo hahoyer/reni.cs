@@ -59,9 +59,6 @@ namespace Reni
             AssertValid();
         }
 
-        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
-            : this(category, getSize, getType, getCode, Refs.None) { }
-
         internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<Refs> getRefs)
             : this()
         {
@@ -74,11 +71,8 @@ namespace Reni
             AssertValid();
         }
 
-        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode)
-            : this(category, getSize, getCode, Refs.None) { }
-
-        internal Result(Category category)
-            : this(category, () => Size.Zero, () => CodeBase.Void(), Refs.None) { }
+        internal Result(Category category, Func<Refs> getRefs)
+            : this(category, () => Size.Zero, CodeBase.Void, getRefs) { }
 
         private bool HasSize { get { return Size != null; } }
         internal bool HasType { get { return Type != null; } }
@@ -253,7 +247,17 @@ namespace Reni
             }
         }
 
-        internal bool HasArg { get { return HasCode && Code.HasArg; } }
+        internal bool? HasArg
+        {
+            get
+            {
+                if(HasRefs)
+                    return Refs.HasArg;
+                if(HasCode)
+                    return Code.HasArg;
+                return null;
+            }
+        }
 
 
         public override string DumpData()
@@ -418,7 +422,7 @@ namespace Reni
             var oldPendingCategory = PendingCategory;
             PendingCategory |= category;
 
-            var result = syntax.Result(context, category);
+            var result = context.ObtainResult(category, syntax);
             result.AssertComplete(category, syntax);
             Update(result);
             PendingCategory = oldPendingCategory;
@@ -461,9 +465,16 @@ namespace Reni
 
         internal Result ReplaceArg(Func<Result> getResultForArg)
         {
-            if(HasArg)
-                return ReplaceArg(getResultForArg());
-            return this;
+            switch(HasArg)
+            {
+                case true:
+                    return ReplaceArg(getResultForArg());
+                case false:
+                    return this;
+            }
+            NotImplementedMethod(getResultForArg);
+            return null;
+
         }
 
         internal Result ReplaceArg(Result resultForArg)
@@ -491,6 +502,22 @@ namespace Reni
             return result;
         }
 
+        internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Category, Result> getReplacement)
+            where TRefInCode : IReferenceInCode
+        {
+            if(HasRefs && !Refs.Contains(refInCode))
+                return this;
+
+            var replacement = getReplacement(CompleteCategory - Category.Size - Category.Type);
+            var result = new Result {Size = Size, Type = Type, IsDirty = true};
+            if(HasCode)
+                result.Code = Code.ReplaceAbsolute(refInCode, () => replacement.Code);
+            if(HasRefs)
+                result.Refs = Refs.Without(refInCode).Sequence(replacement.Refs);
+            result.IsDirty = false;
+            return result;
+        }
+
         internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Refs> replacementRefs)
             where TRefInCode : IReferenceInCode
         {
@@ -514,7 +541,7 @@ namespace Reni
             var result = Clone();
             result.IsDirty = true;
             result.Code = SmartRefs.ReplaceRefsForFunctionBody(Code, refAlignParam, replacement);
-            result.Refs = Refs.None();
+            result.Refs = replacement.Refs;
             result.IsDirty = false;
             return result;
         }

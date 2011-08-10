@@ -1,4 +1,22 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -59,6 +77,8 @@ namespace Reni
         public Compiler(string fileName)
             : this(new CompilerParameters(), fileName) { }
 
+        [Node]
+        [DisableDump]
         internal FunctionList Functions { get { return _functions.Value; } }
 
         [DisableDump]
@@ -67,23 +87,26 @@ namespace Reni
         [DisableDump]
         public Source Source { get { return _source.Value; } }
 
-        [Node, DisableDump]
+        [Node]
+        [DisableDump]
         internal ReniParser.ParsedSyntax Syntax { get { return _syntax.Value; } }
 
         [DisableDump]
         public string ExecutedCode { get { return _executedCode.Value; } }
 
-        [Node, DisableDump]
+        [Node]
+        [DisableDump]
         private CodeBase Code { get { return _code.Value; } }
 
         [DisableDump]
         private Container MainContainer { get { return _mainContainer.Value; } }
 
-        [Node, DisableDump]
+        [DisableDump]
         private List<Container> FunctionContainers { get { return _functionContainers.Value; } }
 
+        [Node]
         [DisableDump]
-        private ContextBase RootContext{ get { return _rootContext.Value; } }
+        private ContextBase RootContext { get { return _rootContext.Value; } }
 
 
         public static string FormattedNow
@@ -113,7 +136,7 @@ namespace Reni
                 Tracer.Line("Dump Source\n" + Source.Dump());
 
             if(_parameters.Trace.Syntax)
-                Tracer.FlaggedLine("Dump Syntax\n"+Syntax.Dump());
+                Tracer.FlaggedLine("Dump Syntax\n" + Syntax.Dump());
 
             if(_parameters.ParseOnly)
                 return null;
@@ -122,7 +145,7 @@ namespace Reni
             {
                 Materialize();
                 Tracer.FlaggedLine("Dump functions, Count = " + Functions.Count);
-                for (var i = 0; i < Functions.Count; i++)
+                for(var i = 0; i < Functions.Count; i++)
                     Tracer.FlaggedLine(Functions[i].DumpFunction());
             }
 

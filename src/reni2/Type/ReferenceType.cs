@@ -46,7 +46,7 @@ namespace Reni.Type
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
-        internal Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode); }
+        internal Result DereferenceResult(Category category) { return ValueType.Result(category, DereferenceCode, Refs.Arg); }
         protected abstract CodeBase DereferenceCode();
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
 
@@ -60,12 +60,9 @@ namespace Reni.Type
         {
             return UniqueAlign(refAlignParam.AlignBits)
                 .Result
-                (
-                    category,
-                    () =>
-                    LocalReferenceCode(refAlignParam).Dereference
-                        (refAlignParam, refAlignParam.RefSize),
-                    () => Destructor(Category.Refs).Refs
+                ( category
+                ,() =>LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
+                ,() => Destructor(Category.Refs).Refs
                 );
         }
 

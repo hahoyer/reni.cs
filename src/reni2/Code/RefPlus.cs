@@ -33,7 +33,6 @@ namespace Reni.Code
     {
         private readonly RefAlignParam _refAlignParam;
 
-        [Node]
         [DisableDump]
         private readonly Size _right;
 

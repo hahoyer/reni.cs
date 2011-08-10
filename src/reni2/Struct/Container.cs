@@ -208,10 +208,22 @@ namespace Reni.Struct
 
         internal Result InternalInnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
-            return parent
-                .UniqueChildContext(this, accessPosition)
-                .Result(category | Category.Type, Statements[position])
-                .AutomaticDereference();
+            var trace = ObjectId==-10 && accessPosition==3 && position == 2 && category.HasRefs;
+            StartMethodDump(trace,category,parent,accessPosition,position);
+            try
+            {
+
+                var uniqueChildContext = parent
+                    .UniqueChildContext(this, accessPosition);
+                var result = uniqueChildContext
+                    .Result(category | Category.Type, Statements[position]);
+                return ReturnMethodDump(result
+                    .AutomaticDereference(),true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)

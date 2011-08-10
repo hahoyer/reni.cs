@@ -105,6 +105,7 @@
     <Compile Include="Context\Root.cs" />
     <Compile Include="FeatureTest\StringStruct.cs" />
     <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
+    <Compile Include="FeatureTest\Text.cs" />
     <Compile Include="Feature\DumpPrint\DumpPrintToken.cs" />
     <Compile Include="Feature\IInfixFeature.cs" />
     <Compile Include="Parser\ITokenClass.cs" />

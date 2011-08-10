@@ -16,7 +16,6 @@ namespace Reni.Code
     [Serializable]
     internal sealed class RecursiveCallCandidate : FiberItem
     {
-        [Node]
         private readonly Size _refsSize;
 
         internal override Size InputSize { get { return _refsSize; } }

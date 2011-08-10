@@ -70,6 +70,9 @@ namespace Reni.Basics
         [DebuggerHidden]
         [DisableDump]
         public Category Typed { get { return this | Type; } }
+        [DebuggerHidden]
+        [DisableDump]
+        public Category Refsd { get { return this | Refs; } }
 
         [DebuggerHidden]
         public static Category operator |(Category x, Category y)

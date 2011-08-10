@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 
 namespace Reni.Code
@@ -11,6 +12,7 @@ namespace Reni.Code
         private readonly CodeBase[] _data;
         private static int _nextObjectId;
 
+        [Node]
         internal CodeBase[] Data { get { return _data; } }
 
         internal static List Create(params CodeBase[] data) { return new List(data); }

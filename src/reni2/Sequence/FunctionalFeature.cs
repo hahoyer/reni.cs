@@ -46,19 +46,15 @@ namespace Reni.Sequence
         protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
             return result
-                .ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), () => _objectType.ReferenceArgCode(refAlignParam), Refs.None);
+                .ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), category=>_objectType.ReferenceArgResult(category,refAlignParam));
         }
 
         internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
 
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
         {
-            return new Result
-                (category
-                 , () => refAlignParam.RefSize
-                 , () => UniqueFunctionalType(refAlignParam)
-                 , () => _objectType.ReferenceArgCode(refAlignParam)
-                );
+            return UniqueFunctionalType(refAlignParam)
+                .Result(category, _objectType.ReferenceArgResult(category.Typed, refAlignParam));
         }
 
         protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
@@ -75,7 +71,7 @@ namespace Reni.Sequence
         private Result Apply(Category category, int objSize, int argsSize)
         {
             var type = _feature.ResultType(objSize, argsSize);
-            return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize));
+            return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize), Refs.Arg);
         }
     }
 }

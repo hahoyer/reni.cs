@@ -82,7 +82,7 @@ namespace Reni.Type
         {
             return _concatArraysFeatureCache
                 .Find(refAlignParam.RefSize)
-                .Result(category, () => ReferenceArgCode(refAlignParam));
+                .Result(category, ReferenceArgResult(category, refAlignParam));
         }
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam)
@@ -98,7 +98,7 @@ namespace Reni.Type
         private CodeBase DumpPrintCode(RefAlignParam refAlignParam)
         {
             var elementReference = Element.UniqueAutomaticReference(refAlignParam);
-            var argCode = ReferenceArgCode(refAlignParam);
+            var argCode = UniqueAutomaticReference(refAlignParam).ArgCode();
             var elementDumpPrint = Element.GenericDumpPrintResult(Category.Code, refAlignParam).Code;
             var code = CodeBase.DumpPrintText("array(" + Element.DumpPrintText + ",(");
             for(var i = 0; i < Count; i++)
@@ -120,7 +120,7 @@ namespace Reni.Type
             {
                 var index = BitsConst.Convert(i);
                 var argsResult = UniqueNumber(index.Size.ToInt())
-                    .Result(category.Typed, () => CodeBase.BitsConst(index));
+                    .Result(category.Typed, () => CodeBase.BitsConst(index), Refs.ArgLess);
                 var rawResult = functionalFeature.ObtainApplyResult(category, operationResult, argsResult, null);
                 var convertedResult = rawResult.Conversion(Element) & result.CompleteCategory;
                 result = convertedResult.Sequence(result);

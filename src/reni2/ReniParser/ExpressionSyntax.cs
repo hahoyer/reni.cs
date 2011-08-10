@@ -55,7 +55,7 @@ namespace Reni.ReniParser
 
         internal override string DumpShort()
         {
-            var result = _token.Name;
+            var result = base.DumpShort() +"." +  _tokenClass.ObjectId;
             if(Left != null)
                 result = "(" + Left.DumpShort() + ")" + result;
             if(Right != null)

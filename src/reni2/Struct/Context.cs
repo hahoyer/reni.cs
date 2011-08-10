@@ -21,6 +21,7 @@ namespace Reni.Struct
             Container = container;
         }
 
+        [Node]
         internal int Position { get { return _position; } }
 
         protected override void Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent)

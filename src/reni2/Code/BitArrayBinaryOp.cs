@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,7 +23,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
-using Reni.Type;
 
 namespace Reni.Code
 {
@@ -15,7 +32,8 @@ namespace Reni.Code
     [Serializable]
     internal sealed class BitArrayBinaryOp : BinaryOp
     {
-        [Node, DisableDump]
+        [Node]
+        [DisableDump]
         internal readonly ISequenceOfBitBinaryOperation OpToken;
 
         private readonly Size _size;
@@ -47,14 +65,14 @@ namespace Reni.Code
     [Serializable]
     internal sealed class BitArrayPrefixOp : FiberItem
     {
-        [Node, DisableDump]
-        
+        [Node]
+        [DisableDump]
         internal readonly ISequenceOfBitPrefixOperation OpToken;
 
         private readonly Size _size;
 
-        [Node, DisableDump]
-        
+        [Node]
+        [DisableDump]
         internal readonly Size ArgSize;
 
         internal BitArrayPrefixOp(ISequenceOfBitPrefixOperation name, Size size, Size argSize)
@@ -102,7 +120,8 @@ namespace Reni.Code
     [Serializable]
     internal sealed class DumpPrintText : FiberHead
     {
-        [Node, EnableDump]
+        [Node]
+        [EnableDump]
         private readonly string _dumpPrintText;
 
         internal DumpPrintText(string dumpPrintText) { _dumpPrintText = dumpPrintText; }

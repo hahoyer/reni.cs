@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
 
@@ -46,7 +47,9 @@ namespace Reni.Code
         internal Fiber(FiberHead fiberHead)
             : this(fiberHead, null, null) { }
 
+        [Node]
         internal FiberHead FiberHead { get { return _fiberHead; } }
+        [Node]
         internal FiberItem[] FiberItems { get { return _fiberItems; } }
         internal override bool IsRelativeReference { get { return _fiberHead.IsRelativeReference; } }
 
