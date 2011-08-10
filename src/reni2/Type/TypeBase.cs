@@ -283,7 +283,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = defineable.ObjectId == 12 && category.HasCode;
+            var trace = ObjectId == -2 && defineable.ObjectId == 12 && (category.HasCode || category.HasType); ;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -294,11 +294,13 @@ namespace Reni.Type
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
-                var featureResult = feature.ObtainResult(category.Refsd, refAlignParam);
+                var featureResult = feature.ObtainResult(category.Refsd | Category.Code, refAlignParam);
                 Dump("featureResult", featureResult);
+                var convertObject = ConvertObject(category.Typed, refAlignParam, feature);
+                Dump("convertObject", convertObject);
                 BreakExecution();
                 var result = featureResult
-                    .ReplaceArg(() => ConvertObject(category.Typed, refAlignParam, feature));
+                    .ReplaceArg(() => convertObject);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -309,7 +311,7 @@ namespace Reni.Type
 
         private Result ConvertObject(Category category, RefAlignParam refAlignParam, IFeature feature)
         {
-            var trace = feature.GetObjectId() == -127;
+            var trace = feature.GetObjectId() == -1 && category.HasCode;
             StartMethodDump(trace, category, refAlignParam, feature);
             try
             {
@@ -344,7 +346,8 @@ namespace Reni.Type
         {
             return UniqueAlign(refAlignParam.AlignBits)
                 .UniqueArray(1)
-                .ReferenceArgResult(category, refAlignParam);
+                .UniqueAutomaticReference(refAlignParam)
+                .Result(category, ReferenceArgResult(category, refAlignParam));
         }
 
         internal Result Conversion(Category category, TypeBase destination)
