@@ -25,6 +25,7 @@ namespace Reni.Syntax
         public TerminalSyntax(TokenData token, ITerminal terminal)
             : base(token) { Terminal = terminal; }
 
+        internal override string DumpPrintText { get { return Token.Name;  } }
         internal override Result Result(ContextBase context, Category category)
         {
             return Terminal

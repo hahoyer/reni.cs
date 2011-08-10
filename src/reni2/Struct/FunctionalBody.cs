@@ -53,7 +53,7 @@ namespace Reni.Struct
             internal override Result PropertyResult(Category category) { return _parent.ObtainApplyResult(category, Void); }
 
             protected override Size GetSize() { return Size.Zero; }
-            internal override string DumpPrintText { get { return _parent._body.DumpShort() + "/\\"; } }
+            internal override string DumpPrintText { get { return _parent._body.DumpPrintText + "/\\"; } }
             internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
         }
 

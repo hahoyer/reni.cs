@@ -17,5 +17,6 @@ namespace Reni.Syntax
         TokenData FirstToken { get; }
         TokenData LastToken { get; }
         bool IsLambda{ get; }
+        string DumpPrintText { get; }
     }
 }

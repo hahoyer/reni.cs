@@ -67,6 +67,18 @@ namespace Reni.ReniParser
 
         protected override TokenData GetLastToken() { return Right == null ? Token : Right.LastToken; }
 
+        internal override string DumpPrintText
+        {
+            get
+            {
+                var result = base.DumpShort();
+                if (Left != null)
+                    result = "(" + Left.DumpPrintText + ")" + result;
+                if (Right != null)
+                    result += "(" + Right.DumpPrintText + ")";
+                return result;
+            }
+        }
         internal override Result Result(ContextBase context, Category category) { return context.Result(category, Left, _tokenClass, Right); }
     }
 }
