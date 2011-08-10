@@ -1,4 +1,22 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -39,64 +57,69 @@ namespace Reni.Parser
         /// <summary>
         ///     Scans source for begin of next token, advances and returns the new token.
         /// </summary>
-        /// <param name = "sp">Source position, is advanced during create token</param>
+        /// <param name = "sourcePosn">Source position, is advanced during create token</param>
         /// <param name = "tokenFactory">The token factory.</param>
         /// <returns>the next token</returns>
-        Token IScanner.CreateToken(SourcePosn sp, ITokenFactory tokenFactory)
+        Token IScanner.CreateToken(SourcePosn sourcePosn, ITokenFactory tokenFactory)
         {
             for(;;)
             {
-                WhiteSpace(sp);
+                WhiteSpace(sourcePosn);
 
-                if(sp.IsEnd())
-                    return Token(sp, 0, tokenFactory.RightParenthesisClass(0));
-                if(IsDigit(sp.Current))
-                    return Number(sp, tokenFactory);
-                if(IsAlpha(sp.Current))
-                    return Name(sp, tokenFactory);
-                if(IsSymbol(sp.Current))
-                    return Symbol(sp, tokenFactory);
+                if(sourcePosn.IsEnd())
+                    return Token(tokenFactory.RightParenthesisClass(0), sourcePosn, 0);
+                if(IsDigit(sourcePosn.Current))
+                    return Number(sourcePosn, tokenFactory);
+                if(IsAlpha(sourcePosn.Current))
+                    return Name(sourcePosn, tokenFactory);
+                if(IsSymbol(sourcePosn.Current))
+                    return Symbol(sourcePosn, tokenFactory);
 
-                switch(sp.Current)
+                switch(sourcePosn.Current)
                 {
                     case '#':
                     {
-                        var error = Comment(sp);
+                        var error = Comment(sourcePosn);
                         if(error != null)
                             return error;
                         break;
                     }
 
                     case '"':
-                        return String(sp);
+                        return Text(sourcePosn, tokenFactory);
                     case '\'':
-                        return String(sp);
+                        return Text(sourcePosn, tokenFactory);
 
                     case '(':
-                        return Token(sp, 1, tokenFactory.LeftParenthesisClass(3));
+                        return Token(tokenFactory.LeftParenthesisClass(3), sourcePosn, 1);
                     case '[':
-                        return Token(sp, 1, tokenFactory.LeftParenthesisClass(2));
+                        return Token(tokenFactory.LeftParenthesisClass(2), sourcePosn, 1);
                     case '{':
-                        return Token(sp, 1, tokenFactory.LeftParenthesisClass(1));
+                        return Token(tokenFactory.LeftParenthesisClass(1), sourcePosn, 1);
 
                     case ')':
-                        return Token(sp, 1, tokenFactory.RightParenthesisClass(3));
+                        return Token(tokenFactory.RightParenthesisClass(3), sourcePosn, 1);
                     case ']':
-                        return Token(sp, 1, tokenFactory.RightParenthesisClass(2));
+                        return Token(tokenFactory.RightParenthesisClass(2), sourcePosn, 1);
                     case '}':
-                        return Token(sp, 1, tokenFactory.RightParenthesisClass(1));
+                        return Token(tokenFactory.RightParenthesisClass(1), sourcePosn, 1);
 
                     case ';':
                     case ',':
-                        return Token(sp, 1, tokenFactory.ListClass);
+                        return Token(tokenFactory.ListClass, sourcePosn, 1);
                     default:
-                        DumpMethodWithBreak("not implemented", sp);
+                        DumpMethodWithBreak("not implemented", sourcePosn);
                         throw new NotImplementedException();
                 }
             }
         }
 
-        private static Token Token(SourcePosn sp, int length, ITokenClass tokenClass) { return new Token(sp, length, tokenClass); }
+        private static Token Token(ITokenClass tokenClass, SourcePosn sourcePosn, int length)
+        {
+            var result = new Token(tokenClass, sourcePosn.Source, sourcePosn.Position, length);
+            sourcePosn.Incr(length);
+            return result;
+        }
 
         private void WhiteSpace(SourcePosn sp)
         {
@@ -111,7 +134,7 @@ namespace Reni.Parser
             var i = 1;
             while(IsDigit(sp[i]))
                 i++;
-            return Token(sp, i, tokenFactory.NumberClass);
+            return Token(tokenFactory.NumberClass, sp, i);
         }
 
         private Token Name(SourcePosn sp, ITokenFactory tokenFactory)
@@ -119,7 +142,7 @@ namespace Reni.Parser
             var i = 1;
             while(IsAlphaNum(sp[i]))
                 i++;
-            return Token(sp, i, tokenFactory.TokenClass(sp.SubString(0, i)));
+            return Token(tokenFactory.TokenClass(sp.SubString(0, i)), sp, i);
         }
 
         private Token Symbol(SourcePosn sp, ITokenFactory tokenFactory)
@@ -127,7 +150,7 @@ namespace Reni.Parser
             var i = 1;
             while(IsSymbol(sp[i]))
                 i++;
-            return Token(sp, i, tokenFactory.TokenClass(sp.SubString(0, i)));
+            return Token(tokenFactory.TokenClass(sp.SubString(0, i)), sp, i);
         }
 
         private Token Comment(SourcePosn sp)
@@ -158,12 +181,12 @@ namespace Reni.Parser
             while(sp[i] != '\0' && IsWhiteSpace(sp[i]) && sp.SubString(i + 1, endOfComment.Length) != endOfComment)
                 i++;
             if(sp[i] == '\0')
-                return Token(sp, i, _syntaxErrorEOFComment);
+                return Token(_syntaxErrorEOFComment, sp, i);
 
             sp.Incr(i + 1 + endOfComment.Length);
             if(errorPosition == null)
                 return null;
-            return Token(sp, i, _syntaxErrorBeginComment);
+            return Token(_syntaxErrorBeginComment, sp, i);
         }
 
         private static void SingleLineComment(SourcePosn sp)
@@ -176,11 +199,24 @@ namespace Reni.Parser
 
         private static readonly SyntaxError _syntaxErrorEOFComment = new SyntaxError("unexpected end of file in comment");
         private static readonly SyntaxError _syntaxErrorBeginComment = new SyntaxError("invalid opening character for comment");
+        private static readonly SyntaxError _syntaxErrorEOFString = new SyntaxError("unexpected end of file in string");
 
-        private static Token String(SourcePosn sp)
+        private static Token Text(SourcePosn sourcePosn, ITokenFactory tokenFactory)
         {
-            NotImplementedFunction(sp);
-            return null;
+            var position = 1;
+            while(sourcePosn[position] != '\0')
+            {
+                position++;
+                if (sourcePosn[position - 1] == sourcePosn[0])
+                {
+                    if (sourcePosn[position] != sourcePosn[0])
+                        return Token(tokenFactory.TextClass, sourcePosn, position);
+
+                    position++;
+                }
+            }
+
+            return Token(_syntaxErrorEOFString, sourcePosn, position);
         }
 
         private void SetCharType(char type, IEnumerable<char> chars)

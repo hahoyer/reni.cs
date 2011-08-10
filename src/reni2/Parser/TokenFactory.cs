@@ -1,4 +1,22 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -7,12 +25,13 @@ using HWClassLibrary.Helper;
 namespace Reni.Parser
 {
     internal abstract class TokenFactory<TTokenClass> : ReniObject, ITokenFactory
-        where TTokenClass : ITokenClass
+        where TTokenClass : class, ITokenClass 
     {
         private readonly SimpleCache<Dictionary<string, TTokenClass>> _tokenClasses;
         private readonly SimpleCache<PrioTable> _prioTable;
         private readonly SimpleCache<TTokenClass> _listClass;
         private readonly SimpleCache<TTokenClass> _numberClass;
+        private readonly SimpleCache<TTokenClass> _textClass;
         private readonly DictionaryEx<int, TTokenClass> _leftParenthesis;
         private readonly DictionaryEx<int, TTokenClass> _righParenthesis;
 
@@ -24,6 +43,7 @@ namespace Reni.Parser
             _listClass = new SimpleCache<TTokenClass>(InternalGetListClass);
             _prioTable = new SimpleCache<PrioTable>(GetPrioTable);
             _tokenClasses = new SimpleCache<Dictionary<string, TTokenClass>>(InternalGetTokenClasses);
+            _textClass = new SimpleCache<TTokenClass>(InternalGetTextClass);
         }
 
         private Dictionary<string, TTokenClass> InternalGetTokenClasses()
@@ -46,6 +66,14 @@ namespace Reni.Parser
             var result = GetNumberClass();
             result.Name = "<number>";
             return result;
+        }
+
+        private TTokenClass InternalGetTextClass()
+        {
+            var result = GetTextClass();
+            result.Name = "<Text>";
+            return result;
+            ;
         }
 
         private TTokenClass InternalGetRightParenthesisClass(int i)
@@ -78,16 +106,20 @@ namespace Reni.Parser
 
         ITokenClass ITokenFactory.ListClass { get { return _listClass.Value; } }
         ITokenClass ITokenFactory.NumberClass { get { return _numberClass.Value; } }
+        ITokenClass ITokenFactory.TextClass { get { return _textClass.Value; } }
         ITokenClass ITokenFactory.RightParenthesisClass(int level) { return _righParenthesis.Find(level); }
         ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return _leftParenthesis.Find(level); }
 
-        protected abstract TTokenClass GetNewTokenClass(string name);
+        protected abstract TTokenClass GetSyntaxError(string message);
         protected abstract PrioTable GetPrioTable();
         protected abstract Dictionary<string, TTokenClass> GetTokenClasses();
-        protected abstract TTokenClass GetListClass();
-        protected abstract TTokenClass GetRightParenthesisClass(int level);
-        protected abstract TTokenClass GetLeftParenthesisClass(int level);
-        protected abstract TTokenClass GetNumberClass();
+
+        protected virtual TTokenClass GetNewTokenClass(string name) { return GetSyntaxError("invalid symbol: " + name.Quote()); }
+        protected virtual TTokenClass GetListClass() { return GetSyntaxError("unexpected list token"); }
+        protected virtual TTokenClass GetRightParenthesisClass(int level) { return GetSyntaxError("unexpected parenthesis"); }
+        protected virtual TTokenClass GetLeftParenthesisClass(int level) { return GetSyntaxError("unexpected parenthesis"); }
+        protected virtual TTokenClass GetNumberClass() { return GetSyntaxError("unexpected number"); }
+        protected virtual TTokenClass GetTextClass() { return GetSyntaxError("unexpected string"); }
 
         private Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
         protected ITokenClass TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }

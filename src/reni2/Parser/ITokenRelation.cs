@@ -12,6 +12,7 @@ namespace Reni.Parser
         PrioTable PrioTable { get; }
         ITokenClass ListClass { get; }
         ITokenClass NumberClass { get; }
+        ITokenClass TextClass { get; }
         ITokenClass RightParenthesisClass(int level);
         ITokenClass LeftParenthesisClass(int level);
     }

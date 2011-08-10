@@ -228,6 +228,7 @@
     <Compile Include="TokenClasses\List.cs" />
     <Compile Include="TokenClasses\Number.cs" />
     <Compile Include="TokenClasses\RightParenthesis.cs" />
+    <Compile Include="TokenClasses\Text.cs" />
     <Compile Include="TokenClasses\ThenToken.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
