@@ -37,7 +37,7 @@ namespace Reni.TokenClasses
                 .UniqueNumber(BitsConst.BitSize(data[0].GetType()))
                 .UniqueTextItem()
                 .UniqueSequence(data.Length)
-                .Result(category, () => CodeBase.BitsConst(BitsConst.ConverAsText(data)), Refs.ArgLess);
+                .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), Refs.ArgLess);
         }
         private string StripQutes(string text)
         {

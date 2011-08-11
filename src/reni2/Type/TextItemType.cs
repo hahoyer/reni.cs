@@ -29,9 +29,8 @@ namespace Reni.Type
 {
     internal sealed class TextItemType : TagChild
     {
-        public ISearchPath<IFeature, SequenceType> DumpPrintSequenceFeature;
         public TextItemType(TypeBase parent)
-            : base(parent) { DumpPrintSequenceFeature = new DumpPrintSequenceFeature(this); }
+            : base(parent) { }
         protected override string TagTitle { get { return "text_item"; } }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -39,12 +38,29 @@ namespace Reni.Type
             Parent.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);
         }
+
+        internal override Result DumpPrintTextResultFromSequence(Category category, RefAlignParam refAlignParam, int count)
+        {
+            return Void.Result
+                (category
+                 , () => DumpPrintCodeFromSequence(refAlignParam, count)
+                 , Refs.Arg
+                );
+        }
+
+        private CodeBase DumpPrintCodeFromSequence(RefAlignParam refAlignParam, int count)
+        {
+            return
+                UniqueSequence(count)
+                    .UniqueAutomaticReference(refAlignParam)
+                    .ArgCode()
+                    .Dereference(refAlignParam, Size*count)
+                    .DumpPrintText(Size);
+        }
     }
 
     internal sealed class DumpPrintSequenceFeature : ISearchPath<IFeature, SequenceType>
     {
-        private readonly TextItemType _type;
-        public DumpPrintSequenceFeature(TextItemType type) { _type = type; }
         IFeature ISearchPath<IFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.DumpPrintTextResult); }
     }
 }

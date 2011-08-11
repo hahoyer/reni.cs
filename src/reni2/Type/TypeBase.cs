@@ -60,7 +60,7 @@ namespace Reni.Type
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
                 Function = new SimpleCache<Context.Function>(() => new Context.Function(parent));
-                TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent) );
+                TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent));
             }
         }
 
@@ -285,7 +285,8 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = ObjectId == 5 && defineable.ObjectId == 21 && (category.HasCode || category.HasType); ;
+            var trace = ObjectId == -5 && defineable.ObjectId == 21 && (category.HasCode || category.HasType);
+            ;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -431,6 +432,12 @@ namespace Reni.Type
                 return null;
             }
             NotImplementedMethod(conversionParameter, destination);
+            return null;
+        }
+        
+        internal virtual Result DumpPrintTextResultFromSequence(Category category, RefAlignParam refAlignParam, int count)
+        {
+            NotImplementedMethod(category, refAlignParam, count);
             return null;
         }
     }

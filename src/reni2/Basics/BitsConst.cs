@@ -38,14 +38,14 @@ namespace Reni.Basics
         private static int _nextObjectId;
 
         private readonly Size _size;
-        private byte[] _data;
+        private readonly byte[] _data;
         private readonly SimpleCache<BigInteger> _dataCache;
 
         private BitsConst(Size size)
             : base(_nextObjectId++)
         {
             _size = size;
-            CreateDataArray();
+            _data = CreateDataArray();
             _dataCache = new SimpleCache<BigInteger>(() => new BigInteger(_data));
             StopByObjectId(-7);
         }
@@ -85,7 +85,7 @@ namespace Reni.Basics
 
         private static Size SlagBits(Size size) { return SegmentBits*DataSize(size) - size; }
 
-        private void CreateDataArray() { _data = new byte[DataSize(_size)]; }
+        private byte[] CreateDataArray() { return new byte[DataSize(_size)]; }
 
         private static void MoveData(byte[] data, Size size, byte[] source, Size sourceSize)
         {
@@ -149,10 +149,10 @@ namespace Reni.Basics
 
         public static BitsConst Convert(string value) { return new BitsConst(System.Convert.ToInt64(value)); }
 
-        public static BitsConst ConverAsText(string value)
+        public static BitsConst ConvertAsText(string value)
         {
             Tracer.Assert(Marshal.SizeOf(value[0].GetType()) == 1);
-            return new BitsConst(value.Length, value.ToCharArray().Cast<byte>().ToArray(), 0);
+            return new BitsConst(value.Length, value.Select(c => (byte) c).ToArray(), 0);
         }
         public static int PlusSize(int left, int right) { return Math.Max(left, right) + 1; }
 
@@ -257,7 +257,7 @@ namespace Reni.Basics
         private string ToString(Size itemSize)
         {
             Tracer.Assert(itemSize == SegmentBits);
-            return _data.Cast<char>().ToString();
+            return new string(_data.Select(c=>(char)c).ToArray());
         }
 
         public string ToString(int radix)
