@@ -11,10 +11,6 @@ namespace Reni.FeatureTest.Text
 {
     [TestFixture]
     [TargetSet(@"'Hallo' dump_print","Hallo")]
-    [IntegerPlusInteger]
-    [FunctionVariable]
-    [ArrayFromPieces]
-    [CombineArraysFromPieces]
     public sealed class Text : CompilerTest
     {
         [Test]

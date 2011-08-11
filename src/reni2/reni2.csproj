@@ -261,6 +261,7 @@
     <Compile Include="Type\AutomaticReferenceType.cs" />
     <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\TagChild.cs" />
+    <Compile Include="Type\TextItemType.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\Void.cs" />

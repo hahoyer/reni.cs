@@ -22,33 +22,29 @@ using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
-using Reni.Parser;
-using Reni.Type;
+using Reni.Feature;
+using Reni.Sequence;
 
-namespace Reni.TokenClasses
+namespace Reni.Type
 {
-    internal sealed class Text : Terminal
+    internal sealed class TextItemType : TagChild
     {
-        public override Result Result(ContextBase context, Category category, TokenData token)
+        public ISearchPath<IFeature, SequenceType> DumpPrintSequenceFeature;
+        public TextItemType(TypeBase parent)
+            : base(parent) { DumpPrintSequenceFeature = new DumpPrintSequenceFeature(this); }
+        protected override string TagTitle { get { return "text_item"; } }
+
+        internal override void Search(ISearchVisitor searchVisitor)
         {
-            var data = StripQutes(token.Name);
-            return TypeBase
-                .UniqueNumber(BitsConst.BitSize(data[0].GetType()))
-                .UniqueTextItem()
-                .UniqueSequence(data.Length)
-                .Result(category, () => CodeBase.BitsConst(BitsConst.ConverAsText(data)), Refs.ArgLess);
+            Parent.Search(searchVisitor.Child(this));
+            base.Search(searchVisitor);
         }
-        private string StripQutes(string text)
-        {
-            var result = "";
-            for(int i = 1; i < text.Length-1; i++)
-            {
-                result += text[i];
-                if (text[i] == text[0])
-                    i++;
-            }
-            return result;
-        }
+    }
+
+    internal sealed class DumpPrintSequenceFeature : ISearchPath<IFeature, SequenceType>
+    {
+        private readonly TextItemType _type;
+        public DumpPrintSequenceFeature(TextItemType type) { _type = type; }
+        IFeature ISearchPath<IFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.DumpPrintTextResult); }
     }
 }

@@ -65,6 +65,7 @@ namespace Reni.Basics
         private static Size SegmentBits { get { return Size.Create(1 << SegmentAlignBits); } }
         private static int SegmentValues { get { return 1 << SegmentBits.ToInt(); } }
         private static int MaxSegmentValue { get { return SegmentValues - 1; } }
+        public static int BitSize(System.Type t) { return Marshal.SizeOf(t) << SegmentAlignBits; }
         public bool IsEmpty { get { return Size.IsZero; } }
         public Size Size { get { return _size; } }
         public int ByteCount { get { return DataSize(Size); } }
@@ -144,10 +145,15 @@ namespace Reni.Basics
 
         public static BitsConst None() { return new BitsConst(Size.Zero); }
 
-        public static BitsConst Convert(Int64 arg) { return new BitsConst(arg); }
+        public static BitsConst Convert(Int64 value) { return new BitsConst(value); }
 
-        public static BitsConst Convert(string left) { return new BitsConst(System.Convert.ToInt64(left)); }
+        public static BitsConst Convert(string value) { return new BitsConst(System.Convert.ToInt64(value)); }
 
+        public static BitsConst ConverAsText(string value)
+        {
+            Tracer.Assert(Marshal.SizeOf(value[0].GetType()) == 1);
+            return new BitsConst(value.Length, value.ToCharArray().Cast<byte>().ToArray(), 0);
+        }
         public static int PlusSize(int left, int right) { return Math.Max(left, right) + 1; }
 
         public static int MultiplySize(int left, int right) { return left + right - 1; }
@@ -246,6 +252,13 @@ namespace Reni.Basics
         }
 
         public void PrintNumber() { PrintNumber(None()); }
+        public void PrintText(Size itemSize) { _outStream.Add(ToString(itemSize)); }
+        
+        private string ToString(Size itemSize)
+        {
+            Tracer.Assert(itemSize == SegmentBits);
+            return _data.Cast<char>().ToString();
+        }
 
         public string ToString(int radix)
         {
@@ -519,5 +532,6 @@ namespace Reni.Basics
                 Tracer.ThrowAssertionFailed(1, "", () => Tracer.Dump(this));
             }
         }
+
     }
 }

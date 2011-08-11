@@ -49,6 +49,7 @@ namespace Reni.Type
             public readonly DictionaryEx<RefAlignParam, AutomaticReferenceType> References;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<Context.Function> Function;
+            public readonly SimpleCache<TextItemType> TextItem;
 
             public Cache(TypeBase parent)
             {
@@ -59,6 +60,7 @@ namespace Reni.Type
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
                 Function = new SimpleCache<Context.Function>(() => new Context.Function(parent));
+                TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent) );
             }
         }
 
@@ -119,6 +121,7 @@ namespace Reni.Type
         internal virtual AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
         internal SequenceType UniqueSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueSequence(bitCount); }
+        internal TextItemType UniqueTextItem() { return _cache.TextItem.Value; }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         internal virtual TypeBase TypeForTypeOperator() { return this; }
@@ -228,7 +231,6 @@ namespace Reni.Type
         internal virtual int ArrayElementCount { get { return 1; } }
         [DisableDump]
         internal virtual bool IsArray { get { return false; } }
-
         private TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
         private TFeature SearchDefineable<TFeature>(Defineable defineable)
@@ -283,7 +285,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = ObjectId == -2 && defineable.ObjectId == 12 && (category.HasCode || category.HasType); ;
+            var trace = ObjectId == 5 && defineable.ObjectId == 21 && (category.HasCode || category.HasType); ;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {

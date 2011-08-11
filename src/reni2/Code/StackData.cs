@@ -58,7 +58,8 @@ namespace Reni.Code
             return null;
         }
 
-        internal void DumpPrintOperation() { GetBitsConst().PrintNumber(); }
+        internal void PrintNumber() { GetBitsConst().PrintNumber(); }
+        internal void PrintText(Size itemSize) { GetBitsConst().PrintText(itemSize); }
 
         internal StackData DoGetTop(Size size)
         {

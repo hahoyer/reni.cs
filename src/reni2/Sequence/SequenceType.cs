@@ -148,5 +148,23 @@ namespace Reni.Sequence
                 destination.NotImplementedMethod(source, conversionParameter);
             return new FunctionalConverter(category => Conversion(category, source, destination));
         }
+        
+        internal Result DumpPrintTextResult(Category category, RefAlignParam refAlignParam)
+        {
+            return Void.Result
+                (category
+                 , () => DumpPrintCode(refAlignParam)
+                 , Refs.Arg
+                );
+        }
+
+        private CodeBase DumpPrintCode(RefAlignParam refAlignParam)
+        {
+            return
+                UniqueAutomaticReference(refAlignParam)
+                .ArgCode()
+                .Dereference(refAlignParam, Size)
+                .DumpPrintText(Element.Size);
+        }
     }
 }

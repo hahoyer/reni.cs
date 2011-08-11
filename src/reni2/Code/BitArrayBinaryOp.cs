@@ -102,9 +102,9 @@ namespace Reni.Code
     ///     Dump and print
     /// </summary>
     [Serializable]
-    internal sealed class DumpPrintOperation : BinaryOp
+    internal sealed class DumpPrintNumberOperation : BinaryOp
     {
-        internal DumpPrintOperation(Size leftSize, Size rightSize)
+        internal DumpPrintNumberOperation(Size leftSize, Size rightSize)
             : base(leftSize, rightSize) { }
 
         [DisableDump]
@@ -114,7 +114,26 @@ namespace Reni.Code
         public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
 
         protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.DumpPrint(top, InputSize); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintOperation(LeftSize, RightSize); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.PrintNumber(LeftSize, RightSize); }
+    }
+
+    [Serializable]
+    internal sealed class DumpPrintTextOperation : FiberItem
+    {
+        private readonly Size _leftSize;
+        private readonly Size _itemSize;
+        internal DumpPrintTextOperation(Size leftSize, Size itemSize)
+        {
+            _leftSize = leftSize;
+            _itemSize = itemSize;
+        }
+
+        internal override Size InputSize { get { return _leftSize; } }
+        [DisableDump]
+        internal override Size OutputSize { get { return Size.Zero; } }
+        [DisableDump]
+        public override string NodeDump { get { return base.NodeDump + " <" + InputSize + "> dump_print_text("+_itemSize+")"; } }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.PrintText(InputSize, _itemSize); }
     }
 
     [Serializable]
@@ -128,7 +147,7 @@ namespace Reni.Code
 
         protected override Size GetSize() { return Size.Zero; }
         protected override string CSharpString() { return CSharpGenerator.DumpPrintText(_dumpPrintText); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.DumpPrintText(_dumpPrintText); }
+        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.PrintText(_dumpPrintText); }
 
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }

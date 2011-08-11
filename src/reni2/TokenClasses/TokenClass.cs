@@ -30,7 +30,7 @@ namespace Reni.TokenClasses
     [Serializable]
     internal abstract class TokenClass : Parser.TokenClass
     {
-        protected override IParsedSyntax Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return Syntax((ReniParser.ParsedSyntax) left, token, (ReniParser.ParsedSyntax) right); }
+        sealed protected override IParsedSyntax Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return Syntax((ReniParser.ParsedSyntax) left, token, (ReniParser.ParsedSyntax) right); }
 
         protected virtual ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {

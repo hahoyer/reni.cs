@@ -35,8 +35,9 @@ namespace Reni.Code
         void Call(Size size, int functionIndex, Size argsAndRefsSize);
         void Dereference(RefAlignParam refAlignParam, Size size, Size dataSize);
         void Drop(Size beforeSize, Size afterSize);
-        void DumpPrintOperation(Size leftSize, Size rightSize);
-        void DumpPrintText(string dumpPrintText);
+        void PrintNumber(Size leftSize, Size rightSize);
+        void PrintText(Size leftSize, Size itemSize);
+        void PrintText(string dumpPrintText);
         void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
         void List(CodeBase[] data);
         void LocalBlockEnd(Size size, Size intermediateSize);
@@ -110,7 +111,7 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, size);
         }
 
-        void IFormalMaschine.DumpPrintOperation(Size leftSize, Size rightSize)
+        void IFormalMaschine.PrintNumber(Size leftSize, Size rightSize)
         {
             Tracer.Assert(rightSize.IsZero);
             ResetInputValuesOfData(leftSize);
@@ -170,7 +171,7 @@ namespace Reni.Code
 
         void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam) { ResetInputValuesOfData(refAlignParam.RefSize*2); }
         void IFormalMaschine.BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize) { NotImplementedMethod(opToken, size, argSize); }
-        void IFormalMaschine.DumpPrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
+        void IFormalMaschine.PrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
         void IFormalMaschine.List(CodeBase[] data) { NotImplementedMethod(data); }
         void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }
         void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size, holder, offset); }
@@ -179,8 +180,8 @@ namespace Reni.Code
         void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
         void IFormalMaschine.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }
         void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName, valueSize); }
-        void IFormalMaschine.TopFrameRef(Size offset, Size size) { NotImplementedMethod(offset,size); }
-
+        void IFormalMaschine.TopFrameRef(Size offset, Size size) { NotImplementedMethod(offset, size); }
+        void IFormalMaschine.PrintText(Size leftSize, Size itemSize) { NotImplementedMethod(leftSize, itemSize); }
 
         private IFormalValue CreateValuesInFrame(Size size, Size offset)
         {

@@ -24,7 +24,7 @@ namespace Reni.Feature.DumpPrint
             return objectType
                 .ArgCode()
                 .Dereference(objectType.RefAlignParam, alignedSize)
-                .DumpPrint(alignedSize);
+                .DumpPrintNumber(alignedSize);
         }
     }
 

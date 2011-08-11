@@ -15,6 +15,7 @@ namespace Reni
         ISearchVisitor ISearchVisitor.Child(Sequence.SequenceType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(AutomaticReferenceType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(AccessType target) { return InternalChild(target); }
+        ISearchVisitor ISearchVisitor.Child(TextItemType target) { return InternalChild(target); }
         internal abstract void SearchTypeBase();
 
         protected abstract ISearchVisitor InternalChild<TType>(TType target)

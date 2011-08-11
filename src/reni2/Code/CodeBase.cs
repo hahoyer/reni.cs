@@ -265,7 +265,8 @@ namespace Reni.Code
         }
 
         internal CodeBase BitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize) { return CreateFiber(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
-        internal CodeBase DumpPrint(Size leftSize) { return CreateFiber(new DumpPrintOperation(leftSize, Size - leftSize)); }
+        internal CodeBase DumpPrintNumber(Size leftSize) { return CreateFiber(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
+        internal CodeBase DumpPrintText(Size itemSize) { return CreateFiber(new DumpPrintTextOperation(Size, itemSize)); }
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
 
         internal static CodeBase LocalVariableReference(RefAlignParam refAlignParam, string holder, Size offset = null) { return new LocalVariableReference(refAlignParam, holder, offset); }

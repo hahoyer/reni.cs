@@ -119,10 +119,15 @@ namespace Reni.Code
             Push(Pull(targetSize).BitCast(significantSize).BitCast(size));
         }
 
-        void IFormalMaschine.DumpPrintOperation(Size leftSize, Size rightSize)
+        void IFormalMaschine.PrintNumber(Size leftSize, Size rightSize)
         {
             Tracer.Assert(rightSize.IsZero);
-            Pull(leftSize).DumpPrintOperation();
+            Pull(leftSize).PrintNumber();
+        }
+
+        void IFormalMaschine.PrintText(Size size, Size itemSize)
+        {
+            Pull(size).PrintText(itemSize);
         }
 
         void IFormalMaschine.LocalBlockEnd(Size size, Size intermediateSize) { NotImplementedMethod(size, intermediateSize); }
@@ -157,7 +162,7 @@ namespace Reni.Code
             left.Assign(targetSize, right);
         }
 
-        void IFormalMaschine.DumpPrintText(string dumpPrintText) { BitsConst.OutStream.Add(dumpPrintText); }
+        void IFormalMaschine.PrintText(string dumpPrintText) { BitsConst.OutStream.Add(dumpPrintText); }
 
         void IFormalMaschine.List(CodeBase[] data)
         {
