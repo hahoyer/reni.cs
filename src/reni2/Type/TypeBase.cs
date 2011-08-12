@@ -66,13 +66,18 @@ namespace Reni.Type
 
         private static int _nextObjectId;
         private readonly Cache _cache;
+        [DisableDump]
+        internal readonly ISearchPath<IPrefixFeature, ReferenceType> CreateArrayFromReferenceFeature;
 
         [UsedImplicitly]
         private static ReniObject _lastSearchVisitor;
 
-
         protected TypeBase()
-            : base(_nextObjectId++) { _cache = new Cache(this); }
+            : base(_nextObjectId++)
+        {
+            CreateArrayFromReferenceFeature = new CreateArrayFromReferenceFeature(this);
+            _cache = new Cache(this);
+        }
 
         internal static Void Void { get { return Cache.Void; } }
         internal static TypeBase Bit { get { return Cache.Bit; } }
@@ -285,8 +290,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = ObjectId == -5 && defineable.ObjectId == 21 && (category.HasCode || category.HasType);
-            ;
+            var trace = ObjectId == -5 && defineable.ObjectId == 12 && (category.HasCode || category.HasType);
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -297,8 +301,9 @@ namespace Reni.Type
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
-                var featureResult = feature.ObtainResult(category.Refsd | Category.Code, refAlignParam);
+                var featureResult = feature.ObtainResult(category.Refsd, refAlignParam);
                 Dump("featureResult", featureResult);
+                BreakExecution();
                 var convertObject = ConvertObject(category.Typed, refAlignParam, feature);
                 Dump("convertObject", convertObject);
                 BreakExecution();
@@ -434,11 +439,19 @@ namespace Reni.Type
             NotImplementedMethod(conversionParameter, destination);
             return null;
         }
-        
+
         internal virtual Result DumpPrintTextResultFromSequence(Category category, RefAlignParam refAlignParam, int count)
         {
             NotImplementedMethod(category, refAlignParam, count);
             return null;
+        }
+
+        internal Result TextItemResult(Category category, RefAlignParam refAlignParam)
+        {
+            return
+                UniqueTextItem()
+                    .UniqueAutomaticReference(refAlignParam)
+                    .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
         }
     }
 }

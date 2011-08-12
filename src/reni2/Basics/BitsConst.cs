@@ -260,7 +260,7 @@ namespace Reni.Basics
             return new string(_data.Select(c=>(char)c).ToArray());
         }
 
-        public string ToString(int radix)
+        private string ToString(int radix)
         {
             if(radix <= 0 || radix > Digits.Length)
                 Tracer.AssertionFailed("radix <= 0 || radix > " + Digits.Length, radix.ToString);

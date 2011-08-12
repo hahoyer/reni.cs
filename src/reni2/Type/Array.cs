@@ -24,6 +24,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -36,10 +37,12 @@ namespace Reni.Type
         private readonly DictionaryEx<Size, ConcatArraysFeature> _concatArraysFeatureCache;
 
         private readonly int _count;
+        public readonly ISearchPath<IFeature, ReferenceType> ConcatArraysFromReferenceFeature;
 
         public Array(TypeBase element, int count)
             : base(element)
         {
+            ConcatArraysFromReferenceFeature = new ConcatArraysFromReferenceFeature(this);
             _count = count;
             Tracer.Assert(count > 0);
             _concatArraysFeatureCache = new DictionaryEx<Size, ConcatArraysFeature>(size => new ConcatArraysFeature(this, size));
@@ -127,36 +130,13 @@ namespace Reni.Type
             }
             return Result(category, result);
         }
-    }
-
-    internal sealed class ConcatArraysFeature : TypeBase, IFunctionalFeature
-    {
-        [EnableDump]
-        private readonly Array _type;
-        private readonly Size _refSize;
-
-        public ConcatArraysFeature(Array type, Size refSize)
+        
+        internal Result SequenceResult(Category category, RefAlignParam refAlignParam)
         {
-            _type = type;
-            _refSize = refSize;
-        }
-
-        protected override Size GetSize() { return _refSize; }
-        internal override IFunctionalFeature FunctionalFeature { get { return this; } }
-        bool IFunctionalFeature.IsRegular { get { return true; } }
-
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
-        {
-            var newCount = argsResult.Type.ArrayElementCount;
-            var newElementResult = argsResult.Conversion(argsResult.Type.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);
-            return _type
-                .Element
-                .UniqueArray(_type.Count + newCount)
-                .Result
-                (category
-                 , () => newElementResult.Code.Sequence(operationResult.Code.Dereference(refAlignParam, _type.Size))
-                 , () => newElementResult.Refs + operationResult.Refs
-                );
+            return Element
+                .UniqueSequence(Count)
+                .UniqueAutomaticReference(refAlignParam)
+                .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
         }
     }
 }

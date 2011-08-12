@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Basics;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -30,13 +29,13 @@ namespace Reni.Feature.DumpPrint
 {
     internal sealed class DumpPrintToken :
         Defineable,
-        IFeature,
         ISearchPath<ISearchPath<IFeature, AutomaticReferenceType>, StructureType>,
         ISearchPath<IFeature, TypeType>,
         ISearchPath<IFeature, Bit>,
         ISearchPath<IFeature, Type.Void>,
         ISearchPath<IFeature, StructureType>,
         ISearchPath<IFeature, Type.Array>,
+        ISearchPath<IFeature, TextItemType>,
         ISearchPath<ISearchPath<IFeature, SequenceType>, Bit>,
         ISearchPath<ISearchPath<IFeature, SequenceType>, TextItemType>,
         ISearchPath<IFeature, FunctionalBody>
@@ -51,25 +50,11 @@ namespace Reni.Feature.DumpPrint
         IFeature ISearchPath<IFeature, StructureType>.Convert(StructureType type) { return new Feature(type.DumpPrintResult); }
         IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new Feature(type.DumpPrintResult); }
         IFeature ISearchPath<IFeature, FunctionalBody>.Convert(FunctionalBody type) { return new Feature(type.DumpPrintResult); }
+        IFeature ISearchPath<IFeature, TextItemType>.Convert(TextItemType type) { return new Feature(type.DumpPrintTextResult); }
 
         ISearchPath<IFeature, SequenceType> ISearchPath<ISearchPath<IFeature, SequenceType>, TextItemType>.Convert(TextItemType type) { return _dumpPrintSequenceFeature; }
         ISearchPath<IFeature, SequenceType> ISearchPath<ISearchPath<IFeature, SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<IFeature, AutomaticReferenceType> ISearchPath<ISearchPath<IFeature, AutomaticReferenceType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
-
-        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(category, refAlignParam);
-            return null;
-        }
-
-        TypeBase IFeature.ObjectType
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
 
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
     }

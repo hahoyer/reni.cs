@@ -48,6 +48,15 @@ namespace Reni.Type
                 );
         }
 
+        internal Result DumpPrintTextResult(Category category, RefAlignParam refAlignParam)
+        {
+            return Void.Result
+                (category
+                 , () => DumpPrintCode(refAlignParam)
+                 , Refs.Arg
+                );
+        }
+
         private CodeBase DumpPrintCodeFromSequence(RefAlignParam refAlignParam, int count)
         {
             return
@@ -55,6 +64,15 @@ namespace Reni.Type
                     .UniqueAutomaticReference(refAlignParam)
                     .ArgCode()
                     .Dereference(refAlignParam, Size*count)
+                    .DumpPrintText(Size);
+        }
+
+        private CodeBase DumpPrintCode(RefAlignParam refAlignParam)
+        {
+            return
+                UniqueAutomaticReference(refAlignParam)
+                    .ArgCode()
+                    .Dereference(refAlignParam, Size)
                     .DumpPrintText(Size);
         }
     }

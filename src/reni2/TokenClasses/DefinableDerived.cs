@@ -32,14 +32,26 @@ namespace Reni.TokenClasses
         IFeature ISearchPath<IFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
     }
 
-    internal sealed class ConcatArrays : Defineable, ISearchPath<IPrefixFeature, TypeBase>, ISearchPath<IFeature, Type.Array>
+    internal sealed class ConcatArrays :
+        Defineable
+        , ISearchPath<IPrefixFeature, TypeBase>
+        , ISearchPath<IFeature, Type.Array>
+        , ISearchPath<ISearchPath<IPrefixFeature, ReferenceType>, TypeBase>
+        , ISearchPath<ISearchPath<IFeature, ReferenceType>, Type.Array>
     {
         IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrays); }
         IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new Feature.PrefixFeature(type.CreateArray); }
+        ISearchPath<IPrefixFeature, ReferenceType> ISearchPath<ISearchPath<IPrefixFeature, ReferenceType>, TypeBase>.Convert(TypeBase type) { return type.CreateArrayFromReferenceFeature; }
+        ISearchPath<IFeature, ReferenceType> ISearchPath<ISearchPath<IFeature, ReferenceType>, Type.Array>.Convert(Type.Array type) { return type.ConcatArraysFromReferenceFeature; }
     }
 
     internal sealed class Assignment : Defineable, ISearchPath<IFeature, AccessType>
     {
         IFeature ISearchPath<IFeature, AccessType>.Convert(AccessType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
+    }
+
+    internal sealed class SequenceToken : Defineable, ISearchPath<IPrefixFeature, Type.Array>
+    {
+        IPrefixFeature ISearchPath<IPrefixFeature, Type.Array>.Convert(Type.Array type) { return new Feature.PrefixFeature(type.SequenceResult); }
     }
 }

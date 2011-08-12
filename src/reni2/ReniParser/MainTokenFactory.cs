@@ -122,6 +122,8 @@ namespace Reni.ReniParser
                        {"dump_print", new DumpPrintToken()},
                        {"else", new ElseToken()},
                        {"enable_cut", new EnableCut()},
+                       {"sequence", new SequenceToken()},
+                       {"text_item", new TextItem()},
                        {"then", new ThenToken()},
                        {"type", new TypeOperator()}
                    };
