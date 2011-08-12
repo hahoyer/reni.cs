@@ -89,6 +89,8 @@ namespace Reni.Code
 
         internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(_data, formerStack); }
         internal override StackData PushOnto(ListStack formerStack) { return new ListStack(_data, formerStack); }
+        internal override BitsConst GetBitsConst() { return _data.Aggregate(BitsConst.None(), Paste); }
+        private BitsConst Paste(BitsConst bitsConst, NonListStackData data) { return bitsConst.Concat(data.GetBitsConst()); }
         internal override StackData Push(StackData formerStack){return formerStack.PushOnto(this);}
         internal override Size Size { get { return _data.Aggregate(Size.Zero, (current, data) => current + data.Size); } }
     }

@@ -241,6 +241,15 @@ namespace Reni.Basics
 
         private static BitsConst ToBitsConst(bool value, Size size) { return new BitsConst(value ? -1 : 0, size); }
 
+        public BitsConst Concat(BitsConst other)
+        {
+            Size.AssertAlignedSize(SegmentAlignBits);
+            var result = new BitsConst(Size + other.Size);
+            Data.MoveBytes(DataSize(Size), result._data, 0, _data, 0);
+            Data.MoveBytes(DataSize(other.Size), result._data, DataSize(Size), other._data, 0);
+            return result;
+        }
+
         public void PrintNumber(BitsConst radix)
         {
             var r = radix.ToInt64();
