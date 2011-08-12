@@ -16,7 +16,7 @@ namespace Reni
         [UsedImplicitly]
         private readonly SearchVisitor<TFeature> _parent;
 
-        [UsedImplicitly]
+        [UsedImplicitly, EnableDump]
         private bool? _isFoundMode;
 
         public SearchResult(SearchVisitor<TFeature> parent, TypeBase target = null)

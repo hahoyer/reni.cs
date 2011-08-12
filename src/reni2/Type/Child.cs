@@ -42,9 +42,9 @@ namespace Reni.Type
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            if(IsInheritor)
-                Parent.Search(searchVisitor);
             base.Search(searchVisitor);
+            if (IsInheritor)
+                Parent.Search(searchVisitor);
         }
     }
 }
