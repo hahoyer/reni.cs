@@ -31,6 +31,7 @@ using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 using Reni.Struct;
+using Reni.Syntax;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -226,6 +227,9 @@ namespace Reni.Type
                 return null;
             }
         }
+
+        [DisableDump]
+        internal virtual IMetaFeature MetaFeature { get { return null; } }
 
         [DisableDump]
         internal virtual bool IsZeroSized { get { return Size.IsZero; } }
@@ -453,5 +457,10 @@ namespace Reni.Type
                     .UniqueAutomaticReference(refAlignParam)
                     .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
         }
+    }
+
+    internal interface IMetaFeature
+    {
+        Result ObtainResult(Category category, ContextBase contextBase, ICompileSyntax left, ICompileSyntax right, RefAlignParam refAlignParam);
     }
 }

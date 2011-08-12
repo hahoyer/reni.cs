@@ -243,12 +243,19 @@ namespace Reni.Context
                     return null;
                 }
 
-                if(right == null)
+                var metaFeature = suffixOperationResult.Type.MetaFeature;
+                if (metaFeature != null)
+                {
+                    Dump("metaFeature", metaFeature);
+                    BreakExecution();
+                    return ReturnMethodDump(metaFeature.ObtainResult(category, this, left, right, RefAlignParam), true);
+                }
+
+                if (right == null)
                     return ReturnMethodDump(suffixOperationResult, true);
 
                 var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
-                var rightCategory = functionalFeature.IsRegular ? category.Typed : Category.All;
-                var rightResult = Result(rightCategory, right).LocalReferenceResult(RefAlignParam);
+                var rightResult = Result(category.Typed, right).LocalReferenceResult(RefAlignParam);
                 Dump("suffixOperationResult", suffixOperationResult);
                 Dump("rightResult", rightResult);
                 BreakExecution();
@@ -409,6 +416,7 @@ namespace Reni.Context
             public string IconKey { get { return "Cache"; } }
         }
 
+        internal BitsConst Evaluate(ICompileSyntax left) { return Result(Category.All,left).Evaluate(); }
     }
 
     internal sealed class PendingContext : Child

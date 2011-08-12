@@ -25,6 +25,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.UnitTest;
 using JetBrains.Annotations;
+using Reni.Context;
 using Reni.Runtime;
 
 namespace Reni.Basics
@@ -154,6 +155,20 @@ namespace Reni.Basics
             Tracer.Assert(Marshal.SizeOf(value[0].GetType()) == 1);
             return new BitsConst(value.Length, value.Select(c => (byte) c).ToArray(), 0);
         }
+
+        public static BitsConst Convert(string target, int @base)
+        {
+            Int64 result = 0;
+            for (var i = 0; i < target.Length; i++ )
+            {
+                Comparer<char> ccc = null;
+                var digit = "0123456789abcdefghijklmnopqrstuvwxyz".IndexOf(target.Substring(i,1), StringComparison.InvariantCultureIgnoreCase);
+                Tracer.Assert(digit >= 0 && digit < @base);
+                result = result*@base + digit;
+            }
+            return Convert(result);
+        }
+
         public static int PlusSize(int left, int right) { return Math.Max(left, right) + 1; }
 
         public static int MultiplySize(int left, int right) { return left + right - 1; }
@@ -262,8 +277,8 @@ namespace Reni.Basics
 
         public void PrintNumber() { PrintNumber(None()); }
         public void PrintText(Size itemSize) { _outStream.Add(ToString(itemSize)); }
-        
-        private string ToString(Size itemSize)
+
+        public string ToString(Size itemSize)
         {
             Tracer.Assert(itemSize == SegmentBits);
             return new string(_data.Select(c=>(char)c).ToArray());

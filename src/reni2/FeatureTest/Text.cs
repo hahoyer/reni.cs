@@ -73,4 +73,14 @@ namespace Reni.FeatureTest.Text
         [Test]
         public override void Run() { BaseRun(); }
     }
-}
+
+    [TestFixture]
+    [Hallo]
+    [BitArrayOp.Number]
+    [TargetSet("'80' to_number_of_base(16) dump_print", "128")]
+    public sealed class ConvertHexadecimal : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+}               
