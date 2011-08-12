@@ -58,7 +58,7 @@ namespace Reni.FeatureTest.Text
 
     [TestFixture]
     [Hallo]
-    [TargetSet("127 type(108) text_item dump_print", "l")]
+    [TargetSet("text_item(108) dump_print", "l")]
     public sealed class ConvertFromNumber : CompilerTest
     {
         [Test]
@@ -67,7 +67,7 @@ namespace Reni.FeatureTest.Text
 
     [TestFixture]
     [ConvertFromNumber]
-    [TargetSet("sequence (<< 108 text_item << 109 text_item) dump_print", "lm")]
+    [TargetSet("sequence (<< text_item(108)<< text_item(109)) dump_print", "lm")]
     public sealed class ConvertFromNumbers : CompilerTest
     {
         [Test]

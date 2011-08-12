@@ -25,8 +25,8 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class TextItem : Defineable, ISearchPath<IFeature, TypeBase>
+    internal sealed class TextItem : Defineable, ISearchPath<IPrefixFeature, TypeBase>
     {
-        IFeature ISearchPath<IFeature, TypeBase>.Convert(TypeBase type) { return new Feature.Feature(type.TextItemResult); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new PrefixFeature(type.TextItemResult); }
     }
 }
