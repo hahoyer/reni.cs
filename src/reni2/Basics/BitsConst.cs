@@ -161,8 +161,7 @@ namespace Reni.Basics
             Int64 result = 0;
             for (var i = 0; i < target.Length; i++ )
             {
-                Comparer<char> ccc = null;
-                var digit = "0123456789abcdefghijklmnopqrstuvwxyz".IndexOf(target.Substring(i,1), StringComparison.InvariantCultureIgnoreCase);
+                var digit = Digits.IndexOf(target.Substring(i,1), StringComparison.InvariantCultureIgnoreCase);
                 Tracer.Assert(digit >= 0 && digit < @base);
                 result = result*@base + digit;
             }

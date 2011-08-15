@@ -221,10 +221,6 @@ namespace Reni.Context
             try
             {
                 BreakExecution();
-                var categoryForFunctionals = category;
-                if(right != null)
-                    categoryForFunctionals |= Category.Type;
-
                 if(left == null && right != null)
                 {
                     var prefixOperationResult = OperationResult<IPrefixFeature>(category, right, defineable);
@@ -234,8 +230,8 @@ namespace Reni.Context
 
                 var suffixOperationResult =
                     left == null
-                        ? ContextOperationResult(categoryForFunctionals, defineable)
-                        : OperationResult<IFeature>(categoryForFunctionals, left, defineable);
+                        ? ContextOperationResult(category.Typed, defineable)
+                        : OperationResult<IFeature>(category.Typed, left, defineable);
 
                 if(suffixOperationResult == null)
                 {
