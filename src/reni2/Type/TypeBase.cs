@@ -209,14 +209,10 @@ namespace Reni.Type
         internal TypeType UniqueTypeType { get { return _cache.TypeType.Value; } }
 
         [DisableDump]
-        internal virtual IFunctionalFeature FunctionalFeature
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        internal virtual IFunctionalFeature FunctionalFeature { get { return this as IFunctionalFeature; } }
+
+        [DisableDump]
+        internal virtual IMetaFeature MetaFeature { get { return this as IMetaFeature; } }
 
         [DisableDump]
         internal virtual Structure FindRecentStructure
@@ -227,9 +223,6 @@ namespace Reni.Type
                 return null;
             }
         }
-
-        [DisableDump]
-        internal virtual IMetaFeature MetaFeature { get { return null; } }
 
         [DisableDump]
         internal virtual bool IsZeroSized { get { return Size.IsZero; } }

@@ -413,6 +413,7 @@ namespace Reni.Context
         }
 
         internal BitsConst Evaluate(ICompileSyntax left) { return Result(Category.All,left).Evaluate(); }
+        public Result Result(ICompileSyntax compileSyntax) { return Result(Category.All, compileSyntax); }
     }
 
     internal sealed class PendingContext : Child

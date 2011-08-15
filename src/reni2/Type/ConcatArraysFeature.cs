@@ -37,8 +37,6 @@ namespace Reni.Type
         }
 
         protected override Size GetSize() { return _refSize; }
-        internal override IFunctionalFeature FunctionalFeature { get { return this; } }
-        bool IFunctionalFeature.IsRegular { get { return true; } }
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {

@@ -22,6 +22,8 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -68,17 +70,15 @@ namespace Reni.Type
         }
         internal Result Repeat(Category category, RefAlignParam refAlignParam) { return _repeaterType.Result(category); }
 
-
-        private sealed class RepeaterType : TypeBase, IFunctionalFeature
+        private sealed class RepeaterType : TypeBase, IMetaFeature
         {
-            internal override IFunctionalFeature FunctionalFeature { get { return this; } }
             private readonly TypeType _typeType;
             public RepeaterType(TypeType typeType) { _typeType = typeType; }
             protected override Size GetSize() { return Size.Zero; }
 
-            Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
+            Result IMetaFeature.ObtainResult(Category category, ContextBase contextBase, ICompileSyntax left, ICompileSyntax right, RefAlignParam refAlignParam)
             {
-                var count = argsResult
+                var count = contextBase.Result(right)
                     .AutomaticDereference()
                     .Evaluate()
                     .ToInt32();
@@ -89,7 +89,6 @@ namespace Reni.Type
                     .UniqueTypeType
                     .Result(category);
             }
-            bool IFunctionalFeature.IsRegular { get { return false; } }
         }
     }
 }

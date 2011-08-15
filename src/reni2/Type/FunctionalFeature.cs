@@ -36,7 +36,6 @@ namespace Reni.Type
         internal TypeBase UniqueFunctionalType(RefAlignParam refAlignParam) { return _functionalTypesCache.Find(refAlignParam); }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
-        bool IFunctionalFeature.IsRegular { get { return true; } }
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
