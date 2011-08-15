@@ -1,4 +1,4 @@
-//     Compiler for programming language "Reni"
+//     Compiler for programming language "Reni"      /
 //     Copyright (C) 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
@@ -31,9 +31,22 @@ namespace Reni.FeatureTest
         {
             return
                 @"
+system:
+{
+    !property MaxNumber8: '7f' to_number_of_base(16) /\;
+    !property MaxNumber16: '7fff' to_number_of_base(16) /\;
+    !property MaxNumber32: '7fffffff' to_number_of_base(16) /\;
+    !property MaxNumber64: '7fffffffffffffff' to_number_of_base(16) /\;
+
+    TextItemType: text_item(MaxNumber8) type;
+};
+
 Text: 
 {
-    _data: text_item(127)type *
+    _data: (system TextItemType * system MaxNumber32) reference (args);
+    _length: system MaxNumber32 type (arg type / system TextItemType);
+    AfterCopy: _data:= system NewMemory(system TextItemType,system MaxNumber32,_data at arg /\)/\;
+    AfterCopy();
 }/\
 ";
         }
@@ -43,10 +56,18 @@ Text:
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
-    [Output("3")]
-    [InstanceCode("(Character('a')dump_print")]
+    [Output("a")]
+    [InstanceCode("Text('a')")]
     [Integer1]
-    public sealed class Character1: TextStruct
+    public sealed class Text1: TextStruct
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+    [Output("Hallo")]
+    [InstanceCode("(Text('H') << 'allo'")]
+    [Integer1]
+    public sealed class TextConcat : TextStruct
     {
         [Test]
         public override void Run() { BaseRun(); }
