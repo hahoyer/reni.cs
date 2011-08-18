@@ -35,29 +35,27 @@ namespace Reni
     {
         private static int _nextId;
         private readonly List<IReferenceInCode> _data;
-        private readonly bool _hasArg;
         private SizeArray _sizesCache;
 
-        private Refs(bool hasArg)
+        private Refs()
             : base(_nextId++)
         {
-            _hasArg = hasArg;
             _data = new List<IReferenceInCode>();
             StopByObjectId(-10);
         }
 
         private Refs(IReferenceInCode context)
-            : this(false) { Add(context); }
+            : this() { Add(context); }
 
-        private Refs(bool hasArg, IEnumerable<IReferenceInCode> a, IEnumerable<IReferenceInCode> b)
-            : this(hasArg)
+        private Refs(IEnumerable<IReferenceInCode> a, IEnumerable<IReferenceInCode> b)
+            : this()
         {
             AddRange(a);
             AddRange(b);
         }
 
-        private Refs(bool hasArg, IEnumerable<IReferenceInCode> a)
-            : this(hasArg) { AddRange(a); }
+        private Refs(IEnumerable<IReferenceInCode> a)
+            : this() { AddRange(a); }
 
 
         private void AddRange(IEnumerable<IReferenceInCode> a)
@@ -79,23 +77,23 @@ namespace Reni
         [DisableDump]
         private SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
 
-        internal bool HasArg { get { return _hasArg; } }
+        internal bool HasArg { get { return Contains(RefsArg.Instance); } }
         public int Count { get { return _data.Count; } }
 
         public IReferenceInCode this[int i] { get { return _data[i]; } }
         public Size Size { get { return Sizes.Size; } }
         public bool IsNone { get { return Count == 0; } }
 
-        internal static Refs ArgLess() { return new Refs(false); }
-        internal static Refs Arg() { return new Refs(true); }
+        internal static Refs Void() { return new Refs(); }
+        internal static Refs Arg() { return new Refs(RefsArg.Instance); }
 
         public Refs Sequence(Refs refs)
         {
-            if(refs.Count == 0 && !refs.HasArg)
+            if(refs.Count == 0)
                 return this;
-            if(Count == 0 && !HasArg)
+            if(Count == 0)
                 return refs;
-            return new Refs(HasArg || refs.HasArg, _data, refs._data);
+            return new Refs(_data, refs._data);
         }
 
         internal static Refs Create(IReferenceInCode referenceInCode) { return new Refs(referenceInCode); }
@@ -126,9 +124,10 @@ namespace Reni
                 return this;
             var r = new List<IReferenceInCode>(_data);
             r.Remove(e);
-            return new Refs(HasArg, r);
+            return new Refs(r);
         }
 
+        public Refs WithoutArg() { return Without(RefsArg.Instance); }
         public Refs Without(Refs other) { return other._data.Aggregate(this, (current, refInCode) => current.Without(refInCode)); }
         public bool Contains(IReferenceInCode context) { return _data.Contains(context); }
         public bool Contains(Refs other) { return other._data.All(Contains); }
@@ -170,5 +169,12 @@ namespace Reni
         public static Refs operator -(Refs x, Refs y) { return x.Without(y); }
         public static Refs operator -(Refs x, IReferenceInCode y) { return x.Without(y); }
         TreeNode[] ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
+
+        sealed class RefsArg: IReferenceInCode
+        {
+            internal static readonly IReferenceInCode Instance = new RefsArg();
+            public RefAlignParam RefAlignParam { get { return null; } }
+        }
+
     }
 }

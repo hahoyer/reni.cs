@@ -150,9 +150,12 @@ namespace Reni.Context
 
         internal Result ObtainResult(Category category, ICompileSyntax syntax)
         {
-            StartMethodDump(ObjectId == -1 && syntax.GetObjectId() == 25 && (category.HasType || category.HasCode), category, syntax);
+            var trace = ObjectId > -1 && syntax.GetObjectId() == 88 && (category.HasRefs || category.HasCode);
+            StartMethodDump(trace, category, syntax);
             try
             {
+                if (trace)
+                    category = category | Category.Refs | Category.Code;
                 return ReturnMethodDump(syntax.Result(this, category), true);
             }
             finally
@@ -216,7 +219,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == -12 && right != null && right.GetObjectId() == 24 && (category.HasCode || category.HasType);
+            var trace = defineable.ObjectId == 16 && left != null && left.GetObjectId() == 210 && (category.HasCode || category.HasType);
             StartMethodDump(trace, category, left, defineable, right);
             try
             {
@@ -318,7 +321,7 @@ namespace Reni.Context
             if(ContextItem is PendingContext)
             {
                 if(category == Category.Refs)
-                    return new Result(category, Refs.ArgLess);
+                    return new Result(category, Refs.Void);
                 var result = syntax.Result(this, category);
                 Tracer.Assert(result.CompleteCategory == category);
                 return result;

@@ -151,7 +151,7 @@ namespace Reni.Type
                 (
                     category,
                     () => CodeBase.BitsConst(Size, BitsConst.Convert(0).Resize(Size))
-                    , Refs.ArgLess);
+                    , Refs.Void);
         }
 
         internal Result Result(Category category, Result codeAndRefs)

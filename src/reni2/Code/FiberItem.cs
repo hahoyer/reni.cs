@@ -123,7 +123,7 @@ namespace Reni.Code
 
         void IFormalCodeItem.Execute(IFormalMaschine formalMaschine) { Execute(formalMaschine); }
 
-        protected virtual Refs GetRefsImplementation() { return Refs.ArgLess(); }
+        protected virtual Refs GetRefsImplementation() { return Refs.Void(); }
     }
 
     internal interface IFormalCodeItem

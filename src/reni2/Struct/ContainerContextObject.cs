@@ -91,7 +91,7 @@ namespace Reni.Struct
 
         internal Result Result(Category category, Result innerResult)
         {
-            var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam), Refs.ArgLess);
+            var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam), Refs.Void);
             if(category.HasType)
                 result.Type = ToStructure.Type;
             return result;

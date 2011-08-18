@@ -123,7 +123,7 @@ namespace Reni.Type
             {
                 var index = BitsConst.Convert(i);
                 var argsResult = UniqueNumber(index.Size.ToInt())
-                    .Result(category.Typed, () => CodeBase.BitsConst(index), Refs.ArgLess);
+                    .Result(category.Typed, () => CodeBase.BitsConst(index), Refs.Void);
                 var rawResult = functionalFeature.ObtainApplyResult(category, operationResult, argsResult, null);
                 var convertedResult = rawResult.Conversion(Element) & result.CompleteCategory;
                 result = convertedResult.Sequence(result);

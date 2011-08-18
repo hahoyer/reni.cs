@@ -479,11 +479,12 @@ namespace Reni
 
         internal Result ReplaceArg(Result resultForArg)
         {
-            var result = new Result {Size = Size, Type = Type};
+            var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode && resultForArg.HasCode)
                 result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
             if(HasRefs && resultForArg.HasRefs)
-                result.Refs = Refs.Sequence(resultForArg.Refs);
+                result.Refs = Refs.WithoutArg().Sequence(resultForArg.Refs);
+            result.IsDirty = false;
             return result;
         }
 
@@ -590,6 +591,7 @@ namespace Reni
             for(var i = 0; i < count; i++)
             {
                 var elemResult = elemResults(i);
+                result.IsDirty = true;
                 if(category.HasCode)
                 {
                     if(i > 0)
@@ -598,6 +600,7 @@ namespace Reni
                 }
                 if(category.HasRefs)
                     result.Refs = result.Refs.Sequence(elemResult.Refs);
+                result.IsDirty = false;
             }
             if(category.HasCode)
                 result.Code = result.Code.Sequence(CodeBase.DumpPrintText(")"));

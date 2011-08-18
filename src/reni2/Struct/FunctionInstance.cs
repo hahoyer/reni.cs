@@ -169,7 +169,7 @@ namespace Reni.Struct
                 Dump("postProcessedResult", postProcessedResult);
                 BreakExecution();
                 var result = postProcessedResult
-                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.ArgLess);
+                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.Void);
                 return ReturnMethodDump(result, true);
             }
             finally

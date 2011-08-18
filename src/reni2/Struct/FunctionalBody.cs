@@ -50,7 +50,7 @@ namespace Reni.Struct
             [DisableDump]
             internal override Structure FindRecentStructure { get { return _parent._structure; } }
 
-            internal override Result PropertyResult(Category category) { return _parent.ObtainApplyResult(category, Void); }
+            internal override Result PropertyResult(Category category) { return _parent.ObtainApplyResult(category, Void).ReplaceArg(Void.Result(category.Typed)); }
 
             protected override Size GetSize() { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpPrintText + "/\\"; } }
@@ -75,12 +75,10 @@ namespace Reni.Struct
 
         private Result ObtainApplyResult(Category category, TypeBase argsType)
         {
-            StartMethodDump(ObjectId < 0 && category.HasCode, category, argsType);
+            StartMethodDump(false && category.HasCode, category, argsType);
             try
             {
                 var argsResult = argsType.ArgResult(category.Typed);
-                if(argsType.IsZeroSized && category.HasCode)
-                    argsResult.Code = CodeBase.Void();
                 var result = _structure.CreateFunctionCall(category, Body, argsResult);
                 return ReturnMethodDump(result, true);
             }
