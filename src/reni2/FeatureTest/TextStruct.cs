@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
 
 namespace Reni.FeatureTest
@@ -31,22 +32,22 @@ namespace Reni.FeatureTest
         {
             return
                 @"
-system:
+!property system:
 {
     !property MaxNumber8: '7f' to_number_of_base(16) /\;
     !property MaxNumber16: '7fff' to_number_of_base(16) /\;
     !property MaxNumber32: '7fffffff' to_number_of_base(16) /\;
     !property MaxNumber64: '7fffffffffffffff' to_number_of_base(16) /\;
 
-    TextItemType: text_item(MaxNumber8) type;
-};
+    !property TextItemType: text_item(MaxNumber8) type /\;
+}/\;
 
 Text: 
 {
     _data: (system TextItemType * system MaxNumber32) reference (args);
     _length: system MaxNumber32 type (arg type / system TextItemType);
     AfterCopy: _data:= system NewMemory(system TextItemType,system MaxNumber32,_data at arg /\)/\;
-    AfterCopy();
+    AfterCopy()
 }/\
 ";
         }
@@ -56,17 +57,21 @@ Text:
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
+    [TestFixture]
     [Output("a")]
     [InstanceCode("Text('a')")]
     [Integer1]
+    [PrimitiveRecursiveFunctionByteWithDump]
     public sealed class Text1: TextStruct
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
+
+    [TestFixture]
     [Output("Hallo")]
     [InstanceCode("(Text('H') << 'allo'")]
-    [Integer1]
+    [Text1]
     public sealed class TextConcat : TextStruct
     {
         [Test]
