@@ -42,9 +42,9 @@ namespace Reni.FeatureTest
         private static Dictionary<System.Type, CompilerTest> _cache;
         private bool _needToRunDependants = true;
 
-        protected void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
-        protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
-        protected void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
+        internal void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
+        internal void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
+        internal void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
 
         private void CreateFileAndRunCompiler(int depth, string name, string text, Action<Compiler> expectedResult, string expectedOutput)
         {
@@ -180,7 +180,7 @@ namespace Reni.FeatureTest
                 .ToArray();
         }
 
-        protected virtual void AssertValid(Compiler c) { }
+        internal virtual void AssertValid(Compiler c) { }
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]

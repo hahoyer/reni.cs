@@ -6,7 +6,7 @@ using HWClassLibrary.IO;
 
 namespace Reni.Parser
 {
-    public sealed class Source : ReniObject
+    internal sealed class Source : ReniObject
     {
         private readonly string _data;
         private readonly File _file;

@@ -54,7 +54,7 @@ namespace Reni
         /// </summary>
         /// <param name = "fileName">Name of the file.</param>
         /// <param name = "parameters"></param>
-        public Compiler(CompilerParameters parameters, string fileName)
+        internal Compiler(CompilerParameters parameters, string fileName)
         {
             _fileName = fileName;
             _parameters = parameters;
@@ -82,17 +82,17 @@ namespace Reni
         internal FunctionList Functions { get { return _functions.Value; } }
 
         [DisableDump]
-        public string FileName { get { return _fileName; } }
+        private string FileName { get { return _fileName; } }
 
         [DisableDump]
-        public Source Source { get { return _source.Value; } }
+        private Source Source { get { return _source.Value; } }
 
         [Node]
         [DisableDump]
         internal ReniParser.ParsedSyntax Syntax { get { return _syntax.Value; } }
 
         [DisableDump]
-        public string ExecutedCode { get { return _executedCode.Value; } }
+        private string ExecutedCode { get { return _executedCode.Value; } }
 
         [Node]
         [DisableDump]
@@ -109,7 +109,7 @@ namespace Reni
         private ContextBase RootContext { get { return _rootContext.Value; } }
 
 
-        public static string FormattedNow
+        internal static string FormattedNow
         {
             get
             {
@@ -130,7 +130,7 @@ namespace Reni
         /// <summary>
         ///     Performs compilation
         /// </summary>
-        public OutStream Exec()
+        internal OutStream Exec()
         {
             if(_parameters.Trace.Source)
                 Tracer.Line("Dump Source\n" + Source.Dump());

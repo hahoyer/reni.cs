@@ -138,7 +138,7 @@ namespace Reni.Code
     /// <summary>
     ///     Nothing, since void cannot be used for this purpose
     /// </summary>
-    public class none
+    internal class none
     {
         private static readonly none _instance = new none();
 
