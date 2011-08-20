@@ -139,7 +139,7 @@ namespace Reni.Context
             return result;
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result Result(Category category, ICompileSyntax syntax)
         {
             return _cache
@@ -150,13 +150,13 @@ namespace Reni.Context
 
         internal Result ObtainResult(Category category, ICompileSyntax syntax)
         {
-            var trace = ObjectId > -1 && syntax.GetObjectId() == 88 && (category.HasRefs || category.HasCode);
+            var trace = ObjectId == -8 && syntax.GetObjectId() == 88 && (category.HasRefs || category.HasCode);
             StartMethodDump(trace, category, syntax);
             try
             {
-                if (trace)
-                    category = category | Category.Refs | Category.Code;
-                return ReturnMethodDump(syntax.Result(this, category), true);
+                //if (trace)
+                //    category = category | Category.Refs | Category.Code;
+                return ReturnMethodDump(syntax.Result(this, category.Replenished), true);
             }
             finally
             {
@@ -219,7 +219,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
         {
-            var trace = defineable.ObjectId == 16 && left != null && left.GetObjectId() == 210 && (category.HasCode || category.HasType);
+            var trace = defineable.ObjectId == 31 && right != null && right.GetObjectId() == 109 && (category.HasCode || category.HasRefs);
             StartMethodDump(trace, category, left, defineable, right);
             try
             {

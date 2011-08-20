@@ -73,6 +73,18 @@ namespace Reni.Basics
         [DebuggerHidden]
         [DisableDump]
         public Category Refsd { get { return this | Refs; } }
+        public Category Replenished
+        {
+            get
+            {
+                var result = this;
+                if (HasType || HasCode)
+                    result |= Size;
+                if (HasCode)
+                    result |= Refs;
+                return result;
+            }
+        }
 
         [DebuggerHidden]
         public static Category operator |(Category x, Category y)
