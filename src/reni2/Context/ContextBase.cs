@@ -37,7 +37,7 @@ namespace Reni.Context
     ///     Base class for compiler environments
     /// </summary>
     [Serializable]
-    internal sealed class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
+    internal sealed partial class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         private static int _nextId;
 
@@ -139,23 +139,23 @@ namespace Reni.Context
             return result;
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result Result(Category category, ICompileSyntax syntax)
         {
-            return _cache
-                .ResultCache
-                .Find(syntax)
-                .Result(category);
+            var cacheItem = _cache.ResultCache.Find(syntax);
+            cacheItem.Update(category);
+            var result = cacheItem.Data & category;
+            Tracer.Assert(category == result.CompleteCategory);
+            return result;
         }
 
-        internal Result ObtainResult(Category category, ICompileSyntax syntax)
+        [DebuggerHidden]
+        private Result ObtainResult(Category category, ICompileSyntax syntax)
         {
             var trace = ObjectId == -8 && syntax.GetObjectId() == 88 && (category.HasRefs || category.HasCode);
             StartMethodDump(trace, category, syntax);
             try
             {
-                //if (trace)
-                //    category = category | Category.Refs | Category.Code;
                 return ReturnMethodDump(syntax.Result(this, category.Replenished), true);
             }
             finally
@@ -316,7 +316,7 @@ namespace Reni.Context
             return feature.ObtainResult(category) & category;
         }
 
-        internal Result PendingResult(Category category, ICompileSyntax syntax)
+        private Result PendingResult(Category category, ICompileSyntax syntax)
         {
             if(ContextItem is PendingContext)
             {

@@ -137,7 +137,7 @@ namespace Reni
         TreeNode[] ITreeNodeSupport.CreateNodes()
         {
             var result = new List<TreeNode>();
-            if(!PendingCategory.IsNone)
+            if(PendingCategory.HasAny)
                 result.Add(Dump().CreateNamedNode("Pending", "Pending"));
             if(HasSize)
                 result.Add(Size.FormatForView().CreateNamedNode("Size", "Number"));
@@ -371,64 +371,7 @@ namespace Reni
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
         }
 
-        [DebuggerHidden]
-        internal void AddCategories(ContextBase context, Category category, ICompileSyntax syntax)
-        {
-            var trace = context.ObjectId == -17 && category.HasRefs && syntax.GetObjectId() == 1192;
-            StartMethodDump(trace, context);
-            try
-            {
-                BreakExecution();
-                var localCateogory = category - CompleteCategory - PendingCategory;
-
-                if(localCateogory.HasSize && FindSize != null)
-                {
-                    _size = FindSize;
-                    localCateogory -= Category.Size;
-                }
-
-                if(localCateogory.HasRefs && FindRefs != null)
-                {
-                    _refs = FindRefs;
-                    localCateogory -= Category.Refs;
-                }
-
-                InternalAddCategories(context, localCateogory, syntax);
-                TreatPendingCategories(context, category - CompleteCategory, syntax);
-                ReturnVoidMethodDump(true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        private void TreatPendingCategories(ContextBase context, Category category, ICompileSyntax syntax)
-        {
-            if(category.IsNone)
-                return;
-
-            var result = context.PendingResult(category, syntax);
-            Tracer.Assert(result.CompleteCategory == category);
-            Update(result);
-        }
-
-        [DebuggerHidden]
-        private void InternalAddCategories(ContextBase context, Category category, ICompileSyntax syntax)
-        {
-            if(category.IsNone)
-                return;
-
-            var oldPendingCategory = PendingCategory;
-            PendingCategory |= category;
-
-            var result = context.ObtainResult(category, syntax);
-            result.AssertComplete(category, syntax);
-            Update(result);
-            PendingCategory = oldPendingCategory;
-        }
-
-        private void AssertComplete(Category category, ICompileSyntax syntaxForDump)
+        internal void AssertComplete(Category category, ICompileSyntax syntaxForDump)
         {
             Tracer.Assert
                 (

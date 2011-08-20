@@ -86,6 +86,7 @@
     <Compile Include="Compiler.cs" />
     <Compile Include="CompilerParameters.cs" />
     <Compile Include="ContextSearchVisitor.cs" />
+    <Compile Include="Context\CacheItem.cs" />
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
     <Compile Include="Context\FunctionContext.cs" />
@@ -259,7 +260,6 @@
     <Compile Include="Result.cs" />
     <Compile Include="Runtime\Data.cs" />
     <Compile Include="Struct\Container.cs" />
-    <Compile Include="Syntax\CacheItem.cs" />
     <Compile Include="ThenElse.cs" />
     <Compile Include="Type\Aligner.cs" />
     <Compile Include="Type\Array.cs" />
