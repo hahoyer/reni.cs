@@ -3,37 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 
 namespace Reni.Struct
 {
-    internal sealed class Context : Child
+    internal sealed class Context : ReniObject, IContextItem
     {
-        private readonly int _position;
-
+        [Node]
+        internal readonly int Position;
         [Node]
         internal readonly Container Container;
 
         internal Context(Container container, int position)
         {
-            _position = position;
+            Position = position;
             Container = container;
         }
 
-        [Node]
-        internal int Position { get { return _position; } }
-
-        protected override void Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent)
+        internal void Search(SearchVisitor<IContextFeature> searchVisitor, ContainerContextObject context)
         {
             if(!searchVisitor.IsSuccessFull)
             {
                 searchVisitor.InternalResult =
                     Container
                         .SearchFromStructContext(searchVisitor.Defineable)
-                        .CheckedConvert(parent.UniqueContainerContext(Container));
+                        .CheckedConvert(context);
             }
-            base.Search(searchVisitor, parent);
         }
     }
 }

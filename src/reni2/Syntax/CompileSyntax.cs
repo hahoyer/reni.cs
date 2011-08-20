@@ -76,7 +76,7 @@ namespace Reni.Syntax
 
         internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
         {
-            var leftResultAsRef = context.UniqueResultAsReference(category.Typed, this);
+            var leftResultAsRef = ResultAsReference(context, category.Typed);
             var rightResult = right.Result(context);
             return leftResultAsRef
                 .Type
@@ -103,5 +103,10 @@ namespace Reni.Syntax
         }
 
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
+        
+        internal Result ResultAsReference(ContextBase context, Category category)
+        {
+            return context.UniqueResult(category.Typed, this).LocalReferenceResult(context.RefAlignParam);
+        }
     }
 }

@@ -89,7 +89,6 @@
     <Compile Include="Context\CacheItem.cs" />
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
-    <Compile Include="Context\FunctionContext.cs" />
     <Compile Include="Context\FunctionContextObject.cs" />
     <Compile Include="Context\FunctionList.cs" />
     <Compile Include="Context\IContextItem.cs" />
@@ -99,7 +98,6 @@
     <Compile Include="FeatureTest\BitArrayOp.cs" />
     <Compile Include="FeatureTest\Array.cs" />
     <Compile Include="FeatureTest\CompilerTest.cs" />
-    <Compile Include="Context\Child.cs" />
     <Compile Include="Context\ContextCache.cs" />
     <Compile Include="Context\Function.cs" />
     <Compile Include="Context\Number.cs" />

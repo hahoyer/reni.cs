@@ -25,14 +25,10 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    [Serializable]
-    internal sealed class Function : Child
+    internal sealed class Function : ReniObject, IContextItem
     {
-        private readonly TypeBase _argsType;
-
-        internal Function(TypeBase argsType) { _argsType = argsType; }
-
         [Node]
-        internal TypeBase ArgsType { get { return _argsType; } }
+        internal readonly TypeBase ArgsType;
+        internal Function(TypeBase argsType) { ArgsType = argsType; }
     }
 }

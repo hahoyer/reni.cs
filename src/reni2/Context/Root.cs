@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Feature;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -29,26 +28,20 @@ namespace Reni.Context
 {
     internal sealed class Root : ReniObject, IContextItem
     {
+        [DisableDump]
         private readonly FunctionList _functions;
 
         internal Root(FunctionList functions) { _functions = functions; }
 
-        RefAlignParam IContextItem.RefAlignParam { get { return DefaultRefAlignParam; } }
-        void IContextItem.Search(SearchVisitor<IContextFeature> searchVisitor, ContextBase parent) { }
-
-        private static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
-
-        [DisableDump]
-        private FunctionList Functions { get { return _functions; } }
+        internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
         internal Result CreateFunctionCall(Structure structure, Category category, CompileSyntax body, Result argsResult)
         {
             Tracer.Assert(argsResult.HasType);
             var alignedArgsResult = argsResult.Align(DefaultRefAlignParam.AlignBits);
-            var functionInstance = Functions.Find(body, structure, alignedArgsResult.Type);
+            var functionInstance = _functions.Find(body, structure, alignedArgsResult.Type);
             return functionInstance.CreateCall(category, alignedArgsResult);
         }
 
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
     }
 }

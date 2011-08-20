@@ -65,21 +65,19 @@ namespace Reni.Context
 
         internal static ContextBase CreateRoot(FunctionList functions) { return new ContextBase(null, new Root(functions)); }
 
-        [UsedImplicitly]
         [Node]
         internal IContextItem ContextItem { get { return _contextItem; } }
-        [UsedImplicitly]
+
         [Node]
         internal ContextBase Parent { get { return _parent; } }
 
         [Node]
         [DisableDump]
-        [UsedImplicitly]
         internal CacheItems Cache { get { return _cache; } }
 
         [Node]
         [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return ContextItem.RefAlignParam ?? Parent.RefAlignParam; } }
+        internal RefAlignParam RefAlignParam { get { return Root.DefaultRefAlignParam; } }
 
         [DisableDump]
         internal int AlignBits { get { return RefAlignParam.AlignBits; } }
@@ -96,7 +94,7 @@ namespace Reni.Context
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal FunctionContextObject UniqueFunction(TypeBase args)
+        private FunctionContextObject UniqueFunction(TypeBase args)
         {
             return _cache
                 .FunctionContextObjects
@@ -122,17 +120,27 @@ namespace Reni.Context
 
         internal void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
-            ContextItem.Search(searchVisitor, Parent);
             if(searchVisitor.IsSuccessFull)
                 return;
+
+            var structContext = ContextItem as Struct.Context;
+            if(structContext != null)
+            {
+                structContext.Search(searchVisitor, Parent.UniqueContainerContext(structContext.Container));
+                if(searchVisitor.IsSuccessFull)
+                    return;
+            }
+
             if(Parent != null)
+            {
                 Parent.Search(searchVisitor);
-            if(searchVisitor.IsSuccessFull)
-                return;
+                if(searchVisitor.IsSuccessFull)
+                    return;
+            }
             searchVisitor.SearchTypeBase();
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache.Find(syntax);
@@ -142,7 +150,7 @@ namespace Reni.Context
             return result;
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         private Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = ObjectId == -8 && syntax.GetObjectId() == 88 && (category.HasRefs || category.HasCode);
@@ -164,8 +172,6 @@ namespace Reni.Context
             syntax.AddToCacheForDebug(this, result);
             return result;
         }
-
-        internal Result UniqueResultAsReference(Category category, CompileSyntax syntax) { return UniqueResult(category.Typed, syntax).LocalReferenceResult(RefAlignParam); }
 
         private Structure ObtainRecentStructure()
         {
@@ -308,6 +314,7 @@ namespace Reni.Context
         }
     }
 
-    internal sealed class PendingContext : Child
-    {}
+    internal sealed class PendingContext : ReniObject, IContextItem
+    {
+    }
 }

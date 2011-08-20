@@ -38,7 +38,7 @@ namespace Reni.Feature
         {
             var leftType = left.Type(context).AutomaticDereference();
             if(category.HasCode || category.HasRefs)
-                return context.UniqueResultAsReference(category.Typed, (CompileSyntax) right).Conversion(leftType) & category;
+                return ((CompileSyntax) right).ResultAsReference(context, category.Typed).Conversion(leftType) & category;
             return leftType.Result(category);
         }
     }

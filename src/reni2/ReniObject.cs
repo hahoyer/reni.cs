@@ -21,7 +21,7 @@ namespace Reni
         protected ReniObject(int nextObjectId) { _objectId = nextObjectId; }
 
         [DisableDump]
-        public virtual int ObjectId { get { return _objectId; } }
+        internal int ObjectId { get { return _objectId; } }
 
         [DisableDump]
         public virtual string NodeDump { get { return DumpShort(); } }
@@ -72,20 +72,6 @@ namespace Reni
                 Tracer.ConditionalBreak
                     (stackFrameDepth + 1, "", () => @"_objectId==" + objectId + "\n" + Dump());
             IsStopByObjectIdActive = isStopByObjectIdActive;
-        }
-
-        public bool DeepEqual(ReniObject other)
-        {
-            if(this == other)
-                return true;
-            if(GetType() != other.GetType())
-                return false;
-            var mi = GetType().GetMethod("TypedDeepEqual");
-            if(mi != null)
-                return (bool) mi.Invoke(this, new object[] {other});
-
-            DumpMethodWithBreak("Not implemented", other);
-            return false;
         }
     }
 

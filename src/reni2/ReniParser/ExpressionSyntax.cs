@@ -140,7 +140,7 @@ namespace Reni.ReniParser
             if(operationResult == null)
                 return (null);
 
-            var targetResult = context.UniqueResultAsReference(category.Typed, target);
+            var targetResult = target.ResultAsReference(context, category.Typed);
             var result = operationResult.ReplaceArg(targetResult);
             return (result);
         }
