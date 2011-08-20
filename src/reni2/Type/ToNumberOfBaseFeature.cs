@@ -61,10 +61,10 @@ namespace Reni.Type
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return Result(category); }
         TypeBase IFeature.ObjectType { get { return _type.UniqueSequence(_count); } }
         protected override Size GetSize() { return Size.Zero; }
-        Result IMetaFeature.ObtainResult(Category category, ContextBase context, ICompileSyntax left, ICompileSyntax right, RefAlignParam refAlignParam)
+        Result IMetaFeature.ObtainResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
         {
-            var target = context.Evaluate(left).ToString(_type.Size);
-            var conversionBase = context.Evaluate(right).ToInt32();
+            var target = left.Evaluate(context).ToString(_type.Size);
+            var conversionBase = right.Evaluate(context).ToInt32();
             Tracer.Assert(conversionBase >= 2 && conversionBase <= 36, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
             return UniqueNumber(result.Size.ToInt())

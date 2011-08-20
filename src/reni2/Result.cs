@@ -371,7 +371,7 @@ namespace Reni
                 Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
         }
 
-        internal void AssertComplete(Category category, ICompileSyntax syntaxForDump)
+        internal void AssertComplete(Category category, CompileSyntax syntaxForDump)
         {
             Tracer.Assert
                 (
@@ -586,9 +586,9 @@ namespace Reni
     internal sealed class Error
     {
         private readonly ContextBase _context;
-        private readonly ICompileSyntax _syntax;
+        private readonly CompileSyntax _syntax;
 
-        internal Error(ContextBase context, ICompileSyntax syntax)
+        internal Error(ContextBase context, CompileSyntax syntax)
         {
             _context = context;
             _syntax = syntax;
@@ -604,6 +604,6 @@ namespace Reni
         }
 
         internal ContextBase Context { get { return _context; } }
-        internal ICompileSyntax Syntax { get { return _syntax; } }
+        internal CompileSyntax Syntax { get { return _syntax; } }
     }
 }

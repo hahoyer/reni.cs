@@ -36,13 +36,13 @@ namespace Reni.Context
                 .StructReferenceViaContextReference(category);
         }
 
-        public override Result Result(ContextBase context, Category category, ICompileSyntax left)
+        public override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
             StartMethodDump(false, context);
             try
             {
                 BreakExecution();
-                var leftResult = context.Result(category.Typed, left);
+                var leftResult = left.Result(context, category.Typed);
                 Dump("leftResult", leftResult);
                 BreakExecution();
                 var structureType = leftResult.Type.FindRecentStructure;

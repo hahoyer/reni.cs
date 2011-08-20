@@ -24,15 +24,17 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.Syntax
 {
     [Serializable]
-    internal abstract class CompileSyntax : ReniParser.ParsedSyntax, ICompileSyntax
+    internal abstract class CompileSyntax : ReniParser.ParsedSyntax
     {
         // Used for debug only
         [DisableDump]
@@ -45,13 +47,11 @@ namespace Reni.Syntax
         internal CompileSyntax(TokenData token, int objectId)
             : base(token, objectId) { }
 
-        string ICompileSyntax.DumpShort() { return DumpShort(); }
-        string ICompileSyntax.FilePosition() { return FilePosition(); }
-        void ICompileSyntax.AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
-        TokenData ICompileSyntax.FirstToken { get { return GetFirstToken(); } }
-        TokenData ICompileSyntax.LastToken { get { return GetLastToken(); } }
-        bool ICompileSyntax.IsLambda { get { return GetIsLambda(); } }
-        string ICompileSyntax.DumpPrintText { get { return DumpPrintText; } }
+        internal override ReniParser.ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ReniParser.ParsedSyntax right) { return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull()); }
+
+        [DisableDump]
+        internal bool IsLambda { get { return GetIsLambda(); } }
+
         [DisableDump]
         internal virtual string DumpPrintText
         {
@@ -62,20 +62,46 @@ namespace Reni.Syntax
             }
         }
 
-        protected virtual bool GetIsLambda() { return false; }
-
         [DebuggerHidden]
-        Result ICompileSyntax.Result(ContextBase context, Category category) { return Result(context, category); }
-
-        internal virtual Result Result(ContextBase context, Category category)
+        internal virtual Result ObtainResult(ContextBase context, Category category)
         {
             NotImplementedMethod(context, category);
             return null;
         }
 
+        protected virtual bool GetIsLambda() { return false; }
         internal override ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData token, TokenData rightToken) { return this; }
+        internal override CompileSyntax ToCompiledSyntax() { return this; }
+        internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
 
-        internal override ICompileSyntax ToCompiledSyntax() { return this; }
-        internal override ReniParser.ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ReniParser.ParsedSyntax right) { return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull()); }
+        internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
+        {
+            var leftResultAsRef = context.UniqueResultAsReference(category.Typed, this);
+            var rightResult = right.Result(context);
+            return leftResultAsRef
+                .Type
+                .FindRecentStructure
+                .AccessViaThisReference(category, rightResult)
+                .ReplaceArg(leftResultAsRef);
+        }
+        
+        internal CodeBase Code(ContextBase context)
+        {
+            var result = Result(context, Category.Code).Code;
+            Tracer.Assert(result != null);
+            return result;
+        }
+
+        internal Result Result(ContextBase context) { return Result(context, Category.All); }
+        internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
+
+        internal TypeBase Type(ContextBase context)
+        {
+            var result = Result(context, Category.Type).Type;
+            Tracer.Assert(result != null);
+            return result;
+        }
+
+        internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
     }
 }

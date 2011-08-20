@@ -37,13 +37,13 @@ namespace Reni.TokenClasses
         }
 
         public abstract Result Result(ContextBase context, Category category, TokenData token);
-        public abstract Result Result(ContextBase context, Category category, ICompileSyntax left);
+        public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
 
     [Serializable]
     internal abstract class Prefix : Special, IPrefix
     {
-        public abstract Result Result(ContextBase context, Category category, ICompileSyntax right);
+        public abstract Result Result(ContextBase context, Category category, CompileSyntax right);
 
         protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -55,7 +55,7 @@ namespace Reni.TokenClasses
     [Serializable]
     internal abstract class Suffix : Special, ISuffix
     {
-        public abstract Result Result(ContextBase context, Category category, ICompileSyntax right);
+        public abstract Result Result(ContextBase context, Category category, CompileSyntax right);
 
         protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -67,7 +67,7 @@ namespace Reni.TokenClasses
     [Serializable]
     internal abstract class Infix : Special, IInfix
     {
-        public abstract Result Result(ContextBase callContext, Category category, ICompileSyntax left, ICompileSyntax right);
+        public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
 
         protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new InfixSyntax(token, left.CheckedToCompiledSyntax(), this, right.CheckedToCompiledSyntax()); }
     }

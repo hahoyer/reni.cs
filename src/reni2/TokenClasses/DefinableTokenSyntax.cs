@@ -20,6 +20,6 @@ namespace Reni.TokenClasses
         protected override TokenData GetLastToken() { return Token; }
         internal override ReniParser.ParsedSyntax CreateDeclarationSyntax(TokenData token, ReniParser.ParsedSyntax right) { return new DeclarationSyntax(_defineable, token, right); }
         internal override ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData leftToken, TokenData rightToken) { return this; }
-        internal override ICompileSyntax ToCompiledSyntax() { return new ExpressionSyntax(_defineable, null, Token, null); }
+        internal override CompileSyntax ToCompiledSyntax() { return new ExpressionSyntax(_defineable, null, Token, null); }
     }
 }

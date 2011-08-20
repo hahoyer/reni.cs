@@ -11,7 +11,7 @@ namespace Reni.TokenClasses
     [Serializable]
     internal sealed class Function : Suffix
     {
-        public override Result Result(ContextBase context, Category category, ICompileSyntax target)
+        public override Result Result(ContextBase context, Category category, CompileSyntax target)
         {
             return context
                 .FindRecentStructure.UniqueFunctionalFeature(target)

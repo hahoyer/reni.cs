@@ -9,9 +9,9 @@ namespace Reni.Syntax
 {
     internal sealed class ConverterSyntax : ReniParser.ParsedSyntax
     {
-        internal readonly ICompileSyntax Body;
+        internal readonly CompileSyntax Body;
 
-        internal ConverterSyntax(TokenData token, ICompileSyntax body)
+        internal ConverterSyntax(TokenData token, CompileSyntax body)
             : base(token) { Body = body; }
 
         internal override string DumpShort() { return "converter (" + Body.DumpShort() + ")"; }

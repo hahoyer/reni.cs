@@ -33,16 +33,16 @@ namespace Reni
     internal abstract class CondSyntax : CompileSyntax
     {
         [Node]
-        internal readonly ICompileSyntax Cond;
+        internal readonly CompileSyntax Cond;
 
         [Node]
-        internal readonly ICompileSyntax Then;
+        internal readonly CompileSyntax Then;
 
         [Node]
-        internal readonly ICompileSyntax Else;
+        internal readonly CompileSyntax Else;
 
-        protected CondSyntax(ICompileSyntax condSyntax, TokenData thenToken, ICompileSyntax thenSyntax,
-                             ICompileSyntax elseSyntax)
+        protected CondSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax,
+                             CompileSyntax elseSyntax)
             : base(thenToken)
         {
             Cond = condSyntax;
@@ -50,15 +50,15 @@ namespace Reni
             Else = elseSyntax;
         }
 
-        internal override Result Result(ContextBase context, Category category) { return InternalResult(context, category); }
+        internal override Result ObtainResult(ContextBase context, Category category) { return InternalResult(context, category); }
 
         internal Result CondResult(ContextBase context, Category category)
         {
-            return context
-                .Result(category | Category.Type, Cond)
+            return Cond
+                .Result(context, category.Typed)
                 .Conversion(TypeBase.Bit)
                 .Align(context.AlignBits)
-                .LocalBlock(category | Category.Type)
+                .LocalBlock(category.Typed)
                 .Conversion(TypeBase.Bit);
         }
 
@@ -71,15 +71,15 @@ namespace Reni
 
         private Result ThenResult(ContextBase context, Category category) { return CondBranchResult(context, category, Then); }
 
-        private Result CondBranchResult(ContextBase context, Category category, ICompileSyntax syntax)
+        private Result CondBranchResult(ContextBase context, Category category, CompileSyntax syntax)
         {
-            var branchResult = context.Result(category | Category.Type, syntax).AutomaticDereference();
+            var branchResult = syntax.Result(context,category.Typed).AutomaticDereference();
             if((category - Category.Type).IsNone)
                 return branchResult.Align(context.RefAlignParam.AlignBits);
 
             var commonType = context.CommonType(this);
             var result = branchResult.Type
-                .Conversion(category | Category.Type, commonType)
+                .Conversion(category.Typed, commonType)
                 .ReplaceArg(branchResult);
             return result.LocalBlock(category);
         }
@@ -128,10 +128,10 @@ namespace Reni
     [Serializable]
     internal sealed class ThenSyntax : CondSyntax
     {
-        internal ThenSyntax(ICompileSyntax condSyntax, TokenData thenToken, ICompileSyntax thenSyntax)
+        internal ThenSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax)
             : base(condSyntax, thenToken, thenSyntax, null) { }
 
-        internal override ReniParser.ParsedSyntax CreateElseSyntax(TokenData token, ICompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
+        internal override ReniParser.ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
     }
 
     [Serializable]
@@ -140,8 +140,8 @@ namespace Reni
         [Node]
         private readonly TokenData _elseToken;
 
-        public ThenElseSyntax(ICompileSyntax condSyntax, TokenData thenToken, ICompileSyntax thenSyntax, TokenData elseToken,
-                              ICompileSyntax elseSyntax)
+        public ThenElseSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax, TokenData elseToken,
+                              CompileSyntax elseSyntax)
             : base(condSyntax, thenToken, thenSyntax, elseSyntax) { _elseToken = elseToken; }
 
         internal override string DumpShort()

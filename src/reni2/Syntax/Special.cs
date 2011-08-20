@@ -26,7 +26,7 @@ namespace Reni.Syntax
             : base(token) { Terminal = terminal; }
 
         internal override string DumpPrintText { get { return Token.Name;  } }
-        internal override Result Result(ContextBase context, Category category)
+        internal override Result ObtainResult(ContextBase context, Category category)
         {
             return Terminal
                 .Result(context, category, Token);
@@ -43,16 +43,16 @@ namespace Reni.Syntax
         private readonly IPrefix _prefix;
 
         [Node, EnableDump]
-        private readonly ICompileSyntax _right;
+        private readonly CompileSyntax _right;
 
-        public PrefixSyntax(TokenData token, IPrefix prefix, ICompileSyntax right)
+        public PrefixSyntax(TokenData token, IPrefix prefix, CompileSyntax right)
             : base(token)
         {
             _prefix = prefix;
             _right = right;
         }
 
-        internal override Result Result(ContextBase context, Category category)
+        internal override Result ObtainResult(ContextBase context, Category category)
         {
             return _prefix
                 .Result(context, category, _right);
@@ -67,15 +67,15 @@ namespace Reni.Syntax
     internal sealed class InfixSyntax : SpecialSyntax
     {
         [Node, EnableDump]
-        private readonly ICompileSyntax _left;
+        private readonly CompileSyntax _left;
 
         [Node, EnableDump]
         private readonly IInfix _infix;
 
         [Node, EnableDump]
-        private readonly ICompileSyntax _right;
+        private readonly CompileSyntax _right;
 
-        public InfixSyntax(TokenData token, ICompileSyntax left, IInfix infix, ICompileSyntax right)
+        public InfixSyntax(TokenData token, CompileSyntax left, IInfix infix, CompileSyntax right)
             : base(token)
         {
             _left = left;
@@ -83,7 +83,7 @@ namespace Reni.Syntax
             _right = right;
         }
 
-        internal override Result Result(ContextBase context, Category category)
+        internal override Result ObtainResult(ContextBase context, Category category)
         {
             return _infix
                 .Result(context, category, _left, _right);
@@ -97,12 +97,12 @@ namespace Reni.Syntax
     internal sealed class SuffixSyntax : SpecialSyntax
     {
         [Node, EnableDump]
-        private readonly ICompileSyntax _left;
+        private readonly CompileSyntax _left;
 
         [Node, EnableDump]
         private readonly ISuffix _suffix;
 
-        internal SuffixSyntax(TokenData token, ICompileSyntax left, ISuffix suffix)
+        internal SuffixSyntax(TokenData token, CompileSyntax left, ISuffix suffix)
             : base(token)
         {
             _left = left;
@@ -111,7 +111,7 @@ namespace Reni.Syntax
 
         protected override bool GetIsLambda() { return _suffix is TokenClasses.Function; }
 
-        internal override Result Result(ContextBase context, Category category)
+        internal override Result ObtainResult(ContextBase context, Category category)
         {
             return _suffix
                 .Result(context, category, _left);
@@ -130,16 +130,16 @@ namespace Reni.Syntax
 
     internal interface IPrefix
     {
-        Result Result(ContextBase context, Category category, ICompileSyntax right);
+        Result Result(ContextBase context, Category category, CompileSyntax right);
     }
 
     internal interface IInfix
     {
-        Result Result(ContextBase context, Category category, ICompileSyntax left, ICompileSyntax right);
+        Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
     }
 
     internal interface ISuffix
     {
-        Result Result(ContextBase context, Category category, ICompileSyntax left);
+        Result Result(ContextBase context, Category category, CompileSyntax left);
     }
 }

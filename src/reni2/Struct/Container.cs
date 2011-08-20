@@ -25,7 +25,7 @@ namespace Reni.Struct
     {
         private readonly TokenData _firstToken;
         private readonly TokenData _lastToken;
-        private readonly ICompileSyntax[] _statements;
+        private readonly CompileSyntax[] _statements;
         private readonly DictionaryEx<string, int> _dictionary;
         private readonly int[] _converters;
         private readonly int[] _properties;
@@ -38,7 +38,7 @@ namespace Reni.Struct
         private readonly DictionaryEx<ContextBase, ContainerContextObject> _containerContextCache;
 
         [Node]
-        internal ICompileSyntax[] Statements { get { return _statements; } }
+        internal CompileSyntax[] Statements { get { return _statements; } }
 
         [DisableDump]
         internal int EndPosition { get { return Statements.Length; } }
@@ -56,7 +56,7 @@ namespace Reni.Struct
 
         protected override TokenData GetLastToken() { return _lastToken; }
 
-        private Container(TokenData leftToken, TokenData rightToken, ICompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters, int[] properties)
+        private Container(TokenData leftToken, TokenData rightToken, CompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters, int[] properties)
             : base(leftToken,_nextObjectId++)
         {
             _firstToken = leftToken;
@@ -79,7 +79,7 @@ namespace Reni.Struct
             }
         }
 
-        internal override ICompileSyntax ToCompiledSyntax() { return this; }
+        internal override CompileSyntax ToCompiledSyntax() { return this; }
 
         [DisableDump]
         internal int IndexSize { get { return BitsConst.AutoSize(Statements.Length); } }
@@ -95,7 +95,7 @@ namespace Reni.Struct
 
         sealed class PreContainer: ReniObject
         {
-            private readonly List<ICompileSyntax> _list = new List<ICompileSyntax>();
+            private readonly List<CompileSyntax> _list = new List<CompileSyntax>();
             private readonly DictionaryEx<string, int> _dictionary = new DictionaryEx<string, int>();
             private readonly List<int> _converters = new List<int>();
             private readonly List<int> _properties = new List<int>();
@@ -200,7 +200,7 @@ namespace Reni.Struct
             return FindStructFeature(defineable.Name);
         }
 
-        internal override Result Result(ContextBase context, Category category)
+        internal override Result ObtainResult(ContextBase context, Category category)
         {
             var innerResult = ConstructionResult(category - Category.Type, context, 0, EndPosition);
             return context.UniqueContainerContext(this).Result(category, innerResult);
@@ -215,8 +215,8 @@ namespace Reni.Struct
 
                 var uniqueChildContext = parent
                     .UniqueChildContext(this, accessPosition);
-                var result = uniqueChildContext
-                    .Result(category | Category.Type, Statements[position]);
+                var result = Statements[position]
+                    .Result(uniqueChildContext, category.Typed);
                 return ReturnMethodDump(result
                     .AutomaticDereference(),true);
             }
@@ -270,7 +270,7 @@ namespace Reni.Struct
         internal Size ConstructionSize(ContextBase parent, int fromPosition, int fromNotPosition) { return ConstructionResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
         internal TypeBase InnerType(ContextBase parent, int accessPosition, int position) { return InnerResult(Category.Type, parent, accessPosition, position).Type; }
         
-        internal bool IsLambda(int position) { return Statements[position].IsLambda; }
+        internal new bool IsLambda(int position) { return Statements[position].IsLambda; }
         internal bool IsProperty(int position) { return Properties.Contains(position); }
 
         internal bool IsZeroSized(ContextBase parent, int fromPosition, int fromNotPosition)

@@ -37,7 +37,7 @@ namespace Reni.Struct
         private readonly ContainerContextObject _containerContextObject;
         private readonly int _endPosition;
         [Node]
-        private readonly DictionaryEx<ICompileSyntax, FunctionalBody> _functionalFeatureCache;
+        private readonly DictionaryEx<CompileSyntax, FunctionalBody> _functionalFeatureCache;
         [Node]
         private readonly SimpleCache<StructureType> _typeCache;
         [Node]
@@ -47,7 +47,7 @@ namespace Reni.Struct
         {
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
-            _functionalFeatureCache = new DictionaryEx<ICompileSyntax, FunctionalBody>(body => new FunctionalBody(this, body));
+            _functionalFeatureCache = new DictionaryEx<CompileSyntax, FunctionalBody>(body => new FunctionalBody(this, body));
             _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
             _accessTypesCache = new DictionaryEx<int, AccessType>(position => new AccessType(this, position));
         }
@@ -120,7 +120,7 @@ namespace Reni.Struct
         [DisableDump]
         internal bool IsZeroSized { get { return ContainerContextObject.IsZeroSized(EndPosition); } }
 
-        internal FunctionalBody UniqueFunctionalFeature(ICompileSyntax body) { return _functionalFeatureCache.Find(body); }
+        internal FunctionalBody UniqueFunctionalFeature(CompileSyntax body) { return _functionalFeatureCache.Find(body); }
         internal AccessType UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
 
         internal Result AccessViaThisReference(Category category, Result rightResult)
@@ -131,8 +131,6 @@ namespace Reni.Struct
                 .ToInt32();
             return AccessViaThisReference(category, position);
         }
-
-        private ICompileSyntax[] Statements { get { return ContainerContextObject.Statements; } }
 
 
         internal Size FieldOffset(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
@@ -158,7 +156,7 @@ namespace Reni.Struct
                 .SearchFromRefToStruct(defineable);
         }
 
-        internal Result CreateFunctionCall(Category category, ICompileSyntax body, Result argsResult)
+        internal Result CreateFunctionCall(Category category, CompileSyntax body, Result argsResult)
         {
             return (ContainerContextObject
                 .RootContext
@@ -187,7 +185,7 @@ namespace Reni.Struct
             var accessType = UniqueAccessType(position);
             return accessType
                 .DumpPrintOperationResult(category)
-                .ReplaceArg(accessType.FieldReferenceViaStructReference(category | Category.Type));
+                .ReplaceArg(accessType.FieldReferenceViaStructReference(category.Typed));
         }
 
         internal Result ContextReferenceViaStructReference(Result result) { return ContainerContextObject.ContextReferenceViaStructReference(EndPosition, result); }

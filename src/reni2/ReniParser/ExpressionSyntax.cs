@@ -16,7 +16,6 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
-using System.Diagnostics;
 using HWClassLibrary.Debug;
 using System;
 using System.Collections.Generic;
@@ -24,6 +23,7 @@ using System.Linq;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
@@ -37,15 +37,15 @@ namespace Reni.ReniParser
         private readonly Defineable _tokenClass;
 
         [Node]
-        internal readonly ICompileSyntax Left;
+        internal readonly CompileSyntax Left;
 
         [Node]
         private readonly TokenData _token;
 
         [Node]
-        internal readonly ICompileSyntax Right;
+        internal readonly CompileSyntax Right;
 
-        internal ExpressionSyntax(Defineable tokenClass, ICompileSyntax left, TokenData token, ICompileSyntax right)
+        internal ExpressionSyntax(Defineable tokenClass, CompileSyntax left, TokenData token, CompileSyntax right)
             : base(token)
         {
             _tokenClass = tokenClass;
@@ -56,7 +56,7 @@ namespace Reni.ReniParser
 
         internal override string DumpShort()
         {
-            var result = base.DumpShort() +"." +  _tokenClass.ObjectId;
+            var result = base.DumpShort() + "." + _tokenClass.ObjectId;
             if(Left != null)
                 result = "(" + Left.DumpShort() + ")" + result;
             if(Right != null)
@@ -73,14 +73,76 @@ namespace Reni.ReniParser
             get
             {
                 var result = base.DumpShort();
-                if (Left != null)
+                if(Left != null)
                     result = "(" + Left.DumpPrintText + ")" + result;
-                if (Right != null)
+                if(Right != null)
                     result += "(" + Right.DumpPrintText + ")";
                 return result;
             }
         }
-        [DebuggerHidden]
-        internal override Result Result(ContextBase context, Category category) { return context.Result(category, Left, _tokenClass, Right); }
+
+        internal override Result ObtainResult(ContextBase context, Category category)
+        {
+            var trace = _tokenClass.ObjectId == 31 && Right != null && Right.GetObjectId() == 109 && (category.HasCode || category.HasRefs);
+            StartMethodDump(trace, context, category);
+            try
+            {
+                BreakExecution();
+                if(Left == null && Right != null)
+                {
+                    var prefixOperationResult = OperationResult<IPrefixFeature>(context, category, Right, _tokenClass);
+                    if(prefixOperationResult != null)
+                        return ReturnMethodDump(prefixOperationResult);
+                }
+
+                var suffixOperationResult =
+                    Left == null
+                        ? context.ContextOperationResult(category.Typed, _tokenClass)
+                        : OperationResult<IFeature>(context, category.Typed, Left, _tokenClass);
+
+                if(suffixOperationResult == null)
+                {
+                    NotImplementedMethod(category, Left, _tokenClass, Right);
+                    return null;
+                }
+
+                var metaFeature = suffixOperationResult.Type.MetaFeature;
+                if(metaFeature != null)
+                {
+                    Dump("metaFeature", metaFeature);
+                    BreakExecution();
+                    return ReturnMethodDump(metaFeature.ObtainResult(category, context, Left, Right, context.RefAlignParam), true);
+                }
+
+                if(Right == null)
+                    return ReturnMethodDump(suffixOperationResult, true);
+
+                var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
+                var rightResult = Right.Result(context, category.Typed).LocalReferenceResult(context.RefAlignParam);
+                Dump("suffixOperationResult", suffixOperationResult);
+                Dump("rightResult", rightResult);
+                BreakExecution();
+                var result = functionalFeature
+                    .ObtainApplyResult(category, suffixOperationResult, rightResult, context.RefAlignParam);
+                return ReturnMethodDump(result, true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+        
+        private static Result OperationResult<TFeature>(ContextBase context, Category category, CompileSyntax target, Defineable defineable)
+            where TFeature : class
+        {
+            var targetType = target.Type(context);
+            var operationResult = targetType.OperationResult<TFeature>(category, defineable, context.RefAlignParam);
+            if(operationResult == null)
+                return (null);
+
+            var targetResult = context.UniqueResultAsReference(category.Typed, target);
+            var result = operationResult.ReplaceArg(targetResult);
+            return (result);
+        }
     }
 }

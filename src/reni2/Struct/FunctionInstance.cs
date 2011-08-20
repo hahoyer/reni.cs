@@ -41,7 +41,7 @@ namespace Reni.Struct
 
         [Node]
         [EnableDump]
-        private readonly ICompileSyntax _body;
+        private readonly CompileSyntax _body;
 
         [Node]
         [EnableDump]
@@ -60,7 +60,7 @@ namespace Reni.Struct
         /// <param name = "structure">The context.</param>
         /// <param name = "args">The args.</param>
         /// created 03.01.2007 21:19
-        internal FunctionInstance(int index, ICompileSyntax body, Structure structure, TypeBase args)
+        internal FunctionInstance(int index, CompileSyntax body, Structure structure, TypeBase args)
             : base(index)
         {
             _index = index;
@@ -106,7 +106,7 @@ namespace Reni.Struct
 
         public Result CreateCall(Category category, Result args)
         {
-            var trace = ObjectId == -1 && (category.HasCode || category.HasRefs);
+            var trace = ObjectId == -120 && (category.HasCode || category.HasRefs);
             StartMethodDump(trace, category, args);
             try
             {
@@ -151,14 +151,14 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = ObjectId == -1 && category.HasRefs;
+            var trace = ObjectId == -10 && category.HasRefs;
             StartMethodDump(trace, category);
             try
             {
                 BreakExecution();
                 var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
                 Dump("functionContext", functionContext);
-                var rawResult = functionContext.Result(category.Typed, _body).Clone();
+                var rawResult = _body.Result(functionContext, category.Typed).Clone();
                 Dump("rawResult", rawResult);
                 BreakExecution();
                 var postProcessedResult = rawResult

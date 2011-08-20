@@ -29,6 +29,7 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Runtime;
+using Reni.Syntax;
 
 namespace Reni
 {
@@ -66,7 +67,7 @@ namespace Reni
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<Container>>(() => Functions.Compile());
             _rootContext = new SimpleCache<ContextBase>(() => ContextBase.CreateRoot(Functions));
-            _code = new SimpleCache<CodeBase>(() => RootContext.Result(Category.Code, Struct.Container.Create(Syntax)).Code);
+            _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
         }
 
         /// <summary>

@@ -76,9 +76,10 @@ namespace Reni.Type
             public RepeaterType(TypeType typeType) { _typeType = typeType; }
             protected override Size GetSize() { return Size.Zero; }
 
-            Result IMetaFeature.ObtainResult(Category category, ContextBase contextBase, ICompileSyntax left, ICompileSyntax right, RefAlignParam refAlignParam)
+            Result IMetaFeature.ObtainResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
             {
-                var count = contextBase.Result(right)
+                var count = right
+                    .Result(contextBase)
                     .AutomaticDereference()
                     .Evaluate()
                     .ToInt32();

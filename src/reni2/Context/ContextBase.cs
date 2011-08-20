@@ -132,15 +132,8 @@ namespace Reni.Context
             searchVisitor.SearchTypeBase();
         }
 
-        internal TypeBase Type(ICompileSyntax syntax)
-        {
-            var result = Result(Category.Type, syntax).Type;
-            Tracer.Assert(result != null);
-            return result;
-        }
-
-        [DebuggerHidden]
-        internal Result Result(Category category, ICompileSyntax syntax)
+        //[DebuggerHidden]
+        internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache.Find(syntax);
             cacheItem.Update(category);
@@ -149,14 +142,14 @@ namespace Reni.Context
             return result;
         }
 
-        [DebuggerHidden]
-        private Result ObtainResult(Category category, ICompileSyntax syntax)
+        //[DebuggerHidden]
+        private Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = ObjectId == -8 && syntax.GetObjectId() == 88 && (category.HasRefs || category.HasCode);
             StartMethodDump(trace, category, syntax);
             try
             {
-                return ReturnMethodDump(syntax.Result(this, category.Replenished), true);
+                return ReturnMethodDump(syntax.ObtainResult(this, category.Replenished), true);
             }
             finally
             {
@@ -165,14 +158,14 @@ namespace Reni.Context
         }
         private ContextBase UniquePendingContext { get { return _cache.PendingContext.Value; } }
 
-        private CacheItem CreateCacheElement(ICompileSyntax syntax)
+        private CacheItem CreateCacheElement(CompileSyntax syntax)
         {
             var result = new CacheItem(syntax, this);
             syntax.AddToCacheForDebug(this, result);
             return result;
         }
 
-        internal Result ResultAsReference(Category category, ICompileSyntax syntax) { return Result(category.Typed, syntax).LocalReferenceResult(RefAlignParam); }
+        internal Result UniqueResultAsReference(Category category, CompileSyntax syntax) { return UniqueResult(category.Typed, syntax).LocalReferenceResult(RefAlignParam); }
 
         private Structure ObtainRecentStructure()
         {
@@ -182,7 +175,7 @@ namespace Reni.Context
             return Parent.ObtainRecentStructure();
         }
 
-        internal Structure UniqueStructure(Struct.Context context) { return Cache.Structures.Find(context.Container).Find(context.Position); }
+        private Structure UniqueStructure(Struct.Context context) { return Cache.Structures.Find(context.Container).Find(context.Position); }
         internal Structure UniqueStructure(Container container) { return Cache.Structures.Find(container).Find(container.EndPosition); }
         internal ContainerContextObject UniqueContainerContext(Container context) { return Cache.ContainerContextObjects.Find(context); }
 
@@ -196,107 +189,6 @@ namespace Reni.Context
             return Parent.ObtainRecentFunctionContext();
         }
 
-        internal Result AtTokenResult(Category category, ICompileSyntax left, ICompileSyntax right)
-        {
-            var leftResultAsRef = ResultAsReference(category | Category.Type, left);
-            var rightResult = Result(Category.All, right);
-            return leftResultAsRef
-                .Type
-                .FindRecentStructure
-                .AccessViaThisReference(category, rightResult)
-                .ReplaceArg(leftResultAsRef);
-        }
-
-        internal Result CallResult(Category category, ICompileSyntax left, ICompileSyntax right)
-        {
-            var leftResult = Result(category.Typed, left);
-            var rightResult = Result(category.Typed, right);
-            return leftResult
-                .Type
-                .FunctionalFeature
-                .ObtainApplyResult(category, leftResult, rightResult, RefAlignParam);
-        }
-
-        internal Result Result(Category category, ICompileSyntax left, Defineable defineable, ICompileSyntax right)
-        {
-            var trace = defineable.ObjectId == 31 && right != null && right.GetObjectId() == 109 && (category.HasCode || category.HasRefs);
-            StartMethodDump(trace, category, left, defineable, right);
-            try
-            {
-                BreakExecution();
-                if(left == null && right != null)
-                {
-                    var prefixOperationResult = OperationResult<IPrefixFeature>(category, right, defineable);
-                    if(prefixOperationResult != null)
-                        return ReturnMethodDump(prefixOperationResult);
-                }
-
-                var suffixOperationResult =
-                    left == null
-                        ? ContextOperationResult(category.Typed, defineable)
-                        : OperationResult<IFeature>(category.Typed, left, defineable);
-
-                if(suffixOperationResult == null)
-                {
-                    NotImplementedMethod(category, left, defineable, right);
-                    return null;
-                }
-
-                var metaFeature = suffixOperationResult.Type.MetaFeature;
-                if (metaFeature != null)
-                {
-                    Dump("metaFeature", metaFeature);
-                    BreakExecution();
-                    return ReturnMethodDump(metaFeature.ObtainResult(category, this, left, right, RefAlignParam), true);
-                }
-
-                if (right == null)
-                    return ReturnMethodDump(suffixOperationResult, true);
-
-                var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
-                var rightResult = Result(category.Typed, right).LocalReferenceResult(RefAlignParam);
-                Dump("suffixOperationResult", suffixOperationResult);
-                Dump("rightResult", rightResult);
-                BreakExecution();
-                var result = functionalFeature
-                    .ObtainApplyResult(category, suffixOperationResult, rightResult, RefAlignParam);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        private Result OperationResult<TFeature>(Category category, ICompileSyntax target, Defineable defineable)
-            where TFeature : class
-        {
-            var trace = defineable.ObjectId == -12 && target.GetObjectId() == 24 && (category.HasCode || category.HasType);
-            StartMethodDump(trace, category, target, defineable);
-            try
-            {
-                BreakExecution();
-                var targetType = Type(target);
-                Dump("targetType", targetType);
-                BreakExecution();
-                var operationResult = targetType.OperationResult<TFeature>(category, defineable, RefAlignParam);
-                Dump("operationResult", operationResult);
-                BreakExecution();
-                if(operationResult == null)
-                    return ReturnMethodDump<Result>(null);
-
-                var targetResult = ResultAsReference(category.Typed, target);
-                Dump("targetResult", targetResult);
-                BreakExecution();
-                var result = operationResult.ReplaceArg(targetResult);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
         private IContextFeature SearchDefinable(Defineable defineable)
         {
             var visitor = new ContextSearchVisitor(defineable);
@@ -304,7 +196,7 @@ namespace Reni.Context
             return visitor.Result;
         }
 
-        private Result ContextOperationResult(Category category, Defineable defineable)
+        internal Result ContextOperationResult(Category category, Defineable defineable)
         {
             var feature = SearchDefinable(defineable);
             if(feature == null)
@@ -316,13 +208,13 @@ namespace Reni.Context
             return feature.ObtainResult(category) & category;
         }
 
-        private Result PendingResult(Category category, ICompileSyntax syntax)
+        private Result PendingResult(Category category, CompileSyntax syntax)
         {
             if(ContextItem is PendingContext)
             {
                 if(category == Category.Refs)
                     return new Result(category, Refs.Void);
-                var result = syntax.Result(this, category);
+                var result = syntax.ObtainResult(this, category);
                 Tracer.Assert(result.CompleteCategory == category);
                 return result;
             }
@@ -349,7 +241,7 @@ namespace Reni.Context
             return null;
         }
 
-        private Category PendingCategory(ICompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
+        private Category PendingCategory(CompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
 
         internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
 
@@ -387,7 +279,7 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<ICompileSyntax, CacheItem> ResultCache;
+            internal readonly DictionaryEx<CompileSyntax, CacheItem> ResultCache;
 
             [Node]
             [SmartNode]
@@ -396,7 +288,7 @@ namespace Reni.Context
 
             public CacheItems(ContextBase parent)
             {
-                ResultCache = new DictionaryEx<ICompileSyntax, CacheItem>(parent.CreateCacheElement);
+                ResultCache = new DictionaryEx<CompileSyntax, CacheItem>(parent.CreateCacheElement);
                 StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>(
                     container => new DictionaryEx<int, ContextBase>(
                                      position => new ContextBase(parent, container.UniqueContext(position))));
@@ -414,9 +306,6 @@ namespace Reni.Context
             [DisableDump]
             public string IconKey { get { return "Cache"; } }
         }
-
-        internal BitsConst Evaluate(ICompileSyntax left) { return Result(Category.All,left).Evaluate(); }
-        public Result Result(ICompileSyntax compileSyntax) { return Result(Category.All, compileSyntax); }
     }
 
     internal sealed class PendingContext : Child

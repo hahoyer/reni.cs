@@ -87,7 +87,7 @@ namespace Reni.Type
 
         internal Result ApplyAssignment(Category category, TypeBase argsType)
         {
-            var typedCategory = category | Category.Type;
+            var typedCategory = category.Typed;
             var sourceResult = argsType.Conversion(typedCategory, ValueTypeReference);
             var destinationResult = ValueReferenceViaFieldReference(typedCategory)
                 .ReplaceArg(FieldReferenceViaStructReference(typedCategory))

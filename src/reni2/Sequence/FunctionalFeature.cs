@@ -60,7 +60,7 @@ namespace Reni.Sequence
         protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
             Tracer.Assert(_objectType.Element == TypeBase.Bit);
-            var typedCategory = category | Category.Type;
+            var typedCategory = category.Typed;
             var result = Apply(category, _objectType.Count, argsType.SequenceCount(_objectType.Element));
             var objectResult = _objectType.UniqueObjectReference(refAlignParam).Result(typedCategory);
             var convertedObjectResult = objectResult.ConvertToBitSequence(typedCategory);

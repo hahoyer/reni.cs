@@ -203,7 +203,6 @@
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Syntax\IResultProvider.cs" />
-    <Compile Include="Syntax\MemberElem.cs" />
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="Parser\ParserInst.cs" />
     <Compile Include="Parser\PrioTable.cs" />
@@ -212,7 +211,6 @@
     <Compile Include="Parser\SourcePosn.cs" />
     <Compile Include="Parser\Token.cs" />
     <Compile Include="Syntax\Special.cs" />
-    <Compile Include="Syntax\SyntaxBase.cs" />
     <Compile Include="Syntax\EmptyList.cs" />
     <Compile Include="Syntax\VisitStrategy.cs" />
     <Compile Include="Struct\FunctionalBody.cs" />

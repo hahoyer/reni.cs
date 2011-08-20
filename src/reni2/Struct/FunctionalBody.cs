@@ -30,11 +30,11 @@ namespace Reni.Struct
 {
     internal sealed class FunctionalBody : FunctionalFeature
     {
-        private readonly ICompileSyntax _body;
+        private readonly CompileSyntax _body;
         private readonly Structure _structure;
         private readonly SimpleCache<Type> _typeCache;
 
-        internal FunctionalBody(Structure structure, ICompileSyntax body)
+        internal FunctionalBody(Structure structure, CompileSyntax body)
         {
             _structure = structure;
             _body = body;
@@ -58,7 +58,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        private ICompileSyntax Body { get { return _body; } }
+        private CompileSyntax Body { get { return _body; } }
 
         [DisableDump]
         protected override TypeBase ObjectType { get { return _structure.Type; } }
@@ -75,7 +75,7 @@ namespace Reni.Struct
 
         private Result ObtainApplyResult(Category category, TypeBase argsType)
         {
-            StartMethodDump(false && category.HasCode, category, argsType);
+            StartMethodDump(false, category, argsType);
             try
             {
                 var argsResult = argsType.ArgResult(category.Typed);

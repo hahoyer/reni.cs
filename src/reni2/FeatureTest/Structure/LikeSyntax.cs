@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -79,7 +97,7 @@ namespace Reni.FeatureTest.Structure
             var co = (Container) syntax;
             Tracer.Assert(_list.Length == co.Statements.Length);
             for(var i = 0; i < _list.Length; i++)
-                _list[i].AssertLike((IParsedSyntax) co.Statements[i]);
+                _list[i].AssertLike(co.Statements[i]);
             Tracer.Assert(_declarations.Length == co.Dictionary.Count);
             var coi = co.Dictionary.GetEnumerator();
             coi.MoveNext();
@@ -94,7 +112,7 @@ namespace Reni.FeatureTest.Structure
         }
     }
 
-    internal class Expression : LikeSyntax
+    internal sealed class Expression : LikeSyntax
     {
         private readonly LikeSyntax _s1;
         private readonly string _s2;
@@ -115,12 +133,12 @@ namespace Reni.FeatureTest.Structure
             AssertLike(_s3, ex.Right);
         }
 
-        private static void AssertLike(LikeSyntax s3, ICompileSyntax right)
+        private static void AssertLike(LikeSyntax s3, CompileSyntax right)
         {
             if(s3 == null)
                 Tracer.Assert(right == null);
             else
-                s3.AssertLike((IParsedSyntax) right);
+                s3.AssertLike(right);
         }
     }
 

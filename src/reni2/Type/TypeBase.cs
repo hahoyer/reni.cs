@@ -357,7 +357,7 @@ namespace Reni.Type
 
         internal Result Conversion(Category category, TypeBase destination)
         {
-            if(category <= (Category.Size | Category.Type))
+            if(category <= (Category.Size.Typed))
                 return destination.Result(category);
 
             var result = Converter(destination).Result(category);
@@ -454,6 +454,6 @@ namespace Reni.Type
 
     internal interface IMetaFeature
     {
-        Result ObtainResult(Category category, ContextBase contextBase, ICompileSyntax left, ICompileSyntax right, RefAlignParam refAlignParam);
+        Result ObtainResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam);
     }
 }

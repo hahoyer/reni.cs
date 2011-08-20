@@ -18,7 +18,7 @@ namespace Reni.ReniParser
         protected ParsedSyntax(TokenData token, int nextObjectId)
             : base(token, nextObjectId) { }
 
-        internal virtual ICompileSyntax ToCompiledSyntax()
+        internal virtual CompileSyntax ToCompiledSyntax()
         {
             NotImplementedMethod(); //Probably it's a missing right parenthesis
             return null;
@@ -30,9 +30,9 @@ namespace Reni.ReniParser
             return null;
         }
 
-        internal virtual ParsedSyntax CreateThenSyntax(TokenData token, ICompileSyntax condition) { return new ThenSyntax(condition, token, ToCompiledSyntax()); }
+        internal virtual ParsedSyntax CreateThenSyntax(TokenData token, CompileSyntax condition) { return new ThenSyntax(condition, token, ToCompiledSyntax()); }
 
-        internal virtual ParsedSyntax CreateElseSyntax(TokenData token, ICompileSyntax elseSyntax)
+        internal virtual ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax)
         {
             NotImplementedMethod(token, elseSyntax);
             return null;
@@ -80,7 +80,7 @@ namespace Reni.ReniParser
 
     internal static class ParsedSyntaxExtender
     {
-        internal static ICompileSyntax CheckedToCompiledSyntax(this ParsedSyntax parsedSyntax)
+        internal static CompileSyntax CheckedToCompiledSyntax(this ParsedSyntax parsedSyntax)
         {
             parsedSyntax.AssertIsNotNull();
             return parsedSyntax.ToCompiledSyntax();
@@ -90,7 +90,7 @@ namespace Reni.ReniParser
 
         internal static void AssertIsNotNull(this ParsedSyntax parsedSyntax) { Tracer.Assert(parsedSyntax != null); }
 
-        internal static ICompileSyntax ToCompiledSyntaxOrNull(this ParsedSyntax parsedSyntax)
+        internal static CompileSyntax ToCompiledSyntaxOrNull(this ParsedSyntax parsedSyntax)
         {
             if(parsedSyntax == null)
                 return null;

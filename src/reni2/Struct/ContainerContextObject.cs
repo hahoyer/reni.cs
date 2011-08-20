@@ -24,7 +24,6 @@ using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -49,9 +48,6 @@ namespace Reni.Struct
 
         internal Container Container { get { return _container; } }
         internal ContextBase Parent { get { return _parent; } }
-
-        [DisableDump]
-        internal ICompileSyntax[] Statements { get { return Container.Statements; } }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }

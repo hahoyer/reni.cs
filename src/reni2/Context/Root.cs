@@ -41,7 +41,7 @@ namespace Reni.Context
         [DisableDump]
         private FunctionList Functions { get { return _functions; } }
 
-        internal Result CreateFunctionCall(Structure structure, Category category, ICompileSyntax body, Result argsResult)
+        internal Result CreateFunctionCall(Structure structure, Category category, CompileSyntax body, Result argsResult)
         {
             Tracer.Assert(argsResult.HasType);
             var alignedArgsResult = argsResult.Align(DefaultRefAlignParam.AlignBits);

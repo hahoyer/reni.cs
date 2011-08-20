@@ -21,24 +21,24 @@ namespace Reni.Feature
             return new InfixSyntax(token, left.CheckedToCompiledSyntax(), this, right.CheckedToCompiledSyntax());
         }
 
-        Result ISuffix.Result(ContextBase context, Category category, ICompileSyntax left)
+        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left)
         {
             var result = TypeBase.VoidResult(category).Clone();
             if(category.HasType)
             {
-                result.Type = context
-                    .Type(left)
+                result.Type = left
+                    .Type(context)
                     .TypeForTypeOperator()
                     .UniqueTypeType;
             }
             return result;
         }
 
-        Result IInfix.Result(ContextBase context, Category category, ICompileSyntax left, ICompileSyntax right)
+        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var leftType = context.Type(left).AutomaticDereference();
+            var leftType = left.Type(context).AutomaticDereference();
             if(category.HasCode || category.HasRefs)
-                return context.ResultAsReference(category | Category.Type, right).Conversion(leftType) & category;
+                return context.UniqueResultAsReference(category.Typed, (CompileSyntax) right).Conversion(leftType) & category;
             return leftType.Result(category);
         }
     }

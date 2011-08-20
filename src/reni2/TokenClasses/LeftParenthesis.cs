@@ -39,9 +39,14 @@ namespace Reni.TokenClasses
 
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, left, this, token, right); }
 
-        Result IInfix.Result(ContextBase context, Category category, ICompileSyntax left, ICompileSyntax right)
+        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            return context.CallResult(category, left, right);
+            var leftResult = left.Result(context, category.Typed);
+            var rightResult = right.Result(context, category.Typed);
+            return leftResult
+                .Type
+                .FunctionalFeature
+                .ObtainApplyResult(category, leftResult, rightResult, context.RefAlignParam);
         }
     }
 }

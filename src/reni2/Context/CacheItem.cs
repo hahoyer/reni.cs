@@ -32,14 +32,14 @@ namespace Reni.Context
     {
         internal sealed class CacheItem : ReniObject, IIconKeyProvider, ITreeNodeSupport
         {
-            private readonly ICompileSyntax _syntax;
+            private readonly CompileSyntax _syntax;
             private readonly ContextBase _context;
             private readonly Result _data = new Result();
 
             [Node]
             public Result Data { get { return _data; } }
 
-            public CacheItem(ICompileSyntax syntax, ContextBase context)
+            public CacheItem(CompileSyntax syntax, ContextBase context)
             {
                 if(syntax == null)
                     throw new NullReferenceException("parameter \"syntax\" must not be null");
@@ -47,7 +47,7 @@ namespace Reni.Context
                 _context = context;
             }
 
-            [DebuggerHidden]
+            //[DebuggerHidden]
             internal void Update(Category category)
             {
                 var trace = _context.ObjectId == -6 && category.HasRefs && _syntax.GetObjectId() == 39;

@@ -127,7 +127,7 @@ namespace Reni.Sequence
 
         private static Result Conversion(Category category, SequenceType source, SequenceType destination)
         {
-            var result = source.ArgResult(category | Category.Type);
+            var result = source.ArgResult(category.Typed);
             if(source.Count > destination.Count)
                 result = source.RemoveElementsAtEnd(category, destination.Count);
 

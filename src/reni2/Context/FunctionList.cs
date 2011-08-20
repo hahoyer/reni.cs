@@ -36,13 +36,13 @@ namespace Reni.Context
     internal sealed class FunctionList : ReniObject
     {
         [Node]
-        private readonly DictionaryEx<ICompileSyntax, DictionaryEx<Structure, DictionaryEx<TypeBase, int>>> _dictionary;
+        private readonly DictionaryEx<CompileSyntax, DictionaryEx<Structure, DictionaryEx<TypeBase, int>>> _dictionary;
 
         [Node]
         private readonly List<FunctionInstance> _list = new List<FunctionInstance>();
 
         public FunctionList() {
-            _dictionary = new DictionaryEx<ICompileSyntax, DictionaryEx<Structure, DictionaryEx<TypeBase, int>>>
+            _dictionary = new DictionaryEx<CompileSyntax, DictionaryEx<Structure, DictionaryEx<TypeBase, int>>>
             (body => new DictionaryEx<Structure, DictionaryEx<TypeBase, int>>
                 (structure => new DictionaryEx<TypeBase, int>
                     (-1, args => CreateFunctionInstance(args, body, structure))));
@@ -52,7 +52,7 @@ namespace Reni.Context
         internal int Count { get { return _list.Count; } }
         internal CodeBase[] Code { get { return _list.Select(t => t.BodyCode).ToArray(); } }
 
-        internal FunctionInstance Find(ICompileSyntax body, Structure structure, TypeBase args)
+        internal FunctionInstance Find(CompileSyntax body, Structure structure, TypeBase args)
         {
             var index = _dictionary.Find(body).Find(structure).Find(args);
             return _list[index];
@@ -60,7 +60,7 @@ namespace Reni.Context
 
         internal List<Code.Container> Compile() { return _list.Select(t => t.Serialize(false)).ToList(); }
 
-        private int CreateFunctionInstance(TypeBase args, ICompileSyntax body, Structure structure)
+        private int CreateFunctionInstance(TypeBase args, CompileSyntax body, Structure structure)
         {
             var index = _list.Count;
             var f = new FunctionInstance(index, body, structure, args);
