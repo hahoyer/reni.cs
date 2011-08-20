@@ -61,7 +61,7 @@ Text:
     [Output("a")]
     [InstanceCode("Text('a')")]
     [Integer1]
-    [Array.FromTypeAndFunction]
+    [PrimitiveRecursiveFunctionByteWithDump]
     public sealed class Text1: TextStruct
     {
         [Test]

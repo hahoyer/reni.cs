@@ -49,7 +49,6 @@ namespace Reni.Type
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
             public readonly DictionaryEx<RefAlignParam, AutomaticReferenceType> References;
             public readonly SimpleCache<TypeType> TypeType;
-            public readonly SimpleCache<Context.Function> Function;
             public readonly SimpleCache<TextItemType> TextItem;
 
             public Cache(TypeBase parent)
@@ -60,7 +59,6 @@ namespace Reni.Type
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
-                Function = new SimpleCache<Context.Function>(() => new Context.Function(parent));
                 TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent));
             }
         }
@@ -281,8 +279,6 @@ namespace Reni.Type
                 )
                 ;
         }
-
-        internal IContextItem UniqueFunction() { return _cache.Function.Value; }
 
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class

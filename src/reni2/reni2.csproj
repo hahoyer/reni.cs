@@ -87,12 +87,14 @@
     <Compile Include="CompilerParameters.cs" />
     <Compile Include="ContextSearchVisitor.cs" />
     <Compile Include="Context\CacheItem.cs" />
+    <Compile Include="Context\Child.cs" />
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
     <Compile Include="Context\FunctionContextObject.cs" />
     <Compile Include="Context\FunctionList.cs" />
     <Compile Include="Context\IContextItem.cs" />
     <Compile Include="Context\IRootContext.cs" />
+    <Compile Include="Context\PendingContext.cs" />
     <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />

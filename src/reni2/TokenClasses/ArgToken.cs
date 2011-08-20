@@ -29,6 +29,11 @@ namespace Reni.TokenClasses
     [Serializable]
     internal sealed class ArgToken : Terminal
     {
-        public override Result Result(ContextBase context, Category category, TokenData token) { return context.CreateArgsReferenceResult(category); }
+        public override Result Result(ContextBase context, Category category, TokenData token)
+        {
+            return context
+                .FindRecentFunctionContextObject
+                .CreateArgsReferenceResult(category);
+        }
     }
 }

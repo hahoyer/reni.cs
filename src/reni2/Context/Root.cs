@@ -21,17 +21,29 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Feature;
 using Reni.Struct;
 using Reni.Syntax;
 
 namespace Reni.Context
 {
-    internal sealed class Root : ReniObject, IContextItem
+    internal sealed class Root : ContextBase
     {
         [DisableDump]
         private readonly FunctionList _functions;
 
         internal Root(FunctionList functions) { _functions = functions; }
+
+        [DisableDump]
+        internal override Root RootContext { get { return this; } }
+
+        internal override void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
+
+        protected override Result CommonResult(Category category, CondSyntax condSyntax)
+        {
+            NotImplementedMethod(category, condSyntax);
+            return null;
+        }
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
@@ -42,6 +54,5 @@ namespace Reni.Context
             var functionInstance = _functions.Find(body, structure, alignedArgsResult.Type);
             return functionInstance.CreateCall(category, alignedArgsResult);
         }
-
     }
 }

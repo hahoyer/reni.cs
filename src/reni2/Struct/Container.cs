@@ -6,7 +6,6 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
@@ -34,8 +33,6 @@ namespace Reni.Struct
         private static bool _isInsideFileDump;
         private static int _nextObjectId;
         private DictionaryEx<int, string> _reverseDictionaryCache;
-        private readonly DictionaryEx<int, Context> _contextCache;
-        private readonly DictionaryEx<ContextBase, ContainerContextObject> _containerContextCache;
 
         [Node]
         internal CompileSyntax[] Statements { get { return _statements; } }
@@ -65,8 +62,6 @@ namespace Reni.Struct
             _dictionary = dictionary;
             _converters = converters;
             _properties = properties;
-            _contextCache = new DictionaryEx<int, Context>(position => new Context(this, position));
-            _containerContextCache = new DictionaryEx<ContextBase, ContainerContextObject>(parent => new ContainerContextObject(this, parent));
         }
 
         internal DictionaryEx<int, string> ReverseDictionary
@@ -232,13 +227,6 @@ namespace Reni.Struct
             return InternalInnerResult(category, parent, accessPosition, position);
         }
 
-        internal Context UniqueContext(int position) { return _contextCache.Find(position); }
-
-        internal ContainerContextObject UniqueContainerContext(ContextBase parent)
-        {
-            return _containerContextCache.Find(parent);
-        }
-        
         internal Result ConstructionResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
             var result = TypeBase.VoidResult(category);

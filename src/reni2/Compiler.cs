@@ -66,7 +66,7 @@ namespace Reni
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, false));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<Container>>(() => Functions.Compile());
-            _rootContext = new SimpleCache<ContextBase>(() => ContextBase.CreateRoot(Functions));
+            _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions));
             _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
         }
 

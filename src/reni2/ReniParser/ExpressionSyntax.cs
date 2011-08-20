@@ -83,7 +83,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = _tokenClass.ObjectId == 31 && Right != null && Right.GetObjectId() == 109 && (category.HasCode || category.HasRefs);
+            var trace = _tokenClass.ObjectId == -31 && Right != null && Right.GetObjectId() == 109 && (category.HasCode || category.HasRefs);
             StartMethodDump(trace, context, category);
             try
             {

@@ -25,10 +25,13 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    internal sealed class Function : ReniObject, IContextItem
+    internal sealed class Function : Child
     {
         [Node]
         internal readonly TypeBase ArgsType;
-        internal Function(TypeBase argsType) { ArgsType = argsType; }
+        internal Function(ContextBase parent, TypeBase argsType)
+            : base(parent) { ArgsType = argsType; }
+
+        internal override FunctionContextObject ObtainRecentFunctionContext() { return Parent.UniqueFunctionContextObject(ArgsType); }
     }
 }
