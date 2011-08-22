@@ -32,7 +32,6 @@ namespace Reni.Struct
         public static bool IsInContainerDump;
         private static bool _isInsideFileDump;
         private static int _nextObjectId;
-        private DictionaryEx<int, string> _reverseDictionaryCache;
 
         [Node]
         internal CompileSyntax[] Statements { get { return _statements; } }
@@ -64,29 +63,12 @@ namespace Reni.Struct
             _properties = properties;
         }
 
-        internal DictionaryEx<int, string> ReverseDictionary
-        {
-            get
-            {
-                if(_reverseDictionaryCache == null)
-                    CreateReverseDictionary();
-                return _reverseDictionaryCache;
-            }
-        }
-
         internal override CompileSyntax ToCompiledSyntax() { return this; }
 
         [DisableDump]
         internal int IndexSize { get { return BitsConst.AutoSize(Statements.Length); } }
 
         internal override string DumpShort() { return "container." + ObjectId; }
-
-        private void CreateReverseDictionary()
-        {
-            _reverseDictionaryCache = new DictionaryEx<int, string>();
-            foreach(var pair in Dictionary)
-                _reverseDictionaryCache[pair.Value] = pair.Key;
-        }
 
         sealed class PreContainer: ReniObject
         {
@@ -109,7 +91,7 @@ namespace Reni.Struct
                 if (parsedSyntax is ConverterSyntax)
                 {
                     var body = ((ConverterSyntax)parsedSyntax).Body;
-                    parsedSyntax = (ReniParser.ParsedSyntax)body;
+                    parsedSyntax = body;
                     _converters.Add(_list.Count);
                 }
 
@@ -201,15 +183,16 @@ namespace Reni.Struct
             return context.UniqueContainerContext(this).Result(category, innerResult);
         }
 
-        internal Result InternalInnerResult(Category category, ContextBase parent, int accessPosition, int position)
+        private Result InternalInnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = ObjectId==-10 && accessPosition==3 && position == 2 && category.HasRefs;
+            var trace = ObjectId==-1 && accessPosition==1 && position == 0 && (category.HasRefs || category.HasCode);
             StartMethodDump(trace,category,parent,accessPosition,position);
             try
             {
-
                 var uniqueChildContext = parent
                     .UniqueChildContext(this, accessPosition);
+                Dump("Statements[position]", Statements[position]);
+                BreakExecution();
                 var result = Statements[position]
                     .Result(uniqueChildContext, category.Typed);
                 return ReturnMethodDump(result
@@ -221,7 +204,7 @@ namespace Reni.Struct
             }
         }
 
-        internal Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)
+        private Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
             Tracer.Assert(!(category.HasCode));
             return InternalInnerResult(category, parent, accessPosition, position);
@@ -237,7 +220,7 @@ namespace Reni.Struct
 
         private Result ConstructorResult(Category category, ContextBase parent, int position)
         {
-            StartMethodDump(ObjectId == -1 && position == 1 && category.HasCode, category, parent, position);
+            StartMethodDump(ObjectId == -1 && position == 0 && category.HasCode, category, parent, position);
             try
             {
                 var internalInnerResult = InternalInnerResult(category, parent, position + 1, position);

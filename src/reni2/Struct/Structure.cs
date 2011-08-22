@@ -158,9 +158,9 @@ namespace Reni.Struct
 
         internal Result CreateFunctionCall(Category category, CompileSyntax body, Result argsResult)
         {
-            return (ContainerContextObject
+            return ContainerContextObject
                 .RootContext
-                .CreateFunctionCall(this, category, body, argsResult));
+                .CreateFunctionCall(this, category, body, argsResult);
         }
 
         internal Result AccessViaContextReference(Category category, int position)
