@@ -29,35 +29,34 @@ namespace Reni.Type
     {
         private static int _nextObjectId;
         protected Converter()
-            : base(_nextObjectId++) {}
+            : base(_nextObjectId++) { }
         internal abstract Result Result(Category category);
         internal bool IsValid { get { return true; } }
 
-        public static Converter operator*(Converter first, Func<Category, Result> second) { return new ConcatConverter(first, new FunctionalConverter(second)); }
-        public static Converter operator*(Func<Category, Result> first, Converter second) { return new ConcatConverter(new FunctionalConverter(first), second); }
-        public static Converter operator*(Converter first, Converter second) { return new ConcatConverter(first, second); }
+        public static Converter operator *(Converter first, Func<Category, Result> second) { return new ConcatConverter(first, new FunctionalConverter(second)); }
+        public static Converter operator *(Func<Category, Result> first, Converter second) { return new ConcatConverter(new FunctionalConverter(first), second); }
+        public static Converter operator *(Converter first, Converter second) { return new ConcatConverter(first, second); }
     }
 
     internal sealed class ConcatConverter : Converter
     {
         private readonly Converter _first;
         private readonly Converter _second;
+        private Result _testResult;
         public ConcatConverter(Converter first, Converter second)
         {
             _first = first;
             _second = second;
 
             AssertValid();
-            StopByObjectId(-4);
+            StopByObjectId(1);
         }
         private void AssertValid()
         {
-            if (!Debugger.IsAttached)
+            if(!Debugger.IsAttached)
                 return;
 
-            var first = _first.Result(Category.Type).Type;
-            var second = _second.Result(Category.Code).Code;
-            var testResult = Result(Category.Code);
+            _testResult = Result(Category.Type | Category.Code);
         }
 
         internal override Result Result(Category category)
@@ -79,17 +78,19 @@ namespace Reni.Type
         }
     }
 
-    internal sealed class DecoratetConverter : Converter
+    internal sealed class DecoratedConverter : Converter
     {
         private readonly ReferenceType _source;
         private readonly Converter _converter;
         private readonly AutomaticReferenceType _destination;
-        public DecoratetConverter(ReferenceType source, Converter converter, AutomaticReferenceType destination)
+        
+        public DecoratedConverter(ReferenceType source, Converter converter, AutomaticReferenceType destination)
         {
             _source = source;
             _converter = converter;
             _destination = destination;
         }
+
         internal override Result Result(Category category)
         {
             return _converter

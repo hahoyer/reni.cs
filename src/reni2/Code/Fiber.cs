@@ -1,11 +1,28 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
-using Reni.Context;
 
 namespace Reni.Code
 {
@@ -26,7 +43,7 @@ namespace Reni.Code
                 l.Add(fiberItem);
             _fiberItems = l.ToArray();
             AssertValid();
-            StopByObjectId(-92);
+            StopByObjectId(-7);
         }
 
         private void AssertValid()
@@ -44,24 +61,19 @@ namespace Reni.Code
         internal Fiber(FiberHead fiberHead, FiberItem fiberItem)
             : this(fiberHead, null, fiberItem) { }
 
-        internal Fiber(FiberHead fiberHead)
-            : this(fiberHead, null, null) { }
-
         [Node]
         internal FiberHead FiberHead { get { return _fiberHead; } }
         [Node]
         internal FiberItem[] FiberItems { get { return _fiberItems; } }
         internal override bool IsRelativeReference { get { return _fiberHead.IsRelativeReference; } }
-
+        [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _fiberItems[_fiberItems.Length - 1].RefAlignParam; } }
         protected override Size GetSize() { return _fiberItems[_fiberItems.Length - 1].OutputSize; }
 
         protected override Refs GetRefsImplementation()
         {
-            var refs = FiberHead.Refs;
-            foreach(var fiberItem in _fiberItems)
-                refs = refs.Sequence(fiberItem.Refs);
-            return refs;
+            return _fiberItems
+                .Aggregate(FiberHead.Refs, (current, fiberItem) => current.Sequence(fiberItem.Refs));
         }
 
         internal override CodeBase CreateFiber(FiberItem subsequentElement)
@@ -120,8 +132,6 @@ namespace Reni.Code
             result += _fiberItems.DumpLines();
             return result.Substring(0, result.Length - 1);
         }
-
-        internal CodeBase List() { return Code.List.Create(this); }
 
         internal CodeBase ReCreate(CodeBase newHead, FiberItem[] newItems)
         {

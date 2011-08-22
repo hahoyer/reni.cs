@@ -120,10 +120,10 @@ namespace Reni.Type
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
         internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText), Refs.Void); }
 
-        internal Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
+        private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
-            StartMethodDump(ObjectId == 13 && category.HasCode, category);
+            StartMethodDump(ObjectId == -4 && category.HasCode, category);
             try
             {
                 BreakExecution();
@@ -161,7 +161,11 @@ namespace Reni.Type
         private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
-        internal override Result DereferenceResult(Category category) { return ValueReferenceViaFieldReference(category).AutomaticDereference(); }
-        internal override Result ToAutomaticReferenceResult(Category category) { return ValueReferenceViaFieldReference(category); }
+        internal override Result DereferenceResult(Category category)
+        {
+            return ValueReferenceViaFieldReference(category)
+                .AutomaticDereference();
+        }
+        protected override Result ToAutomaticReferenceResult(Category category) { return ValueReferenceViaFieldReference(category); }
     }
 }

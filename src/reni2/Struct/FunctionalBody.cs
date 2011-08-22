@@ -22,7 +22,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -50,7 +49,12 @@ namespace Reni.Struct
             [DisableDump]
             internal override Structure FindRecentStructure { get { return _parent._structure; } }
 
-            internal override Result PropertyResult(Category category) { return _parent.ObtainApplyResult(category, Void).ReplaceArg(Void.Result(category.Typed)); }
+            internal override Result PropertyResult(Category category)
+            {
+                return _parent
+                    .ObtainApplyResult(category, Void)
+                    .ReplaceArg(Void.Result(category.Typed));
+            }
 
             protected override Size GetSize() { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpPrintText + "/\\"; } }
