@@ -85,7 +85,7 @@ namespace Reni.Context
 
         internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache.Find(syntax);
@@ -95,10 +95,10 @@ namespace Reni.Context
             return result;
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         private Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = ObjectId == -8 && syntax.GetObjectId() == 88 && (category.HasRefs || category.HasCode);
+            var trace = ObjectId == -2 && syntax.GetObjectId() == 42 && (category.HasRefs || category.HasCode);
             StartMethodDump(trace, category, syntax);
             try
             {
