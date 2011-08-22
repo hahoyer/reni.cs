@@ -373,21 +373,13 @@ namespace Reni.Type
 
             var referenceSource = this as ReferenceType;
             if(referenceSource != null)
-            {
-                var referenceDestination = destination as AutomaticReferenceType;
-                if(referenceDestination != null)
-                    return AutomaticReferenceType.Converter(referenceSource, conversionParameter, referenceDestination);
-
-                return
-                    referenceSource.DereferenceResult
-                    *referenceSource.ValueType.Converter(conversionParameter, destination);
-            }
+                return referenceSource.Converter(conversionParameter, destination);
 
             var alignerSource = this as Aligner;
             if(alignerSource != null)
             {
                 return
-                    alignerSource.UnalignedResult
+                    alignerSource.UnAlignedResult
                     *alignerSource.Parent.Converter(conversionParameter, destination);
             }
 
@@ -446,6 +438,8 @@ namespace Reni.Type
                     .UniqueAutomaticReference(refAlignParam)
                     .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
         }
+
+        internal virtual Result UnAlignedResult(Category category) { return ArgResult(category); }
     }
 
     internal interface IMetaFeature

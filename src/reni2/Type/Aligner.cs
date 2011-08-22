@@ -48,6 +48,16 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
         [DisableDump]
         internal override TypeBase UnAlignedType { get { return Parent; } }
+        
+        internal override Result UnAlignedResult(Category category)
+        {
+            return Parent.Result
+                (
+                    category,
+                    () => ArgCode().BitCast(Parent.Size)
+                    , Refs.Arg
+                );
+        }
 
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
         protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
@@ -62,16 +72,6 @@ namespace Reni.Type
             if(_alignBits == refAlignParam.AlignBits)
                 return Parent.UniqueAutomaticReference(refAlignParam);
             return base.UniqueAutomaticReference(refAlignParam);
-        }
-
-        internal Result UnalignedResult(Category category)
-        {
-            return Parent.Result
-                (
-                    category,
-                    () => ArgCode().BitCast(Parent.Size)
-                    , Refs.Arg
-                );
         }
 
         internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }

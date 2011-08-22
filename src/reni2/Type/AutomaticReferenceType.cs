@@ -67,17 +67,15 @@ namespace Reni.Type
                 (category
                  , () => ArgCode().Dereference(RefAlignParam, ValueType.Size)
                  , Refs.Arg
-                )
-                .Align(RefAlignParam.AlignBits);
+                );
         }
 
         internal override Result ReferenceInCode(IReferenceInCode target, Category category)
         {
             return Result
-                (
-                    category,
-                    () => CodeBase.ReferenceCode(target).Dereference(target.RefAlignParam, target.RefAlignParam.RefSize),
-                    () => Refs.Create(target)
+                (category
+                 , () => CodeBase.ReferenceCode(target).Dereference(target.RefAlignParam, target.RefAlignParam.RefSize)
+                 , () => Refs.Create(target)
                 );
         }
 
@@ -87,18 +85,8 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
+        protected override Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
 
-        internal static Converter Converter(ReferenceType source, ConversionParameter conversionParameter, AutomaticReferenceType destination)
-        {
-            if(source.ValueType == destination.ValueType && destination.RefAlignParam == source.RefAlignParam)
-                return new FunctionalConverter(source.ToAutomaticReferenceResult);
-            return
-                source.DereferenceResult
-                *source.ValueType.Converter(conversionParameter, destination.ValueType)
-                *destination.ValueTypeToLocalReferenceResult;
-        }
-
-        private Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.LocalReferenceResult(category, RefAlignParam); }
+        internal Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.LocalReferenceResult(category, RefAlignParam); }
     }
 }

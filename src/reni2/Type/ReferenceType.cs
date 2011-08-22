@@ -65,6 +65,41 @@ namespace Reni.Type
                 );
         }
 
-        internal abstract Result ToAutomaticReferenceResult(Category category);
+        protected abstract Result ToAutomaticReferenceResult(Category category);
+
+        private Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
+        {
+            var trace = ObjectId == 4;
+            try
+            {
+                StartMethodDump(trace,conversionParameter,destination);
+                if(ValueType == destination.ValueType && destination.RefAlignParam == RefAlignParam)
+                    return ReturnMethodDump(new FunctionalConverter(ToAutomaticReferenceResult), true);
+
+                var c1 = new FunctionalConverter(DereferenceResult);
+                Dump("c1", c1.Result(Category.Type | Category.Code));
+                var c2 = ValueType.UnAlignedType.Converter(conversionParameter, destination.ValueType);
+                Dump("c2", c2.Result(Category.Type | Category.Code));
+                var c3 = new FunctionalConverter(destination.ValueTypeToLocalReferenceResult);
+                Dump("c3", c3.Result(Category.Type | Category.Code));
+                BreakExecution();
+                var result = c1*c2*c3;
+                return ReturnMethodDump(result, true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+        internal new Converter Converter(ConversionParameter conversionParameter, TypeBase destination)
+        {
+            var referenceDestination = destination as AutomaticReferenceType;
+            if(referenceDestination != null)
+                return Converter(conversionParameter, referenceDestination);
+
+            return
+                DereferenceResult
+                *ValueType.Converter(conversionParameter, destination);
+        }
     }
 }
