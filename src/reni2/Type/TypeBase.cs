@@ -258,7 +258,7 @@ namespace Reni.Type
                 (
                     category,
                     () => LocalReferenceCode(refAlignParam),
-                    () => Destructor(Category.Refs).Refs
+                    () => Destructor(Category.Refs).Refs + Refs.Arg()
                 );
         }
 

@@ -30,7 +30,6 @@ namespace Reni
     /// <summary>
     ///     Contains list of references to compiler environemnts.
     /// </summary>
-    [Serializable]
     internal sealed class Refs : ReniObject, ITreeNodeSupport
     {
         private static int _nextId;
@@ -72,12 +71,19 @@ namespace Reni
 
         [SmartNode]
         public List<IReferenceInCode> Data { get { return _data; } }
-        internal override string DumpShort() { return base.DumpShort() + " HasArg=" + HasArg; }
+        internal override string DumpShort()
+        {
+            var result = base.DumpShort();
+            if(HasArg)
+                return result + " HasArg";
+            return result;
+        }
+
 
         [DisableDump]
         private SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
 
-        internal bool HasArg { get { return Contains(RefsArg.Instance); } }
+        internal bool HasArg { get { return Contains(arg.Instance); } }
         public int Count { get { return _data.Count; } }
 
         public IReferenceInCode this[int i] { get { return _data[i]; } }
@@ -85,7 +91,7 @@ namespace Reni
         public bool IsNone { get { return Count == 0; } }
 
         internal static Refs Void() { return new Refs(); }
-        internal static Refs Arg() { return new Refs(RefsArg.Instance); }
+        internal static Refs Arg() { return new Refs(arg.Instance); }
 
         public Refs Sequence(Refs refs)
         {
@@ -127,7 +133,7 @@ namespace Reni
             return new Refs(r);
         }
 
-        public Refs WithoutArg() { return Without(RefsArg.Instance); }
+        public Refs WithoutArg() { return Without(arg.Instance); }
         public Refs Without(Refs other) { return other._data.Aggregate(this, (current, refInCode) => current.Without(refInCode)); }
         public bool Contains(IReferenceInCode context) { return _data.Contains(context); }
         public bool Contains(Refs other) { return other._data.All(Contains); }
@@ -170,10 +176,10 @@ namespace Reni
         public static Refs operator -(Refs x, IReferenceInCode y) { return x.Without(y); }
         TreeNode[] ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
-        sealed class RefsArg: IReferenceInCode
+        sealed class arg: IReferenceInCode
         {
-            internal static readonly IReferenceInCode Instance = new RefsArg();
-            public RefAlignParam RefAlignParam { get { return null; } }
+            internal static readonly IReferenceInCode Instance = new arg();
+            RefAlignParam IReferenceInCode.RefAlignParam { get { return null; } }
         }
 
     }

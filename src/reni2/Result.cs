@@ -43,7 +43,11 @@ namespace Reni
         private Refs _refs;
 
         internal Result()
-            : base(_nextObjectId++) { PendingCategory = new Category(); }
+            : base(_nextObjectId++)
+        {
+            PendingCategory = new Category();
+            StopByObjectId(-135);
+        }
 
         internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs)
             : this()
@@ -247,7 +251,7 @@ namespace Reni
             }
         }
 
-        internal bool? HasArg
+        internal bool HasArg
         {
             get
             {
@@ -255,7 +259,7 @@ namespace Reni
                     return Refs.HasArg;
                 if(HasCode)
                     return Code.HasArg;
-                return null;
+                return false;
             }
         }
 
@@ -367,8 +371,13 @@ namespace Reni
                     Tracer.AssertionFailed(1, @"Code.Size==size", () => "Code size differs " + Dump());
             }
 
-            if(HasRefs && HasCode && !Refs.Contains(Code.Refs))
-                Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
+            if(HasRefs && HasCode)
+            {
+                var refs = Refs;
+                var codeRefs = Code.Refs;
+                if(!(refs.Contains(codeRefs) && codeRefs.Contains(refs)))
+                    Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
+            }
         }
 
         internal void AssertComplete(Category category, CompileSyntax syntaxForDump)
@@ -399,7 +408,7 @@ namespace Reni
             IsDirty = false;
         }
 
-        public Result Sequence(Result second)
+        internal Result Sequence(Result second)
         {
             var result = Clone();
             result.Add(second);
@@ -408,19 +417,19 @@ namespace Reni
 
         internal Result ReplaceArg(Func<Result> getResultForArg)
         {
-            switch(HasArg)
-            {
-                case true:
-                    return ReplaceArg(getResultForArg());
-                case false:
-                    return this;
-            }
-            NotImplementedMethod(getResultForArg);
-            return null;
-
+            if(HasArg)
+                return InternalReplaceArg(getResultForArg());
+            return this;
         }
 
         internal Result ReplaceArg(Result resultForArg)
+        {
+            if(HasArg)
+                return InternalReplaceArg(resultForArg);
+            return this;
+        }
+
+        private Result InternalReplaceArg(Result resultForArg)
         {
             var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode && resultForArg.HasCode)

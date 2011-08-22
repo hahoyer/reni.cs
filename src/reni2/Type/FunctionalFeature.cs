@@ -57,10 +57,10 @@ namespace Reni.Type
                 Dump("replaceArgResult", replaceArgResult);
                 var replaceObjectResult = ReplaceObjectReferenceByArg(replaceArgResult, refAlignParam);
                 Dump("replaceObjectResult", replaceObjectResult);
-                if(replaceObjectResult.HasArg == false)
+                if(!replaceObjectResult.HasArg)
                     return ReturnMethodDump(replaceObjectResult, true);
 
-                Tracer.Assert(replaceObjectResult.HasArg == true, replaceObjectResult.Dump);
+                Tracer.Assert(replaceObjectResult.HasArg, replaceObjectResult.Dump);
 
                 BreakExecution();
                 var objectResult = ObjectType

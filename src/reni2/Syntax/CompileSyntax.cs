@@ -33,7 +33,6 @@ using Reni.Type;
 
 namespace Reni.Syntax
 {
-    [Serializable]
     internal abstract class CompileSyntax : ReniParser.ParsedSyntax
     {
         // Used for debug only
@@ -46,8 +45,6 @@ namespace Reni.Syntax
 
         internal CompileSyntax(TokenData token, int objectId)
             : base(token, objectId) { }
-
-        internal override ReniParser.ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ReniParser.ParsedSyntax right) { return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull()); }
 
         [DisableDump]
         internal bool IsLambda { get { return GetIsLambda(); } }
@@ -70,9 +67,14 @@ namespace Reni.Syntax
         }
 
         protected virtual bool GetIsLambda() { return false; }
+        internal override ReniParser.ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ReniParser.ParsedSyntax right) { return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull()); }
         internal override ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData token, TokenData rightToken) { return this; }
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
+        internal Result Result(ContextBase context) { return Result(context, Category.All); }
+        internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
+        internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
+        internal Result ResultAsReference(ContextBase context, Category category) { return context.UniqueResult(category.Typed, this).LocalReferenceResult(context.RefAlignParam); }
 
         internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
         {
@@ -84,7 +86,7 @@ namespace Reni.Syntax
                 .AccessViaThisReference(category, rightResult)
                 .ReplaceArg(leftResultAsRef);
         }
-        
+
         internal CodeBase Code(ContextBase context)
         {
             var result = Result(context, Category.Code).Code;
@@ -92,21 +94,11 @@ namespace Reni.Syntax
             return result;
         }
 
-        internal Result Result(ContextBase context) { return Result(context, Category.All); }
-        internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
-
         internal TypeBase Type(ContextBase context)
         {
             var result = Result(context, Category.Type).Type;
             Tracer.Assert(result != null);
             return result;
-        }
-
-        internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
-        
-        internal Result ResultAsReference(ContextBase context, Category category)
-        {
-            return context.UniqueResult(category.Typed, this).LocalReferenceResult(context.RefAlignParam);
         }
     }
 }

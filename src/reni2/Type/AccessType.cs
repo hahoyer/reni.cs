@@ -161,13 +161,7 @@ namespace Reni.Type
         private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
-
-        protected override CodeBase DereferenceCode()
-        {
-            var code = ValueReferenceViaFieldReference(Category.Code).Code;
-            return code.Dereference(RefAlignParam, ValueType.Size);
-        }
-
+        internal override Result DereferenceResult(Category category) { return ValueReferenceViaFieldReference(category).AutomaticDereference(); }
         internal override Result ToAutomaticReferenceResult(Category category) { return ValueReferenceViaFieldReference(category); }
     }
 }

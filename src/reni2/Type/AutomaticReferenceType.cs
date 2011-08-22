@@ -61,7 +61,15 @@ namespace Reni.Type
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
 
-        protected override CodeBase DereferenceCode() { return ArgCode().Dereference(RefAlignParam, ValueType.Size); }
+        internal override Result DereferenceResult(Category category)
+        {
+            return ValueType.Result
+                (category
+                 , () => ArgCode().Dereference(RefAlignParam, ValueType.Size)
+                 , Refs.Arg
+                )
+                .Align(RefAlignParam.AlignBits);
+        }
 
         internal override Result ReferenceInCode(IReferenceInCode target, Category category)
         {
@@ -91,10 +99,6 @@ namespace Reni.Type
                 *destination.ValueTypeToLocalReferenceResult;
         }
 
-        private Result ValueTypeToLocalReferenceResult(Category category)
-        {
-            return ValueType
-                .LocalReferenceResult(category, RefAlignParam);
-        }
+        private Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.LocalReferenceResult(category, RefAlignParam); }
     }
 }
