@@ -59,6 +59,14 @@ namespace Reni.Struct
             protected override Size GetSize() { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpPrintText + "/\\"; } }
             internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
+            internal Converter UnalignedConverter(ConversionParameter conversionParameter, TypeBase destination)
+            {
+                var arrayDestination = destination as Reni.Type.Array;
+                if(arrayDestination != null)
+                    return new FunctionalConverter(category => arrayDestination.Result(category, FunctionalFeature));
+                NotImplementedMethod(conversionParameter, destination);
+                return null;
+            }
         }
 
         [DisableDump]

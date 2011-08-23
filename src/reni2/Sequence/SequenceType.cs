@@ -150,5 +150,15 @@ namespace Reni.Sequence
         }
 
         internal Result DumpPrintTextResult(Category category, RefAlignParam refAlignParam) { return Element.DumpPrintTextResultFromSequence(category, refAlignParam, Count); }
+        
+        protected override Converter UnalignedConverter(ConversionParameter conversionParameter, TypeBase destination)
+        {
+            var sequenceDestination = destination as SequenceType;
+            if(sequenceDestination != null)
+                return SequenceType.Converter(this, conversionParameter, sequenceDestination);
+            
+            NotImplementedMethod(conversionParameter, destination);
+            return null;
+        }
     }
 }

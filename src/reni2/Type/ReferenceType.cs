@@ -91,7 +91,8 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
-        internal new Converter Converter(ConversionParameter conversionParameter, TypeBase destination)
+
+        protected override Converter DiffConverter(ConversionParameter conversionParameter, TypeBase destination)
         {
             var referenceDestination = destination as AutomaticReferenceType;
             if(referenceDestination != null)

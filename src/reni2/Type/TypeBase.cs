@@ -371,58 +371,36 @@ namespace Reni.Type
             if(this == destination)
                 return new FunctionalConverter(ArgResult);
 
-            var referenceSource = this as ReferenceType;
-            if(referenceSource != null)
-                return referenceSource.Converter(conversionParameter, destination);
+            return DiffConverter(conversionParameter, destination);
+        }
 
-            var alignerSource = this as Aligner;
-            if(alignerSource != null)
-            {
-                return
-                    alignerSource.UnAlignedResult
-                    *alignerSource.Parent.Converter(conversionParameter, destination);
-            }
-
+        protected virtual Converter DiffConverter(ConversionParameter conversionParameter, TypeBase destination)
+        {
             var alignerDestination = destination as Aligner;
             if(alignerDestination != null)
-            {
-                return
-                    Converter(conversionParameter, alignerDestination.Parent)
-                    *alignerDestination.ParentToAlignedResult;
-            }
+                return Converter(conversionParameter, alignerDestination);
 
-            var sequenceSource = this as SequenceType;
-            if(sequenceSource != null)
-            {
-                var sequenceDestination = destination as SequenceType;
-                if(sequenceDestination != null)
-                    return SequenceType.Converter(sequenceSource, conversionParameter, sequenceDestination);
-                NotImplementedMethod(conversionParameter, destination);
-                return null;
-            }
+            return UnalignedConverter(conversionParameter, destination);
+        }
 
-            var enableCutSource = this as EnableCut;
-            if(enableCutSource != null)
-            {
-                return
-                    enableCutSource.StripTagResult
-                    *enableCutSource.Parent.Converter(conversionParameter.EnableCut, destination);
-            }
-
+        protected virtual Converter UnalignedConverter(ConversionParameter conversionParameter, TypeBase destination)
+        {
             if(IsZeroSized && destination is Void)
                 return new FunctionalConverter(c => Void.Result(c, ArgResult(c)));
 
             var functionalSource = this as FunctionalBody.Type;
             if(functionalSource != null)
-            {
-                var arrayDestination = destination as Array;
-                if(arrayDestination != null)
-                    return new FunctionalConverter(category => arrayDestination.Result(category, functionalSource.FunctionalFeature));
-                NotImplementedMethod(conversionParameter, destination);
-                return null;
-            }
+                return functionalSource.UnalignedConverter(conversionParameter, destination);
+
             NotImplementedMethod(conversionParameter, destination);
             return null;
+        }
+
+        private Converter Converter(ConversionParameter conversionParameter, Aligner alignerDestination)
+        {
+            return
+                Converter(conversionParameter, alignerDestination.Parent)
+                *alignerDestination.ParentToAlignedResult;
         }
 
         internal virtual Result DumpPrintTextResultFromSequence(Category category, RefAlignParam refAlignParam, int count)
