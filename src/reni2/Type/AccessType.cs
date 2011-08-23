@@ -120,7 +120,12 @@ namespace Reni.Type
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
         internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText), Refs.Void); }
 
-        private Result ValueReferenceViaFieldReference(Category category) { return AccessObject.ValueReferenceViaFieldReference(category, this); }
+        private Result ValueReferenceViaFieldReference(Category category)
+        {
+            var result = AccessObject.ValueReferenceViaFieldReference(category, this);
+            result.AssertVoidOrValidReference();
+            return result;
+        }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
             StartMethodDump(ObjectId == -4 && category.HasCode, category);
@@ -138,7 +143,9 @@ namespace Reni.Type
                 Dump("structReferenceViaFieldReference", structReferenceViaFieldReference);
                 BreakExecution();
                 var result = replaceObjectRefByArg
-                    .ReplaceArg(structReferenceViaFieldReference);
+                    .ReplaceArg(structReferenceViaFieldReference)
+                    .LocalReferenceResult(RefAlignParam);
+                result.AssertVoidOrValidReference();
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -166,6 +173,10 @@ namespace Reni.Type
             return ValueReferenceViaFieldReference(category)
                 .AutomaticDereference();
         }
-        protected override Result ToAutomaticReferenceResult(Category category) { return ValueReferenceViaFieldReference(category); }
+        protected override Result ToAutomaticReferenceResult(Category category)
+        {
+            return ValueReferenceViaFieldReference(category)
+                .AssertValidReference();
+        }
     }
 }

@@ -69,7 +69,7 @@ namespace Reni.Type
 
         private Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
         {
-            var trace = ObjectId == 4;
+            var trace = ObjectId == 13;
             try
             {
                 StartMethodDump(trace,conversionParameter,destination);

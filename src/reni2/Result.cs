@@ -590,6 +590,30 @@ namespace Reni
             return accessPoint
                 .ContextReferenceViaStructReference(this);
         }
+
+        [DebuggerHidden]
+        internal Result AssertVoidOrValidReference()
+        {
+            var size = SmartSize;
+            if(size != null)
+                Tracer.Assert(size.IsZero || size == Root.DefaultRefAlignParam.RefSize, Dump);
+
+            if(HasType)
+                Tracer.Assert(Type is Type.Void || Type is ReferenceType, Dump);
+            return this;
+        }
+
+        [DebuggerHidden]
+        internal Result AssertValidReference()
+        {
+            var size = SmartSize;
+            if (size != null)
+                Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, Dump);
+
+            if (HasType)
+                Tracer.Assert(Type is ReferenceType, Dump);
+            return this;
+        }
     }
 
     internal sealed class Error

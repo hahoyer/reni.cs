@@ -28,8 +28,20 @@ namespace Reni.Type
     internal abstract class Converter : ReniObject
     {
         private static int _nextObjectId;
+        [EnableDump]
+        private Result _testResult;
+
         protected Converter()
             : base(_nextObjectId++) { }
+
+        protected void AssertValid()
+        {
+            if(!Debugger.IsAttached)
+                return;
+
+            _testResult = Result(Category.Type | Category.Code);
+        }
+
         internal abstract Result Result(Category category);
         internal bool IsValid { get { return true; } }
 
@@ -42,7 +54,6 @@ namespace Reni.Type
     {
         private readonly Converter _first;
         private readonly Converter _second;
-        private Result _testResult;
         public ConcatConverter(Converter first, Converter second)
         {
             _first = first;
@@ -50,13 +61,6 @@ namespace Reni.Type
 
             AssertValid();
             StopByObjectId(1);
-        }
-        private void AssertValid()
-        {
-            if(!Debugger.IsAttached)
-                return;
-
-            _testResult = Result(Category.Type | Category.Code);
         }
 
         internal override Result Result(Category category)
@@ -78,32 +82,16 @@ namespace Reni.Type
         }
     }
 
-    internal sealed class DecoratedConverter : Converter
-    {
-        private readonly ReferenceType _source;
-        private readonly Converter _converter;
-        private readonly AutomaticReferenceType _destination;
-        
-        public DecoratedConverter(ReferenceType source, Converter converter, AutomaticReferenceType destination)
-        {
-            _source = source;
-            _converter = converter;
-            _destination = destination;
-        }
-
-        internal override Result Result(Category category)
-        {
-            return _converter
-                .Result(category.Typed)
-                .ReplaceArg(_source.DereferenceResult(category.Typed))
-                .LocalReferenceResult(_destination.RefAlignParam);
-        }
-    }
-
     internal sealed class FunctionalConverter : Converter
     {
         private readonly Func<Category, Result> _function;
-        public FunctionalConverter(Func<Category, Result> function) { _function = function; }
+        
+        public FunctionalConverter(Func<Category, Result> function)
+        {
+            _function = function;
+            AssertValid();
+        }
+        
         internal override Result Result(Category category) { return _function(category); }
     }
 }
