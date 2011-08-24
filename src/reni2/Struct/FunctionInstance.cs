@@ -84,13 +84,13 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        private Refs Refs
+        private CodeArgs CodeArgs
         {
             get
             {
                 if (IsStopByObjectIdActive)
                     return null;
-                return Result(Category.Refs).Refs;
+                return Result(Category.Args).CodeArgs;
             }
         }
 
@@ -98,7 +98,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        private Size FrameSize { get { return _args.Size + Refs.Size; } }
+        private Size FrameSize { get { return _args.Size + CodeArgs.Size; } }
 
         [Node]
         [DisableDump]
@@ -106,7 +106,7 @@ namespace Reni.Struct
 
         public Result CreateCall(Category category, Result args)
         {
-            var trace = ObjectId == -120 && (category.HasCode || category.HasRefs);
+            var trace = ObjectId == -120 && (category.HasCode || category.HasArgs);
             StartMethodDump(trace, category, args);
             try
             {
@@ -115,8 +115,8 @@ namespace Reni.Struct
                 if(category.HasCode)
                     localCategory = (localCategory - Category.Code) | Category.Size;
                 var result = Result(localCategory).Clone();
-                if(category.HasRefs)
-                    result.Refs = result.Refs.Sequence(args.Refs);
+                if(category.HasArgs)
+                    result.CodeArgs = result.CodeArgs.Sequence(args.CodeArgs);
 
                 if(category.HasCode)
                     result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
@@ -129,7 +129,7 @@ namespace Reni.Struct
             }
         }
 
-        private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return Refs.ToCode().Sequence(argsCode); }
+        private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return CodeArgs.ToCode().Sequence(argsCode); }
 
         private CodeBase CreateBodyCode()
         {
@@ -151,7 +151,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = ObjectId == -10 && category.HasRefs;
+            var trace = ObjectId == -10 && category.HasArgs;
             StartMethodDump(trace, category);
             try
             {
@@ -169,7 +169,7 @@ namespace Reni.Struct
                 Dump("postProcessedResult", postProcessedResult);
                 BreakExecution();
                 var result = postProcessedResult
-                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, Refs.Void);
+                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
                 return ReturnMethodDump(result, true);
             }
             finally

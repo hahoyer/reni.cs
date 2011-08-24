@@ -33,7 +33,7 @@ namespace Reni.Sequence
                 .AutomaticDereference()
                 .Align(refAlignParam.AlignBits);
             return _objectType
-                .Result(category, () => _objectType.BitSequenceOperation(_definable), Refs.Arg)
+                .Result(category, () => _objectType.BitSequenceOperation(_definable), CodeArgs.Arg)
                 .ReplaceArg(resultForArg);
         }
     }

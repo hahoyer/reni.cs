@@ -30,16 +30,16 @@ namespace Reni.Basics
     {
         private readonly bool _code;
         private readonly bool _type;
-        private readonly bool _refs;
+        private readonly bool _args;
         private readonly bool _size;
 
         public Category() { }
 
-        internal Category(bool size, bool type, bool code, bool refs)
+        internal Category(bool size, bool type, bool code, bool args)
         {
             _code = code;
             _type = type;
-            _refs = refs;
+            _args = args;
             _size = size;
         }
 
@@ -53,7 +53,7 @@ namespace Reni.Basics
         public static Category Code { get { return new Category(false, false, true, false); } }
 
         [DebuggerHidden]
-        public static Category Refs { get { return new Category(false, false, false, true); } }
+        public static Category Args { get { return new Category(false, false, false, true); } }
 
         [DebuggerHidden]
         public static Category None { get { return new Category(false, false, false, false); } }
@@ -64,16 +64,16 @@ namespace Reni.Basics
         public bool IsNone { get { return !HasAny; } }
         public bool HasCode { get { return _code; } }
         public bool HasType { get { return _type; } }
-        public bool HasRefs { get { return _refs; } }
+        public bool HasArgs { get { return _args; } }
         public bool HasSize { get { return _size; } }
-        public bool HasAny { get { return _code || _type || _refs || _size; } }
+        public bool HasAny { get { return _code || _type || _args || _size; } }
 
         [DebuggerHidden]
         [DisableDump]
         public Category Typed { get { return this | Type; } }
         [DebuggerHidden]
         [DisableDump]
-        public Category Refsd { get { return this | Refs; } }
+        public Category Argsed { get { return this | Args; } }
         public Category Replenished
         {
             get
@@ -82,7 +82,7 @@ namespace Reni.Basics
                 if (HasType || HasCode)
                     result |= Size;
                 if (HasCode)
-                    result |= Refs;
+                    result |= Args;
                 return result;
             }
         }
@@ -94,7 +94,7 @@ namespace Reni.Basics
                 x.HasSize || y.HasSize,
                 x.HasType || y.HasType,
                 x.HasCode || y.HasCode,
-                x.HasRefs || y.HasRefs
+                x.HasArgs || y.HasArgs
                 );
         }
 
@@ -105,7 +105,7 @@ namespace Reni.Basics
                 x.HasSize && y.HasSize,
                 x.HasType && y.HasType,
                 x.HasCode && y.HasCode,
-                x.HasRefs && y.HasRefs);
+                x.HasArgs && y.HasArgs);
         }
 
         public override int GetHashCode()
@@ -114,7 +114,7 @@ namespace Reni.Basics
             {
                 var result = _code.GetHashCode();
                 result = (result*397) ^ _type.GetHashCode();
-                result = (result*397) ^ _refs.GetHashCode();
+                result = (result*397) ^ _args.GetHashCode();
                 result = (result*397) ^ _size.GetHashCode();
                 return result;
             }
@@ -124,7 +124,7 @@ namespace Reni.Basics
         {
             return
                 HasCode == x.HasCode
-                && HasRefs == x.HasRefs
+                && HasArgs == x.HasArgs
                 && HasSize == x.HasSize
                 && HasType == x.HasType
                 ;
@@ -134,7 +134,7 @@ namespace Reni.Basics
         {
             return
                 (!HasCode && x.HasCode)
-                || (!HasRefs && x.HasRefs)
+                || (!HasArgs && x.HasArgs)
                 || (!HasSize && x.HasSize)
                 || (!HasType && x.HasType)
                 ;
@@ -144,7 +144,7 @@ namespace Reni.Basics
         {
             if(HasCode && !x.HasCode)
                 return false;
-            if(HasRefs && !x.HasRefs)
+            if(HasArgs && !x.HasArgs)
                 return false;
             if(HasSize && !x.HasSize)
                 return false;
@@ -160,7 +160,7 @@ namespace Reni.Basics
                 x.HasSize && !y.HasSize,
                 x.HasType && !y.HasType,
                 x.HasCode && !y.HasCode,
-                x.HasRefs && !y.HasRefs);
+                x.HasArgs && !y.HasArgs);
         }
 
         protected override string Dump(bool isRecursion) { return DumpShort(); }
@@ -172,8 +172,8 @@ namespace Reni.Basics
                 result += ".Size.";
             if(HasType)
                 result += ".Type.";
-            if(HasRefs)
-                result += ".Refs.";
+            if(HasArgs)
+                result += ".Args.";
             if(HasCode)
                 result += ".Code.";
             result = result.Replace("..", ",").Replace(".", "");
@@ -188,7 +188,7 @@ namespace Reni.Basics
                 return false;
             if(ReferenceEquals(this, obj))
                 return true;
-            return obj._code.Equals(_code) && obj._type.Equals(_type) && obj._refs.Equals(_refs) && obj._size.Equals(_size);
+            return obj._code.Equals(_code) && obj._type.Equals(_type) && obj._args.Equals(_args) && obj._size.Equals(_size);
         }
 
         public override bool Equals(object obj)

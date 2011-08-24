@@ -40,7 +40,7 @@ namespace Reni
         private Size _size;
         private TypeBase _type;
         private CodeBase _code;
-        private Refs _refs;
+        private CodeArgs _codeArgs;
 
         internal Result()
             : base(_nextObjectId++)
@@ -49,7 +49,7 @@ namespace Reni
             StopByObjectId(-135);
         }
 
-        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<Refs> getRefs)
+        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
             : this()
         {
             if(category.HasSize)
@@ -58,30 +58,30 @@ namespace Reni
                 _type = getType();
             if(category.HasCode)
                 _code = getCode();
-            if(category.HasRefs)
-                _refs = getRefs();
+            if(category.HasArgs)
+                _codeArgs = getRefs();
             AssertValid();
         }
 
-        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<Refs> getRefs)
+        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
             : this()
         {
             if(category.HasSize)
                 _size = getSize();
             if(category.HasCode)
                 _code = getCode();
-            if(category.HasRefs)
-                _refs = getRefs();
+            if(category.HasArgs)
+                _codeArgs = getRefs();
             AssertValid();
         }
 
-        internal Result(Category category, Func<Refs> getRefs)
+        internal Result(Category category, Func<CodeArgs> getRefs)
             : this(category, () => Size.Zero, CodeBase.Void, getRefs) { }
 
         private bool HasSize { get { return Size != null; } }
         internal bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
-        internal bool HasRefs { get { return Refs != null; } }
+        internal bool HasRefs { get { return CodeArgs != null; } }
 
         [Node]
         [EnableDumpWithExceptions]
@@ -128,12 +128,12 @@ namespace Reni
 
         [Node]
         [DebuggerHidden]
-        public Refs Refs
+        public CodeArgs CodeArgs
         {
-            get { return _refs; }
+            get { return _codeArgs; }
             set
             {
-                _refs = value;
+                _codeArgs = value;
                 AssertValid();
             }
         }
@@ -150,7 +150,7 @@ namespace Reni
             if(HasCode)
                 result.Add(Code.CreateNamedNode("Code", "Code"));
             if(HasRefs)
-                result.Add(Refs.Data.CreateNamedNode("Refs", "Refs"));
+                result.Add(CodeArgs.Data.CreateNamedNode("Args", "Args"));
             return result.ToArray();
         }
 
@@ -182,24 +182,24 @@ namespace Reni
             }
         }
 
-        internal Refs FindRefs
+        internal CodeArgs FindArgs
         {
             get
             {
                 if(HasRefs)
-                    return Refs;
+                    return CodeArgs;
                 if(HasCode)
-                    return Code.Refs;
+                    return Code.CodeArgs;
                 return null;
             }
         }
 
         [DisableDump]
-        internal Refs SmartRefs
+        internal CodeArgs SmartArgs
         {
             get
             {
-                var result = FindRefs;
+                var result = FindArgs;
                 if(result == null)
                 {
                     DumpMethodWithBreak("No approriate result property defined");
@@ -231,7 +231,7 @@ namespace Reni
                     return false;
                 if(CompleteCategory.HasCode && !Code.IsEmpty)
                     return false;
-                if(CompleteCategory.HasRefs && !Refs.IsNone)
+                if(CompleteCategory.HasArgs && !CodeArgs.IsNone)
                     return false;
                 return true;
             }
@@ -245,7 +245,7 @@ namespace Reni
                     return false;
                 if(CompleteCategory.HasCode && !Code.IsEmpty)
                     return false;
-                if(CompleteCategory.HasRefs && !Refs.IsNone)
+                if(CompleteCategory.HasArgs && !CodeArgs.IsNone)
                     return false;
                 return true;
             }
@@ -256,7 +256,7 @@ namespace Reni
             get
             {
                 if(HasRefs)
-                    return Refs.HasArg;
+                    return CodeArgs.HasArg;
                 if(HasCode)
                     return Code.HasArg;
                 return false;
@@ -275,7 +275,7 @@ namespace Reni
             if(HasType)
                 result += "\nType=" + Tracer.Dump(_type);
             if(HasRefs)
-                result += "\nRefs=" + Tracer.Dump(_refs);
+                result += "\nRefs=" + Tracer.Dump(_codeArgs);
             if(HasCode)
                 result += "\nCode=" + Tracer.Dump(_code);
             return result;
@@ -290,7 +290,7 @@ namespace Reni
                 _type = result.Type;
 
             if(result.HasRefs)
-                _refs = result.Refs;
+                _codeArgs = result.CodeArgs;
 
             if(result.HasCode)
                 _code = result.Code;
@@ -309,8 +309,8 @@ namespace Reni
                 result._size = Size;
             if(category.HasType)
                 result._type = Type;
-            if(category.HasRefs)
-                result._refs = Refs;
+            if(category.HasArgs)
+                result._codeArgs = CodeArgs;
             if(category.HasCode)
                 result._code = Code;
             result.AssertValid();
@@ -335,7 +335,7 @@ namespace Reni
             if(HasCode)
                 r.Code = Code.BitCast(alignedSize);
             if(HasRefs)
-                r.Refs = Refs;
+                r.CodeArgs = CodeArgs;
             return r;
         }
 
@@ -348,12 +348,12 @@ namespace Reni
                 r.Type = Type;
             if(category.HasCode)
                 r.Code = Code;
-            if(category.HasRefs)
-                r.Refs = Refs;
+            if(category.HasArgs)
+                r.CodeArgs = CodeArgs;
             return r;
         }
 
-        internal Result Clone() { return new Result {PendingCategory = PendingCategory, Size = Size, Type = Type, Code = Code, Refs = Refs}; }
+        internal Result Clone() { return new Result {PendingCategory = PendingCategory, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs}; }
 
         private void AssertValid()
         {
@@ -373,10 +373,10 @@ namespace Reni
 
             if(HasRefs && HasCode)
             {
-                var refs = Refs;
-                var codeRefs = Code.Refs;
+                var refs = CodeArgs;
+                var codeRefs = Code.CodeArgs;
                 if(!(refs.Contains(codeRefs) && codeRefs.Contains(refs)))
-                    Tracer.AssertionFailed(1, @"Refs.Contains(codeRefs)", () => "Code and Refs differ " + Dump());
+                    Tracer.AssertionFailed(1, @"Args.Contains(codeRefs)", () => "Code and Args differ " + Dump());
             }
         }
 
@@ -403,8 +403,8 @@ namespace Reni
                 Type = Type.Pair(other.Type);
             if(category.HasCode)
                 Code = Code.Sequence(other.Code);
-            if(category.HasRefs)
-                Refs = Refs.Sequence(other.Refs);
+            if(category.HasArgs)
+                CodeArgs = CodeArgs.Sequence(other.CodeArgs);
             IsDirty = false;
         }
 
@@ -435,22 +435,22 @@ namespace Reni
             if(HasCode && resultForArg.HasCode)
                 result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
             if(HasRefs && resultForArg.HasRefs)
-                result.Refs = Refs.WithoutArg().Sequence(resultForArg.Refs);
+                result.CodeArgs = CodeArgs.WithoutArg().Sequence(resultForArg.CodeArgs);
             result.IsDirty = false;
             return result;
         }
 
-        internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Refs> replacementRefs)
+        internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
             where TRefInCode : IReferenceInCode
         {
-            if(HasRefs && !Refs.Contains(refInCode))
+            if(HasRefs && !CodeArgs.Contains(refInCode))
                 return this;
 
             var result = new Result {Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, replacementCode);
             if(HasRefs)
-                result.Refs = Refs.Without(refInCode).Sequence(replacementRefs());
+                result.CodeArgs = CodeArgs.Without(refInCode).Sequence(replacementRefs());
             result.IsDirty = false;
             return result;
         }
@@ -458,7 +458,7 @@ namespace Reni
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Category, Result> getReplacement)
             where TRefInCode : IReferenceInCode
         {
-            if(HasRefs && !Refs.Contains(refInCode))
+            if(HasRefs && !CodeArgs.Contains(refInCode))
                 return this;
 
             var replacement = getReplacement(CompleteCategory - Category.Size - Category.Type);
@@ -466,22 +466,22 @@ namespace Reni
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, () => replacement.Code);
             if(HasRefs)
-                result.Refs = Refs.Without(refInCode).Sequence(replacement.Refs);
+                result.CodeArgs = CodeArgs.Without(refInCode).Sequence(replacement.CodeArgs);
             result.IsDirty = false;
             return result;
         }
 
-        internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<Refs> replacementRefs)
+        internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
             where TRefInCode : IReferenceInCode
         {
-            if(HasRefs && !Refs.Contains(refInCode))
+            if(HasRefs && !CodeArgs.Contains(refInCode))
                 return this;
 
             var result = new Result {Size = Size, Type = Type};
             if(HasCode)
                 result.Code = Code.ReplaceRelative(refInCode, replacementCode);
             if(HasRefs)
-                result.Refs = Refs.Without(refInCode).Sequence(replacementRefs());
+                result.CodeArgs = CodeArgs.Without(refInCode).Sequence(replacementRefs());
             return result;
         }
 
@@ -489,27 +489,27 @@ namespace Reni
         {
             if(!HasCode)
                 return this;
-            if(SmartRefs.Count == 0)
+            if(SmartArgs.Count == 0)
                 return this;
             var result = Clone();
             result.IsDirty = true;
-            result.Code = SmartRefs.ReplaceRefsForFunctionBody(Code, refAlignParam, replacement);
-            result.Refs = replacement.Refs;
+            result.Code = SmartArgs.ReplaceRefsForFunctionBody(Code, refAlignParam, replacement);
+            result.CodeArgs = replacement.CodeArgs;
             result.IsDirty = false;
             return result;
         }
 
         internal Result LocalBlock(Category category)
         {
-            if(!category.HasCode && !category.HasRefs)
+            if(!category.HasCode && !category.HasArgs)
                 return this;
 
             var result = Clone(category);
             var copier = Type.Copier(category);
             if(category.HasCode)
                 result.Code = Code.LocalBlock(copier.Code);
-            if(category.HasRefs)
-                result.Refs = Refs.Sequence(copier.Refs);
+            if(category.HasArgs)
+                result.CodeArgs = CodeArgs.Sequence(copier.CodeArgs);
             return result;
         }
 
@@ -517,14 +517,14 @@ namespace Reni
 
         internal BitsConst Evaluate()
         {
-            Tracer.Assert(Refs.IsNone);
+            Tracer.Assert(CodeArgs.IsNone);
             var result = Align(3).LocalBlock(CompleteCategory);
             return result.Code.Evaluate();
         }
 
         internal Result AutomaticDereference()
         {
-            if(CompleteCategory == Category.Refs)
+            if(CompleteCategory == Category.Args)
                 return this;
 
             Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
@@ -534,7 +534,7 @@ namespace Reni
         internal static Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)
         {
             var result = TypeBase.VoidResult(category);
-            if(!(category.HasCode || category.HasRefs))
+            if(!(category.HasCode || category.HasArgs))
                 return result;
 
             if(category.HasCode)
@@ -550,8 +550,8 @@ namespace Reni
                         result.Code = result.Code.Sequence(CodeBase.DumpPrintText(", "));
                     result.Code = result.Code.Sequence(elemResult.Code);
                 }
-                if(category.HasRefs)
-                    result.Refs = result.Refs.Sequence(elemResult.Refs);
+                if(category.HasArgs)
+                    result.CodeArgs = result.CodeArgs.Sequence(elemResult.CodeArgs);
                 result.IsDirty = false;
             }
             if(category.HasCode)
@@ -609,6 +609,22 @@ namespace Reni
             var size = SmartSize;
             if (size != null)
                 Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, Dump);
+
+            if (HasType)
+                Tracer.Assert(Type is ReferenceType, Dump);
+            return this;
+        }
+
+        [DebuggerHidden]
+        internal Result AssertEmptyOrValidReference()
+        {
+            var size = SmartSize;
+            if (size != null)
+            {
+                if (size.IsZero)
+                    return this;
+                Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, Dump);
+            }
 
             if (HasType)
                 Tracer.Assert(Type is ReferenceType, Dump);

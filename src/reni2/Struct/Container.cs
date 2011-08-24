@@ -185,7 +185,7 @@ namespace Reni.Struct
 
         private Result InternalInnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = ObjectId==-1 && accessPosition==1 && position == 0 && (category.HasRefs || category.HasCode);
+            var trace = ObjectId==-1 && accessPosition==1 && position == 0 && (category.HasArgs || category.HasCode);
             StartMethodDump(trace,category,parent,accessPosition,position);
             try
             {
@@ -247,7 +247,7 @@ namespace Reni.Struct
         internal bool IsZeroSized(ContextBase parent, int fromPosition, int fromNotPosition)
         {
             for(var i = fromPosition; i < fromNotPosition; i++)
-                if (!IsLambda(i) && !InnerSize(parent, i).IsZero)
+                if (!IsLambda(i) && !Statements[i].IsZeroSized(parent))
                     return false;
             return true;
         }

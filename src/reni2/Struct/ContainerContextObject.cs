@@ -74,7 +74,7 @@ namespace Reni.Struct
                 .Result
                 (category
                  , () => AccessPointCodeFromContextReference(endPosition)
-                 , () => Refs.Create(this)
+                 , () => CodeArgs.Create(this)
                 );
             return result;
         }
@@ -82,12 +82,12 @@ namespace Reni.Struct
         internal Result ContextReferenceViaStructReference(int position, Result result)
         {
             return result
-                .ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), Refs.Arg);
+                .ReplaceAbsolute(this, () => ContextReferenceViaStructReferenceCode(position), CodeArgs.Arg);
         }
 
         internal Result Result(Category category, Result innerResult)
         {
-            var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam), Refs.Void);
+            var result = innerResult.ReplaceRelative(this, () => CodeBase.TopRef(RefAlignParam), CodeArgs.Void);
             if(category.HasType)
                 result.Type = ToStructure.Type;
             return result;
@@ -109,7 +109,7 @@ namespace Reni.Struct
                     return AccessManager.Property;
                 return AccessManager.Function;
             }
-            if(InnerSize(position).IsZero)
+            if(IsZeroSized(position))
                 return AccessManager.ProcedureCall;
             return AccessManager.Field;
         }

@@ -39,13 +39,13 @@ namespace Reni.Type
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -1  && (category.HasCode || category.HasRefs);
+            var trace = ObjectId == -1  && (category.HasCode || category.HasArgs);
             StartMethodDump(trace, category, operationResult, argsResult, refAlignParam);
             try
             {                                                                                                                   
                 BreakExecution();
                 var applyResult = ObtainApplyResult(category, argsResult.Type, refAlignParam);
-                if(!category.HasCode && !category.HasRefs)
+                if(!category.HasCode && !category.HasArgs)
                     return ReturnMethodDump(applyResult);
 
                 Dump("applyResult", applyResult);
@@ -64,7 +64,7 @@ namespace Reni.Type
 
                 BreakExecution();
                 var objectResult = ObjectType
-                    .ForceReference(refAlignParam)
+                    .SmartReference(refAlignParam)
                     .Result(category.Typed, operationResult);
                 Dump("objectResult", objectResult);
                 var result = replaceObjectResult.ReplaceArg(objectResult);

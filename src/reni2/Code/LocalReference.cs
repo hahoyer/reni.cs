@@ -57,7 +57,7 @@ namespace Reni.Code
         internal CodeBase Code { get { return _unalignedCode.Align(RefAlignParam.AlignBits); } }
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
-        protected override Refs GetRefsImplementation() { return _unalignedCode.Refs + DestructorCode.Refs; }
+        protected override CodeArgs GetRefsImplementation() { return _unalignedCode.CodeArgs + DestructorCode.CodeArgs; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
 
         internal CodeBase AccompayningDestructorCode(ref Size size, string holder)

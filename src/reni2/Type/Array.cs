@@ -94,7 +94,7 @@ namespace Reni.Type
                 .Result
                 (category
                  , () => DumpPrintCode(refAlignParam)
-                 , () => Element.GenericDumpPrintResult(Category.Refs, refAlignParam).Refs
+                 , () => Element.GenericDumpPrintResult(Category.Args, refAlignParam).CodeArgs
                 );
         }
 
@@ -123,7 +123,7 @@ namespace Reni.Type
             {
                 var index = BitsConst.Convert(i);
                 var argsResult = UniqueNumber(index.Size.ToInt())
-                    .Result(category.Typed, () => CodeBase.BitsConst(index), Refs.Void);
+                    .Result(category.Typed, () => CodeBase.BitsConst(index), CodeArgs.Void);
                 var rawResult = functionalFeature.ObtainApplyResult(category.Typed, operationResult, argsResult, null);
                 var convertedResult = rawResult.Conversion(Element) & result.CompleteCategory;
                 result = convertedResult.Sequence(result);

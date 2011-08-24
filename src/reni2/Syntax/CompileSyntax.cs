@@ -100,5 +100,19 @@ namespace Reni.Syntax
             Tracer.Assert(result != null);
             return result;
         }
+
+        internal Size Size(ContextBase context)
+        {
+            var result = Result(context, Category.Size).Size;
+            Tracer.Assert(result != null);
+            return result;
+        }
+
+        internal virtual bool IsZeroSized(ContextBase context)
+        {
+            NotImplementedMethod(context);
+            return false;
+
+        }
     }
 }

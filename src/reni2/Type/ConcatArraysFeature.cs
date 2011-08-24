@@ -48,7 +48,7 @@ namespace Reni.Type
                 .Result
                 (category
                  , () => newElementResult.Code.Sequence(operationResult.Code.Dereference(refAlignParam, _type.Size))
-                 , () => newElementResult.Refs + operationResult.Refs
+                 , () => newElementResult.CodeArgs + operationResult.CodeArgs
                 );
         }
     }

@@ -45,7 +45,7 @@ namespace Reni.Type
             return Void.Result
                 (category
                  , () => DumpPrintCodeFromSequence(refAlignParam, count)
-                 , Refs.Arg
+                 , CodeArgs.Arg
                 );
         }
 
@@ -54,7 +54,7 @@ namespace Reni.Type
             return Void.Result
                 (category
                  , () => DumpPrintCode(refAlignParam)
-                 , Refs.Arg
+                 , CodeArgs.Arg
                 );
         }
 

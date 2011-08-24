@@ -95,7 +95,7 @@ namespace Reni
                 (
                     category,
                     () => condResult.Code.ThenElse(ThenResult(context, Category.Code).Code, ElseResult(context, Category.Code).Code),
-                    () => condResult.Refs + context.CommonRefs(this)
+                    () => condResult.CodeArgs + context.CommonRefs(this)
                 );
         }
 
@@ -111,14 +111,14 @@ namespace Reni
 
         internal Result CommonResult(ContextBase context, Category category)
         {
-            Tracer.Assert(category <= (Category.Type | Category.Refs));
+            Tracer.Assert(category <= (Category.Type | Category.Args));
             var thenResult = ThenResult(context, category);
             var elseResult = ElseResult(context, category);
             var result = new Result();
             if(category.HasType)
                 result.Type = TypeBase.CommonType(thenResult.Type, elseResult.Type);
-            if(category.HasRefs)
-                result.Refs = thenResult.Refs + elseResult.Refs;
+            if(category.HasArgs)
+                result.CodeArgs = thenResult.CodeArgs + elseResult.CodeArgs;
             return result;
         }
 

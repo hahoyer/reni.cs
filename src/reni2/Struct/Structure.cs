@@ -75,7 +75,7 @@ namespace Reni.Struct
         internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
-        internal AutomaticReferenceType ReferenceType { get { return Type.UniqueAutomaticReference(RefAlignParam); } }
+        internal TypeBase ReferenceType { get { return Type.SmartReference(RefAlignParam); } }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + ContainerContextObject.DumpShort() + "@" + EndPosition + ")"; }
 
@@ -176,7 +176,7 @@ namespace Reni.Struct
                 .Result
                 (category
                  , StructReferenceCodeViaContextReference
-                 , () => Refs.Create(ContainerContextObject)
+                 , () => CodeArgs.Create(ContainerContextObject)
                 );
         }
 

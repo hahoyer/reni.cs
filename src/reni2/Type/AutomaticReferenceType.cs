@@ -34,7 +34,7 @@ namespace Reni.Type
             : base(valueType)
         {
             _refAlignParam = refAlignParam;
-            //Tracer.Assert(!valueType.IsZeroSized, valueType.Dump);
+            Tracer.Assert(!valueType.IsZeroSized, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
             StopByObjectId(-8);
         }
@@ -66,7 +66,7 @@ namespace Reni.Type
             return ValueType.Result
                 (category
                  , () => ArgCode().Dereference(RefAlignParam, ValueType.Size)
-                 , Refs.Arg
+                 , CodeArgs.Arg
                 );
         }
 
@@ -75,7 +75,7 @@ namespace Reni.Type
             return Result
                 (category
                  , () => CodeBase.ReferenceCode(target).Dereference(target.RefAlignParam, target.RefAlignParam.RefSize)
-                 , () => Refs.Create(target)
+                 , () => CodeArgs.Create(target)
                 );
         }
 

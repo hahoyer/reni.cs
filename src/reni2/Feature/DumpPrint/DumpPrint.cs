@@ -15,7 +15,7 @@ namespace Reni.Feature.DumpPrint
         protected static Result Apply(Category category, AutomaticReferenceType objectType)
         {
             return TypeBase.Void
-                .Result(category, () => BitSequenceDumpPrint(objectType), Refs.Arg);
+                .Result(category, () => BitSequenceDumpPrint(objectType), CodeArgs.Arg);
         }
 
         private static CodeBase BitSequenceDumpPrint(AutomaticReferenceType objectType)

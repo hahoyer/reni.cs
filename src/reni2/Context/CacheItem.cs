@@ -50,7 +50,7 @@ namespace Reni.Context
             //[DebuggerHidden]
             internal void Update(Category category)
             {
-                var trace = _context.ObjectId == -6 && category.HasRefs && _syntax.GetObjectId() == 39;
+                var trace = _context.ObjectId == -6 && category.HasArgs && _syntax.GetObjectId() == 39;
                 StartMethodDump(trace, category);
                 try
                 {
@@ -63,10 +63,10 @@ namespace Reni.Context
                         localCategory -= Category.Size;
                     }
 
-                    if(localCategory.HasRefs && _data.FindRefs != null)
+                    if(localCategory.HasArgs && _data.FindArgs != null)
                     {
-                        _data.Refs = _data.FindRefs;
-                        localCategory -= Category.Refs;
+                        _data.CodeArgs = _data.FindArgs;
+                        localCategory -= Category.Args;
                     }
 
                     if(localCategory.HasAny)

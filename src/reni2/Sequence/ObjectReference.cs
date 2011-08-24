@@ -52,7 +52,7 @@ namespace Reni.Sequence
                 .Result
                 (category
                  , () => CodeBase.ReferenceCode(this)
-                 , () => Refs.Create(this)
+                 , () => CodeArgs.Create(this)
                 );
         }
     }

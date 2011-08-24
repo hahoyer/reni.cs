@@ -252,7 +252,7 @@
     <Compile Include="Type\FunctionalFeature.cs" />
     <Compile Include="Type\IFunctionalFeature.cs" />
     <Compile Include="Type\Pending.cs" />
-    <Compile Include="Refs.cs" />
+    <Compile Include="CodeArgs.cs" />
     <Compile Include="ReniException.cs" />
     <Compile Include="ReniObject.cs" />
     <Compile Include="Result.cs" />

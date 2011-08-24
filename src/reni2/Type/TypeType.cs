@@ -65,7 +65,7 @@ namespace Reni.Type
                 .Result
                 (category
                  , () => CodeBase.DumpPrintText(_value.DumpPrintText)
-                 , Refs.Void
+                 , CodeArgs.Void
                 );
         }
         internal Result Repeat(Category category, RefAlignParam refAlignParam) { return _repeaterType.Result(category); }

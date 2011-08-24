@@ -34,7 +34,7 @@ namespace Reni.Type
         }
         internal override Result LocalReferenceResult(Category category, RefAlignParam refAlignParam) { return ArgResult(category); }
 
-        internal override TypeBase ForceReference(RefAlignParam refAlignParam) { return this; }
+        internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
 
         protected override TypeBase ReversePair(TypeBase first) { return first; }
         protected override Size GetSize() { return Size.Zero; }

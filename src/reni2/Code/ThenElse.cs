@@ -62,7 +62,7 @@ namespace Reni.Code
             }
         }
 
-        protected override Refs GetRefsImplementation() { return ThenCode.Refs.Sequence(ElseCode.Refs); }
+        protected override CodeArgs GetRefsImplementation() { return ThenCode.CodeArgs.Sequence(ElseCode.CodeArgs); }
 
         internal override FiberItem[] TryToCombineBack(BitCast preceding)
         {

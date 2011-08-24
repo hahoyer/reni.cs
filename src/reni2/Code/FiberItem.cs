@@ -79,7 +79,7 @@ namespace Reni.Code
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
         [DisableDump]
-        internal Refs Refs { get { return GetRefsImplementation(); } }
+        internal CodeArgs CodeArgs { get { return GetRefsImplementation(); } }
 
         [DisableDump]
         internal virtual bool HasArg { get { return false; } }
@@ -123,7 +123,7 @@ namespace Reni.Code
 
         void IFormalCodeItem.Execute(IFormalMaschine formalMaschine) { Execute(formalMaschine); }
 
-        protected virtual Refs GetRefsImplementation() { return Refs.Void(); }
+        protected virtual CodeArgs GetRefsImplementation() { return CodeArgs.Void(); }
     }
 
     internal interface IFormalCodeItem

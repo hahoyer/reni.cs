@@ -39,11 +39,11 @@ namespace Reni.Context
             }
 
             var result = new Result();
-            var reducedCategory = category - Category.Refs;
+            var reducedCategory = category - Category.Args;
             if(reducedCategory.HasAny)
                 result.Update(syntax.ObtainResult(this, reducedCategory));
-            if(category.HasRefs)
-                result.Refs = Refs.Void();
+            if(category.HasArgs)
+                result.CodeArgs = CodeArgs.Void();
 
             Tracer.Assert(result.CompleteCategory == category);
             return result;

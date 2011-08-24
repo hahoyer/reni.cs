@@ -45,7 +45,7 @@ namespace Reni.Code
         internal TypeBase Type { get { return _type; } }
 
         protected override Size GetSize() { return _type.Size; }
-        protected override Refs GetRefsImplementation() { return Refs.Arg(); }
+        protected override CodeArgs GetRefsImplementation() { return CodeArgs.Arg(); }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Arg(this); }
     }
 }

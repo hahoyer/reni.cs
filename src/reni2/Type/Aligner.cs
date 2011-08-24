@@ -55,7 +55,7 @@ namespace Reni.Type
                 (
                     category,
                     () => ArgCode().BitCast(Parent.Size)
-                    , Refs.Arg
+                    , CodeArgs.Arg
                 );
         }
 

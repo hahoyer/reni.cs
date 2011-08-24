@@ -74,6 +74,13 @@ namespace Reni.Struct
             return base.LocalReferenceResult(category, refAlignParam);
         }
 
+        internal override TypeBase SmartReference(RefAlignParam refAlignParam)
+        {
+            if(IsZeroSized)
+                return this;
+            return base.SmartReference(refAlignParam);
+        }
+
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
         [DisableDump]

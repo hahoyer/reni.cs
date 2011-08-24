@@ -83,7 +83,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = _tokenClass.ObjectId == -24 && Left != null && Left.GetObjectId() == 36 && (category.HasCode || category.HasRefs);
+            var trace = _tokenClass.ObjectId == -24 && Left != null && Left.GetObjectId() == 36 && (category.HasCode || category.HasArgs);
             StartMethodDump(trace, context, category);
             try
             {
@@ -143,6 +143,11 @@ namespace Reni.ReniParser
             var targetResult = target.ResultAsReference(context, category.Typed);
             var result = operationResult.ReplaceArg(targetResult);
             return (result);
+        }
+
+        internal override bool IsZeroSized(ContextBase context)
+        {
+            return Size(context).IsZero;
         }
     }
 }

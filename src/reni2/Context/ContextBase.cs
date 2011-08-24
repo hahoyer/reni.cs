@@ -98,7 +98,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         private Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = ObjectId == -2 && syntax.GetObjectId() == 42 && (category.HasRefs || category.HasCode);
+            var trace = ObjectId == -2 && syntax.GetObjectId() == 42 && (category.HasArgs || category.HasCode);
             StartMethodDump(trace, category, syntax);
             try
             {
@@ -145,7 +145,7 @@ namespace Reni.Context
 
         internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
 
-        internal Refs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.Refs, condSyntax).Refs; }
+        internal CodeArgs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.Args, condSyntax).CodeArgs; }
 
         internal sealed class CacheItems : ReniObject, IIconKeyProvider
         {

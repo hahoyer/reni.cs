@@ -70,10 +70,10 @@ namespace Reni.Code
         internal override RefAlignParam RefAlignParam { get { return _fiberItems[_fiberItems.Length - 1].RefAlignParam; } }
         protected override Size GetSize() { return _fiberItems[_fiberItems.Length - 1].OutputSize; }
 
-        protected override Refs GetRefsImplementation()
+        protected override CodeArgs GetRefsImplementation()
         {
             return _fiberItems
-                .Aggregate(FiberHead.Refs, (current, fiberItem) => current.Sequence(fiberItem.Refs));
+                .Aggregate(FiberHead.CodeArgs, (current, fiberItem) => current.Sequence(fiberItem.CodeArgs));
         }
 
         internal override CodeBase CreateFiber(FiberItem subsequentElement)

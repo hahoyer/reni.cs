@@ -31,7 +31,7 @@ namespace Reni.Code
         [DisableDump]
         internal override bool IsRelativeReference { get { return false; } }
 
-        protected override Refs GetRefsImplementation() { return Refs.Create(_context); }
+        protected override CodeArgs GetRefsImplementation() { return CodeArgs.Create(_context); }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }

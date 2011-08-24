@@ -65,7 +65,9 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase ValueTypeFunction { get { return base.ValueType; } }
         [DisableDump]
-        private TypeBase ValueTypeReference { get { return ValueType.ForceReference(RefAlignParam); } }
+        private TypeBase ValueTypeReference { get { return ValueType.SmartReference(RefAlignParam); } }
+        [DisableDump]
+        internal override bool IsZeroSized { get { return AccessPoint.IsZeroSized || base.IsZeroSized; } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -80,7 +82,7 @@ namespace Reni.Type
                  , () => refAlignParam.RefSize
                  , () => _assignmentFeatureCache.Value.UniqueFunctionalType(refAlignParam)
                  , ArgCode
-                 , Refs.Arg
+                 , CodeArgs.Arg
                 );
             return result;
         }
@@ -103,7 +105,7 @@ namespace Reni.Type
                  , () => Size.Zero
                  , () => Void
                  , AssignmentCode
-                 , Refs.Arg
+                 , CodeArgs.Arg
                 );
         }
 
@@ -118,13 +120,13 @@ namespace Reni.Type
         internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
         internal Result DumpPrintFieldResult(Category category) { return GenericDumpPrintResult(category, RefAlignParam); }
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
-        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText), Refs.Void); }
+        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText), CodeArgs.Void); }
 
         private Result ValueReferenceViaFieldReference(Category category)
         {
-            var result = AccessObject.ValueReferenceViaFieldReference(category, this);
-            result.AssertVoidOrValidReference();
-            return result;
+            return AccessObject
+                .ValueReferenceViaFieldReference(category, this)
+                .AssertEmptyOrValidReference();
         }
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
@@ -145,7 +147,6 @@ namespace Reni.Type
                 var result = replaceObjectRefByArg
                     .ReplaceArg(structReferenceViaFieldReference)
                     .LocalReferenceResult(RefAlignParam);
-                result.AssertVoidOrValidReference();
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -161,13 +162,21 @@ namespace Reni.Type
                 .Result(category, ArgResult(category));
         }
 
-        internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode, Refs.Arg); }
+        internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode, CodeArgs.Arg); }
 
-        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode(), Refs.Arg); }
+        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode(), CodeArgs.Arg); }
 
         private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
+        
+        protected override Size GetSize()
+        {
+            if(AccessPoint.IsZeroSized)
+                return Size.Zero;
+            return base.GetSize();
+        }
+
         internal override Result DereferenceResult(Category category)
         {
             return ValueReferenceViaFieldReference(category)
@@ -176,7 +185,7 @@ namespace Reni.Type
         protected override Result ToAutomaticReferenceResult(Category category)
         {
             return ValueReferenceViaFieldReference(category)
-                .AssertValidReference();
+                .AssertEmptyOrValidReference();
         }
     }
 }

@@ -68,7 +68,7 @@ namespace Reni.Type
             Tracer.Assert(conversionBase >= 2 && conversionBase <= 36, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
             return UniqueNumber(result.Size.ToInt())
-                .Result(category, () => CodeBase.BitsConst(result), Refs.Void)
+                .Result(category, () => CodeBase.BitsConst(result), CodeArgs.Void)
                 .Align(refAlignParam.AlignBits);
         }
     }

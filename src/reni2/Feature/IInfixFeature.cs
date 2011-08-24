@@ -84,11 +84,11 @@ namespace Reni.Feature
 
     internal static class FeatureExtender
     {
-        internal static TypeBase TypeOfArgInApplyResult(this IFeature feature, RefAlignParam refAlignParam)
+        internal static TypeBase TypeOfArgInObtainResult(this IFeature feature, RefAlignParam refAlignParam)
         {
             return feature
                 .ObjectType
-                .ForceReference(refAlignParam);
+                .SmartReference(refAlignParam);
         }
 
         internal static IFeature ConvertToFeature(this object feature)

@@ -71,7 +71,7 @@ namespace Reni.Sequence
         private Result Apply(Category category, int objSize, int argsSize)
         {
             var type = _feature.ResultType(objSize, argsSize);
-            return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize), Refs.Arg);
+            return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize), CodeArgs.Arg);
         }
     }
 }

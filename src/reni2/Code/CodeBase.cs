@@ -70,7 +70,7 @@ namespace Reni.Code
         internal Size MaxSize { get { return MaxSizeImplementation; } }
 
         [DisableDump]
-        internal Refs Refs { get { return GetRefsImplementation(); } }
+        internal CodeArgs CodeArgs { get { return GetRefsImplementation(); } }
 
         [DisableDump]
         internal virtual bool IsEmpty { get { return false; } }
@@ -113,7 +113,7 @@ namespace Reni.Code
 
         protected abstract Size GetSize();
 
-        protected virtual Refs GetRefsImplementation() { return Refs.Void(); }
+        protected virtual CodeArgs GetRefsImplementation() { return CodeArgs.Void(); }
 
         internal CodeBase Assignment(RefAlignParam refAlignParam, Size size)
         {
@@ -309,10 +309,10 @@ namespace Reni.Code
 
         void IFormalCodeItem.Execute(IFormalMaschine formalMaschine) { Execute(formalMaschine); }
 
-        protected static Refs GetRefs(CodeBase[] codeBases)
+        protected static CodeArgs GetRefs(CodeBase[] codeBases)
         {
-            var refs = codeBases.Select(code => code.Refs).ToArray();
-            return refs.Aggregate(Refs.Void(), (r1, r2) => r1.Sequence(r2));
+            var refs = codeBases.Select(code => code.CodeArgs).ToArray();
+            return refs.Aggregate(CodeArgs.Void(), (r1, r2) => r1.Sequence(r2));
         }
 
         internal static CodeBase Arg(TypeBase type) { return new Arg(type); }

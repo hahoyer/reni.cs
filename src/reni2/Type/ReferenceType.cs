@@ -42,7 +42,7 @@ namespace Reni.Type
         internal override bool IsArray { get { return ValueType.IsArray; } }
 
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
-        internal override TypeBase ForceReference(RefAlignParam refAlignParam) { return this; }
+        internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
@@ -61,7 +61,7 @@ namespace Reni.Type
                 .Result
                 ( category
                 ,() =>LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
-                ,() => Destructor(Category.Refs).Refs + Refs.Arg()
+                ,() => Destructor(Category.Args).CodeArgs + CodeArgs.Arg()
                 );
         }
 
@@ -69,7 +69,7 @@ namespace Reni.Type
 
         private Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
         {
-            var trace = ObjectId == 13;
+            var trace = ObjectId == -13;
             try
             {
                 StartMethodDump(trace,conversionParameter,destination);
