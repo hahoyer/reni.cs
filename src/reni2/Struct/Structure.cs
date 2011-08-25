@@ -110,15 +110,16 @@ namespace Reni.Struct
             }
         }
 
+        [DisableDump]
+        internal bool StructIsDataLess { get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
+        internal bool IsDataLess{get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
+
         private sealed class RecursionWhileObtainingStructSizeException : Exception
         {
             [EnableDump]
             private readonly Structure _structure;
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
-
-        [DisableDump]
-        internal bool IsZeroSized { get { return ContainerContextObject.IsZeroSized(EndPosition); } }
 
         internal FunctionalBody UniqueFunctionalFeature(CompileSyntax body) { return _functionalFeatureCache.Find(body); }
         internal AccessType UniqueAccessType(int position) { return _accessTypesCache.Find(position); }

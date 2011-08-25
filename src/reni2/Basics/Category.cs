@@ -32,41 +32,47 @@ namespace Reni.Basics
         private readonly bool _type;
         private readonly bool _args;
         private readonly bool _size;
+        private readonly bool _isDataLess;
 
-        public Category() { }
+        internal Category() { }
 
-        internal Category(bool size, bool type, bool code, bool args)
+        internal Category(bool isDataLess, bool size, bool type, bool code, bool args)
         {
             _code = code;
             _type = type;
             _args = args;
+            _isDataLess = isDataLess;
             _size = size;
         }
 
         [DebuggerHidden]
-        public static Category Size { get { return new Category(true, false, false, false); } }
+        public static Category Size { get { return new Category(false, true, false, false, false); } }
 
         [DebuggerHidden]
-        public static Category Type { get { return new Category(false, true, false, false); } }
+        public static Category Type { get { return new Category(false, false, true, false, false); } }
 
         [DebuggerHidden]
-        public static Category Code { get { return new Category(false, false, true, false); } }
+        public static Category Code { get { return new Category(false, false, false, true, false); } }
 
         [DebuggerHidden]
-        public static Category Args { get { return new Category(false, false, false, true); } }
+        public static Category Args { get { return new Category(false, false, false, false, true); } }
 
         [DebuggerHidden]
-        public static Category None { get { return new Category(false, false, false, false); } }
+        public static Category IsDataLess { get { return new Category(true, false, false, false, false); } }
 
         [DebuggerHidden]
-        public static Category All { get { return new Category(true, true, true, true); } }
+        public static Category None { get { return new Category(false, false, false, false, false); } }
+
+        [DebuggerHidden]
+        public static Category All { get { return new Category(true, true, true, true, true); } }
 
         public bool IsNone { get { return !HasAny; } }
         public bool HasCode { get { return _code; } }
         public bool HasType { get { return _type; } }
         public bool HasArgs { get { return _args; } }
         public bool HasSize { get { return _size; } }
-        public bool HasAny { get { return _code || _type || _args || _size; } }
+        public bool HasIsDataLess { get { return _isDataLess; } }
+        public bool HasAny { get { return _code || _type || _args || _size || _isDataLess; } }
 
         [DebuggerHidden]
         [DisableDump]
@@ -79,10 +85,12 @@ namespace Reni.Basics
             get
             {
                 var result = this;
-                if (HasType || HasCode)
+                if(HasType || HasCode)
                     result |= Size;
-                if (HasCode)
+                if(HasCode)
                     result |= Args;
+                if(result.HasSize)
+                    result |= IsDataLess;
                 return result;
             }
         }
@@ -90,22 +98,13 @@ namespace Reni.Basics
         [DebuggerHidden]
         public static Category operator |(Category x, Category y)
         {
-            return new Category(
-                x.HasSize || y.HasSize,
-                x.HasType || y.HasType,
-                x.HasCode || y.HasCode,
-                x.HasArgs || y.HasArgs
-                );
+            return new Category(x.HasIsDataLess || y.HasIsDataLess, x.HasSize || y.HasSize, x.HasType || y.HasType, x.HasCode || y.HasCode, x.HasArgs || y.HasArgs);
         }
 
         [DebuggerHidden]
         public static Category operator &(Category x, Category y)
         {
-            return new Category(
-                x.HasSize && y.HasSize,
-                x.HasType && y.HasType,
-                x.HasCode && y.HasCode,
-                x.HasArgs && y.HasArgs);
+            return new Category(x.HasIsDataLess && y.HasIsDataLess, x.HasSize && y.HasSize, x.HasType && y.HasType, x.HasCode && y.HasCode, x.HasArgs && y.HasArgs);
         }
 
         public override int GetHashCode()
@@ -116,6 +115,7 @@ namespace Reni.Basics
                 result = (result*397) ^ _type.GetHashCode();
                 result = (result*397) ^ _args.GetHashCode();
                 result = (result*397) ^ _size.GetHashCode();
+                result = (result*397) ^ _isDataLess.GetHashCode();
                 return result;
             }
         }
@@ -127,6 +127,7 @@ namespace Reni.Basics
                 && HasArgs == x.HasArgs
                 && HasSize == x.HasSize
                 && HasType == x.HasType
+                && HasIsDataLess == x.HasIsDataLess
                 ;
         }
 
@@ -137,6 +138,7 @@ namespace Reni.Basics
                 || (!HasArgs && x.HasArgs)
                 || (!HasSize && x.HasSize)
                 || (!HasType && x.HasType)
+                || (!HasIsDataLess && x.HasIsDataLess)
                 ;
         }
 
@@ -150,17 +152,15 @@ namespace Reni.Basics
                 return false;
             if(HasType && !x.HasType)
                 return false;
+            if(HasIsDataLess && !x.HasIsDataLess)
+                return false;
             return true;
         }
 
         [DebuggerHidden]
         public static Category operator -(Category x, Category y)
         {
-            return new Category(
-                x.HasSize && !y.HasSize,
-                x.HasType && !y.HasType,
-                x.HasCode && !y.HasCode,
-                x.HasArgs && !y.HasArgs);
+            return new Category(x.HasIsDataLess && !y.HasIsDataLess, x.HasSize && !y.HasSize, x.HasType && !y.HasType, x.HasCode && !y.HasCode, x.HasArgs && !y.HasArgs);
         }
 
         protected override string Dump(bool isRecursion) { return DumpShort(); }
@@ -168,6 +168,8 @@ namespace Reni.Basics
         internal override string DumpShort()
         {
             var result = "";
+            if(HasIsDataLess)
+                result += ".IsDataLess.";
             if(HasSize)
                 result += ".Size.";
             if(HasType)
@@ -188,7 +190,12 @@ namespace Reni.Basics
                 return false;
             if(ReferenceEquals(this, obj))
                 return true;
-            return obj._code.Equals(_code) && obj._type.Equals(_type) && obj._args.Equals(_args) && obj._size.Equals(_size);
+            return obj._code.Equals(_code)
+                   && obj._type.Equals(_type)
+                   && obj._args.Equals(_args)
+                   && obj._size.Equals(_size)
+                   && obj._isDataLess.Equals(_isDataLess)
+                ;
         }
 
         public override bool Equals(object obj)

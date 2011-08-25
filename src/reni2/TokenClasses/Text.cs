@@ -39,6 +39,9 @@ namespace Reni.TokenClasses
                 .UniqueSequence(data.Length)
                 .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }
+        
+        public override bool? FlatIsDataLess(ContextBase context, TokenData token) { return StripQutes(token.Name).Length == 0; }
+        
         private string StripQutes(string text)
         {
             var result = "";

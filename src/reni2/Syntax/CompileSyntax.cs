@@ -73,6 +73,7 @@ namespace Reni.Syntax
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
+        private Result QuickResult(ContextBase context, Category category) { return context.QuickResult(category, this); }
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
         internal Result ResultAsReference(ContextBase context, Category category) { return context.UniqueResult(category.Typed, this).LocalReferenceResult(context.RefAlignParam); }
 
@@ -108,10 +109,23 @@ namespace Reni.Syntax
             return result;
         }
 
-        internal virtual bool IsZeroSized(ContextBase context)
+        internal bool IsDataLess(ContextBase context)
+        {
+            var result = Result(context, Category.IsDataLess).IsDataLess;
+            Tracer.Assert(result != null);
+            return result.Value;
+        }
+
+        internal bool? QuickIsDataLess(ContextBase context)
+        {
+            var result = QuickResult(context, Category.IsDataLess).IsDataLess;
+            return result;
+        }
+        
+        internal virtual bool? FlatIsDataLess(ContextBase context)
         {
             NotImplementedMethod(context);
-            return false;
+            return null;
 
         }
     }

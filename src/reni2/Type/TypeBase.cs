@@ -50,9 +50,11 @@ namespace Reni.Type
             public readonly DictionaryEx<RefAlignParam, AutomaticReferenceType> References;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<TextItemType> TextItem;
+            public readonly SimpleCache<EnableCut> EnableCut;
 
             public Cache(TypeBase parent)
             {
+                EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
                 References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Sequences = new DictionaryEx<int, SequenceType>(elementCount => new SequenceType(parent, elementCount));
@@ -126,6 +128,7 @@ namespace Reni.Type
         internal SequenceType UniqueSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueSequence(bitCount); }
         internal TextItemType UniqueTextItem() { return _cache.TextItem.Value; }
+        internal EnableCut UniqueEnableCut() { return _cache.EnableCut.Value; }
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         internal virtual TypeBase TypeForTypeOperator() { return this; }
@@ -169,9 +172,11 @@ namespace Reni.Type
         internal Result Result(Category category, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
         {
             var result = new Result();
-            if(category.HasSize)
+            if(category.HasIsDataLess)
+                result.IsDataLess = IsDataLess;
+            if (category.HasSize)
                 result.Size = Size;
-            if(category.HasType)
+            if (category.HasType)
                 result.Type = this;
             if(category.HasCode)
                 result.Code = getCode();
@@ -223,7 +228,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual bool IsZeroSized { get { return Size.IsZero; } }
+        internal virtual bool IsDataLess { get { return Size.IsZero; } }
 
         [DisableDump]
         internal virtual TypeBase UnAlignedType { get { return this; } }
@@ -283,7 +288,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = ObjectId == 13 && defineable.ObjectId == 39 && (category.HasCode || category.HasType);
+            var trace = ObjectId == -13 && defineable.ObjectId == 24 && category.HasIsDataLess;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -383,7 +388,7 @@ namespace Reni.Type
 
         protected virtual Converter UnalignedConverter(ConversionParameter conversionParameter, TypeBase destination)
         {
-            if(IsZeroSized && destination is Void)
+            if(IsDataLess && destination is Void)
                 return new FunctionalConverter(c => Void.Result(c, ArgResult(c)));
 
             var functionalSource = this as FunctionalBody.Type;

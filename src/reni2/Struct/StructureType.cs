@@ -69,14 +69,14 @@ namespace Reni.Struct
 
         internal override Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
-            if(IsZeroSized)
+            if(IsDataLess)
                 return ArgResult(category);
             return base.LocalReferenceResult(category, refAlignParam);
         }
 
         internal override TypeBase SmartReference(RefAlignParam refAlignParam)
         {
-            if(IsZeroSized)
+            if(IsDataLess)
                 return this;
             return base.SmartReference(refAlignParam);
         }
@@ -84,7 +84,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
         [DisableDump]
-        internal override bool IsZeroSized { get { return Structure.IsZeroSized; } }
+        internal override bool IsDataLess { get { return Structure.StructIsDataLess; } }
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Structure.DumpPrintResultViaStructReference(category); }
     }

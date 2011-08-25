@@ -68,6 +68,9 @@ namespace Reni.Struct
         internal TypeBase InnerType(int accessPosition, int position) { return Container.InnerType(_parent, accessPosition, position); }
 
         internal Size StructSize(int position) { return ContextReferenceOffsetFromAccessPoint(position); }
+        internal bool StructIsDataLess(int accessPosition) { return Container.IsDataLess(Parent, 0, accessPosition); }
+        internal bool IsDataLess(int position) { return Container.ConstructionResult(Category.IsDataLess, Parent, position,position+1).SmartIsDataLess; }
+
         internal Result AccessFromContextReference(Category category, AccessType typeBase, int endPosition)
         {
             var result = typeBase
@@ -109,7 +112,7 @@ namespace Reni.Struct
                     return AccessManager.Property;
                 return AccessManager.Function;
             }
-            if(IsZeroSized(position))
+            if(IsDataLess(position))
                 return AccessManager.ProcedureCall;
             return AccessManager.Field;
         }
@@ -130,6 +133,5 @@ namespace Reni.Struct
         }
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition) { return Container.ConstructionSize(Parent, fieldPosition + 1, accessPosition); }
-        internal bool IsZeroSized(int accessPosition) { return Container.IsZeroSized(Parent, 0, accessPosition); }
     }
 }

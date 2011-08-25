@@ -67,7 +67,7 @@ namespace Reni.Type
         [DisableDump]
         private TypeBase ValueTypeReference { get { return ValueType.SmartReference(RefAlignParam); } }
         [DisableDump]
-        internal override bool IsZeroSized { get { return AccessPoint.IsZeroSized || base.IsZeroSized; } }
+        internal override bool IsDataLess { get { return AccessPoint.IsDataLess || base.IsDataLess; } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -79,6 +79,7 @@ namespace Reni.Type
         {
             var result = new Result
                 (category
+                 , () => refAlignParam.RefSize.IsZero
                  , () => refAlignParam.RefSize
                  , () => _assignmentFeatureCache.Value.UniqueFunctionalType(refAlignParam)
                  , ArgCode
@@ -102,6 +103,7 @@ namespace Reni.Type
         {
             return new Result
                 (category
+                 , () => true
                  , () => Size.Zero
                  , () => Void
                  , AssignmentCode
@@ -172,7 +174,7 @@ namespace Reni.Type
         
         protected override Size GetSize()
         {
-            if(AccessPoint.IsZeroSized)
+            if(AccessPoint.IsDataLess)
                 return Size.Zero;
             return base.GetSize();
         }

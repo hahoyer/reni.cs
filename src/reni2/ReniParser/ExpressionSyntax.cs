@@ -145,9 +145,5 @@ namespace Reni.ReniParser
             return (result);
         }
 
-        internal override bool IsZeroSized(ContextBase context)
-        {
-            return Size(context).IsZero;
-        }
     }
 }

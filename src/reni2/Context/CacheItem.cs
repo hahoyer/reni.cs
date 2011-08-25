@@ -57,6 +57,12 @@ namespace Reni.Context
                     BreakExecution();
                     var localCategory = category - _data.CompleteCategory - _data.PendingCategory;
 
+                    if(localCategory.HasIsDataLess && _data.FindIsDataLess != null)
+                    {
+                        _data.IsDataLess = _data.FindIsDataLess;
+                        localCategory -= Category.IsDataLess;
+                    }
+
                     if(localCategory.HasSize && _data.FindSize != null)
                     {
                         _data.Size = _data.FindSize;

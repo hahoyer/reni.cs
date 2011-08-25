@@ -218,9 +218,29 @@ namespace Reni.Struct
             return result;
         }
 
+        internal bool IsDataLess(ContextBase context, int fromPosition, int fromNotPosition)
+        {
+            var listQuick = Statements
+                .Select(s => new {Statement=s, IsDataLess=s.QuickIsDataLess(context)})
+                .Where(ss=> ss.IsDataLess != true)
+                .ToArray();
+            if (listQuick.Any(ss => ss.IsDataLess == false))
+                return false;
+
+            var listFlat = listQuick
+                .Select(s => new {Statement = s, IsDataLess = s.Statement.FlatIsDataLess(context)})
+                .Where(s=>s.IsDataLess != true);
+            if (listFlat.Any(ss => ss.IsDataLess == false))
+                return false;
+
+
+            NotImplementedMethod(context,fromPosition,fromNotPosition);
+            return false;
+        }
+
         private Result ConstructorResult(Category category, ContextBase parent, int position)
         {
-            StartMethodDump(ObjectId == -1 && position == 0 && category.HasCode, category, parent, position);
+            StartMethodDump(ObjectId == 0 && position == 0 && category.HasIsDataLess, category, parent, position);
             try
             {
                 var internalInnerResult = InternalInnerResult(category, parent, position + 1, position);
@@ -244,13 +264,6 @@ namespace Reni.Struct
         internal new bool IsLambda(int position) { return Statements[position].IsLambda; }
         internal bool IsProperty(int position) { return Properties.Contains(position); }
 
-        internal bool IsZeroSized(ContextBase parent, int fromPosition, int fromNotPosition)
-        {
-            for(var i = fromPosition; i < fromNotPosition; i++)
-                if (!IsLambda(i) && !Statements[i].IsZeroSized(parent))
-                    return false;
-            return true;
-        }
     }
 
     internal interface IStructFeature

@@ -95,13 +95,16 @@ namespace Reni.Context
             return result;
         }
 
+        internal Result QuickResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Find(syntax).Data & category; }
+
         //[DebuggerHidden]
         private Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = ObjectId == -2 && syntax.GetObjectId() == 42 && (category.HasArgs || category.HasCode);
+            var trace = syntax.ObjectId == -10 && category.HasIsDataLess;
             StartMethodDump(trace, category, syntax);
             try
             {
+                BreakExecution();
                 return ReturnMethodDump(syntax.ObtainResult(this, category.Replenished), true);
             }
             finally
@@ -206,6 +209,5 @@ namespace Reni.Context
             [DisableDump]
             public string IconKey { get { return "Cache"; } }
         }
-
     }
 }

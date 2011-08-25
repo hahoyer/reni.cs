@@ -37,6 +37,7 @@ namespace Reni
     {
         private static int _nextObjectId = 1;
         private bool _isDirty;
+        private bool? _isDataLess;
         private Size _size;
         private TypeBase _type;
         private CodeBase _code;
@@ -49,7 +50,7 @@ namespace Reni
             StopByObjectId(-135);
         }
 
-        internal Result(Category category, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
+        internal Result(Category category, Func<bool> getDataLess, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
             : this()
         {
             if(category.HasSize)
@@ -60,10 +61,12 @@ namespace Reni
                 _code = getCode();
             if(category.HasArgs)
                 _codeArgs = getRefs();
+            if(category.HasIsDataLess)
+                _isDataLess = getDataLess();
             AssertValid();
         }
 
-        internal Result(Category category, Func<Size> getSize, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
+        internal Result(Category category, Func<bool> getDataLess, Func<Size> getSize, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
             : this()
         {
             if(category.HasSize)
@@ -72,22 +75,37 @@ namespace Reni
                 _code = getCode();
             if(category.HasArgs)
                 _codeArgs = getRefs();
+            if(category.HasIsDataLess)
+                _isDataLess = getDataLess();
             AssertValid();
         }
 
         internal Result(Category category, Func<CodeArgs> getRefs)
-            : this(category, () => Size.Zero, CodeBase.Void, getRefs) { }
+            : this(category, () => true, () => Size.Zero, CodeBase.Void, getRefs) { }
 
         private bool HasSize { get { return Size != null; } }
         internal bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
-        internal bool HasRefs { get { return CodeArgs != null; } }
+        internal bool HasArgs { get { return CodeArgs != null; } }
+        internal bool HasIsDataLess { get { return _isDataLess != null; } }
 
         [Node]
         [EnableDumpWithExceptions]
         internal Category PendingCategory;
 
-        public Category CompleteCategory { get { return new Category(HasSize, HasType, HasCode, HasRefs); } }
+        public Category CompleteCategory { get { return new Category(HasIsDataLess, HasSize, HasType, HasCode, HasArgs); } }
+
+        [Node]
+        [DebuggerHidden]
+        public bool? IsDataLess
+        {
+            get { return _isDataLess; }
+            set
+            {
+                _isDataLess = value;
+                AssertValid();
+            }
+        }
 
         [Node]
         [DebuggerHidden]
@@ -143,15 +161,45 @@ namespace Reni
             var result = new List<TreeNode>();
             if(PendingCategory.HasAny)
                 result.Add(Dump().CreateNamedNode("Pending", "Pending"));
+            if(HasIsDataLess)
+                result.Add(IsDataLess.CreateNamedNode("IsDataLess", "Logical"));
             if(HasSize)
                 result.Add(Size.FormatForView().CreateNamedNode("Size", "Number"));
             if(HasType)
                 result.Add(Type.CreateNamedNode("Type", "Type"));
             if(HasCode)
                 result.Add(Code.CreateNamedNode("Code", "Code"));
-            if(HasRefs)
+            if(HasArgs)
                 result.Add(CodeArgs.Data.CreateNamedNode("Args", "Args"));
             return result.ToArray();
+        }
+
+        internal bool? FindIsDataLess
+        {
+            get
+            {
+                if (HasIsDataLess)
+                    return _isDataLess;
+                var size = FindSize;
+                if(size == null)
+                    return null;
+                return size.IsZero;
+            }
+        }
+
+        internal bool SmartIsDataLess
+        {
+            get
+            {
+                var result = FindIsDataLess;
+                if(result == null)
+                {
+                    DumpMethodWithBreak("No approriate result property defined");
+                    Debugger.Break();
+                    return false;
+                }
+                return result.Value;
+            }
         }
 
         internal Size FindSize
@@ -186,7 +234,7 @@ namespace Reni
         {
             get
             {
-                if(HasRefs)
+                if(HasArgs)
                     return CodeArgs;
                 if(HasCode)
                     return Code.CodeArgs;
@@ -225,13 +273,15 @@ namespace Reni
         {
             get
             {
-                if(CompleteCategory.HasSize && !Size.IsZero)
+                if(HasIsDataLess && IsDataLess == false)
                     return false;
-                if(CompleteCategory.HasType && !(Type is Type.Void))
+                if(HasSize && !Size.IsZero)
                     return false;
-                if(CompleteCategory.HasCode && !Code.IsEmpty)
+                if(HasType && !(Type is Type.Void))
                     return false;
-                if(CompleteCategory.HasArgs && !CodeArgs.IsNone)
+                if(HasCode && !Code.IsEmpty)
+                    return false;
+                if(HasArgs && !CodeArgs.IsNone)
                     return false;
                 return true;
             }
@@ -255,7 +305,7 @@ namespace Reni
         {
             get
             {
-                if(HasRefs)
+                if(HasArgs)
                     return CodeArgs.HasArg;
                 if(HasCode)
                     return Code.HasArg;
@@ -270,11 +320,13 @@ namespace Reni
             result += "PendingCategory=" + PendingCategory.Dump();
             result += "\n";
             result += "CompleteCategory=" + CompleteCategory.Dump();
+            if(HasIsDataLess)
+                result += "\nIsDataLess=" + Tracer.Dump(_isDataLess);
             if(HasSize)
                 result += "\nSize=" + Tracer.Dump(_size);
             if(HasType)
                 result += "\nType=" + Tracer.Dump(_type);
-            if(HasRefs)
+            if(HasArgs)
                 result += "\nRefs=" + Tracer.Dump(_codeArgs);
             if(HasCode)
                 result += "\nCode=" + Tracer.Dump(_code);
@@ -283,13 +335,16 @@ namespace Reni
 
         internal void Update(Result result)
         {
+            if(result.HasIsDataLess)
+                _isDataLess = result.IsDataLess;
+
             if(result.HasSize)
                 _size = result.Size;
 
             if(result.HasType)
                 _type = result.Type;
 
-            if(result.HasRefs)
+            if(result.HasArgs)
                 _codeArgs = result.CodeArgs;
 
             if(result.HasCode)
@@ -305,6 +360,8 @@ namespace Reni
                              PendingCategory = PendingCategory & category
                          };
 
+            if(category.HasIsDataLess)
+                result._isDataLess = IsDataLess;
             if(category.HasSize)
                 result._size = Size;
             if(category.HasType)
@@ -327,38 +384,55 @@ namespace Reni
             if(alignedSize == size)
                 return this;
 
-            var r = new Result();
+            var result = new Result();
+            if(HasIsDataLess)
+                result._isDataLess = IsDataLess;
             if(HasSize)
-                r.Size = alignedSize;
+                result.Size = alignedSize;
             if(HasType)
-                r.Type = Type.UniqueAlign(alignBits);
+                result.Type = Type.UniqueAlign(alignBits);
             if(HasCode)
-                r.Code = Code.BitCast(alignedSize);
-            if(HasRefs)
-                r.CodeArgs = CodeArgs;
-            return r;
+                result.Code = Code.BitCast(alignedSize);
+            if(HasArgs)
+                result.CodeArgs = CodeArgs;
+            return result;
         }
 
         private Result Clone(Category category)
         {
-            var r = new Result {PendingCategory = PendingCategory & category};
+            var result = new Result {PendingCategory = PendingCategory & category};
+            if(category.HasIsDataLess)
+                result._isDataLess = IsDataLess;
             if(category.HasSize)
-                r.Size = Size;
+                result.Size = Size;
             if(category.HasType)
-                r.Type = Type;
+                result.Type = Type;
             if(category.HasCode)
-                r.Code = Code;
+                result.Code = Code;
             if(category.HasArgs)
-                r.CodeArgs = CodeArgs;
-            return r;
+                result.CodeArgs = CodeArgs;
+            return result;
         }
 
-        internal Result Clone() { return new Result {PendingCategory = PendingCategory, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs}; }
+        internal Result Clone() { return new Result {PendingCategory = PendingCategory, IsDataLess = IsDataLess, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs}; }
 
         private void AssertValid()
         {
             if(IsDirty)
                 return;
+
+            var isDataLess = FindIsDataLess;
+            if(isDataLess != null)
+            {
+                if(HasIsDataLess && IsDataLess != isDataLess.Value)
+                    Tracer.AssertionFailed(1, @"IsDataLess==isDataLess", () => "IsDataLess differs " + Dump());
+                if(HasSize && Size.IsZero != isDataLess.Value)
+                    Tracer.AssertionFailed(1, @"Size.IsZero==isDataLess.Value", () => "Size differs " + Dump());
+                if(HasType && Type.Size.IsZero != isDataLess.Value)
+                    Tracer.AssertionFailed(1, @"Type.Size.IsZero==isDataLess.Value", () => "Type size differs " + Dump());
+                if(HasCode && Code.Size.IsZero != isDataLess.Value)
+                    Tracer.AssertionFailed(1, @"Code.Size.IsZero==isDataLess.Value", () => "Code size differs " + Dump());
+            }
 
             var size = FindSize;
             if(size != null)
@@ -371,7 +445,7 @@ namespace Reni
                     Tracer.AssertionFailed(1, @"Code.Size==size", () => "Code size differs " + Dump());
             }
 
-            if(HasRefs && HasCode)
+            if(HasArgs && HasCode)
             {
                 var refs = CodeArgs;
                 var codeRefs = Code.CodeArgs;
@@ -386,7 +460,7 @@ namespace Reni
                 (
                     1,
                     category <= (CompleteCategory | PendingCategory),
-                    () => string.Format("syntax={2}\ncategory={0}\nResult={1}", category, Dump(), syntaxForDump.DumpShort())
+                    () => string.Format("syntax={2}\ncategory={0}\nResult={1}", category.DumpShort(), Dump(), syntaxForDump.DumpShort())
                 );
         }
 
@@ -397,6 +471,8 @@ namespace Reni
             Tracer.Assert(category <= other.CompleteCategory);
             Tracer.Assert(category <= CompleteCategory);
             IsDirty = true;
+            if(category.HasIsDataLess)
+                IsDataLess = SmartIsDataLess && other.SmartIsDataLess;
             if(category.HasSize)
                 Size += other.Size;
             if(category.HasType)
@@ -431,10 +507,10 @@ namespace Reni
 
         private Result InternalReplaceArg(Result resultForArg)
         {
-            var result = new Result {Size = Size, Type = Type, IsDirty = true};
+            var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
             if(HasCode && resultForArg.HasCode)
                 result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
-            if(HasRefs && resultForArg.HasRefs)
+            if(HasArgs && resultForArg.HasArgs)
                 result.CodeArgs = CodeArgs.WithoutArg().Sequence(resultForArg.CodeArgs);
             result.IsDirty = false;
             return result;
@@ -443,13 +519,13 @@ namespace Reni
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
             where TRefInCode : IReferenceInCode
         {
-            if(HasRefs && !CodeArgs.Contains(refInCode))
+            if(HasArgs && !CodeArgs.Contains(refInCode))
                 return this;
 
-            var result = new Result {Size = Size, Type = Type, IsDirty = true};
+            var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, replacementCode);
-            if(HasRefs)
+            if(HasArgs)
                 result.CodeArgs = CodeArgs.Without(refInCode).Sequence(replacementRefs());
             result.IsDirty = false;
             return result;
@@ -458,14 +534,14 @@ namespace Reni
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Category, Result> getReplacement)
             where TRefInCode : IReferenceInCode
         {
-            if(HasRefs && !CodeArgs.Contains(refInCode))
+            if(HasArgs && !CodeArgs.Contains(refInCode))
                 return this;
 
             var replacement = getReplacement(CompleteCategory - Category.Size - Category.Type);
-            var result = new Result {Size = Size, Type = Type, IsDirty = true};
+            var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
             if(HasCode)
                 result.Code = Code.ReplaceAbsolute(refInCode, () => replacement.Code);
-            if(HasRefs)
+            if(HasArgs)
                 result.CodeArgs = CodeArgs.Without(refInCode).Sequence(replacement.CodeArgs);
             result.IsDirty = false;
             return result;
@@ -474,13 +550,13 @@ namespace Reni
         internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
             where TRefInCode : IReferenceInCode
         {
-            if(HasRefs && !CodeArgs.Contains(refInCode))
+            if(HasArgs && !CodeArgs.Contains(refInCode))
                 return this;
 
-            var result = new Result {Size = Size, Type = Type};
+            var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type};
             if(HasCode)
                 result.Code = Code.ReplaceRelative(refInCode, replacementCode);
-            if(HasRefs)
+            if(HasArgs)
                 result.CodeArgs = CodeArgs.Without(refInCode).Sequence(replacementRefs());
             return result;
         }
@@ -594,7 +670,7 @@ namespace Reni
         [DebuggerHidden]
         internal Result AssertVoidOrValidReference()
         {
-            var size = SmartSize;
+            var size = FindSize;
             if(size != null)
                 Tracer.Assert(size.IsZero || size == Root.DefaultRefAlignParam.RefSize, Dump);
 
@@ -606,11 +682,11 @@ namespace Reni
         [DebuggerHidden]
         internal Result AssertValidReference()
         {
-            var size = SmartSize;
-            if (size != null)
+            var size = FindSize;
+            if(size != null)
                 Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, Dump);
 
-            if (HasType)
+            if(HasType)
                 Tracer.Assert(Type is ReferenceType, Dump);
             return this;
         }
@@ -618,15 +694,15 @@ namespace Reni
         [DebuggerHidden]
         internal Result AssertEmptyOrValidReference()
         {
-            var size = SmartSize;
-            if (size != null)
+            var size = FindSize;
+            if(size != null)
             {
-                if (size.IsZero)
+                if(size.IsZero)
                     return this;
                 Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, Dump);
             }
 
-            if (HasType)
+            if(HasType)
                 Tracer.Assert(Type is ReferenceType, Dump);
             return this;
         }
