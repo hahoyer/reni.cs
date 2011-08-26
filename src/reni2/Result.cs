@@ -327,7 +327,7 @@ namespace Reni
             if(HasType)
                 result += "\nType=" + Tracer.Dump(_type);
             if(HasArgs)
-                result += "\nRefs=" + Tracer.Dump(_codeArgs);
+                result += "\nArgs=" + Tracer.Dump(_codeArgs);
             if(HasCode)
                 result += "\nCode=" + Tracer.Dump(_code);
             return result;

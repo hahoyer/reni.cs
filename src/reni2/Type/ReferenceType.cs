@@ -43,7 +43,6 @@ namespace Reni.Type
 
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
         internal abstract Result DereferenceResult(Category category);

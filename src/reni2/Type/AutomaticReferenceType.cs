@@ -70,6 +70,8 @@ namespace Reni.Type
                 );
         }
 
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
+
         internal override Result ReferenceInCode(IReferenceInCode target, Category category)
         {
             return Result

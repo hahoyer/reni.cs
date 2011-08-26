@@ -218,7 +218,9 @@ namespace Reni.Struct
             return result;
         }
 
-        internal bool IsDataLess(ContextBase context, int fromPosition, int fromNotPosition)
+        internal override bool? FlatIsDataLess(ContextBase context) { return FlatIsDataLess(context, 0, EndPosition); }
+
+        bool? FlatIsDataLess(ContextBase context, int fromPosition, int fromNotPosition)
         {
             var listQuick = Statements
                 .Select(s => new {Statement=s, IsDataLess=s.QuickIsDataLess(context)})
@@ -229,18 +231,26 @@ namespace Reni.Struct
 
             var listFlat = listQuick
                 .Select(s => new {Statement = s, IsDataLess = s.Statement.FlatIsDataLess(context)})
-                .Where(s=>s.IsDataLess != true);
+                .Where(s=>s.IsDataLess != true)
+                .ToArray();
             if (listFlat.Any(ss => ss.IsDataLess == false))
                 return false;
+            return null;
+        }
 
+        internal bool IsDataLess(ContextBase context, int fromPosition, int fromNotPosition)
+        {
+            var result = FlatIsDataLess(context, fromPosition, fromNotPosition);
+            if (result != null)
+                return result.Value;
 
-            NotImplementedMethod(context,fromPosition,fromNotPosition);
+            NotImplementedMethod(context, fromPosition, fromNotPosition);
             return false;
         }
 
         private Result ConstructorResult(Category category, ContextBase parent, int position)
         {
-            StartMethodDump(ObjectId == 0 && position == 0 && category.HasIsDataLess, category, parent, position);
+            StartMethodDump(ObjectId == -10 && position == 0 && category.HasIsDataLess, category, parent, position);
             try
             {
                 var internalInnerResult = InternalInnerResult(category, parent, position + 1, position);

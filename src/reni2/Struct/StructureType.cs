@@ -67,20 +67,6 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        internal override Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
-        {
-            if(IsDataLess)
-                return ArgResult(category);
-            return base.LocalReferenceResult(category, refAlignParam);
-        }
-
-        internal override TypeBase SmartReference(RefAlignParam refAlignParam)
-        {
-            if(IsDataLess)
-                return this;
-            return base.SmartReference(refAlignParam);
-        }
-
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
         [DisableDump]

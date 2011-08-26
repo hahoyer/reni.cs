@@ -113,6 +113,7 @@ namespace Reni.Struct
         [DisableDump]
         internal bool StructIsDataLess { get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
         internal bool IsDataLess{get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
+        internal bool? FlatIsDataLess { get { return ContainerContextObject.StructFlatIsDataLess(EndPosition); } }
 
         private sealed class RecursionWhileObtainingStructSizeException : Exception
         {

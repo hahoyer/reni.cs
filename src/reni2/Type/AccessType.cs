@@ -174,9 +174,9 @@ namespace Reni.Type
         
         protected override Size GetSize()
         {
-            if(AccessPoint.IsDataLess)
+            if(AccessPoint.FlatIsDataLess == true)
                 return Size.Zero;
-            return base.GetSize();
+            return RefAlignParam.RefSize;
         }
 
         internal override Result DereferenceResult(Category category)

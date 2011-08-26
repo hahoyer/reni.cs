@@ -100,7 +100,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         private Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -10 && category.HasIsDataLess;
+            var trace = syntax.ObjectId == -44 && category.HasIsDataLess;
             StartMethodDump(trace, category, syntax);
             try
             {

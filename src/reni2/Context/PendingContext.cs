@@ -38,6 +38,12 @@ namespace Reni.Context
                 return null;
             }
 
+            if (category.HasIsDataLess)
+            {
+                NotImplementedMethod(category, syntax);
+                return null;
+            }
+
             var result = new Result();
             var reducedCategory = category - Category.Args;
             if(reducedCategory.HasAny)

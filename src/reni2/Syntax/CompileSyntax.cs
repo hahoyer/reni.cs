@@ -33,7 +33,7 @@ using Reni.Type;
 
 namespace Reni.Syntax
 {
-    internal abstract class CompileSyntax : ReniParser.ParsedSyntax
+    abstract class CompileSyntax : ReniParser.ParsedSyntax
     {
         // Used for debug only
         [DisableDump]
@@ -73,7 +73,7 @@ namespace Reni.Syntax
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
-        private Result QuickResult(ContextBase context, Category category) { return context.QuickResult(category, this); }
+        Result QuickResult(ContextBase context, Category category) { return context.QuickResult(category, this); }
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
         internal Result ResultAsReference(ContextBase context, Category category) { return context.UniqueResult(category.Typed, this).LocalReferenceResult(context.RefAlignParam); }
 
@@ -116,17 +116,12 @@ namespace Reni.Syntax
             return result.Value;
         }
 
-        internal bool? QuickIsDataLess(ContextBase context)
-        {
-            var result = QuickResult(context, Category.IsDataLess).IsDataLess;
-            return result;
-        }
-        
+        internal bool? QuickIsDataLess(ContextBase context) { return QuickResult(context, Category.IsDataLess).IsDataLess; }
+
         internal virtual bool? FlatIsDataLess(ContextBase context)
         {
             NotImplementedMethod(context);
             return null;
-
         }
     }
 }

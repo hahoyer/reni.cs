@@ -69,7 +69,8 @@ namespace Reni.Struct
 
         internal Size StructSize(int position) { return ContextReferenceOffsetFromAccessPoint(position); }
         internal bool StructIsDataLess(int accessPosition) { return Container.IsDataLess(Parent, 0, accessPosition); }
-        internal bool IsDataLess(int position) { return Container.ConstructionResult(Category.IsDataLess, Parent, position,position+1).SmartIsDataLess; }
+        internal bool? StructFlatIsDataLess(int accessPosition) { return Container.FlatIsDataLess(Parent); }
+        internal bool IsDataLess(int position) { return Container.ConstructionResult(Category.IsDataLess, Parent, position, position + 1).SmartIsDataLess; }
 
         internal Result AccessFromContextReference(Category category, AccessType typeBase, int endPosition)
         {
