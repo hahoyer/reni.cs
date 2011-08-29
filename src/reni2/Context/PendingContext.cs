@@ -25,12 +25,12 @@ using Reni.Syntax;
 
 namespace Reni.Context
 {
-    internal sealed class PendingContext : Child
+    sealed class PendingContext : Child
     {
         internal PendingContext(ContextBase parent)
             : base(parent) { }
 
-        protected override Result PendingResult(Category category, CompileSyntax syntax)
+        internal Result Result(Category category, CompileSyntax syntax)
         {
             if(category.HasCode)
             {
@@ -38,28 +38,31 @@ namespace Reni.Context
                 return null;
             }
 
-            if (category.HasIsDataLess)
-            {
-                NotImplementedMethod(category, syntax);
-                return null;
-            }
-
             var result = new Result();
-            var reducedCategory = category - Category.Args;
-            if(reducedCategory.HasAny)
-                result.Update(syntax.ObtainResult(this, reducedCategory));
-            if(category.HasArgs)
+            var localCategory = category;
+            if (category.HasArgs)
                 result.CodeArgs = CodeArgs.Void();
+            localCategory -= Category.Args;
+            if (category.HasIsDataLess)
+                result.IsDataLess = false;
+            localCategory -= Category.IsDataLess;
+            if(localCategory.HasAny)
+                result.Update(syntax.ObtainResult(this, localCategory));
 
             Tracer.Assert(result.CompleteCategory == category);
             return result;
+        }
+
+        protected override Result PendingResult(Category category, CompileSyntax syntax)
+        {
+            NotImplementedMethod(category, syntax);
+            return null;
         }
 
         protected override Result CommonResult(Category category, CondSyntax condSyntax)
         {
             var pendingCategory = Parent.PendingCategory(condSyntax);
             if(category <= pendingCategory)
-            {
                 return condSyntax.CommonResult
                     (
                         this,
@@ -67,7 +70,6 @@ namespace Reni.Context
                         category <= Parent.PendingCategory(condSyntax.Then),
                         condSyntax.Else != null && category <= Parent.PendingCategory(condSyntax.Else)
                     );
-            }
             NotImplementedMethod(category, condSyntax);
             return null;
         }

@@ -83,14 +83,14 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = _tokenClass.ObjectId == -24 && Right != null && Right.GetObjectId() == 40 && category.HasIsDataLess;
+            var trace = ObjectId == -40 && context.ObjectId == 3;
             StartMethodDump(trace, context, category);
             try
             {
                 BreakExecution();
                 if(Left == null && Right != null)
                 {
-                    var prefixOperationResult = OperationResult<IPrefixFeature>(context, category, Right, _tokenClass);
+                    var prefixOperationResult = Right.OperationResult<IPrefixFeature>(context, category, _tokenClass);
                     if(prefixOperationResult != null)
                         return ReturnMethodDump(prefixOperationResult);
                 }
@@ -98,7 +98,7 @@ namespace Reni.ReniParser
                 var suffixOperationResult =
                     Left == null
                         ? context.ContextOperationResult(category.Typed, _tokenClass)
-                        : OperationResult<IFeature>(context, category.Typed, Left, _tokenClass);
+                        : Left.OperationResult<IFeature>(context, category.Typed, _tokenClass);
 
                 if(suffixOperationResult == null)
                 {
@@ -131,19 +131,5 @@ namespace Reni.ReniParser
                 EndMethodDump();
             }
         }
-        
-        private static Result OperationResult<TFeature>(ContextBase context, Category category, CompileSyntax target, Defineable defineable)
-            where TFeature : class
-        {
-            var targetType = target.Type(context);
-            var operationResult = targetType.OperationResult<TFeature>(category, defineable, context.RefAlignParam);
-            if(operationResult == null)
-                return (null);
-
-            var targetResult = target.ResultAsReference(context, category.Typed);
-            var result = operationResult.ReplaceArg(targetResult);
-            return (result);
-        }
-
     }
 }

@@ -42,10 +42,11 @@ namespace Reni.Struct
 
         private void Search(SearchVisitor<IContextFeature> searchVisitor, ContainerContextObject context)
         {
-            searchVisitor.InternalResult =
-                Container
-                    .SearchFromStructContext(searchVisitor.Defineable)
-                    .CheckedConvert(context);
+            var feature = Container.SearchFromStructContext(searchVisitor.Defineable);
+            if (feature == null)
+                return;
+            var accessPoint = context.UniqueAccessPoint(Position);
+            searchVisitor.InternalResult = feature.ConvertToContextFeature(accessPoint);
         }
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)

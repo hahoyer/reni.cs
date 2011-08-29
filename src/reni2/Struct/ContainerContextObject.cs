@@ -64,12 +64,13 @@ namespace Reni.Struct
         private int IndexSize { get { return Container.IndexSize; } }
 
         internal AccessManager.IAccessObject UniqueAccessObject(int position) { return _accessObjectsCache.Find(position); }
+        internal Structure UniqueAccessPoint(int position) { return Parent.UniqueStructure(Container,position); }
         private Size InnerSize(int position) { return Container.InnerSize(_parent, position); }
         internal TypeBase InnerType(int accessPosition, int position) { return Container.InnerType(_parent, accessPosition, position); }
 
         internal Size StructSize(int position) { return ContextReferenceOffsetFromAccessPoint(position); }
-        internal bool StructIsDataLess(int accessPosition) { return Container.IsDataLess(Parent, 0, accessPosition); }
-        internal bool? StructFlatIsDataLess(int accessPosition) { return Container.FlatIsDataLess(Parent); }
+        internal bool StructIsDataLess(int accessPosition) { return Container.IsDataLess(Parent, accessPosition); }
+        internal bool? StructFlatIsDataLess(int accessPosition) { return Container.FlatIsDataLess(Parent, accessPosition); }
         internal bool IsDataLess(int position) { return Container.ConstructionResult(Category.IsDataLess, Parent, position, position + 1).SmartIsDataLess; }
 
         internal Result AccessFromContextReference(Category category, AccessType typeBase, int endPosition)

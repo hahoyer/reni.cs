@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,18 +38,18 @@ namespace Reni.Struct
     ///     Structured data, context free version
     /// </summary>
     [Serializable]
-    internal sealed class Container : CompileSyntax, IDumpShortProvider
+    sealed class Container : CompileSyntax, IDumpShortProvider
     {
-        private readonly TokenData _firstToken;
-        private readonly TokenData _lastToken;
-        private readonly CompileSyntax[] _statements;
-        private readonly DictionaryEx<string, int> _dictionary;
-        private readonly int[] _converters;
-        private readonly int[] _properties;
-        private static readonly string _runId = Compiler.FormattedNow + "\n";
+        readonly TokenData _firstToken;
+        readonly TokenData _lastToken;
+        readonly CompileSyntax[] _statements;
+        readonly DictionaryEx<string, int> _dictionary;
+        readonly int[] _converters;
+        readonly int[] _properties;
+        static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
-        private static bool _isInsideFileDump;
-        private static int _nextObjectId;
+        static bool _isInsideFileDump;
+        static int _nextObjectId;
 
         [Node]
         internal CompileSyntax[] Statements { get { return _statements; } }
@@ -39,21 +57,24 @@ namespace Reni.Struct
         [DisableDump]
         internal int EndPosition { get { return Statements.Length; } }
 
-        [Node, SmartNode]
+        [Node]
+        [SmartNode]
         internal DictionaryEx<string, int> Dictionary { get { return _dictionary; } }
 
-        [Node, SmartNode]
+        [Node]
+        [SmartNode]
         internal int[] Converters { get { return _converters; } }
 
-        [Node, SmartNode]
+        [Node]
+        [SmartNode]
         internal int[] Properties { get { return _properties; } }
-        
+
         protected override TokenData GetFirstToken() { return _firstToken; }
 
         protected override TokenData GetLastToken() { return _lastToken; }
 
-        private Container(TokenData leftToken, TokenData rightToken, CompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters, int[] properties)
-            : base(leftToken,_nextObjectId++)
+        Container(TokenData leftToken, TokenData rightToken, CompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters, int[] properties)
+            : base(leftToken, _nextObjectId++)
         {
             _firstToken = leftToken;
             _lastToken = rightToken;
@@ -70,38 +91,35 @@ namespace Reni.Struct
 
         internal override string DumpShort() { return "container." + ObjectId; }
 
-        sealed class PreContainer: ReniObject
+        sealed class PreContainer : ReniObject
         {
-            private readonly List<CompileSyntax> _list = new List<CompileSyntax>();
-            private readonly DictionaryEx<string, int> _dictionary = new DictionaryEx<string, int>();
-            private readonly List<int> _converters = new List<int>();
-            private readonly List<int> _properties = new List<int>();
+            readonly List<CompileSyntax> _list = new List<CompileSyntax>();
+            readonly DictionaryEx<string, int> _dictionary = new DictionaryEx<string, int>();
+            readonly List<int> _converters = new List<int>();
+            readonly List<int> _properties = new List<int>();
 
             public void Add(IParsedSyntax parsedSyntax)
             {
-                while (parsedSyntax is DeclarationSyntax)
+                while(parsedSyntax is DeclarationSyntax)
                 {
-                    var d = (DeclarationSyntax)parsedSyntax;
+                    var d = (DeclarationSyntax) parsedSyntax;
                     _dictionary.Add(d.Defineable.Name, _list.Count);
                     parsedSyntax = d.Definition;
-                    if (d.IsProperty)
+                    if(d.IsProperty)
                         _properties.Add(_list.Count);
                 }
 
-                if (parsedSyntax is ConverterSyntax)
+                if(parsedSyntax is ConverterSyntax)
                 {
-                    var body = ((ConverterSyntax)parsedSyntax).Body;
+                    var body = ((ConverterSyntax) parsedSyntax).Body;
                     parsedSyntax = body;
                     _converters.Add(_list.Count);
                 }
 
-                _list.Add(((ReniParser.ParsedSyntax)parsedSyntax).ToCompiledSyntax());
+                _list.Add(((ReniParser.ParsedSyntax) parsedSyntax).ToCompiledSyntax());
             }
 
-            public Container ToContainer(TokenData leftToken, TokenData rightToken) 
-            { 
-                return new Container(leftToken,rightToken,_list.ToArray(),_dictionary,_converters.ToArray(),_properties.ToArray());
-            }
+            public Container ToContainer(TokenData leftToken, TokenData rightToken) { return new Container(leftToken, rightToken, _list.ToArray(), _dictionary, _converters.ToArray(), _properties.ToArray()); }
         }
 
 
@@ -131,7 +149,7 @@ namespace Reni.Struct
             return result;
         }
 
-        private string DumpDataToFile()
+        string DumpDataToFile()
         {
             var dumpFile = File.m("struct." + ObjectId);
             var oldResult = dumpFile.String;
@@ -146,7 +164,7 @@ namespace Reni.Struct
             return Tracer.FilePosn(dumpFile.FullName, 1, 0, "see there") + "\n";
         }
 
-        private string DumpDataToString()
+        string DumpDataToString()
         {
             var isInDump = IsInContainerDump;
             IsInContainerDump = true;
@@ -157,7 +175,7 @@ namespace Reni.Struct
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        private IStructFeature FindStructFeature(string name)
+        IStructFeature FindStructFeature(string name)
         {
             if(Dictionary.ContainsKey(name))
             {
@@ -167,15 +185,9 @@ namespace Reni.Struct
             return null;
         }
 
-        internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable)
-        {
-            return FindStructFeature(defineable.Name);
-        }
+        internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
 
-        internal ISearchPath<IContextFeature, ContainerContextObject> SearchFromStructContext(Defineable defineable)
-        {
-            return FindStructFeature(defineable.Name);
-        }
+        internal IStructFeature SearchFromStructContext(Defineable defineable) { return FindStructFeature(defineable.Name); }
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
@@ -183,10 +195,10 @@ namespace Reni.Struct
             return context.UniqueContainerContext(this).Result(category, innerResult);
         }
 
-        private Result InternalInnerResult(Category category, ContextBase parent, int accessPosition, int position)
+        Result InternalInnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = ObjectId==-1 && accessPosition==1 && position == 0 && (category.HasArgs || category.HasCode);
-            StartMethodDump(trace,category,parent,accessPosition,position);
+            var trace = ObjectId == -10 && accessPosition == 2 && position == 1;
+            StartMethodDump(trace, category, parent, accessPosition, position);
             try
             {
                 var uniqueChildContext = parent
@@ -195,8 +207,7 @@ namespace Reni.Struct
                 BreakExecution();
                 var result = Statements[position]
                     .Result(uniqueChildContext, category.Typed);
-                return ReturnMethodDump(result
-                    .AutomaticDereference(),true);
+                return ReturnMethodDump(result.AutomaticDereference(), true);
             }
             finally
             {
@@ -204,7 +215,7 @@ namespace Reni.Struct
             }
         }
 
-        private Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)
+        Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
             Tracer.Assert(!(category.HasCode));
             return InternalInnerResult(category, parent, accessPosition, position);
@@ -218,37 +229,47 @@ namespace Reni.Struct
             return result;
         }
 
-        internal override bool? FlatIsDataLess(ContextBase context) { return FlatIsDataLess(context, 0, EndPosition); }
+        internal override bool? FlatIsDataLess(ContextBase context) { return FlatIsDataLess(context, EndPosition); }
 
-        bool? FlatIsDataLess(ContextBase context, int fromPosition, int fromNotPosition)
+        internal bool? FlatIsDataLess(ContextBase parent, int accessPosition) 
         {
-            var listQuick = Statements
-                .Select(s => new {Statement=s, IsDataLess=s.QuickIsDataLess(context)})
-                .Where(ss=> ss.IsDataLess != true)
-                .ToArray();
-            if (listQuick.Any(ss => ss.IsDataLess == false))
+            var context = parent
+                .UniqueChildContext(this, accessPosition);
+            var subStatements = Statements.Take(accessPosition).ToArray();
+            if(subStatements.Any(s => s.QuickIsDataLess(context) == false))
                 return false;
+            var listQuick = subStatements
+                .Where(s => s.QuickIsDataLess(context) == null)
+                .ToArray();
 
-            var listFlat = listQuick
-                .Select(s => new {Statement = s, IsDataLess = s.Statement.FlatIsDataLess(context)})
-                .Where(s=>s.IsDataLess != true)
-                .ToArray();
-            if (listFlat.Any(ss => ss.IsDataLess == false))
+            if(listQuick.Any(s => s.FlatIsDataLess(context) == false))
                 return false;
+            var listFlat = listQuick
+                .Where(s => s.FlatIsDataLess(context) == null)
+                .ToArray();
+
+            if(listFlat.Length == 0)
+                return true;
+
             return null;
         }
 
-        internal bool IsDataLess(ContextBase context, int fromPosition, int fromNotPosition)
+        internal bool IsDataLess(ContextBase parent, int accessPosition)
         {
-            var result = FlatIsDataLess(context, fromPosition, fromNotPosition);
-            if (result != null)
+            var context = parent
+                .UniqueChildContext(this, accessPosition);
+
+            var result = FlatIsDataLess(context, accessPosition);
+            if(result != null)
                 return result.Value;
 
-            NotImplementedMethod(context, fromPosition, fromNotPosition);
-            return false;
+            var subStatements = Statements.Take(accessPosition).ToArray();
+            if (subStatements.Any(s => !s.IsDataLess(context)))
+                return false;
+            return subStatements.All(s => s.IsDataLess(context));
         }
 
-        private Result ConstructorResult(Category category, ContextBase parent, int position)
+        Result ConstructorResult(Category category, ContextBase parent, int position)
         {
             StartMethodDump(ObjectId == -10 && position == 0 && category.HasIsDataLess, category, parent, position);
             try
@@ -259,7 +280,7 @@ namespace Reni.Struct
                 Dump("alignedResult", alignedResult);
                 BreakExecution();
                 var result = alignedResult.LocalBlock(category);
-                return ReturnMethodDump(result,true);
+                return ReturnMethodDump(result, true);
             }
             finally
             {
@@ -270,36 +291,28 @@ namespace Reni.Struct
         internal Size InnerSize(ContextBase parent, int position) { return InnerResult(Category.Size, parent, EndPosition, position).Size; }
         internal Size ConstructionSize(ContextBase parent, int fromPosition, int fromNotPosition) { return ConstructionResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
         internal TypeBase InnerType(ContextBase parent, int accessPosition, int position) { return InnerResult(Category.Type, parent, accessPosition, position).Type; }
-        
+
         internal new bool IsLambda(int position) { return Statements[position].IsLambda; }
         internal bool IsProperty(int position) { return Properties.Contains(position); }
-
     }
 
-    internal interface IStructFeature
-        : ISearchPath<IContextFeature, ContainerContextObject>, ISearchPath<IFeature, StructureType>
-    {}
+    interface IStructFeature
+        : ISearchPath<IFeature, StructureType>
+    {
+        IContextFeature ConvertToContextFeature(Structure accessPoint);
+    }
 
     [Serializable]
-    internal sealed class StructureFeature : ReniObject, IStructFeature
+    sealed class StructureFeature : ReniObject, IStructFeature
     {
-        private readonly int _position;
+        [EnableDump]
+        readonly int _position;
 
-        public StructureFeature(int position)
-        {
-            _position = position;
-        }
+        public StructureFeature(int position) { _position = position; }
 
-        IContextFeature ISearchPath<IContextFeature, ContainerContextObject>.Convert(ContainerContextObject contextObject)
-        {
-            return Convert(contextObject.ToStructure);
-        }
+        AccessFeature Convert(Structure contextObject) { return contextObject.UniqueAccessFeature(_position); }
 
-        private AccessFeature Convert(Structure contextObject) { return new AccessFeature(contextObject, _position); }
-
-        IFeature ISearchPath<IFeature, StructureType>.Convert(StructureType structureType)
-        {
-            return Convert(structureType.Structure);
-        }
+        IFeature ISearchPath<IFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
+        IContextFeature IStructFeature.ConvertToContextFeature(Structure accessPoint) { return Convert(accessPoint); }
     }
 }

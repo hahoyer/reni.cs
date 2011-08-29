@@ -78,14 +78,15 @@ namespace Reni.Context
         internal FunctionContextObject UniqueFunctionContextObject(TypeBase args) { return _cache.FunctionContextObjects.Find(args); }
         internal ContextBase UniqueChildContext(Container container, int position) { return _cache.StructContexts.Find(container).Find(position); }
         internal ContextBase UniqueChildContext(TypeBase args) { return _cache.FunctionContexts.Find(args); }
-        private ContextBase UniquePendingContext { get { return _cache.PendingContext.Value; } }
+        private PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
         internal Structure UniqueStructure(Struct.Context context) { return Cache.Structures.Find(context.Container).Find(context.Position); }
-        internal Structure UniqueStructure(Container container) { return Cache.Structures.Find(container).Find(container.EndPosition); }
+        internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
+        internal Structure UniqueStructure(Container container, int accessPosition) { return Cache.Structures.Find(container).Find(accessPosition); }
         internal ContainerContextObject UniqueContainerContext(Container context) { return Cache.ContainerContextObjects.Find(context); }
 
         internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache.Find(syntax);
@@ -97,7 +98,7 @@ namespace Reni.Context
 
         internal Result QuickResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Find(syntax).Data & category; }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         private Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == -44 && category.HasIsDataLess;
@@ -139,7 +140,7 @@ namespace Reni.Context
             return feature.ObtainResult(category) & category;
         }
 
-        protected virtual Result PendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.PendingResult(category, syntax); }
+        protected virtual Result PendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
         protected abstract Result CommonResult(Category category, CondSyntax condSyntax);
         internal virtual Structure ObtainRecentStructure() { return null; }
         internal virtual FunctionContextObject ObtainRecentFunctionContext() { return null; }
@@ -186,7 +187,7 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly SimpleCache<ContextBase> PendingContext;
+            internal readonly SimpleCache<PendingContext> PendingContext;
 
 
             public CacheItems(ContextBase target)
@@ -197,7 +198,7 @@ namespace Reni.Context
                                      position => new Struct.Context(target, container, position)));
                 FunctionContexts = new DictionaryEx<TypeBase, Function>(argsType => new Function(target, argsType));
                 FunctionContextObjects = new DictionaryEx<TypeBase, FunctionContextObject>(args => new FunctionContextObject(args, target));
-                PendingContext = new SimpleCache<ContextBase>(() => new PendingContext(target));
+                PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(target));
                 RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<FunctionContextObject>(target.ObtainRecentFunctionContext);
                 Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(

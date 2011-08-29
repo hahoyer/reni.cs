@@ -27,12 +27,13 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    internal sealed class AccessType : ReferenceType
+    sealed class AccessType : ReferenceType
     {
-        private readonly Structure _accessPoint;
-        private readonly int _position;
-        private readonly SimpleCache<AssignmentFeature> _assignmentFeatureCache;
-        private readonly SimpleCache<AccessManager.IAccessObject> _accessObjectCache;
+        readonly Structure _accessPoint;
+        readonly int _position;
+        readonly SimpleCache<AssignmentFeature> _assignmentFeatureCache;
+        readonly SimpleCache<AccessManager.IAccessObject> _accessObjectCache;
+        readonly SimpleCache<CodeBase> _valueReferenceViaFieldReferenceCodeCache;
 
         public AccessType(Structure accessPoint, int position)
             : base(accessPoint.ValueType(position))
@@ -42,6 +43,7 @@ namespace Reni.Type
             _position = position;
             _assignmentFeatureCache = new SimpleCache<AssignmentFeature>(() => new AssignmentFeature(this));
             _accessObjectCache = new SimpleCache<AccessManager.IAccessObject>(() => _accessPoint.ContainerContextObject.UniqueAccessObject(_position));
+            _valueReferenceViaFieldReferenceCodeCache = new SimpleCache<CodeBase>(ObtainValueReferenceViaFieldReferenceCode);
         }
 
         [EnableDump]
@@ -51,7 +53,7 @@ namespace Reni.Type
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return AccessPoint.RefAlignParam; } }
         [DisableDump]
-        private AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
+        AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return ValueType.FunctionalFeature; } }
         [DisableDump]
@@ -65,7 +67,7 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase ValueTypeFunction { get { return base.ValueType; } }
         [DisableDump]
-        private TypeBase ValueTypeReference { get { return ValueType.SmartReference(RefAlignParam); } }
+        TypeBase ValueTypeReference { get { return ValueType.SmartReference(RefAlignParam); } }
         [DisableDump]
         internal override bool IsDataLess { get { return AccessPoint.IsDataLess || base.IsDataLess; } }
 
@@ -99,7 +101,7 @@ namespace Reni.Type
             return AssignmentResult(category).ReplaceArg(resultForArg);
         }
 
-        private Result AssignmentResult(Category category)
+        Result AssignmentResult(Category category)
         {
             return new Result
                 (category
@@ -111,7 +113,7 @@ namespace Reni.Type
                 );
         }
 
-        private CodeBase AssignmentCode()
+        CodeBase AssignmentCode()
         {
             return ValueTypeReference
                 .Pair(ValueTypeReference)
@@ -124,7 +126,7 @@ namespace Reni.Type
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
         internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText), CodeArgs.Void); }
 
-        private Result ValueReferenceViaFieldReference(Category category)
+        Result ValueReferenceViaFieldReference(Category category)
         {
             return AccessObject
                 .ValueReferenceViaFieldReference(category, this)
@@ -157,7 +159,7 @@ namespace Reni.Type
             }
         }
 
-        private Result StructReferenceViaFieldReference(Category category)
+        Result StructReferenceViaFieldReference(Category category)
         {
             return AccessPoint
                 .ReferenceType
@@ -168,10 +170,18 @@ namespace Reni.Type
 
         internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode(), CodeArgs.Arg); }
 
-        private CodeBase ValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
+        CodeBase ValueReferenceViaFieldReferenceCode()
+        {
+            if(!_valueReferenceViaFieldReferenceCodeCache.IsBusy)
+                return _valueReferenceViaFieldReferenceCodeCache.Value;
+            NotImplementedMethod();
+            return null;
+
+        }
+        CodeBase ObtainValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
-        
+
         protected override Size GetSize()
         {
             if(AccessPoint.FlatIsDataLess == true)

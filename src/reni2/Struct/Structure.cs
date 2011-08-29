@@ -42,6 +42,8 @@ namespace Reni.Struct
         private readonly SimpleCache<StructureType> _typeCache;
         [Node]
         private readonly DictionaryEx<int, AccessType> _accessTypesCache;
+        [Node]
+        private readonly DictionaryEx<int, AccessFeature> _accessFeaturesCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
         {
@@ -50,6 +52,8 @@ namespace Reni.Struct
             _functionalFeatureCache = new DictionaryEx<CompileSyntax, FunctionalBody>(body => new FunctionalBody(this, body));
             _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
             _accessTypesCache = new DictionaryEx<int, AccessType>(position => new AccessType(this, position));
+            _accessFeaturesCache = new DictionaryEx<int, AccessFeature>(position => new AccessFeature(this, position));
+            StopByObjectId(-313);
         }
 
         [EnableDump]
@@ -112,7 +116,9 @@ namespace Reni.Struct
 
         [DisableDump]
         internal bool StructIsDataLess { get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
-        internal bool IsDataLess{get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
+        [DisableDump]
+        internal bool IsDataLess { get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
+        [DisableDump]
         internal bool? FlatIsDataLess { get { return ContainerContextObject.StructFlatIsDataLess(EndPosition); } }
 
         private sealed class RecursionWhileObtainingStructSizeException : Exception
@@ -124,6 +130,7 @@ namespace Reni.Struct
 
         internal FunctionalBody UniqueFunctionalFeature(CompileSyntax body) { return _functionalFeatureCache.Find(body); }
         internal AccessType UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
+        internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }
 
         internal Result AccessViaThisReference(Category category, Result rightResult)
         {
@@ -133,7 +140,6 @@ namespace Reni.Struct
                 .ToInt32();
             return AccessViaThisReference(category, position);
         }
-
 
         internal Size FieldOffset(int position) { return ContainerContextObject.FieldOffsetFromAccessPoint(EndPosition, position); }
 

@@ -72,6 +72,7 @@ namespace Reni.Syntax
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
+        [DebuggerHidden]
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
         Result QuickResult(ContextBase context, Category category) { return context.QuickResult(category, this); }
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
@@ -118,10 +119,41 @@ namespace Reni.Syntax
 
         internal bool? QuickIsDataLess(ContextBase context) { return QuickResult(context, Category.IsDataLess).IsDataLess; }
 
-        internal virtual bool? FlatIsDataLess(ContextBase context)
+        internal virtual bool? FlatIsDataLess(ContextBase context) { return null; }
+
+        internal Result OperationResult<TFeature>(ContextBase context, Category category, Defineable defineable)
+            where TFeature : class
         {
-            NotImplementedMethod(context);
-            return null;
+            var trace = ObjectId == -39 && context.ObjectId == 3 && defineable.ObjectId == 19;
+            StartMethodDump(trace, context, category, defineable);
+            try
+            {
+                BreakExecution();
+                var targetType = Type(context);
+                Dump("targetType", targetType);
+                BreakExecution();
+                var operationResult = targetType.OperationResult<TFeature>(category, defineable, context.RefAlignParam);
+                if(operationResult == null)
+                    return (null);
+
+                if(!category.HasCode && !category.HasArgs)
+                    return ReturnMethodDump(operationResult, true);
+
+                if (!operationResult.HasArg)
+                    return ReturnMethodDump(operationResult, true);
+
+                Dump("operationResult", operationResult);
+                BreakExecution();
+                var targetResult = ResultAsReference(context, category.Typed);
+                Dump("targetResult", targetResult);
+                BreakExecution();
+                var result = operationResult.ReplaceArg(targetResult);
+                return ReturnMethodDump(result, true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
     }
 }
