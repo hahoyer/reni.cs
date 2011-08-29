@@ -129,8 +129,9 @@ namespace Reni.Struct
         private CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)
         {
             return Parent
-                .UniqueStructure(Container)
-                .ReferenceType.ArgCode()
+                .UniqueStructure(Container,accessPosition)
+                .ReferenceType
+                .ArgCode()
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 
