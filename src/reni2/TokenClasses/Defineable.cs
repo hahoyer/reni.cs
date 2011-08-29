@@ -23,6 +23,7 @@ namespace Reni.TokenClasses
         internal TFeatureType Check<TFeatureType>()
             where TFeatureType : class { return this as TFeatureType; }
 
+        [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
     }
 

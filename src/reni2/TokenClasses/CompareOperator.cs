@@ -8,6 +8,7 @@ namespace Reni.TokenClasses
 {
     internal class CompareOperator : SequenceOfBitOperation
     {
+        [EnableDumpExcept(true)]
         protected override bool IsCompareOperator { get { return true; } }
         protected override int ResultSize(int objSize, int argSize) { return 1; }
     }

@@ -55,8 +55,7 @@ namespace Reni.Code
             }
         }
 
-        [DumpExcept("")]
-        [EnableDump]
+        [EnableDumpExcept("")]
         internal string Reason { get { return _reason; } }
 
         protected CodeBase(int objectId)

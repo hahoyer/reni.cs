@@ -21,9 +21,6 @@ namespace Reni.Sequence
             return new Feature(this);
         }
 
-        [DumpExcept(true)]
-        bool ISequenceOfBitBinaryOperation.IsCompareOperator { get { return IsCompareOperator; } }
-
         [DisableDump]
         string ISequenceOfBitBinaryOperation.DataFunctionName { get { return DataFunctionName; } }
 
@@ -37,7 +34,7 @@ namespace Reni.Sequence
         [DisableDump]
         protected virtual string CSharpNameOfDefaultOperation { get { return Name; } }
 
-        [DumpExcept(true)]
+        [DisableDumpExcept(true)]
         protected virtual bool IsCompareOperator { get { return false; } }
     }
 }

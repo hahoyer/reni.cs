@@ -297,7 +297,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = ObjectId == -2 && defineable.ObjectId == 24 && category.HasIsDataLess;
+            var trace = ObjectId == -4 && defineable.ObjectId == 19 && category.HasType;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -378,7 +378,7 @@ namespace Reni.Type
                 DumpDataWithBreak("Wrong conversion result type", "this", this, "destination", destination, "result", result);
             return result;
         }
-
+                                     
         Converter Converter(TypeBase destination) { return Converter(ConversionParameter.Instance, destination); }
 
         bool IsConvertable(TypeBase destination) { return Converter(destination).IsValid; }

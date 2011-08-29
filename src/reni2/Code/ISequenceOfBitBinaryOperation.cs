@@ -8,7 +8,6 @@ namespace Reni.Code
     internal interface ISequenceOfBitBinaryOperation
     {
         int ResultSize(int objBitCount, int argBitCount);
-        bool IsCompareOperator { get; }
         string DataFunctionName { get; }
         string CSharpNameOfDefaultOperation { get; }
     }

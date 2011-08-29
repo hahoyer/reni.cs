@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Struct;
 
 namespace Reni
 {

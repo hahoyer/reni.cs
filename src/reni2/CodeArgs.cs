@@ -71,14 +71,6 @@ namespace Reni
 
         [SmartNode]
         public List<IReferenceInCode> Data { get { return _data; } }
-        internal override string DumpShort()
-        {
-            var result = base.DumpShort();
-            if(HasArg)
-                return result + " HasArg";
-            return result;
-        }
-
 
         [DisableDump]
         private SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }

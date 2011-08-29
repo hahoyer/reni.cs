@@ -47,7 +47,7 @@ namespace Reni.Context
                 _context = context;
             }
 
-            //[DebuggerHidden]
+            [DebuggerHidden]
             internal void Update(Category category)
             {
                 var trace = _context.ObjectId == -6 && category.HasArgs && _syntax.GetObjectId() == 39;

@@ -33,15 +33,15 @@ using Reni.Type;
 namespace Reni
 {
     [Serializable]
-    internal sealed class Result : ReniObject, ITreeNodeSupport
+    sealed class Result : ReniObject, ITreeNodeSupport
     {
-        private static int _nextObjectId = 1;
-        private bool _isDirty;
-        private bool? _isDataLess;
-        private Size _size;
-        private TypeBase _type;
-        private CodeBase _code;
-        private CodeArgs _codeArgs;
+        static int _nextObjectId = 1;
+        bool _isDirty;
+        bool? _isDataLess;
+        Size _size;
+        TypeBase _type;
+        CodeBase _code;
+        CodeArgs _codeArgs;
 
         internal Result()
             : base(_nextObjectId++)
@@ -83,14 +83,14 @@ namespace Reni
         internal Result(Category category, Func<CodeArgs> getRefs)
             : this(category, () => true, () => Size.Zero, CodeBase.Void, getRefs) { }
 
-        private bool HasSize { get { return Size != null; } }
+        bool HasSize { get { return Size != null; } }
         internal bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
         internal bool HasArgs { get { return CodeArgs != null; } }
         internal bool HasIsDataLess { get { return _isDataLess != null; } }
 
         [Node]
-        [EnableDumpWithExceptions]
+        [EnableDumpWithExceptionPredicate]
         internal Category PendingCategory;
 
         public Category CompleteCategory { get { return new Category(HasIsDataLess, HasSize, HasType, HasCode, HasArgs); } }
@@ -178,7 +178,7 @@ namespace Reni
         {
             get
             {
-                if (HasIsDataLess)
+                if(HasIsDataLess)
                     return _isDataLess;
                 var size = FindSize;
                 if(size == null)
@@ -259,7 +259,7 @@ namespace Reni
 
         internal static Error Error { get { return null; } }
 
-        private bool IsDirty
+        bool IsDirty
         {
             get { return _isDirty; }
             set
@@ -353,7 +353,7 @@ namespace Reni
             AssertValid();
         }
 
-        private Result Filter(Category category)
+        Result Filter(Category category)
         {
             var result = new Result
                          {
@@ -398,7 +398,7 @@ namespace Reni
             return result;
         }
 
-        private Result Clone(Category category)
+        Result Clone(Category category)
         {
             var result = new Result {PendingCategory = PendingCategory & category};
             if(category.HasIsDataLess)
@@ -416,7 +416,7 @@ namespace Reni
 
         internal Result Clone() { return new Result {PendingCategory = PendingCategory, IsDataLess = IsDataLess, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs}; }
 
-        private void AssertValid()
+        void AssertValid()
         {
             if(IsDirty)
                 return;
@@ -464,9 +464,9 @@ namespace Reni
                 );
         }
 
-        private void Add(Result other) { Add(other, CompleteCategory); }
+        void Add(Result other) { Add(other, CompleteCategory); }
 
-        private void Add(Result other, Category category)
+        void Add(Result other, Category category)
         {
             Tracer.Assert(category <= other.CompleteCategory);
             Tracer.Assert(category <= CompleteCategory);
@@ -505,7 +505,7 @@ namespace Reni
             return this;
         }
 
-        private Result InternalReplaceArg(Result resultForArg)
+        Result InternalReplaceArg(Result resultForArg)
         {
             var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
             if(HasCode && resultForArg.HasCode)
@@ -708,10 +708,10 @@ namespace Reni
         }
     }
 
-    internal sealed class Error
+    sealed class Error
     {
-        private readonly ContextBase _context;
-        private readonly CompileSyntax _syntax;
+        readonly ContextBase _context;
+        readonly CompileSyntax _syntax;
 
         internal Error(ContextBase context, CompileSyntax syntax)
         {
@@ -719,7 +719,7 @@ namespace Reni
             _syntax = syntax;
         }
 
-        private Error(Error e0, Error e1) { }
+        Error(Error e0, Error e1) { }
 
         public static Error operator +(Error e0, Error e1)
         {
@@ -730,5 +730,12 @@ namespace Reni
 
         internal ContextBase Context { get { return _context; } }
         internal CompileSyntax Syntax { get { return _syntax; } }
+    }
+
+    class ResultCache: ReniObject
+    {
+        Result _cache;
+        Func<Category, Result> _obtainResult;
+        public ResultCache(Func<Category, Result> obtainResult) { _obtainResult = obtainResult; }
     }
 }

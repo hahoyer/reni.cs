@@ -50,7 +50,7 @@ namespace Reni.Code
             }
         }
 
-        [DumpExcept("")]
+        [EnableDumpExcept("")]
         [EnableDump]
         internal string Reason { get { return _reason; } }
 

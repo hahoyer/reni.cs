@@ -27,11 +27,11 @@ using Reni.Sequence;
 
 namespace Reni.Type
 {
-    internal sealed class TextItemType : TagChild
+    sealed class TextItemType : TagChild
     {
         public readonly ISearchPath<IFeature, SequenceType> ToNumberOfBaseFeature;
         public TextItemType(TypeBase parent)
-            : base(parent) { ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this);  }
+            : base(parent) { ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this); }
         protected override string TagTitle { get { return "text_item"; } }
 
         internal override void Search(ISearchVisitor searchVisitor)
@@ -58,17 +58,17 @@ namespace Reni.Type
                 );
         }
 
-        private CodeBase DumpPrintCodeFromSequence(RefAlignParam refAlignParam, int count)
+        CodeBase DumpPrintCodeFromSequence(RefAlignParam refAlignParam, int count)
         {
             return
                 UniqueSequence(count)
                     .UniqueAutomaticReference(refAlignParam)
                     .ArgCode()
-                    .Dereference(refAlignParam, Size*count)
+                    .Dereference(refAlignParam, Size * count)
                     .DumpPrintText(Size);
         }
 
-        private CodeBase DumpPrintCode(RefAlignParam refAlignParam)
+        CodeBase DumpPrintCode(RefAlignParam refAlignParam)
         {
             return
                 UniqueAutomaticReference(refAlignParam)

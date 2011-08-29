@@ -25,11 +25,11 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal abstract class Converter : ReniObject
+    abstract class Converter : ReniObject
     {
-        private static int _nextObjectId;
+        static int _nextObjectId;
         [EnableDump]
-        private Result _testResult;
+        Result _testResult;
 
         protected Converter()
             : base(_nextObjectId++) { }
@@ -50,10 +50,10 @@ namespace Reni.Type
         public static Converter operator *(Converter first, Converter second) { return new ConcatConverter(first, second); }
     }
 
-    internal sealed class ConcatConverter : Converter
+    sealed class ConcatConverter : Converter
     {
-        private readonly Converter _first;
-        private readonly Converter _second;
+        readonly Converter _first;
+        readonly Converter _second;
         public ConcatConverter(Converter first, Converter second)
         {
             _first = first;
@@ -82,16 +82,16 @@ namespace Reni.Type
         }
     }
 
-    internal sealed class FunctionalConverter : Converter
+    sealed class FunctionalConverter : Converter
     {
-        private readonly Func<Category, Result> _function;
-        
+        readonly Func<Category, Result> _function;
+
         public FunctionalConverter(Func<Category, Result> function)
         {
             _function = function;
             AssertValid();
         }
-        
+
         internal override Result Result(Category category) { return _function(category); }
     }
 }
