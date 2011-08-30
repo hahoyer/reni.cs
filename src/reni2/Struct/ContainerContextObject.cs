@@ -73,17 +73,6 @@ namespace Reni.Struct
         internal bool? StructFlatIsDataLess(int accessPosition) { return Container.FlatIsDataLess(Parent, accessPosition); }
         internal bool IsDataLess(int position) { return Container.ConstructionResult(Category.IsDataLess, Parent, position, position + 1).SmartIsDataLess; }
 
-        internal Result AccessFromContextReference(Category category, AccessType typeBase, int endPosition)
-        {
-            var result = typeBase
-                .Result
-                (category
-                 , () => AccessPointCodeFromContextReference(endPosition)
-                 , () => CodeArgs.Create(this)
-                );
-            return result;
-        }
-
         internal Result ContextReferenceViaStructReference(int position, Result result)
         {
             return result
@@ -98,7 +87,7 @@ namespace Reni.Struct
             return result;
         }
 
-        private Size ContextReferenceOffsetFromAccessPoint(int position)
+        internal Size ContextReferenceOffsetFromAccessPoint(int position)
         {
             return Container
                 .ConstructionResult(Category.Size, Parent, 0, position).Size;
@@ -117,13 +106,6 @@ namespace Reni.Struct
             if(IsDataLess(position))
                 return AccessManager.ProcedureCall;
             return AccessManager.Field;
-        }
-
-        private CodeBase AccessPointCodeFromContextReference(int endPosition)
-        {
-            return CodeBase
-                .ReferenceCode(this)
-                .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(endPosition)*-1);
         }
 
         private CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)

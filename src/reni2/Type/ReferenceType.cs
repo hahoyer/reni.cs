@@ -60,7 +60,7 @@ namespace Reni.Type
                 .Result
                 ( category
                 ,() =>LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
-                ,() => Destructor(Category.Args).CodeArgs + CodeArgs.Arg()
+                ,() => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }
 

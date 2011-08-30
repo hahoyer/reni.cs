@@ -111,7 +111,7 @@ namespace Reni
 
         internal Result CommonResult(ContextBase context, Category category)
         {
-            Tracer.Assert(category <= (Category.Type | Category.Args));
+            Tracer.Assert(category <= (Category.Type | Category.CodeArgs));
             var thenResult = ThenResult(context, category);
             var elseResult = ElseResult(context, category);
             var result = new Result();

@@ -83,7 +83,7 @@ namespace Reni
         internal Result(Category category, Func<CodeArgs> getRefs)
             : this(category, () => true, () => Size.Zero, CodeBase.Void, getRefs) { }
 
-        bool HasSize { get { return Size != null; } }
+        internal bool HasSize { get { return Size != null; } }
         internal bool HasType { get { return Type != null; } }
         internal bool HasCode { get { return Code != null; } }
         internal bool HasArgs { get { return CodeArgs != null; } }
@@ -170,7 +170,7 @@ namespace Reni
             if(HasCode)
                 result.Add(Code.CreateNamedNode("Code", "Code"));
             if(HasArgs)
-                result.Add(CodeArgs.Data.CreateNamedNode("Args", "Args"));
+                result.Add(CodeArgs.Data.CreateNamedNode("CodeArgs", "CodeArgs"));
             return result.ToArray();
         }
 
@@ -450,7 +450,7 @@ namespace Reni
                 var refs = CodeArgs;
                 var codeRefs = Code.CodeArgs;
                 if(!(refs.Contains(codeRefs) && codeRefs.Contains(refs)))
-                    Tracer.AssertionFailed(1, @"Args.Contains(codeRefs)", () => "Code and Args differ " + Dump());
+                    Tracer.AssertionFailed(1, @"CodeArgs.Contains(codeRefs)", () => "Code and CodeArgs differ " + Dump());
             }
         }
 
@@ -600,7 +600,7 @@ namespace Reni
 
         internal Result AutomaticDereference()
         {
-            if(CompleteCategory == Category.Args)
+            if(CompleteCategory == Category.CodeArgs)
                 return this;
 
             Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
@@ -706,6 +706,15 @@ namespace Reni
                 Tracer.Assert(Type is ReferenceType, Dump);
             return this;
         }
+
+        internal Result AddToReference(RefAlignParam refAlignParam, Func<Size> getOffset)
+        {
+            if(!CompleteCategory.HasCode)
+                return this;
+            var result = Clone();
+            result.Code = result.Code.AddToReference(refAlignParam, getOffset());
+            return result;
+        }
     }
 
     sealed class Error
@@ -730,12 +739,5 @@ namespace Reni
 
         internal ContextBase Context { get { return _context; } }
         internal CompileSyntax Syntax { get { return _syntax; } }
-    }
-
-    class ResultCache: ReniObject
-    {
-        Result _cache;
-        Func<Category, Result> _obtainResult;
-        public ResultCache(Func<Category, Result> obtainResult) { _obtainResult = obtainResult; }
     }
 }

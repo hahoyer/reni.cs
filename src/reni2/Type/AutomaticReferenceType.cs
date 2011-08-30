@@ -72,13 +72,9 @@ namespace Reni.Type
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
 
-        internal override Result ReferenceInCode(IReferenceInCode target, Category category)
+        internal override Result ReferenceInCode(Category category, IReferenceInCode target)
         {
-            return Result
-                (category
-                 , () => CodeBase.ReferenceCode(target).Dereference(target.RefAlignParam, target.RefAlignParam.RefSize)
-                 , () => CodeArgs.Create(target)
-                );
+            return ValueType.ReferenceInCode(category, target);
         }
 
         internal override void Search(ISearchVisitor searchVisitor)

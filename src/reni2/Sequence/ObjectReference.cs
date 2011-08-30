@@ -25,15 +25,15 @@ using Reni.Code;
 
 namespace Reni.Sequence
 {
-    internal sealed class ObjectReference : ReniObject, IReferenceInCode
+    sealed class ObjectReference : ReniObject, IReferenceInCode
     {
-        private static int _nextObjectId;
+        static int _nextObjectId;
 
         [EnableDump]
-        private readonly SequenceType _objectType;
+        readonly SequenceType _objectType;
 
         [DisableDump]
-        private readonly RefAlignParam _refAlignParam;
+        readonly RefAlignParam _refAlignParam;
 
         internal ObjectReference(SequenceType objectType, RefAlignParam refAlignParam)
             : base(_nextObjectId++)
@@ -45,15 +45,6 @@ namespace Reni.Sequence
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return _refAlignParam; } }
         internal override string DumpShort() { return base.DumpShort() + "(" + _objectType.DumpShort() + ")"; }
-
-        internal Result Result(Category category)
-        {
-            return _objectType.UniqueAutomaticReference(_refAlignParam)
-                .Result
-                (category
-                 , () => CodeBase.ReferenceCode(this)
-                 , () => CodeArgs.Create(this)
-                );
-        }
+        internal Result Result(Category category) { return _objectType.ReferenceInCode(category, this); }
     }
 }

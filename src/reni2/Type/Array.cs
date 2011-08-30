@@ -94,7 +94,7 @@ namespace Reni.Type
                 .Result
                 (category
                  , () => DumpPrintCode(refAlignParam)
-                 , () => Element.GenericDumpPrintResult(Category.Args, refAlignParam).CodeArgs
+                 , () => Element.GenericDumpPrintResult(Category.CodeArgs, refAlignParam).CodeArgs
                 );
         }
 

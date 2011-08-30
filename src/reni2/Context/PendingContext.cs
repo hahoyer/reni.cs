@@ -42,7 +42,7 @@ namespace Reni.Context
             var localCategory = category;
             if (category.HasArgs)
                 result.CodeArgs = CodeArgs.Void();
-            localCategory -= Category.Args;
+            localCategory -= Category.CodeArgs;
             if (category.HasIsDataLess)
                 result.IsDataLess = false;
             localCategory -= Category.IsDataLess;
@@ -53,7 +53,7 @@ namespace Reni.Context
             return result;
         }
 
-        protected override Result PendingResult(Category category, CompileSyntax syntax)
+        protected override Result ObtainPendingResult(Category category, CompileSyntax syntax)
         {
             NotImplementedMethod(category, syntax);
             return null;

@@ -132,7 +132,7 @@ namespace Reni.Type
         internal virtual TypeBase AutomaticDereference() { return this; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         internal virtual TypeBase TypeForTypeOperator() { return this; }
-        static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.Args)); }
+        static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
         internal static Result VoidResult(Category category) { return Void.Result(category); }
         internal virtual Result Destructor(Category category) { return VoidCodeAndRefs(category); }
         internal virtual Result ArrayDestructor(Category category, int count) { return VoidCodeAndRefs(category); }
@@ -155,12 +155,24 @@ namespace Reni.Type
                     , CodeArgs.Void);
         }
 
+        internal Result Result(Category category, IReferenceInCode target)
+        {
+            return new Result
+                (category
+                 , () => false
+                 , () => target.RefAlignParam.RefSize
+                 , () => this
+                 , () => CodeBase.ReferenceCode(target)
+                 , () => CodeArgs.Create(target));
+        }
+
+
         internal Result Result(Category category, Result codeAndRefs)
         {
             var result = new Result();
             if(category.HasCode)
                 result.Code = codeAndRefs.Code;
-            if (category.HasArgs)
+            if(category.HasArgs)
                 result.CodeArgs = codeAndRefs.CodeArgs;
             return AmendResult(category, result);
         }
@@ -272,7 +284,7 @@ namespace Reni.Type
                 (
                     category,
                     () => LocalReferenceCode(refAlignParam),
-                    () => Destructor(Category.Args).CodeArgs + CodeArgs.Arg()
+                    () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }
 
@@ -282,16 +294,10 @@ namespace Reni.Type
                 .LocalReference(refAlignParam, Destructor(Category.Code).Code);
         }
 
-        internal virtual Result ReferenceInCode(IReferenceInCode target, Category category)
+        internal virtual Result ReferenceInCode(Category category, IReferenceInCode target)
         {
             return UniqueAutomaticReference(target.RefAlignParam)
-                .Result
-                (
-                    category,
-                    () => CodeBase.ReferenceCode(target),
-                    () => CodeArgs.Create(target)
-                )
-                ;
+                .Result(category, target);
         }
 
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
@@ -378,7 +384,7 @@ namespace Reni.Type
                 DumpDataWithBreak("Wrong conversion result type", "this", this, "destination", destination, "result", result);
             return result;
         }
-                                     
+
         Converter Converter(TypeBase destination) { return Converter(ConversionParameter.Instance, destination); }
 
         bool IsConvertable(TypeBase destination) { return Converter(destination).IsValid; }

@@ -173,10 +173,11 @@ namespace Reni.Struct
 
         internal Result AccessViaContextReference(Category category, int position)
         {
-            var accessType = UniqueAccessType(position);
-            return ContainerContextObject
-                .AccessFromContextReference(category, accessType, EndPosition);
+            return UniqueAccessType(position)
+                .Result(category, ContainerContextObject)
+                .AddToReference(RefAlignParam, ContextOffset);
         }
+        Size ContextOffset() { return ContainerContextObject.ContextReferenceOffsetFromAccessPoint(EndPosition) * -1; }
 
         internal Result StructReferenceViaContextReference(Category category)
         {

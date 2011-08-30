@@ -55,7 +55,7 @@ namespace Reni.Basics
         public static Category Code { get { return new Category(false, false, false, true, false); } }
 
         [DebuggerHidden]
-        public static Category Args { get { return new Category(false, false, false, false, true); } }
+        public static Category CodeArgs { get { return new Category(false, false, false, false, true); } }
 
         [DebuggerHidden]
         public static Category IsDataLess { get { return new Category(true, false, false, false, false); } }
@@ -79,7 +79,7 @@ namespace Reni.Basics
         public Category Typed { get { return this | Type; } }
         [DebuggerHidden]
         [DisableDump]
-        public Category Argsed { get { return this | Args; } }
+        public Category Argsed { get { return this | CodeArgs; } }
         public Category Replenished
         {
             get
@@ -88,7 +88,7 @@ namespace Reni.Basics
                 if(HasType || HasCode)
                     result |= Size;
                 if(HasCode)
-                    result |= Args;
+                    result |= CodeArgs;
                 if(result.HasSize)
                     result |= IsDataLess;
                 return result;
@@ -175,7 +175,7 @@ namespace Reni.Basics
             if(HasType)
                 result += ".Type.";
             if(HasArgs)
-                result += ".Args.";
+                result += ".CodeArgs.";
             if(HasCode)
                 result += ".Code.";
             result = result.Replace("..", ",").Replace(".", "");

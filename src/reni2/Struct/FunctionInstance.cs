@@ -90,7 +90,7 @@ namespace Reni.Struct
             {
                 if (IsStopByObjectIdActive)
                     return null;
-                return Result(Category.Args).CodeArgs;
+                return Result(Category.CodeArgs).CodeArgs;
             }
         }
 

@@ -83,7 +83,7 @@ namespace Reni.Syntax
                     _result = _result.ReplaceRelativeContextRef(referencedContext, replaceContextCode);
                 }
 
-            //foreach(var referencedContext in _result.Args.Data)
+            //foreach(var referencedContext in _result.CodeArgs.Data)
             //    Tracer.Assert(!_context.IsStructParentOf(referencedContext));
         }
 

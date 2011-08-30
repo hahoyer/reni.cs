@@ -23,6 +23,7 @@
     <Compile Include="Basics\Category.cs" />
     <Compile Include="Basics\RefAlignParam.cs" />
     <Compile Include="Basics\Size.cs" />
+    <Compile Include="ResultCache.cs" />
     <Compile Include="ChildSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />
@@ -86,7 +87,6 @@
     <Compile Include="Compiler.cs" />
     <Compile Include="CompilerParameters.cs" />
     <Compile Include="ContextSearchVisitor.cs" />
-    <Compile Include="Context\CacheItem.cs" />
     <Compile Include="Context\Child.cs" />
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
