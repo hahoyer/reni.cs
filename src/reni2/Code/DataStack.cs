@@ -22,12 +22,14 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Context;
+using Reni.Runtime;
 
 namespace Reni.Code
 {
-    internal sealed class DataStack : ReniObject, IFormalMaschine
+    sealed class DataStack : ReniObject, IVisitor
     {
-        private sealed class LocalData : ReniObject, IStackDataAddressBase
+        sealed class LocalData : ReniObject, IStackDataAddressBase
         {
             public StackData Data = new EmptyStackData();
             public FrameData Frame = new FrameData(null);
@@ -45,16 +47,18 @@ namespace Reni.Code
                     .Push(oldTop);
             }
 
-            internal StackDataAddress Address(Size offset, Size size) { return new StackDataAddress(this, size, offset - Data.Size); }
+            internal StackDataAddress Address(Size offset) { return new StackDataAddress(this, offset - Data.Size); }
 
-            internal StackData FrameAddress(Size offset, Size size) { return new StackDataAddress(Frame, size, offset); }
+            internal StackData FrameAddress(Size offset) { return new StackDataAddress(Frame, offset); }
         }
 
-        [EnableDump]
-        private LocalData _localData = new LocalData();
+        internal static Size RefSize { get { return Root.DefaultRefAlignParam.RefSize; } }
 
-        private readonly CodeBase[] _functions;
-        private readonly bool _isTraceEnabled;
+        [EnableDump]
+        LocalData _localData = new LocalData();
+
+        readonly CodeBase[] _functions;
+        readonly bool _isTraceEnabled;
 
         public DataStack(CodeBase[] functions, bool isTraceEnabled)
         {
@@ -65,35 +69,35 @@ namespace Reni.Code
         [DisableDump]
         internal BitsConst Value { get { return Data.GetBitsConst(); } }
 
-        void IFormalMaschine.Call(Size size, int functionIndex, Size argsAndRefsSize)
+        void IVisitor.Call(Size size, int functionIndex, Size argsAndRefsSize)
         {
             var oldFrame = _localData.Frame;
             var argsAndRefs = Pull(argsAndRefsSize);
             do
             {
                 _localData.Frame = new FrameData(argsAndRefs);
-                SubExecute("call " + functionIndex, _functions[functionIndex]);
+                SubVisit("call " + functionIndex, _functions[functionIndex]);
             } while(_localData.Frame.IsRepeatRequired);
             _localData.Frame = oldFrame;
         }
 
-        void IFormalMaschine.RecursiveCall() { _localData.Frame.IsRepeatRequired = true; }
+        void IVisitor.RecursiveCall() { _localData.Frame.IsRepeatRequired = true; }
 
-        private StackData Data { get { return _localData.Data; } set { _localData.Data = value; } }
+        StackData Data { get { return _localData.Data; } set { _localData.Data = value; } }
 
-        void IFormalMaschine.BitsArray(Size size, BitsConst data)
+        void IVisitor.BitsArray(Size size, BitsConst data)
         {
             if(size.IsZero)
                 return;
             Push(new BitsStackData(data.Resize(size)));
         }
 
-        private void Push(StackData value) { Data = Data.Push(value); }
+        void Push(StackData value) { Data = Data.Push(value); }
 
-        void IFormalMaschine.TopRef(Size offset, Size size) { Push(_localData.Address(offset, size)); }
-        void IFormalMaschine.TopFrameRef(Size offset, Size size) { Push(_localData.FrameAddress(offset, size)); }
+        void IVisitor.TopRef(Size offset) { Push(_localData.Address(offset)); }
+        void IVisitor.TopFrameRef(Size offset) { Push(_localData.FrameAddress(offset)); }
 
-        void IFormalMaschine.TopFrameData(Size offset, Size size, Size dataSize)
+        void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
         {
             var frame = _localData.Frame.Data;
             var value = frame
@@ -104,7 +108,7 @@ namespace Reni.Code
             Push(value);
         }
 
-        void IFormalMaschine.TopData(Size offset, Size size, Size dataSize)
+        void IVisitor.TopData(Size offset, Size size, Size dataSize)
         {
             var value = Data
                 .DoPull(offset)
@@ -113,36 +117,33 @@ namespace Reni.Code
             Push(value);
         }
 
-        void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
+        void IVisitor.BitCast(Size size, Size targetSize, Size significantSize)
         {
             Tracer.Assert(size == targetSize);
             Push(Pull(targetSize).BitCast(significantSize).BitCast(size));
         }
 
-        void IFormalMaschine.PrintNumber(Size leftSize, Size rightSize)
+        void IVisitor.PrintNumber(Size leftSize, Size rightSize)
         {
             Tracer.Assert(rightSize.IsZero);
             Pull(leftSize).PrintNumber();
         }
 
-        void IFormalMaschine.PrintText(Size size, Size itemSize)
+        void IVisitor.PrintText(Size size, Size itemSize) { Pull(size).PrintText(itemSize); }
+
+        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) { NotImplementedMethod(size, intermediateSize); }
+
+        void IVisitor.Drop(Size beforeSize, Size afterSize) { NotImplementedMethod(beforeSize, afterSize); }
+
+        void IVisitor.RefPlus(Size right) { Push(Pull(RefSize).RefPlus(right)); }
+
+        void IVisitor.Dereference(Size size, Size dataSize)
         {
-            Pull(size).PrintText(itemSize);
-        }
-
-        void IFormalMaschine.LocalBlockEnd(Size size, Size intermediateSize) { NotImplementedMethod(size, intermediateSize); }
-
-        void IFormalMaschine.Drop(Size beforeSize, Size afterSize) { NotImplementedMethod(beforeSize, afterSize); }
-
-        void IFormalMaschine.RefPlus(Size size, Size right) { Push(Pull(size).RefPlus(right)); }
-
-        void IFormalMaschine.Dereference(RefAlignParam refAlignParam, Size size, Size dataSize)
-        {
-            var value = Pull(refAlignParam.RefSize);
+            var value = Pull(RefSize);
             Push(value.Dereference(size, dataSize));
         }
 
-        void IFormalMaschine.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        void IVisitor.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
         {
             var right = Pull(rightSize);
             var left = Pull(leftSize);
@@ -155,34 +156,34 @@ namespace Reni.Code
             Push(arg.BitArrayPrefixOp(opToken, size));
         }
 
-        void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam)
+        void IVisitor.Assign(Size targetSize)
         {
-            var right = Pull(refAlignParam.RefSize);
-            var left = Pull(refAlignParam.RefSize);
+            var right = Pull(RefSize);
+            var left = Pull(RefSize);
             left.Assign(targetSize, right);
         }
 
-        void IFormalMaschine.PrintText(string dumpPrintText) { BitsConst.OutStream.Add(dumpPrintText); }
+        void IVisitor.PrintText(string dumpPrintText) { BitsConst.OutStream.Add(dumpPrintText); }
 
-        void IFormalMaschine.List(CodeBase[] data)
+        void IVisitor.List(CodeBase[] data)
         {
             var index = 0;
             foreach(var codeBase in data)
             {
-                SubExecute("[" + index + "]", codeBase);
+                SubVisit("[" + index + "]", codeBase);
                 index++;
             }
         }
 
-        void IFormalMaschine.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextReference(context); }
+        void IVisitor.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextReference(context); }
 
-        void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize)
+        void IVisitor.LocalVariableDefinition(string holderName, Size valueSize)
         {
             Locals
                 .Add(holderName, Pull(valueSize));
         }
 
-        private void SubExecute(string tag, IFormalCodeItem codeBase)
+        void SubVisit(string tag, IFormalCodeItem codeBase)
         {
             const string stars = "\n******************************\n";
             if(IsTraceEnabled)
@@ -191,40 +192,40 @@ namespace Reni.Code
                 Tracer.Line(tag + " " + codeBase.Dump());
                 Tracer.IndentStart();
             }
-            codeBase.Execute(this);
+            codeBase.Visit(this);
             if(IsTraceEnabled)
                 Tracer.IndentEnd();
         }
 
-        private bool IsTraceEnabled { get { return _isTraceEnabled; } }
+        bool IsTraceEnabled { get { return _isTraceEnabled; } }
 
-        void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
+        void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
         {
-            SubExecute("[*]", fiberHead);
+            SubVisit("[*]", fiberHead);
             var index = 0;
             foreach(var codeBase in fiberItems)
             {
-                SubExecute("[" + index + "]", codeBase);
+                SubVisit("[" + index + "]", codeBase);
                 index++;
             }
         }
 
-        void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { Push(new StackDataAddress(new LocalStackReference(Locals, holder), size, offset)); }
+        void IVisitor.LocalVariableReference(string holder, Size offset) { Push(new StackDataAddress(new LocalStackReference(Locals, holder), offset)); }
 
-        void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
+        void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
         {
             var bitsConst = Pull(condSize).GetBitsConst();
             if(bitsConst.IsZero)
-                SubExecute("else:", elseCode);
+                SubVisit("else:", elseCode);
             else
-                SubExecute("then:", thenCode);
+                SubVisit("then:", thenCode);
         }
 
-        private DictionaryEx<string, StackData> Locals { get { return _localData.Frame.Locals; } }
+        DictionaryEx<string, StackData> Locals { get { return _localData.Frame.Locals; } }
 
-        void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { Push(Locals[holder].DoPull(offset).DoGetTop(dataSize).BitCast(size)); }
+        void IVisitor.LocalVariableAccess(string holder, Size offset, Size size, Size dataSize) { Push(Locals[holder].DoPull(offset).DoGetTop(dataSize).BitCast(size)); }
 
-        private StackData Pull(Size size)
+        StackData Pull(Size size)
         {
             var result = Data.DoGetTop(size);
             Data = Data.DoPull(size);

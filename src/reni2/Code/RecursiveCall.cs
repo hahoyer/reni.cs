@@ -11,6 +11,6 @@ namespace Reni.Code
     {
         protected override Size GetSize() { return Size.Zero; }
         protected override string CSharpString() { return CSharpGenerator.CreateRecursiveCall(); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.RecursiveCall(); }
+        internal override void Visit(IVisitor visitor) { visitor.RecursiveCall(); }
     }
 }

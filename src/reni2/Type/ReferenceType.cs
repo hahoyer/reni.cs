@@ -64,6 +64,11 @@ namespace Reni.Type
                 );
         }
 
+        internal override Result ReferenceInCode(Category category, IReferenceInCode target)
+        {
+            return ValueType.ReferenceInCode(category, target);
+        }
+
         protected abstract Result ToAutomaticReferenceResult(Category category);
 
         private Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)

@@ -151,7 +151,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = ObjectId == -10 && category.HasArgs;
+            var trace = ObjectId == -10 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
@@ -183,14 +183,15 @@ namespace Reni.Struct
             var refAlignParam = _structure.UniqueContext.RefAlignParam;
             return CodeBase
                 .FrameRef(refAlignParam)
-                .AddToReference(refAlignParam, FrameSize*-1);
+                .AddToReference(refAlignParam, FrameSize*-1)
+                .Dereference(refAlignParam, refAlignParam.RefSize);
         }
 
         internal Code.Container Serialize(bool isInternal)
         {
             try
             {
-                return new Code.Container(BodyCode, FrameSize, Description, isInternal);
+                return new Code.Container(BodyCode, Description, FrameSize);
             }
             catch(UnexpectedVisitOfPending)
             {

@@ -24,7 +24,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             _outputSize = outputSize;
             _dataSize = dataSize;
-            StopByObjectId(-28);
+            StopByObjectId(-4);
         }
 
         [DisableDump]
@@ -62,8 +62,6 @@ namespace Reni.Code
             return new TopFrameData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
         }
 
-        protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.Dereference(top, InputSize, OutputSize); }
-
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Dereference(RefAlignParam, OutputSize, DataSize); }
+        internal override void Visit(IVisitor visitor) { visitor.Dereference(OutputSize, DataSize); }
     }
 }

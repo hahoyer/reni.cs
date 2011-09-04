@@ -57,7 +57,7 @@ namespace Reni.Code
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Right=" + _right; } }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.RefPlus(GetSize(), _right); }
+        internal override void Visit(IVisitor visitor) { visitor.RefPlus(_right); }
 
         [DisableDump]
         internal override Size InputSize { get { return GetSize(); } }

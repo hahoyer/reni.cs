@@ -21,51 +21,26 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using JetBrains.Annotations;
 using Reni.Basics;
+using Reni.Context;
 
 namespace Reni.Code
 {
-    internal interface IFormalMaschine
+    [UsedImplicitly]
+    sealed class FormalMachine : ReniObject, IVisitor
     {
-        void Assign(Size targetSize, RefAlignParam refAlignParam);
-        void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
-        void BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize);
-        void BitCast(Size size, Size targetSize, Size significantSize);
-        void BitsArray(Size size, BitsConst data);
-        void Call(Size size, int functionIndex, Size argsAndRefsSize);
-        void Dereference(RefAlignParam refAlignParam, Size size, Size dataSize);
-        void Drop(Size beforeSize, Size afterSize);
-        void PrintNumber(Size leftSize, Size rightSize);
-        void PrintText(Size leftSize, Size itemSize);
-        void PrintText(string dumpPrintText);
-        void Fiber(FiberHead fiberHead, FiberItem[] fiberItems);
-        void List(CodeBase[] data);
-        void LocalBlockEnd(Size size, Size intermediateSize);
-        void LocalVariableData(Size size, string holder, Size offset, Size dataSize);
-        void LocalVariableDefinition(string holderName, Size valueSize);
-        void LocalVariableReference(Size size, string holder, Size offset);
-        void RecursiveCall();
-        void ReferenceCode(IReferenceInCode context);
-        void RefPlus(Size size, Size right);
-        void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
-        void TopData(Size offset, Size size, Size dataSize);
-        void TopFrameData(Size offset, Size size, Size dataSize);
-        void TopRef(Size offset, Size size);
-        void TopFrameRef(Size offset, Size size);
-    }
+        readonly Size _startAddress;
 
-    internal class FormalMaschine : ReniObject, IFormalMaschine
-    {
-        private readonly Size _startAddress;
-
-        private readonly FormalValueAccess[] _data;
-        private FormalValueAccess[] _frameData = new FormalValueAccess[0];
-        private readonly FormalPointer[] _points;
-        private FormalPointer[] _framePoints = new FormalPointer[1];
-        private int _nextValue;
+        readonly FormalValueAccess[] _data;
+        FormalValueAccess[] _frameData = new FormalValueAccess[0];
+        readonly FormalPointer[] _points;
+        FormalPointer[] _framePoints = new FormalPointer[1];
+        int _nextValue;
         internal const string Names = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        static Size RefSize { get { return Root.DefaultRefAlignParam.RefSize; } }
 
-        internal FormalMaschine(Size dataSize)
+        internal FormalMachine(Size dataSize)
         {
             _startAddress = dataSize;
             _data = new FormalValueAccess[dataSize.ToInt()];
@@ -80,22 +55,22 @@ namespace Reni.Code
                    _framePoints.Aggregate("", (current, t) => current + (t == null ? "  " : t.Dump())) + "\n";
         }
 
-        void IFormalMaschine.BitsArray(Size size, BitsConst data)
+        void IVisitor.BitsArray(Size size, BitsConst data)
         {
             var startAddress = (_startAddress - size).ToInt();
             var element = FormalValueAccess.BitsArray(data);
             SetFormalValues(element, startAddress, size);
         }
 
-        void IFormalMaschine.TopRef(Size offset, Size size)
+        void IVisitor.TopRef(Size offset)
         {
             var index = (_startAddress + offset).ToInt();
             FormalPointer.Ensure(_points, index);
-            var startAddress = (_startAddress - size).ToInt();
-            SetFormalValues(_points[index], startAddress, size);
+            var startAddress = (_startAddress - RefSize).ToInt();
+            SetFormalValues(_points[index], startAddress, RefSize);
         }
 
-        void IFormalMaschine.Call(Size size, int functionIndex, Size argsAndRefsSize)
+        void IVisitor.Call(Size size, int functionIndex, Size argsAndRefsSize)
         {
             var formalSubValues = PullInputValuesFromData(argsAndRefsSize);
             var startAddress = (_startAddress + argsAndRefsSize - size).ToInt();
@@ -103,7 +78,7 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, size);
         }
 
-        void IFormalMaschine.BitCast(Size size, Size targetSize, Size significantSize)
+        void IVisitor.BitCast(Size size, Size targetSize, Size significantSize)
         {
             var formalSubValue = GetInputValuesFromData(significantSize).OnlyOne();
             var startAddress = (_startAddress + targetSize - size).ToInt();
@@ -111,13 +86,13 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, size);
         }
 
-        void IFormalMaschine.PrintNumber(Size leftSize, Size rightSize)
+        void IVisitor.PrintNumber(Size leftSize, Size rightSize)
         {
             Tracer.Assert(rightSize.IsZero);
             ResetInputValuesOfData(leftSize);
         }
 
-        void IFormalMaschine.TopFrameData(Size offset, Size size, Size dataSize)
+        void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
         {
             AlignFrame(offset);
             var access = GetInputValuesFromFrame(offset, size).OnlyOne() ?? CreateValuesInFrame(size, offset);
@@ -125,14 +100,14 @@ namespace Reni.Code
             SetFormalValues(access, startAddress, dataSize);
         }
 
-        void IFormalMaschine.TopData(Size offset, Size size, Size dataSize)
+        void IVisitor.TopData(Size offset, Size size, Size dataSize)
         {
             var source = GetInputValuesFromData(offset, dataSize).OnlyOne();
             var startAddress = (_startAddress - size).ToInt();
             SetFormalValues(source, startAddress, dataSize);
         }
 
-        void IFormalMaschine.LocalBlockEnd(Size size, Size intermediateSize)
+        void IVisitor.LocalBlockEnd(Size size, Size intermediateSize)
         {
             var dataSize = (size - intermediateSize).ToInt();
             var accesses = new FormalValueAccess[dataSize];
@@ -142,25 +117,25 @@ namespace Reni.Code
                 _data[i + (_startAddress + intermediateSize).ToInt()] = accesses[i];
         }
 
-        void IFormalMaschine.Drop(Size beforeSize, Size afterSize) { ResetInputValuesOfData(beforeSize - afterSize); }
+        void IVisitor.Drop(Size beforeSize, Size afterSize) { ResetInputValuesOfData(beforeSize - afterSize); }
 
-        void IFormalMaschine.RefPlus(Size size, Size right)
+        void IVisitor.RefPlus(Size right)
         {
-            var formalSubValue = PullInputValuesFromData(size).OnlyOne();
+            var formalSubValue = PullInputValuesFromData(RefSize).OnlyOne();
             var startAddress = _startAddress.ToInt();
             var element = FormalValueAccess.RefPlus(formalSubValue, right.ToInt());
-            SetFormalValues(element, startAddress, size);
+            SetFormalValues(element, startAddress, RefSize);
         }
 
-        void IFormalMaschine.Dereference(RefAlignParam refAlignParam, Size size, Size dataSize)
+        void IVisitor.Dereference(Size size, Size dataSize)
         {
-            var formalSubValue = PullInputValuesFromData(refAlignParam.RefSize).OnlyOne();
-            var startAddress = (_startAddress + refAlignParam.RefSize - size).ToInt();
+            var formalSubValue = PullInputValuesFromData(RefSize).OnlyOne();
+            var startAddress = (_startAddress + RefSize - size).ToInt();
             var element = FormalValueAccess.Dereference(formalSubValue);
             SetFormalValues(element, startAddress, dataSize);
         }
 
-        void IFormalMaschine.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        void IVisitor.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
         {
             var formalLeftSubValue = PullInputValuesFromData(leftSize).OnlyOne();
             var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).OnlyOne();
@@ -169,21 +144,21 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, size);
         }
 
-        void IFormalMaschine.Assign(Size targetSize, RefAlignParam refAlignParam) { ResetInputValuesOfData(refAlignParam.RefSize*2); }
-        void IFormalMaschine.BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize) { NotImplementedMethod(opToken, size, argSize); }
-        void IFormalMaschine.PrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
-        void IFormalMaschine.List(CodeBase[] data) { NotImplementedMethod(data); }
-        void IFormalMaschine.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }
-        void IFormalMaschine.LocalVariableReference(Size size, string holder, Size offset) { NotImplementedMethod(size, holder, offset); }
-        void IFormalMaschine.RecursiveCall() { throw new NotImplementedException(); }
-        void IFormalMaschine.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
-        void IFormalMaschine.LocalVariableData(Size size, string holder, Size offset, Size dataSize) { NotImplementedMethod(size, holder, offset); }
-        void IFormalMaschine.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }
-        void IFormalMaschine.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName, valueSize); }
-        void IFormalMaschine.TopFrameRef(Size offset, Size size) { NotImplementedMethod(offset, size); }
-        void IFormalMaschine.PrintText(Size leftSize, Size itemSize) { NotImplementedMethod(leftSize, itemSize); }
+        void IVisitor.Assign(Size targetSize) { ResetInputValuesOfData(RefSize * 2); }
+        void IVisitor.BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize) { NotImplementedMethod(opToken, size, argSize); }
+        void IVisitor.PrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
+        void IVisitor.List(CodeBase[] data) { NotImplementedMethod(data); }
+        void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }
+        void IVisitor.LocalVariableReference(string holder, Size offset) { NotImplementedMethod(holder, offset); }
+        void IVisitor.RecursiveCall() { throw new NotImplementedException(); }
+        void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
+        void IVisitor.LocalVariableAccess(string holder, Size offset, Size size, Size dataSize) { NotImplementedMethod(size, holder, offset); }
+        void IVisitor.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }
+        void IVisitor.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName, valueSize); }
+        void IVisitor.TopFrameRef(Size offset) { NotImplementedMethod(offset); }
+        void IVisitor.PrintText(Size leftSize, Size itemSize) { NotImplementedMethod(leftSize, itemSize); }
 
-        private IFormalValue CreateValuesInFrame(Size size, Size offset)
+        IFormalValue CreateValuesInFrame(Size size, Size offset)
         {
             var element = FormalValueAccess.Variable(Names[_nextValue++]);
             var size1 = size.ToInt();
@@ -193,7 +168,7 @@ namespace Reni.Code
             return element;
         }
 
-        private void AlignFrame(Size offset)
+        void AlignFrame(Size offset)
         {
             var minSize = -offset.ToInt();
             if(_frameData.Length >= minSize)
@@ -213,7 +188,7 @@ namespace Reni.Code
                 _framePoints[i + delta] = framePoints[i];
         }
 
-        private IFormalValue[] GetInputValuesFromFrame(Size offset, Size size)
+        IFormalValue[] GetInputValuesFromFrame(Size offset, Size size)
         {
             var accesses = new List<FormalValueAccess>();
             var start = _frameData.Length + offset.ToInt();
@@ -222,7 +197,7 @@ namespace Reni.Code
             return FormalValueAccess.Transpose(accesses);
         }
 
-        private IFormalValue[] PullInputValuesFromData(Size offset, Size inputSize)
+        IFormalValue[] PullInputValuesFromData(Size offset, Size inputSize)
         {
             var accesses = new List<FormalValueAccess>();
             var start = (_startAddress + offset).ToInt();
@@ -234,9 +209,9 @@ namespace Reni.Code
             return FormalValueAccess.Transpose(accesses);
         }
 
-        private IFormalValue[] GetInputValuesFromData(Size inputSize) { return GetInputValuesFromData(Size.Zero, inputSize); }
+        IFormalValue[] GetInputValuesFromData(Size inputSize) { return GetInputValuesFromData(Size.Zero, inputSize); }
 
-        private IFormalValue[] GetInputValuesFromData(Size offset, Size inputSize)
+        IFormalValue[] GetInputValuesFromData(Size offset, Size inputSize)
         {
             var accesses = new List<FormalValueAccess>();
             var start = (_startAddress + offset).ToInt();
@@ -245,16 +220,16 @@ namespace Reni.Code
             return FormalValueAccess.Transpose(accesses);
         }
 
-        private IFormalValue[] PullInputValuesFromData(Size inputSize) { return PullInputValuesFromData(Size.Zero, inputSize); }
+        IFormalValue[] PullInputValuesFromData(Size inputSize) { return PullInputValuesFromData(Size.Zero, inputSize); }
 
-        private void ResetInputValuesOfData(Size inputSize)
+        void ResetInputValuesOfData(Size inputSize)
         {
             var start = _startAddress.ToInt();
             for(var i = 0; i < inputSize.ToInt(); i++)
                 _data[i + start] = null;
         }
 
-        private void SetFormalValues(IFormalValue element, int startAddress, Size size)
+        void SetFormalValues(IFormalValue element, int startAddress, Size size)
         {
             var size1 = size.ToInt();
             for(var i = 0; i < size1; i++)

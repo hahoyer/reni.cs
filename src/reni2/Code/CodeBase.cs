@@ -66,7 +66,7 @@ namespace Reni.Code
         internal Size Size { get { return GetSize(); } }
 
         [DisableDump]
-        internal Size MaxSize { get { return MaxSizeImplementation; } }
+        internal Size TemporarySize { get { return GetTemporarySize(); } }
 
         [DisableDump]
         internal CodeArgs CodeArgs { get { return GetRefsImplementation(); } }
@@ -80,8 +80,7 @@ namespace Reni.Code
         [DisableDump]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
-        [DisableDump]
-        protected virtual Size MaxSizeImplementation { get { return Size; } }
+        protected virtual Size GetTemporarySize() { return Size; }
 
         [DisableDump]
         internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
@@ -211,7 +210,7 @@ namespace Reni.Code
 
         internal TResult Visit<TResult>(Visitor<TResult> actual) { return VisitImplementation(actual); }
 
-        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Default(); }
+        protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Default(this); }
 
         internal CodeBase Call(int index, Size resultSize) { return CreateFiber(new Call(index, resultSize, Size)); }
 
@@ -227,7 +226,7 @@ namespace Reni.Code
         internal BitsConst Evaluate()
         {
             var dataStack = new DataStack(new CodeBase[0], false);
-            Execute(dataStack);
+            Visit(dataStack);
             return dataStack.Value;
         }
 
@@ -284,7 +283,10 @@ namespace Reni.Code
 
         internal virtual CSharpCodeSnippet CSharpCodeSnippet() { return new CSharpCodeSnippet("", CSharpString()); }
 
-        internal virtual string ReversePolish(Size top) { return CSharpString(top); }
+        internal string ReversePolish(Size top)
+        {
+            return CSharpString(top);
+        }
 
         protected virtual string CSharpString(Size top)
         {
@@ -296,7 +298,7 @@ namespace Reni.Code
         {
             try
             {
-                Execute(new DataStack(functions, isTraceEnabled));
+                Visit(new DataStack(functions, isTraceEnabled));
             }
             catch(UnexpectedContextReference e)
             {
@@ -304,9 +306,9 @@ namespace Reni.Code
             }
         }
 
-        protected virtual void Execute(IFormalMaschine formalMaschine) { NotImplementedMethod(formalMaschine); }
+        internal virtual void Visit(IVisitor visitor) { NotImplementedMethod(visitor); }
 
-        void IFormalCodeItem.Execute(IFormalMaschine formalMaschine) { Execute(formalMaschine); }
+        void IFormalCodeItem.Visit(IVisitor visitor) { Visit(visitor); }
 
         protected static CodeArgs GetRefs(CodeBase[] codeBases)
         {

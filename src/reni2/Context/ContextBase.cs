@@ -70,12 +70,11 @@ namespace Reni.Context
         internal Structure FindRecentStructure { get { return Cache.RecentStructure.Value; } }
 
         [DisableDump]
-        internal FunctionContextObject FindRecentFunctionContextObject { get { return Cache.RecentFunctionContextObject.Value; } }
+        internal Function FindRecentFunctionContextObject { get { return Cache.RecentFunctionContextObject.Value; } }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal FunctionContextObject UniqueFunctionContextObject(TypeBase args) { return _cache.FunctionContextObjects.Find(args); }
         internal ContextBase UniqueChildContext(Container container, int position) { return _cache.StructContexts.Find(container).Find(position); }
         internal ContextBase UniqueChildContext(TypeBase args) { return _cache.FunctionContexts.Find(args); }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
@@ -150,7 +149,7 @@ namespace Reni.Context
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
         protected abstract Result CommonResult(Category category, CondSyntax condSyntax);
         internal virtual Structure ObtainRecentStructure() { return null; }
-        internal virtual FunctionContextObject ObtainRecentFunctionContext() { return null; }
+        internal virtual Function ObtainRecentFunctionContext() { return null; }
 
         internal Category PendingCategory(CompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
 
@@ -166,11 +165,7 @@ namespace Reni.Context
 
             [Node]
             [DisableDump]
-            internal readonly SimpleCache<FunctionContextObject> RecentFunctionContextObject;
-
-            [Node]
-            [SmartNode]
-            internal readonly DictionaryEx<TypeBase, FunctionContextObject> FunctionContextObjects;
+            internal readonly SimpleCache<Function> RecentFunctionContextObject;
 
             [Node]
             [SmartNode]
@@ -204,10 +199,9 @@ namespace Reni.Context
                     container => new DictionaryEx<int, ContextBase>(
                                      position => new Struct.Context(target, container, position)));
                 FunctionContexts = new DictionaryEx<TypeBase, Function>(argsType => new Function(target, argsType));
-                FunctionContextObjects = new DictionaryEx<TypeBase, FunctionContextObject>(args => new FunctionContextObject(args, target));
                 PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(target));
                 RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
-                RecentFunctionContextObject = new SimpleCache<FunctionContextObject>(target.ObtainRecentFunctionContext);
+                RecentFunctionContextObject = new SimpleCache<Function>(target.ObtainRecentFunctionContext);
                 Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(
                     container => new DictionaryEx<int, Structure>(
                                      position => new Structure(ContainerContextObjects.Find(container), position)));

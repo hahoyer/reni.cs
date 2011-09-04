@@ -96,7 +96,7 @@ namespace Reni.Code
 
         private FormalPointer(FormalPointer[] points, int index)
         {
-            _name = FormalMaschine.Names[_nextPointer++];
+            _name = FormalMachine.Names[_nextPointer++];
             _points = points;
             _index = index;
         }

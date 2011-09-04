@@ -72,7 +72,6 @@ namespace Reni.Syntax
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
-        [DebuggerHidden]
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
         Result QuickResult(ContextBase context, Category category) { return context.QuickResult(category, this); }
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }

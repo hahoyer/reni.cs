@@ -24,17 +24,17 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal abstract class FiberItem : ReniObject, IFormalCodeItem
+    abstract class FiberItem : ReniObject, IFormalCodeItem
     {
-        private static int _nextObjectId;
-        private static string _newCombinedReason;
-        private readonly string _reason;
+        static int _nextObjectId;
+        static string _newCombinedReason;
+        readonly string _reason;
 
         [DisableDump]
         internal string ReasonForCombine { get { return _reason == "" ? DumpShortForDebug() : _reason; } }
 
         [DisableDump]
-        private string NewCombinedReason
+        string NewCombinedReason
         {
             get
             {
@@ -73,7 +73,7 @@ namespace Reni.Code
         public override string NodeDump { get { return base.NodeDump + DumpSignature; } }
 
         [DisableDump]
-        private string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }
+        string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }
 
         [DisableDump]
         internal virtual RefAlignParam RefAlignParam { get { return null; } }
@@ -83,14 +83,10 @@ namespace Reni.Code
 
         [DisableDump]
         internal virtual bool HasArg { get { return false; } }
+        [DisableDump]
+        internal Size TemporarySize { get { return OutputSize + GetAdditionalTemporarySize(); } }
 
-        internal string ReversePolish(Size top) { return CSharpCodeSnippet(top) + ";\n"; }
-
-        protected virtual string CSharpCodeSnippet(Size top)
-        {
-            NotImplementedMethod(top);
-            return null;
-        }
+        protected virtual Size GetAdditionalTemporarySize() { return Size.Zero; }
 
         internal FiberItem[] TryToCombine(FiberItem subsequentElement)
         {
@@ -119,16 +115,16 @@ namespace Reni.Code
 
         protected virtual FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return null; }
 
-        protected abstract void Execute(IFormalMaschine formalMaschine);
+        internal abstract void Visit(IVisitor visitor);
 
-        void IFormalCodeItem.Execute(IFormalMaschine formalMaschine) { Execute(formalMaschine); }
+        void IFormalCodeItem.Visit(IVisitor visitor) { Visit(visitor); }
 
         protected virtual CodeArgs GetRefsImplementation() { return CodeArgs.Void(); }
     }
 
-    internal interface IFormalCodeItem
+    interface IFormalCodeItem
     {
-        void Execute(IFormalMaschine formalMaschine);
+        void Visit(IVisitor visitor);
         string Dump();
     }
 }

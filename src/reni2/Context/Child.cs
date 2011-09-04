@@ -47,7 +47,7 @@ namespace Reni.Context
         }
 
         internal override Structure ObtainRecentStructure() { return Parent.ObtainRecentStructure(); }
-        internal override FunctionContextObject ObtainRecentFunctionContext() { return Parent.ObtainRecentFunctionContext(); }
+        internal override Function ObtainRecentFunctionContext() { return Parent.ObtainRecentFunctionContext(); }
         protected override Result CommonResult(Category category, CondSyntax condSyntax) { return condSyntax.CommonResult(this, category); }
     }
 }

@@ -71,9 +71,7 @@ namespace Reni.Code
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " InputSize=" + InputSize + " InputDataSize=" + _inputDataSize; } }
 
-        protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.BitCast(top, OutputSize, _inputDataSize); }
-
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitCast(OutputSize, InputSize, _inputDataSize); }
+        internal override void Visit(IVisitor visitor) { visitor.BitCast(OutputSize, InputSize, _inputDataSize); }
 
         internal override CodeBase TryToCombineBack(TopData precedingElement)
         {

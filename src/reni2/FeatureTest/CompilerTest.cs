@@ -68,7 +68,7 @@ namespace Reni.FeatureTest
             if(TestRunner.IsModeErrorFocus || IsCallerUnderConstruction(1))
                 Parameters.Trace.All();
 
-            Parameters.RunFromCode = true;
+            //Parameters.RunFromCode = true;
             InternalRunCompiler(Parameters, fileName, expectedResult, expectedOutput);
         }
 
@@ -86,7 +86,7 @@ namespace Reni.FeatureTest
             if(os != null && os.Data != expectedOutput)
             {
                 os.Exec();
-                Tracer.ThrowAssertionFailed(
+                    Tracer.ThrowAssertionFailed(
                     "os.Data != expectedOutput",
                     () => "os.Data:" + os.Data + " expected: " + expectedOutput);
             }

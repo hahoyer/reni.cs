@@ -332,7 +332,7 @@ namespace Reni.Type
 
         Result ConvertObject(Category category, RefAlignParam refAlignParam, TypeBase featureObject)
         {
-            var trace = featureObject.ObjectId == 22 && category.HasCode;
+            var trace = featureObject.ObjectId == -22 && category.HasCode;
             StartMethodDump(trace, category, refAlignParam, featureObject);
             try
             {

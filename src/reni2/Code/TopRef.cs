@@ -37,7 +37,7 @@ namespace Reni.Code
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopRef(Offset, Size); }
+        internal override void Visit(IVisitor visitor) { visitor.TopRef(Offset); }
     }
 
     [Serializable]
@@ -52,6 +52,6 @@ namespace Reni.Code
         protected override string CSharpString() { return CSharpGenerator.CreateFrameRef(RefAlignParam, Offset); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrameRef(Offset, Size); }
+        internal override void Visit(IVisitor visitor) { visitor.TopFrameRef(Offset); }
     }
 }

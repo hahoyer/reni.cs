@@ -44,7 +44,7 @@ namespace Reni.Context
                 result.CodeArgs = CodeArgs.Void();
             localCategory -= Category.CodeArgs;
             if (category.HasIsDataLess)
-                result.IsDataLess = false;
+                result.IsDataLess = true;
             localCategory -= Category.IsDataLess;
             if(localCategory.HasAny)
                 result.Update(syntax.ObtainResult(this, localCategory));

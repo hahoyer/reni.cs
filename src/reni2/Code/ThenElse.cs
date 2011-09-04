@@ -28,12 +28,12 @@ namespace Reni.Code
     /// <summary>
     ///     Then-Else construct
     /// </summary>
-    internal sealed class ThenElse : FiberItem
+    sealed class ThenElse : FiberItem
     {
-        private static int _nextId;
+        static int _nextId;
 
         [Node]
-        private readonly Size _condSize;
+        readonly Size _condSize;
 
         [Node]
         internal readonly CodeBase ThenCode;
@@ -44,22 +44,12 @@ namespace Reni.Code
         internal ThenElse(CodeBase thenCode, CodeBase elseCode)
             : this(Size.Create(1), thenCode, elseCode) { }
 
-        private ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
+        ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
             : base(_nextId++)
         {
             _condSize = condSize;
             ThenCode = thenCode;
             ElseCode = elseCode;
-        }
-
-        private Size MaxSizeImplementation
-        {
-            get
-            {
-                var tSize = ThenCode.MaxSize;
-                var eSize = ElseCode.MaxSize;
-                return tSize.Max(eSize);
-            }
         }
 
         protected override CodeArgs GetRefsImplementation() { return ThenCode.CodeArgs.Sequence(ElseCode.CodeArgs); }
@@ -77,58 +67,9 @@ namespace Reni.Code
 
         internal override Size InputSize { get { return _condSize; } }
         internal override Size OutputSize { get { return ThenCode.Size; } }
+        protected override Size GetAdditionalTemporarySize() { return ThenCode.TemporarySize.Max(ElseCode.TemporarySize).Max(OutputSize) - OutputSize; }
         protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ThenElse(this); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.ThenElse(_condSize, ThenCode, ElseCode); }
+        internal override void Visit(IVisitor visitor) { visitor.ThenElse(_condSize, ThenCode, ElseCode); }
         internal FiberItem ReCreate(CodeBase newThen, CodeBase newElse) { return new ThenElse(_condSize, newThen ?? ThenCode, newElse ?? ElseCode); }
-    }
-
-    [Serializable]
-    internal sealed class Then : FiberItem
-    {
-        [Node]
-        internal readonly Size CondSize;
-
-        internal Then(Size condSize) { CondSize = condSize; }
-
-        internal override Size OutputSize { get { return Size.Zero; } }
-        internal override Size InputSize { get { return CondSize; } }
-
-        internal override FiberItem[] TryToCombineBack(BitCast preceding)
-        {
-            if(preceding.OutputSize == CondSize)
-                return new[] {new Then(preceding.InputSize)};
-            return null;
-        }
-
-        internal override FiberItem[] TryToCombineBack(BitArrayBinaryOp precedingElement)
-        {
-            if(precedingElement.OutputSize == CondSize)
-                return new[] {new BitArrayOpThen(this, precedingElement)};
-            return null;
-        }
-
-        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
-    }
-
-    [Serializable]
-    internal sealed class BitArrayOpThen : FiberItem
-    {
-        [Node]
-        [EnableDump]
-        private readonly BitArrayBinaryOp _bitArrayBinaryOp;
-
-        [Node]
-        [EnableDump]
-        private readonly Then _thenCode;
-
-        public BitArrayOpThen(Then thenCode, BitArrayBinaryOp bitArrayBinaryOp)
-        {
-            _thenCode = thenCode;
-            _bitArrayBinaryOp = bitArrayBinaryOp;
-        }
-
-        internal override Size InputSize { get { return _bitArrayBinaryOp.DeltaSize + _bitArrayBinaryOp.OutputSize; } }
-        internal override Size OutputSize { get { return _thenCode.OutputSize; } }
-        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
     }
 }

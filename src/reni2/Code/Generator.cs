@@ -1,5 +1,22 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
-using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
@@ -7,106 +24,36 @@ using System.Linq;
 using System.Reflection;
 using HWClassLibrary.Debug;
 using Microsoft.CSharp;
+using Reni.Basics;
+using Reni.Runtime;
 
 namespace Reni.Code
 {
-    internal static class Generator
+    static class Generator
     {
-        private static string _baseName = "";
-        private static int _nextId;
-        private static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
+        static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
+        static readonly string[] _referencedAssemblies = new[] {"reni.dll", "HWClassLibrary.dll"};
+        internal const string FrameArgName = "frame";
+
         public static string NotACommentFlag { get { return "<notacomment> "; } }
+        internal static string MainFunctionName { get { return "MainFunction"; } }
+        internal static string FunctionName(int i) { return "Function" + i; }
 
-        /// <summary>
-        ///     Gets the name of the main method.
-        /// </summary>
-        /// <value>The name of the main method.</value>
-        /// created 15.11.2006 22:04
-        public static string MainFunctionName { get { return "MainFunction"; } }
+        internal static string CreateCSharpString(Container main, List<Container> functions, bool useStatementAligner) { return new CSharp_Generated(main, functions).TransformText(useStatementAligner); }
+        internal static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align) { return CodeToAssembly(CreateCSharpString(main, functions, align)); }
 
-        /// <summary>
-        ///     Functions the name of the method.
-        /// </summary>
-        /// <param name = "i">The i.</param>
-        /// <returns></returns>
-        /// created 15.11.2006 22:04
-        public static string FunctionName(int i) { return "Function" + i; }
-
-        /// <summary>
-        ///     Creates the C sharp code.
-        /// </summary>
-        /// <param name = "main">The main.</param>
-        /// <param name = "functions">The functions.</param>
-        /// <param name = "useStatementAligner">if set to <c>true</c> [align].</param>
-        /// <returns></returns>
-        /// created 08.10.2006 02:35
-        public static string CreateCSharpString(Container main, List<Container> functions, bool useStatementAligner) { return CodeToString(CreateCompileUnit(main, functions, useStatementAligner)); }
-
-        /// <summary>
-        ///     Creates the C sharp assembly.
-        /// </summary>
-        /// <param name = "main">The main.</param>
-        /// <param name = "functions">The functions.</param>
-        /// <param name = "align">if set to <c>true</c> [align].</param>
-        /// <returns></returns>
-        /// created 08.10.2006 22:44
-        public static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align) { return CodeToAssembly(CreateCompileUnit(main, functions, align)); }
-
-        private static CodeCompileUnit CreateCompileUnit(Container main, List<Container> functions, bool useStatementAligner)
+        static void CodeToFile(string name, string result)
         {
-            var name = CreateName();
-            var ctd = main.GetCSharpTypeCode(functions, name, useStatementAligner);
-            return CreateCSharpCode(ctd, name);
-        }
-
-        private static CodeCompileUnit CreateCSharpCode(CodeTypeDeclaration ctd, string name) { return ToCompileUnit(ToNameSpace(ctd, name)); }
-
-        private static CodeCompileUnit ToCompileUnit(CodeNamespace ns)
-        {
-            var cu = new CodeCompileUnit();
-            cu.Namespaces.Add(ns);
-            cu.ReferencedAssemblies.Add("reni.dll");
-            cu.ReferencedAssemblies.Add("HWClassLibrary.dll");
-            return cu;
-        }
-
-        private static CodeNamespace ToNameSpace(CodeTypeDeclaration ctd, string name)
-        {
-            var ns = new CodeNamespace(name);
-            ns.Types.Add(ctd);
-            ns.Imports.Add(new CodeNamespaceImport("System"));
-            ns.Imports.Add(new CodeNamespaceImport("Reni"));
-            ns.Imports.Add(new CodeNamespaceImport("Reni.Runtime"));
-
-            return ns;
-        }
-
-        private static string CodeToString(CodeCompileUnit cu)
-        {
-            var sw = new StringWriter();
-            CodeToText(sw, cu);
-            var result = sw.ToString().Replace("// " + NotACommentFlag, "");
-            return result;
-        }
-
-        private static void CodeToFile(string name, CodeCompileUnit cu)
-        {
-            var sw = new StreamWriter(name);
+            var streamWriter = new StreamWriter(name);
             Tracer.Line(Tracer.FilePosn(HWClassLibrary.IO.File.m(name).FullName, 0, 0, ""));
-            sw.Write(CodeToString(cu));
-            sw.Close();
+            streamWriter.Write(result);
+            streamWriter.Close();
         }
 
-        private static void CodeToText(TextWriter tw, CodeCompileUnit cu)
-        {
-            var codeGeneratorOptions = new CodeGeneratorOptions {BlankLinesBetweenMembers = true};
-            _provider.GenerateCodeFromCompileUnit(cu, tw, codeGeneratorOptions);
-        }
-
-        public static Assembly CodeToAssembly(CodeCompileUnit cu)
+        static Assembly CodeToAssembly(string codeToString)
         {
             const string name = "generated.cs";
-            CodeToFile(name, cu);
+            CodeToFile(name, codeToString);
 
             // Build the parameters for source compilation.
             var cp = new System.CodeDom.Compiler.CompilerParameters
@@ -116,7 +63,7 @@ namespace Reni.Code
                          IncludeDebugInformation = true,
                          TempFiles = new TempFileCollection(null, true)
                      };
-            cp.ReferencedAssemblies.AddRange(GetReferencesAssemblies(cu));
+            cp.ReferencedAssemblies.AddRange(_referencedAssemblies);
             var cr = _provider.CompileAssemblyFromFile(cp, name);
 
             if(cr.Errors.Count > 0)
@@ -125,48 +72,42 @@ namespace Reni.Code
             return cr.CompiledAssembly;
         }
 
-        private static string[] GetReferencesAssemblies(CodeCompileUnit cu)
-        {
-            var result = new string[cu.ReferencedAssemblies.Count];
-            cu.ReferencedAssemblies.CopyTo(result, 0);
-            return result;
-        }
-
-        private static void HandleErrors(CompilerErrorCollection cr)
+        static void HandleErrors(CompilerErrorCollection cr)
         {
             for(var i = 0; i < cr.Count; i++)
                 Tracer.Line(cr[i].ToString());
 
             throw new CompilerErrorException(cr);
         }
-
-        /// <summary>
-        ///     Creates the name of the class.
-        /// </summary>
-        /// <returns></returns>
-        /// created 08.10.2006 02:35
-        private static string CreateName()
-        {
-            if(_baseName == "")
-                _baseName = CreateBaseName();
-
-            var result = _baseName;
-            var id = _nextId++;
-            if(id != 0)
-                result += "Id" + id;
-            return result;
-        }
-
-        private static string CreateBaseName() { return Compiler.FormattedNow; }
-        internal const string FrameArgName = "frame";
     }
 
-    internal class CompilerErrorException : Exception
+    sealed class CompilerErrorException : Exception
     {
-        private readonly CompilerErrorCollection _compilerErrorCollection;
+        readonly CompilerErrorCollection _compilerErrorCollection;
 
         public CompilerErrorCollection CompilerErrorCollection { get { return _compilerErrorCollection; } }
 
         public CompilerErrorException(CompilerErrorCollection cr) { _compilerErrorCollection = cr; }
+    }
+
+// ReSharper disable InconsistentNaming
+    partial class CSharp_Generated
+// ReSharper restore InconsistentNaming
+    {
+        readonly Container _main;
+        readonly List<Container> _functions;
+        internal CSharp_Generated(Container main, List<Container> functions)
+        {
+            _main = main;
+            _functions = functions;
+        }
+
+        static int RefBytes { get { return DataHandler.RefBytes; } }
+
+        internal string TransformText(bool useStatementAligner)
+        {
+            var result = TransformText();
+            return result;
+        }
     }
 }

@@ -193,6 +193,7 @@ namespace Reni.FeatureTest.Function
     [ApplyTypeOperatorWithCut]
     [SimpleFunction]
     [TwoFunctions1]
+    [FunctionWithRefArg]
     [Target(@"f: {1000 type({arg = 1 then 1 else (arg * f[arg type((arg-1)enable_cut)])}enable_cut)}/\;f(4)dump_print")]
     [Output("24")]
     public sealed class RecursiveFunction : CompilerTest

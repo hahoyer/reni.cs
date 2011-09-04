@@ -66,21 +66,17 @@ namespace Reni.Code
             }
         }
 
-        [DisableDump]
-        protected override Size MaxSizeImplementation
+        protected override Size GetTemporarySize()
         {
-            get
+            var result = Size.Zero;
+            var sizeSoFar = Size.Zero;
+            foreach(var codeBase in _data)
             {
-                var result = Size.Zero;
-                var sizeSoFar = Size.Zero;
-                foreach(var codeBase in _data)
-                {
-                    var newResult = sizeSoFar + codeBase.MaxSize;
-                    sizeSoFar += codeBase.Size;
-                    result = result.Max(newResult).Max(sizeSoFar);
-                }
-                return result;
+                var newResult = sizeSoFar + codeBase.TemporarySize;
+                sizeSoFar += codeBase.Size;
+                result = result.Max(newResult).Max(sizeSoFar);
             }
+            return result;
         }
 
         protected override Size GetSize()
@@ -91,6 +87,6 @@ namespace Reni.Code
 
         protected override CodeArgs GetRefsImplementation() { return GetRefs(_data); }
         protected override string CSharpString(Size top) { return CSharpGenerator.List(top, ObjectId, _data); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.List(_data); }
+        internal override void Visit(IVisitor visitor) { visitor.List(_data); }
     }
 }

@@ -39,7 +39,7 @@ namespace Reni.Type
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == 1  && (category.HasCode || category.HasArgs);
+            var trace = ObjectId == -1  && (category.HasCode || category.HasArgs);
             StartMethodDump(trace, category, operationResult, argsResult, refAlignParam);
             try
             {                                                                                                                   

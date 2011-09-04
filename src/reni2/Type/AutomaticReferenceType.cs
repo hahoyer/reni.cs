@@ -35,7 +35,7 @@ namespace Reni.Type
         {
             _refAlignParam = refAlignParam;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
-            Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
+            Tracer.Assert(!(valueType is ReferenceType), valueType.Dump);
             StopByObjectId(-8);
         }
 
@@ -71,11 +71,6 @@ namespace Reni.Type
         }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
-
-        internal override Result ReferenceInCode(Category category, IReferenceInCode target)
-        {
-            return ValueType.ReferenceInCode(category, target);
-        }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {

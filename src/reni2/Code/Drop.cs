@@ -17,9 +17,7 @@ namespace Reni.Code
             _afterSize = afterSize;
         }
 
-        protected override string CSharpCodeSnippet(Size top) { return CSharpGenerator.Drop(InputSize, OutputSize); }
-
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Drop(_beforeSize, _afterSize); }
+        internal override void Visit(IVisitor visitor) { visitor.Drop(_beforeSize, _afterSize); }
 
         [DisableDump]
         internal override Size InputSize { get { return _beforeSize; } }

@@ -44,9 +44,9 @@ namespace Reni.FeatureTest
 
 Text: 
 {
-    _data: (system TextItemType * system MaxNumber32) reference (args);
+    data: (system TextItemType * system MaxNumber32) reference (args);
     _length: system MaxNumber32 type (arg type / system TextItemType);
-    AfterCopy: _data:= system NewMemory(system TextItemType,system MaxNumber32,_data at arg /\)/\;
+    AfterCopy: data:= system NewMemory(system TextItemType,system MaxNumber32,data at arg /\)/\;
     AfterCopy()
 }/\
 ";

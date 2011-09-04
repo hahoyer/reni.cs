@@ -30,7 +30,7 @@ namespace Reni.Code
         internal override Size InputSize { get { return _intermediateSize + _size; } }
         internal override Size OutputSize { get { return _intermediateSize + _size; } }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalBlockEnd(OutputSize, _intermediateSize); }
+        internal override void Visit(IVisitor visitor) { visitor.LocalBlockEnd(OutputSize, _intermediateSize); }
 
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " IntermediateSize=" + _intermediateSize; } }

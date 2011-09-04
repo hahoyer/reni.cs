@@ -23,6 +23,13 @@
     <Compile Include="Basics\Category.cs" />
     <Compile Include="Basics\RefAlignParam.cs" />
     <Compile Include="Basics\Size.cs" />
+    <Compile Include="Code\CSharp_Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CSharp_Generated.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Code\Generator.cs" />
+    <Compile Include="Code\IVisitor.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="ChildSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
@@ -47,7 +54,6 @@
     <Compile Include="Code\FormalMaschine.cs" />
     <Compile Include="Code\FormalValueAccess.cs" />
     <Compile Include="Code\FrameData.cs" />
-    <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\HasArgVisitor.cs" />
     <Compile Include="Code\IFormalValue.cs" />
     <Compile Include="Code\ISequenceOfBitBinaryOperation.cs" />
@@ -90,7 +96,6 @@
     <Compile Include="Context\Child.cs" />
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
-    <Compile Include="Context\FunctionContextObject.cs" />
     <Compile Include="Context\FunctionList.cs" />
     <Compile Include="Context\IContextItem.cs" />
     <Compile Include="Context\IRootContext.cs" />
@@ -156,7 +161,7 @@
     <Compile Include="ReniParser\ExpressionSyntax.cs" />
     <Compile Include="ReniParser\MainTokenFactory.cs" />
     <Compile Include="ReniParser\ParsedSyntax.cs" />
-    <Compile Include="Runtime\DataContainer.cs" />
+    <Compile Include="Runtime\DataHandler.cs" />
     <Compile Include="SearchResult.cs" />
     <Compile Include="Sequence\CompareFeature.cs" />
     <Compile Include="Sequence\Feature.cs" />
@@ -177,7 +182,7 @@
     <Compile Include="Struct\StructureType.cs" />
     <Compile Include="Syntax\LeftParenthesis.cs" />
     <Compile Include="Syntax\ListSyntax.cs" />
-    <Compile Include="TestGenerated.cs" />
+    <Compile Include="T4Compiler.cs" />
     <Compile Include="ISearchVisitor.cs" />
     <Compile Include="Parser\IParsedSyntax.cs" />
     <Compile Include="Parser\Scanner.cs" />
@@ -196,7 +201,6 @@
     <Compile Include="FeatureTest\SimpleFiles.cs" />
     <Compile Include="FeatureTest\Struct.cs" />
     <Compile Include="FeatureTest\ThenElse.cs" />
-    <Compile Include="ReniTest.cs" />
     <Compile Include="Parser\Test.cs" />
     <Compile Include="StructAccess.cs" />
     <Compile Include="Struct\AccessFeature.cs" />
@@ -275,6 +279,10 @@
     <Compile Include="Type\Void.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Code\CSharp_Generated.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>CSharp_Generated.cs</LastGenOutput>
+    </None>
     <None Include="ParsedSyntax.cd" />
     <None Include="Visitor.cd" />
     <None Include="sys.targets" />
@@ -289,6 +297,8 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="sys.targets" />
 </Project>

@@ -47,6 +47,6 @@ namespace Reni.Code
         public Size ValueSize { get { return _valueSize; } }
 
         public override string NodeDump { get { return base.NodeDump + " Holder=" + _holderName + " ValueSize=" + _valueSize; } }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableDefinition(_holderName, _valueSize); }
+        internal override void Visit(IVisitor visitor) { visitor.LocalVariableDefinition(_holderName, _valueSize); }
     }
 }

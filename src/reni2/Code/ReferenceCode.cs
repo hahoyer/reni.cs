@@ -20,7 +20,7 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _context = context;
-            StopByObjectId(4);
+            StopByObjectId(-4);
         }
 
         [Node]
@@ -35,6 +35,6 @@ namespace Reni.Code
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.ReferenceCode(Context); }
+        internal override void Visit(IVisitor visitor) { visitor.ReferenceCode(Context); }
     }
 }

@@ -31,7 +31,7 @@ namespace Reni.Code
         private readonly RefAlignParam _refAlignParam;
 
         public override string NodeDump { get { return base.NodeDump + " TargetSize=" + _targetSize + " RefSize=" + _refAlignParam.RefSize; } }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.Assign(_targetSize, _refAlignParam); }
+        internal override void Visit(IVisitor visitor) { visitor.Assign(_targetSize); }
 
         [DisableDump]
         private readonly Size _targetSize;
@@ -47,5 +47,6 @@ namespace Reni.Code
 
         [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
+
     }
 }

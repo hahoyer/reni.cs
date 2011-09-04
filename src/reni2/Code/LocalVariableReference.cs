@@ -60,7 +60,7 @@ namespace Reni.Code
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
         protected override string CSharpString(Size top) { return CSharpGenerator.LocalVariableReference(top, Size, Holder, Offset); }
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.LocalVariableReference(Size, Holder, Offset); }
+        internal override void Visit(IVisitor visitor) { visitor.LocalVariableReference(Holder, Offset); }
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
     }
 }

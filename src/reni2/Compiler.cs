@@ -29,26 +29,24 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Runtime;
-using Reni.Syntax;
 
 namespace Reni
 {
-    [Serializable]
     public sealed class Compiler : ReniObject
     {
-        private readonly string _fileName;
-        private readonly CompilerParameters _parameters;
-        private readonly ITokenFactory _tokenFactory = new MainTokenFactory();
+        readonly string _fileName;
+        readonly CompilerParameters _parameters;
+        readonly ITokenFactory _tokenFactory = new MainTokenFactory();
 
-        private readonly SimpleCache<Source> _source;
-        private readonly SimpleCache<ReniParser.ParsedSyntax> _syntax;
-        private readonly SimpleCache<CodeBase> _code;
-        private readonly SimpleCache<CodeBase[]> _functionCode;
-        private readonly SimpleCache<Container> _mainContainer;
-        private readonly SimpleCache<List<Container>> _functionContainers;
-        private readonly SimpleCache<string> _executedCode;
-        private readonly SimpleCache<FunctionList> _functions;
-        private readonly SimpleCache<ContextBase> _rootContext;
+        readonly SimpleCache<Source> _source;
+        readonly SimpleCache<ReniParser.ParsedSyntax> _syntax;
+        readonly SimpleCache<CodeBase> _code;
+        readonly SimpleCache<CodeBase[]> _functionCode;
+        readonly SimpleCache<Container> _mainContainer;
+        readonly SimpleCache<List<Container>> _functionContainers;
+        readonly SimpleCache<string> _executedCode;
+        readonly SimpleCache<FunctionList> _functions;
+        readonly SimpleCache<ContextBase> _rootContext;
 
         /// <summary>
         ///     ctor from file
@@ -62,8 +60,8 @@ namespace Reni
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
             _functionCode = new SimpleCache<CodeBase[]>(() => Functions.Code);
-            _mainContainer = new SimpleCache<Container>(() => new Container(Code));
-            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, false));
+            _mainContainer = new SimpleCache<Container>(() => new Container(Code, Source.Data ));
+            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<Container>>(() => Functions.Compile());
             _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions));
@@ -83,31 +81,31 @@ namespace Reni
         internal FunctionList Functions { get { return _functions.Value; } }
 
         [DisableDump]
-        private string FileName { get { return _fileName; } }
+        string FileName { get { return _fileName; } }
 
         [DisableDump]
-        private Source Source { get { return _source.Value; } }
+        Source Source { get { return _source.Value; } }
 
         [Node]
         [DisableDump]
         internal ReniParser.ParsedSyntax Syntax { get { return _syntax.Value; } }
 
         [DisableDump]
-        private string ExecutedCode { get { return _executedCode.Value; } }
+        internal string ExecutedCode { get { return _executedCode.Value; } }
 
         [Node]
         [DisableDump]
-        private CodeBase Code { get { return _code.Value; } }
+        CodeBase Code { get { return _code.Value; } }
 
         [DisableDump]
-        private Container MainContainer { get { return _mainContainer.Value; } }
+        Container MainContainer { get { return _mainContainer.Value; } }
 
         [DisableDump]
-        private List<Container> FunctionContainers { get { return _functionContainers.Value; } }
+        List<Container> FunctionContainers { get { return _functionContainers.Value; } }
 
         [Node]
         [DisableDump]
-        private ContextBase RootContext { get { return _rootContext.Value; } }
+        ContextBase RootContext { get { return _rootContext.Value; } }
 
 
         internal static string FormattedNow
@@ -182,7 +180,7 @@ namespace Reni
                 Functions[i].EnsureBodyCode();
         }
 
-        private OutStream GetOutStream()
+        OutStream GetOutStream()
         {
             BitsConst.OutStream = new OutStream();
             try
@@ -199,7 +197,7 @@ namespace Reni
             return BitsConst.OutStream;
         }
 
-        private OutStream GetOutStreamFromCode()
+        OutStream GetOutStreamFromCode()
         {
             BitsConst.OutStream = new OutStream();
             Code.Execute(_functionCode.Value, _parameters.Trace.CodeExecutor);

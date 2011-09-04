@@ -1,132 +1,91 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
-using Reni.Runtime;
 
 namespace Reni.Code
 {
     /// <summary>
     ///     base class for all compiled code items
     /// </summary>
-    internal sealed class Container : ReniObject
+    sealed class Container : ReniObject
     {
-        private static readonly Container _unexpectedVisitOfPending = new Container("UnexpectedVisitOfPending");
-        private readonly string _description;
-
-        /// <summary>
-        ///     When set, some exceptions for unserialisable elements are not thrown.
-        /// </summary>
-        internal readonly bool IsInternal;
+        static readonly Container _unexpectedVisitOfPending = new Container("UnexpectedVisitOfPending");
+        readonly string _description;
 
         [EnableDump]
-        private readonly Size _frameSize;
+        readonly Size _frameSize;
 
         [DisableDump]
-        private readonly CodeBase _data;
+        readonly CodeBase _data;
 
-        public Container(CodeBase data, Size frameSize = null, string description = "", bool isInternal = false)
+        public Container(CodeBase data, string description, Size frameSize = null)
         {
-            IsInternal = isInternal;
             _frameSize = frameSize ?? Size.Zero;
             _description = description;
             _data = data;
         }
 
-        private Container(string errorText)
+        Container(string errorText)
         {
             _description = errorText;
-            IsInternal = false;
         }
 
-        [Node, EnableDump]
+        [Node]
+        [EnableDump]
         internal CodeBase Data { get { return _data; } }
 
-        [Node, EnableDump]
+        [Node]
+        [EnableDump]
         internal string Description { get { return _description; } }
 
-        [Node, DisableDump]
+        [Node]
+        [DisableDump]
         internal bool IsError { get { return _frameSize == null; } }
 
-        [Node, DisableDump]
-        public Size MaxSize { get { return _data.MaxSize; } }
+        [Node]
+        [DisableDump]
+        public Size MaxSize { get { return _data.TemporarySize; } }
 
-        [Node, DisableDump]
+        [Node]
+        [DisableDump]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
-
-        private void DataAdd(FiberItem leafElement) { NotImplementedMethod(leafElement); }
-
-        public CodeTypeDeclaration GetCSharpTypeCode(List<Container> functions, string name, bool useStatementAligner)
-        {
-            var result = new CodeTypeDeclaration(name);
-            result.Comments.Add(new CodeCommentStatement(Generator.NotACommentFlag + "unsafe"));
-            result.Members.Add(GetCSharpFunctionCode(Generator.MainFunctionName, false, useStatementAligner));
-            for(var i = 0; i < functions.Count; i++)
-                result.Members.Add(functions[i].GetCSharpFunctionCode(Generator.FunctionName(i), true, useStatementAligner));
-            return result;
-        }
-
-        private CodeMemberMethod GetCSharpFunctionCode(string name, bool isFunction, bool useStatementAligner)
-        {
-            var result = new CodeMemberMethod();
-            result.Comments.AddRange(CreateComment(Description));
-            result.Comments.Add(new CodeCommentStatement(Generator.NotACommentFlag + "unsafe"));
-            result.Name = name;
-            result.Attributes = MemberAttributes.Static | MemberAttributes.Public;
-            result.Statements.Add(new CodeSnippetExpression(GetCSharpStatements(useStatementAligner, isFunction)));
-            if(isFunction)
-            {
-                result.Parameters.Add(new CodeParameterDeclarationExpression(typeof(DataContainer), Generator.FrameArgName));
-                result.Attributes = MemberAttributes.Static | MemberAttributes.Private;
-                result.ReturnType = new CodeTypeReference(typeof(DataContainer));
-            }
-            return result;
-        }
-
-        private static CodeCommentStatementCollection CreateComment(string description)
-        {
-            var lines = description.Split('\n');
-            var result = new CodeCommentStatementCollection();
-            for(var i = 0; i < lines.Length; i++)
-                result.Add(new CodeCommentStatement(lines[i]));
-            return result;
-        }
-
-        private string GetCSharpStatements(bool useStatementAligner, bool isFunction)
-        {
-            if(IsError)
-                return "throw new Exception(" + Description.Replace("\"", "\"\"") + ")";
-
-            var statements = CSharpGenerator.CreateFunctionBody(_data, isFunction);
-            if(useStatementAligner)
-                statements = StatementAligner(statements);
-            statements = statements.Indent(3);
-            return statements;
-        }
-
-        private static string StatementAligner(string statements)
-        {
-            var aligner = new StringAligner();
-            aligner.AddFloatingColumn("frame", "data");
-            aligner.AddFloatingColumn(" ", ")");
-            aligner.AddFloatingColumn("; // ");
-            aligner.AddFloatingColumn(" ");
-            return aligner.Format(statements);
-        }
 
         internal BitsConst Evaluate()
         {
             NotImplementedMethod();
             return null;
         }
+        public string GetCSharpStatements()
+        {
+            var generator = new CSharpGenerator(_data.TemporarySize.SaveByteCount);
+            _data.Visit(generator);
+            return generator.Data;
+        }
     }
 
     [Serializable]
-    internal class ErrorElement : FiberHead
+    class ErrorElement : FiberHead
     {
         [Node]
         internal readonly CodeBase CodeBase;
@@ -138,9 +97,9 @@ namespace Reni.Code
     /// <summary>
     ///     Nothing, since void cannot be used for this purpose
     /// </summary>
-    internal class none
+    class none
     {
-        private static readonly none _instance = new none();
+        static readonly none _instance = new none();
 
         /// <summary>
         ///     Gets the instance.

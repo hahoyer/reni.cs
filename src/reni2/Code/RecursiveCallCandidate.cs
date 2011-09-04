@@ -22,7 +22,7 @@ namespace Reni.Code
 
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { throw new NotImplementedException(); }
+        internal override void Visit(IVisitor visitor) { throw new NotImplementedException(); }
 
         internal override CodeBase TryToCombineBack(TopFrameData precedingElement)
         {

@@ -31,18 +31,17 @@ namespace Reni.Code
                 return new CodeBase[0];
             return new[] {this};
         }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.BitArray(this); }
 
         [DisableDump]
         internal override bool IsEmpty { get { return Size.IsZero; } }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.BitsArray(Size, Data); }
+        internal override void Visit(IVisitor visitor) { visitor.BitsArray(Size, Data); }
 
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Data=" + Data; } }
-
-        protected override string CSharpString() { return CSharpGenerator.CreateBitArray(GetSize(), Data); }
 
         protected override string CSharpString(Size top) { return CSharpGenerator.Push(top, Size, Data); }
 

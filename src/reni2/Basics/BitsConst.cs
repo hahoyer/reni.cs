@@ -55,13 +55,13 @@ namespace Reni.Basics
             : this(new BitsConst(value), size) { }
 
         private BitsConst(Int64 value)
-            : this(Size.Create(AutoSize(value))) { Data.MoveBytes(DataSize(_size), _data, 0, value); }
+            : this(Size.Create(AutoSize(value))) { DataHandler.MoveBytes(DataSize(_size), _data, 0, value); }
 
         private BitsConst(BitsConst value, Size size)
             : this(size) { MoveData(_data, Size, value._data, value.Size); }
 
         private BitsConst(int bytes, byte[] value, int start)
-            : this(Size.Create(bytes*8)) { Data.MoveBytes(DataSize(_size), _data, 0, value, start); }
+            : this(Size.Create(bytes * 8)) { DataHandler.MoveBytes(DataSize(_size), _data, 0, value, start); }
 
         private static Size SegmentBits { get { return Size.Create(1 << SegmentAlignBits); } }
         private static int SegmentValues { get { return 1 << SegmentBits.ToInt(); } }
@@ -81,6 +81,8 @@ namespace Reni.Basics
                 return GetBit(Size - 1) != 0;
             }
         }
+
+        public byte[] ToByteArray() { return (byte[]) _data.Clone(); }
 
         public static OutStream OutStream { get { return _outStream; } set { _outStream = value; } }
 
@@ -259,8 +261,8 @@ namespace Reni.Basics
         {
             Size.AssertAlignedSize(SegmentAlignBits);
             var result = new BitsConst(Size + other.Size);
-            Data.MoveBytes(DataSize(Size), result._data, 0, _data, 0);
-            Data.MoveBytes(DataSize(other.Size), result._data, DataSize(Size), other._data, 0);
+            DataHandler.MoveBytes(DataSize(Size), result._data, 0, _data, 0);
+            DataHandler.MoveBytes(DataSize(other.Size), result._data, DataSize(Size), other._data, 0);
             return result;
         }
 

@@ -35,15 +35,11 @@ namespace Reni.Code
         protected override Size GetSize() { return Left.Size + Right.Size; }
         protected override CodeArgs GetRefsImplementation() { return _left.CodeArgs.Sequence(_right.CodeArgs); }
 
-        [DisableDump]
-        protected override Size MaxSizeImplementation
+        protected override Size GetTemporarySize()
         {
-            get
-            {
-                var lSize = Left.MaxSize;
-                var rSize = Left.Size + Right.MaxSize;
-                return lSize.Max(rSize);
-            }
+            var lSize = Left.TemporarySize;
+            var rSize = Left.Size + Right.TemporarySize;
+            return lSize.Max(rSize);
         }
 
         public override string DumpData() { return InternalDumpData(""); }

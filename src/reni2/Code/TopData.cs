@@ -41,7 +41,7 @@ namespace Reni.Code
             return fiber;
         }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopData(Offset, Size, DataSize); }
+        internal override void Visit(IVisitor visitor) { visitor.TopData(Offset, Size, DataSize); }
 
         protected override string CSharpString() { return CSharpGenerator.TopData(Offset, GetSize()); }
     }
@@ -63,7 +63,7 @@ namespace Reni.Code
             return fiber;
         }
 
-        protected override void Execute(IFormalMaschine formalMaschine) { formalMaschine.TopFrameData(Offset, Size, DataSize); }
+        internal override void Visit(IVisitor visitor) { visitor.TopFrameData(Offset, Size, DataSize); }
 
         protected override string CSharpString() { return CSharpGenerator.TopFrame(Offset, GetSize()); }
     }

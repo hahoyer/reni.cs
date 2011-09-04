@@ -21,17 +21,22 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
+using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Context
 {
-    internal sealed class Function : Child
+    sealed class Function : Child, IReferenceInCode
     {
         [Node]
         internal readonly TypeBase ArgsType;
         internal Function(ContextBase parent, TypeBase argsType)
             : base(parent) { ArgsType = argsType; }
 
-        internal override FunctionContextObject ObtainRecentFunctionContext() { return Parent.UniqueFunctionContextObject(ArgsType); }
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+
+        internal override Function ObtainRecentFunctionContext() { return this; }
+        internal Result CreateArgsReferenceResult(Category category) { return ArgsType.ReferenceInCode(category, this); }
     }
 }

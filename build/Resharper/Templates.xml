@@ -1,18 +1,1 @@
-<TemplatesExport family="Live Templates">
-  <Template uid="50847285-1ac1-4e4a-bad4-c47c57eb5bbd" shortcut="nim" description="" text="NotImplementedMethod($END$);&#xD;&#xA;return null;&#xD;&#xA;" reformat="True" shortenQualifiedReferences="True">
-    <Context>
-      <CSharpContext context="Statement" minimumLanguageVersion="2.0" />
-    </Context>
-    <Categories />
-    <Variables />
-    <CustomProperties />
-  </Template>
-  <Template uid="bad15b73-0c76-4eb7-8801-1c3b18a77b99" shortcut="vd" description="Create code to dump a variable" text="Dump(&quot;$SELECTION$&quot;, $SELECTION$);&#xD;&#xA;" reformat="True" shortenQualifiedReferences="True">
-    <Scopes>
-      <Scope type="InCSharpStatement" minimumLanguageVersion="2.0" />
-    </Scopes>
-    <Categories />
-    <Variables />
-    <CustomProperties />
-  </Template>
-</TemplatesExport>
+<TemplatesExport />
