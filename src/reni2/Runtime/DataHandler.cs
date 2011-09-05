@@ -131,9 +131,9 @@ namespace Reni.Runtime
             var bytes = RefBytes;
 
             var result = new byte[bytes];
-            fixed (byte* dataPointer = &data[dataStart])
+            fixed (byte* dataPointer = data)
             {
-                var intPointer = (int) dataPointer;
+                var intPointer = (int) (dataPointer + dataStart);
                 var bytePointer = (byte*) &intPointer;
                 for(var i = 0; i < bytes; i++)
                     result[i] = bytePointer[i];
