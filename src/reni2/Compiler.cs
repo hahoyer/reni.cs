@@ -60,7 +60,7 @@ namespace Reni
             _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
             _functionCode = new SimpleCache<CodeBase[]>(() => Functions.Code);
-            _mainContainer = new SimpleCache<Container>(() => new Container(Code, Source.Data ));
+            _mainContainer = new SimpleCache<Container>(() => new Container(Code, Source.Data));
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<Container>>(() => Functions.Compile());
@@ -125,6 +125,7 @@ namespace Reni
                 return result;
             }
         }
+        public static OutStream OutStream { get { return BitsConst.OutStream; } set { BitsConst.OutStream = value; } }
 
         /// <summary>
         ///     Performs compilation

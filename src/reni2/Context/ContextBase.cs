@@ -97,10 +97,10 @@ namespace Reni.Context
 
         internal Result QuickResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Find(syntax).Data & category; }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -44 && category.HasIsDataLess;
+            var trace = syntax.ObjectId == -244;
             StartMethodDump(trace, category, syntax);
             try
             {

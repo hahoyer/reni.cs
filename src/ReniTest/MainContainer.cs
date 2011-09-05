@@ -29,17 +29,19 @@ using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
 using Reni.FeatureTest.DefaultOperations;
+using Reni.Runtime;
 
 namespace ReniTest
 {
-    internal static class MainContainer
+    static class MainContainer
     {
         public static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Reni.MainFunction();
+            if(false)
+                ExecTest();
 
             //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
             //RunSpecificTest();
@@ -51,9 +53,9 @@ namespace ReniTest
         }
 
         [Test]
-        private static void RunSpecificTest() { new TypeNameExtenderTest().TestMethod(); }
+        static void RunSpecificTest() { new TypeNameExtenderTest().TestMethod(); }
 
-        private const string Target = @"
+        const string Target = @"
 f1: ((
   y: 3;
   f: y/\;
@@ -62,10 +64,10 @@ f1: ((
 
 f1()dump_print;
 ";
-        private const string Output = "3";
-        private static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
+        const string Output = "3";
+        static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
 
-        private static Compiler CreateCompiler(string text)
+        static Compiler CreateCompiler(string text)
         {
             Tracer.IsBreakDisabled = false;
             const string fileName = "temptest.reni";
@@ -76,22 +78,31 @@ f1()dump_print;
             //Tracer.FlaggedLine(Profiler.Format(10,0.0));
             return compiler;
         }
-    }
 
-    [TestFixture]
-    public sealed class TypeNameExtenderTest
-    {
-        [Test]
-        public void TestMethod()
+        static void ExecTest()
         {
-            InternalTest(typeof(int), "int");
-            InternalTest(typeof(List<int>), "List<int>");
-            InternalTest(typeof(List<List<int>>), "List<List<int>>");
-            InternalTest(typeof(Dictionary<int, string>), "Dictionary<int,string>");
-            InternalTest(typeof(TypeOperator), "DefaultOperations.TypeOperator");
+            var os = Compiler.OutStream;
+            Compiler.OutStream = new OutStream();
+            Reni.MainFunction();
+            var osNew = Compiler.OutStream;
+            Compiler.OutStream = os;
         }
 
-        [DebuggerHidden]
-        private static void InternalTest(Type type, string expectedTypeName) { Tracer.Assert(1, type.PrettyName() == expectedTypeName, () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName); }
+        [TestFixture]
+        public sealed class TypeNameExtenderTest
+        {
+            [Test]
+            public void TestMethod()
+            {
+                InternalTest(typeof(int), "int");
+                InternalTest(typeof(List<int>), "List<int>");
+                InternalTest(typeof(List<List<int>>), "List<List<int>>");
+                InternalTest(typeof(Dictionary<int, string>), "Dictionary<int,string>");
+                InternalTest(typeof(TypeOperator), "DefaultOperations.TypeOperator");
+            }
+
+            [DebuggerHidden]
+            static void InternalTest(Type type, string expectedTypeName) { Tracer.Assert(1, type.PrettyName() == expectedTypeName, () => type + "\nFound   : " + type.PrettyName() + "\nExpected: " + expectedTypeName); }
+        }
     }
 }

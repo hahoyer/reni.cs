@@ -27,26 +27,26 @@ namespace ReniTest
     public static class Reni
     {
         // 
-// f: arg/\;f(2) dump_print;
+//x: 100; f: x/\;f() dump_print;
 //
         public static void MainFunction()
         {
-            var data = Data.Create(4);
-            data.Push(2);
-            var h_1_0 = data.Pull(1);
-            data.Push(h_1_0.Address(0));
+            var data = Data.Create(5);
+            data.Push(100);
+            data.Push(data.Address(1));
             data.Push(Function0(data.Pull(4)));
-            var h_1_1 = data.Pull(1);
-            data.Push(h_1_1.Get(1, 0));
+            var h_2_0 = data.Pull(1);
+            data.Push(h_2_0.Get(1, 0));
             data.Pull(1).PrintNumber();
         }
-        // arg
+        // x.27
         static Data Function0(Data frame)
         {
             var data = Data.Create(4);
             data.Push(frame.GetFromBack(4, -4));
-            data.Push(data.Pull(4).Dereference(1).BitCast(3).BitCast(8));
+            data.RefPlus(-1);
+            data.Push(data.Pull(4).Dereference(1));
             return data;
         }
     }
-}
+}                                                            
