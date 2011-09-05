@@ -1,0 +1,41 @@
+﻿<#@ template language="C#" #>
+<#@ import namespace="global::HWClassLibrary.Helper" #>
+<#@ import namespace="global::Reni.Basics" #>
+
+using System;
+using Reni;
+using Reni.Runtime;
+
+namespace ReniTest
+{
+	unsafe static public class Reni
+	{
+	<# 
+        GenerateCSharpFunctionCode(_main, Generator.MainFunctionName, false);
+        for(var i = 0; i < _functions.Count; i++)
+            GenerateCSharpFunctionCode(_functions[i], Generator.FunctionName(i), true);
+	#>
+	}
+}
+
+<#+ 
+	void GenerateCSharpFunctionCode(Container container, string name, bool isFunction)
+	{
+		var comment = container.Description.Replace("\n", "\n//" );
+		#>
+		// <#= comment #>
+		<#+if(isFunction){#>
+			unsafe static Data <#= name #>(Data frame)
+		<#+}else{#>
+			unsafe static public void <#= name #>( )
+		<#+}#>
+			{
+			<#=container.GetCSharpStatements()#><#+
+			if(isFunction)
+			{
+				#>return data;<#+
+			}#>
+			}
+	<#+}
+	
+#>

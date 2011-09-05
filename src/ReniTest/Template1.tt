@@ -1,0 +1,12 @@
+﻿<#@ template debug="true" hostSpecific="true" #>
+<#@ include file="EF.Utility.CS.ttinclude"#>
+<#@ output extension=".cs" #>
+<#@ Assembly Name="$(TargetDir)HWClassLibrary.dll" #>
+<#@ Assembly Name="$(TargetDir)Reni.dll" #>
+<#@ import namespace="global::Reni" #>// <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") #> <# 
+var code = new T4Compiler(
+@"
+ f: arg/\;f(2) dump_print;
+").Code(); 
+#>     
+<#= code #>     

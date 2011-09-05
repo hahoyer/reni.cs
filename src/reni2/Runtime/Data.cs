@@ -82,6 +82,7 @@ namespace Reni.Runtime
         public void RefPlus(int offset) { _data.DoRefPlus(StartIndex, offset); }
         public Data Dereference(int bytes) { return Create(_data.Dereference(StartIndex, bytes)); }
         public Data Get(int bytes, int offset) { return Create(_data.Get(StartIndex + offset, bytes)); }
+        public Data GetFromBack(int bytes, int offset) { return Create(_data.Get(_data.Length + offset, bytes)); }
         public void PrintNumber() { GetBytes().PrintNumber(); }
         public void PrintText(int itemBytes)
         {

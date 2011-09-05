@@ -51,7 +51,6 @@ namespace Reni.Code
         void AddCode(string pattern, params object[] data)
         {
             var c = string.Format(pattern, data);
-            Tracer.ConditionalBreak(c == "data.==(1, 1);", () => "");
             _data.Add("    ".Repeat(_indent) + c);
         }
 
@@ -64,13 +63,11 @@ namespace Reni.Code
 
         static int RefBytes { get { return DataHandler.RefBytes; } }
 
-        void IVisitor.Call(Size size, int functionIndex, Size argsAndRefsSize) { throw new NotImplementedException(); }
         void IVisitor.Drop(Size beforeSize, Size afterSize) { throw new NotImplementedException(); }
         void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) { throw new NotImplementedException(); }
         void IVisitor.RecursiveCall() { throw new NotImplementedException(); }
         void IVisitor.ReferenceCode(IReferenceInCode context) { throw new NotImplementedException(); }
         void IVisitor.TopData(Size offset, Size size, Size dataSize) { throw new NotImplementedException(); }
-        void IVisitor.TopFrameData(Size offset, Size size, Size dataSize) { throw new NotImplementedException(); }
         void IVisitor.TopFrameRef(Size offset) { throw new NotImplementedException(); }
 
         void IVisitor.BitsArray(Size size, BitsConst data) { AddCode("data.Push({0})", data.ByteSequence(size)); }
@@ -83,6 +80,25 @@ namespace Reni.Code
         void IVisitor.Assign(Size targetSize) { AddCode("data.Assign({0})", targetSize.SaveByteCount); }
         void IVisitor.BitCast(Size size, Size targetSize, Size significantSize) { AddCode("data.Push(data.Pull({0}).BitCast({1}).BitCast({2}))", targetSize.SaveByteCount, significantSize.ToInt(), size.ToInt()); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) { AddCode("data.Pull({0}).PrintText({1})", leftSize.SaveByteCount, itemSize.SaveByteCount); }
+
+        void IVisitor.Call(Size size, int functionIndex, Size argsAndRefsSize)
+        {
+            AddCode
+                ("data.Push({0}(data.Pull({1})))"
+                 , Generator.FunctionName(functionIndex)
+                 , argsAndRefsSize.SaveByteCount
+                );
+        }
+
+        void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
+        {
+            AddCode
+                ("data.Push(frame.GetFromBack({0}, {1}){2})"
+                 , dataSize.ByteCount
+                 , offset.SaveByteCount
+                 , BitCast(size, dataSize)
+                );
+        }
 
         void IVisitor.LocalVariableAccess(string holder, Size offset, Size size, Size dataSize)
         {
@@ -154,9 +170,10 @@ namespace Reni.Code
             Unindent();
             AddCode("}}");
         }
-        
-        string PullBool(int saveByteCount) {
-            if (saveByteCount == 1)
+
+        string PullBool(int saveByteCount)
+        {
+            if(saveByteCount == 1)
                 return "data.Pull(1).GetBytes()[0] != 0";
             return "data.Pull(" + saveByteCount + ").IsNotNull()";
         }
@@ -379,14 +396,9 @@ namespace Reni.Code
 
         internal static string TopData(Size offset, Size size) { return "DataContainer.TopData(" + offset.SaveByteCount + ", " + size.SaveByteCount + ")"; }
 
-        internal static string BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize) { return opToken.DataFunctionName + "(" + size.SaveByteCount + ", " + leftSize.SaveByteCount + ")"; }
-
-        internal static string BitArrayPrefix(ISequenceOfBitPrefixOperation opToken, Size size) { return opToken.DataFunctionName + "(" + size.SaveByteCount + ")"; }
         internal static string Drop(Size size, Size outputSize) { return "Drop(" + outputSize.SaveByteCount + ")"; }
 
         internal static string LocalVariableAccess(string holder, Size offset, Size size) { return holder + ".DataPart(" + offset.SaveByteCount + ", " + size.SaveByteCount + ")"; }
-
-        internal static string Call(int functionIndex) { return "Call(" + Generator.FunctionName(functionIndex) + ")"; }
 
         internal static string TopFrame(Size offset, Size size) { return Generator.FrameArgName + ".DataPartFromBack(" + offset.SaveByteCount + ", " + size.SaveByteCount + ")"; }
     }

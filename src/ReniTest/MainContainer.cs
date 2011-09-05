@@ -39,7 +39,7 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //Reni.MainFunction();
+            Reni.MainFunction();
 
             //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
             //RunSpecificTest();
