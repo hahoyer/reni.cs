@@ -26,10 +26,12 @@ namespace ReniTest
 		// <#= comment #>
 		<#+if(isFunction){#>
 			unsafe static Data <#= name #>(Data frame)
+			{
+			Start:
 		<#+}else{#>
 			unsafe static public void <#= name #>( )
-		<#+}#>
 			{
+		<#+}#>
 			<#=container.GetCSharpStatements()#><#+
 			if(isFunction)
 			{

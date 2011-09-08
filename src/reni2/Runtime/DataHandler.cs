@@ -16,13 +16,11 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
-using System.Diagnostics;
 using System.Numerics;
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 
@@ -131,7 +129,7 @@ namespace Reni.Runtime
             var bytes = RefBytes;
 
             var result = new byte[bytes];
-            fixed (byte* dataPointer = data)
+            fixed(byte* dataPointer = data)
             {
                 var intPointer = (int) (dataPointer + dataStart);
                 var bytePointer = (byte*) &intPointer;
@@ -145,10 +143,10 @@ namespace Reni.Runtime
         {
             Tracer.Assert(data.Length >= dataStart + RefBytes);
             var result = new byte[bytes];
-            fixed (byte* dataPointer = &data[dataStart])
+            fixed(byte* dataPointer = &data[dataStart])
             {
-                var bytePointer = *(byte**)dataPointer;
-                for (var i = 0; i < bytes; i++)
+                var bytePointer = *(byte**) dataPointer;
+                for(var i = 0; i < bytes; i++)
                     result[i] = bytePointer[i];
             }
             return result;
@@ -158,7 +156,7 @@ namespace Reni.Runtime
         {
             Tracer.Assert(data != null, "data != null");
             var result = new byte[RefBytes];
-            fixed (byte* dataPointer = &data[dataStart])
+            fixed(byte* dataPointer = &data[dataStart])
             {
                 var intPointer = (int*) dataPointer;
                 *intPointer += offset;
@@ -169,7 +167,7 @@ namespace Reni.Runtime
         {
             var result = new byte[bytes];
             for(var i = 0; i < bytes; i++)
-                result[i] = source[sourceStart+i];
+                result[i] = source[sourceStart + i];
             return result;
         }
 
@@ -179,14 +177,11 @@ namespace Reni.Runtime
                 BitCast(bytes, dataPointer, bits);
         }
 
-        internal static void PrintNumber(this byte[] data)
-        {
-            PrintText(new BigInteger(data).ToString());
-        }
+        internal static void PrintNumber(this byte[] data) { PrintText(new BigInteger(data).ToString()); }
 
         internal static void PrintText(this string text) { BitsConst.OutStream.Add(text); }
-        internal static void PrintText(this byte[] text) { new string(text.Select(x=>(char)x).ToArray()).PrintText(); }
-        
+        internal static void PrintText(this byte[] text) { new string(text.Select(x => (char) x).ToArray()).PrintText(); }
+
         internal static unsafe void AssignFromPointers(this byte[] leftData, byte[] rightData, int bytes)
         {
             fixed(byte* leftPointer = leftData)
@@ -205,20 +200,20 @@ namespace Reni.Runtime
             var rightBytes = right.Length;
             var isLeftNegative = left[leftBytes - 1] < 0;
             var isRightNegative = right[rightBytes - 1] < 0;
-            if (isLeftNegative != isRightNegative)
+            if(isLeftNegative != isRightNegative)
                 return isRightNegative;
 
-            for (var i = Math.Max(leftBytes, rightBytes) - 1; i >= 0; i--)
+            for(var i = Math.Max(leftBytes, rightBytes) - 1; i >= 0; i--)
             {
-                var leftByte = (sbyte)(isLeftNegative ? -1 : 0);
-                var rightByte = (sbyte)(isRightNegative ? -1 : 0);
-                if (i < leftBytes)
-                    leftByte = (sbyte)left[i];
-                if (i < rightBytes)
-                    rightByte = (sbyte)right[i];
-                if (leftByte < rightByte)
+                var leftByte = (sbyte) (isLeftNegative ? -1 : 0);
+                var rightByte = (sbyte) (isRightNegative ? -1 : 0);
+                if(i < leftBytes)
+                    leftByte = (sbyte) left[i];
+                if(i < rightBytes)
+                    rightByte = (sbyte) right[i];
+                if(leftByte < rightByte)
                     return false;
-                if (leftByte > rightByte)
+                if(leftByte > rightByte)
                     return true;
             }
 
@@ -231,30 +226,30 @@ namespace Reni.Runtime
             var rightBytes = right.Length;
             var d = 0;
             var i = 0;
-            for (; i < leftBytes && i < rightBytes; i++)
+            for(; i < leftBytes && i < rightBytes; i++)
             {
-                d = (sbyte)left[i];
-                if (d != (sbyte)right[i])
+                d = (sbyte) left[i];
+                if(d != (sbyte) right[i])
                     return false;
             }
-            for (; i < leftBytes; i++)
+            for(; i < leftBytes; i++)
             {
-                if (d < 0 && (sbyte)left[i] != -1)
+                if(d < 0 && (sbyte) left[i] != -1)
                     return false;
-                if (d >= 0 && (sbyte)left[i] != 0)
+                if(d >= 0 && (sbyte) left[i] != 0)
                     return false;
             }
-            for (; i < rightBytes; i++)
+            for(; i < rightBytes; i++)
             {
-                if (d < 0 && (sbyte)right[i] != -1)
+                if(d < 0 && (sbyte) right[i] != -1)
                     return false;
-                if (d >= 0 && (sbyte)right[i] != 0)
+                if(d >= 0 && (sbyte) right[i] != 0)
                     return false;
             }
             return true;
         }
 
-        internal static byte[] Plus(int bytes, byte[] left, byte[] right)
+        internal static byte[] Plus(this byte[] left, byte[] right, int bytes)
         {
             var leftBytes = left.Length;
             var rightBytes = right.Length;
@@ -262,13 +257,13 @@ namespace Reni.Runtime
             var d = 0;
             var carry = 0;
 
-            for (var i = 0; i < bytes; i++)
+            for(var i = 0; i < bytes; i++)
             {
                 if(i < leftBytes)
-                    carry += ((sbyte)left[i] & 0xff);
+                    carry += ((sbyte) left[i] & 0xff);
                 if(i < rightBytes)
                 {
-                    d = (sbyte)right[i];
+                    d = (sbyte) right[i];
                     carry += (d & 0xff);
                 }
                 else if(d < 0)
@@ -279,14 +274,14 @@ namespace Reni.Runtime
             }
             return result;
         }
-        
-        internal static byte[] PlusSimple(byte[] left, byte[] right)
+
+        internal static byte[] PlusSimple(this byte[] left, byte[] right)
         {
             Tracer.Assert(left.Length == right.Length);
             var bytes = left.Length;
             var result = new byte[bytes];
             var carry = 0;
-            for (var i = 0; i < bytes; i++)
+            for(var i = 0; i < bytes; i++)
             {
                 carry += (sbyte) left[i] & 0xff;
                 carry += (sbyte) right[i] & 0xff;
@@ -295,53 +290,40 @@ namespace Reni.Runtime
             }
             return result;
         }
-        
-        internal static unsafe void MinusPrefix(byte[] data)
+
+        internal static void MinusPrefix(this byte[] data)
         {
             var carry = 1;
-            for (var i = 0; i < data.Length; i++)
+            for(var i = 0; i < data.Length; i++)
             {
-                data[i] = (byte)((sbyte)(~(sbyte)data[i]) + carry);
+                data[i] = (byte) ((sbyte) (~(sbyte) data[i]) + carry);
                 carry = data[i] == 0 ? 1 : 0;
             }
         }
-    }
-    class Dummy : ReniObject
-    {
-        /// <summary>
-        ///     Casts x by number of bits given.
-        /// </summary>
-        /// <param name = "count">The count.</param>
-        /// <param name = "x">The x.</param>
-        /// <param name = "bits">The bits.</param>
-        /// created 03.02.2007 01:39
-        [UsedImplicitly]
-        public static unsafe void BitCast(int count, sbyte* x, int bits)
+
+        internal static byte[] Times(this byte[] left, byte[] right, int bytes)
         {
-            var isNegative = x[count - 1] < 0;
-            while (bits >= 8)
-            {
-                count--;
-                x[count] = (sbyte)(isNegative ? -1 : 0);
-                bits -= 8;
-            }
-            if (bits > 0)
-            {
-                count--;
-                x[count] = (sbyte)((sbyte)(x[count] << bits) >> bits);
-            }
-            if (bits < 0)
-            {
-                NotImplementedFunction(count, x[0], bits);
-                throw new NotImplementedException();
-            }
+            return (new BigInteger(left) * new BigInteger(right))
+                .ToByteArray()
+                .ByteAlign(bytes);
         }
 
-        static unsafe void BoolToSBytes(int countResult, sbyte* dataResult, bool result)
+        static byte[] ByteAlign(this byte[] data, int bytes)
         {
-            var value = (sbyte)(result ? -1 : 0);
-            for (var i = 0; i < countResult; i++)
-                dataResult[i] = value;
+            if(data.Length == bytes)
+                return data;
+            var result = new byte[bytes];
+            var i = 0;
+            for(; i < bytes && i < data.Length; i++)
+                result[i] = data[i];
+            if(i < bytes)
+            {
+                var sign = (byte) (data[i - 1] < 0 ? 127 : 0);
+                for(; i < bytes; i++)
+                    result[i] = sign;
+            }
+
+            return result;
         }
     }
 }

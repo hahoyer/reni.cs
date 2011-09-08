@@ -139,14 +139,14 @@ namespace Reni.Runtime
         {
             var right = Pull(rightBytes);
             var left = Pull(leftBytes);
-            Push((byte)(operation(left._data, right._data) ? -1 : 0));
+            Push((byte) (operation(left._data, right._data) ? -1 : 0));
         }
 
         [UsedImplicitly]
         public void MinusPrefix(int bytes)
         {
             var data = Pull(bytes);
-            DataHandler.MinusPrefix(data._data);
+            data._data.MinusPrefix();
             Push(data);
         }
 
@@ -155,7 +155,7 @@ namespace Reni.Runtime
         {
             var right = Pull(rightBytes);
             var left = Pull(leftBytes);
-            Push(DataHandler.Plus(sizeBytes, left._data, right._data));
+            Push(left._data.Plus(right._data, sizeBytes));
         }
 
         [UsedImplicitly]
@@ -169,9 +169,15 @@ namespace Reni.Runtime
             var right = Pull(rightBytes);
             var left = Pull(leftBytes);
             right.MinusPrefix(rightBytes);
-            Push(DataHandler.Plus(sizeBytes, left._data, right._data));
+            Push(left._data.Plus(right._data, sizeBytes));
+        }
+
+        [UsedImplicitly]
+        public void Star(int sizeBytes, int leftBytes, int rightBytes)
+        {
+            var right = Pull(rightBytes);
+            var left = Pull(leftBytes);
+            Push(left._data.Times(right._data, sizeBytes));
         }
     }
-
 }
-
