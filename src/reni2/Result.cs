@@ -694,6 +694,9 @@ namespace Reni
         [DebuggerHidden]
         internal Result AssertEmptyOrValidReference()
         {
+            if (FindIsDataLess == true)
+                return this;
+
             var size = FindSize;
             if(size != null)
             {

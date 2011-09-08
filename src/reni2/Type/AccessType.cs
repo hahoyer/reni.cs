@@ -81,7 +81,7 @@ namespace Reni.Type
         {
             var result = new Result
                 (category
-                 , () => refAlignParam.RefSize.IsZero
+                 , () => false
                  , () => refAlignParam.RefSize
                  , () => _assignmentFeatureCache.Value.UniqueFunctionalType(refAlignParam)
                  , ArgCode

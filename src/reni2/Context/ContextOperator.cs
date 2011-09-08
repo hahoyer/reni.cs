@@ -48,7 +48,7 @@ namespace Reni.Context
                 var structureType = leftResult.Type.FindRecentStructure;
                 Dump("structureType", structureType);
                 BreakExecution();
-                if (structureType.StructSize.IsZero)
+                if (structureType.StructIsDataLess)
                 {
                     NotImplementedMethod(context,category,left);
                     return null;

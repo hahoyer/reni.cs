@@ -141,7 +141,7 @@ namespace Reni.Struct
             var visitResult = Result(category);
             var result = visitResult
                 .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
-            if(_args.Size.IsZero)
+            if(_args.IsDataLess)
                 result.Code = result.Code.TryReplacePrimitiveRecursivity(_index);
             return result.Code;
         }
