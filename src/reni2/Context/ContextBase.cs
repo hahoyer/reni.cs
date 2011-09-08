@@ -100,7 +100,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -244;
+            var trace = syntax.ObjectId == -244 && ObjectId == 3;
             StartMethodDump(trace, category, syntax);
             try
             {

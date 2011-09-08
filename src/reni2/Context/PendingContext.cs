@@ -32,25 +32,36 @@ namespace Reni.Context
 
         internal Result Result(Category category, CompileSyntax syntax)
         {
-            if(category.HasCode)
+            var trace = ObjectId == -5 && syntax.ObjectId == 244;
+            StartMethodDump(trace, category,syntax);
+            try
             {
-                NotImplementedMethod(category, syntax);
-                return null;
+                BreakExecution();
+                if(category.HasCode)
+                {
+                    NotImplementedMethod(category, syntax);
+                    return null;
+                }
+
+                var result = new Result();
+                var localCategory = category;
+                if(category.HasArgs)
+                    result.CodeArgs = CodeArgs.Void();
+                localCategory -= Category.CodeArgs;
+                if(category.HasIsDataLess)
+                    result.IsDataLess = true;
+                localCategory -= Category.IsDataLess;
+                if(localCategory.HasAny)
+                    result.Update(syntax.ObtainResult(this, localCategory));
+
+                Tracer.Assert(result.CompleteCategory == category);
+                return ReturnMethodDump(result,true);
+
             }
-
-            var result = new Result();
-            var localCategory = category;
-            if (category.HasArgs)
-                result.CodeArgs = CodeArgs.Void();
-            localCategory -= Category.CodeArgs;
-            if (category.HasIsDataLess)
-                result.IsDataLess = true;
-            localCategory -= Category.IsDataLess;
-            if(localCategory.HasAny)
-                result.Update(syntax.ObtainResult(this, localCategory));
-
-            Tracer.Assert(result.CompleteCategory == category);
-            return result;
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         protected override Result ObtainPendingResult(Category category, CompileSyntax syntax)

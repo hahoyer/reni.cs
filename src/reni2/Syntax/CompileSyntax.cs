@@ -123,7 +123,7 @@ namespace Reni.Syntax
         internal Result OperationResult<TFeature>(ContextBase context, Category category, Defineable defineable)
             where TFeature : class
         {
-            var trace = ObjectId == -39 && context.ObjectId == 3 && defineable.ObjectId == 19;
+            var trace = ObjectId == -241 && context.ObjectId == 3 && defineable.ObjectId == 19;
             StartMethodDump(trace, context, category, defineable);
             try
             {
