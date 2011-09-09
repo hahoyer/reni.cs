@@ -1,4 +1,4 @@
-//     Compiler for programming language "Reni"      /
+//     Compiler for programming language "Reni"
 //     Copyright (C) 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
 
@@ -28,7 +29,7 @@ namespace Reni.FeatureTest
 {
     public class TextStruct : CompilerTest
     {
-        private static string Definition()
+        static string Definition()
         {
             return
                 @"
@@ -61,8 +62,10 @@ Text:
     [Output("a")]
     [InstanceCode("Text('a')")]
     [Integer1]
+    [TwoFunctions]
+    [FromTypeAndFunction]
     [PrimitiveRecursiveFunctionByteWithDump]
-    public sealed class Text1: TextStruct
+    public sealed class Text1 : TextStruct
     {
         [Test]
         public override void Run() { BaseRun(); }

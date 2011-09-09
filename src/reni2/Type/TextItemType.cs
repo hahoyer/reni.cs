@@ -29,9 +29,12 @@ namespace Reni.Type
 {
     sealed class TextItemType : TagChild
     {
+        [DisableDump]
         public readonly ISearchPath<IFeature, SequenceType> ToNumberOfBaseFeature;
+        
         public TextItemType(TypeBase parent)
             : base(parent) { ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this); }
+        
         protected override string TagTitle { get { return "text_item"; } }
 
         internal override void Search(ISearchVisitor searchVisitor)
