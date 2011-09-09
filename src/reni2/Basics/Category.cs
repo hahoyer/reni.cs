@@ -85,11 +85,13 @@ namespace Reni.Basics
             get
             {
                 var result = this;
-                if(HasType || HasCode)
+                if(result.HasCode)
+                {
                     result |= Size;
-                if(HasCode)
                     result |= CodeArgs;
-                if(result.HasSize)
+                }
+                
+                if (result.HasSize)
                     result |= IsDataLess;
                 return result;
             }
