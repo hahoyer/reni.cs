@@ -24,7 +24,7 @@ namespace Reni.TokenClasses
         }
 
         public abstract Result Result(ContextBase context, Category category, TokenData token);
-        public abstract bool? FlatIsDataLess(ContextBase context, TokenData token);
+        public abstract bool? FlatIsDereferencedDataLess(ContextBase context, TokenData token);
     }
 
     internal abstract class NonPrefix: Special, ITerminal, ISuffix
@@ -39,7 +39,7 @@ namespace Reni.TokenClasses
 
         public abstract Result Result(ContextBase context, Category category, TokenData token);
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
-        bool? ITerminal.FlatIsDataLess(ContextBase context, TokenData token)
+        bool? ITerminal.FlatIsDereferencedDataLess(ContextBase context, TokenData token)
         {
             NotImplementedMethod(context);
             return null;

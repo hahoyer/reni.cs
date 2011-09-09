@@ -116,9 +116,16 @@ namespace Reni.Syntax
             return result.Value;
         }
 
-        internal bool? QuickIsDataLess(ContextBase context) { return QuickResult(context, Category.IsDataLess).IsDataLess; }
+        internal bool? QuickIsDereferencedDataLess(ContextBase context)
+        {
+            var type = QuickResult(context, Category.Type).Type;
+            if (type == null)
+                return null;
+            return type.IsDereferencedDataLess(false);
 
-        internal virtual bool? FlatIsDataLess(ContextBase context) { return null; }
+        }
+
+        internal virtual bool? FlatIsDereferencedDataLess(ContextBase context) { return null; }
 
         internal Result OperationResult<TFeature>(ContextBase context, Category category, Defineable defineable)
             where TFeature : class
@@ -153,6 +160,23 @@ namespace Reni.Syntax
             {
                 EndMethodDump();
             }
+        }
+        
+        internal bool? IsDereferencedDataLess(bool? isFlat, ContextBase context)
+        {
+            var quick = QuickIsDereferencedDataLess(context);
+            if (quick != null)
+                return quick;
+            if (isFlat == false)
+                return null;
+
+            var flat = FlatIsDereferencedDataLess(context);
+            if (flat != null)
+                return flat;
+            if (isFlat == true)
+                return null;
+
+            return Type(context).IsDereferencedDataLess(null);
         }
     }
 }

@@ -35,6 +35,6 @@ namespace Reni.TokenClasses
                 .FindRecentFunctionContextObject
                 .CreateArgsReferenceResult(category);
         }
-        public override bool? FlatIsDataLess(ContextBase context, TokenData token) { return context.ObtainRecentFunctionContext().ArgsType.IsDataLess; }
+        public override bool? FlatIsDereferencedDataLess(ContextBase context, TokenData token) { return context.ObtainRecentFunctionContext().ArgsType.IsDereferencedDataLess(true); }
     }
 }

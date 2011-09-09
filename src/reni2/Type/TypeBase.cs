@@ -303,7 +303,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = ObjectId == -4 && defineable.ObjectId == 19 && category.HasType;
+            var trace = ObjectId == 27 && defineable.ObjectId == 24 && category.HasType;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -434,13 +434,16 @@ namespace Reni.Type
 
         internal Result TextItemResult(Category category, RefAlignParam refAlignParam)
         {
+            var uniqueTextItem = UniqueTextItem();
             return
-                UniqueTextItem()
+                uniqueTextItem
                     .UniqueAutomaticReference(refAlignParam)
                     .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
         }
 
         internal virtual Result UnAlignedResult(Category category) { return ArgResult(category); }
+
+        internal virtual bool? IsDereferencedDataLess(bool? isFlat) { return Size.IsZero; }
     }
 
     interface IMetaFeature

@@ -32,18 +32,18 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Structure : ReniObject
+    sealed class Structure : ReniObject
     {
-        private readonly ContainerContextObject _containerContextObject;
-        private readonly int _endPosition;
+        readonly ContainerContextObject _containerContextObject;
+        readonly int _endPosition;
         [Node]
-        private readonly DictionaryEx<CompileSyntax, FunctionalBody> _functionalFeatureCache;
+        readonly DictionaryEx<CompileSyntax, FunctionalBody> _functionalFeatureCache;
         [Node]
-        private readonly SimpleCache<StructureType> _typeCache;
+        readonly SimpleCache<StructureType> _typeCache;
         [Node]
-        private readonly DictionaryEx<int, AccessType> _accessTypesCache;
+        readonly DictionaryEx<int, AccessType> _accessTypesCache;
         [Node]
-        private readonly DictionaryEx<int, AccessFeature> _accessFeaturesCache;
+        readonly DictionaryEx<int, AccessFeature> _accessFeaturesCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
         {
@@ -89,7 +89,7 @@ namespace Reni.Struct
         [DisableDump]
         internal TypeBase IndexType { get { return ContainerContextObject.IndexType; } }
 
-        private bool _isObtainStructSizeActive;
+        bool _isObtainStructSizeActive;
 
         [DisableDump]
         internal Size StructSize
@@ -115,16 +115,18 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal bool StructIsDataLess { get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
-        [DisableDump]
-        internal bool IsDataLess { get { return ContainerContextObject.StructIsDataLess(EndPosition); } }
+// ReSharper disable PossibleInvalidOperationException
+        internal bool IsDataLess { get { return StructIsDataLess(null).Value; } }
+// ReSharper restore PossibleInvalidOperationException
         [DisableDump]
         internal bool? FlatIsDataLess { get { return ContainerContextObject.StructFlatIsDataLess(EndPosition); } }
 
-        private sealed class RecursionWhileObtainingStructSizeException : Exception
+        internal bool? StructIsDataLess(bool? isFlat) { return ContainerContextObject.StructIsDataLess(isFlat, EndPosition); }
+
+        sealed class RecursionWhileObtainingStructSizeException : Exception
         {
             [EnableDump]
-            private readonly Structure _structure;
+            readonly Structure _structure;
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
 
@@ -174,7 +176,7 @@ namespace Reni.Struct
         internal Result AccessViaContextReference(Category category, int position)
         {
             var accessType = UniqueAccessType(position);
-            if (accessType.IsDataLess)
+            if(accessType.IsDataLess)
                 return accessType.Result(category);
             return accessType
                 .Result(category, ContainerContextObject)
@@ -192,7 +194,7 @@ namespace Reni.Struct
                 );
         }
 
-        private Result DumpPrintResultViaAccessReference(Category category, int position)
+        Result DumpPrintResultViaAccessReference(Category category, int position)
         {
             var accessType = UniqueAccessType(position);
             return accessType
@@ -201,7 +203,7 @@ namespace Reni.Struct
         }
 
         internal Result ContextReferenceViaStructReference(Result result) { return ContainerContextObject.ContextReferenceViaStructReference(EndPosition, result); }
-        private CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize*-1); }
+        CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize * -1); }
         internal TypeBase ValueType(int position) { return ContainerContextObject.InnerType(EndPosition, position).UnAlignedType; }
     }
 }

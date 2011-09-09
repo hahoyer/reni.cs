@@ -77,6 +77,12 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
+        internal override bool? IsDereferencedDataLess(bool? isFlat)
+        {
+            NotImplementedMethod(isFlat);
+            return null;               
+        }
+
         internal Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
         {
             var result = new Result

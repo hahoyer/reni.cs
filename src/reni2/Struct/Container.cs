@@ -197,7 +197,7 @@ namespace Reni.Struct
 
         Result InternalInnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = ObjectId == -10 && accessPosition == 2 && position == 1;
+            var trace = ObjectId == -1 && accessPosition == 2 && position == 1;
             StartMethodDump(trace, category, parent, accessPosition, position);
             try
             {
@@ -215,6 +215,13 @@ namespace Reni.Struct
             }
         }
 
+        bool? InternalInnerIsDataLess(bool? isFlat, ContextBase parent, int accessPosition, int position )
+        {
+            var uniqueChildContext = parent
+                .UniqueChildContext(this, accessPosition);
+            return Statements[position].IsDereferencedDataLess(isFlat, uniqueChildContext);
+        }
+
         Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
             Tracer.Assert(!(category.HasCode));
@@ -229,44 +236,40 @@ namespace Reni.Struct
             return result;
         }
 
-        internal override bool? FlatIsDataLess(ContextBase context) { return FlatIsDataLess(context, EndPosition); }
+        internal override bool? FlatIsDereferencedDataLess(ContextBase context) { return FlatIsDataLess(context, EndPosition); }
 
-        internal bool? FlatIsDataLess(ContextBase parent, int accessPosition) 
+        internal bool? FlatIsDataLess(ContextBase parent, int accessPosition) { return IsDataLess(true, parent, accessPosition); }
+
+        internal bool? IsDataLess(bool? isFlat, ContextBase parent, int accessPosition)
         {
-            var context = parent
-                .UniqueChildContext(this, accessPosition);
-            var subStatements = Statements.Take(accessPosition).ToArray();
-            if(subStatements.Any(s => s.QuickIsDataLess(context) == false))
+            var subStatementIds = Statements.Select((dummy, position) => position).Take(accessPosition).ToArray();
+            if (subStatementIds.Any(position => InternalInnerIsDataLess(false, parent, accessPosition, position) == false))
                 return false;
-            var listQuick = subStatements
-                .Where(s => s.QuickIsDataLess(context) == null)
+            var listQuick = subStatementIds
+                .Where(position => InternalInnerIsDataLess(false, parent, accessPosition, position) == null)
                 .ToArray();
-
-            if(listQuick.Any(s => s.FlatIsDataLess(context) == false))
-                return false;
-            var listFlat = listQuick
-                .Where(s => s.FlatIsDataLess(context) == null)
-                .ToArray();
-
-            if(listFlat.Length == 0)
+            if (listQuick.Length == 0)
                 return true;
 
-            return null;
-        }
+            if (isFlat == false)
+                return null;
 
-        internal bool IsDataLess(ContextBase parent, int accessPosition)
-        {
-            var context = parent
-                .UniqueChildContext(this, accessPosition);
-
-            var result = FlatIsDataLess(context, accessPosition);
-            if(result != null)
-                return result.Value;
-
-            var subStatements = Statements.Take(accessPosition).ToArray();
-            if (subStatements.Any(s => !s.IsDataLess(context)))
+            if (listQuick.Any(position => InternalInnerIsDataLess(true, parent, accessPosition, position) == false))
                 return false;
-            return subStatements.All(s => s.IsDataLess(context));
+            var listFlat = listQuick
+                .Where(position => InternalInnerIsDataLess(true, parent, accessPosition, position) == null)
+                .ToArray();
+            if (listFlat.Length == 0)
+                return true;
+        
+            if (isFlat == false)
+                return null;
+
+            if (listFlat.Any(position => InternalInnerIsDataLess(null, parent, accessPosition, position) == false))
+                return false;
+            if(listFlat.Any(position => InternalInnerIsDataLess(null, parent, accessPosition, position) == null))
+                return null;
+            return true;
         }
 
         Result ConstructorResult(Category category, ContextBase parent, int position)

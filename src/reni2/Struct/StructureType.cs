@@ -66,11 +66,12 @@ namespace Reni.Struct
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
+        internal override bool? IsDereferencedDataLess(bool? isFlat) { return Structure.StructIsDataLess(isFlat); }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return Structure.StructIsDataLess; } }
+        internal override bool IsDataLess { get { return Structure.StructIsDataLess(null) == true; } }
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Structure.DumpPrintResultViaStructReference(category); }
     }
