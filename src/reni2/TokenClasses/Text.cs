@@ -40,7 +40,7 @@ namespace Reni.TokenClasses
                 .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }
 
-        public override bool? FlatIsDereferencedDataLess(ContextBase context, TokenData token) { return StripQutes(token.Name).Length == 0; }
+        public override bool? QuickIsDereferencedDataLess(ContextBase context, TokenData token) { return StripQutes(token.Name).Length == 0; }
         
         private string StripQutes(string text)
         {

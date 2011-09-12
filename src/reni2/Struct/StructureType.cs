@@ -27,9 +27,9 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class StructureType : TypeBase
+    sealed class StructureType : TypeBase
     {
-        private readonly Structure _structure;
+        readonly Structure _structure;
 
         [DisableDump]
         internal readonly ISearchPath<IFeature, AutomaticReferenceType> DumpPrintReferenceFeature;
@@ -49,7 +49,7 @@ namespace Reni.Struct
         [DisableDump]
         internal Structure Structure { get { return _structure; } }
 
-        protected override Size GetSize() { return Structure.StructSize; }
+        internal override Size GetSize(bool isFlat) { return isFlat ? null : Structure.StructSize; }
 
         internal override string DumpShort() { return "type(" + Structure.DumpShort() + ")"; }
 
@@ -57,21 +57,19 @@ namespace Reni.Struct
         {
             var searchVisitorChild = searchVisitor as SearchVisitor<IFeature>;
             if(searchVisitorChild != null && !searchVisitorChild.IsSuccessFull)
-            {
                 searchVisitorChild.InternalResult =
                     Structure
                         .SearchFromRefToStruct(searchVisitorChild.Defineable)
                         .CheckedConvert(this);
-            }
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
-        internal override bool? IsDereferencedDataLess(bool? isFlat) { return Structure.StructIsDataLess(isFlat); }
+        internal override bool? IsDereferencedDataLess(bool isQuick) { return Structure.StructIsDataLess(isQuick); }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return Structure.StructIsDataLess(null) == true; } }
+        internal override bool IsDataLess { get { return Structure.StructIsDataLess(false) == true; } }
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Structure.DumpPrintResultViaStructReference(category); }
     }

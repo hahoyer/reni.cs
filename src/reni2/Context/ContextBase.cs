@@ -43,18 +43,14 @@ namespace Reni.Context
 
         [DisableDump]
         [Node]
-        readonly CacheItems _cache;
+        readonly Cache _cache;
 
         protected ContextBase()
-            : base(_nextId++) { _cache = new CacheItems(this); }
+            : base(_nextId++) { _cache = new Cache(this); }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         string IIconKeyProvider.IconKey { get { return "Context"; } }
-
-        [Node]
-        [DisableDump]
-        internal CacheItems Cache { get { return _cache; } }
 
         [Node]
         [DisableDump]
@@ -67,10 +63,10 @@ namespace Reni.Context
         internal abstract Root RootContext { get; }
 
         [DisableDump]
-        internal Structure FindRecentStructure { get { return Cache.RecentStructure.Value; } }
+        internal Structure FindRecentStructure { get { return _cache.RecentStructure.Value; } }
 
         [DisableDump]
-        internal Function FindRecentFunctionContextObject { get { return Cache.RecentFunctionContextObject.Value; } }
+        internal Function FindRecentFunctionContextObject { get { return _cache.RecentFunctionContextObject.Value; } }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
@@ -78,14 +74,14 @@ namespace Reni.Context
         internal ContextBase UniqueChildContext(Container container, int position) { return _cache.StructContexts.Find(container).Find(position); }
         internal ContextBase UniqueChildContext(TypeBase args) { return _cache.FunctionContexts.Find(args); }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
-        internal Structure UniqueStructure(Struct.Context context) { return Cache.Structures.Find(context.Container).Find(context.Position); }
+        internal Structure UniqueStructure(Struct.Context context) { return _cache.Structures.Find(context.Container).Find(context.Position); }
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
-        internal Structure UniqueStructure(Container container, int accessPosition) { return Cache.Structures.Find(container).Find(accessPosition); }
-        internal ContainerContextObject UniqueContainerContext(Container context) { return Cache.ContainerContextObjects.Find(context); }
+        internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Find(container).Find(accessPosition); }
+        internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects.Find(context); }
 
         internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache.Find(syntax);
@@ -95,9 +91,9 @@ namespace Reni.Context
             return result;
         }
 
-        internal Result QuickResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Find(syntax).Data & category; }
+        internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Find(syntax).Data & category; }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == -244 && ObjectId == 3 && category.HasIsDataLess;
@@ -113,6 +109,7 @@ namespace Reni.Context
             }
         }
 
+        [DebuggerHidden]
         ResultCache CreateCacheElement(CompileSyntax syntax)
         {
             var result = new ResultCache((category, isPending) => ObtainResult(category, isPending, syntax));
@@ -120,6 +117,7 @@ namespace Reni.Context
             return result;
         }
 
+        [DebuggerHidden]
         Result ObtainResult(Category category, bool isPending, CompileSyntax syntax)
         {
             if(isPending)
@@ -157,7 +155,9 @@ namespace Reni.Context
 
         internal CodeArgs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.CodeArgs, condSyntax).CodeArgs; }
 
-        internal sealed class CacheItems : ReniObject, IIconKeyProvider
+        internal virtual bool? QuickIsDataLess(CompileSyntax compileSyntax) { return null; }
+
+        sealed class Cache : ReniObject, IIconKeyProvider
         {
             [Node]
             [DisableDump]
@@ -192,7 +192,7 @@ namespace Reni.Context
             internal readonly SimpleCache<PendingContext> PendingContext;
 
 
-            public CacheItems(ContextBase target)
+            public Cache(ContextBase target)
             {
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>(

@@ -52,7 +52,7 @@ namespace Reni.Type
         internal int Position { get { return _position; } }
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return AccessPoint.RefAlignParam; } }
-        [DisableDump]
+        [EnableDump]
         AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return ValueType.FunctionalFeature; } }
@@ -69,7 +69,7 @@ namespace Reni.Type
         [DisableDump]
         TypeBase ValueTypeReference { get { return ValueType.SmartReference(RefAlignParam); } }
         [DisableDump]
-        internal override bool IsDataLess { get { return AccessPoint.IsDataLess || base.IsDataLess; } }
+        internal override bool IsDataLess { get { return AccessObject.IsDataLess(this); } }
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
@@ -77,10 +77,10 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override bool? IsDereferencedDataLess(bool? isFlat)
+        internal override bool? IsDereferencedDataLess(bool isQuick)
         {
-            NotImplementedMethod(isFlat);
-            return null;               
+            NotImplementedMethod(isQuick);
+            return null;
         }
 
         internal Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
@@ -182,17 +182,17 @@ namespace Reni.Type
                 return _valueReferenceViaFieldReferenceCodeCache.Value;
             NotImplementedMethod();
             return null;
-
         }
         CodeBase ObtainValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
 
-        protected override Size GetSize()
+        internal override Size GetSize(bool isFlat)
         {
-            if(AccessPoint.FlatIsDataLess == true)
-                return Size.Zero;
-            return RefAlignParam.RefSize;
+            if(isFlat)
+                return null;
+            NotImplementedMethod(isFlat);
+            return null;
         }
 
         internal override Result DereferenceResult(Category category)

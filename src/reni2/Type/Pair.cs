@@ -1,3 +1,21 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,18 +25,31 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    [Serializable]
-    internal class Pair : Child
+    sealed class Pair : TypeBase
     {
-        private readonly TypeBase _second;
+        [EnableDump]
+        readonly TypeBase _first;
+        [EnableDump]
+        readonly TypeBase _second;
 
         internal Pair(TypeBase first, TypeBase second)
-            : base(first) { _second = second; }
+        {
+            _first = first;
+            _second = second;
+        }
 
-        internal TypeBase First { get { return Parent; } }
-        internal TypeBase Second { get { return _second; } }
+        internal override Size GetSize(bool isFlat)
+        {
+            var firstSize = _first.GetSize(isFlat);
+            if (firstSize == null)
+                return null;
 
-        protected override Size GetSize() { return First.Size + Second.Size; }
+            var secondSize = _second.GetSize(isFlat);
+            if (secondSize == null)
+                return null;
+
+            return firstSize + secondSize;
+        }
 
         [DisableDump]
         internal override string DumpPrintText
@@ -41,15 +72,15 @@ namespace Reni.Type
         {
             get
             {
-                var result = new List<TypeBase>(Parent.ToList) {Second};
+                var result = new List<TypeBase>(_first.ToList) {_second};
                 return result.ToArray();
             }
         }
 
         internal override Result Destructor(Category category)
         {
-            var firstHandler = First.Destructor(category);
-            var secondHandler = Second.Destructor(category);
+            var firstHandler = _first.Destructor(category);
+            var secondHandler = _second.Destructor(category);
             if(firstHandler.IsEmpty)
                 return secondHandler;
             if(secondHandler.IsEmpty)
@@ -60,7 +91,5 @@ namespace Reni.Type
         }
 
         internal override string DumpShort() { return "pair." + ObjectId; }
-
-        protected override bool IsInheritor { get { return false; } }
     }
 }

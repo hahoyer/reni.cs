@@ -25,16 +25,17 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal static class AccessManager
+    static class AccessManager
     {
         internal interface IAccessObject
         {
             Result DumpPrintOperationResult(AccessType accessType, Category category);
             TypeBase ValueType(AccessType accessType);
             Result ValueReferenceViaFieldReference(Category category, AccessType accessType);
+            bool IsDataLess(AccessType accessType);
         }
 
-        private sealed class FunctionAccessObject : ReniObject, IAccessObject
+        sealed class FunctionAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFunctionResult(category); }
             TypeBase IAccessObject.ValueType(AccessType accessType) { return accessType.ValueTypeFunction; }
@@ -44,16 +45,18 @@ namespace Reni.Struct
                 NotImplementedMethod(category, accessType);
                 return null;
             }
+            bool IAccessObject.IsDataLess(AccessType accessType) { return true; }
         }
 
-        private sealed class FieldAccessObject : ReniObject, IAccessObject
+        sealed class FieldAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFieldResult(category); }
             TypeBase IAccessObject.ValueType(AccessType accessType) { return accessType.ValueTypeField; }
             Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType) { return accessType.ValueReferenceViaFieldReferenceField(category); }
+            bool IAccessObject.IsDataLess(AccessType accessType) { return accessType.ValueType.IsDataLess; }
         }
 
-        private sealed class ProcedureCallAccessObject : ReniObject, IAccessObject
+        sealed class ProcedureCallAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintProcedureCallResult(category); }
 
@@ -68,9 +71,10 @@ namespace Reni.Struct
                 NotImplementedMethod(category, accessType);
                 return null;
             }
+            bool IAccessObject.IsDataLess(AccessType accessType) { return true; }
         }
 
-        private sealed class PropertyAccessObject : ReniObject, IAccessObject
+        sealed class PropertyAccessObject : ReniObject, IAccessObject
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category)
             {
@@ -80,6 +84,7 @@ namespace Reni.Struct
 
             TypeBase IAccessObject.ValueType(AccessType accessType) { return accessType.ValueTypeProperty; }
             Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType) { return accessType.ValueReferenceViaFieldReferenceProperty(category); }
+            bool IAccessObject.IsDataLess(AccessType accessType) { return accessType.ValueType.IsDataLess; }
         }
 
         internal static readonly IAccessObject Function = new FunctionAccessObject();
