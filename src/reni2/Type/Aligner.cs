@@ -20,13 +20,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal sealed class Aligner : Child
+    sealed class Aligner : Child
     {
-        private readonly int _alignBits;
+        readonly int _alignBits;
 
         public Aligner(TypeBase target, int alignBits)
             : base(target)
@@ -39,7 +40,7 @@ namespace Reni.Type
         protected override bool IsInheritor { get { return true; } }
 
         [DisableDump]
-        private int AlignBits { get { return _alignBits; } }
+        int AlignBits { get { return _alignBits; } }
 
         [DisableDump]
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }
@@ -48,7 +49,7 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
         [DisableDump]
         internal override TypeBase UnAlignedType { get { return Parent; } }
-        
+
         internal override Result UnAlignedResult(Category category)
         {
             return Parent.Result
@@ -60,7 +61,9 @@ namespace Reni.Type
         }
 
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
-        protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
+
+        internal override Size GetSize(bool isQuick) { return Parent.GetSize(isQuick).CheckedApply(size => size.Align(AlignBits)); }
+
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
@@ -75,11 +78,11 @@ namespace Reni.Type
         }
 
         internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
-        
+
         protected override Converter DiffConverter(ConversionParameter conversionParameter, TypeBase destination)
         {
             return UnAlignedResult
-                   *Parent.Converter(conversionParameter, destination);
+                   * Parent.Converter(conversionParameter, destination);
         }
     }
 }

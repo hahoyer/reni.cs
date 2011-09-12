@@ -65,21 +65,16 @@ namespace Reni.Struct
 
         internal AccessManager.IAccessObject UniqueAccessObject(int position) { return _accessObjectsCache.Find(position); }
         internal Structure UniqueAccessPoint(int position) { return Parent.UniqueStructure(Container,position); }
-        private Size InnerSize(int position) { return Container.InnerSize(_parent, position); }
         internal TypeBase InnerType(int accessPosition, int position) { return Container.InnerType(_parent, accessPosition, position); }
 
-        internal Size StructSize(int position)
+        internal Size StructureSize(int position)
         {
-            if (StructIsDataLess(null, position) == true)
+            if (StructureIsDataLess(false, position) == true)
                 return Size.Zero;
-            return ContextReferenceOffsetFromAccessPoint(position);
+            return StructureSize(0, position);
         }
-        internal bool? StructIsDataLess(bool? isFlat, int accessPosition)
-        {
-            return Container.IsDataLess(isFlat, Parent, accessPosition);
-        }
-        internal bool? StructFlatIsDataLess(int accessPosition) { return Container.FlatIsDataLess(Parent, accessPosition); }
-        internal bool IsDataLess(int position) { return Container.ConstructionResult(Category.IsDataLess, Parent, position, position + 1).SmartIsDataLess; }
+        internal bool? StructureIsDataLess(bool isQuick, int accessPosition) { return Container.IsDataLess(isQuick, Parent, accessPosition); }
+        internal bool IsDataLess(int position) { return Container.StructureResult(Category.IsDataLess, Parent, position, position + 1).SmartIsDataLess; }
 
         internal Result ContextReferenceViaStructReference(int position, Result result)
         {
@@ -95,11 +90,10 @@ namespace Reni.Struct
             return result;
         }
 
-        internal Size ContextReferenceOffsetFromAccessPoint(int position)
-        {
-            return Container
-                .ConstructionResult(Category.Size, Parent, 0, position).Size;
-        }
+        internal Size ContextReferenceOffsetFromAccessPoint(int position) { return StructureSize(0, position); }
+
+        Size StructureSize(int fromPosition, int fromNotPosition) { return Container.StructureSize(Parent, fromPosition, fromNotPosition); }
+
         private bool IsLambda(int position) { return Container.IsLambda(position); }
         private bool IsPoperty(int position) { return Container.IsProperty(position); }
 
@@ -125,6 +119,6 @@ namespace Reni.Struct
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 
-        internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition) { return Container.ConstructionSize(Parent, fieldPosition + 1, accessPosition); }
+        internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition) { return Container.StructureSize(Parent, fieldPosition + 1, accessPosition); }
     }
 }

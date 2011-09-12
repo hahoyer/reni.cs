@@ -211,7 +211,7 @@ namespace Reni
                 if(HasCode)
                     return Code.Size;
                 if(HasType)
-                    return Type.Size;
+                    return Type.GetSize(true);
                 return null;
             }
         }
@@ -645,6 +645,12 @@ namespace Reni
             var result = aResult.Clone();
             result.Update(bResult);
             return result;
+        }
+
+        [DebuggerHidden]
+        public static Result operator +(Result aResult, Result bResult)
+        {
+            return aResult.Sequence(bResult);
         }
 
         internal Result ConvertToBitSequence(Category category)

@@ -16,6 +16,7 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+using System.Diagnostics;
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +33,8 @@ namespace Reni.Context
 
         internal Result Result(Category category, CompileSyntax syntax)
         {
-            var trace = ObjectId == -5 && syntax.ObjectId == 244;
-            StartMethodDump(trace, category,syntax);
+            var trace = ObjectId == 4 && syntax.ObjectId == 244;
+            StartMethodDump(trace, category, syntax);
             try
             {
                 BreakExecution();
@@ -55,8 +56,7 @@ namespace Reni.Context
                     result.Update(syntax.ObtainResult(this, localCategory));
 
                 Tracer.Assert(result.CompleteCategory == category);
-                return ReturnMethodDump(result,true);
-
+                return ReturnMethodDump(result, true);
             }
             finally
             {
@@ -67,6 +67,12 @@ namespace Reni.Context
         protected override Result ObtainPendingResult(Category category, CompileSyntax syntax)
         {
             NotImplementedMethod(category, syntax);
+            return null;
+        }
+
+        internal override bool? QuickIsDataLess(CompileSyntax compileSyntax)
+        {
+            NotImplementedMethod(compileSyntax);
             return null;
         }
 

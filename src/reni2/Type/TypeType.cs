@@ -43,7 +43,8 @@ namespace Reni.Type
             _value = value;
         }
 
-        protected override Size GetSize() { return Size.Zero; }
+        internal override Size GetSize(bool isQuick) { return Size.Zero; }
+        
         internal override string DumpPrintText { get { return "(" + _value.DumpPrintText + "()) type"; } }
 
         [DisableDump]
@@ -74,8 +75,9 @@ namespace Reni.Type
         {
             private readonly TypeType _typeType;
             public RepeaterType(TypeType typeType) { _typeType = typeType; }
-            protected override Size GetSize() { return Size.Zero; }
 
+            internal override Size GetSize(bool isQuick) { return Size.Zero; }
+            
             Result IMetaFeature.ObtainResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
             {
                 var count = right

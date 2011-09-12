@@ -56,7 +56,7 @@ namespace Reni.Struct
                     .ReplaceArg(Void.Result(category.Typed));
             }
 
-            protected override Size GetSize() { return Size.Zero; }
+            internal override Size GetSize(bool isQuick) { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpPrintText + "/\\"; } }
             internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
             protected override Converter UnalignedConverter(ConversionParameter conversionParameter, TypeBase destination)

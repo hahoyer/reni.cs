@@ -32,11 +32,11 @@ namespace Reni.Type
     ///     Fixed sized array of a type
     /// </summary>
     [Serializable]
-    internal sealed class Array : Child
+    sealed class Array : Child
     {
-        private readonly DictionaryEx<Size, ConcatArraysFeature> _concatArraysFeatureCache;
+        readonly DictionaryEx<Size, ConcatArraysFeature> _concatArraysFeatureCache;
 
-        private readonly int _count;
+        readonly int _count;
         public readonly ISearchPath<IFeature, ReferenceType> ConcatArraysFromReferenceFeature;
 
         public Array(TypeBase element, int count)
@@ -59,7 +59,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsArray { get { return true; } }
 
-        protected override Size GetSize() { return Element.Size*_count; }
+        internal override Size GetSize(bool isQuick) { return Element.GetSize(isQuick).CheckedApply(size => size * _count); }
 
         internal override Result Destructor(Category category) { return Element.ArrayDestructor(category, Count); }
 
@@ -98,7 +98,7 @@ namespace Reni.Type
                 );
         }
 
-        private CodeBase DumpPrintCode(RefAlignParam refAlignParam)
+        CodeBase DumpPrintCode(RefAlignParam refAlignParam)
         {
             var elementReference = Element.UniqueAutomaticReference(refAlignParam);
             var argCode = UniqueAutomaticReference(refAlignParam).ArgCode();
@@ -108,7 +108,7 @@ namespace Reni.Type
             {
                 if(i > 0)
                     code = code.Sequence(CodeBase.DumpPrintText(", "));
-                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.AddToReference(refAlignParam, Element.Size*i));
+                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.AddToReference(refAlignParam, Element.Size * i));
                 code = code.Sequence(elemCode);
             }
             code = code.Sequence(CodeBase.DumpPrintText("))"));
@@ -130,7 +130,7 @@ namespace Reni.Type
             }
             return Result(category, result);
         }
-        
+
         internal Result SequenceResult(Category category, RefAlignParam refAlignParam)
         {
             return Element

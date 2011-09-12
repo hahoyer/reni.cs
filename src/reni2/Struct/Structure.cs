@@ -102,7 +102,7 @@ namespace Reni.Struct
                 try
                 {
                     _isObtainStructSizeActive = true;
-                    var result = ContainerContextObject.StructSize(EndPosition);
+                    var result = ContainerContextObject.StructureSize(EndPosition);
                     _isObtainStructSizeActive = false;
                     return result;
                 }
@@ -116,12 +116,10 @@ namespace Reni.Struct
 
         [DisableDump]
 // ReSharper disable PossibleInvalidOperationException
-        internal bool IsDataLess { get { return StructIsDataLess(null).Value; } }
+        internal bool IsDataLess { get { return StructIsDataLess(false).Value; } }
 // ReSharper restore PossibleInvalidOperationException
-        [DisableDump]
-        internal bool? FlatIsDataLess { get { return ContainerContextObject.StructFlatIsDataLess(EndPosition); } }
 
-        internal bool? StructIsDataLess(bool? isFlat) { return ContainerContextObject.StructIsDataLess(isFlat, EndPosition); }
+        internal bool? StructIsDataLess(bool isQuick) { return ContainerContextObject.StructureIsDataLess(isQuick, EndPosition); }
 
         sealed class RecursionWhileObtainingStructSizeException : Exception
         {

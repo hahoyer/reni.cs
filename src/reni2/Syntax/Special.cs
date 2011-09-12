@@ -31,7 +31,7 @@ namespace Reni.Syntax
             return Terminal
                 .Result(context, category, Token);
         }
-        internal override bool? FlatIsDereferencedDataLess(ContextBase context) { return Terminal.FlatIsDereferencedDataLess(context, Token); }
+        internal override bool? QuickIsDereferencedDataLess(ContextBase context) { return Terminal.QuickIsDereferencedDataLess(context, Token); }
 
         protected override TokenData GetFirstToken() { return Token; }
         protected override TokenData GetLastToken() { return Token; }
@@ -127,7 +127,7 @@ namespace Reni.Syntax
     internal interface ITerminal
     {
         Result Result(ContextBase context, Category category, TokenData token);
-        bool? FlatIsDereferencedDataLess(ContextBase context, TokenData token);
+        bool? QuickIsDereferencedDataLess(ContextBase context, TokenData token);
     }
 
     internal interface IPrefix

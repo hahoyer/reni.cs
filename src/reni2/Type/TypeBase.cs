@@ -84,9 +84,29 @@ namespace Reni.Type
         internal static TypeBase Bit { get { return Cache.Bit; } }
 
         [Node]
-        internal Size Size { get { return GetSize(); } }
+        internal Size FlatSize { get { return GetSize(true); } }
+        [DisableDump]
+        internal Size Size { get { return GetSize(true) ?? GetSize(false); } }
 
-        protected abstract Size GetSize();
+        internal virtual Size GetSize(bool isFlat)
+        {
+            NotImplementedMethod();
+            return null;
+        }
+
+        [DisableDump]
+        internal virtual bool IsDataLess
+        {
+            get
+            {
+                var size = GetSize(true);
+                if(size != null)
+                    return size.IsZero;
+                NotImplementedMethod();
+                return false;
+
+            }
+        }
 
         [DisableDump]
         internal virtual Size UnrefSize { get { return Size; } }
@@ -246,9 +266,6 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual bool IsDataLess { get { return Size.IsZero; } }
-
-        [DisableDump]
         internal virtual TypeBase UnAlignedType { get { return this; } }
         [DisableDump]
         internal virtual int ArrayElementCount { get { return 1; } }
@@ -303,7 +320,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class
         {
-            var trace = ObjectId == 27 && defineable.ObjectId == 24 && category.HasType;
+            var trace = ObjectId == 16 && defineable.ObjectId == 19 && (category.HasType || category.HasCode);
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -443,7 +460,7 @@ namespace Reni.Type
 
         internal virtual Result UnAlignedResult(Category category) { return ArgResult(category); }
 
-        internal virtual bool? IsDereferencedDataLess(bool? isFlat) { return Size.IsZero; }
+        internal virtual bool? IsDereferencedDataLess(bool isQuick) { return Size.IsZero; }
     }
 
     interface IMetaFeature

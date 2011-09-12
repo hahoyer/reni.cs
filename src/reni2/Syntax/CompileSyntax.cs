@@ -72,8 +72,9 @@ namespace Reni.Syntax
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
+        [DebuggerHidden]
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
-        Result QuickResult(ContextBase context, Category category) { return context.QuickResult(category, this); }
+        Result FindResult(ContextBase context, Category category) { return context.FindResult(category, this); }
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
         internal Result ResultAsReference(ContextBase context, Category category) { return context.UniqueResult(category.Typed, this).LocalReferenceResult(context.RefAlignParam); }
 
@@ -95,6 +96,7 @@ namespace Reni.Syntax
             return result;
         }
 
+        [DebuggerHidden]
         internal TypeBase Type(ContextBase context)
         {
             var result = Result(context, Category.Type).Type;
@@ -102,35 +104,23 @@ namespace Reni.Syntax
             return result;
         }
 
-        internal Size Size(ContextBase context)
+        internal virtual bool? QuickIsDereferencedDataLess(ContextBase context)
         {
-            var result = Result(context, Category.Size).Size;
-            Tracer.Assert(result != null);
-            return result;
+            var contextResult = context.QuickIsDataLess(this);
+            if (contextResult != null)
+                return contextResult;
+            
+            var type = FindResult(context, Category.Type).Type;
+            if(type != null)
+                return type.IsDereferencedDataLess(true);
+            return null;
         }
-
-        internal bool IsDataLess(ContextBase context)
-        {
-            var result = Result(context, Category.IsDataLess).IsDataLess;
-            Tracer.Assert(result != null);
-            return result.Value;
-        }
-
-        internal bool? QuickIsDereferencedDataLess(ContextBase context)
-        {
-            var type = QuickResult(context, Category.Type).Type;
-            if (type == null)
-                return null;
-            return type.IsDereferencedDataLess(false);
-
-        }
-
-        internal virtual bool? FlatIsDereferencedDataLess(ContextBase context) { return null; }
 
         internal Result OperationResult<TFeature>(ContextBase context, Category category, Defineable defineable)
             where TFeature : class
         {
-            var trace = ObjectId == -241 && context.ObjectId == 3 && defineable.ObjectId == 19;
+            var trace = ObjectId == -241 && context.ObjectId == 3 && defineable.ObjectId == 19
+                || ObjectId == 241 && context.ObjectId == 4 && defineable.ObjectId == 19;
             StartMethodDump(trace, context, category, defineable);
             try
             {
@@ -162,21 +152,15 @@ namespace Reni.Syntax
             }
         }
         
-        internal bool? IsDereferencedDataLess(bool? isFlat, ContextBase context)
+        internal bool? IsDereferencedDataLess(bool isQuick, ContextBase context)
         {
-            var quick = QuickIsDereferencedDataLess(context);
-            if (quick != null)
-                return quick;
-            if (isFlat == false)
+            var result = QuickIsDereferencedDataLess(context);
+            if (result != null)
+                return result;
+            if (isQuick)
                 return null;
 
-            var flat = FlatIsDereferencedDataLess(context);
-            if (flat != null)
-                return flat;
-            if (isFlat == true)
-                return null;
-
-            return Type(context).IsDereferencedDataLess(null);
+            return Type(context).IsDereferencedDataLess(true);
         }
     }
 }
