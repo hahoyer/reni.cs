@@ -29,16 +29,17 @@ namespace Reni.Code
     /// <summary>
     ///     Arg is is used as a placeholder.
     /// </summary>
-    internal sealed class Arg : FiberHead
+    sealed class Arg : FiberHead
     {
-        private static int _nextObjectId;
-        private readonly TypeBase _type;
+        static int _nextObjectId;
+        readonly TypeBase _type;
 
         internal Arg(TypeBase type)
             : base(_nextObjectId++)
         {
             _type = type;
-            StopByObjectId(1);
+            StopByObjectId(-1);
+            Tracer.Assert(_type.FlatSize != null, Dump);
         }
 
         [Node]
