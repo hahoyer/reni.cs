@@ -95,16 +95,11 @@ namespace Reni.Struct
         Size StructureSize(int fromPosition, int fromNotPosition) { return Container.StructureSize(Parent, fromPosition, fromNotPosition); }
 
         private bool IsLambda(int position) { return Container.IsLambda(position); }
-        private bool IsPoperty(int position) { return Container.IsProperty(position); }
 
         private AccessManager.IAccessObject GetAccessObject(int position)
         {
             if(IsLambda(position))
-            {
-                if(IsPoperty(position))
-                    return AccessManager.Property;
                 return AccessManager.Function;
-            }
             if(IsDataLess(position))
                 return AccessManager.ProcedureCall;
             return AccessManager.Field;

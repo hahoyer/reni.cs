@@ -32,7 +32,7 @@ namespace Reni.ReniParser
         protected override PrioTable GetPrioTable()
         {
             var prioTable = PrioTable.Left("!");
-            prioTable += PrioTable.Left("property", "converter");
+            prioTable += PrioTable.Left("converter");
             prioTable = prioTable.Level
                 (new[]
                  {
@@ -52,7 +52,6 @@ namespace Reni.ReniParser
             return new Dictionary<string, TokenClasses.TokenClass>
                    {
                        {"converter", new ConverterToken()},
-                       {"property", new PropertyToken()}
                    };
         }
 

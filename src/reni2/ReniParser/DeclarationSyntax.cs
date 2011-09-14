@@ -27,8 +27,6 @@ namespace Reni.ReniParser
             StopByObjectId(-876);
         }
 
-        internal bool IsProperty { get { return ExtensionSyntax != null && ExtensionSyntax.IsProperty; } }
-
         internal override string DumpShort() { return Defineable.Name + ": " + Definition.DumpShort(); }
 
         internal override ParsedSyntax SurroundedByParenthesis(TokenData leftToken, TokenData rightToken) { return Container.Create(leftToken, rightToken, this); }

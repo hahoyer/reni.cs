@@ -41,13 +41,10 @@ Integer8:
     _data: 127 type (arg enable_cut);
 
     create   : (Integer8(arg))/\;
-    !property 
-    dump_print: (_data dump_print)/\ ;
+    dump_print: (_data dump_print)/\ auto_call;
     +        :  create(_data + create(arg) _data)/\;
-    !property 
-    clone: create(_data)/\ ;
-    !property 
-    enable_cut: _data enable_cut /\ ;
+    clone: create(_data)/\  auto_call;
+    enable_cut: _data enable_cut /\  auto_call;
     !converter: _data /\ ;
 }/\
 ";

@@ -32,39 +32,12 @@ namespace Reni.Parser
         }
 
         [Test]
-        public void AlternativePrioTableProperty1()
-        {
-            var syntaxPrototype = LikeSyntax.Struct(
-                new[] {LikeSyntax.Number(3)},
-                new[] {LikeSyntax.Declaration("x", 0)},
-                new int[] {},
-                new[] {0}
-                );
-            Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!property x: 3", c => syntaxPrototype.AssertLike(c.Syntax));
-        }
-
-        [Test]
-        public void AlternativePrioTableProperty2()
-        {
-            var syntaxPrototype = LikeSyntax.Struct(
-                new[] {LikeSyntax.Number(3)},
-                new[] {LikeSyntax.Declaration("property", 0)},
-                new int[] {},
-                new[] {0}
-                );
-            Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!property property: 3", c => syntaxPrototype.AssertLike(c.Syntax));
-        }
-
-        [Test]
         public void AlternativePrioTableConverter()
         {
             var syntaxPrototype = LikeSyntax.Struct(
                 new[] {LikeSyntax.Number(3)},
                 new Declaration[] {},
-                new[] {0},
-                new int[] {}
+                new[] {0}
                 );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3", c => syntaxPrototype.AssertLike(c.Syntax));
@@ -75,12 +48,11 @@ namespace Reni.Parser
         {
             var syntaxPrototype = LikeSyntax.Struct(
                 new[] {LikeSyntax.Number(3), LikeSyntax.Number(4)},
-                new[] {LikeSyntax.Declaration("x", 1)},
-                new[] {0},
-                new[] {1}
+                new Declaration[] { },
+                new[] {0, 1}
                 );
             Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3; !property x: 4",
+            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3; !converter: 4",
                                      c => syntaxPrototype.AssertLike(c.Syntax));
         }
     }

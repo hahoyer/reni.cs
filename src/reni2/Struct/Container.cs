@@ -46,7 +46,6 @@ namespace Reni.Struct
         readonly CompileSyntax[] _statements;
         readonly DictionaryEx<string, int> _dictionary;
         readonly int[] _converters;
-        readonly int[] _properties;
         static readonly string _runId = Compiler.FormattedNow + "\n";
         public static bool IsInContainerDump;
         static bool _isInsideFileDump;
@@ -66,15 +65,11 @@ namespace Reni.Struct
         [SmartNode]
         internal int[] Converters { get { return _converters; } }
 
-        [Node]
-        [SmartNode]
-        internal int[] Properties { get { return _properties; } }
-
         protected override TokenData GetFirstToken() { return _firstToken; }
 
         protected override TokenData GetLastToken() { return _lastToken; }
 
-        Container(TokenData leftToken, TokenData rightToken, CompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters, int[] properties)
+        Container(TokenData leftToken, TokenData rightToken, CompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters)
             : base(leftToken, _nextObjectId++)
         {
             _firstToken = leftToken;
@@ -82,7 +77,6 @@ namespace Reni.Struct
             _statements = statements;
             _dictionary = dictionary;
             _converters = converters;
-            _properties = properties;
         }
 
         internal override CompileSyntax ToCompiledSyntax() { return this; }
@@ -97,7 +91,6 @@ namespace Reni.Struct
             readonly List<CompileSyntax> _list = new List<CompileSyntax>();
             readonly DictionaryEx<string, int> _dictionary = new DictionaryEx<string, int>();
             readonly List<int> _converters = new List<int>();
-            readonly List<int> _properties = new List<int>();
 
             public void Add(IParsedSyntax parsedSyntax)
             {
@@ -106,8 +99,6 @@ namespace Reni.Struct
                     var d = (DeclarationSyntax) parsedSyntax;
                     _dictionary.Add(d.Defineable.Name, _list.Count);
                     parsedSyntax = d.Definition;
-                    if(d.IsProperty)
-                        _properties.Add(_list.Count);
                 }
 
                 if(parsedSyntax is ConverterSyntax)
@@ -120,7 +111,7 @@ namespace Reni.Struct
                 _list.Add(((ReniParser.ParsedSyntax) parsedSyntax).ToCompiledSyntax());
             }
 
-            public Container ToContainer(TokenData leftToken, TokenData rightToken) { return new Container(leftToken, rightToken, _list.ToArray(), _dictionary, _converters.ToArray(), _properties.ToArray()); }
+            public Container ToContainer(TokenData leftToken, TokenData rightToken) { return new Container(leftToken, rightToken, _list.ToArray(), _dictionary, _converters.ToArray()); }
         }
 
 
@@ -234,7 +225,7 @@ namespace Reni.Struct
             StartMethodDump(trace, isQuick,parent, accessPosition);
             try
             {
-                var subStatementIds = accessPosition.Array(i => i);
+                var subStatementIds = accessPosition.Array(i => i).ToArray();
                 Dump("subStatementIds", subStatementIds); 
                 BreakExecution();
                 if (subStatementIds.Any(position => InternalInnerIsDataLess(true, parent, accessPosition, position) == false))
@@ -261,17 +252,17 @@ namespace Reni.Struct
             }
         }
 
-        [DebuggerHidden]
         internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
+            var typedCategory = category.Typed;
             return (fromNotPosition - fromPosition)
                 .Array(i=>fromPosition+i)
                 .Aggregate
-                (TypeBase.VoidResult(category)
+                (TypeBase.VoidResult(typedCategory)
                 , (current, position) 
                     => 
-                    current 
-                    + InnerResult(category, parent, position + 1, position)
+                    current
+                    + InnerResult(typedCategory, parent, position + 1, position)
                     .Align(parent.RefAlignParam.AlignBits)
                 )
                 .LocalBlock(category);
@@ -281,7 +272,6 @@ namespace Reni.Struct
         internal TypeBase InnerType(ContextBase parent, int accessPosition, int position) { return InnerResult(Category.Type, parent, accessPosition, position).Type; }
 
         internal new bool IsLambda(int position) { return Statements[position].IsLambda; }
-        internal bool IsProperty(int position) { return Properties.Contains(position); }
     }
 
     interface IStructFeature

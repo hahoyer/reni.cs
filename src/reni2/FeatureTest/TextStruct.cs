@@ -33,15 +33,15 @@ namespace Reni.FeatureTest
         {
             return
                 @"
-!property system:
+!system:
 {
-    !property MaxNumber8: '7f' to_number_of_base(16) /\;
-    !property MaxNumber16: '7fff' to_number_of_base(16) /\;
-    !property MaxNumber32: '7fffffff' to_number_of_base(16) /\;
-    !property MaxNumber64: '7fffffffffffffff' to_number_of_base(16) /\;
+    MaxNumber8: '7f' to_number_of_base(16) /\ auto_call;
+    MaxNumber16: '7fff' to_number_of_base(16) /\ auto_call;
+    MaxNumber32: '7fffffff' to_number_of_base(16) /\ auto_call;
+    MaxNumber64: '7fffffffffffffff' to_number_of_base(16) /\ auto_call;
 
-    !property TextItemType: text_item(MaxNumber8) type /\;
-}/\;
+    TextItemType: text_item(MaxNumber8) type /\ auto_call;
+}/\ auto_call;
 
 Text: 
 {

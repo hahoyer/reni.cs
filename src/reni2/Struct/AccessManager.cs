@@ -46,6 +46,7 @@ namespace Reni.Struct
                 return null;
             }
             bool IAccessObject.IsDataLess(AccessType accessType) { return true; }
+            
         }
 
         sealed class FieldAccessObject : ReniObject, IAccessObject
@@ -74,22 +75,8 @@ namespace Reni.Struct
             bool IAccessObject.IsDataLess(AccessType accessType) { return true; }
         }
 
-        sealed class PropertyAccessObject : ReniObject, IAccessObject
-        {
-            Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category)
-            {
-                NotImplementedMethod(accessType, category);
-                return null;
-            }
-
-            TypeBase IAccessObject.ValueType(AccessType accessType) { return accessType.ValueTypeProperty; }
-            Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType) { return accessType.ValueReferenceViaFieldReferenceProperty(category); }
-            bool IAccessObject.IsDataLess(AccessType accessType) { return accessType.ValueType.IsDataLess; }
-        }
-
         internal static readonly IAccessObject Function = new FunctionAccessObject();
         internal static readonly IAccessObject Field = new FieldAccessObject();
         internal static readonly IAccessObject ProcedureCall = new ProcedureCallAccessObject();
-        internal static readonly IAccessObject Property = new PropertyAccessObject();
     }
 }

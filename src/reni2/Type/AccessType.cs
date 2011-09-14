@@ -138,31 +138,18 @@ namespace Reni.Type
                 .ValueReferenceViaFieldReference(category, this)
                 .AssertEmptyOrValidReference();
         }
+
         internal Result ValueReferenceViaFieldReferenceProperty(Category category)
         {
-            StartMethodDump(ObjectId == -4 && category.HasCode, category);
-            try
-            {
-                BreakExecution();
-                var propertyResult = base.ValueType.PropertyResult(category);
-                Dump("propertyResult", propertyResult);
-                var localReferenceResult = propertyResult.LocalReferenceResult(RefAlignParam);
-                Dump("localReferenceResult", localReferenceResult);
-                var replaceObjectRefByArg = localReferenceResult
-                    .ContextReferenceViaStructReference(AccessPoint);
-                Dump("replaceObjectRefByArg", replaceObjectRefByArg);
-                var structReferenceViaFieldReference = StructReferenceViaFieldReference(category.Typed);
-                Dump("structReferenceViaFieldReference", structReferenceViaFieldReference);
-                BreakExecution();
-                var result = replaceObjectRefByArg
-                    .ReplaceArg(structReferenceViaFieldReference)
-                    .LocalReferenceResult(RefAlignParam);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            var propertyResult = base.ValueType.PropertyResult(category);
+            var localReferenceResult = propertyResult.LocalReferenceResult(RefAlignParam);
+            var replaceObjectRefByArg = localReferenceResult
+                .ContextReferenceViaStructReference(AccessPoint);
+            var structReferenceViaFieldReference = StructReferenceViaFieldReference(category.Typed);
+            var result = replaceObjectRefByArg
+                .ReplaceArg(structReferenceViaFieldReference)
+                .LocalReferenceResult(RefAlignParam);
+            return (result);
         }
 
         Result StructReferenceViaFieldReference(Category category)
@@ -187,12 +174,11 @@ namespace Reni.Type
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
 
-        internal override Size GetSize(bool isFlat)
+        internal override Size GetSize(bool isQuick)
         {
-            if(isFlat)
-                return null;
-            NotImplementedMethod(isFlat);
-            return null;
+            if (IsDataLess)
+                return Size.Zero;
+            return RefAlignParam.RefSize;
         }
 
         internal override Result DereferenceResult(Category category)

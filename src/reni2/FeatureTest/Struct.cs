@@ -88,7 +88,7 @@ namespace Reni.FeatureTest.Struct
     [Function.Function]
     public sealed class PropertyVariable : CompilerTest
     {
-        protected override string Target { get { return @"! property x: 11/\; x dump_print"; } }
+        protected override string Target { get { return @"x: 11/\ auto_call; x dump_print"; } }
         protected override string Output { get { return "11"; } }
 
         [Test]

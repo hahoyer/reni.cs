@@ -36,16 +36,6 @@ namespace Reni.TokenClasses
     }
 
     [Serializable]
-    internal sealed class PropertyToken : TokenClass
-    {
-        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
-        {
-            right.AssertIsNull();
-            return ((DeclarationExtensionSyntax) left).ExtendByProperty(token);
-        }
-    }
-
-    [Serializable]
     internal sealed class ConverterToken : TokenClass
     {
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
@@ -60,35 +50,10 @@ namespace Reni.TokenClasses
         protected DeclarationExtensionSyntax(TokenData token)
             : base(token) { }
 
-        internal virtual bool IsProperty { get { return false; } }
-
-        internal virtual ReniParser.ParsedSyntax ExtendByProperty(TokenData token)
-        {
-            NotImplementedMethod(token);
-            return null;
-        }
-
         internal virtual ReniParser.ParsedSyntax ExtendByConverter(TokenData token)
         {
             NotImplementedMethod(token);
             return null;
-        }
-    }
-
-    internal sealed class PropertyDeclarationSyntax : DeclarationExtensionSyntax
-    {
-        [UsedImplicitly]
-        private readonly TokenData _token;
-
-        internal PropertyDeclarationSyntax(TokenData token, TokenData otherToken)
-            : base(token) { _token = otherToken; }
-
-        internal override bool IsProperty { get { return true; } }
-
-        internal override ReniParser.ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ReniParser.ParsedSyntax right)
-        {
-            right.AssertIsNull();
-            return tokenClass.CreateDeclarationPartSyntax(this, token);
         }
     }
 
@@ -106,8 +71,6 @@ namespace Reni.TokenClasses
     {
         internal ExclamationSyntax(TokenData token)
             : base(token) { }
-
-        internal override ReniParser.ParsedSyntax ExtendByProperty(TokenData token) { return new PropertyDeclarationSyntax(Token, token); }
 
         internal override ReniParser.ParsedSyntax ExtendByConverter(TokenData token) { return new ConverterDeclarationSyntax(Token, token); }
     }

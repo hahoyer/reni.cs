@@ -37,7 +37,7 @@ namespace Reni.FeatureTest.Structure
 
         public LikeSyntax Expression(string s2) { return new Expression(this, s2, null); }
 
-        public static LikeSyntax Struct(LikeSyntax[] list, Declaration[] declarations, int[] converters, int[] properties) { return new Struct(list, declarations, converters, properties); }
+        public static LikeSyntax Struct(LikeSyntax[] list, Declaration[] declarations, int[] converters) { return new Struct(list, declarations, converters); }
 
         public abstract void AssertLike(IParsedSyntax syntax);
 
@@ -82,14 +82,12 @@ namespace Reni.FeatureTest.Structure
         private readonly LikeSyntax[] _list;
         private readonly Declaration[] _declarations;
         private readonly int[] _converters;
-        private readonly int[] _properties;
 
-        public Struct(LikeSyntax[] list, Declaration[] declarations, int[] converters, int[] properties)
+        public Struct(LikeSyntax[] list, Declaration[] declarations, int[] converters)
         {
             _list = list;
             _declarations = declarations;
             _converters = converters;
-            _properties = properties;
         }
 
         public override void AssertLike(IParsedSyntax syntax)
@@ -106,9 +104,6 @@ namespace Reni.FeatureTest.Structure
             Tracer.Assert(_converters.Length == co.Converters.Length);
             for(var i = 0; i < _converters.Length; i++)
                 Tracer.Assert(_converters[i] == co.Converters[i]);
-            Tracer.Assert(_properties.Length == co.Properties.Length);
-            for(var i = 0; i < _properties.Length; i++)
-                Tracer.Assert(_properties[i] == co.Properties[i]);
         }
     }
 
