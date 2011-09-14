@@ -84,11 +84,12 @@ namespace Reni.Type
         internal static TypeBase Bit { get { return Cache.Bit; } }
 
         [Node]
+        [EnableDumpExcept(null)]
         internal Size FlatSize { get { return GetSize(true); } }
         [DisableDump]
         internal Size Size { get { return GetSize(true) ?? GetSize(false); } }
 
-        internal virtual Size GetSize(bool isFlat)
+        internal virtual Size GetSize(bool isQuick)
         {
             NotImplementedMethod();
             return null;
@@ -404,33 +405,33 @@ namespace Reni.Type
 
         Converter Converter(TypeBase destination) { return Converter(ConversionParameter.Instance, destination); }
 
-        bool IsConvertable(TypeBase destination) { return Converter(destination).IsValid; }
+        bool IsConvertable(TypeBase destination) { return Converter(destination) != null; }
 
         internal Converter Converter(ConversionParameter conversionParameter, TypeBase destination)
         {
             if(this == destination)
                 return new FunctionalConverter(ArgResult);
 
-            return DiffConverter(conversionParameter, destination);
+            return ConverterForDifferentTypes(conversionParameter, destination);
         }
 
-        protected virtual Converter DiffConverter(ConversionParameter conversionParameter, TypeBase destination)
+        protected virtual Converter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             var alignerDestination = destination as Aligner;
             if(alignerDestination != null)
                 return Converter(conversionParameter, alignerDestination);
 
-            return UnalignedConverter(conversionParameter, destination);
+            return ConverterForUnalignedTypes(conversionParameter, destination);
         }
 
-        protected virtual Converter UnalignedConverter(ConversionParameter conversionParameter, TypeBase destination)
+        protected virtual Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             if(IsDataLess && destination is Void)
                 return new FunctionalConverter(c => Void.Result(c, ArgResult(c)));
 
             var functionalSource = this as FunctionalBody.Type;
             if(functionalSource != null)
-                return functionalSource.UnalignedConverter(conversionParameter, destination);
+                return functionalSource.ConverterForUnalignedTypes(conversionParameter, destination);
 
             NotImplementedMethod(conversionParameter, destination);
             return null;

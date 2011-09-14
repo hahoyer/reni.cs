@@ -67,7 +67,7 @@ namespace Reni.Sequence
         [UsedImplicitly]
         internal Type.Array InheritedType { get { return _inheritedType; } }
 
-        internal override Size GetSize(bool isFlat) { return _inheritedType.GetSize(isFlat); }
+        internal override Size GetSize(bool isQuick) { return _inheritedType.GetSize(isQuick); }
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
 
@@ -150,7 +150,7 @@ namespace Reni.Sequence
 
         internal Result DumpPrintTextResult(Category category, RefAlignParam refAlignParam) { return Element.DumpPrintTextResultFromSequence(category, refAlignParam, Count); }
         
-        protected override Converter UnalignedConverter(ConversionParameter conversionParameter, TypeBase destination)
+        protected override Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             var sequenceDestination = destination as SequenceType;
             if(sequenceDestination != null)

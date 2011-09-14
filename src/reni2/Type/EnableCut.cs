@@ -31,7 +31,7 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
-        protected override Converter UnalignedConverter(ConversionParameter conversionParameter, TypeBase destination)
+        protected override Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             return
                 StripTagResult

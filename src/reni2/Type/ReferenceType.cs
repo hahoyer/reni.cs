@@ -96,7 +96,7 @@ namespace Reni.Type
             }
         }
 
-        protected override Converter DiffConverter(ConversionParameter conversionParameter, TypeBase destination)
+        protected override Converter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             var referenceDestination = destination as AutomaticReferenceType;
             if(referenceDestination != null)

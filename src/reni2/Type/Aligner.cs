@@ -79,7 +79,7 @@ namespace Reni.Type
 
         internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
 
-        protected override Converter DiffConverter(ConversionParameter conversionParameter, TypeBase destination)
+        protected override Converter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             return UnAlignedResult
                    * Parent.Converter(conversionParameter, destination);
