@@ -85,7 +85,7 @@ namespace Reni.Type
 
         [Node]
         [EnableDumpExcept(null)]
-        internal Size FlatSize { get { return GetSize(true); } }
+        internal Size QuickSize { get { return GetSize(true); } }
         [DisableDump]
         internal Size Size { get { return GetSize(true) ?? GetSize(false); } }
 
