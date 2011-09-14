@@ -20,7 +20,7 @@ namespace Reni.Code
             //Tracer.Assert(size.IsPositive);
             _size = size;
             Data = data;
-            StopByObjectId(-527);
+            StopByObjectId(-2);
         }
 
         protected override Size GetSize() { return _size; }

@@ -6,7 +6,7 @@
 <#@ import namespace="global::Reni" #>// <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") #> <# 
 var code = new T4Compiler(
 @"
-f: {1000 type({arg = 1 then 1 else (arg * f[arg type((arg-1)enable_cut)])}enable_cut)}/\;f(4)dump_print
+5, (^ _A_T_ 0 + ^ _A_T_ 0)dump_print
 ").Code(); 
 #>     
 <#= code #>     

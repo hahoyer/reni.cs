@@ -254,18 +254,30 @@ namespace Reni.Struct
 
         internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
-            var typedCategory = category.Typed;
-            return (fromNotPosition - fromPosition)
-                .Array(i=>fromPosition+i)
-                .Aggregate
-                (TypeBase.VoidResult(typedCategory)
-                , (current, position) 
-                    => 
-                    current
-                    + InnerResult(typedCategory, parent, position + 1, position)
-                    .Align(parent.RefAlignParam.AlignBits)
-                )
-                .LocalBlock(category);
+            var trace = ObjectId == 0 && category.HasCode;
+            StartMethodDump(trace, category,parent,fromPosition,fromNotPosition);
+            try
+            {
+                var typedCategory = category.Typed;
+                var result = (fromNotPosition - fromPosition)
+                    .Array(i => fromPosition + i)
+                    .Aggregate
+                    (TypeBase.VoidResult(typedCategory)
+                     , (current, position)
+                       =>
+                       current
+                       + InnerResult(typedCategory, parent, position + 1, position)
+                             .Align(parent.RefAlignParam.AlignBits)
+                    );
+
+                Dump("result", result); 
+                BreakExecution();
+                return ReturnMethodDump(result.LocalBlock(category),true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Size StructureSize(ContextBase parent, int fromPosition, int fromNotPosition) { return StructureResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
