@@ -161,7 +161,12 @@ namespace Reni.Type
 
         internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode, CodeArgs.Arg); }
 
-        internal Result FieldReferenceViaStructReference(Category category) { return Result(category, () => AccessPoint.ReferenceType.ArgCode(), CodeArgs.Arg); }
+        internal Result FieldReferenceViaStructReference(Category category)
+        {
+            if(IsDataLess)
+                return Result(category);
+            return Result(category, () => AccessPoint.ReferenceType.ArgCode(), CodeArgs.Arg);
+        }
 
         CodeBase ValueReferenceViaFieldReferenceCode()
         {
