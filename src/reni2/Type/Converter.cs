@@ -43,7 +43,6 @@ namespace Reni.Type
         }
 
         internal abstract Result Result(Category category);
-        internal bool IsValid { get { return true; } }
 
         public static Converter operator *(Converter first, Func<Category, Result> second) { return new ConcatConverter(first, new FunctionalConverter(second)); }
         public static Converter operator *(Func<Category, Result> first, Converter second) { return new ConcatConverter(new FunctionalConverter(first), second); }

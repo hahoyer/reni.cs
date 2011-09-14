@@ -36,7 +36,7 @@ namespace Reni.Type
             _refAlignParam = refAlignParam;
         }
 
-        internal override Size GetSize(bool isFlat) { return _refAlignParam.RefSize; }
+        internal override Size GetSize(bool isQuick) { return _refAlignParam.RefSize; }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
 

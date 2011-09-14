@@ -49,7 +49,7 @@ namespace Reni.Struct
         [DisableDump]
         internal Structure Structure { get { return _structure; } }
 
-        internal override Size GetSize(bool isFlat) { return isFlat ? null : Structure.StructSize; }
+        internal override Size GetSize(bool isQuick) { return Structure.StructSize; }
 
         internal override string DumpShort() { return "type(" + Structure.DumpShort() + ")"; }
 

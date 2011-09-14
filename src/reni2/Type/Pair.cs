@@ -38,13 +38,13 @@ namespace Reni.Type
             _second = second;
         }
 
-        internal override Size GetSize(bool isFlat)
+        internal override Size GetSize(bool isQuick)
         {
-            var firstSize = _first.GetSize(isFlat);
+            var firstSize = _first.GetSize(isQuick);
             if (firstSize == null)
                 return null;
 
-            var secondSize = _second.GetSize(isFlat);
+            var secondSize = _second.GetSize(isQuick);
             if (secondSize == null)
                 return null;
 
