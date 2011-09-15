@@ -30,40 +30,40 @@ namespace Reni
     /// <summary>
     ///     Contains list of references to compiler environemnts.
     /// </summary>
-    internal sealed class CodeArgs : ReniObject, ITreeNodeSupport
+    sealed class CodeArgs : ReniObject, ITreeNodeSupport
     {
-        private static int _nextId;
-        private readonly List<IReferenceInCode> _data;
-        private SizeArray _sizesCache;
+        static int _nextId;
+        readonly List<IReferenceInCode> _data;
+        SizeArray _sizesCache;
 
-        private CodeArgs()
+        CodeArgs()
             : base(_nextId++)
         {
             _data = new List<IReferenceInCode>();
             StopByObjectId(-10);
         }
 
-        private CodeArgs(IReferenceInCode context)
+        CodeArgs(IReferenceInCode context)
             : this() { Add(context); }
 
-        private CodeArgs(IEnumerable<IReferenceInCode> a, IEnumerable<IReferenceInCode> b)
+        CodeArgs(IEnumerable<IReferenceInCode> a, IEnumerable<IReferenceInCode> b)
             : this()
         {
             AddRange(a);
             AddRange(b);
         }
 
-        private CodeArgs(IEnumerable<IReferenceInCode> a)
+        CodeArgs(IEnumerable<IReferenceInCode> a)
             : this() { AddRange(a); }
 
 
-        private void AddRange(IEnumerable<IReferenceInCode> a)
+        void AddRange(IEnumerable<IReferenceInCode> a)
         {
             foreach(var e in a)
                 Add(e);
         }
 
-        private void Add(IReferenceInCode e)
+        void Add(IReferenceInCode e)
         {
             if(!_data.Contains(e))
                 _data.Add(e);
@@ -73,7 +73,7 @@ namespace Reni
         public List<IReferenceInCode> Data { get { return _data; } }
 
         [DisableDump]
-        private SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
+        SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
 
         internal bool HasArg { get { return Contains(arg.Instance); } }
         public int Count { get { return _data.Count; } }
@@ -108,7 +108,7 @@ namespace Reni
             return result;
         }
 
-        private SizeArray CalculateSizes()
+        SizeArray CalculateSizes()
         {
             var result = new SizeArray();
             for(var i = 0; i < Count; i++)
@@ -141,7 +141,7 @@ namespace Reni
             StartMethodDump(false, code, refAlignParam, endOfRefsCode);
             try
             {
-                var reference = endOfRefsCode.AddToReference(refAlignParam, refAlignParam.RefSize*-_data.Count);
+                var reference = endOfRefsCode.AddToReference(refAlignParam, refAlignParam.RefSize * -_data.Count);
                 var result = code;
                 foreach(var referenceInCode in _data)
                 {
@@ -168,12 +168,11 @@ namespace Reni
         public static CodeArgs operator -(CodeArgs x, IReferenceInCode y) { return x.Without(y); }
         TreeNode[] ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
-        sealed class arg: IReferenceInCode
+        sealed class arg : IReferenceInCode
         {
             internal static readonly IReferenceInCode Instance = new arg();
             RefAlignParam IReferenceInCode.RefAlignParam { get { return null; } }
             string IDumpShortProvider.DumpShort() { return "arg"; }
         }
-
     }
 }
