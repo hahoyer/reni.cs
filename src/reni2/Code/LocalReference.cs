@@ -65,5 +65,6 @@ namespace Reni.Code
             size += Code.Size;
             return DestructorCode.ReplaceArg(null, LocalVariableReference(RefAlignParam, holder));
         }
+        string IDumpShortProvider.DumpShort() { return DumpShort(); }
     }
 }

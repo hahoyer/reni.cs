@@ -254,25 +254,22 @@ namespace Reni.Struct
 
         internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
-            var trace = ObjectId == 0 && category.HasCode;
+            var trace = ObjectId == -10 && category.HasCode;
             StartMethodDump(trace, category,parent,fromPosition,fromNotPosition);
             try
             {
-                var typedCategory = category.Typed;
                 var result = (fromNotPosition - fromPosition)
                     .Array(i => fromPosition + i)
                     .Aggregate
-                    (TypeBase.VoidResult(typedCategory)
+                    (TypeBase.VoidResult(category)
                      , (current, position)
                        =>
                        current
-                       + InnerResult(typedCategory, parent, position + 1, position)
+                       + InnerResult(category, parent, position + 1, position)
                              .Align(parent.RefAlignParam.AlignBits)
+                             .LocalBlock(category)
                     );
-
-                Dump("result", result); 
-                BreakExecution();
-                return ReturnMethodDump(result.LocalBlock(category),true);
+                return ReturnMethodDump(result,true);
             }
             finally
             {

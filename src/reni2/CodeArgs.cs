@@ -172,6 +172,7 @@ namespace Reni
         {
             internal static readonly IReferenceInCode Instance = new arg();
             RefAlignParam IReferenceInCode.RefAlignParam { get { return null; } }
+            string IDumpShortProvider.DumpShort() { return "arg"; }
         }
 
     }

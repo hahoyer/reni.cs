@@ -7,7 +7,7 @@ using Reni.Context;
 
 namespace Reni.Code
 {
-    internal interface IReferenceInCode
+    internal interface IReferenceInCode: IDumpShortProvider
     {
         RefAlignParam RefAlignParam { get; }
     }
