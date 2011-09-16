@@ -104,7 +104,7 @@ namespace Reni.ReniParser
 
                 if(suffixOperationResult == null)
                 {
-                    NotImplementedMethod(category, Left, _tokenClass, Right);
+                    NotImplementedMethod(context, category);
                     return null;
                 }
 

@@ -31,7 +31,10 @@ namespace Reni.Parser
         private string _name;
 
         protected TokenClass()
-            : base(_nextObjectId++) { }
+            : base(_nextObjectId++)
+        {
+            StopByObjectId(-31);
+        }
 
         [DisableDump]
         string ITokenClass.Name { set { _name = value; } }

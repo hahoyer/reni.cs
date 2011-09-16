@@ -54,6 +54,7 @@ namespace Reni.Context
 
         [Node]
         [DisableDump]
+        [DebuggerHidden]
         internal RefAlignParam RefAlignParam { get { return Root.DefaultRefAlignParam; } }
 
         [DisableDump]
