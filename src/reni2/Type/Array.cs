@@ -32,7 +32,7 @@ namespace Reni.Type
     ///     Fixed sized array of a type
     /// </summary>
     [Serializable]
-    sealed class Array : Child
+    sealed class Array : Child<TypeBase>
     {
         readonly DictionaryEx<Size, ConcatArraysFeature> _concatArraysFeatureCache;
 

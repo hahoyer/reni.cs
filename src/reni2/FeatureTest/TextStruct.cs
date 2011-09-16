@@ -35,13 +35,13 @@ namespace Reni.FeatureTest
                 @"
 !system:
 {
-    MaxNumber8: '7f' to_number_of_base(16) /\ auto_call;
-    MaxNumber16: '7fff' to_number_of_base(16) /\ auto_call;
-    MaxNumber32: '7fffffff' to_number_of_base(16) /\ auto_call;
-    MaxNumber64: '7fffffffffffffff' to_number_of_base(16) /\ auto_call;
+    MaxNumber8: '7f' to_number_of_base(16) /!\ ;
+    MaxNumber16: '7fff' to_number_of_base(16) /!\ ;
+    MaxNumber32: '7fffffff' to_number_of_base(16) /!\ ;
+    MaxNumber64: '7fffffffffffffff' to_number_of_base(16) /!\ ;
 
-    TextItemType: text_item(MaxNumber8) type /\ auto_call;
-}/\ auto_call;
+    TextItemType: text_item(MaxNumber8) type /!\ ;
+}/!\ ;
 
 Text: 
 {

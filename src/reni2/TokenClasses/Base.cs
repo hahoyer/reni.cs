@@ -1,4 +1,22 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -11,10 +29,10 @@ using Reni.Syntax;
 namespace Reni.TokenClasses
 {
     [Serializable]
-    internal abstract class Special : TokenClass
+    abstract class Special : TokenClass
     {}
 
-    internal abstract class Terminal : Special, ITerminal
+    abstract class Terminal : Special, ITerminal
     {
         protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -27,8 +45,11 @@ namespace Reni.TokenClasses
         public abstract bool? QuickIsDereferencedDataLess(ContextBase context, TokenData token);
     }
 
-    internal abstract class NonPrefix: Special, ITerminal, ISuffix
+    abstract class NonPrefix : Special, ITerminal, ISuffix
     {
+        [DisableDump]
+        bool ISuffix.IsLambda { get { return false; } }
+
         protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
             right.AssertIsNull();
@@ -47,7 +68,7 @@ namespace Reni.TokenClasses
     }
 
     [Serializable]
-    internal abstract class Prefix : Special, IPrefix
+    abstract class Prefix : Special, IPrefix
     {
         public abstract Result Result(ContextBase context, Category category, CompileSyntax right);
 
@@ -59,8 +80,12 @@ namespace Reni.TokenClasses
     }
 
     [Serializable]
-    internal abstract class Suffix : Special, ISuffix
+    abstract class Suffix : Special, ISuffix
     {
+        [DisableDump]
+        bool ISuffix.IsLambda { get { return IsLambda; } }
+        [DisableDump]
+        protected virtual bool IsLambda { get { return false; } }
         public abstract Result Result(ContextBase context, Category category, CompileSyntax right);
 
         protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
@@ -71,7 +96,7 @@ namespace Reni.TokenClasses
     }
 
     [Serializable]
-    internal abstract class Infix : Special, IInfix
+    abstract class Infix : Special, IInfix
     {
         public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
 

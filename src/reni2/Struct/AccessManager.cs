@@ -42,8 +42,7 @@ namespace Reni.Struct
 
             Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType)
             {
-                NotImplementedMethod(category, accessType);
-                return null;
+                return accessType.ValueReferenceViaFieldReferenceFunction(category);
             }
             bool IAccessObject.IsDataLess(AccessType accessType) { return true; }
             

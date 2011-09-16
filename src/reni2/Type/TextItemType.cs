@@ -27,7 +27,7 @@ using Reni.Sequence;
 
 namespace Reni.Type
 {
-    sealed class TextItemType : TagChild
+    sealed class TextItemType : TagChild<TypeBase>
     {
         [DisableDump]
         public readonly ISearchPath<IFeature, SequenceType> ToNumberOfBaseFeature;

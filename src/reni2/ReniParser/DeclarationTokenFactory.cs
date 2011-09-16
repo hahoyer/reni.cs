@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Parser;
 using Reni.TokenClasses;
 
@@ -47,9 +48,9 @@ namespace Reni.ReniParser
             return prioTable;
         }
 
-        protected override Dictionary<string, TokenClasses.TokenClass> GetTokenClasses()
+        protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()
         {
-            return new Dictionary<string, TokenClasses.TokenClass>
+            return new DictionaryEx<string, TokenClasses.TokenClass>
                    {
                        {"converter", new ConverterToken()},
                    };

@@ -27,7 +27,7 @@ namespace Reni.Parser
     internal abstract class TokenFactory<TTokenClass> : ReniObject, ITokenFactory
         where TTokenClass : class, ITokenClass 
     {
-        private readonly SimpleCache<Dictionary<string, TTokenClass>> _tokenClasses;
+        private readonly SimpleCache<DictionaryEx<string, TTokenClass>> _tokenClasses;
         private readonly SimpleCache<PrioTable> _prioTable;
         private readonly SimpleCache<TTokenClass> _listClass;
         private readonly SimpleCache<TTokenClass> _numberClass;
@@ -42,13 +42,13 @@ namespace Reni.Parser
             _numberClass = new SimpleCache<TTokenClass>(InternalGetNumberClass);
             _listClass = new SimpleCache<TTokenClass>(InternalGetListClass);
             _prioTable = new SimpleCache<PrioTable>(GetPrioTable);
-            _tokenClasses = new SimpleCache<Dictionary<string, TTokenClass>>(InternalGetTokenClasses);
+            _tokenClasses = new SimpleCache<DictionaryEx<string, TTokenClass>>(InternalGetTokenClasses);
             _textClass = new SimpleCache<TTokenClass>(InternalGetTextClass);
         }
 
-        private Dictionary<string, TTokenClass> InternalGetTokenClasses()
+        private DictionaryEx<string, TTokenClass> InternalGetTokenClasses()
         {
-            var result = GetTokenClasses();
+            DictionaryEx<string, TTokenClass> result = GetTokenClasses();
             foreach(var pair in result)
                 pair.Value.Name = pair.Key;
             return result;
@@ -112,7 +112,7 @@ namespace Reni.Parser
 
         protected abstract TTokenClass GetSyntaxError(string message);
         protected abstract PrioTable GetPrioTable();
-        protected abstract Dictionary<string, TTokenClass> GetTokenClasses();
+        protected abstract DictionaryEx<string, TTokenClass> GetTokenClasses();
 
         protected virtual TTokenClass GetNewTokenClass(string name) { return GetSyntaxError("invalid symbol: " + name.Quote()); }
         protected virtual TTokenClass GetListClass() { return GetSyntaxError("unexpected list token"); }

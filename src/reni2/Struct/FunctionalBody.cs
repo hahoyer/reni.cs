@@ -27,34 +27,29 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class FunctionalBody : FunctionalFeature
+    sealed class FunctionalBody : FunctionalFeature
     {
-        private readonly CompileSyntax _body;
-        private readonly Structure _structure;
-        private readonly SimpleCache<Type> _typeCache;
+        readonly CompileSyntax _body;
+        readonly Structure _structure;
+        readonly SimpleCache<Type> _typeCache;
+        readonly SimpleCache<AutoCallType> _autoCallCache;
 
         internal FunctionalBody(Structure structure, CompileSyntax body)
         {
             _structure = structure;
             _body = body;
+            _autoCallCache = new SimpleCache<AutoCallType>(() => new AutoCallType(this));
             _typeCache = new SimpleCache<Type>(() => new Type(this));
             StopByObjectId(-1);
         }
 
         internal sealed class Type : TypeBase
         {
-            private readonly FunctionalBody _parent;
+            readonly FunctionalBody _parent;
             public Type(FunctionalBody parent) { _parent = parent; }
 
             [DisableDump]
             internal override Structure FindRecentStructure { get { return _parent._structure; } }
-
-            internal override Result PropertyResult(Category category)
-            {
-                return _parent
-                    .ObtainApplyResult(category, Void)
-                    .ReplaceArg(Void.Result(category.Typed));
-            }
 
             internal override Size GetSize(bool isQuick) { return Size.Zero; }
             internal override string DumpPrintText { get { return _parent._body.DumpPrintText + "/\\"; } }
@@ -69,11 +64,38 @@ namespace Reni.Struct
             }
         }
 
+        internal sealed class AutoCallType : TypeBase
+        {
+            [EnableDump]
+            readonly FunctionalBody _parent;
+            
+            internal AutoCallType(FunctionalBody parent) { _parent = parent; }
+
+            internal override Size GetSize(bool isQuick) { return Size.Zero; }
+
+            Result ValueResult(Category category)
+            {
+                return _parent
+                    .ObtainApplyResult(category, Void)
+                    .ReplaceArg(Void.Result(category.Typed));
+            }
+
+            internal override void Search(ISearchVisitor searchVisitor)
+            {
+                base.Search(searchVisitor);
+                ValueType.Search(searchVisitor);
+            }
+            [DisableDump]
+            TypeBase ValueType { get { return ValueResult(Category.Type).Type; } }
+        }
+
         [DisableDump]
-        private CompileSyntax Body { get { return _body; } }
+        CompileSyntax Body { get { return _body; } }
 
         [DisableDump]
         protected override TypeBase ObjectType { get { return _structure.Type; } }
+        [DisableDump]
+        internal AutoCallType UniqueAutoCallType { get { return _autoCallCache.Value; } }
 
         protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
@@ -85,7 +107,7 @@ namespace Reni.Struct
 
         protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return ObtainApplyResult(category, argsType); }
 
-        private Result ObtainApplyResult(Category category, TypeBase argsType)
+        Result ObtainApplyResult(Category category, TypeBase argsType)
         {
             StartMethodDump(false, category, argsType);
             try
@@ -107,6 +129,6 @@ namespace Reni.Struct
         }
 
         internal Result Result(Category category) { return ToType().Result(category); }
-        private Type ToType() { return _typeCache.Value; }
+        Type ToType() { return _typeCache.Value; }
     }
 }

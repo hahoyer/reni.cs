@@ -25,7 +25,7 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    sealed class Aligner : Child
+    sealed class Aligner : Child<TypeBase>
     {
         readonly int _alignBits;
 

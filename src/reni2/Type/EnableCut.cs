@@ -24,7 +24,7 @@ using HWClassLibrary.Debug;
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class EnableCut : TagChild
+    internal sealed class EnableCut : TagChild<TypeBase>
     {
         internal EnableCut(TypeBase parent)
             : base(parent) { }

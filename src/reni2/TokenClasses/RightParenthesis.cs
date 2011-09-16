@@ -18,7 +18,9 @@ namespace Reni.TokenClasses
             Tracer.Assert(right == null);
             if(left != null)
                 return left.RightParenthesis(_level, token);
-            return base.Syntax(left, token, right);
+            
+            NotImplementedMethod(left, token, right);
+            return null;
         }
     }
 }

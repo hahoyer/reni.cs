@@ -25,15 +25,16 @@ using HWClassLibrary.TreeStructure;
 namespace Reni.Type
 {
     [Serializable]
-    internal abstract class Child : TypeBase
+    internal abstract class Child<TParent> : TypeBase
+        where TParent: TypeBase
     {
-        private readonly TypeBase _parent;
+        private readonly TParent _parent;
 
-        protected Child(TypeBase parent) { _parent = parent; }
+        protected Child(TParent parent) { _parent = parent; }
 
         [Node]
         [DisableDump]
-        public TypeBase Parent { get { return _parent; } }
+        public TParent Parent { get { return _parent; } }
 
         [DisableDump]
         protected internal override int IndexSize { get { return Parent.IndexSize; } }

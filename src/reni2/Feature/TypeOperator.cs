@@ -14,6 +14,9 @@ namespace Reni.Feature
 {
     internal sealed class TypeOperator : Special, ISuffix, IInfix
     {
+        [DisableDump]
+        bool ISuffix.IsLambda { get { return false; } }
+
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
             if(right == null)

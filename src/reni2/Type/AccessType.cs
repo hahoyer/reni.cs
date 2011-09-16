@@ -61,8 +61,6 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase ValueType { get { return AccessObject.ValueType(this); } }
         [DisableDump]
-        internal TypeBase ValueTypeProperty { get { return base.ValueType.PropertyResult(Category.Type).Type; } }
-        [DisableDump]
         internal TypeBase ValueTypeField { get { return base.ValueType; } }
         [DisableDump]
         internal TypeBase ValueTypeFunction { get { return base.ValueType; } }
@@ -160,6 +158,7 @@ namespace Reni.Type
         }
 
         internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode, CodeArgs.Arg); }
+        internal Result ValueReferenceViaFieldReferenceFunction(Category category) { return ValueType.Result(category); }
 
         internal Result FieldReferenceViaStructReference(Category category)
         {

@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
@@ -30,7 +31,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    internal sealed class MainTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
+    sealed class MainTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
         protected override PrioTable GetPrioTable()
         {
@@ -72,7 +73,8 @@ namespace Reni.ReniParser
                  new[] {"else"}
                 );
             x += PrioTable.Right("!");
-            x += PrioTable.Right(":", "/\\");
+            x += PrioTable.Left("/\\", "/!\\");
+            x += PrioTable.Right(":");
             x += PrioTable.Right(",");
             x += PrioTable.Right(";");
             x = x.Level
@@ -97,9 +99,9 @@ namespace Reni.ReniParser
         ///     Creates the main token classes.
         /// </summary>
         /// <returns></returns>
-        protected override Dictionary<string, TokenClasses.TokenClass> GetTokenClasses()
+        protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()
         {
-            return new Dictionary<string, TokenClasses.TokenClass>
+            return new DictionaryEx<string, TokenClasses.TokenClass>
                    {
                        {"^", new ContextOperator()},
                        {":", new Colon()},
@@ -119,6 +121,7 @@ namespace Reni.ReniParser
                        {"*", new Star()},
                        {"_A_T_", new AtToken()},
                        {"arg", new ArgToken()},
+                       {"/!\\", new AutoCallFunction()},
                        {"dump_print", new DumpPrintToken()},
                        {"else", new ElseToken()},
                        {"enable_cut", new EnableCut()},
@@ -133,15 +136,21 @@ namespace Reni.ReniParser
         protected override TokenClasses.TokenClass GetListClass() { return new List(); }
         protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
         protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
-        protected override TokenClasses.TokenClass GetNumberClass() { return new Number(); }
+        protected override TokenClasses.TokenClass GetNumberClass() { return new TokenClasses.Number(); }
         protected override TokenClasses.TokenClass GetNewTokenClass(string name) { return new UserSymbol(name); }
         protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
-        protected override TokenClasses.TokenClass GetTextClass() { return new TokenClasses.Text(); }
+        protected override TokenClasses.TokenClass GetTextClass() { return new Text(); }
     }
 
-    internal sealed class SyntaxError : TokenClasses.TokenClass
+    sealed class SyntaxError : TokenClasses.TokenClass
     {
-        private readonly string _message;
+        readonly string _message;
         public SyntaxError(string message) { _message = message; }
+
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
     }
 }

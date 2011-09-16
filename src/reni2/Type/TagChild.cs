@@ -24,9 +24,10 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal abstract class TagChild : Child
+    internal abstract class TagChild<TParent> : Child<TParent>
+        where TParent : TypeBase
     {
-        protected TagChild(TypeBase parent)
+        protected TagChild(TParent parent)
             : base(parent) { }
 
         [DisableDump]

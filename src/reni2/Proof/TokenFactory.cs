@@ -20,6 +20,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Helper;
 using Reni.Parser;
 using Reni.Proof.TokenClasses;
 
@@ -63,10 +64,10 @@ namespace Reni.Proof
             return x;
         }
 
-        protected override Dictionary<string, TokenClasses.TokenClass> GetTokenClasses()
+        protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()
         {
             var result =
-                new Dictionary<string, TokenClasses.TokenClass>
+                new DictionaryEx<string, TokenClasses.TokenClass>
                 {
                     {"=", new Equal()},
                     {"-", new Minus()},
@@ -83,7 +84,7 @@ namespace Reni.Proof
         protected override TokenClasses.TokenClass GetListClass() { return new List(); }
         protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
         protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
-        protected override TokenClasses.TokenClass GetNumberClass() { return new Number(); }
+        protected override TokenClasses.TokenClass GetNumberClass() { return new TokenClasses.Number(); }
 
         internal Minus Minus { get { return (Minus) TokenClass("-"); } }
         internal Equal Equal { get { return (Equal) TokenClass("="); } }

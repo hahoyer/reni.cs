@@ -110,7 +110,7 @@ namespace Reni.Syntax
             _suffix = suffix;
         }
 
-        protected override bool GetIsLambda() { return _suffix is TokenClasses.Function; }
+        protected override bool GetIsLambda() { return _suffix.IsLambda; }
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
@@ -143,5 +143,6 @@ namespace Reni.Syntax
     internal interface ISuffix
     {
         Result Result(ContextBase context, Category category, CompileSyntax left);
+        bool IsLambda { get; }
     }
 }
