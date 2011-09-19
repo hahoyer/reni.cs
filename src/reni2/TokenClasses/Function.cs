@@ -36,7 +36,7 @@ namespace Reni.TokenClasses
             return context
                 .FindRecentStructure
                 .UniqueFunctionalFeature(target)
-                .Result(category);
+                .Result(category, false);
         }
     }
 }

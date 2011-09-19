@@ -68,7 +68,7 @@ namespace Reni.Struct
         {
             [EnableDump]
             readonly FunctionalBody _parent;
-            
+
             internal AutoCallType(FunctionalBody parent) { _parent = parent; }
 
             internal override Size GetSize(bool isQuick) { return Size.Zero; }
@@ -94,8 +94,6 @@ namespace Reni.Struct
 
         [DisableDump]
         protected override TypeBase ObjectType { get { return _structure.Type; } }
-        [DisableDump]
-        internal AutoCallType UniqueAutoCallType { get { return _autoCallCache.Value; } }
 
         protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
@@ -128,7 +126,13 @@ namespace Reni.Struct
             return null;
         }
 
-        internal Result Result(Category category) { return ToType().Result(category); }
-        Type ToType() { return _typeCache.Value; }
+        internal Result Result(Category category, bool isAutoCall) { return UniqueType(isAutoCall).Result(category); }
+
+        TypeBase UniqueType(bool isAutoCall)
+        {
+            if(isAutoCall)
+                return _autoCallCache.Value;
+            return _typeCache.Value;
+        }
     }
 }
