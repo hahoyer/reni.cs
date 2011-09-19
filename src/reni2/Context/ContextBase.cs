@@ -212,5 +212,12 @@ namespace Reni.Context
             [DisableDump]
             public string IconKey { get { return "Cache"; } }
         }
+
+        internal Result FunctionalResult(Category category, CompileSyntax target, bool isAutoCall)
+        {
+            return FindRecentStructure
+                .UniqueFunctionalFeature(target)
+                .Result(category, isAutoCall);
+        }
     }
 }

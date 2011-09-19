@@ -30,13 +30,6 @@ namespace Reni.TokenClasses
     {
         [DisableDump]
         protected override bool IsLambda { get { return true; } }
-
-        public override Result Result(ContextBase context, Category category, CompileSyntax target)
-        {
-            return context
-                .FindRecentStructure
-                .UniqueFunctionalFeature(target)
-                .Result(category, false);
-        }
+        public override Result Result(ContextBase context, Category category, CompileSyntax target) { return context.FunctionalResult(category, target, false); }
     }
 }
