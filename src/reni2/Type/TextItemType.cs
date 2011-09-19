@@ -30,7 +30,7 @@ namespace Reni.Type
     sealed class TextItemType : TagChild<TypeBase>
     {
         [DisableDump]
-        public readonly ISearchPath<IFeature, SequenceType> ToNumberOfBaseFeature;
+        public readonly ISearchPath<ISuffixFeature, SequenceType> ToNumberOfBaseFeature;
         
         public TextItemType(TypeBase parent)
             : base(parent) { ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this); }

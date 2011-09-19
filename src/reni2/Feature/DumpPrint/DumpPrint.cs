@@ -30,12 +30,12 @@ namespace Reni.Feature.DumpPrint
 
     internal sealed class BitSequenceFeature :
         ReniObject,
-        ISearchPath<IFeature, Sequence.SequenceType>
+        ISearchPath<ISuffixFeature, Sequence.SequenceType>
     {
-        IFeature ISearchPath<IFeature, Sequence.SequenceType>.Convert(Sequence.SequenceType type) { return type.BitDumpPrintFeature; }
+        ISuffixFeature ISearchPath<ISuffixFeature, Sequence.SequenceType>.Convert(Sequence.SequenceType type) { return type.BitDumpPrintFeature; }
     }
 
-    internal sealed class BitSequenceFeatureClass : BitFeatureBase, IFeature
+    internal sealed class BitSequenceFeatureClass : BitFeatureBase, ISuffixFeature
     {
         private readonly Sequence.SequenceType _parent;
 
@@ -45,21 +45,21 @@ namespace Reni.Feature.DumpPrint
         TypeBase IFeature.ObjectType { get { return _parent; } }
     }
 
-    internal sealed class BitFeature : BitFeatureBase, IFeature
+    internal sealed class BitFeature : BitFeatureBase, ISuffixFeature
     {
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.UniqueAutomaticReference(refAlignParam)); }
         TypeBase IFeature.ObjectType { get { return TypeBase.Bit; } }
     }
 
-    internal sealed class StructReferenceFeature : ReniObject, ISearchPath<IFeature, AutomaticReferenceType>,
-                                                   IFeature
+    internal sealed class StructReferenceFeature : ReniObject, ISearchPath<ISuffixFeature, AutomaticReferenceType>,
+                                                   ISuffixFeature
     {
         [EnableDump]
         private readonly StructureType _structureType;
 
         public StructReferenceFeature(StructureType structureType) { _structureType = structureType; }
 
-        IFeature ISearchPath<IFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type)
+        ISuffixFeature ISearchPath<ISuffixFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type)
         {
             Tracer.Assert(type.RefAlignParam == _structureType.RefAlignParam);
             return this;

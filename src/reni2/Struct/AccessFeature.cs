@@ -12,7 +12,7 @@ namespace Reni.Struct
     internal sealed class AccessFeature :
         ReniObject,
         IContextFeature,
-        IFeature
+        ISuffixFeature
     {
         [EnableDump]
         private readonly Structure _structure;

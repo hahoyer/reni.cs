@@ -26,7 +26,7 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    internal sealed class FunctionalFeature : Type.FunctionalFeature, IFeature
+    internal sealed class FunctionalFeature : Type.FunctionalFeature, ISuffixFeature
     {
         [EnableDump]
         private readonly SequenceType _objectType;

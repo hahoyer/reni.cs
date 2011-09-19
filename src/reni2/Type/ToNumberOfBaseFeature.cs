@@ -31,7 +31,7 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
-    internal sealed class ToNumberOfBaseFeature : ISearchPath<IFeature, SequenceType>
+    internal sealed class ToNumberOfBaseFeature : ISearchPath<ISuffixFeature, SequenceType>
     {
         private readonly DictionaryEx<int, ToNumberOfBaseSequenceFeature> _toNumberOfBaseSeqquenceFeaturesCache;
         private readonly TextItemType _type;
@@ -40,14 +40,14 @@ namespace Reni.Type
             _toNumberOfBaseSeqquenceFeaturesCache = new DictionaryEx<int, ToNumberOfBaseSequenceFeature>(count => new ToNumberOfBaseSequenceFeature(_type, count));
             _type = type;
         }
-        IFeature ISearchPath<IFeature, SequenceType>.Convert(SequenceType type)
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
             Tracer.Assert(_type == type.Element);
             return _toNumberOfBaseSeqquenceFeaturesCache.Find(type.Count);
         }
     }
 
-    internal sealed class ToNumberOfBaseSequenceFeature : TypeBase, IFeature, IMetaFeature
+    internal sealed class ToNumberOfBaseSequenceFeature : TypeBase, ISuffixFeature, IMetaFeature
     {
         [EnableDump]
         private readonly TextItemType _type;

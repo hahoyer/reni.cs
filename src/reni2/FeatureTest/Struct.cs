@@ -23,6 +23,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
 using Reni.FeatureTest.DefaultOperations;
+using Reni.FeatureTest.Function;
 
 namespace Reni.FeatureTest.Struct
 {
@@ -86,6 +87,7 @@ namespace Reni.FeatureTest.Struct
     [TestFixture]
     [InnerAccess]
     [Function.Function]
+    [SimpleFunctionWithNonLocal]
     public sealed class PropertyVariable : CompilerTest
     {
         protected override string Target { get { return @"x: 11/!\ ; x dump_print"; } }

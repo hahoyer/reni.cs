@@ -177,7 +177,7 @@ namespace Reni.Struct
             return null;
         }
 
-        internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
+        internal ISearchPath<ISuffixFeature, StructureType> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
 
         internal IStructFeature SearchFromStructContext(Defineable defineable) { return FindStructFeature(defineable.Name); }
 
@@ -284,7 +284,7 @@ namespace Reni.Struct
     }
 
     interface IStructFeature
-        : ISearchPath<IFeature, StructureType>
+        : ISearchPath<ISuffixFeature, StructureType>
     {
         IContextFeature ConvertToContextFeature(Structure accessPoint);
     }
@@ -299,7 +299,7 @@ namespace Reni.Struct
 
         AccessFeature Convert(Structure contextObject) { return contextObject.UniqueAccessFeature(_position); }
 
-        IFeature ISearchPath<IFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
+        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
         IContextFeature IStructFeature.ConvertToContextFeature(Structure accessPoint) { return Convert(accessPoint); }
     }
 }

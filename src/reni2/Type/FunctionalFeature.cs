@@ -39,7 +39,7 @@ namespace Reni.Type
 
         Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -1  && category.HasCode;
+            var trace = ObjectId == 1  && category.HasCode;
             StartMethodDump(trace, category, operationResult, argsResult, refAlignParam);
             try
             {                                                                                                                   
@@ -48,11 +48,13 @@ namespace Reni.Type
                     return ReturnMethodDump(applyResult);
 
                 Dump("applyResult", applyResult);
+                BreakExecution();
                 var replaceArgResult = applyResult.ReplaceArg(argsResult);
                 if(ObjectType.IsDataLess)
                     return ReturnMethodDump(replaceArgResult);
 
                 Dump("replaceArgResult", replaceArgResult);
+                BreakExecution();
                 var replaceObjectResult = ReplaceObjectReferenceByArg(replaceArgResult, refAlignParam);
                 Dump("replaceObjectResult", replaceObjectResult);
                 if(!replaceObjectResult.HasArg)
@@ -60,9 +62,10 @@ namespace Reni.Type
 
                 Tracer.Assert(replaceObjectResult.HasArg, replaceObjectResult.Dump);
 
-                var objectResult = ObjectType
-                    .SmartReference(refAlignParam)
-                    .Result(category.Typed, operationResult);
+                var objectAsReference = ObjectType.SmartReference(refAlignParam);
+                Dump("objectAsReference", objectAsReference);
+                BreakExecution();
+                var objectResult = objectAsReference.Result(category.Typed, operationResult);
                 Dump("objectResult", objectResult);
                 BreakExecution();
                 var result = replaceObjectResult.ReplaceArg(objectResult);

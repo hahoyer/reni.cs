@@ -25,8 +25,8 @@ using Reni.Sequence;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class EnableCut : Defineable, ISearchPath<IFeature, SequenceType>
+    internal sealed class EnableCut : Defineable, ISearchPath<ISuffixFeature, SequenceType>
     {
-        IFeature ISearchPath<IFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
     }
 }

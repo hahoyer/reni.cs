@@ -25,8 +25,8 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class Assignment : Defineable, ISearchPath<IFeature, AccessType>
+    internal sealed class Assignment : Defineable, ISearchPath<ISuffixFeature, AccessType>
     {
-        IFeature ISearchPath<IFeature, AccessType>.Convert(AccessType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, AccessType>.Convert(AccessType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
     }
 }

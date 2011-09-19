@@ -25,33 +25,34 @@ using Reni.Type;
 
 namespace Reni.Feature
 {
-    internal interface ISearchPath<out TOutType, in TInType>
+    interface ISearchPath<out TOutType, in TInType>
     {
         TOutType Convert(TInType type);
     }
 
-    internal interface IFeature
+    interface IFeature
     {
         Result ObtainResult(Category category, RefAlignParam refAlignParam);
         TypeBase ObjectType { get; }
     }
 
-    internal interface IPrefixFeature
-    {
-        IFeature Feature { get; }
-    }
+    interface ISuffixFeature : IFeature
+    {}
+
+    interface IPrefixFeature : IFeature
+    {}
 
 
-    internal interface IContextFeature
+    interface IContextFeature
     {
         Result ObtainResult(Category category);
     }
 
-    internal sealed class Feature : ReniObject, IFeature
+    sealed class Feature : ReniObject, ISuffixFeature
     {
         [EnableDump]
-        private readonly Func<Category, RefAlignParam, Result> _function;
-        private static int _nextObjectId;
+        readonly Func<Category, RefAlignParam, Result> _function;
+        static int _nextObjectId;
 
         public Feature(Func<Category, RefAlignParam, Result> function)
             : base(_nextObjectId++)
@@ -64,11 +65,11 @@ namespace Reni.Feature
         TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
     }
 
-    internal sealed class PrefixFeature : ReniObject, IPrefixFeature, IFeature
+    sealed class PrefixFeature : ReniObject, IPrefixFeature, ISuffixFeature
     {
         [EnableDump]
-        private readonly Func<Category, RefAlignParam, Result> _function;
-        private static int _nextObjectId;
+        readonly Func<Category, RefAlignParam, Result> _function;
+        static int _nextObjectId;
 
         public PrefixFeature(Func<Category, RefAlignParam, Result> function)
             : base(_nextObjectId++)
@@ -78,24 +79,16 @@ namespace Reni.Feature
         }
 
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
-        TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
-        IFeature IPrefixFeature.Feature { get { return this; } }
+        TypeBase IFeature.ObjectType { get { return (TypeBase)_function.Target; } }
     }
 
-    internal static class FeatureExtender
+    static class FeatureExtender
     {
         internal static TypeBase TypeOfArgInObtainResult(this IFeature feature, RefAlignParam refAlignParam)
         {
             return feature
                 .ObjectType
                 .SmartReference(refAlignParam);
-        }
-
-        internal static IFeature ConvertToFeature(this object feature)
-        {
-            if(feature is IPrefixFeature)
-                return ((IPrefixFeature) feature).Feature;
-            return (IFeature) feature;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Reni.Sequence
         private readonly Type.Array _inheritedType;
 
         [DisableDump]
-        internal readonly IFeature BitDumpPrintFeature;
+        internal readonly ISuffixFeature BitDumpPrintFeature;
         private readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
         internal Result EnableCutFeature(Category category, RefAlignParam refAlignParam)
@@ -50,7 +50,7 @@ namespace Reni.Sequence
                 );
         }
 
-        internal IFeature Feature(FeatureBase featureBase) { return new FunctionalFeature(this, featureBase); }
+        internal ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionalFeature(this, featureBase); }
 
         internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
 

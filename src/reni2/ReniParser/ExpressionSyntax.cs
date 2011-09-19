@@ -83,9 +83,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == -244 && context.ObjectId == 3
-                        || ObjectId == -244 && context.ObjectId == 4
-                        || ObjectId == -241 && context.ObjectId == 3;
+            var trace = ObjectId == -48 && context.ObjectId == 4 && (category.HasCode || category.HasType);
             StartMethodDump(trace, context, category);
             try
             {
@@ -100,7 +98,7 @@ namespace Reni.ReniParser
                 var suffixOperationResult =
                     Left == null
                         ? context.ContextOperationResult(category.Typed, _tokenClass)
-                        : Left.OperationResult<IFeature>(context, category.Typed, _tokenClass);
+                        : Left.OperationResult<ISuffixFeature>(context, category.Typed, _tokenClass);
 
                 if(suffixOperationResult == null)
                 {

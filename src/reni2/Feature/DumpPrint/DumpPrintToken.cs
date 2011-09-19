@@ -29,32 +29,32 @@ namespace Reni.Feature.DumpPrint
 {
     internal sealed class DumpPrintToken :
         Defineable,
-        ISearchPath<ISearchPath<IFeature, AutomaticReferenceType>, StructureType>,
-        ISearchPath<IFeature, TypeType>,
-        ISearchPath<IFeature, Bit>,
-        ISearchPath<IFeature, Type.Void>,
-        ISearchPath<IFeature, StructureType>,
-        ISearchPath<IFeature, Type.Array>,
-        ISearchPath<IFeature, TextItemType>,
-        ISearchPath<ISearchPath<IFeature, SequenceType>, Bit>,
-        ISearchPath<ISearchPath<IFeature, SequenceType>, TextItemType>,
-        ISearchPath<IFeature, FunctionalBody>
+        ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, StructureType>,
+        ISearchPath<ISuffixFeature, TypeType>,
+        ISearchPath<ISuffixFeature, Bit>,
+        ISearchPath<ISuffixFeature, Type.Void>,
+        ISearchPath<ISuffixFeature, StructureType>,
+        ISearchPath<ISuffixFeature, Type.Array>,
+        ISearchPath<ISuffixFeature, TextItemType>,
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>,
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>,
+        ISearchPath<ISuffixFeature, FunctionalBody>
     {
         private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
         private static readonly BitFeature _bitFeature = new BitFeature();
-        private static readonly ISearchPath<IFeature, SequenceType> _dumpPrintSequenceFeature = new DumpPrintSequenceFeature();
+        private static readonly ISearchPath<ISuffixFeature, SequenceType> _dumpPrintSequenceFeature = new DumpPrintSequenceFeature();
 
-        IFeature ISearchPath<IFeature, TypeType>.Convert(TypeType type) { return new Feature(type.DumpPrintResult); }
-        IFeature ISearchPath<IFeature, Bit>.Convert(Bit type) { return _bitFeature; }
-        IFeature ISearchPath<IFeature, Type.Void>.Convert(Type.Void type) { return new Feature(type.DumpPrintResult); }
-        IFeature ISearchPath<IFeature, StructureType>.Convert(StructureType type) { return new Feature(type.DumpPrintResult); }
-        IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new Feature(type.DumpPrintResult); }
-        IFeature ISearchPath<IFeature, FunctionalBody>.Convert(FunctionalBody type) { return new Feature(type.DumpPrintResult); }
-        IFeature ISearchPath<IFeature, TextItemType>.Convert(TextItemType type) { return new Feature(type.DumpPrintTextResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return new Feature(type.DumpPrintResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Bit>.Convert(Bit type) { return _bitFeature; }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Void>.Convert(Type.Void type) { return new Feature(type.DumpPrintResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType type) { return new Feature(type.DumpPrintResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new Feature(type.DumpPrintResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, FunctionalBody>.Convert(FunctionalBody type) { return new Feature(type.DumpPrintResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TextItemType>.Convert(TextItemType type) { return new Feature(type.DumpPrintTextResult); }
 
-        ISearchPath<IFeature, SequenceType> ISearchPath<ISearchPath<IFeature, SequenceType>, TextItemType>.Convert(TextItemType type) { return _dumpPrintSequenceFeature; }
-        ISearchPath<IFeature, SequenceType> ISearchPath<ISearchPath<IFeature, SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
-        ISearchPath<IFeature, AutomaticReferenceType> ISearchPath<ISearchPath<IFeature, AutomaticReferenceType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
+        ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>.Convert(TextItemType type) { return _dumpPrintSequenceFeature; }
+        ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
+        ISearchPath<ISuffixFeature, AutomaticReferenceType> ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
 
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
     }

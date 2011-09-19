@@ -158,7 +158,7 @@ namespace Reni.Struct
                 .Result(category, codeAndRefs);
         }
 
-        internal ISearchPath<IFeature, StructureType> SearchFromRefToStruct(Defineable defineable)
+        internal ISearchPath<ISuffixFeature, StructureType> SearchFromRefToStruct(Defineable defineable)
         {
             return ContainerContextObject
                 .Container

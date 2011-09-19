@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni
 {

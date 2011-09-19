@@ -37,7 +37,7 @@ namespace Reni.Type
         readonly DictionaryEx<Size, ConcatArraysFeature> _concatArraysFeatureCache;
 
         readonly int _count;
-        public readonly ISearchPath<IFeature, ReferenceType> ConcatArraysFromReferenceFeature;
+        public readonly ISearchPath<ISuffixFeature, ReferenceType> ConcatArraysFromReferenceFeature;
 
         public Array(TypeBase element, int count)
             : base(element)

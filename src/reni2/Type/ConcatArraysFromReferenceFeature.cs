@@ -27,12 +27,12 @@ namespace Reni.Type
 {
     internal sealed class ConcatArraysFromReferenceFeature :
         ReniObject
-        , ISearchPath<IFeature, ReferenceType>
-        , IFeature
+        , ISearchPath<ISuffixFeature, ReferenceType>
+        , ISuffixFeature
     {
         private readonly Array _type;
         public ConcatArraysFromReferenceFeature(Array type) { _type = type; }
-        IFeature ISearchPath<IFeature, ReferenceType>.Convert(ReferenceType type) { return this; }
+        ISuffixFeature ISearchPath<ISuffixFeature, ReferenceType>.Convert(ReferenceType type) { return this; }
         Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _type.ConcatArrays(category, refAlignParam); }
         TypeBase IFeature.ObjectType { get { return _type; } }
     }

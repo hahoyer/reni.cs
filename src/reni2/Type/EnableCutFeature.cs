@@ -10,7 +10,7 @@ using Reni.Sequence;
 namespace Reni.Type
 {
     [Serializable]
-    internal class EnableCutFeature : ReniObject, IFeature
+    internal class EnableCutFeature : ReniObject, ISuffixFeature
     {
         private readonly Sequence.SequenceType _sequenceType;
         public EnableCutFeature(Sequence.SequenceType sequenceType) { _sequenceType = sequenceType; }

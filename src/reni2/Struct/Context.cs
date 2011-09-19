@@ -21,12 +21,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class Context : Child
+    sealed class Context : Child
     {
         [Node]
         internal readonly int Position;
@@ -40,13 +42,18 @@ namespace Reni.Struct
             Container = container;
         }
 
-        private void Search(SearchVisitor<IContextFeature> searchVisitor, ContainerContextObject context)
+        void Search(SearchVisitor<IContextFeature> searchVisitor, ContainerContextObject context)
         {
             var feature = Container.SearchFromStructContext(searchVisitor.Defineable);
-            if (feature == null)
+            if(feature == null)
                 return;
             var accessPoint = context.UniqueAccessPoint(Position);
             searchVisitor.InternalResult = feature.ConvertToContextFeature(accessPoint);
+        }
+        Result SearchConverter(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)

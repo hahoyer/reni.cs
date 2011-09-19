@@ -29,13 +29,13 @@ namespace Reni.TokenClasses
     internal sealed class ConcatArrays :
         Defineable
         , ISearchPath<IPrefixFeature, TypeBase>
-        , ISearchPath<IFeature, Type.Array>
+        , ISearchPath<ISuffixFeature, Type.Array>
         , ISearchPath<ISearchPath<IPrefixFeature, ReferenceType>, TypeBase>
-        , ISearchPath<ISearchPath<IFeature, ReferenceType>, Type.Array>
+        , ISearchPath<ISearchPath<ISuffixFeature, ReferenceType>, Type.Array>
     {
-        IFeature ISearchPath<IFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrays); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrays); }
         IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new Feature.PrefixFeature(type.CreateArray); }
         ISearchPath<IPrefixFeature, ReferenceType> ISearchPath<ISearchPath<IPrefixFeature, ReferenceType>, TypeBase>.Convert(TypeBase type) { return type.CreateArrayFromReferenceFeature; }
-        ISearchPath<IFeature, ReferenceType> ISearchPath<ISearchPath<IFeature, ReferenceType>, Type.Array>.Convert(Type.Array type) { return type.ConcatArraysFromReferenceFeature; }
+        ISearchPath<ISuffixFeature, ReferenceType> ISearchPath<ISearchPath<ISuffixFeature, ReferenceType>, Type.Array>.Convert(Type.Array type) { return type.ConcatArraysFromReferenceFeature; }
     }
 }

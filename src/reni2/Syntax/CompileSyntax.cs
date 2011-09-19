@@ -26,6 +26,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.TokenClasses;
@@ -117,7 +118,7 @@ namespace Reni.Syntax
         }
 
         internal Result OperationResult<TFeature>(ContextBase context, Category category, Defineable defineable)
-            where TFeature : class
+            where TFeature : class, IFeature
         {
             var trace = ObjectId == -21 && context.ObjectId == 2 && defineable.ObjectId == 31
                 || ObjectId == 241 && context.ObjectId == 4 && defineable.ObjectId == 19;

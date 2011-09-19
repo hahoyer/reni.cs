@@ -319,15 +319,14 @@ namespace Reni.Type
         }
 
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
-            where TFeature : class
+            where TFeature : class, IFeature
         {
             var trace = ObjectId == 4 && defineable.ObjectId == 20 && (category.HasType || category.HasCode);
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
                 BreakExecution();
-                var searchResult = SearchDefineable<TFeature>(defineable);
-                var feature = searchResult.ConvertToFeature();
+                var feature = SearchDefineable<TFeature>(defineable);
                 Dump("feature", feature);
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
@@ -384,7 +383,7 @@ namespace Reni.Type
                 .BitSequenceOperation(token, Size);
         }
 
-        internal Result GenericDumpPrintResult(Category category, RefAlignParam refAlignParam) { return OperationResult<IFeature>(category, DumpPrintToken.Create(), refAlignParam); }
+        internal Result GenericDumpPrintResult(Category category, RefAlignParam refAlignParam) { return OperationResult<ISuffixFeature>(category, DumpPrintToken.Create(), refAlignParam); }
 
         internal Result CreateArray(Category category, RefAlignParam refAlignParam)
         {

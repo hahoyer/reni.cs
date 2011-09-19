@@ -25,8 +25,8 @@ using Reni.Sequence;
 
 namespace Reni.Type
 {
-    internal sealed class DumpPrintSequenceFeature : ISearchPath<IFeature, SequenceType>
+    internal sealed class DumpPrintSequenceFeature : ISearchPath<ISuffixFeature, SequenceType>
     {
-        IFeature ISearchPath<IFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.DumpPrintTextResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.DumpPrintTextResult); }
     }
 }

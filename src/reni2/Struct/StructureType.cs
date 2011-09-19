@@ -32,7 +32,7 @@ namespace Reni.Struct
         readonly Structure _structure;
 
         [DisableDump]
-        internal readonly ISearchPath<IFeature, AutomaticReferenceType> DumpPrintReferenceFeature;
+        internal readonly ISearchPath<ISuffixFeature, AutomaticReferenceType> DumpPrintReferenceFeature;
 
         internal StructureType(Structure structure)
         {
@@ -55,14 +55,18 @@ namespace Reni.Struct
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            var searchVisitorChild = searchVisitor as SearchVisitor<IFeature>;
+            var searchVisitorChild = searchVisitor as SearchVisitor<ISuffixFeature>;
             if(searchVisitorChild != null && !searchVisitorChild.IsSuccessFull)
-                searchVisitorChild.InternalResult =
-                    Structure
-                        .SearchFromRefToStruct(searchVisitorChild.Defineable)
-                        .CheckedConvert(this);
+                searchVisitorChild.InternalResult = Structure
+                    .SearchFromRefToStruct(searchVisitorChild.Defineable)
+                    .CheckedConvert(this);
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
+        }
+        Result SearchConverter(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
         internal override bool? IsDereferencedDataLess(bool isQuick) { return Structure.StructIsDataLess(isQuick); }
 

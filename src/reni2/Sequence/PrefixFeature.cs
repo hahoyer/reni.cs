@@ -10,7 +10,7 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    internal sealed class PrefixFeature : ReniObject, IFeature, IPrefixFeature
+    internal sealed class PrefixFeature : ReniObject, ISuffixFeature, IPrefixFeature
     {
         private readonly SequenceType _objectType;
         private readonly ISequenceOfBitPrefixOperation _definable;
@@ -20,8 +20,6 @@ namespace Reni.Sequence
             _objectType = objectType;
             _definable = definable;
         }
-
-        IFeature IPrefixFeature.Feature { get { return this; } }
 
         TypeBase IFeature.ObjectType { get { return _objectType; } }
 
