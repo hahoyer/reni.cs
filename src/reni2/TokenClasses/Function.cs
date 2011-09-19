@@ -26,10 +26,29 @@ using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class Function : Suffix
+    abstract class Function : Suffix
     {
+        readonly bool _isAutoCall;
+        protected Function(bool isAutoCall) { _isAutoCall = isAutoCall; }
         [DisableDump]
         protected override bool IsLambda { get { return true; } }
-        public override Result Result(ContextBase context, Category category, CompileSyntax target) { return context.FunctionalResult(category, target, false); }
+        
+        public override Result Result(ContextBase context, Category category, CompileSyntax target)
+        {
+            return context
+                .FunctionalResult(category, target, _isAutoCall);
+        }
+    }
+
+    sealed class CallableFunction : Function
+    {
+        public CallableFunction()
+            : base(false) { }
+    }
+
+    sealed class AutoCallFunction : Function
+    {
+        public AutoCallFunction()
+            : base(true) { }
     }
 }
