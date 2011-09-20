@@ -26,6 +26,7 @@ namespace Reni.Type
 {
     internal interface IFunctionalFeature : IDumpShortProvider
     {
-        Result ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam);
+        Result ObtainApplyResult(Category category, ResultCache objectResult, Result argsResult, RefAlignParam refAlignParam);
+        bool IsDataLessObjectType { get; }
     }
 }

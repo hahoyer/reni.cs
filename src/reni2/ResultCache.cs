@@ -22,6 +22,8 @@ using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
+using Reni.Type;
 
 namespace Reni
 {
@@ -31,6 +33,20 @@ namespace Reni
         readonly Func<Category, bool, Result> _obtainResult;
 
         public ResultCache(Func<Category, bool, Result> obtainResult) { _obtainResult = obtainResult; }
+        
+        ResultCache(Result data)
+        {
+            _data = data;
+            _obtainResult = NotSupported;
+        }
+
+        public static implicit operator ResultCache (Result x){return new ResultCache(x);}
+        
+        Result NotSupported(Category category, bool isPending)
+        {
+            NotImplementedMethod(category, isPending);
+            return null;
+        }
 
         internal Result Data { get { return _data; } }
 
@@ -86,7 +102,7 @@ namespace Reni
             get { return _data.HasIsDataLess; }
             set
             {
-                if (value)
+                if(value)
                     Update(Category.IsDataLess);
                 else
                     _data.IsDataLess = null;
@@ -98,7 +114,7 @@ namespace Reni
             get { return _data.HasSize; }
             set
             {
-                if (value)
+                if(value)
                     Update(Category.Size);
                 else
                     _data.Size = null;
@@ -110,19 +126,19 @@ namespace Reni
             get { return _data.HasType; }
             set
             {
-                if (value)
+                if(value)
                     Update(Category.Type);
                 else
                     _data.Type = null;
             }
         }
 
-        bool HasCode
+        internal bool HasCode
         {
             get { return _data.HasCode; }
             set
             {
-                if (value)
+                if(value)
                     Update(Category.Code);
                 else
                     _data.Code = null;
@@ -134,10 +150,51 @@ namespace Reni
             get { return _data.HasArgs; }
             set
             {
-                if (value)
+                if(value)
                     Update(Category.CodeArgs);
                 else
                     _data.CodeArgs = null;
+            }
+        }
+
+        internal TypeBase Type
+        {
+            get
+            {
+                Update(Category.Type);
+                return Data.Type;
+            }
+        }
+        internal CodeBase Code
+        {
+            get
+            {
+                Update(Category.Code);
+                return Data.Code;
+            }
+        }
+        internal CodeArgs CodeArgs
+        {
+            get
+            {
+                Update(Category.CodeArgs);
+                return Data.CodeArgs;
+            }
+        }
+        internal Size Size
+        {
+            get
+            {
+                Update(Category.Size);
+                return Data.Size;
+            }
+        }
+        internal bool? IsDataLess
+        {
+            get
+            {
+                Update(Category.IsDataLess);
+                return Data.IsDataLess;
             }
         }
     }

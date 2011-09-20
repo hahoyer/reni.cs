@@ -116,7 +116,10 @@ namespace Reni.Struct
 
         [DisableDump]
 // ReSharper disable PossibleInvalidOperationException
-        internal bool IsDataLess { get { return StructIsDataLess(false).Value; } }
+            internal bool IsDataLess
+        {
+            get { return StructIsDataLess(false).Value; }
+        }
 // ReSharper restore PossibleInvalidOperationException
 
         internal bool? StructIsDataLess(bool isQuick) { return ContainerContextObject.StructureIsDataLess(isQuick, EndPosition); }
@@ -175,11 +178,8 @@ namespace Reni.Struct
         internal Result AccessViaContextReference(Category category, int position)
         {
             var accessType = UniqueAccessType(position);
-            if(accessType.IsDataLess)
-                return accessType.Result(category);
-            return accessType
-                .Result(category, ContainerContextObject)
-                .AddToReference(RefAlignParam, ContextOffset);
+            var result = accessType.Result(category, ContainerContextObject, ContextOffset);
+            return result;
         }
         Size ContextOffset() { return ContainerContextObject.ContextReferenceOffsetFromAccessPoint(EndPosition) * -1; }
 

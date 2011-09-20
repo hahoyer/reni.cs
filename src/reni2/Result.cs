@@ -498,6 +498,21 @@ namespace Reni
             return this;
         }
 
+        internal Result ReplaceArg(ResultCache resultForArg)
+        {
+            if (!HasArg)
+                return this;
+
+            resultForArg.Update(CompleteCategory);
+            var result = new Result { IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true };
+            if (HasCode)
+                result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
+            if (HasArgs)
+                result.CodeArgs = CodeArgs.WithoutArg().Sequence(resultForArg.CodeArgs);
+            result.IsDirty = false;
+            return result;
+        }
+
         internal Result ReplaceArg(Result resultForArg)
         {
             if(HasArg)
@@ -715,15 +730,7 @@ namespace Reni
                 Tracer.Assert(Type is ReferenceType, Dump);
             return this;
         }
-
-        internal Result AddToReference(RefAlignParam refAlignParam, Func<Size> getOffset)
-        {
-            if(!CompleteCategory.HasCode)
-                return this;
-            var result = Clone();
-            result.Code = result.Code.AddToReference(refAlignParam, getOffset());
-            return result;
-        }
+        
     }
 
     sealed class Error

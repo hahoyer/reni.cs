@@ -27,6 +27,7 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.ReniParser
 {
@@ -83,7 +84,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == 48 && context.ObjectId == 4 && (category.HasCode || category.HasType);
+            var trace = ObjectId == 48 && context.ObjectId == 4 && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
@@ -124,7 +125,7 @@ namespace Reni.ReniParser
                 Dump("rightResult", rightResult);
                 BreakExecution();
                 var result = functionalFeature
-                    .ObtainApplyResult(category, suffixOperationResult, rightResult, context.RefAlignParam);
+                    .ObtainApplyResult(category, new ResultCache((c,p)=>context.ObjectResult(c,Left)), rightResult, context.RefAlignParam);
                 return ReturnMethodDump(result, true);
             }
             finally

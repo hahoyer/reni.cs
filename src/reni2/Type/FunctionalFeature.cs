@@ -37,10 +37,10 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ObtainApplyResult(Category category, ResultCache objectResult, Result argsResult, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == 1  && category.HasCode;
-            StartMethodDump(trace, category, operationResult, argsResult, refAlignParam);
+            StartMethodDump(trace, category, objectResult, argsResult, refAlignParam);
             try
             {                                                                                                                   
                 var applyResult = ObtainApplyResult(category, argsResult.Type, refAlignParam);
@@ -62,12 +62,6 @@ namespace Reni.Type
 
                 Tracer.Assert(replaceObjectResult.HasArg, replaceObjectResult.Dump);
 
-                var objectAsReference = ObjectType.SmartReference(refAlignParam);
-                Dump("objectAsReference", objectAsReference);
-                BreakExecution();
-                var objectResult = objectAsReference.Result(category.Typed, operationResult);
-                Dump("objectResult", objectResult);
-                BreakExecution();
                 var result = replaceObjectResult.ReplaceArg(objectResult);
                 return ReturnMethodDump(result, true);
             }
@@ -76,6 +70,8 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
+        
+        bool IFunctionalFeature.IsDataLessObjectType { get { return ObjectType.IsDataLess; } }
 
         protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         protected abstract TypeBase ObjectType { get; }

@@ -24,11 +24,11 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal sealed class ConcatArraysFeature : TypeBase, IFunctionalFeature
+    sealed class ConcatArraysFeature : TypeBase, IFunctionalFeature
     {
         [EnableDump]
-        private readonly Array _type;
-        private readonly Size _refSize;
+        readonly Array _type;
+        readonly Size _refSize;
 
         public ConcatArraysFeature(Array type, Size refSize)
         {
@@ -38,7 +38,7 @@ namespace Reni.Type
 
         internal override Size GetSize(bool isQuick) { return _refSize; }
 
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result operationResult, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ObtainApplyResult(Category category, ResultCache objectResult, Result argsResult, RefAlignParam refAlignParam)
         {
             var newCount = argsResult.Type.ArrayElementCount;
             var newElementResult = argsResult.Conversion(argsResult.Type.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);
@@ -47,9 +47,17 @@ namespace Reni.Type
                 .UniqueArray(_type.Count + newCount)
                 .Result
                 (category
-                 , () => newElementResult.Code.Sequence(operationResult.Code.Dereference(refAlignParam, _type.Size))
-                 , () => newElementResult.CodeArgs + operationResult.CodeArgs
+                 , () => newElementResult.Code.Sequence(objectResult.Code.Dereference(refAlignParam, _type.Size))
+                 , () => newElementResult.CodeArgs + objectResult.CodeArgs
                 );
+        }
+        bool IFunctionalFeature.IsDataLessObjectType
+        {
+            get
+            {
+                NotImplementedMethod();
+                return false;
+            }
         }
     }
 }

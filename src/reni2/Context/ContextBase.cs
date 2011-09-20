@@ -141,7 +141,6 @@ namespace Reni.Context
                 NotImplementedMethod(category, defineable);
                 return null;
             }
-
             return feature.ObtainResult(category) & category;
         }
 
@@ -218,6 +217,14 @@ namespace Reni.Context
             return FindRecentStructure
                 .UniqueFunctionalFeature(target)
                 .Result(category, isAutoCall);
+        }
+        
+        internal Result ObjectResult(Category category, CompileSyntax syntax)
+        {
+            if (syntax != null)
+                return UniqueResult(category, syntax);
+            
+            return FindRecentStructure.
         }
     }
 }

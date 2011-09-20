@@ -136,7 +136,7 @@ namespace Reni.Syntax
                 if(!category.HasCode && !category.HasArgs)
                     return ReturnMethodDump(operationResult, true);
 
-                if (!operationResult.HasArg)
+                if(!operationResult.HasArg)
                     return ReturnMethodDump(operationResult, true);
 
                 Dump("operationResult", operationResult);

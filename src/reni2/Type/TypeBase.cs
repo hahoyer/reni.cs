@@ -105,7 +105,6 @@ namespace Reni.Type
                     return size.IsZero;
                 NotImplementedMethod();
                 return false;
-
             }
         }
 
@@ -176,14 +175,16 @@ namespace Reni.Type
                     , CodeArgs.Void);
         }
 
-        internal Result Result(Category category, IReferenceInCode target)
+        internal Result Result(Category category, IReferenceInCode target, Func<Size> getOffset)
         {
+            if(IsDataLess)
+                return Result(category);
             return new Result
                 (category
                  , () => false
                  , () => target.RefAlignParam.RefSize
                  , () => this
-                 , () => CodeBase.ReferenceCode(target)
+                 , () => CodeBase.ReferenceCode(target).AddToReference(target.RefAlignParam, getOffset())
                  , () => CodeArgs.Create(target));
         }
 
@@ -312,11 +313,7 @@ namespace Reni.Type
                 .LocalReference(refAlignParam, Destructor(Category.Code).Code);
         }
 
-        internal virtual Result ReferenceInCode(Category category, IReferenceInCode target)
-        {
-            return UniqueAutomaticReference(target.RefAlignParam)
-                .Result(category, target);
-        }
+        internal virtual Result ReferenceInCode(Category category, IReferenceInCode target) { return UniqueAutomaticReference(target.RefAlignParam).Result(category, target, () => Size.Zero); }
 
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class, IFeature
@@ -334,7 +331,7 @@ namespace Reni.Type
                 var featureResult = feature.ObtainResult(category.Argsed, refAlignParam);
                 Dump("featureResult", featureResult);
                 var objectResult = feature.TypeOfArgInObtainResult(refAlignParam);
-                Dump("objectResult", objectResult); 
+                Dump("objectResult", objectResult);
                 BreakExecution();
                 var convertObject = ConvertObject(category.Typed, refAlignParam, objectResult);
                 Dump("convertObject", convertObject);
@@ -463,6 +460,8 @@ namespace Reni.Type
         internal virtual Result UnAlignedResult(Category category) { return ArgResult(category); }
 
         internal virtual bool? IsDereferencedDataLess(bool isQuick) { return Size.IsZero; }
+
+        internal bool IsDataLessApply() { return FunctionalFeature == null || FunctionalFeature.IsDataLessObjectType; }
     }
 
     interface IMetaFeature

@@ -59,12 +59,6 @@ namespace Reni.Type
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _accessPoint; } }
         [DisableDump]
-        internal override TypeBase ValueType { get { return AccessObject.ValueType(this); } }
-        [DisableDump]
-        internal TypeBase ValueTypeField { get { return base.ValueType; } }
-        [DisableDump]
-        internal TypeBase ValueTypeFunction { get { return base.ValueType; } }
-        [DisableDump]
         TypeBase ValueTypeReference { get { return ValueType.SmartReference(RefAlignParam); } }
         [DisableDump]
         internal override bool IsDataLess { get { return AccessObject.IsDataLess(this); } }
@@ -128,33 +122,13 @@ namespace Reni.Type
         internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
         internal Result DumpPrintFieldResult(Category category) { return GenericDumpPrintResult(category, RefAlignParam); }
         internal Result DumpPrintProcedureCallResult(Category category) { return Void.Result(category); }
-        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(base.ValueType.DumpPrintText), CodeArgs.Void); }
+        internal Result DumpPrintFunctionResult(Category category) { return Void.Result(category, () => CodeBase.DumpPrintText(ValueType.DumpPrintText), CodeArgs.Void); }
 
         Result ValueReferenceViaFieldReference(Category category)
         {
             return AccessObject
                 .ValueReferenceViaFieldReference(category, this)
                 .AssertEmptyOrValidReference();
-        }
-
-        internal Result ValueReferenceViaFieldReferenceProperty(Category category)
-        {
-            var propertyResult = base.ValueType.PropertyResult(category);
-            var localReferenceResult = propertyResult.LocalReferenceResult(RefAlignParam);
-            var replaceObjectRefByArg = localReferenceResult
-                .ContextReferenceViaStructReference(AccessPoint);
-            var structReferenceViaFieldReference = StructReferenceViaFieldReference(category.Typed);
-            var result = replaceObjectRefByArg
-                .ReplaceArg(structReferenceViaFieldReference)
-                .LocalReferenceResult(RefAlignParam);
-            return (result);
-        }
-
-        Result StructReferenceViaFieldReference(Category category)
-        {
-            return AccessPoint
-                .ReferenceType
-                .Result(category, ArgResult(category));
         }
 
         internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode, CodeArgs.Arg); }
