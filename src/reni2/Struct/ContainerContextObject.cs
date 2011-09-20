@@ -28,11 +28,11 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    internal sealed class ContainerContextObject : ReniObject, IDumpShortProvider, IReferenceInCode
+    sealed class ContainerContextObject : ReniObject, IReferenceInCode
     {
-        private readonly Container _container;
-        private readonly ContextBase _parent;
-        private readonly DictionaryEx<int, AccessManager.IAccessObject> _accessObjectsCache;
+        readonly Container _container;
+        readonly ContextBase _parent;
+        readonly DictionaryEx<int, AccessManager.IAccessObject> _accessObjectsCache;
 
         internal ContainerContextObject(Container container, ContextBase parent)
         {
@@ -59,22 +59,22 @@ namespace Reni.Struct
         internal Root RootContext { get { return Parent.RootContext; } }
 
         [DisableDump]
-        internal Structure ToStructure { get { return _parent.UniqueStructure(Container); } }
+        Structure ToStructure { get { return _parent.UniqueStructure(Container); } }
 
-        private int IndexSize { get { return Container.IndexSize; } }
+        int IndexSize { get { return Container.IndexSize; } }
 
         internal AccessManager.IAccessObject UniqueAccessObject(int position) { return _accessObjectsCache.Find(position); }
-        internal Structure UniqueAccessPoint(int position) { return Parent.UniqueStructure(Container,position); }
+        internal Structure UniqueAccessPoint(int position) { return Parent.UniqueStructure(Container, position); }
         internal TypeBase InnerType(int accessPosition, int position) { return Container.InnerType(_parent, accessPosition, position); }
 
         internal Size StructureSize(int position)
         {
-            if (StructureIsDataLess(false, position) == true)
+            if(StructureIsDataLess(false, position) == true)
                 return Size.Zero;
             return StructureSize(0, position);
         }
         internal bool? StructureIsDataLess(bool isQuick, int accessPosition) { return Container.IsDataLess(isQuick, Parent, accessPosition); }
-        internal bool IsDataLess(int position) { return Container.StructureResult(Category.IsDataLess, Parent, position, position + 1).SmartIsDataLess; }
+        bool IsDataLess(int position) { return Container.StructureResult(Category.IsDataLess, Parent, position, position + 1).SmartIsDataLess; }
 
         internal Result ContextReferenceViaStructReference(int position, Result result)
         {
@@ -94,9 +94,9 @@ namespace Reni.Struct
 
         Size StructureSize(int fromPosition, int fromNotPosition) { return Container.StructureSize(Parent, fromPosition, fromNotPosition); }
 
-        private bool IsLambda(int position) { return Container.IsLambda(position); }
+        bool IsLambda(int position) { return Container.IsLambda(position); }
 
-        private AccessManager.IAccessObject GetAccessObject(int position)
+        AccessManager.IAccessObject GetAccessObject(int position)
         {
             if(IsLambda(position))
                 return AccessManager.Function;
@@ -105,10 +105,10 @@ namespace Reni.Struct
             return AccessManager.Field;
         }
 
-        private CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)
+        CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)
         {
             return Parent
-                .UniqueStructure(Container,accessPosition)
+                .UniqueStructure(Container, accessPosition)
                 .ReferenceType
                 .ArgCode()
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));

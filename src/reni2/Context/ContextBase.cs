@@ -75,7 +75,6 @@ namespace Reni.Context
         internal ContextBase UniqueChildContext(Container container, int position) { return _cache.StructContexts.Find(container).Find(position); }
         internal ContextBase UniqueChildContext(TypeBase args) { return _cache.FunctionContexts.Find(args); }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
-        internal Structure UniqueStructure(Struct.Context context) { return _cache.Structures.Find(context.Container).Find(context.Position); }
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
         internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Find(container).Find(accessPosition); }
         internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects.Find(context); }
@@ -221,10 +220,12 @@ namespace Reni.Context
         
         internal Result ObjectResult(Category category, CompileSyntax syntax)
         {
-            if (syntax != null)
-                return UniqueResult(category, syntax);
-            
-            return FindRecentStructure.
+            if(syntax == null)
+                return ObjectResult(category);
+
+            return UniqueResult(category.Typed, syntax).LocalReferenceResult(RefAlignParam);
         }
+
+        protected abstract Result ObjectResult(Category category);
     }
 }

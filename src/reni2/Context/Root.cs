@@ -27,10 +27,10 @@ using Reni.Syntax;
 
 namespace Reni.Context
 {
-    internal sealed class Root : ContextBase
+    sealed class Root : ContextBase
     {
         [DisableDump]
-        private readonly FunctionList _functions;
+        readonly FunctionList _functions;
 
         internal Root(FunctionList functions) { _functions = functions; }
 
@@ -42,6 +42,11 @@ namespace Reni.Context
         protected override Result CommonResult(Category category, CondSyntax condSyntax)
         {
             NotImplementedMethod(category, condSyntax);
+            return null;
+        }
+        protected override Result ObjectResult(Category category)
+        {
+            NotImplementedMethod(category);
             return null;
         }
 

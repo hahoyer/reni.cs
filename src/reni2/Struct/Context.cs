@@ -24,7 +24,6 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -50,11 +49,6 @@ namespace Reni.Struct
             var accessPoint = context.UniqueAccessPoint(Position);
             searchVisitor.InternalResult = feature.ConvertToContextFeature(accessPoint);
         }
-        Result SearchConverter(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
         {
@@ -64,6 +58,8 @@ namespace Reni.Struct
             base.Search(searchVisitor);
         }
 
-        internal override Structure ObtainRecentStructure() { return Parent.UniqueStructure(this); }
+        protected override Result ObjectResult(Category category) { return FindRecentStructure.StructReferenceViaContextReference(category); }
+
+        internal override Structure ObtainRecentStructure() { return Parent.UniqueStructure(Container, Position); }
     }
 }

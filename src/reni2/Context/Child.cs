@@ -27,7 +27,7 @@ using Reni.Struct;
 
 namespace Reni.Context
 {
-    internal class Child : ContextBase
+    internal abstract class Child : ContextBase
     {
         [DisableDump]
         private readonly ContextBase _parent;
