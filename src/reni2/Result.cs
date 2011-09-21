@@ -317,9 +317,10 @@ namespace Reni
         public override string DumpData()
         {
             var result = "";
-            result += "PendingCategory=" + PendingCategory.Dump();
-            result += "\n";
-            result += "CompleteCategory=" + CompleteCategory.Dump();
+            if(PendingCategory != Category.None)
+                result += "\nPendingCategory=" + PendingCategory.Dump();
+            if(CompleteCategory != Category.None)
+                result += "\nCompleteCategory=" + CompleteCategory.Dump();
             if(HasIsDataLess)
                 result += "\nIsDataLess=" + Tracer.Dump(_isDataLess);
             if(HasSize)
@@ -330,7 +331,9 @@ namespace Reni
                 result += "\nArgs=" + Tracer.Dump(_codeArgs);
             if(HasCode)
                 result += "\nCode=" + Tracer.Dump(_code);
-            return result;
+            if (result == "")
+                return "";
+            return result.Substring(1);
         }
 
         internal void Update(Result result)
@@ -500,14 +503,14 @@ namespace Reni
 
         internal Result ReplaceArg(ResultCache resultForArg)
         {
-            if (!HasArg)
+            if(!HasArg)
                 return this;
 
             resultForArg.Update(CompleteCategory);
-            var result = new Result { IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true };
-            if (HasCode)
+            var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
+            if(HasCode)
                 result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
-            if (HasArgs)
+            if(HasArgs)
                 result.CodeArgs = CodeArgs.WithoutArg().Sequence(resultForArg.CodeArgs);
             result.IsDirty = false;
             return result;
@@ -663,10 +666,7 @@ namespace Reni
         }
 
         [DebuggerHidden]
-        public static Result operator +(Result aResult, Result bResult)
-        {
-            return aResult.Sequence(bResult);
-        }
+        public static Result operator +(Result aResult, Result bResult) { return aResult.Sequence(bResult); }
 
         internal Result ConvertToBitSequence(Category category)
         {
@@ -715,7 +715,7 @@ namespace Reni
         [DebuggerHidden]
         internal Result AssertEmptyOrValidReference()
         {
-            if (FindIsDataLess == true)
+            if(FindIsDataLess == true)
                 return this;
 
             var size = FindSize;
@@ -730,7 +730,6 @@ namespace Reni
                 Tracer.Assert(Type is ReferenceType, Dump);
             return this;
         }
-        
     }
 
     sealed class Error

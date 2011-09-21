@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
@@ -31,17 +30,32 @@ namespace Reni
     {
         readonly Result _data = new Result();
         readonly Func<Category, bool, Result> _obtainResult;
+        readonly Func<Category, Result> _obtainFlatResult;
+        internal string FunctionDump;
 
         public ResultCache(Func<Category, bool, Result> obtainResult) { _obtainResult = obtainResult; }
-        
+        public ResultCache(Func<Category, Result> obtainResult)
+        {
+            _obtainResult = ObtainFlatResult;
+            _obtainFlatResult = obtainResult;
+        }
+
+        Result ObtainFlatResult(Category category, bool isPending)
+        {
+            if(!isPending)
+                return _obtainFlatResult(category);
+            NotImplementedMethod(category, isPending);
+            return null;
+        }
+
         ResultCache(Result data)
         {
             _data = data;
             _obtainResult = NotSupported;
         }
 
-        public static implicit operator ResultCache (Result x){return new ResultCache(x);}
-        
+        public static implicit operator ResultCache(Result x) { return new ResultCache(x); }
+
         Result NotSupported(Category category, bool isPending)
         {
             NotImplementedMethod(category, isPending);
@@ -50,7 +64,7 @@ namespace Reni
 
         internal Result Data { get { return _data; } }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal void Update(Category category)
         {
             var localCategory = category - _data.CompleteCategory - _data.PendingCategory;
@@ -80,6 +94,7 @@ namespace Reni
                 {
                     _data.PendingCategory |= localCategory;
                     var result = _obtainResult(localCategory, false);
+                    Tracer.Assert(localCategory <= result.CompleteCategory);
                     _data.Update(result);
                 }
                 finally
@@ -157,6 +172,7 @@ namespace Reni
             }
         }
 
+        [DisableDump]
         internal TypeBase Type
         {
             get
@@ -165,6 +181,7 @@ namespace Reni
                 return Data.Type;
             }
         }
+        [DisableDump]
         internal CodeBase Code
         {
             get
@@ -173,6 +190,7 @@ namespace Reni
                 return Data.Code;
             }
         }
+        [DisableDump]
         internal CodeArgs CodeArgs
         {
             get
@@ -181,6 +199,7 @@ namespace Reni
                 return Data.CodeArgs;
             }
         }
+        [DisableDump]
         internal Size Size
         {
             get
@@ -189,6 +208,7 @@ namespace Reni
                 return Data.Size;
             }
         }
+        [DisableDump]
         internal bool? IsDataLess
         {
             get
@@ -196,6 +216,15 @@ namespace Reni
                 Update(Category.IsDataLess);
                 return Data.IsDataLess;
             }
+        }
+
+        public override string DumpData()
+        {
+            var result = FunctionDump;
+            if(result != "")
+                result += "\n";
+            result += Data.DumpData();
+            return result;
         }
     }
 }

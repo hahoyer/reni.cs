@@ -84,7 +84,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == -48 && context.ObjectId == 4 && category.HasCode;
+            var trace = ObjectId == -41 && context.ObjectId == 3 && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
@@ -96,10 +96,13 @@ namespace Reni.ReniParser
                         return ReturnMethodDump(prefixOperationResult);
                 }
 
+                var leftCategory = Category.Type;
+                if (Right == null)
+                    leftCategory |= category;
                 var suffixOperationResult =
                     Left == null
-                        ? context.ContextOperationResult(category.Typed, _tokenClass)
-                        : Left.OperationResult<ISuffixFeature>(context, category.Typed, _tokenClass);
+                        ? context.ContextOperationResult(leftCategory, _tokenClass)
+                        : Left.OperationResult<ISuffixFeature>(context, leftCategory, _tokenClass);
 
                 if(suffixOperationResult == null)
                 {
@@ -124,8 +127,12 @@ namespace Reni.ReniParser
                 var rightResult = Right.Result(context, category.Typed).LocalReferenceResult(context.RefAlignParam);
                 Dump("rightResult", rightResult);
                 BreakExecution();
+                var leftResult = new ResultCache(c=>context.ObjectResult(c,Left));
+                leftResult.FunctionDump = "context=" + context.Dump();
+                if(Left != null)
+                    leftResult.FunctionDump += "\nLeft=" + Left.Dump();
                 var result = functionalFeature
-                    .ObtainApplyResult(category, new ResultCache((c,p)=>context.ObjectResult(c,Left)), rightResult, context.RefAlignParam);
+                    .ObtainApplyResult(category, leftResult, rightResult, context.RefAlignParam);
                 return ReturnMethodDump(result, true);
             }
             finally

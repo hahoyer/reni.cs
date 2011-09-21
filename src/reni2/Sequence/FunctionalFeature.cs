@@ -28,7 +28,6 @@ namespace Reni.Sequence
 {
     internal sealed class FunctionalFeature : Type.FunctionalFeature, ISuffixFeature
     {
-        [EnableDump]
         private readonly SequenceType _objectType;
 
         [EnableDump]

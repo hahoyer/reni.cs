@@ -81,7 +81,7 @@ namespace Reni.Context
 
         internal virtual void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache.Find(syntax);
@@ -93,7 +93,7 @@ namespace Reni.Context
 
         internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Find(syntax).Data & category; }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == -244 && ObjectId == 3 && category.HasIsDataLess;
@@ -101,7 +101,9 @@ namespace Reni.Context
             try
             {
                 BreakExecution();
-                return ReturnMethodDump(syntax.ObtainResult(this, category.Replenished), true);
+                var result = syntax.ObtainResult(this, category.Replenished);
+                Tracer.Assert(category <= result.CompleteCategory);
+                return ReturnMethodDump(result, true);
             }
             finally
             {
@@ -117,7 +119,7 @@ namespace Reni.Context
             return result;
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         Result ObtainResult(Category category, bool isPending, CompileSyntax syntax)
         {
             if(isPending)
