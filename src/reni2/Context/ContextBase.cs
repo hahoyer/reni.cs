@@ -127,11 +127,11 @@ namespace Reni.Context
             return ObtainResult(category, syntax);
         }
 
-        IContextFeature SearchDefinable(Defineable defineable)
+        SearchResult<IContextFeature> SearchDefinable(Defineable defineable)
         {
             var visitor = new ContextSearchVisitor(defineable);
             visitor.Search(this);
-            return visitor.Result;
+            return visitor.SearchResult;
         }
 
         internal Result ContextOperationResult(Category category, Defineable defineable)
@@ -142,7 +142,7 @@ namespace Reni.Context
                 NotImplementedMethod(category, defineable);
                 return null;
             }
-            return feature.ObtainResult(category) & category;
+            return feature.ObtainObjectResult(category) & category;
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }

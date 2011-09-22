@@ -50,7 +50,7 @@ namespace Reni.Sequence
 
         internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
 
-        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
+        Result IFeature.Result(Category category, RefAlignParam refAlignParam)
         {
             return UniqueFunctionalType(refAlignParam)
                 .Result(category, _objectType.ReferenceArgResult(category.Typed, refAlignParam));

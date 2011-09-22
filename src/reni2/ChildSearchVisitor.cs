@@ -1,22 +1,42 @@
+//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
 
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Feature;
+using Reni.Syntax;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni
 {
-    internal sealed class ChildSearchVisitor<TFeature, TType> : SearchVisitor<ISearchPath<TFeature, TType>>
+    sealed class ChildSearchVisitor<TFeature, TType> : SearchVisitor<ISearchPath<TFeature, TType>>
         where TFeature : class
-        where TType : IDumpShortProvider
+        where TType : IDumpShortProvider, IResultProvider
     {
         [DisableDump]
-        private readonly SearchVisitor<TFeature> _parent;
+        readonly SearchVisitor<TFeature> _parent;
 
         [EnableDump]
-        private readonly TType _target;
+        readonly TType _target;
 
         public ChildSearchVisitor(SearchVisitor<TFeature> parent, TType target)
         {
@@ -26,17 +46,17 @@ namespace Reni
         }
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
+        internal override Defineable Defineable { get { return _parent.Defineable; } }
+        internal override Result SearchConverter(Category category) { return _parent.SearchConverter(category); }
 
         internal override ISearchPath<TFeature, TType> InternalResult
         {
             set
             {
-                if(value == null)
-                    return;
-                _parent.InternalResult = value.Convert(_target);
+                if(value != null)
+                    _parent.InternalResult = value.Convert(_target);
             }
         }
-
-        internal override Defineable Defineable { get { return _parent.Defineable; } }
+        internal override IFoundItem[] FoundPath { get { return _parent.FoundPath; } set { _parent.FoundPath = value; } }
     }
 }

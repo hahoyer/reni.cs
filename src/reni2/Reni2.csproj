@@ -162,7 +162,7 @@
     <Compile Include="ReniParser\MainTokenFactory.cs" />
     <Compile Include="ReniParser\ParsedSyntax.cs" />
     <Compile Include="Runtime\DataHandler.cs" />
-    <Compile Include="SearchResult.cs" />
+    <Compile Include="DebugSearchResult.cs" />
     <Compile Include="Sequence\CompareFeature.cs" />
     <Compile Include="Sequence\Feature.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
@@ -271,6 +271,7 @@
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\AutomaticReferenceType.cs" />
     <Compile Include="Type\ReferenceType.cs" />
+    <Compile Include="Type\SearchResult.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemType.cs" />
     <Compile Include="Type\ToNumberOfBaseFeature.cs" />

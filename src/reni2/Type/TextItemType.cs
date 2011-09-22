@@ -24,10 +24,11 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Sequence;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
-    sealed class TextItemType : TagChild<TypeBase>
+    sealed class TextItemType : TagChild<TypeBase>, IResultProvider
     {
         [DisableDump]
         public readonly ISearchPath<ISuffixFeature, SequenceType> ToNumberOfBaseFeature;

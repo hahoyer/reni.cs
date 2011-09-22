@@ -77,4 +77,5 @@ namespace Reni.Struct
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Structure.DumpPrintResultViaStructReference(category); }
     }
+
 }

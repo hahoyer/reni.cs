@@ -27,6 +27,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -159,5 +160,6 @@ namespace Reni.Sequence
             NotImplementedMethod(conversionParameter, destination);
             return null;
         }
+
     }
 }

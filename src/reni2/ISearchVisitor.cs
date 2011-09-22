@@ -20,7 +20,9 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Sequence;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni
@@ -28,10 +30,17 @@ namespace Reni
     internal interface ISearchVisitor
     {
         void Search();
-        void ChildSearch<TType>(TType target) where TType : IDumpShortProvider;
+        void ChildSearch<TType>(TType target) where TType : IDumpShortProvider, IResultProvider;
         ISearchVisitor Child(SequenceType target);
         ISearchVisitor Child(AutomaticReferenceType target);
         ISearchVisitor Child(AccessType target);
         ISearchVisitor Child(TextItemType target);
+        void AddFoundItem(IFoundItem foundItem);
     }
+
+    interface IFoundItem
+    {
+        Result Result(Category category);
+    }
+
 }

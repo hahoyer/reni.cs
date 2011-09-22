@@ -24,10 +24,11 @@ using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Struct;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
-    sealed class AccessType : ReferenceType
+    sealed class AccessType : ReferenceType, IResultProvider
     {
         readonly Structure _accessPoint;
         readonly int _position;

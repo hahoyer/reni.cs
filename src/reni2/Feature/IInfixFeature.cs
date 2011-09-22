@@ -32,7 +32,7 @@ namespace Reni.Feature
 
     interface IFeature
     {
-        Result ObtainResult(Category category, RefAlignParam refAlignParam);
+        Result Result(Category category, RefAlignParam refAlignParam);
         TypeBase ObjectType { get; }
     }
 
@@ -61,7 +61,7 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is TypeBase);
         }
 
-        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
+        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
         TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
     }
 
@@ -78,7 +78,7 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is TypeBase);
         }
 
-        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
+        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
         TypeBase IFeature.ObjectType { get { return (TypeBase)_function.Target; } }
     }
 

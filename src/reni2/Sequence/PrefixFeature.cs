@@ -23,7 +23,7 @@ namespace Reni.Sequence
 
         TypeBase IFeature.ObjectType { get { return _objectType; } }
 
-        Result IFeature.ObtainResult(Category category, RefAlignParam refAlignParam)
+        Result IFeature.Result(Category category, RefAlignParam refAlignParam)
         {
             var resultForArg = _objectType
                 .UniqueAutomaticReference(refAlignParam)

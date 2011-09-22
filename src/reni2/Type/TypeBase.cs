@@ -37,7 +37,7 @@ using Reni.TokenClasses;
 namespace Reni.Type
 {
     [Serializable]
-    abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider
+    abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider, IResultProvider
     {
         sealed class Cache
         {
@@ -275,14 +275,14 @@ namespace Reni.Type
         internal virtual bool IsArray { get { return false; } }
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
-        TFeature SearchDefineable<TFeature>(Defineable defineable)
+        SearchResult<TFeature> SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class
         {
             var searchVisitor = new RootSearchVisitor<TFeature>(defineable);
             searchVisitor.Search(this);
             if(Debugger.IsAttached)
                 _lastSearchVisitor = searchVisitor;
-            return searchVisitor.Result;
+            return searchVisitor.SearchResult;
         }
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
@@ -318,7 +318,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class, IFeature
         {
-            var trace = ObjectId == 4 && defineable.ObjectId == 20 && (category.HasType || category.HasCode);
+            var trace = ObjectId == -13 && defineable.ObjectId == 25 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -328,35 +328,16 @@ namespace Reni.Type
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
-                var featureResult = feature.ObtainResult(category.Argsed, refAlignParam);
+                var featureResult = feature
+                    .Feature
+                    .Result(category.Argsed,refAlignParam);
                 Dump("featureResult", featureResult);
-                var objectResult = feature.TypeOfArgInObtainResult(refAlignParam);
-                Dump("objectResult", objectResult);
                 BreakExecution();
-                var convertObject = ConvertObject(category.Typed, refAlignParam, objectResult);
-                Dump("convertObject", convertObject);
+                var converterResult = feature.ObtainObjectResult(category).LocalReferenceResult(refAlignParam);
+                Dump("converterResult", converterResult);
                 BreakExecution();
-                var result = featureResult
-                    .ReplaceArg(() => convertObject);
+                var result = featureResult.ReplaceArg(converterResult);
                 return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        Result ConvertObject(Category category, RefAlignParam refAlignParam, TypeBase featureObject)
-        {
-            var trace = featureObject.ObjectId == -22 && category.HasCode;
-            StartMethodDump(trace, category, refAlignParam, featureObject);
-            try
-            {
-                BreakExecution();
-                var reference = SmartReference(refAlignParam);
-                if(reference == featureObject)
-                    return ReturnMethodDump(featureObject.ArgResult(category), true);
-                return ReturnMethodDump(reference.Conversion(category.Typed, featureObject), true);
             }
             finally
             {
@@ -462,6 +443,8 @@ namespace Reni.Type
         internal virtual bool? IsDereferencedDataLess(bool isQuick) { return Size.IsZero; }
 
         internal bool IsDataLessApply() { return FunctionalFeature == null || FunctionalFeature.IsDataLessObjectType; }
+
+        Result IResultProvider.Result(Category category) { return ArgResult(category); }
     }
 
     interface IMetaFeature

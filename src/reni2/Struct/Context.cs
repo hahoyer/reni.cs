@@ -24,6 +24,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Type;
 
 namespace Reni.Struct
 {

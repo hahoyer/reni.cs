@@ -51,6 +51,7 @@ namespace Reni.Type
         internal override void Search(ISearchVisitor searchVisitor)
         {
             ValueType.Search(searchVisitor);
+            searchVisitor.AddFoundItem(new DereferenceFoundItem(this));
             base.Search(searchVisitor);
         }
 
@@ -106,5 +107,13 @@ namespace Reni.Type
                 DereferenceResult
                 *ValueType.Converter(conversionParameter, destination);
         }
+    }
+
+    sealed class DereferenceFoundItem : ReniObject, IFoundItem
+    {
+        [EnableDump]
+        readonly ReferenceType _referenceType;
+        internal DereferenceFoundItem(ReferenceType referenceType) { _referenceType = referenceType; }
+        Result IFoundItem.Result(Category category) { return _referenceType.DereferenceResult(category); }
     }
 }

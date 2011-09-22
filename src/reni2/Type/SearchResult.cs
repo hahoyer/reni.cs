@@ -21,19 +21,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
-using Reni.Feature;
 
 namespace Reni.Type
 {
-    internal sealed class ConcatArraysFromReferenceFeature :
-        ReniObject
-        , ISearchPath<ISuffixFeature, ReferenceType>
-        , ISuffixFeature
+    sealed class SearchResult<TFeature> : ReniObject
+        where TFeature : class
     {
-        private readonly Array _type;
-        public ConcatArraysFromReferenceFeature(Array type) { _type = type; }
-        ISuffixFeature ISearchPath<ISuffixFeature, ReferenceType>.Convert(ReferenceType type) { return this; }
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _type.ConcatArrays(category, refAlignParam); }
-        TypeBase IFeature.ObjectType { get { return _type; } }
+        internal readonly TFeature Feature;
+        internal readonly IFoundItem[] FoundPath;
+        internal SearchResult(TFeature feature, IFoundItem[] foundPath)
+        {
+            Tracer.Assert(feature != null);
+            Feature = feature;
+            FoundPath = foundPath;
+        }
+        internal Result ObtainObjectResult(Category category)
+        {
+            if (FoundPath.Length == 1)
+                return FoundPath[0].Result(category);
+
+            NotImplementedMethod(category);
+            return null;
+        }
     }
 }
