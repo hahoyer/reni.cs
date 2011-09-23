@@ -35,7 +35,7 @@ namespace Reni
         ISearchVisitor ISearchVisitor.Child(AutomaticReferenceType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(AccessType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(TextItemType target) { return InternalChild(target); }
-        ISearchVisitor ISearchVisitor.Path(IFoundItem foundItem) { return new PathSearchVisitor(this, foundItem); }
+        public abstract ISearchVisitor Path(IFoundItem foundItem);
 
         internal abstract void SearchTypeBase();
 
@@ -43,13 +43,21 @@ namespace Reni
             where TType : IResultProvider, IDumpShortProvider;
     }
 
-    abstract class SearchVisitor<TFeature> : SearchVisitor
-        where TFeature : class
+    abstract class FoundSearchVisitor : SearchVisitor
     {
         internal abstract bool IsSuccessFull { get; }
+        internal abstract void Add(IFoundItem foundItem);
+        public override ISearchVisitor Path(IFoundItem foundItem) { return new PathSearchVisitor(this, foundItem); }
+    }
+
+    abstract class SearchVisitor<TFeature> : FoundSearchVisitor
+        where TFeature : class
+    {
         internal abstract TFeature InternalResult { set; }
         internal abstract IFoundItem[] FoundPath { set; get; }
         internal abstract Defineable Defineable { get; }
+
+        internal override void Add(IFoundItem foundItem) { FoundPath = FoundPath.Concat(new[] {foundItem}).ToArray(); }
 
         internal void Search(TypeBase typeBase)
         {

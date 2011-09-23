@@ -26,15 +26,30 @@ namespace Reni
     sealed class PathSearchVisitor : SearchVisitor
     {
         [EnableDump]
-        readonly SearchVisitor _parent;
+        readonly FoundSearchVisitor _parent;
         [EnableDump]
         readonly IFoundItem _foundItem;
-        internal PathSearchVisitor(SearchVisitor parent, IFoundItem foundItem)
+        internal PathSearchVisitor(FoundSearchVisitor parent, IFoundItem foundItem)
         {
             _parent = parent;
             _foundItem = foundItem;
         }
-        internal override void SearchTypeBase() { _parent.SearchTypeBase(); }
+        bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
+
+        public override ISearchVisitor Path(IFoundItem foundItem)
+        {
+            NotImplementedMethod(foundItem);
+            return null;
+        }
+        internal override void SearchTypeBase()
+        {
+            if(IsSuccessFull)
+                return;
+            _parent.SearchTypeBase();
+            if(IsSuccessFull)
+                _parent.Add(_foundItem);
+        }
+
         internal override ISearchVisitor InternalChild<TType>(TType target) { return _parent.InternalChild(target).Path(_foundItem); }
     }
 }

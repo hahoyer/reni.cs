@@ -312,7 +312,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class, IFeature
         {
-            var trace = ObjectId == 12 && defineable.ObjectId == 33 && category.HasCode;
+            var trace = ObjectId == -11 && defineable.ObjectId == 25 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
@@ -327,10 +327,12 @@ namespace Reni.Type
                     .Result(category.Argsed,refAlignParam);
                 Dump("featureResult", featureResult);
                 BreakExecution();
-                var converterResult = feature.ObtainObjectResult(category).LocalReferenceResult(refAlignParam);
+                var converterResult = feature.ObtainObjectResult(category);
+                if (converterResult == null)
+                    return featureResult;
                 Dump("converterResult", converterResult);
                 BreakExecution();
-                var result = featureResult.ReplaceArg(converterResult);
+                var result = featureResult.ReplaceArg(converterResult.LocalReferenceResult(refAlignParam));
                 return ReturnMethodDump(result, true);
             }
             finally

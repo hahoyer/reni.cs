@@ -37,8 +37,14 @@ namespace Reni.Type
         }
         internal Result ObtainObjectResult(Category category)
         {
-            if (FoundPath.Length == 1)
-                return FoundPath[0].Result(category);
+            switch(FoundPath.Length)
+            {
+                case 0:
+
+                    return null;
+                case 1:
+                    return FoundPath[0].Result(category);
+            }
 
             NotImplementedMethod(category);
             return null;
