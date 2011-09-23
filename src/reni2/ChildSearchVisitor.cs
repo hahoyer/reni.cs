@@ -20,11 +20,9 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using Reni.Basics;
 using Reni.Feature;
 using Reni.Syntax;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni
 {
@@ -42,12 +40,10 @@ namespace Reni
         {
             _parent = parent;
             _target = target;
-            _parent.Add(this);
         }
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
         internal override Defineable Defineable { get { return _parent.Defineable; } }
-        internal override Result SearchConverter(Category category) { return _parent.SearchConverter(category); }
 
         internal override ISearchPath<TFeature, TType> InternalResult
         {

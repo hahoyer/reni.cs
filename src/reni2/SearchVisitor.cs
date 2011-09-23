@@ -20,7 +20,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using Reni.Basics;
 using Reni.Sequence;
 using Reni.Syntax;
 using Reni.TokenClasses;
@@ -36,23 +35,17 @@ namespace Reni
         ISearchVisitor ISearchVisitor.Child(AutomaticReferenceType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(AccessType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(TextItemType target) { return InternalChild(target); }
-        void ISearchVisitor.AddFoundItem(IFoundItem foundItem) { AddFoundItem(foundItem); }
+        ISearchVisitor ISearchVisitor.Path(IFoundItem foundItem) { return new PathSearchVisitor(this, foundItem); }
 
-        protected abstract void AddFoundItem(IFoundItem foundItem);
         internal abstract void SearchTypeBase();
 
-        protected abstract ISearchVisitor InternalChild<TType>(TType target)
+        internal abstract ISearchVisitor InternalChild<TType>(TType target)
             where TType : IResultProvider, IDumpShortProvider;
     }
 
     abstract class SearchVisitor<TFeature> : SearchVisitor
         where TFeature : class
     {
-        ISearchVisitor[] _children = new ISearchVisitor[0];
-        DebugSearchResult<TFeature>[] _debugSearchResults = new DebugSearchResult<TFeature>[0];
-
-        internal ISearchVisitor[] Children { get { return _children; } }
-        internal DebugSearchResult<TFeature>[] DebugSearchResults { get { return _debugSearchResults; } }
         internal abstract bool IsSuccessFull { get; }
         internal abstract TFeature InternalResult { set; }
         internal abstract IFoundItem[] FoundPath { set; get; }
@@ -60,44 +53,17 @@ namespace Reni
 
         internal void Search(TypeBase typeBase)
         {
-            var searchResult = new DebugSearchResult<TFeature>(this, typeBase);
-            Add(searchResult);
-
-            if(IsSuccessFull)
-                return;
-
-            searchResult.SetSearchMode();
-
-            typeBase.Search(this);
+            if(!IsSuccessFull)
+                typeBase.Search(this);
         }
 
         internal override void SearchTypeBase()
         {
-            var searchResult = new DebugSearchResult<TFeature>(this);
-            Add(searchResult);
-
-            if(IsSuccessFull)
-                return;
-
-            searchResult.SetSearchMode();
-
-            InternalResult = Defineable.Check<TFeature>();
-
-            if(IsSuccessFull)
-                searchResult.SetFoundMode();
+            if(!IsSuccessFull)
+                InternalResult = Defineable.Check<TFeature>();
         }
-        internal abstract Result SearchConverter(Category category);
 
-        protected override ISearchVisitor InternalChild<TType>(TType target) { return new ChildSearchVisitor<TFeature, TType>(this, target); }
+        internal override ISearchVisitor InternalChild<TType>(TType target) { return new ChildSearchVisitor<TFeature, TType>(this, target); }
 
-        void Add(DebugSearchResult<TFeature> debugSearchResult) { _debugSearchResults = new List<DebugSearchResult<TFeature>>(_debugSearchResults) {debugSearchResult}.ToArray(); }
-
-        internal void Add(ISearchVisitor child) { _children = new List<ISearchVisitor>(_children) {child}.ToArray(); }
-
-        protected override void AddFoundItem(IFoundItem foundItem)
-        {
-            if(IsSuccessFull)
-                FoundPath = FoundPath.Concat(new[] {foundItem}).ToArray();
-        }
     }
 }

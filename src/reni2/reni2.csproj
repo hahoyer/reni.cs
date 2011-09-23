@@ -30,6 +30,7 @@
     </Compile>
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\IVisitor.cs" />
+    <Compile Include="PathSearchVisitor.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="ChildSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />

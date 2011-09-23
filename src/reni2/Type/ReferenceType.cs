@@ -50,8 +50,7 @@ namespace Reni.Type
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            ValueType.Search(searchVisitor);
-            searchVisitor.AddFoundItem(new DereferenceFoundItem(this));
+            ValueType.Search(searchVisitor.Path(new DereferenceFoundItem(this)));
             base.Search(searchVisitor);
         }
 

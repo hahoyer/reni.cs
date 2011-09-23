@@ -287,12 +287,6 @@ namespace Reni.Type
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        internal virtual Result PropertyResult(Category category)
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
         internal virtual Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
             if(IsDataLess)
@@ -318,7 +312,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class, IFeature
         {
-            var trace = ObjectId == -13 && defineable.ObjectId == 25 && category.HasCode;
+            var trace = ObjectId == 12 && defineable.ObjectId == 33 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {

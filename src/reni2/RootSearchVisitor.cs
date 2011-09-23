@@ -48,7 +48,7 @@ namespace Reni
 
         internal override Defineable Defineable { get { return _defineable; } }
 
-        internal override Result SearchConverter(Category category)
+        internal virtual Result SearchConverter(Category category)
         {
             NotImplementedMethod(category);
             return null;

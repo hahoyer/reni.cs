@@ -35,7 +35,7 @@ namespace Reni
         ISearchVisitor Child(AutomaticReferenceType target);
         ISearchVisitor Child(AccessType target);
         ISearchVisitor Child(TextItemType target);
-        void AddFoundItem(IFoundItem foundItem);
+        ISearchVisitor Path(IFoundItem foundItem);
     }
 
     interface IFoundItem
