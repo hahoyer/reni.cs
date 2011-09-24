@@ -322,7 +322,7 @@ namespace Reni.Type
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
-                var result = feature.Result(category.Argsed,refAlignParam);
+                var result = feature.Result(category,refAlignParam);
                 return ReturnMethodDump(result, true);
             }
             finally
