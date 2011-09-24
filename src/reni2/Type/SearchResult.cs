@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
+using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -28,26 +29,44 @@ namespace Reni.Type
         where TFeature : class
     {
         internal readonly TFeature Feature;
-        internal readonly IFoundItem[] FoundPath;
+        readonly IFoundItem[] _foundPath;
         internal SearchResult(TFeature feature, IFoundItem[] foundPath)
         {
             Tracer.Assert(feature != null);
             Feature = feature;
-            FoundPath = foundPath;
+            _foundPath = foundPath;
         }
-        internal Result ObtainObjectResult(Category category)
+
+        internal Result Result(Category category, RefAlignParam refAlignParam)
         {
-            switch(FoundPath.Length)
+            var featureResult = FeatureResult(category, refAlignParam);
+            if (_foundPath.Length == 0)
+                return featureResult;
+            var converterResult = ObjectResult(category).LocalReferenceResult(refAlignParam);
+            return featureResult.ReplaceArg(converterResult);
+        }
+
+        Result ObjectResult(Category category)
+        {
+            switch(_foundPath.Length)
             {
                 case 0:
 
                     return null;
                 case 1:
-                    return FoundPath[0].Result(category);
+                    return _foundPath[0].Result(category);
             }
 
             NotImplementedMethod(category);
             return null;
+        }
+
+        Result FeatureResult(Category category, RefAlignParam refAlignParam)
+        {
+            var contextFeature = Feature as IContextFeature;
+            if (contextFeature != null)
+                return contextFeature.Result(category);
+            return ((IFeature)Feature).Result(category, refAlignParam);
         }
     }
 }

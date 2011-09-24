@@ -45,7 +45,7 @@ namespace Reni.Feature
 
     interface IContextFeature
     {
-        Result ObtainResult(Category category);
+        Result Result(Category category);
     }
 
     sealed class Feature : ReniObject, ISuffixFeature

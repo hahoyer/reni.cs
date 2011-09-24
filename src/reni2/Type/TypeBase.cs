@@ -322,17 +322,7 @@ namespace Reni.Type
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
-                var featureResult = feature
-                    .Feature
-                    .Result(category.Argsed,refAlignParam);
-                Dump("featureResult", featureResult);
-                BreakExecution();
-                var converterResult = feature.ObtainObjectResult(category);
-                if (converterResult == null)
-                    return featureResult;
-                Dump("converterResult", converterResult);
-                BreakExecution();
-                var result = featureResult.ReplaceArg(converterResult.LocalReferenceResult(refAlignParam));
+                var result = feature.Result(category.Argsed,refAlignParam);
                 return ReturnMethodDump(result, true);
             }
             finally

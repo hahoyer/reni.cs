@@ -142,7 +142,7 @@ namespace Reni.Context
                 NotImplementedMethod(category, defineable);
                 return null;
             }
-            return feature.ObtainObjectResult(category) & category;
+            return feature.Result(category,RefAlignParam) & category;
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
