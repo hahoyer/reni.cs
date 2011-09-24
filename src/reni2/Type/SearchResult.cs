@@ -28,22 +28,45 @@ namespace Reni.Type
     sealed class SearchResult<TFeature> : ReniObject
         where TFeature : class
     {
-        internal readonly TFeature Feature;
+        static int _nextObjectId; 
+        [EnableDump]
+        readonly TFeature _feature;
+        [EnableDump]
         readonly IFoundItem[] _foundPath;
         internal SearchResult(TFeature feature, IFoundItem[] foundPath)
+            : base(_nextObjectId++)
         {
             Tracer.Assert(feature != null);
-            Feature = feature;
+            _feature = feature;
             _foundPath = foundPath;
         }
 
         internal Result Result(Category category, RefAlignParam refAlignParam)
         {
-            var featureResult = FeatureResult(category, refAlignParam);
-            if (_foundPath.Length == 0)
-                return featureResult;
-            var converterResult = ObjectResult(category).LocalReferenceResult(refAlignParam);
-            return featureResult.ReplaceArg(converterResult);
+            var trace = ObjectId == -10 && category.HasCode;
+            StartMethodDump(trace, category,refAlignParam);
+            try
+            {
+                var featureResult = FeatureResult(category, refAlignParam);
+                if(_foundPath.Length == 0)
+                    return ReturnMethodDump(featureResult, true);
+
+                Dump("featureResult", featureResult);
+                BreakExecution();
+                var converterResult = ObjectResult(category).LocalReferenceResult(refAlignParam);
+                
+                Dump("converterResult", converterResult); 
+                BreakExecution();
+                
+                var result = featureResult.ReplaceArg(converterResult);
+                
+                return ReturnMethodDump(result,true);
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         Result ObjectResult(Category category)
@@ -63,10 +86,10 @@ namespace Reni.Type
 
         Result FeatureResult(Category category, RefAlignParam refAlignParam)
         {
-            var contextFeature = Feature as IContextFeature;
+            var contextFeature = _feature as IContextFeature;
             if (contextFeature != null)
                 return contextFeature.Result(category);
-            return ((IFeature)Feature).Result(category, refAlignParam);
+            return ((IFeature)_feature).Result(category, refAlignParam);
         }
     }
 }

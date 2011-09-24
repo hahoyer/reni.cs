@@ -53,7 +53,11 @@ namespace Reni.Context
                     result.IsDataLess = true;
                 localCategory -= Category.IsDataLess;
                 if(localCategory.HasAny)
-                    result.Update(syntax.ObtainResult(this, localCategory));
+                {
+                    var newResult = syntax.ObtainResult(this, localCategory);
+                    Tracer.Assert(newResult.CompleteCategory == localCategory);
+                    result.Update(newResult);
+                }
 
                 Tracer.Assert(result.CompleteCategory == category);
                 return ReturnMethodDump(result, true);

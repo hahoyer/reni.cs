@@ -133,7 +133,8 @@ namespace Reni.Syntax
                 if(operationResult == null)
                     return (null);
 
-                if(!category.HasCode && !category.HasArgs)
+                Tracer.Assert(operationResult.CompleteCategory == category);
+                if (!category.HasCode && !category.HasArgs)
                     return ReturnMethodDump(operationResult, true);
 
                 if (!operationResult.HasArg)
@@ -147,6 +148,7 @@ namespace Reni.Syntax
                 Dump("targetResult", targetResult);
                 BreakExecution();
                 var result = operationResult.ReplaceArg(targetResult);
+                Tracer.Assert(result.CompleteCategory == category);
                 return ReturnMethodDump(result, true);
             }
             finally

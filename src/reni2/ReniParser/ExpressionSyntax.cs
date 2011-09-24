@@ -84,7 +84,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == -41 && context.ObjectId == 3 && category.HasCode;
+            var trace = ObjectId == -40 && context.ObjectId == 5 && (category.HasSize && category.HasType && !category.HasCode);
             StartMethodDump(trace, context, category);
             try
             {
@@ -110,6 +110,7 @@ namespace Reni.ReniParser
                     return null;
                 }
 
+                Tracer.Assert(suffixOperationResult.CompleteCategory == leftCategory);
                 Dump("suffixOperationResult", suffixOperationResult);
                 BreakExecution();
                 var metaFeature = suffixOperationResult.Type.MetaFeature;
