@@ -77,11 +77,10 @@ namespace Reni.Syntax
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
         Result FindResult(ContextBase context, Category category) { return context.FindResult(category, this); }
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(); }
-        internal Result ResultAsReference(ContextBase context, Category category) { return context.UniqueResult(category.Typed, this).LocalReferenceResult(context.RefAlignParam); }
 
         internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
         {
-            var leftResultAsRef = ResultAsReference(context, category.Typed);
+            var leftResultAsRef = context.ResultAsReference(category.Typed, this);
             var rightResult = right.Result(context);
             return leftResultAsRef
                 .Type
@@ -120,43 +119,10 @@ namespace Reni.Syntax
         internal Result OperationResult<TFeature>(ContextBase context, Category category, Defineable defineable)
             where TFeature : class, IFeature
         {
-            var trace = ObjectId == -21 && context.ObjectId == 2 && defineable.ObjectId == 31
-                || ObjectId == 241 && context.ObjectId == 4 && defineable.ObjectId == 19;
-            StartMethodDump(trace, context, category, defineable);
-            try
-            {
-                BreakExecution();
-                var targetType = Type(context);
-                Dump("targetType", targetType);
-                BreakExecution();
-                var operationResult = targetType.OperationResult<TFeature>(category, defineable, context.RefAlignParam);
-                if(operationResult == null)
-                    return (null);
-
-                Tracer.Assert(operationResult.CompleteCategory == category);
-                if (!category.HasCode && !category.HasArgs)
-                    return ReturnMethodDump(operationResult, true);
-
-                if (!operationResult.HasArg)
-                {
-                    return ReturnMethodDump(operationResult, true);
-                }
-
-                Dump("operationResult", operationResult);
-                BreakExecution();
-                var targetResult = ResultAsReference(context, category.Typed);
-                Dump("targetResult", targetResult);
-                BreakExecution();
-                var result = operationResult.ReplaceArg(targetResult);
-                Tracer.Assert(result.CompleteCategory == category);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            return Type(context)
+                .OperationResult<TFeature>(category, defineable, context.RefAlignParam);
         }
-        
+
         internal bool? IsDereferencedDataLess(bool isQuick, ContextBase context)
         {
             var result = QuickIsDereferencedDataLess(context);

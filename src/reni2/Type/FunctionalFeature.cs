@@ -37,7 +37,7 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        Result IFunctionalFeature.ObtainApplyResult(Category category, ResultCache objectResult, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ObtainApplyResult(Category category, Result objectResult, Result argsResult, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == 1  && category.HasCode;
             StartMethodDump(trace, category, objectResult, argsResult, refAlignParam);

@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var leftResult = new ResultCache((c,p) => left.Result(context, c));
+            var leftResult = left.Result(context, category.Typed);
             var rightResult = right.Result(context, category.Typed);
             return leftResult
                 .Type

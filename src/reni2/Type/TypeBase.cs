@@ -312,7 +312,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
             where TFeature : class, IFeature
         {
-            var trace = ObjectId == -11 && defineable.ObjectId == 25 && category.HasCode;
+            var trace = ObjectId == -12 && defineable.ObjectId == 17 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {

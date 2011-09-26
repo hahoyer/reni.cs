@@ -134,7 +134,7 @@ namespace Reni.Context
             return visitor.SearchResult;
         }
 
-        internal Result ContextOperationResult(Category category, Defineable defineable)
+        internal Result OperationResult(Category category, Defineable defineable)
         {
             var feature = SearchDefinable(defineable);
             if(feature == null)
@@ -142,7 +142,7 @@ namespace Reni.Context
                 NotImplementedMethod(category, defineable);
                 return null;
             }
-            return feature.Result(category,RefAlignParam) & category;
+            return feature.Result(category, RefAlignParam) & category;
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
@@ -219,7 +219,7 @@ namespace Reni.Context
                 .UniqueFunctionalFeature(target)
                 .Result(category, isAutoCall);
         }
-        
+
         internal Result ObjectResult(Category category, CompileSyntax syntax)
         {
             if(syntax == null)
@@ -229,5 +229,11 @@ namespace Reni.Context
         }
 
         protected abstract Result ObjectResult(Category category);
+        
+        internal Result ResultAsReference(Category category, CompileSyntax syntax)
+        {
+            return UniqueResult(category.Typed, syntax)
+                .LocalReferenceResult(RefAlignParam);
+        }
     }
 }

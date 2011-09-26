@@ -38,7 +38,7 @@ namespace Reni.Type
 
         internal override Size GetSize(bool isQuick) { return _refSize; }
 
-        Result IFunctionalFeature.ObtainApplyResult(Category category, ResultCache objectResult, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ObtainApplyResult(Category category, Result objectResult, Result argsResult, RefAlignParam refAlignParam)
         {
             var newCount = argsResult.Type.ArrayElementCount;
             var newElementResult = argsResult.Conversion(argsResult.Type.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);

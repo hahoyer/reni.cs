@@ -42,11 +42,12 @@ namespace Reni
         TypeBase _type;
         CodeBase _code;
         CodeArgs _codeArgs;
+        Category _pendingCategory;
 
         internal Result()
             : base(_nextObjectId++)
         {
-            PendingCategory = new Category();
+            _pendingCategory = new Category();
             StopByObjectId(-135);
         }
 
@@ -91,8 +92,6 @@ namespace Reni
 
         [Node]
         [EnableDumpWithExceptionPredicate]
-        internal Category PendingCategory;
-
         public Category CompleteCategory { get { return new Category(HasIsDataLess, HasSize, HasType, HasCode, HasArgs); } }
 
         [Node]
@@ -159,7 +158,7 @@ namespace Reni
         TreeNode[] ITreeNodeSupport.CreateNodes()
         {
             var result = new List<TreeNode>();
-            if(PendingCategory.HasAny)
+            if(_pendingCategory.HasAny)
                 result.Add(Dump().CreateNamedNode("Pending", "Pending"));
             if(HasIsDataLess)
                 result.Add(IsDataLess.CreateNamedNode("IsDataLess", "Logical"));
@@ -312,13 +311,22 @@ namespace Reni
                 return false;
             }
         }
+        public Category PendingCategory
+        {
+            get { return _pendingCategory; }
+            set
+            {
+                _pendingCategory = value;
+                AssertValid();
+            }
+        }
 
 
         public override string DumpData()
         {
             var result = "";
-            if(PendingCategory != Category.None)
-                result += "\nPendingCategory=" + PendingCategory.Dump();
+            if(_pendingCategory != Category.None)
+                result += "\nPendingCategory=" + _pendingCategory.Dump();
             if(CompleteCategory != Category.None)
                 result += "\nCompleteCategory=" + CompleteCategory.Dump();
             if(HasIsDataLess)
@@ -331,7 +339,7 @@ namespace Reni
                 result += "\nArgs=" + Tracer.Dump(_codeArgs);
             if(HasCode)
                 result += "\nCode=" + Tracer.Dump(_code);
-            if (result == "")
+            if(result == "")
                 return "";
             return result.Substring(1);
         }
@@ -353,6 +361,8 @@ namespace Reni
             if(result.HasCode)
                 _code = result.Code;
 
+            _pendingCategory = _pendingCategory - result.CompleteCategory;
+
             AssertValid();
         }
 
@@ -360,7 +370,7 @@ namespace Reni
         {
             var result = new Result
                          {
-                             PendingCategory = PendingCategory & category
+                             _pendingCategory = _pendingCategory & category
                          };
 
             if(category.HasIsDataLess)
@@ -403,7 +413,7 @@ namespace Reni
 
         Result Clone(Category category)
         {
-            var result = new Result {PendingCategory = PendingCategory & category};
+            var result = new Result {_pendingCategory = _pendingCategory & category};
             if(category.HasIsDataLess)
                 result._isDataLess = IsDataLess;
             if(category.HasSize)
@@ -417,7 +427,7 @@ namespace Reni
             return result;
         }
 
-        internal Result Clone() { return new Result {PendingCategory = PendingCategory, IsDataLess = IsDataLess, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs}; }
+        internal Result Clone() { return new Result {_pendingCategory = _pendingCategory, IsDataLess = IsDataLess, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs}; }
 
         void AssertValid()
         {
@@ -455,6 +465,8 @@ namespace Reni
                 if(!(refs.Contains(codeRefs) && codeRefs.Contains(refs)))
                     Tracer.AssertionFailed(1, @"CodeArgs.Contains(codeRefs)", () => "Code and CodeArgs differ " + Dump());
             }
+
+            Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
         }
 
         internal void AssertComplete(Category category, CompileSyntax syntaxForDump)
@@ -462,7 +474,7 @@ namespace Reni
             Tracer.Assert
                 (
                     1,
-                    category <= (CompleteCategory | PendingCategory),
+                    category <= (CompleteCategory | _pendingCategory),
                     () => string.Format("syntax={2}\ncategory={0}\nResult={1}", category.DumpShort(), Dump(), syntaxForDump.DumpShort())
                 );
         }

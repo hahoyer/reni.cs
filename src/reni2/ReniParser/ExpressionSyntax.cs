@@ -84,24 +84,30 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == -40 && context.ObjectId == 5 && (category.HasSize && category.HasType && !category.HasCode);
+            var trace = ObjectId == 41 && context.ObjectId == 3 && category.HasCode 
+                || ObjectId == 47 && context.ObjectId == 3 && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
                 BreakExecution();
+                var leftResult = Left != null ? Left.Result(context, category.Typed).LocalReferenceResult(context.RefAlignParam) : null;
+                var rightResult = Right != null ? Right.Result(context, category.Typed).LocalReferenceResult(context.RefAlignParam) : null;
+                Dump("leftResult", leftResult);
+                Dump("rightResult", rightResult);
+
                 if(Left == null && Right != null)
                 {
+                    BreakExecution();
                     var prefixOperationResult = Right.OperationResult<IPrefixFeature>(context, category, _tokenClass);
                     if(prefixOperationResult != null)
-                        return ReturnMethodDump(prefixOperationResult);
+                        return ReturnMethodDump(prefixOperationResult.ReplaceArg(rightResult));
                 }
 
-                var leftCategory = Category.Type;
-                if (Right == null)
-                    leftCategory |= category;
+                var leftCategory = category.Typed;
+                BreakExecution();
                 var suffixOperationResult =
                     Left == null
-                        ? context.ContextOperationResult(leftCategory, _tokenClass)
+                        ? context.OperationResult(leftCategory, _tokenClass)
                         : Left.OperationResult<ISuffixFeature>(context, leftCategory, _tokenClass);
 
                 if(suffixOperationResult == null)
@@ -122,18 +128,13 @@ namespace Reni.ReniParser
                 }
 
                 if(Right == null)
-                    return ReturnMethodDump(suffixOperationResult, true);
+                    return ReturnMethodDump(suffixOperationResult.ReplaceArg(leftResult), true);
 
                 var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
-                var rightResult = Right.Result(context, category.Typed).LocalReferenceResult(context.RefAlignParam);
-                Dump("rightResult", rightResult);
                 BreakExecution();
-                var leftResult = new ResultCache(c=>context.ObjectResult(c,Left));
-                leftResult.FunctionDump = "context=" + context.Dump();
-                if(Left != null)
-                    leftResult.FunctionDump += "\nLeft=" + Left.Dump();
                 var result = functionalFeature
-                    .ObtainApplyResult(category, leftResult, rightResult, context.RefAlignParam);
+                    .ObtainApplyResult(category, suffixOperationResult, rightResult, context.RefAlignParam)
+                    .ReplaceArg(leftResult);
                 return ReturnMethodDump(result, true);
             }
             finally

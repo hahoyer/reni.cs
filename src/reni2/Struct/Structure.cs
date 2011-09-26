@@ -201,8 +201,22 @@ namespace Reni.Struct
                 .ReplaceArg(accessType.FieldReferenceViaStructReference(category.Typed));
         }
 
-        internal Result ContextReferenceViaStructReference(Result result) { return ContainerContextObject.ContextReferenceViaStructReference(EndPosition, result); }
-        CodeBase StructReferenceCodeViaContextReference() { return CodeBase.ReferenceCode(ContainerContextObject).AddToReference(RefAlignParam, StructSize * -1); }
-        internal TypeBase ValueType(int position) { return ContainerContextObject.InnerType(EndPosition, position).UnAlignedType; }
+        internal Result ContextReferenceViaStructReference(Result result)
+        {
+            return ContainerContextObject
+                .ContextReferenceViaStructReference(EndPosition, result);
+        }
+        CodeBase StructReferenceCodeViaContextReference()
+        {
+            return CodeBase
+                .ReferenceCode(ContainerContextObject)
+                .AddToReference(RefAlignParam, StructSize * -1);
+        }
+        internal TypeBase ValueType(int position)
+        {
+            return ContainerContextObject
+                .InnerType(EndPosition, position)
+                .UnAlignedType;
+        }
     }
 }
