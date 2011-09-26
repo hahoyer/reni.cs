@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
+using Reni.Code;
 
 namespace Reni.Type
 {
@@ -38,7 +39,7 @@ namespace Reni.Type
 
         internal override Size GetSize(bool isQuick) { return _refSize; }
 
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result objectResult, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ObtainApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             var newCount = argsResult.Type.ArrayElementCount;
             var newElementResult = argsResult.Conversion(argsResult.Type.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);
@@ -47,10 +48,11 @@ namespace Reni.Type
                 .UniqueArray(_type.Count + newCount)
                 .Result
                 (category
-                 , () => newElementResult.Code.Sequence(objectResult.Code.Dereference(refAlignParam, _type.Size))
-                 , () => newElementResult.CodeArgs + objectResult.CodeArgs
+                 , () => newElementResult.Code.Sequence(_type.DereferencedReferenceCode(refAlignParam))
+                 , () => newElementResult.CodeArgs + CodeArgs.Arg()
                 );
         }
+
         bool IFunctionalFeature.IsDataLessObjectType
         {
             get

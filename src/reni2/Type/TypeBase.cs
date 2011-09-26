@@ -163,7 +163,8 @@ namespace Reni.Type
         internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
         internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgResult(category); }
-
+        internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size); }
+ 
         internal virtual Result AutomaticDereferenceResult(Category category) { return ArgResult(category); }
 
         internal Result Result(Category category)

@@ -25,10 +25,10 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal abstract class FunctionalFeature : ReniObject, IFunctionalFeature
+    abstract class FunctionalFeature : ReniObject, IFunctionalFeature
     {
-        private static int _nextObjectId;
-        private readonly DictionaryEx<RefAlignParam, TypeBase> _functionalTypesCache;
+        static int _nextObjectId;
+        readonly DictionaryEx<RefAlignParam, TypeBase> _functionalTypesCache;
 
         protected FunctionalFeature()
             : base(_nextObjectId++) { _functionalTypesCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new FunctionalFeatureType<IFunctionalFeature>(this, refAlignParam)); }
@@ -37,12 +37,12 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result objectResult, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ObtainApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == 1  && category.HasCode;
-            StartMethodDump(trace, category, objectResult, argsResult, refAlignParam);
+            var trace = ObjectId == -10 && category.HasCode;
+            StartMethodDump(trace, category, argsResult, refAlignParam);
             try
-            {                                                                                                                   
+            {
                 var applyResult = ObtainApplyResult(category, argsResult.Type, refAlignParam);
                 if(!category.HasCode && !category.HasArgs)
                     return ReturnMethodDump(applyResult);
@@ -55,13 +55,7 @@ namespace Reni.Type
 
                 Dump("replaceArgResult", replaceArgResult);
                 BreakExecution();
-                var replaceObjectResult = ReplaceObjectReferenceByArg(replaceArgResult, refAlignParam);
-                Dump("replaceObjectResult", replaceObjectResult);
-                if(!replaceObjectResult.HasArg)
-                    return ReturnMethodDump(replaceObjectResult, true);
-                Tracer.Assert(replaceObjectResult.HasArg, replaceObjectResult.Dump);
-                BreakExecution();
-                var result = replaceObjectResult.ReplaceArg(objectResult);
+                var result = ReplaceObjectReferenceByArg(replaceArgResult, refAlignParam);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -69,7 +63,7 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
-        
+
         bool IFunctionalFeature.IsDataLessObjectType { get { return ObjectType.IsDataLess; } }
 
         protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);

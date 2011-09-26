@@ -46,7 +46,8 @@ namespace Reni.TokenClasses
             return leftResult
                 .Type
                 .FunctionalFeature
-                .ObtainApplyResult(category, leftResult, rightResult, context.RefAlignParam);
+                .ObtainApplyResult(category, rightResult, context.RefAlignParam)
+                .ReplaceArg(leftResult);
         }
     }
 }
