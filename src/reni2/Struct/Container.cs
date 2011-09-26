@@ -265,7 +265,7 @@ namespace Reni.Struct
                      , (current, position)
                        =>
                        current
-                       + InnerResult(category, parent, position + 1, position)
+                       + InnerResult(category, parent, position, position)
                              .Align(parent.RefAlignParam.AlignBits)
                              .LocalBlock(category)
                     );
