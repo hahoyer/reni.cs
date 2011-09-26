@@ -26,7 +26,6 @@ namespace Reni.Type
 {
     internal sealed class AssignmentFeature : FunctionalFeature
     {
-        [EnableDump]
         private readonly AccessType _type;
 
         internal AssignmentFeature(AccessType type) { _type = type; }
