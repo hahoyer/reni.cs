@@ -44,6 +44,8 @@ namespace Reni.Struct
         readonly DictionaryEx<int, AccessType> _accessTypesCache;
         [Node]
         readonly DictionaryEx<int, AccessFeature> _accessFeaturesCache;
+        [Node]
+        readonly DictionaryEx<int, ContextAccessFeature> _contextAccessFeaturesCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
         {
@@ -53,6 +55,7 @@ namespace Reni.Struct
             _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
             _accessTypesCache = new DictionaryEx<int, AccessType>(position => new AccessType(this, position));
             _accessFeaturesCache = new DictionaryEx<int, AccessFeature>(position => new AccessFeature(this, position));
+            _contextAccessFeaturesCache = new DictionaryEx<int, ContextAccessFeature>(position => new ContextAccessFeature(this, position));
             StopByObjectId(-313);
         }
 
@@ -134,6 +137,7 @@ namespace Reni.Struct
         internal FunctionalBody UniqueFunctionalFeature(CompileSyntax body) { return _functionalFeatureCache.Find(body); }
         internal AccessType UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
         internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }
+        internal IContextFeature UniqueContextAccessFeature(int position) { return _contextAccessFeaturesCache.Find(position); }
 
         internal Result AccessViaThisReference(Category category, Result rightResult)
         {

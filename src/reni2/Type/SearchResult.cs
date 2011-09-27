@@ -25,15 +25,14 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class SearchResult<TFeature> : ReniObject
-        where TFeature : class
+    sealed class SearchResult: ReniObject
     {
         static int _nextObjectId; 
         [EnableDump]
-        readonly TFeature _feature;
+        readonly IFeature _feature;
         [EnableDump]
         readonly IFoundItem[] _foundPath;
-        internal SearchResult(TFeature feature, IFoundItem[] foundPath)
+        internal SearchResult(IFeature feature, IFoundItem[] foundPath)
             : base(_nextObjectId++)
         {
             Tracer.Assert(feature != null);
@@ -47,37 +46,36 @@ namespace Reni.Type
             StartMethodDump(trace, category,refAlignParam);
             try
             {
+                category = category.Typed;
                 var featureResult = FeatureResult(category, refAlignParam);
                 if(_foundPath.Length == 0)
                     return ReturnMethodDump(featureResult, true);
 
                 Dump("featureResult", featureResult);
                 BreakExecution();
-                var converterResult = ObjectResult(category).LocalReferenceResult(refAlignParam);
-                
-                Dump("converterResult", converterResult); 
-                BreakExecution();
-                
-                var result = featureResult.ReplaceArg(converterResult);
-                
-                return ReturnMethodDump(result,true);
 
+                var converterResult = ConverterResult(category, refAlignParam);
+
+                Dump("converterResult", converterResult);
+                BreakExecution();
+
+                var result = featureResult.ReplaceArg(converterResult);
+
+                return ReturnMethodDump(result, true);
             }
             finally
             {
                 EndMethodDump();
             }
         }
-
-        Result ObjectResult(Category category)
+        internal Result ConverterResult(Category category, RefAlignParam refAlignParam)
         {
-            switch(_foundPath.Length)
+            switch (_foundPath.Length)
             {
                 case 0:
-
                     return null;
                 case 1:
-                    return _foundPath[0].Result(category);
+                    return _foundPath[0].Result(category).LocalReferenceResult(refAlignParam);
             }
 
             NotImplementedMethod(category);
@@ -86,10 +84,7 @@ namespace Reni.Type
 
         Result FeatureResult(Category category, RefAlignParam refAlignParam)
         {
-            var contextFeature = _feature as IContextFeature;
-            if (contextFeature != null)
-                return contextFeature.Result(category);
-            return ((IFeature)_feature).Result(category, refAlignParam);
+            return _feature.Result(category, refAlignParam);
         }
     }
 }

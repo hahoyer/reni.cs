@@ -37,7 +37,7 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == -10 && category.HasCode;
             StartMethodDump(trace, category, argsResult, refAlignParam);
@@ -63,6 +63,7 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
+        Result IFunctionalFeature.ObjectConversion(Category category) { return null; }
 
         bool IFunctionalFeature.IsDataLessObjectType { get { return ObjectType.IsDataLess; } }
 

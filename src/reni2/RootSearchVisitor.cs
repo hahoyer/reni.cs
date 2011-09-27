@@ -21,13 +21,14 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni
 {
     class RootSearchVisitor<TFeature> : SearchVisitor<TFeature>
-        where TFeature : class
+        where TFeature : class, IFeature
     {
         readonly Defineable _defineable;
         internal override sealed IFoundItem[] FoundPath { get; set; }
@@ -54,12 +55,12 @@ namespace Reni
             return null;
         }
 
-        internal SearchResult<TFeature> SearchResult
+        internal SearchResult SearchResult
         {
             get
             {
                 if(IsSuccessFull)
-                    return new SearchResult<TFeature>(Result, FoundPath);
+                    return new SearchResult(Result, FoundPath);
                 return null;
             }
         }

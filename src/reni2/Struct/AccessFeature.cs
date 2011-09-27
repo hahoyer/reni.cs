@@ -11,7 +11,6 @@ namespace Reni.Struct
 {
     internal sealed class AccessFeature :
         ReniObject,
-        IContextFeature,
         ISuffixFeature
     {
         [EnableDump]
@@ -29,6 +28,27 @@ namespace Reni.Struct
         TypeBase IFeature.ObjectType { get { return _structure.Type; } }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _structure.AccessViaThisReference(category, _position); }
-        Result IContextFeature.Result(Category category) { return _structure.AccessViaContextReference(category, _position); }
+    }
+
+
+    internal sealed class ContextAccessFeature :
+        ReniObject,
+        IContextFeature
+    {
+        [EnableDump]
+        private readonly Structure _structure;
+
+        [EnableDump]
+        private readonly int _position;
+
+        internal ContextAccessFeature(Structure structure, int position)
+        {
+            _structure = structure;
+            _position = position;
+        }
+
+        TypeBase IFeature.ObjectType { get { return _structure.Type; } }
+
+        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _structure.AccessViaContextReference(category, _position); }
     }
 }

@@ -127,22 +127,20 @@ namespace Reni.Context
             return ObtainResult(category, syntax);
         }
 
-        SearchResult<IContextFeature> SearchDefinable(Defineable defineable)
+        TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }
+
+        SearchResult SearchDefinable(Defineable defineable)
         {
             var visitor = new ContextSearchVisitor(defineable);
             visitor.Search(this);
             return visitor.SearchResult;
         }
 
-        internal Result OperationResult(Category category, Defineable defineable)
+        internal SearchResult OperationResult(CompileSyntax syntax, Defineable defineable)
         {
-            var feature = SearchDefinable(defineable);
-            if(feature == null)
-            {
-                NotImplementedMethod(category, defineable);
-                return null;
-            }
-            return feature.Result(category, RefAlignParam) & category;
+            return syntax == null
+                       ? SearchDefinable(defineable)
+                       : Type(syntax).SearchDefineable<ISuffixFeature>(defineable);
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
@@ -229,7 +227,7 @@ namespace Reni.Context
         }
 
         protected abstract Result ObjectResult(Category category);
-        
+
         internal Result ResultAsReference(Category category, CompileSyntax syntax)
         {
             return UniqueResult(category.Typed, syntax)

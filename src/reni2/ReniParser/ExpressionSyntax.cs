@@ -102,22 +102,24 @@ namespace Reni.ReniParser
                         return ReturnMethodDump(prefixOperationResult.ReplaceArg(rightResult));
                 }
 
-                var leftCategory = category.Typed;
-                BreakExecution();
-                var suffixOperationResult =
-                    Left == null
-                        ? context.OperationResult(leftCategory, _tokenClass)
-                        : Left.OperationResult<ISuffixFeature>(context, leftCategory, _tokenClass);
+                var operationCategory = Category.Type;
+                if (Right == null)
+                    operationCategory |= category;
 
-                if(suffixOperationResult == null)
+                BreakExecution();
+                var searchResult = context.OperationResult(Left, _tokenClass);
+                if(searchResult == null)
                 {
                     NotImplementedMethod(context, category);
                     return null;
                 }
 
-                Tracer.Assert(suffixOperationResult.CompleteCategory == leftCategory);
+                var suffixOperationResult = searchResult.Result(operationCategory, context.RefAlignParam);
+
+                Tracer.Assert(suffixOperationResult.CompleteCategory == operationCategory);
                 Dump("suffixOperationResult", suffixOperationResult);
                 BreakExecution();
+                
                 var metaFeature = suffixOperationResult.Type.MetaFeature;
                 if(metaFeature != null)
                 {
@@ -130,9 +132,14 @@ namespace Reni.ReniParser
                     return ReturnMethodDump(suffixOperationResult.ReplaceArg(leftResult), true);
 
                 var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
+
                 BreakExecution();
-                var result = functionalFeature
-                    .ObtainApplyResult(category, rightResult, context.RefAlignParam)
+                var applyResult = functionalFeature
+                    .ApplyResult(category, rightResult, context.RefAlignParam);
+                Dump("applyResult", applyResult); 
+                BreakExecution();
+                var result = applyResult
+                    .ReplaceArg(searchResult.ConverterResult(category.Typed, context.RefAlignParam))
                     .ReplaceArg(leftResult);
                 return ReturnMethodDump(result, true);
             }

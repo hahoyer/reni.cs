@@ -276,14 +276,14 @@ namespace Reni.Type
         internal virtual bool IsArray { get { return false; } }
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
-        SearchResult<TFeature> SearchDefineable<TFeature>(Defineable defineable)
-            where TFeature : class
+        internal SearchResult SearchDefineable<TFeature>(Defineable defineable)
+            where TFeature : class, IFeature
         {
-            var searchVisitor = new RootSearchVisitor<TFeature>(defineable);
-            searchVisitor.Search(this);
+            var visitor = new RootSearchVisitor<TFeature>(defineable);
+            visitor.Search(this);
             if(Debugger.IsAttached)
-                _lastSearchVisitor = searchVisitor;
-            return searchVisitor.SearchResult;
+                _lastSearchVisitor = visitor;
+            return visitor.SearchResult;
         }
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }

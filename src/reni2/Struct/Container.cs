@@ -297,9 +297,7 @@ namespace Reni.Struct
 
         public StructureFeature(int position) { _position = position; }
 
-        AccessFeature Convert(Structure contextObject) { return contextObject.UniqueAccessFeature(_position); }
-
-        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
-        IContextFeature IStructFeature.ConvertToContextFeature(Structure accessPoint) { return Convert(accessPoint); }
+        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType structureType) { return structureType.Structure.UniqueAccessFeature(_position); }
+        IContextFeature IStructFeature.ConvertToContextFeature(Structure accessPoint) { return accessPoint.UniqueContextAccessFeature(_position); }
     }
 }

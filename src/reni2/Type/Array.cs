@@ -125,7 +125,7 @@ namespace Reni.Type
                 var argsResult = UniqueNumber(index.Size.ToInt())
                     .Result(category.Typed, () => CodeBase.BitsConst(index), CodeArgs.Void);
                 var rawResult = functionalFeature
-                    .ObtainApplyResult(category.Typed, argsResult, null)
+                    .ApplyResult(category.Typed, argsResult, null)
                     .ReplaceArg(operationResult);
                 var convertedResult = rawResult.Conversion(Element) & result.CompleteCategory;
                 result = convertedResult.Sequence(result);

@@ -39,7 +39,7 @@ namespace Reni.Type
 
         internal override Size GetSize(bool isQuick) { return _refSize; }
 
-        Result IFunctionalFeature.ObtainApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             var newCount = argsResult.Type.ArrayElementCount;
             var newElementResult = argsResult.Conversion(argsResult.Type.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);
@@ -52,6 +52,7 @@ namespace Reni.Type
                  , () => newElementResult.CodeArgs + CodeArgs.Arg()
                 );
         }
+        Result IFunctionalFeature.ObjectConversion(Category category) { return null; }
 
         bool IFunctionalFeature.IsDataLessObjectType
         {
