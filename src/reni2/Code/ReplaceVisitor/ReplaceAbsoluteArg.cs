@@ -8,9 +8,9 @@ namespace Reni.Code.ReplaceVisitor
 {
     internal sealed class ReplaceAbsoluteArg : ReplaceArg
     {
-        public ReplaceAbsoluteArg(CodeBase actual, TypeBase actualArgType)
-            : base(actual, actualArgType) { }
+        public ReplaceAbsoluteArg(Result actualArg)
+            : base(actualArg) { }
 
-        protected override CodeBase Actual { get { return ActualArg; } }
+        protected override CodeBase Actual { get { return ActualArg.Code; } }
     }
 }

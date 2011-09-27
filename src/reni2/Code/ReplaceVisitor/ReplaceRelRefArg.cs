@@ -13,30 +13,30 @@ namespace Reni.Code.ReplaceVisitor
         [EnableDump]
         private readonly Size _offset;
 
-        private ReplaceRelRefArg(CodeBase actual, TypeBase actualArgType, Size offset)
-            : base(actual, actualArgType)
+        private ReplaceRelRefArg(Result actualArg, Size offset)
+            : base(actualArg)
         {
             _offset = offset;
             StopByObjectId(-22);
         }
 
-        internal ReplaceRelRefArg(CodeBase actualArg, TypeBase actualArgType)
-            : this(actualArg, actualArgType, Size.Create(0)) { }
+        internal ReplaceRelRefArg(Result actualArg)
+            : this(actualArg, Size.Create(0)) { }
 
-        private RefAlignParam RefAlignParam { get { return ActualArg.RefAlignParam; } }
+        private RefAlignParam RefAlignParam { get { return ActualArg.Code.RefAlignParam; } }
 
         protected override CodeBase Actual
         {
             get
             {
                 if(_offset.IsZero)
-                    return ActualArg;
-                return ActualArg.AddToReference(RefAlignParam, Offset);
+                    return ActualArg.Code;
+                return ActualArg.Code.AddToReference(RefAlignParam, Offset);
             }
         }
 
         private Size Offset { get { return _offset; } }
 
-        protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelRefArg(ActualArg, ActualArgType, Offset + size); }
+        protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelRefArg(ActualArg, Offset + size); }
     }
 }

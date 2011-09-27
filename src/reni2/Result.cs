@@ -506,42 +506,27 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceArg(Func<Result> getResultForArg)
+        internal Result ReplaceArg(Func<Category, Result> getResultForArg)
         {
-            if(HasArg)
-                return InternalReplaceArg(getResultForArg());
+            if(HasArg && getResultForArg != null)
+                return InternalReplaceArg(getResultForArg);
             return this;
-        }
-
-        internal Result ReplaceArg(ResultCache resultForArg)
-        {
-            if(!HasArg)
-                return this;
-
-            resultForArg.Update(CompleteCategory);
-            var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
-            if(HasCode)
-                result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
-            if(HasArgs)
-                result.CodeArgs = CodeArgs.WithoutArg().Sequence(resultForArg.CodeArgs);
-            result.IsDirty = false;
-            return result;
         }
 
         internal Result ReplaceArg(Result resultForArg)
         {
-            if(HasArg)
-                return InternalReplaceArg(resultForArg);
+            if (HasArg && resultForArg != null)
+                return InternalReplaceArg(category=>resultForArg);
             return this;
         }
 
-        Result InternalReplaceArg(Result resultForArg)
+        Result InternalReplaceArg(Func<Category, Result> resultForArg)
         {
             var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
-            if(HasCode && resultForArg.HasCode)
-                result.Code = Code.ReplaceArg(resultForArg.Type, resultForArg.Code);
-            if(HasArgs && resultForArg.HasArgs)
-                result.CodeArgs = CodeArgs.WithoutArg().Sequence(resultForArg.CodeArgs);
+            if (HasCode)
+                result.Code = Code.ReplaceArg(resultForArg(Category.Type | Category.Code));
+            if(HasArgs)
+                result.CodeArgs = CodeArgs.WithoutArg() + resultForArg(Category.CodeArgs).CodeArgs;
             result.IsDirty = false;
             return result;
         }
@@ -742,6 +727,7 @@ namespace Reni
                 Tracer.Assert(Type is ReferenceType, Dump);
             return this;
         }
+        
     }
 
     sealed class Error

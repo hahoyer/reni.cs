@@ -14,30 +14,28 @@ namespace Reni.Code.ReplaceVisitor
     internal abstract class ReplaceArg : Base
     {
         private static int _nextObjectId;
-        private readonly CodeBase _actualArg;
-        private readonly TypeBase _actualArgType;
+        private readonly Result _actualArg;
 
-        internal ReplaceArg(CodeBase actualArg, TypeBase actualArgType)
+        internal ReplaceArg(Result actualArg)
             : base(_nextObjectId++)
         {
             Tracer.Assert(actualArg != null, () => "actualArg != null");
+            Tracer.Assert(actualArg.HasCode, () => "actualArg.HasCode");
+            //Tracer.Assert(actualArg.HasType, () => "actualArg.HasType");
             _actualArg = actualArg;
-            _actualArgType = actualArgType;
         }
 
         [DisableDump]
-        protected CodeBase ActualArg { get { return _actualArg; } }
+        protected Result ActualArg { get { return _actualArg; } }
 
         protected abstract CodeBase Actual { get; }
 
         internal override CodeBase Arg(Arg visitedObject)
         {
-            if(ActualArgType != visitedObject.Type)
+            if(ActualArg.Type != visitedObject.Type)
                 throw new SizeException(Actual, visitedObject);
             return Actual;
         }
-
-        protected TypeBase ActualArgType { get { return _actualArgType; } }
 
         [Dump("Dump")]
         internal sealed class SizeException : Exception

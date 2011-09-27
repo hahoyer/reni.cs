@@ -29,10 +29,10 @@ using Reni.Type;
 namespace Reni.Code
 {
     [Serializable]
-    internal abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
+    abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
     {
-        private static string _newCombinedReason;
-        private readonly string _reason;
+        static string _newCombinedReason;
+        readonly string _reason;
 
         [DisableDump]
         internal string ReasonForCombine { get { return _reason == "" ? DumpShortForDebug() : _reason; } }
@@ -158,18 +158,19 @@ namespace Reni.Code
 
         protected virtual IEnumerable<CodeBase> AsList() { return new[] {this}; }
 
-        internal CodeBase ReplaceArg(TypeBase argType, CodeBase argCode)
+        internal CodeBase ReplaceArg(TypeBase type, CodeBase code) { return ReplaceArg(new Result {Type = type, Code = code}); }
+        internal CodeBase ReplaceArg(Result arg)
         {
             try
             {
-                var result = argCode.IsRelativeReference
-                                 ? Visit(new ReplaceRelRefArg(argCode, argType))
-                                 : Visit(new ReplaceAbsoluteArg(argCode, argType));
+                var result = arg.Code.IsRelativeReference
+                                 ? Visit(new ReplaceRelRefArg(arg))
+                                 : Visit(new ReplaceAbsoluteArg(arg));
                 return result ?? this;
             }
             catch(ReplaceArg.SizeException sizeException)
             {
-                DumpDataWithBreak("", "this", this, "argType", argType, "sizeException", sizeException);
+                DumpDataWithBreak("", "this", this, "arg", arg, "sizeException", sizeException);
                 throw;
             }
         }
@@ -283,10 +284,7 @@ namespace Reni.Code
 
         internal virtual CSharpCodeSnippet CSharpCodeSnippet() { return new CSharpCodeSnippet("", CSharpString()); }
 
-        internal string ReversePolish(Size top)
-        {
-            return CSharpString(top);
-        }
+        internal string ReversePolish(Size top) { return CSharpString(top); }
 
         protected virtual string CSharpString(Size top)
         {
@@ -319,15 +317,15 @@ namespace Reni.Code
         internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
     }
 
-    internal abstract class UnexpectedVisitOfPending : Exception
+    abstract class UnexpectedVisitOfPending : Exception
     {}
 
-    internal static class CodeBaseExtender
+    static class CodeBaseExtender
     {
         internal static CodeBase ToSequence(this IEnumerable<CodeBase> x) { return x.Aggregate(CodeBase.Void(), (code, result) => code.Sequence(result)); }
 
         internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern) { return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x))); }
 
-        private static CodeBase LocalVariableDefinition(string holderName, CodeBase value) { return value.CreateFiber(new LocalVariableDefinition(holderName, value.Size)); }
+        static CodeBase LocalVariableDefinition(string holderName, CodeBase value) { return value.CreateFiber(new LocalVariableDefinition(holderName, value.Size)); }
     }
 }
