@@ -31,7 +31,7 @@ namespace Reni
         readonly Result _data = new Result();
         readonly Func<Category, bool, Result> _obtainResult;
         readonly Func<Category, Result> _obtainFlatResult;
-        internal string FunctionDump;
+        internal string FunctionDump = "";
 
         public ResultCache(Func<Category, bool, Result> obtainResult) { _obtainResult = obtainResult; }
         public ResultCache(Func<Category, Result> obtainResult)
