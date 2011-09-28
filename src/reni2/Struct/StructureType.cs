@@ -44,9 +44,6 @@ namespace Reni.Struct
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }
 
         [DisableDump]
-        internal ContainerContextObject ContainerContextObject { get { return Structure.ContainerContextObject; } }
-
-        [DisableDump]
         internal Structure Structure { get { return _structure; } }
 
         internal override Size GetSize(bool isQuick) { return Structure.StructSize; }
@@ -55,19 +52,21 @@ namespace Reni.Struct
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            var searchVisitorChild = searchVisitor as SearchVisitor<ISuffixFeature>;
-            if(searchVisitorChild != null && !searchVisitorChild.IsSuccessFull)
-                searchVisitorChild.InternalResult = Structure
-                    .SearchFromRefToStruct(searchVisitorChild.Defineable)
-                    .CheckedConvert(this);
+            searchVisitor.Search(this);
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
-        Result SearchConverter(Category category)
+
+        internal void Search<TFeature>(SearchVisitor<TFeature> searchVisitor) where TFeature : class
         {
-            NotImplementedMethod(category);
-            return null;
+            var searchVisitorChild = searchVisitor as SearchVisitor<ISuffixFeature>;
+            if(searchVisitorChild == null || searchVisitorChild.IsSuccessFull)
+                return;
+            searchVisitorChild.InternalResult = Structure
+                .SearchFromRefToStruct(searchVisitorChild.Defineable)
+                .CheckedConvert(this);
         }
+
         internal override bool? IsDereferencedDataLess(bool isQuick) { return Structure.StructIsDataLess(isQuick); }
 
         [DisableDump]

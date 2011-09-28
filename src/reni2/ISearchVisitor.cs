@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Sequence;
+using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -36,6 +37,7 @@ namespace Reni
         ISearchVisitor Child(AccessType target);
         ISearchVisitor Child(TextItemType target);
         ISearchVisitor Path(IFoundItem foundItem);
+        void Search(StructureType structureType);
     }
 
     interface IFoundItem

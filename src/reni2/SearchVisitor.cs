@@ -21,6 +21,7 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Sequence;
+using Reni.Struct;
 using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -35,6 +36,7 @@ namespace Reni
         ISearchVisitor ISearchVisitor.Child(AutomaticReferenceType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(AccessType target) { return InternalChild(target); }
         ISearchVisitor ISearchVisitor.Child(TextItemType target) { return InternalChild(target); }
+        public abstract void Search(StructureType structureType); 
         public abstract ISearchVisitor Path(IFoundItem foundItem);
 
         internal abstract void SearchTypeBase();
@@ -65,6 +67,7 @@ namespace Reni
                 typeBase.Search(this);
         }
 
+        public override void Search(StructureType structureType) { structureType.Search(this); }
         internal override void SearchTypeBase()
         {
             if(!IsSuccessFull)

@@ -20,6 +20,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Reni.Struct;
 
 namespace Reni
 {
@@ -35,6 +36,15 @@ namespace Reni
             _foundItem = foundItem;
         }
         bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
+
+        public override void Search(StructureType structureType)
+        {
+            if (IsSuccessFull)
+                return;
+            _parent.Search(structureType);
+            if (IsSuccessFull)
+                _parent.Add(_foundItem);
+        }
 
         public override ISearchVisitor Path(IFoundItem foundItem)
         {
