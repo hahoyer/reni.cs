@@ -38,7 +38,7 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _type = type;
-            StopByObjectId(-1);
+            StopByObjectId(-4);
             Tracer.Assert(_type.QuickSize != null, Dump);
         }
 

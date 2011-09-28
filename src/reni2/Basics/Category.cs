@@ -96,14 +96,15 @@ namespace Reni.Basics
                 return result;
             }
         }
+
         internal Category ReplaceArged
         {
             get
             {
                 var result = None;
-                if(HasCode)
+                if (HasCode)
                     result |= Type | Code;
-                if(HasArgs)
+                if (HasArgs)
                     result |= CodeArgs;
                 return result;
             }
