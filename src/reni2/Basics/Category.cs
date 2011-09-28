@@ -26,13 +26,13 @@ namespace Reni.Basics
 {
     [Dump("Dump")]
     [Serializable]
-    internal sealed class Category : ReniObject, IEquatable<Category>
+    sealed class Category : ReniObject, IEquatable<Category>
     {
-        private readonly bool _code;
-        private readonly bool _type;
-        private readonly bool _args;
-        private readonly bool _size;
-        private readonly bool _isDataLess;
+        readonly bool _code;
+        readonly bool _type;
+        readonly bool _args;
+        readonly bool _size;
+        readonly bool _isDataLess;
 
         internal Category() { }
 
@@ -90,34 +90,40 @@ namespace Reni.Basics
                     result |= Size;
                     result |= CodeArgs;
                 }
-                
-                if (result.HasSize)
+
+                if(result.HasSize)
                     result |= IsDataLess;
+                return result;
+            }
+        }
+        internal Category ReplaceArged
+        {
+            get
+            {
+                var result = None;
+                if(HasCode)
+                    result |= Type | Code;
+                if(HasArgs)
+                    result |= CodeArgs;
                 return result;
             }
         }
 
         [DebuggerHidden]
-        public static Category operator |(Category x, Category y)
-        {
-            return new Category(x.HasIsDataLess || y.HasIsDataLess, x.HasSize || y.HasSize, x.HasType || y.HasType, x.HasCode || y.HasCode, x.HasArgs || y.HasArgs);
-        }
+        public static Category operator |(Category x, Category y) { return new Category(x.HasIsDataLess || y.HasIsDataLess, x.HasSize || y.HasSize, x.HasType || y.HasType, x.HasCode || y.HasCode, x.HasArgs || y.HasArgs); }
 
         [DebuggerHidden]
-        public static Category operator &(Category x, Category y)
-        {
-            return new Category(x.HasIsDataLess && y.HasIsDataLess, x.HasSize && y.HasSize, x.HasType && y.HasType, x.HasCode && y.HasCode, x.HasArgs && y.HasArgs);
-        }
+        public static Category operator &(Category x, Category y) { return new Category(x.HasIsDataLess && y.HasIsDataLess, x.HasSize && y.HasSize, x.HasType && y.HasType, x.HasCode && y.HasCode, x.HasArgs && y.HasArgs); }
 
         public override int GetHashCode()
         {
             unchecked
             {
                 var result = _code.GetHashCode();
-                result = (result*397) ^ _type.GetHashCode();
-                result = (result*397) ^ _args.GetHashCode();
-                result = (result*397) ^ _size.GetHashCode();
-                result = (result*397) ^ _isDataLess.GetHashCode();
+                result = (result * 397) ^ _type.GetHashCode();
+                result = (result * 397) ^ _args.GetHashCode();
+                result = (result * 397) ^ _size.GetHashCode();
+                result = (result * 397) ^ _isDataLess.GetHashCode();
                 return result;
             }
         }
@@ -133,7 +139,7 @@ namespace Reni.Basics
                 ;
         }
 
-        private bool IsLessThan(Category x)
+        bool IsLessThan(Category x)
         {
             return
                 (!HasCode && x.HasCode)
@@ -144,7 +150,7 @@ namespace Reni.Basics
                 ;
         }
 
-        private bool IsLessThanOrEqual(Category x)
+        bool IsLessThanOrEqual(Category x)
         {
             if(HasCode && !x.HasCode)
                 return false;
@@ -160,10 +166,7 @@ namespace Reni.Basics
         }
 
         [DebuggerHidden]
-        public static Category operator -(Category x, Category y)
-        {
-            return new Category(x.HasIsDataLess && !y.HasIsDataLess, x.HasSize && !y.HasSize, x.HasType && !y.HasType, x.HasCode && !y.HasCode, x.HasArgs && !y.HasArgs);
-        }
+        public static Category operator -(Category x, Category y) { return new Category(x.HasIsDataLess && !y.HasIsDataLess, x.HasSize && !y.HasSize, x.HasType && !y.HasType, x.HasCode && !y.HasCode, x.HasArgs && !y.HasArgs); }
 
         protected override string Dump(bool isRecursion) { return DumpShort(); }
 
