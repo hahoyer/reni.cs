@@ -54,7 +54,8 @@ namespace Reni.Type
                 Dump("featureResult", featureResult);
                 BreakExecution();
 
-                var converterResult = ConverterResult(category, refAlignParam);
+                var converterCategory = category.ReplaceArged;
+                var converterResult = ConverterResult(converterCategory, refAlignParam);
 
                 Dump("converterResult", converterResult);
                 BreakExecution();
@@ -70,12 +71,14 @@ namespace Reni.Type
         }
         internal Result ConverterResult(Category category, RefAlignParam refAlignParam)
         {
+            if(category.IsNone)
+                return new Result();
             switch (_foundPath.Length)
             {
                 case 0:
                     return null;
                 case 1:
-                    return _foundPath[0].Result(category).LocalReferenceResult(refAlignParam);
+                    return _foundPath[0].Result(category.Typed).LocalReferenceResult(refAlignParam);
             }
 
             NotImplementedMethod(category);
