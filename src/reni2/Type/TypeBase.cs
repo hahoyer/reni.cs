@@ -440,7 +440,7 @@ namespace Reni.Type
         internal RootFoundItem(TypeBase typeBase) { _typeBase = typeBase; }
         Result IFoundItem.Result(Category category, RefAlignParam refAlignParam)
         {
-            return _typeBase.SmartLocalReferenceResult(category,refAlignParam);
+            return _typeBase.SmartReference(refAlignParam).ArgResult(category);
         }
     }
 
