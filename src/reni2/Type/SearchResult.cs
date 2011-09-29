@@ -48,8 +48,6 @@ namespace Reni.Type
             {
                 category = category.Typed;
                 var featureResult = FeatureResult(category, refAlignParam);
-                if(_foundPath.Length == 0)
-                    return ReturnMethodDump(featureResult, true);
 
                 Dump("featureResult", featureResult);
                 BreakExecution();
@@ -73,16 +71,12 @@ namespace Reni.Type
         {
             if(category.IsNone)
                 return new Result();
-            switch (_foundPath.Length)
-            {
-                case 0:
-                    return null;
-                case 1:
-                    return _foundPath[0].Result(category.Typed).LocalReferenceResult(refAlignParam);
-            }
 
-            NotImplementedMethod(category);
-            return null;
+            var results = _foundPath.Select(f => f.Result(category, refAlignParam)).ToArray();
+            var result = results[0];
+            for(var i = 1; i < results.Length; i++)
+                result = result.ReplaceArg(results[i]);
+            return result;
         }
 
         Result FeatureResult(Category category, RefAlignParam refAlignParam)

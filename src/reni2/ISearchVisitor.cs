@@ -42,7 +42,7 @@ namespace Reni
 
     interface IFoundItem
     {
-        Result Result(Category category);
+        Result Result(Category category, RefAlignParam refAlignParam);
     }
 
 }

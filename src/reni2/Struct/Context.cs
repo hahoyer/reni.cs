@@ -69,6 +69,6 @@ namespace Reni.Struct
         readonly Structure _accessPoint;
         internal ContextFoundItem(Structure accessPoint) { _accessPoint = accessPoint; }
 
-        Result IFoundItem.Result(Category category) { return _accessPoint.StructReferenceViaContextReference(category); }
+        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam) { return _accessPoint.StructReferenceViaContextReference(category); }
     }
 }

@@ -283,6 +283,8 @@ namespace Reni.Type
             visitor.Search(this);
             if(Debugger.IsAttached)
                 _lastSearchVisitor = visitor;
+            if(visitor.IsSuccessFull)
+                visitor.Add(new RootFoundItem(this));
             return visitor.SearchResult;
         }
 
@@ -429,9 +431,17 @@ namespace Reni.Type
 
         internal virtual bool? IsDereferencedDataLess(bool isQuick) { return Size.IsZero; }
 
-        internal bool IsDataLessApply() { return FunctionalFeature == null || FunctionalFeature.IsDataLessObjectType; }
-
         Result IResultProvider.Result(Category category) { return ArgResult(category); }
+    }
+
+    sealed class RootFoundItem : ReniObject, IFoundItem
+    {
+        readonly TypeBase _typeBase;
+        internal RootFoundItem(TypeBase typeBase) { _typeBase = typeBase; }
+        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam)
+        {
+            return _typeBase.ArgResult(category);
+        }
     }
 
     interface IMetaFeature

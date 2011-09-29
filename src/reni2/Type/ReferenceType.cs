@@ -113,6 +113,6 @@ namespace Reni.Type
         [EnableDump]
         readonly ReferenceType _referenceType;
         internal DereferenceFoundItem(ReferenceType referenceType) { _referenceType = referenceType; }
-        Result IFoundItem.Result(Category category) { return _referenceType.DereferenceResult(category); }
+        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam) { return _referenceType.DereferenceResult(category); }
     }
 }
