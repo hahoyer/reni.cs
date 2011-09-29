@@ -165,7 +165,7 @@ namespace Reni.Type
             return ValueReferenceViaFieldReference(category)
                 .AutomaticDereference();
         }
-        protected override Result ToAutomaticReferenceResult(Category category)
+        internal override Result ToAutomaticReferenceResult(Category category)
         {
             return ValueReferenceViaFieldReference(category)
                 .AssertEmptyOrValidReference();

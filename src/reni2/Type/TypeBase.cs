@@ -290,7 +290,7 @@ namespace Reni.Type
 
         internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        internal virtual Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
+        internal virtual Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
             if(IsDataLess)
                 return ArgResult(category);
@@ -440,7 +440,7 @@ namespace Reni.Type
         internal RootFoundItem(TypeBase typeBase) { _typeBase = typeBase; }
         Result IFoundItem.Result(Category category, RefAlignParam refAlignParam)
         {
-            return _typeBase.ArgResult(category);
+            return _typeBase.SmartLocalReferenceResult(category,refAlignParam);
         }
     }
 

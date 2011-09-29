@@ -84,13 +84,13 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == -38 && context.ObjectId == 3 && category.HasCode;
+            var trace = ObjectId == -40 && context.ObjectId == 3 && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
                 BreakExecution();
-                var leftResult = Left != null ? Left.Result(context, category.Typed).LocalReferenceResult(context.RefAlignParam) : null;
-                var rightResult = Right != null ? Right.Result(context, category.Typed).LocalReferenceResult(context.RefAlignParam) : null;
+                var leftResult = Left != null ? Left.Result(context, category.Typed).SmartLocalReferenceResult(context.RefAlignParam) : null;
+                var rightResult = Right != null ? Right.Result(context, category.Typed).SmartLocalReferenceResult(context.RefAlignParam) : null;
                 Dump("leftResult", leftResult);
                 Dump("rightResult", rightResult);
 

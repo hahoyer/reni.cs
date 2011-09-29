@@ -223,7 +223,7 @@ namespace Reni.Context
             if(syntax == null)
                 return ObjectResult(category);
 
-            return UniqueResult(category.Typed, syntax).LocalReferenceResult(RefAlignParam);
+            return UniqueResult(category.Typed, syntax).SmartLocalReferenceResult(RefAlignParam);
         }
 
         protected abstract Result ObjectResult(Category category);
@@ -231,7 +231,7 @@ namespace Reni.Context
         internal Result ResultAsReference(Category category, CompileSyntax syntax)
         {
             return UniqueResult(category.Typed, syntax)
-                .LocalReferenceResult(RefAlignParam);
+                .SmartLocalReferenceResult(RefAlignParam);
         }
     }
 }

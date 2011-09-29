@@ -672,10 +672,10 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result LocalReferenceResult(RefAlignParam refAlignParam)
+        internal Result SmartLocalReferenceResult(RefAlignParam refAlignParam)
         {
             return Type
-                .LocalReferenceResult(CompleteCategory, refAlignParam)
+                .SmartLocalReferenceResult(CompleteCategory, refAlignParam)
                 .ReplaceArg(this);
         }
 

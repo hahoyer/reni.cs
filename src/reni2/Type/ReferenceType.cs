@@ -54,7 +54,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override Result LocalReferenceResult(Category category, RefAlignParam refAlignParam)
+        internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
             return UniqueAlign(refAlignParam.AlignBits)
                 .Result
@@ -69,7 +69,7 @@ namespace Reni.Type
             return ValueType.ReferenceInCode(category, target);
         }
 
-        protected abstract Result ToAutomaticReferenceResult(Category category);
+        internal abstract Result ToAutomaticReferenceResult(Category category);
 
         private Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
         {
@@ -113,6 +113,6 @@ namespace Reni.Type
         [EnableDump]
         readonly ReferenceType _referenceType;
         internal DereferenceFoundItem(ReferenceType referenceType) { _referenceType = referenceType; }
-        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam) { return _referenceType.DereferenceResult(category); }
+        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam) { return _referenceType.ToAutomaticReferenceResult(category); }
     }
 }

@@ -79,8 +79,8 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        protected override Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
+        internal override Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
 
-        internal Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.LocalReferenceResult(category, RefAlignParam); }
+        internal Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category, RefAlignParam); }
     }
 }
