@@ -674,6 +674,8 @@ namespace Reni
 
         internal Result SmartLocalReferenceResult(RefAlignParam refAlignParam)
         {
+            if (Type.IsDataLess)
+                return this;
             return Type
                 .SmartLocalReferenceResult(CompleteCategory, refAlignParam)
                 .ReplaceArg(this);
