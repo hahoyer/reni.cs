@@ -25,9 +25,9 @@ using Reni.Code;
 
 namespace Reni.Type
 {
-    internal abstract class ReferenceType : TypeBase
+    abstract class ReferenceType : TypeBase
     {
-        private readonly TypeBase _valueType;
+        readonly TypeBase _valueType;
 
         protected ReferenceType(TypeBase valueType) { _valueType = valueType; }
 
@@ -50,7 +50,7 @@ namespace Reni.Type
 
         internal override void Search(ISearchVisitor searchVisitor)
         {
-            ValueType.Search(searchVisitor.Path(new DereferenceFoundItem(this)));
+            ValueType.Search(searchVisitor.Path((category, refAlignParam) => ToAutomaticReferenceResult(category)));
             base.Search(searchVisitor);
         }
 
@@ -58,25 +58,22 @@ namespace Reni.Type
         {
             return UniqueAlign(refAlignParam.AlignBits)
                 .Result
-                ( category
-                ,() =>LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
-                ,() => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
+                (category
+                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
+                 , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }
 
-        internal override Result ReferenceInCode(Category category, IReferenceInCode target)
-        {
-            return ValueType.ReferenceInCode(category, target);
-        }
+        internal override Result ReferenceInCode(Category category, IReferenceInCode target) { return ValueType.ReferenceInCode(category, target); }
 
         internal abstract Result ToAutomaticReferenceResult(Category category);
 
-        private Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
+        Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
         {
             var trace = ObjectId == -13;
             try
             {
-                StartMethodDump(trace,conversionParameter,destination);
+                StartMethodDump(trace, conversionParameter, destination);
                 if(ValueType == destination.ValueType && destination.RefAlignParam == RefAlignParam)
                     return ReturnMethodDump(new FunctionalConverter(ToAutomaticReferenceResult), true);
 
@@ -87,7 +84,7 @@ namespace Reni.Type
                 var c3 = new FunctionalConverter(destination.ValueTypeToLocalReferenceResult);
                 Dump("c3", c3.Result(Category.Type | Category.Code));
                 BreakExecution();
-                var result = c1*c2*c3;
+                var result = c1 * c2 * c3;
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -104,15 +101,7 @@ namespace Reni.Type
 
             return
                 DereferenceResult
-                *ValueType.Converter(conversionParameter, destination);
+                * ValueType.Converter(conversionParameter, destination);
         }
-    }
-
-    sealed class DereferenceFoundItem : ReniObject, IFoundItem
-    {
-        [EnableDump]
-        readonly ReferenceType _referenceType;
-        internal DereferenceFoundItem(ReferenceType referenceType) { _referenceType = referenceType; }
-        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam) { return _referenceType.ToAutomaticReferenceResult(category); }
     }
 }

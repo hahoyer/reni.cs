@@ -31,10 +31,10 @@ namespace Reni
         where TFeature : class, IFeature
     {
         readonly Defineable _defineable;
-        internal override sealed IFoundItem[] FoundPath { get; set; }
+        internal override sealed ConversionFunction[] ConversionFunctions { get; set; }
         TFeature Result { get; set; }
 
-        internal RootSearchVisitor(Defineable defineable) { _defineable = defineable;FoundPath = new IFoundItem[0]; }
+        internal RootSearchVisitor(Defineable defineable) { _defineable = defineable; ConversionFunctions = new ConversionFunction[0]; }
 
         internal override bool IsSuccessFull { get { return Result != null; } }
 
@@ -60,7 +60,7 @@ namespace Reni
             get
             {
                 if(IsSuccessFull)
-                    return new SearchResult(Result, FoundPath);
+                    return new SearchResult(Result, ConversionFunctions);
                 return null;
             }
         }

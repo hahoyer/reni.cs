@@ -31,13 +31,13 @@ namespace Reni.Type
         [EnableDump]
         readonly IFeature _feature;
         [EnableDump]
-        readonly IFoundItem[] _foundPath;
-        internal SearchResult(IFeature feature, IFoundItem[] foundPath)
+        readonly ConversionFunction[] _conversionFunctions;
+        internal SearchResult(IFeature feature, ConversionFunction[] conversionFunctions)
             : base(_nextObjectId++)
         {
             Tracer.Assert(feature != null);
             _feature = feature;
-            _foundPath = foundPath;
+            _conversionFunctions = conversionFunctions;
         }
 
         internal Result Result(Category category, RefAlignParam refAlignParam)
@@ -72,7 +72,7 @@ namespace Reni.Type
             if(category.IsNone)
                 return new Result();
 
-            var results = _foundPath.Select(f => f.Result(category, refAlignParam)).ToArray();
+            var results = _conversionFunctions.Select(f => f(category, refAlignParam)).ToArray();
             var result = results[0];
             for(var i = 1; i < results.Length; i++)
                 result = result.ReplaceArg(results[i]);

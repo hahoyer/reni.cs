@@ -28,6 +28,8 @@ using Reni.Type;
 
 namespace Reni
 {
+    internal delegate Result ConversionFunction(Category category,RefAlignParam refAlignParam);
+
     internal interface ISearchVisitor
     {
         void Search();
@@ -36,13 +38,10 @@ namespace Reni
         ISearchVisitor Child(AutomaticReferenceType target);
         ISearchVisitor Child(AccessType target);
         ISearchVisitor Child(TextItemType target);
-        ISearchVisitor Path(IFoundItem foundItem);
+        ISearchVisitor Path(ConversionFunction conversionFunction);
         void Search(StructureType structureType);
+
     }
 
-    interface IFoundItem
-    {
-        Result Result(Category category, RefAlignParam refAlignParam);
-    }
 
 }

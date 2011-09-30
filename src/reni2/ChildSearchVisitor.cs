@@ -53,6 +53,6 @@ namespace Reni
                     _parent.InternalResult = value.Convert(_target);
             }
         }
-        internal override IFoundItem[] FoundPath { get { return _parent.FoundPath; } set { _parent.FoundPath = value; } }
+        internal override ConversionFunction[] ConversionFunctions { get { return _parent.ConversionFunctions; } set { _parent.ConversionFunctions = value; } }
     }
 }

@@ -48,7 +48,7 @@ namespace Reni.Struct
                 return;
             var accessPoint = context.UniqueAccessPoint(Position);
             searchVisitor.InternalResult = feature.ConvertToContextFeature(accessPoint);
-            searchVisitor.Add(new ContextFoundItem(accessPoint));
+            searchVisitor.Add((category, rap)=> accessPoint.StructReferenceViaContextReference(category));
         }
 
         internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
@@ -62,13 +62,5 @@ namespace Reni.Struct
         protected override Result ObjectResult(Category category) { return FindRecentStructure.StructReferenceViaContextReference(category); }
 
         internal override Structure ObtainRecentStructure() { return Parent.UniqueStructure(Container, Position); }
-    }
-
-    sealed class ContextFoundItem : ReniObject, IFoundItem
-    {
-        readonly Structure _accessPoint;
-        internal ContextFoundItem(Structure accessPoint) { _accessPoint = accessPoint; }
-
-        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam) { return _accessPoint.StructReferenceViaContextReference(category); }
     }
 }

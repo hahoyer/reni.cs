@@ -82,8 +82,13 @@ namespace Reni.Struct
 
             internal override void Search(ISearchVisitor searchVisitor)
             {
-                base.Search(searchVisitor);
+                base.Search(searchVisitor.Path(FoundConversion));
                 ValueType.Search(searchVisitor);
+            }
+            Result FoundConversion(Category category, RefAlignParam refAlignParam)
+            {
+                NotImplementedMethod(category, refAlignParam);
+                return null;
             }
             [DisableDump]
             TypeBase ValueType { get { return ValueResult(Category.Type).Type; } }
