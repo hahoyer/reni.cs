@@ -199,7 +199,7 @@ namespace Reni.Type
                 result.CodeArgs = codeAndRefs.CodeArgs;
             if (category.HasType)
                 result.Type = this;
-            result.Amend(category);
+            result.Amend(category, this);
             return result;
         }
 
@@ -212,7 +212,7 @@ namespace Reni.Type
                 result.CodeArgs = getRefs();
             if (category.HasType)
                 result.Type = this;
-            result.Amend(category);
+            result.Amend(category, this);
             return result;
         }
 

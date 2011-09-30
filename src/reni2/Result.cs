@@ -730,21 +730,25 @@ namespace Reni
             return this;
         }
 
-        internal void Amend(Category category)
+        public void Amend(Category category, TypeBase type)
         {
-            if(category.HasType)
+            if (category.HasType)
                 Tracer.Assert(CompleteCategory.HasType);
             if (category.HasCode)
                 Tracer.Assert(CompleteCategory.HasCode);
             if (category.HasArgs && !CompleteCategory.HasArgs)
                 CodeArgs = Code.CodeArgs;
             if (category.HasSize && !CompleteCategory.HasSize)
-                Size = category.HasCode ? Code.Size : Type.Size;
-            if(category.HasIsDataLess && !CompleteCategory.HasIsDataLess)
-                IsDataLess = 
-                    category.HasCode ? Code.Size.IsZero : 
-                    category.HasSize ? Size.IsZero : 
-                    Type.IsDataLess;
+                Size = 
+                    CompleteCategory.HasCode ? Code.Size : 
+                    CompleteCategory.HasType ? Type.Size :
+                    type.Size;
+            if (category.HasIsDataLess && !CompleteCategory.HasIsDataLess)
+                IsDataLess =
+                    CompleteCategory.HasCode ? Code.Size.IsZero :
+                    CompleteCategory.HasSize ? Size.IsZero :
+                    CompleteCategory.HasType ? Type.IsDataLess:
+                    type.IsDataLess;
         }
     }
 
