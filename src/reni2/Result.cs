@@ -727,7 +727,23 @@ namespace Reni
                 Tracer.Assert(Type is ReferenceType, Dump);
             return this;
         }
-        
+
+        internal void Amend(Category category)
+        {
+            if(category.HasType)
+                Tracer.Assert(CompleteCategory.HasType);
+            if (category.HasCode)
+                Tracer.Assert(CompleteCategory.HasCode);
+            if (category.HasArgs && !CompleteCategory.HasArgs)
+                CodeArgs = Code.CodeArgs;
+            if (category.HasSize && !CompleteCategory.HasSize)
+                Size = category.HasCode ? Code.Size : Type.Size;
+            if(category.HasIsDataLess && !CompleteCategory.HasIsDataLess)
+                IsDataLess = 
+                    category.HasCode ? Code.Size.IsZero : 
+                    category.HasSize ? Size.IsZero : 
+                    Type.IsDataLess;
+        }
     }
 
     sealed class Error

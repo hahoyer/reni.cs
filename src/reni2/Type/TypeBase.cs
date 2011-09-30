@@ -164,7 +164,7 @@ namespace Reni.Type
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
         internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgResult(category); }
         internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size); }
- 
+
         internal virtual Result AutomaticDereferenceResult(Category category) { return ArgResult(category); }
 
         internal Result Result(Category category)
@@ -197,22 +197,9 @@ namespace Reni.Type
                 result.Code = codeAndRefs.Code;
             if(category.HasArgs)
                 result.CodeArgs = codeAndRefs.CodeArgs;
-            return AmendResult(category, result);
-        }
-
-        Result AmendResult(Category category, Result result)
-        {
-            if(category.HasType)
+            if (category.HasType)
                 result.Type = this;
-            if(category.HasSize)
-                result.Size
-                    = category.HasCode ? result.Code.Size
-                          : Size;
-            if(category.HasIsDataLess)
-                result.IsDataLess
-                    = category.HasCode ? result.Code.Size.IsZero
-                          : category.HasSize ? result.Size.IsZero
-                                : IsDataLess;
+            result.Amend(category);
             return result;
         }
 
@@ -223,7 +210,10 @@ namespace Reni.Type
                 result.Code = getCode();
             if(category.HasArgs)
                 result.CodeArgs = getRefs();
-            return AmendResult(category, result);
+            if (category.HasType)
+                result.Type = this;
+            result.Amend(category);
+            return result;
         }
 
         internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
@@ -325,7 +315,7 @@ namespace Reni.Type
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
-                var result = feature.Result(category,refAlignParam);
+                var result = feature.Result(category, refAlignParam);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -438,10 +428,7 @@ namespace Reni.Type
     {
         readonly TypeBase _typeBase;
         internal RootFoundItem(TypeBase typeBase) { _typeBase = typeBase; }
-        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam)
-        {
-            return _typeBase.SmartReference(refAlignParam).ArgResult(category);
-        }
+        Result IFoundItem.Result(Category category, RefAlignParam refAlignParam) { return _typeBase.SmartReference(refAlignParam).ArgResult(category); }
     }
 
     interface IMetaFeature
