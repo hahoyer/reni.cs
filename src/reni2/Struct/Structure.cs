@@ -189,6 +189,9 @@ namespace Reni.Struct
 
         internal Result StructReferenceViaContextReference(Category category)
         {
+            if (IsDataLess)
+                return Type.Result(category);
+
             return ReferenceType
                 .Result
                 (category
