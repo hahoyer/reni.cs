@@ -29,14 +29,13 @@ namespace Reni
     sealed class TypeSearchResult : SearchResult
     {
         readonly TypeBase _type;
+
         internal TypeSearchResult(ITypeFeature feature, ConversionFunction[] conversionFunctions, TypeBase type)
-            : base(feature, conversionFunctions)
-        {
-            _type = type;
-        }
+            : base(feature, conversionFunctions) { _type = type; }
+
         void AssertValid(RefAlignParam refAlignParam)
         {
-            if (ConversionFunctions.Length == 0)
+            if(ConversionFunctions.Length == 0)
                 return;
             Tracer.Assert(_type.SmartReference(refAlignParam) == ConversionFunctions[ConversionFunctions.Length - 1].ArgType);
         }
@@ -44,28 +43,21 @@ namespace Reni
         internal override Result ConverterResult(Category category, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == -4;
-            StartMethodDump(trace, category,refAlignParam);
+            StartMethodDump(trace, category, refAlignParam);
             try
             {
                 BreakExecution();
                 AssertValid(refAlignParam);
 
-                if(ConversionFunctions.Length == 0)
-                    return ReturnMethodDump(TrivialConverterResult(category, refAlignParam),true);
-
                 var result = ConversionFunctions[0].Result(category);
                 for(var i = 1; i < ConversionFunctions.Length; i++)
                     result = result.ReplaceArg(ConversionFunctions[i].Result);
                 return ReturnMethodDump(result, true);
-
             }
             finally
             {
                 EndMethodDump();
             }
         }
-        Category Category(Category category, int i) { return i < ConversionFunctions.Length - 1 ? category.ReplaceArged : category; }
-
-        Result TrivialConverterResult(Category category, RefAlignParam refAlignParam) { return _type.SmartReference(refAlignParam).ArgResult(category); }
     }
 }

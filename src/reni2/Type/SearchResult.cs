@@ -50,7 +50,7 @@ namespace Reni.Type
             {
                 category = category.Typed;
                 var featureResult = FeatureResult(category, refAlignParam);
-                if(!featureResult.HasArg)
+                if(!featureResult.HasArg || ConversionFunctions.Length == 0)
                     return ReturnMethodDump(featureResult, true);
 
                 Dump("featureResult", featureResult);
