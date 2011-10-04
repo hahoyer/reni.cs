@@ -56,7 +56,7 @@ namespace Reni.Type
                 Dump("featureResult", featureResult);
                 BreakExecution();
 
-                var converterResult = ConverterResult(category, refAlignParam);
+                var converterResult = ConverterResult(category, refAlignParam).SmartLocalReferenceResult(refAlignParam);
 
                 Dump("converterResult", converterResult);
                 BreakExecution();

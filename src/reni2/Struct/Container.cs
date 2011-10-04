@@ -215,7 +215,7 @@ namespace Reni.Struct
         }
 
 
-        internal override bool? QuickIsDereferencedDataLess(ContextBase context) { return QuickIsDataLess(context, EndPosition); }
+        protected override bool? QuickIsDereferencedDataLess(ContextBase context) { return QuickIsDataLess(context, EndPosition); }
 
         internal bool? QuickIsDataLess(ContextBase parent, int accessPosition) { return IsDataLess(true, parent, accessPosition); }
 
