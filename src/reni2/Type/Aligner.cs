@@ -84,5 +84,6 @@ namespace Reni.Type
             return UnAlignedResult
                    * Parent.Converter(conversionParameter, destination);
         }
+        protected override Result ChildConversionResult(Category category) { return UnAlignedResult(category); }
     }
 }

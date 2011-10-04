@@ -36,10 +36,14 @@ namespace Reni.Feature
         TypeBase ObjectType { get; }
     }
 
-    interface ISuffixFeature : IFeature
+    interface ITypeFeature: IFeature
+    {
+    }
+
+    interface ISuffixFeature : ITypeFeature
     {}
 
-    interface IPrefixFeature : IFeature
+    interface IPrefixFeature : ITypeFeature
     {}
 
 
@@ -79,15 +83,5 @@ namespace Reni.Feature
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
         TypeBase IFeature.ObjectType { get { return (TypeBase)_function.Target; } }
-    }
-
-    static class FeatureExtender
-    {
-        internal static TypeBase TypeOfArgInObtainResult(this IFeature feature, RefAlignParam refAlignParam)
-        {
-            return feature
-                .ObjectType
-                .SmartReference(refAlignParam);
-        }
     }
 }

@@ -20,11 +20,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class EnableCut : TagChild<TypeBase>
+    sealed class EnableCut : TagChild<TypeBase>
     {
         internal EnableCut(TypeBase parent)
             : base(parent) { }
@@ -35,7 +36,12 @@ namespace Reni.Type
         {
             return
                 StripTagResult
-                *Parent.Converter(conversionParameter.EnableCut, destination);
+                * Parent.Converter(conversionParameter.EnableCut, destination);
+        }
+        protected override Result ChildConversionResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
     }
 }

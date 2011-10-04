@@ -80,16 +80,21 @@ namespace Reni.Struct
                     .ReplaceArg(Void.Result(category.Typed));
             }
 
-            internal override void Search(ISearchVisitor searchVisitor)
+            internal override void Search(SearchVisitor searchVisitor)
             {
-                base.Search(searchVisitor.Path(FoundConversion));
-                ValueType.Search(searchVisitor);
+                base.Search(searchVisitor);
+                ValueType.Search(searchVisitor,new ConversionFunction(this));
             }
-            Result FoundConversion(Category category, RefAlignParam refAlignParam)
+
+            sealed class ConversionFunction : Reni.ConversionFunction
             {
-                NotImplementedMethod(category, refAlignParam);
-                return null;
+                readonly AutoCallType _parent;
+                public ConversionFunction(AutoCallType parent) { _parent = parent; }
+                [DisableDump]
+                internal override TypeBase ArgType { get { return _parent; } }
+                internal override Result Result(Category category) { return _parent.ValueResult(category); }
             }
+
             [DisableDump]
             TypeBase ValueType { get { return ValueResult(Category.Type).Type; } }
         }

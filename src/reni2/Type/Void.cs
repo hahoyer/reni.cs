@@ -27,7 +27,7 @@ namespace Reni.Type
     [Serializable]
     internal sealed class Void : TypeBase
     {
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);

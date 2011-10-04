@@ -64,7 +64,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return AccessObject.IsDataLess(this); } }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             ValueType.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);

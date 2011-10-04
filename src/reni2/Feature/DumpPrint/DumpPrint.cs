@@ -1,4 +1,22 @@
-﻿using System;
+﻿//     Compiler for programming language "Reni"
+//     Copyright (C) 2011 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -10,7 +28,7 @@ using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
 {
-    internal abstract class BitFeatureBase : ReniObject
+    abstract class BitFeatureBase : ReniObject
     {
         protected static Result Apply(Category category, AutomaticReferenceType objectType)
         {
@@ -18,7 +36,7 @@ namespace Reni.Feature.DumpPrint
                 .Result(category, () => BitSequenceDumpPrint(objectType), CodeArgs.Arg);
         }
 
-        private static CodeBase BitSequenceDumpPrint(AutomaticReferenceType objectType)
+        static CodeBase BitSequenceDumpPrint(AutomaticReferenceType objectType)
         {
             var alignedSize = objectType.ValueType.Size.Align(objectType.RefAlignParam.AlignBits);
             return objectType
@@ -28,34 +46,35 @@ namespace Reni.Feature.DumpPrint
         }
     }
 
-    internal sealed class BitSequenceFeature :
+    sealed class BitSequenceFeature :
         ReniObject,
-        ISearchPath<ISuffixFeature, Sequence.SequenceType>
+        ISearchPath<ISuffixFeature, SequenceType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Sequence.SequenceType>.Convert(Sequence.SequenceType type) { return type.BitDumpPrintFeature; }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.BitDumpPrintFeature; }
     }
 
-    internal sealed class BitSequenceFeatureClass : BitFeatureBase, ISuffixFeature
+    sealed class BitSequenceFeatureClass : BitFeatureBase, ISuffixFeature
     {
-        private readonly Sequence.SequenceType _parent;
+        readonly SequenceType _parent;
 
-        internal BitSequenceFeatureClass(Sequence.SequenceType parent) { _parent = parent; }
+        internal BitSequenceFeatureClass(SequenceType parent) { _parent = parent; }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.UniqueAutomaticReference(refAlignParam)); }
+        [EnableDump]
         TypeBase IFeature.ObjectType { get { return _parent; } }
     }
 
-    internal sealed class BitFeature : BitFeatureBase, ISuffixFeature
+    sealed class BitFeature : BitFeatureBase, ISuffixFeature
     {
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.UniqueAutomaticReference(refAlignParam)); }
         TypeBase IFeature.ObjectType { get { return TypeBase.Bit; } }
     }
 
-    internal sealed class StructReferenceFeature : ReniObject, ISearchPath<ISuffixFeature, AutomaticReferenceType>,
-                                                   ISuffixFeature
+    sealed class StructReferenceFeature : ReniObject, ISearchPath<ISuffixFeature, AutomaticReferenceType>,
+                                          ISuffixFeature
     {
         [EnableDump]
-        private readonly StructureType _structureType;
+        readonly StructureType _structureType;
 
         public StructReferenceFeature(StructureType structureType) { _structureType = structureType; }
 

@@ -73,7 +73,7 @@ namespace Reni.Type
 
         internal override Size GetSize(bool isQuick) { return RefAlignParam.RefSize; }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             ValueType.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);

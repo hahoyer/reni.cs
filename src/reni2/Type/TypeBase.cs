@@ -197,7 +197,7 @@ namespace Reni.Type
                 result.Code = codeAndRefs.Code;
             if(category.HasArgs)
                 result.CodeArgs = codeAndRefs.CodeArgs;
-            if (category.HasType)
+            if(category.HasType)
                 result.Type = this;
             result.Amend(category, this);
             return result;
@@ -210,7 +210,7 @@ namespace Reni.Type
                 result.Code = getCode();
             if(category.HasArgs)
                 result.CodeArgs = getRefs();
-            if (category.HasType)
+            if(category.HasType)
                 result.Type = this;
             result.Amend(category, this);
             return result;
@@ -266,19 +266,40 @@ namespace Reni.Type
         internal virtual bool IsArray { get { return false; } }
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
-        internal SearchResult SearchDefineable<TFeature>(Defineable defineable)
-            where TFeature : class, IFeature
+        internal SearchResult SearchDefineable<TFeature>(Defineable defineable, RefAlignParam refAlignParam)
+            where TFeature : class, ITypeFeature
         {
-            var visitor = new RootSearchVisitor<TFeature>(defineable);
+            var visitor = new TypeRootSearchVisitor<TFeature>(defineable, this);
             visitor.Search(this);
             if(Debugger.IsAttached)
                 _lastSearchVisitor = visitor;
-            if(visitor.IsSuccessFull)
-                visitor.Add((category, refAlignParam) => SmartReference(refAlignParam).ArgResult(category));
             return visitor.SearchResult;
         }
 
-        internal virtual void Search(ISearchVisitor searchVisitor) { searchVisitor.Search(); }
+        sealed class ConversionFunction : Reni.ConversionFunction
+        {
+            readonly TypeBase _parent;
+            readonly RefAlignParam _refAlignParam;
+            public ConversionFunction(TypeBase parent, RefAlignParam refAlignParam)
+            {
+                _parent = parent;
+                _refAlignParam = refAlignParam;
+            }
+            [DisableDump]
+            internal override TypeBase ArgType { get { return ResultType; } }
+            internal override Result Result(Category category) { return _parent.SmartReference(_refAlignParam).ArgResult(category); }
+        }
+
+        internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(); }
+
+        internal void Search(SearchVisitor searchVisitor, Reni.ConversionFunction conversionFunction)
+        {
+            if(searchVisitor.IsSuccessFull)
+                return;
+            Search(searchVisitor);
+            if(searchVisitor.IsSuccessFull)
+                searchVisitor.Add(conversionFunction);
+        }
 
         internal virtual Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
@@ -303,14 +324,14 @@ namespace Reni.Type
         internal virtual Result ReferenceInCode(Category category, IReferenceInCode target) { return UniqueAutomaticReference(target.RefAlignParam).Result(category, target, () => Size.Zero); }
 
         internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
-            where TFeature : class, IFeature
+            where TFeature : class, ITypeFeature
         {
             var trace = ObjectId == -12 && defineable.ObjectId == 17 && category.HasCode;
             StartMethodDump(trace, category, defineable, refAlignParam);
             try
             {
                 BreakExecution();
-                var feature = SearchDefineable<TFeature>(defineable);
+                var feature = SearchDefineable<TFeature>(defineable, refAlignParam);
                 Dump("feature", feature);
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);

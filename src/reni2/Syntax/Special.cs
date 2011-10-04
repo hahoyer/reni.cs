@@ -31,7 +31,7 @@ namespace Reni.Syntax
             return Terminal
                 .Result(context, category, Token);
         }
-        internal override bool? QuickIsDereferencedDataLess(ContextBase context) { return Terminal.QuickIsDereferencedDataLess(context, Token); }
+        protected override bool? QuickIsDereferencedDataLess(ContextBase context) { return Terminal.QuickIsDereferencedDataLess(context, Token); }
 
         protected override TokenData GetFirstToken() { return Token; }
         protected override TokenData GetLastToken() { return Token; }

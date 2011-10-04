@@ -37,7 +37,7 @@ namespace Reni.Context
         [DisableDump]
         internal override Root RootContext { get { return this; } }
 
-        internal override void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.SearchTypeBase(); }
+        internal override void Search(SearchVisitor<IContextFeature> searchVisitor) { searchVisitor.Search(); }
 
         protected override Result CommonResult(Category category, CondSyntax condSyntax)
         {

@@ -71,7 +71,7 @@ namespace Reni.Type
                 return "ObjectId=" + ObjectId;
             return GetType().PrettyName() + "(" + Element.Dump() + ", " + Count + ")";
         }
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
@@ -139,6 +139,11 @@ namespace Reni.Type
                 .UniqueSequence(Count)
                 .UniqueAutomaticReference(refAlignParam)
                 .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
+        }
+        protected override Result ChildConversionResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
     }
 }

@@ -25,9 +25,9 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class SearchResult: ReniObject
+    abstract class SearchResult : ReniObject
     {
-        static int _nextObjectId; 
+        static int _nextObjectId;
         [EnableDump]
         readonly IFeature _feature;
         [EnableDump]
@@ -40,20 +40,23 @@ namespace Reni.Type
             _conversionFunctions = conversionFunctions;
         }
 
+        protected ConversionFunction[] ConversionFunctions { get { return _conversionFunctions; } }
+
         internal Result Result(Category category, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == -10 && category.HasCode;
-            StartMethodDump(trace, category,refAlignParam);
+            StartMethodDump(trace, category, refAlignParam);
             try
             {
                 category = category.Typed;
                 var featureResult = FeatureResult(category, refAlignParam);
+                if(!featureResult.HasArg)
+                    return ReturnMethodDump(featureResult, true);
 
                 Dump("featureResult", featureResult);
                 BreakExecution();
 
-                var converterCategory = category.ReplaceArged;
-                var converterResult = ConverterResult(converterCategory, refAlignParam);
+                var converterResult = ConverterResult(category, refAlignParam);
 
                 Dump("converterResult", converterResult);
                 BreakExecution();
@@ -67,21 +70,9 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
-        internal Result ConverterResult(Category category, RefAlignParam refAlignParam)
-        {
-            if(category.IsNone)
-                return new Result();
 
-            var results = _conversionFunctions.Select(f => f(category, refAlignParam)).ToArray();
-            var result = results[0];
-            for(var i = 1; i < results.Length; i++)
-                result = result.ReplaceArg(results[i]);
-            return result;
-        }
+        internal abstract Result ConverterResult(Category category, RefAlignParam refAlignParam);
 
-        Result FeatureResult(Category category, RefAlignParam refAlignParam)
-        {
-            return _feature.Result(category, refAlignParam);
-        }
+        Result FeatureResult(Category category, RefAlignParam refAlignParam) { return _feature.Result(category, refAlignParam); }
     }
 }

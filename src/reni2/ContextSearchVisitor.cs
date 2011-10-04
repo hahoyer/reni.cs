@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
@@ -32,11 +33,43 @@ namespace Reni
         internal ContextSearchVisitor(Defineable defineable)
             : base(defineable) { }
 
+        internal SearchResult SearchResult
+        {
+            get
+            {
+                if(IsSuccessFull)
+                    return new ContextSearchResult(Result, ConversionFunctions);
+                return null;
+            }
+        }
+
         internal void Search(ContextBase contextBase)
         {
             if(IsSuccessFull)
                 return;
             contextBase.Search(this);
+        }
+        protected override void AssertValid()
+        {
+            TypeBase lastType = null;
+            foreach(var currentType in ConversionFunctions)
+            {
+                Tracer.Assert(lastType == currentType.ArgType);
+                lastType = currentType.ResultType;
+            }
+        }
+    }
+
+    sealed class ContextSearchResult : SearchResult
+    {
+        internal ContextSearchResult(IContextFeature feature, ConversionFunction[] conversionFunctions)
+            : base(feature, conversionFunctions) { }
+
+        internal override Result ConverterResult(Category category, RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(category,refAlignParam);
+            return null;
+
         }
     }
 }

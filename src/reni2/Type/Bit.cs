@@ -34,7 +34,7 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount(TypeBase elementType) { return 1; }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);

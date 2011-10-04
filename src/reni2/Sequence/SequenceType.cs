@@ -83,7 +83,7 @@ namespace Reni.Sequence
 
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + "*" + Count + ")"; }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             Element.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);

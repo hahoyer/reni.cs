@@ -38,7 +38,7 @@ namespace Reni.Type
         
         protected override string TagTitle { get { return "text_item"; } }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             Parent.Search(searchVisitor.Child(this));
             base.Search(searchVisitor);
@@ -79,6 +79,11 @@ namespace Reni.Type
                     .ArgCode()
                     .Dereference(refAlignParam, Size)
                     .DumpPrintText(Size);
+        }
+        protected override Result ChildConversionResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
     }
 }

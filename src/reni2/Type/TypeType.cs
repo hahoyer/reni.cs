@@ -54,7 +54,7 @@ namespace Reni.Type
         [DisableDump]
         private TypeBase Value { get { return _value; } }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);

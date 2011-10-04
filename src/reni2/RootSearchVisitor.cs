@@ -20,21 +20,34 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
-using Reni.Basics;
 using Reni.Feature;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni
 {
-    class RootSearchVisitor<TFeature> : SearchVisitor<TFeature>
+    abstract class RootSearchVisitor<TFeature> : SearchVisitor<TFeature>
         where TFeature : class, IFeature
     {
         readonly Defineable _defineable;
-        internal override sealed ConversionFunction[] ConversionFunctions { get; set; }
-        TFeature Result { get; set; }
+        ConversionFunction[] _conversionFunctions;
+        protected TFeature Result { get; private set; }
 
-        internal RootSearchVisitor(Defineable defineable) { _defineable = defineable; ConversionFunctions = new ConversionFunction[0]; }
+        internal RootSearchVisitor(Defineable defineable)
+        {
+            _defineable = defineable;
+            ConversionFunctions = new ConversionFunction[0];
+        }
+
+        internal override sealed ConversionFunction[] ConversionFunctions
+        {
+            get { return _conversionFunctions; }
+            set
+            {
+                _conversionFunctions = value;
+                AssertValid();
+            }
+        }
+        protected abstract void AssertValid();
 
         internal override bool IsSuccessFull { get { return Result != null; } }
 
@@ -48,21 +61,5 @@ namespace Reni
         }
 
         internal override Defineable Defineable { get { return _defineable; } }
-
-        internal virtual Result SearchConverter(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
-        internal SearchResult SearchResult
-        {
-            get
-            {
-                if(IsSuccessFull)
-                    return new SearchResult(Result, ConversionFunctions);
-                return null;
-            }
-        }
     }
 }

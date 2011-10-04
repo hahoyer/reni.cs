@@ -22,6 +22,7 @@ using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -48,10 +49,19 @@ namespace Reni.Type
         internal abstract Result DereferenceResult(Category category);
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
-            ValueType.Search(searchVisitor.Path((category, refAlignParam) => ToAutomaticReferenceResult(category)));
+            ValueType.Search(searchVisitor, new ConversionFunction(this));
             base.Search(searchVisitor);
+        }
+
+        sealed class ConversionFunction : Reni.ConversionFunction
+        {
+            readonly ReferenceType _parent;
+            public ConversionFunction(ReferenceType parent) { _parent = parent; }
+            internal override Result Result(Category category) { return _parent.ToAutomaticReferenceResult(category); }
+            [DisableDump]
+            internal override TypeBase ArgType { get { return _parent; } }
         }
 
         internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)

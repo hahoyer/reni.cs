@@ -104,7 +104,7 @@ namespace Reni.Syntax
             return result;
         }
 
-        internal virtual bool? QuickIsDereferencedDataLess(ContextBase context)
+        protected virtual bool? QuickIsDereferencedDataLess(ContextBase context)
         {
             var contextResult = context.QuickIsDataLess(this);
             if (contextResult != null)
@@ -117,7 +117,7 @@ namespace Reni.Syntax
         }
 
         internal Result OperationResult<TFeature>(ContextBase context, Category category, Defineable defineable)
-            where TFeature : class, IFeature
+            where TFeature : class, ITypeFeature
         {
             return Type(context)
                 .OperationResult<TFeature>(category, defineable, context.RefAlignParam);

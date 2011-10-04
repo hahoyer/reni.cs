@@ -21,14 +21,15 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using System;
 using HWClassLibrary.TreeStructure;
+using Reni.Basics;
 
 namespace Reni.Type
 {
     [Serializable]
-    internal abstract class Child<TParent> : TypeBase
-        where TParent: TypeBase
+    abstract class Child<TParent> : TypeBase
+        where TParent : TypeBase
     {
-        private readonly TParent _parent;
+        readonly TParent _parent;
 
         protected Child(TParent parent) { _parent = parent; }
 
@@ -41,11 +42,21 @@ namespace Reni.Type
 
         protected abstract bool IsInheritor { get; }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             base.Search(searchVisitor);
-            if (IsInheritor)
-                Parent.Search(searchVisitor);
+            if(IsInheritor)
+                Parent.Search(searchVisitor, new ConversionFunction(this));
         }
+
+        sealed class ConversionFunction : Reni.ConversionFunction
+        {
+            readonly Child<TParent> _parent;
+            public ConversionFunction(Child<TParent> parent) { _parent = parent; }
+            internal override Result Result(Category category) { return _parent.ChildConversionResult(category); }
+            internal override TypeBase ArgType { get { return _parent; } }
+        }
+
+        protected abstract Result ChildConversionResult(Category category);
     }
 }

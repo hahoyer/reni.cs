@@ -50,9 +50,9 @@ namespace Reni.Struct
 
         internal override string DumpShort() { return "type(" + Structure.DumpShort() + ")"; }
 
-        internal override void Search(ISearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.Search(this);
+            searchVisitor.Search();
             searchVisitor.ChildSearch(this);
             base.Search(searchVisitor);
         }
