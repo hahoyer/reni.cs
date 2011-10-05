@@ -30,24 +30,23 @@ namespace Reni
 {
     abstract class SearchVisitor : ReniObject
     {
-        internal void ChildSearch<TType>(TType target)
-            where TType : IDumpShortProvider, IResultProvider { InternalChild(target).Search(); }
+        internal abstract void Search(StructureType structureType);
+        internal abstract void Search();
 
         internal SearchVisitor Child(SequenceType target) { return InternalChild(target); }
         internal SearchVisitor Child(AutomaticReferenceType target) { return InternalChild(target); }
         internal SearchVisitor Child(AccessType target) { return InternalChild(target); }
         internal SearchVisitor Child(TextItemType target) { return InternalChild(target); }
-
-        protected abstract void Search(StructureType structureType);
-        internal abstract ConversionFunction[] ConversionFunctions { set; get; }
-
-        internal abstract void Search();
+        
+        internal void ChildSearch<TType>(TType target)
+            where TType : IDumpShortProvider, IResultProvider { InternalChild(target).Search(); }
 
         protected abstract SearchVisitor InternalChild<TType>(TType target)
             where TType : IResultProvider, IDumpShortProvider;
 
         internal abstract bool IsSuccessFull { get; }
-        internal void Add(ConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
+        internal abstract ConversionFunction[] ConversionFunctions { set; get; }
+        internal void Add(ConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] { conversionFunction }).ToArray(); }
     }
 
     abstract class SearchVisitor<TFeature> : SearchVisitor
@@ -63,7 +62,7 @@ namespace Reni
                 typeBase.Search(this);
         }
 
-        protected override void Search(StructureType structureType) { structureType.Search(this); }
+        internal override void Search(StructureType structureType) { structureType.SearchFeature(this); }
         internal override void Search()
         {
             if(!IsSuccessFull)
