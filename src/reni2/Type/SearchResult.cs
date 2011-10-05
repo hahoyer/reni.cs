@@ -56,7 +56,7 @@ namespace Reni.Type
                 Dump("featureResult", featureResult);
                 BreakExecution();
 
-                var converterResult = ConverterResult(category, refAlignParam).SmartLocalReferenceResult(refAlignParam);
+                var converterResult = ConverterResult(category).SmartLocalReferenceResult(refAlignParam);
 
                 Dump("converterResult", converterResult);
                 BreakExecution();
@@ -71,7 +71,15 @@ namespace Reni.Type
             }
         }
 
-        internal abstract Result ConverterResult(Category category, RefAlignParam refAlignParam);
+        internal Result ConverterResult(Category category, RefAlignParam refAlignParam)
+        {
+            if (ConversionFunctions.Length == 0)
+                return TrivialConversionResult(category, refAlignParam);
+            return ConverterResult(category).SmartLocalReferenceResult(refAlignParam);
+        }
+
+        protected abstract Result TrivialConversionResult(Category category, RefAlignParam refAlignParam);
+        protected abstract Result ConverterResult(Category category);
 
         Result FeatureResult(Category category, RefAlignParam refAlignParam) { return _feature.Result(category, refAlignParam); }
     }

@@ -65,11 +65,16 @@ namespace Reni
         internal ContextSearchResult(IContextFeature feature, ConversionFunction[] conversionFunctions)
             : base(feature, conversionFunctions) { }
 
-        internal override Result ConverterResult(Category category, RefAlignParam refAlignParam)
+        protected override Result TrivialConversionResult(Category category, RefAlignParam refAlignParam)
         {
-            NotImplementedMethod(category,refAlignParam);
+            NotImplementedMethod(category, refAlignParam);
             return null;
+        }
 
+        protected override Result ConverterResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
     }
 }

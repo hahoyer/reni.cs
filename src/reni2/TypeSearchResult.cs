@@ -40,15 +40,15 @@ namespace Reni
             Tracer.Assert(_type.SmartReference(refAlignParam) == ConversionFunctions[ConversionFunctions.Length - 1].ArgType);
         }
 
-        internal override Result ConverterResult(Category category, RefAlignParam refAlignParam)
+        protected override Result TrivialConversionResult(Category category, RefAlignParam refAlignParam) { return _type.SmartReference(refAlignParam).ArgResult(category); }
+        
+        protected override Result ConverterResult(Category category)
         {
             var trace = ObjectId == -4;
-            StartMethodDump(trace, category, refAlignParam);
+            StartMethodDump(trace, category);
             try
             {
                 BreakExecution();
-                AssertValid(refAlignParam);
-
                 var result = ConversionFunctions[0].Result(category);
                 for(var i = 1; i < ConversionFunctions.Length; i++)
                     result = result.ReplaceArg(ConversionFunctions[i].Result);
