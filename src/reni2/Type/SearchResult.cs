@@ -75,7 +75,7 @@ namespace Reni.Type
         {
             if (ConversionFunctions.Length == 0)
                 return TrivialConversionResult(category, refAlignParam);
-            return ConverterResult(category).SmartLocalReferenceResult(refAlignParam);
+            return ConverterResult(category.Typed).SmartLocalReferenceResult(refAlignParam);
         }
 
         protected abstract Result TrivialConversionResult(Category category, RefAlignParam refAlignParam);
