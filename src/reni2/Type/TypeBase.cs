@@ -292,15 +292,6 @@ namespace Reni.Type
 
         internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        internal void Search(SearchVisitor searchVisitor, Reni.ConversionFunction conversionFunction)
-        {
-            if(searchVisitor.IsSuccessFull)
-                return;
-            Search(searchVisitor);
-            if(searchVisitor.IsSuccessFull)
-                searchVisitor.Add(conversionFunction);
-        }
-
         internal virtual Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
             if(IsDataLess)

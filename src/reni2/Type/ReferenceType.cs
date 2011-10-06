@@ -51,7 +51,7 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            ValueType.Search(searchVisitor, new ConversionFunction(this));
+            searchVisitor.Search(ValueType, new ConversionFunction(this));
             base.Search(searchVisitor);
         }
 

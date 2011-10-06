@@ -38,7 +38,7 @@ namespace Reni.Context
         [DisableDump]
         internal override Root RootContext { get { return Parent.RootContext; } }
 
-        internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
+        internal override void Search(ContextSearchVisitor searchVisitor)
         {
             Parent.Search(searchVisitor);
             if(searchVisitor.IsSuccessFull)

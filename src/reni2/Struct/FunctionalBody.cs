@@ -83,7 +83,7 @@ namespace Reni.Struct
             internal override void Search(SearchVisitor searchVisitor)
             {
                 base.Search(searchVisitor);
-                ValueType.Search(searchVisitor,new ConversionFunction(this));
+                searchVisitor.Search(ValueType,new ConversionFunction(this));
             }
 
             sealed class ConversionFunction : Reni.ConversionFunction

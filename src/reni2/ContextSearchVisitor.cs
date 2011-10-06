@@ -23,6 +23,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -57,6 +58,14 @@ namespace Reni
                 Tracer.Assert(lastType == currentType.ArgType);
                 lastType = currentType.ResultType;
             }
+        }
+        internal void Search(Structure accessPoint, ConversionFunction conversionFunction)
+        {
+            var feature = accessPoint.SearchFromStructContext(Defineable);
+            if(feature == null)
+                return;
+            InternalResult = feature.ConvertToContextFeature(accessPoint);
+            Add(conversionFunction);
         }
     }
 

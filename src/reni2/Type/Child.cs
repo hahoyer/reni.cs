@@ -46,7 +46,7 @@ namespace Reni.Type
         {
             base.Search(searchVisitor);
             if(IsInheritor)
-                Parent.Search(searchVisitor, new ConversionFunction(this));
+                searchVisitor.Search(Parent, new ConversionFunction(this));
         }
 
         sealed class ConversionFunction : Reni.ConversionFunction

@@ -189,7 +189,7 @@ namespace Reni.Struct
 
         internal Result StructReferenceViaContextReference(Category category)
         {
-            if (IsDataLess)
+            if(IsDataLess)
                 return Type.Result(category);
 
             return ReferenceType
@@ -215,8 +215,7 @@ namespace Reni.Struct
         }
         CodeBase StructReferenceCodeViaContextReference()
         {
-            return CodeBase
-                .ReferenceCode(ContainerContextObject)
+            return CodeBase.ReferenceCode(ContainerContextObject)
                 .AddToReference(RefAlignParam, StructSize * -1);
         }
         internal TypeBase ValueType(int position)
@@ -225,5 +224,7 @@ namespace Reni.Struct
                 .InnerType(EndPosition, position)
                 .UnAlignedType;
         }
+
+        internal IStructFeature SearchFromStructContext(Defineable defineable) { return ContainerContextObject.Container.SearchFromStructContext(defineable); }
     }
 }

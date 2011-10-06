@@ -23,7 +23,6 @@ using System;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -42,34 +41,27 @@ namespace Reni.Struct
             Container = container;
         }
 
-        void Search(SearchVisitor<IContextFeature> searchVisitor, ContainerContextObject context)
-        {
-            var feature = Container.SearchFromStructContext(searchVisitor.Defineable);
-            if(feature == null)
-                return;
-            var accessPoint = context.UniqueAccessPoint(Position);
-            searchVisitor.InternalResult = feature.ConvertToContextFeature(accessPoint);
-            searchVisitor.Add(new ConversionFunction(accessPoint));
-        }
+        [DisableDump]
+        Structure Structure { get { return Parent.UniqueStructure(Container, Position); } }
 
-        sealed class ConversionFunction : Reni.ConversionFunction
+        internal override void Search(ContextSearchVisitor searchVisitor)
         {
-            readonly Structure _parent;
-            public ConversionFunction(Structure parent) { _parent = parent; }
-            internal override Result Result(Category category) { return _parent.StructReferenceViaContextReference(category); }
-            internal override TypeBase ArgType { get { return null; } }
-        }
-
-        internal override void Search(SearchVisitor<IContextFeature> searchVisitor)
-        {
-            Search(searchVisitor, Parent.UniqueContainerContext(Container));
+            searchVisitor.Search(Structure, new ConversionFunction(this));
             if(searchVisitor.IsSuccessFull)
                 return;
             base.Search(searchVisitor);
         }
 
-        protected override Result ObjectResult(Category category) { return FindRecentStructure.StructReferenceViaContextReference(category); }
+        sealed class ConversionFunction : Reni.ConversionFunction
+        {
+            readonly Context _parent;
+            public ConversionFunction(Context parent) { _parent = parent; }
+            internal override Result Result(Category category) { return _parent.ObjectResult(category); }
+            internal override TypeBase ArgType { get { return null; } }
+        }
 
-        internal override Structure ObtainRecentStructure() { return Parent.UniqueStructure(Container, Position); }
+        protected override Result ObjectResult(Category category) { return Structure.StructReferenceViaContextReference(category); }
+
+        internal override Structure ObtainRecentStructure() { return Structure; }
     }
 }
