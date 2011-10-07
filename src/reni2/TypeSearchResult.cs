@@ -33,31 +33,7 @@ namespace Reni
         internal TypeSearchResult(ITypeFeature feature, ConversionFunction[] conversionFunctions, TypeBase type)
             : base(feature, conversionFunctions) { _type = type; }
 
-        void AssertValid(RefAlignParam refAlignParam)
-        {
-            if(ConversionFunctions.Length == 0)
-                return;
-            Tracer.Assert(_type.SmartReference(refAlignParam) == ConversionFunctions[ConversionFunctions.Length - 1].ArgType);
-        }
-
         protected override Result TrivialConversionResult(Category category, RefAlignParam refAlignParam) { return _type.SmartReference(refAlignParam).ArgResult(category); }
         
-        protected override Result ConverterResult(Category category)
-        {
-            var trace = ObjectId == -4;
-            StartMethodDump(trace, category);
-            try
-            {
-                BreakExecution();
-                var result = ConversionFunctions[0].Result(category);
-                for(var i = 1; i < ConversionFunctions.Length; i++)
-                    result = result.ReplaceArg(ConversionFunctions[i].Result);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
     }
 }

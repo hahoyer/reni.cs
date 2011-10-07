@@ -40,7 +40,7 @@ namespace Reni.Type
             _conversionFunctions = conversionFunctions;
         }
 
-        protected ConversionFunction[] ConversionFunctions { get { return _conversionFunctions; } }
+        ConversionFunction[] ConversionFunctions { get { return _conversionFunctions; } }
 
         internal Result Result(Category category, RefAlignParam refAlignParam)
         {
@@ -79,7 +79,24 @@ namespace Reni.Type
         }
 
         protected abstract Result TrivialConversionResult(Category category, RefAlignParam refAlignParam);
-        protected abstract Result ConverterResult(Category category);
+        
+        Result ConverterResult(Category category)
+        {
+            var trace = ObjectId == -4;
+            StartMethodDump(trace, category);
+            try
+            {
+                BreakExecution();
+                var result = ConversionFunctions[0].Result(category);
+                for (var i = 1; i < ConversionFunctions.Length; i++)
+                    result = result.ReplaceArg(ConversionFunctions[i].Result);
+                return ReturnMethodDump(result, true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
         Result FeatureResult(Category category, RefAlignParam refAlignParam) { return _feature.Result(category, refAlignParam); }
     }

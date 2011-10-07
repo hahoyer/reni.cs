@@ -79,11 +79,5 @@ namespace Reni
             NotImplementedMethod(category, refAlignParam);
             return null;
         }
-
-        protected override Result ConverterResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
     }
 }
