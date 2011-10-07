@@ -207,10 +207,10 @@ namespace Reni.Struct
             }
         }
 
-        bool? InternalInnerIsDataLess(bool isQuick, ContextBase parent, int accessPosition, int position )
+        bool? InternalInnerIsDataLess(bool isQuick, ContextBase parent, int position )
         {
             var uniqueChildContext = parent
-                .UniqueChildContext(this, accessPosition);
+                .UniqueChildContext(this, position);
             return Statements[position].IsDereferencedDataLess(isQuick, uniqueChildContext);
         }
 
@@ -228,10 +228,10 @@ namespace Reni.Struct
                 var subStatementIds = accessPosition.Array(i => i).ToArray();
                 Dump("subStatementIds", subStatementIds); 
                 BreakExecution();
-                if (subStatementIds.Any(position => InternalInnerIsDataLess(true, parent, accessPosition, position) == false))
+                if (subStatementIds.Any(position => InternalInnerIsDataLess(true, parent, position) == false))
                     return ReturnMethodDump(false, true);
                 var quickNonDataLess = subStatementIds
-                    .Where(position => InternalInnerIsDataLess(true, parent, accessPosition, position) == null)
+                    .Where(position => InternalInnerIsDataLess(true, parent, position) == null)
                     .ToArray();
                 Dump("quickNonDataLess", quickNonDataLess);
                 BreakExecution();
@@ -239,9 +239,9 @@ namespace Reni.Struct
                     return ReturnMethodDump(true, true);
                 if(isQuick)
                     return ReturnMethodDump<bool?>(null, true);
-                if(quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, accessPosition, position) == false))
+                if(quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, position) == false))
                     return ReturnMethodDump(false, true);
-                if (quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, accessPosition, position) == null))
+                if (quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, position) == null))
                     return ReturnMethodDump<bool?>(null, true);
                 return ReturnMethodDump(true, true);
 
