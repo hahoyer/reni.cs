@@ -442,7 +442,7 @@ namespace Reni
                 if(HasSize && Size.IsZero != isDataLess.Value)
                     Tracer.AssertionFailed(1, @"Size.IsZero==isDataLess.Value", () => "Size differs " + Dump());
                 if(HasType && Type.IsDataLess != isDataLess.Value)
-                    Tracer.AssertionFailed(1, @"Type.IsDataLess==isDataLess.Value", () => "Type size differs " + Dump());
+                    Tracer.AssertionFailed(1, @"Type.IsDataLess==isDataLess.Value", () => "Type IsDataLess property differs " + Dump());
                 if(HasCode && Code.Size.IsZero != isDataLess.Value)
                     Tracer.AssertionFailed(1, @"Code.Size.IsZero==isDataLess.Value", () => "Code size differs " + Dump());
             }
