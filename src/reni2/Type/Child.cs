@@ -45,6 +45,8 @@ namespace Reni.Type
         internal override void Search(SearchVisitor searchVisitor)
         {
             base.Search(searchVisitor);
+            if (searchVisitor.IsSuccessFull)
+                return;
             if(IsInheritor)
                 searchVisitor.Search(Parent, new ConversionFunction(this));
         }

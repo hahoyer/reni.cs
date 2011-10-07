@@ -85,7 +85,11 @@ namespace Reni.Sequence
 
         internal override void Search(SearchVisitor searchVisitor)
         {
+            if (searchVisitor.IsSuccessFull)
+                return;
             Element.Search(searchVisitor.Child(this));
+            if (searchVisitor.IsSuccessFull)
+                return;
             base.Search(searchVisitor);
         }
 
