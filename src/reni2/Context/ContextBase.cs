@@ -140,7 +140,7 @@ namespace Reni.Context
         {
             return syntax == null
                        ? SearchDefinable(defineable)
-                       : Type(syntax).SearchDefineable<ISuffixFeature>(defineable,RefAlignParam);
+                       : Type(syntax).UnAlignedType.SearchDefineable<ISuffixFeature>(defineable,RefAlignParam);
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
