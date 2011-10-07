@@ -134,8 +134,6 @@ namespace Reni.Code
             }
         }
 
-        protected override string CSharpString(Size top) { return CSharpGenerator.Fiber(top, ObjectId, _fiberItems, _fiberHead); }
-
         internal override void Visit(IVisitor visitor) { visitor.Fiber(_fiberHead, _fiberItems); }
 
         public override string DumpData()

@@ -276,22 +276,6 @@ namespace Reni.Code
                 .Aggregate(this, (current, fiberItem) => current.CreateFiber(fiberItem));
         }
 
-        protected virtual string CSharpString()
-        {
-            NotImplementedMethod();
-            return "";
-        }
-
-        internal virtual CSharpCodeSnippet CSharpCodeSnippet() { return new CSharpCodeSnippet("", CSharpString()); }
-
-        internal string ReversePolish(Size top) { return CSharpString(top); }
-
-        protected virtual string CSharpString(Size top)
-        {
-            NotImplementedMethod(top);
-            return "";
-        }
-
         internal void Execute(CodeBase[] functions, bool isTraceEnabled)
         {
             try

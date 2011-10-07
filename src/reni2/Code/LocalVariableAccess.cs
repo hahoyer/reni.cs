@@ -69,7 +69,6 @@ namespace Reni.Code
         }
 
         protected override Size GetSize() { return _size; }
-        protected override string CSharpString() { return CSharpGenerator.LocalVariableAccess(Holder, Offset, _size); }
         internal override void Visit(IVisitor visitor) { visitor.LocalVariableAccess(Holder, Offset, Size, DataSize); }
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
     }

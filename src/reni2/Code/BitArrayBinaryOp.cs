@@ -141,7 +141,6 @@ namespace Reni.Code
         internal DumpPrintText(string dumpPrintText) { _dumpPrintText = dumpPrintText; }
 
         protected override Size GetSize() { return Size.Zero; }
-        protected override string CSharpString() { return CSharpGenerator.DumpPrintText(_dumpPrintText); }
         internal override void Visit(IVisitor visitor) { visitor.PrintText(_dumpPrintText); }
 
         [DisableDump]

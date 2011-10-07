@@ -25,10 +25,10 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal sealed class LocalVariableReference : FiberHead
+    sealed class LocalVariableReference : FiberHead
     {
-        private static int _nextObjectId;
-        private readonly RefAlignParam _refAlignParam;
+        static int _nextObjectId;
+        readonly RefAlignParam _refAlignParam;
         [Node]
         internal readonly string Holder;
         [Node]
@@ -59,7 +59,6 @@ namespace Reni.Code
         }
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
-        protected override string CSharpString(Size top) { return CSharpGenerator.LocalVariableReference(top, Size, Holder, Offset); }
         internal override void Visit(IVisitor visitor) { visitor.LocalVariableReference(Holder, Offset); }
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
     }

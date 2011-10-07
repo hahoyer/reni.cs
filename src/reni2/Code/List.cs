@@ -86,7 +86,6 @@ namespace Reni.Code
         }
 
         protected override CodeArgs GetRefsImplementation() { return GetRefs(_data); }
-        protected override string CSharpString(Size top) { return CSharpGenerator.List(top, ObjectId, _data); }
         internal override void Visit(IVisitor visitor) { visitor.List(_data); }
     }
 }

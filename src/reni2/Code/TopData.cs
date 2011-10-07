@@ -42,8 +42,6 @@ namespace Reni.Code
         }
 
         internal override void Visit(IVisitor visitor) { visitor.TopData(Offset, Size, DataSize); }
-
-        protected override string CSharpString() { return CSharpGenerator.TopData(Offset, GetSize()); }
     }
 
     /// <summary>
@@ -64,7 +62,5 @@ namespace Reni.Code
         }
 
         internal override void Visit(IVisitor visitor) { visitor.TopFrameData(Offset, Size, DataSize); }
-
-        protected override string CSharpString() { return CSharpGenerator.TopFrame(Offset, GetSize()); }
     }
 }
