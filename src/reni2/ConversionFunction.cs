@@ -33,6 +33,17 @@ namespace Reni
         [DisableDump]
         internal TypeBase ResultType { get { return Result(Category.Type).Type; } }
 
-        public override string NodeDump { get { return base.NodeDump + "[" + ArgType.NodeDump + "=>" + ResultType.NodeDump +"]"; } }
+        public override string NodeDump
+        {
+            get
+            {
+                return base.NodeDump
+                       + "["
+                       + (ArgType == null ? "<null>" : ArgType.NodeDump)
+                       + "=>"
+                       + ResultType.NodeDump
+                       + "]";
+            }
+        }
     }
 }
