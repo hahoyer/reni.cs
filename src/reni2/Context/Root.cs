@@ -52,12 +52,12 @@ namespace Reni.Context
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
-        internal Result CreateFunctionCall(Structure structure, Category category, CompileSyntax body, Result argsResult)
+        internal Result Call(Structure structure, Category category, CompileSyntax body, Result argsResult)
         {
             Tracer.Assert(argsResult.HasType);
             var alignedArgsResult = argsResult.Align(DefaultRefAlignParam.AlignBits);
             var functionInstance = _functions.Find(body, structure, alignedArgsResult.Type);
-            return functionInstance.CreateCall(category, alignedArgsResult);
+            return functionInstance.Call(category, alignedArgsResult);
         }
     }
 }

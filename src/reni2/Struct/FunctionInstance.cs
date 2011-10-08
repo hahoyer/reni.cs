@@ -80,7 +80,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeBase CallCode { get { return CreateCall(Category.Code, _args.ArgResult(Category.Code)).Code; } }
+        internal CodeBase CallCode { get { return Call(Category.Code, _args.ArgResult(Category.Code)).Code; } }
 
         [Node]
         [DisableDump]
@@ -104,7 +104,7 @@ namespace Reni.Struct
         [DisableDump]
         private string Description { get { return _body.DumpShort(); } }
 
-        public Result CreateCall(Category category, Result args)
+        public Result Call(Category category, Result args)
         {
             var trace = ObjectId == -120 && (category.HasCode || category.HasArgs);
             StartMethodDump(trace, category, args);
@@ -119,7 +119,7 @@ namespace Reni.Struct
                     result.CodeArgs = result.CodeArgs.Sequence(args.CodeArgs);
 
                 if(category.HasCode)
-                    result.Code = CreateArgsAndRefForFunction(args.Code).Call(_index, result.Size);
+                    result.Code = ArgsForFunction(args.Code).Call(_index, result.Size);
 
                 return ReturnMethodDump(result, true);
             }
@@ -129,7 +129,7 @@ namespace Reni.Struct
             }
         }
 
-        private CodeBase CreateArgsAndRefForFunction(CodeBase argsCode) { return CodeArgs.ToCode().Sequence(argsCode); }
+        private CodeBase ArgsForFunction(CodeBase argsCode) { return CodeArgs.ToCode().Sequence(argsCode); }
 
         private CodeBase CreateBodyCode()
         {

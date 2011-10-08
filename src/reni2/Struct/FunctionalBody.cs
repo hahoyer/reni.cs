@@ -121,7 +121,7 @@ namespace Reni.Struct
             try
             {
                 var argsResult = argsType.ArgResult(category.Typed);
-                var result = _structure.CreateFunctionCall(category, Body, argsResult);
+                var result = _structure.Call(category, Body, argsResult);
                 return ReturnMethodDump(result, true);
             }
             finally
