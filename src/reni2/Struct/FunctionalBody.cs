@@ -117,7 +117,8 @@ namespace Reni.Struct
 
         Result ObtainApplyResult(Category category, TypeBase argsType)
         {
-            StartMethodDump(false, category, argsType);
+            var trace = ObjectId == -3 && category.HasCode;
+            StartMethodDump(trace, category, argsType);
             try
             {
                 var argsResult = argsType.ArgResult(category.Typed);
