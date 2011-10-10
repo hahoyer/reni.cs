@@ -84,9 +84,6 @@ namespace Reni.Type
         internal static TypeBase Bit { get { return Cache.Bit; } }
 
         [Node]
-        [EnableDumpExcept(null)]
-        internal Size QuickSize { get { return GetSize(); } }
-        [DisableDump]
         internal Size Size
         {
             get
