@@ -137,7 +137,7 @@ namespace Reni.Type
 
         internal Result FieldReferenceViaStructReference(Category category)
         {
-            if(IsDataLess)
+            if(AccessObject.IsDataLess(this))
                 return Result(category);
             return Result(category, () => AccessPoint.ReferenceType.ArgCode(), CodeArgs.Arg);
         }
@@ -153,12 +153,7 @@ namespace Reni.Type
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
 
-        internal override Size GetSize(bool isQuick)
-        {
-            if (IsDataLess)
-                return Size.Zero;
-            return RefAlignParam.RefSize;
-        }
+        internal override Size GetSize() { return RefAlignParam.RefSize; }
 
         internal override Result DereferenceResult(Category category)
         {

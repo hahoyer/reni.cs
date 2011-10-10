@@ -51,7 +51,7 @@ namespace Reni.Struct
             [DisableDump]
             internal override Structure FindRecentStructure { get { return _parent._structure; } }
 
-            internal override Size GetSize(bool isQuick) { return Size.Zero; }
+            internal override bool IsDataLess { get { return true; } }
             internal override string DumpPrintText { get { return _parent._body.DumpPrintText + "/\\"; } }
             internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
             protected override Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
@@ -64,14 +64,13 @@ namespace Reni.Struct
             }
         }
 
-        internal sealed class AutoCallType : TypeBase
+        sealed class AutoCallType : TypeBase
         {
             [EnableDump]
             readonly FunctionalBody _parent;
 
             internal AutoCallType(FunctionalBody parent) { _parent = parent; }
-
-            internal override Size GetSize(bool isQuick) { return Size.Zero; }
+            internal override bool IsDataLess { get { return true; } }
 
             Result ValueResult(Category category)
             {

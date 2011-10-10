@@ -38,18 +38,8 @@ namespace Reni.Type
             _second = second;
         }
 
-        internal override Size GetSize(bool isQuick)
-        {
-            var firstSize = _first.GetSize(isQuick);
-            if (firstSize == null)
-                return null;
-
-            var secondSize = _second.GetSize(isQuick);
-            if (secondSize == null)
-                return null;
-
-            return firstSize + secondSize;
-        }
+        internal override bool IsDataLess { get { return _first.IsDataLess && _second.IsDataLess; } }
+        internal override Size GetSize() { return _first.Size + _second.Size; }
 
         [DisableDump]
         internal override string DumpPrintText

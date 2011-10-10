@@ -210,7 +210,7 @@ namespace Reni
                 if(HasCode)
                     return Code.Size;
                 if(HasType)
-                    return Type.GetSize(true);
+                    return Type.GetSize();
                 return null;
             }
         }

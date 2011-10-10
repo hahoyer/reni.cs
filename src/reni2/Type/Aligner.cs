@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Basics;
 
 namespace Reni.Type
@@ -62,7 +61,8 @@ namespace Reni.Type
 
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
 
-        internal override Size GetSize(bool isQuick) { return Parent.GetSize(isQuick).CheckedApply(size => size.Align(AlignBits)); }
+        internal override Size GetSize() { return Parent.Size.Align(AlignBits); }
+        internal override bool IsDataLess { get { return Parent.IsDataLess; } }
 
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }

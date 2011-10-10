@@ -33,7 +33,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
         protected override TypeBase ReversePair(TypeBase first) { return first; }
-        internal override Size GetSize(bool isQuick) { return Size.Zero; }
+        internal override bool IsDataLess { get { return true; } }
         internal override TypeBase Pair(TypeBase second) { return second; }
         internal override string DumpPrintText { get { return "void"; } }
         internal override string DumpShort() { return "void"; }

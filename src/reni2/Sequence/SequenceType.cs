@@ -68,7 +68,8 @@ namespace Reni.Sequence
         [UsedImplicitly]
         internal Type.Array InheritedType { get { return _inheritedType; } }
 
-        internal override Size GetSize(bool isQuick) { return _inheritedType.GetSize(isQuick); }
+        internal override bool IsDataLess { get { return _inheritedType.IsDataLess; } }
+        internal override Size GetSize() { return _inheritedType.Size; }
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
 

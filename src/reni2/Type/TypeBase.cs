@@ -85,14 +85,23 @@ namespace Reni.Type
 
         [Node]
         [EnableDumpExcept(null)]
-        internal Size QuickSize { get { return GetSize(true); } }
+        internal Size QuickSize { get { return GetSize(); } }
         [DisableDump]
-        internal Size Size { get { return GetSize(true) ?? GetSize(false); } }
+        internal Size Size
+        {
+            get
+            {
+                if(IsDataLess)
+                    return Size.Zero;
+                return GetSize();
+            }
+        }
 
-        internal virtual Size GetSize(bool isQuick)
+        [NotNull]
+        internal virtual Size GetSize()
         {
             NotImplementedMethod();
-            return null;
+            return Size.Zero;
         }
 
         [DisableDump]
@@ -100,11 +109,8 @@ namespace Reni.Type
         {
             get
             {
-                var size = GetSize(true);
-                if(size != null)
-                    return size.IsZero;
                 NotImplementedMethod();
-                return false;
+                return true;
             }
         }
 

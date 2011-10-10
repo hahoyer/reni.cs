@@ -36,7 +36,8 @@ namespace Reni.Type
         protected override bool IsInheritor { get { return true; } }
         internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
 
-        internal override Size GetSize(bool isQuick) { return Parent.GetSize(isQuick); }
+        internal override bool IsDataLess { get { return Parent.IsDataLess; } }
+        internal override Size GetSize() { return Parent.Size; }
         internal override string DumpShort() { return Parent.DumpShort() + "[" + TagTitle + "]"; }
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
         internal override Result ArrayDestructor(Category category, int count) { return Parent.ArrayDestructor(category, count); }

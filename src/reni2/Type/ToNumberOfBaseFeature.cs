@@ -60,7 +60,7 @@ namespace Reni.Type
         }
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Result(category); }
         TypeBase IFeature.ObjectType { get { return _type.UniqueSequence(_count); } }
-        internal override Size GetSize(bool isQuick) { return Size.Zero; }
+        internal override bool IsDataLess { get { return true; } }
         Result IMetaFeature.ObtainResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
         {
             var target = left.Evaluate(context).ToString(_type.Size);

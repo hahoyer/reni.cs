@@ -71,7 +71,8 @@ namespace Reni.Type
                 );
         }
 
-        internal override Size GetSize(bool isQuick) { return RefAlignParam.RefSize; }
+        internal override bool IsDataLess { get { return false; } }
+        internal override Size GetSize() { return RefAlignParam.RefSize; }
 
         internal override void Search(SearchVisitor searchVisitor)
         {

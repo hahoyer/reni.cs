@@ -58,8 +58,8 @@ namespace Reni.Type
         internal override int ArrayElementCount { get { return Count; } }
         [DisableDump]
         internal override bool IsArray { get { return true; } }
-
-        internal override Size GetSize(bool isQuick) { return Element.GetSize(isQuick).CheckedApply(size => size * _count); }
+        internal override bool IsDataLess { get { return Count == 0 || Element.IsDataLess; } }
+        internal override Size GetSize() { return Element.Size * _count; }
 
         internal override Result Destructor(Category category) { return Element.ArrayDestructor(category, Count); }
 
