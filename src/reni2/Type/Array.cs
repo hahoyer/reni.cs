@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -59,7 +60,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsArray { get { return true; } }
         internal override bool IsDataLess { get { return Count == 0 || Element.IsDataLess; } }
-        internal override Size GetSize() { return Element.Size * _count; }
+        protected override Size GetSize() { return Element.Size * _count; }
 
         internal override Result Destructor(Category category) { return Element.ArrayDestructor(category, Count); }
 

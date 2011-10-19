@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,10 +28,10 @@ using Reni.Code;
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class Bit : TypeBase
+    sealed class Bit : TypeBase
     {
         internal override bool IsDataLess { get { return false; } }
-        internal override Size GetSize() { return Size.Create(1); }
+        protected override Size GetSize() { return Size.Create(1); }
 
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount(TypeBase elementType) { return 1; }

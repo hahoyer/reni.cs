@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,11 +25,11 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal sealed class FunctionalFeatureType<TFeature> : TypeBase
+    sealed class FunctionalFeatureType<TFeature> : TypeBase
         where TFeature : IFunctionalFeature
     {
-        private readonly TFeature _functionalFeature;
-        private readonly RefAlignParam _refAlignParam;
+        readonly TFeature _functionalFeature;
+        readonly RefAlignParam _refAlignParam;
 
         internal FunctionalFeatureType(TFeature functionalFeature, RefAlignParam refAlignParam)
         {
@@ -37,7 +38,7 @@ namespace Reni.Type
         }
 
         internal override bool IsDataLess { get { return false; } }
-        internal override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
 

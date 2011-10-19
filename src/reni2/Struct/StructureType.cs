@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -46,7 +47,7 @@ namespace Reni.Struct
         [DisableDump]
         internal Structure Structure { get { return _structure; } }
 
-        internal override Size GetSize() { return Structure.StructSize; }
+        protected override Size GetSize() { return Structure.StructSize; }
 
         internal override string DumpShort() { return "type(" + Structure.DumpShort() + ")"; }
 
@@ -76,5 +77,4 @@ namespace Reni.Struct
 
         internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Structure.DumpPrintResultViaStructReference(category); }
     }
-
 }

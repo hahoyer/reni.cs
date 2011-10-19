@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,7 +25,7 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    internal abstract class TagChild<TParent> : Child<TParent>
+    abstract class TagChild<TParent> : Child<TParent>
         where TParent : TypeBase
     {
         protected TagChild(TParent parent)
@@ -37,7 +38,7 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
 
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
-        internal override Size GetSize() { return Parent.Size; }
+        protected override Size GetSize() { return Parent.Size; }
         internal override string DumpShort() { return Parent.DumpShort() + "[" + TagTitle + "]"; }
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
         internal override Result ArrayDestructor(Category category, int count) { return Parent.ArrayDestructor(category, count); }

@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -39,7 +40,7 @@ namespace Reni.Type
         }
 
         internal override bool IsDataLess { get { return _first.IsDataLess && _second.IsDataLess; } }
-        internal override Size GetSize() { return _first.Size + _second.Size; }
+        protected override Size GetSize() { return _first.Size + _second.Size; }
 
         [DisableDump]
         internal override string DumpPrintText
@@ -48,10 +49,10 @@ namespace Reni.Type
             {
                 var result = "";
                 var types = ToList;
-                for(var i = 0; i < types.Length; i++)
+                foreach(var t in types)
                 {
                     result += "\n";
-                    result += types[i];
+                    result += t;
                 }
                 return "(" + result.Indent() + "\n)";
             }

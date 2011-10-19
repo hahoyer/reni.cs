@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,15 +22,14 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Struct;
 using Reni.Syntax;
 
 namespace Reni.Type
 {
-    internal sealed class AutomaticReferenceType : ReferenceType, IResultProvider
+    sealed class AutomaticReferenceType : ReferenceType, IResultProvider
     {
-        private readonly RefAlignParam _refAlignParam;
+        readonly RefAlignParam _refAlignParam;
 
         internal AutomaticReferenceType(TypeBase valueType, RefAlignParam refAlignParam)
             : base(valueType)
@@ -72,7 +72,7 @@ namespace Reni.Type
         }
 
         internal override bool IsDataLess { get { return false; } }
-        internal override Size GetSize() { return RefAlignParam.RefSize; }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
 
         internal override void Search(SearchVisitor searchVisitor)
         {

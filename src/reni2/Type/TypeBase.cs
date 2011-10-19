@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -95,7 +96,7 @@ namespace Reni.Type
         }
 
         [NotNull]
-        internal virtual Size GetSize()
+        protected virtual Size GetSize()
         {
             NotImplementedMethod();
             return Size.Zero;
@@ -269,7 +270,7 @@ namespace Reni.Type
         internal virtual bool IsArray { get { return false; } }
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
-        internal SearchResult SearchDefineable<TFeature>(Defineable defineable, RefAlignParam refAlignParam)
+        internal SearchResult SearchDefineable<TFeature>(Defineable defineable)
             where TFeature : class, ITypeFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(defineable, this);
@@ -277,20 +278,6 @@ namespace Reni.Type
             if(Debugger.IsAttached)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
-        }
-
-        sealed class ConversionFunction : Reni.ConversionFunction
-        {
-            readonly TypeBase _parent;
-            readonly RefAlignParam _refAlignParam;
-            public ConversionFunction(TypeBase parent, RefAlignParam refAlignParam)
-            {
-                _parent = parent;
-                _refAlignParam = refAlignParam;
-            }
-            [DisableDump]
-            internal override TypeBase ArgType { get { return ResultType; } }
-            internal override Result Result(Category category) { return _parent.SmartReference(_refAlignParam).ArgResult(category); }
         }
 
         internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(); }
@@ -325,7 +312,7 @@ namespace Reni.Type
             try
             {
                 BreakExecution();
-                var feature = SearchDefineable<TFeature>(defineable, refAlignParam);
+                var feature = SearchDefineable<TFeature>(defineable);
                 Dump("feature", feature);
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
@@ -431,8 +418,6 @@ namespace Reni.Type
                     .UniqueAutomaticReference(refAlignParam)
                     .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
         }
-
-        internal virtual Result UnAlignedResult(Category category) { return ArgResult(category); }
 
         internal virtual bool? IsDereferencedDataLess(bool isQuick) { return Size.IsZero; }
 

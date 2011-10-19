@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -37,15 +38,15 @@ namespace Reni
 
         protected override void AssertValid()
         {
-            if (ConversionFunctions.Length == 0)
+            if(ConversionFunctions.Length == 0)
                 return;
             var lastType = Result.ObjectType;
             var result = true;
             for(var index = 0; index < ConversionFunctions.Length; index++)
             {
                 var currentType = ConversionFunctions[index];
-                if (index == 0 && lastType != currentType.ResultType && currentType.ResultType is AutomaticReferenceType)
-                    lastType = lastType.SmartReference(((AutomaticReferenceType)currentType.ResultType).RefAlignParam);
+                if(index == 0 && lastType != currentType.ResultType && currentType.ResultType is AutomaticReferenceType)
+                    lastType = lastType.SmartReference(((AutomaticReferenceType) currentType.ResultType).RefAlignParam);
                 if(lastType != currentType.ResultType)
                 {
                     result = false;

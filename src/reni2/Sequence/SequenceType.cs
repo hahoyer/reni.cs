@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,19 +28,18 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
     [Serializable]
-    internal sealed class SequenceType : TypeBase
+    sealed class SequenceType : TypeBase
     {
-        private readonly Type.Array _inheritedType;
+        readonly Type.Array _inheritedType;
 
         [DisableDump]
         internal readonly ISuffixFeature BitDumpPrintFeature;
-        private readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
+        readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
         internal Result EnableCutFeature(Category category, RefAlignParam refAlignParam)
         {
@@ -69,7 +69,7 @@ namespace Reni.Sequence
         internal Type.Array InheritedType { get { return _inheritedType; } }
 
         internal override bool IsDataLess { get { return _inheritedType.IsDataLess; } }
-        internal override Size GetSize() { return _inheritedType.Size; }
+        protected override Size GetSize() { return _inheritedType.Size; }
 
         internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
 
@@ -86,15 +86,15 @@ namespace Reni.Sequence
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            if (searchVisitor.IsSuccessFull)
+            if(searchVisitor.IsSuccessFull)
                 return;
             Element.Search(searchVisitor.Child(this));
-            if (searchVisitor.IsSuccessFull)
+            if(searchVisitor.IsSuccessFull)
                 return;
             base.Search(searchVisitor);
         }
 
-        private Result ExtendFrom(Category category, int oldCount)
+        Result ExtendFrom(Category category, int oldCount)
         {
             var result = Result
                 (
@@ -105,7 +105,7 @@ namespace Reni.Sequence
             return result;
         }
 
-        private Result RemoveElementsAtEnd(Category category, int newCount)
+        Result RemoveElementsAtEnd(Category category, int newCount)
         {
             var destructor = Element.Destructor(category);
             if(!destructor.IsEmpty)
@@ -130,7 +130,7 @@ namespace Reni.Sequence
 
         internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache.Find(refAlignParam); }
 
-        private static Result Conversion(Category category, SequenceType source, SequenceType destination)
+        static Result Conversion(Category category, SequenceType source, SequenceType destination)
         {
             var result = source.ArgResult(category.Typed);
             if(source.Count > destination.Count)
@@ -155,16 +155,15 @@ namespace Reni.Sequence
         }
 
         internal Result DumpPrintTextResult(Category category, RefAlignParam refAlignParam) { return Element.DumpPrintTextResultFromSequence(category, refAlignParam, Count); }
-        
+
         protected override Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             var sequenceDestination = destination as SequenceType;
             if(sequenceDestination != null)
-                return SequenceType.Converter(this, conversionParameter, sequenceDestination);
-            
+                return Converter(this, conversionParameter, sequenceDestination);
+
             NotImplementedMethod(conversionParameter, destination);
             return null;
         }
-
     }
 }

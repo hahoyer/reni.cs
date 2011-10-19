@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -153,7 +154,7 @@ namespace Reni.Type
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
 
-        internal override Size GetSize() { return RefAlignParam.RefSize; }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
 
         internal override Result DereferenceResult(Category category)
         {
