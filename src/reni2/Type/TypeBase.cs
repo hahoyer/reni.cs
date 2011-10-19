@@ -38,7 +38,7 @@ using Reni.TokenClasses;
 namespace Reni.Type
 {
     [Serializable]
-    abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider, IResultProvider
+    abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         sealed class Cache
         {
@@ -420,8 +420,6 @@ namespace Reni.Type
         }
 
         internal virtual bool? IsDereferencedDataLess(bool isQuick) { return Size.IsZero; }
-
-        Result IResultProvider.Result(Category category) { return ArgResult(category); }
     }
 
     interface IMetaFeature

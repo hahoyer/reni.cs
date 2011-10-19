@@ -23,11 +23,10 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Struct;
-using Reni.Syntax;
 
 namespace Reni.Type
 {
-    sealed class AutomaticReferenceType : ReferenceType, IResultProvider
+    sealed class AutomaticReferenceType : ReferenceType
     {
         readonly RefAlignParam _refAlignParam;
 

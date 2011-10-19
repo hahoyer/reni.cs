@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,18 +25,17 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Sequence;
-using Reni.Syntax;
 
 namespace Reni.Type
 {
-    sealed class TextItemType : TagChild<TypeBase>, IResultProvider
+    sealed class TextItemType : TagChild<TypeBase>
     {
         [DisableDump]
         public readonly ISearchPath<ISuffixFeature, SequenceType> ToNumberOfBaseFeature;
-        
+
         public TextItemType(TypeBase parent)
             : base(parent) { ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this); }
-        
+
         protected override string TagTitle { get { return "text_item"; } }
 
         internal override void Search(SearchVisitor searchVisitor)

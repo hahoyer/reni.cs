@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -22,7 +23,6 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Sequence;
 using Reni.Struct;
-using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -39,15 +39,15 @@ namespace Reni
         internal SearchVisitor Child(TextItemType target) { return InternalChild(target); }
 
         internal void ChildSearch<TType>(TType target)
-            where TType : IDumpShortProvider, IResultProvider { InternalChild(target).Search(); }
+            where TType : IDumpShortProvider { InternalChild(target).Search(); }
 
         protected abstract SearchVisitor InternalChild<TType>(TType target)
-            where TType : IResultProvider, IDumpShortProvider;
+            where TType : IDumpShortProvider;
 
         internal abstract bool IsSuccessFull { get; }
         internal abstract ConversionFunction[] ConversionFunctions { set; get; }
         internal void Add(ConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
-        
+
         internal void Search(TypeBase type, ConversionFunction conversionFunction)
         {
             if(IsSuccessFull)
@@ -61,7 +61,6 @@ namespace Reni
     abstract class SearchVisitor<TFeature> : SearchVisitor
         where TFeature : class
     {
-        protected SearchVisitor() {}
         internal abstract TFeature InternalResult { set; }
         internal abstract Defineable Defineable { get; }
 
