@@ -55,7 +55,7 @@ namespace Reni.Struct
             [DisableDump]
             protected abstract TypeBase ArgsType { get; }
             [DisableDump]
-            internal override bool IsDataLess { get { return _parent.IsObjectForCallRequired; } }
+            internal override bool IsDataLess { get { return !_parent.IsObjectForCallRequired; } }
             [DisableDump]
             protected abstract string Tag { get; }
 
