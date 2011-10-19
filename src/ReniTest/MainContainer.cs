@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project reniTest
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -43,17 +44,12 @@ namespace ReniTest
             if(false)
                 ExecTest();
 
-            //CompilerTest.Run("Test", "(-1234) dump_print", "-1234");
-            //RunSpecificTest();
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
             //Reni.Proof.Main.Run();
         }
-
-        [Test]
-        static void RunSpecificTest() { new TypeNameExtenderTest().TestMethod(); }
 
         const string Target = @"
 f1: ((
