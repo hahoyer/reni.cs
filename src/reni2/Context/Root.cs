@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,9 +22,9 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Feature;
 using Reni.Struct;
 using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.Context
 {
@@ -59,5 +60,6 @@ namespace Reni.Context
             var functionInstance = _functions.Find(body, structure, alignedArgsResult.Type);
             return functionInstance.Call(category, alignedArgsResult);
         }
+
     }
 }

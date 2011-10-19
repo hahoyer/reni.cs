@@ -52,9 +52,9 @@ namespace Reni.Context
         internal int Count { get { return _list.Count; } }
         internal CodeBase[] Code { get { return _list.Select(t => t.BodyCode).ToArray(); } }
 
-        internal FunctionInstance Find(CompileSyntax body, Structure structure, TypeBase args)
+        internal FunctionInstance Find(CompileSyntax body, Structure structure, TypeBase argsType)
         {
-            var index = _dictionary.Find(body).Find(structure).Find(args);
+            var index = _dictionary.Find(body).Find(structure).Find(argsType);
             return _list[index];
         }
 

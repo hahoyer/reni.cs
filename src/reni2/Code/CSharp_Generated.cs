@@ -57,7 +57,7 @@ namespace Reni.Code
             
             #line default
             #line hidden
-            this.Write("\t}\r\n}\r\n\r\n");
+            this.Write("    }\r\n}\r\n\r\n");
             return this.GenerationEnvironment.ToString();
         }
         

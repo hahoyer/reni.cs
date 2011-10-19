@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -31,7 +32,7 @@ namespace Reni.Struct
     {
         readonly CompileSyntax _body;
         readonly Structure _structure;
-        readonly SimpleCache<Type> _typeCache;
+        readonly SimpleCache<CallType> _typeCache;
         readonly SimpleCache<AutoCallType> _autoCallCache;
 
         internal FunctionalBody(Structure structure, CompileSyntax body)
@@ -39,21 +40,39 @@ namespace Reni.Struct
             _structure = structure;
             _body = body;
             _autoCallCache = new SimpleCache<AutoCallType>(() => new AutoCallType(this));
-            _typeCache = new SimpleCache<Type>(() => new Type(this));
+            _typeCache = new SimpleCache<CallType>(() => new CallType(this));
             StopByObjectId(-1);
         }
 
-        internal sealed class Type : TypeBase
+        internal abstract class Type : TypeBase
         {
             readonly FunctionalBody _parent;
-            public Type(FunctionalBody parent) { _parent = parent; }
+
+            protected Type(FunctionalBody parent) { _parent = parent; }
 
             [DisableDump]
             internal override Structure FindRecentStructure { get { return _parent._structure; } }
+            [DisableDump]
+            protected abstract TypeBase ArgsType { get; }
+            [DisableDump]
+            internal override bool IsDataLess { get { return _parent.IsObjectForCallRequired; } }
+            [DisableDump]
+            protected abstract string Tag { get; }
 
-            internal override bool IsDataLess { get { return true; } }
-            internal override string DumpPrintText { get { return _parent._body.DumpPrintText + "/\\"; } }
+            internal override string DumpPrintText { get { return _parent._body.DumpPrintText + Tag; } }
             internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
+
+            protected override Size GetSize() { return _parent.RefAlignParam.RefSize; }
+            protected Result ObtainApplyResult(Category category) { return _parent.ObtainApplyResult(category, ArgsType); }
+        }
+
+        internal sealed class CallType : Type
+        {
+            public CallType(FunctionalBody parent)
+                : base(parent) { }
+
+            protected override TypeBase ArgsType { get { return null; } }
+
             protected override Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
             {
                 var arrayDestination = destination as Reni.Type.Array;
@@ -62,27 +81,21 @@ namespace Reni.Struct
                 NotImplementedMethod(conversionParameter, destination);
                 return null;
             }
+            protected override string Tag { get { return "/\\"; } }
         }
 
-        sealed class AutoCallType : TypeBase
+        sealed class AutoCallType : Type
         {
-            [EnableDump]
-            readonly FunctionalBody _parent;
+            internal AutoCallType(FunctionalBody parent)
+                : base(parent) { }
 
-            internal AutoCallType(FunctionalBody parent) { _parent = parent; }
-            internal override bool IsDataLess { get { return true; } }
 
-            Result ValueResult(Category category)
-            {
-                return _parent
-                    .ObtainApplyResult(category, Void)
-                    .ReplaceArg(Void.Result(category.Typed));
-            }
+            Result ValueResult(Category category) { return ObtainApplyResult(category).ReplaceArg(Void.Result(category.Typed)); }
 
             internal override void Search(SearchVisitor searchVisitor)
             {
                 base.Search(searchVisitor);
-                searchVisitor.Search(ValueType,new ConversionFunction(this));
+                searchVisitor.Search(ValueType, new ConversionFunction(this));
             }
 
             sealed class ConversionFunction : Reni.ConversionFunction
@@ -96,7 +109,14 @@ namespace Reni.Struct
 
             [DisableDump]
             TypeBase ValueType { get { return ValueResult(Category.Type).Type; } }
+            [DisableDump]
+            protected override TypeBase ArgsType { get { return Void; } }
+            [DisableDump]
+            protected override string Tag { get { return "/!\\"; } }
         }
+
+        [DisableDump]
+        bool IsObjectForCallRequired { get { return _structure.IsObjectForCallRequired(Body); } }
 
         [DisableDump]
         CompileSyntax Body { get { return _body; } }
@@ -106,9 +126,11 @@ namespace Reni.Struct
 
         protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
         {
-            Tracer.Assert(refAlignParam == _structure.RefAlignParam);
+            Tracer.Assert(refAlignParam == RefAlignParam);
             return _structure.ContextReferenceViaStructReference(result);
         }
+
+        RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + _structure.ObjectId + "#)#"; }
 

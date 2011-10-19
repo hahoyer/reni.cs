@@ -35,7 +35,7 @@ namespace ReniTest
         for(var i = 0; i < _functions.Count; i++)
             GenerateCSharpFunctionCode(_functions[i], Generator.FunctionName(i), true);
 	#>
-	}
+    }
 }
 
 <#+ 
