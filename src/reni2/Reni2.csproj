@@ -176,8 +176,11 @@
     <Compile Include="Sequence\Slash.cs" />
     <Compile Include="Sequence\Star.cs" />
     <Compile Include="Struct\AccessManager.cs" />
+    <Compile Include="Struct\AutoCallType.cs" />
+    <Compile Include="Struct\CallType.cs" />
     <Compile Include="Struct\ContainerContextObject.cs" />
     <Compile Include="Struct\Context.cs" />
+    <Compile Include="Struct\FunctionalBodyType.cs" />
     <Compile Include="Struct\FunctionInstance.cs" />
     <Compile Include="Struct\Structure.cs" />
     <Compile Include="Struct\StructureType.cs" />

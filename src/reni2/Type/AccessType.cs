@@ -127,9 +127,9 @@ namespace Reni.Type
 
         Result ValueReferenceViaFieldReference(Category category)
         {
-            return AccessObject
-                .ValueReferenceViaFieldReference(category, this)
-                .AssertEmptyOrValidReference();
+            var result = AccessObject.ValueReferenceViaFieldReference(category, this);
+            //result.AssertVoidOrValidReference();
+            return result;
         }
 
         internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode, CodeArgs.Arg); }
@@ -153,17 +153,16 @@ namespace Reni.Type
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
 
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
-
-        internal override Result DereferenceResult(Category category)
+        protected override Result DereferenceResult(Category category)
         {
             return ValueReferenceViaFieldReference(category)
                 .AutomaticDereference();
         }
-        internal override Result ToAutomaticReferenceResult(Category category)
+        protected override Result ToAutomaticReferenceResult(Category category)
         {
-            return ValueReferenceViaFieldReference(category)
-                .AssertEmptyOrValidReference();
+            var result = ValueReferenceViaFieldReference(category);
+            //result.AssertEmptyOrValidReference();
+            return result;
         }
     }
 }

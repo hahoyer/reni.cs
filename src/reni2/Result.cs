@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -515,15 +516,15 @@ namespace Reni
 
         internal Result ReplaceArg(Result resultForArg)
         {
-            if (HasArg && resultForArg != null)
-                return InternalReplaceArg(category=>resultForArg);
+            if(HasArg && resultForArg != null)
+                return InternalReplaceArg(category => resultForArg);
             return this;
         }
 
         Result InternalReplaceArg(Func<Category, Result> resultForArg)
         {
             var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
-            if (HasCode)
+            if(HasCode)
                 result.Code = Code.ReplaceArg(resultForArg(Category.Type | Category.Code));
             if(HasArgs)
                 result.CodeArgs = CodeArgs.WithoutArg() + resultForArg(Category.CodeArgs).CodeArgs;
@@ -674,7 +675,7 @@ namespace Reni
 
         internal Result SmartLocalReferenceResult(RefAlignParam refAlignParam)
         {
-            if (Type.IsDataLess)
+            if(Type.IsDataLess)
                 return this;
             return Type
                 .SmartLocalReferenceResult(CompleteCategory, refAlignParam)
@@ -688,67 +689,64 @@ namespace Reni
         }
 
         [DebuggerHidden]
-        internal Result AssertVoidOrValidReference()
+        internal void AssertVoidOrValidReference()
         {
             var size = FindSize;
             if(size != null)
-                Tracer.Assert(size.IsZero || size == Root.DefaultRefAlignParam.RefSize, Dump);
+                Tracer.Assert(size.IsZero || size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: 0 or RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is Type.Void || Type is ReferenceType, Dump);
-            return this;
+                Tracer.Assert(Type is Type.Void || Type is ReferenceType, () => "Expected type: Void or ReferenceType\n" + Dump());
         }
 
         [DebuggerHidden]
-        internal Result AssertValidReference()
+        internal void AssertValidReference()
         {
             var size = FindSize;
             if(size != null)
-                Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, Dump);
+                Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is ReferenceType, Dump);
-            return this;
+                Tracer.Assert(Type is ReferenceType, () => "Expected type: ReferenceType\n" + Dump());
         }
 
         [DebuggerHidden]
-        internal Result AssertEmptyOrValidReference()
+        internal void AssertEmptyOrValidReference()
         {
             if(FindIsDataLess == true)
-                return this;
+                return;
 
             var size = FindSize;
             if(size != null)
             {
                 if(size.IsZero)
-                    return this;
-                Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, Dump);
+                    return;
+                Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: 0 or RefSize\n" + Dump());
             }
 
             if(HasType)
-                Tracer.Assert(Type is ReferenceType, Dump);
-            return this;
+                Tracer.Assert(Type is ReferenceType, () => "Expected type: ReferenceType\n" + Dump());
         }
 
         public void Amend(Category category, TypeBase type)
         {
-            if (category.HasType)
+            if(category.HasType)
                 Tracer.Assert(CompleteCategory.HasType);
-            if (category.HasCode)
+            if(category.HasCode)
                 Tracer.Assert(CompleteCategory.HasCode);
-            if (category.HasArgs && !CompleteCategory.HasArgs)
+            if(category.HasArgs && !CompleteCategory.HasArgs)
                 CodeArgs = Code.CodeArgs;
-            if (category.HasSize && !CompleteCategory.HasSize)
-                Size = 
-                    CompleteCategory.HasCode ? Code.Size : 
-                    CompleteCategory.HasType ? Type.Size :
-                    type.Size;
-            if (category.HasIsDataLess && !CompleteCategory.HasIsDataLess)
+            if(category.HasSize && !CompleteCategory.HasSize)
+                Size =
+                    CompleteCategory.HasCode ? Code.Size :
+                                                             CompleteCategory.HasType ? Type.Size :
+                                                                                                      type.Size;
+            if(category.HasIsDataLess && !CompleteCategory.HasIsDataLess)
                 IsDataLess =
                     CompleteCategory.HasCode ? Code.Size.IsZero :
-                    CompleteCategory.HasSize ? Size.IsZero :
-                    CompleteCategory.HasType ? Type.IsDataLess:
-                    type.IsDataLess;
+                                                                    CompleteCategory.HasSize ? Size.IsZero :
+                                                                                                               CompleteCategory.HasType ? Type.IsDataLess :
+                                                                                                                                                              type.IsDataLess;
         }
     }
 

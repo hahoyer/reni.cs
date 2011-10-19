@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -22,7 +23,6 @@ using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Struct;
 
 namespace Reni.Type
 {
@@ -35,18 +35,19 @@ namespace Reni.Type
         [DisableDump]
         internal abstract RefAlignParam RefAlignParam { get; }
 
-        internal virtual TypeBase ValueType { get { return _valueType; } }
+        internal TypeBase ValueType { get { return _valueType; } }
 
         [DisableDump]
         internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
         [DisableDump]
         internal override bool IsArray { get { return ValueType.IsArray; } }
 
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
         internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator(); }
 
-        internal abstract Result DereferenceResult(Category category);
+        protected abstract Result DereferenceResult(Category category);
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
 
         internal override void Search(SearchVisitor searchVisitor)
@@ -76,7 +77,7 @@ namespace Reni.Type
 
         internal override Result ReferenceInCode(Category category, IReferenceInCode target) { return ValueType.ReferenceInCode(category, target); }
 
-        internal abstract Result ToAutomaticReferenceResult(Category category);
+        protected abstract Result ToAutomaticReferenceResult(Category category);
 
         Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
         {

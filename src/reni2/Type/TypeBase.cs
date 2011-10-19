@@ -389,7 +389,7 @@ namespace Reni.Type
             if(IsDataLess && destination is Void)
                 return new FunctionalConverter(c => Void.Result(c, ArgResult(c)));
 
-            var functionalSource = this as FunctionalBody.CallType;
+            var functionalSource = this as CallType;
             if(functionalSource != null)
                 return functionalSource.ConverterForUnalignedTypes(conversionParameter, destination);
 

@@ -61,7 +61,7 @@ namespace Reni.Type
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
 
-        internal override Result DereferenceResult(Category category)
+        protected override Result DereferenceResult(Category category)
         {
             return ValueType.Result
                 (category
@@ -71,7 +71,6 @@ namespace Reni.Type
         }
 
         internal override bool IsDataLess { get { return false; } }
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
@@ -79,7 +78,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
+        protected override Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
 
         internal Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category, RefAlignParam); }
     }
