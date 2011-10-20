@@ -118,7 +118,7 @@ namespace Reni.ReniParser
                        {"+", new Sign()},
                        {"/", new Slash()},
                        {"/!\\", new AutoCallFunction()},
-                       {"/\\", new CallableFunction()},
+                       {"/\\", new CallFunction()},
                        {"*", new Star()},
                        {"_A_T_", new AtToken()},
                        {"arg", new ArgToken()},

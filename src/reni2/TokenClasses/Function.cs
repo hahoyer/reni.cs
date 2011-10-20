@@ -40,9 +40,9 @@ namespace Reni.TokenClasses
         }
     }
 
-    sealed class CallableFunction : Function
+    sealed class CallFunction : Function
     {
-        public CallableFunction()
+        public CallFunction()
             : base(false) { }
     }
 

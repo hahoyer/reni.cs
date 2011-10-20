@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -64,7 +65,6 @@ namespace Reni.Code
 
         void IVisitor.Drop(Size beforeSize, Size afterSize) { throw new NotImplementedException(); }
         void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) { throw new NotImplementedException(); }
-        void IVisitor.ReferenceCode(IReferenceInCode context) { throw new NotImplementedException(); }
         void IVisitor.TopData(Size offset, Size size, Size dataSize) { throw new NotImplementedException(); }
         void IVisitor.TopFrameRef(Size offset) { throw new NotImplementedException(); }
 
@@ -79,6 +79,7 @@ namespace Reni.Code
         void IVisitor.BitCast(Size size, Size targetSize, Size significantSize) { AddCode("data.Push(data.Pull({0}).BitCast({1}).BitCast({2}))", targetSize.SaveByteCount, significantSize.ToInt(), size.ToInt()); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) { AddCode("data.Pull({0}).PrintText({1})", leftSize.SaveByteCount, itemSize.SaveByteCount); }
         void IVisitor.RecursiveCall() { AddCode("goto Start"); }
+        void IVisitor.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextReference(context); }
 
         void IVisitor.Call(Size size, int functionIndex, Size argsAndRefsSize)
         {

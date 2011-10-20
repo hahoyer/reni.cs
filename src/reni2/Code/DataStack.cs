@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,7 +24,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Runtime;
 
 namespace Reni.Code
 {

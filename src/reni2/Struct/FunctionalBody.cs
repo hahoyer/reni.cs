@@ -32,7 +32,7 @@ namespace Reni.Struct
     {
         readonly CompileSyntax _body;
         internal readonly Structure Structure;
-        readonly SimpleCache<CallType> _typeCache;
+        readonly SimpleCache<CallType> _callCache;
         readonly SimpleCache<AutoCallType> _autoCallCache;
 
         internal FunctionalBody(Structure structure, CompileSyntax body)
@@ -40,7 +40,7 @@ namespace Reni.Struct
             Structure = structure;
             _body = body;
             _autoCallCache = new SimpleCache<AutoCallType>(() => new AutoCallType(this));
-            _typeCache = new SimpleCache<CallType>(() => new CallType(this));
+            _callCache = new SimpleCache<CallType>(() => new CallType(this));
             StopByObjectId(-1);
         }
 
@@ -93,7 +93,7 @@ namespace Reni.Struct
         {
             if(isAutoCall)
                 return _autoCallCache.Value;
-            return _typeCache.Value;
+            return _callCache.Value;
         }
     }
 }
