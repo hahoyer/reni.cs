@@ -82,14 +82,19 @@ namespace Reni.Type
         
         Result ConverterResult(Category category)
         {
-            var trace = ObjectId == -4;
+            var trace = ObjectId == 6 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
-                BreakExecution();
                 var result = ConversionFunctions[0].Result(category);
                 for (var i = 1; i < ConversionFunctions.Length; i++)
+                {
+                    Dump("result", result);
+                    Dump("i", i);
+                    Dump("resultForArg", ConversionFunctions[i].Result(category.Typed));
+                    BreakExecution();
                     result = result.ReplaceArg(ConversionFunctions[i].Result);
+                }
                 return ReturnMethodDump(result, true);
             }
             finally
