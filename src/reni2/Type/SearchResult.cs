@@ -44,7 +44,7 @@ namespace Reni.Type
 
         internal Result Result(Category category, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -10 && category.HasCode;
+            var trace = ObjectId == 6 && category.HasCode;
             StartMethodDump(trace, category, refAlignParam);
             try
             {
