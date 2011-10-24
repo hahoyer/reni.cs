@@ -45,7 +45,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal bool IsObjectForCallRequired { get { return Structure.IsObjectForCallRequired(Body); } }
+        internal bool IsObjectForCallRequired { get { return !Structure.IsDataLess && Structure.IsObjectForCallRequired(Body); } }
 
         [DisableDump]
         internal CompileSyntax Body { get { return _body; } }

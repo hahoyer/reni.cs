@@ -40,10 +40,11 @@ namespace Reni.Struct
         internal override bool IsDataLess { get { return !_parent.IsObjectForCallRequired; } }
         [DisableDump]
         protected abstract string Tag { get; }
+        [DisableDump]
+        protected RefAlignParam RefAlignParam { get { return _parent.RefAlignParam; } }
         internal override string DumpPrintText { get { return _parent.Body.DumpPrintText + Tag; } }
         internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
 
-        protected override Size GetSize() { return _parent.RefAlignParam.RefSize; }
-        protected Result ObtainApplyResult(Category category) { return _parent.ObtainApplyResult(category, ArgsType); }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
     }
 }

@@ -32,7 +32,7 @@ namespace Reni.Struct
             : base(parent) { }
 
 
-        Result ValueResult(Category category) { return ObtainApplyResult(category).ReplaceArg(Void.Result(category.Typed)); }
+        Result ValueResult(Category category) { return FunctionalFeature.ApplyResult(category, Void.Result(category.Typed), RefAlignParam); }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
