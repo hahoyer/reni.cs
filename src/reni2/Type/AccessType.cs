@@ -132,8 +132,17 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result ValueReferenceViaFieldReferenceField(Category category) { return ValueTypeReference.Result(category, ValueReferenceViaFieldReferenceCode, CodeArgs.Arg); }
-        internal Result ValueReferenceViaFieldReferenceFunction(Category category) { return ValueType.Result(category); }
+        internal Result ValueReferenceViaFieldReferenceField(Category category)
+        {
+            return ValueTypeReference
+                .Result(category, ValueReferenceViaFieldReferenceCode, CodeArgs.Arg);
+        }
+        
+        internal Result ValueReferenceViaFieldReferenceFunction(Category category)
+        {
+            return ValueType
+                .ArgResult(category);
+        }
 
         internal Result FieldReferenceViaStructReference(Category category)
         {
@@ -149,7 +158,12 @@ namespace Reni.Type
             NotImplementedMethod();
             return null;
         }
-        CodeBase ObtainValueReferenceViaFieldReferenceCode() { return ArgCode().AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position)); }
+
+        CodeBase ObtainValueReferenceViaFieldReferenceCode()
+        {
+            return ArgCode()
+                .AddToReference(RefAlignParam, AccessPoint.FieldOffset(Position));
+        }
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
 

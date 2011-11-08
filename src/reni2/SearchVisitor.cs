@@ -50,11 +50,23 @@ namespace Reni
 
         internal void Search(TypeBase type, ConversionFunction conversionFunction)
         {
-            if(IsSuccessFull)
+            if (IsSuccessFull)
                 return;
             type.Search(this);
-            if(IsSuccessFull)
+            if (!IsSuccessFull)
+                return;
+
+            var trace = conversionFunction.ObjectId == 4;
+            StartMethodDump(trace, type,conversionFunction);
+            try
+            {
+                BreakExecution();
                 Add(conversionFunction);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
     }
 

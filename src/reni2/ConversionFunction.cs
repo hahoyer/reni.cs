@@ -27,6 +27,11 @@ namespace Reni
 {
     abstract class ConversionFunction : ReniObject
     {
+        static int _nextObjectId;
+        protected ConversionFunction()
+            : base(_nextObjectId++)
+        {
+        }
         internal abstract Result Result(Category category);
         [DisableDump]
         internal abstract TypeBase ArgType { get; }
