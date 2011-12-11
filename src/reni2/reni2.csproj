@@ -67,8 +67,6 @@
     <Compile Include="Code\LocalVariableAccess.cs" />
     <Compile Include="Code\LocalVariableDefinition.cs" />
     <Compile Include="Code\LocalVariableReference.cs" />
-    <Compile Include="Code\Multiplyop.cs" />
-    <Compile Include="Code\Op.cs" />
     <Compile Include="Code\ListStack.cs" />
     <Compile Include="Code\RecursiveCall.cs" />
     <Compile Include="Code\RecursiveCallCandidate.cs" />

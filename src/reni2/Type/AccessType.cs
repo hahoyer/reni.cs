@@ -137,11 +137,11 @@ namespace Reni.Type
             return ValueTypeReference
                 .Result(category, ValueReferenceViaFieldReferenceCode, CodeArgs.Arg);
         }
-        
+
         internal Result ValueReferenceViaFieldReferenceFunction(Category category)
         {
             return ValueType
-                .ArgResult(category);
+                .Result(category, ArgResult(category.Typed));
         }
 
         internal Result FieldReferenceViaStructReference(Category category)

@@ -53,9 +53,10 @@ namespace Reni.Type
                  , () => newElementResult.CodeArgs + CodeArgs.Arg()
                 );
         }
-        Result IFunctionalFeature.ObjectConversion(Category category) { return null; }
+        public TypeBase ObjectReference(RefAlignParam refAlignParam) { return _type.UniqueAutomaticReference(refAlignParam); }
+        public Result ObjectConversion(Category category) { return null; }
 
-        bool IFunctionalFeature.IsDataLessObjectType
+        public bool IsDataLessObjectType
         {
             get
             {
@@ -63,5 +64,6 @@ namespace Reni.Type
                 return false;
             }
         }
+
     }
 }

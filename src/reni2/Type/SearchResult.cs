@@ -44,7 +44,7 @@ namespace Reni.Type
 
         internal Result Result(Category category, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == 6 && category.HasCode;
+            var trace = ObjectId == -6 && category.HasCode;
             StartMethodDump(trace, category, refAlignParam);
             try
             {
@@ -86,15 +86,14 @@ namespace Reni.Type
             StartMethodDump(trace, category);
             try
             {
-                var result = ConversionFunctions[0].Result(category);
-                for (var i = 1; i < ConversionFunctions.Length; i++)
-                {
-                    Dump("result", result);
-                    Dump("i", i);
-                    Dump("resultForArg", ConversionFunctions[i].Result(category.Typed));
-                    BreakExecution();
-                    result = result.ReplaceArg(ConversionFunctions[i].Result);
-                }
+                var results = ConversionFunctions.Select((cf,i)=> cf.Result(i==0?category:category.Typed)).ToArray();
+                Dump("results", results);
+                BreakExecution();
+
+                var result = results[0];
+                for(var i = 1; i < results.Length; i++)
+                    result = result.ReplaceArg(results[i]);
+                
                 return ReturnMethodDump(result, true);
             }
             finally

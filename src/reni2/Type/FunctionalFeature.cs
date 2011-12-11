@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -63,9 +64,7 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
-        Result IFunctionalFeature.ObjectConversion(Category category) { return null; }
-
-        bool IFunctionalFeature.IsDataLessObjectType { get { return ObjectType.IsDataLess; } }
+        public TypeBase ObjectReference(RefAlignParam refAlignParam) { return ObjectType.UniqueAutomaticReference(refAlignParam); }
 
         protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         protected abstract TypeBase ObjectType { get; }

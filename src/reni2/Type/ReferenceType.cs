@@ -59,10 +59,21 @@ namespace Reni.Type
         sealed class ConversionFunction : Reni.ConversionFunction
         {
             readonly ReferenceType _parent;
-            public ConversionFunction(ReferenceType parent) { _parent = parent; }
-            internal override Result Result(Category category) { return _parent.ToAutomaticReferenceResult(category); }
-            [DisableDump]
-            internal override TypeBase ArgType { get { return _parent; } }
+            public ConversionFunction(ReferenceType parent):base(parent) { _parent = parent; }
+            internal override Result Result(Category category) {
+                var trace = ObjectId == 4 && category.HasCode;
+                StartMethodDump(trace, category);
+                try
+                {
+                    BreakExecution();
+                    var result = _parent.ToAutomaticReferenceResult(category);
+                    return ReturnMethodDump(result,true);
+                }
+                finally
+                {
+                    EndMethodDump();
+                }
+            }
         }
 
         internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)

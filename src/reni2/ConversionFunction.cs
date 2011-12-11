@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,16 +26,15 @@ using Reni.Type;
 
 namespace Reni
 {
-    abstract class ConversionFunction : ReniObject
+    abstract class ConversionFunction: ReniObject
     {
+        readonly TypeBase _parent;
         static int _nextObjectId;
-        protected ConversionFunction()
-            : base(_nextObjectId++)
-        {
-        }
+        protected ConversionFunction(TypeBase parent)
+            : base(_nextObjectId++) { _parent = parent; }
         internal abstract Result Result(Category category);
         [DisableDump]
-        internal abstract TypeBase ArgType { get; }
+        internal TypeBase ArgType { get { return _parent; } }
         [DisableDump]
         internal TypeBase ResultType { get { return Result(Category.Type).Type; } }
 

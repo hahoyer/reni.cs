@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -45,7 +46,7 @@ namespace Reni.Type
         internal override void Search(SearchVisitor searchVisitor)
         {
             base.Search(searchVisitor);
-            if (searchVisitor.IsSuccessFull)
+            if(searchVisitor.IsSuccessFull)
                 return;
             if(IsInheritor)
                 searchVisitor.Search(Parent, new ConversionFunction(this));
@@ -54,9 +55,9 @@ namespace Reni.Type
         sealed class ConversionFunction : Reni.ConversionFunction
         {
             readonly Child<TParent> _parent;
-            public ConversionFunction(Child<TParent> parent) { _parent = parent; }
+            public ConversionFunction(Child<TParent> parent)
+                : base(parent) { _parent = parent; }
             internal override Result Result(Category category) { return _parent.ChildConversionResult(category); }
-            internal override TypeBase ArgType { get { return _parent; } }
         }
 
         protected abstract Result ChildConversionResult(Category category);

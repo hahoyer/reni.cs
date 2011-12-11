@@ -31,8 +31,19 @@ namespace Reni.Struct
         internal AutoCallType(FunctionalBody parent)
             : base(parent) { }
 
-
-        Result ValueResult(Category category) { return FunctionalFeature.ApplyResult(category, Void.Result(category.Typed), RefAlignParam); }
+        Result ValueResult(Category category)
+        {
+            var trace = ObjectId == -1 &&  category.HasCode;
+            StartMethodDump(trace, category);
+            try
+            {
+                return ReturnMethodDump(FunctionalFeature.ApplyResult(category, Void.Result(category.Typed), RefAlignParam), true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
@@ -43,9 +54,7 @@ namespace Reni.Struct
         sealed class ConversionFunction : Reni.ConversionFunction
         {
             readonly AutoCallType _parent;
-            public ConversionFunction(AutoCallType parent) { _parent = parent; }
-            [DisableDump]
-            internal override TypeBase ArgType { get { return _parent; } }
+            public ConversionFunction(AutoCallType parent):base(parent) { _parent = parent; }
             internal override Result Result(Category category) { return _parent.ValueResult(category); }
         }
 
@@ -55,5 +64,7 @@ namespace Reni.Struct
         protected override TypeBase ArgsType { get { return Void; } }
         [DisableDump]
         protected override string Tag { get { return "/!\\"; } }
+        [DisableDump]
+        TypeBase ObjectReference { get { return FunctionalFeature.ObjectReference(RefAlignParam); } }
     }
 }

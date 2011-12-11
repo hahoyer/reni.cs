@@ -56,7 +56,7 @@ namespace Reni
             if (!IsSuccessFull)
                 return;
 
-            var trace = conversionFunction.ObjectId == 4;
+            var trace = conversionFunction.ObjectId == -4;
             StartMethodDump(trace, type,conversionFunction);
             try
             {

@@ -37,7 +37,7 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _context = context;
-            StopByObjectId(0);
+            StopByObjectId(-10);
         }
 
         [Node]
