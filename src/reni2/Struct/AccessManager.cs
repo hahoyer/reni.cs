@@ -38,7 +38,7 @@ namespace Reni.Struct
         {
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFunctionResult(category); }
             Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType) { return accessType.ValueReferenceViaFieldReferenceFunction(category); }
-            bool IAccessObject.IsDataLess(AccessType accessType) { return true; }
+            bool IAccessObject.IsDataLess(AccessType accessType) { return accessType.ValueType.IsDataLess; }
         }
 
         sealed class FieldAccessObject : ReniObject, IAccessObject
