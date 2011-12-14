@@ -61,7 +61,7 @@ namespace Reni.Type
             readonly ReferenceType _parent;
             public ConversionFunction(ReferenceType parent):base(parent) { _parent = parent; }
             internal override Result Result(Category category) {
-                var trace = ObjectId == 4 && category.HasCode;
+                var trace = ObjectId == -4 && category.HasCode;
                 StartMethodDump(trace, category);
                 try
                 {

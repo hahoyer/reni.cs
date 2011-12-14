@@ -140,8 +140,25 @@ namespace Reni.Type
 
         internal Result ValueReferenceViaFieldReferenceFunction(Category category)
         {
-            return ValueType
-                .Result(category, ArgResult(category.Typed));
+            var trace = ObjectId == -14 && category.HasCode;
+            StartMethodDump(trace, category);
+            try
+            {
+                BreakExecution();
+                var argResult = ArgResult(category.Typed);
+                Dump("argResult", argResult);
+                BreakExecution();
+                var valueType = ValueType;
+                Dump("valueType", valueType);
+                BreakExecution();
+                var result = valueType.Result(category, argResult);
+                return ReturnMethodDump(result,true);
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Result FieldReferenceViaStructReference(Category category)

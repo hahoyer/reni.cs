@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,7 +28,7 @@ using Reni.Parser;
 namespace Reni.TokenClasses
 {
     [Serializable]
-    internal sealed class ArgToken : Terminal
+    sealed class ArgToken : Terminal
     {
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
@@ -35,6 +36,13 @@ namespace Reni.TokenClasses
                 .FindRecentFunctionContextObject
                 .CreateArgsReferenceResult(category);
         }
-        public override bool? QuickIsDereferencedDataLess(ContextBase context, TokenData token) { return context.ObtainRecentFunctionContext().ArgsType.IsDereferencedDataLess(true); }
+
+        public override bool? QuickIsDereferencedDataLess(ContextBase context, TokenData token)
+        {
+            return context
+                .ObtainRecentFunctionContext()
+                .ArgsType
+                .IsDereferencedDataLess(true);
+        }
     }
 }
