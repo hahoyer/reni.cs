@@ -33,11 +33,12 @@ namespace Reni.Struct
 
         Result ValueResult(Category category)
         {
-            var trace = ObjectId == -1 &&  category.HasCode;
+            var trace = ObjectId == -13 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
-                return ReturnMethodDump(FunctionalFeature.ApplyResult(category, Void.Result(category.Typed), RefAlignParam), true);
+                var result = FunctionalFeature.ApplyResult(category, Void.Result(category.Typed), RefAlignParam);
+                return ReturnMethodDump(result, true);
             }
             finally
             {
@@ -54,8 +55,9 @@ namespace Reni.Struct
         sealed class ConversionFunction : Reni.ConversionFunction
         {
             readonly AutoCallType _parent;
-            public ConversionFunction(AutoCallType parent):base(parent) { _parent = parent; }
-            internal override Result Result(Category category) { return _parent.ValueResult(category); }
+            public ConversionFunction(AutoCallType parent)
+                : base(parent) { _parent = parent; }
+            internal override Result Result(Category category) { return _parent.ConversionResult(category); }
         }
 
         [DisableDump]
@@ -66,5 +68,6 @@ namespace Reni.Struct
         protected override string Tag { get { return "/!\\"; } }
         [DisableDump]
         TypeBase ObjectReference { get { return FunctionalFeature.ObjectReference(RefAlignParam); } }
+        Result ConversionResult(Category category) { return ValueResult(category).ReplaceArg(c => ObjectReference.Result(c.Typed, ArgResult(c))); }
     }
 }
