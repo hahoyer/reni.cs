@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -104,15 +105,15 @@ namespace Reni.Syntax
             return result;
         }
 
-        protected virtual bool? QuickIsDereferencedDataLess(ContextBase context)
+        bool? QuickIsDataLessStructureElement(ContextBase context)
         {
             var contextResult = context.QuickIsDataLess(this);
             if (contextResult != null)
                 return contextResult;
-            
+
             var type = FindResult(context, Category.Type).Type;
-            if(type != null)
-                return type.IsDereferencedDataLess(true);
+            if (type != null)
+                return type.IsDataLessStructureElement(true);
             return null;
         }
 
@@ -123,15 +124,16 @@ namespace Reni.Syntax
                 .OperationResult<TFeature>(category, defineable, context.RefAlignParam);
         }
 
-        internal bool? IsDereferencedDataLess(bool isQuick, ContextBase context)
+        internal bool? IsDataLessStructureElement(bool isQuick, ContextBase context)
         {
-            var result = QuickIsDereferencedDataLess(context);
+            var result = QuickIsDataLessStructureElement(context);
             if (result != null)
                 return result;
             if (isQuick)
                 return null;
 
-            return Type(context).IsDereferencedDataLess(true);
+            return Type(context).IsDataLessStructureElement(false);
         }
+        
     }
 }

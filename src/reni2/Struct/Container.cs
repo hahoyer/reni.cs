@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -18,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -189,7 +189,7 @@ namespace Reni.Struct
 
         Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = ObjectId == -1 && accessPosition == 2 && position == 1;
+            var trace = ObjectId == -1 && accessPosition == 1 && position == 1;
             StartMethodDump(trace, category, parent, accessPosition, position);
             try
             {
@@ -207,44 +207,38 @@ namespace Reni.Struct
             }
         }
 
-        bool? InternalInnerIsDataLess(bool isQuick, ContextBase parent, int position )
+        bool? InternalInnerIsDataLess(bool isQuick, ContextBase parent, int position)
         {
             var uniqueChildContext = parent
                 .UniqueChildContext(this, position);
-            return Statements[position].IsDereferencedDataLess(isQuick, uniqueChildContext);
+            return Statements[position].IsDataLessStructureElement(isQuick, uniqueChildContext);
         }
-
-
-        protected override bool? QuickIsDereferencedDataLess(ContextBase context) { return QuickIsDataLess(context, EndPosition); }
-
-        internal bool? QuickIsDataLess(ContextBase parent, int accessPosition) { return IsDataLess(true, parent, accessPosition); }
 
         internal bool? IsDataLess(bool isQuick, ContextBase parent, int accessPosition)
         {
             var trace = ObjectId == -1 && accessPosition == 2 && parent.ObjectId == 1;
-            StartMethodDump(trace, isQuick,parent, accessPosition);
+            StartMethodDump(trace, isQuick, parent, accessPosition);
             try
             {
                 var subStatementIds = accessPosition.Array(i => i).ToArray();
-                Dump("subStatementIds", subStatementIds); 
+                Dump("subStatementIds", subStatementIds);
                 BreakExecution();
-                if (subStatementIds.Any(position => InternalInnerIsDataLess(true, parent, position) == false))
+                if(subStatementIds.Any(position => InternalInnerIsDataLess(true, parent, position) == false))
                     return ReturnMethodDump(false, true);
                 var quickNonDataLess = subStatementIds
                     .Where(position => InternalInnerIsDataLess(true, parent, position) == null)
                     .ToArray();
                 Dump("quickNonDataLess", quickNonDataLess);
                 BreakExecution();
-                if (quickNonDataLess.Length == 0)
+                if(quickNonDataLess.Length == 0)
                     return ReturnMethodDump(true, true);
                 if(isQuick)
                     return ReturnMethodDump<bool?>(null, true);
                 if(quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, position) == false))
                     return ReturnMethodDump(false, true);
-                if (quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, position) == null))
+                if(quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, position) == null))
                     return ReturnMethodDump<bool?>(null, true);
                 return ReturnMethodDump(true, true);
-
             }
             finally
             {
@@ -255,7 +249,7 @@ namespace Reni.Struct
         internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
             var trace = ObjectId == -10 && category.HasCode;
-            StartMethodDump(trace, category,parent,fromPosition,fromNotPosition);
+            StartMethodDump(trace, category, parent, fromPosition, fromNotPosition);
             try
             {
                 var result = (fromNotPosition - fromPosition)
@@ -269,7 +263,7 @@ namespace Reni.Struct
                              .Align(parent.RefAlignParam.AlignBits)
                              .LocalBlock(category)
                     );
-                return ReturnMethodDump(result,true);
+                return ReturnMethodDump(result, true);
             }
             finally
             {

@@ -419,7 +419,7 @@ namespace Reni.Type
                     .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
         }
 
-        internal virtual bool? IsDereferencedDataLess(bool isQuick) { return Size.IsZero; }
+        internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
     }
 
     interface IMetaFeature

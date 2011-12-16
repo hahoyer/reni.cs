@@ -68,7 +68,7 @@ namespace Reni.Struct
                 .CheckedConvert(this);
         }
 
-        internal override bool? IsDereferencedDataLess(bool isQuick) { return Structure.StructIsDataLess(isQuick); }
+        internal override bool? IsDataLessStructureElement(bool isQuick) { return Structure.StructIsDataLess(isQuick); }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }

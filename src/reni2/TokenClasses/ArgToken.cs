@@ -42,7 +42,7 @@ namespace Reni.TokenClasses
             return context
                 .ObtainRecentFunctionContext()
                 .ArgsType
-                .IsDereferencedDataLess(true);
+                .IsDataLessStructureElement(true);
         }
     }
 }

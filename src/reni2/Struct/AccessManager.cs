@@ -32,6 +32,7 @@ namespace Reni.Struct
             Result DumpPrintOperationResult(AccessType accessType, Category category);
             Result ValueReferenceViaFieldReference(Category category, AccessType accessType);
             bool IsDataLess(AccessType accessType);
+            bool? IsDataLessStructureElement(AccessType accessType, bool isQuick);
         }
 
         sealed class FunctionAccessObject : ReniObject, IAccessObject
@@ -39,6 +40,7 @@ namespace Reni.Struct
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFunctionResult(category); }
             Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType) { return accessType.ValueReferenceViaFieldReferenceFunction(category); }
             bool IAccessObject.IsDataLess(AccessType accessType) { return accessType.ValueType.IsDataLess; }
+            bool? IAccessObject.IsDataLessStructureElement(AccessType accessType, bool isQuick) { return true; }
         }
 
         sealed class FieldAccessObject : ReniObject, IAccessObject
@@ -46,6 +48,13 @@ namespace Reni.Struct
             Result IAccessObject.DumpPrintOperationResult(AccessType accessType, Category category) { return accessType.DumpPrintFieldResult(category); }
             Result IAccessObject.ValueReferenceViaFieldReference(Category category, AccessType accessType) { return accessType.ValueReferenceViaFieldReferenceField(category); }
             bool IAccessObject.IsDataLess(AccessType accessType) { return accessType.ValueType.IsDataLess; }
+            
+            bool? IAccessObject.IsDataLessStructureElement(AccessType accessType, bool isQuick)
+            {
+                NotImplementedMethod(accessType,isQuick);
+                return null;
+
+            }
         }
 
         sealed class ProcedureCallAccessObject : ReniObject, IAccessObject
@@ -57,6 +66,12 @@ namespace Reni.Struct
             {
                 NotImplementedMethod(category, accessType);
                 return null;
+            }
+            bool? IAccessObject.IsDataLessStructureElement(AccessType accessType, bool isQuick)
+            {
+                NotImplementedMethod(accessType, isQuick);
+                return null;
+
             }
         }
 

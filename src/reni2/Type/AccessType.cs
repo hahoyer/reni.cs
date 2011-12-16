@@ -70,12 +70,8 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
-        internal override bool? IsDereferencedDataLess(bool isQuick)
-        {
-            NotImplementedMethod(isQuick);
-            return null;
-        }
-
+        internal override bool? IsDataLessStructureElement(bool isQuick) { return AccessObject.IsDataLessStructureElement(this, isQuick); }
+        
         internal Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
         {
             var result = new Result
@@ -152,8 +148,7 @@ namespace Reni.Type
                 Dump("valueType", valueType);
                 BreakExecution();
                 var result = valueType.Result(category, argResult);
-                return ReturnMethodDump(result,true);
-
+                return ReturnMethodDump(result, true);
             }
             finally
             {
