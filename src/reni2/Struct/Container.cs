@@ -187,9 +187,16 @@ namespace Reni.Struct
             return context.UniqueContainerContext(this).Result(category, innerResult);
         }
 
-        Result InnerResult(Category category, ContextBase parent, int accessPosition, int position)
+        Result InnerResult(Category category, ContextBase parent, int position)
         {
-            var trace = ObjectId == -1 && accessPosition == 1 && position == 1;
+            Tracer.Assert(!Statements[position].IsLambda);
+            return Result(category, parent, position, position);
+        }
+
+        Result Result(Category category, ContextBase parent, int accessPosition, int position)
+        {
+            var trace = ObjectId == -10 && Statements[position].IsLambda;
+            //var trace = ObjectId == 0 && accessPosition == 1 && position == 1;
             StartMethodDump(trace, category, parent, accessPosition, position);
             try
             {
@@ -248,21 +255,24 @@ namespace Reni.Struct
 
         internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
-            var trace = ObjectId == -10 && category.HasCode;
+            var trace = ObjectId == -10 && category.HasSize;
             StartMethodDump(trace, category, parent, fromPosition, fromNotPosition);
             try
             {
-                var result = (fromNotPosition - fromPosition)
+
+                Dump("Statements", Statements);
+
+                var results = (fromNotPosition - fromPosition)
                     .Array(i => fromPosition + i)
-                    .Aggregate
-                    (TypeBase.VoidResult(category)
-                     , (current, position)
-                       =>
-                       current
-                       + InnerResult(category, parent, position, position)
-                             .Align(parent.RefAlignParam.AlignBits)
-                             .LocalBlock(category)
-                    );
+                    .Where(position => !Statements[position].IsLambda)
+                    .Select(position => InnerResult(category, parent, position))
+                    .Select(r => r.Align(parent.RefAlignParam.AlignBits))
+                    .Select(r => r.LocalBlock(category))
+                    .ToArray();
+                Dump("results", results); 
+                BreakExecution();
+                var result = results
+                    .Aggregate(TypeBase.VoidResult(category), (current, next) => current + next);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -272,7 +282,23 @@ namespace Reni.Struct
         }
 
         internal Size StructureSize(ContextBase parent, int fromPosition, int fromNotPosition) { return StructureResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
-        internal TypeBase InnerType(ContextBase parent, int accessPosition, int position) { return InnerResult(Category.Type, parent, accessPosition, position).Type; }
+        
+        internal TypeBase AccessType(ContextBase parent, int accessPosition, int position)
+        {
+            var trace = ObjectId == -10 && Statements[position].IsLambda;
+            StartMethodDump(trace, parent, accessPosition, position);
+            try
+            {
+                Dump("Statements[position]", Statements[position]); 
+                BreakExecution();
+                var result = Result(Category.Type, parent, accessPosition, position).Type;
+                return ReturnMethodDump(result,true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
         internal new bool IsLambda(int position) { return Statements[position].IsLambda; }
     }

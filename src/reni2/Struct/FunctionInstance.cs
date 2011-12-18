@@ -106,7 +106,7 @@ namespace Reni.Struct
 
         public Result Call(Category category, Result args)
         {
-            var trace = ObjectId == -120 && (category.HasCode || category.HasArgs);
+            var trace = ObjectId == -10 && (category.HasCode || category.HasArgs);
             StartMethodDump(trace, category, args);
             try
             {

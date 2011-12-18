@@ -34,6 +34,7 @@ namespace Reni.Struct
 {
     sealed class Structure : ReniObject
     {
+        static int _nextObjectId;
         readonly ContainerContextObject _containerContextObject;
         readonly int _endPosition;
         [Node]
@@ -48,6 +49,7 @@ namespace Reni.Struct
         readonly DictionaryEx<int, ContextAccessFeature> _contextAccessFeaturesCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
+            : base(_nextObjectId++)
         {
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
@@ -229,7 +231,7 @@ namespace Reni.Struct
         internal TypeBase ValueType(int position)
         {
             return ContainerContextObject
-                .InnerType(EndPosition, position)
+                .AccessType(EndPosition, position)
                 .UnAlignedType;
         }
 

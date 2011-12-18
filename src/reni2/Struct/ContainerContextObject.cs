@@ -30,11 +30,13 @@ namespace Reni.Struct
 {
     sealed class ContainerContextObject : ReniObject, IReferenceInCode
     {
+        static int _nextObjectId;
         readonly Container _container;
         readonly ContextBase _parent;
         readonly DictionaryEx<int, AccessManager.IAccessObject> _accessObjectsCache;
 
         internal ContainerContextObject(Container container, ContextBase parent)
+            : base(_nextObjectId++)
         {
             _container = container;
             _parent = parent;
@@ -65,7 +67,7 @@ namespace Reni.Struct
 
         internal AccessManager.IAccessObject UniqueAccessObject(int position) { return _accessObjectsCache.Find(position); }
         internal Structure UniqueAccessPoint(int position) { return Parent.UniqueStructure(Container, position); }
-        internal TypeBase InnerType(int accessPosition, int position) { return Container.InnerType(_parent, accessPosition, position); }
+        internal TypeBase AccessType(int accessPosition, int position) { return Container.AccessType(_parent, accessPosition, position); }
 
         internal Size StructureSize(int position)
         {
