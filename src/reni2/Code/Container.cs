@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -30,6 +31,7 @@ namespace Reni.Code
     /// </summary>
     sealed class Container : ReniObject
     {
+        static int _nextObjectId;
         static readonly Container _unexpectedVisitOfPending = new Container("UnexpectedVisitOfPending");
         readonly string _description;
 
@@ -40,16 +42,15 @@ namespace Reni.Code
         readonly CodeBase _data;
 
         public Container(CodeBase data, string description, Size frameSize = null)
+            : base(_nextObjectId++)
         {
             _frameSize = frameSize ?? Size.Zero;
             _description = description;
             _data = data;
+            StopByObjectId(-10);
         }
 
-        Container(string errorText)
-        {
-            _description = errorText;
-        }
+        Container(string errorText) { _description = errorText; }
 
         [Node]
         [EnableDump]
@@ -104,7 +105,7 @@ namespace Reni.Code
         /// <summary>
         ///     Gets the instance.
         /// </summary>
-        /// <value>The instance.</value>
+        /// <value> The instance. </value>
         /// created 03.10.2006 01:24
         public static none Instance { get { return _instance; } }
     }

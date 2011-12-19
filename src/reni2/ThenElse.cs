@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -30,7 +31,7 @@ using Reni.Type;
 namespace Reni
 {
     [Serializable]
-    internal abstract class CondSyntax : CompileSyntax
+    abstract class CondSyntax : CompileSyntax
     {
         [Node]
         internal readonly CompileSyntax Cond;
@@ -42,7 +43,7 @@ namespace Reni
         internal readonly CompileSyntax Else;
 
         protected CondSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax,
-                             CompileSyntax elseSyntax)
+            CompileSyntax elseSyntax)
             : base(thenToken)
         {
             Cond = condSyntax;
@@ -62,18 +63,18 @@ namespace Reni
                 .Conversion(TypeBase.Bit);
         }
 
-        private Result ElseResult(ContextBase context, Category category)
+        Result ElseResult(ContextBase context, Category category)
         {
             if(Else == null)
                 return TypeBase.Void.Result(category);
             return CondBranchResult(context, category, Else);
         }
 
-        private Result ThenResult(ContextBase context, Category category) { return CondBranchResult(context, category, Then); }
+        Result ThenResult(ContextBase context, Category category) { return CondBranchResult(context, category, Then); }
 
-        private Result CondBranchResult(ContextBase context, Category category, CompileSyntax syntax)
+        Result CondBranchResult(ContextBase context, Category category, CompileSyntax syntax)
         {
-            var branchResult = syntax.Result(context,category.Typed).AutomaticDereference();
+            var branchResult = syntax.Result(context, category.Typed).AutomaticDereference();
             if((category - Category.Type).IsNone)
                 return branchResult.Align(context.RefAlignParam.AlignBits);
 
@@ -84,7 +85,7 @@ namespace Reni
             return result.LocalBlock(category);
         }
 
-        private Result InternalResult(ContextBase context, Category category)
+        Result InternalResult(ContextBase context, Category category)
         {
             var commonType = context.CommonType(this);
             if(category <= (Category.Type | Category.Size))
@@ -114,11 +115,11 @@ namespace Reni
             Tracer.Assert(category <= (Category.Type | Category.CodeArgs));
             var thenResult = ThenResult(context, category);
             var elseResult = ElseResult(context, category);
-            var result = new Result();
-            if(category.HasType)
-                result.Type = TypeBase.CommonType(thenResult.Type, elseResult.Type);
-            if(category.HasArgs)
-                result.CodeArgs = thenResult.CodeArgs + elseResult.CodeArgs;
+            var result = new Result
+                (category
+                 , getType: () => TypeBase.CommonType(thenResult.Type, elseResult.Type)
+                 , getArgs: () => thenResult.CodeArgs + elseResult.CodeArgs
+                );
             return result;
         }
 
@@ -126,7 +127,7 @@ namespace Reni
     }
 
     [Serializable]
-    internal sealed class ThenSyntax : CondSyntax
+    sealed class ThenSyntax : CondSyntax
     {
         internal ThenSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax)
             : base(condSyntax, thenToken, thenSyntax, null) { }
@@ -135,13 +136,13 @@ namespace Reni
     }
 
     [Serializable]
-    internal sealed class ThenElseSyntax : CondSyntax
+    sealed class ThenElseSyntax : CondSyntax
     {
         [Node]
-        private readonly TokenData _elseToken;
+        readonly TokenData _elseToken;
 
         public ThenElseSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax, TokenData elseToken,
-                              CompileSyntax elseSyntax)
+            CompileSyntax elseSyntax)
             : base(condSyntax, thenToken, thenSyntax, elseSyntax) { _elseToken = elseToken; }
 
         internal override string DumpShort()

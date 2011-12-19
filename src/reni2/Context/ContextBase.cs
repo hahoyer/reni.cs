@@ -97,7 +97,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -10 && ObjectId == 4 && category.HasIsDataLess;
+            var trace = syntax.ObjectId == -1 && ObjectId == 1 && category.HasCode;
             StartMethodDump(trace, category, syntax);
             try
             {

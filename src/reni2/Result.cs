@@ -52,38 +52,36 @@ namespace Reni
             StopByObjectId(-804);
         }
 
-        internal Result(Category category, Func<bool> getDataLess, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
+        internal Result(Category category, Func<bool> getDataLess = null, Func<Size> getSize = null, Func<TypeBase> getType = null, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
             : this()
         {
             if(category.HasSize)
+            {
+                Tracer.Assert(getSize != null);
                 _size = getSize();
+            }
             if(category.HasType)
+            {
+                Tracer.Assert(getType != null);
                 _type = getType();
+            }
             if(category.HasCode)
+            {
+                Tracer.Assert(getCode != null);
                 _code = getCode();
+            }
             if(category.HasArgs)
-                _codeArgs = getRefs();
+            {
+                Tracer.Assert(getArgs != null);
+                _codeArgs = getArgs();
+            }
             if(category.HasIsDataLess)
+            {
+                Tracer.Assert(getDataLess != null);
                 _isDataLess = getDataLess();
+            }
             AssertValid();
         }
-
-        internal Result(Category category, Func<bool> getDataLess, Func<Size> getSize, Func<CodeBase> getCode, Func<CodeArgs> getRefs)
-            : this()
-        {
-            if(category.HasSize)
-                _size = getSize();
-            if(category.HasCode)
-                _code = getCode();
-            if(category.HasArgs)
-                _codeArgs = getRefs();
-            if(category.HasIsDataLess)
-                _isDataLess = getDataLess();
-            AssertValid();
-        }
-
-        internal Result(Category category, Func<CodeArgs> getRefs)
-            : this(category, () => true, () => Size.Zero, CodeBase.Void, getRefs) { }
 
         internal bool HasSize { get { return Size != null; } }
         internal bool HasType { get { return Type != null; } }
@@ -369,23 +367,15 @@ namespace Reni
 
         Result Filter(Category category)
         {
-            var result = new Result
-                         {
-                             _pendingCategory = _pendingCategory & category
-                         };
-
-            if(category.HasIsDataLess)
-                result._isDataLess = IsDataLess;
-            if(category.HasSize)
-                result._size = Size;
-            if(category.HasType)
-                result._type = Type;
-            if(category.HasArgs)
-                result._codeArgs = CodeArgs;
-            if(category.HasCode)
-                result._code = Code;
-            result.AssertValid();
-            return result;
+            return new Result
+                (CompleteCategory & category
+                 , getDataLess: () => IsDataLess.Value
+                 , getSize: () => Size
+                 , getType: () => Type
+                 , getCode: () => Code
+                 , getArgs: () => CodeArgs
+                )
+                   {_pendingCategory = _pendingCategory & category};
         }
 
         internal Result Align(int alignBits)
@@ -398,37 +388,18 @@ namespace Reni
             if(alignedSize == size)
                 return this;
 
-            var result = new Result();
-            if(HasIsDataLess)
-                result._isDataLess = IsDataLess;
-            if(HasSize)
-                result.Size = alignedSize;
-            if(HasType)
-                result.Type = Type.UniqueAlign(alignBits);
-            if(HasCode)
-                result.Code = Code.BitCast(alignedSize);
-            if(HasArgs)
-                result.CodeArgs = CodeArgs;
+            var result = new Result
+                (CompleteCategory
+                 , getDataLess: () => IsDataLess.Value
+                 , getSize: () => alignedSize
+                 , getType: () => Type.UniqueAlign(alignBits)
+                 , getCode: () => Code.BitCast(alignedSize)
+                 , getArgs: () => CodeArgs
+                );
             return result;
         }
 
-        Result Clone(Category category)
-        {
-            var result = new Result {_pendingCategory = _pendingCategory & category};
-            if(category.HasIsDataLess)
-                result._isDataLess = IsDataLess;
-            if(category.HasSize)
-                result.Size = Size;
-            if(category.HasType)
-                result.Type = Type;
-            if(category.HasCode)
-                result.Code = Code;
-            if(category.HasArgs)
-                result.CodeArgs = CodeArgs;
-            return result;
-        }
-
-        internal Result Clone() { return new Result {_pendingCategory = _pendingCategory, IsDataLess = IsDataLess, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs}; }
+        internal Result Clone() { return Filter(CompleteCategory); }
 
         void AssertValid()
         {
@@ -596,7 +567,7 @@ namespace Reni
             if(!category.HasCode && !category.HasArgs)
                 return this;
 
-            var result = Clone(category);
+            var result = this & category;
             var copier = Type.Copier(category);
             if(category.HasCode)
                 result.Code = Code.LocalBlock(copier.Code);
@@ -738,15 +709,15 @@ namespace Reni
                 CodeArgs = Code.CodeArgs;
             if(category.HasSize && !CompleteCategory.HasSize)
                 Size =
-                    CompleteCategory.HasCode ? Code.Size :
-                                                             CompleteCategory.HasType ? Type.Size :
-                                                                                                      type.Size;
+                    CompleteCategory.HasCode ? Code.Size
+                        : CompleteCategory.HasType ? Type.Size
+                              : type.Size;
             if(category.HasIsDataLess && !CompleteCategory.HasIsDataLess)
                 IsDataLess =
-                    CompleteCategory.HasCode ? Code.Size.IsZero :
-                                                                    CompleteCategory.HasSize ? Size.IsZero :
-                                                                                                               CompleteCategory.HasType ? Type.IsDataLess :
-                                                                                                                                                              type.IsDataLess;
+                    CompleteCategory.HasCode ? Code.Size.IsZero
+                        : CompleteCategory.HasSize ? Size.IsZero
+                              : CompleteCategory.HasType ? Type.IsDataLess
+                                    : type.IsDataLess;
         }
     }
 
