@@ -24,7 +24,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Struct;
 using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.Context
 {
@@ -45,11 +44,6 @@ namespace Reni.Context
             NotImplementedMethod(category, condSyntax);
             return null;
         }
-        protected override Result ObjectResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
@@ -60,6 +54,5 @@ namespace Reni.Context
             var functionInstance = _functions.Find(body, structure, alignedArgsResult.Type);
             return functionInstance.Call(category, alignedArgsResult);
         }
-
     }
 }

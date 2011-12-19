@@ -65,7 +65,7 @@ namespace Reni.Struct
 
         protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return ObtainApplyResult(category, argsType); }
 
-        internal Result ObtainApplyResult(Category category, TypeBase argsType)
+        Result ObtainApplyResult(Category category, TypeBase argsType)
         {
             var trace = ObjectId == -3 && category.HasCode;
             StartMethodDump(trace, category, argsType);
@@ -87,9 +87,7 @@ namespace Reni.Struct
             return null;
         }
 
-        internal Result Result(Category category, bool isAutoCall) { return UniqueType(isAutoCall).Result(category); }
-
-        TypeBase UniqueType(bool isAutoCall)
+        internal TypeBase UniqueType(bool isAutoCall)
         {
             if(isAutoCall)
                 return _autoCallCache.Value;

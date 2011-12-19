@@ -60,7 +60,7 @@ namespace Reni.Struct
             internal override Result Result(Category category) { return _parent.ObjectResult(category); }
         }
 
-        protected override Result ObjectResult(Category category) { return Structure.StructReferenceViaContextReference(category); }
+        Result ObjectResult(Category category) { return Structure.StructReferenceViaContextReference(category); }
 
         internal override Structure ObtainRecentStructure() { return Structure; }
     }

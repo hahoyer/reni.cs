@@ -38,11 +38,6 @@ namespace Reni.Context
 
         internal override Function ObtainRecentFunctionContext() { return this; }
 
-        protected override Result ObjectResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
         internal Result CreateArgsReferenceResult(Category category) { return ArgsType.ReferenceInCode(category, this); }
     }
 }

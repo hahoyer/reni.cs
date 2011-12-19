@@ -97,7 +97,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -244 && ObjectId == 3 && category.HasIsDataLess;
+            var trace = syntax.ObjectId == -10 && ObjectId == 4 && category.HasIsDataLess;
             StartMethodDump(trace, category, syntax);
             try
             {
@@ -216,18 +216,9 @@ namespace Reni.Context
         {
             return FindRecentStructure
                 .UniqueFunctionalFeature(target)
-                .Result(category, isAutoCall);
+                .UniqueType(isAutoCall)
+                .Result(category);
         }
-
-        internal Result ObjectResult(Category category, CompileSyntax syntax)
-        {
-            if(syntax == null)
-                return ObjectResult(category);
-
-            return UniqueResult(category.Typed, syntax).SmartLocalReferenceResult(RefAlignParam);
-        }
-
-        protected abstract Result ObjectResult(Category category);
 
         internal Result ResultAsReference(Category category, CompileSyntax syntax)
         {

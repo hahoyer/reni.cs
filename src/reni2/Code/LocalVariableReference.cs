@@ -30,8 +30,10 @@ namespace Reni.Code
         static int _nextObjectId;
         readonly RefAlignParam _refAlignParam;
         [Node]
+        [DisableDump]
         internal readonly string Holder;
         [Node]
+        [DisableDump]
         internal readonly Size Offset;
 
         public LocalVariableReference(RefAlignParam refAlignParam, string holder, Size offset)

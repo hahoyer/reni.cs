@@ -68,12 +68,6 @@ namespace Reni.Context
             }
         }
 
-        protected override Result ObjectResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
         protected override Result ObtainPendingResult(Category category, CompileSyntax syntax)
         {
             NotImplementedMethod(category, syntax);

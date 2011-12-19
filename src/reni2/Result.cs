@@ -439,24 +439,24 @@ namespace Reni
             if(isDataLess != null)
             {
                 if(HasIsDataLess && IsDataLess != isDataLess.Value)
-                    Tracer.AssertionFailed(1, @"IsDataLess==isDataLess", () => "IsDataLess differs " + Dump());
+                    Tracer.AssertionFailed(@"IsDataLess==isDataLess", () => "IsDataLess differs " + Dump());
                 if(HasSize && Size.IsZero != isDataLess.Value)
-                    Tracer.AssertionFailed(1, @"Size.IsZero==isDataLess.Value", () => "Size differs " + Dump());
+                    Tracer.AssertionFailed(@"Size.IsZero==isDataLess.Value", () => "Size differs " + Dump());
                 if(HasType && Type.IsDataLess != isDataLess.Value)
-                    Tracer.AssertionFailed(1, @"Type.IsDataLess==isDataLess.Value", () => "Type IsDataLess property differs " + Dump());
+                    Tracer.AssertionFailed(@"Type.IsDataLess==isDataLess.Value", () => "Type IsDataLess property differs " + Dump());
                 if(HasCode && Code.Size.IsZero != isDataLess.Value)
-                    Tracer.AssertionFailed(1, @"Code.Size.IsZero==isDataLess.Value", () => "Code size differs " + Dump());
+                    Tracer.AssertionFailed(@"Code.Size.IsZero==isDataLess.Value", () => "Code size differs " + Dump());
             }
 
             var size = FindSize;
             if(size != null)
             {
                 if(HasSize && Size != size)
-                    Tracer.AssertionFailed(1, @"Size==size", () => "Size differs " + Dump());
+                    Tracer.AssertionFailed(@"Size==size", () => "Size differs " + Dump());
                 if(HasType && Type.Size != size)
-                    Tracer.AssertionFailed(1, @"Type.Size==size", () => "Type size differs " + Dump());
+                    Tracer.AssertionFailed(@"Type.Size==size", () => "Type size differs " + Dump());
                 if(HasCode && Code.Size != size)
-                    Tracer.AssertionFailed(1, @"Code.Size==size", () => "Code size differs " + Dump());
+                    Tracer.AssertionFailed(@"Code.Size==size", () => "Code size differs " + Dump());
             }
 
             if(HasArgs && HasCode)
@@ -464,7 +464,7 @@ namespace Reni
                 var refs = CodeArgs;
                 var codeRefs = Code.CodeArgs;
                 if(!(refs.Contains(codeRefs) && codeRefs.Contains(refs)))
-                    Tracer.AssertionFailed(1, @"CodeArgs.Contains(codeRefs)", () => "Code and CodeArgs differ " + Dump());
+                    Tracer.AssertionFailed(@"CodeArgs.Contains(codeRefs)", () => "Code and CodeArgs differ " + Dump());
             }
 
             Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);

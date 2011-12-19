@@ -195,8 +195,7 @@ namespace Reni.Struct
 
         Result Result(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = ObjectId == -10 && Statements[position].IsLambda;
-            //var trace = ObjectId == 0 && accessPosition == 1 && position == 1;
+            var trace = ObjectId == -1 && accessPosition == 1 && position == 1;
             StartMethodDump(trace, category, parent, accessPosition, position);
             try
             {
@@ -206,6 +205,7 @@ namespace Reni.Struct
                 BreakExecution();
                 var result = Statements[position]
                     .Result(uniqueChildContext, category.Typed);
+                Dump("result", result); 
                 return ReturnMethodDump(result.AutomaticDereference(), true);
             }
             finally
@@ -255,7 +255,7 @@ namespace Reni.Struct
 
         internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
-            var trace = ObjectId == -10 && category.HasSize;
+            var trace = ObjectId == -1 && category.HasSize;
             StartMethodDump(trace, category, parent, fromPosition, fromNotPosition);
             try
             {
