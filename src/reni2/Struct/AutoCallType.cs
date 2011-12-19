@@ -46,6 +46,8 @@ namespace Reni.Struct
             }
         }
 
+        internal override Result AutomaticDereferenceResult(Category category) { return ValueResult(category); }
+
         internal override void Search(SearchVisitor searchVisitor)
         {
             base.Search(searchVisitor);
