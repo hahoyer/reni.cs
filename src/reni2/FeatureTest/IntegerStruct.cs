@@ -41,7 +41,7 @@ Integer8:
     _data: 127 type (arg enable_cut);
 
     create   : (Integer8(arg))/\;
-    dump_print: (_data dump_print)/!\;
+    dump_print: (_data dump_print)/\;
     +        :  create(_data + create(arg) _data)/\;
     clone: create(_data)/!\ ;
     enable_cut: _data enable_cut /!\ ;
@@ -51,7 +51,7 @@ Integer8:
         }
 
         public override void Run() { }
-        protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print"; } }
+        protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print()"; } }
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
