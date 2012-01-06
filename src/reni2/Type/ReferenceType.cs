@@ -28,15 +28,10 @@ namespace Reni.Type
 {
     abstract class ReferenceType : TypeBase
     {
-        readonly TypeBase _valueType;
-
-        protected ReferenceType(TypeBase valueType) { _valueType = valueType; }
-
         [DisableDump]
         internal abstract RefAlignParam RefAlignParam { get; }
-
-        internal TypeBase ValueType { get { return _valueType; } }
-
+        [DisableDump]
+        abstract internal TypeBase ValueType { get; }
         [DisableDump]
         internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
         [DisableDump]
@@ -63,7 +58,7 @@ namespace Reni.Type
                 : base(parent) { _parent = parent; }
             internal override Result Result(Category category)
             {
-                var trace = ObjectId == -4 && category.HasCode;
+                var trace = ObjectId == -1 && category.HasCode;
                 StartMethodDump(trace, category);
                 try
                 {

@@ -88,6 +88,7 @@ namespace Reni.FeatureTest.Struct
     [InnerAccess]
     [Function.Function]
     [SimpleFunctionWithNonLocal]
+    [FunctionAssignment]
     public sealed class PropertyVariable : CompilerTest
     {
         protected override string Target { get { return @"x: 11/!\ ; x dump_print"; } }

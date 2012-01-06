@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,58 +21,52 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionalBody : FunctionalFeature
+    sealed class FunctionalBody : ReniObject
     {
-        readonly CompileSyntax _body;
         internal readonly Structure Structure;
-        readonly SimpleCache<CallType> _callCache;
-        readonly SimpleCache<AutoCallType> _autoCallCache;
+        internal readonly CompileSyntax Getter;
+        internal readonly CompileSyntax Setter;
 
-        internal FunctionalBody(Structure structure, CompileSyntax body)
+        internal FunctionalBody(Structure structure, CompileSyntax getter, CompileSyntax setter)
         {
             Structure = structure;
-            _body = body;
-            _autoCallCache = new SimpleCache<AutoCallType>(() => new AutoCallType(this));
-            _callCache = new SimpleCache<CallType>(() => new CallType(this));
+            Getter = getter;
+            Setter = setter;
             StopByObjectId(-1);
         }
 
         [DisableDump]
-        internal bool IsObjectForCallRequired { get { return !Structure.IsDataLess && Structure.IsObjectForCallRequired(Body); } }
-
+        internal bool IsObjectForCallRequired { get { return !Structure.IsDataLess && (Structure.IsObjectForCallRequired(Getter) || Structure.IsObjectForCallRequired(Setter)); } }
         [DisableDump]
-        internal CompileSyntax Body { get { return _body; } }
-
-        [DisableDump]
-        protected override TypeBase ObjectType { get { return Structure.Type; } }
-
-        protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
-        {
-            Tracer.Assert(refAlignParam == RefAlignParam);
-            return Structure.ContextReferenceViaStructReference(result);
-        }
-
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }
 
-        internal override string DumpShort() { return base.DumpShort() + "(" + _body.DumpShort() + ")/\\" + "#(#in context." + Structure.ObjectId + "#)#"; }
+        internal override string DumpShort()
+        {
+            return base.DumpShort()
+                   + FormatSite(Getter)
+                   + "/?\\"
+                   + FormatSite(Setter)
+                   + "#(#in context."
+                   + Structure.ObjectId
+                   + "#)#";
+        }
 
-        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return ObtainApplyResult(category, argsType); }
+        static string FormatSite(CompileSyntax syntax) { return syntax == null ? "" : "(" + syntax.DumpShort() + ")"; }
 
-        Result ObtainApplyResult(Category category, TypeBase argsType)
+        internal Result ObtainApplyResult(Category category, TypeBase argsType)
         {
             var trace = ObjectId == -3 && category.HasCode;
             StartMethodDump(trace, category, argsType);
             try
             {
                 var argsResult = argsType.ArgResult(category.Typed);
-                var result = Structure.Call(category, Body, argsResult);
+                var result = Structure.Call(category, Getter, argsResult);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -85,13 +79,6 @@ namespace Reni.Struct
         {
             NotImplementedMethod(category);
             return null;
-        }
-
-        internal TypeBase UniqueType(bool isAutoCall)
-        {
-            if(isAutoCall)
-                return _autoCallCache.Value;
-            return _callCache.Value;
         }
     }
 }

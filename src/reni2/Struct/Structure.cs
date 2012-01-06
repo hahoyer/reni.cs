@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -38,11 +39,9 @@ namespace Reni.Struct
         readonly ContainerContextObject _containerContextObject;
         readonly int _endPosition;
         [Node]
-        readonly DictionaryEx<CompileSyntax, FunctionalBody> _functionalFeatureCache;
-        [Node]
         readonly SimpleCache<StructureType> _typeCache;
         [Node]
-        readonly DictionaryEx<int, AccessType> _accessTypesCache;
+        readonly DictionaryEx<int, TypeBase> _accessTypesCache;
         [Node]
         readonly DictionaryEx<int, AccessFeature> _accessFeaturesCache;
         [Node]
@@ -53,9 +52,8 @@ namespace Reni.Struct
         {
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
-            _functionalFeatureCache = new DictionaryEx<CompileSyntax, FunctionalBody>(body => new FunctionalBody(this, body));
             _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
-            _accessTypesCache = new DictionaryEx<int, AccessType>(position => new AccessType(this, position));
+            _accessTypesCache = new DictionaryEx<int, TypeBase>(ObtainAccessType);
             _accessFeaturesCache = new DictionaryEx<int, AccessFeature>(position => new AccessFeature(this, position));
             _contextAccessFeaturesCache = new DictionaryEx<int, ContextAccessFeature>(position => new ContextAccessFeature(this, position));
             StopByObjectId(-313);
@@ -136,10 +134,20 @@ namespace Reni.Struct
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
 
-        internal FunctionalBody UniqueFunctionalFeature(CompileSyntax body) { return _functionalFeatureCache.Find(body); }
-        internal AccessType UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
+        internal TypeBase FunctionalFeature(CompileSyntax getter, CompileSyntax setter, bool isAutoCall) { return new FunctionalBodyType(this, getter, setter, isAutoCall); }
+        TypeBase UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
         internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }
         internal IContextFeature UniqueContextAccessFeature(int position) { return _contextAccessFeaturesCache.Find(position); }
+
+        TypeBase ObtainAccessType(int position)
+        {
+            var accessType = ContainerContextObject.AccessType(EndPosition, position);
+            if(accessType.IsLambda)
+                return accessType;
+
+            NotImplementedMethod(position);
+            return null;
+        }
 
         internal Result AccessViaThisReference(Category category, Result rightResult)
         {
@@ -163,7 +171,7 @@ namespace Reni.Struct
         internal Result AccessViaThisReference(Category category, int position)
         {
             var resultType = UniqueAccessType(position);
-            if (resultType.IsDataLess)
+            if(resultType.IsDataLess)
                 return resultType.Result(category);
 
             return resultType
@@ -184,10 +192,7 @@ namespace Reni.Struct
                 .Call(this, category, body, argsResult);
         }
 
-        internal bool IsObjectForCallRequired(CompileSyntax body)
-        {
-            return true;
-        }
+        internal bool IsObjectForCallRequired(CompileSyntax body) { return true; }
 
         internal Result AccessViaContextReference(Category category, int position)
         {
@@ -198,7 +203,7 @@ namespace Reni.Struct
         Size ContextOffset() { return ContainerContextObject.ContextReferenceOffsetFromAccessPoint(EndPosition) * -1; }
 
         internal Result StructReferenceViaContextReference(Category category)
-        {
+        {                              
             if(IsDataLess)
                 return Type.Result(category);
 
@@ -212,7 +217,7 @@ namespace Reni.Struct
 
         Result DumpPrintResultViaAccessReference(Category category, int position)
         {
-            var accessType = UniqueAccessType(position);
+            var accessType = (AccessType) UniqueAccessType(position);
             return accessType
                 .DumpPrintOperationResult(category)
                 .ReplaceArg(accessType.FieldReferenceViaStructReference(category.Typed));
@@ -228,6 +233,7 @@ namespace Reni.Struct
             return CodeBase.ReferenceCode(ContainerContextObject)
                 .AddToReference(RefAlignParam, StructSize * -1);
         }
+
         internal TypeBase ValueType(int position)
         {
             return ContainerContextObject

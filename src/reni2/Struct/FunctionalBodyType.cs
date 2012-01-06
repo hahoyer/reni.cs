@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,30 +21,65 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    abstract class FunctionalBodyType : TypeBase
+    sealed class FunctionalBodyType : TypeBase, IFunctionalFeature
     {
-        readonly FunctionalBody _parent;
+        [EnableDump]
+        readonly Structure _structure;
+        [EnableDump]
+        readonly CompileSyntax _getter;
+        [EnableDump]
+        readonly CompileSyntax _setter;
+        [EnableDump]
+        readonly bool _isImplicit;
 
-        protected FunctionalBodyType(FunctionalBody parent) { _parent = parent; }
+        readonly DictionaryEx<TypeBase,FunctionAccessType> _functionAccessTypes;
+
+        internal FunctionalBodyType(Structure structure, CompileSyntax getter, CompileSyntax setter, bool isImplicit)
+        {
+            _structure = structure;
+            _getter = getter;
+            _setter = setter;
+            _isImplicit = isImplicit;
+            _functionAccessTypes = new DictionaryEx<TypeBase, FunctionAccessType>(argsType => new FunctionAccessType(this, argsType));
+        }
 
         [DisableDump]
-        internal override Structure FindRecentStructure { get { return _parent.Structure; } }
+        internal bool IsObjectForCallRequired { get { return !_structure.IsDataLess && (_structure.IsObjectForCallRequired(_getter) || _structure.IsObjectForCallRequired(_setter)); } }
         [DisableDump]
-        protected abstract TypeBase ArgsType { get; }
+        internal override Structure FindRecentStructure { get { return _structure; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return !_parent.IsObjectForCallRequired; } }
+        internal override bool IsLambda { get { return true; } }
         [DisableDump]
-        protected abstract string Tag { get; }
+        internal override bool IsDataLess { get { return !IsObjectForCallRequired; } }
         [DisableDump]
-        protected RefAlignParam RefAlignParam { get { return _parent.RefAlignParam; } }
-        internal override string DumpPrintText { get { return _parent.Body.DumpPrintText + Tag; } }
-        internal override IFunctionalFeature FunctionalFeature { get { return _parent; } }
+        string Tag { get { return _isImplicit ? "/!\\" : "/\\"; } }
+        [DisableDump]
+        internal RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+        [DisableDump]
+        internal override bool IsLikeReference { get { return true; } }
+        
+        internal override string DumpPrintText { get { return _getter.DumpPrintText + Tag + _setter.DumpPrintText; } }
+        [DisableDump]
+        internal override IFunctionalFeature FunctionalFeature { get { return this; } }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
+
+        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        {
+            Tracer.Assert(!_isImplicit);
+            return 
+                _functionAccessTypes
+                .Find(argsResult.Type)
+                .Result(category, argsResult);
+        }
+
+        TypeBase IFunctionalFeature.ObjectReference(RefAlignParam refAlignParam) { return _structure.Type.UniqueAutomaticReference(refAlignParam); }
     }
 }

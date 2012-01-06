@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -28,14 +29,16 @@ using Reni.Syntax;
 namespace Reni.TokenClasses
 {
     [Serializable]
-    internal sealed class LeftParenthesis : TokenClass, IInfix
+    sealed class LeftParenthesis : TokenClass, IInfix
     {
-        private readonly int _level;
+        readonly int _level;
 
         internal LeftParenthesis(int level) { _level = level; }
 
         [DisableDump]
         internal int Level { get { return _level; } }
+        [DisableDump]
+        bool IInfix.IsLambda { get { return false; } }
 
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, left, this, token, right); }
 

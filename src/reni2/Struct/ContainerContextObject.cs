@@ -1,5 +1,5 @@
 //     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+//     Copyright (C) 2011-2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,6 @@ namespace Reni.Struct
         int IndexSize { get { return Container.IndexSize; } }
 
         internal AccessManager.IAccessObject UniqueAccessObject(int position) { return _accessObjectsCache.Find(position); }
-        internal Structure UniqueAccessPoint(int position) { return Parent.UniqueStructure(Container, position); }
         internal TypeBase AccessType(int accessPosition, int position) { return Container.AccessType(_parent, accessPosition, position); }
 
         internal Size StructureSize(int position)

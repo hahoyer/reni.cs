@@ -37,7 +37,6 @@ namespace Reni.Type
         readonly SimpleCache<CodeBase> _valueReferenceViaFieldReferenceCodeCache;
 
         public AccessType(Structure accessPoint, int position)
-            : base(accessPoint.ValueType(position))
         {
             Tracer.Assert(!(accessPoint.ValueType(position) is Aligner));
             _accessPoint = accessPoint;
@@ -53,6 +52,8 @@ namespace Reni.Type
         internal int Position { get { return _position; } }
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return AccessPoint.RefAlignParam; } }
+        [DisableDump]
+        internal override TypeBase ValueType { get { return _accessPoint.ValueType(_position); } }
         [EnableDump]
         AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
         [DisableDump]
@@ -136,7 +137,7 @@ namespace Reni.Type
 
         internal Result ValueReferenceViaFieldReferenceFunction(Category category)
         {
-            var trace = ObjectId == -14 && category.HasCode;
+            var trace = ObjectId == 4 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {

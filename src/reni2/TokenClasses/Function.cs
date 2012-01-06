@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -22,33 +23,42 @@ using System.Collections.Generic;
 using System.Linq;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
-    abstract class Function : Suffix
+    abstract class Function : Special, IInfix
     {
         readonly bool _isAutoCall;
         protected Function(bool isAutoCall) { _isAutoCall = isAutoCall; }
+
         [DisableDump]
-        protected override bool IsLambda { get { return true; } }
-        
-        public override Result Result(ContextBase context, Category category, CompileSyntax target)
+        bool IInfix.IsLambda { get { return true; } }
+
+        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        {
+            Tracer.Assert(left != null || right != null);
+            return new InfixSyntax(token, left.ToCompiledSyntaxOrNull(), this, right.ToCompiledSyntaxOrNull());
+        }
+
+        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return context
-                .FunctionalResult(category, target, _isAutoCall);
+                .FunctionalResult(category, left, right, _isAutoCall);
         }
     }
 
-    sealed class CallFunction : Function
+    sealed class ExplicitFunction : Function
     {
-        public CallFunction()
+        public ExplicitFunction()
             : base(false) { }
     }
 
-    sealed class AutoCallFunction : Function
+    sealed class ImplicitFunction : Function
     {
-        public AutoCallFunction()
+        public ImplicitFunction()
             : base(true) { }
     }
 }

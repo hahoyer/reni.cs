@@ -648,6 +648,8 @@ namespace Reni
         {
             if(Type.IsDataLess)
                 return this;
+            if (Type.IsLikeReference)
+                return this;
             return Type
                 .SmartLocalReferenceResult(CompleteCategory, refAlignParam)
                 .ReplaceArg(this);

@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
-        public TypeBase ObjectReference(RefAlignParam refAlignParam) { return ObjectType.UniqueAutomaticReference(refAlignParam); }
+        TypeBase IFunctionalFeature.ObjectReference(RefAlignParam refAlignParam) { return ObjectType.UniqueAutomaticReference(refAlignParam); }
 
         protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         protected abstract TypeBase ObjectType { get; }

@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -237,7 +237,7 @@ namespace Reni.Type
         /// <summary>
         ///     Gets the icon key.
         /// </summary>
-        /// <value>The icon key.</value>
+        /// <value> The icon key. </value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
 
         [DisableDump]
@@ -268,6 +268,11 @@ namespace Reni.Type
         internal virtual int ArrayElementCount { get { return 1; } }
         [DisableDump]
         internal virtual bool IsArray { get { return false; } }
+        [DisableDump]
+        internal virtual bool IsLambda { get { return false; } }
+        [DisableDump]
+        internal virtual bool IsLikeReference { get { return false; } }
+
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
         internal SearchResult SearchDefineable<TFeature>(Defineable defineable)
@@ -388,10 +393,6 @@ namespace Reni.Type
         {
             if(IsDataLess && destination is Void)
                 return new FunctionalConverter(c => Void.Result(c, ArgResult(c)));
-
-            var functionalSource = this as CallType;
-            if(functionalSource != null)
-                return functionalSource.ConverterForUnalignedTypes(conversionParameter, destination);
 
             NotImplementedMethod(conversionParameter, destination);
             return null;

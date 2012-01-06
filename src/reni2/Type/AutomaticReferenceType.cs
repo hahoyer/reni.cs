@@ -28,11 +28,12 @@ namespace Reni.Type
 {
     sealed class AutomaticReferenceType : ReferenceType
     {
+        readonly TypeBase _valueType;
         readonly RefAlignParam _refAlignParam;
 
         internal AutomaticReferenceType(TypeBase valueType, RefAlignParam refAlignParam)
-            : base(valueType)
         {
+            _valueType = valueType;
             _refAlignParam = refAlignParam;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is ReferenceType), valueType.Dump);
@@ -57,6 +58,9 @@ namespace Reni.Type
 
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal override TypeBase ValueType { get { return _valueType; } }
+        [DisableDump]
+        internal override bool IsLikeReference { get { return true; } }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }

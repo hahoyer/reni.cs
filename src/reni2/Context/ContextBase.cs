@@ -212,11 +212,10 @@ namespace Reni.Context
             public string IconKey { get { return "Cache"; } }
         }
 
-        internal Result FunctionalResult(Category category, CompileSyntax target, bool isAutoCall)
+        internal Result FunctionalResult(Category category, CompileSyntax getter, CompileSyntax setter, bool isAutoCall)
         {
             return FindRecentStructure
-                .UniqueFunctionalFeature(target)
-                .UniqueType(isAutoCall)
+                .FunctionalFeature(getter, setter, isAutoCall)
                 .Result(category);
         }
 

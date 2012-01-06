@@ -278,4 +278,15 @@ f1()dump_print;
         [Test]
         public override void Run() { BaseRun(); }
     }
+
+    [TestFixture]
+    [SimpleFunctionWithNonLocal]
+    [TargetSet(@"f: arg/\arg+value;f(2) := 100;", "102")]
+    public sealed class FunctionAssignment : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+
 }
