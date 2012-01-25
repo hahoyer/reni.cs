@@ -77,11 +77,9 @@ f1()dump_print;
 
         static void ExecTest()
         {
-            var os = Compiler.OutStream;
-            Compiler.OutStream = new OutStream();
+            Data.OutStream = new OutStream();
             Reni.MainFunction();
-            var osNew = Compiler.OutStream;
-            Compiler.OutStream = os;
+            Data.OutStream = null;
         }
 
         [TestFixture]

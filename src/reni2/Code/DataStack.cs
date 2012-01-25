@@ -1,6 +1,6 @@
 ﻿// 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -31,8 +31,9 @@ namespace Reni.Code
     {
         sealed class LocalData : ReniObject, IStackDataAddressBase
         {
-            public StackData Data = new EmptyStackData();
+            public StackData Data;
             public FrameData Frame = new FrameData(null);
+            public LocalData(IOutStream outStream) { Data = new EmptyStackData(outStream); }
 
             string IStackDataAddressBase.Dump() { return "stack"; }
 
@@ -47,23 +48,26 @@ namespace Reni.Code
                     .Push(oldTop);
             }
 
-            internal StackDataAddress Address(Size offset) { return new StackDataAddress(this, offset - Data.Size); }
+            internal StackDataAddress Address(Size offset) { return new StackDataAddress(this, offset - Data.Size,Data.OutStream); }
 
-            internal StackData FrameAddress(Size offset) { return new StackDataAddress(Frame, offset); }
+            internal StackData FrameAddress(Size offset) { return new StackDataAddress(Frame, offset, Data.OutStream); }
         }
 
         internal static Size RefSize { get { return Root.DefaultRefAlignParam.RefSize; } }
 
         [EnableDump]
-        LocalData _localData = new LocalData();
+        LocalData _localData;
 
         readonly CodeBase[] _functions;
         readonly bool _isTraceEnabled;
+        readonly IOutStream _outStream;
 
-        public DataStack(CodeBase[] functions, bool isTraceEnabled)
+        public DataStack(CodeBase[] functions, bool isTraceEnabled, IOutStream outStream)
         {
             _functions = functions;
             _isTraceEnabled = isTraceEnabled;
+            _outStream = outStream;
+            _localData = new LocalData(_outStream);
         }
 
         [DisableDump]
@@ -89,7 +93,7 @@ namespace Reni.Code
         {
             if(size.IsZero)
                 return;
-            Push(new BitsStackData(data.Resize(size)));
+            Push(new BitsStackData(data.Resize(size),_outStream));
         }
 
         void Push(StackData value) { Data = Data.Push(value); }
@@ -163,7 +167,7 @@ namespace Reni.Code
             left.Assign(targetSize, right);
         }
 
-        void IVisitor.PrintText(string dumpPrintText) { BitsConst.OutStream.Add(dumpPrintText); }
+        void IVisitor.PrintText(string dumpPrintText) { _outStream.Add(dumpPrintText); }
 
         void IVisitor.List(CodeBase[] data)
         {
@@ -210,7 +214,7 @@ namespace Reni.Code
             }
         }
 
-        void IVisitor.LocalVariableReference(string holder, Size offset) { Push(new StackDataAddress(new LocalStackReference(Locals, holder), offset)); }
+        void IVisitor.LocalVariableReference(string holder, Size offset) { Push(new StackDataAddress(new LocalStackReference(Locals, holder), offset, _outStream)); }
 
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
         {

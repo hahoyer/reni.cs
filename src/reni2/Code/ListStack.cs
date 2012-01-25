@@ -11,11 +11,12 @@ namespace Reni.Code
         [EnableDump]
         private readonly NonListStackData[] _data;
 
-        public ListStack(NonListStackData top, NonListStackData formerStackData) { _data = new NonListStackData[2] {top, formerStackData}; }
+        public ListStack(NonListStackData top, NonListStackData formerStackData): base(top.OutStream) { _data = new NonListStackData[2] {top, formerStackData}; }
 
-        private ListStack(NonListStackData[] data) { _data = data; }
+        private ListStack(NonListStackData[] data, IOutStream outStream) : base(outStream) { _data = data; }
 
         private ListStack(NonListStackData[] data, NonListStackData formerStackData)
+            : base(formerStackData.OutStream)
         {
             _data = new NonListStackData[data.Length + 1];
             data.CopyTo(_data, 0);
@@ -23,6 +24,7 @@ namespace Reni.Code
         }
 
         private ListStack(NonListStackData[] data, ListStack formerStack)
+            : base(formerStack.OutStream)
         {
             _data = new NonListStackData[data.Length + formerStack._data.Length];
             data.CopyTo(_data, 0);
@@ -30,6 +32,7 @@ namespace Reni.Code
         }
 
         public ListStack(NonListStackData data, ListStack formerStack)
+            : base(formerStack.OutStream)
         {
             _data = new NonListStackData[formerStack._data.Length + 1];
             _data[0] = data;
@@ -74,7 +77,7 @@ namespace Reni.Code
             switch(length)
             {
                 case 0:
-                    return new EmptyStackData();
+                    return new EmptyStackData(OutStream);
                 case 1:
                     return _data[start];
                 default:
@@ -82,7 +85,7 @@ namespace Reni.Code
                     var newData = new NonListStackData[length];
                     for(var i = 0; i < length; i++)
                         newData[i] = _data[start + i];
-                    return new ListStack(newData);
+                    return new ListStack(newData,OutStream);
                 }
             }
         }
@@ -97,6 +100,8 @@ namespace Reni.Code
 
     internal abstract class NonListStackData : StackData
     {
+        protected NonListStackData(IOutStream outStream)
+            : base(outStream) {}
         internal override StackData Push(StackData stackData) { return stackData.PushOnto(this); }
         internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(this, formerStack); }
         internal override StackData PushOnto(ListStack formerStack) { return new ListStack(this, formerStack); }

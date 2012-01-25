@@ -34,7 +34,6 @@ namespace Reni.Basics
     {
         const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         internal const int SegmentAlignBits = 3;
-        static OutStream _outStream;
         static int _nextObjectId;
 
         readonly Size _size;
@@ -82,8 +81,6 @@ namespace Reni.Basics
         }
 
         public byte[] ToByteArray() { return (byte[]) _data.Clone(); }
-
-        public static OutStream OutStream { get { return _outStream; } set { _outStream = value; } }
 
         static Size SlagBits(Size size) { return SegmentBits * DataSize(size) - size; }
 
@@ -259,18 +256,18 @@ namespace Reni.Basics
             return result;
         }
 
-        public void PrintNumber(BitsConst radix)
+        public void PrintNumber(BitsConst radix, IOutStream outStream)
         {
             var r = radix.ToInt64();
             if(radix.Size.IsZero)
                 r = 10;
             var left = ToString((int) r);
 
-            _outStream.Add(left);
+            outStream.Add(left);
         }
 
-        public void PrintNumber() { PrintNumber(None()); }
-        public void PrintText(Size itemSize) { _outStream.Add(ToString(itemSize)); }
+        public void PrintNumber(IOutStream outStream) { PrintNumber(None(), outStream); }
+        public void PrintText(Size itemSize, IOutStream outStream) { outStream.Add(ToString(itemSize)); }
 
         public string ToString(Size itemSize)
         {

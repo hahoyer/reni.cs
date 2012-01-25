@@ -26,6 +26,10 @@ namespace Reni.Code
 {
     internal abstract class StackData : ReniObject
     {
+        internal readonly IOutStream OutStream;
+        
+        protected StackData(IOutStream outStream) { OutStream = outStream; }
+        
         internal virtual StackData Push(StackData stackData)
         {
             NotImplementedMethod(stackData);
@@ -58,15 +62,15 @@ namespace Reni.Code
             return null;
         }
 
-        internal void PrintNumber() { GetBitsConst().PrintNumber(); }
-        internal void PrintText(Size itemSize) { GetBitsConst().PrintText(itemSize); }
+        internal void PrintNumber() { GetBitsConst().PrintNumber(OutStream); }
+        internal void PrintText(Size itemSize) { GetBitsConst().PrintText(itemSize, OutStream); }
 
         internal StackData DoGetTop(Size size)
         {
             if(size == Size)
                 return this;
             if(size.IsZero)
-                return new EmptyStackData();
+                return new EmptyStackData(OutStream);
             return GetTop(size);
         }
 
@@ -75,7 +79,7 @@ namespace Reni.Code
             if(size.IsZero)
                 return this;
             if(size == Size)
-                return new EmptyStackData();
+                return new EmptyStackData(OutStream);
             return Pull(size);
         }
 
@@ -84,7 +88,7 @@ namespace Reni.Code
             if(Size == dataSize)
                 return this;
 
-            return new BitsStackData(GetBitsConst().Resize(dataSize));
+            return new BitsStackData(GetBitsConst().Resize(dataSize),OutStream);
         }
 
         internal StackData BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, StackData right)
@@ -92,14 +96,14 @@ namespace Reni.Code
             var leftData = GetBitsConst();
             var rightData = right.GetBitsConst();
             var resultData = leftData.BitArrayBinaryOp(opToken.DataFunctionName, size, rightData);
-            return new BitsStackData(resultData);
+            return new BitsStackData(resultData, OutStream);
         }
 
         internal StackData BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size)
         {
             var argData = GetBitsConst();
             var resultData = argData.BitArrayPrefixOp(opToken.DataFunctionName, size);
-            return new BitsStackData(resultData);
+            return new BitsStackData(resultData, OutStream);
         }
 
         internal StackData RefPlus(Size offset) { return GetAddress().RefPlus(offset); }

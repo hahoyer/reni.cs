@@ -31,8 +31,15 @@ namespace Reni.Context
     {
         [DisableDump]
         readonly FunctionList _functions;
+        [DisableDump]
+        internal readonly IOutStream OutStream;
 
-        internal Root(FunctionList functions) { _functions = functions; }
+
+        internal Root(FunctionList functions, IOutStream outStream)
+        {
+            _functions = functions;
+            OutStream = outStream;
+        }
 
         [DisableDump]
         internal override Root RootContext { get { return this; } }

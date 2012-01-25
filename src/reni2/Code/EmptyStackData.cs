@@ -8,6 +8,8 @@ namespace Reni.Code
 {
     internal sealed class EmptyStackData : StackData
     {
+        internal EmptyStackData(IOutStream outStream)
+            : base(outStream) {}
         internal override StackData Push(StackData stackData) { return stackData; }
         internal override StackData PushOnto(NonListStackData formerStack) { return formerStack; }
         internal override StackData PushOnto(ListStack formerStack) { return formerStack; }

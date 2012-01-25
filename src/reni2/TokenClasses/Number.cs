@@ -37,7 +37,6 @@ namespace Reni.TokenClasses
                 .UniqueNumber(bitsConst.Size.ToInt())
                 .Result(category, () => CodeBase.BitsConst(bitsConst), CodeArgs.Void);
         }
-        public override bool? QuickIsDereferencedDataLess(ContextBase context, TokenData token) { return BitsConst.Convert(token.Name).IsEmpty; }
 
         public static Int64 ToInt64(TokenData token) { return BitsConst.Convert(token.Name).ToInt64(); }
     }

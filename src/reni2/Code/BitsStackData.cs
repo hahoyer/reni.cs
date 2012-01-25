@@ -11,7 +11,8 @@ namespace Reni.Code
         [EnableDump]
         private readonly BitsConst _data;
 
-        public BitsStackData(BitsConst data)
+        public BitsStackData(BitsConst data, IOutStream outStream)
+            : base(outStream)
         {
             _data = data;
             Tracer.Assert(!_data.Size.IsZero);

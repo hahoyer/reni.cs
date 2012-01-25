@@ -53,7 +53,7 @@ namespace Reni
         /// </summary>
         /// <param name = "fileName">Name of the file.</param>
         /// <param name = "parameters"></param>
-        internal Compiler(CompilerParameters parameters, string fileName)
+        public Compiler(CompilerParameters parameters, string fileName)
         {
             _fileName = fileName;
             _parameters = parameters;
@@ -64,7 +64,7 @@ namespace Reni
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<Container>>(() => Functions.Compile());
-            _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions));
+            _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions,OutStream));
             _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
         }
 
@@ -125,12 +125,13 @@ namespace Reni
                 return result;
             }
         }
-        public static OutStream OutStream { get { return BitsConst.OutStream; } set { BitsConst.OutStream = value; } }
+
+        internal IOutStream OutStream { get { return _parameters.OutStream; } }
 
         /// <summary>
         ///     Performs compilation
         /// </summary>
-        internal OutStream Exec()
+        public void Exec()
         {
             if(_parameters.Trace.Source)
                 Tracer.Line("Dump Source\n" + Source.Dump());
@@ -139,7 +140,7 @@ namespace Reni
                 Tracer.FlaggedLine("Dump Syntax\n" + Syntax.Dump());
 
             if(_parameters.ParseOnly)
-                return null;
+                return;
 
             if(_parameters.Trace.Functions)
             {
@@ -158,7 +159,10 @@ namespace Reni
             }
 
             if(_parameters.RunFromCode)
-                return GetOutStreamFromCode();
+            {
+                Code.Execute(_functionCode.Value, _parameters.Trace.CodeExecutor, OutStream);
+                return;
+            }
 
             if(_parameters.Trace.CodeSequence)
             {
@@ -169,7 +173,19 @@ namespace Reni
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(ExecutedCode);
 
-            return GetOutStream();
+            Data.OutStream = OutStream;
+            try
+            {
+                var assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false, _parameters.Trace.GeneratorFilePosn);
+                var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
+                methodInfo.Invoke(null, new object[0]);
+            }
+            catch (CompilerErrorException e)
+            {
+                for (var i = 0; i < e.CompilerErrorCollection.Count; i++)
+                    OutStream.Add(e.CompilerErrorCollection[i].ToString());
+            }
+            Data.OutStream = null;
         }
 
         internal void Materialize()
@@ -180,29 +196,10 @@ namespace Reni
             for(var i = 0; i < Functions.Count; i++)
                 Functions[i].EnsureBodyCode();
         }
+    }
 
-        OutStream GetOutStream()
-        {
-            BitsConst.OutStream = new OutStream();
-            try
-            {
-                var assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false);
-                var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
-                methodInfo.Invoke(null, new object[0]);
-            }
-            catch(CompilerErrorException e)
-            {
-                for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
-                    BitsConst.OutStream.Add(e.CompilerErrorCollection[i].ToString());
-            }
-            return BitsConst.OutStream;
-        }
-
-        OutStream GetOutStreamFromCode()
-        {
-            BitsConst.OutStream = new OutStream();
-            Code.Execute(_functionCode.Value, _parameters.Trace.CodeExecutor);
-            return BitsConst.OutStream;
-        }
+    public interface IOutStream
+    {
+        void Add(string text);
     }
 }

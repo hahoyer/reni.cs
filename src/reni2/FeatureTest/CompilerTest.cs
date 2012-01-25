@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,6 +25,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.IO;
 using HWClassLibrary.UnitTest;
+using Reni.Runtime;
 
 namespace Reni.FeatureTest
 {
@@ -39,14 +41,14 @@ namespace Reni.FeatureTest
         internal const string Worked = "Worked";
 
         internal readonly CompilerParameters Parameters = new CompilerParameters();
-        private static Dictionary<System.Type, CompilerTest> _cache;
-        private bool _needToRunDependants = true;
+        static Dictionary<System.Type, CompilerTest> _cache;
+        bool _needToRunDependants = true;
 
         internal void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
         internal void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
         internal void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
 
-        private void CreateFileAndRunCompiler(int depth, string name, string text, Action<Compiler> expectedResult, string expectedOutput)
+        void CreateFileAndRunCompiler(int depth, string name, string text, Action<Compiler> expectedResult, string expectedOutput)
         {
             var fileName = name + ".reni";
             var f = File.m(fileName);
@@ -62,7 +64,7 @@ namespace Reni.FeatureTest
             InternalRunCompiler(CompilerParameters.CreateTraceAll(), fileName, null, expectedOutput);
         }
 
-        private void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
+        void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
             Tracer.FlaggedLine(depth + 1, "Position of method tested");
             if(TestRunner.IsModeErrorFocus || IsCallerUnderConstruction(1))
@@ -72,8 +74,10 @@ namespace Reni.FeatureTest
             InternalRunCompiler(Parameters, fileName, expectedResult, expectedOutput);
         }
 
-        private static void InternalRunCompiler(CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, string expectedOutput)
+        static void InternalRunCompiler(CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
+            var outStream = new OutStream();
+            compilerParameters.OutStream = outStream;
             var c = new Compiler(compilerParameters, fileName);
 
             if(expectedResult != null)
@@ -82,17 +86,18 @@ namespace Reni.FeatureTest
                 expectedResult(c);
             }
 
-            var os = c.Exec();
-            if(os != null && os.Data != expectedOutput)
-            {
-                os.Exec();
-                    Tracer.ThrowAssertionFailed(
-                    "os.Data != expectedOutput",
-                    () => "os.Data:" + os.Data + " expected: " + expectedOutput);
-            }
+            c.Exec();
+            
+            if(outStream.Data == expectedOutput)
+                return;
+            
+            Tracer.Line("---------------------\n" + outStream.Data + "\n---------------------");
+            Tracer.ThrowAssertionFailed(
+                "outStream.Data != expectedOutput",
+                () => "outStream.Data:" + outStream.Data + " expected: " + expectedOutput);
         }
 
-        private static bool IsCallerUnderConstruction(int depth)
+        static bool IsCallerUnderConstruction(int depth)
         {
             for(var i = 0; i < 100; i++)
             {
@@ -106,7 +111,7 @@ namespace Reni.FeatureTest
             return false;
         }
 
-        private void RunDependant()
+        void RunDependant()
         {
             RunDependants();
             Run();
@@ -125,7 +130,7 @@ namespace Reni.FeatureTest
         }
 
 
-        private void RunDependants()
+        void RunDependants()
         {
             if(!_needToRunDependants)
                 return;
@@ -141,7 +146,7 @@ namespace Reni.FeatureTest
                 ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
         }
 
-        private IEnumerable<Tuple<string, string>> TargetSet
+        IEnumerable<Tuple<string, string>> TargetSet
         {
             get
             {
@@ -172,7 +177,7 @@ namespace Reni.FeatureTest
             return attrs.Length == 1 ? ((T) attrs[0]).Value : "";
         }
 
-        private Tuple<string, string>[] GetStringPairAttributes<T>() where T : StringPairAttribute
+        Tuple<string, string>[] GetStringPairAttributes<T>() where T : StringPairAttribute
         {
             return GetType()
                 .GetCustomAttributes(typeof(T), true)
@@ -184,45 +189,45 @@ namespace Reni.FeatureTest
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    internal sealed class IsUnderConstructionAttribute : Attribute
+    sealed class IsUnderConstructionAttribute : Attribute
     {}
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    internal abstract class StringAttribute : Attribute
+    abstract class StringAttribute : Attribute
     {
         internal readonly string Value;
         protected StringAttribute(string value) { Value = value; }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    internal sealed class OutputAttribute : StringAttribute
+    sealed class OutputAttribute : StringAttribute
     {
         internal OutputAttribute(string value)
             : base(value) { }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    internal sealed class TargetAttribute : StringAttribute
+    sealed class TargetAttribute : StringAttribute
     {
         internal TargetAttribute(string value)
             : base(value) { }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    internal sealed class InstanceCodeAttribute : StringAttribute
+    sealed class InstanceCodeAttribute : StringAttribute
     {
         public InstanceCodeAttribute(string value)
             : base(value) { }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    internal sealed class TargetSetAttribute : StringPairAttribute
+    sealed class TargetSetAttribute : StringPairAttribute
     {
         internal TargetSetAttribute(string target, string output)
             : base(new Tuple<string, string>(target, output)) { }
     }
 
-    internal abstract class StringPairAttribute : Attribute
+    abstract class StringPairAttribute : Attribute
     {
         public readonly Tuple<string, string> Value;
         protected StringPairAttribute(Tuple<string, string> value) { Value = value; }

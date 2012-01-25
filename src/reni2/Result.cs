@@ -578,11 +578,11 @@ namespace Reni
 
         internal Result Conversion(TypeBase target) { return Type.Conversion(CompleteCategory, target).ReplaceArg(this); }
 
-        internal BitsConst Evaluate()
+        internal BitsConst Evaluate(IOutStream outStream)
         {
             Tracer.Assert(CodeArgs.IsNone);
             var result = Align(3).LocalBlock(CompleteCategory);
-            return result.Code.Evaluate();
+            return result.Code.Evaluate(outStream);
         }
 
         internal Result AutomaticDereference()

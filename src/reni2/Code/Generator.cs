@@ -40,20 +40,21 @@ namespace Reni.Code
         internal static string FunctionName(int i) { return "Function" + i; }
 
         internal static string CreateCSharpString(Container main, List<Container> functions, bool useStatementAligner) { return new CSharp_Generated(main, functions).TransformText(useStatementAligner); }
-        internal static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align) { return CodeToAssembly(CreateCSharpString(main, functions, align)); }
+        internal static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align, bool traceFilePosn) { return CodeToAssembly(CreateCSharpString(main, functions, align),traceFilePosn); }
 
-        static void CodeToFile(string name, string result)
+        static void CodeToFile(string name, string result, bool traceFilePosn)
         {
             var streamWriter = new StreamWriter(name);
-            Tracer.Line(Tracer.FilePosn(HWClassLibrary.IO.File.m(name).FullName, 0, 0, ""));
+            if(traceFilePosn)
+                Tracer.Line(Tracer.FilePosn(HWClassLibrary.IO.File.m(name).FullName, 0, 0, ""));
             streamWriter.Write(result);
             streamWriter.Close();
         }
 
-        static Assembly CodeToAssembly(string codeToString)
+        static Assembly CodeToAssembly(string codeToString, bool traceFilePosn)
         {
             const string name = "generated.cs";
-            CodeToFile(name, codeToString);
+            CodeToFile(name, codeToString, traceFilePosn);
 
             // Build the parameters for source compilation.
             var cp = new System.CodeDom.Compiler.CompilerParameters

@@ -32,6 +32,8 @@ namespace Reni.Runtime
         readonly byte[] _data;
         int _length;
 
+        static public IOutStream OutStream { get; set; }
+
         public static Data Create(int bytes) { return new Data(new byte[bytes]); }
         public static Data Create(byte[] bytes) { return new Data(bytes) {StartIndex = 0}; }
 

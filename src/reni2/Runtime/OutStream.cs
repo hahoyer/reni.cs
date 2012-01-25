@@ -8,29 +8,17 @@ namespace Reni.Runtime
     /// <summary>
     ///     Handle printouts
     /// </summary>
-    public class OutStream : ReniObject
+    public sealed class OutStream : ReniObject, IOutStream
     {
         private string _data = "";
 
-        /// <summary>
-        ///     Content so far
-        /// </summary>
-        public string Data { get { return _data; } }
+        internal string Data { get { return _data; } }
 
-        /// <summary>
-        ///     Adds some text
-        /// </summary>
-        /// <param name = "x"></param>
-        public void Add(string x)
+        void IOutStream.Add(string x)
         {
             _data += x;
-            Exec();
+            Tracer.Line("---------------------\n" + _data + "\n---------------------");
             Tracer.Assert(_data.Length < 1000);
         }
-
-        /// <summary>
-        ///     put it out
-        /// </summary>
-        public void Exec() { Tracer.Line("---------------------\n" + _data + "\n---------------------"); }
     }
 }

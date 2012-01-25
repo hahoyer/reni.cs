@@ -86,19 +86,6 @@ namespace Reni.Runtime
                 destination[i + destOffset] = source[i + sourceOffset];
         }
 
-        /// <summary>
-        ///     Dumps the print.
-        /// </summary>
-        /// <param name = "s">The s.</param>
-        /// created 08.01.2007 18:42
-        internal static void DumpPrint(string s) { BitsConst.OutStream.Add(s); }
-
-        internal static unsafe void BitCast(this byte[] x, int bits)
-        {
-            fixed(byte* xx = x)
-                BitCast(x.Length, xx, bits);
-        }
-
         static unsafe void BitCast(int count, byte* x, int bitsToCast)
         {
             var isNegative = IsNegative(x[count - 1]);
@@ -179,7 +166,7 @@ namespace Reni.Runtime
 
         internal static void PrintNumber(this byte[] data) { PrintText(new BigInteger(data).ToString()); }
 
-        internal static void PrintText(this string text) { BitsConst.OutStream.Add(text); }
+        internal static void PrintText(this string text) { Data.OutStream.Add(text); }
         internal static void PrintText(this byte[] text) { new string(text.Select(x => (char) x).ToArray()).PrintText(); }
 
         internal static unsafe void AssignFromPointers(this byte[] leftData, byte[] rightData, int bytes)

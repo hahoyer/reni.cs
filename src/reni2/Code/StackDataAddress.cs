@@ -11,7 +11,8 @@ namespace Reni.Code
         private readonly IStackDataAddressBase _data;
         private readonly Size _offset;
 
-        public StackDataAddress(IStackDataAddressBase data, Size offset)
+        public StackDataAddress(IStackDataAddressBase data, Size offset, IOutStream outStream)
+            : base(outStream)
         {
             _data = data;
             _offset = offset;
@@ -30,7 +31,7 @@ namespace Reni.Code
         {
             if(offset.IsZero)
                 return this;
-            return new StackDataAddress(_data, offset + _offset);
+            return new StackDataAddress(_data, offset + _offset, OutStream);
         }
 
         protected override StackDataAddress GetAddress() { return this; }
