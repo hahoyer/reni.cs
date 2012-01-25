@@ -74,7 +74,7 @@ namespace Reni.Struct
             {
                 return ContainerContextObject
                     .Parent
-                    .UniqueChildContext(ContainerContextObject.Container, EndPosition);
+                    .UniqueStructurePositionContext(ContainerContextObject.Container, EndPosition);
             }
         }
 
@@ -153,7 +153,7 @@ namespace Reni.Struct
         {
             var position = rightResult
                 .Conversion(IndexType)
-                .Evaluate()
+                .Evaluate(ContainerContextObject.RootContext.OutStream)
                 .ToInt32();
             return AccessViaThisReference(category, position);
         }

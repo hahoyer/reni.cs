@@ -248,6 +248,8 @@ namespace Reni.Type
 
         [DisableDump]
         internal virtual IFunctionalFeature FunctionalFeature { get { return this as IFunctionalFeature; } }
+        [DisableDump]
+        internal virtual IFunctionalFeatureSpecial FunctionalFeatureSpecial { get { return this as IFunctionalFeatureSpecial; } }
 
         [DisableDump]
         internal virtual IMetaFeature MetaFeature { get { return this as IMetaFeature; } }
@@ -423,8 +425,4 @@ namespace Reni.Type
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
     }
 
-    interface IMetaFeature
-    {
-        Result ObtainResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam);
-    }
 }

@@ -78,12 +78,12 @@ namespace Reni.Type
 
             internal override bool IsDataLess { get { return true; } }
             
-            Result IMetaFeature.ObtainResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
+            Result IMetaFeature.ApplyResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
             {
                 var count = right
                     .Result(contextBase)
                     .AutomaticDereference()
-                    .Evaluate()
+                    .Evaluate(contextBase.RootContext.OutStream)
                     .ToInt32();
                 return _typeType
                     .Value

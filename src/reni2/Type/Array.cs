@@ -116,24 +116,6 @@ namespace Reni.Type
             return code;
         }
 
-        internal Result Result(Category category, IFunctionalFeature functionalFeature)
-        {
-            var operationResult = VoidResult(category);
-            var result = VoidResult(category);
-            for(var i = 0; i < Count; i++)
-            {
-                var index = BitsConst.Convert(i);
-                var argsResult = UniqueNumber(index.Size.ToInt())
-                    .Result(category.Typed, () => CodeBase.BitsConst(index), CodeArgs.Void);
-                var rawResult = functionalFeature
-                    .ApplyResult(category.Typed, argsResult, null)
-                    .ReplaceArg(operationResult);
-                var convertedResult = rawResult.Conversion(Element) & result.CompleteCategory;
-                result = convertedResult.Sequence(result);
-            }
-            return Result(category, result);
-        }
-
         internal Result SequenceResult(Category category, RefAlignParam refAlignParam)
         {
             return Element

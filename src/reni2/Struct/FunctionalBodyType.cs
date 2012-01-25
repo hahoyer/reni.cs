@@ -80,6 +80,16 @@ namespace Reni.Struct
                 .Result(category, argsResult);
         }
 
-        TypeBase IFunctionalFeature.ObjectReference(RefAlignParam refAlignParam) { return _structure.Type.UniqueAutomaticReference(refAlignParam); }
+        internal TypeBase ValueType(TypeBase argsType)
+        {
+            Tracer.Assert(!_isImplicit);
+            if(_getter == null)
+                return null;
+            return _structure
+                .UniqueContext
+                .UniqueFunctionContext(argsType)
+                .UniqueResult(Category.Type, _getter)
+                .Type;
+        }
     }
 }

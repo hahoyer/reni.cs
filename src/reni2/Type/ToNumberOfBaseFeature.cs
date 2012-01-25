@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,7 +17,6 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
-using System.Numerics;
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,10 +31,10 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
-    internal sealed class ToNumberOfBaseFeature : ISearchPath<ISuffixFeature, SequenceType>
+    sealed class ToNumberOfBaseFeature : ISearchPath<ISuffixFeature, SequenceType>
     {
-        private readonly DictionaryEx<int, ToNumberOfBaseSequenceFeature> _toNumberOfBaseSeqquenceFeaturesCache;
-        private readonly TextItemType _type;
+        readonly DictionaryEx<int, ToNumberOfBaseSequenceFeature> _toNumberOfBaseSeqquenceFeaturesCache;
+        readonly TextItemType _type;
         public ToNumberOfBaseFeature(TextItemType type)
         {
             _toNumberOfBaseSeqquenceFeaturesCache = new DictionaryEx<int, ToNumberOfBaseSequenceFeature>(count => new ToNumberOfBaseSequenceFeature(_type, count));
@@ -47,12 +47,12 @@ namespace Reni.Type
         }
     }
 
-    internal sealed class ToNumberOfBaseSequenceFeature : TypeBase, ISuffixFeature, IMetaFeature
+    sealed class ToNumberOfBaseSequenceFeature : TypeBase, ISuffixFeature, IMetaFeature
     {
         [EnableDump]
-        private readonly TextItemType _type;
+        readonly TextItemType _type;
         [EnableDump]
-        private readonly int _count;
+        readonly int _count;
         public ToNumberOfBaseSequenceFeature(TextItemType type, int count)
         {
             _type = type;
@@ -61,7 +61,7 @@ namespace Reni.Type
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Result(category); }
         TypeBase IFeature.ObjectType { get { return _type.UniqueSequence(_count); } }
         internal override bool IsDataLess { get { return true; } }
-        Result IMetaFeature.ObtainResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
+        Result IMetaFeature.ApplyResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
         {
             var target = left.Evaluate(context).ToString(_type.Size);
             var conversionBase = right.Evaluate(context).ToInt32();

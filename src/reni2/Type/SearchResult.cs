@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2011 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -44,7 +45,7 @@ namespace Reni.Type
 
         internal Result Result(Category category, RefAlignParam refAlignParam)
         {
-            var trace = ObjectId == -6 && category.HasCode;
+            var trace = ObjectId == -2 && category.HasCode;
             StartMethodDump(trace, category, refAlignParam);
             try
             {
@@ -73,27 +74,27 @@ namespace Reni.Type
 
         internal Result ConverterResult(Category category, RefAlignParam refAlignParam)
         {
-            if (ConversionFunctions.Length == 0)
+            if(ConversionFunctions.Length == 0)
                 return TrivialConversionResult(category, refAlignParam);
             return ConverterResult(category.Typed).SmartLocalReferenceResult(refAlignParam);
         }
 
         protected abstract Result TrivialConversionResult(Category category, RefAlignParam refAlignParam);
-        
+
         Result ConverterResult(Category category)
         {
             var trace = ObjectId == -6 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
-                var results = ConversionFunctions.Select((cf,i)=> cf.Result(i==0?category:category.Typed)).ToArray();
+                var results = ConversionFunctions.Select((cf, i) => cf.Result(i == 0 ? category : category.Typed)).ToArray();
                 Dump("results", results);
                 BreakExecution();
 
                 var result = results[0];
                 for(var i = 1; i < results.Length; i++)
                     result = result.ReplaceArg(results[i]);
-                
+
                 return ReturnMethodDump(result, true);
             }
             finally

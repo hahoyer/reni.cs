@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -36,13 +36,14 @@ namespace Reni.TokenClasses
                 .FindRecentFunctionContextObject
                 .CreateArgsReferenceResult(category);
         }
+    }
 
-        public override bool? QuickIsDereferencedDataLess(ContextBase context, TokenData token)
+    sealed class ValueToken : Terminal
+    {
+        public override Result Result(ContextBase context, Category category, TokenData token)
         {
-            return context
-                .ObtainRecentFunctionContext()
-                .ArgsType
-                .IsDataLessStructureElement(true);
+            NotImplementedMethod(context, category, token);
+            return null;
         }
     }
 }

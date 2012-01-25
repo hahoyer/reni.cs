@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -200,12 +200,12 @@ namespace Reni.Struct
             try
             {
                 var uniqueChildContext = parent
-                    .UniqueChildContext(this, accessPosition);
+                    .UniqueStructurePositionContext(this, accessPosition);
                 Dump("Statements[position]", Statements[position]);
                 BreakExecution();
                 var result = Statements[position]
                     .Result(uniqueChildContext, category.Typed);
-                Dump("result", result); 
+                Dump("result", result);
                 return ReturnMethodDump(result.AutomaticDereference(), true);
             }
             finally
@@ -217,7 +217,7 @@ namespace Reni.Struct
         bool? InternalInnerIsDataLess(bool isQuick, ContextBase parent, int position)
         {
             var uniqueChildContext = parent
-                .UniqueChildContext(this, position);
+                .UniqueStructurePositionContext(this, position);
             return Statements[position].IsDataLessStructureElement(isQuick, uniqueChildContext);
         }
 
@@ -259,7 +259,6 @@ namespace Reni.Struct
             StartMethodDump(trace, category, parent, fromPosition, fromNotPosition);
             try
             {
-
                 Dump("Statements", Statements);
 
                 var results = (fromNotPosition - fromPosition)
@@ -269,7 +268,7 @@ namespace Reni.Struct
                     .Select(r => r.Align(parent.RefAlignParam.AlignBits))
                     .Select(r => r.LocalBlock(category))
                     .ToArray();
-                Dump("results", results); 
+                Dump("results", results);
                 BreakExecution();
                 var result = results
                     .Aggregate(TypeBase.VoidResult(category), (current, next) => current + next);
@@ -282,17 +281,17 @@ namespace Reni.Struct
         }
 
         internal Size StructureSize(ContextBase parent, int fromPosition, int fromNotPosition) { return StructureResult(Category.Size, parent, fromPosition, fromNotPosition).Size; }
-        
+
         internal TypeBase AccessType(ContextBase parent, int accessPosition, int position)
         {
-            var trace = ObjectId == -10 && Statements[position].IsLambda;
+            var trace = ObjectId == -10 && accessPosition == 1 && position == 0;
             StartMethodDump(trace, parent, accessPosition, position);
             try
             {
-                Dump("Statements[position]", Statements[position]); 
+                Dump("Statements[position]", Statements[position]);
                 BreakExecution();
                 var result = Result(Category.Type, parent, accessPosition, position).Type;
-                return ReturnMethodDump(result,true);
+                return ReturnMethodDump(result, true);
             }
             finally
             {

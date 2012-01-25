@@ -53,7 +53,6 @@ namespace Reni.Type
                  , () => newElementResult.CodeArgs + CodeArgs.Arg()
                 );
         }
-        public TypeBase ObjectReference(RefAlignParam refAlignParam) { return _type.UniqueAutomaticReference(refAlignParam); }
         public Result ObjectConversion(Category category) { return null; }
 
         public bool IsDataLessObjectType

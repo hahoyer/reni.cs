@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ namespace Reni.Type
         [DisableDump]
         internal abstract RefAlignParam RefAlignParam { get; }
         [DisableDump]
-        abstract internal TypeBase ValueType { get; }
+        internal abstract TypeBase ValueType { get; }
         [DisableDump]
         internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
         [DisableDump]

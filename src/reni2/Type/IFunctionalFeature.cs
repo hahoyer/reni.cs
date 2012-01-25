@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,12 +22,23 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Context;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
-    internal interface IFunctionalFeature : IDumpShortProvider
+    interface IFunctionalFeature : IDumpShortProvider
     {
         Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam);
-        TypeBase ObjectReference(RefAlignParam refAlignParam);
+    }
+
+    interface IFunctionalFeatureSpecial
+    {
+        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam);
+    }
+
+    interface IMetaFeature
+    {
+        Result ApplyResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam);
     }
 }

@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ namespace Reni.Type
         }
 
         internal override bool? IsDataLessStructureElement(bool isQuick) { return AccessObject.IsDataLessStructureElement(this, isQuick); }
-        
+
         internal Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
         {
             var result = new Result

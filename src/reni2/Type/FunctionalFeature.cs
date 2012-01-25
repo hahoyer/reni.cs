@@ -64,7 +64,6 @@ namespace Reni.Type
                 EndMethodDump();
             }
         }
-        TypeBase IFunctionalFeature.ObjectReference(RefAlignParam refAlignParam) { return ObjectType.UniqueAutomaticReference(refAlignParam); }
 
         protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         protected abstract TypeBase ObjectType { get; }

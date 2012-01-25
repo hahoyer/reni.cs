@@ -129,7 +129,8 @@ namespace Reni.ReniParser
                        {"sequence", new SequenceToken()},
                        {"text_item", new TextItem()},
                        {"then", new ThenToken()},
-                       {"type", new TypeOperator()}
+                       {"type", new TypeOperator()},
+                       {"value", new ValueToken()}
                    };
         }
 

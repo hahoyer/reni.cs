@@ -156,7 +156,7 @@ namespace Reni.Struct
             try
             {
                 BreakExecution();
-                var functionContext = _structure.UniqueContext.UniqueChildContext(_args);
+                var functionContext = _structure.UniqueContext.UniqueFunctionContext(_args);
                 Dump("functionContext", functionContext);
                 var rawResult = _body.Result(functionContext, category.Typed).Clone();
                 Dump("rawResult", rawResult);

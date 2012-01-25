@@ -21,6 +21,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Type;
 
@@ -32,12 +33,47 @@ namespace Reni.Struct
         readonly FunctionalBodyType _functionalBodyType;
         [EnableDump]
         readonly TypeBase _argsType;
+        readonly DictionaryEx<RefAlignParam, TypeBase> _setterTypeCache;
 
         public FunctionAccessType(FunctionalBodyType functionalBodyType, TypeBase argsType)
         {
             _functionalBodyType = functionalBodyType;
             _argsType = argsType;
+            _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new SetterType(this, refAlignParam));
         }
+
+        sealed class SetterType : TypeBase, IFunctionalFeature
+        {
+            [EnableDump]
+            readonly FunctionAccessType _functionAccessType;
+            [EnableDump]
+            readonly RefAlignParam _refAlignParam;
+
+            public SetterType(FunctionAccessType functionAccessType, RefAlignParam refAlignParam)
+            {
+                _functionAccessType = functionAccessType;
+                _refAlignParam = refAlignParam;
+            }
+            internal override bool IsDataLess { get { return false; } }
+            protected override Size GetSize() { return _refAlignParam.RefSize; }
+
+            Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+            {
+                var valueType = _functionAccessType.ValueType ?? argsResult.Type;
+                var result = _functionAccessType
+                    .ApplySetterResult(category, valueType)
+                    .ReplaceArg(argsResult.Conversion(valueType));
+                return result;
+            }
+        }
+
+        Result ApplySetterResult(Category category, TypeBase valueType)
+        {
+            NotImplementedMethod(category, valueType);
+            return null;
+        }
+
+        TypeBase ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
 
         [DisableDump]
         internal override bool IsDataLess { get { return _argsType.IsDataLess; } }
@@ -58,7 +94,7 @@ namespace Reni.Struct
                 (category
                  , () => false
                  , () => refAlignParam.RefSize
-                 , () => _assignmentFeatureCache.Value.UniqueFunctionalType(refAlignParam)
+                 , () => _setterTypeCache.Find(refAlignParam)
                  , ArgCode
                  , CodeArgs.Arg
                 );

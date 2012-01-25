@@ -86,7 +86,10 @@ namespace Reni.ReniParser
             return parsedSyntax.ToCompiledSyntax();
         }
 
-        internal static void AssertIsNull(this ParsedSyntax parsedSyntax) { Tracer.Assert(parsedSyntax == null, () =>parsedSyntax.Dump()); }
+        internal static void AssertIsNull(this ParsedSyntax parsedSyntax)
+        {
+            Tracer.Assert(parsedSyntax == null, () => parsedSyntax.Dump());
+        }
 
         internal static void AssertIsNotNull(this ParsedSyntax parsedSyntax) { Tracer.Assert(parsedSyntax != null); }
 
