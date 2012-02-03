@@ -39,7 +39,7 @@ namespace Reni.Struct
         [EnableDump]
         readonly bool _isImplicit;
 
-        readonly DictionaryEx<TypeBase,FunctionAccessType> _functionAccessTypes;
+        readonly DictionaryEx<TypeBase, FunctionAccessType> _functionAccessTypes;
 
         internal FunctionalBodyType(Structure structure, CompileSyntax getter, CompileSyntax setter, bool isImplicit)
         {
@@ -64,7 +64,7 @@ namespace Reni.Struct
         internal RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         [DisableDump]
         internal override bool IsLikeReference { get { return true; } }
-        
+
         internal override string DumpPrintText { get { return _getter.DumpPrintText + Tag + _setter.DumpPrintText; } }
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return this; } }
@@ -74,10 +74,10 @@ namespace Reni.Struct
         Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!_isImplicit);
-            return 
+            return
                 _functionAccessTypes
-                .Find(argsResult.Type)
-                .Result(category, argsResult);
+                    .Find(argsResult.Type)
+                    .Result(category, argsResult);
         }
 
         internal TypeBase ValueType(TypeBase argsType)
@@ -90,6 +90,15 @@ namespace Reni.Struct
                 .UniqueFunctionContext(argsType)
                 .UniqueResult(Category.Type, _getter)
                 .Type;
+        }
+
+        internal Result ApplySetterResult(Category category, TypeBase argsType, TypeBase valueType)
+        {
+            Tracer.Assert(!_isImplicit);
+            return _structure
+                .UniqueContext
+                .UniqueFunctionContext(argsType, valueType)
+                .UniqueResult(category, _setter);
         }
     }
 }

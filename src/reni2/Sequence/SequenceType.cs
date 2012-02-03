@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -147,10 +147,10 @@ namespace Reni.Sequence
             return result;
         }
 
-        internal static Converter Converter(SequenceType source, ConversionParameter conversionParameter, SequenceType destination)
+        static Converter Converter(SequenceType source, ConversionParameter conversionParameter, SequenceType destination)
         {
             if(source.Count > destination.Count && conversionParameter.IsDisableCut)
-                destination.NotImplementedMethod(source, conversionParameter);
+                destination.NotImplementedMethod(source, conversionParameter, destination);
             return new FunctionalConverter(category => Conversion(category, source, destination));
         }
 

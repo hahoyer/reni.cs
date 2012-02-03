@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,17 +28,41 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    sealed class Function : Child, IReferenceInCode
+    sealed class Function : Child, IFunctionContext
     {
         [Node]
-        internal readonly TypeBase ArgsType;
-        internal Function(ContextBase parent, TypeBase argsType)
-            : base(parent) { ArgsType = argsType; }
+        internal readonly TypeBase ArgType;
+        [Node]
+        internal readonly TypeBase ValueType;
+        internal Function(ContextBase parent, TypeBase argType, TypeBase valueType)
+            : base(parent)
+        {
+            ArgType = argType;
+            ValueType = valueType;
+        }
+
+        internal Function(ContextBase parent, TypeBase argType)
+            : base(parent) { ArgType = argType; }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
 
-        internal override Function ObtainRecentFunctionContext() { return this; }
+        internal override IFunctionContext ObtainRecentFunctionContext() { return this; }
 
-        internal Result CreateArgsReferenceResult(Category category) { return ArgsType.ReferenceInCode(category, this); }
+        Result IFunctionContext.CreateArgReferenceResult(Category category) { return ArgType.ReferenceInCode(category, this); }
+        Result IFunctionContext.CreateValueReferenceResult(Category category)
+        {
+            if(ValueType == null)
+                throw new ValueCannotBeUsedHereException();
+            return ValueType.ReferenceInCode(category, this);
+        }
+    }
+
+    sealed class ValueCannotBeUsedHereException : Exception
+    {}
+
+    interface IFunctionContext : IReferenceInCode
+    {
+        Result CreateArgReferenceResult(Category category);
+        Result CreateValueReferenceResult(Category category);
     }
 }

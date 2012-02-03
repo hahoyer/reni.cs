@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -281,12 +282,10 @@ f1()dump_print;
 
     [TestFixture]
     [SimpleFunctionWithNonLocal]
-    [TargetSet(@"f: arg/\arg+value;f(2) := 100;", "102")]
+    [TargetSet(@"f: arg/\arg+value;f(100) := 2;", "102")]
     public sealed class FunctionAssignment : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
-
-
 }

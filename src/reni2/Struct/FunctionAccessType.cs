@@ -67,11 +67,7 @@ namespace Reni.Struct
             }
         }
 
-        Result ApplySetterResult(Category category, TypeBase valueType)
-        {
-            NotImplementedMethod(category, valueType);
-            return null;
-        }
+        Result ApplySetterResult(Category category, TypeBase valueType) { return _functionalBodyType.ApplySetterResult(category, _argsType, valueType); }
 
         TypeBase ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
 

@@ -34,16 +34,7 @@ namespace Reni.TokenClasses
         {
             return context
                 .FindRecentFunctionContextObject
-                .CreateArgsReferenceResult(category);
-        }
-    }
-
-    sealed class ValueToken : Terminal
-    {
-        public override Result Result(ContextBase context, Category category, TokenData token)
-        {
-            NotImplementedMethod(context, category, token);
-            return null;
+                .CreateArgReferenceResult(category);
         }
     }
 }

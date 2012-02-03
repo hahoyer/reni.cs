@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -68,13 +68,14 @@ namespace Reni.Context
         internal Structure FindRecentStructure { get { return _cache.RecentStructure.Value; } }
 
         [DisableDump]
-        internal Function FindRecentFunctionContextObject { get { return _cache.RecentFunctionContextObject.Value; } }
+        internal IFunctionContext FindRecentFunctionContextObject { get { return _cache.RecentFunctionContextObject.Value; } }
 
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
         internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts.Find(container).Find(position); }
-        internal ContextBase UniqueFunctionContext(TypeBase args) { return _cache.FunctionContexts.Find(args); }
+        internal ContextBase UniqueFunctionContext(TypeBase argsType) { return _cache.GetterFunctionContexts.Find(argsType); }
+        internal ContextBase UniqueFunctionContext(TypeBase argsType, TypeBase valueType) { return _cache.SetterFunctionContexts.Find(argsType).Find(valueType); }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
         internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Find(container).Find(accessPosition); }
@@ -147,7 +148,7 @@ namespace Reni.Context
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
         protected abstract Result CommonResult(Category category, CondSyntax condSyntax);
         internal virtual Structure ObtainRecentStructure() { return null; }
-        internal virtual Function ObtainRecentFunctionContext() { return null; }
+        internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
 
         internal Category PendingCategory(CompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
 
@@ -165,7 +166,7 @@ namespace Reni.Context
 
             [Node]
             [DisableDump]
-            internal readonly SimpleCache<Function> RecentFunctionContextObject;
+            internal readonly SimpleCache<IFunctionContext> RecentFunctionContextObject;
 
             [Node]
             [SmartNode]
@@ -181,7 +182,11 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<TypeBase, Function> FunctionContexts;
+            internal readonly DictionaryEx<TypeBase, Function> GetterFunctionContexts;
+
+            [Node]
+            [SmartNode]
+            internal readonly DictionaryEx<TypeBase, DictionaryEx<TypeBase, Function>> SetterFunctionContexts;
 
             [Node]
             [SmartNode]
@@ -196,15 +201,21 @@ namespace Reni.Context
             {
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>(
-                    container => new DictionaryEx<int, ContextBase>(
-                                     position => new Struct.Context(target, container, position)));
-                FunctionContexts = new DictionaryEx<TypeBase, Function>(argsType => new Function(target, argsType));
+                    container =>
+                    new DictionaryEx<int, ContextBase>(
+                        position => new Struct.Context(target, container, position)));
+                GetterFunctionContexts = new DictionaryEx<TypeBase, Function>(argsType => new Function(target, argsType));
+                SetterFunctionContexts = new DictionaryEx<TypeBase, DictionaryEx<TypeBase, Function>>(
+                    argsType =>
+                    new DictionaryEx<TypeBase, Function>(
+                        valueType => new Function(target, argsType, valueType)));
                 PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(target));
                 RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
-                RecentFunctionContextObject = new SimpleCache<Function>(target.ObtainRecentFunctionContext);
+                RecentFunctionContextObject = new SimpleCache<IFunctionContext>(target.ObtainRecentFunctionContext);
                 Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(
-                    container => new DictionaryEx<int, Structure>(
-                                     position => new Structure(ContainerContextObjects.Find(container), position)));
+                    container =>
+                    new DictionaryEx<int, Structure>(
+                        position => new Structure(ContainerContextObjects.Find(container), position)));
                 ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>(container => new ContainerContextObject(container, target));
             }
 
@@ -225,4 +236,5 @@ namespace Reni.Context
                 .SmartLocalReferenceResult(RefAlignParam);
         }
     }
+
 }
