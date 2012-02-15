@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,21 +28,20 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni.ReniParser
 {
     [Serializable]
-    internal sealed class ExpressionSyntax : CompileSyntax
+    sealed class ExpressionSyntax : CompileSyntax
     {
         [Node]
-        private readonly Defineable _tokenClass;
+        readonly Defineable _tokenClass;
 
         [Node]
         internal readonly CompileSyntax Left;
 
         [Node]
-        private readonly TokenData _token;
+        readonly TokenData _token;
 
         [Node]
         internal readonly CompileSyntax Right;
@@ -83,7 +83,7 @@ namespace Reni.ReniParser
         }
 
         internal override Result ObtainResult(ContextBase context, Category category)
-        {   
+        {
             var trace = ObjectId == -48 && context.ObjectId == 2 && category.HasCode;
             StartMethodDump(trace, context, category);
             try
@@ -103,11 +103,11 @@ namespace Reni.ReniParser
                 }
 
                 var operationCategory = Category.Type;
-                if (Right == null)
+                if(Right == null)
                     operationCategory |= category;
-                  
+
                 BreakExecution();
-                
+
                 var searchResult = context.OperationResult(Left, _tokenClass);
                 if(searchResult == null)
                 {
@@ -123,13 +123,13 @@ namespace Reni.ReniParser
                 Tracer.Assert(suffixOperationResult.CompleteCategory == operationCategory);
                 Dump("suffixOperationResult", suffixOperationResult);
                 BreakExecution();
-                
+
                 var metaFeature = suffixOperationResult.Type.MetaFeature;
                 if(metaFeature != null)
                 {
                     Dump("metaFeature", metaFeature);
                     BreakExecution();
-                    
+
                     return ReturnMethodDump(metaFeature.ApplyResult(category, context, Left, Right, context.RefAlignParam), true);
                 }
 
@@ -141,7 +141,7 @@ namespace Reni.ReniParser
                 BreakExecution();
                 var applyResult = functionalFeature
                     .ApplyResult(category, rightResult, context.RefAlignParam);
-                Dump("applyResult", applyResult); 
+                Dump("applyResult", applyResult);
                 BreakExecution();
                 var result = applyResult
                     .ReplaceArg(c => searchResult.ConverterResult(c, context.RefAlignParam))

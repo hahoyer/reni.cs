@@ -1,19 +1,36 @@
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Context;
-using Reni.Type;
 
 namespace Reni.Code.ReplaceVisitor
 {
-    internal sealed class ReplaceRelRefArg : ReplaceArg
+    sealed class ReplaceRelRefArg : ReplaceArg
     {
         [EnableDump]
-        private readonly Size _offset;
+        readonly Size _offset;
 
-        private ReplaceRelRefArg(Result actualArg, Size offset)
+        ReplaceRelRefArg(Result actualArg, Size offset)
             : base(actualArg)
         {
             _offset = offset;
@@ -23,7 +40,7 @@ namespace Reni.Code.ReplaceVisitor
         internal ReplaceRelRefArg(Result actualArg)
             : this(actualArg, Size.Create(0)) { }
 
-        private RefAlignParam RefAlignParam { get { return ActualArg.Code.RefAlignParam; } }
+        RefAlignParam RefAlignParam { get { return ActualArg.Code.RefAlignParam; } }
 
         protected override CodeBase Actual
         {
@@ -35,7 +52,7 @@ namespace Reni.Code.ReplaceVisitor
             }
         }
 
-        private Size Offset { get { return _offset; } }
+        Size Offset { get { return _offset; } }
 
         protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelRefArg(ActualArg, Offset + size); }
     }

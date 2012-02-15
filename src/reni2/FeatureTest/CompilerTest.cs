@@ -23,7 +23,6 @@ using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.IO;
 using HWClassLibrary.UnitTest;
 using Reni.Runtime;
 
@@ -35,11 +34,6 @@ namespace Reni.FeatureTest
     [AttributeUsage(AttributeTargets.Class)]
     public abstract class CompilerTest : DependantAttribute
     {
-        [Obsolete("Use IsUnderConstruction", true)]
-        internal const string UnderConstruction = "Under Construction";
-        [Obsolete("Remove it", true)]
-        internal const string Worked = "Worked";
-
         internal readonly CompilerParameters Parameters = new CompilerParameters();
         static Dictionary<System.Type, CompilerTest> _cache;
         bool _needToRunDependants = true;
@@ -87,10 +81,10 @@ namespace Reni.FeatureTest
             }
 
             c.Exec();
-            
+
             if(outStream.Data == expectedOutput)
                 return;
-            
+
             Tracer.Line("---------------------\n" + outStream.Data + "\n---------------------");
             Tracer.ThrowAssertionFailed(
                 "outStream.Data != expectedOutput",
@@ -185,7 +179,7 @@ namespace Reni.FeatureTest
                 .ToArray();
         }
 
-        internal virtual void AssertValid(Compiler c) { }
+        protected virtual void AssertValid(Compiler c) { }
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]

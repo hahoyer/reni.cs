@@ -8,7 +8,9 @@ namespace Reni.Code
 {
     internal sealed class StackDataAddress : NonListStackData
     {
+        [EnableDump]
         private readonly IStackDataAddressBase _data;
+        [EnableDump]
         private readonly Size _offset;
 
         public StackDataAddress(IStackDataAddressBase data, Size offset, IOutStream outStream)
@@ -17,9 +19,6 @@ namespace Reni.Code
             _data = data;
             _offset = offset;
         }
-
-        internal IStackDataAddressBase Data { get { return _data; } }
-        internal Size Offset { get { return _offset; } }
 
         internal override Size Size { get { return DataStack.RefSize; } }
 

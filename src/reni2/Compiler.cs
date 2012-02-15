@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,9 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using HWClassLibrary.IO;
 using HWClassLibrary.TreeStructure;
-using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
@@ -51,8 +50,8 @@ namespace Reni
         /// <summary>
         ///     ctor from file
         /// </summary>
-        /// <param name = "fileName">Name of the file.</param>
-        /// <param name = "parameters"></param>
+        /// <param name="fileName"> Name of the file. </param>
+        /// <param name="parameters"> </param>
         public Compiler(CompilerParameters parameters, string fileName)
         {
             _fileName = fileName;
@@ -64,14 +63,14 @@ namespace Reni
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<Container>>(() => Functions.Compile());
-            _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions,OutStream));
+            _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, OutStream));
             _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref = "Compiler" /> class.
+        ///     Initializes a new instance of the <see cref="Compiler" /> class.
         /// </summary>
-        /// <param name = "fileName">Name of the file.</param>
+        /// <param name="fileName"> Name of the file. </param>
         /// created 14.07.2007 15:59 on HAHOYER-DELL by hh
         public Compiler(string fileName)
             : this(new CompilerParameters(), fileName) { }
@@ -126,7 +125,7 @@ namespace Reni
             }
         }
 
-        internal IOutStream OutStream { get { return _parameters.OutStream; } }
+        IOutStream OutStream { get { return _parameters.OutStream; } }
 
         /// <summary>
         ///     Performs compilation
@@ -180,9 +179,9 @@ namespace Reni
                 var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
                 methodInfo.Invoke(null, new object[0]);
             }
-            catch (CompilerErrorException e)
+            catch(CompilerErrorException e)
             {
-                for (var i = 0; i < e.CompilerErrorCollection.Count; i++)
+                for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
                     OutStream.Add(e.CompilerErrorCollection[i].ToString());
             }
             Data.OutStream = null;

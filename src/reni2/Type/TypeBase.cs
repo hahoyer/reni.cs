@@ -27,12 +27,10 @@ using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 using Reni.Struct;
-using Reni.Syntax;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -164,7 +162,6 @@ namespace Reni.Type
         internal virtual Result ArrayCopier(Category category, int count) { return VoidCodeAndRefs(category); }
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
         internal Result ArgResult(Category category) { return Result(category, ArgCode, CodeArgs.Arg); }
-        internal Result Result(Result codeAndRefs) { return Result(codeAndRefs.CompleteCategory, codeAndRefs); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
         internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgResult(category); }
         internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size); }
@@ -249,10 +246,10 @@ namespace Reni.Type
         [DisableDump]
         internal virtual IFunctionalFeature FunctionalFeature { get { return this as IFunctionalFeature; } }
         [DisableDump]
-        internal virtual IFunctionalFeatureSpecial FunctionalFeatureSpecial { get { return this as IFunctionalFeatureSpecial; } }
+        internal IFunctionalFeatureSpecial FunctionalFeatureSpecial { get { return this as IFunctionalFeatureSpecial; } }
 
         [DisableDump]
-        internal virtual IMetaFeature MetaFeature { get { return this as IMetaFeature; } }
+        internal IMetaFeature MetaFeature { get { return this as IMetaFeature; } }
 
         [DisableDump]
         internal virtual Structure FindRecentStructure
@@ -424,5 +421,4 @@ namespace Reni.Type
 
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
     }
-
 }

@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,11 +26,11 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal sealed class LocalVariableDefinition : FiberItem
+    sealed class LocalVariableDefinition : FiberItem
     {
         [Node]
-        private readonly string _holderName;
-        private readonly Size _valueSize;
+        readonly string _holderName;
+        readonly Size _valueSize;
 
         public LocalVariableDefinition(string holderName, Size valueSize)
         {
@@ -42,9 +43,6 @@ namespace Reni.Code
 
         [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
-
-        [DisableDump]
-        public Size ValueSize { get { return _valueSize; } }
 
         public override string NodeDump { get { return base.NodeDump + " Holder=" + _holderName + " ValueSize=" + _valueSize; } }
         internal override void Visit(IVisitor visitor) { visitor.LocalVariableDefinition(_holderName, _valueSize); }

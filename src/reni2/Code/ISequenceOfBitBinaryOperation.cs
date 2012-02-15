@@ -9,6 +9,5 @@ namespace Reni.Code
     {
         int ResultSize(int objBitCount, int argBitCount);
         string DataFunctionName { get; }
-        string CSharpNameOfDefaultOperation { get; }
     }
 }

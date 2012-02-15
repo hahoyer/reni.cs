@@ -1,4 +1,23 @@
-﻿using System;
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -7,7 +26,7 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    internal abstract class Defineable : TokenClass
+    abstract class Defineable : TokenClass
     {
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -18,27 +37,10 @@ namespace Reni.TokenClasses
             return left.CreateSyntaxOrDeclaration(this, token, right);
         }
 
-        internal ReniParser.ParsedSyntax CreateDeclarationPartSyntax(DeclarationExtensionSyntax extensionSyntax, TokenData token) { return new DeclarationPartSyntax(this, extensionSyntax, token); }
-
         internal TFeatureType Check<TFeatureType>()
             where TFeatureType : class { return this as TFeatureType; }
 
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
-    }
-
-    internal sealed class DeclarationPartSyntax : ReniParser.ParsedSyntax
-    {
-        private readonly Defineable _defineable;
-        private readonly DeclarationExtensionSyntax _extensionSyntax;
-
-        internal DeclarationPartSyntax(Defineable defineable, DeclarationExtensionSyntax extensionSyntax, TokenData token)
-            : base(token)
-        {
-            _defineable = defineable;
-            _extensionSyntax = extensionSyntax;
-        }
-
-        internal override ReniParser.ParsedSyntax CreateDeclarationSyntax(TokenData token, ReniParser.ParsedSyntax right) { return new DeclarationSyntax(_extensionSyntax, _defineable, token, right); }
     }
 }

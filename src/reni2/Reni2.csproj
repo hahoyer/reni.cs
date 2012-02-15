@@ -30,7 +30,7 @@
     </Compile>
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\IVisitor.cs" />
-    <Compile Include="PathSearchVisitor.cs" />
+    <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="ChildSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
@@ -44,11 +44,9 @@
     <Compile Include="Code\CodeBaseException.cs" />
     <Compile Include="Code\Container.cs" />
     <Compile Include="Code\Call.cs" />
-    <Compile Include="Code\CSharpCodeSnippet.cs" />
     <Compile Include="Code\DataStack.cs" />
     <Compile Include="Code\Drop.cs" />
     <Compile Include="Code\EmptyStackData.cs" />
-    <Compile Include="Code\Environment.cs" />
     <Compile Include="Code\Fiber.cs" />
     <Compile Include="Code\FiberHead.cs" />
     <Compile Include="Code\FiberItem.cs" />
@@ -78,7 +76,6 @@
     <Compile Include="Code\ReplaceVisitor\Base.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceRelRefArg.cs" />
     <Compile Include="Code\ReplaceVisitor\ReplaceContextRefWithArg.cs" />
-    <Compile Include="Code\Pair.cs" />
     <Compile Include="Code\LocalBlockEnd.cs" />
     <Compile Include="Code\CSharpGenerator.cs" />
     <Compile Include="Code\StackData.cs" />
@@ -96,17 +93,13 @@
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
     <Compile Include="Context\FunctionList.cs" />
-    <Compile Include="Context\IContextItem.cs" />
-    <Compile Include="Context\IRootContext.cs" />
     <Compile Include="Context\PendingContext.cs" />
     <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
     <Compile Include="FeatureTest\Array.cs" />
     <Compile Include="FeatureTest\CompilerTest.cs" />
-    <Compile Include="Context\ContextCache.cs" />
     <Compile Include="Context\Function.cs" />
-    <Compile Include="Context\Number.cs" />
     <Compile Include="Context\Root.cs" />
     <Compile Include="FeatureTest\TextStruct.cs" />
     <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
@@ -124,7 +117,6 @@
     <Compile Include="Proof\FactorSyntax.cs" />
     <Compile Include="Proof\IsolateAndReplaceStrategy.cs" />
     <Compile Include="Proof\IStrategy.cs" />
-    <Compile Include="Proof\MinusSyntax.cs" />
     <Compile Include="Proof\ParsedSyntaxExtender.cs" />
     <Compile Include="Proof\TokenClasses\And.cs" />
     <Compile Include="Proof\AssociativeSyntax.cs" />
@@ -161,7 +153,6 @@
     <Compile Include="ReniParser\MainTokenFactory.cs" />
     <Compile Include="ReniParser\ParsedSyntax.cs" />
     <Compile Include="Runtime\DataHandler.cs" />
-    <Compile Include="DebugSearchResult.cs" />
     <Compile Include="Sequence\CompareFeature.cs" />
     <Compile Include="Sequence\Feature.cs" />
     <Compile Include="Sequence\FeatureBase.cs" />
@@ -188,14 +179,12 @@
     <Compile Include="Parser\IParsedSyntax.cs" />
     <Compile Include="Parser\Scanner.cs" />
     <Compile Include="Feature\DumpPrint\DumpPrint.cs" />
-    <Compile Include="IPostProcessStrategy.cs" />
     <Compile Include="Feature\TypeOperator.cs" />
     <Compile Include="Parser\TokenFactory.cs" />
     <Compile Include="RootSearchVisitor.cs" />
     <Compile Include="SearchResultExtender.cs" />
     <Compile Include="SearchVisitor.cs" />
     <Compile Include="Struct\AtToken.cs" />
-    <Compile Include="Struct\ContextPosition.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />
     <Compile Include="FeatureTest\Function.cs" />
     <Compile Include="FeatureTest\IntegerStruct.cs" />
@@ -203,7 +192,6 @@
     <Compile Include="FeatureTest\Struct.cs" />
     <Compile Include="FeatureTest\ThenElse.cs" />
     <Compile Include="Parser\Test.cs" />
-    <Compile Include="StructAccess.cs" />
     <Compile Include="Struct\AccessFeature.cs" />
     <Compile Include="Syntax\CompileSyntax.cs" />
     <Compile Include="Syntax\ConverterSyntax.cs" />
@@ -216,7 +204,6 @@
     <Compile Include="Parser\Token.cs" />
     <Compile Include="Syntax\Special.cs" />
     <Compile Include="Syntax\EmptyList.cs" />
-    <Compile Include="Syntax\VisitStrategy.cs" />
     <Compile Include="Struct\FunctionalBody.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\Assignment.cs" />
@@ -258,7 +245,6 @@
     <Compile Include="Type\AccessType.cs" />
     <Compile Include="Type\FunctionalFeature.cs" />
     <Compile Include="Type\IFunctionalFeature.cs" />
-    <Compile Include="Type\Pending.cs" />
     <Compile Include="CodeArgs.cs" />
     <Compile Include="ReniException.cs" />
     <Compile Include="ReniObject.cs" />
@@ -270,7 +256,6 @@
     <Compile Include="Type\Array.cs" />
     <Compile Include="Type\Bit.cs" />
     <Compile Include="Type\FunctionalFeatureType.cs" />
-    <Compile Include="Type\List.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\AutomaticReferenceType.cs" />
     <Compile Include="Type\ReferenceType.cs" />

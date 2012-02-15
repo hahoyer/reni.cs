@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -53,16 +53,5 @@ namespace Reni.Type
                  , () => newElementResult.CodeArgs + CodeArgs.Arg()
                 );
         }
-        public Result ObjectConversion(Category category) { return null; }
-
-        public bool IsDataLessObjectType
-        {
-            get
-            {
-                NotImplementedMethod();
-                return false;
-            }
-        }
-
     }
 }

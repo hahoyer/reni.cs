@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,14 +25,14 @@ using Reni.Parser;
 
 namespace Reni.Syntax
 {
-    internal sealed class LeftParenthesis : ReniParser.ParsedSyntax
+    sealed class LeftParenthesis : ReniParser.ParsedSyntax
     {
-        private readonly int _leftLevel;
-        private readonly ReniParser.ParsedSyntax _left;
-        private readonly TokenClasses.LeftParenthesis _parenthesis;
+        readonly int _leftLevel;
+        readonly ReniParser.ParsedSyntax _left;
+        readonly TokenClasses.LeftParenthesis _parenthesis;
 
         [EnableDump]
-        private readonly ReniParser.ParsedSyntax _right;
+        readonly ReniParser.ParsedSyntax _right;
 
         public LeftParenthesis(int leftLevel, ReniParser.ParsedSyntax left, TokenClasses.LeftParenthesis parenthesis, TokenData token, ReniParser.ParsedSyntax right)
             : base(token)
@@ -64,18 +65,14 @@ namespace Reni.Syntax
                 return surroundedByParenthesis;
             return new InfixSyntax(token, _left.ToCompiledSyntax(), _parenthesis, _right.ToCompiledSyntax());
         }
-        private ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData token)
-        {
-            if(_right == null)
-                return new EmptyList(Token, token);
-            return _right.SurroundedByParenthesis(Token, token);
-        }
 
-        private sealed class ParenthesisMissmatchException : Exception
+        ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData token) { return _right == null ? new EmptyList(Token, token) : _right.SurroundedByParenthesis(Token, token); }
+
+        sealed class ParenthesisMissmatchException : Exception
         {
-            private readonly LeftParenthesis _leftParenthesis;
-            private readonly int _level;
-            private readonly TokenData _token;
+            readonly LeftParenthesis _leftParenthesis;
+            readonly int _level;
+            readonly TokenData _token;
 
             public ParenthesisMissmatchException(LeftParenthesis leftParenthesis, int level, TokenData token)
             {

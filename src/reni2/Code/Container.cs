@@ -105,15 +105,15 @@ namespace Reni.Code
     /// <summary>
     ///     Nothing, since void cannot be used for this purpose
     /// </summary>
-    class none
+    class None
     {
-        static readonly none _instance = new none();
+        static readonly None _instance = new None();
 
         /// <summary>
         ///     Gets the instance.
         /// </summary>
         /// <value> The instance. </value>
         /// created 03.10.2006 01:24
-        public static none Instance { get { return _instance; } }
+        public static None Instance { get { return _instance; } }
     }
 }

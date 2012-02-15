@@ -1,4 +1,23 @@
-﻿using System;
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -6,16 +25,18 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal sealed class ListStack : StackData
+    sealed class ListStack : StackData
     {
         [EnableDump]
-        private readonly NonListStackData[] _data;
+        readonly NonListStackData[] _data;
 
-        public ListStack(NonListStackData top, NonListStackData formerStackData): base(top.OutStream) { _data = new NonListStackData[2] {top, formerStackData}; }
+        public ListStack(NonListStackData top, NonListStackData formerStackData)
+            : base(top.OutStream) { _data = new[] {top, formerStackData}; }
 
-        private ListStack(NonListStackData[] data, IOutStream outStream) : base(outStream) { _data = data; }
+        ListStack(NonListStackData[] data, IOutStream outStream)
+            : base(outStream) { _data = data; }
 
-        private ListStack(NonListStackData[] data, NonListStackData formerStackData)
+        ListStack(NonListStackData[] data, NonListStackData formerStackData)
             : base(formerStackData.OutStream)
         {
             _data = new NonListStackData[data.Length + 1];
@@ -23,7 +44,7 @@ namespace Reni.Code
             _data[data.Length] = formerStackData;
         }
 
-        private ListStack(NonListStackData[] data, ListStack formerStack)
+        ListStack(NonListStackData[] data, ListStack formerStack)
             : base(formerStack.OutStream)
         {
             _data = new NonListStackData[data.Length + formerStack._data.Length];
@@ -41,7 +62,7 @@ namespace Reni.Code
 
         protected override StackData GetTop(Size size)
         {
-            if (_data.Length > 0 && _data[0].Size >= size)
+            if(_data.Length > 0 && _data[0].Size >= size)
                 return _data[0].DoGetTop(size);
             var i = Index(size);
             if(i == null)
@@ -50,7 +71,7 @@ namespace Reni.Code
             return Head(i.Value);
         }
 
-        private int? Index(Size size)
+        int? Index(Size size)
         {
             var sizeSoFar = Size.Zero;
             var i = 0;
@@ -69,10 +90,10 @@ namespace Reni.Code
             return Tail(i.Value);
         }
 
-        private StackData Head(int value) { return SubString(0, value); }
-        private StackData Tail(int value) { return SubString(value, _data.Length - value); }
+        StackData Head(int value) { return SubString(0, value); }
+        StackData Tail(int value) { return SubString(value, _data.Length - value); }
 
-        private StackData SubString(int start, int length)
+        StackData SubString(int start, int length)
         {
             switch(length)
             {
@@ -85,7 +106,7 @@ namespace Reni.Code
                     var newData = new NonListStackData[length];
                     for(var i = 0; i < length; i++)
                         newData[i] = _data[start + i];
-                    return new ListStack(newData,OutStream);
+                    return new ListStack(newData, OutStream);
                 }
             }
         }
@@ -93,15 +114,15 @@ namespace Reni.Code
         internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(_data, formerStack); }
         internal override StackData PushOnto(ListStack formerStack) { return new ListStack(_data, formerStack); }
         internal override BitsConst GetBitsConst() { return _data.Aggregate(BitsConst.None(), Paste); }
-        private BitsConst Paste(BitsConst bitsConst, NonListStackData data) { return bitsConst.Concat(data.GetBitsConst()); }
-        internal override StackData Push(StackData formerStack){return formerStack.PushOnto(this);}
+        BitsConst Paste(BitsConst bitsConst, NonListStackData data) { return bitsConst.Concat(data.GetBitsConst()); }
+        internal override StackData Push(StackData formerStack) { return formerStack.PushOnto(this); }
         internal override Size Size { get { return _data.Aggregate(Size.Zero, (current, data) => current + data.Size); } }
     }
 
-    internal abstract class NonListStackData : StackData
+    abstract class NonListStackData : StackData
     {
         protected NonListStackData(IOutStream outStream)
-            : base(outStream) {}
+            : base(outStream) { }
         internal override StackData Push(StackData stackData) { return stackData.PushOnto(this); }
         internal override StackData PushOnto(NonListStackData formerStack) { return new ListStack(this, formerStack); }
         internal override StackData PushOnto(ListStack formerStack) { return new ListStack(this, formerStack); }

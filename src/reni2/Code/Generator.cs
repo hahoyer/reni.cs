@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,8 +26,6 @@ using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Microsoft.CSharp;
-using Reni.Basics;
-using Reni.Runtime;
 
 namespace Reni.Code
 {
@@ -34,14 +33,12 @@ namespace Reni.Code
     {
         static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
         static readonly string[] _referencedAssemblies = new[] {"reni.dll", "HWClassLibrary.dll"};
-        internal const string FrameArgName = "frame";
 
-        public static string NotACommentFlag { get { return "<notacomment> "; } }
         internal static string MainFunctionName { get { return "MainFunction"; } }
         internal static string FunctionName(int i) { return "Function" + i; }
 
         internal static string CreateCSharpString(Container main, List<Container> functions, bool useStatementAligner) { return new CSharp_Generated(main, functions).TransformText(useStatementAligner); }
-        internal static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align, bool traceFilePosn) { return CodeToAssembly(CreateCSharpString(main, functions, align),traceFilePosn); }
+        internal static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align, bool traceFilePosn) { return CodeToAssembly(CreateCSharpString(main, functions, align), traceFilePosn); }
 
         static void CodeToFile(string name, string result, bool traceFilePosn)
         {
@@ -103,8 +100,6 @@ namespace Reni.Code
             _main = main;
             _functions = functions;
         }
-
-        static int RefBytes { get { return DataHandler.RefBytes; } }
 
         internal string TransformText(bool useStatementAligner)
         {

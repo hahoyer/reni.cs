@@ -1,8 +1,26 @@
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using JetBrains.Annotations;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
@@ -10,7 +28,7 @@ using Reni.Syntax;
 namespace Reni.TokenClasses
 {
     [Serializable]
-    internal sealed class Colon : TokenClass
+    sealed class Colon : TokenClass
     {
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -20,9 +38,9 @@ namespace Reni.TokenClasses
     }
 
     [Serializable]
-    internal sealed class Exclamation : TokenClass
+    sealed class Exclamation : TokenClass
     {
-        private static readonly ITokenFactory _tokenFactory = DeclarationTokenFactory.Instance;
+        static readonly ITokenFactory _tokenFactory = DeclarationTokenFactory.Instance;
 
         [DisableDump]
         protected override ITokenFactory NewTokenFactory { get { return _tokenFactory; } }
@@ -36,7 +54,7 @@ namespace Reni.TokenClasses
     }
 
     [Serializable]
-    internal sealed class ConverterToken : TokenClass
+    sealed class ConverterToken : TokenClass
     {
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -45,7 +63,7 @@ namespace Reni.TokenClasses
         }
     }
 
-    internal abstract class DeclarationExtensionSyntax : ReniParser.ParsedSyntax
+    abstract class DeclarationExtensionSyntax : ReniParser.ParsedSyntax
     {
         protected DeclarationExtensionSyntax(TokenData token)
             : base(token) { }
@@ -57,9 +75,9 @@ namespace Reni.TokenClasses
         }
     }
 
-    internal sealed class ConverterDeclarationSyntax : DeclarationExtensionSyntax
+    sealed class ConverterDeclarationSyntax : DeclarationExtensionSyntax
     {
-        private readonly TokenData _token;
+        readonly TokenData _token;
 
         internal ConverterDeclarationSyntax(TokenData token, TokenData otherToken)
             : base(token) { _token = otherToken; }
@@ -67,7 +85,7 @@ namespace Reni.TokenClasses
         internal override ReniParser.ParsedSyntax CreateDeclarationSyntax(TokenData token, ReniParser.ParsedSyntax right) { return new ConverterSyntax(_token, right.CheckedToCompiledSyntax()); }
     }
 
-    internal sealed class ExclamationSyntax : DeclarationExtensionSyntax
+    sealed class ExclamationSyntax : DeclarationExtensionSyntax
     {
         internal ExclamationSyntax(TokenData token)
             : base(token) { }

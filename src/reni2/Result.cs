@@ -369,7 +369,9 @@ namespace Reni
         {
             return new Result
                 (CompleteCategory & category
+// ReSharper disable PossibleInvalidOperationException
                  , getDataLess: () => IsDataLess.Value
+// ReSharper restore PossibleInvalidOperationException
                  , getSize: () => Size
                  , getType: () => Type
                  , getCode: () => Code
@@ -390,7 +392,9 @@ namespace Reni
 
             var result = new Result
                 (CompleteCategory
+// ReSharper disable PossibleInvalidOperationException
                  , getDataLess: () => IsDataLess.Value
+// ReSharper restore PossibleInvalidOperationException
                  , getSize: () => alignedSize
                  , getType: () => Type.UniqueAlign(alignBits)
                  , getCode: () => Code.BitCast(alignedSize)

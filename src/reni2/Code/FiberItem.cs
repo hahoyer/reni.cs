@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -46,7 +47,6 @@ namespace Reni.Code
             {
                 Tracer.Assert((_newCombinedReason == null) != (value == null));
                 _newCombinedReason = value;
-                ;
             }
         }
 

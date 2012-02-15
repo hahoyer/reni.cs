@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,13 +24,13 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Type
 {
-    internal sealed class ConversionParameter : ReniObject
+    sealed class ConversionParameter : ReniObject
     {
-        private static ConversionParameter _instance;
-        private readonly bool _isDisableCut;
-        private readonly bool _isUseConverter;
+        static ConversionParameter _instance;
+        readonly bool _isDisableCut;
+        readonly bool _isUseConverter;
 
-        private ConversionParameter(bool isUseConverter, bool isDisableCut)
+        ConversionParameter(bool isUseConverter, bool isDisableCut)
         {
             _isUseConverter = isUseConverter;
             _isDisableCut = isDisableCut;

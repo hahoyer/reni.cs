@@ -75,7 +75,7 @@ namespace Reni
         [DisableDump]
         SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
 
-        internal bool HasArg { get { return Contains(arg.Instance); } }
+        internal bool HasArg { get { return Contains(CodeArg.Instance); } }
         public int Count { get { return _data.Count; } }
 
         public IReferenceInCode this[int i] { get { return _data[i]; } }
@@ -83,7 +83,7 @@ namespace Reni
         public bool IsNone { get { return Count == 0; } }
 
         internal static CodeArgs Void() { return new CodeArgs(); }
-        internal static CodeArgs Arg() { return new CodeArgs(arg.Instance); }
+        internal static CodeArgs Arg() { return new CodeArgs(CodeArg.Instance); }
 
         public CodeArgs Sequence(CodeArgs codeArgs)
         {
@@ -125,7 +125,7 @@ namespace Reni
             return new CodeArgs(r);
         }
 
-        public CodeArgs WithoutArg() { return Without(arg.Instance); }
+        public CodeArgs WithoutArg() { return Without(CodeArg.Instance); }
         public CodeArgs Without(CodeArgs other) { return other._data.Aggregate(this, (current, refInCode) => current.Without(refInCode)); }
         public bool Contains(IReferenceInCode context) { return _data.Contains(context); }
         public bool Contains(CodeArgs other) { return other._data.All(Contains); }
@@ -168,11 +168,11 @@ namespace Reni
         public static CodeArgs operator -(CodeArgs x, IReferenceInCode y) { return x.Without(y); }
         TreeNode[] ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
-        sealed class arg : IReferenceInCode
+        sealed class CodeArg : IReferenceInCode
         {
-            internal static readonly IReferenceInCode Instance = new arg();
+            internal static readonly IReferenceInCode Instance = new CodeArg();
             RefAlignParam IReferenceInCode.RefAlignParam { get { return null; } }
-            string IDumpShortProvider.DumpShort() { return "arg"; }
+            string IDumpShortProvider.DumpShort() { return "CodeArg"; }
         }
     }
 }

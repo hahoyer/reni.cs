@@ -17,7 +17,7 @@ namespace Reni.Sequence
         ISearchPath<IPrefixFeature, SequenceType> ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Bit>.Convert(Bit type) { return new OperationPrefixFeature(type, this); }
 
         [DisableDump]
-        string ISequenceOfBitPrefixOperation.CSharpNameOfDefaultOperation { get { return Name; } }
+        public string CSharpNameOfDefaultOperation { get { return Name; } }
 
         [DisableDump]
         string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }

@@ -23,7 +23,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni;
 
-namespace ReniTest
+namespace ReniExe
 {
     static class MainContainer
     {

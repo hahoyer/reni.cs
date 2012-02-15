@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,10 +24,10 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Parser
 {
-    internal sealed class Token : ReniObject
+    sealed class Token : ReniObject
     {
-        private readonly TokenData _data;
-        private readonly ITokenClass _tokenClass;
+        readonly TokenData _data;
+        readonly ITokenClass _tokenClass;
 
         internal Token(ITokenClass tokenClass, Source source, int position, int length)
         {
@@ -38,12 +39,7 @@ namespace Reni.Parser
 
         internal ITokenClass TokenClass { get { return _tokenClass; } }
 
-        [DisableDump]
-        public new string NodeDump { get { return ToString(); } }
-
         public override string ToString() { return Data.FilePosition; }
-
-        public string ShortDump() { return Data.Name; }
         public override string DumpData() { return Data.Name; }
 
         [DisableDump]
@@ -52,12 +48,12 @@ namespace Reni.Parser
         internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
     }
 
-    internal sealed class TokenData : ReniObject
+    sealed class TokenData : ReniObject
     {
-        private static int _nextObjectId;
-        private readonly int _length;
-        private readonly Source _source;
-        private readonly int _position;
+        static int _nextObjectId;
+        readonly int _length;
+        readonly Source _source;
+        readonly int _position;
 
         internal TokenData(Source source, int position, int length)
             : base(_nextObjectId++)

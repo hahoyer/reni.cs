@@ -270,7 +270,7 @@ f1()dump_print;
     [ObjectFunction]
     public sealed class TwoFunctions1 : CompilerTest
     {
-        internal override void AssertValid(Compiler c)
+        protected override void AssertValid(Compiler c)
         {
             var x = new ExpectedCompilationResult(c);
             //Tracer.Assert(x.FunctionCount() == 2);

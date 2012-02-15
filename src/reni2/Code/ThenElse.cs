@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -67,6 +68,7 @@ namespace Reni.Code
 
         internal override Size InputSize { get { return _condSize; } }
         internal override Size OutputSize { get { return ThenCode.Size; } }
+        internal override bool HasArg { get { return ThenCode.HasArg || ElseCode.HasArg; } }
         protected override Size GetAdditionalTemporarySize() { return ThenCode.TemporarySize.Max(ElseCode.TemporarySize).Max(OutputSize) - OutputSize; }
         protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ThenElse(this); }
         internal override void Visit(IVisitor visitor) { visitor.ThenElse(_condSize, ThenCode, ElseCode); }

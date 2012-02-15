@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,12 +22,11 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Basics;
 using Reni.Context;
 
 namespace Reni.Runtime
 {
-    public static class DataHandler
+    static class DataHandler
     {
         internal static unsafe int RefBytes
         {
@@ -43,10 +43,10 @@ namespace Reni.Runtime
         /// <summary>
         ///     Moves the bytes.
         /// </summary>
-        /// <param name = "count">The count.</param>
-        /// <param name = "destination">The destination.</param>
-        /// <param name = "destByte">The destination byte.</param>
-        /// <param name = "source">The source.</param>
+        /// <param name="count"> The count. </param>
+        /// <param name="destination"> The destination. </param>
+        /// <param name="destByte"> The destination byte. </param>
+        /// <param name="source"> The source. </param>
         /// created 08.10.2006 17:43
         internal static unsafe void MoveBytes(int count, byte[] destination, int destByte, Int64 source)
         {
@@ -57,11 +57,11 @@ namespace Reni.Runtime
         /// <summary>
         ///     Moves the bytes.
         /// </summary>
-        /// <param name = "count">The count.</param>
-        /// <param name = "destination">The destination.</param>
-        /// <param name = "source">The source.</param>
+        /// <param name="count"> The count. </param>
+        /// <param name="destination"> The destination. </param>
+        /// <param name="source"> The source. </param>
         /// created 08.10.2006 17:43
-        internal static unsafe void MoveBytes(int count, byte* destination, byte* source)
+        static unsafe void MoveBytes(int count, byte* destination, byte* source)
         {
             if(destination < source)
                 for(var i = 0; i < count; i++)
@@ -74,11 +74,11 @@ namespace Reni.Runtime
         /// <summary>
         ///     Moves the bytes with offset.
         /// </summary>
-        /// <param name = "count">The count.</param>
-        /// <param name = "destination">The destination.</param>
-        /// <param name = "destOffset">The destination offset.</param>
-        /// <param name = "source">The source.</param>
-        /// <param name = "sourceOffset">The source offset.</param>
+        /// <param name="count"> The count. </param>
+        /// <param name="destination"> The destination. </param>
+        /// <param name="destOffset"> The destination offset. </param>
+        /// <param name="source"> The source. </param>
+        /// <param name="sourceOffset"> The source offset. </param>
         /// created 08.10.2006 20:07
         internal static void MoveBytes(int count, byte[] destination, int destOffset, byte[] source, int sourceOffset)
         {
@@ -142,7 +142,6 @@ namespace Reni.Runtime
         internal static unsafe void DoRefPlus(this byte[] data, int dataStart, int offset)
         {
             Tracer.Assert(data != null, "data != null");
-            var result = new byte[RefBytes];
             fixed(byte* dataPointer = &data[dataStart])
             {
                 var intPointer = (int*) dataPointer;

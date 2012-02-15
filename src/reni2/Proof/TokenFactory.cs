@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -26,7 +27,7 @@ using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    internal sealed class TokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
+    sealed class TokenFactory : TokenFactory<TokenClasses.TokenClass>
     {
         internal static TokenFactory Instance { get { return new TokenFactory(); } }
 
@@ -92,9 +93,9 @@ namespace Reni.Proof
 
         protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
 
-        private sealed class SyntaxError : TokenClasses.TokenClass
+        sealed class SyntaxError : TokenClasses.TokenClass
         {
-            private readonly string _message;
+            readonly string _message;
             public SyntaxError(string message) { _message = message; }
         }
     }

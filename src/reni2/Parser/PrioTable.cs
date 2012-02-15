@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 
@@ -13,8 +14,8 @@ namespace Reni.Parser
     [Serializable]
     internal sealed class PrioTable
     {
-        private string[] _token;
-        private char[,] _data;
+        private readonly string[] _token;
+        private readonly SimpleCache<char[,]> _dataCache;
 
         /// <summary>
         ///     asis
@@ -26,7 +27,7 @@ namespace Reni.Parser
             var x = obj as PrioTable;
             if(x == null)
                 return false;
-            return _token == x._token && _data == x._data;
+            return _token == x._token && _dataCache == x._dataCache;
         }
 
         public static bool operator ==(PrioTable x, PrioTable y)
@@ -40,7 +41,7 @@ namespace Reni.Parser
         ///     asis
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode() { return _token.GetHashCode() + _data.GetHashCode(); }
+        public override int GetHashCode() { return _token.GetHashCode() + _dataCache.GetHashCode(); }
 
         public static bool operator !=(PrioTable x, PrioTable y)
         {
@@ -77,31 +78,29 @@ namespace Reni.Parser
                 head1 += ii[4];
                 result += _token[i].PadLeft(maxlen) + " " + ii.Substring(3, 2) + " ";
                 for(var j = 0; j < Length; j++)
-                    result += _data[i, j];
+                    result += _dataCache.Value[i, j];
                 result += "\n";
             }
             return head0 + "\n" + head1 + "\n" + result;
         }
 
-        private void AllocData(params string[][] tokenArrayList)
+        char[,] AllocData()
+        {
+            var data = new char[Length,Length];
+            for(var i = 0; i < Length; i++)
+                for(var j = 0; j < Length; j++)
+                    data[i, j] = ' ';
+            return data;
+        }
+        static string[] AllocTokens(params string[][] tokenArrayList)
         {
             var l = tokenArrayList.Sum(t => t.Length);
-            _token = new string[l];
+            var tokens = new string[l];
             var k = 0;
             foreach(var tokenArray in tokenArrayList)
-            {
                 foreach(var token in tokenArray)
-                {
-                    _token[k] = token;
-                    k++;
-                }
-            }
-            _data = new char[Length,Length];
-            for(var i = 0; i < Length; i++)
-            {
-                for(var j = 0; j < Length; j++)
-                    _data[i, j] = ' ';
-            }
+                    tokens[k++] = token;
+            return tokens;
         }
 
         /// <summary>
@@ -109,37 +108,42 @@ namespace Reni.Parser
         /// </summary>
         private int Length { get { return _token.Length; } }
 
-        private PrioTable(char data, string[] token)
+        private PrioTable()
         {
-            AllocData(token);
+            _dataCache = new SimpleCache<char[,]>(AllocData);
+        }
+
+        private PrioTable(char data, string[] token) : this()
+        {
+            _token = AllocTokens(token);
             for(var i = 0; i < Length; i++)
             {
                 for(var j = 0; j < Length; j++)
-                    _data[i, j] = data;
+                    _dataCache.Value[i, j] = data;
             }
         }
 
-        private PrioTable(PrioTable x, PrioTable y)
+        private PrioTable(PrioTable x, PrioTable y): this()
         {
-            AllocData(x._token, y._token);
+            _token = AllocTokens(x._token, y._token);
             for(var i = 0; i < Length; i++)
             {
                 if(i < x.Length)
                 {
                     for(var j = 0; j < Length; j++)
                     {
-                        _data[i, j] = '+';
+                        _dataCache.Value[i, j] = '+';
                         if(j < x.Length)
-                            _data[i, j] = x._data[i, j];
+                            _dataCache.Value[i, j] = x._dataCache.Value[i, j];
                     }
                 }
                 else
                 {
                     for(var j = 0; j < Length; j++)
                     {
-                        _data[i, j] = '-';
+                        _dataCache.Value[i, j] = '-';
                         if(j >= x.Length)
-                            _data[i, j] = y._data[i - x.Length, j - x.Length];
+                            _dataCache.Value[i, j] = y._dataCache.Value[i - x.Length, j - x.Length];
                     }
                 }
             }
@@ -156,27 +160,27 @@ namespace Reni.Parser
             return x.Length;
         }
 
-        private PrioTable(PrioTable x, string[] data, string[] left, string[] right)
+        private PrioTable(PrioTable x, string[] data, string[] left, string[] right): this()
         {
-            AllocData(left, x._token, right);
+            _token = AllocTokens(left, x._token, right);
             for(var i = 0; i < Length; i++)
             {
                 for(var j = 0; j < Length; j++)
                 {
                     var iData = Find(i, left, x._token);
                     var jData = Find(j, left, x._token);
-                    _data[i, j] = data[iData][jData];
+                    _dataCache.Value[i, j] = data[iData][jData];
 
                     if(iData == 1 && jData == 1)
-                        _data[i, j] = x._data[i - left.Length, j - left.Length];
+                        _dataCache.Value[i, j] = x._dataCache.Value[i - left.Length, j - left.Length];
                     else if(iData == 2 && jData == 0)
                     {
                         if(j < i - left.Length - x.Length)
-                            _data[i, j] = '-';
+                            _dataCache.Value[i, j] = '-';
                         else if(j == i - left.Length - x.Length)
-                            _data[i, j] = '=';
+                            _dataCache.Value[i, j] = '=';
                         else
-                            _data[i, j] = '+';
+                            _dataCache.Value[i, j] = '+';
                     }
                 }
             }
@@ -192,16 +196,12 @@ namespace Reni.Parser
         public int Index(string name)
         {
             for(var i = 0; i < Length; i++)
-            {
                 if(_token[i] == name)
                     return (i);
-            }
 
             for(var i = 0; i < Length; i++)
-            {
                 if(_token[i] == "<common>")
                     return (i);
-            }
 
             throw new NotImplementedException("missing <common> entry in priority table");
         }
@@ -260,7 +260,7 @@ namespace Reni.Parser
         /// <param name = "t"></param>
         /// <param name = "d"></param>
         [UsedImplicitly]
-        public void Correct(string n, string t, char d) { _data[Index(n), Index(t)] = d; }
+        public void Correct(string n, string t, char d) { _dataCache.Value[Index(n), Index(t)] = d; }
 
         /// <summary>
         ///     List of names, without the special tokens "frame", "end" and "else" in angle brackets
@@ -303,8 +303,8 @@ namespace Reni.Parser
         /// <returns></returns>
         public char Relation(string newTokenName, string recentTokenName)
         {
-            //Tracer.FlaggedLine("\"" + _token[New] + "\" on \"" + _token[recentToken] + "\" --> \"" + _data[New, recentToken] + "\"");
-            return _data[Index(newTokenName), Index(recentTokenName)];
+            //Tracer.FlaggedLine("\"" + _token[New] + "\" on \"" + _token[recentToken] + "\" --> \"" + _dataCache[New, recentToken] + "\"");
+            return _dataCache.Value[Index(newTokenName), Index(recentTokenName)];
         }
 
         //For debug only
@@ -317,12 +317,12 @@ namespace Reni.Parser
         {
             get
             {
-                var result = new string[_data.GetLength(0)];
-                for(var i = 0; i < _data.GetLength(0); i++)
+                var result = new string[_dataCache.Value.GetLength(0)];
+                for (var i = 0; i < _dataCache.Value.GetLength(0); i++)
                 {
                     result[i] = "";
-                    for(var j = 0; j < _data.GetLength(1); j++)
-                        result[i] += _data[i, j];
+                    for (var j = 0; j < _dataCache.Value.GetLength(1); j++)
+                        result[i] += _dataCache.Value[i, j];
                 }
                 return result;
             }

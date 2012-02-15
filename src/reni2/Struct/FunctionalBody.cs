@@ -41,11 +41,6 @@ namespace Reni.Struct
             StopByObjectId(-1);
         }
 
-        [DisableDump]
-        internal bool IsObjectForCallRequired { get { return !Structure.IsDataLess && (Structure.IsObjectForCallRequired(Getter) || Structure.IsObjectForCallRequired(Setter)); } }
-        [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }
-
         internal override string DumpShort()
         {
             return base.DumpShort()

@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -20,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 
 namespace Reni.Code
@@ -29,12 +29,12 @@ namespace Reni.Code
     ///     Reference shift
     /// </summary>
     [Serializable]
-    internal sealed class RefPlus : FiberItem
+    sealed class RefPlus : FiberItem
     {
-        private readonly RefAlignParam _refAlignParam;
+        readonly RefAlignParam _refAlignParam;
 
         [DisableDump]
-        private readonly Size _right;
+        readonly Size _right;
 
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
@@ -48,7 +48,7 @@ namespace Reni.Code
             StopByObjectId(-8);
         }
 
-        private void AssertValid()
+        void AssertValid()
         {
             _right.AssertAlignedSize(RefAlignParam.AlignBits);
             Tracer.Assert(!_right.IsZero);
@@ -65,7 +65,7 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize { get { return GetSize(); } }
 
-        private Size GetSize() { return RefAlignParam.RefSize; }
+        Size GetSize() { return RefAlignParam.RefSize; }
 
         internal override CodeBase TryToCombineBack(TopRef precedingElement)
         {
@@ -88,7 +88,7 @@ namespace Reni.Code
                 var newRight = _right + precedingElement._right;
                 if(newRight.IsZero)
                     return new FiberItem[0];
-                return new[] {new RefPlus(RefAlignParam, newRight)};
+                return new FiberItem[] { new RefPlus(RefAlignParam, newRight) };
             }
             return base.TryToCombineBack(precedingElement);
         }

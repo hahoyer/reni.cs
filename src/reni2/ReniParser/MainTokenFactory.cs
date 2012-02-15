@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -31,7 +32,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
+    sealed class MainTokenFactory : TokenFactory<TokenClasses.TokenClass>
     {
         protected override PrioTable GetPrioTable()
         {
@@ -98,7 +99,7 @@ namespace Reni.ReniParser
         /// <summary>
         ///     Creates the main token classes.
         /// </summary>
-        /// <returns></returns>
+        /// <returns> </returns>
         protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()
         {
             return new DictionaryEx<string, TokenClasses.TokenClass>

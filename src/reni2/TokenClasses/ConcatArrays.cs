@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -26,7 +27,7 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class ConcatArrays :
+    sealed class ConcatArrays :
         Defineable
         , ISearchPath<IPrefixFeature, TypeBase>
         , ISearchPath<ISuffixFeature, Type.Array>
@@ -34,7 +35,7 @@ namespace Reni.TokenClasses
         , ISearchPath<ISearchPath<ISuffixFeature, ReferenceType>, Type.Array>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrays); }
-        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new Feature.PrefixFeature(type.CreateArray); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new PrefixFeature(type.CreateArray); }
         ISearchPath<IPrefixFeature, ReferenceType> ISearchPath<ISearchPath<IPrefixFeature, ReferenceType>, TypeBase>.Convert(TypeBase type) { return type.CreateArrayFromReferenceFeature; }
         ISearchPath<ISuffixFeature, ReferenceType> ISearchPath<ISearchPath<ISuffixFeature, ReferenceType>, Type.Array>.Convert(Type.Array type) { return type.ConcatArraysFromReferenceFeature; }
     }
