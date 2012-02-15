@@ -80,7 +80,14 @@ namespace Reni.Code
         public string GetCSharpStatements()
         {
             var generator = new CSharpGenerator(_data.TemporarySize.SaveByteCount);
-            _data.Visit(generator);
+            try
+            {
+                _data.Visit(generator);
+            }
+            catch (UnexpectedContextReference e)
+            {
+                Tracer.AssertionFailed("", () => e.Message);
+            }
             return generator.Data;
         }
     }

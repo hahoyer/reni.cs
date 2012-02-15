@@ -16,7 +16,7 @@ namespace Reni.Proof
 
         public Holder(string text)
         {
-            var file = File.m("main.proof");
+            var file = "main.proof".FileHandle();
             file.String = text;
             _text = text;
             var parsedSyntax = _parser.Compile(new Source(file));

@@ -57,7 +57,7 @@ namespace Reni
         {
             _fileName = fileName;
             _parameters = parameters;
-            _source = new SimpleCache<Source>(() => new Source(File.m(FileName)));
+            _source = new SimpleCache<Source>(() => new Source(FileName.FileHandle()));
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
             _functionCode = new SimpleCache<CodeBase[]>(() => Functions.Code);
             _mainContainer = new SimpleCache<Container>(() => new Container(Code, Source.Data));

@@ -10,6 +10,6 @@ namespace Reni.Code
         string Dump(int index, int size);
         string Dump();
         IFormalValue RefPlus(int right);
-        void Check(IEnumerable<FormalValueAccess> accesses);
+        void Check(FormalValueAccess[] accesses);
     }
 }

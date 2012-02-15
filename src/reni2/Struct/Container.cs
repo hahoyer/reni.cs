@@ -143,7 +143,7 @@ namespace Reni.Struct
 
         string DumpDataToFile()
         {
-            var dumpFile = File.m("struct." + ObjectId);
+            var dumpFile = ("struct." + ObjectId).FileHandle();
             var oldResult = dumpFile.String;
             var newResult = (_runId + DumpDataToString()).Replace("\n", "\r\n");
             if(oldResult == null || !oldResult.StartsWith(_runId))

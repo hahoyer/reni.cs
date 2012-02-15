@@ -1,4 +1,23 @@
-﻿using System;
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -7,26 +26,24 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal class FormalValueAccess
+    sealed class FormalValueAccess : ReniObject
     {
-        private readonly int _index;
-        private readonly int _size;
-        private readonly IFormalValue _formalValue;
-        internal int Index { get { return _index; } }
-        internal int Size { get { return _size; } }
-        private IFormalValue FormalValue { get { return _formalValue; } }
+        readonly int _index;
+        readonly int _size;
+        readonly IFormalValue _formalValue;
+        int Index { get { return _index; } }
+        int Size { get { return _size; } }
+        IFormalValue FormalValue { get { return _formalValue; } }
 
-        public static IFormalValue[] Transpose(IEnumerable<FormalValueAccess> accesses)
+        public static IFormalValue[] Transpose(FormalValueAccess[] accesses)
         {
             var distinctAccesses = accesses.Distinct().ToArray();
             if(distinctAccesses.Length == 1 && distinctAccesses[0] == null)
                 return new IFormalValue[1];
             var result = accesses.Select(x => x == null ? null : x.FormalValue).Distinct().ToArray();
             foreach(var formalValue in result)
-            {
                 if(formalValue != null)
-                    formalValue.Check(accesses.Where(x => x != null && x.FormalValue == formalValue));
-            }
+                    formalValue.Check(accesses.Where(x => x != null && x.FormalValue == formalValue).ToArray());
             return result;
         }
 
@@ -37,7 +54,7 @@ namespace Reni.Code
             _index = index;
         }
 
-        public string Dump() { return _formalValue.Dump(_index, _size); }
+        public new string Dump() { return _formalValue.Dump(_index, _size); }
 
         public static IFormalValue BitsArray(BitsConst data) { return new BitsArrayValue(data); }
         public static IFormalValue Call(IFormalValue[] formalSubValues, int functionIndex) { return new CallValue(formalSubValues, functionIndex); }
@@ -47,7 +64,7 @@ namespace Reni.Code
         public static IFormalValue Dereference(IFormalValue formalSubValue) { return new DereferenceValue(formalSubValue); }
         public static IFormalValue BitArrayBinaryOp(string operation, IFormalValue formalLeftSubValue, IFormalValue formalRightSubValue) { return new BitArrayBinaryOpValue(operation, formalLeftSubValue, formalRightSubValue); }
 
-        internal static void Check(IEnumerable<FormalValueAccess> accesses)
+        internal static void Check(FormalValueAccess[] accesses)
         {
             var ss = accesses.Select(x => x.Size).Distinct().ToArray();
             if(ss.Length != 1 || ss[0] != accesses.ToArray().Length)
@@ -58,11 +75,11 @@ namespace Reni.Code
         }
     }
 
-    internal class BitArrayBinaryOpValue : NamedValue
+    sealed class BitArrayBinaryOpValue : NamedValue
     {
-        private readonly string _operation;
-        private readonly IFormalValue _leftSubValue;
-        private readonly IFormalValue _rightSubValue;
+        readonly string _operation;
+        readonly IFormalValue _leftSubValue;
+        readonly IFormalValue _rightSubValue;
 
         public BitArrayBinaryOpValue(string operation, IFormalValue leftSubValue, IFormalValue rightSubValue)
         {
@@ -76,25 +93,25 @@ namespace Reni.Code
         protected override string Dump(bool isRecursion) { return "(" + _leftSubValue + ")" + _operation + "(" + _rightSubValue + ")"; }
     }
 
-    internal class DereferenceValue : NamedValue
+    sealed class DereferenceValue : NamedValue
     {
-        private readonly IFormalValue _formalSubValue;
+        readonly IFormalValue _formalSubValue;
         public DereferenceValue(IFormalValue formalSubValue) { _formalSubValue = formalSubValue; }
         protected override char DumpShort() { return 'd'; }
 
         protected override string Dump(bool isRecursion) { return "(" + _formalSubValue.Dump() + ")d"; }
     }
 
-    internal sealed class FormalPointer : NamedValue
+    sealed class FormalPointer : NamedValue
     {
         [EnableDump]
-        private readonly char _name;
+        readonly char _name;
 
-        private readonly FormalPointer[] _points;
-        private readonly int _index;
-        private static int _nextPointer;
+        readonly FormalPointer[] _points;
+        readonly int _index;
+        static int _nextPointer;
 
-        private FormalPointer(FormalPointer[] points, int index)
+        FormalPointer(FormalPointer[] points, int index)
         {
             _name = FormalMachine.Names[_nextPointer++];
             _points = points;
@@ -118,15 +135,15 @@ namespace Reni.Code
         }
     }
 
-    internal abstract class NamedValue : ReniObject, IFormalValue
+    abstract class NamedValue : ReniObject, IFormalValue
     {
-        private string CreateText(int size)
+        string CreateText(int size)
         {
             var text = Dump();
-            var fillCount = 2*size - text.Length - 1;
+            var fillCount = 2 * size - text.Length - 1;
             if(fillCount >= 0)
-                return " " + "<".Repeat(fillCount/2) + text + ">".Repeat(fillCount - fillCount/2);
-            return " " + (DumpShort() + "").Repeat(2*size - 1);
+                return " " + "<".Repeat(fillCount / 2) + text + ">".Repeat(fillCount - fillCount / 2);
+            return " " + (DumpShort() + "").Repeat(2 * size - 1);
         }
 
         protected new abstract char DumpShort();
@@ -134,7 +151,7 @@ namespace Reni.Code
         string IFormalValue.Dump(int index, int size)
         {
             var text = CreateText(size);
-            return text.Substring(index*2, 2);
+            return text.Substring(index * 2, 2);
         }
 
         string IFormalValue.Dump() { return Dump(); }
@@ -143,7 +160,7 @@ namespace Reni.Code
 
         IFormalValue IFormalValue.RefPlus(int right) { return RefPlus(right); }
 
-        void IFormalValue.Check(IEnumerable<FormalValueAccess> accesses) { FormalValueAccess.Check(accesses); }
+        void IFormalValue.Check(FormalValueAccess[] accesses) { FormalValueAccess.Check(accesses); }
 
         protected virtual IFormalValue RefPlus(int right)
         {
@@ -153,10 +170,10 @@ namespace Reni.Code
     }
 
 
-    internal sealed class CallValue : NamedValue
+    sealed class CallValue : NamedValue
     {
-        private readonly IFormalValue[] _formalSubValues;
-        private readonly int _functionIndex;
+        readonly IFormalValue[] _formalSubValues;
+        readonly int _functionIndex;
 
         public CallValue(IFormalValue[] formalSubValues, int functionIndex)
         {
@@ -169,11 +186,11 @@ namespace Reni.Code
         protected override string Dump(bool isRecursion) { return "F" + _functionIndex + "(" + _formalSubValues.Aggregate("", (x, y) => (x == "" ? "" : x + ", ") + y.Dump()) + ")"; }
     }
 
-    internal class VariableValue : NamedValue
+    sealed class VariableValue : NamedValue
     {
-        private readonly char _name;
+        readonly char _name;
         public VariableValue(char name) { _name = name; }
-        private bool _isPointer;
+        bool _isPointer;
 
         protected override char DumpShort() { return 'V'; }
 
@@ -192,10 +209,10 @@ namespace Reni.Code
         }
     }
 
-    internal class PointerValue : NamedValue
+    sealed class PointerValue : NamedValue
     {
-        private readonly VariableValue _variableValue;
-        private readonly int _right;
+        readonly VariableValue _variableValue;
+        readonly int _right;
 
         public PointerValue(VariableValue variableValue, int right)
         {
@@ -207,7 +224,7 @@ namespace Reni.Code
 
         protected override string Dump(bool isRecursion) { return _variableValue.Dump() + FormatRight(); }
 
-        private string FormatRight()
+        string FormatRight()
         {
             if(_right > 0)
                 return "+" + _right;
@@ -217,10 +234,10 @@ namespace Reni.Code
         }
     }
 
-    internal class BitCastValue : ReniObject, IFormalValue
+    sealed class BitCastValue : ReniObject, IFormalValue
     {
-        private readonly IFormalValue _formalSubValue;
-        private readonly int _castedBits;
+        readonly IFormalValue _formalSubValue;
+        readonly int _castedBits;
 
         public BitCastValue(IFormalValue formalSubValue, int castedBits)
         {
@@ -236,7 +253,7 @@ namespace Reni.Code
         }
 
         string IFormalValue.Dump() { return _formalSubValue.Dump(); }
-        void IFormalValue.Check(IEnumerable<FormalValueAccess> accesses) { FormalValueAccess.Check(accesses); }
+        void IFormalValue.Check(FormalValueAccess[] accesses) { FormalValueAccess.Check(accesses); }
 
         IFormalValue IFormalValue.RefPlus(int right)
         {
@@ -245,9 +262,9 @@ namespace Reni.Code
         }
     }
 
-    internal sealed class BitsArrayValue : ReniObject, IFormalValue
+    sealed class BitsArrayValue : ReniObject, IFormalValue
     {
-        private readonly BitsConst _data;
+        readonly BitsConst _data;
 
         public BitsArrayValue(BitsConst data) { _data = data; }
 
@@ -265,7 +282,7 @@ namespace Reni.Code
         }
 
         protected override string Dump(bool isRecursion) { return _data.DumpValue(); }
-        void IFormalValue.Check(IEnumerable<FormalValueAccess> accesses) { }
+        void IFormalValue.Check(FormalValueAccess[] formalValueAccesses) { }
 
         IFormalValue IFormalValue.RefPlus(int right)
         {

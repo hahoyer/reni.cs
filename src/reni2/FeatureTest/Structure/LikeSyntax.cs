@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,7 +28,7 @@ using Reni.Syntax;
 
 namespace Reni.FeatureTest.Structure
 {
-    internal abstract class LikeSyntax
+    abstract class LikeSyntax
     {
         public static LikeSyntax Number(int i) { return new Number(i); }
 
@@ -54,15 +55,15 @@ namespace Reni.FeatureTest.Structure
         public static LikeSyntax Symbol(string s) { return new Expression(null, s, null); }
     }
 
-    internal class Empty : LikeSyntax
+    sealed class Empty : LikeSyntax
     {
         public override void AssertLike(IParsedSyntax syntax) { Tracer.Assert(syntax is EmptyList); }
     }
 
-    internal class Declaration
+    sealed class Declaration
     {
-        private readonly string _name;
-        private readonly int _position;
+        readonly string _name;
+        readonly int _position;
 
         public Declaration(string name, int position)
         {
@@ -77,11 +78,11 @@ namespace Reni.FeatureTest.Structure
         }
     }
 
-    internal class Struct : LikeSyntax
+    sealed class Struct : LikeSyntax
     {
-        private readonly LikeSyntax[] _list;
-        private readonly Declaration[] _declarations;
-        private readonly int[] _converters;
+        readonly LikeSyntax[] _list;
+        readonly Declaration[] _declarations;
+        readonly int[] _converters;
 
         public Struct(LikeSyntax[] list, Declaration[] declarations, int[] converters)
         {
@@ -107,11 +108,11 @@ namespace Reni.FeatureTest.Structure
         }
     }
 
-    internal sealed class Expression : LikeSyntax
+    sealed class Expression : LikeSyntax
     {
-        private readonly LikeSyntax _s1;
-        private readonly string _s2;
-        private readonly LikeSyntax _s3;
+        readonly LikeSyntax _s1;
+        readonly string _s2;
+        readonly LikeSyntax _s3;
 
         public Expression(LikeSyntax s1, string s2, LikeSyntax s3)
         {
@@ -128,7 +129,7 @@ namespace Reni.FeatureTest.Structure
             AssertLike(_s3, ex.Right);
         }
 
-        private static void AssertLike(LikeSyntax s3, CompileSyntax right)
+        static void AssertLike(LikeSyntax s3, CompileSyntax right)
         {
             if(s3 == null)
                 Tracer.Assert(right == null);
@@ -137,9 +138,9 @@ namespace Reni.FeatureTest.Structure
         }
     }
 
-    internal class Number : LikeSyntax
+    sealed class Number : LikeSyntax
     {
-        private readonly Int64 _i;
+        readonly Int64 _i;
 
         internal Number(Int64 i) { _i = i; }
 

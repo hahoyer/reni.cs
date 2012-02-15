@@ -51,7 +51,7 @@ namespace Reni.FeatureTest
         void CreateFileAndRunCompiler(int depth, string name, string text, Action<Compiler> expectedResult, string expectedOutput)
         {
             var fileName = name + ".reni";
-            var f = File.m(fileName);
+            var f = fileName.FileHandle();
             f.String = text;
             InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
         }
@@ -59,7 +59,7 @@ namespace Reni.FeatureTest
         public static void Run(string name, string target, string expectedOutput)
         {
             var fileName = name + ".reni";
-            var f = File.m(fileName);
+            var f = fileName.FileHandle();
             f.String = target;
             InternalRunCompiler(CompilerParameters.CreateTraceAll(), fileName, null, expectedOutput);
         }

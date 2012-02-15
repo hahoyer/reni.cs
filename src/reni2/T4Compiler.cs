@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -20,7 +21,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.IO;
+using HWClassLibrary.Helper;
 
 namespace Reni
 {
@@ -31,7 +32,7 @@ namespace Reni
         public string Code()
         {
             const string fileName = "temptest.reni";
-            var f = File.m(fileName);
+            var f = fileName.FileHandle();
             f.String = _text;
             var compiler = new Compiler(fileName);
             return compiler.ExecutedCode;

@@ -50,7 +50,7 @@ namespace Reni
         public IOutStream OutStream;
 
         [Serializable]
-        public class TraceParamters
+        public sealed class TraceParamters
         {
             [Node]
             [EnableDump]

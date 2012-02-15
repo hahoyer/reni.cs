@@ -194,7 +194,7 @@ namespace Reni.Code
             var start = _frameData.Length + offset.ToInt();
             for(var i = 0; i < size.ToInt(); i++)
                 accesses.Add(_frameData[i + start]);
-            return FormalValueAccess.Transpose(accesses);
+            return FormalValueAccess.Transpose(accesses.ToArray());
         }
 
         IFormalValue[] PullInputValuesFromData(Size offset, Size inputSize)
@@ -206,7 +206,7 @@ namespace Reni.Code
                 accesses.Add(_data[i + start]);
                 _data[i + start] = null;
             }
-            return FormalValueAccess.Transpose(accesses);
+            return FormalValueAccess.Transpose(accesses.ToArray());
         }
 
         IFormalValue[] GetInputValuesFromData(Size inputSize) { return GetInputValuesFromData(Size.Zero, inputSize); }
@@ -217,7 +217,7 @@ namespace Reni.Code
             var start = (_startAddress + offset).ToInt();
             for(var i = 0; i < inputSize.ToInt(); i++)
                 accesses.Add(_data[i + start]);
-            return FormalValueAccess.Transpose(accesses);
+            return FormalValueAccess.Transpose(accesses.ToArray());
         }
 
         IFormalValue[] PullInputValuesFromData(Size inputSize) { return PullInputValuesFromData(Size.Zero, inputSize); }

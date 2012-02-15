@@ -1,3 +1,22 @@
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +28,7 @@ using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    internal abstract class ParsedSyntax : Parser.ParsedSyntax, IComparable<ParsedSyntax>
+    abstract class ParsedSyntax : Parser.ParsedSyntax, IComparable<ParsedSyntax>
     {
         protected ParsedSyntax(TokenData token)
             : base(token) { }
@@ -80,9 +99,9 @@ namespace Reni.Proof
         internal ParsedSyntax Equal(TokenData token, ParsedSyntax other)
         {
             var difference = CompareTo(other);
-            if (difference == 0)
+            if(difference == 0)
                 return TrueSyntax.Instance;
-            if (this is PlusSyntax || other is PlusSyntax)
+            if(this is PlusSyntax || other is PlusSyntax)
                 return Minus(token, other).Normalize().DefaultEqual(token, new NumberSyntax(0));
             return DefaultEqual(token, other);
         }
@@ -93,11 +112,11 @@ namespace Reni.Proof
             return null;
         }
 
-        private EqualSyntax DefaultEqual(TokenData token, ParsedSyntax other) { return new EqualSyntax(this, token, other); }
+        EqualSyntax DefaultEqual(TokenData token, ParsedSyntax other) { return new EqualSyntax(this, token, other); }
 
         internal ParsedSyntax Plus(TokenData token, ParsedSyntax otherSite) { return Associative(Main.TokenFactory.Plus, token, otherSite); }
 
-        private int? GenericCompareTo<T>(ParsedSyntax other)
+        int? GenericCompareTo<T>(ParsedSyntax other)
             where T : ParsedSyntax, IComparableEx<T>
         {
             if(this is T)
@@ -134,7 +153,7 @@ namespace Reni.Proof
                 return result;
             var v1 = Variables.OrderBy(x => x).ToArray();
             var v2 = right.Variables.OrderBy(x => x).ToArray();
-            result = v1.Zip(v2, (x, y) => x.CompareTo(y)).Where(x => x != 0).FirstOrDefault();
+            result = v1.Zip(v2, String.CompareOrdinal).FirstOrDefault(x => x != 0);
             if(result != 0)
                 return result;
             var potentialResult = GenericCompareTo<EqualSyntax>(right);
@@ -154,7 +173,7 @@ namespace Reni.Proof
                 potentialResult = GenericCompareTo<NumberSyntax>(right);
             if(potentialResult == null)
                 potentialResult = GenericCompareTo<IntegerSyntax>(right);
-            if (potentialResult == null)
+            if(potentialResult == null)
                 potentialResult = GenericCompareTo<TrueSyntax>(right);
             result = potentialResult == null ? VirtualCompareTo(right) : potentialResult.Value;
             return result;
@@ -162,7 +181,7 @@ namespace Reni.Proof
 
         internal static readonly IComparer<ParsedSyntax> Comparer = new ComparerClass();
 
-        private sealed class ComparerClass : IComparer<ParsedSyntax>
+        sealed class ComparerClass : IComparer<ParsedSyntax>
         {
             public int Compare(ParsedSyntax x, ParsedSyntax y) { return x.CompareTo(y); }
         }
@@ -218,7 +237,7 @@ namespace Reni.Proof
         internal KeyValuePair<string, ParsedSyntax> GetDefinition(string variable) { return new KeyValuePair<string, ParsedSyntax>(variable, IsolateClause(variable)); }
     }
 
-    internal interface IComparableEx<in T>
+    interface IComparableEx<in T>
     {
         int CompareToEx(T other);
     }

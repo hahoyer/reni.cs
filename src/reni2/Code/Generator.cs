@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Microsoft.CSharp;
 using Reni.Basics;
 using Reni.Runtime;
@@ -46,7 +47,7 @@ namespace Reni.Code
         {
             var streamWriter = new StreamWriter(name);
             if(traceFilePosn)
-                Tracer.Line(Tracer.FilePosn(HWClassLibrary.IO.File.m(name).FullName, 0, 0, ""));
+                Tracer.Line(Tracer.FilePosn(name.FileHandle().FullName, 0, 0, ""));
             streamWriter.Write(result);
             streamWriter.Close();
         }

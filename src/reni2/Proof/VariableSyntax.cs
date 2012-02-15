@@ -1,21 +1,39 @@
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
 using Reni.Parser;
-using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    internal sealed class VariableSyntax : ParsedSyntax, IComparableEx<VariableSyntax>
+    sealed class VariableSyntax : ParsedSyntax, IComparableEx<VariableSyntax>
     {
         internal readonly string Name;
 
         public VariableSyntax(TokenData token, string name)
             : base(token) { Name = name; }
 
-        int IComparableEx<VariableSyntax>.CompareToEx(VariableSyntax other) { return Name.CompareTo(other.Name); }
+        int IComparableEx<VariableSyntax>.CompareToEx(VariableSyntax other) { return String.CompareOrdinal(Name, other.Name); }
 
         [DisableDump]
         internal override Set<string> Variables { get { return new Set<string> {Name}; } }
@@ -24,7 +42,7 @@ namespace Reni.Proof
         internal override ParsedSyntax IsolateFromEquation(string variable, ParsedSyntax otherSite) { return Equal(Token, otherSite); }
         internal override ParsedSyntax IsolateFromSum(string variable, ParsedSyntax other)
         {
-            if (Name == variable)
+            if(Name == variable)
                 return other;
             return null;
         }
@@ -37,19 +55,19 @@ namespace Reni.Proof
 
         internal override ParsedSyntax CombineForPlus(ParsedSyntax other) { return other.CombineForPlus(this); }
         internal override ParsedSyntax CombineForPlus(ParsedSyntax other, BigRational otherValue) { return other.CombineForPlus(this, otherValue); }
-        
+
         internal override ParsedSyntax CombineForPlus(ParsedSyntax other, BigRational otherValue, BigRational thisValue) { return other.CombineForPlus(this, thisValue, otherValue); }
 
         internal override ParsedSyntax CombineForPlus(VariableSyntax other, BigRational thisValue)
         {
-            if (Name == other.Name)
+            if(Name == other.Name)
                 return Times(thisValue + 1);
             return null;
         }
 
         internal override ParsedSyntax CombineForPlus(VariableSyntax other, BigRational otherValue, BigRational thisValue)
         {
-            if (Name == other.Name)
+            if(Name == other.Name)
                 return Times(thisValue + otherValue);
             return null;
         }
@@ -64,6 +82,6 @@ namespace Reni.Proof
 
         internal override string SmartDump(ISmartDumpToken @operator) { return Name; }
 
-        private bool IsDistinct(VariableSyntax other) { return Name != other.Name; }
+        bool IsDistinct(VariableSyntax other) { return Name != other.Name; }
     }
 }

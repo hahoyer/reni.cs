@@ -67,7 +67,7 @@ f1()dump_print;
         {
             Tracer.IsBreakDisabled = false;
             const string fileName = "temptest.reni";
-            var f = File.m(fileName);
+            var f = fileName.FileHandle();
             f.String = text;
             var compiler = new Compiler(fileName);
             //Profiler.Measure(()=>compiler.Exec());
