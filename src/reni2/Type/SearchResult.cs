@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@ namespace Reni.Type
         [EnableDump]
         readonly IFeature _feature;
         [EnableDump]
-        readonly ConversionFunction[] _conversionFunctions;
-        internal SearchResult(IFeature feature, ConversionFunction[] conversionFunctions)
+        readonly IConversionFunction[] _conversionFunctions;
+        internal SearchResult(IFeature feature, IConversionFunction[] conversionFunctions)
             : base(_nextObjectId++)
         {
             Tracer.Assert(feature != null);
@@ -41,7 +41,7 @@ namespace Reni.Type
             _conversionFunctions = conversionFunctions;
         }
 
-        ConversionFunction[] ConversionFunctions { get { return _conversionFunctions; } }
+        IConversionFunction[] ConversionFunctions { get { return _conversionFunctions; } }
 
         internal Result Result(Category category, RefAlignParam refAlignParam)
         {
@@ -87,7 +87,9 @@ namespace Reni.Type
             StartMethodDump(trace, category);
             try
             {
-                var results = ConversionFunctions.Select((cf, i) => cf.Result(i == 0 ? category : category.Typed)).ToArray();
+                var results = ConversionFunctions
+                    .Select((cf, i) => cf.Result(i == 0 ? category : category.Typed))
+                    .ToArray();
                 Dump("results", results);
                 BreakExecution();
 

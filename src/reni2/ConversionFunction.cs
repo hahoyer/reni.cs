@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -26,29 +26,20 @@ using Reni.Type;
 
 namespace Reni
 {
-    abstract class ConversionFunction: ReniObject
+    sealed class ConversionFunction : ReniObject, IConversionFunction
     {
-        readonly TypeBase _parent;
         static int _nextObjectId;
-        protected ConversionFunction(TypeBase parent)
-            : base(_nextObjectId++) { _parent = parent; }
-        internal abstract Result Result(Category category);
-        [DisableDump]
-        internal TypeBase ArgType { get { return _parent; } }
-        [DisableDump]
-        internal TypeBase ResultType { get { return Result(Category.Type).Type; } }
+        readonly IContainerType _containerType;
 
-        public override string NodeDump
-        {
-            get
-            {
-                return base.NodeDump
-                       + "["
-                       + (ArgType == null ? "<null>" : ArgType.NodeDump)
-                       + "=>"
-                       + ResultType.NodeDump
-                       + "]";
-            }
-        }
+        internal ConversionFunction(IContainerType containerType)
+            : base(_nextObjectId++) { _containerType = containerType; }
+        Result IConversionFunction.Result(Category category) { return _containerType.Converter().Result(category); }
+        public override string NodeDump { get { return string.Format("{0}[{1}=>{2}]", base.NodeDump, ((ReniObject)_containerType).NodeDump, _containerType.Target.NodeDump); } }
+    }
+
+    interface IContainerType
+    {
+        IConverter Converter();
+        TypeBase Target { get; }
     }
 }

@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ namespace Reni.Type
         [DisableDump]
         protected abstract string TagTitle { get; }
         [DisableDump]
-        protected override bool IsInheritor { get { return true; } }
         internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
 
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
@@ -44,6 +43,6 @@ namespace Reni.Type
         internal override Result ArrayDestructor(Category category, int count) { return Parent.ArrayDestructor(category, count); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
-        internal Result StripTagResult(Category category) { return Parent.Result(category, ArgResult(category.Typed)); }
+        protected override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult(category.Typed)); }
     }
 }

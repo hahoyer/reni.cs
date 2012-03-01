@@ -28,7 +28,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class AccessType : ReferenceType
+    sealed class AccessType : TypeBase
     {
         readonly Structure _accessPoint;
         readonly int _position;
@@ -51,9 +51,9 @@ namespace Reni.Type
         [EnableDump]
         internal int Position { get { return _position; } }
         [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return AccessPoint.RefAlignParam; } }
+        internal RefAlignParam RefAlignParam { get { return AccessPoint.RefAlignParam; } }
         [DisableDump]
-        internal override TypeBase ValueType { get { return _accessPoint.ValueType(_position); } }
+        internal TypeBase ValueType { get { return _accessPoint.ValueType(_position); } }
         [EnableDump]
         AccessManager.IAccessObject AccessObject { get { return _accessObjectCache.Value; } }
         [DisableDump]
@@ -180,12 +180,12 @@ namespace Reni.Type
 
         internal override TypeBase AutomaticDereference() { return ValueType; }
 
-        protected override Result DereferenceResult(Category category)
+        Result DereferenceResult(Category category)
         {
             return ValueReferenceViaFieldReference(category)
                 .AutomaticDereference();
         }
-        protected override Result ToAutomaticReferenceResult(Category category)
+        Result ToAutomaticReferenceResult(Category category)
         {
             var result = ValueReferenceViaFieldReference(category);
             //result.AssertEmptyOrValidReference();

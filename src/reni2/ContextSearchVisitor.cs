@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -23,7 +24,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -50,28 +50,28 @@ namespace Reni
                 return;
             contextBase.Search(this);
         }
-        protected override void AssertValid()
+
+        internal void Search(Struct.Context context)
         {
-            TypeBase lastType = null;
-            foreach(var currentType in ConversionFunctions)
-            {
-                Tracer.Assert(lastType == currentType.ArgType);
-                lastType = currentType.ResultType;
-            }
-        }
-        internal void Search(Structure accessPoint, ConversionFunction conversionFunction)
-        {
+            var accessPoint = context.Structure;
             var feature = accessPoint.SearchFromStructContext(Defineable);
             if(feature == null)
                 return;
             InternalResult = feature.ConvertToContextFeature(accessPoint);
-            Add(conversionFunction);
+            Add(new ConversionFunction(context));
+        }
+
+        sealed class ConversionFunction : ReniObject, IConversionFunction
+        {
+            readonly Struct.Context _parent;
+            public ConversionFunction(Struct.Context parent) { _parent = parent; }
+            Result IConversionFunction.Result(Category category) { return _parent.ObjectResult(category); }
         }
     }
 
     sealed class ContextSearchResult : SearchResult
     {
-        internal ContextSearchResult(IContextFeature feature, ConversionFunction[] conversionFunctions)
+        internal ContextSearchResult(IContextFeature feature, IConversionFunction[] conversionFunctions)
             : base(feature, conversionFunctions) { }
 
         protected override Result TrivialConversionResult(Category category, RefAlignParam refAlignParam)

@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -37,9 +37,6 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected override bool IsInheritor { get { return true; } }
-
-        [DisableDump]
         int AlignBits { get { return _alignBits; } }
 
         [DisableDump]
@@ -50,7 +47,7 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase UnAlignedType { get { return Parent; } }
 
-        Result UnAlignedResult(Category category)
+        protected override Result ParentConversionResult(Category category)
         {
             return Parent.Result
                 (
@@ -80,11 +77,10 @@ namespace Reni.Type
 
         internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
 
-        protected override Converter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
+        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
-            return UnAlignedResult
-                   * Parent.Converter(conversionParameter, destination);
+            return new FunctionalConverter(ParentConversionResult)
+                .Concat(Parent.Converter(conversionParameter, destination));
         }
-        protected override Result ChildConversionResult(Category category) { return UnAlignedResult(category); }
     }
 }

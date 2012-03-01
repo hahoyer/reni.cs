@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -33,17 +33,18 @@ namespace Reni.Type
     ///     Fixed sized array of a type
     /// </summary>
     [Serializable]
-    sealed class Array : Child<TypeBase>
+    sealed class Array : TypeBase
     {
         readonly DictionaryEx<Size, ConcatArraysFeature> _concatArraysFeatureCache;
 
+        readonly TypeBase _element;
         readonly int _count;
         public readonly ISearchPath<ISuffixFeature, ReferenceType> ConcatArraysFromReferenceFeature;
 
         public Array(TypeBase element, int count)
-            : base(element)
         {
             ConcatArraysFromReferenceFeature = new ConcatArraysFromReferenceFeature(this);
+            _element = element;
             _count = count;
             Tracer.Assert(count > 0);
             _concatArraysFeatureCache = new DictionaryEx<Size, ConcatArraysFeature>(size => new ConcatArraysFeature(this, size));
@@ -53,7 +54,7 @@ namespace Reni.Type
         internal int Count { get { return _count; } }
 
         [Node]
-        internal TypeBase Element { get { return Parent; } }
+        internal TypeBase Element { get { return _element; } }
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
         [DisableDump]
         internal override int ArrayElementCount { get { return Count; } }
@@ -79,8 +80,6 @@ namespace Reni.Type
         }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + ")array(" + Count + ")"; }
-
-        protected override bool IsInheritor { get { return false; } }
 
         internal Result ConcatArrays(Category category, RefAlignParam refAlignParam)
         {
@@ -122,11 +121,6 @@ namespace Reni.Type
                 .UniqueSequence(Count)
                 .UniqueAutomaticReference(refAlignParam)
                 .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
-        }
-        protected override Result ChildConversionResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
         }
     }
 }

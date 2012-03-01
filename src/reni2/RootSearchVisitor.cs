@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -29,26 +30,15 @@ namespace Reni
         where TFeature : class, IFeature
     {
         readonly Defineable _defineable;
-        ConversionFunction[] _conversionFunctions;
         protected TFeature Result { get; private set; }
 
         internal RootSearchVisitor(Defineable defineable)
         {
             _defineable = defineable;
-            ConversionFunctions = new ConversionFunction[0];
+            ConversionFunctions = new IConversionFunction[0];
         }
 
-        internal override sealed ConversionFunction[] ConversionFunctions
-        {
-            get { return _conversionFunctions; }
-            set
-            {
-                _conversionFunctions = value;
-                AssertValid();
-            }
-        }
-        protected abstract void AssertValid();
-
+        internal override sealed IConversionFunction[] ConversionFunctions { get; set; }
         internal override bool IsSuccessFull { get { return Result != null; } }
 
         internal override TFeature InternalResult

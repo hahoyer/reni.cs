@@ -26,7 +26,7 @@ using Reni.Code;
 
 namespace Reni.Type
 {
-    abstract class ReferenceType : TypeBase
+    abstract class ReferenceType : TypeBase, IContainerType
     {
         [DisableDump]
         internal abstract RefAlignParam RefAlignParam { get; }
@@ -47,30 +47,8 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.Search(ValueType, new ConversionFunction(this));
+            searchVisitor.SearchAndConvert(ValueType, this);
             base.Search(searchVisitor);
-        }
-
-        sealed class ConversionFunction : Reni.ConversionFunction
-        {
-            readonly ReferenceType _parent;
-            public ConversionFunction(ReferenceType parent)
-                : base(parent) { _parent = parent; }
-            internal override Result Result(Category category)
-            {
-                var trace = ObjectId == -1 && category.HasCode;
-                StartMethodDump(trace, category);
-                try
-                {
-                    BreakExecution();
-                    var result = _parent.ToAutomaticReferenceResult(category);
-                    return ReturnMethodDump(result, true);
-                }
-                finally
-                {
-                    EndMethodDump();
-                }
-            }
         }
 
         internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
@@ -87,7 +65,7 @@ namespace Reni.Type
 
         protected abstract Result ToAutomaticReferenceResult(Category category);
 
-        Converter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
+        IConverter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
         {
             var trace = ObjectId == -13;
             try
@@ -103,7 +81,7 @@ namespace Reni.Type
                 var c3 = new FunctionalConverter(destination.ValueTypeToLocalReferenceResult);
                 Dump("c3", c3.Result(Category.Type | Category.Code));
                 BreakExecution();
-                var result = c1 * c2 * c3;
+                var result = c1.Concat(c2).Concat(c3);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -112,15 +90,21 @@ namespace Reni.Type
             }
         }
 
-        protected override Converter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
+        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             var referenceDestination = destination as AutomaticReferenceType;
             if(referenceDestination != null)
                 return Converter(conversionParameter, referenceDestination);
 
             return
-                DereferenceResult
-                * ValueType.Converter(conversionParameter, destination);
+                new FunctionalConverter(DereferenceResult)
+                .Concat(ValueType.Converter(conversionParameter, destination));
         }
+        IConverter IContainerType.Converter()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+        TypeBase IContainerType.Target { get { return ValueType; } }
     }
 }

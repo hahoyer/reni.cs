@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -44,6 +44,13 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
 
+        protected override Result ParentConversionResult(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+
+        }
+
         internal override Result DumpPrintTextResultFromSequence(Category category, RefAlignParam refAlignParam, int count)
         {
             return Void.Result
@@ -79,11 +86,6 @@ namespace Reni.Type
                     .ArgCode()
                     .Dereference(refAlignParam, Size)
                     .DumpPrintText(Size);
-        }
-        protected override Result ChildConversionResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
         }
     }
 }

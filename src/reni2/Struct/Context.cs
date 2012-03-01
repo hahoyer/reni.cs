@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -42,25 +42,17 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        Structure Structure { get { return Parent.UniqueStructure(Container, Position); } }
+        internal Structure Structure { get { return Parent.UniqueStructure(Container, Position); } }
 
         internal override void Search(ContextSearchVisitor searchVisitor)
         {
-            searchVisitor.Search(Structure, new ConversionFunction(this));
+            searchVisitor.Search(this);
             if(searchVisitor.IsSuccessFull)
                 return;
             base.Search(searchVisitor);
         }
 
-        sealed class ConversionFunction : Reni.ConversionFunction
-        {
-            readonly Context _parent;
-            public ConversionFunction(Context parent)
-                : base(null) { _parent = parent; }
-            internal override Result Result(Category category) { return _parent.ObjectResult(category); }
-        }
-
-        Result ObjectResult(Category category) { return Structure.StructReferenceViaContextReference(category); }
+        internal Result ObjectResult(Category category) { return Structure.StructReferenceViaContextReference(category); }
 
         internal override Structure ObtainRecentStructure() { return Structure; }
     }

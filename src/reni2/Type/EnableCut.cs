@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -32,16 +33,12 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
-        protected override Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
+
+        protected override IConverter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             return
-                StripTagResult
-                * Parent.Converter(conversionParameter.EnableCut, destination);
-        }
-        protected override Result ChildConversionResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
+                new FunctionalConverter(ParentConversionResult)
+                .Concat(Parent.Converter(conversionParameter.EnableCut, destination));
         }
     }
 }

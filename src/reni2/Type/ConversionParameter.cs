@@ -27,6 +27,7 @@ namespace Reni.Type
     sealed class ConversionParameter : ReniObject
     {
         static ConversionParameter _instance;
+        static ConversionParameter _instanceForSearchConversiuon;
         readonly bool _isDisableCut;
         readonly bool _isUseConverter;
 
@@ -46,5 +47,6 @@ namespace Reni.Type
         internal bool IsUseConverter { get { return _isUseConverter; } }
 
         internal static ConversionParameter Instance { get { return _instance ?? (_instance = new ConversionParameter(true, true)); } }
+        internal static ConversionParameter InstanceForSearchConversion { get { return _instanceForSearchConversiuon ?? (_instanceForSearchConversiuon = new ConversionParameter(false, true)); } }
     }
 }

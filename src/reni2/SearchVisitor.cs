@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -45,29 +46,24 @@ namespace Reni
             where TType : IDumpShortProvider;
 
         internal abstract bool IsSuccessFull { get; }
-        internal abstract ConversionFunction[] ConversionFunctions { set; get; }
-        internal void Add(ConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
+        internal abstract IConversionFunction[] ConversionFunctions { set; get; }
+        internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
 
-        internal void Search(TypeBase type, ConversionFunction conversionFunction)
+        internal void SearchAndConvert(TypeBase searchType, IContainerType argType)
         {
-            if (IsSuccessFull)
+            if(IsSuccessFull)
                 return;
-            type.Search(this);
-            if (!IsSuccessFull)
+            searchType.Search(this);
+            if(!IsSuccessFull)
                 return;
 
-            var trace = conversionFunction.ObjectId == -4;
-            StartMethodDump(trace, type,conversionFunction);
-            try
-            {
-                BreakExecution();
-                Add(conversionFunction);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            Add(new ConversionFunction(argType));
         }
+    }
+
+    interface IConversionFunction
+    {
+        Result Result(Category category);
     }
 
     abstract class SearchVisitor<TFeature> : SearchVisitor

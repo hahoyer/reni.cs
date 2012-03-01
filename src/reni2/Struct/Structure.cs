@@ -144,6 +144,8 @@ namespace Reni.Struct
             var accessType = ContainerContextObject.AccessType(EndPosition, position);
             if(accessType.IsLambda)
                 return accessType;
+            if(!accessType.IsDataLess)
+                return accessType.UniqueFieldAccessType(RefAlignParam, FieldOffset(position));
 
             NotImplementedMethod(position);
             return null;
@@ -203,7 +205,7 @@ namespace Reni.Struct
         Size ContextOffset() { return ContainerContextObject.ContextReferenceOffsetFromAccessPoint(EndPosition) * -1; }
 
         internal Result StructReferenceViaContextReference(Category category)
-        {                              
+        {
             if(IsDataLess)
                 return Type.Result(category);
 
@@ -217,10 +219,10 @@ namespace Reni.Struct
 
         Result DumpPrintResultViaAccessReference(Category category, int position)
         {
-            var accessType = (AccessType) UniqueAccessType(position);
+            var accessType = UniqueAccessType(position);
             return accessType
-                .DumpPrintOperationResult(category)
-                .ReplaceArg(accessType.FieldReferenceViaStructReference(category.Typed));
+                .GenericDumpPrintResult(category,RefAlignParam)
+                .ReplaceArg(AccessViaThisReference(category.Typed,position));
         }
 
         internal Result ContextReferenceViaStructReference(Result result)

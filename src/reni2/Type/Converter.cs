@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,7 +17,6 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
-using System.Diagnostics;
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,44 +25,29 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    abstract class Converter : ReniObject
+    interface IConverter
     {
-        static int _nextObjectId;
-        [EnableDump]
-        Result _testResult;
-
-        protected Converter()
-            : base(_nextObjectId++) { }
-
-        protected void AssertValid()
-        {
-            if(!Debugger.IsAttached)
-                return;
-
-            _testResult = Result(Category.Type | Category.Code);
-        }
-
-        internal abstract Result Result(Category category);
-
-        public static Converter operator *(Converter first, Func<Category, Result> second) { return new ConcatConverter(first, new FunctionalConverter(second)); }
-        public static Converter operator *(Func<Category, Result> first, Converter second) { return new ConcatConverter(new FunctionalConverter(first), second); }
-        public static Converter operator *(Converter first, Converter second) { return new ConcatConverter(first, second); }
+        Result Result(Category category);
     }
 
-    sealed class ConcatConverter : Converter
+    static class ConverterExtension
     {
-        readonly Converter _first;
-        readonly Converter _second;
-        public ConcatConverter(Converter first, Converter second)
+        public static IConverter Concat(this IConverter first, Func<Category, Result> second) { return new ConcatConverter(first, new FunctionalConverter(second)); }
+        public static IConverter Concat(this IConverter first, IConverter second) { return new ConcatConverter(first, second); }
+    }
+
+    sealed class ConcatConverter : ReniObject, IConverter
+    {
+        readonly IConverter _first;
+        readonly IConverter _second;
+
+        public ConcatConverter(IConverter first, IConverter second)
         {
             _first = first;
             _second = second;
-
-            AssertValid();
-            StopByObjectId(1);
         }
 
-        internal override Result Result(Category category)
+        public Result Result(Category category)
         {
             StartMethodDump(false, category);
             try
@@ -81,16 +66,11 @@ namespace Reni.Type
         }
     }
 
-    sealed class FunctionalConverter : Converter
+    sealed class FunctionalConverter : IConverter
     {
         readonly Func<Category, Result> _function;
 
-        public FunctionalConverter(Func<Category, Result> function)
-        {
-            _function = function;
-            AssertValid();
-        }
-
-        internal override Result Result(Category category) { return _function(category); }
+        public FunctionalConverter(Func<Category, Result> function) { _function = function; }
+        public Result Result(Category category) { return _function(category); }
     }
 }

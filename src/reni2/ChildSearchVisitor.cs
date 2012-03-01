@@ -53,6 +53,6 @@ namespace Reni
                     _parent.InternalResult = value.Convert(_target);
             }
         }
-        internal override ConversionFunction[] ConversionFunctions { get { return _parent.ConversionFunctions; } set { _parent.ConversionFunctions = value; } }
+        internal override IConversionFunction[] ConversionFunctions { get { return _parent.ConversionFunctions; } set { _parent.ConversionFunctions = value; } }
     }
 }

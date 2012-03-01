@@ -147,7 +147,7 @@ namespace Reni.Sequence
             return result;
         }
 
-        static Converter Converter(SequenceType source, ConversionParameter conversionParameter, SequenceType destination)
+        static IConverter Converter(SequenceType source, ConversionParameter conversionParameter, SequenceType destination)
         {
             if(source.Count > destination.Count && conversionParameter.IsDisableCut)
                 destination.NotImplementedMethod(source, conversionParameter, destination);
@@ -156,7 +156,7 @@ namespace Reni.Sequence
 
         internal Result DumpPrintTextResult(Category category, RefAlignParam refAlignParam) { return Element.DumpPrintTextResultFromSequence(category, refAlignParam, Count); }
 
-        protected override Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
+        protected override IConverter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             var sequenceDestination = destination as SequenceType;
             if(sequenceDestination != null)

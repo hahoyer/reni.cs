@@ -50,9 +50,16 @@ namespace Reni.Type
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<TextItemType> TextItem;
             public readonly SimpleCache<EnableCut> EnableCut;
+            public readonly DictionaryEx<RefAlignParam, DictionaryEx<Size, FieldAccessType>> FieldAccessType;
 
             public Cache(TypeBase parent)
             {
+                FieldAccessType = new DictionaryEx<RefAlignParam, DictionaryEx<Size, FieldAccessType>>(
+                    refAlignParam
+                    => new DictionaryEx<Size, FieldAccessType>(
+                           offset => new FieldAccessType(parent, refAlignParam, offset)
+                           )
+                    );
                 EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
                 References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
@@ -367,11 +374,11 @@ namespace Reni.Type
             return result;
         }
 
-        Converter Converter(TypeBase destination) { return Converter(ConversionParameter.Instance, destination); }
+        IConverter Converter(TypeBase destination) { return Converter(ConversionParameter.Instance, destination); }
 
         bool IsConvertable(TypeBase destination) { return Converter(destination) != null; }
 
-        internal Converter Converter(ConversionParameter conversionParameter, TypeBase destination)
+        internal IConverter Converter(ConversionParameter conversionParameter, TypeBase destination)
         {
             if(this == destination)
                 return new FunctionalConverter(ArgResult);
@@ -379,7 +386,7 @@ namespace Reni.Type
             return ConverterForDifferentTypes(conversionParameter, destination);
         }
 
-        protected virtual Converter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
+        protected virtual IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             var alignerDestination = destination as Aligner;
             if(alignerDestination != null)
@@ -388,7 +395,7 @@ namespace Reni.Type
             return ConverterForUnalignedTypes(conversionParameter, destination);
         }
 
-        protected virtual Converter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
+        protected virtual IConverter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             if(IsDataLess && destination is Void)
                 return new FunctionalConverter(c => Void.Result(c, ArgResult(c)));
@@ -397,11 +404,11 @@ namespace Reni.Type
             return null;
         }
 
-        Converter Converter(ConversionParameter conversionParameter, Aligner alignerDestination)
+        IConverter Converter(ConversionParameter conversionParameter, Aligner alignerDestination)
         {
             return
                 Converter(conversionParameter, alignerDestination.Parent)
-                * alignerDestination.ParentToAlignedResult;
+                    .Concat(alignerDestination.ParentToAlignedResult);
         }
 
         internal virtual Result DumpPrintTextResultFromSequence(Category category, RefAlignParam refAlignParam, int count)
@@ -420,5 +427,11 @@ namespace Reni.Type
         }
 
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
+
+        internal TypeBase UniqueFieldAccessType(RefAlignParam refAlignParam, Size offset)
+        {
+            return _cache
+                .FieldAccessType.Find(refAlignParam).Find(offset);
+        }
     }
 }

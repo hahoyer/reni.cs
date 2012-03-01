@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ using Reni.Basics;
 namespace Reni.Type
 {
     [Serializable]
-    abstract class Child<TParent> : TypeBase
+    abstract class Child<TParent> : TypeBase, IContainerType, IConverter
         where TParent : TypeBase
     {
         readonly TParent _parent;
@@ -41,25 +41,17 @@ namespace Reni.Type
         [DisableDump]
         protected internal override int IndexSize { get { return Parent.IndexSize; } }
 
-        protected abstract bool IsInheritor { get; }
-
         internal override void Search(SearchVisitor searchVisitor)
         {
             base.Search(searchVisitor);
             if(searchVisitor.IsSuccessFull)
                 return;
-            if(IsInheritor)
-                searchVisitor.Search(Parent, new ConversionFunction(this));
-        }
 
-        sealed class ConversionFunction : Reni.ConversionFunction
-        {
-            readonly Child<TParent> _parent;
-            public ConversionFunction(Child<TParent> parent)
-                : base(parent) { _parent = parent; }
-            internal override Result Result(Category category) { return _parent.ChildConversionResult(category); }
+            searchVisitor.SearchAndConvert(Parent, this);
         }
-
-        protected abstract Result ChildConversionResult(Category category);
+        IConverter IContainerType.Converter() { return this; }
+        TypeBase IContainerType.Target { get { return _parent; } }
+        Result IConverter.Result(Category category) { return ParentConversionResult(category); }
+        protected abstract Result ParentConversionResult(Category category);
     }
 }
