@@ -21,20 +21,24 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : Child<TypeBase>
+    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType
     {
         readonly RefAlignParam _refAlignParam;
         readonly Size _offset;
+        readonly DictionaryEx<RefAlignParam, TypeBase> _setterTypeCache;
 
         internal FieldAccessType(TypeBase target, RefAlignParam refAlignParam, Size offset)
             : base(target)
         {
             _refAlignParam = refAlignParam;
             _offset = offset;
+            _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(rap => new SetterType(this, rap));
         }
         protected override Size GetSize() { return _refAlignParam.RefSize; }
         internal override bool IsDataLess { get { return false; } }
@@ -54,6 +58,27 @@ namespace Reni.Type
         {
             return Parent.SmartReference(_refAlignParam)
                 .Result(category, () => ArgCode().AddToReference(_refAlignParam, _offset), CodeArgs.Arg);
+        }
+
+        public Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
+        {
+            var result = new Result
+                (category
+                 , () => false
+                 , () => refAlignParam.RefSize
+                 , () => _setterTypeCache.Find(refAlignParam)
+                 , ArgCode
+                 , CodeArgs.Arg
+                );
+            return result;
+        }
+        
+        TypeBase ISetterTargetType.ValueType { get { return Parent; } }
+        
+        Result ISetterTargetType.ApplySetterResult(Category category, TypeBase valueType)
+        {
+            NotImplementedMethod(category, valueType);
+            return null;
         }
     }
 }

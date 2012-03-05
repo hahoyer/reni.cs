@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,15 +26,14 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    internal sealed class ConcatArraysFromReferenceFeature :
+    sealed class ConcatArraysFromReferenceFeature :
         ReniObject
         , ISearchPath<ISuffixFeature, ReferenceType>
         , ISuffixFeature
     {
-        private readonly Array _type;
+        readonly Array _type;
         public ConcatArraysFromReferenceFeature(Array type) { _type = type; }
         ISuffixFeature ISearchPath<ISuffixFeature, ReferenceType>.Convert(ReferenceType type) { return this; }
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _type.ConcatArrays(category, refAlignParam); }
-        TypeBase IFeature.ObjectType { get { return _type; } }
     }
 }

@@ -59,7 +59,6 @@ namespace Reni.Type
             _count = count;
         }
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Result(category); }
-        TypeBase IFeature.ObjectType { get { return _type.UniqueSequence(_count); } }
         internal override bool IsDataLess { get { return true; } }
         Result IMetaFeature.ApplyResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
         {

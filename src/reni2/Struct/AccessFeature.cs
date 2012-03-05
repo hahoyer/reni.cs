@@ -23,7 +23,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Feature;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -42,8 +41,6 @@ namespace Reni.Struct
             _structure = structure;
             _position = position;
         }
-
-        TypeBase IFeature.ObjectType { get { return _structure.Type; } }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _structure.AccessViaThisReference(category, _position); }
     }
@@ -64,8 +61,6 @@ namespace Reni.Struct
             _structure = structure;
             _position = position;
         }
-
-        TypeBase IFeature.ObjectType { get { return _structure.Type; } }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _structure.AccessViaContextReference(category, _position); }
     }

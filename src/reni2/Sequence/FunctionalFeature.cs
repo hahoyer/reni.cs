@@ -39,7 +39,6 @@ namespace Reni.Sequence
             _feature = feature;
         }
 
-        TypeBase IFeature.ObjectType { get { return _objectType; } }
         protected override TypeBase ObjectType { get { return _objectType; } }
 
         protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)

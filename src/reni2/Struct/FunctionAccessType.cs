@@ -27,7 +27,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionAccessType : TypeBase
+    sealed class FunctionAccessType : TypeBase, ISetterTargetType
     {
         [EnableDump]
         readonly FunctionalBodyType _functionalBodyType;
@@ -42,34 +42,9 @@ namespace Reni.Struct
             _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new SetterType(this, refAlignParam));
         }
 
-        sealed class SetterType : TypeBase, IFunctionalFeature
-        {
-            [EnableDump]
-            readonly FunctionAccessType _functionAccessType;
-            [EnableDump]
-            readonly RefAlignParam _refAlignParam;
+        Result ISetterTargetType.ApplySetterResult(Category category, TypeBase valueType) { return _functionalBodyType.ApplySetterResult(category, _argsType, valueType); }
 
-            public SetterType(FunctionAccessType functionAccessType, RefAlignParam refAlignParam)
-            {
-                _functionAccessType = functionAccessType;
-                _refAlignParam = refAlignParam;
-            }
-            internal override bool IsDataLess { get { return false; } }
-            protected override Size GetSize() { return _refAlignParam.RefSize; }
-
-            Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
-            {
-                var valueType = _functionAccessType.ValueType ?? argsResult.Type;
-                var result = _functionAccessType
-                    .ApplySetterResult(category, valueType)
-                    .ReplaceArg(argsResult.Conversion(valueType));
-                return result;
-            }
-        }
-
-        Result ApplySetterResult(Category category, TypeBase valueType) { return _functionalBodyType.ApplySetterResult(category, _argsType, valueType); }
-
-        TypeBase ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
+        TypeBase ISetterTargetType.ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
 
         [DisableDump]
         internal override bool IsDataLess { get { return _argsType.IsDataLess; } }
@@ -97,4 +72,5 @@ namespace Reni.Struct
             return result;
         }
     }
+
 }

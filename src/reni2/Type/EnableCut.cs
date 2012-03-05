@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Basics;
 
 namespace Reni.Type
 {
@@ -38,7 +37,7 @@ namespace Reni.Type
         {
             return
                 new FunctionalConverter(ParentConversionResult)
-                .Concat(Parent.Converter(conversionParameter.EnableCut, destination));
+                    .Concat(Parent.Converter(conversionParameter.EnableCut, destination));
         }
     }
 }

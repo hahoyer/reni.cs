@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -61,13 +62,12 @@ namespace Reni.Feature.DumpPrint
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.UniqueAutomaticReference(refAlignParam)); }
         [EnableDump]
-        TypeBase IFeature.ObjectType { get { return _parent; } }
+        internal TypeBase ObjectType { get { return _parent; } }
     }
 
     sealed class BitFeature : BitFeatureBase, ISuffixFeature
     {
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.UniqueAutomaticReference(refAlignParam)); }
-        TypeBase IFeature.ObjectType { get { return TypeBase.Bit; } }
     }
 
     sealed class StructReferenceFeature : ReniObject, ISearchPath<ISuffixFeature, AutomaticReferenceType>,
@@ -90,7 +90,5 @@ namespace Reni.Feature.DumpPrint
                 .Structure
                 .DumpPrintResultViaContextReference(category);
         }
-
-        TypeBase IFeature.ObjectType { get { return _structureType; } }
     }
 }

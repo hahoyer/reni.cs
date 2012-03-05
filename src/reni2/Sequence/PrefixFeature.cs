@@ -24,7 +24,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Type;
 
 namespace Reni.Sequence
 {
@@ -38,8 +37,6 @@ namespace Reni.Sequence
             _objectType = objectType;
             _definable = definable;
         }
-
-        TypeBase IFeature.ObjectType { get { return _objectType; } }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam)
         {

@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -33,23 +34,19 @@ namespace Reni.Feature
     interface IFeature
     {
         Result Result(Category category, RefAlignParam refAlignParam);
-        TypeBase ObjectType { get; }
     }
 
-    interface ITypeFeature: IFeature
-    {
-    }
+    interface ITypeFeature : IFeature
+    {}
 
     interface ISuffixFeature : ITypeFeature
     {}
 
     interface IPrefixFeature : ITypeFeature
     {}
-
-
+                
     interface IContextFeature : IFeature
-    {
-    }
+    {}
 
     sealed class Feature : ReniObject, ISuffixFeature
     {
@@ -65,7 +62,6 @@ namespace Reni.Feature
         }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
-        TypeBase IFeature.ObjectType { get { return (TypeBase) _function.Target; } }
     }
 
     sealed class PrefixFeature : ReniObject, IPrefixFeature, ISuffixFeature
@@ -82,6 +78,5 @@ namespace Reni.Feature
         }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
-        TypeBase IFeature.ObjectType { get { return (TypeBase)_function.Target; } }
     }
 }

@@ -170,6 +170,7 @@
     <Compile Include="Struct\FunctionAccessType.cs" />
     <Compile Include="Struct\FunctionalBodyType.cs" />
     <Compile Include="Struct\FunctionInstance.cs" />
+    <Compile Include="Struct\SetterType.cs" />
     <Compile Include="Struct\Structure.cs" />
     <Compile Include="Struct\StructureType.cs" />
     <Compile Include="Syntax\LeftParenthesis.cs" />
@@ -240,7 +241,6 @@
     <Compile Include="Type\ConcatArraysFromReferenceFeature.cs" />
     <Compile Include="Type\DumpPrintSequenceFeature.cs" />
     <Compile Include="Type\EnableCut.cs" />
-    <Compile Include="Type\EnableCutFeature.cs" />
     <Compile Include="Sequence\FunctionalFeature.cs" />
     <Compile Include="Type\AccessType.cs" />
     <Compile Include="Type\FieldAccessType.cs" />
