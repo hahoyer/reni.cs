@@ -4,11 +4,11 @@
     <ProjectGuid>{EBB73C84-6622-4183-A28F-B0DFF606006B}</ProjectGuid>
     <AssemblyName>Reni</AssemblyName>
     <TargetTypeEx>CSharp.Library</TargetTypeEx>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\HWClassLibrary\HWClassLibrary.csproj">
@@ -231,7 +231,6 @@
     <Compile Include="TokenClasses\ValueToken.cs" />
     <Compile Include="TypeRootSearchVisitor.cs" />
     <Compile Include="TypeSearchResult.cs" />
-    <Compile Include="Type\AssignmentFeature.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConcatArraysFeature.cs" />
     <Compile Include="Type\ConversionFeature.cs" />

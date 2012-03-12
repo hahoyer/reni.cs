@@ -50,16 +50,9 @@ namespace Reni.Type
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<TextItemType> TextItem;
             public readonly SimpleCache<EnableCut> EnableCut;
-            public readonly DictionaryEx<RefAlignParam, DictionaryEx<Size, FieldAccessType>> FieldAccessType;
 
             public Cache(TypeBase parent)
             {
-                FieldAccessType = new DictionaryEx<RefAlignParam, DictionaryEx<Size, FieldAccessType>>(
-                    refAlignParam
-                    => new DictionaryEx<Size, FieldAccessType>(
-                           offset => new FieldAccessType(parent, refAlignParam, offset)
-                           )
-                    );
                 EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
                 References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
@@ -428,10 +421,5 @@ namespace Reni.Type
 
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
 
-        internal TypeBase UniqueFieldAccessType(RefAlignParam refAlignParam, Size offset)
-        {
-            return _cache
-                .FieldAccessType.Find(refAlignParam).Find(offset);
-        }
     }
 }

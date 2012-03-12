@@ -1,5 +1,5 @@
 // 
-//     Project Reni2
+//     Project reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Microsoft.CSharp;
@@ -32,7 +33,6 @@ namespace Reni.Code
     static class Generator
     {
         static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
-        static readonly string[] _referencedAssemblies = new[] {"reni.dll", "HWClassLibrary.dll"};
 
         internal static string MainFunctionName { get { return "MainFunction"; } }
         internal static string FunctionName(int i) { return "Function" + i; }
@@ -51,7 +51,14 @@ namespace Reni.Code
 
         static Assembly CodeToAssembly(string codeToString, bool traceFilePosn)
         {
-            const string name = "generated.cs";
+            var name =
+                Environment.GetEnvironmentVariable("temp")
+                + "\\reni.compiler\\"
+                + Thread.CurrentThread.ManagedThreadId
+                + ".reni";
+            var fileHandle = name.FileHandle();
+            fileHandle.AssumeDirectoryOfFileExists();
+
             CodeToFile(name, codeToString, traceFilePosn);
 
             // Build the parameters for source compilation.
@@ -62,7 +69,13 @@ namespace Reni.Code
                          IncludeDebugInformation = true,
                          TempFiles = new TempFileCollection(null, true)
                      };
-            cp.ReferencedAssemblies.AddRange(_referencedAssemblies);
+            var referencedAssemblies
+                = new[]
+                  {
+                      Assembly.GetAssembly(typeof(Generator)).Location,
+                      Assembly.GetAssembly(typeof(HWClassLibrary.IO.File)).Location,
+                  };
+            cp.ReferencedAssemblies.AddRange(referencedAssemblies);
             var cr = _provider.CompileAssemblyFromFile(cp, name);
 
             if(cr.Errors.Count > 0)

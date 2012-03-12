@@ -42,7 +42,7 @@ namespace Reni.Struct
             _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new SetterType(this, refAlignParam));
         }
 
-        Result ISetterTargetType.ApplySetterResult(Category category, TypeBase valueType) { return _functionalBodyType.ApplySetterResult(category, _argsType, valueType); }
+        Result ISetterTargetType.ApplyResult(Category category, TypeBase valueType) { return _functionalBodyType.ApplySetterResult(category, _argsType, valueType); }
 
         TypeBase ISetterTargetType.ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
 

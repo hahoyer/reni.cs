@@ -32,7 +32,6 @@ namespace Reni.Type
     {
         readonly Structure _accessPoint;
         readonly int _position;
-        readonly SimpleCache<AssignmentFeature> _assignmentFeatureCache;
         readonly SimpleCache<AccessManager.IAccessObject> _accessObjectCache;
         readonly SimpleCache<CodeBase> _valueReferenceViaFieldReferenceCodeCache;
 
@@ -41,7 +40,6 @@ namespace Reni.Type
             Tracer.Assert(!(accessPoint.ValueType(position) is Aligner));
             _accessPoint = accessPoint;
             _position = position;
-            _assignmentFeatureCache = new SimpleCache<AssignmentFeature>(() => new AssignmentFeature(this));
             _accessObjectCache = new SimpleCache<AccessManager.IAccessObject>(() => _accessPoint.ContainerContextObject.UniqueAccessObject(_position));
             _valueReferenceViaFieldReferenceCodeCache = new SimpleCache<CodeBase>(ObtainValueReferenceViaFieldReferenceCode);
         }
@@ -72,50 +70,6 @@ namespace Reni.Type
         }
 
         internal override bool? IsDataLessStructureElement(bool isQuick) { return AccessObject.IsDataLessStructureElement(this, isQuick); }
-
-        internal Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
-        {
-            var result = new Result
-                (category
-                 , () => false
-                 , () => refAlignParam.RefSize
-                 , () => _assignmentFeatureCache.Value.UniqueFunctionalType(refAlignParam)
-                 , ArgCode
-                 , CodeArgs.Arg
-                );
-            return result;
-        }
-
-        internal Result ApplyAssignment(Category category, TypeBase argsType)
-        {
-            var typedCategory = category.Typed;
-            var sourceResult = argsType.Conversion(typedCategory, ValueTypeReference);
-            var destinationResult = ValueReferenceViaFieldReference(typedCategory)
-                .ReplaceArg(FieldReferenceViaStructReference(typedCategory))
-                .ReplaceArg(AccessPoint.StructReferenceViaContextReference(typedCategory));
-            var resultForArg = destinationResult.Sequence(sourceResult);
-            return AssignmentResult(category).ReplaceArg(resultForArg);
-        }
-
-        Result AssignmentResult(Category category)
-        {
-            return new Result
-                (category
-                 , () => true
-                 , () => Size.Zero
-                 , () => Void
-                 , AssignmentCode
-                 , CodeArgs.Arg
-                );
-        }
-
-        CodeBase AssignmentCode()
-        {
-            return ValueTypeReference
-                .Pair(ValueTypeReference)
-                .ArgCode()
-                .Assignment(RefAlignParam, ValueType.Size);
-        }
 
         internal Result DumpPrintOperationResult(Category category) { return AccessObject.DumpPrintOperationResult(this, category); }
         internal Result DumpPrintFieldResult(Category category) { return GenericDumpPrintResult(category, RefAlignParam); }

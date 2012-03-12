@@ -182,7 +182,7 @@ namespace Reni
             catch(CompilerErrorException e)
             {
                 for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
-                    OutStream.Add(e.CompilerErrorCollection[i].ToString());
+                    OutStream.Add(e.CompilerErrorCollection[i].ToString() + "\n");
             }
             Data.OutStream = null;
         }

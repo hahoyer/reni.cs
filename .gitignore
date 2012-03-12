@@ -5,3 +5,12 @@ _ReSharper.*
 *.suo
 *.user
 obj/
+
+/src/WebService/Bin/HWClassLibrary.dll
+/src/WebService/Bin/HWClassLibrary.pdb
+/src/WebService/Bin/Reni.dll
+/src/WebService/Bin/Reni.pdb
+/src/WebSite/Bin/HWClassLibrary.dll
+/src/WebSite/Bin/HWClassLibrary.pdb
+/src/WebSite/Bin/Reni.dll
+/src/WebSite/Bin/Reni.pdb

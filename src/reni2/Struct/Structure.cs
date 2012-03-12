@@ -46,10 +46,13 @@ namespace Reni.Struct
         readonly DictionaryEx<int, AccessFeature> _accessFeaturesCache;
         [Node]
         readonly DictionaryEx<int, ContextAccessFeature> _contextAccessFeaturesCache;
+        [Node]
+        readonly DictionaryEx<int, FieldAccessType> _fieldAccessTypeCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
             : base(_nextObjectId++)
         {
+            _fieldAccessTypeCache = new DictionaryEx<int, FieldAccessType>(position=> new FieldAccessType(this, position));
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
             _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
@@ -138,6 +141,7 @@ namespace Reni.Struct
         TypeBase UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
         internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }
         internal IContextFeature UniqueContextAccessFeature(int position) { return _contextAccessFeaturesCache.Find(position); }
+        FieldAccessType UniqueFieldAccessType(int position) { return _fieldAccessTypeCache.Find(position); }
 
         TypeBase ObtainAccessType(int position)
         {
@@ -145,7 +149,7 @@ namespace Reni.Struct
             if(accessType.IsLambda)
                 return accessType;
             if(!accessType.IsDataLess)
-                return accessType.UniqueFieldAccessType(RefAlignParam, FieldOffset(position));
+                return UniqueFieldAccessType(position);
 
             NotImplementedMethod(position);
             return null;

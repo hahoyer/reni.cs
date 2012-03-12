@@ -45,7 +45,7 @@ namespace Reni.Struct
         {
             var valueType = _target.ValueType ?? argsResult.Type;
             var result = _target
-                .ApplySetterResult(category, valueType)
+                .ApplyResult(category, valueType)
                 .ReplaceArg(argsResult.Conversion(valueType));
             return result;
         }
@@ -54,6 +54,6 @@ namespace Reni.Struct
     interface ISetterTargetType
     {
         TypeBase ValueType { get; }
-        Result ApplySetterResult(Category category, TypeBase valueType);
+        Result ApplyResult(Category category, TypeBase valueType);
     }
 }

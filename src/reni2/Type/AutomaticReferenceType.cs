@@ -37,7 +37,7 @@ namespace Reni.Type
             _refAlignParam = refAlignParam;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is ReferenceType), valueType.Dump);
-            StopByObjectId(-8);
+            StopByObjectId(-14);
         }
 
 

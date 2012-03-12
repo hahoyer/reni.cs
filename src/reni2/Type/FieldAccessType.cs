@@ -23,24 +23,25 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Struct;
 
 namespace Reni.Type
 {
     sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType
     {
-        readonly RefAlignParam _refAlignParam;
-        readonly Size _offset;
+        readonly Structure _structure;
+        readonly int _position;
         readonly DictionaryEx<RefAlignParam, TypeBase> _setterTypeCache;
 
-        internal FieldAccessType(TypeBase target, RefAlignParam refAlignParam, Size offset)
-            : base(target)
+        internal FieldAccessType(Structure structure, int position)
+            : base(structure.ValueType(position))
         {
-            _refAlignParam = refAlignParam;
-            _offset = offset;
+            _structure = structure;
+            _position = position;
             _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(rap => new SetterType(this, rap));
         }
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override bool IsDataLess { get { return false; } }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
 
@@ -56,8 +57,14 @@ namespace Reni.Type
 
         protected override Result ParentConversionResult(Category category)
         {
-            return Parent.SmartReference(_refAlignParam)
-                .Result(category, () => ArgCode().AddToReference(_refAlignParam, _offset), CodeArgs.Arg);
+            return Parent.SmartReference(RefAlignParam)
+                .Result(category, () => ArgCode().AddToReference(RefAlignParam, _structure.FieldOffset(_position)), CodeArgs.Arg);
+        }
+
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.ChildSearch(this);
+            base.Search(searchVisitor);
         }
 
         public Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
@@ -74,11 +81,36 @@ namespace Reni.Type
         }
         
         TypeBase ISetterTargetType.ValueType { get { return Parent; } }
-        
-        Result ISetterTargetType.ApplySetterResult(Category category, TypeBase valueType)
+        RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+
+        Result ISetterTargetType.ApplyResult(Category category, TypeBase valueType)
         {
-            NotImplementedMethod(category, valueType);
-            return null;
+            var typedCategory = category.Typed;
+            var sourceResult = valueType.Conversion(typedCategory, Parent);
+            Result destinationResult = _structure.AccessViaContextReference(typedCategory,_position);
+            var resultForArg = destinationResult.Sequence(sourceResult);
+            return AssignmentResult(category).ReplaceArg(resultForArg);
         }
+
+        Result AssignmentResult(Category category)
+        {
+            return new Result
+                (category
+                 , () => true
+                 , () => Size.Zero
+                 , () => Void
+                 , AssignmentCode
+                 , CodeArgs.Arg
+                );
+        }
+
+        CodeBase AssignmentCode()
+        {
+            return Parent.SmartReference(RefAlignParam)
+                .Pair(Parent.SmartReference(RefAlignParam))
+                .ArgCode()
+                .Assignment(RefAlignParam, Parent.Size);
+        }
+
     }
 }
