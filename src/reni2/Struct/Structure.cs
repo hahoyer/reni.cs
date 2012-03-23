@@ -52,7 +52,7 @@ namespace Reni.Struct
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
             : base(_nextObjectId++)
         {
-            _fieldAccessTypeCache = new DictionaryEx<int, FieldAccessType>(position=> new FieldAccessType(this, position));
+            _fieldAccessTypeCache = new DictionaryEx<int, FieldAccessType>(position => new FieldAccessType(this, position));
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
             _typeCache = new SimpleCache<StructureType>(() => new StructureType(this));
@@ -146,13 +146,9 @@ namespace Reni.Struct
         TypeBase ObtainAccessType(int position)
         {
             var accessType = ContainerContextObject.AccessType(EndPosition, position);
-            if(accessType.IsLambda)
+            if(accessType.IsLambda || accessType.IsDataLess)
                 return accessType;
-            if(!accessType.IsDataLess)
-                return UniqueFieldAccessType(position);
-
-            NotImplementedMethod(position);
-            return null;
+            return UniqueFieldAccessType(position);
         }
 
         internal Result AccessViaThisReference(Category category, Result rightResult)
@@ -225,8 +221,8 @@ namespace Reni.Struct
         {
             var accessType = UniqueAccessType(position);
             return accessType
-                .GenericDumpPrintResult(category,RefAlignParam)
-                .ReplaceArg(AccessViaThisReference(category.Typed,position));
+                .GenericDumpPrintResult(category, RefAlignParam)
+                .ReplaceArg(AccessViaThisReference(category.Typed, position));
         }
 
         internal Result ContextReferenceViaStructReference(Result result)
