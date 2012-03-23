@@ -31,8 +31,8 @@ namespace WebSite
     public partial class Default : Page
     {
         protected void Page_Load(object sender, EventArgs e) { }
-        
-        public string CompileAndRun(string text)
+
+        string CompileAndRun(string text)
         {
             var fileName =
                 Environment.GetEnvironmentVariable("temp")
@@ -45,7 +45,14 @@ namespace WebSite
             var stringStream = new StringStream();
             var parameters = new CompilerParameters {OutStream = stringStream};
             var c = new Compiler(parameters, fileName);
-            c.Exec();
+            try
+            {
+                c.Exec();
+            }
+            catch(Exception exception)
+            {
+                return exception.ToString(); 
+            }
             var result = stringStream.Result;
             return result;
         }
@@ -55,10 +62,6 @@ namespace WebSite
             Result.Text = CompileAndRun(TbName.Text);
         }
 
-        protected void TbName_TextChanged(object sender, EventArgs e)
-        {
-
-        }
     }
     sealed class StringStream : ReniObject, IOutStream
     {

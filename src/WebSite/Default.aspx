@@ -9,8 +9,7 @@
 
     <body>
         <form id="reniForm" runat="server">
-            &nbsp;<asp:TextBox id="TbName" runat="server" Height="24px" 
-                ontextchanged="TbName_TextChanged" TextMode="MultiLine" Width="223px" />
+            &nbsp;<asp:TextBox id="TbName" runat="server" Height="123px" TextMode="MultiLine" Width="440px" />
             <br />
             <asp:Button ID="Compile" Text="Compile and run" runat="server" 
                 OnClick="ButtonOkClick" Width="451px" />
