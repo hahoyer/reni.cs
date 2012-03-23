@@ -475,7 +475,7 @@ namespace Reni
             IsDirty = false;
         }
 
-        internal Result Sequence(Result second)
+        Result Sequence(Result second)
         {
             var result = Clone();
             result.Add(second);

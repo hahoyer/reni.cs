@@ -86,9 +86,9 @@ namespace Reni.Type
         Result ISetterTargetType.ApplyResult(Category category, TypeBase valueType)
         {
             var typedCategory = category.Typed;
-            var sourceResult = valueType.Conversion(typedCategory, Parent);
+            var sourceResult = valueType.UniqueAutomaticReference(RefAlignParam).Conversion(typedCategory, Parent.UniqueAutomaticReference(RefAlignParam));
             Result destinationResult = _structure.AccessViaContextReference(typedCategory,_position);
-            var resultForArg = destinationResult.Sequence(sourceResult);
+            var resultForArg = destinationResult + sourceResult;
             return AssignmentResult(category).ReplaceArg(resultForArg);
         }
 
@@ -106,8 +106,7 @@ namespace Reni.Type
 
         CodeBase AssignmentCode()
         {
-            return Parent.SmartReference(RefAlignParam)
-                .Pair(Parent.SmartReference(RefAlignParam))
+            return Pair(Parent.SmartReference(RefAlignParam))
                 .ArgCode()
                 .Assignment(RefAlignParam, Parent.Size);
         }

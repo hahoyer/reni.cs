@@ -46,7 +46,7 @@ namespace Reni.Struct
             var valueType = _target.ValueType ?? argsResult.Type;
             var result = _target
                 .ApplyResult(category, valueType)
-                .ReplaceArg(argsResult.Conversion(valueType));
+                .ReplaceArg(argsResult.Conversion(valueType.UniqueAutomaticReference(refAlignParam)));
             return result;
         }
     }

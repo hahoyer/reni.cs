@@ -63,7 +63,7 @@ namespace Reni.Sequence
             var objectResult = _objectType.UniqueObjectReference(refAlignParam).Result(typedCategory);
             var convertedObjectResult = objectResult.ConvertToBitSequence(typedCategory);
             var convertedArgsResult = argsType.ConvertToBitSequence(typedCategory);
-            return result.ReplaceArg(convertedObjectResult.Sequence(convertedArgsResult));
+            return result.ReplaceArg(convertedObjectResult + convertedArgsResult);
         }
 
         private Result Apply(Category category, int objSize, int argsSize)
