@@ -137,7 +137,7 @@ namespace Reni.FeatureTest.Struct
     [TargetSet(@"(10,2000,30, (^ _A_T_ 2) := 4) dump_print", "(10, 2000, 4, )")]
     [SimpleAssignment]
     [SimpleAssignment1]
-    public sealed class Assignment : CompilerTest
+    public sealed class Assignments : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
@@ -145,7 +145,7 @@ namespace Reni.FeatureTest.Struct
 
     [TestFixture]
     [TargetSet(@"(3, (^ _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
-    [Assignment]
+    [Assignments]
     [ApplyTypeOperatorWithCut]
     public sealed class AssignmentWithCut : CompilerTest
     {

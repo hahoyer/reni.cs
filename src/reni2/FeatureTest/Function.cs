@@ -138,7 +138,7 @@ namespace Reni.FeatureTest.Function
     [Add2Numbers]
     [UseThen]
     [UseElse]
-    [Assignment]
+    [Assignments]
     [SimpleFunctionWithNonLocal]
     [RecursiveFunction]
     [NamedSimpleAssignment]
