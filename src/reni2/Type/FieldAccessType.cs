@@ -87,9 +87,14 @@ namespace Reni.Type
         {
             var typedCategory = category.Typed;
             var sourceResult = valueType.UniqueAutomaticReference(RefAlignParam).Conversion(typedCategory, Parent.UniqueAutomaticReference(RefAlignParam));
-            Result destinationResult = _structure.AccessViaContextReference(typedCategory,_position);
+            Result destinationResult = DestinationResult(typedCategory);
             var resultForArg = destinationResult + sourceResult;
             return AssignmentResult(category).ReplaceArg(resultForArg);
+        }
+
+        Result DestinationResult(Category typedCategory)
+        {
+            return Result(typedCategory, _structure.ContainerContextObject, () => _structure.ContainerContextObject.ContextReferenceOffsetFromAccessPoint(_position+1) * -1);
         }
 
         Result AssignmentResult(Category category)
