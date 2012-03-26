@@ -82,6 +82,7 @@ namespace Reni.Type
         
         TypeBase ISetterTargetType.ValueType { get { return Parent; } }
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+        internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
 
         Result ISetterTargetType.ApplyResult(Category category, TypeBase valueType)
         {
@@ -116,5 +117,10 @@ namespace Reni.Type
                 .Assignment(RefAlignParam, Parent.Size);
         }
 
+        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
+        {
+            return new FunctionalConverter(ParentConversionResult)
+                .Concat(Parent.SmartReference(RefAlignParam).Converter(conversionParameter, destination));
+        }
     }
 }
