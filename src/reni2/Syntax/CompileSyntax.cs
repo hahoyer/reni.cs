@@ -117,11 +117,11 @@ namespace Reni.Syntax
             return null;
         }
 
-        internal Result OperationResult<TFeature>(ContextBase context, Category category, Defineable defineable)
+        internal Result OperationResult<TFeature>(ContextBase context, Category category, ISearchTarget target)
             where TFeature : class, ITypeFeature
         {
             return Type(context)
-                .OperationResult<TFeature>(category, defineable, context.RefAlignParam);
+                .OperationResult<TFeature>(category, target, context.RefAlignParam);
         }
 
         internal bool? IsDataLessStructureElement(bool isQuick, ContextBase context)

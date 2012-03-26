@@ -31,8 +31,8 @@ namespace Reni
 {
     sealed class ContextSearchVisitor : RootSearchVisitor<IContextFeature>
     {
-        internal ContextSearchVisitor(Defineable defineable)
-            : base(defineable) { }
+        internal ContextSearchVisitor(ISearchTarget target)
+            : base(target) { }
 
         internal SearchResult SearchResult
         {
@@ -54,7 +54,7 @@ namespace Reni
         internal void Search(Struct.Context context)
         {
             var accessPoint = context.Structure;
-            var feature = accessPoint.SearchFromStructContext(Defineable);
+            var feature = accessPoint.SearchFromStructContext(Target);
             if(feature == null)
                 return;
             InternalResult = feature.ConvertToContextFeature(accessPoint);

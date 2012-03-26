@@ -26,7 +26,7 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    abstract class Defineable : TokenClass
+    abstract class Defineable : TokenClass, ISearchTarget
     {
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
@@ -37,10 +37,8 @@ namespace Reni.TokenClasses
             return left.CreateSyntaxOrDeclaration(this, token, right);
         }
 
-        internal TFeatureType Check<TFeatureType>()
-            where TFeatureType : class { return this as TFeatureType; }
-
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
+        string ISearchTarget.StructFeatureName { get { return Name; } }
     }
 }

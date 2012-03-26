@@ -43,7 +43,7 @@ namespace Reni
         }
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
-        internal override Defineable Defineable { get { return _parent.Defineable; } }
+        internal override ISearchTarget Target { get { return _parent.Target; } }
 
         internal override ISearchPath<TFeature, TType> InternalResult
         {

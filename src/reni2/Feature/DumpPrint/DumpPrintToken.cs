@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,7 +28,7 @@ using Reni.Type;
 
 namespace Reni.Feature.DumpPrint
 {
-    internal sealed class DumpPrintToken :
+    sealed class DumpPrintToken :
         Defineable,
         ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, StructureType>,
         ISearchPath<ISuffixFeature, TypeType>,
@@ -40,9 +41,9 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>,
         ISearchPath<ISuffixFeature, FunctionalBody>
     {
-        private static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
-        private static readonly BitFeature _bitFeature = new BitFeature();
-        private static readonly ISearchPath<ISuffixFeature, SequenceType> _dumpPrintSequenceFeature = new DumpPrintSequenceFeature();
+        static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
+        static readonly BitFeature _bitFeature = new BitFeature();
+        static readonly ISearchPath<ISuffixFeature, SequenceType> _dumpPrintSequenceFeature = new DumpPrintSequenceFeature();
 
         ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return new Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, Bit>.Convert(Bit type) { return _bitFeature; }

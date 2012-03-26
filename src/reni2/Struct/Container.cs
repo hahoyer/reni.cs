@@ -176,9 +176,9 @@ namespace Reni.Struct
             return null;
         }
 
-        internal ISearchPath<ISuffixFeature, StructureType> SearchFromRefToStruct(Defineable defineable) { return FindStructFeature(defineable.Name); }
+        internal ISearchPath<ISuffixFeature, StructureType> SearchFromRefToStruct(ISearchTarget target) { return FindStructFeature(target.StructFeatureName); }
 
-        internal IStructFeature SearchFromStructContext(Defineable defineable) { return FindStructFeature(defineable.Name); }
+        internal IStructFeature SearchFromStructContext(ISearchTarget defineable) { return FindStructFeature(defineable.StructFeatureName); }
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {

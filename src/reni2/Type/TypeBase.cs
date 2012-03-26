@@ -274,10 +274,10 @@ namespace Reni.Type
 
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
-        internal SearchResult SearchDefineable<TFeature>(Defineable defineable)
+        internal SearchResult Search<TFeature>(ISearchTarget target)
             where TFeature : class, ITypeFeature
         {
-            var visitor = new TypeRootSearchVisitor<TFeature>(defineable, this);
+            var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
             visitor.Search(this);
             if(Debugger.IsAttached)
                 _lastSearchVisitor = visitor;
@@ -308,15 +308,15 @@ namespace Reni.Type
 
         internal virtual Result ReferenceInCode(Category category, IReferenceInCode target) { return UniqueAutomaticReference(target.RefAlignParam).Result(category, target, () => Size.Zero); }
 
-        internal Result OperationResult<TFeature>(Category category, Defineable defineable, RefAlignParam refAlignParam)
+        internal Result OperationResult<TFeature>(Category category, ISearchTarget target, RefAlignParam refAlignParam)
             where TFeature : class, ITypeFeature
         {
-            var trace = ObjectId == -12 && defineable.ObjectId == 17 && category.HasCode;
-            StartMethodDump(trace, category, defineable, refAlignParam);
+            var trace = ObjectId == -12 && target.GetObjectId() == 17 && category.HasCode;
+            StartMethodDump(trace, category, target, refAlignParam);
             try
             {
                 BreakExecution();
-                var feature = SearchDefineable<TFeature>(defineable);
+                var feature = Search<TFeature>(target);
                 Dump("feature", feature);
                 if(feature == null)
                     return ReturnMethodDump<Result>(null);
@@ -420,6 +420,5 @@ namespace Reni.Type
         }
 
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
-
     }
 }

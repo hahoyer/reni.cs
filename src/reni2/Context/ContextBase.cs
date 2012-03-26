@@ -131,18 +131,18 @@ namespace Reni.Context
 
         TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }
 
-        SearchResult SearchDefinable(Defineable defineable)
+        SearchResult Search(ISearchTarget target)
         {
-            var visitor = new ContextSearchVisitor(defineable);
+            var visitor = new ContextSearchVisitor(target);
             visitor.Search(this);
             return visitor.SearchResult;
         }
 
-        internal SearchResult OperationResult(CompileSyntax syntax, Defineable defineable)
+        internal SearchResult OperationResult(CompileSyntax syntax, ISearchTarget target)
         {
             return syntax == null
-                       ? SearchDefinable(defineable)
-                       : Type(syntax).UnAlignedType.SearchDefineable<ISuffixFeature>(defineable);
+                       ? Search(target)
+                       : Type(syntax).UnAlignedType.Search<ISuffixFeature>(target);
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }

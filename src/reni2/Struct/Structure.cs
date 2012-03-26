@@ -180,11 +180,11 @@ namespace Reni.Struct
                 .Result(category, ReferenceType.ArgResult(category));
         }
 
-        internal ISearchPath<ISuffixFeature, StructureType> SearchFromRefToStruct(Defineable defineable)
+        internal ISearchPath<ISuffixFeature, StructureType> SearchFromRefToStruct(ISearchTarget target)
         {
             return ContainerContextObject
                 .Container
-                .SearchFromRefToStruct(defineable);
+                .SearchFromRefToStruct(target);
         }
 
         internal Result Call(Category category, CompileSyntax body, Result argsResult)
@@ -243,6 +243,6 @@ namespace Reni.Struct
                 .UnAlignedType;
         }
 
-        internal IStructFeature SearchFromStructContext(Defineable defineable) { return ContainerContextObject.Container.SearchFromStructContext(defineable); }
+        internal IStructFeature SearchFromStructContext(ISearchTarget target) { return ContainerContextObject.Container.SearchFromStructContext(target); }
     }
 }

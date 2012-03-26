@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Feature;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni
@@ -33,8 +32,8 @@ namespace Reni
         [EnableDump]
         readonly TypeBase _type;
 
-        internal TypeRootSearchVisitor(Defineable defineable, TypeBase type)
-            : base(defineable) { _type = type; }
+        internal TypeRootSearchVisitor(ISearchTarget target, TypeBase type)
+            : base(target) { _type = type; }
 
         internal SearchResult SearchResult
         {

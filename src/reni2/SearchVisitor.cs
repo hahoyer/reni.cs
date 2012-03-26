@@ -24,7 +24,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Sequence;
 using Reni.Struct;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni
@@ -70,7 +69,7 @@ namespace Reni
         where TFeature : class
     {
         internal abstract TFeature InternalResult { set; }
-        internal abstract Defineable Defineable { get; }
+        internal abstract ISearchTarget Target { get; }
 
 
         internal void Search(TypeBase typeBase)
@@ -83,9 +82,14 @@ namespace Reni
         internal override void Search()
         {
             if(!IsSuccessFull)
-                InternalResult = Defineable.Check<TFeature>();
+                InternalResult = Target as TFeature;
         }
 
         protected override SearchVisitor InternalChild<TType>(TType target) { return new ChildSearchVisitor<TFeature, TType>(this, target); }
+    }
+
+    interface ISearchTarget
+    {
+        string StructFeatureName { get; }
     }
 }

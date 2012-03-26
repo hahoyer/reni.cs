@@ -29,12 +29,12 @@ namespace Reni
     abstract class RootSearchVisitor<TFeature> : SearchVisitor<TFeature>
         where TFeature : class, IFeature
     {
-        readonly Defineable _defineable;
+        readonly ISearchTarget _target;
         protected TFeature Result { get; private set; }
 
-        internal RootSearchVisitor(Defineable defineable)
+        internal RootSearchVisitor(ISearchTarget target)
         {
-            _defineable = defineable;
+            _target = target;
             ConversionFunctions = new IConversionFunction[0];
         }
 
@@ -50,6 +50,6 @@ namespace Reni
             }
         }
 
-        internal override Defineable Defineable { get { return _defineable; } }
+        internal override ISearchTarget Target { get { return _target; } }
     }
 }
