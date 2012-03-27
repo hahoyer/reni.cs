@@ -26,7 +26,7 @@ using Reni.Code;
 
 namespace Reni.Type
 {
-    abstract class ReferenceType : TypeBase, IContainerType
+    abstract class ReferenceType : TypeBase, IContainerType, IConverter
     {
         [DisableDump]
         internal abstract RefAlignParam RefAlignParam { get; }
@@ -100,11 +100,8 @@ namespace Reni.Type
                 new FunctionalConverter(DereferenceResult)
                 .Concat(ValueType.Converter(conversionParameter, destination));
         }
-        IConverter IContainerType.Converter()
-        {
-            NotImplementedMethod();
-            return null;
-        }
+        IConverter IContainerType.Converter() { return this; }
         TypeBase IContainerType.Target { get { return ValueType; } }
+        Result IConverter.Result(Category category) { return DereferenceResult(category); }
     }
 }
