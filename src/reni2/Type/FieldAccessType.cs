@@ -30,7 +30,9 @@ namespace Reni.Type
 {
     sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType
     {
+        [EnableDump]
         readonly Structure _structure;
+        [EnableDump]
         readonly int _position;
         readonly DictionaryEx<RefAlignParam, TypeBase> _setterTypeCache;
 
@@ -44,6 +46,7 @@ namespace Reni.Type
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override bool IsDataLess { get { return false; } }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
+        internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
 
         internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
