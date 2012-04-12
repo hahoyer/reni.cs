@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011-2012 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -20,7 +21,6 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -33,14 +33,12 @@ namespace Reni.Struct
         static int _nextObjectId;
         readonly Container _container;
         readonly ContextBase _parent;
-        readonly DictionaryEx<int, AccessManager.IAccessObject> _accessObjectsCache;
 
         internal ContainerContextObject(Container container, ContextBase parent)
             : base(_nextObjectId++)
         {
             _container = container;
             _parent = parent;
-            _accessObjectsCache = new DictionaryEx<int, AccessManager.IAccessObject>(GetAccessObject);
         }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
@@ -65,8 +63,11 @@ namespace Reni.Struct
 
         int IndexSize { get { return Container.IndexSize; } }
 
-        internal AccessManager.IAccessObject UniqueAccessObject(int position) { return _accessObjectsCache.Find(position); }
-        internal TypeBase AccessType(int accessPosition, int position) { return Container.AccessType(_parent, accessPosition, position); }
+        internal TypeBase AccessType(int accessPosition, int position)
+        {
+            return Container
+                .AccessType(_parent, accessPosition, position);
+        }
 
         internal Size StructureSize(int position)
         {
@@ -74,8 +75,12 @@ namespace Reni.Struct
                 return Size.Zero;
             return StructureSize(0, position);
         }
-        internal bool? StructureIsDataLess(bool isQuick, int accessPosition) { return Container.IsDataLess(isQuick, Parent, accessPosition); }
-        bool IsDataLess(int position) { return Container.StructureResult(Category.IsDataLess, Parent, position, position + 1).SmartIsDataLess; }
+
+        internal bool? StructureIsDataLess(bool isQuick, int accessPosition)
+        {
+            return Container
+                .IsDataLess(isQuick, Parent, accessPosition);
+        }
 
         internal Result ContextReferenceViaStructReference(int position, Result result)
         {
@@ -93,17 +98,10 @@ namespace Reni.Struct
 
         internal Size ContextReferenceOffsetFromAccessPoint(int position) { return StructureSize(0, position); }
 
-        Size StructureSize(int fromPosition, int fromNotPosition) { return Container.StructureSize(Parent, fromPosition, fromNotPosition); }
-
-        bool IsLambda(int position) { return Container.IsLambda(position); }
-
-        AccessManager.IAccessObject GetAccessObject(int position)
+        Size StructureSize(int fromPosition, int fromNotPosition)
         {
-            if(IsLambda(position))
-                return AccessManager.Function;
-            if(IsDataLess(position))
-                return AccessManager.ProcedureCall;
-            return AccessManager.Field;
+            return Container
+                .StructureSize(Parent, fromPosition, fromNotPosition);
         }
 
         CodeBase ContextReferenceViaStructReferenceCode(int accessPosition)
@@ -115,6 +113,10 @@ namespace Reni.Struct
                 .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 
-        internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition) { return Container.StructureSize(Parent, fieldPosition + 1, accessPosition); }
+        internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)
+        {
+            return Container
+                .StructureSize(Parent, fieldPosition + 1, accessPosition);
+        }
     }
 }

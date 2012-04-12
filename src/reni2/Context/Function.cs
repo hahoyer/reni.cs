@@ -24,6 +24,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Context
@@ -54,6 +55,24 @@ namespace Reni.Context
             if(ValueType == null)
                 throw new ValueCannotBeUsedHereException();
             return ValueType.ReferenceInCode(category, this);
+        }
+        internal Result UniqueResultWithReplace(Category category, CompileSyntax body)
+        {
+            var trace = false;
+            StartMethodDump(trace, category,body);
+            try
+            {
+                var result = UniqueResult(category, body);
+
+                Dump("result", result); 
+                BreakExecution();
+                return result;
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
     }
 

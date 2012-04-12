@@ -116,7 +116,17 @@ namespace Reni.Syntax
                 .Result(context, category, _left, _right);
         }
 
-        internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort() + "(" + _right.DumpShort() + ")"; }
+        internal override string DumpShort()
+        {
+            var result = "(";
+            result += _left.DumpShort();
+            result += ")";
+            result += base.DumpShort();
+            result += "(";
+            result += _right.DumpShort();
+            result += ")";
+            return result;
+        }
         protected override TokenData GetFirstToken() { return _left.FirstToken; }
         protected override TokenData GetLastToken() { return _right.LastToken; }
     }

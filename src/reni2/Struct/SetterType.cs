@@ -45,7 +45,7 @@ namespace Reni.Struct
         {
             var valueType = _target.ValueType ?? argsResult.Type;
             var result = _target
-                .ApplyResult(category, valueType)
+                .Result(category, valueType)
                 .ReplaceArg(argsResult.Conversion(valueType.UniqueAutomaticReference(refAlignParam)));
             return result;
         }
@@ -54,6 +54,6 @@ namespace Reni.Struct
     interface ISetterTargetType
     {
         TypeBase ValueType { get; }
-        Result ApplyResult(Category category, TypeBase valueType);
+        Result Result(Category category, TypeBase valueType);
     }
 }

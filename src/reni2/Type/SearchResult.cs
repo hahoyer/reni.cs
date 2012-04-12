@@ -29,19 +29,15 @@ namespace Reni.Type
     abstract class SearchResult : ReniObject
     {
         static int _nextObjectId;
-        [EnableDump]
-        readonly IFeature _feature;
-        [EnableDump]
-        readonly IConversionFunction[] _conversionFunctions;
+        internal readonly IFeature Feature;
+        internal readonly IConversionFunction[] ConversionFunctions;
         internal SearchResult(IFeature feature, IConversionFunction[] conversionFunctions)
             : base(_nextObjectId++)
         {
             Tracer.Assert(feature != null);
-            _feature = feature;
-            _conversionFunctions = conversionFunctions;
+            Feature = feature;
+            ConversionFunctions = conversionFunctions;
         }
-
-        IConversionFunction[] ConversionFunctions { get { return _conversionFunctions; } }
 
         internal Result Result(Category category, RefAlignParam refAlignParam)
         {
@@ -105,6 +101,6 @@ namespace Reni.Type
             }
         }
 
-        Result FeatureResult(Category category, RefAlignParam refAlignParam) { return _feature.Result(category, refAlignParam); }
+        Result FeatureResult(Category category, RefAlignParam refAlignParam) { return Feature.Result(category, refAlignParam); }
     }
 }

@@ -164,7 +164,6 @@
     <Compile Include="Sequence\Sign.cs" />
     <Compile Include="Sequence\Slash.cs" />
     <Compile Include="Sequence\Star.cs" />
-    <Compile Include="Struct\AccessManager.cs" />
     <Compile Include="Struct\ContainerContextObject.cs" />
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\FunctionAccessType.cs" />
@@ -241,7 +240,6 @@
     <Compile Include="Type\DumpPrintSequenceFeature.cs" />
     <Compile Include="Type\EnableCut.cs" />
     <Compile Include="Sequence\FunctionalFeature.cs" />
-    <Compile Include="Type\AccessType.cs" />
     <Compile Include="Type\FieldAccessType.cs" />
     <Compile Include="Type\FunctionalFeature.cs" />
     <Compile Include="Type\IFunctionalFeature.cs" />

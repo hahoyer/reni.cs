@@ -68,6 +68,7 @@ namespace Reni.Sequence
         [UsedImplicitly]
         internal Type.Array InheritedType { get { return _inheritedType; } }
 
+        [DisableDump]
         internal override bool IsDataLess { get { return _inheritedType.IsDataLess; } }
         protected override Size GetSize() { return _inheritedType.Size; }
 

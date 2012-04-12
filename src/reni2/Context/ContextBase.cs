@@ -74,8 +74,8 @@ namespace Reni.Context
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
         internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts.Find(container).Find(position); }
-        internal ContextBase UniqueFunctionContext(TypeBase argsType) { return _cache.GetterFunctionContexts.Find(argsType); }
-        internal ContextBase UniqueFunctionContext(TypeBase argsType, TypeBase valueType) { return _cache.SetterFunctionContexts.Find(argsType).Find(valueType); }
+        internal Function UniqueFunctionContext(TypeBase argsType) { return _cache.GetterFunctionContexts.Find(argsType); }
+        internal Function UniqueFunctionContext(TypeBase argsType, TypeBase valueType) { return _cache.SetterFunctionContexts.Find(argsType).Find(valueType); }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
         internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Find(container).Find(accessPosition); }

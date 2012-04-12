@@ -82,23 +82,27 @@ namespace Reni.Struct
 
         internal TypeBase ValueType(TypeBase argsType)
         {
-            Tracer.Assert(!_isImplicit);
-            if(_getter == null)
+            if (_getter == null)
                 return null;
-            return _structure
-                .UniqueContext
-                .UniqueFunctionContext(argsType)
-                .UniqueResult(Category.Type, _getter)
-                .Type;
+            return GetterResult(Category.Type, argsType).Type;
         }
 
-        internal Result ApplySetterResult(Category category, TypeBase argsType, TypeBase valueType)
+        internal Result SetterResult(Category category, TypeBase argsType, TypeBase valueType)
         {
             Tracer.Assert(!_isImplicit);
             return _structure
                 .UniqueContext
                 .UniqueFunctionContext(argsType, valueType)
-                .UniqueResult(category, _setter);
+                .UniqueResultWithReplace(category, _setter);
+        }
+
+        internal Result GetterResult(Category category, TypeBase argsType)
+        {
+            Tracer.Assert(!_isImplicit);
+            return _structure
+                .UniqueContext
+                .UniqueFunctionContext(argsType)
+                .UniqueResultWithReplace(category, _getter);
         }
     }
 }

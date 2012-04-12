@@ -61,7 +61,11 @@ namespace Reni.Type
         protected override Result ParentConversionResult(Category category)
         {
             return Parent.SmartReference(RefAlignParam)
-                .Result(category, () => ArgCode().AddToReference(RefAlignParam, _structure.FieldOffset(_position)), CodeArgs.Arg);
+                .Result
+                (category
+                 , () => ArgCode().AddToReference(RefAlignParam, _structure.FieldOffset(_position))
+                 , CodeArgs.Arg
+                );
         }
 
         internal override void Search(SearchVisitor searchVisitor)
@@ -82,23 +86,29 @@ namespace Reni.Type
                 );
             return result;
         }
-        
+
         TypeBase ISetterTargetType.ValueType { get { return Parent; } }
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
 
-        Result ISetterTargetType.ApplyResult(Category category, TypeBase valueType)
+        Result ISetterTargetType.Result(Category category, TypeBase valueType)
         {
             var typedCategory = category.Typed;
-            var sourceResult = valueType.UniqueAutomaticReference(RefAlignParam).Conversion(typedCategory, Parent.UniqueAutomaticReference(RefAlignParam));
-            Result destinationResult = DestinationResult(typedCategory);
+            var sourceResult = valueType
+                .UniqueAutomaticReference(RefAlignParam)
+                .Conversion(typedCategory, Parent.UniqueAutomaticReference(RefAlignParam));
+            var destinationResult = DestinationResult(typedCategory);
             var resultForArg = destinationResult + sourceResult;
             return AssignmentResult(category).ReplaceArg(resultForArg);
         }
 
         Result DestinationResult(Category typedCategory)
         {
-            return Result(typedCategory, _structure.ContainerContextObject, () => _structure.ContainerContextObject.ContextReferenceOffsetFromAccessPoint(_position+1) * -1);
+            return Result
+                (typedCategory
+                 , _structure.ContainerContextObject
+                 , () => _structure.ContainerContextObject.ContextReferenceOffsetFromAccessPoint(_position + 1) * -1
+                );
         }
 
         Result AssignmentResult(Category category)

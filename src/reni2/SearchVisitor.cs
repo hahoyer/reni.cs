@@ -35,8 +35,8 @@ namespace Reni
 
         internal SearchVisitor Child(SequenceType target) { return InternalChild(target); }
         internal SearchVisitor Child(AutomaticReferenceType target) { return InternalChild(target); }
-        internal SearchVisitor Child(AccessType target) { return InternalChild(target); }
         internal SearchVisitor Child(TextItemType target) { return InternalChild(target); }
+        internal SearchVisitor Child(FunctionAccessType target) { return InternalChild(target); }
 
         internal void ChildSearch<TType>(TType target)
             where TType : IDumpShortProvider { InternalChild(target).Search(); }
@@ -48,7 +48,7 @@ namespace Reni
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
         internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
 
-        internal void SearchAndConvert(TypeBase searchType, IContainerType argType)
+        internal void SearchAndConvert(TypeBase searchType, IContainerType containerType)
         {
             if(IsSuccessFull)
                 return;
@@ -56,7 +56,7 @@ namespace Reni
             if(!IsSuccessFull)
                 return;
 
-            Add(new ConversionFunction(argType));
+            Add(new ConversionFunction(containerType));
         }
     }
 

@@ -29,7 +29,7 @@ using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
-    abstract class Function : Special, IInfix
+    abstract class Function : Special, IInfix, IPrefix, ISuffix
     {
         readonly bool _isAutoCall;
         protected Function(bool isAutoCall) { _isAutoCall = isAutoCall; }
@@ -39,7 +39,10 @@ namespace Reni.TokenClasses
 
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
-            Tracer.Assert(left != null || right != null);
+            if(left == null)
+                return new PrefixSyntax(token, this, right.ToCompiledSyntaxOrNull());
+            if(right == null)
+                return new SuffixSyntax(token, left.ToCompiledSyntaxOrNull(), this);
             return new InfixSyntax(token, left.ToCompiledSyntaxOrNull(), this, right.ToCompiledSyntaxOrNull());
         }
 
@@ -47,6 +50,16 @@ namespace Reni.TokenClasses
         {
             return context
                 .FunctionalResult(category, left, right, _isAutoCall);
+        }
+        Result IPrefix.Result(ContextBase context, Category category, CompileSyntax right)
+        {
+            return context
+                .FunctionalResult(category, null, right, _isAutoCall);
+        }
+        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left)
+        {
+            return context
+                .FunctionalResult(category, left, null, _isAutoCall);
         }
     }
 

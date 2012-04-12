@@ -27,7 +27,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionAccessType : TypeBase, ISetterTargetType
+    sealed class FunctionAccessType : TypeBase, ISetterTargetType, IContainerType, IConverter
     {
         [EnableDump]
         readonly FunctionalBodyType _functionalBodyType;
@@ -42,9 +42,11 @@ namespace Reni.Struct
             _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new SetterType(this, refAlignParam));
         }
 
-        Result ISetterTargetType.ApplyResult(Category category, TypeBase valueType) { return _functionalBodyType.ApplySetterResult(category, _argsType, valueType); }
-
-        TypeBase ISetterTargetType.ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
+        Result ISetterTargetType.Result(Category category, TypeBase valueType) { return _functionalBodyType.SetterResult(category, _argsType, valueType); }
+        TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
+        IConverter IContainerType.Converter() { return this; }
+        TypeBase IContainerType.Target { get { return ValueType; } }
+        Result IConverter.Result(Category category) { return _functionalBodyType.GetterResult(category, _argsType); }
 
         [DisableDump]
         internal override bool IsDataLess { get { return _argsType.IsDataLess; } }
@@ -56,8 +58,12 @@ namespace Reni.Struct
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.ChildSearch(this);
+            ValueType.Search(searchVisitor.Child(this));
+            searchVisitor.SearchAndConvert(ValueType, this);
             base.Search(searchVisitor);
         }
+
+        TypeBase ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
 
         internal Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
         {
@@ -72,5 +78,4 @@ namespace Reni.Struct
             return result;
         }
     }
-
 }
