@@ -32,7 +32,7 @@ namespace Reni.Type
 
         internal override string DumpShort() { return _objectType.DumpShort() + " type"; }
         protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam) { return result; }
-        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return argsType.Conversion(category, _objectType); }
+        protected override Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return argsType.Conversion(category, _objectType); }
         protected override TypeBase ObjectType { get { return _objectType; } }
     }
 }

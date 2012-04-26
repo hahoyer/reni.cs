@@ -30,6 +30,7 @@ namespace Reni.Type
     interface IFunctionalFeature : IDumpShortProvider
     {
         Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam);
+        bool IsImplicit { get; }
     }
 
     interface IFunctionalFeatureSpecial

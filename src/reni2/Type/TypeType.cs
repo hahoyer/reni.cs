@@ -33,7 +33,7 @@ namespace Reni.Type
         [EnableDump]
         private readonly TypeBase _value;
 
-        private readonly IFunctionalFeature _functionalFeature;
+        private readonly ConversionFeature _functionalFeature;
         private readonly RepeaterType _repeaterType;
 
         public TypeType(TypeBase value)
@@ -46,9 +46,6 @@ namespace Reni.Type
         internal override bool IsDataLess { get { return true; } }
         
         internal override string DumpPrintText { get { return "(" + _value.DumpPrintText + "()) type"; } }
-
-        [DisableDump]
-        internal override IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }
 
         internal override string DumpShort() { return "(" + _value.DumpShort() + ") type"; }
         [DisableDump]

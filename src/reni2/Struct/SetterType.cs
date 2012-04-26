@@ -26,7 +26,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class SetterType : TypeBase, IFunctionalFeature
+    sealed class SetterType : TypeBase
     {
         [EnableDump]
         readonly ISetterTargetType _target;
@@ -41,7 +41,7 @@ namespace Reni.Struct
         internal override bool IsDataLess { get { return false; } }
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
-        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             var valueType = _target.ValueType ?? argsResult.Type;
             var result = _target

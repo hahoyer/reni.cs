@@ -26,25 +26,29 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    abstract class FunctionalFeature : ReniObject, IFunctionalFeature
+    abstract class FunctionalFeature : ReniObject, IDumpShortProvider
     {
         static int _nextObjectId;
         readonly DictionaryEx<RefAlignParam, TypeBase> _functionalTypesCache;
 
         protected FunctionalFeature()
-            : base(_nextObjectId++) { _functionalTypesCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new FunctionalFeatureType<IFunctionalFeature>(this, refAlignParam)); }
+            : base(_nextObjectId++)
+        {
+            _functionalTypesCache
+                = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new FunctionalFeatureType(this, refAlignParam));
+        }
 
         internal TypeBase UniqueFunctionalType(RefAlignParam refAlignParam) { return _functionalTypesCache.Find(refAlignParam); }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             var trace = ObjectId == -10 && category.HasCode;
             StartMethodDump(trace, category, argsResult, refAlignParam);
             try
             {
-                var applyResult = ObtainApplyResult(category, argsResult.Type, refAlignParam);
+                var applyResult = ApplyResult(category, argsResult.Type, refAlignParam);
                 if(!category.HasCode && !category.HasArgs)
                     return ReturnMethodDump(applyResult);
 
@@ -65,7 +69,7 @@ namespace Reni.Type
             }
         }
 
-        protected abstract Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        protected abstract Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         protected abstract TypeBase ObjectType { get; }
         protected abstract Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam);
     }

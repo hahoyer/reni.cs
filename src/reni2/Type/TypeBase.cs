@@ -31,6 +31,7 @@ using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 using Reni.Struct;
+using Reni.Syntax;
 using Reni.TokenClasses;
 
 namespace Reni.Type
@@ -189,8 +190,7 @@ namespace Reni.Type
                  , () => CodeBase.ReferenceCode(target).AddToReference(target.RefAlignParam, getOffset())
                  , () => CodeArgs.Create(target));
         }
-
-
+                          
         internal Result Result(Category category, Result codeAndRefs)
         {
             var result = new Result();

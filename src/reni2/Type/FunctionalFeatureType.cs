@@ -25,13 +25,12 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    sealed class FunctionalFeatureType<TFeature> : TypeBase
-        where TFeature : IFunctionalFeature
+    sealed class FunctionalFeatureType : TypeBase
     {
-        readonly TFeature _functionalFeature;
+        readonly FunctionalFeature _functionalFeature;
         readonly RefAlignParam _refAlignParam;
 
-        internal FunctionalFeatureType(TFeature functionalFeature, RefAlignParam refAlignParam)
+        internal FunctionalFeatureType(FunctionalFeature functionalFeature, RefAlignParam refAlignParam)
         {
             _functionalFeature = functionalFeature;
             _refAlignParam = refAlignParam;
@@ -41,8 +40,5 @@ namespace Reni.Type
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
-
-        [DisableDump]
-        internal override IFunctionalFeature FunctionalFeature { get { return _functionalFeature; } }
     }
 }

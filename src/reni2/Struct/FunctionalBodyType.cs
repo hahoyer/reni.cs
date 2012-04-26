@@ -36,9 +36,7 @@ namespace Reni.Struct
         readonly CompileSyntax _getter;
         [EnableDump]
         readonly CompileSyntax _setter;
-        [EnableDump]
         readonly bool _isImplicit;
-
         readonly DictionaryEx<TypeBase, FunctionAccessType> _functionAccessTypes;
 
         internal FunctionalBodyType(Structure structure, CompileSyntax getter, CompileSyntax setter, bool isImplicit)
@@ -51,26 +49,24 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal bool IsObjectForCallRequired { get { return !_structure.IsDataLess && (_structure.IsObjectForCallRequired(_getter) || _structure.IsObjectForCallRequired(_setter)); } }
-        [DisableDump]
         internal override Structure FindRecentStructure { get { return _structure; } }
         [DisableDump]
         internal override bool IsLambda { get { return true; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return !IsObjectForCallRequired; } }
-        [DisableDump]
-        string Tag { get { return _isImplicit ? "/!\\" : "/\\"; } }
-        [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+        internal override bool IsDataLess { get { return _structure.IsDataLess || !(_structure.IsObjectForCallRequired(_getter) || _structure.IsObjectForCallRequired(_setter)); } }
         [DisableDump]
         internal override bool IsLikeReference { get { return true; } }
 
+        string Tag { get { return _isImplicit ? "/!\\" : "/\\"; } }
         internal override string DumpPrintText { get { return _getter.DumpPrintText + Tag + _setter.DumpPrintText; } }
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return this; } }
 
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        protected override Size GetSize() { return _structure.RefAlignParam.RefSize; }
 
+        [DisableDump]
+        bool IFunctionalFeature.IsImplicit { get { return _isImplicit; } }
+        
         Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!_isImplicit);

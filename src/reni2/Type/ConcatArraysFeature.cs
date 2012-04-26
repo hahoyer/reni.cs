@@ -25,7 +25,7 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    sealed class ConcatArraysFeature : TypeBase, IFunctionalFeature
+    sealed class ConcatArraysFeature : TypeBase
     {
         [EnableDump]
         readonly Array _type;
@@ -40,7 +40,7 @@ namespace Reni.Type
         internal override bool IsDataLess { get { return false; } }
         protected override Size GetSize() { return _refSize; }
 
-        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             var newCount = argsResult.Type.ArrayElementCount;
             var newElementResult = argsResult.Conversion(argsResult.Type.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);

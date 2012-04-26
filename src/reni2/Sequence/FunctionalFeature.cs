@@ -55,7 +55,7 @@ namespace Reni.Sequence
                 .Result(category, _objectType.ReferenceArgResult(category.Typed, refAlignParam));
         }
 
-        protected override Result ObtainApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        protected override Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
             Tracer.Assert(_objectType.Element == TypeBase.Bit);
             var typedCategory = category.Typed;
