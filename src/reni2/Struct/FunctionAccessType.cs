@@ -53,7 +53,10 @@ namespace Reni.Struct
         [DisableDump]
         internal override bool IsLikeReference { get { return true; } }
 
-        protected override Size GetSize() { return _argsType.Size; }
+        protected override Size GetSize()
+        {
+            return _functionalBodyType.GetCodeArgsSize(_argsType) + _argsType.Size;
+        }
 
         internal override void Search(SearchVisitor searchVisitor)
         {

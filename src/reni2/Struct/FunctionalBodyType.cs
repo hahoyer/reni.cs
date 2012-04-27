@@ -37,7 +37,7 @@ namespace Reni.Struct
         [EnableDump]
         readonly CompileSyntax _setter;
         readonly bool _isImplicit;
-        readonly DictionaryEx<TypeBase, FunctionAccessType> _functionAccessTypes;
+        readonly DictionaryEx<TypeBase, FunctionAccessType> _functionAccessTypesCache;
 
         internal FunctionalBodyType(Structure structure, CompileSyntax getter, CompileSyntax setter, bool isImplicit)
         {
@@ -45,7 +45,7 @@ namespace Reni.Struct
             _getter = getter;
             _setter = setter;
             _isImplicit = isImplicit;
-            _functionAccessTypes = new DictionaryEx<TypeBase, FunctionAccessType>(argsType => new FunctionAccessType(this, argsType));
+            _functionAccessTypesCache = new DictionaryEx<TypeBase, FunctionAccessType>(argsType => new FunctionAccessType(this, argsType));
         }
 
         [DisableDump]
@@ -66,19 +66,31 @@ namespace Reni.Struct
 
         [DisableDump]
         bool IFunctionalFeature.IsImplicit { get { return _isImplicit; } }
-        
+
+        internal Size GetCodeArgsSize(TypeBase argsType)
+        {
+            var codeArgs = CodeArgs.Void();
+            if(_setter != null)
+                codeArgs += SetterResult(Category.CodeArgs, argsType, ValueType(argsType)).CodeArgs;
+            if(_getter != null)
+                codeArgs += GetterResult(Category.CodeArgs, argsType).CodeArgs;
+            return codeArgs.Size;
+        }
+
         Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
         {
             Tracer.Assert(!_isImplicit);
+            var functionAccessType = _functionAccessTypesCache.Find(argsResult.Type);
+
+
             return
-                _functionAccessTypes
-                    .Find(argsResult.Type)
+                functionAccessType
                     .Result(category, argsResult);
         }
 
         internal TypeBase ValueType(TypeBase argsType)
         {
-            if (_getter == null)
+            if(_getter == null)
                 return null;
             return GetterResult(Category.Type, argsType).Type;
         }
