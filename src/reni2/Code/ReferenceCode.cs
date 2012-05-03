@@ -16,9 +16,6 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
@@ -28,16 +25,16 @@ namespace Reni.Code
     /// <summary>
     ///     ContextAtPosition reference, should be replaced
     /// </summary>
-    sealed class ReferenceCode : FiberHead
+    internal sealed class ReferenceCode : FiberHead
     {
-        readonly IReferenceInCode _context;
-        static int _nextObjectId;
+        private readonly IReferenceInCode _context;
+        private static int _nextObjectId;
 
         internal ReferenceCode(IReferenceInCode context)
             : base(_nextObjectId++)
         {
             _context = context;
-            StopByObjectId(0);
+            StopByObjectId(-10);
         }
 
         [Node]
@@ -45,6 +42,7 @@ namespace Reni.Code
 
         [DisableDump]
         internal override RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+
         [DisableDump]
         internal override bool IsRelativeReference { get { return false; } }
 

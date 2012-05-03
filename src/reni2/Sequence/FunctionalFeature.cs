@@ -26,7 +26,7 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    internal sealed class FunctionalFeature : Type.FunctionalFeature, ISuffixFeature
+    internal sealed class FunctionalFeature : Type.FunctionalFeature, ISuffixFeature, IFunctionalFeature
     {
         private readonly SequenceType _objectType;
 
@@ -71,5 +71,9 @@ namespace Reni.Sequence
             var type = _feature.ResultType(objSize, argsSize);
             return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize), CodeArgs.Arg);
         }
+
+        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam) { throw new NotImplementedException(); }
+
+        bool IFunctionalFeature.IsImplicit { get { return false; } }
     }
 }

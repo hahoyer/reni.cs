@@ -84,7 +84,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == 42 && context.ObjectId == 3 && category.HasCode;
+            var trace = ObjectId == 25 && context.ObjectId == 1 && category.HasCode;
             trace |= ObjectId == 39 && context.ObjectId == 3 && category.HasCode;
             StartMethodDump(trace, context, category);
             try
@@ -136,7 +136,7 @@ namespace Reni.ReniParser
 
                 var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
 
-                if (Right == null && !functionalFeature.IsImplicit)
+                if (Right == null && (functionalFeature == null || !functionalFeature.IsImplicit))
                     return ReturnMethodDump(suffixOperationResult.ReplaceArg(leftResult), true);
 
                 BreakExecution();
@@ -155,4 +155,7 @@ namespace Reni.ReniParser
             }
         }
     }
+
+    // Lord of the weed
+    // Katava dscho dscho
 }
