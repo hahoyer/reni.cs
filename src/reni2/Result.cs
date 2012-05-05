@@ -1,6 +1,6 @@
 ﻿// 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -254,8 +254,6 @@ namespace Reni
                 return result;
             }
         }
-
-        internal static Error Error { get { return null; } }
 
         bool IsDirty
         {
@@ -652,7 +650,7 @@ namespace Reni
         {
             if(Type.IsDataLess)
                 return this;
-            if (Type.IsLikeReference)
+            if(Type.IsLikeReference)
                 return this;
             return Type
                 .SmartLocalReferenceResult(CompleteCategory, refAlignParam)
@@ -715,39 +713,20 @@ namespace Reni
                 CodeArgs = Code.CodeArgs;
             if(category.HasSize && !CompleteCategory.HasSize)
                 Size =
-                    CompleteCategory.HasCode ? Code.Size
-                        : CompleteCategory.HasType ? Type.Size
+                    CompleteCategory.HasCode
+                        ? Code.Size
+                        : CompleteCategory.HasType
+                              ? Type.Size
                               : type.Size;
             if(category.HasIsDataLess && !CompleteCategory.HasIsDataLess)
                 IsDataLess =
-                    CompleteCategory.HasCode ? Code.Size.IsZero
-                        : CompleteCategory.HasSize ? Size.IsZero
-                              : CompleteCategory.HasType ? Type.IsDataLess
+                    CompleteCategory.HasCode
+                        ? Code.Size.IsZero
+                        : CompleteCategory.HasSize
+                              ? Size.IsZero
+                              : CompleteCategory.HasType
+                                    ? Type.IsDataLess
                                     : type.IsDataLess;
         }
-    }
-
-    sealed class Error
-    {
-        readonly ContextBase _context;
-        readonly CompileSyntax _syntax;
-
-        internal Error(ContextBase context, CompileSyntax syntax)
-        {
-            _context = context;
-            _syntax = syntax;
-        }
-
-        Error(Error e0, Error e1) { }
-
-        public static Error operator +(Error e0, Error e1)
-        {
-            if(e0 == null)
-                return e1;
-            return e1 == null ? e0 : new Error(e0, e1);
-        }
-
-        internal ContextBase Context { get { return _context; } }
-        internal CompileSyntax Syntax { get { return _syntax; } }
     }
 }
