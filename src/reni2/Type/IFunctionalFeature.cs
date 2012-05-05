@@ -29,7 +29,7 @@ namespace Reni.Type
 {
     interface IFunctionalFeature : IDumpShortProvider
     {
-        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam);
+        Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         bool IsImplicit { get; }
     }
 

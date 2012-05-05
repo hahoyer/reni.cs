@@ -67,25 +67,21 @@ namespace Reni.Struct
         [DisableDump]
         bool IFunctionalFeature.IsImplicit { get { return _isImplicit; } }
 
-        internal Size GetCodeArgsSize(TypeBase argsType)
+        internal CodeArgs GetCodeArgs(TypeBase argsType)
         {
             var codeArgs = CodeArgs.Void();
             if(_setter != null)
                 codeArgs += SetterResult(Category.CodeArgs, argsType, ValueType(argsType)).CodeArgs;
             if(_getter != null)
                 codeArgs += GetterResult(Category.CodeArgs, argsType).CodeArgs;
-            return codeArgs.Size;
+            return codeArgs;
         }
 
-        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            Tracer.Assert(!_isImplicit);
-            var functionAccessType = _functionAccessTypesCache.Find(argsResult.Type);
-
-
-            return
-                functionAccessType
-                    .Result(category, argsResult);
+            return _functionAccessTypesCache
+                .Find(argsType)
+                .ApplyResult(category);
         }
 
         internal TypeBase ValueType(TypeBase argsType)

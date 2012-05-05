@@ -72,7 +72,7 @@ namespace Reni.Sequence
             return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize), CodeArgs.Arg);
         }
 
-        Result IFunctionalFeature.ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam) { throw new NotImplementedException(); }
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { throw new NotImplementedException(); }
 
         bool IFunctionalFeature.IsImplicit { get { return false; } }
     }

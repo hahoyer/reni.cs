@@ -28,6 +28,7 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.ReniParser
 {
@@ -136,12 +137,15 @@ namespace Reni.ReniParser
 
                 var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
 
-                if (Right == null && (functionalFeature == null || !functionalFeature.IsImplicit))
-                    return ReturnMethodDump(suffixOperationResult.ReplaceArg(leftResult), true);
+                if(rightResult == null)
+                    if(functionalFeature != null && functionalFeature.IsImplicit)
+                        rightResult = TypeBase.Void.Result(category.Typed);
+                    else
+                        return ReturnMethodDump(suffixOperationResult.ReplaceArg(leftResult), true);
 
                 BreakExecution();
                 var applyResult = functionalFeature
-                    .ApplyResult(category, rightResult, context.RefAlignParam);
+                    .ApplyResult(category, rightResult.Type, context.RefAlignParam);
                 Dump("applyResult", applyResult);
                 BreakExecution();
                 var result = applyResult

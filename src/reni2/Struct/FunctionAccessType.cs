@@ -49,14 +49,12 @@ namespace Reni.Struct
         Result IConverter.Result(Category category) { return _functionalBodyType.GetterResult(category, _argsType); }
 
         [DisableDump]
-        internal override bool IsDataLess { get { return _argsType.IsDataLess; } }
+        internal override bool IsDataLess { get { return CodeArgs.IsNone && _argsType.IsDataLess; } }
         [DisableDump]
         internal override bool IsLikeReference { get { return true; } }
-
-        protected override Size GetSize()
-        {
-            return _functionalBodyType.GetCodeArgsSize(_argsType) + _argsType.Size;
-        }
+        [DisableDump]
+        CodeArgs CodeArgs { get { return _functionalBodyType.GetCodeArgs(_argsType); } }
+        protected override Size GetSize() { return CodeArgs.Size + _argsType.Size; }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
@@ -79,6 +77,15 @@ namespace Reni.Struct
                  , CodeArgs.Arg
                 );
             return result;
+        }
+
+        internal Result ApplyResult(Category category)
+        {
+            return Result
+                (category
+                 , () => CodeArgs.ToCode().Sequence(_argsType.ArgCode())
+                 , () => CodeArgs + CodeArgs.Arg()
+                );
         }
     }
 }
