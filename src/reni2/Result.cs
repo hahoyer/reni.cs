@@ -333,7 +333,7 @@ namespace Reni
             if(HasType)
                 result += "\nType=" + Tracer.Dump(_type);
             if(HasArgs)
-                result += "\nArgs=" + Tracer.Dump(_codeArgs);
+                result += "\nCodeArgs=" + Tracer.Dump(_codeArgs);
             if(HasCode)
                 result += "\nCode=" + Tracer.Dump(_code);
             if(result == "")
