@@ -60,8 +60,7 @@ namespace Reni.Struct
             StartMethodDump(trace, category, argsType);
             try
             {
-                var argsResult = argsType.ArgResult(category.Typed);
-                var result = Structure.Call(category, Getter, argsResult);
+                var result = Structure.Call(category, Getter, argsType);
                 return ReturnMethodDump(result, true);
             }
             finally

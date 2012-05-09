@@ -187,7 +187,7 @@ namespace Reni.Struct
                 .SearchFromRefToStruct(target);
         }
 
-        internal Result Call(Category category, CompileSyntax body, Result argsResult)
+        internal Result Call(Category category, CompileSyntax body, TypeBase argsResult)
         {
             return ContainerContextObject
                 .RootContext

@@ -168,7 +168,7 @@ namespace Reni
         public static CodeArgs operator -(CodeArgs x, IReferenceInCode y) { return x.Without(y); }
         TreeNode[] ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
-        sealed class CodeArg : IReferenceInCode
+        internal sealed class CodeArg : IReferenceInCode
         {
             internal static readonly IReferenceInCode Instance = new CodeArg();
             RefAlignParam IReferenceInCode.RefAlignParam { get { return null; } }

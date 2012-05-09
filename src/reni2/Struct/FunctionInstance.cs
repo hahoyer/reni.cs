@@ -1,5 +1,6 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -33,32 +34,32 @@ namespace Reni.Struct
     ///     Instance of a function to compile
     /// </summary>
     [Serializable]
-    internal sealed class FunctionInstance : ReniObject
+    sealed class FunctionInstance : ReniObject
     {
         [Node]
         [EnableDump]
-        private readonly TypeBase _args;
+        readonly TypeBase _args;
 
         [Node]
         [EnableDump]
-        private readonly CompileSyntax _body;
+        readonly CompileSyntax _body;
 
         [Node]
         [EnableDump]
-        private readonly Structure _structure;
+        readonly Structure _structure;
 
         [EnableDump]
-        private readonly int _index;
+        readonly int _index;
 
-        private readonly SimpleCache<CodeBase> _bodyCodeCache;
+        readonly SimpleCache<CodeBase> _bodyCodeCache;
 
         /// <summary>
         ///     Initializes a new instance of the FunctionInstance class.
         /// </summary>
-        /// <param name = "index">The index.</param>
-        /// <param name = "body">The body.</param>
-        /// <param name = "structure">The context.</param>
-        /// <param name = "args">The args.</param>
+        /// <param name="index"> The index. </param>
+        /// <param name="body"> The body. </param>
+        /// <param name="structure"> The context. </param>
+        /// <param name="args"> The args. </param>
         /// created 03.01.2007 21:19
         internal FunctionInstance(int index, CompileSyntax body, Structure structure, TypeBase args)
             : base(index)
@@ -72,7 +73,7 @@ namespace Reni.Struct
         }
 
         [Node]
-        private TypeBase Type { get { return Result(Category.Type).Type; } }
+        TypeBase Type { get { return Result(Category.Type).Type; } }
 
         [Node]
         [DisableDump]
@@ -80,15 +81,11 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeBase CallCode { get { return Call(Category.Code, _args.ArgResult(Category.Code)).Code; } }
-
-        [Node]
-        [DisableDump]
-        private CodeArgs CodeArgs
+        CodeArgs CodeArgs
         {
             get
             {
-                if (IsStopByObjectIdActive)
+                if(IsStopByObjectIdActive)
                     return null;
                 return Result(Category.CodeArgs).CodeArgs;
             }
@@ -98,16 +95,16 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        private Size FrameSize { get { return _args.Size + CodeArgs.Size; } }
+        Size FrameSize { get { return _args.Size + CodeArgs.Size; } }
 
         [Node]
         [DisableDump]
-        private string Description { get { return _body.DumpShort(); } }
+        string Description { get { return _body.DumpShort(); } }
 
-        public Result Call(Category category, Result args)
+        public Result Call(Category category)
         {
             var trace = ObjectId == -10 && (category.HasCode || category.HasArgs);
-            StartMethodDump(trace, category, args);
+            StartMethodDump(trace, category);
             try
             {
                 BreakExecution();
@@ -115,11 +112,11 @@ namespace Reni.Struct
                 if(category.HasCode)
                     localCategory = (localCategory - Category.Code) | Category.Size;
                 var result = Result(localCategory).Clone();
-                if(category.HasArgs)
-                    result.CodeArgs = result.CodeArgs.Sequence(args.CodeArgs);
+                if(category.HasArgs && !_args.IsDataLess)
+                    result.CodeArgs += CodeArgs.Arg();
 
                 if(category.HasCode)
-                    result.Code = ArgsForFunction(args.Code).Call(_index, result.Size);
+                    result.Code = ArgsForFunction().Call(_index, result.Size);
 
                 return ReturnMethodDump(result, true);
             }
@@ -129,9 +126,9 @@ namespace Reni.Struct
             }
         }
 
-        private CodeBase ArgsForFunction(CodeBase argsCode) { return CodeArgs.ToCode().Sequence(argsCode); }
+        CodeBase ArgsForFunction() { return CodeArgs.ToCode().Sequence(_args.ArgCode()); }
 
-        private CodeBase CreateBodyCode()
+        CodeBase CreateBodyCode()
         {
             if(IsStopByObjectIdActive)
                 return null;
@@ -146,7 +143,7 @@ namespace Reni.Struct
             return result.Code;
         }
 
-        private Result Result(Category category)
+        Result Result(Category category)
         {
             if(IsStopByObjectIdActive)
                 return null;
@@ -178,12 +175,12 @@ namespace Reni.Struct
             }
         }
 
-        private CodeBase CreateContextRefCode()
+        CodeBase CreateContextRefCode()
         {
             var refAlignParam = _structure.UniqueContext.RefAlignParam;
             return CodeBase
                 .FrameRef(refAlignParam)
-                .AddToReference(refAlignParam, FrameSize*-1)
+                .AddToReference(refAlignParam, FrameSize * -1)
                 .Dereference(refAlignParam, refAlignParam.RefSize);
         }
 

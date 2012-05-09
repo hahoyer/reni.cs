@@ -32,47 +32,40 @@ namespace Reni.Context
     sealed class Function : Child, IFunctionContext
     {
         [Node]
-        internal readonly TypeBase ArgType;
+        internal readonly TypeBase ArgsType;
         [Node]
         internal readonly TypeBase ValueType;
-        internal Function(ContextBase parent, TypeBase argType, TypeBase valueType)
+        internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType)
             : base(parent)
         {
-            ArgType = argType;
+            ArgsType = argsType;
             ValueType = valueType;
         }
 
-        internal Function(ContextBase parent, TypeBase argType)
-            : base(parent) { ArgType = argType; }
+        internal Function(ContextBase parent, TypeBase argsType)
+            : base(parent) { ArgsType = argsType; }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
 
         internal override IFunctionContext ObtainRecentFunctionContext() { return this; }
 
-        Result IFunctionContext.CreateArgReferenceResult(Category category) { return ArgType.ReferenceInCode(category, this); }
+        Result IFunctionContext.CreateArgReferenceResult(Category category)
+        {
+            return ArgsType
+                .ReferenceInCode(category, this);
+        }
+
         Result IFunctionContext.CreateValueReferenceResult(Category category)
         {
             if(ValueType == null)
                 throw new ValueCannotBeUsedHereException();
             return ValueType.ReferenceInCode(category, this);
         }
+
         internal Result UniqueResultWithReplace(Category category, CompileSyntax body)
         {
-            var trace = false;
-            StartMethodDump(trace, category,body);
-            try
-            {
-                var result = UniqueResult(category, body);
-
-                Dump("result", result); 
-                BreakExecution();
-                return result;
-
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            return RootContext
+                .Call(FindRecentStructure, category, body, ArgsType);
         }
     }
 

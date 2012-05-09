@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Struct;
 using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.Context
 {
@@ -54,12 +55,11 @@ namespace Reni.Context
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
-        internal Result Call(Structure structure, Category category, CompileSyntax body, Result argsResult)
+        internal Result Call(Structure structure, Category category, CompileSyntax body, TypeBase argsType)
         {
-            Tracer.Assert(argsResult.HasType);
-            var alignedArgsResult = argsResult.Align(DefaultRefAlignParam.AlignBits);
-            var functionInstance = _functions.Find(body, structure, alignedArgsResult.Type);
-            return functionInstance.Call(category, alignedArgsResult);
+            var alignedArgsType = argsType.UniqueAlign(DefaultRefAlignParam.AlignBits);
+            var functionInstance = _functions.Find(body, structure, alignedArgsType);
+            return functionInstance.Call(category);
         }
     }
 }

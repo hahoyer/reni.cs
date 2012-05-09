@@ -74,7 +74,7 @@ namespace Reni.Struct
                 codeArgs += SetterResult(Category.CodeArgs, argsType, ValueType(argsType)).CodeArgs;
             if(_getter != null)
                 codeArgs += GetterResult(Category.CodeArgs, argsType).CodeArgs;
-            return codeArgs;
+            return codeArgs - CodeArgs.Arg();
         }
 
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)

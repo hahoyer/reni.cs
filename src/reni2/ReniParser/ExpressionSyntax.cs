@@ -145,9 +145,14 @@ namespace Reni.ReniParser
 
                 BreakExecution();
                 var applyResult = functionalFeature
-                    .ApplyResult(category, rightResult.Type, context.RefAlignParam);
+                    .ApplyResult(category.Argsed, rightResult.Type, context.RefAlignParam);
+
+                if (applyResult.CodeArgs.Count == 1 && applyResult.CodeArgs[0] is CodeArgs.CodeArg)
+                    return ReturnMethodDump(applyResult.ReplaceArg(rightResult), true);
+
                 Dump("applyResult", applyResult);
                 BreakExecution();
+
                 var result = applyResult
                     .ReplaceArg(c => searchResult.ConverterResult(c, context.RefAlignParam))
                     .ReplaceArg(leftResult);
