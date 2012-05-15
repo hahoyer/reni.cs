@@ -46,7 +46,31 @@ namespace Reni.Struct
         TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
         IConverter IContainerType.Converter() { return this; }
         TypeBase IContainerType.Target { get { return ValueType; } }
-        Result IConverter.Result(Category category) { return _functionalBodyType.GetterResult(category, _argsType); }
+        Result IConverter.Result(Category category)
+        {
+            var trace = category.HasCode;
+            StartMethodDump(trace,category);
+            try
+            {
+                BreakExecution();
+                var rawResult = _functionalBodyType.GetterResult(category, _argsType);
+
+                if(CodeArgs.Count > 0)
+                {
+                    Dump("CodeArgs", CodeArgs); 
+                    BreakExecution();
+                }
+
+                var result = rawResult.ReplaceArg(_argsType.Result(category, ArgResult(category)));
+                Dump("result", result);
+                BreakExecution();
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
         [DisableDump]
         internal override bool IsDataLess { get { return CodeArgs.IsNone && _argsType.IsDataLess; } }

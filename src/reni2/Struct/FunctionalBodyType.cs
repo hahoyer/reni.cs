@@ -23,6 +23,7 @@ using System.Linq;
 using System;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -71,9 +72,9 @@ namespace Reni.Struct
         {
             var codeArgs = CodeArgs.Void();
             if(_setter != null)
-                codeArgs += SetterResult(Category.CodeArgs, argsType, ValueType(argsType)).CodeArgs;
+                codeArgs += _structure.Call(Category.CodeArgs, _setter, argsType).CodeArgs;
             if(_getter != null)
-                codeArgs += GetterResult(Category.CodeArgs, argsType).CodeArgs;
+                codeArgs += _structure.Call(Category.CodeArgs, _getter, argsType).CodeArgs;
             return codeArgs - CodeArgs.Arg();
         }
 
@@ -93,20 +94,17 @@ namespace Reni.Struct
 
         internal Result SetterResult(Category category, TypeBase argsType, TypeBase valueType)
         {
-            Tracer.Assert(!_isImplicit);
-            return _structure
-                .UniqueContext
-                .UniqueFunctionContext(argsType, valueType)
-                .UniqueResultWithReplace(category, _setter);
+            var result = _structure.Call(category, _setter, argsType);
+
+            return result;
         }
+
 
         internal Result GetterResult(Category category, TypeBase argsType)
         {
-            Tracer.Assert(!_isImplicit);
-            return _structure
-                .UniqueContext
-                .UniqueFunctionContext(argsType)
-                .UniqueResultWithReplace(category, _getter);
+            var result = _structure.Call(category, _getter, argsType);
+
+            return result;
         }
     }
 }

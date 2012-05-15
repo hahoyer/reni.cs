@@ -34,7 +34,18 @@ namespace Reni
         internal ConversionFunction(IContainerType containerType)
             : base(_nextObjectId++) { _containerType = containerType; }
         Result IConversionFunction.Result(Category category) { return _containerType.Converter().Result(category); }
-        public override string NodeDump { get { return string.Format("{0}[{1}=>{2}]", base.NodeDump, ((ReniObject)_containerType).NodeDump, _containerType.Target.NodeDump); } }
+        public override string NodeDump
+        {
+            get
+            {
+                return base.NodeDump 
+                    + "[" 
+                    + ((ReniObject) _containerType).NodeDump 
+                    + "=>" 
+                    + _containerType.Target.NodeDump 
+                    + "]";
+            }
+        }
     }
 
     interface IContainerType
