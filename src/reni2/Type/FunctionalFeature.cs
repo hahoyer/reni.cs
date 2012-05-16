@@ -42,35 +42,7 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
-        {
-            var trace = ObjectId == -10 && category.HasCode;
-            StartMethodDump(trace, category, argsResult, refAlignParam);
-            try
-            {
-                var applyResult = ApplyResult(category, argsResult.Type, refAlignParam);
-                if(!category.HasCode && !category.HasArgs)
-                    return ReturnMethodDump(applyResult);
-
-                Dump("applyResult", applyResult);
-                BreakExecution();
-                var replaceArgResult = applyResult.ReplaceArg(argsResult);
-                if(ObjectType.IsDataLess)
-                    return ReturnMethodDump(replaceArgResult);
-
-                Dump("replaceArgResult", replaceArgResult);
-                BreakExecution();
-                var result = ReplaceObjectReferenceByArg(replaceArgResult, refAlignParam);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        protected abstract Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
-        protected abstract TypeBase ObjectType { get; }
-        protected abstract Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam);
+        internal abstract Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        internal abstract Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam);
     }
 }

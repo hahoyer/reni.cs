@@ -31,6 +31,7 @@ namespace Reni.Type
     {
         Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
         bool IsImplicit { get; }
+        Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam);
     }
 
     interface IFunctionalFeatureSpecial

@@ -23,7 +23,6 @@ using System.Linq;
 using System;
 using HWClassLibrary.Helper;
 using Reni.Basics;
-using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -67,6 +66,12 @@ namespace Reni.Struct
 
         [DisableDump]
         bool IFunctionalFeature.IsImplicit { get { return _isImplicit; } }
+        
+        Result IFunctionalFeature.ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(result, objectResult, refAlignParam);
+            return null;
+        }
 
         internal CodeArgs GetCodeArgs(TypeBase argsType)
         {

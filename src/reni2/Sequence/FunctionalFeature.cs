@@ -1,5 +1,6 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -26,25 +27,17 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    internal sealed class FunctionalFeature : Type.FunctionalFeature, ISuffixFeature, IFunctionalFeature
+    sealed class FunctionalFeature : Type.FunctionalFeature, ISuffixFeature, IFunctionalFeature
     {
-        private readonly SequenceType _objectType;
+        readonly SequenceType _objectType;
 
         [EnableDump]
-        private readonly FeatureBase _feature;
+        readonly FeatureBase _feature;
 
         internal FunctionalFeature(SequenceType objectType, FeatureBase feature)
         {
             _objectType = objectType;
             _feature = feature;
-        }
-
-        protected override TypeBase ObjectType { get { return _objectType; } }
-
-        protected override Result ReplaceObjectReferenceByArg(Result result, RefAlignParam refAlignParam)
-        {
-            return result
-                .ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), category=>_objectType.ReferenceArgResult(category,refAlignParam));
         }
 
         internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
@@ -55,7 +48,22 @@ namespace Reni.Sequence
                 .Result(category, _objectType.ReferenceArgResult(category.Typed, refAlignParam));
         }
 
-        protected override Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        {
+            NotImplementedMethod(category, argsType, refAlignParam);
+            return null;
+        }
+        internal override Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
+        {
+            return result
+                .ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), c => objectResult & c);
+        }
+
+        Result IFunctionalFeature.ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam) { return ReplaceObjectReference(result, objectResult, refAlignParam); }
+
+        bool IFunctionalFeature.IsImplicit { get { return false; } }
+
+        internal override Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
             Tracer.Assert(_objectType.Element == TypeBase.Bit);
             var typedCategory = category.Typed;
@@ -66,14 +74,10 @@ namespace Reni.Sequence
             return result.ReplaceArg(convertedObjectResult + convertedArgsResult);
         }
 
-        private Result Apply(Category category, int objSize, int argsSize)
+        Result Apply(Category category, int objSize, int argsSize)
         {
             var type = _feature.ResultType(objSize, argsSize);
             return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable, objSize, argsSize), CodeArgs.Arg);
         }
-
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { throw new NotImplementedException(); }
-
-        bool IFunctionalFeature.IsImplicit { get { return false; } }
     }
 }

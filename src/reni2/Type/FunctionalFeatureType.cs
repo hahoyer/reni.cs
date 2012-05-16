@@ -1,6 +1,6 @@
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    sealed class FunctionalFeatureType : TypeBase
+    sealed class FunctionalFeatureType : TypeBase, IFunctionalFeature
     {
         readonly FunctionalFeature _functionalFeature;
         readonly RefAlignParam _refAlignParam;
@@ -40,5 +40,13 @@ namespace Reni.Type
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _functionalFeature.ApplyResult(category, argsType, refAlignParam); }
+        bool IFunctionalFeature.IsImplicit { get { return false; } }
+
+        Result IFunctionalFeature.ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
+        {
+            return _functionalFeature
+                .ReplaceObjectReference(result, objectResult, refAlignParam);
+        }
     }
 }
