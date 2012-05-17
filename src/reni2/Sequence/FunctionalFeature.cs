@@ -27,6 +27,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -45,6 +46,13 @@ namespace Reni.Sequence
             _feature = feature;
         }
 
+        [DisableDump]
+        internal override IReferenceInCode ObjectReference { get { return GetObjectReference(); } }
+        [DisableDump]
+        IReferenceInCode IFunctionalFeature.ObjectReference { get { return ObjectReference; } }
+        [DisableDump]
+        bool IFunctionalFeature.IsImplicit { get { return false; } }
+
         internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam)
@@ -53,33 +61,24 @@ namespace Reni.Sequence
                 .Result(category, _objectType.ReferenceArgResult(category.Typed, refAlignParam));
         }
 
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            NotImplementedMethod(category, argsType, refAlignParam);
+            NotImplementedMethod(category, argsType);
             return null;
         }
-        [DisableDump]
-        IReferenceInCode IFunctionalFeature.ObjectReference
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
 
-        bool IFunctionalFeature.IsImplicit { get { return false; } }
-
-        internal override Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        internal override Result ApplyResult(Category category, TypeBase argsType)
         {
             Tracer.Assert(_objectType.Element == TypeBase.Bit);
             var typedCategory = category.Typed;
             var result = Apply(category, _objectType.Count, argsType.SequenceCount(_objectType.Element));
-            var objectResult = _objectType.UniqueObjectReference(refAlignParam).Result(typedCategory);
+            var objectResult = GetObjectReference().Result(typedCategory);
             var convertedObjectResult = objectResult.ConvertToBitSequence(typedCategory);
             var convertedArgsResult = argsType.ConvertToBitSequence(typedCategory);
             return result.ReplaceArg(convertedObjectResult + convertedArgsResult);
         }
+
+        ObjectReference GetObjectReference() { return _objectType.UniqueObjectReference(Root.DefaultRefAlignParam); }
 
         Result Apply(Category category, int objSize, int argsSize)
         {

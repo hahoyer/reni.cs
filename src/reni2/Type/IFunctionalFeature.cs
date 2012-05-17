@@ -34,7 +34,7 @@ namespace Reni.Type
 {
     interface IFunctionalFeature : IDumpShortProvider
     {
-        Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        Result ApplyResult(Category category, TypeBase argsType);
         [DisableDump]
         bool IsImplicit { get; }
         [DisableDump]

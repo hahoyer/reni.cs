@@ -1,4 +1,6 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
+// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,11 +19,14 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 
 namespace Reni.Type
 {
@@ -31,8 +36,19 @@ namespace Reni.Type
 
         public ConversionFeature(TypeBase objectType) { _objectType = objectType; }
 
+        [DisableDump]
+        internal override IReferenceInCode ObjectReference
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
         internal override string DumpShort() { return _objectType.DumpShort() + " type"; }
-        internal override Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        
+        internal override Result ApplyResult(Category category, TypeBase argsType)
         {
             return argsType
                 .Conversion(category, _objectType);

@@ -41,20 +41,20 @@ namespace Reni.Type
             _refAlignParam = refAlignParam;
         }
 
+        [DisableDump]
         internal override bool IsDataLess { get { return false; } }
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
-
-        internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _functionalFeature.ApplyResult(category, argsType, refAlignParam); }
+        [DisableDump]
         bool IFunctionalFeature.IsImplicit { get { return false; } }
         [DisableDump]
-        IReferenceInCode IFunctionalFeature.ObjectReference
+        IReferenceInCode IFunctionalFeature.ObjectReference { get { return _functionalFeature.ObjectReference; } }
+
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
+        internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
+
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
+            return _functionalFeature
+                .ApplyResult(category, argsType);
         }
     }
 }

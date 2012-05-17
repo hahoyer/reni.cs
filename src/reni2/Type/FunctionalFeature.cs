@@ -23,6 +23,7 @@ using System.Linq;
 using System;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Code;
 
 namespace Reni.Type
 {
@@ -38,10 +39,13 @@ namespace Reni.Type
                 = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new FunctionalFeatureType(this, refAlignParam));
         }
 
+        [DisableDump]
+        internal abstract IReferenceInCode ObjectReference { get; }
+
         internal TypeBase UniqueFunctionalType(RefAlignParam refAlignParam) { return _functionalTypesCache.Find(refAlignParam); }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        internal abstract Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        internal abstract Result ApplyResult(Category category, TypeBase argsType);
     }
 }

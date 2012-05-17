@@ -97,7 +97,7 @@ namespace Reni.Struct
             return codeArgs - CodeArgs.Arg();
         }
 
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
         {
             return _functionAccessTypesCache
                 .Find(argsType)

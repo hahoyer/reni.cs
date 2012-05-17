@@ -149,7 +149,7 @@ namespace Reni.ReniParser
                 BreakExecution();
 
                 var applyResult = functionalFeature
-                    .ApplyResult(category, rightResult.Type, context.RefAlignParam)
+                    .ApplyResult(category, rightResult.Type)
                     .ReplaceArg(rightResult);
                 var objectReference = functionalFeature.ObjectReference;
 

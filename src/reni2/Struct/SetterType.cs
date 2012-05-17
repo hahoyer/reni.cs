@@ -58,12 +58,12 @@ namespace Reni.Struct
 
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
         {
             var valueType = _target.ValueType ?? argsType;
             var result = _target
                 .Result(category, valueType)
-                .ReplaceArg(argsType.Conversion(category, valueType.UniqueAutomaticReference(refAlignParam)));
+                .ReplaceArg(argsType.Conversion(category, valueType.UniqueAutomaticReference(_refAlignParam)));
             return result;
         }
     }
