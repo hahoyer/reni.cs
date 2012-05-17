@@ -37,10 +37,5 @@ namespace Reni.Type
             return argsType
                 .Conversion(category, _objectType);
         }
-        internal override Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(result, objectResult, refAlignParam);
-            return null;
-        }
     }
 }

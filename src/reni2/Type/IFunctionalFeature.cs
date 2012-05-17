@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -17,11 +19,14 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
 
@@ -30,8 +35,10 @@ namespace Reni.Type
     interface IFunctionalFeature : IDumpShortProvider
     {
         Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
+        [DisableDump]
         bool IsImplicit { get; }
-        Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam);
+        [DisableDump]
+        IReferenceInCode ObjectReference { get; }
     }
 
     interface IFunctionalFeatureSpecial

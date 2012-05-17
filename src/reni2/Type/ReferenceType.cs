@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -16,6 +18,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
@@ -61,7 +65,11 @@ namespace Reni.Type
                 );
         }
 
-        internal override Result ReferenceInCode(Category category, IReferenceInCode target) { return ValueType.ReferenceInCode(category, target); }
+        internal override Result ReferenceInCode(Category category, IReferenceInCode target)
+        {
+            return ValueType
+                .ReferenceInCode(category, target);
+        }
 
         protected abstract Result ToAutomaticReferenceResult(Category category);
 
@@ -98,7 +106,7 @@ namespace Reni.Type
 
             return
                 new FunctionalConverter(DereferenceResult)
-                .Concat(ValueType.Converter(conversionParameter, destination));
+                    .Concat(ValueType.Converter(conversionParameter, destination));
         }
         IConverter IContainerType.Converter() { return this; }
         TypeBase IContainerType.Target { get { return ValueType; } }

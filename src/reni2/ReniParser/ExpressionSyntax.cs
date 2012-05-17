@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -16,6 +18,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using HWClassLibrary.Debug;
 using System;
@@ -85,12 +89,11 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == 25 && context.ObjectId == 1 && category.HasCode;
-            trace |= ObjectId == 39 && context.ObjectId == 3 && category.HasCode;
+            var trace = ObjectId == 41 && context.ObjectId == 4 && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
-                BreakExecution();
+                //BreakExecution();
                 var leftResult = Left != null ? Left.Result(context, category.Typed).SmartLocalReferenceResult(context.RefAlignParam) : null;
                 var rightResult = Right != null ? Right.Result(context, category.Typed).SmartLocalReferenceResult(context.RefAlignParam) : null;
                 Dump("leftResult", leftResult);
@@ -108,7 +111,7 @@ namespace Reni.ReniParser
                 if(Right == null)
                     operationCategory |= category;
 
-                BreakExecution();
+                //BreakExecution();
 
                 var searchResult = context.OperationResult(Left, _tokenClass);
                 if(searchResult == null)
@@ -118,7 +121,7 @@ namespace Reni.ReniParser
                 }
 
                 Dump("searchResult", searchResult);
-                BreakExecution();
+                //BreakExecution();
 
                 var suffixOperationResult = searchResult.Result(operationCategory, context.RefAlignParam);
 
@@ -144,22 +147,24 @@ namespace Reni.ReniParser
                         return ReturnMethodDump(suffixOperationResult.ReplaceArg(leftResult), true);
 
                 BreakExecution();
-                var applyResult = functionalFeature
-                    .ApplyResult(category.Argsed, rightResult.Type, context.RefAlignParam)
-                    .ReplaceArg(rightResult);
 
-                if (applyResult.CodeArgs.Count == 1 && applyResult.CodeArgs[0] is CodeArgs.CodeArg)
-                    return ReturnMethodDump(applyResult, true);
+                var applyResult = functionalFeature
+                    .ApplyResult(category, rightResult.Type, context.RefAlignParam)
+                    .ReplaceArg(rightResult);
+                var objectReference = functionalFeature.ObjectReference;
 
                 Dump("applyResult", applyResult);
+                Dump("objectReference", objectReference);
                 BreakExecution();
 
-                var objectResult = searchResult.ConverterResult(category, context.RefAlignParam).ReplaceArg(leftResult);
-
-                Dump("objectResult", objectResult);
-                BreakExecution();
-
-                var result = functionalFeature.ReplaceObjectReference(applyResult, objectResult, context.RefAlignParam);
+                var result = applyResult
+                    .ReplaceAbsolute
+                    (objectReference
+                     , c =>
+                       searchResult
+                           .ConverterResult(c, context.RefAlignParam)
+                           .ReplaceArg(leftResult)
+                    );
                 return ReturnMethodDump(result, true);
             }
             finally

@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -17,12 +19,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -66,8 +71,17 @@ namespace Reni.Struct
 
         [DisableDump]
         bool IFunctionalFeature.IsImplicit { get { return _isImplicit; } }
-        
-        Result IFunctionalFeature.ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
+        [DisableDump]
+        IReferenceInCode IFunctionalFeature.ObjectReference
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
+
+        public Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
         {
             NotImplementedMethod(result, objectResult, refAlignParam);
             return null;

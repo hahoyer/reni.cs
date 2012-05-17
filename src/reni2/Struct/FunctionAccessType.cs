@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
@@ -17,12 +19,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -41,7 +46,15 @@ namespace Reni.Struct
             _argsType = argsType;
             _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new SetterType(this, refAlignParam));
         }
-
+        [DisableDump]
+        IReferenceInCode ISetterTargetType.ObjectReference
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
         Result ISetterTargetType.Result(Category category, TypeBase valueType) { return _functionalBodyType.SetterResult(category, _argsType, valueType); }
         TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
         IConverter IContainerType.Converter() { return this; }
@@ -49,7 +62,7 @@ namespace Reni.Struct
         Result IConverter.Result(Category category)
         {
             var trace = category.HasCode;
-            StartMethodDump(trace,category);
+            StartMethodDump(trace, category);
             try
             {
                 BreakExecution();
@@ -57,7 +70,7 @@ namespace Reni.Struct
 
                 if(CodeArgs.Count > 0)
                 {
-                    Dump("CodeArgs", CodeArgs); 
+                    Dump("CodeArgs", CodeArgs);
                     BreakExecution();
                 }
 

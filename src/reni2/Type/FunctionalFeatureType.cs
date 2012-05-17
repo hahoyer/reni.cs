@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -17,11 +19,14 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 
 namespace Reni.Type
 {
@@ -42,11 +47,14 @@ namespace Reni.Type
         internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam) { return _functionalFeature.ApplyResult(category, argsType, refAlignParam); }
         bool IFunctionalFeature.IsImplicit { get { return false; } }
-
-        Result IFunctionalFeature.ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
+        [DisableDump]
+        IReferenceInCode IFunctionalFeature.ObjectReference
         {
-            return _functionalFeature
-                .ReplaceObjectReference(result, objectResult, refAlignParam);
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
     }
 }

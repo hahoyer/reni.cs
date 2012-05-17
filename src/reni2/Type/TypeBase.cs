@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -17,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,8 +35,6 @@ using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
 using Reni.Struct;
-using Reni.Syntax;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -190,7 +192,7 @@ namespace Reni.Type
                  , () => CodeBase.ReferenceCode(target).AddToReference(target.RefAlignParam, getOffset())
                  , () => CodeArgs.Create(target));
         }
-                          
+
         internal Result Result(Category category, Result codeAndRefs)
         {
             var result = new Result();
@@ -306,7 +308,11 @@ namespace Reni.Type
                 .LocalReference(refAlignParam, Destructor(Category.Code).Code);
         }
 
-        internal virtual Result ReferenceInCode(Category category, IReferenceInCode target) { return UniqueAutomaticReference(target.RefAlignParam).Result(category, target, () => Size.Zero); }
+        internal virtual Result ReferenceInCode(Category category, IReferenceInCode target)
+        {
+            return UniqueAutomaticReference(target.RefAlignParam)
+                .Result(category, target, () => Size.Zero);
+        }
 
         internal Result OperationResult<TFeature>(Category category, ISearchTarget target, RefAlignParam refAlignParam)
             where TFeature : class, ITypeFeature

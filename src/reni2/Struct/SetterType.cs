@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
@@ -17,20 +19,22 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class SetterType : TypeBase
+    sealed class SetterType : TypeBase, IFunctionalFeature
     {
         [EnableDump]
         readonly ISetterTargetType _target;
-        [EnableDump]
         readonly RefAlignParam _refAlignParam;
 
         public SetterType(ISetterTargetType target, RefAlignParam refAlignParam)
@@ -38,15 +42,28 @@ namespace Reni.Struct
             _target = target;
             _refAlignParam = refAlignParam;
         }
+        [DisableDump]
         internal override bool IsDataLess { get { return false; } }
+        [DisableDump]
+        IReferenceInCode IFunctionalFeature.ObjectReference { get { return _target.ObjectReference; } }
+        [DisableDump]
+        bool IFunctionalFeature.IsImplicit
+        {
+            get
+            {
+                NotImplementedMethod();
+                return false;
+            }
+        }
+
         protected override Size GetSize() { return _refAlignParam.RefSize; }
 
-        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam)
         {
-            var valueType = _target.ValueType ?? argsResult.Type;
+            var valueType = _target.ValueType ?? argsType;
             var result = _target
                 .Result(category, valueType)
-                .ReplaceArg(argsResult.Conversion(valueType.UniqueAutomaticReference(refAlignParam)));
+                .ReplaceArg(argsType.Conversion(category, valueType.UniqueAutomaticReference(refAlignParam)));
             return result;
         }
     }
@@ -54,6 +71,7 @@ namespace Reni.Struct
     interface ISetterTargetType
     {
         TypeBase ValueType { get; }
+        IReferenceInCode ObjectReference { get; }
         Result Result(Category category, TypeBase valueType);
     }
 }

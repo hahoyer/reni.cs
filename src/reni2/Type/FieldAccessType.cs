@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
@@ -17,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System.Linq;
 using System.Collections.Generic;
 using System;
@@ -28,7 +32,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType
+    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType, IReferenceInCode
     {
         [EnableDump]
         readonly Structure _structure;
@@ -43,8 +47,20 @@ namespace Reni.Type
             _position = position;
             _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(rap => new SetterType(this, rap));
         }
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        [DisableDump]
         internal override bool IsDataLess { get { return false; } }
+        [DisableDump]
+        TypeBase ISetterTargetType.ValueType { get { return Parent; } }
+        [DisableDump]
+        IReferenceInCode ISetterTargetType.ObjectReference { get { return ObjectReference; } }
+        [DisableDump]
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        [DisableDump]
+        RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+        [DisableDump]
+        IReferenceInCode ObjectReference { get { return this; } }
+
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
         internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
 
@@ -87,8 +103,6 @@ namespace Reni.Type
             return result;
         }
 
-        TypeBase ISetterTargetType.ValueType { get { return Parent; } }
-        RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
 
         Result ISetterTargetType.Result(Category category, TypeBase valueType)
@@ -102,14 +116,7 @@ namespace Reni.Type
             return AssignmentResult(category).ReplaceArg(resultForArg);
         }
 
-        Result DestinationResult(Category typedCategory)
-        {
-            return Result
-                (typedCategory
-                 , _structure.ContainerContextObject
-                 , () => _structure.ContainerContextObject.ContextReferenceOffsetFromAccessPoint(_position + 1) * -1
-                );
-        }
+        Result DestinationResult(Category typedCategory) { return Result(typedCategory, ObjectReference, () => Size.Zero); }
 
         Result AssignmentResult(Category category)
         {

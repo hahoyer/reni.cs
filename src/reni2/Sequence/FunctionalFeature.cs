@@ -1,4 +1,6 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
+// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,11 +19,14 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Feature;
 using Reni.Type;
 
@@ -53,13 +58,15 @@ namespace Reni.Sequence
             NotImplementedMethod(category, argsType, refAlignParam);
             return null;
         }
-        internal override Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
+        [DisableDump]
+        IReferenceInCode IFunctionalFeature.ObjectReference
         {
-            return result
-                .ReplaceAbsolute(_objectType.UniqueObjectReference(refAlignParam), c => objectResult & c);
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
-
-        Result IFunctionalFeature.ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam) { return ReplaceObjectReference(result, objectResult, refAlignParam); }
 
         bool IFunctionalFeature.IsImplicit { get { return false; } }
 

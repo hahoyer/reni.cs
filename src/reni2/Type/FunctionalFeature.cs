@@ -43,6 +43,5 @@ namespace Reni.Type
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
         internal abstract Result ApplyResult(Category category, TypeBase argsType, RefAlignParam refAlignParam);
-        internal abstract Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam);
     }
 }
