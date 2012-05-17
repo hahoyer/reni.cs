@@ -61,7 +61,9 @@ namespace Reni.Type
         IReferenceInCode ObjectReference { get { return this; } }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
-
+        
+        public override string NodeDump { get { return base.NodeDump + "{" + _structure.NodeDump + "@" + _position + "}"; } }
+        
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
 
@@ -117,7 +119,14 @@ namespace Reni.Type
             return AssignmentResult(category).ReplaceArg(resultForArg);
         }
 
-        Result DestinationResult(Category typedCategory) { return Result(typedCategory, ObjectReference, () => Size.Zero); }
+        Result DestinationResult(Category typedCategory)
+        {
+            return Result
+                (typedCategory
+                , ObjectReference
+                , () => _structure.FieldOffset(_position)
+                );
+        }
 
         Result AssignmentResult(Category category)
         {
