@@ -1,5 +1,8 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +30,7 @@ using Reni.Basics;
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class Void : TypeBase
+    sealed class Void : TypeBase
     {
         internal override void Search(SearchVisitor searchVisitor)
         {
@@ -33,6 +38,7 @@ namespace Reni.Type
             base.Search(searchVisitor);
         }
         protected override TypeBase ReversePair(TypeBase first) { return first; }
+        [DisableDump]
         internal override bool IsDataLess { get { return true; } }
         internal override TypeBase Pair(TypeBase second) { return second; }
         internal override string DumpPrintText { get { return "void"; } }

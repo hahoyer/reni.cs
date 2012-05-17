@@ -194,8 +194,6 @@ namespace Reni.Struct
                 .Call(this, category, body, argsResult);
         }
 
-        internal bool IsObjectForCallRequired(CompileSyntax body) { return true; }
-
         internal Result AccessViaContextReference(Category category, int position)
         {
             var accessType = UniqueAccessType(position);

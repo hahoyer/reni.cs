@@ -1,3 +1,26 @@
+#region Copyright (C) 2012
+
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,10 +29,10 @@ using Reni.Basics;
 
 namespace Reni.Code.ReplaceVisitor
 {
-    internal abstract class ReplaceContextRef<TContext> : Base
+    abstract class ReplaceContextRef<TContext> : Base
         where TContext : IReferenceInCode
     {
-        private static int _nextObjectId;
+        static int _nextObjectId;
         protected readonly TContext Context;
         protected readonly Func<CodeBase> Replacement;
 
@@ -28,7 +51,7 @@ namespace Reni.Code.ReplaceVisitor
         }
     }
 
-    internal sealed class ReplaceRelativeContextRef<TContext> : ReplaceContextRef<TContext>
+    sealed class ReplaceRelativeContextRef<TContext> : ReplaceContextRef<TContext>
         where TContext : IReferenceInCode
     {
         public ReplaceRelativeContextRef(TContext context, Func<CodeBase> replacement)
@@ -36,10 +59,10 @@ namespace Reni.Code.ReplaceVisitor
 
         protected override Visitor<CodeBase> After(Size size) { return new ReplaceRelativeContextRef<TContext>(Context, () => AfterCode(size)); }
 
-        private CodeBase AfterCode(Size size) { return Replacement().AddToReference(Context.RefAlignParam, size); }
+        CodeBase AfterCode(Size size) { return Replacement().AddToReference(Context.RefAlignParam, size); }
     }
 
-    internal sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>
+    sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>
         where TContext : IReferenceInCode
     {
         public ReplaceAbsoluteContextRef(TContext context, Func<CodeBase> replacement)
