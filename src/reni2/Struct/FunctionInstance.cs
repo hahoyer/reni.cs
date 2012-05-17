@@ -68,7 +68,7 @@ namespace Reni.Struct
             _body = body;
             _structure = structure;
             _args = args;
-            _bodyCodeCache = new SimpleCache<CodeBase>(CreateBodyCode);
+            _bodyCodeCache = new SimpleCache<CodeBase>(ObtainBodyCode);
             StopByObjectId(-10);
         }
 
@@ -112,11 +112,11 @@ namespace Reni.Struct
                 if(category.HasCode)
                     localCategory = (localCategory - Category.Code) | Category.Size;
                 var result = Result(localCategory).Clone();
-                if(category.HasArgs && !_args.IsDataLess)
+                if(category.HasArgs)
                     result.CodeArgs += CodeArgs.Arg();
 
                 if(category.HasCode)
-                    result.Code = ArgsForFunction().Call(_index, result.Size);
+                    result.Code = ArgsForFunction.Call(_index, result.Size);
 
                 return ReturnMethodDump(result, true);
             }
@@ -126,9 +126,10 @@ namespace Reni.Struct
             }
         }
 
-        CodeBase ArgsForFunction() { return CodeArgs.ToCode().Sequence(_args.ArgCode()); }
+        [DisableDump]
+        CodeBase ArgsForFunction { get { return CodeArgs.ToCode().Sequence(_args.ArgCode()); } }
 
-        CodeBase CreateBodyCode()
+        CodeBase ObtainBodyCode()
         {
             if(IsStopByObjectIdActive)
                 return null;
