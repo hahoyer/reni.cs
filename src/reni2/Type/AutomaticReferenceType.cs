@@ -77,18 +77,22 @@ namespace Reni.Type
 
         internal override bool IsDataLess { get { return false; } }
         [DisableDump]
-        internal override int ArrayElementCount { get { return ArrayElementCount; } }
+        internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
         [DisableDump]
-        internal override bool IsArray { get { return IsArray; } }
+        internal override bool IsArray { get { return ValueType.IsArray; } }
         TypeBase IContainerType.Target { get { return ValueType; } }
+
+        IConverter IContainerType.Converter() { return this; }
+        Result IConverter.Result(Category category) { return DereferenceResult(category); }
 
         Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
 
         Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category, RefAlignParam); }
         protected override Size GetSize() { return RefAlignParam.RefSize; }
-        internal override int SequenceCount(TypeBase elementType) { return SequenceCount(elementType); }
+        internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
-        internal override TypeBase TypeForTypeOperator() { return TypeForTypeOperator(); }
+        [DisableDump]
+        internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator; }
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
         
         internal override void Search(SearchVisitor searchVisitor)
@@ -109,7 +113,8 @@ namespace Reni.Type
         }
         internal override Result ReferenceInCode(Category category, IReferenceInCode target)
         {
-            return ValueType.ReferenceInCode(category, target);
+            return ValueType
+                .ReferenceInCode(category, target);
         }
         IConverter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
         {
@@ -122,7 +127,7 @@ namespace Reni.Type
 
                 var c1 = new FunctionalConverter(DereferenceResult);
                 Dump("c1", c1.Result(Category.Type | Category.Code));
-                var c2 = UnAlignedType.Converter(conversionParameter, destination.ValueType);
+                var c2 = ValueType.UnAlignedType.Converter(conversionParameter, destination.ValueType);
                 Dump("c2", c2.Result(Category.Type | Category.Code));
                 var c3 = new FunctionalConverter(destination.ValueTypeToLocalReferenceResult);
                 Dump("c3", c3.Result(Category.Type | Category.Code));
@@ -139,13 +144,12 @@ namespace Reni.Type
         {
             var referenceDestination = destination as AutomaticReferenceType;
             if(referenceDestination != null)
-                return this.Converter(conversionParameter, referenceDestination);
+                return Converter(conversionParameter, referenceDestination);
 
             return
                 new FunctionalConverter(DereferenceResult)
-                    .Concat(Converter(conversionParameter, destination));
+                    .Concat(ValueType.Converter(conversionParameter, destination));
         }
-        IConverter IContainerType.Converter() { return this; }
-        Result IConverter.Result(Category category) { return DereferenceResult(category); }
+
     }
 }
