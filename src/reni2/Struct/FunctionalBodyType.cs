@@ -33,7 +33,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionalBodyType : TypeBase, IFunctionalFeature
+    sealed class FunctionalBodyType : TypeBase, IFunctionalFeature, IReferenceInCode
     {
         [EnableDump]
         readonly Structure _structure;
@@ -58,9 +58,11 @@ namespace Reni.Struct
         [DisableDump]
         internal override bool IsLambda { get { return true; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return _structure.IsDataLess || !(_structure.IsObjectForCallRequired(_getter) || _structure.IsObjectForCallRequired(_setter)); } }
+        internal override bool IsDataLess { get { return _structure.IsDataLess; } }
         [DisableDump]
         internal override bool IsLikeReference { get { return true; } }
+        [DisableDump]
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return _structure.RefAlignParam; } }
 
         string Tag { get { return _isImplicit ? "/!\\" : "/\\"; } }
         internal override string DumpPrintText { get { return _getter.DumpPrintText + Tag + _setter.DumpPrintText; } }
@@ -72,20 +74,7 @@ namespace Reni.Struct
         [DisableDump]
         bool IFunctionalFeature.IsImplicit { get { return _isImplicit; } }
         [DisableDump]
-        IReferenceInCode IFunctionalFeature.ObjectReference
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-
-        public Result ReplaceObjectReference(Result result, Result objectResult, RefAlignParam refAlignParam)
-        {
-            NotImplementedMethod(result, objectResult, refAlignParam);
-            return null;
-        }
+        IReferenceInCode IFunctionalFeature.ObjectReference { get { return this; } }
 
         internal CodeArgs GetCodeArgs(TypeBase argsType)
         {
