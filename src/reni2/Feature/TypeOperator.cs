@@ -30,8 +30,7 @@ namespace Reni.Feature
             if(category.HasType)
             {
                 result.Type = left
-                    .Type(context)
-                    .TypeForTypeOperator()
+                    .Type(context).TypeForTypeOperator
                     .UniqueTypeType;
             }
             return result;
@@ -39,7 +38,7 @@ namespace Reni.Feature
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var leftType = left.Type(context).AutomaticDereference();
+            var leftType = left.Type(context).AutomaticDereferenceType;
             if(category.HasCode || category.HasArgs)
                 return context.ResultAsReference(category.Typed, right).Conversion(leftType) & category;
             return leftType.Result(category);

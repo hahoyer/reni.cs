@@ -64,7 +64,8 @@ namespace Reni.Type
 
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }
-        internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
+        [DisableDump]
+        internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
 

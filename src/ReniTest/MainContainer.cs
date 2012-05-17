@@ -41,7 +41,9 @@ namespace ReniTest
             Application.SetCompatibleTextRenderingDefault(false);
 
             if(false)
+#pragma warning disable 162
                 ExecTest();
+#pragma warning restore 162
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;

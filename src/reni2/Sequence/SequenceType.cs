@@ -47,7 +47,7 @@ namespace Reni.Sequence
 
         internal Result EnableCutFeature(Category category, RefAlignParam refAlignParam)
         {
-            return UniqueEnableCut()
+            return UniqueEnableCutType
                 .Result
                 (category
                  , () => SmartReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size)

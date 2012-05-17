@@ -59,10 +59,11 @@ namespace Reni.Type
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         [DisableDump]
         IReferenceInCode ObjectReference { get { return this; } }
+        [DisableDump]
+        internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
-        internal override TypeBase TypeForTypeOperator() { return Parent.TypeForTypeOperator(); }
 
         internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {

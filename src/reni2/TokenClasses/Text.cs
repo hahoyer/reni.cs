@@ -34,8 +34,7 @@ namespace Reni.TokenClasses
         {
             var data = StripQutes(token.Name);
             return TypeBase
-                .UniqueNumber(BitsConst.BitSize(data[0].GetType()))
-                .UniqueTextItem()
+                .UniqueNumber(BitsConst.BitSize(data[0].GetType())).UniqueTextItemType
                 .UniqueSequence(data.Length)
                 .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }

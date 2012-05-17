@@ -152,11 +152,13 @@ namespace Reni.Type
         internal virtual AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
         internal SequenceType UniqueSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueSequence(bitCount); }
-        internal TextItemType UniqueTextItem() { return _cache.TextItem.Value; }
-        internal EnableCut UniqueEnableCut() { return _cache.EnableCut.Value; }
-        internal virtual TypeBase AutomaticDereference() { return this; }
+        internal TextItemType UniqueTextItemType { get { return _cache.TextItem.Value; } }
+        internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
+        [DisableDump]
+        internal virtual TypeBase AutomaticDereferenceType { get { return this; } }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
-        internal virtual TypeBase TypeForTypeOperator() { return this; }
+        [DisableDump]
+        internal virtual TypeBase TypeForTypeOperator { get { return this; } }
         static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
         internal static Result VoidResult(Category category) { return Void.Result(category); }
         internal virtual Result Destructor(Category category) { return VoidCodeAndRefs(category); }
@@ -418,7 +420,7 @@ namespace Reni.Type
 
         internal Result TextItemResult(Category category, RefAlignParam refAlignParam)
         {
-            var uniqueTextItem = UniqueTextItem();
+            var uniqueTextItem = UniqueTextItemType;
             return
                 uniqueTextItem
                     .UniqueAutomaticReference(refAlignParam)

@@ -39,7 +39,7 @@ namespace Reni.Type
         public TypeType(TypeBase value)
         {
             _repeaterType = new RepeaterType(this);
-            _functionalFeature = new ConversionFeature(value.AutomaticDereference());
+            _functionalFeature = new ConversionFeature(value.AutomaticDereferenceType);
             _value = value;
         }
 

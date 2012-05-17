@@ -92,7 +92,7 @@ namespace Reni.Type
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
         [DisableDump]
-        internal override TypeBase TypeForTypeOperator() { return ValueType.TypeForTypeOperator; }
+        internal override TypeBase TypeForTypeOperator{get { return ValueType.TypeForTypeOperator; }}
         internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
         
         internal override void Search(SearchVisitor searchVisitor)
