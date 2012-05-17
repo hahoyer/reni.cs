@@ -671,7 +671,7 @@ namespace Reni
                 Tracer.Assert(size.IsZero || size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: 0 or RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is Type.Void || Type is ReferenceType, () => "Expected type: Void or ReferenceType\n" + Dump());
+                Tracer.Assert(Type is Type.Void || Type is AutomaticReferenceType, () => "Expected type: Void or AutomaticReferenceType\n" + Dump());
         }
 
         [DebuggerHidden]
@@ -682,7 +682,7 @@ namespace Reni
                 Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is ReferenceType, () => "Expected type: ReferenceType\n" + Dump());
+                Tracer.Assert(Type is AutomaticReferenceType, () => "Expected type: AutomaticReferenceType\n" + Dump());
         }
 
         [DebuggerHidden]
@@ -700,7 +700,7 @@ namespace Reni
             }
 
             if(HasType)
-                Tracer.Assert(Type is ReferenceType, () => "Expected type: ReferenceType\n" + Dump());
+                Tracer.Assert(Type is AutomaticReferenceType, () => "Expected type: AutomaticReferenceType\n" + Dump());
         }
 
         public void Amend(Category category, TypeBase type)

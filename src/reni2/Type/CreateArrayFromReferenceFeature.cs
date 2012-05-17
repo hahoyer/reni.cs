@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -17,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,14 +31,14 @@ using Reni.Feature;
 namespace Reni.Type
 {
     sealed class CreateArrayFromReferenceFeature : ReniObject
-                                                   , ISearchPath<IPrefixFeature, ReferenceType>
+                                                   , ISearchPath<IPrefixFeature, AutomaticReferenceType>
                                                    , IPrefixFeature
                                                    , ISuffixFeature
     {
         [EnableDump]
         readonly TypeBase _type;
         public CreateArrayFromReferenceFeature(TypeBase type) { _type = type; }
-        IPrefixFeature ISearchPath<IPrefixFeature, ReferenceType>.Convert(ReferenceType type) { return this; }
+        IPrefixFeature ISearchPath<IPrefixFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type) { return this; }
 
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _type.CreateArray(category, refAlignParam); }
     }

@@ -22,11 +22,12 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class AutomaticReferenceType : ReferenceType
+    sealed class AutomaticReferenceType : TypeBase, IContainerType, IConverter
     {
         readonly TypeBase _valueType;
         readonly RefAlignParam _refAlignParam;
@@ -36,7 +37,7 @@ namespace Reni.Type
             _valueType = valueType;
             _refAlignParam = refAlignParam;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
-            Tracer.Assert(!(valueType is ReferenceType), valueType.Dump);
+            Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
             StopByObjectId(-14);
         }
 
@@ -57,15 +58,15 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return DumpShort(); } }
 
         [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
-        internal override TypeBase ValueType { get { return _valueType; } }
+        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal TypeBase ValueType { get { return _valueType; } }
         [DisableDump]
         internal override bool IsLikeReference { get { return true; } }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
 
-        protected override Result DereferenceResult(Category category)
+        Result DereferenceResult(Category category)
         {
             return ValueType.Result
                 (category
@@ -75,15 +76,76 @@ namespace Reni.Type
         }
 
         internal override bool IsDataLess { get { return false; } }
+        [DisableDump]
+        internal override int ArrayElementCount { get { return ArrayElementCount; } }
+        [DisableDump]
+        internal override bool IsArray { get { return IsArray; } }
+        TypeBase IContainerType.Target { get { return ValueType; } }
 
+        Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
+
+        Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category, RefAlignParam); }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        internal override int SequenceCount(TypeBase elementType) { return SequenceCount(elementType); }
+        internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
+        internal override TypeBase TypeForTypeOperator() { return TypeForTypeOperator(); }
+        internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
+        
         internal override void Search(SearchVisitor searchVisitor)
         {
             ValueType.Search(searchVisitor.Child(this));
+            searchVisitor.SearchAndConvert(ValueType, this);
             base.Search(searchVisitor);
         }
 
-        protected override Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
+        internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
+        {
+            return UniqueAlign(refAlignParam.AlignBits)
+                .Result
+                (category
+                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
+                 , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
+                );
+        }
+        internal override Result ReferenceInCode(Category category, IReferenceInCode target)
+        {
+            return ValueType.ReferenceInCode(category, target);
+        }
+        IConverter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
+        {
+            var trace = ObjectId == -13;
+            try
+            {
+                StartMethodDump(trace, conversionParameter, destination);
+                if(ValueType == destination.ValueType && destination.RefAlignParam == RefAlignParam)
+                    return ReturnMethodDump(new FunctionalConverter(ToAutomaticReferenceResult), true);
 
-        internal Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category, RefAlignParam); }
+                var c1 = new FunctionalConverter(DereferenceResult);
+                Dump("c1", c1.Result(Category.Type | Category.Code));
+                var c2 = UnAlignedType.Converter(conversionParameter, destination.ValueType);
+                Dump("c2", c2.Result(Category.Type | Category.Code));
+                var c3 = new FunctionalConverter(destination.ValueTypeToLocalReferenceResult);
+                Dump("c3", c3.Result(Category.Type | Category.Code));
+                BreakExecution();
+                var result = c1.Concat(c2).Concat(c3);
+                return ReturnMethodDump(result, true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
+        {
+            var referenceDestination = destination as AutomaticReferenceType;
+            if(referenceDestination != null)
+                return this.Converter(conversionParameter, referenceDestination);
+
+            return
+                new FunctionalConverter(DereferenceResult)
+                    .Concat(Converter(conversionParameter, destination));
+        }
+        IConverter IContainerType.Converter() { return this; }
+        Result IConverter.Result(Category category) { return DereferenceResult(category); }
     }
 }

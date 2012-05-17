@@ -70,7 +70,7 @@ namespace Reni.Type
         static int _nextObjectId;
         readonly Cache _cache;
         [DisableDump]
-        internal readonly ISearchPath<IPrefixFeature, ReferenceType> CreateArrayFromReferenceFeature;
+        internal readonly ISearchPath<IPrefixFeature, AutomaticReferenceType> CreateArrayFromReferenceFeature;
 
         [UsedImplicitly]
         static ReniObject _lastSearchVisitor;

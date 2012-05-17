@@ -256,7 +256,6 @@
     <Compile Include="Type\FunctionalFeatureType.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\AutomaticReferenceType.cs" />
-    <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\SearchResult.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemType.cs" />

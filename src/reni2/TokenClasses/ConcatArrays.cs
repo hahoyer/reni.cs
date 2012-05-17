@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -17,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,12 +35,12 @@ namespace Reni.TokenClasses
         Defineable
         , ISearchPath<IPrefixFeature, TypeBase>
         , ISearchPath<ISuffixFeature, Type.Array>
-        , ISearchPath<ISearchPath<IPrefixFeature, ReferenceType>, TypeBase>
-        , ISearchPath<ISearchPath<ISuffixFeature, ReferenceType>, Type.Array>
+        , ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>
+        , ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrays); }
         IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new PrefixFeature(type.CreateArray); }
-        ISearchPath<IPrefixFeature, ReferenceType> ISearchPath<ISearchPath<IPrefixFeature, ReferenceType>, TypeBase>.Convert(TypeBase type) { return type.CreateArrayFromReferenceFeature; }
-        ISearchPath<ISuffixFeature, ReferenceType> ISearchPath<ISearchPath<ISuffixFeature, ReferenceType>, Type.Array>.Convert(Type.Array type) { return type.ConcatArraysFromReferenceFeature; }
+        ISearchPath<IPrefixFeature, AutomaticReferenceType> ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>.Convert(TypeBase type) { return type.CreateArrayFromReferenceFeature; }
+        ISearchPath<ISuffixFeature, AutomaticReferenceType> ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>.Convert(Type.Array type) { return type.ConcatArraysFromReferenceFeature; }
     }
 }

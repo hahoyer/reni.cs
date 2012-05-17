@@ -39,7 +39,7 @@ namespace Reni.Type
 
         readonly TypeBase _element;
         readonly int _count;
-        public readonly ISearchPath<ISuffixFeature, ReferenceType> ConcatArraysFromReferenceFeature;
+        public readonly ISearchPath<ISuffixFeature, AutomaticReferenceType> ConcatArraysFromReferenceFeature;
 
         public Array(TypeBase element, int count)
         {
