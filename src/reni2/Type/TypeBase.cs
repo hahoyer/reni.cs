@@ -147,18 +147,21 @@ namespace Reni.Type
             return _cache.Aligners.Find(alignBits);
         }
 
+        [DisableDump]
+        internal TextItemType UniqueTextItemType { get { return _cache.TextItem.Value; } }
+        [DisableDump]
+        internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
+        [DisableDump]
+        internal virtual TypeBase AutomaticDereferenceType { get { return this; } }
+        [DisableDump]
+        internal virtual TypeBase TypeForTypeOperator { get { return this; } }
+
         internal Array UniqueArray(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
         internal virtual AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
         internal SequenceType UniqueSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueSequence(bitCount); }
-        internal TextItemType UniqueTextItemType { get { return _cache.TextItem.Value; } }
-        internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
-        [DisableDump]
-        internal virtual TypeBase AutomaticDereferenceType { get { return this; } }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
-        [DisableDump]
-        internal virtual TypeBase TypeForTypeOperator { get { return this; } }
         static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
         internal static Result VoidResult(Category category) { return Void.Result(category); }
         internal virtual Result Destructor(Category category) { return VoidCodeAndRefs(category); }
