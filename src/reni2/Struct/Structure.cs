@@ -187,11 +187,11 @@ namespace Reni.Struct
                 .SearchFromRefToStruct(target);
         }
 
-        internal Result Call(Category category, CompileSyntax body, TypeBase argsResult)
+        internal FunctionInstance FunctionInstance(CompileSyntax body, TypeBase argsResult)
         {
             return ContainerContextObject
                 .RootContext
-                .Call(this, category, body, argsResult);
+                .FunctionInstance(this, body, argsResult);
         }
 
         internal Result AccessViaContextReference(Category category, int position)

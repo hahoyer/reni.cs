@@ -61,23 +61,20 @@ namespace Reni.Struct
         TypeBase IContainerType.Target { get { return ValueType; } }
         Result IConverter.Result(Category category)
         {
-            var trace = category.HasCode;
+            var trace = ObjectId == -6 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
                 BreakExecution();
                 var rawResult = _functionalBodyType.GetterResult(category, _argsType);
 
-                if(CodeArgs.Count > 0)
-                {
-                    Dump("CodeArgs", CodeArgs);
-                    BreakExecution();
-                }
+                Dump("rawResult", rawResult);
+                BreakExecution();
 
+                return ReturnMethodDump(rawResult);
                 var result = rawResult.ReplaceArg(_argsType.Result(category, ArgResult(category)));
                 Dump("result", result);
                 BreakExecution();
-                return ReturnMethodDump(result);
             }
             finally
             {

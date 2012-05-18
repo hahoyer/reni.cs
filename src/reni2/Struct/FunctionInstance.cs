@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -16,6 +18,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -48,8 +52,7 @@ namespace Reni.Struct
         [EnableDump]
         readonly Structure _structure;
 
-        [EnableDump]
-        readonly int _index;
+        internal readonly int Index;
 
         readonly SimpleCache<CodeBase> _bodyCodeCache;
 
@@ -64,7 +67,7 @@ namespace Reni.Struct
         internal FunctionInstance(int index, CompileSyntax body, Structure structure, TypeBase args)
             : base(index)
         {
-            _index = index;
+            Index = index;
             _body = body;
             _structure = structure;
             _args = args;
@@ -73,7 +76,7 @@ namespace Reni.Struct
         }
 
         [Node]
-        TypeBase Type { get { return Result(Category.Type).Type; } }
+        internal TypeBase ReturnType { get { return Result(Category.Type).Type; } }
 
         [Node]
         [DisableDump]
@@ -81,17 +84,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        CodeArgs CodeArgs
-        {
-            get
-            {
-                if(IsStopByObjectIdActive)
-                    return null;
-                return Result(Category.CodeArgs).CodeArgs;
-            }
-        }
-
-        internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
+        internal CodeArgs CodeArgs { get { return Result(Category.CodeArgs).CodeArgs; } }
 
         [Node]
         [DisableDump]
@@ -101,33 +94,7 @@ namespace Reni.Struct
         [DisableDump]
         string Description { get { return _body.DumpShort(); } }
 
-        public Result Call(Category category)
-        {
-            var trace = ObjectId == -10 && (category.HasCode || category.HasArgs);
-            StartMethodDump(trace, category);
-            try
-            {
-                BreakExecution();
-                var localCategory = category;
-                if(category.HasCode)
-                    localCategory = (localCategory - Category.Code) | Category.Size;
-                var result = Result(localCategory).Clone();
-                if(category.HasArgs)
-                    result.CodeArgs += CodeArgs.Arg();
-
-                if(category.HasCode)
-                    result.Code = ArgsForFunction.Call(_index, result.Size);
-
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
-        [DisableDump]
-        CodeBase ArgsForFunction { get { return CodeArgs.ToCode().Sequence(_args.ArgCode()); } }
+        internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
 
         CodeBase ObtainBodyCode()
         {
@@ -140,7 +107,7 @@ namespace Reni.Struct
             var result = visitResult
                 .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
             if(_args.IsDataLess)
-                result.Code = result.Code.TryReplacePrimitiveRecursivity(_index);
+                result.Code = result.Code.TryReplacePrimitiveRecursivity(Index);
             return result.Code;
         }
 
@@ -176,6 +143,14 @@ namespace Reni.Struct
             }
         }
 
+        internal Result CallResult(Category category)
+        {
+            var localCategory = category - Category.CodeArgs - Category.Code;
+            if(category.HasCode)
+                localCategory |= Category.Size;
+            return Result(localCategory);
+        }
+
         CodeBase CreateContextRefCode()
         {
             var refAlignParam = _structure.UniqueContext.RefAlignParam;
@@ -200,7 +175,7 @@ namespace Reni.Struct
         public string DumpFunction()
         {
             var result = "\n";
-            result += "index=" + _index;
+            result += "index=" + Index;
             result += "\n";
             result += "body=" + _body.DumpShort();
             result += "\n";
@@ -208,7 +183,7 @@ namespace Reni.Struct
             result += "\n";
             result += "context=" + _structure.Dump();
             result += "\n";
-            result += "type=" + Type.Dump();
+            result += "type=" + ReturnType.Dump();
             result += "\n";
             return result;
         }

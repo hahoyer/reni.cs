@@ -80,9 +80,9 @@ namespace Reni.Struct
         {
             var codeArgs = CodeArgs.Void();
             if(_setter != null)
-                codeArgs += _structure.Call(Category.CodeArgs, _setter, argsType).CodeArgs;
+                codeArgs += _structure.FunctionInstance(_setter, argsType).CodeArgs;
             if(_getter != null)
-                codeArgs += _structure.Call(Category.CodeArgs, _getter, argsType).CodeArgs;
+                codeArgs += _structure.FunctionInstance(_getter, argsType).CodeArgs;
             return codeArgs - CodeArgs.Arg();
         }
 
@@ -100,19 +100,23 @@ namespace Reni.Struct
             return GetterResult(Category.Type, argsType).Type;
         }
 
-        internal Result SetterResult(Category category, TypeBase argsType, TypeBase valueType)
+        Result CallResult(Category category, CompileSyntax body, TypeBase argsType)
         {
-            var result = _structure.Call(category, _setter, argsType);
+            var instance = _structure.FunctionInstance(body, argsType);
+
+            var result = instance.CallResult(category);
+            if(category.HasArgs)
+                result.CodeArgs = CodeArgs.Arg();
+            if(category.HasCode)
+                result.Code = _functionAccessTypesCache
+                    .Find(argsType)
+                    .ArgCode()
+                    .Call(instance.Index, result.Size);
 
             return result;
         }
 
-
-        internal Result GetterResult(Category category, TypeBase argsType)
-        {
-            var result = _structure.Call(category, _getter, argsType);
-
-            return result;
-        }
+        internal Result SetterResult(Category category, TypeBase argsType, TypeBase valueType) { return CallResult(category, _setter, argsType); }
+        internal Result GetterResult(Category category, TypeBase argsType) { return CallResult(category, _getter, argsType); }
     }
 }
