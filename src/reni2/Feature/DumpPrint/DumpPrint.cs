@@ -31,18 +31,19 @@ namespace Reni.Feature.DumpPrint
 {
     abstract class BitFeatureBase : ReniObject
     {
-        protected static Result Apply(Category category, AutomaticReferenceType objectType)
+        protected static Result Apply(Category category, IReference objectReference)
         {
             return TypeBase.Void
-                .Result(category, () => BitSequenceDumpPrint(objectType), CodeArgs.Arg);
+                .Result(category, () => BitSequenceDumpPrint(objectReference), CodeArgs.Arg);
         }
 
-        static CodeBase BitSequenceDumpPrint(AutomaticReferenceType objectType)
+        static CodeBase BitSequenceDumpPrint(IReference objectReference)
         {
-            var alignedSize = objectType.ValueType.Size.Align(objectType.RefAlignParam.AlignBits);
-            return objectType
+            var alignedSize = objectReference.TargetType.Size.Align(objectReference.RefAlignParam.AlignBits);
+            return objectReference
+                .Type
                 .ArgCode()
-                .Dereference(objectType.RefAlignParam, alignedSize)
+                .Dereference(objectReference.RefAlignParam, alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
     }
@@ -60,14 +61,14 @@ namespace Reni.Feature.DumpPrint
 
         internal BitSequenceFeatureClass(SequenceType parent) { _parent = parent; }
 
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.UniqueAutomaticReference(refAlignParam)); }
+        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.UniqueReference(refAlignParam)); }
         [EnableDump]
         internal TypeBase ObjectType { get { return _parent; } }
     }
 
     sealed class BitFeature : BitFeatureBase, ISuffixFeature
     {
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.UniqueAutomaticReference(refAlignParam)); }
+        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.UniqueReference(refAlignParam)); }
     }
 
     sealed class StructReferenceFeature : ReniObject, ISearchPath<ISuffixFeature, AutomaticReferenceType>,

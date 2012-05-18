@@ -49,7 +49,7 @@ namespace Reni.Type
             public readonly DictionaryEx<int, Array> Arrays;
             public readonly DictionaryEx<int, SequenceType> Sequences;
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
-            public readonly DictionaryEx<RefAlignParam, AutomaticReferenceType> References;
+            public readonly DictionaryEx<RefAlignParam, IReference> References;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<TextItemType> TextItem;
             public readonly SimpleCache<EnableCut> EnableCut;
@@ -57,7 +57,7 @@ namespace Reni.Type
             public Cache(TypeBase parent)
             {
                 EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
-                References = new DictionaryEx<RefAlignParam, AutomaticReferenceType>(parent.ObtainReference);
+                References = new DictionaryEx<RefAlignParam, IReference>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Sequences = new DictionaryEx<int, SequenceType>(elementCount => new SequenceType(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
@@ -158,7 +158,7 @@ namespace Reni.Type
 
         internal Array UniqueArray(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
-        internal virtual AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
+        internal IReference UniqueReference(RefAlignParam refAlignParam) { return _cache.References.Find(refAlignParam); }
         internal SequenceType UniqueSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
         internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueSequence(bitCount); }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
@@ -171,10 +171,8 @@ namespace Reni.Type
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
         internal Result ArgResult(Category category) { return Result(category, ArgCode, CodeArgs.Arg); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
-        internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgResult(category); }
-        internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueAutomaticReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size); }
-
-        internal virtual Result AutomaticDereferenceResult(Category category) { return ArgResult(category); }
+        internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type.ArgResult(category); }
+        internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type.ArgCode().Dereference(refAlignParam, Size); }
 
         internal Result Result(Category category)
         {
@@ -278,6 +276,8 @@ namespace Reni.Type
         internal virtual bool IsLambda { get { return false; } }
         [DisableDump]
         internal virtual bool IsLikeReference { get { return false; } }
+        [DisableDump]
+        internal virtual IReference Reference { get { return this as IReference; } }
 
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
@@ -298,7 +298,8 @@ namespace Reni.Type
             if(IsDataLess)
                 return ArgResult(category);
 
-            return UniqueAutomaticReference(refAlignParam)
+            return UniqueReference(refAlignParam)
+                .Type
                 .Result
                 (
                     category,
@@ -313,9 +314,10 @@ namespace Reni.Type
                 .LocalReference(refAlignParam, Destructor(Category.Code).Code);
         }
 
-        internal virtual Result ReferenceInCode(Category category, IReferenceInCode target)
+        internal Result ReferenceInCode(Category category, IReferenceInCode target)
         {
-            return UniqueAutomaticReference(target.RefAlignParam)
+            return UniqueReference(target.RefAlignParam)
+                .Type
                 .Result(category, target, () => Size.Zero);
         }
 
@@ -341,13 +343,19 @@ namespace Reni.Type
             }
         }
 
-        AutomaticReferenceType ObtainReference(RefAlignParam refAlignParam) { return new AutomaticReferenceType(this, refAlignParam); }
+        IReference ObtainReference(RefAlignParam refAlignParam)
+        {
+            var result = Reference;
+            if(result == null)
+                result = new AutomaticReferenceType(this, refAlignParam);
+            return result;
+        }
 
-        internal virtual TypeBase SmartReference(RefAlignParam refAlignParam)
+        internal TypeBase SmartReference(RefAlignParam refAlignParam)
         {
             if(IsDataLess)
                 return this;
-            return UniqueAutomaticReference(refAlignParam);
+            return UniqueReference(refAlignParam).Type;
         }
 
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
@@ -363,7 +371,8 @@ namespace Reni.Type
         {
             return UniqueAlign(refAlignParam.AlignBits)
                 .UniqueArray(1)
-                .UniqueAutomaticReference(refAlignParam)
+                .UniqueReference(refAlignParam)
+                .Type
                 .Result(category, ReferenceArgResult(category, refAlignParam));
         }
 
@@ -426,8 +435,10 @@ namespace Reni.Type
             var uniqueTextItem = UniqueTextItemType;
             return
                 uniqueTextItem
-                    .UniqueAutomaticReference(refAlignParam)
-                    .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
+                    .UniqueReference(refAlignParam)
+                    .Type
+                    .Result(category, UniqueReference(refAlignParam).Type.ArgResult(category))
+                ;
         }
 
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }

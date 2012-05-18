@@ -41,7 +41,8 @@ namespace Reni.Sequence
         Result IFeature.Result(Category category, RefAlignParam refAlignParam)
         {
             var resultForArg = _objectType
-                .UniqueAutomaticReference(refAlignParam)
+                .UniqueReference(refAlignParam)
+                .Type
                 .ArgResult(category.Typed)
                 .AutomaticDereference()
                 .Align(refAlignParam.AlignBits);

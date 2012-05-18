@@ -32,7 +32,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionAccessType : TypeBase, ISetterTargetType, IContainerType, IConverter
+    sealed class FunctionAccessType : TypeBase, ISetterTargetType, IContainerType, IConverter, IReference
     {
         [EnableDump]
         readonly FunctionalBodyType _functionalBodyType;
@@ -66,21 +66,16 @@ namespace Reni.Struct
             try
             {
                 BreakExecution();
-                var rawResult = _functionalBodyType.GetterResult(category, _argsType);
-
-                Dump("rawResult", rawResult);
-                BreakExecution();
-
-                return ReturnMethodDump(rawResult);
-                var result = rawResult.ReplaceArg(_argsType.Result(category, ArgResult(category)));
-                Dump("result", result);
-                BreakExecution();
+                var result = _functionalBodyType.GetterResult(category, _argsType);
+                return ReturnMethodDump(result);
             }
             finally
             {
                 EndMethodDump();
             }
         }
+
+        Result IReference.DereferenceResult(Category category) { return _functionalBodyType.GetterResult(category, _argsType); }
 
         [DisableDump]
         internal override bool IsDataLess { get { return CodeArgs.IsNone && _argsType.IsDataLess; } }
@@ -128,5 +123,9 @@ namespace Reni.Struct
                  , () => CodeArgs + CodeArgs.Arg()
                 );
         }
+
+        TypeBase IReference.Type { get { return this; } }
+        TypeBase IReference.TargetType { get { return ValueType; } }
+        RefAlignParam IReference.RefAlignParam { get { return _functionalBodyType.FindRecentStructure.RefAlignParam; } }
     }
 }

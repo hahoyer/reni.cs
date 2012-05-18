@@ -100,8 +100,8 @@ namespace Reni.Type
 
         CodeBase DumpPrintCode(RefAlignParam refAlignParam)
         {
-            var elementReference = Element.UniqueAutomaticReference(refAlignParam);
-            var argCode = UniqueAutomaticReference(refAlignParam).ArgCode();
+            var elementReference = Element.UniqueReference(refAlignParam).Type;
+            var argCode = UniqueReference(refAlignParam).Type.ArgCode();
             var elementDumpPrint = Element.GenericDumpPrintResult(Category.Code, refAlignParam).Code;
             var code = CodeBase.DumpPrintText("array(" + Element.DumpPrintText + ",(");
             for(var i = 0; i < Count; i++)
@@ -119,8 +119,9 @@ namespace Reni.Type
         {
             return Element
                 .UniqueSequence(Count)
-                .UniqueAutomaticReference(refAlignParam)
-                .Result(category, UniqueAutomaticReference(refAlignParam).ArgResult(category));
+                .UniqueReference(refAlignParam)
+                .Type
+                .Result(category, UniqueReference(refAlignParam).Type.ArgResult(category));
         }
     }
 }

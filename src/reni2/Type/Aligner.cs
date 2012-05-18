@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -16,6 +18,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -46,6 +50,8 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
         [DisableDump]
         internal override TypeBase UnAlignedType { get { return Parent; } }
+        [DisableDump]
+        internal override IReference Reference { get { return Parent.Reference; } }
 
         protected override Result ParentConversionResult(Category category)
         {
@@ -68,13 +74,6 @@ namespace Reni.Type
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
-
-        internal override AutomaticReferenceType UniqueAutomaticReference(RefAlignParam refAlignParam)
-        {
-            if(_alignBits == refAlignParam.AlignBits)
-                return Parent.UniqueAutomaticReference(refAlignParam);
-            return base.UniqueAutomaticReference(refAlignParam);
-        }
 
         internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
 

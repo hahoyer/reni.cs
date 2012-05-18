@@ -253,6 +253,7 @@
     <Compile Include="Type\Array.cs" />
     <Compile Include="Type\Bit.cs" />
     <Compile Include="Type\FunctionalFeatureType.cs" />
+    <Compile Include="Type\IReference.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\AutomaticReferenceType.cs" />
     <Compile Include="Type\SearchResult.cs" />

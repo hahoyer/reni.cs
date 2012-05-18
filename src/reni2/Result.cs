@@ -589,11 +589,17 @@ namespace Reni
 
         internal Result AutomaticDereference()
         {
-            if(CompleteCategory == Category.CodeArgs)
-                return this;
-
             Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
-            return Type.AutomaticDereferenceResult(CompleteCategory).ReplaceArg(this);
+
+            var result = this;
+            while(result.Type.Reference != null)
+                result 
+                    = result
+                    .Type
+                    .Reference
+                    .DereferenceResult(CompleteCategory)
+                    .ReplaceArg(result);
+            return result;
         }
 
         internal static Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)

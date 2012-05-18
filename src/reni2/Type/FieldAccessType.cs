@@ -32,7 +32,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType, IReferenceInCode
+    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType, IReferenceInCode, IReference
     {
         [EnableDump]
         readonly Structure _structure;
@@ -56,16 +56,19 @@ namespace Reni.Type
         [DisableDump]
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
         [DisableDump]
+        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+        [DisableDump]
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         [DisableDump]
         IReferenceInCode ObjectReference { get { return this; } }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
-        
+
+        Result IReference.DereferenceResult(Category category) { return ParentConversionResult(category); }
+
         public override string NodeDump { get { return base.NodeDump + "{" + _structure.NodeDump + "@" + _position + "}"; } }
-        
+
         protected override Size GetSize() { return RefAlignParam.RefSize; }
-        internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
 
         internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
@@ -112,8 +115,9 @@ namespace Reni.Type
         {
             var typedCategory = category.Typed;
             var sourceResult = valueType
-                .UniqueAutomaticReference(RefAlignParam)
-                .Conversion(typedCategory, Parent.UniqueAutomaticReference(RefAlignParam));
+                .UniqueReference(RefAlignParam)
+                .Type
+                .Conversion(typedCategory, Parent.UniqueReference(RefAlignParam).Type);
             var destinationResult = DestinationResult(typedCategory);
             var resultForArg = destinationResult + sourceResult;
             return AssignmentResult(category).ReplaceArg(resultForArg);
@@ -123,8 +127,8 @@ namespace Reni.Type
         {
             return Result
                 (typedCategory
-                , ObjectReference
-                , () => _structure.FieldOffset(_position)
+                 , ObjectReference
+                 , () => _structure.FieldOffset(_position)
                 );
         }
 
@@ -152,5 +156,8 @@ namespace Reni.Type
             return new FunctionalConverter(ParentConversionResult)
                 .Concat(Parent.SmartReference(RefAlignParam).Converter(conversionParameter, destination));
         }
+
+        TypeBase IReference.Type { get { return this; } }
+        TypeBase IReference.TargetType { get { return Parent; } }
     }
 }

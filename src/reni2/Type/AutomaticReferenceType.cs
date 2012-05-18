@@ -27,7 +27,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class AutomaticReferenceType : TypeBase, IContainerType, IConverter
+    sealed class AutomaticReferenceType : TypeBase, IContainerType, IConverter, IReference
     {
         readonly TypeBase _valueType;
         readonly RefAlignParam _refAlignParam;
@@ -38,7 +38,7 @@ namespace Reni.Type
             _refAlignParam = refAlignParam;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
-            StopByObjectId(-14);
+            StopByObjectId(-10);
         }
 
 
@@ -58,6 +58,12 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return DumpShort(); } }
 
         [DisableDump]
+        TypeBase IReference.Type { get { return this; } }
+        [DisableDump]
+        TypeBase IReference.TargetType { get { return ValueType; } }
+        [DisableDump]
+        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+        [DisableDump]
         internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
         internal TypeBase ValueType { get { return _valueType; } }
         [DisableDump]
@@ -65,6 +71,8 @@ namespace Reni.Type
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
+
+        Result IReference.DereferenceResult(Category category) { return DereferenceResult(category); }
 
         Result DereferenceResult(Category category)
         {
@@ -90,11 +98,9 @@ namespace Reni.Type
         Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category, RefAlignParam); }
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
-        internal override TypeBase SmartReference(RefAlignParam refAlignParam) { return this; }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator{get { return ValueType.TypeForTypeOperator; }}
-        internal override Result AutomaticDereferenceResult(Category category) { return DereferenceResult(category).AutomaticDereference(); }
-        
+
         internal override void Search(SearchVisitor searchVisitor)
         {
             ValueType.Search(searchVisitor.Child(this));
@@ -111,11 +117,7 @@ namespace Reni.Type
                  , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }
-        internal override Result ReferenceInCode(Category category, IReferenceInCode target)
-        {
-            return ValueType
-                .ReferenceInCode(category, target);
-        }
+
         IConverter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
         {
             var trace = ObjectId == -13;
