@@ -1,4 +1,6 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
+// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +18,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -38,8 +42,7 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<ISuffixFeature, Type.Array>,
         ISearchPath<ISuffixFeature, TextItemType>,
         ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>,
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>,
-        ISearchPath<ISuffixFeature, FunctionalBody>
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>
     {
         static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
         static readonly BitFeature _bitFeature = new BitFeature();
@@ -50,7 +53,6 @@ namespace Reni.Feature.DumpPrint
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Void>.Convert(Type.Void type) { return new Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType type) { return new Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new Feature(type.DumpPrintResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, FunctionalBody>.Convert(FunctionalBody type) { return new Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, TextItemType>.Convert(TextItemType type) { return new Feature(type.DumpPrintTextResult); }
 
         ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>.Convert(TextItemType type) { return _dumpPrintSequenceFeature; }

@@ -204,7 +204,6 @@
     <Compile Include="Parser\Token.cs" />
     <Compile Include="Syntax\Special.cs" />
     <Compile Include="Syntax\EmptyList.cs" />
-    <Compile Include="Struct\FunctionalBody.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\Assignment.cs" />
     <Compile Include="TokenClasses\Base.cs" />
