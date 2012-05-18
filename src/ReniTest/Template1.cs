@@ -1,5 +1,8 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+// 
+//     Project reniTest
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,29 +32,40 @@ namespace ReniTest
     public static class Reni
     {
         // 
-//5, (^ _A_T_ 0 + ^ _A_T_ 0)dump_print
+//f: arg/\;g: f(arg)/\;x:4; g(x)dump_print
 //
         public static void MainFunction()
         {
             var data = Data.Create(5);
-            data.Push(data.Address(-1));
-            var h_6_0 = data.Pull(4);
-            data.Push(h_6_0.Get(4, 0));
-            var h_6_1 = data.Pull(4);
-            data.Push(data.Address(-1));
-            var h_6_2 = data.Pull(4);
-            data.Push(h_6_2.Get(4, 0));
-            var h_6_3 = data.Pull(4);
-            data.Push(h_6_1.Get(4, 0));
-            data.Push(data.Pull(4).Dereference(1).BitCast(4).BitCast(8));
-            data.Push(h_6_3.Get(4, 0));
-            data.Push(data.Pull(4).Dereference(1).BitCast(4).BitCast(8));
-            data.Plus(leftBytes: 1, rightBytes: 1);
-            data.Push(data.Pull(1).BitCast(5).BitCast(8));
-            var h_6_4 = data.Pull(1);
-            data.Push(5);
-            data.Push(h_6_4.Get(1, 0));
+            data.Push(4);
+            data.Push(data.Address(0));
+            var h_3_0 = data.Pull(4);
+            data.Push(h_3_0.Get(4, 0));
+            var frame = data.Pull(4);
+            var result = Function0(frame);
+            data.Push(result);
+            data.Push(data.Pull(1).BitCast(4).BitCast(8));
+            var h_3_1 = data.Pull(1);
+            data.Push(h_3_1.Get(1, 0));
             data.Pull(1).PrintNumber();
+        }
+        // f.29(arg)
+        static Data Function0(Data frame)
+        {
+            var data = Data.Create(4);
+            data.Push(frame.GetFromBack(4, -4));
+            var frame1 = data.Pull(4);
+            var function1 = Function1(frame1);
+            data.Push(function1);
+            return data;
+        }
+        // arg
+        static Data Function1(Data frame)
+        {
+            var data = Data.Create(4);
+            data.Push(frame.GetFromBack(4, -4));
+            data.Push(data.Pull(4).Dereference(1).BitCast(4).BitCast(8));
+            return data;
         }
     }
 }

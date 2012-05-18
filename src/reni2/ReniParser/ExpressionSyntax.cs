@@ -41,13 +41,10 @@ namespace Reni.ReniParser
     {
         [Node]
         readonly Defineable _tokenClass;
-
         [Node]
         internal readonly CompileSyntax Left;
-
         [Node]
         readonly TokenData _token;
-
         [Node]
         internal readonly CompileSyntax Right;
 
@@ -60,40 +57,13 @@ namespace Reni.ReniParser
             Right = right;
         }
 
-        internal override string DumpShort()
-        {
-            var result = base.DumpShort() + "." + _tokenClass.ObjectId;
-            if(Left != null)
-                result = "(" + Left.DumpShort() + ")" + result;
-            if(Right != null)
-                result += "(" + Right.DumpShort() + ")";
-            return result;
-        }
-
-        protected override TokenData GetFirstToken() { return Left == null ? Token : Left.FirstToken; }
-
-        protected override TokenData GetLastToken() { return Right == null ? Token : Right.LastToken; }
-
-        internal override string DumpPrintText
-        {
-            get
-            {
-                var result = base.DumpShort();
-                if(Left != null)
-                    result = "(" + Left.DumpPrintText + ")" + result;
-                if(Right != null)
-                    result += "(" + Right.DumpPrintText + ")";
-                return result;
-            }
-        }
-
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == -52 && context.ObjectId == 4 && category.HasCode;
+            var trace = ObjectId == -44 && context.ObjectId == 6 && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
-                //BreakExecution();
+                BreakExecution();
                 var leftResult = Left != null ? Left.Result(context, category.Typed).SmartLocalReferenceResult(context.RefAlignParam) : null;
                 var rightResult = Right != null ? Right.Result(context, category.Typed).SmartLocalReferenceResult(context.RefAlignParam) : null;
                 Dump("leftResult", leftResult);
@@ -173,6 +143,34 @@ namespace Reni.ReniParser
                 EndMethodDump();
             }
         }
+    
+        internal override string DumpShort()
+        {
+            var result = base.DumpShort() + "." + _tokenClass.ObjectId;
+            if (Left != null)
+                result = "(" + Left.DumpShort() + ")" + result;
+            if (Right != null)
+                result += "(" + Right.DumpShort() + ")";
+            return result;
+        }
+
+        protected override TokenData GetFirstToken() { return Left == null ? Token : Left.FirstToken; }
+
+        protected override TokenData GetLastToken() { return Right == null ? Token : Right.LastToken; }
+
+        internal override string DumpPrintText
+        {
+            get
+            {
+                var result = base.DumpShort();
+                if (Left != null)
+                    result = "(" + Left.DumpPrintText + ")" + result;
+                if (Right != null)
+                    result += "(" + Right.DumpPrintText + ")";
+                return result;
+            }
+        }
+
     }
 
     // Lord of the weed
