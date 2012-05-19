@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +30,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -137,7 +139,7 @@ namespace Reni.Struct
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
 
-        internal TypeBase FunctionalFeature(CompileSyntax getter, CompileSyntax setter, bool isAutoCall) { return new FunctionalBodyType(this, getter, setter, isAutoCall); }
+        internal TypeBase FunctionalFeature(FunctionSyntax syntax) { return new FunctionalBodyType(this, syntax); }
         TypeBase UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
         internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }
         internal IContextFeature UniqueContextAccessFeature(int position) { return _contextAccessFeaturesCache.Find(position); }
@@ -187,11 +189,11 @@ namespace Reni.Struct
                 .SearchFromRefToStruct(target);
         }
 
-        internal FunctionInstance FunctionInstance(CompileSyntax body, TypeBase argsResult)
+        internal Function Function(FunctionSyntax body, TypeBase argsType)
         {
             return ContainerContextObject
                 .RootContext
-                .FunctionInstance(this, body, argsResult);
+                .FunctionInstance(this, body, argsType);
         }
 
         internal Result AccessViaContextReference(Category category, int position)

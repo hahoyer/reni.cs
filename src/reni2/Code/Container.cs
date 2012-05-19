@@ -1,6 +1,8 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -17,12 +19,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
+using Reni.Struct;
 
 namespace Reni.Code
 {
@@ -41,16 +46,20 @@ namespace Reni.Code
         [DisableDump]
         readonly CodeBase _data;
 
-        public Container(CodeBase data, string description, Size frameSize = null)
+        public Container(CodeBase data, string description, FunctionId functionId = null, Size frameSize = null)
             : base(_nextObjectId++)
         {
             _frameSize = frameSize ?? Size.Zero;
             _description = description;
+            FunctionId = functionId;
             _data = data;
             StopByObjectId(-10);
         }
 
-        Container(string errorText) { _description = errorText; }
+        Container(string errorText)
+        {
+            _description = errorText;
+        }
 
         [Node]
         [EnableDump]
@@ -71,6 +80,7 @@ namespace Reni.Code
         [Node]
         [DisableDump]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
+        public FunctionId FunctionId;
 
         internal BitsConst Evaluate()
         {
@@ -84,36 +94,11 @@ namespace Reni.Code
             {
                 _data.Visit(generator);
             }
-            catch (UnexpectedContextReference e)
+            catch(UnexpectedContextReference e)
             {
                 Tracer.AssertionFailed("", () => e.Message);
             }
             return generator.Data;
         }
-    }
-
-    [Serializable]
-    class ErrorElement : FiberHead
-    {
-        [Node]
-        internal readonly CodeBase CodeBase;
-
-        public ErrorElement(CodeBase codeBase) { CodeBase = codeBase; }
-        protected override Size GetSize() { return Size.Zero; }
-    }
-
-    /// <summary>
-    ///     Nothing, since void cannot be used for this purpose
-    /// </summary>
-    class None
-    {
-        static readonly None _instance = new None();
-
-        /// <summary>
-        ///     Gets the instance.
-        /// </summary>
-        /// <value> The instance. </value>
-        /// created 03.10.2006 01:24
-        public static None Instance { get { return _instance; } }
     }
 }

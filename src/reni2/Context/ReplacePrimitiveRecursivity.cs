@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,12 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Code;
 using Reni.Code.ReplaceVisitor;
+using Reni.Struct;
 
 namespace Reni.Context
 {
@@ -31,10 +35,10 @@ namespace Reni.Context
         static int _nextObjectId;
 
         [EnableDump]
-        readonly int _functionIndex;
+        readonly FunctionId _functionId;
 
-        public ReplacePrimitiveRecursivity(int functionIndex)
-            : base(_nextObjectId++) { _functionIndex = functionIndex; }
+        public ReplacePrimitiveRecursivity(FunctionId functionId)
+            : base(_nextObjectId++) { _functionId = functionId; }
 
         internal override CodeBase List(List visitedObject)
         {
@@ -56,6 +60,6 @@ namespace Reni.Context
             return Fiber(visitedObject, null, newItems);
         }
 
-        internal override FiberItem Call(Call visitedObject) { return visitedObject.TryConvertToRecursiveCall(_functionIndex); }
+        internal override FiberItem Call(Call visitedObject) { return visitedObject.TryConvertToRecursiveCall(_functionId); }
     }
 }

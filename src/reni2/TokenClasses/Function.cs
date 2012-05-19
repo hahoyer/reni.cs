@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,50 +18,23 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Reni.Basics;
-using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
-    abstract class Function : Special, IInfix, IPrefix, ISuffix
+    abstract class Function : Special
     {
         readonly bool _isAutoCall;
         protected Function(bool isAutoCall) { _isAutoCall = isAutoCall; }
 
-        [DisableDump]
-        bool IInfix.IsLambda { get { return true; } }
-
-        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
-        {
-            if(left == null)
-                return new PrefixSyntax(token, this, right.ToCompiledSyntaxOrNull());
-            if(right == null)
-                return new SuffixSyntax(token, left.ToCompiledSyntaxOrNull(), this);
-            return new InfixSyntax(token, left.ToCompiledSyntaxOrNull(), this, right.ToCompiledSyntaxOrNull());
-        }
-
-        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-        {
-            return context
-                .FunctionalResult(category, left, right, _isAutoCall);
-        }
-        Result IPrefix.Result(ContextBase context, Category category, CompileSyntax right)
-        {
-            return context
-                .FunctionalResult(category, null, right, _isAutoCall);
-        }
-        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left)
-        {
-            return context
-                .FunctionalResult(category, left, null, _isAutoCall);
-        }
+        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new FunctionSyntax(token, left.ToCompiledSyntaxOrNull(), _isAutoCall, right.ToCompiledSyntaxOrNull()); }
     }
 
     sealed class ExplicitFunction : Function

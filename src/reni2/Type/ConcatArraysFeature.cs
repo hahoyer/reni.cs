@@ -1,3 +1,5 @@
+#region Copyright (C) 2012
+
 // 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
@@ -17,41 +19,58 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
+using Reni.Code;
 
 namespace Reni.Type
 {
-    sealed class ConcatArraysFeature : TypeBase
+    sealed class ConcatArraysFeature : TypeBase, IFunctionalFeature
     {
         [EnableDump]
         readonly Array _type;
-        readonly Size _refSize;
+        readonly RefAlignParam _refAlignParam;
 
-        public ConcatArraysFeature(Array type, Size refSize)
+        public ConcatArraysFeature(Array type, RefAlignParam refAlignParam)
         {
             _type = type;
-            _refSize = refSize;
+            _refAlignParam = refAlignParam;
         }
 
+        [DisableDump]
         internal override bool IsDataLess { get { return false; } }
-        protected override Size GetSize() { return _refSize; }
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
 
-        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam)
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var newCount = argsResult.Type.ArrayElementCount;
-            var newElementResult = argsResult.Conversion(argsResult.Type.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);
+            var newCount = argsType.ArrayElementCount;
+            var newElementResult = argsType
+                .Conversion(category, argsType.IsArray ? _type.Element.UniqueArray(newCount) : _type.Element);
             return _type
                 .Element
                 .UniqueArray(_type.Count + newCount)
                 .Result
                 (category
-                 , () => newElementResult.Code.Sequence(_type.DereferencedReferenceCode(refAlignParam))
+                 , () => newElementResult.Code.Sequence(_type.DereferencedReferenceCode(_refAlignParam))
                  , () => newElementResult.CodeArgs + CodeArgs.Arg()
                 );
+        }
+
+        [DisableDump]
+        bool IFunctionalFeature.IsImplicit { get { return false; } }
+        [DisableDump]
+        IReferenceInCode IFunctionalFeature.ObjectReference
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
     }
 }

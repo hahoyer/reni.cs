@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -35,7 +38,7 @@ namespace Reni.Type
     [Serializable]
     sealed class Array : TypeBase
     {
-        readonly DictionaryEx<Size, ConcatArraysFeature> _concatArraysFeatureCache;
+        readonly DictionaryEx<RefAlignParam, ConcatArraysFeature> _concatArraysFeatureCache;
 
         readonly TypeBase _element;
         readonly int _count;
@@ -47,7 +50,7 @@ namespace Reni.Type
             _element = element;
             _count = count;
             Tracer.Assert(count > 0);
-            _concatArraysFeatureCache = new DictionaryEx<Size, ConcatArraysFeature>(size => new ConcatArraysFeature(this, size));
+            _concatArraysFeatureCache = new DictionaryEx<RefAlignParam, ConcatArraysFeature>(refAlignParam => new ConcatArraysFeature(this, refAlignParam));
         }
 
         [Node]
@@ -84,7 +87,7 @@ namespace Reni.Type
         internal Result ConcatArrays(Category category, RefAlignParam refAlignParam)
         {
             return _concatArraysFeatureCache
-                .Find(refAlignParam.RefSize)
+                .Find(refAlignParam)
                 .Result(category, ReferenceArgResult(category, refAlignParam));
         }
 

@@ -1,5 +1,8 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +29,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Code
@@ -176,13 +182,12 @@ namespace Reni.Code
         }
 
         /// <summary>
-        ///     Replaces appearences of context in code tree.                                                               
-        ///     Assumes, that replacement requires offset alignment when walking along code tree
+        ///     Replaces appearences of context in code tree. Assumes, that replacement requires offset alignment when walking along code tree
         /// </summary>
-        /// <typeparam name = "TContext"></typeparam>
-        /// <param name = "context">The context.</param>
-        /// <param name = "replacement">The replacement.</param>
-        /// <returns></returns>
+        /// <typeparam name="TContext"> </typeparam>
+        /// <param name="context"> The context. </param>
+        /// <param name="replacement"> The replacement. </param>
+        /// <returns> </returns>
         internal CodeBase ReplaceRelative<TContext>(TContext context, Func<CodeBase> replacement)
             where TContext : IReferenceInCode
         {
@@ -193,13 +198,12 @@ namespace Reni.Code
         }
 
         /// <summary>
-        ///     Replaces appearences of context in code tree. 
-        ///     Assumes, that replacement isn't a reference, that changes when walking along the code tree
+        ///     Replaces appearences of context in code tree. Assumes, that replacement isn't a reference, that changes when walking along the code tree
         /// </summary>
-        /// <typeparam name = "TContext"></typeparam>
-        /// <param name = "context">The context.</param>
-        /// <param name = "replacement">The replacement.</param>
-        /// <returns></returns>
+        /// <typeparam name="TContext"> </typeparam>
+        /// <param name="context"> The context. </param>
+        /// <param name="replacement"> The replacement. </param>
+        /// <returns> </returns>
         internal CodeBase ReplaceAbsolute<TContext>(TContext context, Func<CodeBase> replacement)
             where TContext : IReferenceInCode
         {
@@ -213,20 +217,20 @@ namespace Reni.Code
 
         protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Default(this); }
 
-        internal CodeBase Call(int index, Size resultSize) { return CreateFiber(new Call(index, resultSize, Size)); }
+        internal CodeBase Call(FunctionId index, Size resultSize) { return CreateFiber(new Call(index, resultSize, Size)); }
 
-        internal CodeBase TryReplacePrimitiveRecursivity(int functionIndex)
+        internal CodeBase TryReplacePrimitiveRecursivity(FunctionId functionId)
         {
             if(!Size.IsZero)
                 return this;
 
-            var newResult = Visit(new ReplacePrimitiveRecursivity(functionIndex));
+            var newResult = Visit(new ReplacePrimitiveRecursivity(functionId));
             return newResult ?? this;
         }
 
         internal BitsConst Evaluate(IOutStream outStream)
         {
-            var dataStack = new DataStack(new CodeBase[0], false, outStream);
+            var dataStack = new DataStack(outStream);
             Visit(dataStack);
             return dataStack.Value;
         }
@@ -236,7 +240,7 @@ namespace Reni.Code
         /// <summary>
         ///     Gets the icon key.
         /// </summary>
-        /// <value>The icon key.</value>
+        /// <value> The icon key. </value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
 
         [DisableDump]
@@ -276,11 +280,11 @@ namespace Reni.Code
                 .Aggregate(this, (current, fiberItem) => current.CreateFiber(fiberItem));
         }
 
-        internal void Execute(CodeBase[] functions, bool isTraceEnabled, IOutStream outStream)
+        internal void Execute(Tuple<CodeBase, CodeBase>[] functions, bool isTraceEnabled, IOutStream outStream)
         {
             try
             {
-                Visit(new DataStack(functions, isTraceEnabled, outStream));
+                Visit(new DataStack(outStream, functions, isTraceEnabled));
             }
             catch(UnexpectedContextReference e)
             {

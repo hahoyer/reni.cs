@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -40,9 +43,9 @@ namespace Reni
         readonly SimpleCache<Source> _source;
         readonly SimpleCache<ReniParser.ParsedSyntax> _syntax;
         readonly SimpleCache<CodeBase> _code;
-        readonly SimpleCache<CodeBase[]> _functionCode;
+        readonly SimpleCache<Tuple<CodeBase, CodeBase>[]> _functionCode;
         readonly SimpleCache<Container> _mainContainer;
-        readonly SimpleCache<List<Container>> _functionContainers;
+        readonly SimpleCache<List<FunctionContainer>> _functionContainers;
         readonly SimpleCache<string> _executedCode;
         readonly SimpleCache<FunctionList> _functions;
         readonly SimpleCache<ContextBase> _rootContext;
@@ -58,11 +61,11 @@ namespace Reni
             _parameters = parameters;
             _source = new SimpleCache<Source>(() => new Source(FileName.FileHandle()));
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
-            _functionCode = new SimpleCache<CodeBase[]>(() => Functions.Code);
+            _functionCode = new SimpleCache<Tuple<CodeBase, CodeBase>[]>(() => Functions.Code);
             _mainContainer = new SimpleCache<Container>(() => new Container(Code, Source.Data));
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
-            _functionContainers = new SimpleCache<List<Container>>(() => Functions.Compile());
+            _functionContainers = new SimpleCache<List<FunctionContainer>>(() => Functions.Compile());
             _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, OutStream));
             _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
         }
@@ -100,7 +103,7 @@ namespace Reni
         Container MainContainer { get { return _mainContainer.Value; } }
 
         [DisableDump]
-        List<Container> FunctionContainers { get { return _functionContainers.Value; } }
+        List<FunctionContainer> FunctionContainers { get { return _functionContainers.Value; } }
 
         [Node]
         [DisableDump]
@@ -154,7 +157,7 @@ namespace Reni
                 Tracer.FlaggedLine("Dump CodeTree");
                 Tracer.FlaggedLine("main\n" + Code.Dump());
                 for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + Functions[i].BodyCode.Dump());
+                    Tracer.FlaggedLine("function index=" + i + "\n" + Functions[i].BodyCode);
             }
 
             if(_parameters.RunFromCode)
@@ -182,7 +185,7 @@ namespace Reni
             catch(CompilerErrorException e)
             {
                 for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
-                    OutStream.Add(e.CompilerErrorCollection[i].ToString() + "\n");
+                    OutStream.Add(e.CompilerErrorCollection[i] + "\n");
             }
             Data.OutStream = null;
         }

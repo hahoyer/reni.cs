@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,13 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Struct;
-using Reni.Syntax;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Context
@@ -55,7 +58,7 @@ namespace Reni.Context
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
-        internal FunctionInstance FunctionInstance(Structure structure, CompileSyntax body, TypeBase argsType)
+        internal Struct.Function FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)
         {
             var alignedArgsType = argsType.UniqueAlign(DefaultRefAlignParam.AlignBits);
             var functionInstance = _functions.Find(body, structure, alignedArgsType);

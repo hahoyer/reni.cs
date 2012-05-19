@@ -1,4 +1,6 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
+// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +28,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Struct;
 
 namespace Reni.Code
 {
@@ -48,7 +53,7 @@ namespace Reni.Code
                     .Push(oldTop);
             }
 
-            internal StackDataAddress Address(Size offset) { return new StackDataAddress(this, offset - Data.Size,Data.OutStream); }
+            internal StackDataAddress Address(Size offset) { return new StackDataAddress(this, offset - Data.Size, Data.OutStream); }
 
             internal StackData FrameAddress(Size offset) { return new StackDataAddress(Frame, offset, Data.OutStream); }
         }
@@ -58,13 +63,13 @@ namespace Reni.Code
         [EnableDump]
         LocalData _localData;
 
-        readonly CodeBase[] _functions;
+        readonly Tuple<CodeBase, CodeBase>[] _functions;
         readonly bool _isTraceEnabled;
         readonly IOutStream _outStream;
 
-        public DataStack(CodeBase[] functions, bool isTraceEnabled, IOutStream outStream)
+        public DataStack(IOutStream outStream, Tuple<CodeBase, CodeBase>[] functions = null, bool isTraceEnabled = false)
         {
-            _functions = functions;
+            _functions = functions ?? new Tuple<CodeBase, CodeBase>[0];
             _isTraceEnabled = isTraceEnabled;
             _outStream = outStream;
             _localData = new LocalData(_outStream);
@@ -73,14 +78,15 @@ namespace Reni.Code
         [DisableDump]
         internal BitsConst Value { get { return Data.GetBitsConst(); } }
 
-        void IVisitor.Call(Size size, int functionIndex, Size argsAndRefsSize)
+        void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
         {
             var oldFrame = _localData.Frame;
             var argsAndRefs = Pull(argsAndRefsSize);
             do
             {
                 _localData.Frame = new FrameData(argsAndRefs);
-                SubVisit("call " + functionIndex, _functions[functionIndex]);
+                var function = _functions[functionId.Index];
+                SubVisit("call " + functionId, functionId.IsGetter ? function.Item1 : function.Item2);
             } while(_localData.Frame.IsRepeatRequired);
             _localData.Frame = oldFrame;
         }
@@ -93,7 +99,7 @@ namespace Reni.Code
         {
             if(size.IsZero)
                 return;
-            Push(new BitsStackData(data.Resize(size),_outStream));
+            Push(new BitsStackData(data.Resize(size), _outStream));
         }
 
         void Push(StackData value) { Data = Data.Push(value); }

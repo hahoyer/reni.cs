@@ -1,5 +1,7 @@
+#region Copyright (C) 2012
+
 // 
-//     Project reni2
+//     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
@@ -17,6 +19,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -27,6 +31,7 @@ using System.Threading;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Microsoft.CSharp;
+using Reni.Struct;
 
 namespace Reni.Code
 {
@@ -35,10 +40,10 @@ namespace Reni.Code
         static readonly CSharpCodeProvider _provider = new CSharpCodeProvider();
 
         internal static string MainFunctionName { get { return "MainFunction"; } }
-        internal static string FunctionName(int i) { return "Function" + i; }
+        internal static string FunctionName(FunctionId functionId) { return (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index; }
 
-        internal static string CreateCSharpString(Container main, List<Container> functions, bool useStatementAligner) { return new CSharp_Generated(main, functions).TransformText(useStatementAligner); }
-        internal static Assembly CreateCSharpAssembly(Container main, List<Container> functions, bool align, bool traceFilePosn) { return CodeToAssembly(CreateCSharpString(main, functions, align), traceFilePosn); }
+        internal static string CreateCSharpString(Container main, List<FunctionContainer> functions, bool useStatementAligner) { return new CSharp_Generated(main, functions).TransformText(useStatementAligner); }
+        internal static Assembly CreateCSharpAssembly(Container main, List<FunctionContainer> functions, bool align, bool traceFilePosn) { return CodeToAssembly(CreateCSharpString(main, functions, align), traceFilePosn); }
 
         static void CodeToFile(string name, string result, bool traceFilePosn)
         {
@@ -107,8 +112,8 @@ namespace Reni.Code
 // ReSharper restore InconsistentNaming
     {
         readonly Container _main;
-        readonly List<Container> _functions;
-        internal CSharp_Generated(Container main, List<Container> functions)
+        readonly List<FunctionContainer> _functions;
+        internal CSharp_Generated(Container main, List<FunctionContainer> functions)
         {
             _main = main;
             _functions = functions;

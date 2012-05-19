@@ -1,5 +1,8 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+// 
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,33 +19,36 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
+using Reni.Struct;
 
 namespace Reni.Code
 {
     [Serializable]
-    internal sealed class Call : FiberItem
+    sealed class Call : FiberItem
     {
         [Node]
         [DisableDump]
-        internal readonly int FunctionIndex;
+        internal readonly FunctionId FunctionId;
 
         [Node]
         [DisableDump]
-        private readonly Size _resultSize;
+        readonly Size _resultSize;
 
         [Node]
         [DisableDump]
         internal readonly Size ArgsAndRefsSize;
 
-        internal Call(int functionIndex, Size resultSize, Size argsAndRefsSize)
+        internal Call(FunctionId functionId, Size resultSize, Size argsAndRefsSize)
         {
-            FunctionIndex = functionIndex;
+            FunctionId = functionId;
             _resultSize = resultSize;
             ArgsAndRefsSize = argsAndRefsSize;
             StopByObjectId(-10);
@@ -57,13 +63,13 @@ namespace Reni.Code
         protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Call(this); }
 
         [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " FunctionIndex=" + FunctionIndex + " ArgsAndRefsSize=" + ArgsAndRefsSize; } }
+        public override string NodeDump { get { return base.NodeDump + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize; } }
 
-        internal override void Visit(IVisitor visitor) { visitor.Call(OutputSize, FunctionIndex, ArgsAndRefsSize); }
+        internal override void Visit(IVisitor visitor) { visitor.Call(OutputSize, FunctionId, ArgsAndRefsSize); }
 
-        public FiberItem TryConvertToRecursiveCall(int functionIndex)
+        public FiberItem TryConvertToRecursiveCall(FunctionId functionId)
         {
-            if(FunctionIndex != functionIndex)
+            if(FunctionId != functionId)
                 return this;
             Tracer.Assert(_resultSize.IsZero);
             return CodeBase.RecursiveCall(ArgsAndRefsSize);

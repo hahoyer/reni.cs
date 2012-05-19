@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -282,7 +285,7 @@ f1()dump_print;
 
     [TestFixture]
     [SimpleFunctionWithNonLocal]
-    [TargetSet(@"f: arg/\arg+value;f(100) := 2;", "102")]
+    [TargetSet(@"f: arg/\(arg+value)dump_print;f(100) := 2;", "102")]
     public sealed class FunctionAssignment : CompilerTest
     {
         [Test]

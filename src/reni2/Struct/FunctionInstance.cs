@@ -21,97 +21,81 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    /// <summary>
-    ///     Instance of a function to compile
-    /// </summary>
-    [Serializable]
-    sealed class FunctionInstance : ReniObject
+    abstract class FunctionInstance : ReniObject
     {
+        internal abstract FunctionId FunctionId { get; }
+
         [Node]
         [EnableDump]
-        readonly TypeBase _args;
+        readonly TypeBase _argsType;
 
         [Node]
         [EnableDump]
         readonly CompileSyntax _body;
 
-        [Node]
-        [EnableDump]
-        readonly Structure _structure;
-
-        internal readonly int Index;
-
+        readonly SimpleCache<ContextBase> _contextCache;
         readonly SimpleCache<CodeBase> _bodyCodeCache;
 
-        /// <summary>
-        ///     Initializes a new instance of the FunctionInstance class.
-        /// </summary>
-        /// <param name="index"> The index. </param>
-        /// <param name="body"> The body. </param>
-        /// <param name="structure"> The context. </param>
-        /// <param name="args"> The args. </param>
-        /// created 03.01.2007 21:19
-        internal FunctionInstance(int index, CompileSyntax body, Structure structure, TypeBase args)
-            : base(index)
+        protected FunctionInstance([NotNull]CompileSyntax body, TypeBase argsType, Func<ContextBase> getContext)
         {
-            Index = index;
+            _argsType = argsType;
             _body = body;
-            _structure = structure;
-            _args = args;
             _bodyCodeCache = new SimpleCache<CodeBase>(ObtainBodyCode);
-            StopByObjectId(-10);
+            _contextCache = new SimpleCache<ContextBase>(getContext);
         }
-
-        [Node]
-        internal TypeBase ReturnType { get { return Result(Category.Type).Type; } }
 
         [Node]
         [DisableDump]
         internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
-
+        [DisableDump]
+        RefAlignParam RefAlignParam { get { return Context.RefAlignParam; } }
+        [DisableDump]
+        ContextBase Context { get { return _contextCache.Value; } }
+        [Node]
+        [DisableDump]
+        string Description { get { return _body.DumpShort(); } }
+        [Node]
+        [DisableDump]
+        Size FrameSize { get { return _argsType.Size + CodeArgs.Size; } }
         [Node]
         [DisableDump]
         internal CodeArgs CodeArgs { get { return Result(Category.CodeArgs).CodeArgs; } }
 
-        [Node]
-        [DisableDump]
-        Size FrameSize { get { return _args.Size + CodeArgs.Size; } }
-
-        [Node]
-        [DisableDump]
-        string Description { get { return _body.DumpShort(); } }
-
-        internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
-
-        CodeBase ObtainBodyCode()
+        internal Code.Container Serialize()
         {
-            if(IsStopByObjectIdActive)
-                return null;
-            var category = Category.Code;
-            var refAlignParam = _structure.UniqueContext.RefAlignParam;
-            var foreignRefsRef = CodeBase.FrameRef(refAlignParam);
-            var visitResult = Result(category);
-            var result = visitResult
-                .ReplaceRefsForFunctionBody(refAlignParam, foreignRefsRef);
-            if(_args.IsDataLess)
-                result.Code = result.Code.TryReplacePrimitiveRecursivity(Index);
-            return result.Code;
+            try
+            {
+                return new Code.Container(BodyCode, Description, FunctionId, FrameSize);
+            }
+            catch(UnexpectedVisitOfPending)
+            {
+                return Code.Container.UnexpectedVisitOfPending;
+            }
+        }
+        internal Result CallResult(Category category)
+        {
+            var localCategory = category - Category.CodeArgs - Category.Code;
+            if(category.HasCode)
+                localCategory |= Category.Size;
+            return Result(localCategory);
         }
 
-        Result Result(Category category)
+        protected Result Result(Category category)
         {
             if(IsStopByObjectIdActive)
                 return null;
@@ -121,20 +105,18 @@ namespace Reni.Struct
             try
             {
                 BreakExecution();
-                var functionContext = _structure.UniqueContext.UniqueFunctionContext(_args);
-                Dump("functionContext", functionContext);
-                var rawResult = _body.Result(functionContext, category.Typed).Clone();
+                var rawResult = _body.Result(Context, category.Typed).Clone();
                 Dump("rawResult", rawResult);
                 BreakExecution();
                 var postProcessedResult = rawResult
                     .AutomaticDereference()
-                    .Align(_structure.RefAlignParam.AlignBits)
+                    .Align(RefAlignParam.AlignBits)
                     .LocalBlock(category);
 
                 Dump("postProcessedResult", postProcessedResult);
                 BreakExecution();
                 var result = postProcessedResult
-                    .ReplaceAbsolute(functionContext.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
+                    .ReplaceAbsolute(Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -143,49 +125,63 @@ namespace Reni.Struct
             }
         }
 
-        internal Result CallResult(Category category)
-        {
-            var localCategory = category - Category.CodeArgs - Category.Code;
-            if(category.HasCode)
-                localCategory |= Category.Size;
-            return Result(localCategory);
-        }
-
         CodeBase CreateContextRefCode()
         {
-            var refAlignParam = _structure.UniqueContext.RefAlignParam;
+            var refAlignParam = RefAlignParam;
             return CodeBase
                 .FrameRef(refAlignParam)
                 .AddToReference(refAlignParam, FrameSize * -1)
                 .Dereference(refAlignParam, refAlignParam.RefSize);
         }
 
-        internal Code.Container Serialize(bool isInternal)
+        internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
+
+        CodeBase ObtainBodyCode()
         {
-            try
-            {
-                return new Code.Container(BodyCode, Description, FrameSize);
-            }
-            catch(UnexpectedVisitOfPending)
-            {
-                return Code.Container.UnexpectedVisitOfPending;
-            }
+            if(IsStopByObjectIdActive)
+                return null;
+            var category = Category.Code;
+            var foreignRefsRef = CodeBase.FrameRef(RefAlignParam);
+            var visitResult = Result(category);
+            var result = visitResult
+                .ReplaceRefsForFunctionBody(RefAlignParam, foreignRefsRef);
+            if(_argsType.IsDataLess)
+                result.Code = result.Code.TryReplacePrimitiveRecursivity(FunctionId);
+            return result.Code;
         }
 
         public string DumpFunction()
         {
             var result = "\n";
-            result += "index=" + Index;
-            result += "\n";
             result += "body=" + _body.DumpShort();
-            result += "\n";
-            result += "args=" + _args.Dump();
-            result += "\n";
-            result += "context=" + _structure.Dump();
-            result += "\n";
-            result += "type=" + ReturnType.Dump();
             result += "\n";
             return result;
         }
+    }
+
+    sealed class GetterFunctionInstance : FunctionInstance
+    {
+        readonly FunctionId _functionId;
+        public GetterFunctionInstance(int index, CompileSyntax body, TypeBase argsType, Func<ContextBase> getContext)
+            : base(body, argsType, getContext) { _functionId = new FunctionId {Index = index, IsGetter = true}; }
+
+        internal TypeBase ReturnType { get { return Result(Category.Type).Type; } }
+        internal override FunctionId FunctionId { get { return _functionId; } }
+    }
+
+    sealed class SetterFunctionInstance : FunctionInstance
+    {
+        readonly FunctionId _functionId;
+        public SetterFunctionInstance(int index, CompileSyntax body, TypeBase argsType, Func<ContextBase> getContext)
+            : base(body, argsType, getContext) { _functionId = new FunctionId {Index = index, IsGetter = false}; }
+
+        internal override FunctionId FunctionId { get { return _functionId; } }
+    }
+
+    sealed class FunctionId
+    {
+        public int Index;
+        public bool IsGetter;
+        public override string ToString() { return (IsGetter ? "Get" : "Set") + "." + Index; }
     }
 }

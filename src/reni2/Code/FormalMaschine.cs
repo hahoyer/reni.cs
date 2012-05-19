@@ -1,5 +1,7 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +28,7 @@ using HWClassLibrary.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Struct;
 
 namespace Reni.Code
 {
@@ -70,11 +75,11 @@ namespace Reni.Code
             SetFormalValues(_points[index], startAddress, RefSize);
         }
 
-        void IVisitor.Call(Size size, int functionIndex, Size argsAndRefsSize)
+        void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
         {
             var formalSubValues = PullInputValuesFromData(argsAndRefsSize);
             var startAddress = (_startAddress + argsAndRefsSize - size).ToInt();
-            var element = FormalValueAccess.Call(formalSubValues, functionIndex);
+            var element = FormalValueAccess.Call(formalSubValues, functionId);
             SetFormalValues(element, startAddress, size);
         }
 

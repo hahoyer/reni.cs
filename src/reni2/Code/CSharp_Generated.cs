@@ -14,14 +14,14 @@ namespace Reni.Code
     using System;
     
     
-    #line 1 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
+    #line 1 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "10.0.0.0")]
     public partial class CSharp_Generated : CSharp_GeneratedBase
     {
         public virtual string TransformText()
         {
             
-            #line 1 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
+            #line 1 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 
 // 
 //     Project Reni2
@@ -46,13 +46,18 @@ namespace Reni.Code
             #line default
             #line hidden
             this.Write("\r\nusing System;\r\nusing Reni;\r\nusing Reni.Runtime;\r\n\r\nnamespace ReniTest\r\n{\r\n\tunsa" +
-                    "fe static public class Reni\r\n\t{\r\n\t");
+                    "fe static public class Reni\r\n\t{");
             
-            #line 33 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
- 
-        GenerateCSharpFunctionCode(_main, Generator.MainFunctionName, false);
-        for(var i = 0; i < _functions.Count; i++)
-            GenerateCSharpFunctionCode(_functions[i], Generator.FunctionName(i), true);
+            #line 32 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+
+        GenerateCSharpCode(_main);
+        for (var i = 0; i < _functions.Count; i++)
+        {
+	        if(_functions[i].Getter != null)
+	            GenerateCSharpFunctionCode(_functions[i].Getter);
+            if (_functions[i].Setter != null)
+	            GenerateCSharpFunctionCode(_functions[i].Setter);
+        }	     
 	
             
             #line default
@@ -61,145 +66,125 @@ namespace Reni.Code
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 41 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
+        #line 45 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
  
-	void GenerateCSharpFunctionCode(Container container, string name, bool isFunction)
+	void GenerateCSharpCode(Container container)
 	{
-		var comment = container.Description.Replace("\n", "\n//" );
-		
         
         #line default
         #line hidden
         
-        #line 45 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("\t\t// ");
+        #line 47 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write("\t    // ");
 
         
         #line default
         #line hidden
         
-        #line 46 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write(this.ToStringHelper.ToStringWithCulture(comment));
+        #line 48 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write(this.ToStringHelper.ToStringWithCulture(container.Description.Replace("\n", "\n//")));
 
         
         #line default
         #line hidden
         
-        #line 46 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("\r\n\t\t");
+        #line 48 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write(" \r\n\t\tunsafe static public void ");
 
         
         #line default
         #line hidden
         
-        #line 47 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-if(isFunction){
-        
-        #line default
-        #line hidden
-        
-        #line 47 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("\t\t\tunsafe static Data ");
+        #line 49 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write(this.ToStringHelper.ToStringWithCulture(Generator.MainFunctionName));
 
         
         #line default
         #line hidden
         
-        #line 48 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write(this.ToStringHelper.ToStringWithCulture(name));
+        #line 49 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write("()\r\n\t\t{\r\n\t    \t");
 
         
         #line default
         #line hidden
         
-        #line 48 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("(Data frame)\r\n\t\t\t{\r\n\t\t\tStart:\r\n\t\t");
-
-        
-        #line default
-        #line hidden
-        
-        #line 51 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-}else{
-        
-        #line default
-        #line hidden
-        
-        #line 51 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("\t\t\tunsafe static public void ");
-
-        
-        #line default
-        #line hidden
-        
-        #line 52 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write(this.ToStringHelper.ToStringWithCulture(name));
-
-        
-        #line default
-        #line hidden
-        
-        #line 52 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("( )\r\n\t\t\t{\r\n\t\t");
-
-        
-        #line default
-        #line hidden
-        
-        #line 54 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-}
-        
-        #line default
-        #line hidden
-        
-        #line 54 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("\t\t\t");
-
-        
-        #line default
-        #line hidden
-        
-        #line 55 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
+        #line 51 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 this.Write(this.ToStringHelper.ToStringWithCulture(container.GetCSharpStatements()));
 
         
         #line default
         #line hidden
         
-        #line 55 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-
-			if(isFunction)
-			{
-				
-        
-        #line default
-        #line hidden
-        
-        #line 58 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("return data;");
+        #line 51 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write("\r\n        }\r\n\t");
 
         
         #line default
         #line hidden
         
-        #line 58 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-
-			}
+        #line 53 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+}
+	
+    void GenerateCSharpFunctionCode(Container container)
+	{
         
         #line default
         #line hidden
         
-        #line 59 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
-this.Write("\t\t\t}\r\n\t");
+        #line 56 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write("\t    // ");
 
         
         #line default
         #line hidden
         
-        #line 61 "C:\disks\anne.data\data\develop\Reni\src\reni2\Code\CSharp_Generated.tt"
+        #line 57 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write(this.ToStringHelper.ToStringWithCulture(container.Description.Replace("\n", "\n//")));
+
+        
+        #line default
+        #line hidden
+        
+        #line 57 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write(" \r\n\t\tunsafe static Data ");
+
+        
+        #line default
+        #line hidden
+        
+        #line 58 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write(this.ToStringHelper.ToStringWithCulture(Generator.FunctionName(container.FunctionId)));
+
+        
+        #line default
+        #line hidden
+        
+        #line 58 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write("(Data frame)\r\n\t\t{\r\n\t\tStart:\r\n\t\t\t");
+
+        
+        #line default
+        #line hidden
+        
+        #line 61 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write(this.ToStringHelper.ToStringWithCulture(container.GetCSharpStatements()));
+
+        
+        #line default
+        #line hidden
+        
+        #line 61 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
+this.Write("\r\n\t\t\treturn data;\r\n\t\t}\r\n\t");
+
+        
+        #line default
+        #line hidden
+        
+        #line 64 "C:\disks\anne.data\data\develop\Reni\dev\src\reni2\Code\CSharp_Generated.tt"
 }
 
-       // ReSharper disable FieldCanBeMadeReadOnly.Local
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
 
 
         

@@ -55,7 +55,11 @@ namespace Reni.Struct
                 return null;
             }
         }
-        Result ISetterTargetType.Result(Category category, TypeBase valueType) { return _functionalBodyType.SetterResult(category, _argsType, valueType); }
+        Result ISetterTargetType.Result(Category category, TypeBase valueType)
+        {
+            return _functionalBodyType
+                .SetterResult(category, _argsType);
+        }
         TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
         IConverter IContainerType.Converter() { return this; }
         TypeBase IContainerType.Target { get { return ValueType; } }

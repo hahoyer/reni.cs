@@ -1,6 +1,7 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -61,7 +64,7 @@ namespace Reni.Syntax
             }
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal virtual Result ObtainResult(ContextBase context, Category category)
         {
             NotImplementedMethod(context, category);
@@ -74,7 +77,7 @@ namespace Reni.Syntax
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
         Result FindResult(ContextBase context, Category category) { return context.FindResult(category, this); }
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(context.RootContext.OutStream); }
@@ -108,11 +111,11 @@ namespace Reni.Syntax
         bool? QuickIsDataLessStructureElement(ContextBase context)
         {
             var contextResult = context.QuickIsDataLess(this);
-            if (contextResult != null)
+            if(contextResult != null)
                 return contextResult;
 
             var type = FindResult(context, Category.Type).Type;
-            if (type != null)
+            if(type != null)
                 return type.IsDataLessStructureElement(true);
             return null;
         }
@@ -127,13 +130,12 @@ namespace Reni.Syntax
         internal bool? IsDataLessStructureElement(bool isQuick, ContextBase context)
         {
             var result = QuickIsDataLessStructureElement(context);
-            if (result != null)
+            if(result != null)
                 return result;
-            if (isQuick)
+            if(isQuick)
                 return null;
 
             return Type(context).IsDataLessStructureElement(false);
         }
-        
     }
 }

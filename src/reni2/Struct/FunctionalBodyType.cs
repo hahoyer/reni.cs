@@ -28,7 +28,7 @@ using System;
 using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Syntax;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -38,18 +38,13 @@ namespace Reni.Struct
         [EnableDump]
         readonly Structure _structure;
         [EnableDump]
-        readonly CompileSyntax _getter;
-        [EnableDump]
-        readonly CompileSyntax _setter;
-        readonly bool _isImplicit;
+        readonly FunctionSyntax _syntax;
         readonly DictionaryEx<TypeBase, FunctionAccessType> _functionAccessTypesCache;
 
-        internal FunctionalBodyType(Structure structure, CompileSyntax getter, CompileSyntax setter, bool isImplicit)
+        public FunctionalBodyType(Structure structure, FunctionSyntax syntax)
         {
             _structure = structure;
-            _getter = getter;
-            _setter = setter;
-            _isImplicit = isImplicit;
+            _syntax = syntax;
             _functionAccessTypesCache = new DictionaryEx<TypeBase, FunctionAccessType>(argsType => new FunctionAccessType(this, argsType));
         }
 
@@ -63,28 +58,18 @@ namespace Reni.Struct
         internal override bool IsLikeReference { get { return true; } }
         [DisableDump]
         RefAlignParam IReferenceInCode.RefAlignParam { get { return _structure.RefAlignParam; } }
-
-        string Tag { get { return _isImplicit ? "/!\\" : "/\\"; } }
-        internal override string DumpPrintText { get { return _getter.DumpPrintText + Tag + _setter.DumpPrintText; } }
+        internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return this; } }
 
         protected override Size GetSize() { return _structure.RefAlignParam.RefSize; }
 
         [DisableDump]
-        bool IFunctionalFeature.IsImplicit { get { return _isImplicit; } }
+        bool IFunctionalFeature.IsImplicit { get { return _syntax.IsImplicit; } }
         [DisableDump]
         IReferenceInCode IFunctionalFeature.ObjectReference { get { return this; } }
 
-        internal CodeArgs GetCodeArgs(TypeBase argsType)
-        {
-            var codeArgs = CodeArgs.Void();
-            if(_setter != null)
-                codeArgs += _structure.FunctionInstance(_setter, argsType).CodeArgs;
-            if(_getter != null)
-                codeArgs += _structure.FunctionInstance(_getter, argsType).CodeArgs;
-            return codeArgs - CodeArgs.Arg();
-        }
+        internal CodeArgs GetCodeArgs(TypeBase argsType) { return _structure.Function(_syntax, argsType).CodeArgs - CodeArgs.Arg(); }
 
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
         {
@@ -93,17 +78,11 @@ namespace Reni.Struct
                 .ApplyResult(category);
         }
 
-        internal TypeBase ValueType(TypeBase argsType)
-        {
-            if(_getter == null)
-                return null;
-            return GetterResult(Category.Type, argsType).Type;
-        }
+        internal TypeBase ValueType(TypeBase argsType) { return _structure.Function(_syntax, argsType).ValueType; }
 
-        Result CallResult(Category category, CompileSyntax body, TypeBase argsType)
+        Result CallResult(Category category, bool isGetter, TypeBase argsType)
         {
-            var instance = _structure.FunctionInstance(body, argsType);
-
+            var instance = _structure.Function(_syntax, argsType).Instance(isGetter);
             var result = instance.CallResult(category);
             if(category.HasArgs)
                 result.CodeArgs = CodeArgs.Arg();
@@ -111,12 +90,12 @@ namespace Reni.Struct
                 result.Code = _functionAccessTypesCache
                     .Find(argsType)
                     .ArgCode()
-                    .Call(instance.Index, result.Size);
+                    .Call(instance.FunctionId, result.Size);
 
             return result;
         }
 
-        internal Result SetterResult(Category category, TypeBase argsType, TypeBase valueType) { return CallResult(category, _setter, argsType); }
-        internal Result GetterResult(Category category, TypeBase argsType) { return CallResult(category, _getter, argsType); }
+        internal Result GetterResult(Category category, TypeBase argsType) { return CallResult(category, true, argsType); }
+        internal Result SetterResult(Category category, TypeBase argsType) { return CallResult(category, false, argsType); }
     }
 }

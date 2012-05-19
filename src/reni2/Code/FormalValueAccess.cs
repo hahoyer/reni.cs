@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,12 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Struct;
 
 namespace Reni.Code
 {
@@ -57,7 +61,7 @@ namespace Reni.Code
         public new string Dump() { return _formalValue.Dump(_index, _size); }
 
         public static IFormalValue BitsArray(BitsConst data) { return new BitsArrayValue(data); }
-        public static IFormalValue Call(IFormalValue[] formalSubValues, int functionIndex) { return new CallValue(formalSubValues, functionIndex); }
+        public static IFormalValue Call(IFormalValue[] formalSubValues, FunctionId functionId) { return new CallValue(formalSubValues, functionId); }
         public static IFormalValue BitCast(IFormalValue formalSubValue, int castedBits) { return new BitCastValue(formalSubValue, castedBits); }
         public static IFormalValue Variable(char name) { return new VariableValue(name); }
         public static IFormalValue RefPlus(IFormalValue formalSubValue, int right) { return formalSubValue.RefPlus(right); }
@@ -173,17 +177,17 @@ namespace Reni.Code
     sealed class CallValue : NamedValue
     {
         readonly IFormalValue[] _formalSubValues;
-        readonly int _functionIndex;
+        readonly FunctionId _functionId;
 
-        public CallValue(IFormalValue[] formalSubValues, int functionIndex)
+        public CallValue(IFormalValue[] formalSubValues, FunctionId functionId)
         {
             _formalSubValues = formalSubValues;
-            _functionIndex = functionIndex;
+            _functionId = functionId;
         }
 
         protected override char DumpShort() { return 'F'; }
 
-        protected override string Dump(bool isRecursion) { return "F" + _functionIndex + "(" + _formalSubValues.Aggregate("", (x, y) => (x == "" ? "" : x + ", ") + y.Dump()) + ")"; }
+        protected override string Dump(bool isRecursion) { return "F" + _functionId + "(" + _formalSubValues.Aggregate("", (x, y) => (x == "" ? "" : x + ", ") + y.Dump()) + ")"; }
     }
 
     sealed class VariableValue : NamedValue

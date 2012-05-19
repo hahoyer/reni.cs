@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -95,7 +98,7 @@ namespace Reni.Context
 
         internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Find(syntax).Data & category; }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == -1 && ObjectId == 1 && category.HasCode;
@@ -113,7 +116,7 @@ namespace Reni.Context
             }
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         ResultCache CreateCacheElement(CompileSyntax syntax)
         {
             var result = new ResultCache((category, isPending) => ObtainResult(category, isPending, syntax));
@@ -121,7 +124,7 @@ namespace Reni.Context
             return result;
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         Result ObtainResult(Category category, bool isPending, CompileSyntax syntax)
         {
             if(isPending)
@@ -223,10 +226,10 @@ namespace Reni.Context
             public string IconKey { get { return "Cache"; } }
         }
 
-        internal Result FunctionalResult(Category category, CompileSyntax getter, CompileSyntax setter, bool isAutoCall)
+        internal Result FunctionalResult(Category category, FunctionSyntax syntax)
         {
             return FindRecentStructure
-                .FunctionalFeature(getter, setter, isAutoCall)
+                .FunctionalFeature(syntax)
                 .Result(category);
         }
 
@@ -236,5 +239,4 @@ namespace Reni.Context
                 .SmartLocalReferenceResult(RefAlignParam);
         }
     }
-
 }
