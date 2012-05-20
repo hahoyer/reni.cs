@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
@@ -46,6 +45,11 @@ namespace Reni.Struct
             _argsType = argsType;
             _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new SetterType(this, refAlignParam));
         }
+
+        [DisableDump]
+        RefAlignParam RefAlignParam { get { return _functionalBodyType.RefAlignParam; } }
+        [DisableDump]
+        TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
         [DisableDump]
         IReferenceInCode ISetterTargetType.ObjectReference
         {
@@ -55,14 +59,36 @@ namespace Reni.Struct
                 return null;
             }
         }
-        Result ISetterTargetType.Result(Category category, TypeBase valueType)
+
+        Result ISetterTargetType.Result(Category category) { return _functionalBodyType.SetterResult(category, _argsType); }
+        Result ISetterTargetType.DestinationResult(Category category)
         {
-            return _functionalBodyType
-                .SetterResult(category, _argsType);
+            NotImplementedMethod(category);
+            return null;
         }
-        TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
-        IConverter IContainerType.Converter() { return this; }
+        [DisableDump]
+        IConverter IContainerType.Converter { get { return this; } }
+        [DisableDump]
         TypeBase IContainerType.Target { get { return ValueType; } }
+        [DisableDump]
+        internal override bool IsDataLess { get { return CodeArgs.IsNone && _argsType.IsDataLess; } }
+        [DisableDump]
+        internal override bool IsLikeReference { get { return true; } }
+        [DisableDump]
+        CodeArgs CodeArgs
+        {
+            get
+            {
+                return _functionalBodyType
+                    .GetCodeArgs(_argsType);
+            }
+        }
+        [DisableDump]
+        TypeBase ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
+        TypeBase IReference.Type { get { return this; } }
+        TypeBase IReference.TargetType { get { return ValueType; } }
+        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+
         Result IConverter.Result(Category category)
         {
             var trace = ObjectId == -6 && category.HasCode;
@@ -81,38 +107,23 @@ namespace Reni.Struct
 
         Result IReference.DereferenceResult(Category category) { return _functionalBodyType.GetterResult(category, _argsType); }
 
-        [DisableDump]
-        internal override bool IsDataLess { get { return CodeArgs.IsNone && _argsType.IsDataLess; } }
-        [DisableDump]
-        internal override bool IsLikeReference { get { return true; } }
-        [DisableDump]
-        CodeArgs CodeArgs
-        {
-            get
-            {
-                return _functionalBodyType
-                    .GetCodeArgs(_argsType);
-            }
-        }
         protected override Size GetSize() { return CodeArgs.Size + _argsType.Size; }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.ChildSearch(this);
-            ValueType.Search(searchVisitor.Child(this));
+            searchVisitor.SearchAtPath(this);
+            searchVisitor.SearchWithPath(ValueType, this);
             searchVisitor.SearchAndConvert(ValueType, this);
             base.Search(searchVisitor);
         }
 
-        TypeBase ValueType { get { return _functionalBodyType.ValueType(_argsType); } }
-
-        internal Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
+        internal Result AssignmentFeatureResult(Category category)
         {
             var result = new Result
                 (category
                  , () => false
-                 , () => refAlignParam.RefSize
-                 , () => _setterTypeCache.Find(refAlignParam)
+                 , () => RefAlignParam.RefSize
+                 , () => _setterTypeCache.Find(RefAlignParam)
                  , ArgCode
                  , CodeArgs.Arg
                 );
@@ -128,8 +139,5 @@ namespace Reni.Struct
                 );
         }
 
-        TypeBase IReference.Type { get { return this; } }
-        TypeBase IReference.TargetType { get { return ValueType; } }
-        RefAlignParam IReference.RefAlignParam { get { return _functionalBodyType.FindRecentStructure.RefAlignParam; } }
     }
 }

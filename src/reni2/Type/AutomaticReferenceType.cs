@@ -90,7 +90,7 @@ namespace Reni.Type
         internal override bool IsArray { get { return ValueType.IsArray; } }
         TypeBase IContainerType.Target { get { return ValueType; } }
 
-        IConverter IContainerType.Converter() { return this; }
+        IConverter IContainerType.Converter { get { return this; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
 
         Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
@@ -103,7 +103,7 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            ValueType.Search(searchVisitor.Child(this));
+            searchVisitor.SearchWithPath(ValueType, this);
             searchVisitor.SearchAndConvert(ValueType, this);
             base.Search(searchVisitor);
         }

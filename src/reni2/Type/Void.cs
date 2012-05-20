@@ -34,7 +34,7 @@ namespace Reni.Type
     {
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.ChildSearch(this);
+            searchVisitor.SearchAtPath(this);
             base.Search(searchVisitor);
         }
         protected override TypeBase ReversePair(TypeBase first) { return first; }
@@ -43,6 +43,6 @@ namespace Reni.Type
         internal override TypeBase Pair(TypeBase second) { return second; }
         internal override string DumpPrintText { get { return "void"; } }
         internal override string DumpShort() { return "void"; }
-        internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Result(category); }
+        internal Result DumpPrintResult(Category category) { return Result(category); }
     }
 }

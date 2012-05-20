@@ -48,13 +48,13 @@ namespace Reni.Feature
     interface IContextFeature : IFeature
     {}
 
-    sealed class Feature : ReniObject, ISuffixFeature
+    sealed class RefAlignedFeature : ReniObject, ISuffixFeature
     {
         [EnableDump]
         readonly Func<Category, RefAlignParam, Result> _function;
         static int _nextObjectId;
 
-        public Feature(Func<Category, RefAlignParam, Result> function)
+        public RefAlignedFeature(Func<Category, RefAlignParam, Result> function)
             : base(_nextObjectId++)
         {
             _function = function;
@@ -64,13 +64,29 @@ namespace Reni.Feature
         Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
     }
 
-    sealed class PrefixFeature : ReniObject, IPrefixFeature, ISuffixFeature
+    sealed class Feature : ReniObject, ISuffixFeature
+    {
+        [EnableDump]
+        readonly Func<Category, Result> _function;
+        static int _nextObjectId;
+
+        public Feature(Func<Category, Result> function)
+            : base(_nextObjectId++)
+        {
+            _function = function;
+            Tracer.Assert(_function.Target is TypeBase);
+        }
+
+        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category); }
+    }
+
+    sealed class RefAlignedPrefixFeature : ReniObject, IPrefixFeature, ISuffixFeature
     {
         [EnableDump]
         readonly Func<Category, RefAlignParam, Result> _function;
         static int _nextObjectId;
 
-        public PrefixFeature(Func<Category, RefAlignParam, Result> function)
+        public RefAlignedPrefixFeature(Func<Category, RefAlignParam, Result> function)
             : base(_nextObjectId++)
         {
             _function = function;

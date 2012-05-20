@@ -1,6 +1,7 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -54,7 +57,7 @@ namespace Reni.Struct
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this);
-            searchVisitor.ChildSearch(this);
+            searchVisitor.SearchAtPath(this);
             base.Search(searchVisitor);
         }
 
@@ -75,6 +78,6 @@ namespace Reni.Struct
         [DisableDump]
         internal override bool IsDataLess { get { return Structure.StructIsDataLess(false) == true; } }
 
-        internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam) { return Structure.DumpPrintResultViaStructReference(category); }
+        internal Result DumpPrintResult(Category category) { return Structure.DumpPrintResultViaStructReference(category); }
     }
 }

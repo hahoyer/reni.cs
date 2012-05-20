@@ -60,11 +60,36 @@ namespace Reni.Struct
 
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var valueType = _target.ValueType ?? argsType;
-            var result = _target
-                .Result(category, valueType)
-                .ReplaceArg(argsType.Conversion(category, valueType.UniqueReference(_refAlignParam).Type));
-            return result;
+            var trace = ObjectId == 16 && category.HasCode;
+            StartMethodDump(trace, category,argsType);
+            try
+            {
+                var valueType = _target.ValueType ?? argsType;
+                
+                Dump("valueType", valueType); 
+                BreakExecution();
+
+                var rawResult = _target.Result(category);
+                
+                Dump("rawResult", rawResult);
+
+                var sourceResult = argsType.Conversion(category, valueType.UniqueReference(_refAlignParam).Type);
+                Dump("sourceResult", sourceResult);
+                var destinationResult = _target.DestinationResult(category.Typed);
+                Dump("destinationResult", destinationResult);
+                var resultForArg = destinationResult + sourceResult;
+                Dump("resultForArg", resultForArg); 
+
+                BreakExecution();
+                
+                var result = rawResult.ReplaceArg(resultForArg);
+                return ReturnMethodDump(result,true);
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
     }
 
@@ -72,6 +97,7 @@ namespace Reni.Struct
     {
         TypeBase ValueType { get; }
         IReferenceInCode ObjectReference { get; }
-        Result Result(Category category, TypeBase valueType);
+        Result Result(Category category);
+        Result DestinationResult(Category category);
     }
 }

@@ -57,12 +57,14 @@ namespace Reni.Struct
         [DisableDump]
         internal override bool IsLikeReference { get { return true; } }
         [DisableDump]
-        RefAlignParam IReferenceInCode.RefAlignParam { get { return _structure.RefAlignParam; } }
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        [DisableDump]
+        internal RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
         [DisableDump]
         internal override IFunctionalFeature FunctionalFeature { get { return this; } }
 
-        protected override Size GetSize() { return _structure.RefAlignParam.RefSize; }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
 
         [DisableDump]
         bool IFunctionalFeature.IsImplicit { get { return _syntax.IsImplicit; } }

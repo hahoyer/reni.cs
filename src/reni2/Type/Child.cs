@@ -49,7 +49,7 @@ namespace Reni.Type
 
             searchVisitor.SearchAndConvert(Parent, this);
         }
-        IConverter IContainerType.Converter() { return this; }
+        IConverter IContainerType.Converter { get { return this; } }
         TypeBase IContainerType.Target { get { return _parent; } }
         Result IConverter.Result(Category category) { return ParentConversionResult(category); }
         protected abstract Result ParentConversionResult(Category category);

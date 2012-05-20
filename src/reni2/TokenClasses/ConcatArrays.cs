@@ -38,8 +38,8 @@ namespace Reni.TokenClasses
         , ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>
         , ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new Feature.Feature(type.ConcatArrays); }
-        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new PrefixFeature(type.CreateArray); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return new Feature.RefAlignedFeature(type.ConcatArrays); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new RefAlignedPrefixFeature(type.CreateArray); }
         ISearchPath<IPrefixFeature, AutomaticReferenceType> ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>.Convert(TypeBase type) { return type.CreateArrayFromReferenceFeature; }
         ISearchPath<ISuffixFeature, AutomaticReferenceType> ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>.Convert(Type.Array type) { return type.ConcatArraysFromReferenceFeature; }
     }

@@ -33,7 +33,7 @@ namespace Reni
 
         internal ConversionFunction(IContainerType containerType)
             : base(_nextObjectId++) { _containerType = containerType; }
-        Result IConversionFunction.Result(Category category) { return _containerType.Converter().Result(category); }
+        Result IConversionFunction.Result(Category category) { return _containerType.Converter.Result(category); }
         public override string NodeDump
         {
             get
@@ -50,7 +50,7 @@ namespace Reni
 
     interface IContainerType
     {
-        IConverter Converter();
+        IConverter Converter { get; }
         TypeBase Target { get; }
     }
 }

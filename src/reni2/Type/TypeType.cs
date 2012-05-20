@@ -53,11 +53,11 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.ChildSearch(this);
+            searchVisitor.SearchAtPath(this);
             base.Search(searchVisitor);
         }
 
-        internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam)
+        internal Result DumpPrintResult(Category category)
         {
             return Void
                 .Result
@@ -66,7 +66,7 @@ namespace Reni.Type
                  , CodeArgs.Void
                 );
         }
-        internal Result Repeat(Category category, RefAlignParam refAlignParam) { return _repeaterType.Result(category); }
+        internal Result Repeat(Category category) { return _repeaterType.Result(category); }
 
         private sealed class RepeaterType : TypeBase, IMetaFeature
         {

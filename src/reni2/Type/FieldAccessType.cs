@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
@@ -92,17 +91,17 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.ChildSearch(this);
+            searchVisitor.SearchAtPath(this);
             base.Search(searchVisitor);
         }
 
-        public Result AssignmentFeatureResult(Category category, RefAlignParam refAlignParam)
+        public Result AssignmentFeatureResult(Category category)
         {
             var result = new Result
                 (category
                  , () => false
-                 , () => refAlignParam.RefSize
-                 , () => _setterTypeCache.Find(refAlignParam)
+                 , () => RefAlignParam.RefSize
+                 , () => _setterTypeCache.Find(RefAlignParam)
                  , ArgCode
                  , CodeArgs.Arg
                 );
@@ -111,36 +110,22 @@ namespace Reni.Type
 
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
 
-        Result ISetterTargetType.Result(Category category, TypeBase valueType)
+        Result ISetterTargetType.Result(Category category)
         {
-            var typedCategory = category.Typed;
-            var sourceResult = valueType
-                .UniqueReference(RefAlignParam)
-                .Type
-                .Conversion(typedCategory, Parent.UniqueReference(RefAlignParam).Type);
-            var destinationResult = DestinationResult(typedCategory);
-            var resultForArg = destinationResult + sourceResult;
-            return AssignmentResult(category).ReplaceArg(resultForArg);
+            return new Result
+                (category
+                 , getType: () => Void
+                 , getCode: AssignmentCode
+                 , getArgs: CodeArgs.Arg
+                );
         }
 
-        Result DestinationResult(Category typedCategory)
+        Result ISetterTargetType.DestinationResult(Category typedCategory)
         {
             return Result
                 (typedCategory
                  , ObjectReference
                  , () => _structure.FieldOffset(_position)
-                );
-        }
-
-        Result AssignmentResult(Category category)
-        {
-            return new Result
-                (category
-                 , () => true
-                 , () => Size.Zero
-                 , () => Void
-                 , AssignmentCode
-                 , CodeArgs.Arg
                 );
         }
 

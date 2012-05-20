@@ -34,7 +34,7 @@
     <Compile Include="Code\None.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ResultCache.cs" />
-    <Compile Include="ChildSearchVisitor.cs" />
+    <Compile Include="PathItemSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
     <Compile Include="Code\Assign.cs" />
     <Compile Include="Code\BinaryOp.cs" />

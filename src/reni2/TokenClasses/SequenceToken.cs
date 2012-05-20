@@ -26,6 +26,6 @@ namespace Reni.TokenClasses
 {
     internal sealed class SequenceToken : Defineable, ISearchPath<IPrefixFeature, Type.Array>
     {
-        IPrefixFeature ISearchPath<IPrefixFeature, Type.Array>.Convert(Type.Array type) { return new PrefixFeature(type.SequenceResult); }
+        IPrefixFeature ISearchPath<IPrefixFeature, Type.Array>.Convert(Type.Array type) { return new RefAlignedPrefixFeature(type.SequenceResult); }
     }
 }

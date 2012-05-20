@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,12 +18,13 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Sequence;
 using Reni.Struct;
 using Reni.Type;
 
@@ -30,23 +32,31 @@ namespace Reni
 {
     abstract class SearchVisitor : ReniObject
     {
-        internal abstract void Search(StructureType structureType);
-        internal abstract void Search();
-
-        internal SearchVisitor Child(SequenceType target) { return InternalChild(target); }
-        internal SearchVisitor Child(AutomaticReferenceType target) { return InternalChild(target); }
-        internal SearchVisitor Child(TextItemType target) { return InternalChild(target); }
-        internal SearchVisitor Child(FunctionAccessType target) { return InternalChild(target); }
-
-        internal void ChildSearch<TType>(TType target)
-            where TType : IDumpShortProvider { InternalChild(target).Search(); }
-
-        protected abstract SearchVisitor InternalChild<TType>(TType target)
+        protected abstract SearchVisitor PathItem<TType>(TType target)
             where TType : IDumpShortProvider;
 
         internal abstract bool IsSuccessFull { get; }
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
-        internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
+        internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] { conversionFunction }).ToArray(); }
+
+        internal abstract void Search(StructureType structureType);
+        internal abstract void Search();
+
+        internal void SearchAtPath<TType>(TType target)
+            where TType : IDumpShortProvider
+        {
+            if(IsSuccessFull)
+                return;
+            PathItem(target).Search();
+        }
+
+        internal void SearchWithPath<TType>(TypeBase childType, TType target)
+            where TType : IDumpShortProvider
+        {
+            if (IsSuccessFull)
+                return;
+            childType.Search(PathItem(target));
+        }
 
         internal void SearchAndConvert(TypeBase searchType, IContainerType containerType)
         {
@@ -74,18 +84,20 @@ namespace Reni
 
         internal void Search(TypeBase typeBase)
         {
-            if(!IsSuccessFull)
-                typeBase.Search(this);
+            if(IsSuccessFull)
+                return;
+            typeBase.Search(this);
         }
 
         internal override void Search(StructureType structureType) { structureType.SearchFeature(this); }
         internal override void Search()
         {
-            if(!IsSuccessFull)
-                InternalResult = Target as TFeature;
+            if(IsSuccessFull)
+                return;
+            InternalResult = Target as TFeature;
         }
 
-        protected override SearchVisitor InternalChild<TType>(TType target) { return new ChildSearchVisitor<TFeature, TType>(this, target); }
+        protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target); }
     }
 
     interface ISearchTarget
