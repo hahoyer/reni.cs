@@ -36,7 +36,7 @@ namespace ReniExe
             }
 
             var p = new CompilerParameters {OutStream = new ConsoleStream()};
-            var c = new Compiler(p, args[0]);
+            var c = new Compiler(p, args[0], "Reni");
             try
             {
                 c.Exec();

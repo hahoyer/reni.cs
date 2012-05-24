@@ -18,13 +18,13 @@ a gcd b = 1;
 c + a = x;
 c - a = y 
 ").Statement;
-            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
+            Tracer.FlaggedLine(FilePositionTag.Test, "Statement: " + statement.SmartDump());
             statement = statement.IsolateAndReplace(3);
-            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
+            Tracer.FlaggedLine(FilePositionTag.Test, "Statement: " + statement.SmartDump());
             statement = statement.IsolateAndReplace(3);
-            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
+            Tracer.FlaggedLine(FilePositionTag.Test, "Statement: " + statement.SmartDump());
             statement = statement.IsolateAndReplace(3);
-            Tracer.FlaggedLine("Statement: " + statement.SmartDump());
+            Tracer.FlaggedLine(FilePositionTag.Test, "Statement: " + statement.SmartDump());
         }
 
         internal static readonly TokenFactory TokenFactory = TokenFactory.Instance;

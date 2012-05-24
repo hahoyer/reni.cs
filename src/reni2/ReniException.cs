@@ -23,8 +23,8 @@ namespace Reni
         {
             var st = new StackTrace(true);
             for(var i = 1; i < st.FrameCount; i++)
-                _l.Add(Tracer.MethodHeader(i, true));
-            Tracer.FlaggedLine(text);
+                _l.Add(Tracer.MethodHeader(i, FilePositionTag.Output, true));
+            Tracer.FlaggedLine(FilePositionTag.Output, text);
             _text = text;
         }
     }

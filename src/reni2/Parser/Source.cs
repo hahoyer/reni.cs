@@ -39,7 +39,7 @@ namespace Reni.Parser
         {
             if(_file == null)
                 return "????";
-            return Tracer.FilePosn(_file.FullName, LineNr(i), ColNr(i) + 1, flagText);
+            return Tracer.FilePosn(_file.FullName, LineNr(i), ColNr(i) + 1, FilePositionTag.Debug) + flagText;
         }
 
         private int LineNr(int iEnd)

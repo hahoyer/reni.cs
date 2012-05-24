@@ -60,7 +60,7 @@ namespace Reni.FeatureTest
 
         void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
-            Tracer.FlaggedLine(depth + 1, "Position of method tested");
+            Tracer.FlaggedLine(depth + 1, FilePositionTag.Test, "Position of method tested");
             if(TestRunner.IsModeErrorFocus || IsCallerUnderConstruction(1))
                 Parameters.Trace.All();
 
@@ -72,7 +72,7 @@ namespace Reni.FeatureTest
         {
             var outStream = new OutStream();
             compilerParameters.OutStream = outStream;
-            var c = new Compiler(compilerParameters, fileName);
+            var c = new Compiler(compilerParameters, fileName, "Reni");
 
             if(expectedResult != null)
             {
