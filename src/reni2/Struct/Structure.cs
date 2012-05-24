@@ -189,7 +189,7 @@ namespace Reni.Struct
                 .SearchFromRefToStruct(target);
         }
 
-        internal Function Function(FunctionSyntax body, TypeBase argsType)
+        internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
         {
             return ContainerContextObject
                 .RootContext
@@ -199,7 +199,9 @@ namespace Reni.Struct
         internal Result AccessViaContextReference(Category category, int position)
         {
             var accessType = UniqueAccessType(position);
-            var result = accessType.Result(category, ContainerContextObject, ContextOffset);
+            var result = accessType
+                .Result(category, ContainerContextObject)
+                .AddToReference(ContextOffset);
             return result;
         }
         Size ContextOffset() { return ContainerContextObject.ContextReferenceOffsetFromAccessPoint(EndPosition) * -1; }
@@ -233,7 +235,7 @@ namespace Reni.Struct
         CodeBase StructReferenceCodeViaContextReference()
         {
             return CodeBase.ReferenceCode(ContainerContextObject)
-                .AddToReference(RefAlignParam, StructSize * -1);
+                .AddToReference(StructSize * -1);
         }
 
         internal TypeBase ValueType(int position)

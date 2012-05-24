@@ -49,6 +49,7 @@ namespace Reni.Sequence
         }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return _refAlignParam; } }
+        Size IReferenceInCode.RefSize{ get { return _refAlignParam.RefSize; } }
         internal override string DumpShort() { return base.DumpShort() + "(" + _objectType.DumpShort() + ")"; }
         internal Result Result(Category category) { return _objectType.ReferenceInCode(category, this); }
         string IDumpShortProvider.DumpShort() { return DumpShort(); }

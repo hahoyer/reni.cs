@@ -33,7 +33,7 @@ namespace Reni.Code
         {
             _data = data.ToArray();
             AssertValid();
-            StopByObjectId(-1);
+            StopByObjectId(-10);
         }
 
         protected override IEnumerable<CodeBase> AsList() { return _data; }

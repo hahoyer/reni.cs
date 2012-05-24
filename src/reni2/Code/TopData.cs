@@ -51,7 +51,7 @@ namespace Reni.Code
     internal sealed class TopFrameData : Top
     {
         public TopFrameData(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
-            : base(refAlignParam, offset, size, dataSize) { StopByObjectId(544); }
+            : base(refAlignParam, offset, size, dataSize) { StopByObjectId(53); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {

@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -25,7 +24,6 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.TokenClasses;
@@ -39,13 +37,11 @@ namespace Reni.Struct
         readonly Structure _structure;
         [EnableDump]
         readonly FunctionSyntax _syntax;
-        readonly DictionaryEx<TypeBase, FunctionAccessType> _functionAccessTypesCache;
 
         public FunctionalBodyType(Structure structure, FunctionSyntax syntax)
         {
             _structure = structure;
             _syntax = syntax;
-            _functionAccessTypesCache = new DictionaryEx<TypeBase, FunctionAccessType>(argsType => new FunctionAccessType(this, argsType));
         }
 
         [DisableDump]
@@ -58,6 +54,7 @@ namespace Reni.Struct
         internal override bool IsLikeReference { get { return true; } }
         [DisableDump]
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
@@ -73,27 +70,16 @@ namespace Reni.Struct
 
         internal CodeArgs GetCodeArgs(TypeBase argsType) { return _structure.Function(_syntax, argsType).CodeArgs - CodeArgs.Arg(); }
 
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
-        {
-            return _functionAccessTypesCache
-                .Find(argsType)
-                .ApplyResult(category);
-        }
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType) { return Function(argsType).ApplyResult(category); }
 
-        internal TypeBase ValueType(TypeBase argsType) { return _structure.Function(_syntax, argsType).ValueType; }
+        internal TypeBase ValueType(TypeBase argsType) { return Function(argsType).ValueType; }
+
+        FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
 
         Result CallResult(Category category, bool isGetter, TypeBase argsType)
         {
-            var instance = _structure.Function(_syntax, argsType).Instance(isGetter);
+            var instance = Function(argsType).Instance(isGetter);
             var result = instance.CallResult(category);
-            if(category.HasArgs)
-                result.CodeArgs = CodeArgs.Arg();
-            if(category.HasCode)
-                result.Code = _functionAccessTypesCache
-                    .Find(argsType)
-                    .ArgCode()
-                    .Call(instance.FunctionId, result.Size);
-
             return result;
         }
 

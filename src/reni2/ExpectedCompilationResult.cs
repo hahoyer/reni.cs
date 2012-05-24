@@ -36,7 +36,7 @@ namespace Reni
 
         public int FunctionCount() { return _compiler.Functions.Count; }
 
-        public int FunctionCount(Func<Function, bool> fd)
+        public int FunctionCount(Func<FunctionType, bool> fd)
         {
             var result = 0;
             for(var i = 0; i < _compiler.Functions.Count; i++)

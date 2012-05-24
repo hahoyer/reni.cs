@@ -45,6 +45,7 @@ namespace Reni.Struct
 
         [DisableDump]
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
 
         internal Container Container { get { return _container; } }
         internal ContextBase Parent { get { return _parent; } }
@@ -110,7 +111,7 @@ namespace Reni.Struct
                 .UniqueStructure(Container, accessPosition)
                 .ReferenceType
                 .ArgCode()
-                .AddToReference(RefAlignParam, ContextReferenceOffsetFromAccessPoint(accessPosition));
+                .AddToReference(ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)

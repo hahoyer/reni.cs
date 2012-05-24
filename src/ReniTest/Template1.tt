@@ -3,10 +3,5 @@
 <#@ output extension=".cs" #>
 <#@ Assembly Name="$(TargetDir)HWClassLibrary.dll" #>
 <#@ Assembly Name="$(TargetDir)Reni.dll" #>
-<#@ import namespace="global::Reni" #>// <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") #> <# 
-var code = new T4Compiler(
-@"
-f: arg/\;g: f(arg)/\;x:4; g(x)dump_print
-").Code(); 
-#>     
-<#= code #>     
+<#@ import namespace="global::Reni" #>// <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") #> 
+<#= new T4Compiler(@"f: arg/\(arg+value)dump_print;f(100) := 2;").Code() #>     

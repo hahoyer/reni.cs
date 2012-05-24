@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Struct;
@@ -87,7 +88,7 @@ namespace Reni.Code
             NotImplementedMethod();
             return null;
         }
-        public string GetCSharpStatements()
+        public string GetCSharpStatements(int indent)
         {
             var generator = new CSharpGenerator(_data.TemporarySize.SaveByteCount);
             try
@@ -98,7 +99,7 @@ namespace Reni.Code
             {
                 Tracer.AssertionFailed("", () => e.Message);
             }
-            return generator.Data;
+            return generator.Data.Indent(indent);
         }
     }
 }

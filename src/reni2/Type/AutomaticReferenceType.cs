@@ -78,7 +78,7 @@ namespace Reni.Type
         {
             return ValueType.Result
                 (category
-                 , () => ArgCode().Dereference(RefAlignParam, ValueType.Size)
+                 , () => ArgCode().Dereference(ValueType.Size)
                  , CodeArgs.Arg
                 );
         }
@@ -113,7 +113,7 @@ namespace Reni.Type
             return UniqueAlign(refAlignParam.AlignBits)
                 .Result
                 (category
-                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
+                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam.RefSize)
                  , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }

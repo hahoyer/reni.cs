@@ -55,7 +55,8 @@ namespace Reni
         /// </summary>
         /// <param name="fileName"> Name of the file. </param>
         /// <param name="parameters"> </param>
-        public Compiler(CompilerParameters parameters, string fileName)
+        /// <param name="className"> </param>
+        public Compiler(CompilerParameters parameters, string fileName, string className)
         {
             _fileName = fileName;
             _parameters = parameters;
@@ -63,7 +64,7 @@ namespace Reni
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
             _functionCode = new SimpleCache<Tuple<CodeBase, CodeBase>[]>(() => Functions.Code);
             _mainContainer = new SimpleCache<Container>(() => new Container(Code, Source.Data));
-            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true));
+            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true, className));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<FunctionContainer>>(() => Functions.Compile());
             _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, OutStream));
@@ -74,9 +75,10 @@ namespace Reni
         ///     Initializes a new instance of the <see cref="Compiler" /> class.
         /// </summary>
         /// <param name="fileName"> Name of the file. </param>
+        /// <param name="className"> </param>
         /// created 14.07.2007 15:59 on HAHOYER-DELL by hh
-        public Compiler(string fileName)
-            : this(new CompilerParameters(), fileName) { }
+        public Compiler(string fileName, string className)
+            : this(new CompilerParameters(), fileName, className) { }
 
         [Node]
         [DisableDump]
@@ -139,7 +141,7 @@ namespace Reni
                 Tracer.Line("Dump Source\n" + Source.Dump());
 
             if(_parameters.Trace.Syntax)
-                Tracer.FlaggedLine("Dump Syntax\n" + Syntax.Dump());
+                Tracer.FlaggedLine(FilePositionTag.Debug, "Syntax\n" + Syntax.Dump());
 
             if(_parameters.ParseOnly)
                 return;
@@ -147,17 +149,17 @@ namespace Reni
             if(_parameters.Trace.Functions)
             {
                 Materialize();
-                Tracer.FlaggedLine("Dump functions, Count = " + Functions.Count);
+                Tracer.FlaggedLine(FilePositionTag.Debug, "functions, Count = " + Functions.Count);
                 for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine(Functions[i].DumpFunction());
+                    Tracer.FlaggedLine(FilePositionTag.Debug, Functions[i].DumpFunction());
             }
 
             if(_parameters.Trace.CodeTree)
             {
-                Tracer.FlaggedLine("Dump CodeTree");
-                Tracer.FlaggedLine("main\n" + Code.Dump());
+                Tracer.FlaggedLine(FilePositionTag.Debug, "CodeTree");
+                Tracer.FlaggedLine(FilePositionTag.Debug, "main\n" + Code.Dump());
                 for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + Functions[i].BodyCode);
+                    Tracer.FlaggedLine(FilePositionTag.Debug, "function index=" + i + "\n" + Functions[i].BodyCode);
             }
 
             if(_parameters.RunFromCode)
@@ -168,17 +170,17 @@ namespace Reni
 
             if(_parameters.Trace.CodeSequence)
             {
-                Tracer.FlaggedLine("main\n" + MainContainer.Dump());
+                Tracer.FlaggedLine(FilePositionTag.Debug, "main\n" + MainContainer.Dump());
                 for(var i = 0; i < FunctionContainers.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + FunctionContainers[i].Dump());
+                    Tracer.FlaggedLine(FilePositionTag.Debug, "function index=" + i + "\n" + FunctionContainers[i].Dump());
             }
             if(_parameters.Trace.ExecutedCode)
-                Tracer.FlaggedLine(ExecutedCode);
+                Tracer.FlaggedLine(FilePositionTag.Debug, ExecutedCode);
 
             Data.OutStream = OutStream;
             try
             {
-                var assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false, _parameters.Trace.GeneratorFilePosn);
+                var assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false, _parameters.Trace.GeneratorFilePosn,"Reni");
                 var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
                 methodInfo.Invoke(null, new object[0]);
             }

@@ -76,7 +76,7 @@ namespace Reni.Type
                     .UniqueReference(refAlignParam)
                     .Type
                     .ArgCode()
-                    .Dereference(refAlignParam, Size * count)
+                    .Dereference(Size * count)
                     .DumpPrintText(Size);
         }
 
@@ -86,7 +86,7 @@ namespace Reni.Type
                 UniqueReference(refAlignParam)
                     .Type
                     .ArgCode()
-                    .Dereference(refAlignParam, Size)
+                    .Dereference(Size)
                     .DumpPrintText(Size);
         }
     }

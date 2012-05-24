@@ -56,7 +56,7 @@ namespace Reni.Context
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
-        internal Struct.Function FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)
+        internal Struct.FunctionType FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)
         {
             var alignedArgsType = argsType.UniqueAlign(DefaultRefAlignParam.AlignBits);
             var functionInstance = _functions.Find(body, structure, alignedArgsType);

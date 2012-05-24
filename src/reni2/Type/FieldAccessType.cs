@@ -46,16 +46,17 @@ namespace Reni.Type
             _position = position;
             _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(rap => new SetterType(this, rap));
         }
+
+        TypeBase ISetterTargetType.ValueType { get { return Parent; } }
+        IReferenceInCode ISetterTargetType.ObjectReference { get { return ObjectReference; } }
+        TypeBase ISetterTargetType.Type { get { return this; } }
+
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
+        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
-        [DisableDump]
-        TypeBase ISetterTargetType.ValueType { get { return Parent; } }
-        [DisableDump]
-        IReferenceInCode ISetterTargetType.ObjectReference { get { return ObjectReference; } }
-        [DisableDump]
-        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        [DisableDump]
-        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
         [DisableDump]
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         [DisableDump]
@@ -74,7 +75,7 @@ namespace Reni.Type
             return UniqueAlign(refAlignParam.AlignBits)
                 .Result
                 (category
-                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam, refAlignParam.RefSize)
+                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam.RefSize)
                  , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }
@@ -82,11 +83,8 @@ namespace Reni.Type
         protected override Result ParentConversionResult(Category category)
         {
             return Parent.SmartReference(RefAlignParam)
-                .Result
-                (category
-                 , () => ArgCode().AddToReference(RefAlignParam, _structure.FieldOffset(_position))
-                 , CodeArgs.Arg
-                );
+                .ArgResult(category)
+                .AddToReference(()=>_structure.FieldOffset(_position));
         }
 
         internal override void Search(SearchVisitor searchVisitor)
@@ -120,13 +118,10 @@ namespace Reni.Type
                 );
         }
 
-        Result ISetterTargetType.DestinationResult(Category typedCategory)
+        Result ISetterTargetType.DestinationResult(Category category)
         {
-            return Result
-                (typedCategory
-                 , ObjectReference
-                 , () => _structure.FieldOffset(_position)
-                );
+            return Result(category, ObjectReference)
+                .AddToReference(() => _structure.FieldOffset(_position));
         }
 
         CodeBase AssignmentCode()

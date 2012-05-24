@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +30,6 @@ using Reni.Type;
 
 namespace Reni.Code
 {
-    /// <summary>
-    ///     Arg is is used as a placeholder.
-    /// </summary>
     sealed class Arg : FiberHead
     {
         static int _nextObjectId;
@@ -47,5 +48,14 @@ namespace Reni.Code
         protected override Size GetSize() { return _type.Size; }
         protected override CodeArgs GetRefsImplementation() { return CodeArgs.Arg(); }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Arg(this); }
+
+        internal override RefAlignParam RefAlignParam
+        {
+            get
+            {
+                var reference = _type as IReference;
+                return reference == null ? null : reference.RefAlignParam;
+            }
+        }
     }
 }

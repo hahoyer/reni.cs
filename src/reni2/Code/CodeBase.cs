@@ -132,19 +132,18 @@ namespace Reni.Code
 
         internal abstract CodeBase CreateFiber(FiberItem subsequentElement);
 
-        internal CodeBase AddToReference(RefAlignParam refAlignParam, Size right)
+        internal CodeBase AddToReference(Size right)
         {
             if(right.IsZero)
                 return this;
-            return CreateFiber(new RefPlus(refAlignParam, right, CallingMethodName));
+            return CreateFiber(new RefPlus(RefAlignParam, right, CallingMethodName));
         }
 
-        internal CodeBase Dereference(RefAlignParam refAlignParam, Size targetSize)
+        internal CodeBase Dereference(Size targetSize)
         {
             if(Size.IsZero && targetSize.IsZero)
                 return this;
-            Tracer.Assert(Size == refAlignParam.RefSize);
-            return CreateFiber(new Dereference(refAlignParam, targetSize, targetSize));
+            return CreateFiber(new Dereference(RefAlignParam, targetSize, targetSize));
         }
 
         internal CodeBase BitCast(Size size)

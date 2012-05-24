@@ -111,7 +111,7 @@ namespace Reni.Type
             {
                 if(i > 0)
                     code = code.Sequence(CodeBase.DumpPrintText(", "));
-                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.AddToReference(refAlignParam, Element.Size * i));
+                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.AddToReference(Element.Size * i));
                 code = code.Sequence(elemCode);
             }
             code = code.Sequence(CodeBase.DumpPrintText("))"));

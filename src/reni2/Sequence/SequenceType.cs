@@ -50,7 +50,7 @@ namespace Reni.Sequence
             return UniqueEnableCutType
                 .Result
                 (category
-                 , () => SmartReference(refAlignParam).ArgCode().Dereference(refAlignParam, Size)
+                 , () => SmartReference(refAlignParam).ArgCode().Dereference(Size)
                  , CodeArgs.Arg
                 );
         }

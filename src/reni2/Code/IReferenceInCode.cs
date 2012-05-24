@@ -28,5 +28,6 @@ namespace Reni.Code
     interface IReferenceInCode : IDumpShortProvider
     {
         RefAlignParam RefAlignParam { get; }
+        Size RefSize { get; }
     }
 }

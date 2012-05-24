@@ -34,6 +34,13 @@ namespace Reni.Type
 {
     interface IFunctionalFeature : IDumpShortProvider
     {
+        /// <summary>
+        /// Result code contains CodeBase.Arg for argsType and ObjectReference for function object, 
+        /// if appropriate
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="argsType"></param>
+        /// <returns></returns>
         Result ApplyResult(Category category, TypeBase argsType);
         [DisableDump]
         bool IsImplicit { get; }

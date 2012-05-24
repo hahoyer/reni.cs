@@ -136,24 +136,22 @@ namespace Reni
                 .Aggregate(CodeBase.Void(), (current, t) => current.Sequence(CodeBase.ReferenceCode(t)));
         }
 
-        internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, RefAlignParam refAlignParam, CodeBase endOfRefsCode)
+        internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, Size refSize, CodeBase endOfRefsCode)
         {
-            StartMethodDump(false, code, refAlignParam, endOfRefsCode);
+            StartMethodDump(false, code, refSize, endOfRefsCode);
             try
             {
-                var reference = endOfRefsCode.AddToReference(refAlignParam, refAlignParam.RefSize * -_data.Count);
+                var reference = endOfRefsCode.AddToReference(refSize * -_data.Count);
                 var result = code;
                 foreach(var referenceInCode in _data)
                 {
                     Dump("reference", reference);
                     BreakExecution();
-                    var unrefAlignment = referenceInCode.RefAlignParam;
-                    Tracer.Assert(unrefAlignment.IsEqual(refAlignParam));
-                    var unrefPtrAlignment = refAlignParam;
-                    var replacement = reference.Dereference(unrefPtrAlignment, unrefAlignment.RefSize);
+                    Tracer.Assert(referenceInCode.RefSize == refSize);
+                    var replacement = reference.Dereference(refSize);
                     result = result.ReplaceAbsolute(referenceInCode, () => replacement);
                     Dump("result", result);
-                    reference = reference.AddToReference(unrefPtrAlignment, unrefPtrAlignment.RefSize);
+                    reference = reference.AddToReference(refSize);
                 }
                 return ReturnMethodDump(result, true);
             }
@@ -168,10 +166,14 @@ namespace Reni
         public static CodeArgs operator -(CodeArgs x, IReferenceInCode y) { return x.Without(y); }
         TreeNode[] ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
-        internal sealed class CodeArg : IReferenceInCode
+        internal sealed class CodeArg : ReniObject, IReferenceInCode
         {
             internal static readonly IReferenceInCode Instance = new CodeArg();
             RefAlignParam IReferenceInCode.RefAlignParam { get { return null; } }
+            Size IReferenceInCode.RefSize { get {
+                NotImplementedMethod();
+                return null;
+            } }
             string IDumpShortProvider.DumpShort() { return "CodeArg"; }
         }
     }

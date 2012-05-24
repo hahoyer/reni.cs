@@ -52,7 +52,7 @@ namespace Reni.Code.ReplaceVisitor
             {
                 if(_offset.IsZero)
                     return ActualArg.Code;
-                return ActualArg.Code.AddToReference(RefAlignParam, Offset);
+                return ActualArg.Code.AddToReference(Offset);
             }
         }
 

@@ -28,13 +28,18 @@ namespace Reni
     public class T4Compiler
     {
         readonly string _text;
-        public T4Compiler(string text) { _text = text; }
+        readonly string _className;
+        public T4Compiler(string text, string className = "Reni")
+        {
+            _text = text;
+            _className = className;
+        }
         public string Code()
         {
             const string fileName = "temptest.reni";
             var f = fileName.FileHandle();
             f.String = _text;
-            var compiler = new Compiler(fileName);
+            var compiler = new Compiler(fileName, _className);
             return compiler.ExecutedCode;
         }
     }

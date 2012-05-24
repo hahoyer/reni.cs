@@ -550,7 +550,7 @@ namespace Reni
             return result;
         }
 
-        internal Result ReplaceRefsForFunctionBody(RefAlignParam refAlignParam, CodeBase replacement)
+        internal Result ReplaceRefsForFunctionBody(Size refSize, CodeBase replacement)
         {
             if(!HasCode)
                 return this;
@@ -558,7 +558,7 @@ namespace Reni
                 return this;
             var result = Clone();
             result.IsDirty = true;
-            result.Code = SmartArgs.ReplaceRefsForFunctionBody(Code, refAlignParam, replacement);
+            result.Code = SmartArgs.ReplaceRefsForFunctionBody(Code, refSize, replacement);
             result.CodeArgs = replacement.CodeArgs;
             result.IsDirty = false;
             return result;
@@ -733,6 +733,17 @@ namespace Reni
                               : CompleteCategory.HasType
                                     ? Type.IsDataLess
                                     : type.IsDataLess;
+        }
+
+        internal Result AddToReference(Func<Size> func) { return Change(code => code.AddToReference(func())); }
+
+        public Result Change(Func<CodeBase, CodeBase> func)
+        {
+            if (!HasCode)
+                return this;
+            var result = Clone();
+            result.Code = func(Code);
+            return result;
         }
     }
 }

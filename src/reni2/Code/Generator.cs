@@ -42,14 +42,14 @@ namespace Reni.Code
         internal static string MainFunctionName { get { return "MainFunction"; } }
         internal static string FunctionName(FunctionId functionId) { return (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index; }
 
-        internal static string CreateCSharpString(Container main, List<FunctionContainer> functions, bool useStatementAligner) { return new CSharp_Generated(main, functions).TransformText(useStatementAligner); }
-        internal static Assembly CreateCSharpAssembly(Container main, List<FunctionContainer> functions, bool align, bool traceFilePosn) { return CodeToAssembly(CreateCSharpString(main, functions, align), traceFilePosn); }
+        internal static string CreateCSharpString(Container main, List<FunctionContainer> functions, bool useStatementAligner, string className) { return new CSharp_Generated(className, main, functions).TransformText(useStatementAligner); }
+        internal static Assembly CreateCSharpAssembly(Container main, List<FunctionContainer> functions, bool align, bool traceFilePosn, string className) { return CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn); }
 
         static void CodeToFile(string name, string result, bool traceFilePosn)
         {
             var streamWriter = new StreamWriter(name);
             if(traceFilePosn)
-                Tracer.Line(Tracer.FilePosn(name.FileHandle().FullName, 0, 0, ""));
+                Tracer.Line(Tracer.FilePosn(name.FileHandle().FullName, 0, 0, FilePositionTag.Debug));
             streamWriter.Write(result);
             streamWriter.Close();
         }
@@ -111,10 +111,12 @@ namespace Reni.Code
     partial class CSharp_Generated
 // ReSharper restore InconsistentNaming
     {
+        readonly string _className;
         readonly Container _main;
         readonly List<FunctionContainer> _functions;
-        internal CSharp_Generated(Container main, List<FunctionContainer> functions)
+        internal CSharp_Generated(string className, Container main, List<FunctionContainer> functions)
         {
+            _className = className;
             _main = main;
             _functions = functions;
         }

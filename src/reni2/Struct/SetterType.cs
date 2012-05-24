@@ -44,6 +44,7 @@ namespace Reni.Struct
         }
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
+        protected override Size GetSize() { return _refAlignParam.RefSize; }
         [DisableDump]
         IReferenceInCode IFunctionalFeature.ObjectReference { get { return _target.ObjectReference; } }
         [DisableDump]
@@ -56,7 +57,6 @@ namespace Reni.Struct
             }
         }
 
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
 
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
         {
@@ -93,10 +93,11 @@ namespace Reni.Struct
         }
     }
 
-    interface ISetterTargetType
+    interface ISetterTargetType: IReferenceInCode
     {
         TypeBase ValueType { get; }
         IReferenceInCode ObjectReference { get; }
+        TypeBase Type { get; }
         Result Result(Category category);
         Result DestinationResult(Category category);
     }

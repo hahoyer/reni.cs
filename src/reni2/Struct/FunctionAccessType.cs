@@ -48,6 +48,7 @@ namespace Reni.Struct
 
         [DisableDump]
         RefAlignParam RefAlignParam { get { return _functionalBodyType.RefAlignParam; } }
+        public Size RefSize { get { throw new NotImplementedException(); } }
         [DisableDump]
         TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
         [DisableDump]
@@ -59,6 +60,7 @@ namespace Reni.Struct
                 return null;
             }
         }
+        public TypeBase Type { get { throw new NotImplementedException(); } }
 
         Result ISetterTargetType.Result(Category category) { return _functionalBodyType.SetterResult(category, _argsType); }
         Result ISetterTargetType.DestinationResult(Category category)
@@ -129,15 +131,8 @@ namespace Reni.Struct
                 );
             return result;
         }
-
-        internal Result ApplyResult(Category category)
+        RefAlignParam IReferenceInCode.RefAlignParam
         {
-            return Result
-                (category
-                 , () => CodeArgs.ToCode().Sequence(_argsType.ArgCode())
-                 , () => CodeArgs + CodeArgs.Arg()
-                );
-        }
-
+            get { return RefAlignParam; } }
     }
 }

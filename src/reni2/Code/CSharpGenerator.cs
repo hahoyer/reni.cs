@@ -71,7 +71,6 @@ namespace Reni.Code
         void IVisitor.Drop(Size beforeSize, Size afterSize) { throw new NotImplementedException(); }
         void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) { throw new NotImplementedException(); }
         void IVisitor.TopData(Size offset, Size size, Size dataSize) { throw new NotImplementedException(); }
-        void IVisitor.TopFrameRef(Size offset) { throw new NotImplementedException(); }
 
         void IVisitor.BitsArray(Size size, BitsConst data) { AddCode("data.Push({0})", data.ByteSequence(size)); }
         void IVisitor.LocalVariableDefinition(string holderName, Size valueSize) { AddCode("var {0} = data.Pull({1})", holderName, valueSize.SaveByteCount); }
@@ -80,6 +79,7 @@ namespace Reni.Code
         void IVisitor.PrintNumber(Size leftSize, Size rightSize) { AddCode("data.Pull({0}).PrintNumber()", leftSize.SaveByteCount); }
         void IVisitor.PrintText(string dumpPrintText) { AddCode("Data.PrintText({0})", dumpPrintText.Quote()); }
         void IVisitor.TopRef(Size offset) { AddCode("data.Push(data.Address({0}))", offset.SaveByteCount); }
+        void IVisitor.TopFrameRef(Size offset) { AddCode("data.Push(frame.Address({0}))", offset.SaveByteCount); }
         void IVisitor.Assign(Size targetSize) { AddCode("data.Assign({0})", targetSize.SaveByteCount); }
         void IVisitor.BitCast(Size size, Size targetSize, Size significantSize) { AddCode("data.Push(data.Pull({0}).BitCast({1}).BitCast({2}))", targetSize.SaveByteCount, significantSize.ToInt(), size.ToInt()); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) { AddCode("data.Pull({0}).PrintText({1})", leftSize.SaveByteCount, itemSize.SaveByteCount); }

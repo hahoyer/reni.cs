@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -172,7 +171,7 @@ namespace Reni.Type
         internal Result ArgResult(Category category) { return Result(category, ArgCode, CodeArgs.Arg); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
         internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type.ArgResult(category); }
-        internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type.ArgCode().Dereference(refAlignParam, Size); }
+        internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type.ArgCode().Dereference(Size); }
 
         internal Result Result(Category category)
         {
@@ -183,7 +182,7 @@ namespace Reni.Type
                     , CodeArgs.Void);
         }
 
-        internal Result Result(Category category, IReferenceInCode target, Func<Size> getOffset)
+        internal Result Result(Category category, IReferenceInCode target)
         {
             if(IsDataLess)
                 return Result(category);
@@ -192,7 +191,7 @@ namespace Reni.Type
                  , () => false
                  , () => target.RefAlignParam.RefSize
                  , () => this
-                 , () => CodeBase.ReferenceCode(target).AddToReference(target.RefAlignParam, getOffset())
+                 , () => CodeBase.ReferenceCode(target)
                  , () => CodeArgs.Create(target));
         }
 
@@ -318,7 +317,7 @@ namespace Reni.Type
         {
             return UniqueReference(target.RefAlignParam)
                 .Type
-                .Result(category, target, () => Size.Zero);
+                .Result(category, target);
         }
 
         internal Result OperationResult<TFeature>(Category category, ISearchTarget target, RefAlignParam refAlignParam)
@@ -442,5 +441,35 @@ namespace Reni.Type
         }
 
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
+
+        protected Result AssignmentResult(Category category, TypeBase argsType, ISetterTargetType target)
+        {
+            var trace = ObjectId == -9 && category.HasCode;
+            StartMethodDump(trace, category, argsType, target);
+            try
+            {
+                var sourceResult = argsType.Conversion(category, target.ValueType.UniqueReference(target.RefAlignParam).Type);
+                var destinationResult = target
+                    .DestinationResult(category.Typed)
+                    .ReplaceArg(target.Type.Result(category.Typed, target));
+                ;
+                var resultForArg = destinationResult + sourceResult;
+                Dump("resultForArg", resultForArg);
+
+                BreakExecution();
+
+                var rawResult = target.Result(category);
+                Dump("rawResult", rawResult);
+
+                BreakExecution();
+
+                var result = rawResult.ReplaceArg(resultForArg);
+                return ReturnMethodDump(result, true);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
     }
 }

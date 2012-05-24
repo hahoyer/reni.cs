@@ -30,9 +30,9 @@ namespace Reni.TokenClasses
     sealed class Assignment
         : Defineable
           , ISearchPath<ISuffixFeature, FieldAccessType>
-          , ISearchPath<ISuffixFeature, FunctionAccessType>
+          , ISearchPath<ISuffixFeature, FunctionType>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, FieldAccessType>.Convert(FieldAccessType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, FunctionAccessType>.Convert(FunctionAccessType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
     }
 }

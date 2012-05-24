@@ -170,7 +170,9 @@
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\FunctionAccessType.cs" />
     <Compile Include="Struct\FunctionalBodyType.cs" />
-    <Compile Include="Struct\Function.cs" />
+    <Compile Include="Struct\FunctionType.cs" />
+    <Compile Include="Struct\GetterFunctionType.cs" />
+    <Compile Include="Struct\SetterFunctionType.cs" />
     <Compile Include="Struct\SetterType.cs" />
     <Compile Include="Struct\Structure.cs" />
     <Compile Include="Struct\StructureType.cs" />

@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -49,20 +48,24 @@ namespace Reni.Context
             : base(parent) { ArgsType = argsType; }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
 
         internal override IFunctionContext ObtainRecentFunctionContext() { return this; }
 
         Result IFunctionContext.CreateArgReferenceResult(Category category)
         {
             return ArgsType
-                .ReferenceInCode(category, this);
+                .ReferenceInCode(category, this)
+                .AddToReference(() => ArgsType.Size * -1);
         }
 
         Result IFunctionContext.CreateValueReferenceResult(Category category)
         {
             if(ValueType == null)
                 throw new ValueCannotBeUsedHereException();
-            return ValueType.ReferenceInCode(category, this);
+            return ValueType
+                .ReferenceInCode(category, this)
+                .AddToReference(() => (ArgsType.Size + ValueType.Size) * -1);
         }
     }
 

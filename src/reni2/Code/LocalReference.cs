@@ -47,6 +47,7 @@ namespace Reni.Code
         }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
 
         [DisableDump]
         internal override bool IsRelativeReference { get { return false; } }
@@ -56,7 +57,7 @@ namespace Reni.Code
 
         internal CodeBase Code { get { return _unalignedCode.Align(RefAlignParam.AlignBits); } }
 
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
         protected override CodeArgs GetRefsImplementation() { return _unalignedCode.CodeArgs + DestructorCode.CodeArgs; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
 
