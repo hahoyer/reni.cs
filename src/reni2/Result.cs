@@ -55,20 +55,26 @@ namespace Reni
         internal Result(Category category, Func<bool> getDataLess = null, Func<Size> getSize = null, Func<TypeBase> getType = null, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
             : this()
         {
-            if(category.HasSize)
-            {
-                Tracer.Assert(getSize != null);
-                _size = getSize();
-            }
-            if(category.HasType)
+            if (category.HasType)
             {
                 Tracer.Assert(getType != null);
                 _type = getType();
             }
-            if(category.HasCode)
+            if (category.HasCode)
             {
                 Tracer.Assert(getCode != null);
                 _code = getCode();
+            }
+            if (category.HasSize)
+            {
+                if (getSize != null)
+                    _size = getSize();
+                else if (_type != null)
+                    _size = _type.Size;
+                else if (_code != null)
+                    _size = _code.Size;
+                else 
+                    Tracer.AssertionFailed("Size cannot be determned", ToString);
             }
             if(category.HasArgs)
             {
@@ -77,8 +83,16 @@ namespace Reni
             }
             if(category.HasIsDataLess)
             {
-                Tracer.Assert(getDataLess != null);
+                if(getDataLess != null)
                 _isDataLess = getDataLess();
+                else if (_size != null)
+                    _isDataLess = _size.IsZero;
+                else if (_type != null)
+                    _isDataLess = _type.IsDataLess;
+                else if (_code != null)
+                    _isDataLess = _code.IsEmpty;
+                else
+                Tracer.AssertionFailed("Datalessness cannot be determned", ToString);
             }
             AssertValid();
         }

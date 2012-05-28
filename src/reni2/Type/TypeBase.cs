@@ -323,7 +323,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, ISearchTarget target, RefAlignParam refAlignParam)
             where TFeature : class, ITypeFeature
         {
-            var trace = ObjectId == -12 && target.GetObjectId() == 17 && category.HasCode;
+            var trace = ObjectId == 10 && target.GetObjectId() == 34 && category.HasCode;
             StartMethodDump(trace, category, target, refAlignParam);
             try
             {
@@ -364,7 +364,8 @@ namespace Reni.Type
                 .BitSequenceOperation(token, Size);
         }
 
-        internal Result GenericDumpPrintResult(Category category, RefAlignParam refAlignParam) { return OperationResult<ISuffixFeature>(category, DumpPrintToken.Create(), refAlignParam); }
+        internal Result GenericDumpPrintResult(Category category, RefAlignParam refAlignParam) { return OperationResult<ISuffixFeature>(category, _dumpPrintToken.Value, refAlignParam); }
+        private static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create); 
 
         internal Result CreateArray(Category category, RefAlignParam refAlignParam)
         {

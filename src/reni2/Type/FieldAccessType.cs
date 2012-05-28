@@ -83,8 +83,7 @@ namespace Reni.Type
         protected override Result ParentConversionResult(Category category)
         {
             return Parent.SmartReference(RefAlignParam)
-                .ArgResult(category)
-                .AddToReference(()=>_structure.FieldOffset(_position));
+                .Result(category, ArgResult(category.Typed).AddToReference(()=>_structure.FieldOffset(_position)));
         }
 
         internal override void Search(SearchVisitor searchVisitor)
