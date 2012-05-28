@@ -65,7 +65,6 @@ namespace Reni.Struct
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
 
         [Node]
-        [DisableDump]
         internal TypeBase ValueType { get { return _getter.ReturnType; } }
 
         [Node]

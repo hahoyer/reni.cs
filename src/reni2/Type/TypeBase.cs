@@ -444,7 +444,7 @@ namespace Reni.Type
 
         protected Result AssignmentResult(Category category, TypeBase argsType, ISetterTargetType target)
         {
-            var trace = ObjectId == -9 && category.HasCode;
+            var trace = ObjectId == 9 && category.HasCode;
             StartMethodDump(trace, category, argsType, target);
             try
             {
