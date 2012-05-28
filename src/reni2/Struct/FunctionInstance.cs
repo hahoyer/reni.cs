@@ -69,7 +69,6 @@ namespace Reni.Struct
         protected abstract FunctionId FunctionId { get; }
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         protected abstract ContextBase Context { get; }
-        abstract protected TypeBase CallObjectType { get; }
 
         internal Code.Container Serialize()
         {
@@ -92,7 +91,7 @@ namespace Reni.Struct
             if(category.HasArgs)
                 result.CodeArgs = CodeArgs.Arg();
             if(category.HasCode)
-                result.Code = CallObjectType.ArgCode()
+                result.Code = Parent.ArgCode()
                     .Call(FunctionId, result.Size);
             return result;
         }
@@ -102,7 +101,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == 0 && !FunctionId.IsGetter && category.HasCode;
+            var trace = FunctionId.Index == 0 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {

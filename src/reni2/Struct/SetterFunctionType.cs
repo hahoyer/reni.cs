@@ -45,7 +45,6 @@ namespace Reni.Struct
         protected override FunctionId FunctionId { get { return _functionId; } }
         protected override ContextBase Context { get { return Parent.SetterContext; } }
         protected override Size FrameSize { get { return base.FrameSize + RefAlignParam.RefSize; } }
-        protected override TypeBase CallObjectType { get { return Parent.Pair(Parent.ValueType.UniqueReference(RefAlignParam).Type); } }
 
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType) { return AssignmentResult(category, argsType, Parent); }
         bool IFunctionalFeature.IsImplicit { get { return Parent.IsImplicit; } }
