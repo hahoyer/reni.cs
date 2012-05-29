@@ -76,11 +76,7 @@ namespace Reni.Type
                 return "ObjectId=" + ObjectId;
             return GetType().PrettyName() + "(" + Element.Dump() + ", " + Count + ")";
         }
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, ()=>Element);
-            base.Search(searchVisitor);
-        }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Element); }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + ")array(" + Count + ")"; }
 

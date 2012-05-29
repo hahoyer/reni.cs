@@ -54,7 +54,6 @@ namespace Reni.Type
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, null);
-            base.Search(searchVisitor);
         }
 
         internal Result DumpPrintResult(Category category)
@@ -74,7 +73,8 @@ namespace Reni.Type
             public RepeaterType(TypeType typeType) { _typeType = typeType; }
 
             internal override bool IsDataLess { get { return true; } }
-            
+            internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
+
             Result IMetaFeature.ApplyResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
             {
                 var count = right

@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -72,5 +71,6 @@ namespace Reni.Type
                 return null;
             }
         }
+        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
     }
 }

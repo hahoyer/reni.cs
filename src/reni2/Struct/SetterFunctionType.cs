@@ -49,5 +49,6 @@ namespace Reni.Struct
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType) { return AssignmentResult(category, argsType, Parent); }
         bool IFunctionalFeature.IsImplicit { get { return Parent.IsImplicit; } }
         IReferenceInCode IFunctionalFeature.ObjectReference { get { return Parent; } }
+        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
     }
 }

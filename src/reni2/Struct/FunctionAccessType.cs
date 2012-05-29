@@ -111,11 +111,7 @@ namespace Reni.Struct
 
         protected override Size GetSize() { return CodeArgs.Size + _argsType.Size; }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, ()=>ValueType);
-            base.Search(searchVisitor);
-        }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => ValueType); }
 
         internal Result AssignmentFeatureResult(Category category)
         {
@@ -129,8 +125,6 @@ namespace Reni.Struct
                 );
             return result;
         }
-        RefAlignParam IReferenceInCode.RefAlignParam
-        {
-            get { return RefAlignParam; } }
+        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
     }
 }

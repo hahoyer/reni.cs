@@ -290,7 +290,7 @@ namespace Reni.Type
             return visitor.SearchResult;
         }
 
-        internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(); }
+        internal abstract void Search(SearchVisitor searchVisitor);
 
         internal virtual Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {

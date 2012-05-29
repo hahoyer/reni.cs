@@ -32,11 +32,7 @@ namespace Reni.Type
     [Serializable]
     sealed class Void : TypeBase
     {
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this,null);
-            base.Search(searchVisitor);
-        }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
         protected override TypeBase ReversePair(TypeBase first) { return first; }
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }

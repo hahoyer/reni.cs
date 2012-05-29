@@ -1,6 +1,7 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -36,11 +39,7 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount(TypeBase elementType) { return 1; }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, null);
-            base.Search(searchVisitor);
-        }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
 
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
 

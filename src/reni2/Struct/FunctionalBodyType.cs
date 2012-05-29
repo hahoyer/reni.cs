@@ -52,6 +52,7 @@ namespace Reni.Struct
         internal override bool IsDataLess { get { return _structure.IsDataLess; } }
         [DisableDump]
         internal override bool IsLikeReference { get { return true; } }
+        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
         [DisableDump]
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
         Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }

@@ -65,7 +65,7 @@ namespace Reni.Struct
 
         Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        
+
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
 
         internal TypeBase ValueType { get { return _getter.ReturnType; } }
@@ -101,7 +101,7 @@ namespace Reni.Struct
         internal ContextBase SetterContext { get { return _structure.UniqueContext.UniqueFunctionContext(ArgsType, ValueType); } }
 
         Result ISetterTargetType.Result(Category category) { return _setter.CallResult(category); }
-        
+
         Result ISetterTargetType.DestinationResult(Category category) { return Result(category, this); }
 
         protected override Size GetSize() { return CodeArgs.Size + ArgsType.Size; }
@@ -169,10 +169,6 @@ namespace Reni.Struct
             return result;
         }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, ()=>ValueType);
-            base.Search(searchVisitor);
-        }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => ValueType); }
     }
 }

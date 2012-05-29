@@ -91,6 +91,7 @@ namespace Reni.Struct
                 EndMethodDump();
             }
         }
+        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
     }
 
     interface ISetterTargetType: IReferenceInCode

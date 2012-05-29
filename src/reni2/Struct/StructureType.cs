@@ -54,11 +54,7 @@ namespace Reni.Struct
 
         internal override string DumpShort() { return "type(" + Structure.DumpShort() + ")"; }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, null);
-            base.Search(searchVisitor);
-        }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
 
         internal void SearchFeature<TFeature>(SearchVisitor<TFeature> searchVisitor) where TFeature : class
         {

@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,12 +18,13 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -99,13 +101,9 @@ namespace Reni.Type
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
         [DisableDump]
-        internal override TypeBase TypeForTypeOperator{get { return ValueType.TypeForTypeOperator; }}
+        internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, ()=>ValueType);
-            base.Search(searchVisitor);
-        }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => ValueType); }
 
         internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
         {
@@ -151,6 +149,5 @@ namespace Reni.Type
                 new FunctionalConverter(DereferenceResult)
                     .Concat(ValueType.Converter(conversionParameter, destination));
         }
-
     }
 }

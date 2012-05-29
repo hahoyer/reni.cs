@@ -44,5 +44,6 @@ namespace Reni.Struct
         internal TypeBase ReturnType { get { return ApplyResult(Category.Type).Type; } }
         protected override FunctionId FunctionId { get { return _functionId; } }
         protected override ContextBase Context { get { return Parent.GetterContext; } }
+        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
     }
 }
