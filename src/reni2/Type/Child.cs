@@ -27,7 +27,7 @@ using Reni.Basics;
 namespace Reni.Type
 {
     [Serializable]
-    abstract class Child<TParent> : TypeBase, IContainerType, IConverter
+    abstract class Child<TParent> : TypeBase, ISearchContainerType, IConverter
         where TParent : TypeBase
     {
         readonly TParent _parent;
@@ -43,14 +43,11 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
+            searchVisitor.Search(this, ()=>Parent);
             base.Search(searchVisitor);
-            if(searchVisitor.IsSuccessFull)
-                return;
-
-            searchVisitor.SearchAndConvert(Parent, this);
         }
-        IConverter IContainerType.Converter { get { return this; } }
-        TypeBase IContainerType.Target { get { return _parent; } }
+        IConverter ISearchContainerType.Converter { get { return this; } }
+        TypeBase ISearchContainerType.Target { get { return _parent; } }
         Result IConverter.Result(Category category) { return ParentConversionResult(category); }
         protected abstract Result ParentConversionResult(Category category);
     }

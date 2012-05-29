@@ -37,11 +37,15 @@ namespace Reni.Struct
     sealed class FunctionType : TypeBase, ISetterTargetType
     {
         readonly int _index;
+        [Node]
         readonly Structure _structure;
+        [Node]
         internal readonly TypeBase ArgsType;
         internal readonly bool IsImplicit;
+        [Node]
         readonly SetterFunctionType _setter;
         [NotNull]
+        [Node]
         readonly GetterFunctionType _getter;
 
         internal FunctionType(int index, FunctionSyntax body, Structure structure, TypeBase argsType)
@@ -64,7 +68,6 @@ namespace Reni.Struct
         
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
 
-        [Node]
         internal TypeBase ValueType { get { return _getter.ReturnType; } }
 
         [Node]
@@ -168,8 +171,7 @@ namespace Reni.Struct
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.SearchAtPath(this);
-            searchVisitor.SearchWithPath(ValueType, this);
+            searchVisitor.Search(this, ()=>ValueType);
             base.Search(searchVisitor);
         }
     }

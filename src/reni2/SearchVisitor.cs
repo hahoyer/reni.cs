@@ -24,6 +24,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Struct;
 using Reni.Type;
@@ -37,36 +38,37 @@ namespace Reni
 
         internal abstract bool IsSuccessFull { get; }
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
-        internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] { conversionFunction }).ToArray(); }
+        internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
 
         internal abstract void Search(StructureType structureType);
         internal abstract void Search();
 
-        internal void SearchAtPath<TType>(TType target)
+        internal void Search<TType>(TType target, Func<TypeBase> getChild)
             where TType : IDumpShortProvider
         {
             if(IsSuccessFull)
                 return;
-            PathItem(target).Search();
-        }
-
-        internal void SearchWithPath<TType>(TypeBase childType, TType target)
-            where TType : IDumpShortProvider
-        {
-            if (IsSuccessFull)
-                return;
-            childType.Search(PathItem(target));
-        }
-
-        internal void SearchAndConvert(TypeBase searchType, IContainerType containerType)
-        {
+            var pathItemVisitor = PathItem(target);
+            pathItemVisitor.Search();
             if(IsSuccessFull)
                 return;
-            searchType.Search(this);
+
+            if(getChild == null)
+                return;
+
+            var child = getChild();
+            child.Search(pathItemVisitor);
+            if(IsSuccessFull)
+                return;
+
+            var isc = target as ISearchContainerType;
+            if(isc == null)
+                return;
+            child.Search(this);
+
             if(!IsSuccessFull)
                 return;
-
-            Add(new ConversionFunction(containerType));
+            Add(new ConversionFunction(isc));
         }
     }
 
@@ -78,9 +80,14 @@ namespace Reni
     abstract class SearchVisitor<TFeature> : SearchVisitor
         where TFeature : class
     {
+        readonly List<System.Type> _probe;
+
+        protected SearchVisitor(List<System.Type> probe) { _probe = probe; }
+
         internal abstract TFeature InternalResult { set; }
         internal abstract ISearchTarget Target { get; }
 
+        internal List<System.Type> Probe { get { return _probe; } }
 
         internal void Search(TypeBase typeBase)
         {
@@ -94,7 +101,13 @@ namespace Reni
         {
             if(IsSuccessFull)
                 return;
+            AddProbe(typeof(TFeature));
             InternalResult = Target as TFeature;
+        }
+        void AddProbe(System.Type testType)
+        {
+            Tracer.Assert(!_probe.Contains(testType), "Target=" + Target + "\nProbe=" + Tracer.Dump(_probe) + "\ntestType=" + testType.PrettyName());
+            _probe.Add(testType);
         }
 
         protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target); }

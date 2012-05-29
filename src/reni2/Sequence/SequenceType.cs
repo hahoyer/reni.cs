@@ -91,7 +91,7 @@ namespace Reni.Sequence
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.SearchWithPath(Element, this);
+            searchVisitor.Search(this, ()=>Element);
             base.Search(searchVisitor);
         }
 

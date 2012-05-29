@@ -29,26 +29,26 @@ namespace Reni
     sealed class ConversionFunction : ReniObject, IConversionFunction
     {
         static int _nextObjectId;
-        readonly IContainerType _containerType;
+        readonly ISearchContainerType _searchContainerType;
 
-        internal ConversionFunction(IContainerType containerType)
-            : base(_nextObjectId++) { _containerType = containerType; }
-        Result IConversionFunction.Result(Category category) { return _containerType.Converter.Result(category); }
+        internal ConversionFunction(ISearchContainerType searchContainerType)
+            : base(_nextObjectId++) { _searchContainerType = searchContainerType; }
+        Result IConversionFunction.Result(Category category) { return _searchContainerType.Converter.Result(category); }
         public override string NodeDump
         {
             get
             {
                 return base.NodeDump 
                     + "[" 
-                    + ((ReniObject) _containerType).NodeDump 
+                    + ((ReniObject) _searchContainerType).NodeDump 
                     + "=>" 
-                    + _containerType.Target.NodeDump 
+                    + _searchContainerType.Target.NodeDump 
                     + "]";
             }
         }
     }
 
-    interface IContainerType
+    interface ISearchContainerType
     {
         IConverter Converter { get; }
         TypeBase Target { get; }

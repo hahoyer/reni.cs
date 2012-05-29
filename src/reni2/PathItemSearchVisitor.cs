@@ -39,6 +39,7 @@ namespace Reni
         readonly TType _target;
 
         public PathItemSearchVisitor(SearchVisitor<TFeature> parent, TType target)
+            : base(parent.Probe)
         {
             _parent = parent;
             _target = target;

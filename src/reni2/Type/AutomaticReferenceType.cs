@@ -27,7 +27,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class AutomaticReferenceType : TypeBase, IContainerType, IConverter, IReference
+    sealed class AutomaticReferenceType : TypeBase, ISearchContainerType, IConverter, IReference
     {
         readonly TypeBase _valueType;
         readonly RefAlignParam _refAlignParam;
@@ -88,9 +88,9 @@ namespace Reni.Type
         internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
         [DisableDump]
         internal override bool IsArray { get { return ValueType.IsArray; } }
-        TypeBase IContainerType.Target { get { return ValueType; } }
+        TypeBase ISearchContainerType.Target { get { return ValueType; } }
 
-        IConverter IContainerType.Converter { get { return this; } }
+        IConverter ISearchContainerType.Converter { get { return this; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
 
         Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
@@ -103,8 +103,7 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.SearchWithPath(ValueType, this);
-            searchVisitor.SearchAndConvert(ValueType, this);
+            searchVisitor.Search(this, ()=>ValueType);
             base.Search(searchVisitor);
         }
 

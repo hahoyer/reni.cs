@@ -31,7 +31,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionAccessType : TypeBase, ISetterTargetType, IContainerType, IConverter, IReference
+    sealed class FunctionAccessType : TypeBase, ISetterTargetType, ISearchContainerType, IConverter, IReference
     {
         [EnableDump]
         readonly FunctionalBodyType _functionalBodyType;
@@ -69,9 +69,9 @@ namespace Reni.Struct
             return null;
         }
         [DisableDump]
-        IConverter IContainerType.Converter { get { return this; } }
+        IConverter ISearchContainerType.Converter { get { return this; } }
         [DisableDump]
-        TypeBase IContainerType.Target { get { return ValueType; } }
+        TypeBase ISearchContainerType.Target { get { return ValueType; } }
         [DisableDump]
         internal override bool IsDataLess { get { return CodeArgs.IsNone && _argsType.IsDataLess; } }
         [DisableDump]
@@ -113,9 +113,7 @@ namespace Reni.Struct
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.SearchAtPath(this);
-            searchVisitor.SearchWithPath(ValueType, this);
-            searchVisitor.SearchAndConvert(ValueType, this);
+            searchVisitor.Search(this, ()=>ValueType);
             base.Search(searchVisitor);
         }
 

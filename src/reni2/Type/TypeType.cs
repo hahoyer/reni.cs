@@ -53,7 +53,7 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.SearchAtPath(this);
+            searchVisitor.Search(this, null);
             base.Search(searchVisitor);
         }
 
