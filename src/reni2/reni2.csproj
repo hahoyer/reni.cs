@@ -168,7 +168,6 @@
     <Compile Include="Sequence\Star.cs" />
     <Compile Include="Struct\ContainerContextObject.cs" />
     <Compile Include="Struct\Context.cs" />
-    <Compile Include="Struct\FunctionAccessType.cs" />
     <Compile Include="Struct\FunctionalBodyType.cs" />
     <Compile Include="Struct\FunctionType.cs" />
     <Compile Include="Struct\GetterFunctionType.cs" />

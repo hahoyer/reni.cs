@@ -46,8 +46,6 @@ namespace Reni
         internal void Search<TType>(TType target, Func<TypeBase> getChild)
             where TType : IDumpShortProvider
         {
-            if(IsSuccessFull)
-                return;
             var pathItemVisitor = PathItem(target);
             pathItemVisitor.Search();
             if(IsSuccessFull)
@@ -91,16 +89,13 @@ namespace Reni
 
         internal void Search(TypeBase typeBase)
         {
-            if(IsSuccessFull)
-                return;
             typeBase.Search(this);
         }
 
         internal override void Search(StructureType structureType) { structureType.SearchFeature(this); }
         internal override void Search()
         {
-            if(IsSuccessFull)
-                return;
+            Tracer.Assert(!IsSuccessFull);
             AddProbe(typeof(TFeature));
             InternalResult = Target as TFeature;
         }

@@ -32,10 +32,10 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class SetterFunctionType : FunctionInstanceType, IFunctionalFeature
+    sealed class SetterFunction : FunctionInstance, IFunctionalFeature
     {
         readonly FunctionId _functionId;
-        public SetterFunctionType(FunctionType parent, int index, CompileSyntax body)
+        public SetterFunction(FunctionType parent, int index, CompileSyntax body)
             : base(parent, body)
         {
             _functionId = FunctionId
@@ -46,9 +46,10 @@ namespace Reni.Struct
         protected override ContextBase Context { get { return Parent.SetterContext; } }
         protected override Size FrameSize { get { return base.FrameSize + RefAlignParam.RefSize; } }
 
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType) { return AssignmentResult(category, argsType, Parent); }
+        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType) { return SetterType.AssignmentResult(category, argsType,Parent); }
         bool IFunctionalFeature.IsImplicit { get { return Parent.IsImplicit; } }
         IReferenceInCode IFunctionalFeature.ObjectReference { get { return Parent; } }
-        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
+        
+        string IDumpShortProvider.DumpShort() { return _functionId.ToString(); }
     }
 }

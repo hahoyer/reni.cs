@@ -31,10 +31,10 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class GetterFunctionType : FunctionInstanceType
+    sealed class GetterFunction : FunctionInstance
     {
         readonly FunctionId _functionId;
-        public GetterFunctionType(FunctionType parent, int index, CompileSyntax body)
+        public GetterFunction(FunctionType parent, int index, CompileSyntax body)
             : base(parent, body)
         {
             _functionId = FunctionId
@@ -44,6 +44,5 @@ namespace Reni.Struct
         internal TypeBase ReturnType { get { return ApplyResult(Category.Type).Type; } }
         protected override FunctionId FunctionId { get { return _functionId; } }
         protected override ContextBase Context { get { return Parent.GetterContext; } }
-        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
     }
 }

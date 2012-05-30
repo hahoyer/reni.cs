@@ -37,19 +37,20 @@ namespace Reni.Type
         readonly Structure _structure;
         [EnableDump]
         readonly int _position;
-        readonly DictionaryEx<RefAlignParam, TypeBase> _setterTypeCache;
+        readonly SimpleCache<SetterType> _setterTypeCache;
 
         internal FieldAccessType(Structure structure, int position)
             : base(structure.ValueType(position))
         {
             _structure = structure;
             _position = position;
-            _setterTypeCache = new DictionaryEx<RefAlignParam, TypeBase>(rap => new SetterType(this, rap));
+            _setterTypeCache = new SimpleCache<SetterType>(() => new SetterType(this));
         }
 
         TypeBase ISetterTargetType.ValueType { get { return Parent; } }
         IReferenceInCode ISetterTargetType.ObjectReference { get { return ObjectReference; } }
         TypeBase ISetterTargetType.Type { get { return this; } }
+        SetterType ISetterTargetType.SetterType { get { return _setterTypeCache.Value; } }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
         Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
@@ -90,19 +91,6 @@ namespace Reni.Type
         {
             searchVisitor.Search(this, ()=>Parent);
             base.Search(searchVisitor);
-        }
-
-        public Result AssignmentFeatureResult(Category category)
-        {
-            var result = new Result
-                (category
-                 , () => false
-                 , () => RefAlignParam.RefSize
-                 , () => _setterTypeCache.Find(RefAlignParam)
-                 , ArgCode
-                 , CodeArgs.Arg
-                );
-            return result;
         }
 
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }

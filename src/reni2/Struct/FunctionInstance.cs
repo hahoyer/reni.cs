@@ -34,7 +34,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    abstract class FunctionInstanceType : TypeBase
+    abstract class FunctionInstance : ReniObject
     {
         protected readonly FunctionType Parent;
         [Node]
@@ -43,7 +43,7 @@ namespace Reni.Struct
 
         readonly SimpleCache<CodeBase> _bodyCodeCache;
 
-        protected FunctionInstanceType(FunctionType parent, CompileSyntax body)
+        protected FunctionInstance(FunctionType parent, CompileSyntax body)
         {
             _body = body;
             Parent = parent;
@@ -65,9 +65,9 @@ namespace Reni.Struct
         [DisableDump]
         internal CodeArgs CodeArgs { get { return ApplyResult(Category.CodeArgs).CodeArgs; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return false; } }
+        internal bool IsDataLess { get { return false; } }
         protected abstract FunctionId FunctionId { get; }
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        protected Size GetSize() { return RefAlignParam.RefSize; }
         protected abstract ContextBase Context { get; }
 
         internal Code.Container Serialize()

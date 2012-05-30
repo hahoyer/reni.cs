@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -34,7 +35,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionType : TypeBase, ISetterTargetType
+    sealed class FunctionType : TypeBase, ISetterTargetType, ISearchContainerType, IConverter, IReference
     {
         readonly int _index;
         [Node]
@@ -43,25 +44,33 @@ namespace Reni.Struct
         internal readonly TypeBase ArgsType;
         internal readonly bool IsImplicit;
         [Node]
-        readonly SetterFunctionType _setter;
+        readonly SetterFunction _setter;
         [NotNull]
         [Node]
-        readonly GetterFunctionType _getter;
+        readonly GetterFunction _getter;
+        readonly SimpleCache<SetterType> _setterTypeCache;
 
         internal FunctionType(int index, FunctionSyntax body, Structure structure, TypeBase argsType)
         {
             IsImplicit = body.IsImplicit;
-            _getter = new GetterFunctionType(this, index, body.Getter);
-            _setter = body.Setter == null ? null : new SetterFunctionType(this, index, body.Setter);
+            _getter = new GetterFunction(this, index, body.Getter);
+            _setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
             _index = index;
             _structure = structure;
             ArgsType = argsType;
+            _setterTypeCache = new SimpleCache<SetterType>(() => new SetterType(this));
             StopByObjectId(-10);
         }
 
         IReferenceInCode ISetterTargetType.ObjectReference { get { return this; } }
         TypeBase ISetterTargetType.Type { get { return this; } }
         TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
+        SetterType ISetterTargetType.SetterType { get { return _setterTypeCache.Value; } }
+
+        TypeBase IReference.TargetType { get { return ValueType; } }
+        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+        Result IReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
+        TypeBase IReference.Type { get { return this; } }
 
         Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
@@ -121,7 +130,7 @@ namespace Reni.Struct
         }
 
 
-        public FunctionInstanceType Instance(bool isGetter)
+        public FunctionInstance Instance(bool isGetter)
         {
             if(isGetter)
                 return _getter;
@@ -158,17 +167,9 @@ namespace Reni.Struct
                 );
         }
 
-        public Result AssignmentFeatureResult(Category category)
-        {
-            var result = new Result
-                (category
-                 , getType: () => _setter
-                 , getCode: ArgCode
-                 , getArgs: CodeArgs.Arg
-                );
-            return result;
-        }
-
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => ValueType); }
+        IConverter ISearchContainerType.Converter { get { return this; } }
+        TypeBase ISearchContainerType.Target { get { return ValueType; } }
+        Result IConverter.Result(Category category) { return _getter.CallResult(category); }
     }
 }

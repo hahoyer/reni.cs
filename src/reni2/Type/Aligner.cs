@@ -82,5 +82,7 @@ namespace Reni.Type
             return new FunctionalConverter(ParentConversionResult)
                 .Concat(Parent.Converter(conversionParameter, destination));
         }
+
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Parent); }
     }
 }

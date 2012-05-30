@@ -32,7 +32,7 @@ namespace Reni.TokenClasses
           , ISearchPath<ISuffixFeature, FieldAccessType>
           , ISearchPath<ISuffixFeature, FunctionType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, FieldAccessType>.Convert(FieldAccessType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return new Feature.Feature(type.AssignmentFeatureResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, FieldAccessType>.Convert(FieldAccessType type) { return new Feature.Feature(category => ((ISetterTargetType)type).SetterType.AssignmentFeatureResult(category)); }
+        ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return new Feature.Feature(((ISetterTargetType)type).SetterType.AssignmentFeatureResult); }
     }
 }

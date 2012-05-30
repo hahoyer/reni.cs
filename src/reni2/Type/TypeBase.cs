@@ -285,7 +285,7 @@ namespace Reni.Type
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
             visitor.Search(this);
-            if(Debugger.IsAttached)
+            if(Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
         }
@@ -442,35 +442,5 @@ namespace Reni.Type
         }
 
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
-
-        protected Result AssignmentResult(Category category, TypeBase argsType, ISetterTargetType target)
-        {
-            var trace = ObjectId == 9 && category.HasCode;
-            StartMethodDump(trace, category, argsType, target);
-            try
-            {
-                var sourceResult = argsType.Conversion(category, target.ValueType.UniqueReference(target.RefAlignParam).Type);
-                var destinationResult = target
-                    .DestinationResult(category.Typed)
-                    .ReplaceArg(target.Type.Result(category.Typed, target));
-                ;
-                var resultForArg = destinationResult + sourceResult;
-                Dump("resultForArg", resultForArg);
-
-                BreakExecution();
-
-                var rawResult = target.Result(category);
-                Dump("rawResult", rawResult);
-
-                BreakExecution();
-
-                var result = rawResult.ReplaceArg(resultForArg);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
     }
 }
