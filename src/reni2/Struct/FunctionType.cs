@@ -160,9 +160,11 @@ namespace Reni.Struct
 
         public Result ApplyResult(Category category)
         {
+            if(IsDataLess)
+                return Result(category);
             return Result
                 (category
-                 , () => CodeArgs.ToCode().Sequence(ArgsType.ArgCode()).LocalReference(RefAlignParam,CodeBase.Void())
+                 , () => CodeArgs.ToCode().Sequence(ArgsType.ArgCode()).LocalReference(RefAlignParam, CodeBase.Void())
                  , () => CodeArgs + CodeArgs.Arg()
                 );
         }
