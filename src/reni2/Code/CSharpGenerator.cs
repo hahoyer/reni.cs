@@ -98,7 +98,7 @@ namespace Reni.Code
         void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
         {
             AddCode
-                ("data.Push(frame.GetFromBack({0}, {1}){2})"
+                ("data.Push(frame.Get({0}, {1}){2})"
                  , dataSize.ByteCount
                  , offset.SaveByteCount
                  , BitCast(size, dataSize)
