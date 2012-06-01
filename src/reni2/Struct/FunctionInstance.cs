@@ -30,7 +30,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.Struct
 {
@@ -63,11 +62,8 @@ namespace Reni.Struct
         protected virtual Size FrameSize { get { return Parent.ArgsType.Size + CodeArgs.Size; } }
         [Node]
         [DisableDump]
-        internal CodeArgs CodeArgs { get { return ApplyResult(Category.CodeArgs).CodeArgs; } }
-        [DisableDump]
-        internal bool IsDataLess { get { return false; } }
+        internal CodeArgs CodeArgs { get { return Result(Category.CodeArgs).CodeArgs; } }
         protected abstract FunctionId FunctionId { get; }
-        protected Size GetSize() { return RefAlignParam.RefSize; }
         protected abstract ContextBase Context { get; }
 
         internal Code.Container Serialize()
@@ -86,22 +82,24 @@ namespace Reni.Struct
             var localCategory = category - Category.CodeArgs - Category.Code;
             if(category.HasCode)
                 localCategory |= Category.Size;
-            var result = ApplyResult(localCategory);
+            var result = Result(localCategory);
 
             if(category.HasArgs)
                 result.CodeArgs = CodeArgs.Arg();
             if(category.HasCode)
-                result.Code = Parent.ArgCode()
+                result.Code = Parent
+                    .ArgCode()
+                    .Dereference(FrameSize)
                     .Call(FunctionId, result.Size);
             return result;
         }
 
-        protected Result ApplyResult(Category category)
+        Result Result(Category category)
         {
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == 0 && category.HasCode;
+            var trace = FunctionId.Index == -10 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
@@ -129,11 +127,10 @@ namespace Reni.Struct
 
         CodeBase CreateContextRefCode()
         {
-            var refAlignParam = RefAlignParam;
             return CodeBase
-                .FrameRef(refAlignParam)
-                .AddToReference(FrameSize * -1)
-                .Dereference(refAlignParam.RefSize);
+                .FrameRef(RefAlignParam)
+                .Dereference(RefAlignParam.RefSize)
+                .AddToReference(FrameSize);
         }
 
         internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
@@ -142,14 +139,10 @@ namespace Reni.Struct
         {
             if(IsStopByObjectIdActive)
                 return null;
-            var category = Category.Code;
-            var foreignRefsRef = CodeBase.FrameRef(RefAlignParam);
-            var visitResult = ApplyResult(category);
-            var result = visitResult
-                .ReplaceRefsForFunctionBody(RefAlignParam.RefSize, foreignRefsRef);
+            var result = Result(Category.Code).Code;
             if(Parent.ArgsType.IsDataLess)
-                result.Code = result.Code.TryReplacePrimitiveRecursivity(FunctionId);
-            return result.Code;
+                return result.TryReplacePrimitiveRecursivity(FunctionId);
+            return result;
         }
 
         public string DumpFunction()
@@ -165,7 +158,7 @@ namespace Reni.Struct
     {
         public static FunctionId Getter(int index) { return new FunctionId(index, true); }
         public static FunctionId Setter(int index) { return new FunctionId(index, false); }
-        
+
         internal readonly int Index;
         internal readonly bool IsGetter;
 

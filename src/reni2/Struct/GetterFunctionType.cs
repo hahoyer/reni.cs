@@ -41,7 +41,7 @@ namespace Reni.Struct
                 .Getter(index);
         }
 
-        internal TypeBase ReturnType { get { return ApplyResult(Category.Type).Type; } }
+        internal TypeBase ReturnType { get { return CallResult(Category.Type).Type; } }
         protected override FunctionId FunctionId { get { return _functionId; } }
         protected override ContextBase Context { get { return Parent.GetterContext; } }
     }

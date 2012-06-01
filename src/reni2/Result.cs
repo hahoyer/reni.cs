@@ -670,7 +670,7 @@ namespace Reni
         {
             if(Type.IsDataLess)
                 return this;
-            if(Type.IsLikeReference)
+            if(Type is IReference)
                 return this;
             return Type
                 .SmartLocalReferenceResult(CompleteCategory, refAlignParam)

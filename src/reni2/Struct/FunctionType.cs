@@ -113,7 +113,7 @@ namespace Reni.Struct
 
         Result ISetterTargetType.DestinationResult(Category category) { return Result(category, this); }
 
-        protected override Size GetSize() { return CodeArgs.Size + ArgsType.Size; }
+        protected override Size GetSize() { return RefAlignParam.RefSize; }
 
         internal void EnsureBodyCode()
         {
@@ -162,7 +162,7 @@ namespace Reni.Struct
         {
             return Result
                 (category
-                 , () => CodeArgs.ToCode().Sequence(ArgsType.ArgCode())
+                 , () => CodeArgs.ToCode().Sequence(ArgsType.ArgCode()).LocalReference(RefAlignParam,CodeBase.Void())
                  , () => CodeArgs + CodeArgs.Arg()
                 );
         }
