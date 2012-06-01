@@ -95,7 +95,7 @@ namespace Reni
         internal override void Search(StructureType structureType) { structureType.SearchFeature(this); }
         internal override void Search()
         {
-            Tracer.Assert(!IsSuccessFull);
+            Tracer.Assert(!IsSuccessFull, ()=>Tracer.Dump(Probe));
             AddProbe(typeof(TFeature));
             InternalResult = Target as TFeature;
         }

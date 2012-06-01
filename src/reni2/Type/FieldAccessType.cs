@@ -90,7 +90,6 @@ namespace Reni.Type
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, ()=>Parent);
-            base.Search(searchVisitor);
         }
 
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
