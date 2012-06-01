@@ -38,12 +38,11 @@ namespace ReniTest
             var h_1_0 = data.Pull(1);
             data.Push(h_1_0.Address(0));
             var h_1_1 = data.Pull(4);
-            data.Push(h_1_1.Address(4));
+            data.Push(h_1_1.Get(4, 0));
             data.Push(GetFunction0(data.Pull(4)));
             data.Push(data.Pull(1).BitCast(3).BitCast(8));
             var h_1_2 = data.Pull(1);
-            data.Push(h_1_2.Address(0));
-            data.Push(data.Pull(4).Dereference(1));
+            data.Push(h_1_2.Get(1, 0));
             data.Pull(1).PrintNumber();
         }
 
@@ -51,9 +50,9 @@ namespace ReniTest
         static Data GetFunction0(Data frame)
         {
             var data = Data.Create(4);
-            data.Push(frame.Pull(4));
-            data.RefPlus(-4);
-            data.Push(data.Pull(4).Dereference(4).Dereference(1).BitCast(3).BitCast(8));
+            data.Push(frame.Address(0));
+            data.Push(data.Pull(4).Dereference(4));
+            data.Push(data.Pull(4).Dereference(1).BitCast(3).BitCast(8));
 
             return data;
         }
