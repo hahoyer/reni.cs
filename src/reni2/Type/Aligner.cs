@@ -42,16 +42,33 @@ namespace Reni.Type
 
         [DisableDump]
         int AlignBits { get { return _alignBits; } }
-
         [DisableDump]
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }
-
         [DisableDump]
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
         [DisableDump]
         internal override TypeBase UnAlignedType { get { return Parent; } }
         [DisableDump]
         internal override IReference Reference { get { return Parent.Reference; } }
+        [DisableDump]
+        internal override bool IsDataLess { get { return Parent.IsDataLess; } }
+        [DisableDump]
+        internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
+
+        protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
+        internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
+        internal override Result Destructor(Category category) { return Parent.Destructor(category); }
+        internal override Result Copier(Category category) { return Parent.Copier(category); }
+        internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
+        internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Parent); }
+        internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
+
+        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
+        {
+            return new FunctionalConverter(ParentConversionResult)
+                .Concat(Parent.Converter(conversionParameter, destination));
+        }
 
         protected override Result ParentConversionResult(Category category)
         {
@@ -63,26 +80,5 @@ namespace Reni.Type
                 );
         }
 
-        internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
-
-        protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
-        internal override bool IsDataLess { get { return Parent.IsDataLess; } }
-
-        internal override Result Destructor(Category category) { return Parent.Destructor(category); }
-        internal override Result Copier(Category category) { return Parent.Copier(category); }
-        [DisableDump]
-        internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
-        internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
-        internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
-
-        internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
-
-        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
-        {
-            return new FunctionalConverter(ParentConversionResult)
-                .Concat(Parent.Converter(conversionParameter, destination));
-        }
-
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Parent); }
     }
 }

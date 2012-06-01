@@ -50,8 +50,6 @@ namespace Reni.Struct
         internal override bool IsLambda { get { return true; } }
         [DisableDump]
         internal override bool IsDataLess { get { return _structure.IsDataLess; } }
-        [DisableDump]
-        internal override bool IsLikeReference { get { return true; } }
         internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
         [DisableDump]
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
@@ -69,22 +67,8 @@ namespace Reni.Struct
         [DisableDump]
         IReferenceInCode IFunctionalFeature.ObjectReference { get { return this; } }
 
-        internal CodeArgs GetCodeArgs(TypeBase argsType) { return _structure.Function(_syntax, argsType).CodeArgs - CodeArgs.Arg(); }
-
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType) { return Function(argsType).ApplyResult(category); }
 
-        internal TypeBase ValueType(TypeBase argsType) { return Function(argsType).ValueType; }
-
         FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
-
-        Result CallResult(Category category, bool isGetter, TypeBase argsType)
-        {
-            var instance = Function(argsType).Instance(isGetter);
-            var result = instance.CallResult(category);
-            return result;
-        }
-
-        internal Result GetterResult(Category category, TypeBase argsType) { return CallResult(category, true, argsType); }
-        internal Result SetterResult(Category category, TypeBase argsType) { return CallResult(category, false, argsType); }
     }
 }

@@ -1,6 +1,5 @@
 ﻿#region Copyright (C) 2012
 
-// 
 //     Project reniTest
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -31,40 +30,31 @@ namespace ReniTest
 {
     public static class Reni
     {
-        // 
-//f: arg/\;g: f(arg)/\;x:4; g(x)dump_print
-//
+        // f: arg/\;f(2) dump_print; 
         public static void MainFunction()
         {
-            var data = Data.Create(5);
-            data.Push(4);
-            data.Push(data.Address(0));
-            var h_3_0 = data.Pull(4);
-            data.Push(h_3_0.Get(4, 0));
-            var frame = data.Pull(4);
-            var result = Function0(frame);
-            data.Push(result);
-            data.Push(data.Pull(1).BitCast(4).BitCast(8));
-            var h_3_1 = data.Pull(1);
-            data.Push(h_3_1.Get(1, 0));
+            var data = Data.Create(4);
+            data.Push(2);
+            var h_1_0 = data.Pull(1);
+            data.Push(h_1_0.Address(0));
+            var h_1_1 = data.Pull(4);
+            data.Push(h_1_1.Address(4));
+            data.Push(GetFunction0(data.Pull(4)));
+            data.Push(data.Pull(1).BitCast(3).BitCast(8));
+            var h_1_2 = data.Pull(1);
+            data.Push(h_1_2.Address(0));
+            data.Push(data.Pull(4).Dereference(1));
             data.Pull(1).PrintNumber();
         }
-        // f.29(arg)
-        static Data Function0(Data frame)
+
+        // arg 
+        static Data GetFunction0(Data frame)
         {
             var data = Data.Create(4);
-            data.Push(frame.GetFromBack(4, -4));
-            var frame1 = data.Pull(4);
-            var function1 = Function1(frame1);
-            data.Push(function1);
-            return data;
-        }
-        // arg
-        static Data Function1(Data frame)
-        {
-            var data = Data.Create(4);
-            data.Push(frame.GetFromBack(4, -4));
-            data.Push(data.Pull(4).Dereference(1).BitCast(4).BitCast(8));
+            data.Push(frame.Pull(4));
+            data.RefPlus(-4);
+            data.Push(data.Pull(4).Dereference(4).Dereference(1).BitCast(3).BitCast(8));
+
             return data;
         }
     }

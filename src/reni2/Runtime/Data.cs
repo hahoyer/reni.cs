@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -15,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -32,7 +36,7 @@ namespace Reni.Runtime
         readonly byte[] _data;
         int _length;
 
-        static public IOutStream OutStream { get; set; }
+        public static IOutStream OutStream { get; set; }
 
         public static Data Create(int bytes) { return new Data(new byte[bytes]); }
         public static Data Create(byte[] bytes) { return new Data(bytes) {StartIndex = 0}; }
@@ -107,20 +111,25 @@ namespace Reni.Runtime
             return Create(y.ToByteArray());
         }
 
-        string Dump
+        string Dump { get { return Address(0).DataDump + ": " + DataDump; } }
+
+        string DataDump
         {
             get
             {
-                var result = _data.Length.ToString() + ":";
+                var result = "";
                 for(var i = 0; i < _data.Length; i++)
                 {
                     if(StartIndex == i)
-                        result += " [" + _length + ":";
+                        result += "[" + _length + ":";
 
-                    result += " ";
                     result += _data[i].ToString();
+                    if(i < _data.Length - 1)
+                        result += " ";
                 }
-                return result + " ]";
+                if(StartIndex == _data.Length)
+                    result += " [" + _length + ":";
+                return result + "]";
             }
         }
 

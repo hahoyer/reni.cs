@@ -44,6 +44,32 @@ namespace Reni.Type
         }
 
 
+        TypeBase IReference.Type { get { return this; } }
+        TypeBase IReference.TargetType { get { return ValueType; } }
+        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+        
+        TypeBase ISearchContainerType.Target { get { return ValueType; } }
+        IConverter ISearchContainerType.Converter { get { return this; } }
+
+        Result IConverter.Result(Category category) { return DereferenceResult(category); }
+
+        internal override string DumpPrintText { get { return DumpShort(); } }
+        [EnableDump]
+        TypeBase ValueType { get { return _valueType; } }
+        [DisableDump]
+        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        [DisableDump]
+        internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
+
+        Result IReference.DereferenceResult(Category category) { return DereferenceResult(category); }
+        [DisableDump]
+        internal override bool IsDataLess { get { return false; } }
+        [DisableDump]
+        internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
+        [DisableDump]
+        internal override bool IsArray { get { return ValueType.IsArray; } }
+        [DisableDump]
+        internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
         [DisableDump]
         internal override RefAlignParam[] ReferenceChain
         {
@@ -57,25 +83,6 @@ namespace Reni.Type
             }
         }
 
-        internal override string DumpPrintText { get { return DumpShort(); } }
-
-        [DisableDump]
-        TypeBase IReference.Type { get { return this; } }
-        [DisableDump]
-        TypeBase IReference.TargetType { get { return ValueType; } }
-        [DisableDump]
-        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
-        [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
-        internal TypeBase ValueType { get { return _valueType; } }
-        [DisableDump]
-        internal override bool IsLikeReference { get { return true; } }
-
-        [DisableDump]
-        internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
-
-        Result IReference.DereferenceResult(Category category) { return DereferenceResult(category); }
-
         Result DereferenceResult(Category category)
         {
             return ValueType.Result
@@ -85,23 +92,11 @@ namespace Reni.Type
                 );
         }
 
-        internal override bool IsDataLess { get { return false; } }
-        [DisableDump]
-        internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
-        [DisableDump]
-        internal override bool IsArray { get { return ValueType.IsArray; } }
-        TypeBase ISearchContainerType.Target { get { return ValueType; } }
-
-        IConverter ISearchContainerType.Converter { get { return this; } }
-        Result IConverter.Result(Category category) { return DereferenceResult(category); }
-
         Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
 
         Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category, RefAlignParam); }
         protected override Size GetSize() { return RefAlignParam.RefSize; }
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
-        [DisableDump]
-        internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
 
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => ValueType); }
 

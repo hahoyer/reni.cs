@@ -274,8 +274,6 @@ namespace Reni.Type
         [DisableDump]
         internal virtual bool IsLambda { get { return false; } }
         [DisableDump]
-        internal virtual bool IsLikeReference { get { return false; } }
-        [DisableDump]
         internal virtual IReference Reference { get { return this as IReference; } }
 
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }

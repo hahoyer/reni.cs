@@ -42,7 +42,7 @@ namespace Reni.Code
             _refAlignParam = refAlignParam;
             Holder = holder;
             Offset = offset ?? Size.Zero;
-            StopByObjectId(-1);
+            StopByObjectId(-10);
         }
 
         [DisableDump]

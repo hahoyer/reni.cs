@@ -44,11 +44,7 @@ namespace Reni.Code
 
         [Node]
         internal TypeBase Type { get { return _type; } }
-
-        protected override Size GetSize() { return _type.Size; }
-        protected override CodeArgs GetRefsImplementation() { return CodeArgs.Arg(); }
-        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Arg(this); }
-
+        [DisableDump]
         internal override RefAlignParam RefAlignParam
         {
             get
@@ -57,5 +53,9 @@ namespace Reni.Code
                 return reference == null ? null : reference.RefAlignParam;
             }
         }
+
+        protected override Size GetSize() { return _type.Size; }
+        protected override CodeArgs GetRefsImplementation() { return CodeArgs.Arg(); }
+        protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Arg(this); }
     }
 }
