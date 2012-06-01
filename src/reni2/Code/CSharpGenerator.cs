@@ -70,7 +70,6 @@ namespace Reni.Code
 
         void IVisitor.Drop(Size beforeSize, Size afterSize) { throw new NotImplementedException(); }
         void IVisitor.LocalBlockEnd(Size size, Size intermediateSize) { throw new NotImplementedException(); }
-        void IVisitor.TopData(Size offset, Size size, Size dataSize) { throw new NotImplementedException(); }
 
         void IVisitor.BitsArray(Size size, BitsConst data) { AddCode("data.Push({0})", data.ByteSequence(size)); }
         void IVisitor.LocalVariableDefinition(string holderName, Size valueSize) { AddCode("var {0} = data.Pull({1})", holderName, valueSize.SaveByteCount); }
@@ -92,6 +91,16 @@ namespace Reni.Code
                 ("data.Push({0}(data.Pull({1})))"
                  , Generator.FunctionName(functionId)
                  , argsAndRefsSize.SaveByteCount
+                );
+        }
+
+        void IVisitor.TopData(Size offset, Size size, Size dataSize)
+        {
+            AddCode
+                ("data.Push(data.Get({0}, {1}){2})"
+                , dataSize.ByteCount
+                , offset.SaveByteCount
+                , BitCast(size, dataSize)
                 );
         }
 
