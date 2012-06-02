@@ -65,36 +65,53 @@ namespace Reni
                 Tracer.Assert(getCode != null);
                 _code = getCode();
             }
-            if (category.HasSize)
-            {
-                if (getSize != null)
-                    _size = getSize();
-                else if (_type != null)
-                    _size = _type.Size;
-                else if (_code != null)
-                    _size = _code.Size;
-                else 
-                    Tracer.AssertionFailed("Size cannot be determned", ToString);
-            }
+            
+            if(category.HasSize)
+                _size = ObtainSize(getSize, getType, getCode);
+
             if(category.HasArgs)
-            {
-                Tracer.Assert(getArgs != null);
-                _codeArgs = getArgs();
-            }
+                _codeArgs = ObtainCodeArgs(getArgs, getCode);
+
             if(category.HasIsDataLess)
-            {
-                if(getDataLess != null)
-                _isDataLess = getDataLess();
-                else if (_size != null)
-                    _isDataLess = _size.IsZero;
-                else if (_type != null)
-                    _isDataLess = _type.IsDataLess;
-                else if (_code != null)
-                    _isDataLess = _code.IsEmpty;
-                else
-                Tracer.AssertionFailed("Datalessness cannot be determned", ToString);
-            }
+                _isDataLess = ObtainIsDataLess(getDataLess, getSize, getType, getCode);
+            
             AssertValid();
+        }
+
+        bool ObtainIsDataLess(Func<bool> getDataLess, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
+        {
+            if (getDataLess != null)
+                return getDataLess();
+            return ObtainSize(getSize, getType, getCode).IsZero;
+        }
+
+        Size ObtainSize(Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
+        {
+            if (getSize != null)
+                return getSize();
+            if (_type != null)
+                return _type.Size;
+            if (_code != null)
+                return _code.Size;
+            if (getType != null)
+                return getType().Size;
+            if (getCode != null)
+                return getCode().Size;
+
+            Tracer.AssertionFailed("Size cannot be determned", ToString);
+            return null;
+        }
+
+        CodeArgs ObtainCodeArgs(Func<CodeArgs> getArgs, Func<CodeBase> getCode)
+        {
+            if (getArgs != null)
+                return getArgs();
+            if (_code != null)
+                return _code.CodeArgs;
+            if (getCode != null)
+                return getCode().CodeArgs;
+            Tracer.AssertionFailed("CodeArgs cannot be determned", ToString);
+            return null;
         }
 
         internal bool HasSize { get { return Size != null; } }
@@ -601,19 +618,23 @@ namespace Reni
             return result.Code.Evaluate(outStream);
         }
 
-        internal Result AutomaticDereference()
+        internal Result AutomaticDereferenceResult()
         {
             Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
 
             var result = this;
             while(result.Type.Reference != null)
-                result 
-                    = result
-                    .Type
-                    .Reference
-                    .DereferenceResult(CompleteCategory)
-                    .ReplaceArg(result);
+                result = result.DereferenceResult();
             return result;
+        }
+
+        internal Result DereferenceResult()
+        {
+            Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
+            return Type
+                .Reference
+                .DereferenceResult(CompleteCategory)
+                .ReplaceArg(this);
         }
 
         internal static Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)
