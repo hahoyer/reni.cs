@@ -30,32 +30,37 @@ namespace ReniTest
 {
     public static class Reni
     {
-        // x: 100; f: x/\;f() dump_print; 
+        // x: 100;f: arg+x/\;f(2) dump_print; 
         public static void MainFunction()
         {
-            var data = Data.Create(5);
-            if (data != null)
-                return;
+            var data = Data.Create(9);
             data.Push(100);
+            data.Push(2);
+            var h_1_0 = data.Pull(1);
             data.Push(data.Address(1));
-            var h_1_0 = data.Pull(4);
-            data.Push(h_1_0.Get(4, 0));
-            data.Push(GetFunction0(data.Pull(4)));
-            var h_1_1 = data.Pull(1);
-            data.Push(h_1_1.Get(1, 0));
-            data.Pull(1).PrintNumber();
+            data.Push(h_1_0.Address(0));
+            var h_1_1 = data.Pull(8);
+            data.Push(h_1_1.Get(8, 0));
+            data.Push(GetFunction0(data.Pull(8)));
+            data.Push(data.Pull(2).BitCast(9).BitCast(16));
+            var h_1_2 = data.Pull(2);
+            data.Push(h_1_2.Get(2, 0));
+            data.Pull(2).PrintNumber();
         }
 
-        // x.29 
+        // (arg)+.13(x.29) 
         static Data GetFunction0(Data frame)
         {
-            var data = Data.Create(4);
+            var data = Data.Create(5);
             data.Push(frame.Get(4, 0));
-            var pull = data.Pull(4);
-            var dereference = pull.Dereference(4);
-            data.Push(dereference);
+            data.Push(data.Pull(4).Dereference(1).BitCast(3).BitCast(8));
+            var h_4_0 = data.Pull(1);
+            data.Push(h_4_0.Get(1, 0).BitCast(3).BitCast(8));
+            data.Push(frame.Get(4, 4));
             data.RefPlus(-1);
             data.Push(data.Pull(4).Dereference(1));
+            data.Plus(sizeBytes: 2, leftBytes: 1, rightBytes: 1);
+            data.Push(data.Pull(2).BitCast(9).BitCast(16));
 
             return data;
         }

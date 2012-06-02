@@ -45,7 +45,7 @@ namespace Reni.Code
             : this(refAlignParam, Size.Zero) { }
 
         public TopFrameRef(RefAlignParam refAlignParam, Size offset)
-            : base(refAlignParam, offset) { StopByObjectId(40); }
+            : base(refAlignParam, offset) { StopByObjectId(-40); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
         internal override void Visit(IVisitor visitor) { visitor.TopFrameRef(Offset); }
