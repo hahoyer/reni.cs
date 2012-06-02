@@ -30,29 +30,32 @@ namespace ReniTest
 {
     public static class Reni
     {
-        // f: arg/\;f(2) dump_print; 
+        // x: 100; f: x/\;f() dump_print; 
         public static void MainFunction()
         {
-            var data = Data.Create(4);
-            data.Push(2);
-            var h_1_0 = data.Pull(1);
-            data.Push(h_1_0.Address(0));
-            var h_1_1 = data.Pull(4);
-            data.Push(h_1_1.Get(4, 0));
+            var data = Data.Create(5);
+            if (data != null)
+                return;
+            data.Push(100);
+            data.Push(data.Address(1));
+            var h_1_0 = data.Pull(4);
+            data.Push(h_1_0.Get(4, 0));
             data.Push(GetFunction0(data.Pull(4)));
-            data.Push(data.Pull(1).BitCast(3).BitCast(8));
-            var h_1_2 = data.Pull(1);
-            data.Push(h_1_2.Get(1, 0));
+            var h_1_1 = data.Pull(1);
+            data.Push(h_1_1.Get(1, 0));
             data.Pull(1).PrintNumber();
         }
 
-        // arg 
+        // x.29 
         static Data GetFunction0(Data frame)
         {
             var data = Data.Create(4);
-            data.Push(frame.Address(0));
-            data.Push(data.Pull(4).Dereference(4));
-            data.Push(data.Pull(4).Dereference(1).BitCast(3).BitCast(8));
+            data.Push(frame.Get(4, 0));
+            var pull = data.Pull(4);
+            var dereference = pull.Dereference(4);
+            data.Push(dereference);
+            data.RefPlus(-1);
+            data.Push(data.Pull(4).Dereference(1));
 
             return data;
         }

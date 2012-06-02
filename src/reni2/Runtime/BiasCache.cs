@@ -39,7 +39,12 @@ namespace Reni.Runtime
         {
             var number = new BigInteger(data.GetBytes());
             var splitted = Split(number);
-            return "b" + splitted.Item1 + (splitted.Item2==0?"":"+" + splitted.Item2);
+            var offset = "";
+            if(splitted.Item2 > 0)
+                offset = "+";
+            if (splitted.Item2 != 0)
+                offset += splitted.Item2;
+            return "b" + splitted.Item1 + offset;
         }
 
         Tuple<int, BigInteger> Split(BigInteger value)
