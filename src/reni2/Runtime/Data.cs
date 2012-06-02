@@ -111,7 +111,7 @@ namespace Reni.Runtime
             return Create(y.ToByteArray());
         }
 
-        string Dump { get { return Address(0).DataDump + ": " + DataDump; } }
+        string Dump { get { return Address(0).AddressDump + ": " + DataDump; } }
 
         string DataDump
         {
@@ -133,7 +133,10 @@ namespace Reni.Runtime
             }
         }
 
+        static readonly BiasCache _biasCache = new BiasCache(100);
         [UsedImplicitly]
+        string AddressDump { get { return _biasCache.AddressDump(this)+"="+DataDump; } }
+
         public void Equal(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsEqual); }
         [UsedImplicitly]
         public void LessGreater(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsNotEqual); }

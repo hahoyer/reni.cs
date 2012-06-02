@@ -154,6 +154,7 @@
     <Compile Include="ReniParser\ExpressionSyntax.cs" />
     <Compile Include="ReniParser\MainTokenFactory.cs" />
     <Compile Include="ReniParser\ParsedSyntax.cs" />
+    <Compile Include="Runtime\BiasCache.cs" />
     <Compile Include="Runtime\DataHandler.cs" />
     <Compile Include="Sequence\CompareFeature.cs" />
     <Compile Include="Sequence\Feature.cs" />
