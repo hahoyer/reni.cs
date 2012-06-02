@@ -37,8 +37,6 @@ namespace Reni.TokenClasses
 
         [DisableDump]
         internal int Level { get { return _level; } }
-        [DisableDump]
-        bool IInfix.IsLambda { get { return false; } }
 
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, left, this, token, right); }
 

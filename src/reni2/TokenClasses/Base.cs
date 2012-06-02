@@ -88,7 +88,5 @@ namespace Reni.TokenClasses
     {
         public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
         protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new InfixSyntax(token, left.CheckedToCompiledSyntax(), this, right.CheckedToCompiledSyntax()); }
-        [DisableDump]
-        bool IInfix.IsLambda { get { return false; } }
     }
 }

@@ -108,8 +108,6 @@ namespace Reni.Syntax
             _right = right;
         }
 
-        protected override bool GetIsLambda() { return _infix.IsLambda; }
-
         internal override Result ObtainResult(ContextBase context, Category category)
         {
             return _infix
@@ -173,8 +171,6 @@ namespace Reni.Syntax
     interface IInfix
     {
         Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
-        [DisableDump]
-        bool IsLambda { get; }
     }
 
     interface ISuffix

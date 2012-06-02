@@ -46,9 +46,11 @@ namespace Reni.TokenClasses
             Setter = setter;
         }
 
-        internal override Result ObtainResult(ContextBase context, Category category) { return context.FunctionalResult(category, this); }
-
         string Tag { get { return IsImplicit ? "/!\\" : "/\\"; } }
+
+        internal override Result ObtainResult(ContextBase context, Category category) { return context.FunctionalResult(category, this); }
+        protected override bool GetIsLambda() { return true; }
+        
         internal override string DumpPrintText
         {
             get
