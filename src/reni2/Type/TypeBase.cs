@@ -188,11 +188,9 @@ namespace Reni.Type
                 return Result(category);
             return new Result
                 (category
-                 , () => false
-                 , () => target.RefAlignParam.RefSize
-                 , () => this
-                 , () => CodeBase.ReferenceCode(target)
-                 , () => CodeArgs.Create(target));
+                 , getType: () => this
+                 , getCode: () => CodeBase.ReferenceCode(target)
+                );
         }
 
         internal Result Result(Category category, Result codeAndRefs)
@@ -318,6 +316,17 @@ namespace Reni.Type
                 .Result(category, target);
         }
 
+        internal Result ContextAccessResult(Category category, IReferenceInCode target, Size offset)
+        {
+            if(IsDataLess)
+                return Result(category);
+            return new Result
+                (category
+                 , getType: () => this
+                 , getCode: () => CodeBase.ReferenceCode(target).AddToReference(offset).Dereference(Size)
+                );
+        }
+
         internal Result OperationResult<TFeature>(Category category, ISearchTarget target, RefAlignParam refAlignParam)
             where TFeature : class, ITypeFeature
         {
@@ -363,7 +372,7 @@ namespace Reni.Type
         }
 
         internal Result GenericDumpPrintResult(Category category, RefAlignParam refAlignParam) { return OperationResult<ISuffixFeature>(category, _dumpPrintToken.Value, refAlignParam); }
-        private static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create); 
+        static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create);
 
         internal Result CreateArray(Category category, RefAlignParam refAlignParam)
         {

@@ -37,15 +37,12 @@ namespace Reni.Context
         internal readonly TypeBase ArgsType;
         [Node]
         internal readonly TypeBase ValueType;
-        internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType)
+        internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
             : base(parent)
         {
             ArgsType = argsType;
             ValueType = valueType;
         }
-
-        internal Function(ContextBase parent, TypeBase argsType)
-            : base(parent) { ArgsType = argsType; }
 
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
         Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
@@ -55,8 +52,8 @@ namespace Reni.Context
         Result IFunctionContext.CreateArgReferenceResult(Category category)
         {
             return ArgsType
-                .ReferenceInCode(category, this)
-                .AddToReference(() => ArgsType.Size * -1);
+                .ContextAccessResult(category.Typed, this, ArgsType.Size * -1)
+                & category;
         }
 
         Result IFunctionContext.CreateValueReferenceResult(Category category)
@@ -64,8 +61,8 @@ namespace Reni.Context
             if(ValueType == null)
                 throw new ValueCannotBeUsedHereException();
             return ValueType
-                .ReferenceInCode(category, this)
-                .AddToReference(() => (ArgsType.Size + ValueType.Size) * -1);
+                .ContextAccessResult(category.Typed, this, (ArgsType.Size + ValueType.Size) * -1)
+                & category;
         }
     }
 

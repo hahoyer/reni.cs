@@ -136,22 +136,22 @@ namespace Reni
                 .Aggregate(CodeBase.Void(), (current, t) => current.Sequence(CodeBase.ReferenceCode(t)));
         }
 
-        internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, Size refSize, CodeBase endOfRefsCode)
+        internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, Size refSize, CodeBase codeArgsReference)
         {
             var trace = ObjectId == -1;
-            StartMethodDump(trace, code, refSize, endOfRefsCode);
+            StartMethodDump(trace, code, refSize, codeArgsReference);
             try
             {
-                var reference = endOfRefsCode.AddToReference(refSize * -_data.Count);
+                var reference = codeArgsReference.AddToReference(refSize * _data.Count);
                 var result = code;
                 foreach(var referenceInCode in _data)
                 {
                     Dump("reference", reference);
                     BreakExecution();
                     Tracer.Assert(referenceInCode.RefSize == refSize);
-                    result = result.ReplaceAbsolute(referenceInCode, () => reference);
+                    reference = reference.AddToReference(refSize * -1);
+                    result = result.ReplaceAbsolute(referenceInCode, () => reference.Dereference(refSize));
                     Dump("result", result);
-                    reference = reference.AddToReference(refSize);
                 }
                 return ReturnMethodDump(result, true);
             }

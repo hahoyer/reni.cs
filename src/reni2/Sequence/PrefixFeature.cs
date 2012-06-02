@@ -44,7 +44,7 @@ namespace Reni.Sequence
                 .UniqueReference(refAlignParam)
                 .Type
                 .ArgResult(category.Typed)
-                .AutomaticDereference()
+                .AutomaticDereferenceResult()
                 .Align(refAlignParam.AlignBits);
             return _objectType
                 .Result(category, () => _objectType.BitSequenceOperation(_definable), CodeArgs.Arg)

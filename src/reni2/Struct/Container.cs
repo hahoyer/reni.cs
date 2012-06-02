@@ -205,7 +205,7 @@ namespace Reni.Struct
                 var result = Statements[position]
                     .Result(uniqueChildContext, category.Typed);
                 Dump("result", result);
-                return ReturnMethodDump(result.AutomaticDereference(), true);
+                return ReturnMethodDump(result.AutomaticDereferenceResult(), true);
             }
             finally
             {

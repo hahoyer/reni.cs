@@ -77,8 +77,6 @@ namespace Reni.Context
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
         internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts.Find(container).Find(position); }
-        internal Function UniqueFunctionContext(TypeBase argsType) { return _cache.GetterFunctionContexts.Find(argsType); }
-        internal Function UniqueFunctionContext(TypeBase argsType, TypeBase valueType) { return _cache.SetterFunctionContexts.Find(argsType).Find(valueType); }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
         internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Find(container).Find(accessPosition); }
@@ -185,14 +183,6 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<TypeBase, Function> GetterFunctionContexts;
-
-            [Node]
-            [SmartNode]
-            internal readonly DictionaryEx<TypeBase, DictionaryEx<TypeBase, Function>> SetterFunctionContexts;
-
-            [Node]
-            [SmartNode]
             internal readonly DictionaryEx<CompileSyntax, ResultCache> ResultCache;
 
             [Node]
@@ -207,11 +197,6 @@ namespace Reni.Context
                     container =>
                     new DictionaryEx<int, ContextBase>(
                         position => new Struct.Context(target, container, position)));
-                GetterFunctionContexts = new DictionaryEx<TypeBase, Function>(argsType => new Function(target, argsType));
-                SetterFunctionContexts = new DictionaryEx<TypeBase, DictionaryEx<TypeBase, Function>>(
-                    argsType =>
-                    new DictionaryEx<TypeBase, Function>(
-                        valueType => new Function(target, argsType, valueType)));
                 PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(target));
                 RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<IFunctionContext>(target.ObtainRecentFunctionContext);

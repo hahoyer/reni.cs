@@ -41,12 +41,14 @@ namespace Reni.Struct
         readonly CompileSyntax _body;
 
         readonly SimpleCache<CodeBase> _bodyCodeCache;
+        readonly SimpleCache<ContextBase> _contextCache;
 
         protected FunctionInstance(FunctionType parent, CompileSyntax body)
         {
             _body = body;
             Parent = parent;
             _bodyCodeCache = new SimpleCache<CodeBase>(ObtainBodyCode);
+            _contextCache = new SimpleCache<ContextBase>(ObtainCache);
         }
 
         [Node]
@@ -59,12 +61,16 @@ namespace Reni.Struct
         string Description { get { return _body.DumpShort(); } }
         [Node]
         [DisableDump]
-        protected virtual Size FrameSize { get { return Parent.ArgsType.Size + CodeArgs.Size; } }
+        protected Size FrameSize { get { return ArgsPartSize + CodeArgs.Size; } }
+        [DisableDump]
+        protected virtual Size ArgsPartSize { get { return Parent.ArgsType.Size; } }
         [Node]
         [DisableDump]
         internal CodeArgs CodeArgs { get { return Result(Category.CodeArgs).CodeArgs; } }
         protected abstract FunctionId FunctionId { get; }
-        protected abstract ContextBase Context { get; }
+        [Node]
+        [DisableDump]
+        ContextBase Context { get { return _contextCache.Value; } }
 
         internal Code.Container Serialize()
         {
@@ -109,7 +115,7 @@ namespace Reni.Struct
                 Dump("rawResult", rawResult);
                 BreakExecution();
                 var postProcessedResult = rawResult
-                    .AutomaticDereference()
+                    .AutomaticDereferenceResult()
                     .Align(RefAlignParam.AlignBits)
                     .LocalBlock(category);
 
@@ -129,24 +135,34 @@ namespace Reni.Struct
         {
             return CodeBase
                 .FrameRef(RefAlignParam)
-                .Dereference(RefAlignParam.RefSize)
-                .AddToReference(FrameSize);
+                .AddToReference(ArgsPartSize);
         }
 
         internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
 
+        bool _isObtainBodyCodeActive;
+
         CodeBase ObtainBodyCode()
         {
-            if(IsStopByObjectIdActive)
+            if(_isObtainBodyCodeActive || IsStopByObjectIdActive)
                 return null;
-            var foreignRefsRef = CreateContextRefCode();
-            var visitResult = Result(Category.Code| Category.CodeArgs);
-            var result = visitResult
-                .ReplaceRefsForFunctionBody(RefAlignParam.RefSize, foreignRefsRef)
-                .Code;
-            if (Parent.ArgsType.IsDataLess)
-                return result.TryReplacePrimitiveRecursivity(FunctionId);
-            return result;
+
+            try
+            {
+                _isObtainBodyCodeActive = true;
+                var foreignRefsRef = CreateContextRefCode();
+                var visitResult = Result(Category.Code | Category.CodeArgs);
+                var result = visitResult
+                    .ReplaceRefsForFunctionBody(RefAlignParam.RefSize, foreignRefsRef)
+                    .Code;
+                if(Parent.ArgsType.IsDataLess)
+                    return result.TryReplacePrimitiveRecursivity(FunctionId);
+                return result;
+            }
+            finally
+            {
+                _isObtainBodyCodeActive = false;
+            }
         }
 
         public string DumpFunction()
@@ -156,6 +172,9 @@ namespace Reni.Struct
             result += "\n";
             return result;
         }
+
+        ContextBase ObtainCache() { return Parent.CreateSubContext(!IsGetter); }
+        bool IsGetter { get { return FunctionId.IsGetter; } }
     }
 
     sealed class FunctionId

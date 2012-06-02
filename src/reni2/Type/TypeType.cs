@@ -79,7 +79,7 @@ namespace Reni.Type
             {
                 var count = right
                     .Result(contextBase)
-                    .AutomaticDereference()
+                    .AutomaticDereferenceResult()
                     .Evaluate(contextBase.RootContext.OutStream)
                     .ToInt32();
                 return _typeType

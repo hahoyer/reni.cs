@@ -74,7 +74,7 @@ namespace Reni
 
         Result CondBranchResult(ContextBase context, Category category, CompileSyntax syntax)
         {
-            var branchResult = syntax.Result(context, category.Typed).AutomaticDereference();
+            var branchResult = syntax.Result(context, category.Typed).AutomaticDereferenceResult();
             if((category - Category.Type).IsNone)
                 return branchResult.Align(context.RefAlignParam.AlignBits);
 

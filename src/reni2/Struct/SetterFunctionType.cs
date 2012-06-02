@@ -43,8 +43,7 @@ namespace Reni.Struct
         }
 
         protected override FunctionId FunctionId { get { return _functionId; } }
-        protected override ContextBase Context { get { return Parent.SetterContext; } }
-        protected override Size FrameSize { get { return base.FrameSize + RefAlignParam.RefSize; } }
+        protected override Size ArgsPartSize { get { return base.ArgsPartSize + RefAlignParam.RefSize; } }
 
         Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType) { return SetterType.AssignmentResult(category, argsType,Parent); }
         bool IFunctionalFeature.IsImplicit { get { return Parent.IsImplicit; } }

@@ -104,10 +104,6 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override bool IsDataLess { get { return CodeArgs.IsNone && ArgsType.IsDataLess; } }
-        [DisableDump]
-        internal ContextBase GetterContext { get { return _structure.UniqueContext.UniqueFunctionContext(ArgsType); } }
-        [DisableDump]
-        internal ContextBase SetterContext { get { return _structure.UniqueContext.UniqueFunctionContext(ArgsType, ValueType); } }
 
         Result ISetterTargetType.Result(Category category) { return _setter.CallResult(category); }
 
@@ -121,6 +117,8 @@ namespace Reni.Struct
             if(_setter != null)
                 _setter.EnsureBodyCode();
         }
+
+        internal ContextBase CreateSubContext(bool useValue) { return new Reni.Context.Function(_structure.UniqueContext, ArgsType, useValue ? ValueType : null); }
 
         internal FunctionContainer Serialize()
         {
