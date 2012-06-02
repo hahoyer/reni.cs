@@ -138,7 +138,8 @@ namespace Reni
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, Size refSize, CodeBase endOfRefsCode)
         {
-            StartMethodDump(true, code, refSize, endOfRefsCode);
+            var trace = ObjectId == -1;
+            StartMethodDump(trace, code, refSize, endOfRefsCode);
             try
             {
                 var reference = endOfRefsCode.AddToReference(refSize * -_data.Count);
@@ -148,8 +149,7 @@ namespace Reni
                     Dump("reference", reference);
                     BreakExecution();
                     Tracer.Assert(referenceInCode.RefSize == refSize);
-                    var replacement = reference.Dereference(refSize);
-                    result = result.ReplaceAbsolute(referenceInCode, () => replacement);
+                    result = result.ReplaceAbsolute(referenceInCode, () => reference);
                     Dump("result", result);
                     reference = reference.AddToReference(refSize);
                 }

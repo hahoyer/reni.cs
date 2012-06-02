@@ -139,8 +139,12 @@ namespace Reni.Struct
         {
             if(IsStopByObjectIdActive)
                 return null;
-            var result = Result(Category.Code).Code;
-            if(Parent.ArgsType.IsDataLess)
+            var foreignRefsRef = CreateContextRefCode();
+            var visitResult = Result(Category.Code| Category.CodeArgs);
+            var result = visitResult
+                .ReplaceRefsForFunctionBody(RefAlignParam.RefSize, foreignRefsRef)
+                .Code;
+            if (Parent.ArgsType.IsDataLess)
                 return result.TryReplacePrimitiveRecursivity(FunctionId);
             return result;
         }
