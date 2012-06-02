@@ -85,7 +85,7 @@ namespace Reni.Code
 
         void IVisitor.BitCast(Size size, Size targetSize, Size significantSize)
         {
-            var formalSubValue = GetInputValuesFromData(significantSize).OnlyOne();
+            var formalSubValue = GetInputValuesFromData(significantSize).Single();
             var startAddress = (_startAddress + targetSize - size).ToInt();
             var element = FormalValueAccess.BitCast(formalSubValue, (size - significantSize).ToInt());
             SetFormalValues(element, startAddress, size);
@@ -100,14 +100,14 @@ namespace Reni.Code
         void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
         {
             AlignFrame(offset);
-            var access = GetInputValuesFromFrame(offset, size).OnlyOne() ?? CreateValuesInFrame(size, offset);
+            var access = GetInputValuesFromFrame(offset, size).Single() ?? CreateValuesInFrame(size, offset);
             var startAddress = (_startAddress - size).ToInt();
             SetFormalValues(access, startAddress, dataSize);
         }
 
         void IVisitor.TopData(Size offset, Size size, Size dataSize)
         {
-            var source = GetInputValuesFromData(offset, dataSize).OnlyOne();
+            var source = GetInputValuesFromData(offset, dataSize).Single();
             var startAddress = (_startAddress - size).ToInt();
             SetFormalValues(source, startAddress, dataSize);
         }
@@ -126,7 +126,7 @@ namespace Reni.Code
 
         void IVisitor.RefPlus(Size right)
         {
-            var formalSubValue = PullInputValuesFromData(RefSize).OnlyOne();
+            var formalSubValue = PullInputValuesFromData(RefSize).Single();
             var startAddress = _startAddress.ToInt();
             var element = FormalValueAccess.RefPlus(formalSubValue, right.ToInt());
             SetFormalValues(element, startAddress, RefSize);
@@ -134,7 +134,7 @@ namespace Reni.Code
 
         void IVisitor.Dereference(Size size, Size dataSize)
         {
-            var formalSubValue = PullInputValuesFromData(RefSize).OnlyOne();
+            var formalSubValue = PullInputValuesFromData(RefSize).Single();
             var startAddress = (_startAddress + RefSize - size).ToInt();
             var element = FormalValueAccess.Dereference(formalSubValue);
             SetFormalValues(element, startAddress, dataSize);
@@ -142,8 +142,8 @@ namespace Reni.Code
 
         void IVisitor.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
         {
-            var formalLeftSubValue = PullInputValuesFromData(leftSize).OnlyOne();
-            var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).OnlyOne();
+            var formalLeftSubValue = PullInputValuesFromData(leftSize).Single();
+            var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).Single();
             var startAddress = (_startAddress + leftSize + rightSize - size).ToInt();
             var element = FormalValueAccess.BitArrayBinaryOp(opToken.DataFunctionName, formalLeftSubValue, formalRightSubValue);
             SetFormalValues(element, startAddress, size);

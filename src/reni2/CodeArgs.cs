@@ -138,7 +138,7 @@ namespace Reni
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, Size refSize, CodeBase endOfRefsCode)
         {
-            StartMethodDump(false, code, refSize, endOfRefsCode);
+            StartMethodDump(true, code, refSize, endOfRefsCode);
             try
             {
                 var reference = endOfRefsCode.AddToReference(refSize * -_data.Count);
