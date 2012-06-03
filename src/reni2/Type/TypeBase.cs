@@ -170,8 +170,8 @@ namespace Reni.Type
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
         internal Result ArgResult(Category category) { return Result(category, ArgCode, CodeArgs.Arg); }
         internal CodeBase ArgCode() { return CodeBase.Arg(this); }
-        internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type.ArgResult(category); }
-        internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type.ArgCode().Dereference(Size); }
+        internal Result ReferenceArgResult(Category category, RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type().ArgResult(category); }
+        internal CodeBase DereferencedReferenceCode(RefAlignParam refAlignParam) { return UniqueReference(refAlignParam).Type().ArgCode().Dereference(Size); }
 
         internal Result Result(Category category)
         {
@@ -293,8 +293,7 @@ namespace Reni.Type
             if(IsDataLess)
                 return ArgResult(category);
 
-            return UniqueReference(refAlignParam)
-                .Type
+            return UniqueReference(refAlignParam).Type()
                 .Result
                 (
                     category,
@@ -311,8 +310,7 @@ namespace Reni.Type
 
         internal Result ReferenceInCode(Category category, IReferenceInCode target)
         {
-            return UniqueReference(target.RefAlignParam)
-                .Type
+            return UniqueReference(target.RefAlignParam).Type()
                 .Result(category, target);
         }
 
@@ -361,7 +359,7 @@ namespace Reni.Type
         {
             if(IsDataLess)
                 return this;
-            return UniqueReference(refAlignParam).Type;
+            return UniqueReference(refAlignParam).Type();
         }
 
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
@@ -378,8 +376,7 @@ namespace Reni.Type
         {
             return UniqueAlign(refAlignParam.AlignBits)
                 .UniqueArray(1)
-                .UniqueReference(refAlignParam)
-                .Type
+                .UniqueReference(refAlignParam).Type()
                 .Result(category, ReferenceArgResult(category, refAlignParam));
         }
 
@@ -442,9 +439,8 @@ namespace Reni.Type
             var uniqueTextItem = UniqueTextItemType;
             return
                 uniqueTextItem
-                    .UniqueReference(refAlignParam)
-                    .Type
-                    .Result(category, UniqueReference(refAlignParam).Type.ArgResult(category))
+                    .UniqueReference(refAlignParam).Type()
+                    .Result(category, UniqueReference(refAlignParam).Type().ArgResult(category))
                 ;
         }
 

@@ -31,9 +31,13 @@ namespace Reni.Type
 {
     interface IReference
     {
-        TypeBase Type { get; }
         TypeBase TargetType { get; }
         RefAlignParam RefAlignParam { get; }
         Result DereferenceResult(Category category);
+    }
+
+    static internal class ReferenceExtension
+    {
+        internal static TypeBase Type(this IReference reference) { return (TypeBase) reference; }
     }
 }

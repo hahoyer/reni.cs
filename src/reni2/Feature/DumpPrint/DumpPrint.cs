@@ -40,8 +40,7 @@ namespace Reni.Feature.DumpPrint
         static CodeBase BitSequenceDumpPrint(IReference objectReference)
         {
             var alignedSize = objectReference.TargetType.Size.Align(objectReference.RefAlignParam.AlignBits);
-            return objectReference
-                .Type
+            return objectReference.Type()
                 .ArgCode()
                 .Dereference(alignedSize)
                 .DumpPrintNumber(alignedSize);

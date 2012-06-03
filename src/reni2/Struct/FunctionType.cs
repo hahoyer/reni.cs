@@ -70,7 +70,6 @@ namespace Reni.Struct
         TypeBase IReference.TargetType { get { return ValueType; } }
         RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
         Result IReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
-        TypeBase IReference.Type { get { return this; } }
 
         Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
         RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }

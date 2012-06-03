@@ -54,7 +54,7 @@ namespace Reni.Struct
         internal static Result AssignmentResult(Category category, TypeBase argsType, ISetterTargetType target)
         {
             var sourceResult = argsType
-                .Conversion(category, target.ValueType.UniqueReference(target.RefAlignParam).Type);
+                .Conversion(category, target.ValueType.UniqueReference(target.RefAlignParam).Type());
             var destinationResult = target
                 .DestinationResult(category.Typed)
                 .ReplaceArg(target.Type.Result(category.Typed, target));
@@ -79,10 +79,8 @@ namespace Reni.Struct
 
                 Dump("rawResult", rawResult);
 
-                var sourceResult = argsType.Conversion(category, valueType.UniqueReference(_target.RefAlignParam).Type);
-                Dump("sourceResult", sourceResult);
+                var sourceResult = argsType.Conversion(category, valueType.UniqueReference(_target.RefAlignParam).Type());
                 var destinationResult = _target.DestinationResult(category.Typed);
-                Dump("destinationResult", destinationResult);
                 var resultForArg = destinationResult + sourceResult;
                 Dump("resultForArg", resultForArg);
 

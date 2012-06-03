@@ -24,6 +24,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.Type;
 
 namespace Reni.Sequence
 {
@@ -41,8 +42,7 @@ namespace Reni.Sequence
         Result IFeature.Result(Category category, RefAlignParam refAlignParam)
         {
             var resultForArg = _objectType
-                .UniqueReference(refAlignParam)
-                .Type
+                .UniqueReference(refAlignParam).Type()
                 .ArgResult(category.Typed)
                 .AutomaticDereferenceResult()
                 .Align(refAlignParam.AlignBits);

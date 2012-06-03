@@ -73,8 +73,7 @@ namespace Reni.Type
         {
             return
                 UniqueSequence(count)
-                    .UniqueReference(refAlignParam)
-                    .Type
+                    .UniqueReference(refAlignParam).Type()
                     .ArgCode()
                     .Dereference(Size * count)
                     .DumpPrintText(Size);
@@ -83,8 +82,7 @@ namespace Reni.Type
         CodeBase DumpPrintCode(RefAlignParam refAlignParam)
         {
             return
-                UniqueReference(refAlignParam)
-                    .Type
+                UniqueReference(refAlignParam).Type()
                     .ArgCode()
                     .Dereference(Size)
                     .DumpPrintText(Size);

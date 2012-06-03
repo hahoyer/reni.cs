@@ -123,7 +123,6 @@ namespace Reni.Type
                 .Concat(Parent.SmartReference(RefAlignParam).Converter(conversionParameter, destination));
         }
 
-        TypeBase IReference.Type { get { return this; } }
         TypeBase IReference.TargetType { get { return Parent; } }
     }
 }
