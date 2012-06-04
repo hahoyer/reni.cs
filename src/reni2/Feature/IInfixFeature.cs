@@ -61,7 +61,7 @@ namespace Reni.Feature
     {
     }
 
-    sealed class Feature : ReniObject, ISuffixFeature
+    sealed class Feature : ReniObject, ISuffixFeature, ISimpleFeature
     {
         [EnableDump]
         readonly Func<Category, Result> _function;
@@ -76,8 +76,9 @@ namespace Reni.Feature
 
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
-        Result Result(Category category) { return _function(category); }
+        ISimpleFeature IFeature.Simple { get { return this; } }
+        
+        Result ISimpleFeature.Result(Category category) { return _function(category); }
     }
 
     sealed class PrefixFeature : ReniObject, IPrefixFeature

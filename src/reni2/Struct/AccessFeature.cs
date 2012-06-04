@@ -30,7 +30,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class AccessFeature : ReniObject, ISuffixFeature
+    sealed class AccessFeature : ReniObject, ISuffixFeature, ISimpleFeature
     {
         [EnableDump]
         readonly Structure _structure;
@@ -46,15 +46,15 @@ namespace Reni.Struct
 
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
-        Result Result(Category category)
+        ISimpleFeature IFeature.Simple { get { return this; } }
+        Result ISimpleFeature.Result(Category category)
         {
             return _structure
                 .AccessViaThisReference(category, _position);
         }
     }
 
-    sealed class ContextAccessFeature : ReniObject, IContextFeature
+    sealed class ContextAccessFeature : ReniObject, IContextFeature, ISimpleFeature
     {
         [EnableDump]
         readonly Structure _structure;
@@ -68,7 +68,7 @@ namespace Reni.Struct
             _position = position;
         }
 
-        Result Result(Category category)
+        Result ISimpleFeature.Result(Category category)
         {
             return _structure
                 .AccessViaContextReference(category, _position);
@@ -77,6 +77,6 @@ namespace Reni.Struct
         IFeature FeatureProvider { get { return _structure.FeatureProvider(_position) ?? EmptyFeatureProvider.Instance; } }
         IMetaFunctionFeature IFeature.MetaFunction { get { return FeatureProvider.MetaFunction; } }
         IFunctionFeature IFeature.Function { get { return FeatureProvider.Function; } }
-        ISimpleFeature IFeature.Simple { get { return FeatureProvider.Simple; } }
+        ISimpleFeature IFeature.Simple { get { return this; } }
     }
 }
