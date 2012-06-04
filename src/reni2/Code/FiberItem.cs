@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -74,9 +77,6 @@ namespace Reni.Code
 
         [DisableDump]
         string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }
-
-        [DisableDump]
-        internal virtual RefAlignParam RefAlignParam { get { return null; } }
 
         [DisableDump]
         internal CodeArgs CodeArgs { get { return GetRefsImplementation(); } }

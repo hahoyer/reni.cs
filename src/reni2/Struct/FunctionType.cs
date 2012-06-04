@@ -30,49 +30,45 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionType : TypeBase, ISetterTargetType, ISearchContainerType, IConverter, IReference
+    sealed class FunctionType : TypeBase, ISetterTargetType, ISearchContainerType, IConverter, ISoftReference
     {
         readonly int _index;
         [Node]
         readonly Structure _structure;
         [Node]
         internal readonly TypeBase ArgsType;
-        internal readonly bool IsImplicit;
         [Node]
         readonly SetterFunction _setter;
         [NotNull]
         [Node]
         readonly GetterFunction _getter;
-        readonly SimpleCache<SetterType> _setterTypeCache;
+        [DisableDump]
+        internal readonly ISuffixFeature AssignmentFeature;
 
         internal FunctionType(int index, FunctionSyntax body, Structure structure, TypeBase argsType)
         {
-            IsImplicit = body.IsImplicit;
+            AssignmentFeature = new AssignmentFeature(this);
             _getter = new GetterFunction(this, index, body.Getter);
             _setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
             _index = index;
             _structure = structure;
             ArgsType = argsType;
-            _setterTypeCache = new SimpleCache<SetterType>(() => new SetterType(this));
             StopByObjectId(-10);
         }
 
-        IReferenceInCode ISetterTargetType.ObjectReference { get { return this; } }
         TypeBase ISetterTargetType.Type { get { return this; } }
         TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
-        SetterType ISetterTargetType.SetterType { get { return _setterTypeCache.Value; } }
 
         TypeBase IReference.TargetType { get { return ValueType; } }
-        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
         Result IReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
 
-        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
-        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
+        Size IContextReference.Size { get { return Size; } }
 
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
 
@@ -108,7 +104,7 @@ namespace Reni.Struct
 
         Result ISetterTargetType.DestinationResult(Category category) { return Result(category, this); }
 
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
 
         internal void EnsureBodyCode()
         {
@@ -124,14 +120,6 @@ namespace Reni.Struct
             var getter = _getter.Serialize();
             var setter = _setter == null ? null : _setter.Serialize();
             return new FunctionContainer(getter, setter);
-        }
-
-
-        public FunctionInstance Instance(bool isGetter)
-        {
-            if(isGetter)
-                return _getter;
-            return _setter;
         }
 
         public string DumpFunction()
@@ -161,7 +149,7 @@ namespace Reni.Struct
                 return Result(category);
             return Result
                 (category
-                 , () => CodeArgs.ToCode().Sequence(ArgsType.ArgCode()).LocalReference(RefAlignParam, CodeBase.Void())
+                 , () => CodeArgs.ToCode().Sequence(ArgsType.ArgCode)
                  , () => CodeArgs + CodeArgs.Arg()
                 );
         }

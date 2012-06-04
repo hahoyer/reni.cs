@@ -1,8 +1,7 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,29 +26,30 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Struct;
+using Reni.TokenClasses;
 
-namespace Reni.Sequence
+namespace Reni.Type
 {
-    sealed class ObjectReference : ReniObject, IContextReference
+    sealed class FunctionFeature : ReniObject, IFunctionFeature, IContextReference
     {
-        static int _nextObjectId;
-
-        [EnableDump]
-        readonly SequenceType _objectType;
-
-        [DisableDump]
-        readonly RefAlignParam _refAlignParam;
-
-        internal ObjectReference(SequenceType objectType, RefAlignParam refAlignParam)
-            : base(_nextObjectId++)
+        readonly Structure _structure;
+        readonly FunctionSyntax _syntax;
+        public FunctionFeature(Structure structure, FunctionSyntax syntax)
         {
-            _objectType = objectType;
-            _refAlignParam = refAlignParam;
-            StopByObjectId(-1);
+            _structure = structure;
+            _syntax = syntax;
         }
 
-        Size IContextReference.Size{ get { return _refAlignParam.RefSize; } }
-        internal override string DumpShort() { return base.DumpShort() + "(" + _objectType.DumpShort() + ")"; }
-        internal Result Result(Category category) { return _objectType.ReferenceInCode(category, this); }
+        [DisableDump]
+        RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+
+        IContextReference IFunctionFeature.ObjectReference { get { return this; } }
+        bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
+        Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
+
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return Function(argsType).ApplyResult(category); }
+        FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
+
     }
 }

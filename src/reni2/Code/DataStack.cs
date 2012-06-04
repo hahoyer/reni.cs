@@ -185,7 +185,7 @@ namespace Reni.Code
             }
         }
 
-        void IVisitor.ReferenceCode(IReferenceInCode context) { throw new UnexpectedContextReference(context); }
+        void IVisitor.ReferenceCode(IContextReference context) { throw new UnexpectedContextReference(context); }
 
         void IVisitor.LocalVariableDefinition(string holderName, Size valueSize)
         {

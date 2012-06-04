@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,11 +18,14 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Context;
 
 namespace Reni.Code
 {
@@ -31,18 +35,12 @@ namespace Reni.Code
     [Serializable]
     sealed class RefPlus : FiberItem
     {
-        readonly RefAlignParam _refAlignParam;
-
         [DisableDump]
         readonly Size _right;
 
-        [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
-
-        public RefPlus(RefAlignParam refAlignParam, Size right, string reason = null)
+        public RefPlus(Size right, string reason = null)
             : base(reason)
         {
-            _refAlignParam = refAlignParam;
             _right = right;
             AssertValid();
             StopByObjectId(-8);
@@ -50,7 +48,7 @@ namespace Reni.Code
 
         void AssertValid()
         {
-            _right.AssertAlignedSize(RefAlignParam.AlignBits);
+            _right.AssertAlignedSize(Root.DefaultRefAlignParam.AlignBits);
             Tracer.Assert(!_right.IsZero);
         }
 
@@ -60,44 +58,29 @@ namespace Reni.Code
         internal override void Visit(IVisitor visitor) { visitor.RefPlus(_right); }
 
         [DisableDump]
-        internal override Size InputSize { get { return GetSize(); } }
+        internal override Size InputSize { get { return Root.DefaultRefAlignParam.RefSize; } }
 
         [DisableDump]
-        internal override Size OutputSize { get { return GetSize(); } }
+        internal override Size OutputSize { get { return Root.DefaultRefAlignParam.RefSize; } }
 
-        Size GetSize() { return RefAlignParam.RefSize; }
+        internal override CodeBase TryToCombineBack(TopRef precedingElement) { return new TopRef(precedingElement.Offset + _right); }
 
-        internal override CodeBase TryToCombineBack(TopRef precedingElement)
-        {
-            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopRef(RefAlignParam, precedingElement.Offset + _right);
-        }
-
-        internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
-        {
-            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopFrameRef(RefAlignParam, precedingElement.Offset + _right);
-        }
+        internal override CodeBase TryToCombineBack(TopFrameRef precedingElement) { return new TopFrameRef(precedingElement.Offset + _right); }
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
         internal override FiberItem[] TryToCombineBack(RefPlus precedingElement)
         {
-            if(RefAlignParam.IsEqual(precedingElement.RefAlignParam))
-            {
-                var newRight = _right + precedingElement._right;
-                if(newRight.IsZero)
-                    return new FiberItem[0];
-                return new FiberItem[] { new RefPlus(RefAlignParam, newRight) };
-            }
-            return base.TryToCombineBack(precedingElement);
+            var newRight = _right + precedingElement._right;
+            if(newRight.IsZero)
+                return new FiberItem[0];
+            return new FiberItem[] {new RefPlus(newRight)};
         }
 
         internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
         {
-            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
             return CodeBase
-                .LocalVariableReference(RefAlignParam, precedingElement.Holder, precedingElement.Offset + _right);
+                .LocalVariableReference(precedingElement.Holder, precedingElement.Offset + _right);
         }
     }
 }

@@ -50,8 +50,7 @@ namespace Reni.Type
             var objectType = UniqueNumber(objectBits).UniqueAlign(BitsConst.SegmentAlignBits);
             var argsType = UniqueNumber(argsBits).UniqueAlign(BitsConst.SegmentAlignBits);
             return objectType
-                .Pair(argsType)
-                .ArgCode()
+                .Pair(argsType).ArgCode
                 .BitSequenceOperation(token, size, Size.Create(objectBits).ByteAlignedSize);
         }
     }

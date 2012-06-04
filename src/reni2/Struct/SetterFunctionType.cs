@@ -25,14 +25,13 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class SetterFunction : FunctionInstance, IFunctionalFeature
+    sealed class SetterFunction : FunctionInstance
     {
         readonly FunctionId _functionId;
         public SetterFunction(FunctionType parent, int index, CompileSyntax body)
@@ -43,12 +42,7 @@ namespace Reni.Struct
         }
 
         protected override FunctionId FunctionId { get { return _functionId; } }
-        protected override Size ArgsPartSize { get { return base.ArgsPartSize + RefAlignParam.RefSize; } }
-
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType) { return SetterType.AssignmentResult(category, argsType,Parent); }
-        bool IFunctionalFeature.IsImplicit { get { return Parent.IsImplicit; } }
-        IReferenceInCode IFunctionalFeature.ObjectReference { get { return Parent; } }
-        
-        string IDumpShortProvider.DumpShort() { return _functionId.ToString(); }
+        protected override TypeBase CallType { get { return base.CallType.Pair(Parent.ValueType.UniqueReference.Type()); } }
+        protected override Size RelevantValueSize { get { return Root.DefaultRefAlignParam.RefSize; } }
     }
 }

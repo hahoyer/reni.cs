@@ -28,7 +28,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class ContainerContextObject : ReniObject, IReferenceInCode
+    sealed class ContainerContextObject : ReniObject, IContextReference
     {
         static int _nextObjectId;
         readonly Container _container;
@@ -41,11 +41,8 @@ namespace Reni.Struct
             _parent = parent;
         }
 
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        [DisableDump]
-        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
+        Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
 
         internal Container Container { get { return _container; } }
         internal ContextBase Parent { get { return _parent; } }
@@ -109,8 +106,7 @@ namespace Reni.Struct
         {
             return Parent
                 .UniqueStructure(Container, accessPosition)
-                .ReferenceType
-                .ArgCode()
+                .ReferenceType.ArgCode
                 .AddToReference(ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 

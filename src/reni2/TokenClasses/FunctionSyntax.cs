@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
@@ -25,32 +24,48 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
+using Reni.Sequence;
+using Reni.Struct;
 using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
     sealed class FunctionSyntax : SpecialSyntax
     {
         public readonly CompileSyntax Getter;
-        internal readonly bool IsImplicit;
+        readonly bool _isImplicit;
+        readonly bool _isMetaFunction;
         public readonly CompileSyntax Setter;
 
-        public FunctionSyntax(TokenData token, CompileSyntax getter, bool isImplicit, CompileSyntax setter)
+        public FunctionSyntax(TokenData token, CompileSyntax getter, bool isImplicit, bool isMetaFunction, CompileSyntax setter)
             : base(token)
         {
             Getter = getter;
-            IsImplicit = isImplicit;
+            _isImplicit = isImplicit;
             Setter = setter;
+            _isMetaFunction = isMetaFunction;
         }
-
-        string Tag { get { return IsImplicit ? "/!\\" : "/\\"; } }
-
+                                                       
+        string Tag
+        {
+            get
+            {
+                return (_isMetaFunction ? "{0}{0}" : "{0}")
+                    .ReplaceArgs("/{0}\\")
+                    .ReplaceArgs(IsImplicit ? "!" : "");
+            }
+        }
+                                                       
+        internal override bool IsImplicit { get { return _isImplicit; } }
         internal override Result ObtainResult(ContextBase context, Category category) { return context.FunctionalResult(category, this); }
         protected override bool GetIsLambda() { return true; }
-        
+
         internal override string DumpPrintText
         {
             get
@@ -68,5 +83,23 @@ namespace Reni.TokenClasses
             var setter = Setter == null ? "" : "(" + Setter.DumpShort() + ")";
             return getter + base.DumpShort() + setter;
         }
+
+        internal IMetaFunctionFeature MetaFunctionFeature(Structure structure)
+        {
+            if (!_isMetaFunction)
+                return null;
+            NotImplementedMethod(structure);
+            return null;
+        }
+        internal IFunctionFeature FunctionFeature(Structure structure)
+        {
+            if (_isMetaFunction)
+                return null;
+            return new Type.FunctionFeature(structure,this);
+        }
     }
+}
+
+namespace Reni.Type
+{
 }

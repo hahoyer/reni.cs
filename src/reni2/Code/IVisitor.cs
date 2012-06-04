@@ -49,7 +49,7 @@ namespace Reni.Code
         void LocalVariableDefinition(string holderName, Size valueSize);
         void LocalVariableReference(string holder, Size offset);
         void RecursiveCall();
-        void ReferenceCode(IReferenceInCode context);
+        void ReferenceCode(IContextReference context);
         void RefPlus(Size right);
         void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
         void TopData(Size offset, Size size, Size dataSize);

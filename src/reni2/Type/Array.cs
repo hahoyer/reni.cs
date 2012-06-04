@@ -28,6 +28,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -38,7 +39,7 @@ namespace Reni.Type
     [Serializable]
     sealed class Array : TypeBase
     {
-        readonly DictionaryEx<RefAlignParam, ConcatArraysFeature> _concatArraysFeatureCache;
+        readonly SimpleCache<ConcatArraysFeature> _concatArraysFeatureCache;
 
         readonly TypeBase _element;
         readonly int _count;
@@ -50,7 +51,7 @@ namespace Reni.Type
             _element = element;
             _count = count;
             Tracer.Assert(count > 0);
-            _concatArraysFeatureCache = new DictionaryEx<RefAlignParam, ConcatArraysFeature>(refAlignParam => new ConcatArraysFeature(this, refAlignParam));
+            _concatArraysFeatureCache = new SimpleCache<ConcatArraysFeature>(()=> new ConcatArraysFeature(this));
         }
 
         [Node]
@@ -80,28 +81,29 @@ namespace Reni.Type
 
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + ")array(" + Count + ")"; }
 
-        internal Result ConcatArrays(Category category, RefAlignParam refAlignParam)
+        internal Result ConcatArrays(Category category)
         {
             return _concatArraysFeatureCache
-                .Find(refAlignParam)
-                .Result(category, ReferenceArgResult(category, refAlignParam));
+                .Value
+                .Result(category, ReferenceArgResult(category));
         }
 
-        internal Result DumpPrintResult(Category category, RefAlignParam refAlignParam)
+        internal Result DumpPrintResult(Category category)
         {
             return Void
                 .Result
-                (category
-                 , () => DumpPrintCode(refAlignParam)
-                 , () => Element.GenericDumpPrintResult(Category.CodeArgs, refAlignParam).CodeArgs
+                (category: category
+                 , getCode: CreateDumpPrintCode
+                 , getRefs: () => Element.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
                 );
         }
 
-        CodeBase DumpPrintCode(RefAlignParam refAlignParam)
+        CodeBase CreateDumpPrintCode()
         {
-            var elementReference = Element.UniqueReference(refAlignParam).Type();
-            var argCode = UniqueReference(refAlignParam).Type().ArgCode();
-            var elementDumpPrint = Element.GenericDumpPrintResult(Category.Code, refAlignParam).Code;
+            var refAlignParam = Root.DefaultRefAlignParam;
+            var elementReference = Element.UniqueReference.Type();
+            var argCode = UniqueReference.Type().ArgCode;
+            var elementDumpPrint = Element.GenericDumpPrintResult(Category.Code).Code;
             var code = CodeBase.DumpPrintText("array(" + Element.DumpPrintText + ",(");
             for(var i = 0; i < Count; i++)
             {
@@ -114,12 +116,11 @@ namespace Reni.Type
             return code;
         }
 
-        internal Result SequenceResult(Category category, RefAlignParam refAlignParam)
+        internal Result SequenceResult(Category category)
         {
             return Element
-                .UniqueSequence(Count)
-                .UniqueReference(refAlignParam).Type()
-                .Result(category, UniqueReference(refAlignParam).Type().ArgResult(category));
+                .UniqueSequence(Count).UniqueReference.Type()
+                .Result(category, UniqueReference.Type().ArgResult(category));
         }
     }
 }

@@ -44,17 +44,17 @@ namespace Reni.Sequence
         internal readonly ISuffixFeature BitDumpPrintFeature;
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
-        internal Result EnableCutFeature(Category category, RefAlignParam refAlignParam)
+        internal Result EnableCutFeature(Category category)
         {
             return UniqueEnableCutType
                 .Result
                 (category
-                 , () => SmartReference(refAlignParam).ArgCode().Dereference(Size)
+                 , () => SmartReference().ArgCode.Dereference(Size)
                  , CodeArgs.Arg
                 );
         }
 
-        internal ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionalFeature(this, featureBase); }
+        internal ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionFeature(this, featureBase); }
 
         internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
 
@@ -95,7 +95,7 @@ namespace Reni.Sequence
             var result = Result
                 (
                     category,
-                    () => Element.UniqueSequence(oldCount).ArgCode().BitCast(Size)
+                    () => Element.UniqueSequence(oldCount).ArgCode.BitCast(Size)
                     , CodeArgs.Arg
                 );
             return result;
@@ -115,7 +115,7 @@ namespace Reni.Sequence
                 .Result
                 (
                     category,
-                    () => ArgCode().BitCast(newType.Size)
+                    () => ArgCode.BitCast(newType.Size)
                     , CodeArgs.Arg
                 );
             return result;
@@ -150,7 +150,7 @@ namespace Reni.Sequence
             return new FunctionalConverter(category => Conversion(category, source, destination));
         }
 
-        internal Result DumpPrintTextResult(Category category, RefAlignParam refAlignParam) { return Element.DumpPrintTextResultFromSequence(category, refAlignParam, Count); }
+        internal Result DumpPrintTextResult(Category category) { return Element.DumpPrintTextResultFromSequence(category, Count); }
 
         protected override IConverter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
         {

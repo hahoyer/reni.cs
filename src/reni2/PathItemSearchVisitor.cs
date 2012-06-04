@@ -29,7 +29,7 @@ using Reni.Feature;
 namespace Reni
 {
     sealed class PathItemSearchVisitor<TFeature, TType> : SearchVisitor<ISearchPath<TFeature, TType>>
-        where TFeature : class
+        where TFeature : class, ISearchPath
         where TType : IDumpShortProvider
     {
         [DisableDump]

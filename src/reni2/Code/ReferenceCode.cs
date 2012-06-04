@@ -1,5 +1,7 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,11 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
@@ -25,12 +32,12 @@ namespace Reni.Code
     /// <summary>
     ///     ContextAtPosition reference, should be replaced
     /// </summary>
-    internal sealed class ReferenceCode : FiberHead
+    sealed class ReferenceCode : FiberHead
     {
-        private readonly IReferenceInCode _context;
-        private static int _nextObjectId;
+        readonly IContextReference _context;
+        static int _nextObjectId;
 
-        internal ReferenceCode(IReferenceInCode context)
+        internal ReferenceCode(IContextReference context)
             : base(_nextObjectId++)
         {
             _context = context;
@@ -38,20 +45,17 @@ namespace Reni.Code
         }
 
         [Node]
-        internal IReferenceInCode Context { get { return _context; } }
-
-        [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return _context.RefAlignParam; } }
+        internal IContextReference Context { get { return _context; } }
 
         [DisableDump]
         internal override bool IsRelativeReference { get { return false; } }
 
         protected override CodeArgs GetRefsImplementation() { return CodeArgs.Create(_context); }
 
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        protected override Size GetSize() { return _context.Size; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }
         internal override void Visit(IVisitor visitor) { visitor.ReferenceCode(Context); }
 
-        public override string DumpData() { return _context.DumpShort(); }
+        public override string DumpData() { return ((ReniObject) _context).DumpShort(); }
     }
 }

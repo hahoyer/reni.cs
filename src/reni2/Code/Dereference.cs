@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,11 +18,14 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Context;
 
 namespace Reni.Code
 {
@@ -31,22 +35,17 @@ namespace Reni.Code
     [Serializable]
     sealed class Dereference : FiberItem
     {
-        readonly RefAlignParam _refAlignParam;
         readonly Size _outputSize;
         readonly Size _dataSize;
         static int _nextObjectId;
 
-        public Dereference(RefAlignParam refAlignParam, Size outputSize, Size dataSize)
+        public Dereference(Size outputSize, Size dataSize)
             : base(_nextObjectId++)
         {
-            _refAlignParam = refAlignParam;
             _outputSize = outputSize;
             _dataSize = dataSize;
-            StopByObjectId(-4);
+            StopByObjectId(-6);
         }
-
-        [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
 
         [DisableDump]
         internal Size DataSize { get { return _dataSize; } }
@@ -55,30 +54,18 @@ namespace Reni.Code
         public override string NodeDump { get { return base.NodeDump + " DataSize=" + DataSize; } }
 
         [DisableDump]
-        internal override Size InputSize { get { return RefAlignParam.RefSize; } }
+        internal override Size InputSize { get { return Root.DefaultRefAlignParam.RefSize; } }
 
         [DisableDump]
         internal override Size OutputSize { get { return _outputSize; } }
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        internal override CodeBase TryToCombineBack(TopRef precedingElement)
-        {
-            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
-        }
+        internal override CodeBase TryToCombineBack(TopRef precedingElement) { return new TopData(precedingElement.Offset, OutputSize, DataSize); }
 
-        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
-        {
-            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new LocalVariableAccess(RefAlignParam, precedingElement.Holder, precedingElement.Offset, OutputSize, _dataSize);
-        }
+        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement) { return new LocalVariableAccess(precedingElement.Holder, precedingElement.Offset, OutputSize, _dataSize); }
 
-        internal override CodeBase TryToCombineBack(TopFrameRef precedingElement)
-        {
-            Tracer.Assert(RefAlignParam.Equals(precedingElement.RefAlignParam));
-            return new TopFrameData(RefAlignParam, precedingElement.Offset, OutputSize, DataSize);
-        }
+        internal override CodeBase TryToCombineBack(TopFrameRef precedingElement) { return new TopFrameData(precedingElement.Offset, OutputSize, DataSize); }
 
         internal override void Visit(IVisitor visitor) { visitor.Dereference(OutputSize, DataSize); }
     }

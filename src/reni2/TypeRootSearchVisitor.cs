@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,23 +18,29 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Helper;
 using Reni.Feature;
 using Reni.Type;
 
 namespace Reni
 {
     sealed class TypeRootSearchVisitor<TFeature> : RootSearchVisitor<TFeature>
-        where TFeature : class, ITypeFeature
+        where TFeature : class, IFeature
     {
         [EnableDump]
         readonly TypeBase _type;
 
         internal TypeRootSearchVisitor(ISearchTarget target, TypeBase type)
             : base(target) { _type = type; }
+
+        [EnableDump]
+        internal string[] ProbeStr { get { return Probe.Select(x => x.PrettyName()).ToArray(); } }
 
         internal SearchResult SearchResult
         {

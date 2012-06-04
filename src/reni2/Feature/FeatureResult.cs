@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,17 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
-using HWClassLibrary.Debug;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using Reni.Feature;
-using Reni.Sequence;
+#endregion
 
-namespace Reni.TokenClasses
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using HWClassLibrary.Debug;
+
+namespace Reni.Feature
 {
-    internal sealed class EnableCut : Defineable, ISearchPath<ISuffixFeature, SequenceType>
-    {
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
-    }
+    class FeatureResult
+    {}
 }

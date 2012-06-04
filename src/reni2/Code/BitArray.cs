@@ -62,6 +62,6 @@ namespace Reni.Code
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Data=" + Data; } }
 
-        internal new static BitArray Void() { return new BitArray(Size.Create(0), Basics.BitsConst.None()); }
+        new internal static BitArray Void { get { return new BitArray(Size.Create(0), Basics.BitsConst.None()); } }
     }
 }

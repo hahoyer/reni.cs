@@ -75,7 +75,7 @@ namespace Reni.Type
             return Parent.Result
                 (
                     category,
-                    () => ArgCode().BitCast(Parent.Size)
+                    () => ArgCode.BitCast(Parent.Size)
                     , CodeArgs.Arg
                 );
         }

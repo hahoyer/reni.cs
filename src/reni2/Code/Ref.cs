@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,12 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
+using Reni.Context;
 
 namespace Reni.Code
 {
@@ -32,25 +36,19 @@ namespace Reni.Code
     [Serializable]
     abstract class Ref : FiberHead
     {
-        readonly RefAlignParam _refAlignParam;
-
         [Node]
         [DisableDump]
         internal readonly Size Offset;
 
-        protected Ref(RefAlignParam refAlignParam, Size offset)
-        {
-            _refAlignParam = refAlignParam;
-            Offset = offset;
-        }
+        protected Ref(Size offset) { Offset = offset; }
 
-        protected override sealed Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Offset=" + Offset; } }
 
         [Node]
         [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal override bool IsRelativeReference { get { return true; } }
     }
 }

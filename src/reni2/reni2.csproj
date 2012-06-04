@@ -32,6 +32,7 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
+    <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="PathItemSearchVisitor.cs" />
@@ -61,7 +62,7 @@
     <Compile Include="Code\ISequenceOfBitPrefixOperation.cs" />
     <Compile Include="Code\List.cs" />
     <Compile Include="Code\LocalReference.cs" />
-    <Compile Include="Code\IReferenceInCode.cs" />
+    <Compile Include="Code\IContextReference.cs" />
     <Compile Include="Code\LocalReferenceSequenceVisitor.cs" />
     <Compile Include="Code\LocalStackReference.cs" />
     <Compile Include="Code\LocalVariableAccess.cs" />
@@ -169,7 +170,7 @@
     <Compile Include="Sequence\Star.cs" />
     <Compile Include="Struct\ContainerContextObject.cs" />
     <Compile Include="Struct\Context.cs" />
-    <Compile Include="Struct\FunctionalBodyType.cs" />
+    <Compile Include="Struct\FunctionBodyType.cs" />
     <Compile Include="Struct\FunctionType.cs" />
     <Compile Include="Struct\GetterFunctionType.cs" />
     <Compile Include="Struct\SetterFunctionType.cs" />
@@ -235,6 +236,7 @@
     <Compile Include="TokenClasses\ValueToken.cs" />
     <Compile Include="TypeRootSearchVisitor.cs" />
     <Compile Include="TypeSearchResult.cs" />
+    <Compile Include="Type\AssignmentFeature.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConcatArraysFeature.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
@@ -243,11 +245,13 @@
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
     <Compile Include="Type\ConcatArraysFromReferenceFeature.cs" />
     <Compile Include="Type\DumpPrintSequenceFeature.cs" />
+    <Compile Include="Type\EmptyFunctionFeatureProvider.cs" />
     <Compile Include="Type\EnableCut.cs" />
-    <Compile Include="Sequence\FunctionalFeature.cs" />
+    <Compile Include="Sequence\FunctionFeature.cs" />
     <Compile Include="Type\FieldAccessType.cs" />
     <Compile Include="Type\FunctionalFeature.cs" />
-    <Compile Include="Type\IFunctionalFeature.cs" />
+    <Compile Include="Type\FunctionFeature.cs" />
+    <Compile Include="Type\IFunctionFeature.cs" />
     <Compile Include="CodeArgs.cs" />
     <Compile Include="ReniException.cs" />
     <Compile Include="ReniObject.cs" />
@@ -258,7 +262,7 @@
     <Compile Include="Type\Aligner.cs" />
     <Compile Include="Type\Array.cs" />
     <Compile Include="Type\Bit.cs" />
-    <Compile Include="Type\FunctionalFeatureType.cs" />
+    <Compile Include="Type\FunctionFeatureType.cs" />
     <Compile Include="Type\IReference.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\AutomaticReferenceType.cs" />

@@ -40,6 +40,9 @@ namespace Reni.Type
         public CreateArrayFromReferenceFeature(TypeBase type) { _type = type; }
         IPrefixFeature ISearchPath<IPrefixFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type) { return this; }
 
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _type.CreateArray(category, refAlignParam); }
+        Result Result(Category category) { return _type.CreateArray(category); }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return null; } }
     }
 }

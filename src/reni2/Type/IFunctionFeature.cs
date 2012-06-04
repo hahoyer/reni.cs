@@ -22,34 +22,41 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
+using Reni.Feature;
+using Reni.Syntax;
 
-namespace Reni.Sequence
+namespace Reni.Type
 {
-    sealed class ObjectReference : ReniObject, IContextReference
+    interface IFunctionFeature 
     {
-        static int _nextObjectId;
-
-        [EnableDump]
-        readonly SequenceType _objectType;
-
+        /// <summary>
+        /// Result code contains CodeBase.Arg for argsType and ObjectReference for function object, 
+        /// if appropriate
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="argsType"></param>
+        /// <returns></returns>
+        Result ApplyResult(Category category, TypeBase argsType);
         [DisableDump]
-        readonly RefAlignParam _refAlignParam;
-
-        internal ObjectReference(SequenceType objectType, RefAlignParam refAlignParam)
-            : base(_nextObjectId++)
-        {
-            _objectType = objectType;
-            _refAlignParam = refAlignParam;
-            StopByObjectId(-1);
-        }
-
-        Size IContextReference.Size{ get { return _refAlignParam.RefSize; } }
-        internal override string DumpShort() { return base.DumpShort() + "(" + _objectType.DumpShort() + ")"; }
-        internal Result Result(Category category) { return _objectType.ReferenceInCode(category, this); }
+        bool IsImplicit { get; }
+        [DisableDump]
+        IContextReference ObjectReference { get; }
     }
+
+    interface IFunctionalFeatureSpecial
+    {
+        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam);
+    }
+
+    interface IMetaFunctionFeature
+    {
+        Result ApplyResult(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
+    }
+
 }

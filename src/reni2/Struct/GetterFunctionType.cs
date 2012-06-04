@@ -42,6 +42,7 @@ namespace Reni.Struct
         }
 
         internal TypeBase ReturnType { get { return CallResult(Category.Type).Type; } }
+        protected override Size RelevantValueSize { get { return Size.Zero; } }
         protected override FunctionId FunctionId { get { return _functionId; } }
     }
 }

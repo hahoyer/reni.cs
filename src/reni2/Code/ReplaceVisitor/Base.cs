@@ -33,7 +33,7 @@ namespace Reni.Code.ReplaceVisitor
             switch(newListCompleted.Length)
             {
                 case 0:
-                    return CodeBase.Void();
+                    return CodeBase.Void;
                 case 1:
                     return newListCompleted[0];
             }
@@ -61,7 +61,7 @@ namespace Reni.Code.ReplaceVisitor
             var newCode = visitedObject.Code.Visit(this);
             if(newCode == null)
                 return null;
-            return newCode.LocalReference(visitedObject.RefAlignParam, visitedObject.DestructorCode);
+            return newCode.LocalReference(visitedObject.DestructorCode);
         }
     }
 }

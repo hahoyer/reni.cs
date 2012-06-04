@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,12 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -39,16 +43,21 @@ namespace Reni.Sequence
             _definable = definable;
         }
 
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam)
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return null; } }
+        
+        Result Result(Category category)
         {
-            var resultForArg = _objectType
-                .UniqueReference(refAlignParam).Type()
-                .ArgResult(category.Typed)
-                .AutomaticDereferenceResult()
-                .Align(refAlignParam.AlignBits);
             return _objectType
                 .Result(category, () => _objectType.BitSequenceOperation(_definable), CodeArgs.Arg)
-                .ReplaceArg(resultForArg);
+                .ReplaceArg
+                (category1
+                 => _objectType
+                        .UniqueReference.Type()
+                        .ArgResult(category1)
+                        .AutomaticDereferenceResult()
+                        .Align(Root.DefaultRefAlignParam.AlignBits));
         }
     }
 }

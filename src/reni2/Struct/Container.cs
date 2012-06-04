@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +32,6 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -299,6 +301,7 @@ namespace Reni.Struct
         }
 
         internal new bool IsLambda(int position) { return Statements[position].IsLambda; }
+        
     }
 
     interface IStructFeature

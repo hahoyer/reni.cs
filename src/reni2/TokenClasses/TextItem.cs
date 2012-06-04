@@ -27,6 +27,6 @@ namespace Reni.TokenClasses
 {
     internal sealed class TextItem : Defineable, ISearchPath<IPrefixFeature, TypeBase>
     {
-        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new RefAlignedPrefixFeature(type.TextItemResult); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return new PrefixFeature(type.TextItemResult); }
     }
 }

@@ -67,7 +67,7 @@ namespace Reni.Type
         }
         internal Result Repeat(Category category) { return _repeaterType.Result(category); }
 
-        private sealed class RepeaterType : TypeBase, IMetaFeature
+        private sealed class RepeaterType : TypeBase, IMetaFunctionFeature
         {
             private readonly TypeType _typeType;
             public RepeaterType(TypeType typeType) { _typeType = typeType; }
@@ -75,16 +75,16 @@ namespace Reni.Type
             internal override bool IsDataLess { get { return true; } }
             internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
 
-            Result IMetaFeature.ApplyResult(Category category, ContextBase contextBase, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
+            Result IMetaFunctionFeature.ApplyResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
             {
                 var count = right
-                    .Result(contextBase)
+                    .Result(context)
                     .AutomaticDereferenceResult()
-                    .Evaluate(contextBase.RootContext.OutStream)
+                    .Evaluate(context.RootContext.OutStream)
                     .ToInt32();
                 return _typeType
                     .Value
-                    .UniqueAlign(refAlignParam.AlignBits)
+                    .UniqueAlign(context.RefAlignParam.AlignBits)
                     .UniqueArray(count)
                     .UniqueTypeType
                     .Result(category);

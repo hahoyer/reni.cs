@@ -36,9 +36,9 @@ namespace Reni
         [EnableDump]
         readonly TypeBase _type;
 
-        internal TypeSearchResult(ITypeFeature feature, IConversionFunction[] conversionFunctions, TypeBase type)
+        internal TypeSearchResult(IFeature feature, IConversionFunction[] conversionFunctions, TypeBase type)
             : base(feature, conversionFunctions) { _type = type; }
 
-        protected override Result TrivialConversionResult(Category category, RefAlignParam refAlignParam) { return _type.SmartReference(refAlignParam).ArgResult(category); }
+        protected override Result TrivialConversionResult(Category category) { return _type.SmartReference().ArgResult(category); }
     }
 }

@@ -25,19 +25,18 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Context;
 using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class AutomaticReferenceType : TypeBase, ISearchContainerType, IConverter, IReference
+    sealed class AutomaticReferenceType : TypeBase, ISearchContainerType, IConverter, IHardReference
     {
         readonly TypeBase _valueType;
-        readonly RefAlignParam _refAlignParam;
 
-        internal AutomaticReferenceType(TypeBase valueType, RefAlignParam refAlignParam)
+        internal AutomaticReferenceType(TypeBase valueType)
         {
             _valueType = valueType;
-            _refAlignParam = refAlignParam;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
             StopByObjectId(-10);
@@ -45,7 +44,7 @@ namespace Reni.Type
 
 
         TypeBase IReference.TargetType { get { return ValueType; } }
-        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+        RefAlignParam IHardReference.RefAlignParam { get { return Root.DefaultRefAlignParam; } }
         
         TypeBase ISearchContainerType.Target { get { return ValueType; } }
         IConverter ISearchContainerType.Converter { get { return this; } }
@@ -55,8 +54,6 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return DumpShort(); } }
         [EnableDump]
         TypeBase ValueType { get { return _valueType; } }
-        [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return _refAlignParam; } }
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
 
@@ -76,7 +73,7 @@ namespace Reni.Type
             {
                 var subResult = ValueType.ReferenceChain;
                 var result = new RefAlignParam[subResult.Length + 1];
-                result[0] = RefAlignParam;
+                result[0] = Root.DefaultRefAlignParam;
                 subResult.CopyTo(result, 1);
                 return result;
             }
@@ -86,25 +83,25 @@ namespace Reni.Type
         {
             return ValueType.Result
                 (category
-                 , () => ArgCode().Dereference(ValueType.Size)
+                 , () => ArgCode.Dereference(ValueType.Size)
                  , CodeArgs.Arg
                 );
         }
 
         Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
 
-        Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category, RefAlignParam); }
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category); }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
 
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => ValueType); }
 
-        internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
+        internal override Result SmartLocalReferenceResult(Category category)
         {
-            return UniqueAlign(refAlignParam.AlignBits)
+            return UniqueAlign(Root.DefaultRefAlignParam.AlignBits)
                 .Result
                 (category
-                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam.RefSize)
+                 , () => LocalReferenceCode().Dereference(Root.DefaultRefAlignParam.RefSize)
                  , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }
@@ -115,7 +112,7 @@ namespace Reni.Type
             try
             {
                 StartMethodDump(trace, conversionParameter, destination);
-                if(ValueType == destination.ValueType && destination.RefAlignParam == RefAlignParam)
+                if(ValueType == destination.ValueType && Root.DefaultRefAlignParam == Root.DefaultRefAlignParam)
                     return ReturnMethodDump(new FunctionalConverter(ToAutomaticReferenceResult), true);
 
                 var c1 = new FunctionalConverter(DereferenceResult);

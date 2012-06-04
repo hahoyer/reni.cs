@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,11 +31,11 @@ namespace Reni.Code
     [Serializable]
     sealed class TopRef : Ref
     {
-        public TopRef(RefAlignParam refAlignParam, Size offset)
-            : base(refAlignParam, offset) { StopByObjectId(-64); }
+        public TopRef(Size offset)
+            : base(offset) { StopByObjectId(-64); }
 
-        public TopRef(RefAlignParam refAlignParam)
-            : this(refAlignParam, Size.Zero) { }
+        public TopRef()
+            : this(Size.Zero) { }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
@@ -41,11 +45,11 @@ namespace Reni.Code
     [Serializable]
     sealed class TopFrameRef : Ref
     {
-        public TopFrameRef(RefAlignParam refAlignParam)
-            : this(refAlignParam, Size.Zero) { }
+        public TopFrameRef()
+            : this(Size.Zero) { }
 
-        public TopFrameRef(RefAlignParam refAlignParam, Size offset)
-            : base(refAlignParam, offset) { StopByObjectId(-40); }
+        public TopFrameRef(Size offset)
+            : base(offset) { StopByObjectId(-40); }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
         internal override void Visit(IVisitor visitor) { visitor.TopFrameRef(Offset); }

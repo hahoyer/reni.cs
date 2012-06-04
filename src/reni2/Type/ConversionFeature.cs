@@ -37,7 +37,7 @@ namespace Reni.Type
         public ConversionFeature(TypeBase objectType) { _objectType = objectType; }
 
         [DisableDump]
-        internal override IReferenceInCode ObjectReference
+        internal override IContextReference ObjectReference
         {
             get
             {

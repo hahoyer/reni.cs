@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -29,8 +32,6 @@ namespace Reni.Code
     [Serializable]
     abstract class Top : FiberHead
     {
-        readonly RefAlignParam _refAlignParam;
-
         [Node]
         [DisableDump]
         internal readonly Size Offset;
@@ -38,9 +39,8 @@ namespace Reni.Code
         readonly Size _size;
         readonly Size _dataSize;
 
-        protected Top(RefAlignParam refAlignParam, Size offset, Size size, Size dataSize)
+        protected Top(Size offset, Size size, Size dataSize)
         {
-            _refAlignParam = refAlignParam;
             Offset = offset;
             _size = size;
             _dataSize = dataSize;
@@ -50,7 +50,7 @@ namespace Reni.Code
         protected override Size GetSize() { return _size; }
 
         [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal override bool IsRelativeReference { get { return true; } }
 
         [Node]
         [DisableDump]

@@ -45,14 +45,7 @@ namespace Reni.Code
         [Node]
         internal TypeBase Type { get { return _type; } }
         [DisableDump]
-        internal override RefAlignParam RefAlignParam
-        {
-            get
-            {
-                var reference = _type as IReference;
-                return reference == null ? null : reference.RefAlignParam;
-            }
-        }
+        internal override bool IsRelativeReference { get { return _type is IReference; } }
 
         protected override Size GetSize() { return _type.Size; }
         protected override CodeArgs GetRefsImplementation() { return CodeArgs.Arg(); }

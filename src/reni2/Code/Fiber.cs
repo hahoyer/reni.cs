@@ -66,8 +66,6 @@ namespace Reni.Code
         [Node]
         internal FiberItem[] FiberItems { get { return _fiberItems; } }
         internal override bool IsRelativeReference { get { return _fiberHead.IsRelativeReference; } }
-        [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return _fiberItems[_fiberItems.Length - 1].RefAlignParam; } }
 
         protected override Size GetTemporarySize()
         {

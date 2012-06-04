@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,12 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.Type;
@@ -39,9 +43,8 @@ namespace Reni.Feature.DumpPrint
 
         static CodeBase BitSequenceDumpPrint(IReference objectReference)
         {
-            var alignedSize = objectReference.TargetType.Size.Align(objectReference.RefAlignParam.AlignBits);
-            return objectReference.Type()
-                .ArgCode()
+            var alignedSize = objectReference.TargetType.Size.Align(Root.DefaultRefAlignParam.AlignBits);
+            return objectReference.Type().ArgCode
                 .Dereference(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
@@ -54,24 +57,30 @@ namespace Reni.Feature.DumpPrint
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.BitDumpPrintFeature; }
     }
 
-    sealed class BitSequenceFeatureClass : BitFeatureBase, ISuffixFeature
+    sealed class BitSequenceFeatureClass : BitFeatureBase, ISuffixFeature, ISimpleFeature
     {
         readonly SequenceType _parent;
 
         internal BitSequenceFeatureClass(SequenceType parent) { _parent = parent; }
 
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, _parent.UniqueReference(refAlignParam)); }
         [EnableDump]
         internal TypeBase ObjectType { get { return _parent; } }
+        Result ISimpleFeature.Result(Category category) { return Apply(category, _parent.UniqueReference); }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return this; } }
     }
 
-    sealed class BitFeature : BitFeatureBase, ISuffixFeature
+    sealed class BitFeature : BitFeatureBase, ISuffixFeature, ISimpleFeature
     {
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Apply(category, TypeBase.Bit.UniqueReference(refAlignParam)); }
+        Result ISimpleFeature.Result(Category category) { return Apply(category, TypeBase.Bit.UniqueReference); }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return this; } }
     }
 
     sealed class StructReferenceFeature : ReniObject, ISearchPath<ISuffixFeature, AutomaticReferenceType>,
-                                          ISuffixFeature
+                                          ISuffixFeature, ISimpleFeature
     {
         [EnableDump]
         readonly StructureType _structureType;
@@ -80,15 +89,18 @@ namespace Reni.Feature.DumpPrint
 
         ISuffixFeature ISearchPath<ISuffixFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type)
         {
-            Tracer.Assert(type.RefAlignParam == _structureType.RefAlignParam);
+            Tracer.Assert(Root.DefaultRefAlignParam == _structureType.RefAlignParam);
             return this;
         }
 
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam)
+        Result ISimpleFeature.Result(Category category)
         {
             return _structureType
                 .Structure
                 .DumpPrintResultViaContextReference(category);
         }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return this; } }
     }
 }

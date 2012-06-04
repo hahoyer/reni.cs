@@ -30,6 +30,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Syntax;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -50,10 +51,13 @@ namespace Reni.Struct
         readonly DictionaryEx<int, ContextAccessFeature> _contextAccessFeaturesCache;
         [Node]
         readonly DictionaryEx<int, FieldAccessType> _fieldAccessTypeCache;
+        [Node]
+        readonly DictionaryEx<int, IFeature> _functionFeatureProvider;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
             : base(_nextObjectId++)
         {
+            _functionFeatureProvider = new DictionaryEx<int, IFeature>(position => new FeatureProviderClass(this, position));
             _fieldAccessTypeCache = new DictionaryEx<int, FieldAccessType>(position => new FieldAccessType(this, position));
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
@@ -87,7 +91,7 @@ namespace Reni.Struct
         internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
-        internal TypeBase ReferenceType { get { return Type.SmartReference(RefAlignParam); } }
+        internal TypeBase ReferenceType { get { return Type.SmartReference(); } }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + ContainerContextObject.DumpShort() + "@" + EndPosition + ")"; }
 
@@ -139,7 +143,7 @@ namespace Reni.Struct
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
 
-        internal TypeBase FunctionalFeature(FunctionSyntax syntax) { return new FunctionalBodyType(this, syntax); }
+        internal TypeBase FunctionalFeature(FunctionSyntax syntax) { return new FunctionBodyType(this, syntax); }
         TypeBase UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
         internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }
         internal IContextFeature UniqueContextAccessFeature(int position) { return _contextAccessFeaturesCache.Find(position); }
@@ -223,7 +227,7 @@ namespace Reni.Struct
         {
             var accessType = UniqueAccessType(position);
             return accessType
-                .GenericDumpPrintResult(category, RefAlignParam)
+                .GenericDumpPrintResult(category)
                 .ReplaceArg(AccessViaThisReference(category.Typed, position));
         }
 
@@ -245,6 +249,31 @@ namespace Reni.Struct
                 .UnAlignedType;
         }
 
+
         internal IStructFeature SearchFromStructContext(ISearchTarget target) { return ContainerContextObject.Container.SearchFromStructContext(target); }
+        internal IFeature FeatureProvider(int position)
+        {
+            if (!ContainerContextObject.Container.IsLambda(position))
+                return null;
+            return _functionFeatureProvider.Find(position);
+        }
+
+        sealed class FeatureProviderClass : ReniObject, IFeature
+        {
+            readonly Structure _structure;
+            readonly int _position;
+            public FeatureProviderClass(Structure structure, int position)
+            {
+                _structure = structure;
+                _position = position;
+            }
+
+            FunctionSyntax FunctionStatement { get { return _structure.ContainerContextObject.Container.Statements[_position] as FunctionSyntax; } }
+            CompileSyntax Statement { get { return _structure.ContainerContextObject.Container.Statements[_position]; } }
+            IMetaFunctionFeature IFeature.MetaFunction { get { return FunctionStatement.CheckedApply(s => s.MetaFunctionFeature(_structure)); } }
+            IFunctionFeature IFeature.Function { get { return FunctionStatement.CheckedApply(s => s.FunctionFeature(_structure)); } }
+            ISimpleFeature IFeature.Simple { get { return Statement.CheckedApply(s => s.SimpleFeature(_structure)); } }
+        }
+
     }
 }

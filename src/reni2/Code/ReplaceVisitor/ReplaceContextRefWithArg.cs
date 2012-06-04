@@ -30,7 +30,7 @@ using Reni.Basics;
 namespace Reni.Code.ReplaceVisitor
 {
     abstract class ReplaceContextRef<TContext> : Base
-        where TContext : IReferenceInCode
+        where TContext : IContextReference
     {
         static int _nextObjectId;
         protected readonly TContext Context;
@@ -45,14 +45,14 @@ namespace Reni.Code.ReplaceVisitor
 
         internal override CodeBase ContextRef(ReferenceCode visitedObject)
         {
-            if(visitedObject.Context == (IReferenceInCode) Context)
+            if(visitedObject.Context == (IContextReference) Context)
                 return Replacement();
             return null;
         }
     }
 
     sealed class ReplaceRelativeContextRef<TContext> : ReplaceContextRef<TContext>
-        where TContext : IReferenceInCode
+        where TContext : IContextReference
     {
         public ReplaceRelativeContextRef(TContext context, Func<CodeBase> replacement)
             : base(context, replacement) { }
@@ -63,7 +63,7 @@ namespace Reni.Code.ReplaceVisitor
     }
 
     sealed class ReplaceAbsoluteContextRef<TContext> : ReplaceContextRef<TContext>
-        where TContext : IReferenceInCode
+        where TContext : IContextReference
     {
         public ReplaceAbsoluteContextRef(TContext context, Func<CodeBase> replacement)
             : base(context, replacement) { }

@@ -33,44 +33,44 @@ namespace Reni
     sealed class CodeArgs : ReniObject, ITreeNodeSupport
     {
         static int _nextId;
-        readonly List<IReferenceInCode> _data;
+        readonly List<IContextReference> _data;
         SizeArray _sizesCache;
 
         CodeArgs()
             : base(_nextId++)
         {
-            _data = new List<IReferenceInCode>();
+            _data = new List<IContextReference>();
             StopByObjectId(-10);
         }
 
-        CodeArgs(IReferenceInCode context)
+        CodeArgs(IContextReference context)
             : this() { Add(context); }
 
-        CodeArgs(IEnumerable<IReferenceInCode> a, IEnumerable<IReferenceInCode> b)
+        CodeArgs(IEnumerable<IContextReference> a, IEnumerable<IContextReference> b)
             : this()
         {
             AddRange(a);
             AddRange(b);
         }
 
-        CodeArgs(IEnumerable<IReferenceInCode> a)
+        CodeArgs(IEnumerable<IContextReference> a)
             : this() { AddRange(a); }
 
 
-        void AddRange(IEnumerable<IReferenceInCode> a)
+        void AddRange(IEnumerable<IContextReference> a)
         {
             foreach(var e in a)
                 Add(e);
         }
 
-        void Add(IReferenceInCode e)
+        void Add(IContextReference e)
         {
             if(!_data.Contains(e))
                 _data.Add(e);
         }
 
         [SmartNode]
-        public List<IReferenceInCode> Data { get { return _data; } }
+        public List<IContextReference> Data { get { return _data; } }
 
         [DisableDump]
         SizeArray Sizes { get { return _sizesCache ?? (_sizesCache = CalculateSizes()); } }
@@ -78,7 +78,7 @@ namespace Reni
         internal bool HasArg { get { return Contains(CodeArg.Instance); } }
         public int Count { get { return _data.Count; } }
 
-        public IReferenceInCode this[int i] { get { return _data[i]; } }
+        public IContextReference this[int i] { get { return _data[i]; } }
         public Size Size { get { return Sizes.Size; } }
         public bool IsNone { get { return Count == 0; } }
 
@@ -94,7 +94,7 @@ namespace Reni
             return new CodeArgs(_data, codeArgs._data);
         }
 
-        internal static CodeArgs Create(IReferenceInCode referenceInCode) { return new CodeArgs(referenceInCode); }
+        internal static CodeArgs Create(IContextReference contextReference) { return new CodeArgs(contextReference); }
 
         public override string DumpData()
         {
@@ -112,28 +112,28 @@ namespace Reni
         {
             var result = new SizeArray();
             for(var i = 0; i < Count; i++)
-                result.Add((this)[i].RefAlignParam.RefSize);
+                result.Add((this)[i].Size);
             return result;
         }
 
-        public CodeArgs Without(IReferenceInCode e)
+        public CodeArgs Without(IContextReference e)
         {
             if(!_data.Contains(e))
                 return this;
-            var r = new List<IReferenceInCode>(_data);
+            var r = new List<IContextReference>(_data);
             r.Remove(e);
             return new CodeArgs(r);
         }
 
         public CodeArgs WithoutArg() { return Without(CodeArg.Instance); }
         public CodeArgs Without(CodeArgs other) { return other._data.Aggregate(this, (current, refInCode) => current.Without(refInCode)); }
-        public bool Contains(IReferenceInCode context) { return _data.Contains(context); }
+        public bool Contains(IContextReference context) { return _data.Contains(context); }
         public bool Contains(CodeArgs other) { return other._data.All(Contains); }
 
         internal CodeBase ToCode()
         {
             return _data
-                .Aggregate(CodeBase.Void(), (current, t) => current.Sequence(CodeBase.ReferenceCode(t)));
+                .Aggregate(CodeBase.Void, (current, t) => current.Sequence(CodeBase.ReferenceCode(t)));
         }
 
         internal CodeBase ReplaceRefsForFunctionBody(CodeBase code, Size refSize, CodeBase codeArgsReference)
@@ -148,7 +148,7 @@ namespace Reni
                 {
                     Dump("reference", reference);
                     BreakExecution();
-                    Tracer.Assert(referenceInCode.RefSize == refSize);
+                    Tracer.Assert(referenceInCode.Size == refSize);
                     reference = reference.AddToReference(refSize * -1);
                     result = result.ReplaceAbsolute(referenceInCode, () => reference.Dereference(refSize));
                     Dump("result", result);
@@ -163,18 +163,17 @@ namespace Reni
 
         public static CodeArgs operator +(CodeArgs x, CodeArgs y) { return x.Sequence(y); }
         public static CodeArgs operator -(CodeArgs x, CodeArgs y) { return x.Without(y); }
-        public static CodeArgs operator -(CodeArgs x, IReferenceInCode y) { return x.Without(y); }
+        public static CodeArgs operator -(CodeArgs x, IContextReference y) { return x.Without(y); }
         TreeNode[] ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
-        internal sealed class CodeArg : ReniObject, IReferenceInCode
+        internal sealed class CodeArg : ReniObject, IContextReference
         {
-            internal static readonly IReferenceInCode Instance = new CodeArg();
-            RefAlignParam IReferenceInCode.RefAlignParam { get { return null; } }
-            Size IReferenceInCode.RefSize { get {
+            internal static readonly IContextReference Instance = new CodeArg();
+            Size IContextReference.Size { get {
                 NotImplementedMethod();
                 return null;
             } }
-            string IDumpShortProvider.DumpShort() { return "CodeArg"; }
+            internal override string DumpShort() { return "CodeArg"; }
         }
     }
 }

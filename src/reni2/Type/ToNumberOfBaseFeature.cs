@@ -50,7 +50,7 @@ namespace Reni.Type
         }
     }
 
-    sealed class ToNumberOfBaseSequenceFeature : TypeBase, ISuffixFeature, IMetaFeature
+    sealed class ToNumberOfBaseSequenceFeature : TypeBase, ISuffixFeature, IMetaFunctionFeature
     {
         [EnableDump]
         readonly TextItemType _type;
@@ -61,9 +61,8 @@ namespace Reni.Type
             _type = type;
             _count = count;
         }
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return Result(category); }
         internal override bool IsDataLess { get { return true; } }
-        Result IMetaFeature.ApplyResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right, RefAlignParam refAlignParam)
+        Result IMetaFunctionFeature.ApplyResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             var target = left.Evaluate(context).ToString(_type.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
@@ -71,8 +70,11 @@ namespace Reni.Type
             var result = BitsConst.Convert(target, conversionBase);
             return UniqueNumber(result.Size.ToInt())
                 .Result(category, () => CodeBase.BitsConst(result), CodeArgs.Void)
-                .Align(refAlignParam.AlignBits);
+                .Align(context.RefAlignParam.AlignBits);
         }
         internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return this; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return null; } }
     }
 }

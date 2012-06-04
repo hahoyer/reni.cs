@@ -27,41 +27,40 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
+using Reni.Feature;
 using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType, IReferenceInCode, IReference
+    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType, ISoftReference
     {
         [EnableDump]
         readonly Structure _structure;
         [EnableDump]
         readonly int _position;
-        readonly SimpleCache<SetterType> _setterTypeCache;
+        [DisableDump]
+        internal readonly ISuffixFeature AssignmentFeature;
 
         internal FieldAccessType(Structure structure, int position)
             : base(structure.ValueType(position))
         {
+            AssignmentFeature = new AssignmentFeature(this);
             _structure = structure;
             _position = position;
-            _setterTypeCache = new SimpleCache<SetterType>(() => new SetterType(this));
         }
 
         TypeBase ISetterTargetType.ValueType { get { return Parent; } }
-        IReferenceInCode ISetterTargetType.ObjectReference { get { return ObjectReference; } }
         TypeBase ISetterTargetType.Type { get { return this; } }
-        SetterType ISetterTargetType.SetterType { get { return _setterTypeCache.Value; } }
 
-        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
-        RefAlignParam IReference.RefAlignParam { get { return RefAlignParam; } }
+        Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
         [DisableDump]
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         [DisableDump]
-        IReferenceInCode ObjectReference { get { return this; } }
+        IContextReference ObjectReference { get { return this; } }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
 
@@ -71,19 +70,19 @@ namespace Reni.Type
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
 
-        internal override Result SmartLocalReferenceResult(Category category, RefAlignParam refAlignParam)
+        internal override Result SmartLocalReferenceResult(Category category)
         {
-            return UniqueAlign(refAlignParam.AlignBits)
+            return UniqueAlign(Root.DefaultRefAlignParam.AlignBits)
                 .Result
                 (category
-                 , () => LocalReferenceCode(refAlignParam).Dereference(refAlignParam.RefSize)
+                 , () => LocalReferenceCode().Dereference(Root.DefaultRefAlignParam.RefSize)
                  , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }
 
         protected override Result ParentConversionResult(Category category)
         {
-            return Parent.SmartReference(RefAlignParam)
+            return Parent.SmartReference()
                 .Result(category, ArgResult(category.Typed).AddToReference(()=>_structure.FieldOffset(_position)));
         }
 
@@ -112,15 +111,14 @@ namespace Reni.Type
 
         CodeBase AssignmentCode()
         {
-            return Pair(Parent.SmartReference(RefAlignParam))
-                .ArgCode()
+            return Pair(Parent.SmartReference()).ArgCode
                 .Assignment(RefAlignParam, Parent.Size);
         }
 
         protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             return new FunctionalConverter(ParentConversionResult)
-                .Concat(Parent.SmartReference(RefAlignParam).Converter(conversionParameter, destination));
+                .Concat(Parent.SmartReference().Converter(conversionParameter, destination));
         }
 
         TypeBase IReference.TargetType { get { return Parent; } }

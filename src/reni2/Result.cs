@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,18 +18,20 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Struct;
-using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni
@@ -55,61 +58,109 @@ namespace Reni
         internal Result(Category category, Func<bool> getDataLess = null, Func<Size> getSize = null, Func<TypeBase> getType = null, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
             : this()
         {
-            if (category.HasType)
-            {
-                Tracer.Assert(getType != null);
-                _type = getType();
-            }
-            if (category.HasCode)
-            {
-                Tracer.Assert(getCode != null);
-                _code = getCode();
-            }
-            
+            var isDataLess = getDataLess == null ? null : new SimpleCache<bool>(getDataLess);
+            var size = getSize == null ? null : new SimpleCache<Size>(getSize);
+            var type = getType == null ? null : new SimpleCache<TypeBase>(getType);
+            var code = getCode == null ? null : new SimpleCache<CodeBase>(getCode);
+            var codeArgs = getArgs == null ? null : new SimpleCache<CodeArgs>(getArgs);
+
+            if(category.HasType)
+                _type = ObtainType(isDataLess, size, type, code);
+
+            if(category.HasCode)
+                _code = ObtainCode(isDataLess, size, type, code);
+
             if(category.HasSize)
-                _size = ObtainSize(getSize, getType, getCode);
+                _size = ObtainSize(isDataLess, size, type, code);
 
             if(category.HasArgs)
-                _codeArgs = ObtainCodeArgs(getArgs, getCode);
+                _codeArgs = ObtainCodeArgs(isDataLess, size, type, code, codeArgs);
 
             if(category.HasIsDataLess)
-                _isDataLess = ObtainIsDataLess(getDataLess, getSize, getType, getCode);
-            
+                _isDataLess = ObtainIsDataLess(isDataLess, size, type, code);
+
             AssertValid();
         }
 
-        bool ObtainIsDataLess(Func<bool> getDataLess, Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
+        CodeBase ObtainCode(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode)
         {
-            if (getDataLess != null)
-                return getDataLess();
-            return ObtainSize(getSize, getType, getCode).IsZero;
-        }
-
-        Size ObtainSize(Func<Size> getSize, Func<TypeBase> getType, Func<CodeBase> getCode)
-        {
-            if (getSize != null)
-                return getSize();
-            if (_type != null)
-                return _type.Size;
-            if (_code != null)
-                return _code.Size;
-            if (getType != null)
-                return getType().Size;
-            if (getCode != null)
-                return getCode().Size;
-
-            Tracer.AssertionFailed("Size cannot be determned", ToString);
+            if(getCode != null)
+                return getCode.Value;
+// ReSharper disable ExpressionIsAlwaysNull
+            var isDataLess = TryObtainIsDataLess(getDataLess, getSize, getType, getCode);
+// ReSharper restore ExpressionIsAlwaysNull
+            if(isDataLess == true)
+                return CodeBase.Void;
+            Tracer.AssertionFailed("Code cannot be determned", ToString);
             return null;
         }
 
-        CodeArgs ObtainCodeArgs(Func<CodeArgs> getArgs, Func<CodeBase> getCode)
+        TypeBase ObtainType(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode)
         {
-            if (getArgs != null)
-                return getArgs();
-            if (_code != null)
-                return _code.CodeArgs;
-            if (getCode != null)
-                return getCode().CodeArgs;
+            if(getType != null)
+                return getType.Value;
+// ReSharper disable ExpressionIsAlwaysNull
+            var isDataLess = TryObtainIsDataLess(getDataLess, getSize, getType, getCode);
+// ReSharper restore ExpressionIsAlwaysNull
+            if(isDataLess == true)
+                return TypeBase.Void;
+            Tracer.AssertionFailed("Type cannot be determned", ToString);
+            return null;
+        }
+
+        Size ObtainSize(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode)
+        {
+            var result = TryObtainSize(getDataLess, getSize, getType, getCode);
+            Tracer.Assert(result != null, () => "Size cannot be determned " + ToString());
+            return result;
+        }
+
+        static Size TryObtainSize(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode)
+        {
+            if(getSize != null)
+                return getSize.Value;
+            if(getType != null)
+                return getType.Value.Size;
+            if(getCode != null)
+                return getCode.Value.Size;
+            if(getDataLess != null && getDataLess.Value)
+                return Size.Zero;
+            return null;
+        }
+
+        bool ObtainIsDataLess(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode)
+        {
+            var result = TryObtainIsDataLess(getDataLess, getSize, getType, getCode);
+            if(result != null)
+                return result.Value;
+            Tracer.AssertionFailed("Datalessness cannot be determned", ToString);
+            return false;
+        }
+
+        static bool? TryObtainIsDataLess(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode)
+        {
+            if(getDataLess != null)
+                return getDataLess.Value;
+            if(getSize != null)
+                return getSize.Value.IsZero;
+            if(getType != null)
+                return getType.Value.IsDataLess;
+            if(getCode != null)
+                return getCode.Value.IsEmpty;
+            return null;
+        }
+
+        CodeArgs ObtainCodeArgs(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode, SimpleCache<CodeArgs> getArgs)
+        {
+            if(getArgs != null)
+                return getArgs.Value;
+            if(getCode != null)
+                return getCode.Value.CodeArgs;
+// ReSharper disable ExpressionIsAlwaysNull
+            if(TryObtainIsDataLess(getDataLess, getSize, getType, getCode) == true)
+// ReSharper restore ExpressionIsAlwaysNull
+                return CodeArgs.Void();
+
             Tracer.AssertionFailed("CodeArgs cannot be determned", ToString);
             return null;
         }
@@ -314,20 +365,6 @@ namespace Reni
             }
         }
 
-        internal bool IsCodeLess
-        {
-            get
-            {
-                if(CompleteCategory.HasSize && !Size.IsZero)
-                    return false;
-                if(CompleteCategory.HasCode && !Code.IsEmpty)
-                    return false;
-                if(CompleteCategory.HasArgs && !CodeArgs.IsNone)
-                    return false;
-                return true;
-            }
-        }
-
         internal bool HasArg
         {
             get
@@ -399,12 +436,12 @@ namespace Reni
             return new Result
                 (CompleteCategory & category
 // ReSharper disable PossibleInvalidOperationException
-                 , getDataLess: () => IsDataLess.Value
+                 , () => IsDataLess.Value
 // ReSharper restore PossibleInvalidOperationException
-                 , getSize: () => Size
-                 , getType: () => Type
-                 , getCode: () => Code
-                 , getArgs: () => CodeArgs
+                 , () => Size
+                 , () => Type
+                 , () => Code
+                 , () => CodeArgs
                 )
                    {_pendingCategory = _pendingCategory & category};
         }
@@ -422,12 +459,12 @@ namespace Reni
             var result = new Result
                 (CompleteCategory
 // ReSharper disable PossibleInvalidOperationException
-                 , getDataLess: () => IsDataLess.Value
+                 , () => IsDataLess.Value
 // ReSharper restore PossibleInvalidOperationException
-                 , getSize: () => alignedSize
-                 , getType: () => Type.UniqueAlign(alignBits)
-                 , getCode: () => Code.BitCast(alignedSize)
-                 , getArgs: () => CodeArgs
+                 , () => alignedSize
+                 , () => Type.UniqueAlign(alignBits)
+                 , () => Code.BitCast(alignedSize)
+                 , () => CodeArgs
                 );
             return result;
         }
@@ -472,16 +509,6 @@ namespace Reni
             }
 
             Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
-        }
-
-        internal void AssertComplete(Category category, CompileSyntax syntaxForDump)
-        {
-            Tracer.Assert
-                (
-                    1,
-                    category <= (CompleteCategory | _pendingCategory),
-                    () => string.Format("syntax={2}\ncategory={0}\nResult={1}", category.DumpShort(), Dump(), syntaxForDump.DumpShort())
-                );
         }
 
         void Add(Result other) { Add(other, CompleteCategory); }
@@ -537,7 +564,7 @@ namespace Reni
         }
 
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
-            where TRefInCode : IReferenceInCode
+            where TRefInCode : IContextReference
         {
             if(HasArgs && !CodeArgs.Contains(refInCode))
                 return this;
@@ -552,7 +579,7 @@ namespace Reni
         }
 
         internal Result ReplaceAbsolute<TRefInCode>(TRefInCode refInCode, Func<Category, Result> getReplacement)
-            where TRefInCode : IReferenceInCode
+            where TRefInCode : IContextReference
         {
             if(HasArgs && !CodeArgs.Contains(refInCode))
                 return this;
@@ -568,7 +595,7 @@ namespace Reni
         }
 
         internal Result ReplaceRelative<TRefInCode>(TRefInCode refInCode, Func<CodeBase> replacementCode, Func<CodeArgs> replacementRefs)
-            where TRefInCode : IReferenceInCode
+            where TRefInCode : IContextReference
         {
             if(HasArgs && !CodeArgs.Contains(refInCode))
                 return this;
@@ -687,14 +714,14 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal Result SmartLocalReferenceResult(RefAlignParam refAlignParam)
+        internal Result SmartLocalReferenceResult()
         {
             if(Type.IsDataLess)
                 return this;
             if(Type is IReference)
                 return this;
             return Type
-                .SmartLocalReferenceResult(CompleteCategory, refAlignParam)
+                .SmartLocalReferenceResult(CompleteCategory)
                 .ReplaceArg(this);
         }
 
@@ -744,37 +771,11 @@ namespace Reni
                 Tracer.Assert(Type is AutomaticReferenceType, () => "Expected type: AutomaticReferenceType\n" + Dump());
         }
 
-        public void Amend(Category category, TypeBase type)
-        {
-            if(category.HasType)
-                Tracer.Assert(CompleteCategory.HasType);
-            if(category.HasCode)
-                Tracer.Assert(CompleteCategory.HasCode);
-            if(category.HasArgs && !CompleteCategory.HasArgs)
-                CodeArgs = Code.CodeArgs;
-            if(category.HasSize && !CompleteCategory.HasSize)
-                Size =
-                    CompleteCategory.HasCode
-                        ? Code.Size
-                        : CompleteCategory.HasType
-                              ? Type.Size
-                              : type.Size;
-            if(category.HasIsDataLess && !CompleteCategory.HasIsDataLess)
-                IsDataLess =
-                    CompleteCategory.HasCode
-                        ? Code.Size.IsZero
-                        : CompleteCategory.HasSize
-                              ? Size.IsZero
-                              : CompleteCategory.HasType
-                                    ? Type.IsDataLess
-                                    : type.IsDataLess;
-        }
-
         internal Result AddToReference(Func<Size> func) { return Change(code => code.AddToReference(func())); }
 
         public Result Change(Func<CodeBase, CodeBase> func)
         {
-            if (!HasCode)
+            if(!HasCode)
                 return this;
             var result = Clone();
             result.Code = func(Code);

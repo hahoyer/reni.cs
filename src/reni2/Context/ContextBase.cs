@@ -221,7 +221,7 @@ namespace Reni.Context
         internal Result ResultAsReference(Category category, CompileSyntax syntax)
         {
             return UniqueResult(category.Typed, syntax)
-                .SmartLocalReferenceResult(RefAlignParam);
+                .SmartLocalReferenceResult();
         }
     }
 }

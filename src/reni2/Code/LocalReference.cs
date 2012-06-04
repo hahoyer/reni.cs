@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,56 +18,50 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
+using Reni.Context;
 
 namespace Reni.Code
 {
-    internal sealed class LocalReference : FiberHead, IReferenceInCode
+    sealed class LocalReference : FiberHead
     {
-        private readonly RefAlignParam _refAlignParam;
-        private static int _nextObjectId;
+        static int _nextObjectId;
 
         [Node]
-        private readonly CodeBase _unalignedCode;
+        readonly CodeBase _unalignedCode;
 
         [Node]
         [DisableDump]
         internal readonly CodeBase DestructorCode;
 
-        public LocalReference(RefAlignParam refAlignParam, CodeBase code, CodeBase destructorCode)
+        public LocalReference(CodeBase code, CodeBase destructorCode)
             : base(_nextObjectId++)
         {
-            _refAlignParam = refAlignParam;
             _unalignedCode = code;
             DestructorCode = destructorCode;
             StopByObjectId(-1);
         }
 
-        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
-
         [DisableDump]
         internal override bool IsRelativeReference { get { return false; } }
 
-        [DisableDump]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal CodeBase Code { get { return _unalignedCode.Align(Root.DefaultRefAlignParam.AlignBits); } }
 
-        internal CodeBase Code { get { return _unalignedCode.Align(RefAlignParam.AlignBits); } }
-
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
         protected override CodeArgs GetRefsImplementation() { return _unalignedCode.CodeArgs + DestructorCode.CodeArgs; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.LocalReference(this); }
 
         internal CodeBase AccompayningDestructorCode(ref Size size, string holder)
         {
             size += Code.Size;
-            return DestructorCode.ReplaceArg(null, LocalVariableReference(RefAlignParam, holder));
+            return DestructorCode.ReplaceArg(null, LocalVariableReference(holder));
         }
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
     }
 }

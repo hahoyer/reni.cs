@@ -1,6 +1,7 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,19 +33,19 @@ namespace Reni.Type
     abstract class FunctionalFeature : ReniObject, IDumpShortProvider
     {
         static int _nextObjectId;
-        readonly DictionaryEx<RefAlignParam, TypeBase> _functionalTypesCache;
+        readonly SimpleCache<TypeBase> _functionalTypesCache;
 
         protected FunctionalFeature()
             : base(_nextObjectId++)
         {
             _functionalTypesCache
-                = new DictionaryEx<RefAlignParam, TypeBase>(refAlignParam => new FunctionalFeatureType(this, refAlignParam));
+                = new SimpleCache<TypeBase>(() => new FunctionFeatureType(this));
         }
 
         [DisableDump]
-        internal abstract IReferenceInCode ObjectReference { get; }
+        internal abstract IContextReference ObjectReference { get; }
 
-        internal TypeBase UniqueFunctionalType(RefAlignParam refAlignParam) { return _functionalTypesCache.Find(refAlignParam); }
+        internal TypeBase UniqueFunctionalType() { return _functionalTypesCache.Value; }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 

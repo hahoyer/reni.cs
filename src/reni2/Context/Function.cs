@@ -36,16 +36,15 @@ namespace Reni.Context
         [Node]
         internal readonly TypeBase ArgsType;
         [Node]
-        internal readonly TypeBase ValueType;
+        readonly TypeBase _valueType;
         internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
             : base(parent)
         {
             ArgsType = argsType;
-            ValueType = valueType;
+            _valueType = valueType;
         }
 
-        RefAlignParam IReferenceInCode.RefAlignParam { get { return RefAlignParam; } }
-        Size IReferenceInCode.RefSize { get { return RefAlignParam.RefSize; } }
+        Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
 
         internal override IFunctionContext ObtainRecentFunctionContext() { return this; }
 
@@ -58,10 +57,10 @@ namespace Reni.Context
 
         Result IFunctionContext.CreateValueReferenceResult(Category category)
         {
-            if(ValueType == null)
+            if(_valueType == null)
                 throw new ValueCannotBeUsedHereException();
-            return ValueType
-                .ContextAccessResult(category.Typed, this, (ArgsType.Size + ValueType.Size) * -1)
+            return _valueType.UniqueReference.Type()
+                .ContextAccessResult(category.Typed, this, (ArgsType.Size + RefAlignParam.RefSize) * -1)
                 & category;
         }
     }
@@ -69,7 +68,7 @@ namespace Reni.Context
     sealed class ValueCannotBeUsedHereException : Exception
     {}
 
-    interface IFunctionContext : IReferenceInCode
+    interface IFunctionContext : IContextReference
     {
         Result CreateArgReferenceResult(Category category);
         Result CreateValueReferenceResult(Category category);

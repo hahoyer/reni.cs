@@ -33,6 +33,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
+using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -63,6 +64,9 @@ namespace Reni.Syntax
                 return null;
             }
         }
+
+        [DisableDump]
+        internal virtual bool IsImplicit { get { throw new NotImplementedException(); } }
 
         //[DebuggerHidden]
         internal virtual Result ObtainResult(ContextBase context, Category category)
@@ -120,11 +124,11 @@ namespace Reni.Syntax
             return null;
         }
 
-        internal Result OperationResult<TFeature>(ContextBase context, Category category, ISearchTarget target)
-            where TFeature : class, ITypeFeature
+        internal Result OperationResult<TFeature>(ContextBase context, Category category, ISearchTarget target) 
+            where TFeature : class, IFeature
         {
             return Type(context)
-                .OperationResult<TFeature>(category, target, context.RefAlignParam);
+                .OperationResult<TFeature>(category, target);
         }
 
         internal bool? IsDataLessStructureElement(bool isQuick, ContextBase context)
@@ -136,6 +140,12 @@ namespace Reni.Syntax
                 return null;
 
             return Type(context).IsDataLessStructureElement(false);
+        }
+
+        internal ISimpleFeature SimpleFeature(Structure structure)
+        {
+            NotImplementedMethod(structure);
+            return null;
         }
     }
 }

@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Feature;
 using Reni.Struct;
 using Reni.Type;
 
@@ -76,16 +77,14 @@ namespace Reni
     }
 
     abstract class SearchVisitor<TFeature> : SearchVisitor
-        where TFeature : class
+        where TFeature : class, ISearchPath
     {
-        readonly List<System.Type> _probe;
+        internal readonly List<System.Type> Probe;
 
-        protected SearchVisitor(List<System.Type> probe) { _probe = probe; }
+        protected SearchVisitor(List<System.Type> probe) { Probe = probe; }
 
         internal abstract TFeature InternalResult { set; }
         internal abstract ISearchTarget Target { get; }
-
-        internal List<System.Type> Probe { get { return _probe; } }
 
         internal void Search(TypeBase typeBase)
         {
@@ -101,8 +100,8 @@ namespace Reni
         }
         void AddProbe(System.Type testType)
         {
-            Tracer.Assert(!_probe.Contains(testType), "Target=" + Target + "\nProbe=" + Tracer.Dump(_probe) + "\ntestType=" + testType.PrettyName());
-            _probe.Add(testType);
+            Tracer.Assert(!Probe.Contains(testType), "Target=" + Target + "\nProbe=" + Tracer.Dump(Probe) + "\ntestType=" + testType.PrettyName());
+            Probe.Add(testType);
         }
 
         protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target); }

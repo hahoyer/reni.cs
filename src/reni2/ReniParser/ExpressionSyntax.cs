@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -59,13 +58,13 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = ObjectId == 37 && category.HasCode;
+            var trace = (ObjectId == -57 || ObjectId == -36) && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
                 BreakExecution();
-                var leftResult = Left != null ? Left.Result(context, category.Typed).SmartLocalReferenceResult(context.RefAlignParam) : null;
-                var rightResult = Right != null ? Right.Result(context, category.Typed).SmartLocalReferenceResult(context.RefAlignParam) : null;
+                var leftResult = Left != null ? Left.Result(context, category.Typed).SmartLocalReferenceResult() : null;
+                var rightResult = Right != null ? Right.Result(context, category.Typed).SmartLocalReferenceResult() : null;
                 Dump("leftResult", leftResult);
                 Dump("rightResult", rightResult);
 
@@ -96,35 +95,30 @@ namespace Reni.ReniParser
                 Dump("searchResult", searchResult);
                 BreakExecution();
 
-                var suffixOperationResult = searchResult.Result(operationCategory, context.RefAlignParam);
-
-                Tracer.Assert(suffixOperationResult.CompleteCategory == operationCategory);
-                Dump("suffixOperationResult", suffixOperationResult);
-                BreakExecution();
-
-                var metaFeature = suffixOperationResult.Type.MetaFeature;
+                var metaFeature = searchResult.Feature.MetaFunction;
                 if(metaFeature != null)
                 {
                     Dump("metaFeature", metaFeature);
                     BreakExecution();
 
-                    return ReturnMethodDump(metaFeature.ApplyResult(category, context, Left, Right, context.RefAlignParam), true);
+                    return ReturnMethodDump(metaFeature.ApplyResult(context, category, Left, Right), true);
                 }
 
-                var functionalFeature = suffixOperationResult.Type.FunctionalFeature;
+                var functionalFeature = searchResult.Feature.Function;
 
                 if(rightResult == null)
                     if(functionalFeature != null && functionalFeature.IsImplicit)
                         rightResult = TypeBase.Void.Result(category.Typed);
                     else
-                        return ReturnMethodDump(suffixOperationResult.ReplaceArg(leftResult), true);
+                        return ReturnMethodDump(searchResult.ReplaceArg(category, leftResult), true);
 
-                Dump("functionalFeature", functionalFeature); 
+                Tracer.Assert(functionalFeature != null, searchResult.Dump());
+                Dump("functionalFeature", functionalFeature);
                 BreakExecution();
 
-                var applyResult = functionalFeature
-                    .ApplyResult(category, rightResult.Type)
-                    .ReplaceArg(rightResult);
+                var rawApplyResult = functionalFeature.ApplyResult(category, rightResult.Type);
+                Dump("rawApplyResult", rawApplyResult);
+                var applyResult = rawApplyResult.ReplaceArg(rightResult);
                 Dump("applyResult", applyResult);
 
                 var objectReference = functionalFeature.ObjectReference;
@@ -137,7 +131,7 @@ namespace Reni.ReniParser
                     (objectReference
                      , c =>
                        searchResult
-                           .ConverterResult(c, context.RefAlignParam)
+                           .SmartConverterResult(c)
                            .ReplaceArg(leftResult)
                     );
                 return ReturnMethodDump(result, true);
@@ -147,13 +141,13 @@ namespace Reni.ReniParser
                 EndMethodDump();
             }
         }
-    
+
         internal override string DumpShort()
         {
             var result = base.DumpShort() + "." + _tokenClass.ObjectId;
-            if (Left != null)
+            if(Left != null)
                 result = "(" + Left.DumpShort() + ")" + result;
-            if (Right != null)
+            if(Right != null)
                 result += "(" + Right.DumpShort() + ")";
             return result;
         }
@@ -167,14 +161,13 @@ namespace Reni.ReniParser
             get
             {
                 var result = base.DumpShort();
-                if (Left != null)
+                if(Left != null)
                     result = "(" + Left.DumpPrintText + ")" + result;
-                if (Right != null)
+                if(Right != null)
                     result += "(" + Right.DumpPrintText + ")";
                 return result;
             }
         }
-
     }
 
     // Lord of the weed

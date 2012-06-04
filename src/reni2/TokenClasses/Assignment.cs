@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +35,7 @@ namespace Reni.TokenClasses
           , ISearchPath<ISuffixFeature, FieldAccessType>
           , ISearchPath<ISuffixFeature, FunctionType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, FieldAccessType>.Convert(FieldAccessType type) { return new Feature.Feature(category => ((ISetterTargetType)type).SetterType.AssignmentFeatureResult(category)); }
-        ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return new Feature.Feature(((ISetterTargetType)type).SetterType.AssignmentFeatureResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, FieldAccessType>.Convert(FieldAccessType type) { return type.AssignmentFeature; }
+        ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return type.AssignmentFeature; }
     }
 }

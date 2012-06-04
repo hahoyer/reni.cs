@@ -29,23 +29,25 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    abstract class Function : Special
+    sealed class Function : Special
     {
-        readonly bool _isAutoCall;
-        protected Function(bool isAutoCall) { _isAutoCall = isAutoCall; }
+        readonly bool _isImplicit;
+        readonly bool _isMetaFunction;
+        internal Function(bool isImplicit = false, bool isMetaFunction = false)
+        {
+            _isImplicit = isImplicit;
+            _isMetaFunction = isMetaFunction;
+        }
 
-        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new FunctionSyntax(token, left.ToCompiledSyntaxOrNull(), _isAutoCall, right.ToCompiledSyntaxOrNull()); }
-    }
-
-    sealed class ExplicitFunction : Function
-    {
-        public ExplicitFunction()
-            : base(false) { }
-    }
-
-    sealed class ImplicitFunction : Function
-    {
-        public ImplicitFunction()
-            : base(true) { }
+        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        {
+            return new FunctionSyntax
+                (token
+                 , left.ToCompiledSyntaxOrNull()
+                 , _isImplicit
+                 , _isMetaFunction 
+                 , right.ToCompiledSyntaxOrNull()
+                );
+        }
     }
 }

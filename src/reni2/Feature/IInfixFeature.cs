@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,51 +18,47 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Feature
 {
-    interface ISearchPath<out TOutType, in TInType>
+    interface ISearchPath
+    { }
+
+    interface ISearchPath<out TOutType, in TInType>: ISearchPath
+        where TOutType : ISearchPath
     {
         TOutType Convert(TInType type);
     }
 
-    interface IFeature
+    interface IFeature : ISearchPath
     {
-        Result Result(Category category, RefAlignParam refAlignParam);
+        IMetaFunctionFeature MetaFunction { get; }
+        IFunctionFeature Function { get; }
+        ISimpleFeature Simple { get; }
     }
 
-    interface ITypeFeature : IFeature
-    {}
-
-    interface ISuffixFeature : ITypeFeature
-    {}
-
-    interface IPrefixFeature : ITypeFeature
-    {}
-                
-    interface IContextFeature : IFeature
-    {}
-
-    sealed class RefAlignedFeature : ReniObject, ISuffixFeature
+    interface ISimpleFeature
     {
-        [EnableDump]
-        readonly Func<Category, RefAlignParam, Result> _function;
-        static int _nextObjectId;
+        Result Result(Category category);
+    }
 
-        public RefAlignedFeature(Func<Category, RefAlignParam, Result> function)
-            : base(_nextObjectId++)
-        {
-            _function = function;
-            Tracer.Assert(_function.Target is TypeBase);
-        }
+    interface ISuffixFeature : IFeature
+    {}
 
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
+    interface IPrefixFeature : IFeature
+    {}
+
+    interface IContextFeature : IFeature
+    {
     }
 
     sealed class Feature : ReniObject, ISuffixFeature
@@ -77,22 +74,28 @@ namespace Reni.Feature
             Tracer.Assert(_function.Target is TypeBase);
         }
 
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category); }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return null; } }
+        Result Result(Category category) { return _function(category); }
     }
 
-    sealed class RefAlignedPrefixFeature : ReniObject, IPrefixFeature, ISuffixFeature
+    sealed class PrefixFeature : ReniObject, IPrefixFeature
     {
         [EnableDump]
-        readonly Func<Category, RefAlignParam, Result> _function;
+        readonly Func<Category, Result> _function;
         static int _nextObjectId;
 
-        public RefAlignedPrefixFeature(Func<Category, RefAlignParam, Result> function)
+        public PrefixFeature(Func<Category, Result> function)
             : base(_nextObjectId++)
         {
             _function = function;
             Tracer.Assert(_function.Target is TypeBase);
         }
 
-        Result IFeature.Result(Category category, RefAlignParam refAlignParam) { return _function(category, refAlignParam); }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return null; } }
+        Result Result(Category category) { return _function(category); }
     }
 }

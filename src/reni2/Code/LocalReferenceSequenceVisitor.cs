@@ -1,5 +1,7 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,18 +31,18 @@ using Reni.Code.ReplaceVisitor;
 
 namespace Reni.Code
 {
-    internal sealed class LocalReferenceSequenceVisitor : Base
+    sealed class LocalReferenceSequenceVisitor : Base
     {
-        private readonly SimpleCache<CodeBase> _codeCache;
+        readonly SimpleCache<CodeBase> _codeCache;
 
         [Node]
         [EnableDump]
-        private readonly List<LocalReference> _data = new List<LocalReference>();
+        readonly List<LocalReference> _data = new List<LocalReference>();
         [Node]
         [EnableDump]
-        private readonly DictionaryEx<LocalReference, int> _localReferences;
+        readonly DictionaryEx<LocalReference, int> _localReferences;
 
-        private static int _nextObjectId;
+        static int _nextObjectId;
 
         public LocalReferenceSequenceVisitor()
             : base(_nextObjectId++)
@@ -47,7 +51,7 @@ namespace Reni.Code
             _codeCache = new SimpleCache<CodeBase>(Convert);
         }
 
-        private CodeBase Convert()
+        CodeBase Convert()
         {
             return _data
                 .Select(localReference => localReference.Code)
@@ -55,9 +59,9 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        private CodeBase Code { get { return _codeCache.Value; } }
+        CodeBase Code { get { return _codeCache.Value; } }
 
-        private CodeBase DestructorCode
+        CodeBase DestructorCode
         {
             get
             {
@@ -68,7 +72,7 @@ namespace Reni.Code
             }
         }
 
-        private string HolderNamePattern { get { return "h_" + ObjectId + "_{0}"; } }
+        string HolderNamePattern { get { return "h_" + ObjectId + "_{0}"; } }
 
         internal override CodeBase LocalReference(LocalReference visitedObject)
         {
@@ -79,16 +83,16 @@ namespace Reni.Code
                 var holderIndex = _localReferences.Find(visitedObject);
                 Dump("holderIndex", holderIndex);
                 _codeCache.Reset();
-                return ReturnMethodDump(CodeBase.LocalVariableReference(visitedObject.RefAlignParam, HolderName(holderIndex)), true);
+                return ReturnMethodDump(CodeBase.LocalVariableReference(HolderName(holderIndex)), true);
             }
             finally
             {
                 EndMethodDump();
             }
         }
-        private string HolderName(int holderIndex) { return string.Format(HolderNamePattern, holderIndex); }
+        string HolderName(int holderIndex) { return string.Format(HolderNamePattern, holderIndex); }
 
-        private int ObtainHolderIndex(LocalReference visitedObject)
+        int ObtainHolderIndex(LocalReference visitedObject)
         {
             _data.Add(ReVisit(visitedObject) ?? visitedObject);
             return _data.Count - 1;
@@ -107,7 +111,7 @@ namespace Reni.Code
                 var resultSize = alignedBody.Size;
                 var alignedInternal = Code.Align();
                 // Gap is used to avoid overlapping of internal and final location of result, so Copy/Destruction can be used to move result.
-                var gap = CodeBase.Void();
+                var gap = CodeBase.Void;
                 Dump("newBody", newBody);
                 Dump("aligned Body", alignedBody);
                 Dump("alignedInternal", alignedInternal);

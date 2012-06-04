@@ -22,13 +22,13 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
+using Reni.Context;
 
 namespace Reni.Code
 {
     sealed class LocalVariableReference : FiberHead
     {
         static int _nextObjectId;
-        readonly RefAlignParam _refAlignParam;
         [Node]
         [DisableDump]
         internal readonly string Holder;
@@ -36,10 +36,9 @@ namespace Reni.Code
         [DisableDump]
         internal readonly Size Offset;
 
-        public LocalVariableReference(RefAlignParam refAlignParam, string holder, Size offset)
+        public LocalVariableReference(string holder, Size offset)
             : base(_nextObjectId++)
         {
-            _refAlignParam = refAlignParam;
             Holder = holder;
             Offset = offset ?? Size.Zero;
             StopByObjectId(-10);
@@ -47,7 +46,7 @@ namespace Reni.Code
 
         [DisableDump]
         [Node]
-        internal override RefAlignParam RefAlignParam { get { return _refAlignParam; } }
+        internal override bool IsRelativeReference { get { return true; } }
 
         [DisableDump]
         public override string NodeDump
@@ -60,7 +59,7 @@ namespace Reni.Code
             }
         }
 
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
         internal override void Visit(IVisitor visitor) { visitor.LocalVariableReference(Holder, Offset); }
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
     }

@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,17 +18,18 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Feature;
-using Reni.TokenClasses;
 
 namespace Reni
 {
     abstract class RootSearchVisitor<TFeature> : SearchVisitor<TFeature>
-        where TFeature : class, IFeature
+        where TFeature : class, ISearchPath
     {
         readonly ISearchTarget _target;
         protected TFeature Result { get; private set; }

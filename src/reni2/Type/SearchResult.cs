@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -22,10 +21,12 @@
 #endregion
 
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
+using Reni.Context;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -33,8 +34,11 @@ namespace Reni.Type
     abstract class SearchResult : ReniObject
     {
         static int _nextObjectId;
+        [EnableDump]
         internal readonly IFeature Feature;
+        [EnableDump]
         internal readonly IConversionFunction[] ConversionFunctions;
+
         internal SearchResult(IFeature feature, IConversionFunction[] conversionFunctions)
             : base(_nextObjectId++)
         {
@@ -43,21 +47,21 @@ namespace Reni.Type
             ConversionFunctions = conversionFunctions;
         }
 
-        internal Result Result(Category category, RefAlignParam refAlignParam)
+        internal Result Result(Category category)
         {
             var trace = ObjectId == -2 && category.HasCode;
-            StartMethodDump(trace, category, refAlignParam);
+            StartMethodDump(trace, category);
             try
             {
                 category = category.Typed;
-                var featureResult = FeatureResult(category, refAlignParam);
+                var featureResult = Feature.Simple.Result(category);
                 if(!featureResult.HasArg || ConversionFunctions.Length == 0)
                     return ReturnMethodDump(featureResult, true);
 
                 Dump("featureResult", featureResult);
                 BreakExecution();
 
-                var converterResult = ConverterResult(category).SmartLocalReferenceResult(refAlignParam);
+                var converterResult = ConverterResult(category);
 
                 Dump("converterResult", converterResult);
                 BreakExecution();
@@ -72,14 +76,14 @@ namespace Reni.Type
             }
         }
 
-        internal Result ConverterResult(Category category, RefAlignParam refAlignParam)
+        internal Result SmartConverterResult(Category category)
         {
             if(ConversionFunctions.Length == 0)
-                return TrivialConversionResult(category, refAlignParam);
-            return ConverterResult(category.Typed).SmartLocalReferenceResult(refAlignParam);
+                return TrivialConversionResult(category);
+            return ConverterResult(category.Typed);
         }
 
-        protected abstract Result TrivialConversionResult(Category category, RefAlignParam refAlignParam);
+        protected abstract Result TrivialConversionResult(Category category);
 
         Result ConverterResult(Category category)
         {
@@ -97,7 +101,7 @@ namespace Reni.Type
                 for(var i = 1; i < results.Length; i++)
                     result = result.ReplaceArg(results[i]);
 
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result.SmartLocalReferenceResult(), true);
             }
             finally
             {
@@ -105,6 +109,10 @@ namespace Reni.Type
             }
         }
 
-        Result FeatureResult(Category category, RefAlignParam refAlignParam) { return Feature.Result(category, refAlignParam); }
+        internal Result ReplaceArg(Category category, Result objectResult)
+        {
+            return Result(category)
+                .ReplaceArg(objectResult);
+        }
     }
 }

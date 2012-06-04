@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -43,8 +42,6 @@ namespace Reni.Code.ReplaceVisitor
 
         internal ReplaceRelRefArg(Result actualArg)
             : this(actualArg, Size.Create(0)) { }
-
-        RefAlignParam RefAlignParam { get { return ActualArg.Code.RefAlignParam; } }
 
         protected override CodeBase Actual
         {

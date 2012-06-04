@@ -158,7 +158,7 @@ namespace Reni.Code
         void IVisitor.RecursiveCall() { throw new NotImplementedException(); }
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode) { NotImplementedMethod(condSize, thenCode, elseCode); }
         void IVisitor.LocalVariableAccess(string holder, Size offset, Size size, Size dataSize) { NotImplementedMethod(size, holder, offset); }
-        void IVisitor.ReferenceCode(IReferenceInCode context) { NotImplementedMethod(context); }
+        void IVisitor.ReferenceCode(IContextReference context) { NotImplementedMethod(context); }
         void IVisitor.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName, valueSize); }
         void IVisitor.TopFrameRef(Size offset) { NotImplementedMethod(offset); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) { NotImplementedMethod(leftSize, itemSize); }

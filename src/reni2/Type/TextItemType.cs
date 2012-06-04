@@ -51,39 +51,36 @@ namespace Reni.Type
 
         }
 
-        internal override Result DumpPrintTextResultFromSequence(Category category, RefAlignParam refAlignParam, int count)
+        internal override Result DumpPrintTextResultFromSequence(Category category, int count)
         {
             return Void.Result
                 (category
-                 , () => DumpPrintCodeFromSequence(refAlignParam, count)
+                 , () => DumpPrintCodeFromSequence(count)
                  , CodeArgs.Arg
                 );
         }
 
-        internal Result DumpPrintTextResult(Category category, RefAlignParam refAlignParam)
+        internal Result DumpPrintTextResult(Category category)
         {
             return Void.Result
                 (category
-                 , () => DumpPrintCode(refAlignParam)
+                 , DumpPrintCode
                  , CodeArgs.Arg
                 );
         }
 
-        CodeBase DumpPrintCodeFromSequence(RefAlignParam refAlignParam, int count)
+        CodeBase DumpPrintCodeFromSequence(int count)
         {
             return
-                UniqueSequence(count)
-                    .UniqueReference(refAlignParam).Type()
-                    .ArgCode()
+                UniqueSequence(count).UniqueReference.Type().ArgCode
                     .Dereference(Size * count)
                     .DumpPrintText(Size);
         }
 
-        CodeBase DumpPrintCode(RefAlignParam refAlignParam)
+        CodeBase DumpPrintCode()
         {
             return
-                UniqueReference(refAlignParam).Type()
-                    .ArgCode()
+                UniqueReference.Type().ArgCode
                     .Dereference(Size)
                     .DumpPrintText(Size);
         }

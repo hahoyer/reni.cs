@@ -26,26 +26,25 @@ using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 
 namespace Reni.Type
 {
-    sealed class ConcatArraysFeature : TypeBase, IFunctionalFeature
+    sealed class ConcatArraysFeature : TypeBase, IFunctionFeature
     {
         [EnableDump]
         readonly Array _type;
-        readonly RefAlignParam _refAlignParam;
 
-        public ConcatArraysFeature(Array type, RefAlignParam refAlignParam)
+        public ConcatArraysFeature(Array type)
         {
             _type = type;
-            _refAlignParam = refAlignParam;
         }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
-        protected override Size GetSize() { return _refAlignParam.RefSize; }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
-        Result IFunctionalFeature.ApplyResult(Category category, TypeBase argsType)
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
             var newCount = argsType.ArrayElementCount;
             var newElementResult = argsType
@@ -55,15 +54,15 @@ namespace Reni.Type
                 .UniqueArray(_type.Count + newCount)
                 .Result
                 (category
-                 , () => newElementResult.Code.Sequence(_type.DereferencedReferenceCode(_refAlignParam))
+                 , () => newElementResult.Code.Sequence(_type.DereferencedReferenceCode())
                  , () => newElementResult.CodeArgs + CodeArgs.Arg()
                 );
         }
 
         [DisableDump]
-        bool IFunctionalFeature.IsImplicit { get { return false; } }
+        bool IFunctionFeature.IsImplicit { get { return false; } }
         [DisableDump]
-        IReferenceInCode IFunctionalFeature.ObjectReference
+        IContextReference IFunctionFeature.ObjectReference
         {
             get
             {
