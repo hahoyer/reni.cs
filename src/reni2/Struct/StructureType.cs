@@ -56,7 +56,8 @@ namespace Reni.Struct
 
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this); }
 
-        internal void SearchFeature<TFeature>(SearchVisitor<TFeature> searchVisitor) where TFeature : class, ISearchPath
+        internal void SearchNameSpace<TFeature>(SearchVisitor<TFeature> searchVisitor)
+            where TFeature : class, ISearchPath
         {
             var searchVisitorChild = searchVisitor as SearchVisitor<ISuffixFeature>;
             if(searchVisitorChild == null || searchVisitorChild.IsSuccessFull)

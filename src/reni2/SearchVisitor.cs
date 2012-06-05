@@ -41,7 +41,7 @@ namespace Reni
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
         internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
 
-        internal abstract void Search(StructureType structureType);
+        internal abstract void SearchNameSpace(StructureType structureType);
         internal abstract void Search();
 
         internal void Search<TType>(TType target, Func<TypeBase> getChild)
@@ -69,6 +69,13 @@ namespace Reni
                 return;
             Add(new ConversionFunction(isc));
         }
+        internal void Search(StructureType structureType)
+        {
+            SearchNameSpace(structureType);
+            if (IsSuccessFull)
+                return;
+            Search(structureType, null);
+        }
     }
 
     interface IConversionFunction
@@ -91,7 +98,7 @@ namespace Reni
             typeBase.Search(this);
         }
 
-        internal override void Search(StructureType structureType) { structureType.SearchFeature(this); }
+        internal override void SearchNameSpace(StructureType structureType) { structureType.SearchNameSpace(this); }
         internal override void Search()
         {
             Tracer.Assert(!IsSuccessFull, ()=>Tracer.Dump(Probe));
