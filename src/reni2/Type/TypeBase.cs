@@ -172,7 +172,7 @@ namespace Reni.Type
         internal virtual Result Copier(Category category) { return VoidCodeAndRefs(category); }
         internal virtual Result ArrayCopier(Category category, int count) { return VoidCodeAndRefs(category); }
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
-        internal Result ArgResult(Category category) { return Result(category, ()=>ArgCode, CodeArgs.Arg); }
+        internal Result ArgResult(Category category) { return Result(category, () => ArgCode, CodeArgs.Arg); }
         internal Result ReferenceArgResult(Category category) { return UniqueReference.Type().ArgResult(category); }
         internal CodeBase DereferencedReferenceCode() { return UniqueReference.Type().ArgCode.Dereference(Size); }
 
@@ -261,10 +261,9 @@ namespace Reni.Type
         internal virtual bool IsLambda { get { return false; } }
         [DisableDump]
         internal virtual IReference Reference { get { return this as IReference; } }
-
         TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
 
-        internal SearchResult Search<TFeature>(ISearchTarget target) 
+        internal SearchResult Search<TFeature>(ISearchTarget target)
             where TFeature : class, IFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
@@ -313,7 +312,7 @@ namespace Reni.Type
                 );
         }
 
-        internal Result OperationResult<TFeature>(Category category, ISearchTarget target) 
+        internal Result OperationResult<TFeature>(Category category, ISearchTarget target)
             where TFeature : class, IFeature
         {
             var trace = ObjectId == 10 && target.GetObjectId() == 34 && category.HasCode;
@@ -427,6 +426,12 @@ namespace Reni.Type
                 uniqueTextItem.UniqueReference.Type()
                     .Result(category, UniqueReference.Type().ArgResult(category))
                 ;
+        }
+
+        internal Result ConcatArrayFromRef(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
         }
 
         internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }

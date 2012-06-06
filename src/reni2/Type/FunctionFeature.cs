@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Feature;
 using Reni.Struct;
 using Reni.TokenClasses;
 

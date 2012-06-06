@@ -22,11 +22,12 @@ using System.Linq;
 using System;
 using Reni.Feature;
 using Reni.Sequence;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     internal sealed class DumpPrintSequenceFeature : ISearchPath<ISuffixFeature, SequenceType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.DumpPrintTextResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return TokenClass.Feature(type.DumpPrintTextResult); }
     }
 }

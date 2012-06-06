@@ -33,6 +33,8 @@
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
+    <Compile Include="Feature\Function.cs" />
+    <Compile Include="Feature\Simple.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="PathItemSearchVisitor.cs" />
@@ -108,7 +110,7 @@
     <Compile Include="FeatureTest\Structure\LikeSyntax.cs" />
     <Compile Include="FeatureTest\Text.cs" />
     <Compile Include="Feature\DumpPrint\DumpPrintToken.cs" />
-    <Compile Include="Feature\IInfixFeature.cs" />
+    <Compile Include="Feature\Interfaces.cs" />
     <Compile Include="Parser\ITokenClass.cs" />
     <Compile Include="Parser\ITokenRelation.cs" />
     <Compile Include="Parser\ParsedSyntax.cs" />
@@ -238,12 +240,10 @@
     <Compile Include="TypeSearchResult.cs" />
     <Compile Include="Type\AssignmentFeature.cs" />
     <Compile Include="Type\Child.cs" />
-    <Compile Include="Type\ConcatArraysFeature.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
     <Compile Include="Type\ConversionParameter.cs" />
     <Compile Include="Type\Converter.cs" />
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
-    <Compile Include="Type\ConcatArraysFromReferenceFeature.cs" />
     <Compile Include="Type\DumpPrintSequenceFeature.cs" />
     <Compile Include="Type\EmptyFunctionFeatureProvider.cs" />
     <Compile Include="Type\EnableCut.cs" />

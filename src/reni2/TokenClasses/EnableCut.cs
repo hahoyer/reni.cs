@@ -27,6 +27,6 @@ namespace Reni.TokenClasses
 {
     internal sealed class EnableCut : Defineable, ISearchPath<ISuffixFeature, SequenceType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return new Feature.Feature(type.EnableCutFeature); }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Feature(type.EnableCutFeature); }
     }
 }

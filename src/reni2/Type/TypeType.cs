@@ -23,6 +23,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Syntax;
 
 namespace Reni.Type

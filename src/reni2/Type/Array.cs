@@ -28,8 +28,6 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
-using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -37,23 +35,19 @@ namespace Reni.Type
     ///     Fixed sized array of a type
     /// </summary>
     [Serializable]
-    sealed class Array : TypeBase
+    sealed class Array : TypeBase, IContextReference
     {
-        readonly SimpleCache<ConcatArraysFeature> _concatArraysFeatureCache;
-
         readonly TypeBase _element;
         readonly int _count;
-        public readonly ISearchPath<ISuffixFeature, AutomaticReferenceType> ConcatArraysFromReferenceFeature;
 
         public Array(TypeBase element, int count)
         {
-            ConcatArraysFromReferenceFeature = new ConcatArraysFromReferenceFeature(this);
             _element = element;
             _count = count;
             Tracer.Assert(count > 0);
-            _concatArraysFeatureCache = new SimpleCache<ConcatArraysFeature>(()=> new ConcatArraysFeature(this));
         }
 
+        Size IContextReference.Size { get { return Size; } }
         [Node]
         internal int Count { get { return _count; } }
 
@@ -65,6 +59,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsArray { get { return true; } }
         internal override bool IsDataLess { get { return Count == 0 || Element.IsDataLess; } }
+
         protected override Size GetSize() { return Element.Size * _count; }
 
         internal override Result Destructor(Category category) { return Element.ArrayDestructor(category, Count); }
@@ -81,11 +76,29 @@ namespace Reni.Type
 
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + ")array(" + Count + ")"; }
 
-        internal Result ConcatArrays(Category category)
+        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
         {
-            return _concatArraysFeatureCache
-                .Value
-                .Result(category, ReferenceArgResult(category));
+            return ConcatArrays(category, argsType, objectReference);
+        }
+
+        Result ConcatArrays(Category category, TypeBase argsType, IContextReference objectReference)
+        {
+            var oldElementsResult = UniqueReference
+                .Type()
+                .Result(category, objectReference)
+                .DereferenceResult();
+            var newCount = argsType.ArrayElementCount;
+            var newElementsResult = argsType
+                .Conversion(category, argsType.IsArray ? Element.UniqueArray(newCount) : Element);
+            var result = Element
+                .UniqueArray(Count + newCount)
+                .Result(category, newElementsResult + oldElementsResult);
+            return result;
+        }
+
+        internal Result ConcatArraysFromRef(Category category, IContextReference objectReference, TypeBase argsType)
+        {
+            return ConcatArrays(category, argsType, objectReference);
         }
 
         internal Result DumpPrintResult(Category category)
@@ -100,10 +113,9 @@ namespace Reni.Type
 
         CodeBase CreateDumpPrintCode()
         {
-            var refAlignParam = Root.DefaultRefAlignParam;
             var elementReference = Element.UniqueReference.Type();
             var argCode = UniqueReference.Type().ArgCode;
-            var elementDumpPrint = Element.GenericDumpPrintResult(Category.Code).Code;
+            var elementDumpPrint = elementReference.GenericDumpPrintResult(Category.Code).Code;
             var code = CodeBase.DumpPrintText("array(" + Element.DumpPrintText + ",(");
             for(var i = 0; i < Count; i++)
             {

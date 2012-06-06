@@ -58,7 +58,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = (ObjectId == -57 || ObjectId == -36) && category.HasCode;
+            var trace = new[]{47}.Contains(ObjectId) && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
@@ -144,7 +144,7 @@ namespace Reni.ReniParser
 
         internal override string DumpShort()
         {
-            var result = base.DumpShort() + "." + _tokenClass.ObjectId;
+            var result = base.DumpShort();
             if(Left != null)
                 result = "(" + Left.DumpShort() + ")" + result;
             if(Right != null)

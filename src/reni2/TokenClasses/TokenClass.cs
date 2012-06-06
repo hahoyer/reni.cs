@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,11 +18,17 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Reni.Basics;
+using Reni.Code;
+using Reni.Feature;
 using Reni.Parser;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
@@ -28,10 +36,27 @@ namespace Reni.TokenClasses
     ///     Base clas for compiler tokens
     /// </summary>
     [Serializable]
-    internal abstract class TokenClass : Parser.TokenClass
+    abstract class TokenClass : Parser.TokenClass
     {
-        sealed protected override IParsedSyntax Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return Syntax((ReniParser.ParsedSyntax) left, token, (ReniParser.ParsedSyntax) right); }
+        protected override sealed IParsedSyntax Syntax
+            (IParsedSyntax left
+                , TokenData token
+                , IParsedSyntax right
+            )
+        {
+            return
+                Syntax((ReniParser.ParsedSyntax) left, token, (ReniParser.ParsedSyntax) right);
+        }
+        protected abstract ReniParser.ParsedSyntax Syntax
+            (ReniParser.ParsedSyntax left
+                , TokenData token
+                , ReniParser.ParsedSyntax right
+            );
 
-        protected abstract ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right);
+        internal static Simple Feature(Func<Category, Result> function) { return new Simple(function); }
+        internal static Simple<T> Feature<T>(Func<Category, Result> func) { return new Simple<T>(func); }
+
+        internal static Feature.Function Feature(Func<Category, IContextReference, TypeBase, Result> function) { return new Feature.Function(function); }
+        internal static Function<T> Feature<T>(Func<Category, IContextReference, TypeBase, Result> func) { return new Function<T>(func); }
     }
 }
