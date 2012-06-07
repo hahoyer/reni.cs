@@ -35,9 +35,13 @@ namespace Reni.Feature
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var leftType = left.Type(context).AutomaticDereferenceType;
+            var leftType = left.Type(context);
             if(category.HasCode || category.HasArgs)
-                return context.ResultAsReference(category.Typed, right).Conversion(leftType) & category;
+                return context
+                    .ResultAsReference(category.Typed, right)
+                    .Conversion(leftType) 
+                    .AutomaticDereferenceResult()
+                    & category;
             return leftType.Result(category);
         }
     }

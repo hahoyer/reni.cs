@@ -147,12 +147,19 @@ namespace Reni.Sequence
             return result;
         }
 
+        static Result ConversionAsReference(Category category, SequenceType source, SequenceType destination)
+        {
+            return Conversion(category, source, destination)
+                .ReplaceArg(source.DereferenceReferenceResult)
+                .SmartLocalReferenceResult();
+        }
+
         internal Result DumpPrintTextResult(Category category) { return Element.DumpPrintTextResultFromSequence(category, Count); }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
             if(Count >= type.Count)
-                return TokenClass.Feature(c => Conversion(c, type, this));
+                return TokenClass.Feature(c => ConversionAsReference(c, type, this));
             NotImplementedMethod(type);
             return null;
         }
@@ -166,7 +173,7 @@ namespace Reni.Sequence
 
         Result ConvertFromEnableCut(Category category, SequenceType source)
         {
-            return Conversion(category, source, this)
+            return ConversionAsReference(category, source, this)
                 .ReplaceArg(source.DereferenceEnableCutReferenceResult);
         }
 
@@ -179,8 +186,5 @@ namespace Reni.Sequence
                 .DereferenceResult()
                 .Un<TagChild<TypeBase>>();
         }
-    
     }
-
 }
-

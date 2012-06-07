@@ -157,11 +157,21 @@ namespace Reni.Type
         [DisableDump]
         internal IReference UniqueReference { get { return _cache.References.Value; } }
         [DisableDump]
-        internal TypeBase AutomaticDereferenceType { get { return this; } }
-        [DisableDump]
         internal virtual TypeBase TypeForTypeOperator { get { return this; } }
         [DisableDump]
         internal CodeBase ArgCode { get { return CodeBase.Arg(this); } }
+
+        [DisableDump]
+        TypeBase AutomaticDereferenceType
+        {
+            get
+            {
+                var result = Reference;
+                if (result == null)
+                    return this;
+                return result.TargetType.AutomaticDereferenceType;
+            }
+        }
 
         internal Array UniqueArray(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
@@ -382,7 +392,7 @@ namespace Reni.Type
             }
 
             var result = searchResult.Result(category);
-            if(category.HasType && result.Type != destination)
+            if(category.HasType && result.Type.AutomaticDereferenceType != destination.AutomaticDereferenceType)
                 DumpDataWithBreak("Wrong conversion result type", "this", this, "destination", destination, "result", result);
             return result;
         }

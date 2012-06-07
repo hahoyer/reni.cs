@@ -39,7 +39,7 @@ namespace Reni.Type
             _valueType = valueType;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
-            StopByObjectId(10);
+            StopByObjectId(-10);
         }
 
 
