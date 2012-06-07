@@ -132,7 +132,7 @@ namespace Reni.Sequence
 
         Result FlatConversion(Category category, SequenceType source)
         {
-            var result = source.ReferenceResult(category.Typed);
+            var result = source.ArgResult(category.Typed);
             if(source.Count > Count)
                 result = source.RemoveElementsAtEnd(category, Count);
 
@@ -149,17 +149,16 @@ namespace Reni.Sequence
 
         Result ConversionAsReference(Category category, SequenceType source)
         {
-            return FlatConversion(category, source);
-            var trace = ObjectId == 2;
+            var trace = ObjectId == -4;
             StartMethodDump(trace, category, source);
             try
             {
                 var flatResult = FlatConversion(category, source);
                 Dump("flatResult", flatResult);
-                Func<Category, Result> forArg = source.ReferenceResult2;
+                Func<Category, Result> forArg = source.DereferenceReferenceResult;
                 if (trace)
                     Dump("forArg", forArg(Category.All));
-                var result = flatResult.ReplaceArg(source.ReferenceResult2);
+                var result = flatResult.ReplaceArg(source.DereferenceReferenceResult);
                 Dump("result", result); 
                 return ReturnMethodDump(result.SmartLocalReferenceResult());
             }
@@ -195,18 +194,18 @@ namespace Reni.Sequence
 
         Result ConvertFromEnableCut(Category category, SequenceType source)
         {
-            var trace = ObjectId == -1;
+            var trace = ObjectId == -2;
             StartMethodDump(trace, category, source);
             try
             {
-                var result = source.ConversionAsReference(category, this);
+                var result = ConversionAsReference(category, source);
                 Dump("result", result);
 
                 Func<Category, Result> forArg = source.RemoveEnableCutReferenceResult;
                 if(trace)
                     Dump("forArg", forArg(Category.All));
 
-                return ReturnMethodDump(result.ReplaceArg(forArg));
+                return ReturnMethodDump(result.ReplaceArg(source.RemoveEnableCutReferenceResult));
             }
             finally
             {
