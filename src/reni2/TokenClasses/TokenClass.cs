@@ -56,12 +56,26 @@ namespace Reni.TokenClasses
             );
 
         internal static Simple Feature(Func<Category, Result> function) { return new Simple(function); }
-        internal static Simple<T> Feature<T>(Func<Category, Result> func) { return new Simple<T>(func); }
+        internal static Simple<T> Feature<T>(Func<Category, T, Result> function) { return new Simple<T>(function); }
 
-        internal static Feature.Function Feature(Func<Category, IContextReference, TypeBase, Result> function) { return new Feature.Function(function); }
-        internal static Function<T> Feature<T>(Func<Category, IContextReference, TypeBase, Result> func) { return new Function<T>(func); }
+        internal static Feature.Function
+            Feature(Func<Category, IContextReference, TypeBase, Result> function)
+        {
+            return
+                new Feature.Function(function);
+        }
+        internal static Function<T>
+            Feature<T>(Func<Category, IContextReference, TypeBase, Result> function)
+        {
+            return
+                new Function<T>(function);
+        }
 
-        internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { return new MetaFunction(function); }
+        internal static MetaFunction
+            Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function)
+        {
+            return
+                new MetaFunction(function);
+        }
     }
-
 }

@@ -32,12 +32,6 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
-
-        protected override IConverter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
-        {
-            return
-                new FunctionalConverter(ParentConversionResult)
-                    .Concat((IConverter) Parent.Converter(conversionParameter.EnableCut, destination));
-        }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Parent); }
     }
 }

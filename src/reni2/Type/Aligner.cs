@@ -64,12 +64,6 @@ namespace Reni.Type
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Parent); }
         internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
 
-        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
-        {
-            return new FunctionalConverter(ParentConversionResult)
-                .Concat((IConverter) Parent.Converter(conversionParameter, destination));
-        }
-
         protected override Result ParentConversionResult(Category category)
         {
             return Parent.Result

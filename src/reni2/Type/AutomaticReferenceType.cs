@@ -39,7 +39,7 @@ namespace Reni.Type
             _valueType = valueType;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is AutomaticReferenceType), valueType.Dump);
-            StopByObjectId(-10);
+            StopByObjectId(10);
         }
 
 
@@ -88,9 +88,6 @@ namespace Reni.Type
                 );
         }
 
-        Result ToAutomaticReferenceResult(Category category) { return ArgResult(category); }
-
-        Result ValueTypeToLocalReferenceResult(Category category) { return ValueType.SmartLocalReferenceResult(category); }
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
 
@@ -104,41 +101,6 @@ namespace Reni.Type
                  , () => LocalReferenceCode().Dereference(Root.DefaultRefAlignParam.RefSize)
                  , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
-        }
-
-        IConverter Converter(ConversionParameter conversionParameter, AutomaticReferenceType destination)
-        {
-            var trace = ObjectId == -13;
-            try
-            {
-                StartMethodDump(trace, conversionParameter, destination);
-                if(ValueType == destination.ValueType)
-                    return ReturnMethodDump(new FunctionalConverter(ToAutomaticReferenceResult), true);
-
-                var c1 = new FunctionalConverter(DereferenceResult);
-                Dump("c1", c1.Result(Category.Type | Category.Code));
-                var c2 = ValueType.UnAlignedType.Converter(conversionParameter, destination.ValueType);
-                Dump("c2", c2.Result(Category.Type | Category.Code));
-                var c3 = new FunctionalConverter(destination.ValueTypeToLocalReferenceResult);
-                Dump("c3", c3.Result(Category.Type | Category.Code));
-                BreakExecution();
-                var result = c1.Concat((IConverter) c2).Concat(c3);
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
-        {
-            var referenceDestination = destination as AutomaticReferenceType;
-            if(referenceDestination != null)
-                return Converter(conversionParameter, referenceDestination);
-
-            return
-                new FunctionalConverter(DereferenceResult)
-                    .Concat((IConverter) ValueType.Converter(conversionParameter, destination));
         }
     }
 }

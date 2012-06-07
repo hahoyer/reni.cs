@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Type;
 
 namespace Reni.Feature
 {
@@ -35,30 +34,39 @@ namespace Reni.Feature
         Func<Category, Result> _function;
         static int _nextObjectId;
         protected SimpleBase(Func<Category, Result> function)
-            : base(_nextObjectId++)
-        {
-            _function = function;
-            Tracer.Assert(_function.Target is TypeBase);
-        }
+            : base(_nextObjectId++) { _function = function; }
         Result ISimpleFeature.Result(Category category) { return _function(category); }
     }
 
     sealed class Simple<TType>
-        : SimpleBase
+        : ReniObject
           , ISearchPath<ISuffixFeature, TType>
           , ISearchPath<IPrefixFeature, TType>
-          , ISuffixFeature
+    {
+        readonly Func<Category, TType, Result> _function;
+
+        public Simple(Func<Category, TType, Result> function) { _function = function; }
+
+        ISuffixFeature ISearchPath<ISuffixFeature, TType>.Convert(TType type) { return new ConvertedSimple<TType>(type, _function); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TType>.Convert(TType type) { return new ConvertedSimple<TType>(type, _function); }
+    }
+
+    sealed class ConvertedSimple<TType>
+        : ReniObject, ISimpleFeature, ISuffixFeature
           , IPrefixFeature
     {
-        public Simple(Func<Category, Result> function)
-            : base(function) { }
-
-        ISuffixFeature ISearchPath<ISuffixFeature, TType>.Convert(TType type) { return this; }
-        IPrefixFeature ISearchPath<IPrefixFeature, TType>.Convert(TType type) { return this; }
+        readonly TType _type;
+        readonly Func<Category, TType, Result> _function;
+        public ConvertedSimple(TType type, Func<Category, TType, Result> function)
+        {
+            _type = type;
+            _function = function;
+        }
 
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
         ISimpleFeature IFeature.Simple { get { return this; } }
+        Result ISimpleFeature.Result(Category category) { return _function(category, _type); }
     }
 
     sealed class Simple : SimpleBase, IPrefixFeature, ISuffixFeature

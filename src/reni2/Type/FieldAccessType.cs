@@ -115,12 +115,6 @@ namespace Reni.Type
                 .Assignment(RefAlignParam, Parent.Size);
         }
 
-        protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
-        {
-            return new FunctionalConverter(ParentConversionResult)
-                .Concat((IConverter) Parent.SmartReference().Converter(conversionParameter, destination));
-        }
-
         TypeBase IReference.TargetType { get { return Parent; } }
     }
 }

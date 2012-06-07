@@ -35,7 +35,7 @@ namespace Reni.Type
         protected abstract string TagTitle { get; }
         [DisableDump]
         internal override string DumpPrintText { get { return Parent.DumpPrintText + " #(# " + TagTitle + " #)#"; } }
-
+        [DisableDump]
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
         protected override Size GetSize() { return Parent.Size; }
         internal override string DumpShort() { return Parent.DumpShort() + "[" + TagTitle + "]"; }

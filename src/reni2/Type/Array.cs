@@ -131,7 +131,7 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result ConcatArraysFromRef(Category category, IContextReference objectReference, TypeBase argsType) { return ConcatArrays(category, argsType, objectReference); }
+        internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType) { return ConcatArrays(category, argsType, objectReference); }
 
         internal Result DumpPrintResult(Category category)
         {

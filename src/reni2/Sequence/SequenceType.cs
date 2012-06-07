@@ -37,7 +37,10 @@ using Reni.Type;
 namespace Reni.Sequence
 {
     [Serializable]
-    sealed class SequenceType : TypeBase, ISearchPath<ISuffixFeature, SequenceType>
+    sealed class SequenceType
+        : TypeBase
+          , ISearchPath<ISuffixFeature, SequenceType>
+          , ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
     {
         readonly Type.Array _inheritedType;
 
@@ -55,7 +58,7 @@ namespace Reni.Sequence
                 );
         }
 
-        internal ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionFeature(this, featureBase); }
+        internal new ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionFeature(this, featureBase); }
 
         internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
 
@@ -144,31 +147,40 @@ namespace Reni.Sequence
             return result;
         }
 
-        static IConverter Converter(SequenceType source, ConversionParameter conversionParameter, SequenceType destination)
-        {
-            if(source.Count > destination.Count && conversionParameter.IsDisableCut)
-                destination.NotImplementedMethod(source, conversionParameter, destination);
-            return new FunctionalConverter(category => Conversion(category, source, destination));
-        }
-
         internal Result DumpPrintTextResult(Category category) { return Element.DumpPrintTextResultFromSequence(category, Count); }
-
-        protected override IConverter ConverterForUnalignedTypes(ConversionParameter conversionParameter, TypeBase destination)
-        {
-            var sequenceDestination = destination as SequenceType;
-            if(sequenceDestination != null)
-                return Converter(this, conversionParameter, sequenceDestination);
-
-            NotImplementedMethod(conversionParameter, destination);
-            return null;
-        }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
-            if(this == type)
-                return TokenClass.Feature(c=>UniqueReference.Type().ArgResult(c).DereferenceResult());
+            if(Count >= type.Count)
+                return TokenClass.Feature(c => Conversion(c, type, this));
             NotImplementedMethod(type);
             return null;
         }
+
+        ISearchPath<ISuffixFeature, Type.EnableCut>
+            ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.Convert(SequenceType type)
+        {
+            return
+                TokenClass.Feature<Type.EnableCut>((c, t) => ConvertFromEnableCut(c, type));
+        }
+
+        Result ConvertFromEnableCut(Category category, SequenceType source)
+        {
+            return Conversion(category, source, this)
+                .ReplaceArg(source.DereferenceEnableCutReferenceResult);
+        }
+
+        Result DereferenceEnableCutReferenceResult(Category category)
+        {
+            return UniqueEnableCutType
+                .UniqueReference
+                .Type()
+                .ArgResult(category.Typed)
+                .DereferenceResult()
+                .Un<TagChild<TypeBase>>();
+        }
+    
     }
+
 }
+

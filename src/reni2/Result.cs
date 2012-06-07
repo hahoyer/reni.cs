@@ -557,15 +557,15 @@ namespace Reni
             var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs, IsDirty = true};
 
             var categoryForArg = (CompleteCategory & Category.Code.CodeArgsed);
-            if (HasCode)
+            if(HasCode)
                 categoryForArg |= Category.Type;
 
             var resultForArg = getResultForArg(categoryForArg);
             if(resultForArg != null)
             {
-                if (HasCode)
+                if(HasCode)
                     result.Code = Code.ReplaceArg(getResultForArg(Category.Type | Category.Code));
-                if (HasArgs)
+                if(HasArgs)
                     result.CodeArgs = CodeArgs.WithoutArg() + getResultForArg(Category.CodeArgs).CodeArgs;
             }
             result.IsDirty = false;
@@ -789,6 +789,14 @@ namespace Reni
             var result = Clone();
             result.Code = func(Code);
             return result;
+        }
+
+        internal Result Un<T>()
+            where T : IConverter
+        {
+            return ((IConverter) Type)
+                .Result(CompleteCategory)
+                .ReplaceArg(this);
         }
     }
 }
