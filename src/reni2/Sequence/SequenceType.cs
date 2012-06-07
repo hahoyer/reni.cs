@@ -168,13 +168,6 @@ namespace Reni.Sequence
             }
         }
 
-        Result ReferenceResult2(Category c)
-        {
-            return UniqueReference
-                .Type()
-                .ArgResult(c.Typed);
-        }
-
         internal Result DumpPrintTextResult(Category category) { return Element.DumpPrintTextResultFromSequence(category, Count); }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)

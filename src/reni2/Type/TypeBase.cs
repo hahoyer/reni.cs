@@ -440,5 +440,11 @@ namespace Reni.Type
                 .ArgResult(c.Typed)
                 .DereferenceResult();
         }
+        internal Result BitSequenceOperandConversion(Category category)
+        {
+            return ConvertToBitSequence(category)
+                .AutomaticDereferenceResult()
+                .Align(BitsConst.SegmentAlignBits);
+        }
     }
 }

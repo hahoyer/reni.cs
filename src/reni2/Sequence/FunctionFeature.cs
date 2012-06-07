@@ -73,8 +73,8 @@ namespace Reni.Sequence
             var typedCategory = category.Typed;
             var result = Apply(category, _objectType.Count, argsType.SequenceCount(_objectType.Element));
             var objectResult = GetObjectReference().Result(typedCategory);
-            var convertedObjectResult = objectResult.ConvertToBitSequence(typedCategory);
-            var convertedArgsResult = argsType.ConvertToBitSequence(typedCategory);
+            var convertedObjectResult = objectResult.BitSequenceOperandConversion(typedCategory);
+            var convertedArgsResult = argsType.BitSequenceOperandConversion(typedCategory);
             return result.ReplaceArg(convertedObjectResult + convertedArgsResult);
         }
 

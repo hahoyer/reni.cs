@@ -798,5 +798,7 @@ namespace Reni
                 .Result(CompleteCategory)
                 .ReplaceArg(this);
         }
+
+        internal Result BitSequenceOperandConversion(Category category) { return Type.BitSequenceOperandConversion(category).ReplaceArg(this); }
     }
 }
