@@ -51,7 +51,7 @@ namespace Reni.Type
         {
             category = category.Typed;
             var featureResult = Feature.Simple.Result(category);
-            if(!featureResult.HasArg || ConversionFunctions.Length == 0)
+            if(!featureResult.HasArg)
                 return featureResult;
 
             var converterResult = ConverterResult(category);
@@ -67,6 +67,8 @@ namespace Reni.Type
             StartMethodDump(trace, category);
             try
             {
+                if (ConversionFunctions.Length == 0)
+                    return null;
                 var results = ConversionFunctions
                     .Select((cf, i) => cf.Result(i == 0 ? category : category.Typed))
                     .ToArray();

@@ -39,7 +39,7 @@ using Reni.Struct;
 namespace Reni.Type
 {
     [Serializable]
-    abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider
+    abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider, ISearchTarget
     {
         sealed class Cache
         {
@@ -120,6 +120,7 @@ namespace Reni.Type
         protected internal virtual TypeBase[] ToList { get { return new[] {this}; } }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
+        string ISearchTarget.StructFeatureName { get { throw new NotImplementedException(); } }
 
         [DisableDump]
         internal virtual string DumpPrintText
@@ -389,7 +390,9 @@ namespace Reni.Type
             return result;
         }
 
-        internal SearchResult Converter(ConversionParameter conversionParameter, TypeBase destination) { return Search<ISuffixFeature>(new Conversion(conversionParameter, destination)); }
+        internal SearchResult Converter(ConversionParameter conversionParameter, TypeBase destination) { return Search<ISuffixFeature>(destination.ConversionProvider(conversionParameter)); }
+
+        protected virtual ISearchTarget ConversionProvider(ConversionParameter conversionParameter) { return this; }
 
         SearchResult Converter(TypeBase destination) { return Converter(ConversionParameter.Instance, destination); }
 
@@ -448,25 +451,7 @@ namespace Reni.Type
             NotImplementedMethod(category, argsType);
             return null;
         }
+        
     }
 
-    sealed class Conversion : ReniObject, ISearchTarget
-    {
-        readonly ConversionParameter _parameter;
-        readonly TypeBase _destination;
-        public Conversion(ConversionParameter parameter, TypeBase destination)
-        {
-            _parameter = parameter;
-            _destination = destination;
-        }
-
-        string ISearchTarget.StructFeatureName
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
-    }
 }

@@ -552,13 +552,22 @@ namespace Reni
             return this;
         }
 
-        Result InternalReplaceArg(Func<Category, Result> resultForArg)
+        Result InternalReplaceArg(Func<Category, Result> getResultForArg)
         {
-            var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, IsDirty = true};
-            if(HasCode)
-                result.Code = Code.ReplaceArg(resultForArg(Category.Type | Category.Code));
-            if(HasArgs)
-                result.CodeArgs = CodeArgs.WithoutArg() + resultForArg(Category.CodeArgs).CodeArgs;
+            var result = new Result {IsDataLess = IsDataLess, Size = Size, Type = Type, Code = Code, CodeArgs = CodeArgs, IsDirty = true};
+
+            var categoryForArg = (CompleteCategory & Category.Code.CodeArgsed);
+            if (HasCode)
+                categoryForArg |= Category.Type;
+
+            var resultForArg = getResultForArg(categoryForArg);
+            if(resultForArg != null)
+            {
+                if (HasCode)
+                    result.Code = Code.ReplaceArg(getResultForArg(Category.Type | Category.Code));
+                if (HasArgs)
+                    result.CodeArgs = CodeArgs.WithoutArg() + getResultForArg(Category.CodeArgs).CodeArgs;
+            }
             result.IsDirty = false;
             return result;
         }

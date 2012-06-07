@@ -31,12 +31,13 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
     [Serializable]
-    sealed class SequenceType : TypeBase
+    sealed class SequenceType : TypeBase, ISearchPath<ISuffixFeature, SequenceType>
     {
         readonly Type.Array _inheritedType;
 
@@ -159,6 +160,14 @@ namespace Reni.Sequence
                 return Converter(this, conversionParameter, sequenceDestination);
 
             NotImplementedMethod(conversionParameter, destination);
+            return null;
+        }
+
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
+        {
+            if(this == type)
+                return TokenClass.Feature(c=>UniqueReference.Type().ArgResult(c).DereferenceResult());
+            NotImplementedMethod(type);
             return null;
         }
     }

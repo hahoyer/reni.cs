@@ -248,10 +248,8 @@ namespace Reni.Context
             if(metaFeature != null)
                 return metaFeature.ApplyResult(this, category, left, right);
 
-
             var leftResult = left != null ? left.SmartLocalReferenceResult(this, category) : null;
             var obtainResult = FunctionResult(category, right, feature, definingType);
-        
             
             return obtainResult
                 .ReplaceArg(converterResult)
