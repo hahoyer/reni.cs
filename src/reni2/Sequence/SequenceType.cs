@@ -130,28 +130,50 @@ namespace Reni.Sequence
 
         internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache.Find(refAlignParam); }
 
-        static Result Conversion(Category category, SequenceType source, SequenceType destination)
+        Result FlatConversion(Category category, SequenceType source)
         {
-            var result = source.EnableCutReference(category.Typed);
-            if(source.Count > destination.Count)
-                result = source.RemoveElementsAtEnd(category, destination.Count);
+            var result = source.ReferenceResult(category.Typed);
+            if(source.Count > Count)
+                result = source.RemoveElementsAtEnd(category, Count);
 
-            if(source.Element != destination.Element)
+            if(source.Element != Element)
             {
-                DumpDataWithBreak("Element type dismatch", "category", category, "source", source, "destination", destination, "result", result);
+                DumpDataWithBreak("Element type dismatch", "category", category, "source", source, "destination", this, "result", result);
                 return null;
             }
 
-            if(source.Count < destination.Count)
-                result = destination.ExtendFrom(category, source.Count).ReplaceArg(result);
+            if(source.Count < Count)
+                result = ExtendFrom(category, source.Count).ReplaceArg(result);
             return result;
         }
 
-        static Result ConversionAsReference(Category category, SequenceType source, SequenceType destination)
+        Result ConversionAsReference(Category category, SequenceType source)
         {
-            return Conversion(category, source, destination)
-                .ReplaceArg(source.DereferenceReferenceResult)
-                .SmartLocalReferenceResult();
+            return FlatConversion(category, source);
+            var trace = ObjectId == 2;
+            StartMethodDump(trace, category, source);
+            try
+            {
+                var flatResult = FlatConversion(category, source);
+                Dump("flatResult", flatResult);
+                Func<Category, Result> forArg = source.ReferenceResult2;
+                if (trace)
+                    Dump("forArg", forArg(Category.All));
+                var result = flatResult.ReplaceArg(source.ReferenceResult2);
+                Dump("result", result); 
+                return ReturnMethodDump(result.SmartLocalReferenceResult());
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+
+        Result ReferenceResult2(Category c)
+        {
+            return UniqueReference
+                .Type()
+                .ArgResult(c.Typed);
         }
 
         internal Result DumpPrintTextResult(Category category) { return Element.DumpPrintTextResultFromSequence(category, Count); }
@@ -159,7 +181,7 @@ namespace Reni.Sequence
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
             if(Count >= type.Count)
-                return TokenClass.Feature(c => ConversionAsReference(c, type, this));
+                return TokenClass.Feature(c =>  type.ConversionAsReference(c, this));
             NotImplementedMethod(type);
             return null;
         }
@@ -177,7 +199,7 @@ namespace Reni.Sequence
             StartMethodDump(trace, category, source);
             try
             {
-                var result = ConversionAsReference(category, source, this);
+                var result = source.ConversionAsReference(category, this);
                 Dump("result", result);
 
                 Func<Category, Result> forArg = source.RemoveEnableCutReferenceResult;
@@ -196,15 +218,23 @@ namespace Reni.Sequence
         {
             return UniqueReference
                 .Type()
-                .Result(category, EnableCutReference);
+                .Result(category, EnableCutReferenceResult);
         }
 
-        Result EnableCutReference(Category c)
+        Result EnableCutReferenceResult(Category c)
         {
             return UniqueEnableCutType
                 .UniqueReference
                 .Type()
                 .ArgResult(c.Typed);
         }
+
+        Result ReferenceResult(Category c)
+        {
+            return UniqueReference
+                .Type()
+                .ArgResult(c.Typed);
+        }
+
     }
 }
