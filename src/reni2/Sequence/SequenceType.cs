@@ -132,7 +132,7 @@ namespace Reni.Sequence
 
         static Result Conversion(Category category, SequenceType source, SequenceType destination)
         {
-            var result = source.ArgResult(category.Typed);
+            var result = source.EnableCutReference(category.Typed);
             if(source.Count > destination.Count)
                 result = source.RemoveElementsAtEnd(category, destination.Count);
 
@@ -173,18 +173,38 @@ namespace Reni.Sequence
 
         Result ConvertFromEnableCut(Category category, SequenceType source)
         {
-            return ConversionAsReference(category, source, this)
-                .ReplaceArg(source.DereferenceEnableCutReferenceResult);
+            var trace = ObjectId == -1;
+            StartMethodDump(trace, category, source);
+            try
+            {
+                var result = ConversionAsReference(category, source, this);
+                Dump("result", result);
+
+                Func<Category, Result> forArg = source.RemoveEnableCutReferenceResult;
+                if(trace)
+                    Dump("forArg", forArg(Category.All));
+
+                return ReturnMethodDump(result.ReplaceArg(forArg));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
-        Result DereferenceEnableCutReferenceResult(Category category)
+        Result RemoveEnableCutReferenceResult(Category category)
+        {
+            return UniqueReference
+                .Type()
+                .Result(category, EnableCutReference);
+        }
+
+        Result EnableCutReference(Category c)
         {
             return UniqueEnableCutType
                 .UniqueReference
                 .Type()
-                .ArgResult(category.Typed)
-                .DereferenceResult()
-                .Un<TagChild<TypeBase>>();
+                .ArgResult(c.Typed);
         }
     }
 }
