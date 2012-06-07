@@ -52,14 +52,10 @@ namespace Reni.Struct
         [DisableDump]
         internal override bool IsDataLess { get { return _structure.IsDataLess; } }
         internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
-        Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
-        [DisableDump]
-        internal RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+        Size IContextReference.Size { get { return _structure.RefAlignParam.RefSize; } }
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
-        [DisableDump]
-        internal override IFunctionFeature FunctionFeature { get { return this; } }
 
-        protected override Size GetSize() { return RefAlignParam.RefSize; }
+        protected override Size GetSize() { return _structure.RefAlignParam.RefSize; }
 
         [DisableDump]
         bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }

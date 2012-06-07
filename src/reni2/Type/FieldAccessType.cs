@@ -118,7 +118,7 @@ namespace Reni.Type
         protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             return new FunctionalConverter(ParentConversionResult)
-                .Concat(Parent.SmartReference().Converter(conversionParameter, destination));
+                .Concat((IConverter) Parent.SmartReference().Converter(conversionParameter, destination));
         }
 
         TypeBase IReference.TargetType { get { return Parent; } }

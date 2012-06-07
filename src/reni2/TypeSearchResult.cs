@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -39,6 +38,6 @@ namespace Reni
         internal TypeSearchResult(IFeature feature, IConversionFunction[] conversionFunctions, TypeBase type)
             : base(feature, conversionFunctions) { _type = type; }
 
-        protected override Result TrivialConversionResult(Category category) { return _type.SmartReference().ArgResult(category); }
+        protected override TypeBase DefiningType { get { return _type; } }
     }
 }

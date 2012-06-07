@@ -99,7 +99,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -1 && ObjectId == 1 && category.HasCode;
+            var trace = syntax.ObjectId == -44 && ObjectId == 1 && category.HasCode;
             StartMethodDump(trace, category, syntax);
             try
             {
@@ -139,7 +139,7 @@ namespace Reni.Context
             return visitor.SearchResult;
         }
 
-        internal SearchResult OperationResult(CompileSyntax syntax, ISearchTarget target)
+        internal SearchResult Search(CompileSyntax syntax, ISearchTarget target)
         {
             return syntax == null
                        ? Search(target)
@@ -222,6 +222,40 @@ namespace Reni.Context
         {
             return UniqueResult(category.Typed, syntax)
                 .SmartLocalReferenceResult();
+        }
+
+        Result FunctionResult(Category category, CompileSyntax right, IFeature feature, TypeBase definingType)
+        {
+            var function = feature.Function;
+            if(right == null && (function == null || !function.IsImplicit))
+                return feature.Simple.Result(category);
+
+            var rightResult
+                = right == null
+                      ? TypeBase.Void.Result(category.Typed)
+                      : right.SmartLocalReferenceResult(this, category);
+            return function
+                .ApplyResult(category, rightResult.Type)
+                .ReplaceArg(rightResult)
+                .ReplaceAbsolute(function.ObjectReference, c => definingType.SmartReference().ArgResult(c));
+        }
+        
+        internal Result FunctionResult(Category category, CompileSyntax left, TypeBase definingType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
+        {
+            feature.AssertValid(right != null);
+
+            var metaFeature = feature.MetaFunction;
+            if(metaFeature != null)
+                return metaFeature.ApplyResult(this, category, left, right);
+
+
+            var leftResult = left != null ? left.SmartLocalReferenceResult(this, category) : null;
+            var obtainResult = FunctionResult(category, right, feature, definingType);
+        
+            
+            return obtainResult
+                .ReplaceArg(converterResult)
+                .ReplaceArg(leftResult);
         }
     }
 }

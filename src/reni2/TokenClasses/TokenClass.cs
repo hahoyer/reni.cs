@@ -26,8 +26,10 @@ using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.TokenClasses
@@ -58,5 +60,8 @@ namespace Reni.TokenClasses
 
         internal static Feature.Function Feature(Func<Category, IContextReference, TypeBase, Result> function) { return new Feature.Function(function); }
         internal static Function<T> Feature<T>(Func<Category, IContextReference, TypeBase, Result> func) { return new Function<T>(func); }
+
+        internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { return new MetaFunction(function); }
     }
+
 }

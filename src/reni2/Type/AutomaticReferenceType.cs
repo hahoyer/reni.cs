@@ -112,7 +112,7 @@ namespace Reni.Type
             try
             {
                 StartMethodDump(trace, conversionParameter, destination);
-                if(ValueType == destination.ValueType && Root.DefaultRefAlignParam == Root.DefaultRefAlignParam)
+                if(ValueType == destination.ValueType)
                     return ReturnMethodDump(new FunctionalConverter(ToAutomaticReferenceResult), true);
 
                 var c1 = new FunctionalConverter(DereferenceResult);
@@ -122,7 +122,7 @@ namespace Reni.Type
                 var c3 = new FunctionalConverter(destination.ValueTypeToLocalReferenceResult);
                 Dump("c3", c3.Result(Category.Type | Category.Code));
                 BreakExecution();
-                var result = c1.Concat(c2).Concat(c3);
+                var result = c1.Concat((IConverter) c2).Concat(c3);
                 return ReturnMethodDump(result, true);
             }
             finally
@@ -138,7 +138,7 @@ namespace Reni.Type
 
             return
                 new FunctionalConverter(DereferenceResult)
-                    .Concat(ValueType.Converter(conversionParameter, destination));
+                    .Concat((IConverter) ValueType.Converter(conversionParameter, destination));
         }
     }
 }

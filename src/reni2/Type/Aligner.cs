@@ -67,7 +67,7 @@ namespace Reni.Type
         protected override IConverter ConverterForDifferentTypes(ConversionParameter conversionParameter, TypeBase destination)
         {
             return new FunctionalConverter(ParentConversionResult)
-                .Concat(Parent.Converter(conversionParameter, destination));
+                .Concat((IConverter) Parent.Converter(conversionParameter, destination));
         }
 
         protected override Result ParentConversionResult(Category category)

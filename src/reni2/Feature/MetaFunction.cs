@@ -24,15 +24,21 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.Feature;
+using Reni.Basics;
+using Reni.Context;
+using Reni.Syntax;
 
-namespace Reni.Type
+namespace Reni.Feature
 {
-    sealed class EmptyFeature : ReniObject, IFeature
+    sealed class MetaFunction : ReniObject, ISuffixFeature, IMetaFunctionFeature
     {
-        internal static readonly IFeature Instance = new EmptyFeature();
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        readonly Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> _function;
+        public MetaFunction(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function) { _function = function; }
+
+        IMetaFunctionFeature IFeature.MetaFunction { get { return this; } }
         IFunctionFeature IFeature.Function { get { return null; } }
         ISimpleFeature IFeature.Simple { get { return null; } }
+        
+        Result IMetaFunctionFeature.ApplyResult(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right) { return _function(contextBase, category, left, right); }
     }
 }

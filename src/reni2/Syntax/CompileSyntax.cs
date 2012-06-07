@@ -124,11 +124,10 @@ namespace Reni.Syntax
             return null;
         }
 
-        internal Result OperationResult<TFeature>(ContextBase context, Category category, ISearchTarget target) 
-            where TFeature : class, IFeature
+        internal Result OperationResult(ContextBase context, Category category, ISearchTarget target)
         {
             return Type(context)
-                .OperationResult<TFeature>(category, target);
+                .OperationResult<IPrefixFeature>(category, target);
         }
 
         internal bool? IsDataLessStructureElement(bool isQuick, ContextBase context)
@@ -146,6 +145,12 @@ namespace Reni.Syntax
         {
             NotImplementedMethod(structure);
             return null;
+        }
+
+        internal Result SmartLocalReferenceResult(ContextBase context, Category category)
+        {
+            return Result(context, category.Typed)
+                .SmartLocalReferenceResult();
         }
     }
 }

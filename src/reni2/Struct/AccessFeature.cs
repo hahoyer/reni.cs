@@ -74,7 +74,7 @@ namespace Reni.Struct
                 .AccessViaContextReference(category, _position);
         }
 
-        IFeature FeatureProvider { get { return _structure.FeatureProvider(_position) ?? EmptyFeatureProvider.Instance; } }
+        IFeature FeatureProvider { get { return _structure.FeatureProvider(_position) ?? EmptyFeature.Instance; } }
         IMetaFunctionFeature IFeature.MetaFunction { get { return FeatureProvider.MetaFunction; } }
         IFunctionFeature IFeature.Function { get { return FeatureProvider.Function; } }
         ISimpleFeature IFeature.Simple { get { return this; } }

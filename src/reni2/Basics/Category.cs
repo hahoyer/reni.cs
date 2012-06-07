@@ -76,10 +76,19 @@ namespace Reni.Basics
 
         [DebuggerHidden]
         [DisableDump]
+        public Category IaDataLessed { get { return this | IsDataLess; } }
+        [DebuggerHidden]
+        [DisableDump]
+        public Category Sized { get { return this | Size; } }
+        [DebuggerHidden]
+        [DisableDump]
         public Category Typed { get { return this | Type; } }
         [DebuggerHidden]
         [DisableDump]
-        public Category Argsed { get { return this | CodeArgs; } }
+        public Category Coded { get { return this | Code; } }
+        [DebuggerHidden]
+        [DisableDump]
+        public Category CodeArgsed { get { return this | CodeArgs; } }
         public Category Replenished
         {
             get

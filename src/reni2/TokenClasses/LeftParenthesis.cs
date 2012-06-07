@@ -23,6 +23,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.Syntax;
 
@@ -42,13 +43,9 @@ namespace Reni.TokenClasses
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var leftResult = left.Result(context, category.Typed);
-            var rightResult = right.Result(context, category.Typed);
-            return leftResult
-                .Type
-                .FunctionalFeatureSpecial
-                .ApplyResult(category, rightResult, context.RefAlignParam)
-                .ReplaceArg(leftResult);
+            var leftType = left.Type(context);
+            var feature = leftType.Feature;
+            return context.FunctionResult(category, left, leftType, feature, null, right);
         }
     }
 }

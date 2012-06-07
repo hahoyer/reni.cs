@@ -109,6 +109,7 @@ namespace Reni
         {
             Tracer.Assert(!Probe.Contains(testType), "Target=" + Target + "\nProbe=" + Tracer.Dump(Probe) + "\ntestType=" + testType.PrettyName());
             Probe.Add(testType);
+            Tracer.ConditionalBreak(testType.PrettyName() == "ISearchPath<ISearchPath<ISearchPath<ISearchPath<ISuffixFeature,Struct.FunctionType>,Aligner>,Sequence.SequenceType>,Bit>", testType.PrettyName);
         }
 
         protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target); }

@@ -32,8 +32,10 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
+    <Compile Include="Feature\FeatureExtension.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="Feature\Function.cs" />
+    <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ResultCache.cs" />
@@ -190,7 +192,6 @@
     <Compile Include="Feature\TypeOperator.cs" />
     <Compile Include="Parser\TokenFactory.cs" />
     <Compile Include="RootSearchVisitor.cs" />
-    <Compile Include="SearchResultExtender.cs" />
     <Compile Include="SearchVisitor.cs" />
     <Compile Include="Struct\AtToken.cs" />
     <Compile Include="FeatureTest\DefaultOperations.cs" />

@@ -31,7 +31,6 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni.ReniParser
 {
@@ -58,34 +57,26 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = new[]{47}.Contains(ObjectId) && category.HasCode;
+            var trace = new[] {-47}.Contains(ObjectId) && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
                 BreakExecution();
-                var leftResult = Left != null ? Left.Result(context, category.Typed).SmartLocalReferenceResult() : null;
-                var rightResult = Right != null ? Right.Result(context, category.Typed).SmartLocalReferenceResult() : null;
-                Dump("leftResult", leftResult);
-                Dump("rightResult", rightResult);
 
                 if(Left == null && Right != null)
                 {
-                    var prefixOperationResult = Right.OperationResult<IPrefixFeature>(context, category, _tokenClass);
+                    var prefixOperationResult = Right.OperationResult(context, category, _tokenClass);
                     if(prefixOperationResult != null)
                     {
                         Dump("prefixOperationResult", prefixOperationResult);
                         BreakExecution();
-                        return ReturnMethodDump(prefixOperationResult.ReplaceArg(rightResult));
+                        return ReturnMethodDump(prefixOperationResult.ReplaceArg(Right.SmartLocalReferenceResult(context, category)));
                     }
                 }
 
-                var operationCategory = Category.Type;
-                if(Right == null)
-                    operationCategory |= category;
-
                 BreakExecution();
 
-                var searchResult = context.OperationResult(Left, _tokenClass);
+                var searchResult = context.Search(Left, _tokenClass);
                 if(searchResult == null)
                 {
                     NotImplementedMethod(context, category);
@@ -95,46 +86,7 @@ namespace Reni.ReniParser
                 Dump("searchResult", searchResult);
                 BreakExecution();
 
-                var metaFeature = searchResult.Feature.MetaFunction;
-                if(metaFeature != null)
-                {
-                    Dump("metaFeature", metaFeature);
-                    BreakExecution();
-
-                    return ReturnMethodDump(metaFeature.ApplyResult(context, category, Left, Right), true);
-                }
-
-                var functionalFeature = searchResult.Feature.Function;
-
-                if(rightResult == null)
-                    if(functionalFeature != null && functionalFeature.IsImplicit)
-                        rightResult = TypeBase.Void.Result(category.Typed);
-                    else
-                        return ReturnMethodDump(searchResult.ReplaceArg(category, leftResult), true);
-
-                Tracer.Assert(functionalFeature != null, searchResult.Dump());
-                Dump("functionalFeature", functionalFeature);
-                BreakExecution();
-
-                var rawApplyResult = functionalFeature.ApplyResult(category, rightResult.Type);
-                Dump("rawApplyResult", rawApplyResult);
-                var applyResult = rawApplyResult.ReplaceArg(rightResult);
-                Dump("applyResult", applyResult);
-
-                var objectReference = functionalFeature.ObjectReference;
-
-                Dump("objectReference", objectReference);
-                BreakExecution();
-
-                var result = applyResult
-                    .ReplaceAbsolute
-                    (objectReference
-                     , c =>
-                       searchResult
-                           .SmartConverterResult(c)
-                           .ReplaceArg(leftResult)
-                    );
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(searchResult.FunctionResult(context, category, Left, Right),true);
             }
             finally
             {

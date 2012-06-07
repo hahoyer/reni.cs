@@ -76,10 +76,6 @@ namespace Reni
         internal ContextSearchResult(IContextFeature feature, IConversionFunction[] conversionFunctions)
             : base(feature, conversionFunctions) { }
 
-        protected override Result TrivialConversionResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
+        protected override TypeBase DefiningType { get { return null; } }
     }
 }

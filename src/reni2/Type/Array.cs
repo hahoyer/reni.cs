@@ -28,6 +28,9 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
+using Reni.Feature;
+using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -74,12 +77,44 @@ namespace Reni.Type
         }
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Element); }
 
+        internal override Result ConstructorResult(Category category, TypeBase argsType)
+        {
+            return Result
+                (category
+                 , c => ConstructorResultExec(c, argsType)
+                );
+        }
+
+        Result ConstructorResultExec(Category category, TypeBase argsType)
+        {
+            if(category.IsNone)
+                return null;
+            
+            var function = (IFunctionFeature) argsType;
+            var indexType = Bit
+                .UniqueSequence(BitsConst.Convert(Count).Size.ToInt())
+                .UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
+            var elementConstructorResult = function.ApplyResult(category.Typed, indexType);
+            var xxx = Count
+                .Array(i => ElementConstructorResult(category, elementConstructorResult, i, indexType))
+                .ToArray();
+
+            NotImplementedMethod(category, argsType);
+            return null;
+        }
+
+        Result ElementConstructorResult(Category category, Result elementConstructorResult, int i, TypeBase indexType)
+        {
+            var resultForArg = indexType
+                .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
+            return elementConstructorResult
+                .ReplaceArg( resultForArg)
+                .Conversion(Element);
+        }
+
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + ")array(" + Count + ")"; }
 
-        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
-        {
-            return ConcatArrays(category, argsType, objectReference);
-        }
+        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType) { return ConcatArrays(category, argsType, objectReference); }
 
         Result ConcatArrays(Category category, TypeBase argsType, IContextReference objectReference)
         {
@@ -96,10 +131,7 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result ConcatArraysFromRef(Category category, IContextReference objectReference, TypeBase argsType)
-        {
-            return ConcatArrays(category, argsType, objectReference);
-        }
+        internal Result ConcatArraysFromRef(Category category, IContextReference objectReference, TypeBase argsType) { return ConcatArrays(category, argsType, objectReference); }
 
         internal Result DumpPrintResult(Category category)
         {
@@ -107,7 +139,7 @@ namespace Reni.Type
                 .Result
                 (category: category
                  , getCode: CreateDumpPrintCode
-                 , getRefs: () => Element.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
+                 , getArgs: () => Element.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
                 );
         }
 

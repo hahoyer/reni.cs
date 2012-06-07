@@ -37,7 +37,7 @@ namespace Reni.Type
         {
             return
                 new FunctionalConverter(ParentConversionResult)
-                    .Concat(Parent.Converter(conversionParameter.EnableCut, destination));
+                    .Concat((IConverter) Parent.Converter(conversionParameter.EnableCut, destination));
         }
     }
 }

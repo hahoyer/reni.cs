@@ -21,13 +21,13 @@
 #endregion
 
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -49,41 +49,17 @@ namespace Reni.Type
 
         internal Result Result(Category category)
         {
-            var trace = ObjectId == -2 && category.HasCode;
-            StartMethodDump(trace, category);
-            try
-            {
-                category = category.Typed;
-                var featureResult = Feature.Simple.Result(category);
-                if(!featureResult.HasArg || ConversionFunctions.Length == 0)
-                    return ReturnMethodDump(featureResult, true);
+            category = category.Typed;
+            var featureResult = Feature.Simple.Result(category);
+            if(!featureResult.HasArg || ConversionFunctions.Length == 0)
+                return featureResult;
 
-                Dump("featureResult", featureResult);
-                BreakExecution();
-
-                var converterResult = ConverterResult(category);
-
-                Dump("converterResult", converterResult);
-                BreakExecution();
-
-                var result = featureResult.ReplaceArg(converterResult);
-
-                return ReturnMethodDump(result, true);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            var converterResult = ConverterResult(category);
+            var result = featureResult.ReplaceArg(converterResult);
+            return result;
         }
 
-        internal Result SmartConverterResult(Category category)
-        {
-            if(ConversionFunctions.Length == 0)
-                return TrivialConversionResult(category);
-            return ConverterResult(category.Typed);
-        }
-
-        protected abstract Result TrivialConversionResult(Category category);
+        protected abstract TypeBase DefiningType { get; }
 
         Result ConverterResult(Category category)
         {
@@ -109,10 +85,10 @@ namespace Reni.Type
             }
         }
 
-        internal Result ReplaceArg(Category category, Result objectResult)
+        internal Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            return Result(category)
-                .ReplaceArg(objectResult);
+            return context
+                .FunctionResult(category, left, DefiningType, Feature, ConverterResult, right);
         }
     }
 }

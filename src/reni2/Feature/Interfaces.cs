@@ -49,13 +49,13 @@ namespace Reni.Feature
     }
 
     interface ISuffixFeature : IFeature
-    { }
+    {}
 
     interface IPrefixFeature : IFeature
-    { }
+    {}
 
     interface IContextFeature : IFeature
-    { }
+    {}
 
     interface ISimpleFeature
     {
@@ -65,22 +65,16 @@ namespace Reni.Feature
     interface IFunctionFeature
     {
         /// <summary>
-        /// Result code contains CodeBase.Arg for argsType and ObjectReference for function object, 
-        /// if appropriate
+        ///     Result code contains CodeBase.Arg for argsType and ObjectReference for function object, if appropriate
         /// </summary>
-        /// <param name="category"></param>
-        /// <param name="argsType"></param>
-        /// <returns></returns>
+        /// <param name="category"> </param>
+        /// <param name="argsType"> </param>
+        /// <returns> </returns>
         Result ApplyResult(Category category, TypeBase argsType);
         [DisableDump]
         bool IsImplicit { get; }
         [DisableDump]
         IContextReference ObjectReference { get; }
-    }
-
-    interface IFunctionalFeatureSpecial
-    {
-        Result ApplyResult(Category category, Result argsResult, RefAlignParam refAlignParam);
     }
 
     interface IMetaFunctionFeature

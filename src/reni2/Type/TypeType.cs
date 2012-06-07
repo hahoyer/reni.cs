@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,33 +33,24 @@ using Reni.Syntax;
 namespace Reni.Type
 {
     [Serializable]
-    internal sealed class TypeType : TypeBase
+    sealed class TypeType : TypeBase, IFeature, IFunctionFeature, IContextReference
     {
         [EnableDump]
-        private readonly TypeBase _value;
+        readonly TypeBase _value;
 
-        private readonly ConversionFeature _functionalFeature;
-        private readonly RepeaterType _repeaterType;
-
-        public TypeType(TypeBase value)
-        {
-            _repeaterType = new RepeaterType(this);
-            _functionalFeature = new ConversionFeature(value.AutomaticDereferenceType);
-            _value = value;
-        }
+        public TypeType(TypeBase value) { _value = value; }
 
         internal override bool IsDataLess { get { return true; } }
-        
+
         internal override string DumpPrintText { get { return "(" + _value.DumpPrintText + "()) type"; } }
 
         internal override string DumpShort() { return "(" + _value.DumpShort() + ") type"; }
         [DisableDump]
-        private TypeBase Value { get { return _value; } }
+        TypeBase Value { get { return _value; } }
 
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, null);
-        }
+        internal override IFeature Feature { get { return this; } }
+
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
 
         internal Result DumpPrintResult(Category category)
         {
@@ -66,30 +61,29 @@ namespace Reni.Type
                  , CodeArgs.Void
                 );
         }
-        internal Result Repeat(Category category) { return _repeaterType.Result(category); }
-
-        private sealed class RepeaterType : TypeBase, IMetaFunctionFeature
+        internal Result Repeat(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            private readonly TypeType _typeType;
-            public RepeaterType(TypeType typeType) { _typeType = typeType; }
-
-            internal override bool IsDataLess { get { return true; } }
-            internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
-
-            Result IMetaFunctionFeature.ApplyResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-            {
-                var count = right
-                    .Result(context)
-                    .AutomaticDereferenceResult()
-                    .Evaluate(context.RootContext.OutStream)
-                    .ToInt32();
-                return _typeType
-                    .Value
-                    .UniqueAlign(context.RefAlignParam.AlignBits)
-                    .UniqueArray(count)
-                    .UniqueTypeType
-                    .Result(category);
-            }
+            var count = right
+                .Result(context)
+                .AutomaticDereferenceResult()
+                .Evaluate(context.RootContext.OutStream)
+                .ToInt32();
+            return Value
+                .UniqueAlign(context.RefAlignParam.AlignBits)
+                .UniqueArray(count)
+                .UniqueTypeType
+                .Result(category);
         }
+
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return this; } }
+        ISimpleFeature IFeature.Simple { get { return null; } }
+
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _value.ConstructorResult(category, argsType); }
+
+        bool IFunctionFeature.IsImplicit { get { return false; } }
+        IContextReference IFunctionFeature.ObjectReference { get { return this; } }
+
+        Size IContextReference.Size { get { return Size; } }
     }
 }

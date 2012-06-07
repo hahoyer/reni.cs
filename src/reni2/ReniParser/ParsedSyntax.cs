@@ -78,7 +78,7 @@ namespace Reni.ReniParser
         }
     }
 
-    internal static class ParsedSyntaxExtender
+    internal static class ParsedSyntaxExtension
     {
         internal static CompileSyntax CheckedToCompiledSyntax(this ParsedSyntax parsedSyntax)
         {
