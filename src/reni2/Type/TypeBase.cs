@@ -391,10 +391,17 @@ namespace Reni.Type
                 return null;
             }
 
-            var result = searchResult.Result(category);
-            if(category.HasType && result.Type.AutomaticDereferenceType != destination.AutomaticDereferenceType)
-                DumpDataWithBreak("Wrong conversion result type", "this", this, "destination", destination, "result", result);
-            return result;
+            var rawResult = searchResult.Result(category.Typed);
+            var result = rawResult.ReplaceArg(SmartLocalReferenceResult);
+            if(result.Type.AutomaticDereferenceType == destination)
+            {
+                while(result.Type != destination)
+                    result = result.DereferenceResult();
+                return result & category;
+            }
+
+            DumpDataWithBreak("Wrong conversion result type", "this", this, "destination", destination, "result", result);
+            return null;
         }
 
         SearchResult Converter(TypeBase destination)

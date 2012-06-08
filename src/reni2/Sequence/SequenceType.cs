@@ -149,7 +149,7 @@ namespace Reni.Sequence
 
         Result ConversionAsReference(Category category, SequenceType source)
         {
-            var trace = ObjectId == -4;
+            var trace = ObjectId == -10;
             StartMethodDump(trace, category, source);
             try
             {
@@ -173,7 +173,7 @@ namespace Reni.Sequence
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
             if(Count >= type.Count)
-                return TokenClass.Feature(c =>  type.ConversionAsReference(c, this));
+                return TokenClass.Feature(c =>  ConversionAsReference(c, type));
             NotImplementedMethod(type);
             return null;
         }
@@ -187,7 +187,7 @@ namespace Reni.Sequence
 
         Result ConvertFromEnableCut(Category category, SequenceType source)
         {
-            var trace = ObjectId == -2;
+            var trace = ObjectId == -10;
             StartMethodDump(trace, category, source);
             try
             {

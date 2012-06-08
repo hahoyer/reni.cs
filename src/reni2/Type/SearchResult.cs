@@ -70,7 +70,7 @@ namespace Reni.Type
                 if (ConversionFunctions.Length == 0)
                     return null;
                 var results = ConversionFunctions
-                    .Select((cf, i) => cf.Result(i == 0 ? category : category.Typed))
+                    .Select((cf, i) => cf.Result(category.Typed))
                     .ToArray();
                 Dump("results", results);
                 BreakExecution();
