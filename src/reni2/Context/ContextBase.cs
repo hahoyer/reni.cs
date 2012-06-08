@@ -224,7 +224,7 @@ namespace Reni.Context
                 .SmartLocalReferenceResult();
         }
 
-        Result FunctionResult(Category category, CompileSyntax right, IFeature feature, TypeBase definingType)
+        Result FunctionResult(Category category, TypeBase objectType, IFeature feature, CompileSyntax right)
         {
             var function = feature.Function;
             if(right == null && (function == null || !function.IsImplicit))
@@ -237,23 +237,40 @@ namespace Reni.Context
             return function
                 .ApplyResult(category, rightResult.Type)
                 .ReplaceArg(rightResult)
-                .ReplaceAbsolute(function.ObjectReference, c => definingType.SmartReference().ArgResult(c));
+                .ReplaceAbsolute(function.ObjectReference, c => objectType.SmartReference().ArgResult(c));
         }
         
-        internal Result FunctionResult(Category category, CompileSyntax left, TypeBase definingType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
+        internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
         {
-            feature.AssertValid(right != null);
+            var trace = feature.GetObjectId() == -1;
+            StartMethodDump(trace, category,left,leftType,feature,converterResult,right);
+            try
+            {
+                feature.AssertValid(right != null);
 
-            var metaFeature = feature.MetaFunction;
-            if(metaFeature != null)
-                return metaFeature.ApplyResult(this, category, left, right);
+                var metaFeature = feature.MetaFunction;
+                if(metaFeature != null)
+                    return ReturnMethodDump(metaFeature.ApplyResult(this, category, left, right));
 
-            var leftResult = left != null ? left.SmartLocalReferenceResult(this, category) : null;
-            var obtainResult = FunctionResult(category, right, feature, definingType);
-            
-            return obtainResult
-                .ReplaceArg(converterResult)
-                .ReplaceArg(leftResult);
+                var leftResult = left != null ? left.SmartLocalReferenceResult(this, category) : null;
+                Dump("leftResult", leftResult); 
+                
+                var functionResult = FunctionResult(category, leftType, feature, right);
+                Dump("functionResult", functionResult); 
+                if(trace)
+                    Dump("converterResult", converterResult(Category.All)); 
+                BreakExecution();
+
+                var result = functionResult.ReplaceArg(converterResult);
+                Dump("result", result); 
+                
+                return ReturnMethodDump(result.ReplaceArg(leftResult));
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
     }
 }

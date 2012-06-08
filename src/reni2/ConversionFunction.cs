@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -32,18 +35,22 @@ namespace Reni
         readonly ISearchContainerType _searchContainerType;
 
         internal ConversionFunction(ISearchContainerType searchContainerType)
-            : base(_nextObjectId++) { _searchContainerType = searchContainerType; }
+            : base(_nextObjectId++)
+        {
+            _searchContainerType = searchContainerType;
+            StopByObjectId(-1);
+        }
         Result IConversionFunction.Result(Category category) { return _searchContainerType.Converter.Result(category); }
         public override string NodeDump
         {
             get
             {
-                return base.NodeDump 
-                    + "[" 
-                    + ((ReniObject) _searchContainerType).NodeDump 
-                    + "=>" 
-                    + _searchContainerType.Target.NodeDump 
-                    + "]";
+                return base.NodeDump
+                       + "["
+                       + ((ReniObject) _searchContainerType).NodeDump
+                       + "=>"
+                       + _searchContainerType.Target.NodeDump
+                       + "]";
             }
         }
     }

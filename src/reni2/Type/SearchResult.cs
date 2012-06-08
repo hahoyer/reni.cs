@@ -61,13 +61,22 @@ namespace Reni.Type
 
         protected abstract TypeBase DefiningType { get; }
 
+        TypeBase LeftType
+        {
+            get
+            {
+                var result = ConverterResult(Category.Type);
+                return result != null ? result.Type : DefiningType;
+            }
+        }
+
         Result ConverterResult(Category category)
         {
-            var trace = ObjectId == -1 && category.HasCode;
+            var trace = ObjectId == -4 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
-                if (ConversionFunctions.Length == 0)
+                if(ConversionFunctions.Length == 0)
                     return null;
                 var results = ConversionFunctions
                     .Select((cf, i) => cf.Result(category.Typed))
@@ -90,7 +99,7 @@ namespace Reni.Type
         internal Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return context
-                .FunctionResult(category, left, DefiningType, Feature, ConverterResult, right);
+                .FunctionResult(category, left, LeftType, Feature, ConverterResult, right);
         }
     }
 }

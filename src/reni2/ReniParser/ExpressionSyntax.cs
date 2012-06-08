@@ -57,7 +57,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = new[] {-47}.Contains(ObjectId) && category.HasCode;
+            var trace = new[] {-43}.Contains(ObjectId) && category.HasCode;
             StartMethodDump(trace, context, category);
             try
             {
@@ -73,8 +73,6 @@ namespace Reni.ReniParser
                         return ReturnMethodDump(prefixOperationResult.ReplaceArg(Right.SmartLocalReferenceResult(context, category)));
                     }
                 }
-
-                BreakExecution();
 
                 var searchResult = context.Search(Left, _tokenClass);
                 if(searchResult == null)
