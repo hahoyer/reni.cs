@@ -33,8 +33,10 @@ namespace Reni.Type
 {
     sealed class AssignmentFeature : ReniObject, IFunctionFeature, ISuffixFeature
     {
+        static int _nextObjectId;
         readonly ISetterTargetType _target;
-        public AssignmentFeature(ISetterTargetType target) { _target = target; }
+
+        public AssignmentFeature(ISetterTargetType target):base(_nextObjectId++) { _target = target; }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
@@ -44,7 +46,8 @@ namespace Reni.Type
             {
                 BreakExecution();
                 var sourceResult = argsType
-                    .Conversion(category, _target.ValueType.UniqueReference.Type());
+                    .Conversion(category.Typed, _target.ValueType)
+                    .SmartLocalReferenceResult();
                 Dump("sourceResult", sourceResult); 
                 BreakExecution();
 
