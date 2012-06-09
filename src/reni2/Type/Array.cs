@@ -92,13 +92,11 @@ namespace Reni.Type
             var indexType = Bit
                 .UniqueSequence(BitsConst.Convert(Count).Size.ToInt())
                 .UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
-            var elementConstructorResult = function.ApplyResult(category.Typed, indexType);
-            var xxx = Count
-                .Array(i => ElementConstructorResult(category, elementConstructorResult, i, indexType))
-                .ToArray();
-
-            NotImplementedMethod(category, argsType);
-            return null;
+            var constructorResult = function.ApplyResult(category.Typed, indexType);
+            var elements = Count
+                .Array(i => ElementConstructorResult(category, constructorResult, i, indexType))
+                .Aggregate(Void.Result(category), (c,n)=>n + c);
+            return Result(category, elements);
         }
 
         Result ElementConstructorResult(Category category, Result elementConstructorResult, int i, TypeBase indexType)
@@ -107,7 +105,8 @@ namespace Reni.Type
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
             return elementConstructorResult
                 .ReplaceArg(resultForArg)
-                .Conversion(Element);
+                .Conversion(Element)
+                & category;
         }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + ")array(" + Count + ")"; }
