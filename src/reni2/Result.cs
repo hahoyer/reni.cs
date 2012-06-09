@@ -799,6 +799,8 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
+        internal Result SmartUn<T>() where T : IConverter { return Type is T ? Un<T>() : this; }
+
         internal Result BitSequenceOperandConversion(Category category) { return Type.BitSequenceOperandConversion(category).ReplaceArg(this); }
         
         internal Result PostConversionResult(TypeBase destination)

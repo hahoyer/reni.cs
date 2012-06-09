@@ -443,7 +443,7 @@ namespace Reni.Type
 
         internal Result UnalignedDereferenceReferenceResult(Category category)
         {
-            return DereferenceReferenceResult(category).Un<Aligner>();
+            return DereferenceReferenceResult(category).SmartUn<Aligner>();
         }
 
         internal Result BitSequenceOperandConversion(Category category)
