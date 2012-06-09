@@ -31,7 +31,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -40,7 +39,7 @@ namespace Reni.Sequence
     sealed class SequenceType
         : TypeBase
           , ISearchPath<ISuffixFeature, SequenceType>
-          , ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
+          , ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>
     {
         readonly Type.Array _inheritedType;
 
@@ -183,11 +182,11 @@ namespace Reni.Sequence
             return null;
         }
 
-        ISearchPath<ISuffixFeature, Type.EnableCut>
-            ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.Convert(SequenceType type)
+        ISearchPath<ISuffixFeature, EnableCut>
+            ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>.Convert(SequenceType type)
         {
             return
-                Extension.Feature<Type.EnableCut>((c, t) => ConvertFromEnableCut(c, type));
+                Extension.Feature<EnableCut>((c, t) => ConvertFromEnableCut(c, type));
         }
 
         Result ConvertFromEnableCut(Category category, SequenceType source)

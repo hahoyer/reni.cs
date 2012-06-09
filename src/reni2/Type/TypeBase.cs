@@ -155,7 +155,7 @@ namespace Reni.Type
         [DisableDump]
         internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
         [DisableDump]
-        virtual internal IReference UniqueReference { get { return _cache.References.Value; } }
+        internal virtual IReference UniqueReference { get { return _cache.References.Value; } }
         [DisableDump]
         internal virtual TypeBase TypeForTypeOperator { get { return this; } }
         [DisableDump]
@@ -384,6 +384,10 @@ namespace Reni.Type
             if(category <= (Category.Type.Replenished))
                 return destination.Result(category);
 
+            var smartConversionResult = ArgResult(category.Typed).SmartConversionResult(destination);
+            if (smartConversionResult != null)
+                return smartConversionResult;
+
             var searchResult = Converter(destination);
             if(searchResult == null)
             {
@@ -393,7 +397,7 @@ namespace Reni.Type
 
             var rawResult = searchResult.Result(category.Typed);
             var result = rawResult.ReplaceArg(SmartLocalReferenceResult);
-            return result.PostConversionResult(destination)& category;
+            return result.PostConversionResult(destination) & category;
         }
 
         SearchResult Converter(TypeBase destination)
@@ -441,10 +445,7 @@ namespace Reni.Type
                 .DereferenceResult();
         }
 
-        internal Result UnalignedDereferenceReferenceResult(Category category)
-        {
-            return DereferenceReferenceResult(category).SmartUn<Aligner>();
-        }
+        internal Result UnalignedDereferenceReferenceResult(Category category) { return DereferenceReferenceResult(category).SmartUn<Aligner>(); }
 
         internal Result BitSequenceOperandConversion(Category category)
         {

@@ -805,19 +805,27 @@ namespace Reni
         
         internal Result PostConversionResult(TypeBase destination)
         {
-            var result = this;
-            if(result.Type == destination)
+            var result = SmartConversionResult(destination);
+            if (result != null)
                 return result;
-            
-            result = result.DereferenceResult();
-            if(result.Type == destination)
-                return result;
-            
-            result = result.Un<Aligner>();
-            if(result.Type == destination)
-                return result;
-            
             DumpDataWithBreak("Wrong conversion result type", "destination", destination, "result", result);
+            return null;
+        }
+
+        internal Result SmartConversionResult(TypeBase destination)
+        {
+            var result = this;
+            if (result.Type == destination)
+                return result;
+
+            result = result.DereferenceResult();
+            if (result.Type == destination)
+                return result;
+
+            result = result.Un<Aligner>();
+            if (result.Type == destination)
+                return result;
+
             return null;
         }
     }

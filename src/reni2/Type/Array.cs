@@ -52,7 +52,6 @@ namespace Reni.Type
         Size IContextReference.Size { get { return Size; } }
         [Node]
         internal int Count { get { return _count; } }
-
         [Node]
         internal TypeBase Element { get { return _element; } }
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
@@ -60,6 +59,7 @@ namespace Reni.Type
         internal override int ArrayElementCount { get { return Count; } }
         [DisableDump]
         internal override bool IsArray { get { return true; } }
+        [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || Element.IsDataLess; } }
 
         protected override Size GetSize() { return Element.Size * _count; }
@@ -68,12 +68,6 @@ namespace Reni.Type
 
         internal override Result Copier(Category category) { return Element.ArrayCopier(category, Count); }
 
-        protected override string Dump(bool isRecursion)
-        {
-            if(isRecursion)
-                return "ObjectId=" + ObjectId;
-            return GetType().PrettyName() + "(" + Element.Dump() + ", " + Count + ")";
-        }
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => Element);
