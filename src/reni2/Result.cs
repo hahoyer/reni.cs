@@ -800,5 +800,23 @@ namespace Reni
         }
 
         internal Result BitSequenceOperandConversion(Category category) { return Type.BitSequenceOperandConversion(category).ReplaceArg(this); }
+        
+        internal Result PostConversionResult(TypeBase destination)
+        {
+            var result = this;
+            if(result.Type == destination)
+                return result;
+            
+            result = result.DereferenceResult();
+            if(result.Type == destination)
+                return result;
+            
+            result = result.Un<Aligner>();
+            if(result.Type == destination)
+                return result;
+            
+            DumpDataWithBreak("Wrong conversion result type", "destination", destination, "result", result);
+            return null;
+        }
     }
 }

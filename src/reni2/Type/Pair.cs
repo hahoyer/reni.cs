@@ -85,6 +85,5 @@ namespace Reni.Type
         }
 
         internal override string DumpShort() { return "pair." + ObjectId; }
-        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
     }
 }

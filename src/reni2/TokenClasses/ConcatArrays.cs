@@ -37,19 +37,19 @@ namespace Reni.TokenClasses
         , ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>
         , ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Feature(type.ConcatArrays); }
-        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return Feature(type.CreateArray); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.ConcatArrays); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return Extension.Feature(type.CreateArray); }
         ISearchPath<IPrefixFeature, AutomaticReferenceType>
             ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>.Convert(TypeBase type)
         {
             return
-                Feature<AutomaticReferenceType>(type.ConcatArrayFromReference);
+                Extension.Feature<AutomaticReferenceType>(type.ConcatArrayFromReference);
         }
         ISearchPath<ISuffixFeature, AutomaticReferenceType>
             ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>.Convert(Type.Array type)
         {
             return
-                Feature<AutomaticReferenceType>(type.ConcatArraysFromReference);
+                Extension.Feature<AutomaticReferenceType>(type.ConcatArraysFromReference);
         }
     }
 }

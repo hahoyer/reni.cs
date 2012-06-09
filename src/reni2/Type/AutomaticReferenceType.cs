@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -45,7 +46,7 @@ namespace Reni.Type
 
         TypeBase IReference.TargetType { get { return ValueType; } }
         RefAlignParam IHardReference.RefAlignParam { get { return Root.DefaultRefAlignParam; } }
-        
+
         TypeBase ISearchContainerType.Target { get { return ValueType; } }
         IConverter ISearchContainerType.Converter { get { return this; } }
 
@@ -81,9 +82,11 @@ namespace Reni.Type
 
         Result DereferenceResult(Category category)
         {
-            return ValueType.Result
+            var align = ValueType.UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
+            return align
+                .Result
                 (category
-                 , () => ArgCode.Dereference(ValueType.Size)
+                 , () => ArgCode.Dereference(align.Size)
                  , CodeArgs.Arg
                 );
         }
@@ -91,7 +94,12 @@ namespace Reni.Type
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
         internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
 
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => ValueType); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, () => ValueType);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
 
         internal override Result SmartLocalReferenceResult(Category category)
         {
@@ -101,6 +109,14 @@ namespace Reni.Type
                  , () => LocalReferenceCode().Dereference(Root.DefaultRefAlignParam.RefSize)
                  , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
+        }
+
+        internal override ISuffixFeature AlignConversion(TypeBase destination)
+        {
+            if (destination != ValueType)
+                return null;
+
+            return Extension.Feature(ArgResult);
         }
     }
 }

@@ -72,7 +72,7 @@ namespace Reni.Type
                 .Result(category, () => CodeBase.BitsConst(result), CodeArgs.Void)
                 .Align(context.RefAlignParam.AlignBits);
         }
-        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
+
         IMetaFunctionFeature IFeature.MetaFunction { get { return this; } }
         IFunctionFeature IFeature.Function { get { return null; } }
         ISimpleFeature IFeature.Simple { get { return null; } }

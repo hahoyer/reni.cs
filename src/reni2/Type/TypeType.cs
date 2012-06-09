@@ -50,7 +50,12 @@ namespace Reni.Type
 
         internal override IFeature Feature { get { return this; } }
 
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, null);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
 
         internal Result DumpPrintResult(Category category)
         {

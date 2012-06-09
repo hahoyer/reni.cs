@@ -39,7 +39,12 @@ namespace Reni.Type
         internal override string DumpPrintText { get { return "bit"; } }
         internal override int SequenceCount(TypeBase elementType) { return 1; }
 
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, null);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
 
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
 

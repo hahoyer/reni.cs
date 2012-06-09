@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +35,11 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Parent); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, () => Parent);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
     }
 }

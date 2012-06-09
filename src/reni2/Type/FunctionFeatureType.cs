@@ -55,6 +55,5 @@ namespace Reni.Type
             return _functionalFeature
                 .ApplyResult(category, argsType);
         }
-        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
     }
 }

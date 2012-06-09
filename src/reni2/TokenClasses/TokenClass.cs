@@ -24,13 +24,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Basics;
-using Reni.Code;
-using Reni.Context;
-using Reni.Feature;
 using Reni.Parser;
-using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.TokenClasses
 {
@@ -54,28 +48,5 @@ namespace Reni.TokenClasses
                 , TokenData token
                 , ReniParser.ParsedSyntax right
             );
-
-        internal static Simple Feature(Func<Category, Result> function) { return new Simple(function); }
-        internal static Simple<T> Feature<T>(Func<Category, T, Result> function) { return new Simple<T>(function); }
-
-        internal static Feature.Function
-            Feature(Func<Category, IContextReference, TypeBase, Result> function)
-        {
-            return
-                new Feature.Function(function);
-        }
-        internal static Function<T>
-            Feature<T>(Func<Category, IContextReference, TypeBase, Result> function)
-        {
-            return
-                new Function<T>(function);
-        }
-
-        internal static MetaFunction
-            Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function)
-        {
-            return
-                new MetaFunction(function);
-        }
     }
 }

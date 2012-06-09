@@ -24,10 +24,15 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using Reni.Basics;
+using Reni.Code;
+using Reni.Context;
+using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.Feature
 {
-    static class FeatureExtension
+    static class Extension
     {
         internal static TFeature CheckedConvert<TFeature, TType>(this ISearchPath<TFeature, TType> feature, TType target)
             where TFeature : class, IFeature
@@ -66,6 +71,27 @@ namespace Reni.Feature
                 return;
 
             Tracer.AssertionFailed("feature.Simple != null", feature.Dump);
+        }
+
+        internal static Simple Feature(Func<Category, Result> function) { return new Simple(function); }
+        internal static Simple<T> Feature<T>(Func<Category, T, Result> function) { return new Simple<T>(function); }
+        
+        internal static Function Feature(Func<Category, IContextReference, TypeBase, Result> function)
+        {
+            return
+                new Function(function);
+        }
+        
+        internal static Function<T> Feature<T>(Func<Category, IContextReference, TypeBase, Result> function)
+        {
+            return
+                new Function<T>(function);
+        }
+        
+        internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function)
+        {
+            return
+                new MetaFunction(function);
         }
     }
 }

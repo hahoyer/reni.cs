@@ -35,7 +35,7 @@ namespace Reni
         protected TFeature Result { get; private set; }
 
         internal RootSearchVisitor(ISearchTarget target)
-            : base(new List<System.Type>())
+            : base(new HashSet<System.Type>())
         {
             _target = target;
             ConversionFunctions = new IConversionFunction[0];

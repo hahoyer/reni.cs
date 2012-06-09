@@ -24,7 +24,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -83,12 +82,14 @@ namespace Reni.Type
         protected override Result ParentConversionResult(Category category)
         {
             return Parent.SmartReference()
-                .Result(category, ArgResult(category.Typed).AddToReference(()=>_structure.FieldOffset(_position)));
+                .Result(category, ArgResult(category.Typed).AddToReference(() => _structure.FieldOffset(_position)));
         }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.Search(this, ()=>Parent);
+            searchVisitor.Search(this, () => Parent);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
         }
 
         internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }

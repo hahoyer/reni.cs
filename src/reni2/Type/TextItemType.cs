@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
@@ -40,15 +43,15 @@ namespace Reni.Type
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.Search(this, ()=>Parent);
-            base.Search(searchVisitor);
+            searchVisitor.Search(this, () => Parent);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
         }
 
         protected override Result ParentConversionResult(Category category)
         {
             NotImplementedMethod(category);
             return null;
-
         }
 
         internal override Result DumpPrintTextResultFromSequence(Category category, int count)

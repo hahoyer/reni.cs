@@ -92,7 +92,12 @@ namespace Reni.Sequence
 
         internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + "*" + Count + ")"; }
 
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Element); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, () => Element);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
 
         Result ExtendFrom(Category category, int oldCount)
         {
@@ -155,11 +160,11 @@ namespace Reni.Sequence
             {
                 var flatResult = FlatConversion(category, source);
                 Dump("flatResult", flatResult);
-                Func<Category, Result> forArg = source.DereferenceReferenceResult;
-                if (trace)
+                Func<Category, Result> forArg = source.UnalignedDereferenceReferenceResult;
+                if(trace)
                     Dump("forArg", forArg(Category.All));
-                var result = flatResult.ReplaceArg(source.DereferenceReferenceResult);
-                Dump("result", result); 
+                var result = flatResult.ReplaceArg(source.UnalignedDereferenceReferenceResult);
+                Dump("result", result);
                 return ReturnMethodDump(result.SmartLocalReferenceResult());
             }
             finally
@@ -173,7 +178,7 @@ namespace Reni.Sequence
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
             if(Count >= type.Count)
-                return TokenClass.Feature(c =>  ConversionAsReference(c, type));
+                return Extension.Feature(c => ConversionAsReference(c, type));
             NotImplementedMethod(type);
             return null;
         }
@@ -182,7 +187,7 @@ namespace Reni.Sequence
             ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.Convert(SequenceType type)
         {
             return
-                TokenClass.Feature<Type.EnableCut>((c, t) => ConvertFromEnableCut(c, type));
+                Extension.Feature<Type.EnableCut>((c, t) => ConvertFromEnableCut(c, type));
         }
 
         Result ConvertFromEnableCut(Category category, SequenceType source)
@@ -227,6 +232,5 @@ namespace Reni.Sequence
                 .Type()
                 .ArgResult(c.Typed);
         }
-
     }
 }

@@ -30,7 +30,6 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -75,7 +74,12 @@ namespace Reni.Type
                 return "ObjectId=" + ObjectId;
             return GetType().PrettyName() + "(" + Element.Dump() + ", " + Count + ")";
         }
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Element); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, () => Element);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
 
         internal override Result ConstructorResult(Category category, TypeBase argsType)
         {
@@ -89,7 +93,7 @@ namespace Reni.Type
         {
             if(category.IsNone)
                 return null;
-            
+
             var function = (IFunctionFeature) argsType;
             var indexType = Bit
                 .UniqueSequence(BitsConst.Convert(Count).Size.ToInt())
@@ -108,7 +112,7 @@ namespace Reni.Type
             var resultForArg = indexType
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
             return elementConstructorResult
-                .ReplaceArg( resultForArg)
+                .ReplaceArg(resultForArg)
                 .Conversion(Element);
         }
 
@@ -120,7 +124,7 @@ namespace Reni.Type
         {
             var oldElementsResult = UniqueReference
                 .Type()
-                .Result(category, objectReference)
+                .Result(category.Typed, objectReference)
                 .DereferenceResult();
             var newCount = argsType.ArrayElementCount;
             var newElementsResult = argsType

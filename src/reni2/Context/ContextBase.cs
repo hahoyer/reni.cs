@@ -189,7 +189,6 @@ namespace Reni.Context
             [SmartNode]
             internal readonly SimpleCache<PendingContext> PendingContext;
 
-
             public Cache(ContextBase target)
             {
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
@@ -239,11 +238,11 @@ namespace Reni.Context
                 .ReplaceArg(rightResult)
                 .ReplaceAbsolute(function.ObjectReference, c => objectType.SmartReference().ArgResult(c));
         }
-        
+
         internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
         {
             var trace = feature.GetObjectId() == -1;
-            StartMethodDump(trace, category,left,leftType,feature,converterResult,right);
+            StartMethodDump(trace, category, left, leftType, feature, converterResult, right);
             try
             {
                 feature.AssertValid(right != null);
@@ -253,19 +252,18 @@ namespace Reni.Context
                     return ReturnMethodDump(metaFeature.ApplyResult(this, category, left, right));
 
                 var leftResult = left != null ? left.SmartLocalReferenceResult(this, category) : null;
-                Dump("leftResult", leftResult); 
-                
+                Dump("leftResult", leftResult);
+
                 var functionResult = FunctionResult(category, leftType, feature, right);
-                Dump("functionResult", functionResult); 
+                Dump("functionResult", functionResult);
                 if(trace)
-                    Dump("converterResult", converterResult(Category.All)); 
+                    Dump("converterResult", converterResult(Category.All));
                 BreakExecution();
 
                 var result = functionResult.ReplaceArg(converterResult);
-                Dump("result", result); 
-                
-                return ReturnMethodDump(result.ReplaceArg(leftResult));
+                Dump("result", result);
 
+                return ReturnMethodDump(result.ReplaceArg(leftResult));
             }
             finally
             {

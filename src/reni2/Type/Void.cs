@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -32,7 +31,12 @@ namespace Reni.Type
     [Serializable]
     sealed class Void : TypeBase
     {
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, null);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
         protected override TypeBase ReversePair(TypeBase first) { return first; }
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }

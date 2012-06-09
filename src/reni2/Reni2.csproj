@@ -32,7 +32,7 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
-    <Compile Include="Feature\FeatureExtension.cs" />
+    <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\MetaFunction.cs" />

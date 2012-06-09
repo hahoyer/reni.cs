@@ -86,22 +86,19 @@ namespace Reni
     abstract class SearchVisitor<TFeature> : SearchVisitor
         where TFeature : class, ISearchPath
     {
-        internal readonly List<System.Type> Probe;
+        internal readonly HashSet<System.Type> Probe;
 
-        protected SearchVisitor(List<System.Type> probe) { Probe = probe; }
+        protected SearchVisitor(HashSet<System.Type> probe) { Probe = probe; }
 
         internal abstract TFeature InternalResult { set; }
         internal abstract ISearchTarget Target { get; }
-
-        internal void Search(TypeBase typeBase)
-        {
-            typeBase.Search(this);
-        }
 
         internal override void SearchNameSpace(StructureType structureType) { structureType.SearchNameSpace(this); }
         internal override void Search()
         {
             Tracer.Assert(!IsSuccessFull, ()=>Tracer.Dump(Probe));
+            if (Probe.Contains(typeof(TFeature)))
+                return;
             AddProbe(typeof(TFeature));
             InternalResult = Target as TFeature;
         }

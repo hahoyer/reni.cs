@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -154,7 +153,12 @@ namespace Reni.Struct
                 );
         }
 
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => ValueType); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, () => ValueType);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
         IConverter ISearchContainerType.Converter { get { return this; } }
         TypeBase ISearchContainerType.Target { get { return ValueType; } }
         Result IConverter.Result(Category category) { return _getter.CallResult(category); }

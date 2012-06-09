@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -26,10 +25,14 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class Aligner : Child<TypeBase>
+    sealed class Aligner
+        : Child<TypeBase>
+          , ISearchPath<ISuffixFeature, TypeBase>
+
     {
         readonly int _alignBits;
 
@@ -53,6 +56,8 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
         [DisableDump]
+        internal override IReference UniqueReference { get { return Parent.UniqueReference; } }
+        [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
 
         protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
@@ -61,8 +66,12 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, () => Parent); }
-        internal Result ParentToAlignedResult(Category c) { return Parent.ArgResult(c).Align(AlignBits); }
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, () => Parent);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
 
         protected override Result ParentConversionResult(Category category)
         {
@@ -74,5 +83,6 @@ namespace Reni.Type
                 );
         }
 
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type.AlignConversion(Parent); }
     }
 }

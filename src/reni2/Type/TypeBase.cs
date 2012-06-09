@@ -155,7 +155,7 @@ namespace Reni.Type
         [DisableDump]
         internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
         [DisableDump]
-        internal IReference UniqueReference { get { return _cache.References.Value; } }
+        virtual internal IReference UniqueReference { get { return _cache.References.Value; } }
         [DisableDump]
         internal virtual TypeBase TypeForTypeOperator { get { return this; } }
         [DisableDump]
@@ -167,7 +167,7 @@ namespace Reni.Type
             get
             {
                 var result = Reference;
-                if (result == null)
+                if(result == null)
                     return this;
                 return result.TargetType.AutomaticDereferenceType;
             }
@@ -287,13 +287,13 @@ namespace Reni.Type
             where TFeature : class, IFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
-            visitor.Search(this);
+            Search(visitor);
             if(Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
         }
 
-        internal abstract void Search(SearchVisitor searchVisitor);
+        internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
 
         internal virtual Result SmartLocalReferenceResult(Category category)
         {
@@ -393,15 +393,7 @@ namespace Reni.Type
 
             var rawResult = searchResult.Result(category.Typed);
             var result = rawResult.ReplaceArg(SmartLocalReferenceResult);
-            if(result.Type.AutomaticDereferenceType == destination)
-            {
-                while(result.Type != destination)
-                    result = result.DereferenceResult();
-                return result & category;
-            }
-
-            DumpDataWithBreak("Wrong conversion result type", "this", this, "destination", destination, "result", result);
-            return null;
+            return result.PostConversionResult(destination)& category;
         }
 
         SearchResult Converter(TypeBase destination)
@@ -440,18 +432,55 @@ namespace Reni.Type
             NotImplementedMethod(category, automaticReferenceType);
             return null;
         }
-        internal Result DereferenceReferenceResult(Category c)
+
+        internal Result DereferenceReferenceResult(Category category)
         {
             return UniqueReference
                 .Type()
-                .ArgResult(c.Typed)
+                .ArgResult(category.Typed)
                 .DereferenceResult();
         }
+
+        internal Result UnalignedDereferenceReferenceResult(Category category)
+        {
+            return DereferenceReferenceResult(category).Un<Aligner>();
+        }
+
         internal Result BitSequenceOperandConversion(Category category)
         {
             return ConvertToBitSequence(category)
                 .AutomaticDereferenceResult()
                 .Align(BitsConst.SegmentAlignBits);
         }
+
+        internal virtual ISuffixFeature AlignConversion(TypeBase destination)
+        {
+            var childConverter = Converter(destination);
+            if(childConverter != null)
+                return new AlignConverter(childConverter);
+
+            NotImplementedMethod(destination);
+            return null;
+        }
     }
+
+    abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature
+    {
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return null; } }
+        ISimpleFeature IFeature.Simple { get { return this; } }
+        Result ISimpleFeature.Result(Category category) { return Result(category); }
+        protected abstract Result Result(Category category);
+    }
+
+    sealed class AlignConverter : ConverterBase
+    {
+        [EnableDump]
+        readonly SearchResult _childConverter;
+        public AlignConverter(SearchResult childConverter) { _childConverter = childConverter; }
+        protected override Result Result(Category category) { return _childConverter.Result(category.Typed); }
+    }
+
+    // Krautpuster
+    // Gurkennudler
 }

@@ -13,6 +13,6 @@ namespace Reni.Sequence
     internal sealed class Star : SequenceOfBitOperation, ISearchPath<ISuffixFeature,TypeType>
     {
         protected override int ResultSize(int objSize, int argSize) { return BitsConst.MultiplySize(objSize, argSize); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Feature(type.Repeat); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.Repeat); }
     }
 }

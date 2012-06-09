@@ -51,7 +51,6 @@ namespace Reni.Struct
         internal override bool IsLambda { get { return true; } }
         [DisableDump]
         internal override bool IsDataLess { get { return _structure.IsDataLess; } }
-        internal override void Search(SearchVisitor searchVisitor) { NotImplementedMethod(); }
         Size IContextReference.Size { get { return _structure.RefAlignParam.RefSize; } }
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
 
