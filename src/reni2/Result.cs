@@ -818,11 +818,14 @@ namespace Reni
             if (result.Type == destination)
                 return result;
 
+            if (result.Type.Reference == null)
+                return null;
+
             result = result.DereferenceResult();
             if (result.Type == destination)
                 return result;
 
-            result = result.Un<Aligner>();
+            result = result.SmartUn<Aligner>();
             if (result.Type == destination)
                 return result;
 
