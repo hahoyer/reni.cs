@@ -60,7 +60,7 @@ namespace Reni.Type
                 References = new SimpleCache<IReference>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Sequences = new DictionaryEx<int, SequenceType>(elementCount => new SequenceType(parent, elementCount));
-                Arrays = new DictionaryEx<int, Array>(count => new Array(parent, count));
+                Arrays = new DictionaryEx<int, Array>(parent.ObtainArray);
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
                 TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent));
@@ -162,7 +162,7 @@ namespace Reni.Type
         internal CodeBase ArgCode { get { return CodeBase.Arg(this); } }
 
         [DisableDump]
-        TypeBase AutomaticDereferenceType
+        internal TypeBase AutomaticDereferenceType
         {
             get
             {
@@ -355,6 +355,8 @@ namespace Reni.Type
         }
 
         IReference ObtainReference() { return this as IReference ?? new AutomaticReferenceType(this); }
+
+        protected virtual Array ObtainArray(int count) { return new Array(this, count); }
 
         internal TypeBase SmartReference()
         {

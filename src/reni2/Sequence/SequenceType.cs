@@ -64,6 +64,7 @@ namespace Reni.Sequence
         public SequenceType(TypeBase elementType, int count)
         {
             Tracer.Assert(count > 0, () => "count=" + count);
+            Tracer.Assert(elementType.Reference == null);
             _inheritedType = elementType.UniqueArray(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(this, refAlignParam));

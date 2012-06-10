@@ -63,7 +63,11 @@ namespace Reni.Code
 
         internal override CodeBase TryToCombineBack(TopRef precedingElement) { return new TopData(precedingElement.Offset, OutputSize, DataSize); }
 
-        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement) { return new LocalVariableAccess(precedingElement.Holder, precedingElement.Offset, OutputSize, _dataSize); }
+        internal override CodeBase TryToCombineBack(LocalVariableReference precedingElement)
+        {
+            return
+                new LocalVariableAccess(precedingElement.Holder, precedingElement.Offset, OutputSize, _dataSize);
+        }
 
         internal override CodeBase TryToCombineBack(TopFrameRef precedingElement) { return new TopFrameData(precedingElement.Offset, OutputSize, DataSize); }
 

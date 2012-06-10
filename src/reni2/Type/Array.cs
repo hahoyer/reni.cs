@@ -47,6 +47,7 @@ namespace Reni.Type
             _element = element;
             _count = count;
             Tracer.Assert(count > 0);
+            Tracer.Assert(element.Reference == null);
         }
 
         Size IContextReference.Size { get { return Size; } }
@@ -160,6 +161,7 @@ namespace Reni.Type
         internal Result SequenceResult(Category category)
         {
             return Element
+                .AutomaticDereferenceType
                 .UniqueSequence(Count).UniqueReference.Type()
                 .Result(category, UniqueReference.Type().ArgResult(category));
         }

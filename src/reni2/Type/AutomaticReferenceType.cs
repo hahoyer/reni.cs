@@ -111,6 +111,8 @@ namespace Reni.Type
                 );
         }
 
+        protected override Array ObtainArray(int count) { return ValueType.UniqueArray(count); }
+
         internal override ISuffixFeature AlignConversion(TypeBase destination)
         {
             if (destination != ValueType)
