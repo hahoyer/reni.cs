@@ -69,15 +69,15 @@ namespace Reni.Struct
 
         internal Size StructureSize(int position)
         {
-            if(StructureIsDataLess(false, position) == true)
+            if(StructureIsDataLess(position))
                 return Size.Zero;
             return StructureSize(0, position);
         }
 
-        internal bool? StructureIsDataLess(bool isQuick, int accessPosition)
+        internal bool StructureIsDataLess(int accessPosition)
         {
             return Container
-                .IsDataLess(isQuick, Parent, accessPosition);
+                .IsDataLess(Parent, accessPosition);
         }
 
         internal Result ContextReferenceViaStructReference(int position, Result result)

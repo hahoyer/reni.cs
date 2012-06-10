@@ -28,23 +28,20 @@ using Reni.Runtime;
 
 namespace ReniTest
 {
-    public static class Reni
+    public static class other
     {
-        // f: arg/\(arg+value)dump_print;f(100) := 2; 
+        // f: arg/\;f(2) dump_print; 
         public static void MainFunction()
         {
-            var data = Data.Create(8);
-            data.Push(100);
-            var v100 = data.Pull(1);
-            data.Push(v100.Address(0));
-            var a100 = data.Pull(4);
+            var data = Data.Create(4);
             data.Push(2);
-            var v2 = data.Pull(1);
-            data.Push(v2.Get(1, 0).BitCast(3).BitCast(8));
-            var v2x = data.Pull(1);
-            data.Push(a100.Address(0));
-            data.Push(v2x.Address(0));
-            data.Push(SetFunction0(data.Pull(8)));
+            var h_0_0 = data.Pull(1);
+            data.Push(h_0_0.Address(0));
+            data.Push(GetFunction0(data.Pull(4)));
+            data.Push(data.Pull(1).BitCast(3).BitCast(8));
+            var h_0_1 = data.Pull(1);
+            data.Push(h_0_1.Get(1, 0));
+            data.Pull(1).PrintNumber();
         }
 
         // arg 
@@ -56,22 +53,30 @@ namespace ReniTest
 
             return data;
         }
+    }
 
-        // ((arg)+.13(value))dump_print.22 
-        static Data SetFunction0(Data frame)
+
+    public static class Reni
+    {
+        // x: 100; f: x/\;f() dump_print; 
+        public static void MainFunction()
         {
             var data = Data.Create(5);
-            data.Push(frame.Get(4, 4));
-            data.Push(data.Pull(4).Dereference(1));
-            var h_4_0 = data.Pull(1);
-            data.Push(h_4_0.Get(1, 0));
+            data.Push(100);
+            data.Push(data.Address(1));
+            data.Push(GetFunction0(data.Pull(4)));
+            var h_5_0 = data.Pull(1);
+            data.Push(h_5_0.Get(1, 0));
+            data.Pull(1).PrintNumber();
+        }
+
+        // x 
+        static Data GetFunction0(Data frame)
+        {
+            var data = Data.Create(4);
             data.Push(frame.Get(4, 0));
+            data.RefPlus(-1);
             data.Push(data.Pull(4).Dereference(1));
-            data.Plus(sizeBytes: 2, leftBytes: 1, rightBytes: 1);
-            data.Push(data.Pull(2).BitCast(9).BitCast(16));
-            var h_4_1 = data.Pull(2);
-            data.Push(h_4_1.Get(2, 0));
-            data.Pull(2).PrintNumber();
 
             return data;
         }

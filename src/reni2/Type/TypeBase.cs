@@ -425,8 +425,6 @@ namespace Reni.Type
                 ;
         }
 
-        internal virtual bool? IsDataLessStructureElement(bool isQuick) { return Size.IsZero; }
-
         internal virtual Result ConstructorResult(Category category, TypeBase argsType)
         {
             NotImplementedMethod(category, argsType);

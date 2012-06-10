@@ -236,7 +236,7 @@
     <Compile Include="TokenClasses\ThenToken.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
-    <Compile Include="TokenClasses\ValueToken.cs" />
+    <Compile Include="TokenClasses\NewValueToken.cs" />
     <Compile Include="TypeRootSearchVisitor.cs" />
     <Compile Include="TypeSearchResult.cs" />
     <Compile Include="Type\AssignmentFeature.cs" />

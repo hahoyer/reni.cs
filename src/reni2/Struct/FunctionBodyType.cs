@@ -51,6 +51,24 @@ namespace Reni.Struct
         internal override bool IsLambda { get { return true; } }
         [DisableDump]
         internal override bool IsDataLess { get { return _structure.IsDataLess; } }
+
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, () => ValueType);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
+
+        TypeBase ValueType
+        {
+            get
+            {
+                if(!_syntax.IsImplicit)
+                    return null;
+                return ApplyResult(Category.Type, null).Type;
+            }
+        }
+
         Size IContextReference.Size { get { return _structure.RefAlignParam.RefSize; } }
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
 
@@ -61,8 +79,9 @@ namespace Reni.Struct
         [DisableDump]
         IContextReference IFunctionFeature.ObjectReference { get { return this; } }
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return Function(argsType).ApplyResult(category); }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }
 
+        Result ApplyResult(Category category, TypeBase argsType) { return Function(argsType).ApplyResult(category); }
         FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
     }
 }

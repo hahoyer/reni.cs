@@ -127,14 +127,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-// ReSharper disable PossibleInvalidOperationException
-            internal bool IsDataLess
-        {
-            get { return StructIsDataLess(false).Value; }
-        }
-// ReSharper restore PossibleInvalidOperationException
-
-        internal bool? StructIsDataLess(bool isQuick) { return ContainerContextObject.StructureIsDataLess(isQuick, EndPosition); }
+        internal bool IsDataLess { get { return ContainerContextObject.StructureIsDataLess(EndPosition); } }
 
         sealed class RecursionWhileObtainingStructSizeException : Exception
         {
@@ -253,7 +246,7 @@ namespace Reni.Struct
         internal IStructFeature SearchFromStructContext(ISearchTarget target) { return ContainerContextObject.Container.SearchFromStructContext(target); }
         internal IFeature FeatureProvider(int position)
         {
-            if (!ContainerContextObject.Container.IsLambda(position))
+            if(!ContainerContextObject.Container.IsLambda(position))
                 return null;
             return _functionFeatureProvider.Find(position);
         }
@@ -274,6 +267,5 @@ namespace Reni.Struct
             IFunctionFeature IFeature.Function { get { return FunctionStatement.CheckedApply(s => s.FunctionFeature(_structure)); } }
             ISimpleFeature IFeature.Simple { get { return Statement.CheckedApply(s => s.SimpleFeature(_structure)); } }
         }
-
     }
 }

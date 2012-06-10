@@ -112,33 +112,29 @@ namespace Reni.Syntax
             return result;
         }
 
-        bool? QuickIsDataLessStructureElement(ContextBase context)
-        {
-            var contextResult = context.QuickIsDataLess(this);
-            if(contextResult != null)
-                return contextResult;
-
-            var type = FindResult(context, Category.Type).Type;
-            if(type != null)
-                return type.IsDataLessStructureElement(true);
-            return null;
-        }
-
         internal Result OperationResult(ContextBase context, Category category, ISearchTarget target)
         {
             return Type(context)
                 .OperationResult<IPrefixFeature>(category, target);
         }
 
-        internal bool? IsDataLessStructureElement(bool isQuick, ContextBase context)
-        {
-            var result = QuickIsDataLessStructureElement(context);
-            if(result != null)
-                return result;
-            if(isQuick)
-                return null;
+        virtual internal bool? IsDataLessStructureElement() { return IsLambda ? (bool?) true : null; }
 
-            return Type(context).IsDataLessStructureElement(false);
+        internal bool IsDataLessStructureElement(ContextBase context)
+        {
+            var result = IsDataLessStructureElement();
+            if (result != null)
+                return result.Value;
+
+            result = context.QuickIsDataLess(this);
+            if (result != null)
+                return result.Value;
+
+            var type = FindResult(context, Category.Type).Type;
+            if (type != null)
+                return type.IsDataLess;
+
+            return Type(context).IsDataLess;
         }
 
         internal ISimpleFeature SimpleFeature(Structure structure)

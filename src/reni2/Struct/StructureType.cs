@@ -72,12 +72,10 @@ namespace Reni.Struct
                 .CheckedConvert(this);
         }
 
-        internal override bool? IsDataLessStructureElement(bool isQuick) { return Structure.StructIsDataLess(isQuick); }
-
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return Structure.StructIsDataLess(false) == true; } }
+        internal override bool IsDataLess { get { return Structure.IsDataLess; } }
 
         internal Result DumpPrintResult(Category category) { return Structure.DumpPrintResultViaStructReference(category); }
     }

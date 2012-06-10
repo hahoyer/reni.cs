@@ -29,7 +29,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
-using Reni.Sequence;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
@@ -51,7 +50,7 @@ namespace Reni.TokenClasses
             Setter = setter;
             _isMetaFunction = isMetaFunction;
         }
-                                                       
+
         string Tag
         {
             get
@@ -61,9 +60,16 @@ namespace Reni.TokenClasses
                     .ReplaceArgs(IsImplicit ? "!" : "");
             }
         }
-                                                       
+
         internal override bool IsImplicit { get { return _isImplicit; } }
-        internal override Result ObtainResult(ContextBase context, Category category) { return context.FunctionalResult(category, this); }
+
+        internal override Result ObtainResult(ContextBase context, Category category)
+        {
+            var s = context.FindRecentStructure;
+            NotImplementedMethod(context, category);
+            return null;
+        }
+        
         protected override bool GetIsLambda() { return true; }
 
         internal override string DumpPrintText
@@ -86,16 +92,16 @@ namespace Reni.TokenClasses
 
         internal IMetaFunctionFeature MetaFunctionFeature(Structure structure)
         {
-            if (!_isMetaFunction)
+            if(!_isMetaFunction)
                 return null;
             NotImplementedMethod(structure);
             return null;
         }
         internal IFunctionFeature FunctionFeature(Structure structure)
         {
-            if (_isMetaFunction)
+            if(_isMetaFunction)
                 return null;
-            return new Type.FunctionFeature(structure,this);
+            return new FunctionFeature(structure, this);
         }
     }
 }

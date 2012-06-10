@@ -74,7 +74,7 @@ namespace Reni.ReniParser
                  new[] {"else"}
                 );
             x += PrioTable.Right("!");
-            x += PrioTable.Left("/\\", "/!\\");
+            x += PrioTable.Left("/\\", "/!\\", "/\\/\\", "/!\\/!\\");
             x += PrioTable.Right(":");
             x += PrioTable.Right(",");
             x += PrioTable.Right(";");
@@ -128,12 +128,12 @@ namespace Reni.ReniParser
                        {"dump_print", new DumpPrintToken()},
                        {"else", new ElseToken()},
                        {"enable_cut", new EnableCut()},
-                       {"to_number_of_base", new ToNumberOfBase()},
+                       {"new_value", new NewValueToken()},
                        {"sequence", new SequenceToken()},
                        {"text_item", new TextItem()},
                        {"then", new ThenToken()},
-                       {"type", new TypeOperator()},
-                       {"value", new ValueToken()}
+                       {"to_number_of_base", new ToNumberOfBase()},
+                       {"type", new TypeOperator()}
                    };
         }
 

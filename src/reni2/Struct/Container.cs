@@ -81,6 +81,7 @@ namespace Reni.Struct
         }
 
         internal override CompileSyntax ToCompiledSyntax() { return this; }
+        internal override bool? IsDataLessStructureElement() { return Statements.All(syntax => syntax.IsDataLessStructureElement() == true); }
 
         [DisableDump]
         internal int IndexSize { get { return BitsConst.AutoSize(Statements.Length); } }
@@ -215,38 +216,36 @@ namespace Reni.Struct
             }
         }
 
-        bool? InternalInnerIsDataLess(bool isQuick, ContextBase parent, int position)
+        bool InternalInnerIsDataLess(ContextBase parent, int position)
         {
             var uniqueChildContext = parent
                 .UniqueStructurePositionContext(this, position);
-            return Statements[position].IsDataLessStructureElement(isQuick, uniqueChildContext);
+            return Statements[position].IsDataLessStructureElement(uniqueChildContext);
         }
 
-        internal bool? IsDataLess(bool isQuick, ContextBase parent, int accessPosition)
+        bool? InternalInnerIsDataLess(int position) { return Statements[position].IsDataLessStructureElement(); }
+
+        internal bool IsDataLess(ContextBase parent, int accessPosition)
         {
-            var trace = ObjectId == -1 && accessPosition == 2 && parent.ObjectId == 1;
-            StartMethodDump(trace, isQuick, parent, accessPosition);
+            var trace = ObjectId == -10 && accessPosition == 1 && parent.ObjectId == 1;
+            StartMethodDump(trace, parent, accessPosition);
             try
             {
                 var subStatementIds = accessPosition.Array(i => i).ToArray();
                 Dump("subStatementIds", subStatementIds);
                 BreakExecution();
-                if(subStatementIds.Any(position => InternalInnerIsDataLess(true, parent, position) == false))
-                    return ReturnMethodDump(false, true);
+                if(subStatementIds.Any(position => InternalInnerIsDataLess(position) == false))
+                    return ReturnMethodDump(false);
                 var quickNonDataLess = subStatementIds
-                    .Where(position => InternalInnerIsDataLess(true, parent, position) == null)
+                    .Where(position => InternalInnerIsDataLess(position) == null)
                     .ToArray();
                 Dump("quickNonDataLess", quickNonDataLess);
                 BreakExecution();
                 if(quickNonDataLess.Length == 0)
-                    return ReturnMethodDump(true, true);
-                if(isQuick)
-                    return ReturnMethodDump<bool?>(null, true);
-                if(quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, position) == false))
-                    return ReturnMethodDump(false, true);
-                if(quickNonDataLess.Any(position => InternalInnerIsDataLess(false, parent, position) == null))
-                    return ReturnMethodDump<bool?>(null, true);
-                return ReturnMethodDump(true, true);
+                    return ReturnMethodDump(true);
+                if(quickNonDataLess.Any(position => InternalInnerIsDataLess(parent, position) == false))
+                    return ReturnMethodDump(false);
+                return ReturnMethodDump(true);
             }
             finally
             {
@@ -301,7 +300,6 @@ namespace Reni.Struct
         }
 
         internal new bool IsLambda(int position) { return Statements[position].IsLambda; }
-        
     }
 
     interface IStructFeature

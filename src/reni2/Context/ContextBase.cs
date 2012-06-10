@@ -32,7 +32,6 @@ using Reni.Basics;
 using Reni.Feature;
 using Reni.Struct;
 using Reni.Syntax;
-using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Context
@@ -208,13 +207,6 @@ namespace Reni.Context
 
             [DisableDump]
             public string IconKey { get { return "Cache"; } }
-        }
-
-        internal Result FunctionalResult(Category category, FunctionSyntax syntax)
-        {
-            return FindRecentStructure
-                .FunctionalFeature(syntax)
-                .Result(category);
         }
 
         internal Result ResultAsReference(Category category, CompileSyntax syntax)

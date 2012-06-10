@@ -27,7 +27,7 @@ using Reni.Parser;
 
 namespace Reni.TokenClasses
 {
-    sealed class ValueToken : Terminal
+    sealed class NewValueToken : Terminal
     {
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
