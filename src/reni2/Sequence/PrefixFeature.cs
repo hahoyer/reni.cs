@@ -32,7 +32,7 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    sealed class PrefixFeature : ReniObject, ISuffixFeature, IPrefixFeature
+    sealed class PrefixFeature : ReniObject, IPrefixFeature, ISimpleFeature
     {
         readonly SequenceType _objectType;
         readonly ISequenceOfBitPrefixOperation _definable;
@@ -45,9 +45,9 @@ namespace Reni.Sequence
 
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
-        
-        Result Result(Category category)
+        ISimpleFeature IFeature.Simple { get { return this; } }
+
+        Result ISimpleFeature.Result(Category category)
         {
             return _objectType
                 .Result(category, () => _objectType.BitSequenceOperation(_definable), CodeArgs.Arg)
@@ -55,7 +55,7 @@ namespace Reni.Sequence
                 (category1
                  => _objectType
                         .UniqueReference.Type()
-                        .ArgResult(category1)
+                        .ArgResult(category1.Typed)
                         .AutomaticDereferenceResult()
                         .Align(Root.DefaultRefAlignParam.AlignBits));
         }
