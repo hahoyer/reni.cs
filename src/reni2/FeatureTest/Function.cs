@@ -285,7 +285,7 @@ f1()dump_print;
 
     [TestFixture]
     [SimpleFunctionWithNonLocal]
-    [TargetSet(@"f: arg/\(arg+value)dump_print;f(100) := 2;", "102")]
+    [TargetSet(@"f: arg/\(arg + new_value)dump_print;f(100) := 2;", "102")]
     public sealed class FunctionAssignment : CompilerTest
     {
         [Test]
