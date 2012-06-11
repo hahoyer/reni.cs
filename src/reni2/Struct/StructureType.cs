@@ -68,7 +68,7 @@ namespace Reni.Struct
             if(searchVisitorChild == null || searchVisitorChild.IsSuccessFull)
                 return;
             searchVisitorChild.InternalResult = Structure
-                .SearchFromRefToStruct(searchVisitorChild.Target)
+                .Search(searchVisitorChild.Target)
                 .CheckedConvert(this);
         }
 

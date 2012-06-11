@@ -77,7 +77,7 @@ namespace Reni.Struct
         internal bool StructureIsDataLess(int accessPosition)
         {
             return Container
-                .IsDataLess(Parent, accessPosition);
+                .ObtainIsDataLess(Parent, accessPosition);
         }
 
         internal Result ContextReferenceViaStructReference(int position, Result result)

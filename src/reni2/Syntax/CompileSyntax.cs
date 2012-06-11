@@ -118,11 +118,11 @@ namespace Reni.Syntax
                 .OperationResult<IPrefixFeature>(category, target);
         }
 
-        virtual internal bool? IsDataLessStructureElement() { return IsLambda ? (bool?) true : null; }
+        internal virtual bool? IsDataLess { get { return IsLambda ? (bool?) true : null; } }
 
         internal bool IsDataLessStructureElement(ContextBase context)
         {
-            var result = IsDataLessStructureElement();
+            var result = IsDataLess;
             if (result != null)
                 return result.Value;
 

@@ -26,11 +26,12 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Feature;
-using Reni.Type;
+using Reni.Syntax;
+using Reni.TokenClasses;
 
 namespace Reni.Struct
 {
-    sealed class AccessFeature : ReniObject, ISuffixFeature, ISimpleFeature
+    sealed class AccessFeature : ReniObject, ISuffixFeature, IContextFeature, ISimpleFeature
     {
         [EnableDump]
         readonly Structure _structure;
@@ -44,39 +45,44 @@ namespace Reni.Struct
             _position = position;
         }
 
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return null; } }
-        ISimpleFeature IFeature.Simple { get { return this; } }
         Result ISimpleFeature.Result(Category category)
         {
             return _structure
                 .AccessViaThisReference(category, _position);
         }
-    }
 
-    sealed class ContextAccessFeature : ReniObject, IContextFeature, ISimpleFeature
-    {
-        [EnableDump]
-        readonly Structure _structure;
-
-        [EnableDump]
-        readonly int _position;
-
-        internal ContextAccessFeature(Structure structure, int position)
-        {
-            _structure = structure;
-            _position = position;
-        }
-
-        Result ISimpleFeature.Result(Category category)
+        Result Result(Category category)
         {
             return _structure
                 .AccessViaContextReference(category, _position);
         }
 
-        IFeature FeatureProvider { get { return _structure.FeatureProvider(_position) ?? EmptyFeature.Instance; } }
-        IMetaFunctionFeature IFeature.MetaFunction { get { return FeatureProvider.MetaFunction; } }
-        IFunctionFeature IFeature.Function { get { return FeatureProvider.Function; } }
-        ISimpleFeature IFeature.Simple { get { return this; } }
+        CompileSyntax Statement
+        {
+            get
+            {
+                return _structure
+                    .ContainerContextObject
+                    .Container
+                    .Statements[_position];
+            }
+        }
+        IMetaFunctionFeature IFeature.MetaFunction
+        {
+            get
+            {
+                var syntax = Statement as FunctionSyntax;
+                return syntax == null ? null : syntax.MetaFunctionFeature(_structure);
+            }
+        }
+        IFunctionFeature IFeature.Function
+        {
+            get
+            {
+                var syntax = Statement as FunctionSyntax;
+                return syntax == null ? null : syntax.FunctionFeature(_structure);
+            }
+        }
+        ISimpleFeature IFeature.Simple { get { return Statement is FunctionSyntax ? null : this; } }
     }
 }

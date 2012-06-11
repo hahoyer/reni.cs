@@ -81,7 +81,15 @@ namespace Reni.Struct
         }
 
         internal override CompileSyntax ToCompiledSyntax() { return this; }
-        internal override bool? IsDataLessStructureElement() { return Statements.All(syntax => syntax.IsDataLessStructureElement() == true); }
+        [DisableDump]
+        internal override bool? IsDataLess
+        {
+            get
+            {
+                return Statements
+                    .All(syntax => syntax.IsDataLess == true);
+            }
+        }
 
         [DisableDump]
         internal int IndexSize { get { return BitsConst.AutoSize(Statements.Length); } }
@@ -169,19 +177,14 @@ namespace Reni.Struct
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        IStructFeature FindStructFeature(string name)
+        internal StructurePosition Find(string name)
         {
-            if(Dictionary.ContainsKey(name))
-            {
-                var position = Dictionary[name];
-                return new StructureFeature(position);
-            }
-            return null;
+            if(!Dictionary.ContainsKey(name))
+                return null;
+
+            var position = Dictionary[name];
+            return new StructurePosition(position);
         }
-
-        internal ISearchPath<ISuffixFeature, StructureType> SearchFromRefToStruct(ISearchTarget target) { return FindStructFeature(target.StructFeatureName); }
-
-        internal IStructFeature SearchFromStructContext(ISearchTarget defineable) { return FindStructFeature(defineable.StructFeatureName); }
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
@@ -223,9 +226,9 @@ namespace Reni.Struct
             return Statements[position].IsDataLessStructureElement(uniqueChildContext);
         }
 
-        bool? InternalInnerIsDataLess(int position) { return Statements[position].IsDataLessStructureElement(); }
+        bool? InternalInnerIsDataLess(int position) { return Statements[position].IsDataLess; }
 
-        internal bool IsDataLess(ContextBase parent, int accessPosition)
+        internal bool ObtainIsDataLess(ContextBase parent, int accessPosition)
         {
             var trace = ObjectId == -10 && accessPosition == 1 && parent.ObjectId == 1;
             StartMethodDump(trace, parent, accessPosition);
@@ -298,25 +301,18 @@ namespace Reni.Struct
                 EndMethodDump();
             }
         }
-
-        internal new bool IsLambda(int position) { return Statements[position].IsLambda; }
-    }
-
-    interface IStructFeature
-        : ISearchPath<ISuffixFeature, StructureType>
-    {
-        IContextFeature ConvertToContextFeature(Structure accessPoint);
     }
 
     [Serializable]
-    sealed class StructureFeature : ReniObject, IStructFeature
+    sealed class StructurePosition : ReniObject, ISearchPath<ISuffixFeature, StructureType>
     {
         [EnableDump]
         readonly int _position;
 
-        public StructureFeature(int position) { _position = position; }
+        internal StructurePosition(int position) { _position = position; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType structureType) { return structureType.Structure.UniqueAccessFeature(_position); }
-        IContextFeature IStructFeature.ConvertToContextFeature(Structure accessPoint) { return accessPoint.UniqueContextAccessFeature(_position); }
+        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
+        internal IContextFeature ConvertToContextFeature(Structure accessPoint) { return Convert(accessPoint); }
+        AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(_position); }
     }
 }

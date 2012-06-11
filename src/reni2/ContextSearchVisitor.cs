@@ -56,7 +56,7 @@ namespace Reni
         internal void Search(Struct.Context context)
         {
             var accessPoint = context.Structure;
-            var feature = accessPoint.SearchFromStructContext(Target);
+            var feature = accessPoint.Search(Target);
             if(feature == null)
                 return;
             InternalResult = feature.ConvertToContextFeature(accessPoint);
