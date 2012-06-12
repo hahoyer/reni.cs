@@ -31,6 +31,7 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Runtime;
+using Reni.Struct;
 
 namespace Reni
 {
@@ -43,8 +44,8 @@ namespace Reni
         readonly SimpleCache<Source> _source;
         readonly SimpleCache<ReniParser.ParsedSyntax> _syntax;
         readonly SimpleCache<CodeBase> _code;
-        readonly SimpleCache<Tuple<CodeBase, CodeBase>[]> _functionCode;
-        readonly SimpleCache<Container> _mainContainer;
+        readonly SimpleCache<CodeBasePair[]> _functionCode;
+        readonly SimpleCache<Code.Container> _mainContainer;
         readonly SimpleCache<List<FunctionContainer>> _functionContainers;
         readonly SimpleCache<string> _executedCode;
         readonly SimpleCache<FunctionList> _functions;
@@ -62,8 +63,8 @@ namespace Reni
             _parameters = parameters;
             _source = new SimpleCache<Source>(() => new Source(FileName.FileHandle()));
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
-            _functionCode = new SimpleCache<Tuple<CodeBase, CodeBase>[]>(() => Functions.Code);
-            _mainContainer = new SimpleCache<Container>(() => new Container(Code, Source.Data));
+            _functionCode = new SimpleCache<CodeBasePair[]>(() => Functions.Code);
+            _mainContainer = new SimpleCache<Code.Container>(() => new Code.Container(Code, Source.Data));
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true, className));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<FunctionContainer>>(() => Functions.Compile());
@@ -102,7 +103,7 @@ namespace Reni
         CodeBase Code { get { return _code.Value; } }
 
         [DisableDump]
-        Container MainContainer { get { return _mainContainer.Value; } }
+        Code.Container MainContainer { get { return _mainContainer.Value; } }
 
         [DisableDump]
         List<FunctionContainer> FunctionContainers { get { return _functionContainers.Value; } }
@@ -159,7 +160,7 @@ namespace Reni
                 Tracer.FlaggedLine(FilePositionTag.Debug, "CodeTree");
                 Tracer.FlaggedLine(FilePositionTag.Debug, "main\n" + Code.Dump());
                 for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine(FilePositionTag.Debug, "function index=" + i + "\n" + Functions[i].BodyCode);
+                    Tracer.FlaggedLine(FilePositionTag.Debug, "function index=" + i + "\n" + Functions[i].BodyCode.Dump());
             }
 
             if(_parameters.RunFromCode)

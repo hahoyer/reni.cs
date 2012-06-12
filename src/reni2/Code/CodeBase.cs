@@ -275,7 +275,7 @@ namespace Reni.Code
                 .Aggregate(this, (current, fiberItem) => current.CreateFiber(fiberItem));
         }
 
-        internal void Execute(Tuple<CodeBase, CodeBase>[] functions, bool isTraceEnabled, IOutStream outStream)
+        internal void Execute(CodeBasePair[] functions, bool isTraceEnabled, IOutStream outStream)
         {
             try
             {

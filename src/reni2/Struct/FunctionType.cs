@@ -87,12 +87,12 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        public Tuple<CodeBase, CodeBase> BodyCode
+        public CodeBasePair BodyCode
         {
             get
             {
                 return
-                    new Tuple<CodeBase, CodeBase>(_getter.BodyCode, _setter == null ? null : _setter.BodyCode);
+                    new CodeBasePair(_getter.BodyCode, _setter == null ? null : _setter.BodyCode);
             }
         }
 
@@ -162,5 +162,17 @@ namespace Reni.Struct
         IConverter ISearchContainerType.Converter { get { return this; } }
         TypeBase ISearchContainerType.Target { get { return ValueType; } }
         Result IConverter.Result(Category category) { return _getter.CallResult(category); }
+    }
+
+    sealed class CodeBasePair : ReniObject
+    {
+        internal readonly CodeBase Getter;
+        internal readonly CodeBase Setter;
+
+        internal CodeBasePair(CodeBase getter, CodeBase setter)
+        {
+            Getter = getter;
+            Setter = setter;
+        }
     }
 }

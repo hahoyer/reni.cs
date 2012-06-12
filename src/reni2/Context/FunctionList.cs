@@ -55,7 +55,7 @@ namespace Reni.Context
 
         internal Struct.FunctionType this[int i] { get { return _list[i]; } }
         internal int Count { get { return _list.Count; } }
-        internal Tuple<CodeBase, CodeBase>[] Code { get { return _list.Select(t => t.BodyCode).ToArray(); } }
+        internal CodeBasePair[] Code { get { return _list.Select(t => t.BodyCode).ToArray(); } }
 
         internal Struct.FunctionType Find(FunctionSyntax syntax, Structure structure, TypeBase argsType)
         {

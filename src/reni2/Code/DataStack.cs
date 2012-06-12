@@ -63,13 +63,13 @@ namespace Reni.Code
         [EnableDump]
         LocalData _localData;
 
-        readonly Tuple<CodeBase, CodeBase>[] _functions;
+        readonly CodeBasePair[] _functions;
         readonly bool _isTraceEnabled;
         readonly IOutStream _outStream;
 
-        public DataStack(IOutStream outStream, Tuple<CodeBase, CodeBase>[] functions = null, bool isTraceEnabled = false)
+        public DataStack(IOutStream outStream, CodeBasePair[] functions = null, bool isTraceEnabled = false)
         {
-            _functions = functions ?? new Tuple<CodeBase, CodeBase>[0];
+            _functions = functions ?? new CodeBasePair[0];
             _isTraceEnabled = isTraceEnabled;
             _outStream = outStream;
             _localData = new LocalData(_outStream);
@@ -86,7 +86,7 @@ namespace Reni.Code
             {
                 _localData.Frame = new FrameData(argsAndRefs);
                 var function = _functions[functionId.Index];
-                SubVisit("call " + functionId, functionId.IsGetter ? function.Item1 : function.Item2);
+                SubVisit("call " + functionId, functionId.IsGetter ? function.Getter: function.Setter);
             } while(_localData.Frame.IsRepeatRequired);
             _localData.Frame = oldFrame;
         }
