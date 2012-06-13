@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -43,14 +44,23 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+        IContextReference ObjectReference { get { return this; } }
 
-        IContextReference IFunctionFeature.ObjectReference { get { return this; } }
+        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
-        Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
+        Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return Function(argsType).ApplyResult(category); }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        {
+            var applyResult = Function(argsType).ApplyResult(category);
+
+            return applyResult
+                .ReplaceAbsolute
+                (_structure.ContainerContextObject
+                 , () => CodeBase.ReferenceCode(ObjectReference).AddToReference(_structure.StructSize)
+                 , () => CodeArgs.Create(ObjectReference)
+                );
+        }
         FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
-
     }
 }
