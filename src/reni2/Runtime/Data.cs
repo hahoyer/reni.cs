@@ -135,7 +135,7 @@ namespace Reni.Runtime
 
         static readonly BiasCache _biasCache = new BiasCache(100);
         [UsedImplicitly]
-        string AddressDump { get { return _biasCache.AddressDump(this)+"="+DataDump; } }
+        string AddressDump { get { return _biasCache.AddressDump(this) + "=" + DataDump; } }
 
         public void Equal(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsEqual); }
         [UsedImplicitly]
@@ -171,11 +171,6 @@ namespace Reni.Runtime
             var left = Pull(leftBytes);
             Push(left._data.Plus(right._data, sizeBytes));
         }
-
-        [UsedImplicitly]
-        public void Plus(int leftBytes, int rightBytes) { Plus(1, leftBytes, rightBytes); }
-        [UsedImplicitly]
-        public void Minus(int leftBytes, int rightBytes) { Minus(1, leftBytes, rightBytes); }
 
         [UsedImplicitly]
         public void Minus(int sizeBytes, int leftBytes, int rightBytes)

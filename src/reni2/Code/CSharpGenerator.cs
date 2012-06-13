@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -59,7 +58,7 @@ namespace Reni.Code
             _data.Add("    ".Repeat(_indent) + c);
         }
 
-        string BitCast(Size size, Size dataSize)
+        static string BitCast(Size size, Size dataSize)
         {
             if(size == dataSize)
                 return "";
@@ -98,9 +97,9 @@ namespace Reni.Code
         {
             AddCode
                 ("data.Push(data.Get({0}, {1}){2})"
-                , dataSize.ByteCount
-                , offset.SaveByteCount
-                , BitCast(size, dataSize)
+                 , dataSize.ByteCount
+                 , offset.SaveByteCount
+                 , BitCast(size, dataSize)
                 );
         }
 
@@ -155,21 +154,13 @@ namespace Reni.Code
             var sizeBytes = size.SaveByteCount;
             var leftBytes = leftSize.SaveByteCount;
             var rightBytes = rightSize.SaveByteCount;
-            if(sizeBytes == 1)
-                AddCode
-                    ("data.{0}(leftBytes:{1}, rightBytes:{2})"
-                     , opToken.DataFunctionName
-                     , leftBytes
-                     , rightBytes
-                    );
-            else
-                AddCode
-                    ("data.{0}(sizeBytes:{1}, leftBytes:{2}, rightBytes:{3})"
-                     , opToken.DataFunctionName
-                     , sizeBytes
-                     , leftBytes
-                     , rightBytes
-                    );
+            AddCode
+                ("data.{0}(sizeBytes:{1}, leftBytes:{2}, rightBytes:{3})"
+                 , opToken.DataFunctionName
+                 , sizeBytes
+                 , leftBytes
+                 , rightBytes
+                );
         }
 
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
@@ -185,7 +176,7 @@ namespace Reni.Code
             AddCode("}}");
         }
 
-        string PullBool(int saveByteCount)
+        static string PullBool(int saveByteCount)
         {
             if(saveByteCount == 1)
                 return "data.Pull(1).GetBytes()[0] != 0";
@@ -207,6 +198,7 @@ namespace Reni.Code
             foreach(var codeBase in data)
                 codeBase.Visit(this);
         }
+
         internal static string GenerateCSharpStatements(CodeBase codeBase)
         {
             var generator = new CSharpGenerator(codeBase.TemporarySize.SaveByteCount);
