@@ -33,7 +33,6 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
-using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -135,12 +134,6 @@ namespace Reni.Syntax
                 return type.IsDataLess;
 
             return Type(context).IsDataLess;
-        }
-
-        internal ISimpleFeature SimpleFeature(Structure structure)
-        {
-            NotImplementedMethod(structure);
-            return null;
         }
 
         internal Result SmartLocalReferenceResult(ContextBase context, Category category)

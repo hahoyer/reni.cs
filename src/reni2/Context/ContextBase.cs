@@ -217,23 +217,40 @@ namespace Reni.Context
 
         Result FunctionResult(Category category, TypeBase objectType, IFeature feature, CompileSyntax right)
         {
-            var function = feature.Function;
-            if(right == null && (function == null || !function.IsImplicit))
-                return feature.Simple.Result(category);
+            var trace = feature.GetObjectId() == 1 && category.HasCode;
+            StartMethodDump(trace, category, objectType, feature, right);
+            try
+            {
+                var function = feature.Function;
+                if(right == null && (function == null || !function.IsImplicit))
+                    return ReturnMethodDump(feature.Simple.Result(category));
 
-            var rightResult
-                = right == null
-                      ? TypeBase.Void.Result(category.Typed)
-                      : right.SmartLocalReferenceResult(this, category);
-            return function
-                .ApplyResult(category, rightResult.Type)
-                .ReplaceArg(rightResult)
-                .ReplaceAbsolute(function.ObjectReference, c => objectType.SmartReference().ArgResult(c));
+                var rightResult
+                    = right == null
+                          ? TypeBase.Void.Result(category.Typed)
+                          : right.SmartLocalReferenceResult(this, category);
+                Dump("rightResult", rightResult); 
+                
+                var applyResult = function.ApplyResult(category, rightResult.Type);
+                Dump("applyResult", applyResult); 
+                BreakExecution();
+
+                var replaceArg = applyResult.ReplaceArg(rightResult);
+                Dump("replaceArg", replaceArg); 
+                
+                var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.SmartReference().ArgResult(c));
+                return ReturnMethodDump(result);
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
         {
-            var trace = feature.GetObjectId() == -1;
+            var trace = feature.GetObjectId() == 1 && category.HasCode;
             StartMethodDump(trace, category, left, leftType, feature, converterResult, right);
             try
             {

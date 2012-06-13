@@ -33,6 +33,8 @@ namespace Reni.Struct
 {
     sealed class AccessFeature : ReniObject, ISuffixFeature, IContextFeature, ISimpleFeature
     {
+        static int _nextObjectId;
+
         [EnableDump]
         readonly Structure _structure;
 
@@ -40,6 +42,7 @@ namespace Reni.Struct
         readonly int _position;
 
         internal AccessFeature(Structure structure, int position)
+            : base(_nextObjectId++)
         {
             _structure = structure;
             _position = position;
