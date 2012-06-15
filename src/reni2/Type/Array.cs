@@ -135,9 +135,9 @@ namespace Reni.Type
         {
             return Void
                 .Result
-                (category: category
-                 , getCode: CreateDumpPrintCode
-                 , getArgs: () => Element.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
+                (category
+                 , CreateDumpPrintCode
+                 , () => Element.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
                 );
         }
 

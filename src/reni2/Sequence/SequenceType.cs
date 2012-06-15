@@ -225,12 +225,5 @@ namespace Reni.Sequence
                 .Type()
                 .ArgResult(c.Typed);
         }
-
-        Result ReferenceResult(Category c)
-        {
-            return UniqueReference
-                .Type()
-                .ArgResult(c.Typed);
-        }
     }
 }

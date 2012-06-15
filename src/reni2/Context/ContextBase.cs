@@ -229,18 +229,17 @@ namespace Reni.Context
                     = right == null
                           ? TypeBase.Void.Result(category.Typed)
                           : right.SmartLocalReferenceResult(this, category);
-                Dump("rightResult", rightResult); 
-                
+                Dump("rightResult", rightResult);
+
                 var applyResult = function.ApplyResult(category, rightResult.Type);
-                Dump("applyResult", applyResult); 
+                Dump("applyResult", applyResult);
                 BreakExecution();
 
                 var replaceArg = applyResult.ReplaceArg(rightResult);
-                Dump("replaceArg", replaceArg); 
-                
+                Dump("replaceArg", replaceArg);
+
                 var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.SmartReference().ArgResult(c));
                 return ReturnMethodDump(result);
-
             }
             finally
             {
@@ -250,7 +249,7 @@ namespace Reni.Context
 
         internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
         {
-            var trace = feature.GetObjectId() == -1 && category.HasCode;
+            var trace = feature.GetObjectId() == -663 && category.HasCode;
             StartMethodDump(trace, category, left, leftType, feature, converterResult, right);
             try
             {
