@@ -39,7 +39,13 @@ using Reni.Struct;
 namespace Reni.Type
 {
     [Serializable]
-    abstract class TypeBase : ReniObject, IDumpShortProvider, IIconKeyProvider, ISearchTarget
+    abstract class TypeBase
+        : ReniObject
+          , IDumpShortProvider
+          , IIconKeyProvider
+          , ISearchTarget
+          , ISearchPath<ISuffixFeature, Aligner>
+          , ISearchPath<ISuffixFeature, TypeBase>
     {
         sealed class Cache
         {
@@ -402,11 +408,11 @@ namespace Reni.Type
             }
 
             var rawResult = searchResult.Result(category.Typed);
-            var result = rawResult.ReplaceArg(SmartLocalReferenceResult);
+            var result = rawResult.ReplaceArg(ArgResult);
             return result.PostConversionResult(destination) & category;
         }
 
-        SearchResult Converter(TypeBase destination)
+        internal SearchResult Converter(TypeBase destination)
         {
             return
                 Search<ISuffixFeature>(destination.ConversionProvider);
@@ -477,6 +483,9 @@ namespace Reni.Type
                  , CodeArgs.Void
                 );
         }
+
+        ISuffixFeature ISearchPath<ISuffixFeature, Aligner>.Convert(Aligner type) { return type.UnAlignConversion(this); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type == this ? Extension.Feature(DereferenceReferenceResult) : null; }
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature

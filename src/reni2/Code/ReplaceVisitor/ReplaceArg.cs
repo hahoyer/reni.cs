@@ -23,6 +23,8 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using JetBrains.Annotations;
+using Reni.Basics;
+using Reni.Type;
 
 namespace Reni.Code.ReplaceVisitor
 {
@@ -50,9 +52,12 @@ namespace Reni.Code.ReplaceVisitor
 
         internal override CodeBase Arg(Arg visitedObject)
         {
-            if(ActualArg.Type != visitedObject.Type)
-                throw new SizeException(Actual, visitedObject);
-            return Actual;
+            if(ActualArg.Type == visitedObject.Type)
+                return Actual;
+            if(ActualArg.Type.UniqueReference.Type() == visitedObject.Type)
+                return Actual.LocalReference(ActualArg.Type.Destructor(Category.Code).Code);
+
+            throw new SizeException(Actual, visitedObject);
         }
 
         [Dump("Dump")]

@@ -84,5 +84,35 @@ namespace Reni.Type
         }
 
         ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type.AlignConversion(Parent); }
+
+        internal ISuffixFeature UnAlignConversion(TypeBase destination)
+        {
+            var childConverter = Parent.Converter(destination);
+            if(childConverter != null)
+                return new UnAlignConverter(this, childConverter);
+
+            NotImplementedMethod(destination);
+            return null;
+        }
+
+        sealed class UnAlignConverter : ConverterBase
+        {
+            [EnableDump]
+            readonly Aligner _sourceType;
+            [EnableDump]
+            readonly SearchResult _childConverter;
+            public UnAlignConverter(Aligner sourceType, SearchResult childConverter)
+            {
+                _sourceType = sourceType;
+                _childConverter = childConverter;
+            }
+
+            protected override Result Result(Category category)
+            {
+                return _childConverter
+                    .Result(category)
+                    .ReplaceArg(_sourceType.ParentConversionResult);
+            }
+        }
     }
 }

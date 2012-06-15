@@ -808,13 +808,17 @@ namespace Reni
             var result = SmartConversionResult(destination);
             if (result != null)
                 return result;
-            DumpDataWithBreak("Wrong conversion result type", "destination", destination, "result", result);
+            DumpDataWithBreak("Wrong conversion result type", "destination", destination, "this", this);
             return null;
         }
 
         internal Result SmartConversionResult(TypeBase destination)
         {
             var result = this;
+            if (result.Type == destination)
+                return result;
+
+            result = result.SmartUn<Aligner>();
             if (result.Type == destination)
                 return result;
 
