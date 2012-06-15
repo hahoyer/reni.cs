@@ -137,23 +137,26 @@ namespace Reni.Runtime
         [UsedImplicitly]
         string AddressDump { get { return _biasCache.AddressDump(this) + "=" + DataDump; } }
 
-        public void Equal(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsEqual); }
         [UsedImplicitly]
-        public void LessGreater(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsNotEqual); }
+        public void Equal(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsEqual); }
         [UsedImplicitly]
-        public void Less(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsLess); }
+        public void LessGreater(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsNotEqual); }
         [UsedImplicitly]
-        public void Greater(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsGreater); }
+        public void Less(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLess); }
         [UsedImplicitly]
-        public void LessEqual(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsLessEqual); }
+        public void Greater(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreater); }
         [UsedImplicitly]
-        public void GreaterEqual(int leftBytes, int rightBytes) { Compare(leftBytes, rightBytes, DataHandler.IsGreaterEqual); }
+        public void LessEqual(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsLessEqual); }
+        [UsedImplicitly]
+        public void GreaterEqual(int sizeBytes, int leftBytes, int rightBytes) { Compare(sizeBytes, leftBytes, rightBytes, DataHandler.IsGreaterEqual); }
 
-        void Compare(int leftBytes, int rightBytes, Func<byte[], byte[], bool> operation)
+        void Compare(int sizeBytes, int leftBytes, int rightBytes, Func<byte[], byte[], bool> operation)
         {
             var right = Pull(rightBytes);
             var left = Pull(leftBytes);
-            Push((byte) (operation(left._data, right._data) ? -1 : 0));
+            var value = (byte) (operation(left._data, right._data) ? -1 : 0);
+            for(var i = 0; i < sizeBytes; i++)
+                Push(value);
         }
 
         [UsedImplicitly]
