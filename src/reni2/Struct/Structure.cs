@@ -29,7 +29,6 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -129,8 +128,8 @@ namespace Reni.Struct
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
 
-        internal TypeBase FunctionalFeature(FunctionSyntax syntax) { return new FunctionBodyType(this, syntax); }
-        
+        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) { return new FunctionBodyType(this, syntax); }
+
         TypeBase UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
         internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }
         FieldAccessType UniqueFieldAccessType(int position) { return _fieldAccessTypeCache.Find(position); }
@@ -160,7 +159,15 @@ namespace Reni.Struct
                 .ContextReferenceViaStructReference(this);
         }
 
-        internal Result DumpPrintResultViaContextReference(Category category) { return Result.ConcatPrintResult(category, EndPosition, position => DumpPrintResultViaAccessReference(category, position)); }
+        internal Result DumpPrintResultViaContextReference(Category category)
+        {
+            return Result
+                .ConcatPrintResult
+                (category
+                 , EndPosition
+                 , position => DumpPrintResultViaAccessReference(category, position)
+                );
+        }
 
         internal Result AccessViaThisReference(Category category, int position)
         {
@@ -204,10 +211,21 @@ namespace Reni.Struct
 
         Result DumpPrintResultViaAccessReference(Category category, int position)
         {
-            var accessType = UniqueAccessType(position);
-            return accessType
-                .GenericDumpPrintResult(category)
-                .ReplaceArg(AccessViaThisReference(category.Typed, position));
+            var trace = position == -1;
+            StartMethodDump(trace, category,position);
+            try
+            {
+                var accessType = UniqueAccessType(position);
+                var genericDumpPrintResult = accessType.GenericDumpPrintResult(category);
+                Dump("genericDumpPrintResult", genericDumpPrintResult); 
+                BreakExecution();
+                var accessViaThisReference = AccessViaThisReference(category.Typed, position);
+                return ReturnMethodDump(genericDumpPrintResult.ReplaceArg(accessViaThisReference));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Result ContextReferenceViaStructReference(Result result)

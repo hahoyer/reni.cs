@@ -36,6 +36,7 @@ namespace Reni.Feature.DumpPrint
         Defineable,
         ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, StructureType>,
         ISearchPath<ISuffixFeature, TypeType>,
+        ISearchPath<ISuffixFeature, FunctionBodyType>,
         ISearchPath<ISuffixFeature, Bit>,
         ISearchPath<ISuffixFeature, Type.Void>,
         ISearchPath<ISuffixFeature, StructureType>,
@@ -54,6 +55,7 @@ namespace Reni.Feature.DumpPrint
         ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType type) { return Extension.Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, TextItemType>.Convert(TextItemType type) { return Extension.Feature(type.DumpPrintTextResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, FunctionBodyType>.Convert(FunctionBodyType type) { return Extension.Feature(type.DumpPrintTextResult); }
 
         ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>.Convert(TextItemType type) { return _dumpPrintSequenceFeature; }
         ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }

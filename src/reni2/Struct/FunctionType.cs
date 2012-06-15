@@ -63,15 +63,17 @@ namespace Reni.Struct
 
         TypeBase ISetterTargetType.Type { get { return this; } }
         TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
-
         TypeBase IReference.TargetType { get { return ValueType; } }
         Result IReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
-
         Size IContextReference.Size { get { return Size; } }
-
-        RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
+        IConverter ISearchContainerType.Converter { get { return this; } }
+        TypeBase ISearchContainerType.Target { get { return ValueType; } }
 
         internal TypeBase ValueType { get { return _getter.ReturnType; } }
+        [DisableDump]
+        internal override bool IsDataLess { get { return CodeArgs.IsNone && ArgsType.IsDataLess; } }
+        [DisableDump]
+        internal override Structure FindRecentStructure { get { return _structure; } }
 
         [Node]
         [DisableDump]
@@ -96,12 +98,9 @@ namespace Reni.Struct
             }
         }
 
-        [DisableDump]
-        internal override bool IsDataLess { get { return CodeArgs.IsNone && ArgsType.IsDataLess; } }
-
         Result ISetterTargetType.Result(Category category) { return _setter.CallResult(category); }
-
         Result ISetterTargetType.DestinationResult(Category category) { return Result(category, this); }
+        Result IConverter.Result(Category category) { return _getter.CallResult(category); }
 
         protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
 
@@ -159,9 +158,6 @@ namespace Reni.Struct
             if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
-        IConverter ISearchContainerType.Converter { get { return this; } }
-        TypeBase ISearchContainerType.Target { get { return ValueType; } }
-        Result IConverter.Result(Category category) { return _getter.CallResult(category); }
     }
 
     sealed class CodeBasePair : ReniObject

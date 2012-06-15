@@ -25,14 +25,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
-using Reni.Code;
-using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionBodyType : TypeBase, IFunctionFeature, IContextReference
+    sealed class FunctionBodyType : TypeBase
     {
         [EnableDump]
         readonly Structure _structure;
@@ -48,40 +46,10 @@ namespace Reni.Struct
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _structure; } }
         [DisableDump]
-        internal override bool IsLambda { get { return true; } }
+        internal override bool IsDataLess { get { return true; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return _structure.IsDataLess; } }
-
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => ValueType);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
-
-        TypeBase ValueType
-        {
-            get
-            {
-                if(!_syntax.IsImplicit)
-                    return null;
-                return ApplyResult(Category.Type, null).Type;
-            }
-        }
-
-        Size IContextReference.Size { get { return _structure.RefAlignParam.RefSize; } }
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
-
-        protected override Size GetSize() { return _structure.RefAlignParam.RefSize; }
-
-        [DisableDump]
-        bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
-        [DisableDump]
-        IContextReference IFunctionFeature.ObjectReference { get { return this; } }
-
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }
-
-        Result ApplyResult(Category category, TypeBase argsType) { return Function(argsType).ApplyResult(category); }
-        FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
+        internal Result DumpPrintTextResult(Category category) { return DumpPrintTypeNameResult(category); }
     }
 }

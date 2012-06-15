@@ -79,8 +79,11 @@ namespace Reni.Feature.DumpPrint
         ISimpleFeature IFeature.Simple { get { return this; } }
     }
 
-    sealed class StructReferenceFeature : ReniObject, ISearchPath<ISuffixFeature, AutomaticReferenceType>,
-                                          ISuffixFeature, ISimpleFeature
+    sealed class StructReferenceFeature
+        : ReniObject
+          , ISearchPath<ISuffixFeature, AutomaticReferenceType>
+          , ISuffixFeature
+          , ISimpleFeature
     {
         [EnableDump]
         readonly StructureType _structureType;

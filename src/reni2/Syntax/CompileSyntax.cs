@@ -38,7 +38,7 @@ using Reni.Type;
 
 namespace Reni.Syntax
 {
-    abstract class CompileSyntax : ReniParser.ParsedSyntax
+    abstract class CompileSyntax : ParsedSyntax
     {
         // Used for debug only
         [DisableDump]
@@ -75,8 +75,8 @@ namespace Reni.Syntax
         }
 
         protected virtual bool GetIsLambda() { return false; }
-        internal override ReniParser.ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ReniParser.ParsedSyntax right) { return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull()); }
-        internal override ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData token, TokenData rightToken) { return this; }
+        internal override ParsedSyntax CreateSyntaxOrDeclaration(Defineable tokenClass, TokenData token, ParsedSyntax right) { return new ExpressionSyntax(tokenClass, this, token, right.ToCompiledSyntaxOrNull()); }
+        internal override ParsedSyntax SurroundedByParenthesis(TokenData token, TokenData rightToken) { return this; }
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
@@ -122,15 +122,15 @@ namespace Reni.Syntax
         internal bool IsDataLessStructureElement(ContextBase context)
         {
             var result = IsDataLess;
-            if (result != null)
+            if(result != null)
                 return result.Value;
 
             result = context.QuickIsDataLess(this);
-            if (result != null)
+            if(result != null)
                 return result.Value;
 
             var type = FindResult(context, Category.Type).Type;
-            if (type != null)
+            if(type != null)
                 return type.IsDataLess;
 
             return Type(context).IsDataLess;

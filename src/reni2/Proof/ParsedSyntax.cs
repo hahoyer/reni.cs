@@ -28,7 +28,7 @@ using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    abstract class ParsedSyntax : Parser.ParsedSyntax, IComparable<ParsedSyntax>
+    abstract class ParsedSyntax : Parser.ParsedSyntaxBase, IComparable<ParsedSyntax>
     {
         protected ParsedSyntax(TokenData token)
             : base(token) { }

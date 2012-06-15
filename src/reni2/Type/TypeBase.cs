@@ -51,6 +51,7 @@ namespace Reni.Type
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
             public readonly SimpleCache<IReference> References;
             public readonly SimpleCache<TypeType> TypeType;
+            public readonly SimpleCache<FunctionInstanceType> FunctionInstanceType;
             public readonly SimpleCache<TextItemType> TextItem;
             public readonly SimpleCache<EnableCut> EnableCut;
 
@@ -62,6 +63,7 @@ namespace Reni.Type
                 Sequences = new DictionaryEx<int, SequenceType>(elementCount => new SequenceType(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(parent.ObtainArray);
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
+                FunctionInstanceType = new SimpleCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
                 TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent));
             }
@@ -255,6 +257,8 @@ namespace Reni.Type
 
         [DisableDump]
         internal TypeType UniqueTypeType { get { return _cache.TypeType.Value; } }
+        [DisableDump]
+        internal TypeBase UniqueFunctionInstanceType { get { return _cache.FunctionInstanceType.Value; } }
 
         [DisableDump]
         internal virtual Structure FindRecentStructure
@@ -335,7 +339,7 @@ namespace Reni.Type
         internal Result OperationResult<TFeature>(Category category, ISearchTarget target)
             where TFeature : class, IFeature
         {
-            var trace = ObjectId == 10 && target.GetObjectId() == 34 && category.HasCode;
+            var trace = ObjectId == -15 && target.GetObjectId() == 40 && category.HasCode;
             StartMethodDump(trace, category, target);
             try
             {
@@ -346,7 +350,7 @@ namespace Reni.Type
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
                 var result = feature.Result(category);
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result);
             }
             finally
             {
@@ -387,7 +391,7 @@ namespace Reni.Type
                 return destination.Result(category);
 
             var smartConversionResult = ArgResult(category.Typed).SmartConversionResult(destination);
-            if (smartConversionResult != null)
+            if(smartConversionResult != null)
                 return smartConversionResult;
 
             var searchResult = Converter(destination);
@@ -462,6 +466,16 @@ namespace Reni.Type
 
             NotImplementedMethod(destination);
             return null;
+        }
+
+        internal Result DumpPrintTypeNameResult(Category category)
+        {
+            return Void
+                .Result
+                (category
+                 , () => CodeBase.DumpPrintText(DumpPrintText)
+                 , CodeArgs.Void
+                );
         }
     }
 

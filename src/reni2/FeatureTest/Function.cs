@@ -32,8 +32,9 @@ using Reni.FeatureTest.ThenElse;
 
 namespace Reni.FeatureTest.Function
 {
+    [LowPriority]
     [TestFixture]
-    [TargetSet(@"a:(x: 100;f: arg+x/\); a f ^ dump_print;", @"(100, (arg)+(x)/\)")]
+    [TargetSet(@"a:(x: 100;f: arg+x/\); a f(1) function_instance ^ dump_print;", @"(100, (arg)+(x)/\)")]
     [SomeVariables]
     [Add2Numbers]
     [AccessMember]
@@ -209,8 +210,6 @@ namespace Reni.FeatureTest.Function
     [TestFixture]
     [Target(@"f: arg/\;g: f(arg)/\;x:4; g(x)dump_print")]
     [Output("4")]
-    [UseThen]
-    [UseElse]
     [SimpleFunction]
     public sealed class FunctionWithRefArg : CompilerTest
     {

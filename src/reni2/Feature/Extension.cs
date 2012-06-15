@@ -52,13 +52,12 @@ namespace Reni.Feature
             if(feature.MetaFunction != null)
                 return;
 
-            if(hasArg)
-                if(feature.Function != null)
-                {
-                    if(!feature.Function.IsImplicit)
-                        return;
-                    Tracer.AssertionFailed("!feature.Function.IsImplicit", feature.Dump);
-                }
+            if(hasArg && feature.Function != null)
+            {
+                if(!feature.Function.IsImplicit)
+                    return;
+                Tracer.AssertionFailed("!feature.Function.IsImplicit", feature.Dump);
+            }
 
             if(feature.Function != null)
             {

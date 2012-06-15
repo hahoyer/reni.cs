@@ -71,6 +71,12 @@ namespace Reni.Feature
         /// <param name="argsType"> </param>
         /// <returns> </returns>
         Result ApplyResult(Category category, TypeBase argsType);
+        /// <summary>
+        /// Gets a value indicating whether this function requires implicit call (i. e. call without argument list). 
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is implicit; otherwise, <c>false</c>.
+        /// </value>
         [DisableDump]
         bool IsImplicit { get; }
         [DisableDump]

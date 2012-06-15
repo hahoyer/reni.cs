@@ -24,8 +24,12 @@ using HWClassLibrary.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Reni.Basics;
+using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
+using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
@@ -39,15 +43,24 @@ namespace Reni.TokenClasses
             _isMetaFunction = isMetaFunction;
         }
 
-        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             return new FunctionSyntax
                 (token
                  , left.ToCompiledSyntaxOrNull()
                  , _isImplicit
-                 , _isMetaFunction 
+                 , _isMetaFunction
                  , right.ToCompiledSyntaxOrNull()
                 );
+        }
+    }
+
+    sealed class FunctionInstanceToken : Suffix
+    {
+        public override Result Result(ContextBase context, Category category, CompileSyntax left)
+        {
+            var leftResult = left.Result(context, category.Typed);
+            return leftResult.Type.UniqueFunctionInstanceType.Result(category, leftResult);
         }
     }
 }

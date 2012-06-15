@@ -10,7 +10,7 @@ using Reni.TokenClasses;
 namespace Reni.ReniParser
 {
     [Serializable]
-    internal abstract class ParsedSyntax : Parser.ParsedSyntax
+    internal abstract class ParsedSyntax : Parser.ParsedSyntaxBase
     {
         protected ParsedSyntax(TokenData token)
             : base(token) { }

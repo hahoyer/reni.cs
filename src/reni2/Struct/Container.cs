@@ -118,7 +118,7 @@ namespace Reni.Struct
                     _converters.Add(_list.Count);
                 }
 
-                _list.Add(((ReniParser.ParsedSyntax) parsedSyntax).ToCompiledSyntax());
+                _list.Add(((ParsedSyntax) parsedSyntax).ToCompiledSyntax());
             }
 
             public Container ToContainer(TokenData leftToken, TokenData rightToken) { return new Container(leftToken, rightToken, _list.ToArray(), _dictionary, _converters.ToArray()); }
@@ -133,14 +133,14 @@ namespace Reni.Struct
             return result.ToContainer(leftToken, rightToken);
         }
 
-        internal static Container Create(TokenData leftToken, TokenData rightToken, ReniParser.ParsedSyntax parsedSyntax)
+        internal static Container Create(TokenData leftToken, TokenData rightToken, ParsedSyntax parsedSyntax)
         {
             var result = new PreContainer();
             result.Add(parsedSyntax);
             return result.ToContainer(leftToken, rightToken);
         }
 
-        internal static Container Create(ReniParser.ParsedSyntax parsedSyntax) { return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax); }
+        internal static Container Create(ParsedSyntax parsedSyntax) { return Create(parsedSyntax.FirstToken, parsedSyntax.LastToken, parsedSyntax); }
 
         public override string DumpData()
         {
@@ -200,7 +200,7 @@ namespace Reni.Struct
 
         Result Result(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = ObjectId == -1 && accessPosition == 1 && position == 1;
+            var trace = new[] {1, 2}.Contains(ObjectId) && accessPosition == 1 && position == 1;
             StartMethodDump(trace, category, parent, accessPosition, position);
             try
             {
@@ -211,7 +211,7 @@ namespace Reni.Struct
                 var result = Statements[position]
                     .Result(uniqueChildContext, category.Typed);
                 Dump("result", result);
-                return ReturnMethodDump(result.AutomaticDereferenceResult(), true);
+                return ReturnMethodDump(result.AutomaticDereferenceResult());
             }
             finally
             {

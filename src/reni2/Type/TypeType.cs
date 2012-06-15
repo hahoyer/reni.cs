@@ -57,15 +57,8 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal Result DumpPrintResult(Category category)
-        {
-            return Void
-                .Result
-                (category
-                 , () => CodeBase.DumpPrintText(_value.DumpPrintText)
-                 , CodeArgs.Void
-                );
-        }
+        internal Result DumpPrintResult(Category category) { return _value.DumpPrintTypeNameResult(category); }
+        
         internal Result Repeat(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             var count = right

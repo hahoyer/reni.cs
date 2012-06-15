@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -35,7 +38,7 @@ namespace Reni.TokenClasses
 
     abstract class Terminal : Special, ITerminal
     {
-        protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             left.AssertIsNull();
             right.AssertIsNull();
@@ -47,7 +50,7 @@ namespace Reni.TokenClasses
 
     abstract class NonPrefix : Special, ITerminal, ISuffix
     {
-        protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             right.AssertIsNull();
             if(left == null)
@@ -64,7 +67,7 @@ namespace Reni.TokenClasses
     {
         public abstract Result Result(ContextBase context, Category category, CompileSyntax right);
 
-        protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             left.AssertIsNull();
             return new PrefixSyntax(token, this, right.CheckedToCompiledSyntax());
@@ -76,7 +79,7 @@ namespace Reni.TokenClasses
     {
         public abstract Result Result(ContextBase context, Category category, CompileSyntax right);
 
-        protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             right.AssertIsNull();
             return new SuffixSyntax(token, left.CheckedToCompiledSyntax(), this);
@@ -87,6 +90,6 @@ namespace Reni.TokenClasses
     abstract class Infix : Special, IInfix
     {
         public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
-        protected override sealed ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new InfixSyntax(token, left.CheckedToCompiledSyntax(), this, right.CheckedToCompiledSyntax()); }
+        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right) { return new InfixSyntax(token, left.CheckedToCompiledSyntax(), this, right.CheckedToCompiledSyntax()); }
     }
 }

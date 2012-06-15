@@ -65,11 +65,12 @@ namespace Reni.TokenClasses
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var s = context.FindRecentStructure;
-            NotImplementedMethod(context, category);
-            return null;
+            return context
+                .FindRecentStructure
+                .UniqueFunctionalType(this)
+                .Result(category);
         }
-        
+
         protected override bool GetIsLambda() { return true; }
 
         internal override string DumpPrintText

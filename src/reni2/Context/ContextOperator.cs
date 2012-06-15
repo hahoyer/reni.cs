@@ -22,6 +22,7 @@ using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Parser;
+using Reni.Struct;
 using Reni.Syntax;
 using Reni.TokenClasses;
 
@@ -38,23 +39,24 @@ namespace Reni.Context
 
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
-            StartMethodDump(false, context);
+            StartMethodDump(false, context,category,left);
             try
             {
                 BreakExecution();
-                var leftResult = left.Result(context, category.Typed);
+                var leftResult = left.Type(context);
                 Dump("leftResult", leftResult);
                 BreakExecution();
-                var structureType = leftResult.Type.FindRecentStructure;
-                Dump("structureType", structureType);
+                
+                var structure = leftResult.FindRecentStructure;
+                Dump("structure", structure);
                 BreakExecution();
-                if (structureType.IsDataLess)
+                if (structure.IsDataLess)
                 {
                     NotImplementedMethod(context,category,left);
                     return null;
 
                 }
-                var result = structureType.ReferenceType.Result(category, leftResult);
+                var result = structure.ReferenceType.Result(category, structure.ContainerContextObject);
                 return ReturnMethodDump(result, true);
             }
             finally
