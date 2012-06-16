@@ -76,6 +76,7 @@ namespace Reni
         internal ContextSearchResult(IContextFeature feature, IConversionFunction[] conversionFunctions)
             : base(feature, conversionFunctions) { }
 
+        [DisableDump]
         protected override TypeBase DefiningType { get { return null; } }
     }
 }

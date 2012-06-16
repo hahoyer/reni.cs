@@ -401,7 +401,11 @@ namespace Reni.Type
                 return smartConversionResult;
 
             var searchResult = Converter(destination);
-            if(searchResult == null)
+            if(searchResult == null && Reference != null)
+                searchResult = Reference.TargetType.Converter(destination);
+            if (searchResult == null && destination.Reference != null)
+                searchResult = Converter(destination.Reference.TargetType);
+            if (searchResult == null)
             {
                 NotImplementedMethod(category, destination);
                 return null;
@@ -447,7 +451,7 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result DereferenceReferenceResult(Category category)
+        Result DereferenceReferenceResult(Category category)
         {
             return UniqueReference
                 .Type()
@@ -485,7 +489,12 @@ namespace Reni.Type
         }
 
         ISuffixFeature ISearchPath<ISuffixFeature, Aligner>.Convert(Aligner type) { return type.UnAlignConversion(this); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type == this ? Extension.Feature(DereferenceReferenceResult) : null; }
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type)
+        {
+            if(type == this)
+                return Extension.Feature(DereferenceReferenceResult);
+            return null;
+        }
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature

@@ -37,7 +37,7 @@ namespace Reni
 
         internal TypeSearchResult(IFeature feature, IConversionFunction[] conversionFunctions, TypeBase type)
             : base(feature, conversionFunctions) { _type = type; }
-
+        [DisableDump]
         protected override TypeBase DefiningType { get { return _type; } }
     }
 }

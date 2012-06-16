@@ -38,5 +38,12 @@ namespace Reni
 
         // will throw an exception if not a ReniObject
         internal static int GetObjectId(this object reniObject) { return ((ReniObject) reniObject).ObjectId; }
+        // will throw an exception if not a ReniObject
+        internal static int? GetObjectId<T>(this object reniObject)
+        {
+            if(reniObject is T)
+                return ((ReniObject)reniObject).ObjectId;
+            return null;
+        }
     }
 }

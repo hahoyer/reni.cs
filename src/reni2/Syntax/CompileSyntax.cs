@@ -136,9 +136,16 @@ namespace Reni.Syntax
             return Type(context).IsDataLess;
         }
 
-        internal Result SmartLocalReferenceResult(ContextBase context, Category category)
+        internal Result SmartReferenceResult(ContextBase context, Category category)
         {
             return Result(context, category.Typed)
+                .SmartLocalReferenceResult();
+        }
+        
+        internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)
+        {
+            return Result(context, category.Typed)
+                .SmartUn<Struct.FunctionType>()
                 .SmartLocalReferenceResult();
         }
     }

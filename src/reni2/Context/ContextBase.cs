@@ -83,7 +83,7 @@ namespace Reni.Context
 
         internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search(); }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache.Find(syntax);
@@ -98,14 +98,14 @@ namespace Reni.Context
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -44 && ObjectId == 1 && category.HasCode;
+            var trace = syntax.ObjectId == -88 && ObjectId == 3 && category.HasCode;
             StartMethodDump(trace, category, syntax);
             try
             {
                 BreakExecution();
                 var result = syntax.ObtainResult(this, category.Replenished);
                 Tracer.Assert(category <= result.CompleteCategory);
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result);
             }
             finally
             {
@@ -217,7 +217,7 @@ namespace Reni.Context
 
         Result FunctionResult(Category category, TypeBase objectType, IFeature feature, CompileSyntax right)
         {
-            var trace = feature.GetObjectId() == -1 && category.HasCode;
+            var trace = feature.GetObjectId<Sequence.FunctionFeature>() == -10 && category.HasType;
             StartMethodDump(trace, category, objectType, feature, right);
             try
             {
@@ -228,9 +228,10 @@ namespace Reni.Context
                 var rightResult
                     = right == null
                           ? TypeBase.Void.Result(category.Typed)
-                          : right.SmartLocalReferenceResult(this, category);
+                          : right.SmartUnFunctionedReferenceResult(this, category);
                 Dump("rightResult", rightResult);
 
+                BreakExecution();
                 var applyResult = function.ApplyResult(category, rightResult.Type);
                 Dump("applyResult", applyResult);
                 BreakExecution();
@@ -249,7 +250,7 @@ namespace Reni.Context
 
         internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
         {
-            var trace = feature.GetObjectId() == -663 && category.HasCode;
+            var trace = feature.GetObjectId<Sequence.FunctionFeature>() == -1  && category.HasType;
             StartMethodDump(trace, category, left, leftType, feature, converterResult, right);
             try
             {
@@ -259,9 +260,10 @@ namespace Reni.Context
                 if(metaFeature != null)
                     return ReturnMethodDump(metaFeature.ApplyResult(this, category, left, right));
 
-                var leftResult = left != null ? left.SmartLocalReferenceResult(this, category) : null;
+                var leftResult = left != null ? left.SmartReferenceResult(this, category) : null;
                 Dump("leftResult", leftResult);
 
+                BreakExecution();
                 var functionResult = FunctionResult(category, leftType, feature, right);
                 Dump("functionResult", functionResult);
                 if(trace)

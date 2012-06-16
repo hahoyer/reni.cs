@@ -31,7 +31,11 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class AutomaticReferenceType : TypeBase, ISearchContainerType, IConverter, IHardReference
+    sealed class AutomaticReferenceType 
+        : TypeBase
+        , ISearchContainerType
+        , IConverter
+        , IHardReference
     {
         readonly TypeBase _valueType;
 

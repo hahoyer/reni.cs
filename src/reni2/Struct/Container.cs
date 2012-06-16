@@ -200,7 +200,7 @@ namespace Reni.Struct
 
         Result Result(Category category, ContextBase parent, int accessPosition, int position)
         {
-            var trace = new[] {1, 2}.Contains(ObjectId) && accessPosition == 1 && position == 1;
+            var trace = new[] {-1}.Contains(ObjectId) && accessPosition == 1 && position == 1;
             StartMethodDump(trace, category, parent, accessPosition, position);
             try
             {

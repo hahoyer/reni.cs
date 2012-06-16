@@ -59,6 +59,7 @@ namespace Reni.Type
             return result;
         }
 
+        [DisableDump]
         protected abstract TypeBase DefiningType { get; }
 
         TypeBase LeftType
