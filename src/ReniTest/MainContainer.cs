@@ -41,7 +41,7 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //if(false)
+            if(false)
 #pragma warning disable 162
                 ExecTest();
 #pragma warning restore 162
@@ -49,7 +49,7 @@ namespace ReniTest
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
-            //new PrimitiveRecursiveFunctionByteWithDump().Run();
+            //new PrimitiveRecursiveFunctionWithDump().Run();
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
             //Reni.Proof.Main.Run();

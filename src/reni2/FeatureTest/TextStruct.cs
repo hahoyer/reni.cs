@@ -64,7 +64,7 @@ Text:
     [Integer1]
     [TwoFunctions]
     [FromTypeAndFunction]
-    [PrimitiveRecursiveFunctionByteWithDump]
+    [LowPriority]
     public sealed class Text1 : TextStruct
     {
         [Test]

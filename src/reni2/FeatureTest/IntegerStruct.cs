@@ -107,7 +107,6 @@ Integer8:
     [SimpleFunctionWithNonLocal]
     [ObjectProperty]
     [Output("1")]
-    [LowPriority]
     [InstanceCode("Integer8(1)")]
     public sealed class Integer1 : IntegerStruct
     {

@@ -54,12 +54,6 @@ namespace Reni.Struct
                 .AccessViaThisReference(category, _position);
         }
 
-        Result Result(Category category)
-        {
-            return _structure
-                .AccessViaContextReference(category, _position);
-        }
-
         CompileSyntax Statement
         {
             get

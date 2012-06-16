@@ -33,17 +33,13 @@ using Reni.Type;
 
 namespace Reni.Context
 {
-    /// <summary>
-    ///     List of functions
-    /// </summary>
-    [Serializable]
     sealed class FunctionList : ReniObject
     {
         [Node]
         readonly DictionaryEx<FunctionSyntax, DictionaryEx<Structure, DictionaryEx<TypeBase, int>>> _dictionary;
 
         [Node]
-        readonly List<Struct.FunctionType> _list = new List<Struct.FunctionType>();
+        readonly List<FunctionType> _list = new List<FunctionType>();
 
         public FunctionList()
         {
@@ -53,11 +49,11 @@ namespace Reni.Context
                                                  (-1, args => CreateFunctionInstance(args, syntax, structure))));
         }
 
-        internal Struct.FunctionType this[int i] { get { return _list[i]; } }
+        internal FunctionType this[int i] { get { return _list[i]; } }
         internal int Count { get { return _list.Count; } }
         internal CodeBasePair[] Code { get { return _list.Select(t => t.BodyCode).ToArray(); } }
 
-        internal Struct.FunctionType Find(FunctionSyntax syntax, Structure structure, TypeBase argsType)
+        internal FunctionType Find(FunctionSyntax syntax, Structure structure, TypeBase argsType)
         {
             var index = _dictionary.Find(syntax).Find(structure).Find(argsType);
             return _list[index];
@@ -68,7 +64,7 @@ namespace Reni.Context
         int CreateFunctionInstance(TypeBase args, FunctionSyntax syntax, Structure structure)
         {
             var index = _list.Count;
-            var f = new Struct.FunctionType(index, syntax, structure, args);
+            var f = new FunctionType(index, syntax, structure, args);
             _list.Add(f);
             return index;
         }
