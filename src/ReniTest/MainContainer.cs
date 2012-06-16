@@ -29,6 +29,7 @@ using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
 using Reni.FeatureTest.DefaultOperations;
+using Reni.FeatureTest.Function;
 using Reni.Runtime;
 
 namespace ReniTest
@@ -45,8 +46,10 @@ namespace ReniTest
                 ExecTest();
 #pragma warning restore 162
 
+
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
+            //new PrimitiveRecursiveFunctionByteWithDump().Run();
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
             //Reni.Proof.Main.Run();

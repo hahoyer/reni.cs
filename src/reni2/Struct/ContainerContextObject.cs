@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
@@ -40,7 +43,6 @@ namespace Reni.Struct
             _container = container;
             _parent = parent;
         }
-
 
         Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
 

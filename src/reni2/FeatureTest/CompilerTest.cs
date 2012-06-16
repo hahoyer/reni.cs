@@ -61,7 +61,7 @@ namespace Reni.FeatureTest
         void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
             Tracer.FlaggedLine(depth + 1, FilePositionTag.Test, "Position of method tested");
-            if(TestRunner.IsModeErrorFocus || IsCallerUnderConstruction(1))
+            if(TestRunner.IsModeErrorFocus)
                 Parameters.Trace.All();
 
             //Parameters.RunFromCode = true;
@@ -89,20 +89,6 @@ namespace Reni.FeatureTest
             Tracer.ThrowAssertionFailed(
                 "outStream.Data != expectedOutput",
                 () => "outStream.Data:" + outStream.Data + " expected: " + expectedOutput);
-        }
-
-        static bool IsCallerUnderConstruction(int depth)
-        {
-            for(var i = 0; i < 100; i++)
-            {
-                var stackFrame = new StackTrace(true).GetFrame(depth + i);
-                if(stackFrame == null)
-                    return false;
-                var x = stackFrame.GetMethod();
-                if(x.GetCustomAttributes(typeof(IsUnderConstructionAttribute), true).Length > 0)
-                    return true;
-            }
-            return false;
         }
 
         void RunDependant()

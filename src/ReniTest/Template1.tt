@@ -4,5 +4,4 @@
 <#@ Assembly Name="$(TargetDir)HWClassLibrary.dll" #>
 <#@ Assembly Name="$(TargetDir)Reni.dll" #>
 <#@ import namespace="global::Reni" #>// <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") #> 
-<#= new T4Compiler(@"f: arg/\;f(2) dump_print;", "other").Code() #>     
-<#= new T4Compiler(@"x: 100; f: x/\;f() dump_print;").Code() #>     
+<#= new T4Compiler(@"i: 10; f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()").Code() #>     
