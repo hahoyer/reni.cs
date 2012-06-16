@@ -161,6 +161,7 @@ namespace Reni.Code
         void IVisitor.ReferenceCode(IContextReference context) { NotImplementedMethod(context); }
         void IVisitor.LocalVariableDefinition(string holderName, Size valueSize) { NotImplementedMethod(holderName, valueSize); }
         void IVisitor.TopFrameRef(Size offset) { NotImplementedMethod(offset); }
+        void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) { NotImplementedMethod(leftSize, itemSize); }
 
         IFormalValue CreateValuesInFrame(Size size, Size offset)

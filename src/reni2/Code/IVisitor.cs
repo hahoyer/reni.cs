@@ -56,5 +56,6 @@ namespace Reni.Code
         void TopFrameData(Size offset, Size size, Size dataSize);
         void TopRef(Size offset);
         void TopFrameRef(Size offset);
+        void RecursiveCallCandidate();
     }
 }

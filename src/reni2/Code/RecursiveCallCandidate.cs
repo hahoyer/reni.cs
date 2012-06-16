@@ -37,12 +37,12 @@ namespace Reni.Code
 
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        internal override void Visit(IVisitor visitor) { throw new NotImplementedException(); }
+        internal override void Visit(IVisitor visitor) { visitor.RecursiveCallCandidate();  }
 
         internal override CodeBase TryToCombineBack(TopFrameData precedingElement)
         {
             if((DeltaSize + precedingElement.Size).IsZero
-               && (precedingElement.Offset + _refsSize).IsZero)
+               && precedingElement.Offset.IsZero)
                 return new RecursiveCall();
             return base.TryToCombineBack(precedingElement);
         }

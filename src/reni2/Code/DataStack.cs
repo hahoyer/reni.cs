@@ -106,6 +106,7 @@ namespace Reni.Code
 
         void IVisitor.TopRef(Size offset) { Push(_localData.Address(offset)); }
         void IVisitor.TopFrameRef(Size offset) { Push(_localData.FrameAddress(offset)); }
+        void IVisitor.RecursiveCallCandidate() { throw new NotImplementedException(); }
 
         void IVisitor.TopFrameData(Size offset, Size size, Size dataSize)
         {

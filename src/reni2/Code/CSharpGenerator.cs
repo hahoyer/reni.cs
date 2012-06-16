@@ -83,6 +83,7 @@ namespace Reni.Code
         void IVisitor.PrintText(Size leftSize, Size itemSize) { AddCode("data.Pull({0}).PrintText({1})", leftSize.SaveByteCount, itemSize.SaveByteCount); }
         void IVisitor.RecursiveCall() { AddCode("goto Start"); }
         void IVisitor.ReferenceCode(IContextReference context) { throw new UnexpectedContextReference(context); }
+        void IVisitor.RecursiveCallCandidate() { throw new UnexpectedRecursiveCallCandidate(); }
 
         void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
         {
@@ -213,4 +214,5 @@ namespace Reni.Code
             return generator.Data;
         }
     }
+
 }
