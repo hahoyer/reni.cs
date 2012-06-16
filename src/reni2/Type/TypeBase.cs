@@ -470,7 +470,6 @@ namespace Reni.Type
             if(childConverter != null)
                 return new AlignConverter(childConverter);
 
-            NotImplementedMethod(destination);
             return null;
         }
 
