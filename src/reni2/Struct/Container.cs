@@ -179,6 +179,8 @@ namespace Reni.Struct
 
         internal StructurePosition Find(string name)
         {
+            if(name == null)
+                return null;
             if(!Dictionary.ContainsKey(name))
                 return null;
 
@@ -209,7 +211,8 @@ namespace Reni.Struct
                 Dump("Statements[position]", Statements[position]);
                 BreakExecution();
                 var result = Statements[position]
-                    .Result(uniqueChildContext, category.Typed);
+                    .Result(uniqueChildContext, category.Typed)
+                    .SmartUn<FunctionType>();
                 Dump("result", result);
                 return ReturnMethodDump(result.AutomaticDereferenceResult());
             }
@@ -230,7 +233,7 @@ namespace Reni.Struct
 
         internal bool ObtainIsDataLess(ContextBase parent, int accessPosition)
         {
-            var trace = ObjectId == -10 && accessPosition == 1 && parent.ObjectId == 1;
+            var trace = ObjectId == -10 && accessPosition == 3 && parent.ObjectId == 4;
             StartMethodDump(trace, parent, accessPosition);
             try
             {
@@ -300,6 +303,16 @@ namespace Reni.Struct
             {
                 EndMethodDump();
             }
+        }
+
+        internal string[] DataIndexList(ContextBase parent)
+        {
+            return Statements
+                .Length
+                .Array(i => i)
+                .Where(i => !InternalInnerIsDataLess(parent, i))
+                .Select(i=> i.ToString() + "="+ InnerResult(Category.Size,parent,i).Size.ToString())
+                .ToArray();
         }
     }
 

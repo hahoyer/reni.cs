@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Feature;
 
 namespace Reni.Type
 {
@@ -37,6 +38,7 @@ namespace Reni.Type
             if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
+        protected override ISuffixFeature Convert(TypeBase sourceType) { return sourceType.IsDataLess ? Extension.Feature(c => Result(c, sourceType.ArgResult)) : null; }
         protected override TypeBase ReversePair(TypeBase first) { return first; }
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }

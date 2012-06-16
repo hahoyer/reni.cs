@@ -123,14 +123,7 @@ namespace Reni.Type
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
-        string ISearchTarget.StructFeatureName
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        string ISearchTarget.StructFeatureName { get { return null; } }
 
         [DisableDump]
         internal virtual string DumpPrintText
@@ -238,15 +231,7 @@ namespace Reni.Type
                 );
         }
 
-        internal static TypeBase CommonType(TypeBase thenType, TypeBase elseType)
-        {
-            if(thenType.IsConvertable(elseType))
-                return elseType;
-            if(elseType.IsConvertable(thenType))
-                return thenType;
-            thenType.NotImplementedMethod(elseType);
-            return null;
-        }
+        internal TypeBase CommonType(TypeBase elseType) { return elseType.IsConvertable(this) ? this : elseType; }
 
         Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
 
@@ -400,12 +385,8 @@ namespace Reni.Type
             if(smartConversionResult != null)
                 return smartConversionResult;
 
-            var searchResult = Converter(destination);
-            if(searchResult == null && Reference != null)
-                searchResult = Reference.TargetType.Converter(destination);
-            if (searchResult == null && destination.Reference != null)
-                searchResult = Converter(destination.Reference.TargetType);
-            if (searchResult == null)
+            var searchResult = SmartConverter(destination);
+            if(searchResult == null)
             {
                 NotImplementedMethod(category, destination);
                 return null;
@@ -415,6 +396,21 @@ namespace Reni.Type
             var result = rawResult.ReplaceArg(ArgResult);
             return result.PostConversionResult(destination) & category;
         }
+        SearchResult SmartConverter(TypeBase destination)
+        {
+            var searchResult = Converter(destination);
+            if(searchResult != null)
+                return searchResult;
+
+            if(Reference != null)
+                searchResult = Reference.TargetType.Converter(destination);
+            if(searchResult != null)
+                return searchResult;
+
+            if(destination.Reference != null)
+                searchResult = Converter(destination.Reference.TargetType);
+            return searchResult;
+        }
 
         internal SearchResult Converter(TypeBase destination)
         {
@@ -422,7 +418,7 @@ namespace Reni.Type
                 Search<ISuffixFeature>(destination.ConversionProvider);
         }
 
-        bool IsConvertable(TypeBase destination) { return Converter(destination) != null; }
+        bool IsConvertable(TypeBase destination) { return SmartConverter(destination) != null; }
 
         internal virtual Result DumpPrintTextResultFromSequence(Category category, int count)
         {
@@ -489,12 +485,18 @@ namespace Reni.Type
         }
 
         ISuffixFeature ISearchPath<ISuffixFeature, Aligner>.Convert(Aligner type) { return type.UnAlignConversion(this); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type)
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return Convert(type); }
+
+        protected virtual ISuffixFeature Convert(TypeBase type)
         {
             if(type == this)
                 return Extension.Feature(DereferenceReferenceResult);
+
             return null;
         }
+
+        internal TypeBase SmartUn<T>()
+            where T : IConverter { return this is T ? ((IConverter) this).Result(Category.Type).Type : this; }
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature

@@ -131,9 +131,9 @@ namespace Reni.Syntax
 
             var type = FindResult(context, Category.Type).Type;
             if(type != null)
-                return type.IsDataLess;
+                return type.SmartUn<Struct.FunctionType>().IsDataLess;
 
-            return Type(context).IsDataLess;
+            return Type(context).SmartUn<Struct.FunctionType>().IsDataLess;
         }
 
         internal Result SmartReferenceResult(ContextBase context, Category category)

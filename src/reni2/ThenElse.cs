@@ -117,7 +117,7 @@ namespace Reni
             var elseResult = ElseResult(context, category);
             var result = new Result
                 (category
-                 , getType: () => TypeBase.CommonType(thenResult.Type, elseResult.Type)
+                 , getType: () => thenResult.Type.CommonType(elseResult.Type)
                  , getArgs: () => thenResult.CodeArgs + elseResult.CodeArgs
                 );
             return result;
