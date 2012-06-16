@@ -251,7 +251,6 @@
     <Compile Include="Sequence\FunctionFeature.cs" />
     <Compile Include="Type\FieldAccessType.cs" />
     <Compile Include="Type\FunctionalFeature.cs" />
-    <Compile Include="Type\FunctionFeature.cs" />
     <Compile Include="Type\FunctionInstanceType.cs" />
     <Compile Include="Type\IFunctionFeature.cs" />
     <Compile Include="CodeArgs.cs" />

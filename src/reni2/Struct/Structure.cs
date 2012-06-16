@@ -47,10 +47,13 @@ namespace Reni.Struct
         readonly DictionaryEx<int, AccessFeature> _accessFeaturesCache;
         [Node]
         readonly DictionaryEx<int, FieldAccessType> _fieldAccessTypeCache;
+        [Node]
+        readonly DictionaryEx<FunctionSyntax, FunctionBodyType> _functionBodyTypeCache;
 
         internal Structure(ContainerContextObject containerContextObject, int endPosition)
             : base(_nextObjectId++)
         {
+            _functionBodyTypeCache = new DictionaryEx<FunctionSyntax, FunctionBodyType>(syntax => new FunctionBodyType(this, syntax));
             _fieldAccessTypeCache = new DictionaryEx<int, FieldAccessType>(position => new FieldAccessType(this, position));
             _containerContextObject = containerContextObject;
             _endPosition = endPosition;
@@ -128,7 +131,7 @@ namespace Reni.Struct
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
 
-        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) { return new FunctionBodyType(this, syntax); }
+        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) { return _functionBodyTypeCache.Find(syntax); }
 
         TypeBase UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
         internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }

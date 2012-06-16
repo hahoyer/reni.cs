@@ -102,7 +102,7 @@ namespace Reni.TokenClasses
         {
             if(_isMetaFunction)
                 return null;
-            return new FunctionFeature(structure, this);
+            return new FunctionBodyType(structure, this);
         }
     }
 }

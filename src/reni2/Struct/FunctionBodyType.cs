@@ -25,12 +25,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
+using Reni.Code;
+using Reni.Context;
+using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionBodyType : TypeBase
+    sealed class FunctionBodyType : TypeBase, IFunctionFeature, IContextReference
     {
         [EnableDump]
         readonly Structure _structure;
@@ -51,5 +54,25 @@ namespace Reni.Struct
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
         internal Result DumpPrintTextResult(Category category) { return DumpPrintTypeNameResult(category); }
+
+        [DisableDump]
+        IContextReference ObjectReference { get { return this; } }
+
+        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
+        bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
+        Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
+
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        {
+            var applyResult = Function(argsType).ApplyResult(category);
+
+            return applyResult
+                .ReplaceAbsolute
+                (_structure.ContainerContextObject
+                 , () => CodeBase.ReferenceCode(ObjectReference).AddToReference(_structure.StructSize)
+                 , () => CodeArgs.Create(ObjectReference)
+                );
+        }
+        FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
     }
 }
