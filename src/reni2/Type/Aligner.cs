@@ -90,8 +90,6 @@ namespace Reni.Type
             var childConverter = Parent.Converter(destination);
             if(childConverter != null)
                 return new UnAlignConverter(this, childConverter);
-
-            NotImplementedMethod(destination);
             return null;
         }
 
