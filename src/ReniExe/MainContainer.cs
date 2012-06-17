@@ -43,7 +43,7 @@ namespace ReniExe
             }
             catch(Exception exception)
             {
-                Console.WriteLine(exception);
+                Console.WriteLine(exception.Message);
             }
         }
     }

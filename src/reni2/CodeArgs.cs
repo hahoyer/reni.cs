@@ -164,7 +164,7 @@ namespace Reni
         public static CodeArgs operator +(CodeArgs x, CodeArgs y) { return x.Sequence(y); }
         public static CodeArgs operator -(CodeArgs x, CodeArgs y) { return x.Without(y); }
         public static CodeArgs operator -(CodeArgs x, IContextReference y) { return x.Without(y); }
-        TreeNode[] ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
+        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
         internal sealed class CodeArg : ReniObject, IContextReference
         {

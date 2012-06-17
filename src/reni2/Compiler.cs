@@ -57,29 +57,20 @@ namespace Reni
         /// <param name="fileName"> Name of the file. </param>
         /// <param name="parameters"> </param>
         /// <param name="className"> </param>
-        public Compiler(CompilerParameters parameters, string fileName, string className)
+        public Compiler(CompilerParameters parameters, string fileName, string className=null)
         {
             _fileName = fileName;
-            _parameters = parameters;
+            _parameters = parameters ?? new CompilerParameters();
             _source = new SimpleCache<Source>(() => new Source(FileName.FileHandle()));
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
             _functionCode = new SimpleCache<CodeBasePair[]>(() => Functions.Code);
             _mainContainer = new SimpleCache<Code.Container>(() => new Code.Container(Code, Source.Data));
-            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true, className));
+            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true, className??fileName));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<FunctionContainer>>(() => Functions.Compile());
             _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, OutStream));
             _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
         }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Compiler" /> class.
-        /// </summary>
-        /// <param name="fileName"> Name of the file. </param>
-        /// <param name="className"> </param>
-        /// created 14.07.2007 15:59 on HAHOYER-DELL by hh
-        public Compiler(string fileName, string className)
-            : this(new CompilerParameters(), fileName, className) { }
 
         [Node]
         [DisableDump]

@@ -236,22 +236,20 @@ namespace Reni
             }
         }
 
-        TreeNode[] ITreeNodeSupport.CreateNodes()
+        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes()
         {
-            var result = new List<TreeNode>();
             if(_pendingCategory.HasAny)
-                result.Add(Dump().CreateNamedNode("Pending", "Pending"));
+                yield return Dump().CreateNamedNode("Pending", "Pending");
             if(HasIsDataLess)
-                result.Add(IsDataLess.CreateNamedNode("IsDataLess", "Logical"));
+                yield return IsDataLess.CreateNamedNode("IsDataLess", "Logical");
             if(HasSize)
-                result.Add(Size.FormatForView().CreateNamedNode("Size", "Number"));
+                yield return Size.FormatForView().CreateNamedNode("Size", "Number");
             if(HasType)
-                result.Add(Type.CreateNamedNode("Type", "Type"));
+                yield return Type.CreateNamedNode("Type", "Type");
             if(HasCode)
-                result.Add(Code.CreateNamedNode("Code", "Code"));
+                yield return Code.CreateNamedNode("Code", "Code");
             if(HasArgs)
-                result.Add(CodeArgs.Data.CreateNamedNode("CodeArgs", "CodeArgs"));
-            return result.ToArray();
+                yield return CodeArgs.Data.CreateNamedNode("CodeArgs", "CodeArgs");
         }
 
         internal bool? FindIsDataLess

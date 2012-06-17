@@ -39,7 +39,7 @@ namespace Reni
             const string fileName = "temptest.reni";
             var f = fileName.FileHandle();
             f.String = _text;
-            var compiler = new Compiler(fileName, _className);
+            var compiler = new Compiler(null, fileName, _className);
             return compiler.ExecutedCode;
         }
     }

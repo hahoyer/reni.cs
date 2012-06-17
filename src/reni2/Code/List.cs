@@ -59,10 +59,8 @@ namespace Reni.Code
             get
             {
                 for(var i = 0; i < _data.Length - 1; i++)
-                {
                     if(!_data[i].Size.IsZero)
                         return false;
-                }
                 return true;
             }
         }

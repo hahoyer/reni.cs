@@ -51,7 +51,7 @@ namespace WebSite
             }
             catch(Exception exception)
             {
-                return exception.ToString(); 
+                return exception.Message; 
             }
             var result = stringStream.Result;
             return result;
