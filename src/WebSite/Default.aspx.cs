@@ -32,7 +32,7 @@ namespace WebSite
     {
         protected void Page_Load(object sender, EventArgs e) { }
 
-        string CompileAndRun(string text)
+        static string CompileAndRun(string text)
         {
             var fileName =
                 Environment.GetEnvironmentVariable("temp")
@@ -44,7 +44,7 @@ namespace WebSite
             fileHandle.String = text;
             var stringStream = new StringStream();
             var parameters = new CompilerParameters {OutStream = stringStream};
-            var c = new Compiler(parameters, fileName);
+            var c = new Compiler(fileName, parameters);
             try
             {
                 c.Exec();

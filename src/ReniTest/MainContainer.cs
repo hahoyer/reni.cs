@@ -73,7 +73,7 @@ f1()dump_print;
             const string fileName = "temptest.reni";
             var f = fileName.FileHandle();
             f.String = text;
-            var compiler = new Compiler(null, fileName, "Reni");
+            var compiler = new Compiler(fileName);
             //Profiler.Measure(()=>compiler.Exec());
             //Tracer.FlaggedLine(Profiler.Format(10,0.0));
             return compiler;

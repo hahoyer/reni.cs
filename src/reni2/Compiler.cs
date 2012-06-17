@@ -57,7 +57,7 @@ namespace Reni
         /// <param name="fileName"> Name of the file. </param>
         /// <param name="parameters"> </param>
         /// <param name="className"> </param>
-        public Compiler(CompilerParameters parameters, string fileName, string className=null)
+        public Compiler(string fileName, CompilerParameters parameters = null, string className = null)
         {
             _fileName = fileName;
             _parameters = parameters ?? new CompilerParameters();
@@ -65,7 +65,7 @@ namespace Reni
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
             _functionCode = new SimpleCache<CodeBasePair[]>(() => Functions.Code);
             _mainContainer = new SimpleCache<Code.Container>(() => new Code.Container(Code, Source.Data));
-            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true, className??fileName));
+            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true, className??fileName.Symbolize()));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<FunctionContainer>>(() => Functions.Compile());
             _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, OutStream));

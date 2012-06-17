@@ -72,7 +72,7 @@ namespace Reni.FeatureTest
         {
             var outStream = new OutStream();
             compilerParameters.OutStream = outStream;
-            var c = new Compiler(compilerParameters, fileName, "Reni");
+            var c = new Compiler(fileName, compilerParameters, "Reni");
 
             if(expectedResult != null)
             {
