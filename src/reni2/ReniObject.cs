@@ -31,7 +31,7 @@ using HWClassLibrary.TreeStructure;
 namespace Reni
 {
     [AdditionalNodeInfo("NodeDump")]
-    [DebuggerDisplay("{NodeDump}")]
+    [DebuggerDisplay("{NodeDump}.{ObjectId}")]
     public abstract class ReniObject : Dumpable
     {
         static int _nextObjectId;

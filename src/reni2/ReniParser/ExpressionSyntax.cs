@@ -27,7 +27,6 @@ using System.Linq;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
@@ -57,7 +56,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = new[] {-93}.Contains(ObjectId) && category.HasType;
+            var trace = new[] {195, -26}.Contains(ObjectId);
             StartMethodDump(trace, context, category);
             try
             {
@@ -65,6 +64,9 @@ namespace Reni.ReniParser
 
                 if(Left == null && Right != null)
                 {
+                    if(trace)
+                        Dump("RightType", Right.Type(context)); 
+
                     var prefixOperationResult = Right.OperationResult(context, category, _tokenClass);
                     if(prefixOperationResult != null)
                     {
@@ -74,6 +76,10 @@ namespace Reni.ReniParser
                         return ReturnMethodDump(result);
                     }
                 }
+
+                if (trace && Left != null)
+                    Dump("LeftType", Left.Type(context));
+                BreakExecution();
 
                 var searchResult = context.Search(Left, _tokenClass);
                 if(searchResult == null)
