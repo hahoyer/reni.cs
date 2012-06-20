@@ -33,7 +33,7 @@ using Reni.Syntax;
 namespace Reni.Type
 {
     [Serializable]
-    sealed class TypeType : TypeBase, IFeature, IFunctionFeature, IContextReference
+    sealed class TypeType : TypeBase, IFeature, IFunctionFeature
     {
         [EnableDump]
         readonly TypeBase _value;
@@ -81,7 +81,5 @@ namespace Reni.Type
 
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return this; } }
-
-        Size IContextReference.Size { get { return Size; } }
     }
 }

@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -43,6 +46,8 @@ namespace Reni.Type
         internal override Result ArrayDestructor(Category category, int count) { return Parent.ArrayDestructor(category, count); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
-        protected override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult(category.Typed)); }
+        internal override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult(category.Typed)); }
+        internal Result ReferenceConversionResult(Category category) {return ReferenceConversionResult(category, Parent);
+        }
     }
 }

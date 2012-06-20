@@ -71,7 +71,7 @@ namespace Reni.Sequence
         {
             Tracer.Assert(_objectType.Element == TypeBase.Bit);
             var typedCategory = category.Typed;
-            var result = Apply(category, _objectType.Count, argsType.SequenceCount(_objectType.Element));
+            var result = Apply(category, _objectType.Count, argsType.SequenceLength(_objectType.Element));
             var objectResult = GetObjectReference().Result(typedCategory);
             var convertedObjectResult = objectResult.BitSequenceOperandConversion(typedCategory);
             var convertedArgsResult = argsType.BitSequenceOperandConversion(typedCategory);

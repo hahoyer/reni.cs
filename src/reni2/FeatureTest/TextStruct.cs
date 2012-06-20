@@ -24,6 +24,7 @@ using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
+using Reni.FeatureTest.Text;
 
 namespace Reni.FeatureTest
 {
@@ -33,7 +34,7 @@ namespace Reni.FeatureTest
         {
             return
                 @"
-!system:
+system:
 {
     MaxNumber8: '7f' to_number_of_base(16) /!\ ;
     MaxNumber16: '7fff' to_number_of_base(16) /!\ ;
@@ -64,7 +65,7 @@ Text:
     [Integer1]
     [TwoFunctions]
     [FromTypeAndFunction]
-    [LowPriority]
+    [HalloWelt]
     public sealed class Text1 : TextStruct
     {
         [Test]

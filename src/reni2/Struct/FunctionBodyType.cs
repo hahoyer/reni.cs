@@ -33,7 +33,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionBodyType : TypeBase, IFunctionFeature, IContextReference
+    sealed class FunctionBodyType : TypeBase, IFunctionFeature
     {
         [EnableDump]
         readonly Structure _structure;
@@ -60,7 +60,6 @@ namespace Reni.Struct
 
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
-        Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {

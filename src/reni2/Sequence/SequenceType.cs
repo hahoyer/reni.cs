@@ -26,7 +26,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
-using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
@@ -37,12 +36,10 @@ namespace Reni.Sequence
 {
     [Serializable]
     sealed class SequenceType
-        : TypeBase
+        : TagChild<Type.Array>
           , ISearchPath<ISuffixFeature, SequenceType>
           , ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>
     {
-        readonly Type.Array _inheritedType;
-
         [DisableDump]
         internal readonly ISuffixFeature BitDumpPrintFeature;
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
@@ -57,55 +54,73 @@ namespace Reni.Sequence
                 );
         }
 
-        internal new ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionFeature(this, featureBase); }
-
-        internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
-
-        public SequenceType(TypeBase elementType, int count)
+        public SequenceType(Type.Array parent)
+            : base(parent)
         {
-            Tracer.Assert(count > 0, () => "count=" + count);
-            Tracer.Assert(elementType.Reference == null);
-            _inheritedType = elementType.UniqueArray(count);
             BitDumpPrintFeature = new BitSequenceFeatureClass(this);
-            _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(this, refAlignParam));
+            _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>
+                (refAlignParam => new ObjectReference(this, refAlignParam));
             StopByObjectId(-172);
         }
 
         [DisableDump]
-        [UsedImplicitly]
-        internal Type.Array InheritedType { get { return _inheritedType; } }
-
+        protected override string TagTitle { get { return "Sequence"; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return _inheritedType.IsDataLess; } }
-        protected override Size GetSize() { return _inheritedType.Size; }
-
-        internal override string DumpPrintText { get { return "(" + _inheritedType.Element.DumpPrintText + ")sequence(" + _inheritedType.Count + ")"; } }
-
-        internal override int SequenceCount(TypeBase elementType) { return elementType == Element ? Count : 1; }
-
-        [DisableDump]
-        internal int Count { get { return _inheritedType.Count; } }
-
+        internal int Count { get { return Parent.Count; } }
         [Node]
         [DisableDump]
-        public TypeBase Element { get { return _inheritedType.Element; } }
+        public TypeBase Element { get { return Parent.Element; } }
 
-        internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + "*" + Count + ")"; }
+
+        internal new ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionFeature(this, featureBase); }
+        internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
+
+        internal override int? SmartSequenceLength(TypeBase elementType)
+        {
+            return Parent
+                .SmartArrayLength(elementType);
+        }
+
+        internal override int? SmartArrayLength(TypeBase elementType)
+        {
+            return Parent
+                .SmartArrayLength(elementType);
+        }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => Element);
             if(!searchVisitor.IsSuccessFull)
+                Parent.Search(searchVisitor);
+            if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
 
+        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
+        {
+            var trace = ObjectId == -1 && category.HasCode;
+            StartMethodDump(trace, category,objectReference,argsType);
+            try
+            {
+                var result = Parent.InternalConcatArrays(category.Typed, objectReference, argsType);
+                Dump("result", result); 
+                BreakExecution();
+
+                var type = (Type.Array)result.Type;
+                return ReturnMethodDump(type.UniqueSequence.Result(category, result));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
+        
         Result ExtendFrom(Category category, int oldCount)
         {
             var result = Result
-                (
-                    category,
-                    () => Element.UniqueSequence(oldCount).ArgCode.BitCast(Size)
-                    , CodeArgs.Arg
+                (category
+                 , () => Element.UniqueArray(oldCount).UniqueSequence.ArgCode.BitCast(Size)
+                 , CodeArgs.Arg
                 );
             return result;
         }
@@ -119,19 +134,15 @@ namespace Reni.Sequence
                 return null;
             }
             var tempNewCount = Math.Min(Count, newCount);
-            var newType = Element.UniqueSequence(tempNewCount);
+            var newType = Element.UniqueArray(tempNewCount).UniqueSequence;
             var result = newType
                 .Result
-                (
-                    category,
-                    () => ArgCode.BitCast(newType.Size)
-                    , CodeArgs.Arg
+                (category
+                 , () => ArgCode.BitCast(newType.Size)
+                 , CodeArgs.Arg
                 );
             return result;
         }
-        internal override Result Destructor(Category category) { return _inheritedType.Destructor(category); }
-
-        internal override Result Copier(Category category) { return _inheritedType.Copier(category); }
 
         internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache.Find(refAlignParam); }
 
@@ -143,7 +154,8 @@ namespace Reni.Sequence
 
             if(source.Element != Element)
             {
-                DumpDataWithBreak("Element type dismatch", "category", category, "source", source, "destination", this, "result", result);
+                DumpDataWithBreak
+                    ("Element type dismatch", "category", category, "source", source, "destination", this, "result", result);
                 return null;
             }
 

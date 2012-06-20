@@ -215,12 +215,12 @@ namespace Reni.Struct
         Result DumpPrintResultViaAccessReference(Category category, int position)
         {
             var trace = position == -1;
-            StartMethodDump(trace, category,position);
+            StartMethodDump(trace, category, position);
             try
             {
                 var accessType = UniqueAccessType(position);
                 var genericDumpPrintResult = accessType.GenericDumpPrintResult(category);
-                Dump("genericDumpPrintResult", genericDumpPrintResult); 
+                Dump("genericDumpPrintResult", genericDumpPrintResult);
                 BreakExecution();
                 var accessViaThisReference = AccessViaThisReference(category.Typed, position);
                 return ReturnMethodDump(genericDumpPrintResult.ReplaceArg(accessViaThisReference));

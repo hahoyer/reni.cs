@@ -48,12 +48,6 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        protected override Result ParentConversionResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
-
         internal override Result DumpPrintTextResultFromSequence(Category category, int count)
         {
             return Void.Result
@@ -74,18 +68,22 @@ namespace Reni.Type
 
         CodeBase DumpPrintCodeFromSequence(int count)
         {
-            return
-                UniqueSequence(count).UniqueReference.Type().ArgCode
-                    .Dereference(Size * count)
-                    .DumpPrintText(Size);
+            return UniqueArray(count)
+                .UniqueSequence
+                .UniqueReference
+                .Type()
+                .ArgCode
+                .Dereference(Size * count)
+                .DumpPrintText(Size);
         }
 
         CodeBase DumpPrintCode()
         {
-            return
-                UniqueReference.Type().ArgCode
-                    .Dereference(Size)
-                    .DumpPrintText(Size);
+            return UniqueReference
+                .Type()
+                .ArgCode
+                .Dereference(Size)
+                .DumpPrintText(Size);
         }
     }
 }

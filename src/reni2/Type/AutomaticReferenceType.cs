@@ -31,11 +31,11 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class AutomaticReferenceType 
+    sealed class AutomaticReferenceType
         : TypeBase
-        , ISearchContainerType
-        , IConverter
-        , IHardReference
+          , ISearchContainerType
+          , IConverter
+          , IHardReference
     {
         readonly TypeBase _valueType;
 
@@ -66,10 +66,6 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
         [DisableDump]
-        internal override int ArrayElementCount { get { return ValueType.ArrayElementCount; } }
-        [DisableDump]
-        internal override bool IsArray { get { return ValueType.IsArray; } }
-        [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
         [DisableDump]
         internal override RefAlignParam[] ReferenceChain
@@ -84,6 +80,18 @@ namespace Reni.Type
             }
         }
 
+        internal override int? SmartSequenceLength(TypeBase elementType)
+        {
+            return ValueType
+                .SmartSequenceLength(elementType);
+        }
+
+        internal override int? SmartArrayLength(TypeBase elementType)
+        {
+            return ValueType
+                .SmartArrayLength(elementType);
+        }
+
         Result DereferenceResult(Category category)
         {
             var align = ValueType.UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
@@ -96,7 +104,6 @@ namespace Reni.Type
         }
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
-        internal override int SequenceCount(TypeBase elementType) { return ValueType.SequenceCount(elementType); }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
@@ -119,7 +126,7 @@ namespace Reni.Type
 
         internal override ISuffixFeature AlignConversion(TypeBase destination)
         {
-            if (destination != ValueType)
+            if(destination != ValueType)
                 return null;
 
             return Extension.Feature(ArgResult);

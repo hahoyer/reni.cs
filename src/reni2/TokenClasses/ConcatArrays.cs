@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Feature;
+using Reni.Sequence;
 using Reni.Type;
 
 
@@ -34,6 +35,7 @@ namespace Reni.TokenClasses
         Defineable
         , ISearchPath<IPrefixFeature, TypeBase>
         , ISearchPath<ISuffixFeature, Type.Array>
+        , ISearchPath<ISuffixFeature, SequenceType>
         , ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>
         , ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>
     {
@@ -51,5 +53,7 @@ namespace Reni.TokenClasses
             return
                 Extension.Feature<AutomaticReferenceType>(type.ConcatArraysFromReference);
         }
+
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Extension.Feature(type.ConcatArrays); }
     }
 }

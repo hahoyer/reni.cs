@@ -33,7 +33,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Sequence;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -41,6 +40,7 @@ namespace Reni.Type
     [Serializable]
     abstract class TypeBase
         : ReniObject
+        , IContextReference
           , IDumpShortProvider
           , IIconKeyProvider
           , ISearchTarget
@@ -53,7 +53,6 @@ namespace Reni.Type
             public static readonly Void Void = new Void();
             public readonly DictionaryEx<int, Aligner> Aligners;
             public readonly DictionaryEx<int, Array> Arrays;
-            public readonly DictionaryEx<int, SequenceType> Sequences;
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
             public readonly SimpleCache<IReference> References;
             public readonly SimpleCache<TypeType> TypeType;
@@ -66,7 +65,6 @@ namespace Reni.Type
                 EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
                 References = new SimpleCache<IReference>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
-                Sequences = new DictionaryEx<int, SequenceType>(elementCount => new SequenceType(parent, elementCount));
                 Arrays = new DictionaryEx<int, Array>(parent.ObtainArray);
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 FunctionInstanceType = new SimpleCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
@@ -115,6 +113,7 @@ namespace Reni.Type
             }
         }
 
+        Size IContextReference.Size { get { return Size; } }
         [DisableDump]
         internal virtual Size UnrefSize { get { return Size; } }
 
@@ -135,8 +134,12 @@ namespace Reni.Type
             }
         }
 
-        internal virtual int SequenceCount(TypeBase elementType)
+        internal virtual int? SmartSequenceLength(TypeBase elementType) { return SmartArrayLength(elementType); }
+
+        internal virtual int? SmartArrayLength(TypeBase elementType)
         {
+            if (IsConvertable(elementType))
+                return 1;
             NotImplementedMethod(elementType);
             return 0;
         }
@@ -176,8 +179,7 @@ namespace Reni.Type
 
         internal Array UniqueArray(int count) { return _cache.Arrays.Find(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
-        internal SequenceType UniqueSequence(int elementCount) { return _cache.Sequences.Find(elementCount); }
-        internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueSequence(bitCount); }
+        internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueArray(bitCount).UniqueSequence; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
         internal static Result VoidResult(Category category) { return Void.Result(category); }
@@ -264,10 +266,6 @@ namespace Reni.Type
         [DisableDump]
         internal virtual TypeBase UnAlignedType { get { return this; } }
         [DisableDump]
-        internal virtual int ArrayElementCount { get { return 1; } }
-        [DisableDump]
-        internal virtual bool IsArray { get { return false; } }
-        [DisableDump]
         internal virtual bool IsLambda { get { return false; } }
         [DisableDump]
         internal virtual IReference Reference { get { return this as IReference; } }
@@ -276,7 +274,32 @@ namespace Reni.Type
         [DisableDump]
         protected virtual ISearchTarget ConversionProvider { get { return this; } }
 
-        TypeBase CreateSequenceType(TypeBase elementType) { return elementType.UniqueSequence(SequenceCount(elementType)); }
+        TypeBase CreateSequenceType(TypeBase elementType)
+        {
+            return elementType
+                .UniqueArray(SequenceLength(elementType))
+                .UniqueSequence;
+        }
+
+        internal int SequenceLength(TypeBase elementType)
+        {
+            var length = SmartSequenceLength(elementType);
+            if(length != null)
+                return length.Value;
+            
+            NotImplementedMethod(elementType);
+            return -1;
+        }
+
+        internal int ArrayLength(TypeBase elementType)
+        {
+            var length = SmartArrayLength(elementType);
+            if (length != null)
+                return length.Value;
+
+            NotImplementedMethod(elementType);
+            return -1;
+        }
 
         internal SearchResult Search<TFeature>(ISearchTarget target)
             where TFeature : class, IFeature
@@ -418,7 +441,7 @@ namespace Reni.Type
                 Search<ISuffixFeature>(destination.ConversionProvider);
         }
 
-        bool IsConvertable(TypeBase destination) { return SmartConverter(destination) != null; }
+        internal bool IsConvertable(TypeBase destination) { return SmartConverter(destination) != null; }
 
         internal virtual Result DumpPrintTextResultFromSequence(Category category, int count)
         {
@@ -496,6 +519,8 @@ namespace Reni.Type
 
         internal TypeBase SmartUn<T>()
             where T : IConverter { return this is T ? ((IConverter) this).Result(Category.Type).Type : this; }
+        
+        internal Result ReferenceConversionResult(Category category, TypeBase destinationType) { return destinationType.UniqueReference.Type().Result(category, UniqueReference.Type().ArgResult(category.Typed)); }
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature

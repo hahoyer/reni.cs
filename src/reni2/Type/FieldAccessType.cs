@@ -79,7 +79,7 @@ namespace Reni.Type
                 );
         }
 
-        protected override Result ParentConversionResult(Category category)
+        internal override Result ParentConversionResult(Category category)
         {
             return Parent.SmartReference()
                 .Result(category, ArgResult(category.Typed).AddToReference(() => _structure.FieldOffset(_position)));
@@ -92,7 +92,18 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal override int SequenceCount(TypeBase elementType) { return Parent.SequenceCount(elementType); }
+        internal override int? SmartSequenceLength(TypeBase elementType)
+        {
+            return Parent
+                .SmartSequenceLength(elementType);
+        }
+
+        internal override int? SmartArrayLength(TypeBase elementType)
+        {
+            return Parent
+                .SmartArrayLength(elementType);
+        }
+
 
         Result ISetterTargetType.Result(Category category)
         {

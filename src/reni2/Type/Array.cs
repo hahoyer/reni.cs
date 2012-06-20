@@ -30,6 +30,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -37,10 +38,13 @@ namespace Reni.Type
     ///     Fixed sized array of a type
     /// </summary>
     [Serializable]
-    sealed class Array : TypeBase, IContextReference
+    sealed class Array
+        : TypeBase
+          , ISearchPath<ISuffixFeature, SequenceType>
     {
         readonly TypeBase _element;
         readonly int _count;
+        readonly SimpleCache<SequenceType> _sequenceCache;
 
         public Array(TypeBase element, int count)
         {
@@ -48,25 +52,25 @@ namespace Reni.Type
             _count = count;
             Tracer.Assert(count > 0);
             Tracer.Assert(element.Reference == null);
+            _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
         }
 
-        Size IContextReference.Size { get { return Size; } }
         [Node]
+        [DisableDump]
+        internal SequenceType UniqueSequence { get { return _sequenceCache.Value; } }
+        [Node]
+        [DisableDump]
         internal int Count { get { return _count; } }
         [Node]
+        [DisableDump]
         internal TypeBase Element { get { return _element; } }
-        internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
-        [DisableDump]
-        internal override int ArrayElementCount { get { return Count; } }
-        [DisableDump]
-        internal override bool IsArray { get { return true; } }
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || Element.IsDataLess; } }
+        internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
 
+        internal override int? SmartArrayLength(TypeBase elementType) { return Element.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
         protected override Size GetSize() { return Element.Size * _count; }
-
         internal override Result Destructor(Category category) { return Element.ArrayDestructor(category, Count); }
-
         internal override Result Copier(Category category) { return Element.ArrayCopier(category, Count); }
 
         internal override void Search(SearchVisitor searchVisitor)
@@ -91,12 +95,13 @@ namespace Reni.Type
 
             var function = (IFunctionFeature) argsType;
             var indexType = Bit
-                .UniqueSequence(BitsConst.Convert(Count).Size.ToInt())
+                .UniqueArray(BitsConst.Convert(Count).Size.ToInt())
+                .UniqueSequence
                 .UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
             var constructorResult = function.ApplyResult(category.Typed, indexType);
             var elements = Count
                 .Array(i => ElementConstructorResult(category, constructorResult, i, indexType))
-                .Aggregate(Void.Result(category), (c,n)=>n + c);
+                .Aggregate(Void.Result(category), (c, n) => n + c);
             return Result(category, elements);
         }
 
@@ -105,31 +110,30 @@ namespace Reni.Type
             var resultForArg = indexType
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
             return elementConstructorResult
-                .ReplaceArg(resultForArg)
-                .Conversion(Element)
-                & category;
+                       .ReplaceArg(resultForArg)
+                       .Conversion(Element)
+                   & category;
         }
 
-        internal override string DumpShort() { return base.DumpShort() + "(" + Element.DumpShort() + ")array(" + Count + ")"; }
+        internal override string DumpShort() { return Element.DumpShort() + "*" + Count; }
 
-        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType) { return ConcatArrays(category, argsType, objectReference); }
+        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
+        internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
 
-        Result ConcatArrays(Category category, TypeBase argsType, IContextReference objectReference)
+        internal Result InternalConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
         {
             var oldElementsResult = UniqueReference
                 .Type()
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
-            var newCount = argsType.ArrayElementCount;
+            var newCount = argsType.ArrayLength(Element);
             var newElementsResult = argsType
-                .Conversion(category, argsType.IsArray ? Element.UniqueArray(newCount) : Element);
+                .Conversion(category, Element.UniqueArray(newCount));
             var result = Element
                 .UniqueArray(Count + newCount)
                 .Result(category, newElementsResult + oldElementsResult);
             return result;
         }
-
-        internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType) { return ConcatArrays(category, argsType, objectReference); }
 
         internal Result DumpPrintResult(Category category)
         {
@@ -162,8 +166,17 @@ namespace Reni.Type
         {
             return Element
                 .AutomaticDereferenceType
-                .UniqueSequence(Count).UniqueReference.Type()
+                .UniqueArray(Count)
+                .UniqueSequence
+                .UniqueReference.Type()
                 .Result(category, UniqueReference.Type().ArgResult(category));
+        }
+
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
+        {
+            if(type.Parent != this)
+                return null;
+            return Extension.Feature(type.ReferenceConversionResult);
         }
     }
 }

@@ -34,11 +34,9 @@ namespace Reni.Type
     sealed class Bit : TypeBase
     {
         internal override bool IsDataLess { get { return false; } }
-        protected override Size GetSize() { return Size.Create(1); }
-
         internal override string DumpPrintText { get { return "bit"; } }
-        internal override int SequenceCount(TypeBase elementType) { return 1; }
 
+        protected override Size GetSize() { return Size.Create(1); }
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, null);

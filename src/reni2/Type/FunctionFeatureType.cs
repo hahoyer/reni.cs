@@ -45,6 +45,8 @@ namespace Reni.Type
         [DisableDump]
         bool IFunctionFeature.IsImplicit { get { return false; } }
         [DisableDump]
+        internal override bool IsLambda { get { return true; } }
+        [DisableDump]
         IContextReference IFunctionFeature.ObjectReference { get { return _functionalFeature.ObjectReference; } }
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
