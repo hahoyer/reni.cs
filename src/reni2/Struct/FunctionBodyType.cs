@@ -26,7 +26,6 @@ using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -63,14 +62,27 @@ namespace Reni.Struct
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var applyResult = Function(argsType).ApplyResult(category);
+            var trace = ObjectId == -14 && argsType.ObjectId == 1 && category.HasCode;
+            StartMethodDump(trace, category, argsType);
+            try
+            {
+                var applyResult = Function(argsType).ApplyResult(category);
+                Dump("applyResult", applyResult);
+                BreakExecution();
 
-            return applyResult
-                .ReplaceAbsolute
-                (_structure.ContainerContextObject
-                 , () => CodeBase.ReferenceCode(ObjectReference).AddToReference(_structure.StructSize)
-                 , () => CodeArgs.Create(ObjectReference)
-                );
+                var result = applyResult
+                    .ReplaceAbsolute
+                    (_structure.ContainerContextObject
+                     , () => CodeBase.ReferenceCode(_structure.ContainerContextObject)
+                     , () => CodeArgs.Create(_structure.ContainerContextObject)
+                    );
+
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
         FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
     }
