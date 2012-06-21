@@ -217,7 +217,7 @@ namespace Reni.Context
 
         Result FunctionResult(Category category, TypeBase objectType, IFeature feature, CompileSyntax right)
         {
-            var trace = feature.GetObjectId<Sequence.FunctionFeature>() == -10 && category.HasType;
+            var trace = feature.GetObjectId() == -10 && category.HasCode;
             StartMethodDump(trace, category, objectType, feature, right);
             try
             {
@@ -250,7 +250,7 @@ namespace Reni.Context
 
         internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
         {
-            var trace = feature.GetObjectId<Sequence.FunctionFeature>() == -1  && category.HasType;
+            var trace = feature.GetObjectId() == -10  && category.HasCode;
             StartMethodDump(trace, category, left, leftType, feature, converterResult, right);
             try
             {

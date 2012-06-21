@@ -48,12 +48,12 @@ namespace Reni.Code
 
         void AssertValid()
         {
-            Tracer.Assert(!_fiberHead.IsNonFiberHeadList);
-            Tracer.Assert(_fiberItems.Length > 0);
+            Tracer.Assert(!_fiberHead.IsNonFiberHeadList, Dump());
+            Tracer.Assert(_fiberItems.Length > 0, Dump());
             var lastSize = _fiberHead.Size;
             foreach(var t in _fiberItems)
             {
-                Tracer.Assert(lastSize == t.InputSize);
+                Tracer.Assert(lastSize == t.InputSize, Dump());
                 lastSize = t.OutputSize;
             }
         }
