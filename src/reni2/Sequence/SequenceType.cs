@@ -70,7 +70,8 @@ namespace Reni.Sequence
         [Node]
         [DisableDump]
         public TypeBase Element { get { return Parent.Element; } }
-
+        [DisableDump]
+        internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")sequence(" + Count + ")"; } }
 
         internal new ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionFeature(this, featureBase); }
         internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
