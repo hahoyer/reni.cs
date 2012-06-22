@@ -178,21 +178,4 @@ namespace Reni.Struct
         ContextBase ObtainCache() { return Parent.CreateSubContext(!IsGetter); }
         bool IsGetter { get { return FunctionId.IsGetter; } }
     }
-
-    sealed class FunctionId
-    {
-        public static FunctionId Getter(int index) { return new FunctionId(index, true); }
-        public static FunctionId Setter(int index) { return new FunctionId(index, false); }
-
-        internal readonly int Index;
-        internal readonly bool IsGetter;
-
-        FunctionId(int index, bool isGetter)
-        {
-            Index = index;
-            IsGetter = isGetter;
-        }
-
-        public override string ToString() { return Index.ToString() + "." + (IsGetter ? "get" : "set"); }
-    }
 }

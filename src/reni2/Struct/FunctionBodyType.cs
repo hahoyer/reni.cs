@@ -24,8 +24,10 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -38,11 +40,18 @@ namespace Reni.Struct
         readonly Structure _structure;
         [EnableDump]
         readonly FunctionSyntax _syntax;
+        readonly SimpleCache<IContextReference> _objectReferenceCache;
 
         public FunctionBodyType(Structure structure, FunctionSyntax syntax)
         {
             _structure = structure;
             _syntax = syntax;
+            _objectReferenceCache = new SimpleCache<IContextReference>(()=>new ContextReference());
+        }
+
+        sealed class ContextReference : ReniObject, IContextReference
+        {
+            public Size Size { get { return Root.DefaultRefAlignParam.RefSize; } }
         }
 
         [DisableDump]
@@ -55,14 +64,14 @@ namespace Reni.Struct
         internal Result DumpPrintTextResult(Category category) { return DumpPrintTypeNameResult(category); }
 
         [DisableDump]
-        IContextReference ObjectReference { get { return this; } }
+        IContextReference ObjectReference { get { return _objectReferenceCache.Value; } }
 
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var trace = ObjectId == -14 && argsType.ObjectId == 1 && category.HasCode;
+            var trace = ObjectId == 23 && argsType.ObjectId == 1 && category.HasCode;
             StartMethodDump(trace, category, argsType);
             try
             {
@@ -73,8 +82,8 @@ namespace Reni.Struct
                 var result = applyResult
                     .ReplaceAbsolute
                     (_structure.ContainerContextObject
-                     , () => CodeBase.ReferenceCode(_structure.ContainerContextObject)
-                     , () => CodeArgs.Create(_structure.ContainerContextObject)
+                     , () => CodeBase.ReferenceCode(ObjectReference).AddToReference(_structure.StructSize)
+                     , () => CodeArgs.Create(ObjectReference)
                     );
 
                 return ReturnMethodDump(result);

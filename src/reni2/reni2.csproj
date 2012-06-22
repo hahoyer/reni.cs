@@ -175,6 +175,7 @@
     <Compile Include="Struct\ContainerContextObject.cs" />
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\FunctionBodyType.cs" />
+    <Compile Include="Struct\FunctionId.cs" />
     <Compile Include="Struct\FunctionType.cs" />
     <Compile Include="Struct\GetterFunctionType.cs" />
     <Compile Include="Struct\SetterFunctionType.cs" />
