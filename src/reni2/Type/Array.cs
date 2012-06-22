@@ -126,9 +126,15 @@ namespace Reni.Type
                 .Type()
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
-            var newCount = argsType.ArrayLength(Element);
-            var newElementsResult = argsType
-                .Conversion(category, Element.UniqueArray(newCount));
+
+            var newElementsResult = argsType.Conversion(category,Element);
+            var newCount = 1;
+            if (newElementsResult == null)
+            {
+                newCount = argsType.ArrayLength(Element);
+                newElementsResult = argsType.Conversion(category, Element.UniqueArray(newCount));
+            }
+
             var result = Element
                 .UniqueArray(Count + newCount)
                 .Result(category, newElementsResult + oldElementsResult);
