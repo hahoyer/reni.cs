@@ -127,7 +127,7 @@ namespace Reni.Type
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
 
-            var newElementsResult = argsType.Conversion(category,Element);
+            var newElementsResult = argsType.TryConversion(category,Element);
             var newCount = 1;
             if (newElementsResult == null)
             {
