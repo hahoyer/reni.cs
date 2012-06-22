@@ -71,7 +71,7 @@ namespace Reni.Struct
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var trace = ObjectId == 23 && argsType.ObjectId == 1 && category.HasCode;
+            var trace = ObjectId == -23 && argsType.ObjectId == 1 && category.HasCode;
             StartMethodDump(trace, category, argsType);
             try
             {
