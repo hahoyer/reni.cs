@@ -45,6 +45,7 @@ namespace Reni.Type
         readonly TypeBase _element;
         readonly int _count;
         readonly SimpleCache<SequenceType> _sequenceCache;
+        readonly SimpleCache<TextItemsType> _textItemsCache;
 
         public Array(TypeBase element, int count)
         {
@@ -53,11 +54,15 @@ namespace Reni.Type
             Tracer.Assert(count > 0);
             Tracer.Assert(element.Reference == null);
             _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
+            _textItemsCache = new SimpleCache<TextItemsType>(() => new TextItemsType(this));
         }
 
         [Node]
         [DisableDump]
         internal SequenceType UniqueSequence { get { return _sequenceCache.Value; } }
+        [Node]
+        [DisableDump]
+        internal TextItemsType UniqueTextItemsType { get { return _textItemsCache.Value; } }
         [Node]
         [DisableDump]
         internal int Count { get { return _count; } }
@@ -127,7 +132,7 @@ namespace Reni.Type
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
 
-            var newElementsResult = argsType.TryConversion(category,Element);
+                var newElementsResult = argsType.TryConversion(category,Element);
             var newCount = 1;
             if (newElementsResult == null)
             {

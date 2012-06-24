@@ -41,7 +41,7 @@ namespace Reni.TokenClasses
                 .UniqueNumber(BitsConst.BitSize(data[0].GetType()))
                 .UniqueTextItemType
                 .UniqueArray(data.Length)
-                .UniqueSequence
+                .UniqueTextItemsType
                 .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }
 

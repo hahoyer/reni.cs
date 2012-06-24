@@ -41,13 +41,12 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<ISuffixFeature, Type.Void>,
         ISearchPath<ISuffixFeature, StructureType>,
         ISearchPath<ISuffixFeature, Type.Array>,
+        ISearchPath<ISuffixFeature, TextItemsType>,
         ISearchPath<ISuffixFeature, TextItemType>,
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>,
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>
     {
         static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
         static readonly BitFeature _bitFeature = new BitFeature();
-        static readonly ISearchPath<ISuffixFeature, SequenceType> _dumpPrintSequenceFeature = new DumpPrintSequenceFeature();
 
         ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, Bit>.Convert(Bit type) { return _bitFeature; }
@@ -56,8 +55,8 @@ namespace Reni.Feature.DumpPrint
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, TextItemType>.Convert(TextItemType type) { return Extension.Feature(type.DumpPrintTextResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, FunctionBodyType>.Convert(FunctionBodyType type) { return Extension.Feature(type.DumpPrintTextResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.DumpPrintTextResult); }
 
-        ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, TextItemType>.Convert(TextItemType type) { return _dumpPrintSequenceFeature; }
         ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<ISuffixFeature, AutomaticReferenceType> ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
 

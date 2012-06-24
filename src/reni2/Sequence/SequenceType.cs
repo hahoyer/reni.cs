@@ -186,9 +186,12 @@ namespace Reni.Sequence
             }
         }
 
-        internal Result DumpPrintTextResult(Category category) { return Element.DumpPrintTextResultFromSequence(category, Count); }
-
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Count < type.Count ? null : Extension.Feature(c => ConversionAsReference(c, type)); }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
+        {
+            return Count < type.Count
+                       ? null
+                       : Extension.Feature(c => ConversionAsReference(c, type));
+        }
 
         ISearchPath<ISuffixFeature, EnableCut>
             ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>.Convert(SequenceType type)

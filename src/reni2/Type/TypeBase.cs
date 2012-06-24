@@ -453,12 +453,6 @@ namespace Reni.Type
 
         internal bool IsConvertable(TypeBase destination) { return SmartConverter(destination) != null; }
 
-        internal virtual Result DumpPrintTextResultFromSequence(Category category, int count)
-        {
-            NotImplementedMethod(category, count);
-            return null;
-        }
-
         internal Result TextItemResult(Category category)
         {
             var uniqueTextItem = UniqueTextItemType;

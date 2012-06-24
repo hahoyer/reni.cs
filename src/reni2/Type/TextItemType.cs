@@ -21,9 +21,6 @@
 #endregion
 
 using HWClassLibrary.Debug;
-using System.Collections.Generic;
-using System.Linq;
-using System;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
@@ -31,30 +28,26 @@ using Reni.Sequence;
 
 namespace Reni.Type
 {
-    sealed class TextItemType : TagChild<TypeBase>
+    internal sealed class TextItemType : TagChild<TypeBase>
     {
-        [DisableDump]
-        public readonly ISearchPath<ISuffixFeature, SequenceType> ToNumberOfBaseFeature;
+        [DisableDump] public readonly ISearchPath<ISuffixFeature, SequenceType> ToNumberOfBaseFeature;
 
         public TextItemType(TypeBase parent)
-            : base(parent) { ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this); }
+            : base(parent)
+        {
+            ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this);
+            Tracer.Assert(!(parent is Array));
+            StopByObjectId(-10);
+        }
 
+        [DisableDump]
         protected override string TagTitle { get { return "text_item"; } }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => Parent);
-            if(!searchVisitor.IsSuccessFull)
+            if (!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
-        }
-
-        internal override Result DumpPrintTextResultFromSequence(Category category, int count)
-        {
-            return Void.Result
-                (category
-                 , () => DumpPrintCodeFromSequence(count)
-                 , CodeArgs.Arg
-                );
         }
 
         internal Result DumpPrintTextResult(Category category)
@@ -66,18 +59,7 @@ namespace Reni.Type
                 );
         }
 
-        CodeBase DumpPrintCodeFromSequence(int count)
-        {
-            return UniqueArray(count)
-                .UniqueSequence
-                .UniqueReference
-                .Type()
-                .ArgCode
-                .Dereference(Size * count)
-                .DumpPrintText(Size);
-        }
-
-        CodeBase DumpPrintCode()
+        private CodeBase DumpPrintCode()
         {
             return UniqueReference
                 .Type()

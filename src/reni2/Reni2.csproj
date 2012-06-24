@@ -246,7 +246,6 @@
     <Compile Include="Type\ConversionParameter.cs" />
     <Compile Include="Type\Converter.cs" />
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
-    <Compile Include="Type\DumpPrintSequenceFeature.cs" />
     <Compile Include="Type\EmptyFunctionFeatureProvider.cs" />
     <Compile Include="Type\EnableCut.cs" />
     <Compile Include="Sequence\FunctionFeature.cs" />
@@ -270,6 +269,7 @@
     <Compile Include="Type\AutomaticReferenceType.cs" />
     <Compile Include="Type\SearchResult.cs" />
     <Compile Include="Type\TagChild.cs" />
+    <Compile Include="Type\TextItemsType.cs" />
     <Compile Include="Type\TextItemType.cs" />
     <Compile Include="Type\ToNumberOfBaseFeature.cs" />
     <Compile Include="Type\TypeBase.cs" />

@@ -36,6 +36,7 @@ namespace Reni.TokenClasses
         , ISearchPath<IPrefixFeature, TypeBase>
         , ISearchPath<ISuffixFeature, Type.Array>
         , ISearchPath<ISuffixFeature, SequenceType>
+        , ISearchPath<ISuffixFeature, TextItemsType>
         , ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>
         , ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>
     {
@@ -55,5 +56,6 @@ namespace Reni.TokenClasses
         }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Extension.Feature(type.ConcatArrays); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.ConcatArrays); }
     }
 }
