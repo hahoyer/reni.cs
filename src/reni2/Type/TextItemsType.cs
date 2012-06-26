@@ -1,13 +1,21 @@
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Feature;
+using Reni.Sequence;
 
 namespace Reni.Type
 {
     internal sealed class TextItemsType : TagChild<Array>
     {
+        [DisableDump]
+        public readonly ISuffixFeature ToNumberOfBaseFeature;
+
         public TextItemsType(Array parent)
-            : base(parent) { }
+            : base(parent)
+        {
+            ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this);
+        }
 
         [DisableDump]
         protected override string TagTitle { get { return "text_items"; } }

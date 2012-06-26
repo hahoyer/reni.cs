@@ -34,6 +34,8 @@ namespace Reni.Code
 {
     sealed class DataStack : ReniObject, IVisitor
     {
+        private readonly IExecutionContext _context;
+
         sealed class LocalData : ReniObject, IStackDataAddressBase
         {
             public StackData Data;
@@ -63,16 +65,10 @@ namespace Reni.Code
         [EnableDump]
         LocalData _localData;
 
-        readonly CodeBasePair[] _functions;
-        readonly bool _isTraceEnabled;
-        readonly IOutStream _outStream;
-
-        public DataStack(IOutStream outStream, CodeBasePair[] functions = null, bool isTraceEnabled = false)
+        public DataStack(IExecutionContext context)
         {
-            _functions = functions ?? new CodeBasePair[0];
-            _isTraceEnabled = isTraceEnabled;
-            _outStream = outStream;
-            _localData = new LocalData(_outStream);
+            _context = context;
+            _localData = new LocalData(_context.OutStream);
         }
 
         [DisableDump]
@@ -85,8 +81,7 @@ namespace Reni.Code
             do
             {
                 _localData.Frame = new FrameData(argsAndRefs);
-                var function = _functions[functionId.Index];
-                SubVisit("call " + functionId, functionId.IsGetter ? function.Getter: function.Setter);
+                SubVisit("call " + functionId, _context.Function(functionId));
             } while(_localData.Frame.IsRepeatRequired);
             _localData.Frame = oldFrame;
         }
@@ -99,7 +94,7 @@ namespace Reni.Code
         {
             if(size.IsZero)
                 return;
-            Push(new BitsStackData(data.Resize(size), _outStream));
+            Push(new BitsStackData(data.Resize(size), _context.OutStream));
         }
 
         void Push(StackData value) { Data = Data.Push(value); }
@@ -174,7 +169,7 @@ namespace Reni.Code
             left.Assign(targetSize, right);
         }
 
-        void IVisitor.PrintText(string dumpPrintText) { _outStream.Add(dumpPrintText); }
+        void IVisitor.PrintText(string dumpPrintText) { _context.OutStream.Add(dumpPrintText); }
 
         void IVisitor.List(CodeBase[] data)
         {
@@ -208,7 +203,7 @@ namespace Reni.Code
                 Tracer.IndentEnd();
         }
 
-        bool IsTraceEnabled { get { return _isTraceEnabled; } }
+        bool IsTraceEnabled { get { return _context.IsTraceEnabled; } }
 
         void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems)
         {
@@ -221,7 +216,7 @@ namespace Reni.Code
             }
         }
 
-        void IVisitor.LocalVariableReference(string holder, Size offset) { Push(new StackDataAddress(new LocalStackReference(Locals, holder), offset, _outStream)); }
+        void IVisitor.LocalVariableReference(string holder, Size offset) { Push(new StackDataAddress(new LocalStackReference(Locals, holder), offset, _context.OutStream)); }
 
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
         {
@@ -242,5 +237,13 @@ namespace Reni.Code
             Data = Data.DoPull(size);
             return result;
         }
+    }
+
+    internal interface IExecutionContext
+
+    {
+        IOutStream OutStream { get; }
+        bool IsTraceEnabled { get; }
+        CodeBase Function(FunctionId functionId);
     }
 }

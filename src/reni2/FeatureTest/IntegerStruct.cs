@@ -71,7 +71,7 @@ Integer8:
     [Create]
     [ObjectFunction]
     [TwoFunctions1]
-    [LowPriority]
+    //[LowPriority]
     public sealed class IntegerPlusNumber : IntegerStruct
     {
         [Test]

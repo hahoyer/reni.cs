@@ -149,7 +149,7 @@ namespace Reni.Struct
         {
             var position = rightResult
                 .Conversion(IndexType)
-                .Evaluate(ContainerContextObject.RootContext.OutStream)
+                .Evaluate(ContainerContextObject.RootContext.ExecutionContext)
                 .ToInt32();
             return AccessViaThisReference(category, position);
         }

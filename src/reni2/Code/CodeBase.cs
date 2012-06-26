@@ -223,9 +223,9 @@ namespace Reni.Code
             return newResult ?? this;
         }
 
-        internal BitsConst Evaluate(IOutStream outStream)
+        internal BitsConst Evaluate(IExecutionContext context)
         {
-            var dataStack = new DataStack(outStream);
+            var dataStack = new DataStack(context);
             Visit(dataStack);
             return dataStack.Value;
         }
@@ -275,11 +275,11 @@ namespace Reni.Code
                 .Aggregate(this, (current, fiberItem) => current.CreateFiber(fiberItem));
         }
 
-        internal void Execute(CodeBasePair[] functions, bool isTraceEnabled, IOutStream outStream)
+        internal void Execute(IExecutionContext context)
         {
             try
             {
-                Visit(new DataStack(outStream, functions, isTraceEnabled));
+                Visit(new DataStack(context));
             }
             catch(UnexpectedContextReference e)
             {

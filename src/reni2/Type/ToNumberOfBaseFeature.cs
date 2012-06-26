@@ -34,41 +34,21 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
-    sealed class ToNumberOfBaseFeature : ISearchPath<ISuffixFeature, SequenceType>
+    sealed class ToNumberOfBaseFeature : ReniObject, ISuffixFeature                                        , IMetaFunctionFeature
     {
-        readonly DictionaryEx<int, ToNumberOfBaseSequenceFeature> _toNumberOfBaseSeqquenceFeaturesCache;
-        readonly TextItemType _type;
-        public ToNumberOfBaseFeature(TextItemType type)
+        readonly TextItemsType _type;
+        public ToNumberOfBaseFeature(TextItemsType type)
         {
-            _toNumberOfBaseSeqquenceFeaturesCache = new DictionaryEx<int, ToNumberOfBaseSequenceFeature>(count => new ToNumberOfBaseSequenceFeature(_type, count));
             _type = type;
         }
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
-        {
-            Tracer.Assert(_type == type.Element);
-            return _toNumberOfBaseSeqquenceFeaturesCache.Find(type.Count);
-        }
-    }
 
-    sealed class ToNumberOfBaseSequenceFeature : TypeBase, ISuffixFeature, IMetaFunctionFeature
-    {
-        [EnableDump]
-        readonly TextItemType _type;
-        [EnableDump]
-        readonly int _count;
-        public ToNumberOfBaseSequenceFeature(TextItemType type, int count)
-        {
-            _type = type;
-            _count = count;
-        }
-        internal override bool IsDataLess { get { return true; } }
         Result IMetaFunctionFeature.ApplyResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var target = left.Evaluate(context).ToString(_type.Size);
+            var target = left.Evaluate(context).ToString(_type.Parent.Element.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
             Tracer.Assert(conversionBase >= 2 && conversionBase <= 36, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
-            return UniqueNumber(result.Size.ToInt())
+            return TypeBase.UniqueNumber(result.Size.ToInt())
                 .Result(category, () => CodeBase.BitsConst(result), CodeArgs.Void)
                 .Align(context.RefAlignParam.AlignBits);
         }

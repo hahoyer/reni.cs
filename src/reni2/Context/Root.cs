@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -35,14 +36,13 @@ namespace Reni.Context
     {
         [DisableDump]
         readonly FunctionList _functions;
-        [DisableDump]
-        internal readonly IOutStream OutStream;
+        [DisableDump] internal readonly IExecutionContext ExecutionContext;
 
 
-        internal Root(FunctionList functions, IOutStream outStream)
+        internal Root(FunctionList functions, IExecutionContext executionContext)
         {
             _functions = functions;
-            OutStream = outStream;
+            ExecutionContext = executionContext;
         }
 
         [DisableDump]

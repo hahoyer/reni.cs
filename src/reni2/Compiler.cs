@@ -35,7 +35,7 @@ using Reni.Struct;
 
 namespace Reni
 {
-    public sealed class Compiler : ReniObject
+    public sealed class Compiler : ReniObject, IExecutionContext
     {
         readonly string _fileName;
         readonly CompilerParameters _parameters;
@@ -68,7 +68,7 @@ namespace Reni
             _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true, className??fileName.Symbolize()));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
             _functionContainers = new SimpleCache<List<FunctionContainer>>(() => Functions.Compile());
-            _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, OutStream));
+            _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, this));
             _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
         }
 
@@ -122,7 +122,10 @@ namespace Reni
             }
         }
 
-        IOutStream OutStream { get { return _parameters.OutStream; } }
+        IOutStream IExecutionContext.OutStream { get { return _parameters.OutStream; } }
+        bool IExecutionContext.IsTraceEnabled { get { return _parameters.Trace.Functions; } }
+
+        CodeBase IExecutionContext.Function(FunctionId functionId) { throw new NotImplementedException(); }
 
         /// <summary>
         ///     Performs compilation
@@ -156,7 +159,7 @@ namespace Reni
 
             if(_parameters.RunFromCode)
             {
-                Code.Execute(_functionCode.Value, _parameters.Trace.CodeExecutor, OutStream);
+                RunFromCode();
                 return;
             }
 
@@ -169,7 +172,7 @@ namespace Reni
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(FilePositionTag.Debug, ExecutedCode);
 
-            Data.OutStream = OutStream;
+            Data.OutStream = _parameters.OutStream;
             try
             {
                 var assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false, _parameters.Trace.GeneratorFilePosn,"Reni");
@@ -179,10 +182,12 @@ namespace Reni
             catch(CompilerErrorException e)
             {
                 for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
-                    OutStream.Add(e.CompilerErrorCollection[i] + "\n");
+                    _parameters.OutStream.Add(e.CompilerErrorCollection[i] + "\n");
             }
             Data.OutStream = null;
         }
+
+        private void RunFromCode() { Code.Execute(this); }
 
         internal void Materialize()
         {

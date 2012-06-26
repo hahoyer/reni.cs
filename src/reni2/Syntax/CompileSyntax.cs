@@ -83,7 +83,7 @@ namespace Reni.Syntax
         //[DebuggerHidden]
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
         Result FindResult(ContextBase context, Category category) { return context.FindResult(category, this); }
-        internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(context.RootContext.OutStream); }
+        internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(context.RootContext.ExecutionContext); }
 
         internal Result AtTokenResult(ContextBase context, Category category, CompileSyntax right)
         {

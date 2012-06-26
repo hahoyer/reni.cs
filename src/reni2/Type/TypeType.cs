@@ -64,7 +64,7 @@ namespace Reni.Type
             var count = right
                 .Result(context)
                 .AutomaticDereferenceResult()
-                .Evaluate(context.RootContext.OutStream)
+                .Evaluate(context.RootContext.ExecutionContext)
                 .ToInt32();
             return Value
                 .UniqueAlign(context.RefAlignParam.AlignBits)

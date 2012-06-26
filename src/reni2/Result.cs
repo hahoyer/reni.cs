@@ -645,11 +645,11 @@ namespace Reni
 
         internal Result Conversion(TypeBase target) { return Type.Conversion(CompleteCategory, target).ReplaceArg(this); }
 
-        internal BitsConst Evaluate(IOutStream outStream)
+        internal BitsConst Evaluate(IExecutionContext context)
         {
             Tracer.Assert(CodeArgs.IsNone);
             var result = Align(3).LocalBlock(CompleteCategory);
-            return result.Code.Evaluate(outStream);
+            return result.Code.Evaluate(context);
         }
 
         internal Result AutomaticDereferenceResult()
