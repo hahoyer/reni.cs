@@ -46,7 +46,7 @@ namespace Reni
         readonly SimpleCache<CodeBase> _code;
         readonly SimpleCache<CodeBasePair[]> _functionCode;
         readonly SimpleCache<Code.Container> _mainContainer;
-        readonly SimpleCache<List<FunctionContainer>> _functionContainers;
+        readonly DictionaryEx<int, FunctionContainer> _functionContainers;
         readonly SimpleCache<string> _executedCode;
         readonly SimpleCache<FunctionList> _functions;
         readonly SimpleCache<ContextBase> _rootContext;
@@ -65,9 +65,9 @@ namespace Reni
             _syntax = new SimpleCache<ReniParser.ParsedSyntax>(() => (ReniParser.ParsedSyntax) _tokenFactory.Parser.Compile(Source));
             _functionCode = new SimpleCache<CodeBasePair[]>(() => Functions.Code);
             _mainContainer = new SimpleCache<Code.Container>(() => new Code.Container(Code, Source.Data));
-            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, FunctionContainers, true, className??fileName.Symbolize()));
+            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, _functionContainers, true, className??fileName.Symbolize()));
             _functions = new SimpleCache<FunctionList>(() => new FunctionList());
-            _functionContainers = new SimpleCache<List<FunctionContainer>>(() => Functions.Compile());
+            _functionContainers = new DictionaryEx<int, FunctionContainer>(index => Functions.Compile(index));
             _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, this));
             _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
         }
@@ -96,9 +96,6 @@ namespace Reni
         [DisableDump]
         Code.Container MainContainer { get { return _mainContainer.Value; } }
 
-        [DisableDump]
-        List<FunctionContainer> FunctionContainers { get { return _functionContainers.Value; } }
-
         [Node]
         [DisableDump]
         ContextBase RootContext { get { return _rootContext.Value; } }
@@ -125,7 +122,13 @@ namespace Reni
         IOutStream IExecutionContext.OutStream { get { return _parameters.OutStream; } }
         bool IExecutionContext.IsTraceEnabled { get { return _parameters.Trace.Functions; } }
 
-        CodeBase IExecutionContext.Function(FunctionId functionId) { throw new NotImplementedException(); }
+        CodeBase IExecutionContext.Function(FunctionId functionId)
+        {
+            
+            var item = _functionContainers.Find(functionId.Index);
+            var container = functionId.IsGetter ? item.Getter : item.Setter;
+            return container.Data;
+        }
 
         /// <summary>
         ///     Performs compilation
@@ -166,8 +169,8 @@ namespace Reni
             if(_parameters.Trace.CodeSequence)
             {
                 Tracer.FlaggedLine(FilePositionTag.Debug, "main\n" + MainContainer.Dump());
-                for(var i = 0; i < FunctionContainers.Count; i++)
-                    Tracer.FlaggedLine(FilePositionTag.Debug, "function index=" + i + "\n" + FunctionContainers[i].Dump());
+                for(var i = 0; i < Functions.Count; i++)
+                    Tracer.FlaggedLine(FilePositionTag.Debug, "function index=" + i + "\n" + _functionContainers.Find(i).Dump());
             }
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(FilePositionTag.Debug, ExecutedCode);
@@ -175,7 +178,7 @@ namespace Reni
             Data.OutStream = _parameters.OutStream;
             try
             {
-                var assembly = Generator.CreateCSharpAssembly(MainContainer, FunctionContainers, false, _parameters.Trace.GeneratorFilePosn,"Reni");
+                var assembly = Generator.CreateCSharpAssembly(MainContainer, _functionContainers, false, _parameters.Trace.GeneratorFilePosn,"Reni");
                 var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
                 methodInfo.Invoke(null, new object[0]);
             }

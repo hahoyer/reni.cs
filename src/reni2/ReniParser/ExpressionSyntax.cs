@@ -56,7 +56,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = new[] {194}.Contains(ObjectId) && category.HasType;
+            var trace = new[] {-194}.Contains(ObjectId) && category.HasType;
             StartMethodDump(trace, context, category);
             try
             {

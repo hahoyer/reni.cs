@@ -42,8 +42,11 @@ namespace Reni.Code
         internal static string MainFunctionName { get { return "MainFunction"; } }
         internal static string FunctionName(FunctionId functionId) { return (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index; }
 
-        internal static string CreateCSharpString(Container main, List<FunctionContainer> functions, bool useStatementAligner, string className) { return new CSharp_Generated(className, main, functions).TransformText(useStatementAligner); }
-        internal static Assembly CreateCSharpAssembly(Container main, List<FunctionContainer> functions, bool align, bool traceFilePosn, string className) { return CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn); }
+        internal static string CreateCSharpString(Container main, DictionaryEx<int, FunctionContainer> functions, bool useStatementAligner, string className)
+        {
+            return new CSharp_Generated(className, main, functions).TransformText(useStatementAligner);
+        }
+        internal static Assembly CreateCSharpAssembly(Container main, DictionaryEx<int, FunctionContainer> functions, bool align, bool traceFilePosn, string className) { return CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn); }
 
         static void CodeToFile(string name, string result, bool traceFilePosn)
         {
@@ -113,8 +116,8 @@ namespace Reni.Code
     {
         readonly string _className;
         readonly Container _main;
-        readonly List<FunctionContainer> _functions;
-        internal CSharp_Generated(string className, Container main, List<FunctionContainer> functions)
+        readonly DictionaryEx<int, FunctionContainer> _functions;
+        internal CSharp_Generated(string className, Container main, DictionaryEx<int, FunctionContainer> functions)
         {
             _className = className;
             _main = main;

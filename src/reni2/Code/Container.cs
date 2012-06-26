@@ -81,7 +81,7 @@ namespace Reni.Code
         [Node]
         [DisableDump]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
-        public FunctionId FunctionId;
+        public readonly FunctionId FunctionId;
 
         internal BitsConst Evaluate()
         {
