@@ -280,6 +280,8 @@ namespace Reni.Type
 
         [DisableDump]
         protected virtual ISearchTarget ConversionProvider { get { return this; } }
+        [DisableDump]
+        virtual internal bool HasQuickSize { get { return true; } }
 
         private TypeBase CreateSequenceType(TypeBase elementType)
         {

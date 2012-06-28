@@ -51,7 +51,7 @@ namespace Reni
         internal Result()
             : base(_nextObjectId++)
         {
-            _pendingCategory = new Category();
+            _pendingCategory = Category.None;
             StopByObjectId(-804);
         }
 
@@ -173,7 +173,7 @@ namespace Reni
 
         [Node]
         [EnableDumpWithExceptionPredicate]
-        public Category CompleteCategory { get { return new Category(HasIsDataLess, HasSize, HasType, HasCode, HasArgs); } }
+        public Category CompleteCategory { get { return Category.CreateCategory(HasIsDataLess, HasSize, HasType, HasCode, HasArgs); } }
 
         [Node]
         [DebuggerHidden]
@@ -265,6 +265,19 @@ namespace Reni
             }
         }
 
+        bool? QuickFindIsDataLess
+        {
+            get
+            {
+                if(HasIsDataLess)
+                    return _isDataLess;
+                var size = QuickFindSize;
+                if(size == null)
+                    return null;
+                return size.IsZero;
+            }
+        }
+
         internal bool SmartIsDataLess
         {
             get
@@ -289,6 +302,20 @@ namespace Reni
                 if(HasCode)
                     return Code.Size;
                 if(HasType)
+                    return Type.Size;
+                return null;
+            }
+        }
+
+        Size QuickFindSize
+        {
+            get
+            {
+                if(HasSize)
+                    return Size;
+                if(HasCode)
+                    return Code.Size;
+                if(HasType && Type.HasQuickSize)
                     return Type.Size;
                 return null;
             }
@@ -474,25 +501,25 @@ namespace Reni
             if(IsDirty)
                 return;
 
-            var isDataLess = FindIsDataLess;
+            var isDataLess = QuickFindIsDataLess;
             if(isDataLess != null)
             {
                 if(HasIsDataLess && IsDataLess != isDataLess.Value)
                     Tracer.AssertionFailed(@"IsDataLess==isDataLess", () => "IsDataLess differs " + Dump());
                 if(HasSize && Size.IsZero != isDataLess.Value)
                     Tracer.AssertionFailed(@"Size.IsZero==isDataLess.Value", () => "Size differs " + Dump());
-                if(HasType && Type.IsDataLess != isDataLess.Value)
+                if(HasType && Type.HasQuickSize && Type.IsDataLess != isDataLess.Value)
                     Tracer.AssertionFailed(@"Type.IsDataLess==isDataLess.Value", () => "Type IsDataLess property differs " + Dump());
                 if(HasCode && Code.Size.IsZero != isDataLess.Value)
                     Tracer.AssertionFailed(@"Code.Size.IsZero==isDataLess.Value", () => "Code size differs " + Dump());
             }
 
-            var size = FindSize;
+            var size = QuickFindSize;
             if(size != null)
             {
                 if(HasSize && Size != size)
                     Tracer.AssertionFailed(@"Size==size", () => "Size differs " + Dump());
-                if(HasType && Type.Size != size)
+                if(HasType && Type.HasQuickSize && Type.Size != size)
                     Tracer.AssertionFailed(@"Type.Size==size", () => "Type size differs " + Dump());
                 if(HasCode && Code.Size != size)
                     Tracer.AssertionFailed(@"Code.Size==size", () => "Code size differs " + Dump());
@@ -800,11 +827,11 @@ namespace Reni
         internal Result SmartUn<T>() where T : IConverter { return Type is T ? Un<T>() : this; }
 
         internal Result BitSequenceOperandConversion(Category category) { return Type.BitSequenceOperandConversion(category).ReplaceArg(this); }
-        
+
         internal Result PostConversionResult(TypeBase destination)
         {
             var result = SmartConversionResult(destination);
-            if (result != null)
+            if(result != null)
                 return result;
             DumpDataWithBreak("Wrong conversion result type", "destination", destination, "this", this);
             return null;
@@ -813,22 +840,22 @@ namespace Reni
         internal Result SmartConversionResult(TypeBase destination)
         {
             var result = this;
-            if (result.Type == destination)
+            if(result.Type == destination)
                 return result;
 
             result = result.SmartUn<Aligner>();
-            if (result.Type == destination)
+            if(result.Type == destination)
                 return result;
 
-            if (result.Type.Reference == null)
+            if(result.Type.Reference == null)
                 return null;
 
             result = result.DereferenceResult();
-            if (result.Type == destination)
+            if(result.Type == destination)
                 return result;
 
             result = result.SmartUn<Aligner>();
-            if (result.Type == destination)
+            if(result.Type == destination)
                 return result;
 
             return null;

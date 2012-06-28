@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,11 +18,14 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 
 namespace Reni.Basics
 {
@@ -34,9 +39,9 @@ namespace Reni.Basics
         readonly bool _size;
         readonly bool _isDataLess;
 
-        internal Category() { }
-
-        internal Category(bool isDataLess, bool size, bool type, bool code, bool args)
+        static readonly Category[] _cache = new Category[32];
+                                                     
+        Category(bool isDataLess, bool size, bool type, bool code, bool args)
         {
             _code = code;
             _type = type;
@@ -46,25 +51,36 @@ namespace Reni.Basics
         }
 
         [DebuggerHidden]
-        public static Category Size { get { return new Category(false, true, false, false, false); } }
+        internal static Category CreateCategory(bool isDataLess = false, bool size = false, bool type = false, bool code = false, bool args = false)
+        {
+            var result = _cache[IndexFromBool(isDataLess, size, type, code, args)];
+            if(result != null)
+                return result;
+            return _cache[IndexFromBool(isDataLess, size, type, code, args)] = new Category(isDataLess, size, type, code, args);
+        }
+        
+        static int IndexFromBool(params bool[] data) { return data.Aggregate(0, (c, n) => c * 2 + (n ? 1 : 0)); }
 
         [DebuggerHidden]
-        public static Category Type { get { return new Category(false, false, true, false, false); } }
+        public static Category Size { get { return CreateCategory(size: true); } }
 
         [DebuggerHidden]
-        public static Category Code { get { return new Category(false, false, false, true, false); } }
+        public static Category Type { get { return CreateCategory(type: true); } }
 
         [DebuggerHidden]
-        public static Category CodeArgs { get { return new Category(false, false, false, false, true); } }
+        public static Category Code { get { return CreateCategory(code: true); } }
 
         [DebuggerHidden]
-        public static Category IsDataLess { get { return new Category(true, false, false, false, false); } }
+        public static Category CodeArgs { get { return CreateCategory(args: true); } }
 
         [DebuggerHidden]
-        public static Category None { get { return new Category(false, false, false, false, false); } }
+        public static Category IsDataLess { get { return CreateCategory(isDataLess: true); } }
 
         [DebuggerHidden]
-        public static Category All { get { return new Category(true, true, true, true, true); } }
+        public static Category None { get { return CreateCategory(); } }
+
+        [DebuggerHidden]
+        public static Category All { get { return CreateCategory(isDataLess: true, size: true, type: true, code: true, args: true); } }
 
         public bool IsNone { get { return !HasAny; } }
         public bool HasCode { get { return _code; } }
@@ -111,19 +127,19 @@ namespace Reni.Basics
             get
             {
                 var result = None;
-                if (HasCode)
+                if(HasCode)
                     result |= Type | Code;
-                if (HasArgs)
+                if(HasArgs)
                     result |= CodeArgs;
                 return result;
             }
         }
 
         [DebuggerHidden]
-        public static Category operator |(Category x, Category y) { return new Category(x.HasIsDataLess || y.HasIsDataLess, x.HasSize || y.HasSize, x.HasType || y.HasType, x.HasCode || y.HasCode, x.HasArgs || y.HasArgs); }
+        public static Category operator |(Category x, Category y) { return CreateCategory(x.HasIsDataLess || y.HasIsDataLess, x.HasSize || y.HasSize, x.HasType || y.HasType, x.HasCode || y.HasCode, x.HasArgs || y.HasArgs); }
 
         [DebuggerHidden]
-        public static Category operator &(Category x, Category y) { return new Category(x.HasIsDataLess && y.HasIsDataLess, x.HasSize && y.HasSize, x.HasType && y.HasType, x.HasCode && y.HasCode, x.HasArgs && y.HasArgs); }
+        public static Category operator &(Category x, Category y) { return CreateCategory(x.HasIsDataLess && y.HasIsDataLess, x.HasSize && y.HasSize, x.HasType && y.HasType, x.HasCode && y.HasCode, x.HasArgs && y.HasArgs); }
 
         public override int GetHashCode()
         {
@@ -176,7 +192,7 @@ namespace Reni.Basics
         }
 
         [DebuggerHidden]
-        public static Category operator -(Category x, Category y) { return new Category(x.HasIsDataLess && !y.HasIsDataLess, x.HasSize && !y.HasSize, x.HasType && !y.HasType, x.HasCode && !y.HasCode, x.HasArgs && !y.HasArgs); }
+        public static Category operator -(Category x, Category y) { return CreateCategory(x.HasIsDataLess && !y.HasIsDataLess, x.HasSize && !y.HasSize, x.HasType && !y.HasType, x.HasCode && !y.HasCode, x.HasArgs && !y.HasArgs); }
 
         protected override string Dump(bool isRecursion) { return DumpShort(); }
 

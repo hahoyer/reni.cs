@@ -114,6 +114,14 @@ namespace Reni
             }
         }
 
+        public static Result operator &(ResultCache resultCache, Category category) { return resultCache.GetCategories(category); }
+        
+        Result GetCategories(Category category)
+        {
+            Update(category);
+            return Data & category;
+        }
+        
         bool HasIsDataLess
         {
             get { return _data.HasIsDataLess; }

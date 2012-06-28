@@ -178,7 +178,8 @@ namespace Reni
             Data.OutStream = _parameters.OutStream;
             try
             {
-                var assembly = Generator.CreateCSharpAssembly(MainContainer, _functionContainers, false, _parameters.Trace.GeneratorFilePosn,"Reni");
+                EnsureFunctionContainers();
+                var assembly = Generator.CreateCSharpAssembly(MainContainer, _functionContainers, false, _parameters.Trace.GeneratorFilePosn, "Reni");
                 var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
                 methodInfo.Invoke(null, new object[0]);
             }
@@ -188,6 +189,12 @@ namespace Reni
                     _parameters.OutStream.Add(e.CompilerErrorCollection[i] + "\n");
             }
             Data.OutStream = null;
+        }
+
+        void EnsureFunctionContainers()
+        {
+            for(var i = 0; i < Functions.Count; i++)
+                _functionContainers.Find(i);
         }
 
         private void RunFromCode() { Code.Execute(this); }
