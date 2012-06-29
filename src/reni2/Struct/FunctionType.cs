@@ -35,7 +35,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionType : TypeBase, ISetterTargetType, ISearchContainerType, IConverter, ISoftReference
+    sealed class FunctionType : TypeBase, ISetterTargetType, ISearchContainerType, IConverter, ISmartReference
     {
         readonly int _index;
         [Node]
@@ -63,8 +63,8 @@ namespace Reni.Struct
 
         TypeBase ISetterTargetType.Type { get { return this; } }
         TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
-        TypeBase IReference.TargetType { get { return ValueType; } }
-        Result IReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
+        TypeBase ISmartReference.TargetType { get { return ValueType; } }
+        Result ISmartReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
         Size IContextReference.Size { get { return Size; } }
         IConverter ISearchContainerType.Converter { get { return this; } }
         TypeBase ISearchContainerType.Target { get { return ValueType; } }

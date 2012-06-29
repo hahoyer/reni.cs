@@ -35,13 +35,13 @@ namespace Reni.Feature.DumpPrint
 {
     abstract class BitFeatureBase : ReniObject
     {
-        protected static Result Apply(Category category, IReference objectReference)
+        protected static Result Apply(Category category, ISmartReference objectReference)
         {
             return TypeBase.Void
                 .Result(category, () => BitSequenceDumpPrint(objectReference), CodeArgs.Arg);
         }
 
-        static CodeBase BitSequenceDumpPrint(IReference objectReference)
+        static CodeBase BitSequenceDumpPrint(ISmartReference objectReference)
         {
             var alignedSize = objectReference.TargetType.Size.Align(Root.DefaultRefAlignParam.AlignBits);
             return objectReference.Type().ArgCode
@@ -65,7 +65,7 @@ namespace Reni.Feature.DumpPrint
 
         [EnableDump]
         internal TypeBase ObjectType { get { return _parent; } }
-        Result ISimpleFeature.Result(Category category) { return Apply(category, _parent.UniqueReference); }
+        Result ISimpleFeature.Result(Category category) { return Apply(category, _parent.UniqueSmartReference); }
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
         ISimpleFeature IFeature.Simple { get { return this; } }
@@ -73,7 +73,7 @@ namespace Reni.Feature.DumpPrint
 
     sealed class BitFeature : BitFeatureBase, ISuffixFeature, ISimpleFeature
     {
-        Result ISimpleFeature.Result(Category category) { return Apply(category, TypeBase.Bit.UniqueReference); }
+        Result ISimpleFeature.Result(Category category) { return Apply(category, TypeBase.Bit.UniqueSmartReference); }
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
         ISimpleFeature IFeature.Simple { get { return this; } }
@@ -81,7 +81,7 @@ namespace Reni.Feature.DumpPrint
 
     sealed class StructReferenceFeature
         : ReniObject
-          , ISearchPath<ISuffixFeature, AutomaticReferenceType>
+          , ISearchPath<ISuffixFeature, PointerType>
           , ISuffixFeature
           , ISimpleFeature
     {
@@ -90,7 +90,7 @@ namespace Reni.Feature.DumpPrint
 
         public StructReferenceFeature(StructureType structureType) { _structureType = structureType; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type)
+        ISuffixFeature ISearchPath<ISuffixFeature, PointerType>.Convert(PointerType type)
         {
             Tracer.Assert(Root.DefaultRefAlignParam == _structureType.RefAlignParam);
             return this;

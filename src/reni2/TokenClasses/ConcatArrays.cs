@@ -37,22 +37,22 @@ namespace Reni.TokenClasses
         , ISearchPath<ISuffixFeature, Type.Array>
         , ISearchPath<ISuffixFeature, SequenceType>
         , ISearchPath<ISuffixFeature, TextItemsType>
-        , ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>
-        , ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>
+        , ISearchPath<ISearchPath<IPrefixFeature, PointerType>, TypeBase>
+        , ISearchPath<ISearchPath<ISuffixFeature, PointerType>, Type.Array>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.ConcatArrays); }
         IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return Extension.Feature(type.CreateArray); }
-        ISearchPath<IPrefixFeature, AutomaticReferenceType>
-            ISearchPath<ISearchPath<IPrefixFeature, AutomaticReferenceType>, TypeBase>.Convert(TypeBase type)
+        ISearchPath<IPrefixFeature, PointerType>
+            ISearchPath<ISearchPath<IPrefixFeature, PointerType>, TypeBase>.Convert(TypeBase type)
         {
             return
-                Extension.Feature<AutomaticReferenceType>(type.ConcatArrayFromReference);
+                Extension.Feature<PointerType>(type.ConcatArrayFromReference);
         }
-        ISearchPath<ISuffixFeature, AutomaticReferenceType>
-            ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, Type.Array>.Convert(Type.Array type)
+        ISearchPath<ISuffixFeature, PointerType>
+            ISearchPath<ISearchPath<ISuffixFeature, PointerType>, Type.Array>.Convert(Type.Array type)
         {
             return
-                Extension.Feature<AutomaticReferenceType>(type.ConcatArraysFromReference);
+                Extension.Feature<PointerType>(type.ConcatArraysFromReference);
         }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Extension.Feature(type.ConcatArrays); }

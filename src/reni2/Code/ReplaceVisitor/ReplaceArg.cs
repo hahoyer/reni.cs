@@ -54,7 +54,7 @@ namespace Reni.Code.ReplaceVisitor
         {
             if(ActualArg.Type == visitedObject.Type)
                 return Actual;
-            if(ActualArg.Type.UniqueReference.Type() == visitedObject.Type)
+            if(ActualArg.Type.UniquePointer == visitedObject.Type)
                 return Actual.LocalReference(ActualArg.Type.Destructor(Category.Code).Code);
 
             throw new SizeException(Actual, visitedObject);

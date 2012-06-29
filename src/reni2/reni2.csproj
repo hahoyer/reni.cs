@@ -32,6 +32,7 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
+    <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="Feature\Function.cs" />
@@ -226,6 +227,7 @@
     <Compile Include="TokenClasses\EnableCut.cs" />
     <Compile Include="TokenClasses\Function.cs" />
     <Compile Include="TokenClasses\FunctionSyntax.cs" />
+    <Compile Include="TokenClasses\ReferenceToken.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />
     <Compile Include="TokenClasses\List.cs" />
@@ -266,7 +268,8 @@
     <Compile Include="Type\FunctionFeatureType.cs" />
     <Compile Include="Type\IReference.cs" />
     <Compile Include="Type\Pair.cs" />
-    <Compile Include="Type\AutomaticReferenceType.cs" />
+    <Compile Include="Type\PointerType.cs" />
+    <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\SearchResult.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemsType.cs" />

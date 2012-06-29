@@ -29,20 +29,18 @@ using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
-namespace Reni.Struct
+namespace Reni.TokenClasses
 {
-    sealed class SetterFunction : FunctionInstance
+    sealed class ReferenceToken : Infix
     {
-        readonly FunctionId _functionId;
-        public SetterFunction(FunctionType parent, int index, CompileSyntax body)
-            : base(parent, body)
+        public override Result Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            _functionId = FunctionId
-                .Setter(index);
-        }
+            var leftType = left.Type(context) as TypeType;
+            if(leftType != null)
+                return leftType.CreateReference(context, category, right);
 
-        protected override FunctionId FunctionId { get { return _functionId; } }
-        protected override TypeBase CallType { get { return base.CallType.Pair(Parent.ValueType.UniquePointer); } }
-        protected override Size RelevantValueSize { get { return Root.DefaultRefAlignParam.RefSize; } }
+            NotImplementedMethod(context, category, left, right, "leftType", left.Type(context));
+            return null;
+        }
     }
 }

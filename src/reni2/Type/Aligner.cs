@@ -52,11 +52,11 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase UnAlignedType { get { return Parent; } }
         [DisableDump]
-        internal override IReference Reference { get { return Parent.Reference; } }
+        internal override ISmartReference Reference { get { return Parent.Reference; } }
         [DisableDump]
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
         [DisableDump]
-        internal override IReference UniqueReference { get { return Parent.UniqueReference; } }
+        internal override ISmartReference UniqueSmartReference { get { return Parent.UniqueSmartReference; } }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
 

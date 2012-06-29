@@ -21,7 +21,9 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
@@ -36,7 +38,7 @@ using Reni.Struct;
 namespace Reni.Type
 {
     [Serializable]
-    internal abstract class TypeBase
+    abstract class TypeBase
         : ReniObject
           , IContextReference
           , IDumpShortProvider
@@ -45,14 +47,15 @@ namespace Reni.Type
           , ISearchPath<ISuffixFeature, Aligner>
           , ISearchPath<ISuffixFeature, TypeBase>
     {
-        private sealed class Cache
+        sealed class Cache
         {
             public static readonly Bit Bit = new Bit();
             public static readonly Void Void = new Void();
             public readonly DictionaryEx<int, Aligner> Aligners;
             public readonly DictionaryEx<int, Array> Arrays;
             public readonly DictionaryEx<TypeBase, Pair> Pairs;
-            public readonly SimpleCache<IReference> References;
+            public readonly SimpleCache<ISmartReference> Pointer;
+            public readonly SimpleCache<ReferenceType> Reference;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<FunctionInstanceType> FunctionInstanceType;
             public readonly SimpleCache<TextItemType> TextItem;
@@ -61,7 +64,8 @@ namespace Reni.Type
             public Cache(TypeBase parent)
             {
                 EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
-                References = new SimpleCache<IReference>(parent.ObtainReference);
+                Pointer = new SimpleCache<ISmartReference>(parent.ObtainPointer);
+                Reference = new SimpleCache<ReferenceType>(parent.ObtainReference);
                 Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Arrays = new DictionaryEx<int, Array>(parent.ObtainArray);
                 Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
@@ -71,10 +75,11 @@ namespace Reni.Type
             }
         }
 
-        private static int _nextObjectId;
-        private readonly Cache _cache;
+        static int _nextObjectId;
+        readonly Cache _cache;
 
-        [UsedImplicitly] private static ReniObject _lastSearchVisitor;
+        [UsedImplicitly]
+        static ReniObject _lastSearchVisitor;
 
         protected TypeBase()
             : base(_nextObjectId++) { _cache = new Cache(this); }
@@ -87,7 +92,7 @@ namespace Reni.Type
         {
             get
             {
-                if (IsDataLess)
+                if(IsDataLess)
                     return Size.Zero;
                 return GetSize();
             }
@@ -100,11 +105,11 @@ namespace Reni.Type
             return Size.Zero;
         }
 
-        [DisableDump]
+        [DisableDump]                                                               
         internal virtual bool IsDataLess
         {
             get
-            {
+            {                                                   
                 NotImplementedMethod();
                 return true;
             }
@@ -136,7 +141,7 @@ namespace Reni.Type
 
         internal virtual int? SmartArrayLength(TypeBase elementType)
         {
-            if (IsConvertable(elementType))
+            if(IsConvertable(elementType))
                 return 1;
             NotImplementedMethod(elementType);
             return 0;
@@ -147,7 +152,7 @@ namespace Reni.Type
 
         internal TypeBase UniqueAlign(int alignBits)
         {
-            if (Size.Align(alignBits) == Size)
+            if(Size.Align(alignBits) == Size)
                 return this;
             return _cache.Aligners.Find(alignBits);
         }
@@ -159,7 +164,11 @@ namespace Reni.Type
         internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
 
         [DisableDump]
-        internal virtual IReference UniqueReference { get { return _cache.References.Value; } }
+        internal TypeBase UniquePointer { get { return UniqueSmartReference.Type(); } }
+        [DisableDump]
+        internal virtual ISmartReference UniqueSmartReference { get { return _cache.Pointer.Value; } }
+        [DisableDump]
+        internal ReferenceType UniqueReference { get { return _cache.Reference.Value; } }
 
         [DisableDump]
         internal virtual TypeBase TypeForTypeOperator { get { return this; } }
@@ -173,7 +182,7 @@ namespace Reni.Type
             get
             {
                 var result = Reference;
-                if (result == null)
+                if(result == null)
                     return this;
                 return result.TargetType.AutomaticDereferenceType;
             }
@@ -183,7 +192,7 @@ namespace Reni.Type
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
         internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueArray(bitCount).UniqueSequence; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
-        private static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
+        static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
         internal static Result VoidResult(Category category) { return Void.Result(category); }
         internal virtual Result Destructor(Category category) { return VoidCodeAndRefs(category); }
         internal virtual Result ArrayDestructor(Category category, int count) { return VoidCodeAndRefs(category); }
@@ -191,11 +200,11 @@ namespace Reni.Type
         internal virtual Result ArrayCopier(Category category, int count) { return VoidCodeAndRefs(category); }
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
         internal Result ArgResult(Category category) { return Result(category, () => ArgCode, CodeArgs.Arg); }
-        internal Result ReferenceArgResult(Category category) { return UniqueReference.Type().ArgResult(category); }
+        internal Result PointerArgResult(Category category) { return UniquePointer.ArgResult(category); }
 
         internal Result Result(Category category, IContextReference target)
         {
-            if (IsDataLess)
+            if(IsDataLess)
                 return Result(category);
             return new Result
                 (category
@@ -237,7 +246,7 @@ namespace Reni.Type
 
         internal TypeBase CommonType(TypeBase elseType) { return elseType.IsConvertable(this) ? this : elseType; }
 
-        private Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
+        Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
 
         internal Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, Bit).Align(BitsConst.SegmentAlignBits); }
 
@@ -246,9 +255,6 @@ namespace Reni.Type
         /// </summary>
         /// <value> The icon key. </value>
         string IIconKeyProvider.IconKey { get { return "Type"; } }
-
-        [DisableDump]
-        internal virtual RefAlignParam[] ReferenceChain { get { return new RefAlignParam[0]; } }
 
         [DisableDump]
         internal TypeType UniqueTypeType { get { return _cache.TypeType.Value; } }
@@ -273,7 +279,7 @@ namespace Reni.Type
         internal virtual bool IsLambda { get { return false; } }
 
         [DisableDump]
-        internal virtual IReference Reference { get { return this as IReference; } }
+        internal virtual ISmartReference Reference { get { return this as ISmartReference; } }
 
         [DisableDump]
         internal virtual IFeature Feature { get { return null; } }
@@ -281,9 +287,9 @@ namespace Reni.Type
         [DisableDump]
         protected virtual ISearchTarget ConversionProvider { get { return this; } }
         [DisableDump]
-        virtual internal bool HasQuickSize { get { return true; } }
+        internal virtual bool HasQuickSize { get { return true; } }
 
-        private TypeBase CreateSequenceType(TypeBase elementType)
+        TypeBase CreateSequenceType(TypeBase elementType)
         {
             return elementType
                 .UniqueArray(SequenceLength(elementType))
@@ -293,7 +299,7 @@ namespace Reni.Type
         internal int SequenceLength(TypeBase elementType)
         {
             var length = SmartSequenceLength(elementType);
-            if (length != null)
+            if(length != null)
                 return length.Value;
 
             NotImplementedMethod(elementType);
@@ -303,7 +309,7 @@ namespace Reni.Type
         internal int ArrayLength(TypeBase elementType)
         {
             var length = SmartArrayLength(elementType);
-            if (length != null)
+            if(length != null)
                 return length.Value;
 
             NotImplementedMethod(elementType);
@@ -315,7 +321,7 @@ namespace Reni.Type
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
             Search(visitor);
-            if (Debugger.IsAttached && !visitor.IsSuccessFull)
+            if(Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
         }
@@ -324,10 +330,10 @@ namespace Reni.Type
 
         internal virtual Result SmartLocalReferenceResult(Category category)
         {
-            if (IsDataLess)
+            if(IsDataLess)
                 return ArgResult(category);
 
-            return UniqueReference.Type()
+            return UniquePointer
                 .Result
                 (
                     category,
@@ -344,13 +350,13 @@ namespace Reni.Type
 
         internal Result ReferenceInCode(Category category, IContextReference target)
         {
-            return UniqueReference.Type()
+            return UniquePointer
                 .Result(category, target);
         }
 
         internal Result ContextAccessResult(Category category, IContextReference target, Size offset)
         {
-            if (IsDataLess)
+            if(IsDataLess)
                 return Result(category);
             return new Result
                 (category
@@ -369,7 +375,7 @@ namespace Reni.Type
                 BreakExecution();
                 var feature = Search<TFeature>(target);
                 Dump("feature", feature);
-                if (feature == null)
+                if(feature == null)
                     return ReturnMethodDump<Result>(null);
                 BreakExecution();
                 var result = feature.Result(category);
@@ -381,15 +387,16 @@ namespace Reni.Type
             }
         }
 
-        private IReference ObtainReference() { return this as IReference ?? new AutomaticReferenceType(this); }
+        ISmartReference ObtainPointer() { return this as ISmartReference ?? new PointerType(this); }
+        ReferenceType ObtainReference() { return new ReferenceType(AutomaticDereferenceType); }
 
         protected virtual Array ObtainArray(int count) { return new Array(this, count); }
 
         internal TypeBase SmartReference()
         {
-            if (IsDataLess)
+            if(IsDataLess)
                 return this;
-            return UniqueReference.Type();
+            return UniquePointer;
         }
 
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
@@ -400,27 +407,27 @@ namespace Reni.Type
 
         internal Result GenericDumpPrintResult(Category category) { return OperationResult<ISuffixFeature>(category, _dumpPrintToken.Value); }
 
-        private static readonly SimpleCache<DumpPrintToken> _dumpPrintToken =
+        static readonly SimpleCache<DumpPrintToken> _dumpPrintToken =
             new SimpleCache<DumpPrintToken>(DumpPrintToken.Create);
 
         internal Result CreateArray(Category category)
         {
             return UniqueAlign(Root.DefaultRefAlignParam.AlignBits)
-                .UniqueArray(1).UniqueReference.Type()
-                .Result(category, ReferenceArgResult(category));
+                .UniqueArray(1).UniquePointer
+                .Result(category, PointerArgResult(category));
         }
 
         internal Result Conversion(Category category, TypeBase destination)
         {
-            if (category <= (Category.Type.Replenished))
+            if(category <= (Category.Type.Replenished))
                 return destination.Result(category);
 
             var smartConversionResult = ArgResult(category.Typed).SmartConversionResult(destination);
-            if (smartConversionResult != null)
+            if(smartConversionResult != null)
                 return smartConversionResult;
 
             var searchResult = SmartConverter(destination);
-            if (searchResult == null)
+            if(searchResult == null)
             {
                 NotImplementedMethod(category, destination);
                 return null;
@@ -431,18 +438,18 @@ namespace Reni.Type
             return result.PostConversionResult(destination) & category;
         }
 
-        private SearchResult SmartConverter(TypeBase destination)
+        SearchResult SmartConverter(TypeBase destination)
         {
             var searchResult = Converter(destination);
-            if (searchResult != null)
+            if(searchResult != null)
                 return searchResult;
 
-            if (Reference != null)
+            if(Reference != null)
                 searchResult = Reference.TargetType.Converter(destination);
-            if (searchResult != null)
+            if(searchResult != null)
                 return searchResult;
 
-            if (destination.Reference != null)
+            if(destination.Reference != null)
                 searchResult = Converter(destination.Reference.TargetType);
             return searchResult;
         }
@@ -459,8 +466,8 @@ namespace Reni.Type
         {
             var uniqueTextItem = UniqueTextItemType;
             return
-                uniqueTextItem.UniqueReference.Type()
-                    .Result(category, UniqueReference.Type().ArgResult(category))
+                uniqueTextItem.UniquePointer
+                    .Result(category, UniquePointer.ArgResult(category))
                 ;
         }
 
@@ -470,16 +477,15 @@ namespace Reni.Type
             return null;
         }
 
-        internal Result ConcatArrayFromReference(Category category, AutomaticReferenceType automaticReferenceType)
+        internal Result ConcatArrayFromReference(Category category, PointerType pointerType)
         {
-            NotImplementedMethod(category, automaticReferenceType);
+            NotImplementedMethod(category, pointerType);
             return null;
         }
 
-        private Result DereferenceReferenceResult(Category category)
+        Result DereferenceReferenceResult(Category category)
         {
-            return UniqueReference
-                .Type()
+            return UniquePointer
                 .ArgResult(category.Typed)
                 .DereferenceResult();
         }
@@ -496,7 +502,7 @@ namespace Reni.Type
         internal virtual ISuffixFeature AlignConversion(TypeBase destination)
         {
             var childConverter = Converter(destination);
-            if (childConverter != null)
+            if(childConverter != null)
                 return new AlignConverter(childConverter);
 
             return null;
@@ -517,7 +523,7 @@ namespace Reni.Type
 
         protected virtual ISuffixFeature Convert(TypeBase type)
         {
-            if (type == this)
+            if(type == this)
                 return Extension.Feature(DereferenceReferenceResult);
 
             return null;
@@ -528,19 +534,22 @@ namespace Reni.Type
 
         internal Result ReferenceConversionResult(Category category, TypeBase destinationType)
         {
-            return destinationType.UniqueReference.Type().Result(category,
-                                                                 UniqueReference.Type().ArgResult(category.Typed));
+            return destinationType
+                .UniquePointer
+                .Result
+                (category
+                 , UniquePointer.ArgResult(category.Typed));
         }
 
         public Result TryConversion(Category category, TypeBase destinationType)
         {
-            if (IsConvertable(destinationType))
+            if(IsConvertable(destinationType))
                 return Conversion(category, destinationType);
             return null;
         }
     }
 
-    internal abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature
+    abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature
     {
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
@@ -549,9 +558,10 @@ namespace Reni.Type
         protected abstract Result Result(Category category);
     }
 
-    internal sealed class AlignConverter : ConverterBase
+    sealed class AlignConverter : ConverterBase
     {
-        [EnableDump] private readonly SearchResult _childConverter;
+        [EnableDump]
+        readonly SearchResult _childConverter;
         public AlignConverter(SearchResult childConverter) { _childConverter = childConverter; }
         protected override Result Result(Category category) { return _childConverter.Result(category.Typed); }
     }

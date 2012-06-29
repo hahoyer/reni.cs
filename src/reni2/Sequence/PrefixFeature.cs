@@ -54,7 +54,7 @@ namespace Reni.Sequence
                 .ReplaceArg
                 (category1
                  => _objectType
-                        .UniqueReference.Type()
+                        .UniquePointer
                         .ArgResult(category1.Typed)
                         .AutomaticDereferenceResult()
                         .Align(Root.DefaultRefAlignParam.AlignBits));

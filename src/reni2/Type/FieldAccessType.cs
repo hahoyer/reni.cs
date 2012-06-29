@@ -32,7 +32,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType, ISoftReference
+    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType, ISmartReference
     {
         [EnableDump]
         readonly Structure _structure;
@@ -63,7 +63,7 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
 
-        Result IReference.DereferenceResult(Category category) { return ParentConversionResult(category); }
+        Result ISmartReference.DereferenceResult(Category category) { return ParentConversionResult(category); }
 
         public override string NodeDump { get { return base.NodeDump + "{" + _structure.NodeDump + "@" + _position + "}"; } }
 
@@ -127,6 +127,6 @@ namespace Reni.Type
                 .Assignment(RefAlignParam, Parent.Size);
         }
 
-        TypeBase IReference.TargetType { get { return Parent; } }
+        TypeBase ISmartReference.TargetType { get { return Parent; } }
     }
 }

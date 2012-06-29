@@ -127,8 +127,7 @@ namespace Reni.Type
 
         internal Result InternalConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
         {
-            var oldElementsResult = UniqueReference
-                .Type()
+            var oldElementsResult = UniquePointer
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
 
@@ -158,8 +157,8 @@ namespace Reni.Type
 
         CodeBase CreateDumpPrintCode()
         {
-            var elementReference = Element.UniqueReference.Type();
-            var argCode = UniqueReference.Type().ArgCode;
+            var elementReference = Element.UniquePointer;
+            var argCode = UniquePointer.ArgCode;
             var elementDumpPrint = elementReference.GenericDumpPrintResult(Category.Code).Code;
             var code = CodeBase.DumpPrintText("array(" + Element.DumpPrintText + ",(");
             for(var i = 0; i < Count; i++)
@@ -179,8 +178,8 @@ namespace Reni.Type
                 .AutomaticDereferenceType
                 .UniqueArray(Count)
                 .UniqueSequence
-                .UniqueReference.Type()
-                .Result(category, UniqueReference.Type().ArgResult(category));
+                .UniquePointer
+                .Result(category, UniquePointer.ArgResult(category));
         }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)

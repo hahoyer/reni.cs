@@ -20,15 +20,16 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Feature;
-using Reni.Sequence;
 
 namespace Reni.Type
 {
-    internal sealed class TextItemType : TagChild<TypeBase>
+    sealed class TextItemType : TagChild<TypeBase>
     {
         public TextItemType(TypeBase parent)
             : base(parent)
@@ -43,7 +44,7 @@ namespace Reni.Type
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => Parent);
-            if (!searchVisitor.IsSuccessFull)
+            if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
 
@@ -56,10 +57,9 @@ namespace Reni.Type
                 );
         }
 
-        private CodeBase DumpPrintCode()
+        CodeBase DumpPrintCode()
         {
-            return UniqueReference
-                .Type()
+            return UniquePointer
                 .ArgCode
                 .Dereference(Size)
                 .DumpPrintText(Size);

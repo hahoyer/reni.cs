@@ -36,7 +36,7 @@ namespace Reni.Struct
         readonly Structure _structure;
 
         [DisableDump]
-        internal readonly ISearchPath<ISuffixFeature, AutomaticReferenceType> DumpPrintReferenceFeature;
+        internal readonly ISearchPath<ISuffixFeature, PointerType> DumpPrintReferenceFeature;
 
         internal StructureType(Structure structure)
         {

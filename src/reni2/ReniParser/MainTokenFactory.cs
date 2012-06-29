@@ -130,6 +130,7 @@ namespace Reni.ReniParser
                        {"enable_cut", new EnableCut()},
                        {"function_instance", new FunctionInstanceToken()},
                        {"new_value", new NewValueToken()},
+                       {"reference", new ReferenceToken()},
                        {"sequence", new SequenceToken()},
                        {"text_item", new TextItem()},
                        {"then", new ThenToken()},

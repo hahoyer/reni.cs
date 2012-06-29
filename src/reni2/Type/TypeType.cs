@@ -42,9 +42,9 @@ namespace Reni.Type
 
         internal override bool IsDataLess { get { return true; } }
 
-        internal override string DumpPrintText { get { return "(" + _value.DumpPrintText + "()) type"; } }
+        internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
-        internal override string DumpShort() { return "(" + _value.DumpShort() + ") type"; }
+        internal override string DumpShort() { return "(" + Value.DumpShort() + ") type"; }
         [DisableDump]
         TypeBase Value { get { return _value; } }
 
@@ -57,7 +57,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal Result DumpPrintResult(Category category) { return _value.DumpPrintTypeNameResult(category); }
+        internal Result DumpPrintResult(Category category) { return Value.DumpPrintTypeNameResult(category); }
         
         internal Result Repeat(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
@@ -77,9 +77,20 @@ namespace Reni.Type
         IFunctionFeature IFeature.Function { get { return this; } }
         ISimpleFeature IFeature.Simple { get { return null; } }
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _value.ConstructorResult(category, argsType); }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return Value.ConstructorResult(category, argsType); }
 
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return this; } }
+
+        internal Result CreateReference(ContextBase context, Category category, CompileSyntax target)
+        {
+            var rawResult = Value.UniqueReference.ArgResult(category);
+            if (category <= Category.Type.Replenished)
+                return rawResult;
+
+            var targetResult = target.SmartReferenceResult(context, category.Typed);
+            var convertedResult = targetResult.Conversion(this);
+            return rawResult.ReplaceArg(convertedResult);
+        }
     }
 }

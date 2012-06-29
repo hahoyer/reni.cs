@@ -223,16 +223,14 @@ namespace Reni.Sequence
 
         Result RemoveEnableCutReferenceResult(Category category)
         {
-            return UniqueReference
-                .Type()
+            return UniquePointer
                 .Result(category, EnableCutReferenceResult);
         }
 
         Result EnableCutReferenceResult(Category c)
         {
             return UniqueEnableCutType
-                .UniqueReference
-                .Type()
+                .UniquePointer
                 .ArgResult(c.Typed);
         }
     }

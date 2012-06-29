@@ -34,7 +34,7 @@ namespace Reni.Feature.DumpPrint
 {
     sealed class DumpPrintToken :
         Defineable,
-        ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, StructureType>,
+        ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>,
         ISearchPath<ISuffixFeature, TypeType>,
         ISearchPath<ISuffixFeature, FunctionBodyType>,
         ISearchPath<ISuffixFeature, Bit>,
@@ -58,7 +58,7 @@ namespace Reni.Feature.DumpPrint
         ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.DumpPrintTextResult); }
 
         ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
-        ISearchPath<ISuffixFeature, AutomaticReferenceType> ISearchPath<ISearchPath<ISuffixFeature, AutomaticReferenceType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
+        ISearchPath<ISuffixFeature, PointerType> ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
 
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
     }

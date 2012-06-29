@@ -29,24 +29,14 @@ using Reni.Basics;
 
 namespace Reni.Type
 {
-    interface ISoftReference: IReference
-    {
-    }
-
-    interface IHardReference : IReference
-    {
-        RefAlignParam RefAlignParam { get; }
-    }
-
-    interface IReference
+    interface ISmartReference
     {
         TypeBase TargetType { get; }
         Result DereferenceResult(Category category);
     }
 
-
     static internal class ReferenceExtension
     {
-        internal static TypeBase Type(this IReference reference) { return (TypeBase) reference; }
+        internal static TypeBase Type(this ISmartReference reference) { return (TypeBase) reference; }
     }
 }

@@ -20,29 +20,28 @@
 
 #endregion
 
-using System.Linq;
-using System.Collections.Generic;
-using System;
-using HWClassLibrary.Debug;
-using Reni.Basics;
-using Reni.Context;
-using Reni.Syntax;
-using Reni.Type;
+using HWClassLibrary.UnitTest;
 
-namespace Reni.Struct
+namespace Reni.FeatureTest.BlogExamples
 {
-    sealed class SetterFunction : FunctionInstance
+    [TestFixture]
+    [TargetSet("\"Hello world\" dump_print", "Hello world")]
+    [TargetSet(@"Viersich: 4;
+EinsDazu: arg + 1 /\;
+Konstrukt: 
+(
+    Simpel: arg; 
+    Pelsim: EinsDazu(arg); 
+    Fun: Simpel+ EinsDazu(arg) /\
+) /\;
+lorum: Konstrukt(23);
+ipsum: Konstrukt(8);
+ipsum Pelsim := 15;
+(Viersich, ipsum Simpel, ipsum Pelsim, ipsum Fun(7), lorum Simpel, lorum Fun(18)) dump_print"
+        , "(4, 8, 15, 16, 23, 42)")]
+    sealed class Post120617 : CompilerTest
     {
-        readonly FunctionId _functionId;
-        public SetterFunction(FunctionType parent, int index, CompileSyntax body)
-            : base(parent, body)
-        {
-            _functionId = FunctionId
-                .Setter(index);
-        }
-
-        protected override FunctionId FunctionId { get { return _functionId; } }
-        protected override TypeBase CallType { get { return base.CallType.Pair(Parent.ValueType.UniquePointer); } }
-        protected override Size RelevantValueSize { get { return Root.DefaultRefAlignParam.RefSize; } }
+        [Test]
+        public override void Run() { BaseRun(); }
     }
 }

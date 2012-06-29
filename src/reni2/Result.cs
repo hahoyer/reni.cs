@@ -752,7 +752,7 @@ namespace Reni
         {
             if(Type.IsDataLess)
                 return this;
-            if(Type is IReference)
+            if(Type is ISmartReference)
                 return this;
             return Type
                 .SmartLocalReferenceResult(CompleteCategory)
@@ -773,7 +773,7 @@ namespace Reni
                 Tracer.Assert(size.IsZero || size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: 0 or RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is Type.Void || Type is AutomaticReferenceType, () => "Expected type: Void or AutomaticReferenceType\n" + Dump());
+                Tracer.Assert(Type is Type.Void || Type is PointerType, () => "Expected type: Void or PointerType\n" + Dump());
         }
 
         [DebuggerHidden]
@@ -784,7 +784,7 @@ namespace Reni
                 Tracer.Assert(size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is AutomaticReferenceType, () => "Expected type: AutomaticReferenceType\n" + Dump());
+                Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
         }
 
         [DebuggerHidden]
@@ -802,7 +802,7 @@ namespace Reni
             }
 
             if(HasType)
-                Tracer.Assert(Type is AutomaticReferenceType, () => "Expected type: AutomaticReferenceType\n" + Dump());
+                Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
         }
 
         internal Result AddToReference(Func<Size> func) { return Change(code => code.AddToReference(func())); }

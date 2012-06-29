@@ -26,23 +26,20 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Syntax;
-using Reni.Type;
 
-namespace Reni.Struct
+namespace Reni.Type
 {
-    sealed class SetterFunction : FunctionInstance
+    sealed class ReferenceType : TypeBase
     {
-        readonly FunctionId _functionId;
-        public SetterFunction(FunctionType parent, int index, CompileSyntax body)
-            : base(parent, body)
+        readonly TypeBase _target;
+        public ReferenceType(TypeBase target)
         {
-            _functionId = FunctionId
-                .Setter(index);
+            _target = target;
+            AssertValid();
         }
 
-        protected override FunctionId FunctionId { get { return _functionId; } }
-        protected override TypeBase CallType { get { return base.CallType.Pair(Parent.ValueType.UniquePointer); } }
-        protected override Size RelevantValueSize { get { return Root.DefaultRefAlignParam.RefSize; } }
+        void AssertValid() { Tracer.Assert(!_target.IsDataLess); }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
+        internal override bool IsDataLess { get { return false; } }
     }
 }

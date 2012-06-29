@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,11 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.Array;
+using Reni.FeatureTest.BitArrayOp;
 
 namespace Reni.FeatureTest.Text
 {
@@ -62,7 +68,7 @@ namespace Reni.FeatureTest.Text
     [TestFixture]
     [TargetSet("('Hallo' << ' Welt!') dump_print", "Hallo Welt!")]
     [Hallo]
-    [Array.CombineArraysFromPieces]
+    [CombineArraysFromPieces]
     public sealed class HalloWelt : CompilerTest
     {
         [Test]
@@ -81,7 +87,8 @@ namespace Reni.FeatureTest.Text
     [TestFixture]
     [ConvertFromNumber]
     [TargetSet("sequence (<< text_item(108)<< text_item(109)) dump_print", "lm")]
-    [Array.ArrayFromPieces, Hallo]
+    [ArrayFromPieces]
+    [Hallo]
     public sealed class ConvertFromNumbers : CompilerTest
     {
         [Test]
@@ -90,7 +97,7 @@ namespace Reni.FeatureTest.Text
 
     [TestFixture]
     [Hallo]
-    [BitArrayOp.Number]
+    [Number]
     [ConvertFromNumber]
     [TargetSet("'80' to_number_of_base(16) dump_print", "128")]
     public sealed class ConvertHexadecimal : CompilerTest
@@ -98,4 +105,4 @@ namespace Reni.FeatureTest.Text
         [Test]
         public override void Run() { BaseRun(); }
     }
-}               
+}

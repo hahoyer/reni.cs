@@ -59,8 +59,7 @@ namespace Reni.Type
 
         private CodeBase DumpPrintCode()
         {
-            return UniqueReference
-                .Type()
+            return UniquePointer
                 .ArgCode
                 .Dereference(Size)
                 .DumpPrintText(Parent.Element.Size);

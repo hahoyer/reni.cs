@@ -31,14 +31,14 @@ using Reni.Feature;
 namespace Reni.Type
 {
     sealed class CreateArrayFromReferenceFeature : ReniObject
-                                                   , ISearchPath<IPrefixFeature, AutomaticReferenceType>
+                                                   , ISearchPath<IPrefixFeature, PointerType>
                                                    , IPrefixFeature
                                                    , ISuffixFeature
     {
         [EnableDump]
         readonly TypeBase _type;
         public CreateArrayFromReferenceFeature(TypeBase type) { _type = type; }
-        IPrefixFeature ISearchPath<IPrefixFeature, AutomaticReferenceType>.Convert(AutomaticReferenceType type) { return this; }
+        IPrefixFeature ISearchPath<IPrefixFeature, PointerType>.Convert(PointerType type) { return this; }
 
         Result Result(Category category) { return _type.CreateArray(category); }
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }

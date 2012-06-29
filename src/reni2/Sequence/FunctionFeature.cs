@@ -62,7 +62,7 @@ namespace Reni.Sequence
         Result Result(Category category)
         {
             return UniqueFunctionalType()
-                .Result(category, _objectType.ReferenceArgResult(category.Typed));
+                .Result(category, _objectType.PointerArgResult(category.Typed));
         }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }

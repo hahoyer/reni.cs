@@ -59,7 +59,7 @@ namespace Reni.Context
         {
             if(_valueType == null)
                 throw new ValueCannotBeUsedHereException();
-            return _valueType.UniqueReference.Type()
+            return _valueType.UniquePointer
                 .ContextAccessResult(category.Typed, this, (ArgsType.Size + RefAlignParam.RefSize) * -1)
                 & category;
         }
