@@ -55,7 +55,7 @@ namespace Reni.Feature
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var leftType = left.Type(context);
+            var leftType = left.Type(context).TypeForTypeOperator;
             if(category.HasCode || category.HasArgs)
                 return context
                            .ResultAsReference(category.Typed, right)
