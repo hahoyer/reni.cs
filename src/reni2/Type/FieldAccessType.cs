@@ -81,7 +81,7 @@ namespace Reni.Type
 
         internal override Result ParentConversionResult(Category category)
         {
-            return Parent.SmartReference()
+            return Parent.SmartPointer
                 .Result(category, ArgResult(category.Typed).AddToReference(() => _structure.FieldOffset(_position)));
         }
 
@@ -123,7 +123,7 @@ namespace Reni.Type
 
         CodeBase AssignmentCode()
         {
-            return Pair(Parent.SmartReference()).ArgCode
+            return Pair(Parent.SmartPointer).ArgCode
                 .Assignment(RefAlignParam, Parent.Size);
         }
 

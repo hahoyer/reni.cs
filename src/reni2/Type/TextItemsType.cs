@@ -62,7 +62,7 @@ namespace Reni.Type
             return UniquePointer
                 .ArgCode
                 .Dereference(Size)
-                .DumpPrintText(Parent.Element.Size);
+                .DumpPrintText(Parent.ElementType.Size);
         }
     }
 }

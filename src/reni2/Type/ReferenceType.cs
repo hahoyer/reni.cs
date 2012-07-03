@@ -26,20 +26,39 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class ReferenceType : TypeBase
+    sealed class ReferenceType 
+        : TypeBase
+          , ISearchPath<ISuffixFeature, Array>
     {
-        readonly TypeBase _target;
-        public ReferenceType(TypeBase target)
+        readonly TypeBase _elementType;
+        readonly int _count;
+
+        internal ReferenceType(TypeBase elementType, int count)
         {
-            _target = target;
+            _elementType = elementType;
+            _count = count;
             AssertValid();
         }
 
-        void AssertValid() { Tracer.Assert(!_target.IsDataLess); }
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
+        [EnableDump]
+        TypeBase ElementType { get { return _elementType; } }
+        [EnableDump]
+        int Count { get { return _count; } }
+        [DisableDump]
         internal override bool IsDataLess { get { return false; } }
+
+        void AssertValid() { Tracer.Assert(!_elementType.IsDataLess); }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
+
+        ISuffixFeature ISearchPath<ISuffixFeature, Array>.Convert(Array type)
+        {
+            if (type.ElementType != ElementType)
+                return null;
+            return Extension.Feature(type.ConvertToReference(_count));
+        }
     }
 }

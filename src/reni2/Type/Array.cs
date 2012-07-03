@@ -42,17 +42,17 @@ namespace Reni.Type
         : TypeBase
           , ISearchPath<ISuffixFeature, SequenceType>
     {
-        readonly TypeBase _element;
+        readonly TypeBase _elementType;
         readonly int _count;
         readonly SimpleCache<SequenceType> _sequenceCache;
         readonly SimpleCache<TextItemsType> _textItemsCache;
 
-        public Array(TypeBase element, int count)
+        public Array(TypeBase elementType, int count)
         {
-            _element = element;
+            _elementType = elementType;
             _count = count;
             Tracer.Assert(count > 0);
-            Tracer.Assert(element.Reference == null);
+            Tracer.Assert(elementType.Reference == null);
             _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
             _textItemsCache = new SimpleCache<TextItemsType>(() => new TextItemsType(this));
         }
@@ -68,19 +68,21 @@ namespace Reni.Type
         internal int Count { get { return _count; } }
         [Node]
         [DisableDump]
-        internal TypeBase Element { get { return _element; } }
+        internal TypeBase ElementType { get { return _elementType; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return Count == 0 || Element.IsDataLess; } }
-        internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")array(" + Count + ")"; } }
+        internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
+        [DisableDump]
+        internal override ReferenceType SmartReference { get { return ElementType.UniqueReference(Count); } }
+        internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
 
-        internal override int? SmartArrayLength(TypeBase elementType) { return Element.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
-        protected override Size GetSize() { return Element.Size * _count; }
-        internal override Result Destructor(Category category) { return Element.ArrayDestructor(category, Count); }
-        internal override Result Copier(Category category) { return Element.ArrayCopier(category, Count); }
+        internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
+        protected override Size GetSize() { return ElementType.Size * _count; }
+        internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
+        internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.Search(this, () => Element);
+            searchVisitor.Search(this, () => ElementType);
             if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
@@ -116,11 +118,11 @@ namespace Reni.Type
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
             return elementConstructorResult
                        .ReplaceArg(resultForArg)
-                       .Conversion(Element)
+                       .Conversion(ElementType)
                    & category;
         }
 
-        internal override string DumpShort() { return Element.DumpShort() + "*" + Count; }
+        internal override string DumpShort() { return ElementType.DumpShort() + "*" + Count; }
 
         internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
         internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
@@ -131,15 +133,15 @@ namespace Reni.Type
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
 
-                var newElementsResult = argsType.TryConversion(category,Element);
+            var newElementsResult = argsType.TryConversion(category, ElementType);
             var newCount = 1;
-            if (newElementsResult == null)
+            if(newElementsResult == null)
             {
-                newCount = argsType.ArrayLength(Element);
-                newElementsResult = argsType.Conversion(category, Element.UniqueArray(newCount));
+                newCount = argsType.ArrayLength(ElementType);
+                newElementsResult = argsType.Conversion(category, ElementType.UniqueArray(newCount));
             }
 
-            var result = Element
+            var result = ElementType
                 .UniqueArray(Count + newCount)
                 .Result(category, newElementsResult + oldElementsResult);
             return result;
@@ -151,21 +153,21 @@ namespace Reni.Type
                 .Result
                 (category
                  , CreateDumpPrintCode
-                 , () => Element.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
+                 , () => ElementType.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
                 );
         }
 
         CodeBase CreateDumpPrintCode()
         {
-            var elementReference = Element.UniquePointer;
+            var elementReference = ElementType.UniquePointer;
             var argCode = UniquePointer.ArgCode;
             var elementDumpPrint = elementReference.GenericDumpPrintResult(Category.Code).Code;
-            var code = CodeBase.DumpPrintText("array(" + Element.DumpPrintText + ",(");
+            var code = CodeBase.DumpPrintText("array(" + ElementType.DumpPrintText + ",(");
             for(var i = 0; i < Count; i++)
             {
                 if(i > 0)
                     code = code.Sequence(CodeBase.DumpPrintText(", "));
-                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.AddToReference(Element.Size * i));
+                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.AddToReference(ElementType.Size * i));
                 code = code.Sequence(elemCode);
             }
             code = code.Sequence(CodeBase.DumpPrintText("))"));
@@ -174,7 +176,7 @@ namespace Reni.Type
 
         internal Result SequenceResult(Category category)
         {
-            return Element
+            return ElementType
                 .AutomaticDereferenceType
                 .UniqueArray(Count)
                 .UniqueSequence
@@ -187,6 +189,15 @@ namespace Reni.Type
             if(type.Parent != this)
                 return null;
             return Extension.Feature(type.ReferenceConversionResult);
+        }
+
+        internal Func<Category, Result> ConvertToReference(int count) { return category => ConvertToReferenceX(category, count); }
+
+        Result ConvertToReferenceX(Category category, int count)
+        {
+            return ElementType
+                .UniqueReference(count)
+                .Result(category, UniquePointer.ArgResult);
         }
     }
 }

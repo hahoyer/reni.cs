@@ -24,32 +24,25 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.Helper;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Sequence;
 using Reni.Syntax;
 
 namespace Reni.Type
 {
-    sealed class ToNumberOfBaseFeature : ReniObject, ISuffixFeature                                        , IMetaFunctionFeature
+    sealed class ToNumberOfBaseFeature : ReniObject, ISuffixFeature, IMetaFunctionFeature
     {
         readonly TextItemsType _type;
-        public ToNumberOfBaseFeature(TextItemsType type)
-        {
-            _type = type;
-        }
+        public ToNumberOfBaseFeature(TextItemsType type) { _type = type; }
 
         Result IMetaFunctionFeature.ApplyResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var target = left.Evaluate(context).ToString(_type.Parent.Element.Size);
+            var target = left.Evaluate(context).ToString(_type.Parent.ElementType.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
             Tracer.Assert(conversionBase >= 2 && conversionBase <= 36, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
-            return TypeBase.UniqueNumber(result.Size.ToInt())
-                .Result(category, () => CodeBase.BitsConst(result), CodeArgs.Void)
+            return TypeBase.Result(category, result)
                 .Align(context.RefAlignParam.AlignBits);
         }
 

@@ -86,7 +86,7 @@ namespace Reni.Struct
         internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
-        internal TypeBase ReferenceType { get { return Type.SmartReference(); } }
+        internal TypeBase ReferenceType { get { return Type.SmartPointer; } }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + ContainerContextObject.DumpShort() + "@" + EndPosition + ")"; }
 
@@ -131,11 +131,11 @@ namespace Reni.Struct
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
 
-        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) { return _functionBodyTypeCache.Find(syntax); }
+        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) { return _functionBodyTypeCache.Value(syntax); }
 
-        TypeBase UniqueAccessType(int position) { return _accessTypesCache.Find(position); }
-        internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Find(position); }
-        FieldAccessType UniqueFieldAccessType(int position) { return _fieldAccessTypeCache.Find(position); }
+        TypeBase UniqueAccessType(int position) { return _accessTypesCache.Value(position); }
+        internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Value(position); }
+        FieldAccessType UniqueFieldAccessType(int position) { return _fieldAccessTypeCache.Value(position); }
 
         TypeBase ObtainAccessType(int position)
         {
