@@ -75,30 +75,30 @@ namespace Reni.Context
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts.Find(container).Find(position); }
+        internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts.Value(container).Value(position); }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
-        internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Find(container).Find(accessPosition); }
-        internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects.Find(context); }
+        internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Value(container).Value(accessPosition); }
+        internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects.Value(context); }
 
         internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search(); }
 
         //[DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
-            var cacheItem = _cache.ResultCache.Find(syntax);
+            var cacheItem = _cache.ResultCache.Value(syntax);
             cacheItem.Update(category);
             var result = cacheItem.Data & category;
             Tracer.Assert(category == result.CompleteCategory);
             return result;
         }
 
-        internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Find(syntax).Data & category; }
+        internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Value(syntax).Data & category; }
 
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -88 && ObjectId == 3 && category.HasCode;
+            var trace = syntax.ObjectId == -247 && ObjectId == 11;
             StartMethodDump(trace, category, syntax);
             try
             {
@@ -201,7 +201,7 @@ namespace Reni.Context
                 Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(
                     container =>
                     new DictionaryEx<int, Structure>(
-                        position => new Structure(ContainerContextObjects.Find(container), position)));
+                        position => new Structure(ContainerContextObjects.Value(container), position)));
                 ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>(container => new ContainerContextObject(container, target));
             }
 
@@ -239,7 +239,7 @@ namespace Reni.Context
                 var replaceArg = applyResult.ReplaceArg(rightResult);
                 Dump("replaceArg", replaceArg);
 
-                var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.SmartReference().ArgResult(c));
+                var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.SmartPointer.ArgResult(c));
                 return ReturnMethodDump(result);
             }
             finally

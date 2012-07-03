@@ -49,7 +49,7 @@ namespace Reni.Sequence
             return UniqueEnableCutType
                 .Result
                 (category
-                 , () => SmartReference().ArgCode.Dereference(Size)
+                 , () => SmartPointer.ArgCode.Dereference(Size)
                  , CodeArgs.Arg
                 );
         }
@@ -69,7 +69,7 @@ namespace Reni.Sequence
         internal int Count { get { return Parent.Count; } }
         [Node]
         [DisableDump]
-        public TypeBase Element { get { return Parent.Element; } }
+        public TypeBase Element { get { return Parent.ElementType; } }
         [DisableDump]
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")sequence(" + Count + ")"; } }
 
@@ -145,7 +145,7 @@ namespace Reni.Sequence
             return result;
         }
 
-        internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache.Find(refAlignParam); }
+        internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache.Value(refAlignParam); }
 
         Result FlatConversion(Category category, SequenceType source)
         {

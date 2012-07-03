@@ -107,8 +107,8 @@ namespace Reni.Parser
         ITokenClass ITokenFactory.ListClass { get { return _listClass.Value; } }
         ITokenClass ITokenFactory.NumberClass { get { return _numberClass.Value; } }
         ITokenClass ITokenFactory.TextClass { get { return _textClass.Value; } }
-        ITokenClass ITokenFactory.RightParenthesisClass(int level) { return _righParenthesis.Find(level); }
-        ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return _leftParenthesis.Find(level); }
+        ITokenClass ITokenFactory.RightParenthesisClass(int level) { return _righParenthesis.Value(level); }
+        ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return _leftParenthesis.Value(level); }
 
         protected abstract TTokenClass GetSyntaxError(string message);
         protected abstract PrioTable GetPrioTable();

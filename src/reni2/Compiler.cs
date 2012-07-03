@@ -125,7 +125,7 @@ namespace Reni
         CodeBase IExecutionContext.Function(FunctionId functionId)
         {
             
-            var item = _functionContainers.Find(functionId.Index);
+            var item = _functionContainers.Value(functionId.Index);
             var container = functionId.IsGetter ? item.Getter : item.Setter;
             return container.Data;
         }
@@ -170,7 +170,7 @@ namespace Reni
             {
                 Tracer.FlaggedLine(FilePositionTag.Debug, "main\n" + MainContainer.Dump());
                 for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine(FilePositionTag.Debug, "function index=" + i + "\n" + _functionContainers.Find(i).Dump());
+                    Tracer.FlaggedLine(FilePositionTag.Debug, "function index=" + i + "\n" + _functionContainers.Value(i).Dump());
             }
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(FilePositionTag.Debug, ExecutedCode);
@@ -194,7 +194,7 @@ namespace Reni
         void EnsureFunctionContainers()
         {
             for(var i = 0; i < Functions.Count; i++)
-                _functionContainers.Find(i);
+                _functionContainers.Value(i);
         }
 
         private void RunFromCode() { Code.Execute(this); }

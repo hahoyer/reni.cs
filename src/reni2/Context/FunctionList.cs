@@ -55,7 +55,7 @@ namespace Reni.Context
 
         internal FunctionType Find(FunctionSyntax syntax, Structure structure, TypeBase argsType)
         {
-            var index = _dictionary.Find(syntax).Find(structure).Find(argsType);
+            var index = _dictionary.Value(syntax).Value(structure).Value(argsType);
             return _list[index];
         }
 

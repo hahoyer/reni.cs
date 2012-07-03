@@ -44,18 +44,17 @@ namespace Reni.Type
           , IDumpShortProvider
           , IIconKeyProvider
           , ISearchTarget
-          , ISearchPath<ISuffixFeature, Aligner>
-          , ISearchPath<ISuffixFeature, TypeBase>
+          , ISearchPath<ISuffixFeature, Aligner>, ISearchPath<ISuffixFeature, TypeBase>
     {
         sealed class Cache
         {
             public static readonly Bit Bit = new Bit();
             public static readonly Void Void = new Void();
-            public readonly DictionaryEx<int, Aligner> Aligners;
-            public readonly DictionaryEx<int, Array> Arrays;
-            public readonly DictionaryEx<TypeBase, Pair> Pairs;
+            public readonly DictionaryEx<int, Aligner> Aligner;
+            public readonly DictionaryEx<int, Array> Array;
+            public readonly DictionaryEx<TypeBase, Pair> Pair;
             public readonly SimpleCache<ISmartReference> Pointer;
-            public readonly SimpleCache<ReferenceType> Reference;
+            public readonly DictionaryEx<int, ReferenceType> Reference;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<FunctionInstanceType> FunctionInstanceType;
             public readonly SimpleCache<TextItemType> TextItem;
@@ -65,10 +64,10 @@ namespace Reni.Type
             {
                 EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
                 Pointer = new SimpleCache<ISmartReference>(parent.ObtainPointer);
-                Reference = new SimpleCache<ReferenceType>(parent.ObtainReference);
-                Pairs = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
-                Arrays = new DictionaryEx<int, Array>(parent.ObtainArray);
-                Aligners = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
+                Reference = new DictionaryEx<int, ReferenceType>(parent.ObtainReference);
+                Pair = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
+                Array = new DictionaryEx<int, Array>(parent.ObtainArray);
+                Aligner = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 FunctionInstanceType = new SimpleCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
                 TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent));
@@ -105,11 +104,11 @@ namespace Reni.Type
             return Size.Zero;
         }
 
-        [DisableDump]                                                               
+        [DisableDump]
         internal virtual bool IsDataLess
         {
             get
-            {                                                   
+            {
                 NotImplementedMethod();
                 return true;
             }
@@ -154,7 +153,7 @@ namespace Reni.Type
         {
             if(Size.Align(alignBits) == Size)
                 return this;
-            return _cache.Aligners.Find(alignBits);
+            return _cache.Aligner.Value(alignBits);
         }
 
         [DisableDump]
@@ -167,9 +166,9 @@ namespace Reni.Type
         internal TypeBase UniquePointer { get { return UniqueSmartReference.Type(); } }
         [DisableDump]
         internal virtual ISmartReference UniqueSmartReference { get { return _cache.Pointer.Value; } }
-        [DisableDump]
-        internal ReferenceType UniqueReference { get { return _cache.Reference.Value; } }
 
+        [DisableDump]
+        internal virtual ReferenceType SmartReference { get { return _cache.Reference.Value(1); } }
         [DisableDump]
         internal virtual TypeBase TypeForTypeOperator { get { return this; } }
 
@@ -188,8 +187,20 @@ namespace Reni.Type
             }
         }
 
-        internal Array UniqueArray(int count) { return _cache.Arrays.Find(count); }
-        protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pairs.Find(this); }
+        [DisableDump]
+        internal TypeBase SmartPointer
+        {
+            get
+            {
+                if(IsDataLess)
+                    return this;
+                return UniquePointer;
+            }
+        }
+
+        internal ReferenceType UniqueReference(int count) { return _cache.Reference.Value(count); }
+        internal Array UniqueArray(int count) { return _cache.Array.Value(count); }
+        protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair.Value(this); }
         internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueArray(bitCount).UniqueSequence; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
@@ -388,16 +399,10 @@ namespace Reni.Type
         }
 
         ISmartReference ObtainPointer() { return this as ISmartReference ?? new PointerType(this); }
-        ReferenceType ObtainReference() { return new ReferenceType(AutomaticDereferenceType); }
+
+        ReferenceType ObtainReference(int count) { return new ReferenceType(AutomaticDereferenceType, count); }
 
         protected virtual Array ObtainArray(int count) { return new Array(this, count); }
-
-        internal TypeBase SmartReference()
-        {
-            if(IsDataLess)
-                return this;
-            return UniquePointer;
-        }
 
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
         {
@@ -546,6 +551,12 @@ namespace Reni.Type
             if(IsConvertable(destinationType))
                 return Conversion(category, destinationType);
             return null;
+        }
+
+        internal static Result Result(Category category, BitsConst bitsConst)
+        {
+            return UniqueNumber(bitsConst.Size.ToInt())
+                .Result(category, getCode: () => CodeBase.BitsConst(bitsConst));
         }
     }
 

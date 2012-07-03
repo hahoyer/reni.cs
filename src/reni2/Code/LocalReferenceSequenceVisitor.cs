@@ -80,7 +80,7 @@ namespace Reni.Code
             try
             {
                 BreakExecution();
-                var holderIndex = _localReferences.Find(visitedObject);
+                var holderIndex = _localReferences.Value(visitedObject);
                 Dump("holderIndex", holderIndex);
                 _codeCache.Reset();
                 return ReturnMethodDump(CodeBase.LocalVariableReference(HolderName(holderIndex)), true);
