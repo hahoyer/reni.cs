@@ -35,20 +35,19 @@ namespace Reni.Type
     [Serializable]
     sealed class TypeType : TypeBase, IFeature, IFunctionFeature
     {
-        [EnableDump]
         readonly TypeBase _value;
 
         public TypeType(TypeBase value) { _value = value; }
 
+        [DisableDump]
         internal override bool IsDataLess { get { return true; } }
+        [DisableDump]
+        internal override IFeature Feature { get { return this; } }
+        TypeBase Value { get { return _value; } }
 
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
         internal override string DumpShort() { return "(" + Value.DumpShort() + ") type"; }
-        [DisableDump]
-        TypeBase Value { get { return _value; } }
-
-        internal override IFeature Feature { get { return this; } }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
@@ -73,6 +72,29 @@ namespace Reni.Type
                 .Result(category);
         }
 
+        internal Result Split(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        {
+            var rightType = right
+                .Type(context)
+                .SmartUn<Struct.FunctionType>()
+                .SmartUn<PointerType>();
+            var rightTypeType = rightType as TypeType;
+            if(rightTypeType == null)
+            {
+                NotImplementedMethod(context, category, left, right, "rightType", rightType);
+                return null;
+            }
+
+            var count = Value.SmartArrayLength(rightTypeType.Value);
+            if(count == null)
+            {
+                NotImplementedMethod(context, category, left, right, "rightType", rightType);
+                return null;
+            }
+
+            return Result(category, BitsConst.Convert(count.Value));
+        }
+
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return this; } }
         ISimpleFeature IFeature.Simple { get { return null; } }
@@ -84,12 +106,12 @@ namespace Reni.Type
 
         internal Result CreateReference(ContextBase context, Category category, CompileSyntax target)
         {
-            var rawResult = Value.UniqueReference.ArgResult(category);
+            var rawResult = Value.SmartReference.ArgResult(category);
             if (category <= Category.Type.Replenished)
                 return rawResult;
 
             var targetResult = target.SmartReferenceResult(context, category.Typed);
-            var convertedResult = targetResult.Conversion(this);
+            var convertedResult = targetResult.Conversion(Value.SmartReference);
             return rawResult.ReplaceArg(convertedResult);
         }
     }
