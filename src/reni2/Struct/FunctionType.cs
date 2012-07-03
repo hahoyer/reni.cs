@@ -74,6 +74,8 @@ namespace Reni.Struct
         internal override bool IsDataLess { get { return CodeArgs.IsNone && ArgsType.IsDataLess; } }
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _structure; } }
+        [DisableDump]
+        internal override TypeBase TypeForTypeOperator { get { return ValueType; } }
 
         [Node]
         [DisableDump]
