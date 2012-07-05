@@ -476,11 +476,7 @@ namespace Reni.Type
                 ;
         }
 
-        internal virtual Result ConstructorResult(Category category, TypeBase argsType)
-        {
-            NotImplementedMethod(category, argsType);
-            return null;
-        }
+        internal virtual Result ConstructorResult(Category category, TypeBase argsType) { return argsType.Conversion(category, this); }
 
         internal Result ConcatArrayFromReference(Category category, PointerType pointerType)
         {

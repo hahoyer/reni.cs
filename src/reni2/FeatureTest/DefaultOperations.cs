@@ -50,7 +50,7 @@ namespace Reni.FeatureTest.DefaultOperations
     [TestFixture]
     public sealed class ApplyTypeOperator : CompilerTest
     {
-        protected override string Target { get { return @"(31 type (28))dump_print"; } }
+        protected override string Target { get { return @"(31 type instance (28))dump_print"; } }
         protected override string Output { get { return "28"; } }
         protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(TypeOperator)}; } }
 

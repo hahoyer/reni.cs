@@ -53,12 +53,8 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
-        {
-            return RawInstanceResult(category, getRightResult)
-                       .AutomaticDereferenceResult()
-                   & category;
-        }
+        internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult) { return RawInstanceResult(category, getRightResult).SmartLocalReferenceResult() & category; }
+        
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             if(category <= Category.Type.Replenished)
@@ -106,8 +102,6 @@ namespace Reni.Type
 
             return Result(category, BitsConst.Convert(count.Value));
         }
-
-        Result ApplyResult(Category category, TypeBase argsType) { return Value.ConstructorResult(category, argsType); }
 
         internal Result CreateReference(ContextBase context, Category category, CompileSyntax target)
         {
