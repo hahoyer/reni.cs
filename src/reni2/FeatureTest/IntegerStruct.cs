@@ -38,7 +38,7 @@ namespace Reni.FeatureTest.Integer
                 @"
 Integer8: 
 {
-    _data: 127 type (arg enable_cut);
+    _data: 127 type instance(arg enable_cut);
 
     create   : (Integer8(arg))/\;
     dump_print: (_data dump_print)/\;

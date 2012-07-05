@@ -169,7 +169,7 @@ namespace Reni.FeatureTest.Function
     ///     Recursive function that will result in a stack overflow, except when compiled as a loop
     /// </summary>
     [TestFixture]
-    [Target(@"i: 400000 type(400); f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()")]
+    [Target(@"i: 400000 type instance(400); f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionByteWithDump]
     public sealed class PrimitiveRecursiveFunctionSmall : CompilerTest
@@ -179,7 +179,7 @@ namespace Reni.FeatureTest.Function
     }
 
     [TestFixture]
-    [TargetSet(@"i: 400000 type(10); f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()", "9876543210")]
+    [TargetSet(@"i: 400000 type instance(10); f: i > 0 then (i := (i - 1)enable_cut; i dump_print; f())/\;f()", "9876543210")]
     [PrimitiveRecursiveFunctionByteWithDump]
     [UseThen]
     [UseElse]
@@ -200,7 +200,7 @@ namespace Reni.FeatureTest.Function
     [SimpleFunction]
     [TwoFunctions1]
     [FunctionWithRefArg]
-    [Target(@"f: {1000 type({arg = 1 then 1 else (arg * f[arg type((arg-1)enable_cut)])}enable_cut)}/\;f(4)dump_print")]
+    [Target(@"f: {1000 type instance({arg = 1 then 1 else (arg * f[arg type instance((arg-1)enable_cut)])}enable_cut)}/\;f(4)dump_print")]
     [Output("24")]
     public sealed class RecursiveFunction : CompilerTest
     {
