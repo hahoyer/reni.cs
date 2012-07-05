@@ -25,15 +25,14 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
+using Reni.Struct;
 using Reni.Syntax;
 
 namespace Reni.Type
 {
     [Serializable]
-    sealed class TypeType : TypeBase, IFeature, IFunctionFeature
+    sealed class TypeType : TypeBase
     {
         readonly TypeBase _value;
 
@@ -41,8 +40,6 @@ namespace Reni.Type
 
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
-        [DisableDump]
-        internal override IFeature Feature { get { return this; } }
         TypeBase Value { get { return _value; } }
 
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
@@ -56,8 +53,23 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
+        internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
+        {
+            return RawInstanceResult(category, getRightResult)
+                       .AutomaticDereferenceResult()
+                   & category;
+        }
+        Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
+        {
+            if(category <= Category.Type.Replenished)
+                return Value.Result(category.Typed);
+            return Value
+                .ConstructorResult(category.Typed, getRightResult(Category.Type).Type)
+                .ReplaceArg(getRightResult);
+        }
+
         internal Result DumpPrintResult(Category category) { return Value.DumpPrintTypeNameResult(category); }
-        
+
         internal Result Repeat(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             var count = right
@@ -76,7 +88,7 @@ namespace Reni.Type
         {
             var rightType = right
                 .Type(context)
-                .SmartUn<Struct.FunctionType>()
+                .SmartUn<FunctionType>()
                 .SmartUn<PointerType>();
             var rightTypeType = rightType as TypeType;
             if(rightTypeType == null)
@@ -95,19 +107,12 @@ namespace Reni.Type
             return Result(category, BitsConst.Convert(count.Value));
         }
 
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return this; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
-
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return Value.ConstructorResult(category, argsType); }
-
-        bool IFunctionFeature.IsImplicit { get { return false; } }
-        IContextReference IFunctionFeature.ObjectReference { get { return this; } }
+        Result ApplyResult(Category category, TypeBase argsType) { return Value.ConstructorResult(category, argsType); }
 
         internal Result CreateReference(ContextBase context, Category category, CompileSyntax target)
         {
             var rawResult = Value.SmartReference.ArgResult(category);
-            if (category <= Category.Type.Replenished)
+            if(category <= Category.Type.Replenished)
                 return rawResult;
 
             var targetResult = target.SmartReferenceResult(context, category.Typed);

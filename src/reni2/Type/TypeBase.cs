@@ -558,6 +558,13 @@ namespace Reni.Type
             return UniqueNumber(bitsConst.Size.ToInt())
                 .Result(category, getCode: () => CodeBase.BitsConst(bitsConst));
         }
+        
+        virtual internal Result InstanceResult(Category category, Func<Category, Result> getRightResult)
+        {
+            NotImplementedMethod(category, getRightResult(Category.All));
+            return null;
+
+        }
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature

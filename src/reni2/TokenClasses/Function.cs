@@ -57,7 +57,7 @@ namespace Reni.TokenClasses
 
     sealed class FunctionInstanceToken : Suffix
     {
-        public override Result Result(ContextBase context, Category category, CompileSyntax left)
+        protected override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
             var leftResult = left.Result(context, category.Typed);
             return leftResult.Type.UniqueFunctionInstanceType.Result(category, leftResult);

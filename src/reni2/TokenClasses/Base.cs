@@ -77,7 +77,9 @@ namespace Reni.TokenClasses
     [Serializable]
     abstract class Suffix : Special, ISuffix
     {
-        public abstract Result Result(ContextBase context, Category category, CompileSyntax right);
+        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left) { return Result(context, category, left); }
+        
+        protected abstract Result Result(ContextBase context, Category category, CompileSyntax left);
 
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
