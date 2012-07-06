@@ -24,8 +24,8 @@ using Reni.Feature;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class SequenceToken : Defineable, ISearchPath<IPrefixFeature, Type.Array>
+    internal sealed class SequenceToken : Defineable, ISearchPath<ISuffixFeature, Type.Array>
     {
-        IPrefixFeature ISearchPath<IPrefixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.SequenceResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.SequenceResult); }
     }
 }
