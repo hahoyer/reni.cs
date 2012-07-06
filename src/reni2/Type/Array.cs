@@ -87,6 +87,11 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
+        internal Result TextItemsResult(Category category)
+        {
+            return UniqueTextItemsType.PointerResult(category, PointerArgResult);
+        }
+
         internal override Result ConstructorResult(Category category, TypeBase argsType)
         {
             return Result

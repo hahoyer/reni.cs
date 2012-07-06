@@ -212,6 +212,7 @@ namespace Reni.Type
         internal virtual Result ApplyTypeOperator(Result argResult) { return argResult.Type.Conversion(argResult.CompleteCategory, this).ReplaceArg(argResult); }
         internal Result ArgResult(Category category) { return Result(category, () => ArgCode, CodeArgs.Arg); }
         internal Result PointerArgResult(Category category) { return UniquePointer.ArgResult(category); }
+        internal Result PointerResult(Category category, Func<Category, Result> getCodeAndRefs) { return UniquePointer.Result(category, getCodeAndRefs); }
 
         internal Result Result(Category category, IContextReference target)
         {
@@ -554,12 +555,11 @@ namespace Reni.Type
             return UniqueNumber(bitsConst.Size.ToInt())
                 .Result(category, getCode: () => CodeBase.BitsConst(bitsConst));
         }
-        
-        virtual internal Result InstanceResult(Category category, Func<Category, Result> getRightResult)
+
+        internal virtual Result InstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             NotImplementedMethod(category, getRightResult(Category.All));
             return null;
-
         }
     }
 

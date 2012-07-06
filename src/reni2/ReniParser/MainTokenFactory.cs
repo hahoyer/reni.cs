@@ -134,6 +134,7 @@ namespace Reni.ReniParser
                        {"reference", new ReferenceToken()},
                        {"sequence", new SequenceToken()},
                        {"text_item", new TextItem()},
+                       {"text_items", new TextItems()},
                        {"then", new ThenToken()},
                        {"to_number_of_base", new ToNumberOfBase()},
                        {"type", new TypeOperator()}
