@@ -81,7 +81,7 @@ namespace Reni.Context
         internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Value(container).Value(accessPosition); }
         internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects.Value(context); }
 
-        internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search(); }
+        internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search("context"); }
 
         //[DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)

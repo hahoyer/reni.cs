@@ -24,6 +24,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -91,6 +93,20 @@ namespace Reni.Feature
         {
             return
                 new MetaFunction(function);
+        }
+
+        [UsedImplicitly]
+        static bool _isPrettySearchPathHumanFriendly = true;
+
+        internal static string PrettySearchPath(this System.Type type)
+        {
+            if(!_isPrettySearchPathHumanFriendly 
+                || !type.IsGenericType 
+                || type.GetGenericTypeDefinition() != typeof(ISearchPath<,>))
+                return type.PrettyName();
+
+            var types = type.GetGenericArguments();
+            return PrettySearchPath(types[0]) + " -> " + types[1].PrettyName();
         }
     }
 }

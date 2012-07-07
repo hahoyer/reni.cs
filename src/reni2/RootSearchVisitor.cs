@@ -24,6 +24,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Feature;
 
 namespace Reni
@@ -35,7 +36,7 @@ namespace Reni
         protected TFeature Result { get; private set; }
 
         internal RootSearchVisitor(ISearchTarget target)
-            : base(new HashSet<System.Type>())
+            : base(new DictionaryEx<System.Type, string>())
         {
             _target = target;
             ConversionFunctions = new IConversionFunction[0];

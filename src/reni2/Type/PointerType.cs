@@ -47,25 +47,23 @@ namespace Reni.Type
             StopByObjectId(-10);
         }
 
-
         TypeBase ISmartReference.TargetType { get { return ValueType; } }
-
         TypeBase ISearchContainerType.Target { get { return ValueType; } }
         IConverter ISearchContainerType.Converter { get { return this; } }
-
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
-
         internal override string DumpPrintText { get { return DumpShort(); } }
-        [EnableDump]
+        [DisableDump]
         TypeBase ValueType { get { return _valueType; } }
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
-
-        Result ISmartReference.DereferenceResult(Category category) { return DereferenceResult(category); }
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
+
+        internal override string DumpShort() { return ValueType.DumpShort() + "[Pointer]"; }
+
+        Result ISmartReference.DereferenceResult(Category category) { return DereferenceResult(category); }
 
         internal override int? SmartSequenceLength(TypeBase elementType)
         {

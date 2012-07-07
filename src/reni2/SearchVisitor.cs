@@ -34,6 +34,8 @@ namespace Reni
 {
     abstract class SearchVisitor : ReniObject
     {
+        internal static bool Trace; 
+
         protected abstract SearchVisitor PathItem<TType>(TType target)
             where TType : IDumpShortProvider;
 
@@ -41,37 +43,54 @@ namespace Reni
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
         internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
 
-        internal abstract void SearchNameSpace(StructureType structureType);
-        internal abstract void Search();
+        protected abstract void SearchNameSpace(StructureType structureType);
+        internal abstract void Search(string item);
 
         internal void Search<TType>(TType target, Func<TypeBase> getChild)
             where TType : IDumpShortProvider
         {
-            var pathItemVisitor = PathItem(target);
-            pathItemVisitor.Search();
-            if(IsSuccessFull)
-                return;
+            if (Trace) Tracer.FlaggedLine(1, " >>> " + target.DumpShort());
+            if (Trace) Tracer.IndentStart();
+            try
+            {
+                var pathItemVisitor = PathItem(target);
 
-            if(getChild == null)
-                return;
+                if (Trace) Tracer.FlaggedLine("pathItemVisitor.Search()");
+                pathItemVisitor.Search("item");
+                if (IsSuccessFull)
+                    return;
 
-            var child = getChild();
-            if (child == null)
-                return;
+                if(getChild == null)
+                    return;
 
-            child.Search(pathItemVisitor);
-            if(IsSuccessFull)
-                return;
+                var child = getChild();
+                if (child == null)
+                    return;
 
-            var isc = target as ISearchContainerType;
-            if(isc == null)
-                return;
-            child.Search(this);
+                if (Trace) Tracer.FlaggedLine("child.Search(pathItemVisitor)");
+                child.Search(pathItemVisitor);
+                if (IsSuccessFull)
+                    return;
 
-            if(!IsSuccessFull)
-                return;
-            Add(new ConversionFunction(isc));
+                var isc = target as ISearchContainerType;
+                if(isc == null)
+                    return;
+
+                Tracer.Assert(isc.Target == child);
+                if (Trace) Tracer.FlaggedLine("child.Search(this)");
+                child.Search(this);
+
+                if(!IsSuccessFull)
+                    return;
+                Add(new ConversionFunction(isc));
+            }
+            finally
+            {
+                if (Trace) Tracer.IndentEnd();
+                if (Trace) Tracer.FlaggedLine(1, " <<< " + target.DumpShort());
+            }
         }
+
         internal void Search(StructureType structureType)
         {
             SearchNameSpace(structureType);
@@ -89,26 +108,30 @@ namespace Reni
     abstract class SearchVisitor<TFeature> : SearchVisitor
         where TFeature : class, ISearchPath
     {
-        internal readonly HashSet<System.Type> Probe;
+        internal readonly DictionaryEx<System.Type,string> Probe;
 
-        protected SearchVisitor(HashSet<System.Type> probe) { Probe = probe; }
+        protected SearchVisitor(DictionaryEx<System.Type, string> probe) { Probe = probe; }
 
         internal abstract TFeature InternalResult { set; }
         internal abstract ISearchTarget Target { get; }
 
-        internal override void SearchNameSpace(StructureType structureType) { structureType.SearchNameSpace(this); }
-        internal override void Search()
+        protected override void SearchNameSpace(StructureType structureType) { structureType.SearchNameSpace(this); }
+        internal override void Search(string item)
         {
-            Tracer.Assert(!IsSuccessFull, ()=>Tracer.Dump(Probe));
-            if (Probe.Contains(typeof(TFeature)))
+            if (Trace) Tracer.Line(typeof(TFeature).PrettySearchPath());
+            Tracer.Assert(!IsSuccessFull, () => Tracer.Dump(Probe));
+            if(Probe.Keys.Contains(typeof(TFeature)))
+            {
+                Tracer.Assert(Probe[typeof(TFeature)] == item);
                 return;
-            AddProbe(typeof(TFeature));
+            }
+            AddProbe(typeof(TFeature),item);
             InternalResult = Target as TFeature;
         }
-        void AddProbe(System.Type testType)
+        void AddProbe(System.Type testType, string item)
         {
-            Tracer.Assert(!Probe.Contains(testType), "Target=" + Target + "\nProbe=" + Tracer.Dump(Probe) + "\ntestType=" + testType.PrettyName());
-            Probe.Add(testType);
+            Tracer.Assert(!Probe.Keys.Contains(testType), "Target=" + Target + "\nProbe=" + Tracer.Dump(Probe) + "\ntestType=" + testType.PrettyName());
+            Probe.Add(testType, item);
         }
 
         protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target); }

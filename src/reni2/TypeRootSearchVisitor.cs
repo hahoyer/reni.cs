@@ -24,7 +24,6 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using HWClassLibrary.Helper;
 using Reni.Feature;
 using Reni.Type;
 
@@ -40,7 +39,16 @@ namespace Reni
             : base(target) { _type = type; }
 
         [EnableDump]
-        internal string[] ProbeStr { get { return Probe.Select(x => x.PrettyName()).ToArray(); } }
+        internal string[] ProbeStr
+        {
+            get
+            {
+                return Probe
+                    .ToArray()
+                    .Select(pair => pair.Key.PrettySearchPath() + " [" + pair.Value + "]")
+                    .ToArray();
+            }
+        }
 
         internal SearchResult SearchResult
         {

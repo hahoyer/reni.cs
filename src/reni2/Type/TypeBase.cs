@@ -120,6 +120,7 @@ namespace Reni.Type
         internal virtual Size UnrefSize { get { return Size; } }
 
         [DisableDump]
+        internal virtual TypeBase[] ToList { get { return new[] {this}; } }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
@@ -146,6 +147,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
+        internal virtual int IndexSize { get { return 0; } }
 
         internal TypeBase UniqueAlign(int alignBits)
         {
@@ -330,8 +332,10 @@ namespace Reni.Type
             where TFeature : class, IFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
+            SearchVisitor.Trace = true;
             Search(visitor);
-            if(Debugger.IsAttached && !visitor.IsSuccessFull)
+            SearchVisitor.Trace = false;
+            if (Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
         }
