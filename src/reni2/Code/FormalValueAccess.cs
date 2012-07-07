@@ -72,10 +72,10 @@ namespace Reni.Code
         {
             var ss = accesses.Select(x => x.Size).Distinct().ToArray();
             if(ss.Length != 1 || ss[0] != accesses.ToArray().Length)
-                Tracer.FlaggedLine(FilePositionTag.Debug, "Size problem");
+                Tracer.FlaggedLine("Size problem");
             var ii = accesses.Select((x, i) => i - x.Index).Distinct().ToArray();
             if(ii.Length != 1 || ii[0] != 0)
-                Tracer.FlaggedLine(FilePositionTag.Debug, "Consequtivity problem");
+                Tracer.FlaggedLine("Consequtivity problem");
         }
     }
 

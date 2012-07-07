@@ -64,7 +64,7 @@ namespace Reni.Type
                 Dump("result", result);
                 BreakExecution();
 
-                return ReturnMethodDump(result.ReplaceArg(resultForArg),true);
+                return ReturnMethodDump(result.ReplaceArg(resultForArg));
 
             }
             finally

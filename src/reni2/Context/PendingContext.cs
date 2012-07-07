@@ -60,7 +60,7 @@ namespace Reni.Context
                 }
 
                 Tracer.Assert(result.CompleteCategory == category);
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result);
             }
             finally
             {

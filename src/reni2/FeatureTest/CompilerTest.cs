@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,9 +18,10 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -40,7 +42,6 @@ namespace Reni.FeatureTest
 
         internal void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
         internal void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
-        internal void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, expectedResult, expectedOutput); }
 
         void CreateFileAndRunCompiler(int depth, string name, string text, Action<Compiler> expectedResult, string expectedOutput)
         {
@@ -50,17 +51,9 @@ namespace Reni.FeatureTest
             InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
         }
 
-        public static void Run(string name, string target, string expectedOutput)
-        {
-            var fileName = name + ".reni";
-            var f = fileName.FileHandle();
-            f.String = target;
-            InternalRunCompiler(CompilerParameters.CreateTraceAll(), fileName, null, expectedOutput);
-        }
-
         void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
         {
-            Tracer.FlaggedLine(depth + 1, FilePositionTag.Test, "Position of method tested");
+            Tracer.FlaggedLine(depth + 1, "Position of method tested", FilePositionTag.Test);
             if(TestRunner.IsModeErrorFocus)
                 Parameters.Trace.All();
 
@@ -167,10 +160,6 @@ namespace Reni.FeatureTest
 
         protected virtual void AssertValid(Compiler c) { }
     }
-
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class IsUnderConstructionAttribute : Attribute
-    {}
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     abstract class StringAttribute : Attribute

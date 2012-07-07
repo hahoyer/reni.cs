@@ -57,7 +57,7 @@ namespace Reni.Context
 
                 }
                 var result = structure.ReferenceType.Result(category, structure.ContainerContextObject);
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result);
             }
             finally
             {

@@ -153,7 +153,7 @@ namespace Reni
                     result = result.ReplaceAbsolute(referenceInCode, () => reference.Dereference(refSize));
                     Dump("result", result);
                 }
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result);
             }
             finally
             {

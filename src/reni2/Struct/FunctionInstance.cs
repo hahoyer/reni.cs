@@ -125,7 +125,7 @@ namespace Reni.Struct
                 BreakExecution();
                 var result = postProcessedResult
                     .ReplaceAbsolute(Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result);
             }
             finally
             {

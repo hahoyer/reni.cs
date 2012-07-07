@@ -278,7 +278,7 @@ namespace Reni.Struct
                 BreakExecution();
                 var result = results
                     .Aggregate(TypeBase.VoidResult(category), (current, next) => current + next);
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result);
             }
             finally
             {
@@ -297,7 +297,7 @@ namespace Reni.Struct
                 Dump("Statements[position]", Statements[position]);
                 BreakExecution();
                 var result = Result(Category.Type, parent, accessPosition, position).Type;
-                return ReturnMethodDump(result, true);
+                return ReturnMethodDump(result);
             }
             finally
             {
