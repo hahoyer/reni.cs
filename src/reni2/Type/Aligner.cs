@@ -74,7 +74,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal override Result ParentConversionResult(Category category)
+        protected override Result ParentConversionResult(Category category)
         {
             return Parent.Result
                 (

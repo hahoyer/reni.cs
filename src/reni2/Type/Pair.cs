@@ -62,7 +62,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected internal override TypeBase[] ToList
+        internal override TypeBase[] ToList
         {
             get
             {

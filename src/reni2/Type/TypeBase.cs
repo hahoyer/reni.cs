@@ -120,7 +120,6 @@ namespace Reni.Type
         internal virtual Size UnrefSize { get { return Size; } }
 
         [DisableDump]
-        protected internal virtual TypeBase[] ToList { get { return new[] {this}; } }
 
         string IDumpShortProvider.DumpShort() { return DumpShort(); }
 
@@ -147,7 +146,6 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        protected internal virtual int IndexSize { get { return 0; } }
 
         internal TypeBase UniqueAlign(int alignBits)
         {

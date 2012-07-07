@@ -33,11 +33,11 @@ namespace Reni.Code
     {
         [DisableDump]
         [Node]
-        protected internal readonly Size LeftSize;
+        internal readonly Size LeftSize;
 
         [DisableDump]
         [Node]
-        protected internal readonly Size RightSize;
+        internal readonly Size RightSize;
 
         protected BinaryOp(Size leftSize, Size rightSize)
         {

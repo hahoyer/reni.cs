@@ -46,7 +46,7 @@ namespace Reni.Type
         internal override Result ArrayDestructor(Category category, int count) { return Parent.ArrayDestructor(category, count); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
-        internal override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult(category.Typed)); }
+        protected override Result ParentConversionResult(Category category) { return Parent.Result(category, ArgResult(category.Typed)); }
         internal Result ReferenceConversionResult(Category category) {return ReferenceConversionResult(category, Parent);
         }
     }

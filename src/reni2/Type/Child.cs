@@ -54,6 +54,7 @@ namespace Reni.Type
         IConverter ISearchContainerType.Converter { get { return this; } }
         TypeBase ISearchContainerType.Target { get { return _parent; } }
         Result IConverter.Result(Category category) { return ParentConversionResult(category); }
+        protected abstract Result ParentConversionResult(Category category);
         internal abstract Result ParentConversionResult(Category category);
     }
 }

@@ -79,7 +79,7 @@ namespace Reni.Type
                 );
         }
 
-        internal override Result ParentConversionResult(Category category)
+        protected override Result ParentConversionResult(Category category)
         {
             return Parent.SmartPointer
                 .Result(category, ArgResult(category.Typed).AddToReference(() => _structure.FieldOffset(_position)));
