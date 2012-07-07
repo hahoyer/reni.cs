@@ -42,19 +42,11 @@ namespace Reni.Type
         public TParent Parent { get { return _parent; } }
 
         [DisableDump]
-        protected internal override int IndexSize { get { return Parent.IndexSize; } }
-
-        internal override void Search(SearchVisitor searchVisitor)
-        {
-            searchVisitor.Search(this, () => Parent);
-            if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
-        }
+        internal override int IndexSize { get { return Parent.IndexSize; } }
 
         IConverter ISearchContainerType.Converter { get { return this; } }
         TypeBase ISearchContainerType.Target { get { return _parent; } }
         Result IConverter.Result(Category category) { return ParentConversionResult(category); }
         protected abstract Result ParentConversionResult(Category category);
-        internal abstract Result ParentConversionResult(Category category);
     }
 }
