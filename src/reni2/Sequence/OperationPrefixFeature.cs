@@ -5,7 +5,10 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    internal sealed class OperationPrefixFeature : ReniObject, ISearchPath<IPrefixFeature, SequenceType>
+    internal sealed class OperationPrefixFeature 
+        : ReniObject
+        , ISearchPath<IPrefixFeature, SequenceType>
+        , ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Array>
     {
         [EnableDump]
         private readonly ISequenceOfBitPrefixOperation _definable;
@@ -19,5 +22,6 @@ namespace Reni.Sequence
         }
 
         IPrefixFeature ISearchPath<IPrefixFeature, SequenceType>.Convert(SequenceType type) { return type.PrefixFeature(_definable); }
+        ISearchPath<IPrefixFeature, SequenceType> ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Array>.Convert(Array type) { return this; }
     }
 }
