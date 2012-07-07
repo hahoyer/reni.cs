@@ -34,6 +34,12 @@ namespace Reni.FeatureTest
         {
             return
                 @"
+systemdata:
+{
+    Memory: (bit * 200000) instance (0);
+    FreePointer: Memory reference;
+}
+
 system:
 {
     MaxNumber8: '7f' to_number_of_base(16) /!\ ;
@@ -42,13 +48,21 @@ system:
     MaxNumber64: '7fffffffffffffff' to_number_of_base(16) /!\ ;
 
     TextItemType: text_item(MaxNumber8) type /!\ ;
+    
+    NewMemory: 
+    {
+        result: (arg elementType * arg length) reference (systemdata FreePointer enable_raw_conversion),
+        initializer: arg initializer,
+        (arg length) array foreach(result @ arg := initializer(arg) /\)
+        systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
+    } result /\
 }/!\ ;
 
 Text: 
 {
     data: (system TextItemType * system MaxNumber32) reference (arg);
-    _length: system MaxNumber32 type (arg type / system TextItemType);
-    AfterCopy: data:= system NewMemory(system TextItemType,system MaxNumber32,data at arg /\)/\;
+    _length: system MaxNumber32 type instance (arg type / system TextItemType);
+    AfterCopy: data:= system NewMemory(elementType: system TextItemType, length: _length, initializer: data at arg /\)/\;
     AfterCopy()
 }/\
 ";
@@ -66,6 +80,7 @@ Text:
     [TwoFunctions]
     [FromTypeAndFunction]
     [HalloWelt]
+    [LowPriority]
     public sealed class Text1 : TextStruct
     {
         [Test]
