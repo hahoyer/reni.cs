@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,14 +31,14 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    abstract class SequenceOfBitOperation :
-        Defineable,
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>,
-        ISequenceOfBitBinaryOperation
+    abstract class SequenceOfBitOperation
+        : Defineable
+          , ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>, Bit>
+          , ISequenceOfBitBinaryOperation
     {
-        ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>.Convert(Bit type)
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array> ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>, Bit>.Convert(Bit type)
         {
-            if(IsCompareOperator)
+            if (IsCompareOperator)
                 return new CompareFeature(this);
             return new Feature(this);
         }
