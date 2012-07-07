@@ -50,11 +50,13 @@ namespace Reni.Feature.DumpPrint
         }
     }
 
-    sealed class BitSequenceFeature :
-        ReniObject,
-        ISearchPath<ISuffixFeature, SequenceType>
+    sealed class BitSequenceFeature
+        : ReniObject
+          , ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>
+          , ISearchPath<ISuffixFeature, SequenceType>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.BitDumpPrintFeature; }
+        ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>.Convert(Type.Array type) { return this; }
     }
 
     sealed class BitSequenceFeatureClass : BitFeatureBase, ISuffixFeature, ISimpleFeature

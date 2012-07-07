@@ -34,7 +34,6 @@ namespace Reni.Feature.DumpPrint
 {
     sealed class DumpPrintToken :
         Defineable,
-        ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>,
         ISearchPath<ISuffixFeature, TypeType>,
         ISearchPath<ISuffixFeature, FunctionBodyType>,
         ISearchPath<ISuffixFeature, Bit>,
@@ -43,7 +42,8 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<ISuffixFeature, Type.Array>,
         ISearchPath<ISuffixFeature, TextItemsType>,
         ISearchPath<ISuffixFeature, TextItemType>,
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>
+        ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>,
+        ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>, Bit>
     {
         static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
         static readonly BitFeature _bitFeature = new BitFeature();
@@ -57,8 +57,8 @@ namespace Reni.Feature.DumpPrint
         ISuffixFeature ISearchPath<ISuffixFeature, FunctionBodyType>.Convert(FunctionBodyType type) { return Extension.Feature(type.DumpPrintTextResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.DumpPrintTextResult); }
 
-        ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
         ISearchPath<ISuffixFeature, PointerType> ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array> ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
 
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
     }

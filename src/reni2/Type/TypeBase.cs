@@ -332,9 +332,9 @@ namespace Reni.Type
             where TFeature : class, IFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
-            SearchVisitor.Trace = true;
+            //SearchVisitor.Trace = true;
             Search(visitor);
-            SearchVisitor.Trace = false;
+            //SearchVisitor.Trace = false;
             if (Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
