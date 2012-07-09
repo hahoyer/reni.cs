@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,14 +18,16 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Syntax;
 
 namespace Reni.TokenClasses
@@ -39,7 +42,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         internal int Level { get { return _level; } }
 
-        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, left, this, token, right); }
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, left, this, token, right); }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {

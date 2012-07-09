@@ -32,6 +32,10 @@
     <Compile Include="Code\Generator.cs" />
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
+    <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
+    <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
+    <Compile Include="FeatureTest\Array\ElementAccess.cs" />
+    <Compile Include="FeatureTest\Array\FromTypeAndFunction.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
@@ -110,7 +114,6 @@
     <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
-    <Compile Include="FeatureTest\Array.cs" />
     <Compile Include="FeatureTest\CompilerTest.cs" />
     <Compile Include="Context\Function.cs" />
     <Compile Include="Context\Root.cs" />
@@ -280,6 +283,7 @@
     <Compile Include="Type\PointerType.cs" />
     <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\SearchResult.cs" />
+    <Compile Include="Type\SetterTargetType.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemsType.cs" />
     <Compile Include="Type\TextItemType.cs" />

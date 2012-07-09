@@ -42,7 +42,7 @@ namespace Reni.ReniParser
             var x = PrioTable.Left("<common>");
             x += PrioTable.Left
                 ("reference", "instance"
-                 , "_A_T_", "_N_E_X_T_", "@"
+                 , "_A_T_", "_N_E_X_T_"
                  , "to_number_of_base"
                 );
 

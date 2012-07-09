@@ -54,7 +54,7 @@ system:
     {
         result: (arg elementType * arg length) reference (systemdata FreePointer enable_raw_conversion),
         initializer: arg initializer,
-        (arg length) array foreach(result @ arg := initializer(arg) /\),
+        (arg length) array foreach(result(arg) := initializer(arg) /\),
         systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
     } result /\
 }/!\ ;
@@ -67,7 +67,7 @@ Text:
     (
         elementType: system TextItemType, 
         length: _length, 
-        initializer: data @ arg /\
+        initializer: data(arg) /\
     )/\;
     AfterCopy()
 }/\
