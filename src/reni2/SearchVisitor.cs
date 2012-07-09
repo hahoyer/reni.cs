@@ -76,7 +76,7 @@ namespace Reni
                 if(isc == null)
                     return;
 
-                Tracer.Assert(isc.Target == child);
+                Tracer.Assert(isc.TargetType == child);
                 if (Trace) Tracer.FlaggedLine("child.Search(this)");
                 child.Search(this);
 

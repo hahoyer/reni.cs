@@ -45,7 +45,7 @@ namespace Reni.Type
         internal override int IndexSize { get { return Parent.IndexSize; } }
 
         IConverter ISearchContainerType.Converter { get { return this; } }
-        TypeBase ISearchContainerType.Target { get { return _parent; } }
+        TypeBase ISearchContainerType.TargetType { get { return _parent; } }
         Result IConverter.Result(Category category) { return ParentConversionResult(category); }
         protected abstract Result ParentConversionResult(Category category);
     }

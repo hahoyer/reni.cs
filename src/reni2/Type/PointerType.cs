@@ -48,7 +48,7 @@ namespace Reni.Type
         }
 
         TypeBase ISmartReference.TargetType { get { return ValueType; } }
-        TypeBase ISearchContainerType.Target { get { return ValueType; } }
+        TypeBase ISearchContainerType.TargetType { get { return ValueType; } }
         IConverter ISearchContainerType.Converter { get { return this; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
         internal override string DumpPrintText { get { return DumpShort(); } }

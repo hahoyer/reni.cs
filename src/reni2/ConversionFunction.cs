@@ -49,7 +49,7 @@ namespace Reni
                        + "["
                        + ((ReniObject) _searchContainerType).NodeDump
                        + "=>"
-                       + _searchContainerType.Target.NodeDump
+                       + _searchContainerType.TargetType.NodeDump
                        + "]";
             }
         }
@@ -58,6 +58,6 @@ namespace Reni
     interface ISearchContainerType
     {
         IConverter Converter { get; }
-        TypeBase Target { get; }
+        TypeBase TargetType { get; }
     }
 }

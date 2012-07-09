@@ -67,7 +67,7 @@ namespace Reni.Struct
         Result ISmartReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
         Size IContextReference.Size { get { return Size; } }
         IConverter ISearchContainerType.Converter { get { return this; } }
-        TypeBase ISearchContainerType.Target { get { return ValueType; } }
+        TypeBase ISearchContainerType.TargetType { get { return ValueType; } }
 
         internal TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
