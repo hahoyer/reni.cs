@@ -29,7 +29,7 @@ using HWClassLibrary.UnitTest;
 namespace Reni.FeatureTest.TypeType
 {
     [TestFixture]
-    [TargetSet(@"0 type * 2 sequence dump_print;", "1")]
+    [TargetSet(@"(0 type * 2) sequence dump_print;", "1")]
     public sealed class SequenceOfType : CompilerTest
     {
         [Test]
