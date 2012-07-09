@@ -27,45 +27,44 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Struct;
 
 namespace Reni.Type
 {
     sealed class AssignmentFeature : ReniObject, IFunctionFeature, ISuffixFeature
     {
         static int _nextObjectId;
-        readonly ISetterTargetType _target;
+        readonly SetterTargetType _target;
 
-        public AssignmentFeature(ISetterTargetType target):base(_nextObjectId++) { _target = target; }
+        public AssignmentFeature(SetterTargetType target)
+            : base(_nextObjectId++) { _target = target; }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
             var trace = ObjectId == -1;
-            StartMethodDump(trace, category,argsType);
+            StartMethodDump(trace, category, argsType);
             try
             {
                 BreakExecution();
                 var sourceResult = argsType
                     .Conversion(category.Typed, _target.ValueType)
                     .SmartLocalReferenceResult();
-                Dump("sourceResult", sourceResult); 
+                Dump("sourceResult", sourceResult);
                 BreakExecution();
 
                 var destinationResult = _target
                     .DestinationResult(category.Typed)
-                    .ReplaceArg(_target.Type.Result(category.Typed, _target));
-                Dump("destinationResult", destinationResult); 
+                    .ReplaceArg(_target.Result(category.Typed, _target));
+                Dump("destinationResult", destinationResult);
                 BreakExecution();
 
                 var resultForArg = destinationResult + sourceResult;
-                Dump("resultForArg", resultForArg); 
+                Dump("resultForArg", resultForArg);
 
-                var result = _target.Result(category);
+                var result = _target.AssignmentResult(category);
                 Dump("result", result);
                 BreakExecution();
 
                 return ReturnMethodDump(result.ReplaceArg(resultForArg));
-
             }
             finally
             {
@@ -76,7 +75,7 @@ namespace Reni.Type
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return this; } }
         ISimpleFeature IFeature.Simple { get { return null; } }
-        
+
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return _target; } }
     }

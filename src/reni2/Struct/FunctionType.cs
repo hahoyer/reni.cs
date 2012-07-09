@@ -35,7 +35,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionType : TypeBase, ISetterTargetType, ISearchContainerType, IConverter, ISmartReference
+    sealed class FunctionType : SetterTargetType, ISearchContainerType, IConverter, ISmartReference
     {
         readonly int _index;
         [Node]
@@ -47,12 +47,9 @@ namespace Reni.Struct
         [NotNull]
         [Node]
         readonly GetterFunction _getter;
-        [DisableDump]
-        internal readonly ISuffixFeature AssignmentFeature;
 
         internal FunctionType(int index, FunctionSyntax body, Structure structure, TypeBase argsType)
         {
-            AssignmentFeature = new AssignmentFeature(this);
             _getter = new GetterFunction(this, index, body.Getter);
             _setter = body.Setter == null ? null : new SetterFunction(this, index, body.Setter);
             _index = index;
@@ -61,15 +58,12 @@ namespace Reni.Struct
             StopByObjectId(-10);
         }
 
-        TypeBase ISetterTargetType.Type { get { return this; } }
-        TypeBase ISetterTargetType.ValueType { get { return ValueType; } }
         TypeBase ISmartReference.TargetType { get { return ValueType; } }
         Result ISmartReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
-        Size IContextReference.Size { get { return Size; } }
         IConverter ISearchContainerType.Converter { get { return this; } }
         TypeBase ISearchContainerType.TargetType { get { return ValueType; } }
 
-        internal TypeBase ValueType { get { return _getter.ReturnType; } }
+        internal override TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
         internal override bool IsDataLess { get { return CodeArgs.IsNone && ArgsType.IsDataLess; } }
         [DisableDump]
@@ -100,10 +94,10 @@ namespace Reni.Struct
             }
         }
 
-        Result ISetterTargetType.Result(Category category) { return _setter.CallResult(category); }
-        Result ISetterTargetType.DestinationResult(Category category) { return Result(category, this); }
+        internal override Result AssignmentResult(Category category) { return _setter.CallResult(category); }
         Result IConverter.Result(Category category) { return _getter.CallResult(category); }
 
+        internal override Result DestinationResult(Category category) { return Result(category, this); }
         protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
 
         internal void EnsureBodyCode()

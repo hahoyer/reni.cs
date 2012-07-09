@@ -27,32 +27,24 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : Child<TypeBase>, ISetterTargetType, ISmartReference
+    sealed class FieldAccessType : SetterTargetType, ISmartReference, ISearchContainerType, IConverter
     {
         [EnableDump]
         readonly Structure _structure;
         [EnableDump]
         readonly int _position;
-        [DisableDump]
-        internal readonly ISuffixFeature AssignmentFeature;
 
         internal FieldAccessType(Structure structure, int position)
-            : base(structure.ValueType(position))
         {
-            AssignmentFeature = new AssignmentFeature(this);
             _structure = structure;
             _position = position;
         }
 
-        TypeBase ISetterTargetType.ValueType { get { return Parent; } }
-        TypeBase ISetterTargetType.Type { get { return this; } }
-
-        Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
+        internal override TypeBase ValueType { get { return _structure.ValueType(_position); } }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
@@ -61,9 +53,8 @@ namespace Reni.Type
         [DisableDump]
         IContextReference ObjectReference { get { return this; } }
         [DisableDump]
-        internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
+        internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
 
-        Result ISmartReference.DereferenceResult(Category category) { return ParentConversionResult(category); }
 
         public override string NodeDump { get { return base.NodeDump + "{" + _structure.NodeDump + "@" + _position + "}"; } }
 
@@ -79,54 +70,51 @@ namespace Reni.Type
                 );
         }
 
-        protected override Result ParentConversionResult(Category category)
+        Result ParentConversionResult(Category category)
         {
-            return Parent.SmartPointer
+            return ValueType.SmartPointer
                 .Result(category, ArgResult(category.Typed).AddToReference(() => _structure.FieldOffset(_position)));
         }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.Search(this, () => Parent);
+            searchVisitor.Search(this, () => ValueType);
             if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
 
         internal override int? SmartSequenceLength(TypeBase elementType)
         {
-            return Parent
+            return ValueType
                 .SmartSequenceLength(elementType);
         }
 
         internal override int? SmartArrayLength(TypeBase elementType)
         {
-            return Parent
+            return ValueType
                 .SmartArrayLength(elementType);
         }
 
 
-        Result ISetterTargetType.Result(Category category)
-        {
-            return new Result
-                (category
-                 , getType: () => Void
-                 , getCode: AssignmentCode
-                 , getArgs: CodeArgs.Arg
-                );
-        }
-
-        Result ISetterTargetType.DestinationResult(Category category)
+        internal override Result DestinationResult(Category category)
         {
             return Result(category, ObjectReference)
                 .AddToReference(() => _structure.FieldOffset(_position));
         }
 
-        CodeBase AssignmentCode()
+        internal override Result AssignmentResult(Category category)
         {
-            return Pair(Parent.SmartPointer).ArgCode
-                .Assignment(RefAlignParam, Parent.Size);
+            return new Result
+                (category
+                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.Assignment(RefAlignParam, ValueType.Size)
+                 , getArgs: CodeArgs.Arg
+                );
         }
 
-        TypeBase ISmartReference.TargetType { get { return Parent; } }
+        TypeBase ISmartReference.TargetType { get { return ValueType; } }
+        Result ISmartReference.DereferenceResult(Category category) { return ParentConversionResult(category); }
+        IConverter ISearchContainerType.Converter { get { return this; } }
+        TypeBase ISearchContainerType.TargetType { get { return ValueType; } }
+        Result IConverter.Result(Category category) { return ParentConversionResult(category); }
     }
 }

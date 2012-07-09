@@ -25,17 +25,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Feature;
-using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.TokenClasses
 {
     sealed class Assignment
         : Defineable
-          , ISearchPath<ISuffixFeature, FieldAccessType>
-          , ISearchPath<ISuffixFeature, FunctionType>
+          , ISearchPath<ISuffixFeature, SetterTargetType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, FieldAccessType>.Convert(FieldAccessType type) { return type.AssignmentFeature; }
-        ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return type.AssignmentFeature; }
+        ISuffixFeature ISearchPath<ISuffixFeature, SetterTargetType>.Convert(SetterTargetType type) { return type.AssignmentFeature; }
     }
 }
