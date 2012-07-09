@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,14 +18,16 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
-using Reni.FeatureTest.DefaultOperations;
 using Reni.FeatureTest.Function;
+using Reni.FeatureTest.TypeType;
 
 namespace Reni.FeatureTest.Struct
 {
@@ -154,7 +158,9 @@ namespace Reni.FeatureTest.Struct
     }
 
     [TestFixture]
-    [AccessAndAdd, BitArrayOp.BitArrayOp, SubtractOddSizedNumber]
+    [AccessAndAdd]
+    [BitArrayOp.BitArrayOp]
+    [SubtractOddSizedNumber]
     [TargetSet(" 1; 4;2050; (^ _A_T_ 0) + (^ _A_T_ 1) + (^ _A_T_ 2);(^ _A_T_ 3) dump_print;", "2055")]
     public sealed class AccessAndAddComplex : CompilerTest
     {

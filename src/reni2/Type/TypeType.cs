@@ -40,7 +40,8 @@ namespace Reni.Type
 
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
-        TypeBase Value { get { return _value; } }
+        [DisableDump]
+        internal TypeBase Value { get { return _value; } }
 
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
@@ -101,17 +102,6 @@ namespace Reni.Type
             }
 
             return Result(category, BitsConst.Convert(count.Value));
-        }
-
-        internal Result CreateReference(ContextBase context, Category category, CompileSyntax target)
-        {
-            var rawResult = Value.SmartReference.ArgResult(category);
-            if(category <= Category.Type.Replenished)
-                return rawResult;
-
-            var targetResult = target.SmartReferenceResult(context, category.Typed);
-            var convertedResult = targetResult.Conversion(Value.SmartReference);
-            return rawResult.ReplaceArg(convertedResult);
         }
     }
 }

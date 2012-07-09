@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project reniTest
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,8 +31,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
-using Reni.FeatureTest.DefaultOperations;
-using Reni.FeatureTest.Function;
+using Reni.FeatureTest.TypeType;
 using Reni.Runtime;
 
 namespace ReniTest
@@ -96,7 +98,7 @@ f1()dump_print;
                 InternalTest(typeof(List<int>), "List<int>");
                 InternalTest(typeof(List<List<int>>), "List<List<int>>");
                 InternalTest(typeof(Dictionary<int, string>), "Dictionary<int,string>");
-                InternalTest(typeof(TypeOperator), "DefaultOperations.TypeOperator");
+                InternalTest(typeof(TypeOperator), "TypeType.TypeOperator");
             }
 
             [DebuggerHidden]

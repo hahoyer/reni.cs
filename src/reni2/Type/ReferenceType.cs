@@ -30,7 +30,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    sealed class ReferenceType 
+    sealed class ReferenceType
         : TypeBase
           , ISearchPath<ISuffixFeature, Array>
     {
@@ -51,12 +51,18 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
 
+        internal Result EnableRawConversion(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
+
         void AssertValid() { Tracer.Assert(!_elementType.IsDataLess); }
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
         ISuffixFeature ISearchPath<ISuffixFeature, Array>.Convert(Array type)
         {
-            if (type.ElementType != ElementType)
+            if(type.ElementType != ElementType)
                 return null;
             return Extension.Feature(type.ConvertToReference(_count));
         }

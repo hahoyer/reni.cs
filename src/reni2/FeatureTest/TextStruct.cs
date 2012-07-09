@@ -36,16 +36,16 @@ namespace Reni.FeatureTest
                 @"
 systemdata:
 {
-    Memory: (bit * 200000) instance (0);
-    FreePointer: Memory reference;
-}
+    Memory: (0 type * 200000) sequence instance (0);
+    FreePointer: reference Memory;
+};
 
 system:
 {
-    MaxNumber8: '7f' to_number_of_base(16) /!\ ;
-    MaxNumber16: '7fff' to_number_of_base(16) /!\ ;
-    MaxNumber32: '7fffffff' to_number_of_base(16) /!\ ;
-    MaxNumber64: '7fffffffffffffff' to_number_of_base(16) /!\ ;
+    MaxNumber8: '7f' to_number_of_base 16 /!\ ;
+    MaxNumber16: '7fff' to_number_of_base 16 /!\ ;
+    MaxNumber32: '7fffffff' to_number_of_base 16 /!\ ;
+    MaxNumber64: '7fffffffffffffff' to_number_of_base 16 /!\ ;
 
     TextItemType: text_item(MaxNumber8) type /!\ ;
     
@@ -53,16 +53,21 @@ system:
     {
         result: (arg elementType * arg length) reference (systemdata FreePointer enable_raw_conversion),
         initializer: arg initializer,
-        (arg length) array foreach(result @ arg := initializer(arg) /\)
+        (arg length) array foreach(result @ arg := initializer(arg) /\),
         systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
     } result /\
 }/!\ ;
 
 Text: 
 {
-    data: (system TextItemType * system MaxNumber32) reference (arg);
+    data: (system TextItemType * system MaxNumber32) reference arg;
     _length: system MaxNumber32 type instance (arg type / system TextItemType);
-    AfterCopy: data:= system NewMemory(elementType: system TextItemType, length: _length, initializer: data at arg /\)/\;
+    AfterCopy: data:= system NewMemory
+    (
+        elementType: system TextItemType, 
+        length: _length, 
+        initializer: data @ arg /\
+    )/\;
     AfterCopy()
 }/\
 ";
@@ -80,7 +85,7 @@ Text:
     [TwoFunctions]
     [FromTypeAndFunction]
     [HalloWelt]
-    [LowPriority]
+    //[LowPriority]
     public sealed class Text1 : TextStruct
     {
         [Test]

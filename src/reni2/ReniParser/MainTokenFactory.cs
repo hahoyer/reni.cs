@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,17 +35,15 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : TokenFactory<TokenClasses.TokenClass>
+    sealed class MainTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
         protected override PrioTable GetPrioTable()
         {
             var x = PrioTable.Left("<common>");
-            x += PrioTable.Left(
-                "at", "content", "_A_T_", "_N_E_X_T_",
-                "raw_convert", "construct", "bit_cast", "bit_expand",
-                "stable_ref", "consider_as",
-                "size",
-                "bit_address", "bit_align"
+            x += PrioTable.Left
+                ("reference", "instance"
+                 , "_A_T_", "_N_E_X_T_", "@"
+                 , "to_number_of_base"
                 );
 
             x += PrioTable.Left("<<");
@@ -65,11 +66,11 @@ namespace Reni.ReniParser
 
             x = x.Level
                 (new[]
-                 {
-                     "+--",
-                     "+?+",
-                     "?-+"
-                 },
+                {
+                    "+--",
+                    "+?+",
+                    "?-+"
+                },
                  new[] {"then"},
                  new[] {"else"}
                 );
@@ -80,11 +81,11 @@ namespace Reni.ReniParser
             x += PrioTable.Right(";");
             x = x.Level
                 (new[]
-                 {
-                     "++-",
-                     "+?-",
-                     "?--"
-                 },
+                {
+                    "++-",
+                    "+?-",
+                    "?--"
+                },
                  new[] {"(", "[", "{", "<frame>"},
                  new[] {")", "]", "}", "<end>"}
                 );
@@ -103,42 +104,44 @@ namespace Reni.ReniParser
         protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()
         {
             return new DictionaryEx<string, TokenClasses.TokenClass>
-                   {
-                       {"^", new ContextOperator()},
-                       {":", new Colon()},
-                       {":=", new Assignment()},
-                       {"=", new Equal()},
-                       {">", new CompareOperator()},
-                       {">=", new CompareOperator()},
-                       {"<", new CompareOperator()},
-                       {"<=", new CompareOperator()},
-                       {"<>", new NotEqual()},
-                       {"<<", new ConcatArrays()},
-                       {"-", new Sign()},
-                       {"!", new Exclamation()},
-                       {"+", new Sign()},
-                       {"/", new Slash()},
-                       {"/\\", new TokenClasses.Function()},
-                       {"/!\\", new TokenClasses.Function(isImplicit: true)},
-                       {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
-                       {"/!\\/!\\", new TokenClasses.Function(isImplicit: true, isMetaFunction: true)},
-                       {"*", new Star()},
-                       {"_A_T_", new AtToken()},
-                       {"arg", new ArgToken()},
-                       {"dump_print", new DumpPrintToken()},
-                       {"else", new ElseToken()},
-                       {"enable_cut", new EnableCut()},
-                       {"function_instance", new FunctionInstanceToken()},
-                       {"instance", new InstanceToken()},
-                       {"new_value", new NewValueToken()},
-                       {"reference", new ReferenceToken()},
-                       {"sequence", new SequenceToken()},
-                       {"text_item", new TextItem()},
-                       {"text_items", new TextItems()},
-                       {"then", new ThenToken()},
-                       {"to_number_of_base", new ToNumberOfBase()},
-                       {"type", new TypeOperator()}
-                   };
+            {
+                {"@", new AtOperator()},
+                {"^", new ContextOperator()},
+                {":", new Colon()},
+                {":=", new Assignment()},
+                {"=", new Equal()},
+                {">", new CompareOperator()},
+                {">=", new CompareOperator()},
+                {"<", new CompareOperator()},
+                {"<=", new CompareOperator()},
+                {"<>", new NotEqual()},
+                {"<<", new ConcatArrays()},
+                {"-", new Sign()},
+                {"!", new Exclamation()},
+                {"+", new Sign()},
+                {"/", new Slash()},
+                {"/\\", new TokenClasses.Function()},
+                {"/!\\", new TokenClasses.Function(isImplicit: true)},
+                {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
+                {"/!\\/!\\", new TokenClasses.Function(isImplicit: true, isMetaFunction: true)},
+                {"*", new Star()},
+                {"_A_T_", new AtToken()},
+                {"arg", new ArgToken()},
+                {"dump_print", new DumpPrintToken()},
+                {"else", new ElseToken()},
+                {"enable_cut", new EnableCut()},
+                {"enable_raw_conversion", new EnableRawConversion()},
+                {"function_instance", new FunctionInstanceToken()},
+                {"instance", new InstanceToken()},
+                {"new_value", new NewValueToken()},
+                {"reference", new ReferenceToken()},
+                {"sequence", new SequenceToken()},
+                {"text_item", new TextItem()},
+                {"text_items", new TextItems()},
+                {"then", new ThenToken()},
+                {"to_number_of_base", new ToNumberOfBase()},
+                {"type", new TypeOperator()}
+            };
         }
 
         protected override TokenClasses.TokenClass GetListClass() { return new List(); }

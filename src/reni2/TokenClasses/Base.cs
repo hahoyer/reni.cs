@@ -78,7 +78,7 @@ namespace Reni.TokenClasses
     abstract class Suffix : Special, ISuffix
     {
         Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left) { return Result(context, category, left); }
-        
+
         protected abstract Result Result(ContextBase context, Category category, CompileSyntax left);
 
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
@@ -92,6 +92,14 @@ namespace Reni.TokenClasses
     abstract class Infix : Special, IInfix
     {
         public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
-        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right) { return new InfixSyntax(token, left.CheckedToCompiledSyntax(), this, right.CheckedToCompiledSyntax()); }
+        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            return new InfixSyntax
+                (token
+                 , left.CheckedToCompiledSyntax()
+                 , this
+                 , right.CheckedToCompiledSyntax()
+                );
+        }
     }
 }

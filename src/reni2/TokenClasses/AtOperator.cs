@@ -1,7 +1,7 @@
 #region Copyright (C) 2012
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -20,17 +20,13 @@
 
 #endregion
 
-using HWClassLibrary.Debug;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System;
-using Reni.Feature;
-using Reni.Sequence;
+using HWClassLibrary.Debug;
 
 namespace Reni.TokenClasses
 {
-    sealed class EnableCut : Defineable, ISearchPath<ISuffixFeature, SequenceType>
-    {
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Extension.Feature(type.EnableCutFeature); }
-    }
+    sealed class AtOperator : Defineable
+    {}
 }

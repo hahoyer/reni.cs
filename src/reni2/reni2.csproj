@@ -33,6 +33,11 @@
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
+    <Compile Include="FeatureTest\TypeType\ApplyTypeOperator.cs" />
+    <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
+    <Compile Include="FeatureTest\TypeType\SequenceOfType.cs" />
+    <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
+    <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="Feature\Function.cs" />
@@ -217,6 +222,7 @@
     <Compile Include="Syntax\EmptyList.cs" />
     <Compile Include="TokenClasses\ArgToken.cs" />
     <Compile Include="TokenClasses\Assignment.cs" />
+    <Compile Include="TokenClasses\AtOperator.cs" />
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />
     <Compile Include="TokenClasses\CompareOperator.cs" />
@@ -225,6 +231,7 @@
     <Compile Include="TokenClasses\Defineable.cs" />
     <Compile Include="TokenClasses\ElseToken.cs" />
     <Compile Include="TokenClasses\EnableCut.cs" />
+    <Compile Include="TokenClasses\EnableRawConversion.cs" />
     <Compile Include="TokenClasses\Function.cs" />
     <Compile Include="TokenClasses\FunctionSyntax.cs" />
     <Compile Include="TokenClasses\InstanceToken.cs" />

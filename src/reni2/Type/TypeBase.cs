@@ -34,6 +34,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Struct;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -562,6 +563,16 @@ namespace Reni.Type
         {
             NotImplementedMethod(category, getRightResult(Category.All));
             return null;
+        }
+        internal Result CreateReference(ContextBase context, Category category, CompileSyntax target)
+        {
+            var rawResult = SmartReference.ArgResult(category);
+            if(category <= Category.Type.Replenished)
+                return rawResult;
+
+            var targetResult = target.SmartReferenceResult(context, category.Typed);
+            var convertedResult = targetResult.Conversion(SmartReference);
+            return rawResult.ReplaceArg(convertedResult);
         }
     }
 

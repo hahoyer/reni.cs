@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,60 +18,17 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
-using Reni.FeatureTest.Struct;
 
 namespace Reni.FeatureTest.DefaultOperations
 {
-    [TestFixture]
-    public sealed class TypeOperator : CompilerTest
-    {
-        protected override string Target { get { return @"31 type dump_print"; } }
-        protected override string Output { get { return "(bit)sequence(6)"; } }
-
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
-
-    [TestFixture]
-    public sealed class TypeOperatorWithVariable : CompilerTest
-    {
-        protected override string Target { get { return @"x: 0; x type dump_print"; } }
-        protected override string Output { get { return "(bit)sequence(1)"; } }
-        protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(SomeVariables), typeof(TypeOperator)}; } }
-
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
-
-    [TestFixture]
-    public sealed class ApplyTypeOperator : CompilerTest
-    {
-        protected override string Target { get { return @"(31 type instance (28))dump_print"; } }
-        protected override string Output { get { return "28"; } }
-        protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(TypeOperator)}; } }
-
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
-
-    [TestFixture]
-    [ApplyTypeOperator]
-    public sealed class ApplyTypeOperatorWithCut : CompilerTest
-    {
-        protected override string Target { get { return @"(31 type instance (100 enable_cut))dump_print"; } }
-        protected override string Output { get { return "-28"; } }
-        protected override IEnumerable<System.Type> DependsOn { get { return new[] {typeof(ApplyTypeOperator)}; } }
-
-        [Test]
-        public override void Run() { BaseRun(); }
-    }
-
     [TestFixture]
     public abstract class ApplyCompareOperator : CompilerTest
     {

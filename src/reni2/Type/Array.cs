@@ -104,6 +104,11 @@ namespace Reni.Type
         {
             if(category.IsNone)
                 return null;
+            if(!(argsType is IFunctionFeature))
+            {
+                NotImplementedMethod(category,argsType);
+                return null;
+            }
 
             var function = (IFunctionFeature) argsType;
             var indexType = Bit

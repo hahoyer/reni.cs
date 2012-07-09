@@ -1,5 +1,7 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -15,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -43,7 +47,7 @@ namespace Reni.FeatureTest.Array
     }
 
     [TestFixture]
-    [Target("(5 type * 5) instance (arg/\\) dump_print")]
+    [Target("((5 type * 5) instance (arg/\\)) dump_print")]
     [Output("array(#(#align3#)# (bit)sequence(4),(0, 1, 2, 3, 4))")]
     public sealed class FromTypeAndFunction : CompilerTest
     {
