@@ -99,7 +99,7 @@ namespace Reni.FeatureTest.Text
     [Hallo]
     [Number]
     [ConvertFromNumber]
-    [TargetSet("'80' to_number_of_base(16) dump_print", "128")]
+    [TargetSet("('80' to_number_of_base 16) dump_print", "128")]
     public sealed class ConvertHexadecimal : CompilerTest
     {
         [Test]
