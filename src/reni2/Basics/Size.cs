@@ -59,6 +59,15 @@ namespace Reni.Basics
             return result;
         }
 
+        internal static Size AutoSize(long value)
+        {
+            var size = 1;
+            var xn = value >= 0 ? value : -value;
+            for (Int64 upper = 1; xn >= upper; size++, upper *= 2)
+                continue;
+            return Create(size);
+        }
+
         protected override string Dump(bool isRecursion) { return DumpShort(); }
 
         internal override string DumpShort() { return _value.ToString(); }

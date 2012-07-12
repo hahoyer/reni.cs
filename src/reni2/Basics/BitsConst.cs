@@ -54,7 +54,7 @@ namespace Reni.Basics
             : this(new BitsConst(value), size) { }
 
         BitsConst(Int64 value)
-            : this(Size.Create(AutoSize(value))) { DataHandler.MoveBytes(DataSize(_size), _data, 0, value); }
+            : this(Size.AutoSize(value)) { DataHandler.MoveBytes(DataSize(_size), _data, 0, value); }
 
         BitsConst(BitsConst value, Size size)
             : this(size) { MoveData(_data, Size, value._data, value.Size); }
@@ -170,15 +170,6 @@ namespace Reni.Basics
         public static int MultiplySize(int left, int right) { return left + right - 1; }
 
         internal static int DivideSize(int left, int right) { return Math.Max(0, left - right) + 2; }
-
-        internal static int AutoSize(long value)
-        {
-            var size = 1;
-            var xn = value >= 0 ? value : -value;
-            for(Int64 upper = 1; xn >= upper; size++, upper *= 2)
-                continue;
-            return size;
-        }
 
         public BitsConst Resize(Size size) { return new BitsConst(this, size); }
 
