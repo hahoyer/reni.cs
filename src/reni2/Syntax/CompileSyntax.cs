@@ -53,7 +53,8 @@ namespace Reni.Syntax
 
         [DisableDump]
         internal bool IsLambda { get { return GetIsLambda(); } }
-
+        [DisableDump]
+        internal virtual bool? IsDataLess { get { return IsLambda ? (bool?)true : null; } }
         [DisableDump]
         internal virtual string DumpPrintText
         {
@@ -63,7 +64,6 @@ namespace Reni.Syntax
                 return null;
             }
         }
-
         [DisableDump]
         internal virtual bool IsImplicit { get { throw new NotImplementedException(); } }
 
@@ -117,7 +117,6 @@ namespace Reni.Syntax
                 .OperationResult<IPrefixFeature>(category, target);
         }
 
-        internal virtual bool? IsDataLess { get { return IsLambda ? (bool?) true : null; } }
 
         internal bool IsDataLessStructureElement(ContextBase context)
         {

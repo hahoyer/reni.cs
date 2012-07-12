@@ -60,7 +60,7 @@ namespace Reni.Type
                 var resultForArg = destinationResult + sourceResult;
                 Dump("resultForArg", resultForArg);
 
-                var result = _target.AssignmentResult(category);
+                var result = _target.SetterResult(category);
                 Dump("result", result);
                 BreakExecution();
 

@@ -82,7 +82,7 @@ namespace Reni.Struct
                 var result = applyResult
                     .ReplaceAbsolute
                     (_structure.ContainerContextObject
-                     , () => CodeBase.ReferenceCode(ObjectReference).AddToReference(_structure.StructSize)
+                     , () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_structure.StructSize)
                      , () => CodeArgs.Create(ObjectReference)
                     );
 

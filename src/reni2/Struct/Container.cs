@@ -92,7 +92,7 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        internal int IndexSize { get { return BitsConst.AutoSize(Statements.Length); } }
+        internal Size IndexSize { get { return Size.AutoSize(Statements.Length); } }
 
         internal override string DumpShort() { return "container." + ObjectId; }
 

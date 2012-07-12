@@ -239,7 +239,7 @@ namespace Reni.Struct
         CodeBase StructReferenceCodeViaContextReference()
         {
             return CodeBase.ReferenceCode(ContainerContextObject)
-                .AddToReference(StructSize * -1);
+                .ReferencePlus(StructSize * -1);
         }
 
         internal TypeBase ValueType(int position)

@@ -805,7 +805,7 @@ namespace Reni
                 Tracer.Assert(Type is PointerType, () => "Expected type: PointerType\n" + Dump());
         }
 
-        internal Result AddToReference(Func<Size> func) { return Change(code => code.AddToReference(func())); }
+        internal Result AddToReference(Func<Size> func) { return Change(code => code.ReferencePlus(func())); }
 
         public Result Change(Func<CodeBase, CodeBase> func)
         {
@@ -819,9 +819,8 @@ namespace Reni
         internal Result Un<T>()
             where T : IConverter
         {
-            return ((IConverter) Type)
-                .Result(CompleteCategory)
-                .ReplaceArg(this);
+            var result = ((IConverter) Type).Result(CompleteCategory);
+            return result.ReplaceArg(this);
         }
 
         internal Result SmartUn<T>() where T : IConverter { return Type is T ? Un<T>() : this; }

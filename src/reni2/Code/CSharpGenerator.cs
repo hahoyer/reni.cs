@@ -73,7 +73,7 @@ namespace Reni.Code
         void IVisitor.BitsArray(Size size, BitsConst data) { AddCode("data.Push({0})", data.ByteSequence(size)); }
         void IVisitor.LocalVariableDefinition(string holderName, Size valueSize) { AddCode("var {0} = data.Pull({1})", holderName, valueSize.SaveByteCount); }
         void IVisitor.LocalVariableReference(string holder, Size offset) { AddCode("data.Push({0}.Address({1}))", holder, offset.SaveByteCount); }
-        void IVisitor.RefPlus(Size size) { AddCode("data.RefPlus({0})", size.SaveByteCount); }
+        void IVisitor.ReferencePlus(Size size) { AddCode("data.ReferencePlus({0})", size.SaveByteCount); }
         void IVisitor.PrintNumber(Size leftSize, Size rightSize) { AddCode("data.Pull({0}).PrintNumber()", leftSize.SaveByteCount); }
         void IVisitor.PrintText(string dumpPrintText) { AddCode("Data.PrintText({0})", dumpPrintText.Quote()); }
         void IVisitor.TopRef(Size offset) { AddCode("data.Push(data.Address({0}))", offset.SaveByteCount); }
@@ -84,6 +84,26 @@ namespace Reni.Code
         void IVisitor.RecursiveCall() { AddCode("goto Start"); }
         void IVisitor.ReferenceCode(IContextReference context) { throw new UnexpectedContextReference(context); }
         void IVisitor.RecursiveCallCandidate() { throw new UnexpectedRecursiveCallCandidate(); }
+
+        void IVisitor.ArrayAccess(Size elementSize, Size indexSize)
+        {
+            AddCode
+                ("data.Push(data.Pull({0}).BitCast({1}))"
+                 , indexSize.SaveByteCount
+                 , DataHandler.RefSize.ToInt()
+                );
+            AddCode
+                ("data.Push({0})"
+                 , BitsConst.Convert(elementSize.SaveByteCount).ByteSequence(DataHandler.RefSize));
+            AddCode
+                ("data.Star({0},{0},{0})"
+                 , RefBytes
+                );
+            AddCode
+                ("data.Plus({0},{0},{0})"
+                 , RefBytes
+                );
+        }
 
         void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
         {
@@ -214,5 +234,4 @@ namespace Reni.Code
             return generator.Data;
         }
     }
-
 }

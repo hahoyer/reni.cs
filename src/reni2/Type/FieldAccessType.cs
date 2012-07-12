@@ -31,7 +31,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : SetterTargetType, ISmartReference, ISearchContainerType, IConverter
+    sealed class FieldAccessType : SetterTargetType
     {
         [EnableDump]
         readonly Structure _structure;
@@ -55,10 +55,11 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
 
-
         public override string NodeDump { get { return base.NodeDump + "{" + _structure.NodeDump + "@" + _position + "}"; } }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
+
+        Size GetFieldOffset() { return _structure.FieldOffset(_position); }
 
         internal override Result SmartLocalReferenceResult(Category category)
         {
@@ -70,10 +71,25 @@ namespace Reni.Type
                 );
         }
 
-        Result ParentConversionResult(Category category)
+        internal override Result GetterResult(Category category)
         {
             return ValueType.SmartPointer
-                .Result(category, ArgResult(category.Typed).AddToReference(() => _structure.FieldOffset(_position)));
+                .Result(category, ArgResult(category.Typed).AddToReference(GetFieldOffset));
+        }
+
+        internal override Result SetterResult(Category category)
+        {
+            return new Result
+                (category
+                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.Assignment(RefAlignParam, ValueType.Size)
+                 , getArgs: CodeArgs.Arg
+                );
+        }
+
+        internal override Result DestinationResult(Category category)
+        {
+            return Result(category, ObjectReference)
+                .AddToReference(GetFieldOffset);
         }
 
         internal override void Search(SearchVisitor searchVisitor)
@@ -95,26 +111,5 @@ namespace Reni.Type
                 .SmartArrayLength(elementType);
         }
 
-
-        internal override Result DestinationResult(Category category)
-        {
-            return Result(category, ObjectReference)
-                .AddToReference(() => _structure.FieldOffset(_position));
-        }
-
-        internal override Result AssignmentResult(Category category)
-        {
-            return new Result
-                (category
-                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.Assignment(RefAlignParam, ValueType.Size)
-                 , getArgs: CodeArgs.Arg
-                );
-        }
-
-        TypeBase ISmartReference.TargetType { get { return ValueType; } }
-        Result ISmartReference.DereferenceResult(Category category) { return ParentConversionResult(category); }
-        IConverter ISearchContainerType.Converter { get { return this; } }
-        TypeBase ISearchContainerType.TargetType { get { return ValueType; } }
-        Result IConverter.Result(Category category) { return ParentConversionResult(category); }
     }
 }

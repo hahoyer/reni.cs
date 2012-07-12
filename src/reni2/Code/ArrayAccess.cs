@@ -24,17 +24,25 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.Parser;
-using Reni.ReniParser;
+using Reni.Basics;
+using Reni.Context;
 
-namespace Reni.TokenClasses
+namespace Reni.Code
 {
-    sealed class AtOperator : Defineable
+    sealed class ArrayAccess : FiberItem
     {
-        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        internal readonly Size ElementSize;
+        internal readonly Size IndexSize;
+        readonly string _callingMethodName;
+        public ArrayAccess(Size elementSize, Size indexSize, string callingMethodName)
         {
-            NotImplementedMethod(left, token, right);
-            return null;
+            ElementSize = elementSize;
+            IndexSize = indexSize;
+            _callingMethodName = callingMethodName;
         }
+        internal override Size InputSize { get { return Root.DefaultRefAlignParam.RefSize + IndexSize; } }
+        internal override Size OutputSize { get { return Root.DefaultRefAlignParam.RefSize; } }
+        internal override void Visit(IVisitor visitor) { visitor.ArrayAccess(ElementSize,IndexSize); }
+        protected override Size GetAdditionalTemporarySize() { return Root.DefaultRefAlignParam.RefSize * 2; }
     }
 }

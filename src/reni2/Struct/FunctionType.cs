@@ -35,7 +35,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionType : SetterTargetType, ISearchContainerType, IConverter, ISmartReference
+    sealed class FunctionType : SetterTargetType
     {
         readonly int _index;
         [Node]
@@ -57,11 +57,6 @@ namespace Reni.Struct
             ArgsType = argsType;
             StopByObjectId(-10);
         }
-
-        TypeBase ISmartReference.TargetType { get { return ValueType; } }
-        Result ISmartReference.DereferenceResult(Category category) { return _getter.CallResult(category); }
-        IConverter ISearchContainerType.Converter { get { return this; } }
-        TypeBase ISearchContainerType.TargetType { get { return ValueType; } }
 
         internal override TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
@@ -94,9 +89,8 @@ namespace Reni.Struct
             }
         }
 
-        internal override Result AssignmentResult(Category category) { return _setter.CallResult(category); }
-        Result IConverter.Result(Category category) { return _getter.CallResult(category); }
-
+        internal override Result SetterResult(Category category) { return _setter.CallResult(category); }
+        internal override Result GetterResult(Category category) { return _getter.CallResult(category); }
         internal override Result DestinationResult(Category category) { return Result(category, this); }
         protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
 

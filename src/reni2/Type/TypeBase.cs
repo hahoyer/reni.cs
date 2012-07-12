@@ -147,9 +147,6 @@ namespace Reni.Type
             return 0;
         }
 
-        [DisableDump]
-        internal virtual int IndexSize { get { return 0; } }
-
         internal TypeBase UniqueAlign(int alignBits)
         {
             if(Size.Align(alignBits) == Size)
@@ -333,10 +330,11 @@ namespace Reni.Type
             where TFeature : class, IFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
-            //SearchVisitor.Trace = true;
+            var former = SearchVisitor.Trace;
+            SearchVisitor.Trace = false;
             Search(visitor);
-            //SearchVisitor.Trace = false;
-            if (Debugger.IsAttached && !visitor.IsSuccessFull)
+            SearchVisitor.Trace = former;
+            if(Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
         }
@@ -376,7 +374,7 @@ namespace Reni.Type
             return new Result
                 (category
                  , getType: () => this
-                 , getCode: () => CodeBase.ReferenceCode(target).AddToReference(offset).Dereference(Size)
+                 , getCode: () => CodeBase.ReferenceCode(target).ReferencePlus(offset).Dereference(Size)
                 );
         }
 
@@ -495,7 +493,11 @@ namespace Reni.Type
                 .DereferenceResult();
         }
 
-        internal Result UnalignedDereferenceReferenceResult(Category category) { return DereferenceReferenceResult(category).SmartUn<Aligner>(); }
+        internal Result UnalignedDereferenceReferenceResult(Category category)
+        {
+            return DereferenceReferenceResult(category)
+                .SmartUn<Aligner>();
+        }
 
         internal Result BitSequenceOperandConversion(Category category)
         {

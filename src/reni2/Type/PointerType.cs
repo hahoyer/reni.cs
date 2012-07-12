@@ -79,11 +79,10 @@ namespace Reni.Type
 
         Result DereferenceResult(Category category)
         {
-            var align = ValueType.UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
-            return align
+            return ValueType
                 .Result
                 (category
-                 , () => ArgCode.Dereference(align.Size)
+                 , () => ArgCode.Dereference(ValueType.Size)
                  , CodeArgs.Arg
                 );
         }

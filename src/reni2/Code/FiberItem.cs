@@ -109,7 +109,7 @@ namespace Reni.Code
         internal virtual FiberItem[] TryToCombineBack(BitArrayPrefixOp precedingElement) { return null; }
         internal virtual FiberItem[] TryToCombineBack(BitCast preceding) { return null; }
         internal virtual FiberItem[] TryToCombineBack(Dereference preceding) { return null; }
-        internal virtual FiberItem[] TryToCombineBack(RefPlus precedingElement) { return null; }
+        internal virtual FiberItem[] TryToCombineBack(ReferencePlusConstant precedingElement) { return null; }
 
         internal FiberItem Visit<TResult>(Visitor<TResult> actual) { return VisitImplementation(actual); }
 

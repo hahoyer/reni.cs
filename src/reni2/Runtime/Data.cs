@@ -85,7 +85,7 @@ namespace Reni.Runtime
         void EnsureLength() { Tracer.Assert(StartIndex >= 0); }
 
         public Data Address(int offset) { return Create(_data.Address(StartIndex + offset)); }
-        public void RefPlus(int offset) { _data.DoRefPlus(StartIndex, offset); }
+        public void ReferencePlus(int offset) { _data.DoRefPlus(StartIndex, offset); }
         public Data Dereference(int bytes) { return Create(_data.Dereference(StartIndex, bytes)); }
         public Data Get(int bytes, int offset) { return Create(_data.Get(StartIndex + offset, bytes)); }
         public Data GetFromBack(int bytes, int offset) { return Create(_data.Get(_data.Length + offset, bytes)); }
@@ -162,7 +162,7 @@ namespace Reni.Runtime
         [UsedImplicitly]
         public void MinusPrefix(int bytes)
         {
-            var data = Pull(bytes);
+            var data = Pull(bytes);             
             data._data.MinusPrefix();
             Push(data);
         }

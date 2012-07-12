@@ -91,21 +91,21 @@ namespace Reni.Sequence
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => Parent);
-            if (!searchVisitor.IsSuccessFull)
+            if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
 
         internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
         {
             var trace = ObjectId == -1 && category.HasCode;
-            StartMethodDump(trace, category,objectReference,argsType);
+            StartMethodDump(trace, category, objectReference, argsType);
             try
             {
                 var result = Parent.InternalConcatArrays(category.Typed, objectReference, argsType);
-                Dump("result", result); 
+                Dump("result", result);
                 BreakExecution();
 
-                var type = (Type.Array)result.Type;
+                var type = (Type.Array) result.Type;
                 return ReturnMethodDump(type.UniqueSequence.Result(category, result));
             }
             finally
@@ -113,7 +113,7 @@ namespace Reni.Sequence
                 EndMethodDump();
             }
         }
-        
+
         Result ExtendFrom(Category category, int oldCount)
         {
             var result = Result
@@ -165,16 +165,16 @@ namespace Reni.Sequence
 
         Result ConversionAsReference(Category category, SequenceType source)
         {
-            var trace = ObjectId == -10;
+            var trace = ObjectId == -3;
             StartMethodDump(trace, category, source);
             try
             {
                 var flatResult = FlatConversion(category, source);
                 Dump("flatResult", flatResult);
-                Func<Category, Result> forArg = source.UnalignedDereferenceReferenceResult;
+                Func<Category, Result> forArg = source.UnalignedDereferencePointerResult;
                 if(trace)
                     Dump("forArg", forArg(Category.All));
-                var result = flatResult.ReplaceArg(source.UnalignedDereferenceReferenceResult);
+                var result = flatResult.ReplaceArg(forArg);
                 Dump("result", result);
                 return ReturnMethodDump(result.SmartLocalReferenceResult());
             }
@@ -182,6 +182,11 @@ namespace Reni.Sequence
             {
                 EndMethodDump();
             }
+        }
+
+        Result UnalignedDereferencePointerResult(Category category)
+        {
+            return SmartPointer.ArgResult(category.Typed).DereferenceResult() & category;
         }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)

@@ -74,15 +74,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        protected override Result ParentConversionResult(Category category)
-        {
-            return Parent.Result
-                (
-                    category,
-                    () => ArgCode.BitCast(Parent.Size)
-                    , CodeArgs.Arg
-                );
-        }
+        protected override Result ParentConversionResult(Category category) { return Parent.UniquePointer.ArgResult(category); }
 
         ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type.AlignConversion(Parent); }
 

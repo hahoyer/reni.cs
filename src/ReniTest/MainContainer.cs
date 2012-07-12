@@ -43,7 +43,7 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            if(false)
+            //if(false)
 #pragma warning disable 162
                 ExecTest();
 #pragma warning restore 162

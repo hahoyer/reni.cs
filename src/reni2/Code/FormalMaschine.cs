@@ -124,7 +124,7 @@ namespace Reni.Code
 
         void IVisitor.Drop(Size beforeSize, Size afterSize) { ResetInputValuesOfData(beforeSize - afterSize); }
 
-        void IVisitor.RefPlus(Size right)
+        void IVisitor.ReferencePlus(Size right)
         {
             var formalSubValue = PullInputValuesFromData(RefSize).Single();
             var startAddress = _startAddress.ToInt();
@@ -149,6 +149,7 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, size);
         }
 
+        void IVisitor.ArrayAccess(Size elementSize, Size indexSize) { throw new NotImplementedException(); }
         void IVisitor.Assign(Size targetSize) { ResetInputValuesOfData(RefSize * 2); }
         void IVisitor.BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize) { NotImplementedMethod(opToken, size, argSize); }
         void IVisitor.PrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }

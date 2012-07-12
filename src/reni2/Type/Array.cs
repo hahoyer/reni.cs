@@ -40,12 +40,16 @@ namespace Reni.Type
     [Serializable]
     sealed class Array
         : TypeBase
-          , ISearchPath<ISuffixFeature, SequenceType>
+          , ISearchPath<ISuffixFeature, SequenceType>, IFeature, IFunctionFeature
     {
         readonly TypeBase _elementType;
         readonly int _count;
+        [Node]
         readonly SimpleCache<SequenceType> _sequenceCache;
+        [Node]
         readonly SimpleCache<TextItemsType> _textItemsCache;
+        [Node]
+        readonly SimpleCache<ArrayAccessType> _arrayAccessTypeCache;
 
         public Array(TypeBase elementType, int count)
         {
@@ -53,8 +57,10 @@ namespace Reni.Type
             _count = count;
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.Reference == null);
+            Tracer.Assert(!elementType.IsDataLess);
             _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
             _textItemsCache = new SimpleCache<TextItemsType>(() => new TextItemsType(this));
+            _arrayAccessTypeCache = new SimpleCache<ArrayAccessType>(() => new ArrayAccessType(this));
         }
 
         [Node]
@@ -70,10 +76,15 @@ namespace Reni.Type
         [DisableDump]
         internal TypeBase ElementType { get { return _elementType; } }
         [DisableDump]
+        internal Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
+        [DisableDump]
+        TypeBase IndexType { get { return TypeBase.UniqueNumber(IndexSize.ToInt()); } }
+        [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
         [DisableDump]
         internal override ReferenceType SmartReference { get { return ElementType.UniqueReference(Count); } }
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
+        internal override IFeature Feature { get { return this; } }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
         protected override Size GetSize() { return ElementType.Size * _count; }
@@ -87,10 +98,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal Result TextItemsResult(Category category)
-        {
-            return UniqueTextItemsType.PointerResult(category, PointerArgResult);
-        }
+        internal Result TextItemsResult(Category category) { return UniqueTextItemsType.PointerResult(category, PointerArgResult); }
 
         internal override Result ConstructorResult(Category category, TypeBase argsType)
         {
@@ -106,7 +114,7 @@ namespace Reni.Type
                 return null;
             if(!(argsType is IFunctionFeature))
             {
-                NotImplementedMethod(category,argsType);
+                NotImplementedMethod(category, argsType);
                 return null;
             }
 
@@ -143,7 +151,7 @@ namespace Reni.Type
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
 
-            var newElementsResult = argsType.TryConversion(category, ElementType);
+            var newElementsResult = argsType.TryConversion(category, ElementType.UnAlignedType).Align(Root.DefaultRefAlignParam.AlignBits);
             var newCount = 1;
             if(newElementsResult == null)
             {
@@ -177,7 +185,7 @@ namespace Reni.Type
             {
                 if(i > 0)
                     code = code.Sequence(CodeBase.DumpPrintText(", "));
-                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.AddToReference(ElementType.Size * i));
+                var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.ReferencePlus(ElementType.Size * i));
                 code = code.Sequence(elemCode);
             }
             code = code.Sequence(CodeBase.DumpPrintText("))"));
@@ -209,5 +217,25 @@ namespace Reni.Type
                 .UniqueReference(count)
                 .Result(category, UniquePointer.ArgResult);
         }
+
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return this; } }
+        ISimpleFeature IFeature.Simple { get { return null; } }
+
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
+        {
+            var objectResult = UniquePointer.Result(category, ObjectReference);
+            var argsResult = argsType.Conversion(category, IndexType);
+
+            var result = _arrayAccessTypeCache
+                .Value
+                .Result(category, objectResult + argsResult);
+
+            return result;
+        }
+
+        bool IFunctionFeature.IsImplicit { get { return false; } }
+        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
+        IContextReference ObjectReference { get { return UniquePointer; } }
     }
 }

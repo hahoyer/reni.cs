@@ -142,14 +142,14 @@ namespace Reni
             StartMethodDump(trace, code, refSize, codeArgsReference);
             try
             {
-                var reference = codeArgsReference.AddToReference(refSize * _data.Count);
+                var reference = codeArgsReference.ReferencePlus(refSize * _data.Count);
                 var result = code;
                 foreach(var referenceInCode in _data)
                 {
                     Dump("reference", reference);
                     BreakExecution();
                     Tracer.Assert(referenceInCode.Size == refSize);
-                    reference = reference.AddToReference(refSize * -1);
+                    reference = reference.ReferencePlus(refSize * -1);
                     result = result.ReplaceAbsolute(referenceInCode, () => reference.Dereference(refSize));
                     Dump("result", result);
                 }

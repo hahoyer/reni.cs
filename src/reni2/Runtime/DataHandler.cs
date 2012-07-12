@@ -22,6 +22,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Reni.Basics;
 using Reni.Context;
 
 namespace Reni.Runtime
@@ -39,6 +40,8 @@ namespace Reni.Runtime
                 return bytes;
             }
         }
+
+        internal static Size RefSize { get { return Root.DefaultRefAlignParam.RefSize; } }
 
         /// <summary>
         ///     Moves the bytes.

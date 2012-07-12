@@ -31,6 +31,7 @@ namespace Reni.Code
 {
     interface IVisitor
     {
+        void ArrayAccess(Size elementSize, Size indexSize);
         void Assign(Size targetSize);
         void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
         void BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize);
@@ -49,13 +50,13 @@ namespace Reni.Code
         void LocalVariableDefinition(string holderName, Size valueSize);
         void LocalVariableReference(string holder, Size offset);
         void RecursiveCall();
+        void RecursiveCallCandidate();
         void ReferenceCode(IContextReference context);
-        void RefPlus(Size right);
+        void ReferencePlus(Size right);
         void ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode);
         void TopData(Size offset, Size size, Size dataSize);
         void TopFrameData(Size offset, Size size, Size dataSize);
         void TopRef(Size offset);
         void TopFrameRef(Size offset);
-        void RecursiveCallCandidate();
     }
 }

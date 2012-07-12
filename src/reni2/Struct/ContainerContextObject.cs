@@ -53,7 +53,7 @@ namespace Reni.Struct
         internal RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
 
         [DisableDump]
-        internal TypeBase IndexType { get { return TypeBase.UniqueNumber(IndexSize); } }
+        internal TypeBase IndexType { get { return TypeBase.UniqueNumber(IndexSize.ToInt()); } }
 
         [DisableDump]
         internal Root RootContext { get { return Parent.RootContext; } }
@@ -61,7 +61,7 @@ namespace Reni.Struct
         [DisableDump]
         Structure ToStructure { get { return _parent.UniqueStructure(Container); } }
 
-        int IndexSize { get { return Container.IndexSize; } }
+        Size IndexSize { get { return Container.IndexSize; } }
 
         internal TypeBase AccessType(int accessPosition, int position)
         {
@@ -109,7 +109,7 @@ namespace Reni.Struct
             return Parent
                 .UniqueStructure(Container, accessPosition)
                 .ReferenceType.ArgCode
-                .AddToReference(ContextReferenceOffsetFromAccessPoint(accessPosition));
+                .ReferencePlus(ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 
         internal Size FieldOffsetFromAccessPoint(int accessPosition, int fieldPosition)

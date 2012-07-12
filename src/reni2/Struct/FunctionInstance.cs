@@ -137,7 +137,7 @@ namespace Reni.Struct
         {
             return CodeBase
                 .FrameRef(Root.DefaultRefAlignParam)
-                .AddToReference(ArgsPartSize);
+                .ReferencePlus(ArgsPartSize);
         }
 
         internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }

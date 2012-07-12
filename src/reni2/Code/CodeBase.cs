@@ -128,11 +128,16 @@ namespace Reni.Code
 
         internal abstract CodeBase CreateFiber(FiberItem subsequentElement);
 
-        internal CodeBase AddToReference(Size right)
+        internal CodeBase ReferencePlus(Size right)
         {
             if(right.IsZero)
                 return this;
-            return CreateFiber(new RefPlus(right, CallingMethodName));
+            return CreateFiber(new ReferencePlusConstant(right, CallingMethodName));
+        }
+
+        internal CodeBase ArrayAccess(Size elementSize, Size indexSize)
+        {
+            return CreateFiber(new ArrayAccess(elementSize, indexSize, CallingMethodName));
         }
 
         internal CodeBase Dereference(Size targetSize)
@@ -178,7 +183,7 @@ namespace Reni.Code
 
         /// <summary>
         ///     Replaces appearences of context in code tree. Assumes, that replacement requires offset alignment when walking along code tree
-        /// </summary>
+        /// </summary>     
         /// <typeparam name="TContext"> </typeparam>
         /// <param name="context"> The context. </param>
         /// <param name="replacement"> The replacement. </param>

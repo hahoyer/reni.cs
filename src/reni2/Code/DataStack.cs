@@ -141,7 +141,7 @@ namespace Reni.Code
 
         void IVisitor.Drop(Size beforeSize, Size afterSize) { NotImplementedMethod(beforeSize, afterSize); }
 
-        void IVisitor.RefPlus(Size right) { Push(Pull(RefSize).RefPlus(right)); }
+        void IVisitor.ReferencePlus(Size right) { Push(Pull(RefSize).RefPlus(right)); }
 
         void IVisitor.Dereference(Size size, Size dataSize)
         {
@@ -162,6 +162,7 @@ namespace Reni.Code
             Push(arg.BitArrayPrefixOp(opToken, size));
         }
 
+        void IVisitor.ArrayAccess(Size elementSize, Size indexSize) { throw new NotImplementedException(); }
         void IVisitor.Assign(Size targetSize)
         {
             var right = Pull(RefSize);
