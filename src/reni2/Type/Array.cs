@@ -78,7 +78,7 @@ namespace Reni.Type
         [DisableDump]
         internal Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
         [DisableDump]
-        TypeBase IndexType { get { return TypeBase.UniqueNumber(IndexSize.ToInt()); } }
+        TypeBase IndexType { get { return UniqueNumber(IndexSize.ToInt()); } }
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
         [DisableDump]
@@ -151,13 +151,12 @@ namespace Reni.Type
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
 
-            var newElementsResult = argsType.TryConversion(category, ElementType.UnAlignedType).Align(Root.DefaultRefAlignParam.AlignBits);
-            var newCount = 1;
-            if(newElementsResult == null)
-            {
-                newCount = argsType.ArrayLength(ElementType);
-                newElementsResult = argsType.Conversion(category, ElementType.UniqueArray(newCount));
-            }
+            var argsConverter = argsType.Converter(ElementType.UnAlignedType);
+            var newCount = argsConverter == null ? 1 : argsType.ArrayLength(ElementType);
+            var newElementsResult
+                = argsConverter == null
+                      ? argsType.Conversion(category, ElementType.UniqueArray(newCount))
+                      : argsConverter.Result(category).Align(Root.DefaultRefAlignParam.AlignBits);
 
             var result = ElementType
                 .UniqueArray(Count + newCount)

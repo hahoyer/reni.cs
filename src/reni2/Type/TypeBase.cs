@@ -493,12 +493,6 @@ namespace Reni.Type
                 .DereferenceResult();
         }
 
-        internal Result UnalignedDereferenceReferenceResult(Category category)
-        {
-            return DereferenceReferenceResult(category)
-                .SmartUn<Aligner>();
-        }
-
         internal Result BitSequenceOperandConversion(Category category)
         {
             return ConvertToBitSequence(category)
@@ -546,13 +540,6 @@ namespace Reni.Type
                 .Result
                 (category
                  , UniquePointer.ArgResult(category.Typed));
-        }
-
-        public Result TryConversion(Category category, TypeBase destinationType)
-        {
-            if(IsConvertable(destinationType))
-                return Conversion(category, destinationType);
-            return null;
         }
 
         internal static Result Result(Category category, BitsConst bitsConst)
