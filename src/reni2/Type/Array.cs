@@ -152,7 +152,7 @@ namespace Reni.Type
                 .DereferenceResult();
 
             var argsConverter = argsType.Converter(ElementType.UnAlignedType);
-            var newCount = argsConverter == null ? 1 : argsType.ArrayLength(ElementType.UnAlignedType);
+            var newCount = argsConverter != null ? 1 : argsType.ArrayLength(ElementType.UnAlignedType);
             var newElementsResult
                 = argsConverter == null
                       ? argsType.Conversion(category, ElementType.UniqueArray(newCount))
