@@ -84,8 +84,10 @@ namespace Reni.Sequence
 
         internal override int? SmartArrayLength(TypeBase elementType)
         {
-            return Parent
-                .SmartArrayLength(elementType);
+            if(elementType is SequenceType && IsConvertable(elementType)) 
+                return 1;
+            NotImplementedMethod(elementType);
+            return null;
         }
 
         internal override void Search(SearchVisitor searchVisitor)
