@@ -144,7 +144,7 @@ namespace Reni.Type
             if(IsConvertable(elementType))
                 return 1;
             NotImplementedMethod(elementType);
-            return 0;
+            return null;
         }
 
         internal TypeBase UniqueAlign(int alignBits)
