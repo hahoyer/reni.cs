@@ -186,7 +186,7 @@ namespace Reni.Code
 
         void IVisitor.ThenElse(Size condSize, CodeBase thenCode, CodeBase elseCode)
         {
-            AddCode("if({0})\n{{", PullBool(condSize.SaveByteCount));
+            AddCode("if({0})\n{{", PullBool(condSize.ByteCount));
             Indent();
             thenCode.Visit(this);
             Unindent();
@@ -197,11 +197,11 @@ namespace Reni.Code
             AddCode("}}");
         }
 
-        static string PullBool(int saveByteCount)
+        static string PullBool(int byteCount)
         {
-            if(saveByteCount == 1)
+            if(byteCount == 1)
                 return "data.Pull(1).GetBytes()[0] != 0";
-            return "data.Pull(" + saveByteCount + ").IsNotNull()";
+            return "data.Pull(" + byteCount + ").IsNotNull()";
         }
 
         void Unindent() { _indent--; }
