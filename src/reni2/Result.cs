@@ -468,7 +468,7 @@ namespace Reni
                  , () => Code
                  , () => CodeArgs
                 )
-                   {_pendingCategory = _pendingCategory & category};
+            {_pendingCategory = _pendingCategory & category};
         }
 
         internal Result Align(int alignBits)
@@ -698,6 +698,14 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
+        Result UnalignedResult()
+        {
+            Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
+            return ((Aligner) Type)
+                .UnalignedResult(CompleteCategory)
+                .ReplaceArg(this);
+        }
+
         internal static Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)
         {
             var result = TypeBase.VoidResult(category);
@@ -838,6 +846,41 @@ namespace Reni
 
         internal Result SmartConversionResult(TypeBase destination)
         {
+            var type = Type;
+            if(type == destination)
+                return this;
+
+            var coreType = type.CoreType;
+            if(coreType != destination.CoreType)
+                return null;
+
+            var reference = type.Reference;
+            var unalignedDestinationType = destination as Aligner;
+            if (reference != null)
+            {
+                if(reference.TargetType == destination)
+                    return DereferenceResult();
+
+                if(unalignedDestinationType != null && reference.TargetType == unalignedDestinationType.Parent)
+                    return DereferenceResult().Align(unalignedDestinationType.AlignBits);
+                
+                NotImplementedMethod(destination);
+                return null;
+            }
+
+            var unalignedType = type as Aligner;
+            if(unalignedType != null)
+            {
+                if(unalignedType.Parent == destination)
+                    return UnalignedResult();
+
+                NotImplementedMethod(destination);
+                return null;
+            }
+
+            if(unalignedDestinationType != null)
+                return Align(unalignedDestinationType.AlignBits);
+
             var result = this;
             if(result.Type == destination)
                 return result;

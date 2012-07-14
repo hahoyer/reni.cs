@@ -44,7 +44,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        int AlignBits { get { return _alignBits; } }
+        internal int AlignBits { get { return _alignBits; } }
         [DisableDump]
         internal override Size UnrefSize { get { return Parent.UnrefSize; } }
         [DisableDump]
@@ -59,6 +59,8 @@ namespace Reni.Type
         internal override ISmartReference UniqueSmartReference { get { return Parent.UniqueSmartReference; } }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
+        [DisableDump]
+        internal override TypeBase CoreType { get { return Parent.CoreType; } }
 
         protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
         internal override int? SmartSequenceLength(TypeBase elementType) { return Parent.SmartSequenceLength(elementType); }
@@ -105,5 +107,7 @@ namespace Reni.Type
                     .ReplaceArg(_sourceType.ParentConversionResult);
             }
         }
+
+        public Result UnalignedResult(Category category) { return Parent.Result(category, () => ArgCode.Unalign(Parent)); }
     }
 }

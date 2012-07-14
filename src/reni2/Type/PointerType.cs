@@ -60,6 +60,8 @@ namespace Reni.Type
         internal override bool IsDataLess { get { return false; } }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
+        [DisableDump]
+        internal override TypeBase CoreType { get { return ValueType.CoreType; } }
 
         internal override string DumpShort() { return ValueType.DumpShort() + "[Pointer]"; }
 
