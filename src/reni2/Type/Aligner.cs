@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Feature;
 
 namespace Reni.Type
@@ -108,6 +109,6 @@ namespace Reni.Type
             }
         }
 
-        public Result UnalignedResult(Category category) { return Parent.Result(category, () => ArgCode.Unalign(Parent)); }
+        public Result UnalignedResult(Category category) { return Parent.Result(category, () => ArgCode.BitCast(Parent.Size)); }
     }
 }

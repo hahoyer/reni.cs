@@ -300,28 +300,6 @@ namespace Reni.Code
         }
 
         internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
-
-        internal CodeBase Unalign(TypeBase type)
-        {
-            if(Size == type.Size)
-                return this;
-            return CreateFiber(new Unalign(type, Size));
-        }
-    }
-
-    sealed class Unalign : FiberItem
-    {
-        readonly TypeBase _type;
-        readonly Size _inputSize;
-        internal Unalign(TypeBase type, Size inputSize)
-        {
-            _type = type;
-            _inputSize = inputSize;
-        }
-        internal override Size InputSize { get { return _inputSize; } }
-        internal override Size OutputSize { get { return _type.Size; } }
-        internal override void Visit(IVisitor visitor) { NotImplementedMethod(visitor); }
-        internal override FiberItem[] TryToCombineBack(BitCast preceding) { return new FiberItem[] {new BitCast(OutputSize, preceding.InputSize, preceding.InputDataSize)}; }
     }
 
     abstract class UnexpectedVisitOfPending : Exception
