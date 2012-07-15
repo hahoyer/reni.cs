@@ -74,8 +74,7 @@ namespace Reni.Type
                 .AutomaticDereferenceResult()
                 .Evaluate(context.RootContext.ExecutionContext)
                 .ToInt32();
-            return Value
-                .UniqueAlign(context.RefAlignParam.AlignBits)
+            return Value.UniqueAlign
                 .UniqueArray(count)
                 .UniqueTypeType
                 .Result(category);

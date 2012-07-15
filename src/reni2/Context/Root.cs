@@ -52,7 +52,7 @@ namespace Reni.Context
 
         internal FunctionType FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)
         {
-            var alignedArgsType = argsType.UniqueAlign(DefaultRefAlignParam.AlignBits);
+            var alignedArgsType = argsType.UniqueAlign;
             var functionInstance = _functions.Find(body, structure, alignedArgsType);
             return functionInstance;
         }

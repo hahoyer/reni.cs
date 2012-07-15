@@ -147,13 +147,6 @@ namespace Reni.Type
             return null;
         }
 
-        internal TypeBase UniqueAlign(int alignBits)
-        {
-            if(Size.Align(alignBits) == Size)
-                return this;
-            return _cache.Aligner.Value(alignBits);
-        }
-
         [DisableDump]
         internal TextItemType UniqueTextItemType { get { return _cache.TextItem.Value; } }
 
@@ -193,6 +186,18 @@ namespace Reni.Type
                 if(IsDataLess)
                     return this;
                 return UniquePointer;
+            }
+        }
+
+        [DisableDump]
+        internal TypeBase UniqueAlign
+        {
+            get
+            {
+                var alignBits = Root.DefaultRefAlignParam.AlignBits;
+                if(Size.Align(alignBits) == Size)
+                    return this;
+                return _cache.Aligner.Value(alignBits);
             }
         }
 
@@ -410,7 +415,7 @@ namespace Reni.Type
 
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
         {
-            return UniqueAlign(BitsConst.SegmentAlignBits).ArgCode
+            return UniqueAlign.ArgCode
                 .BitSequenceOperation(token, Size);
         }
 
@@ -421,7 +426,7 @@ namespace Reni.Type
 
         internal Result CreateArray(Category category)
         {
-            return UniqueAlign(Root.DefaultRefAlignParam.AlignBits)
+            return UniqueAlign
                 .UniqueArray(1).UniquePointer
                 .Result(category, PointerArgResult(category));
         }

@@ -487,7 +487,7 @@ namespace Reni
                  , () => IsDataLess.Value
 // ReSharper restore PossibleInvalidOperationException
                  , () => alignedSize
-                 , () => Type.UniqueAlign(alignBits)
+                 , () => Type.UniqueAlign
                  , () => Code.BitCast(alignedSize)
                  , () => CodeArgs
                 );
@@ -836,8 +836,7 @@ namespace Reni
         internal Result DereferencedAlignedResult()
         {
             var destinationType = Type
-                .AutomaticDereferenceType
-                .UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
+                .AutomaticDereferenceType.UniqueAlign;
             return Type
                 .ObviousExactConversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);

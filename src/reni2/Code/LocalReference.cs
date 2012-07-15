@@ -52,7 +52,7 @@ namespace Reni.Code
         [DisableDump]
         internal override bool IsRelativeReference { get { return false; } }
 
-        internal CodeBase Code { get { return _unalignedCode.Align(Root.DefaultRefAlignParam.AlignBits); } }
+        internal CodeBase Code { get { return _unalignedCode.Align(); } }
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
         protected override CodeArgs GetRefsImplementation() { return _unalignedCode.CodeArgs + DestructorCode.CodeArgs; }

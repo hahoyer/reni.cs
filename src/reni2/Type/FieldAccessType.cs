@@ -63,7 +63,7 @@ namespace Reni.Type
 
         internal override Result SmartLocalReferenceResult(Category category)
         {
-            return UniqueAlign(Root.DefaultRefAlignParam.AlignBits)
+            return UniqueAlign
                 .Result
                 (category
                  , () => LocalReferenceCode().Dereference(Root.DefaultRefAlignParam.RefSize)

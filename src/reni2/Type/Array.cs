@@ -121,8 +121,7 @@ namespace Reni.Type
             var function = (IFunctionFeature) argsType;
             var indexType = Bit
                 .UniqueArray(BitsConst.Convert(Count).Size.ToInt())
-                .UniqueSequence
-                .UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
+                .UniqueSequence.UniqueAlign;
             var constructorResult = function.ApplyResult(category.Typed, indexType);
             var elements = Count
                 .Array(i => ElementConstructorResult(category, constructorResult, i, indexType))

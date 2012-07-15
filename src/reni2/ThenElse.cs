@@ -77,10 +77,6 @@ namespace Reni
                 .Result(context, category.Typed)
                 .AutomaticDereferenceResult();
 
-            if((category - Category.Type).IsNone)
-                return branchResult
-                    .Align(context.RefAlignParam.AlignBits);
-
             var commonType = CommonType(context);
             return branchResult.Type
                 .Conversion(category.Typed, commonType)
@@ -112,10 +108,10 @@ namespace Reni
         {
             var pendingContext = context as PendingContext;
             if(pendingContext == null)
-                return Then.Type(context).CommonType(Else.Type(context));
+                return Then.Type(context).CommonType(Else.Type(context)).UniqueAlign;
 
             var parent = pendingContext.Parent;
-            return CommonPendingType(parent);
+            return CommonPendingType(parent).UniqueAlign;
         }
 
         TypeBase CommonPendingType(ContextBase context)

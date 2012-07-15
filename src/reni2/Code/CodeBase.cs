@@ -205,7 +205,7 @@ namespace Reni.Code
             return dataStack.Value;
         }
 
-        internal CodeBase Align(int alignBits = Basics.BitsConst.SegmentAlignBits) { return BitCast(Size.NextPacketSize(alignBits)); }
+        internal CodeBase Align() { return BitCast(Size.NextPacketSize(Root.DefaultRefAlignParam.AlignBits)); }
 
         /// <summary>
         ///     Gets the icon key.
