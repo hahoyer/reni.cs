@@ -155,8 +155,8 @@ namespace Reni.Type
             var newCount = isElementArg ? 1 : argsType.ArrayLength(ElementType.UnAlignedType);
             var newElementsResultRaw
                 = isElementArg
-                      ? argsType.Conversion(category, ElementType.UnAlignedType)
-                      : argsType.Conversion(category, ElementType.UniqueArray(newCount));
+                      ? argsType.Conversion(category.Typed, ElementType.UnAlignedType)
+                      : argsType.Conversion(category.Typed, ElementType.UniqueArray(newCount));
 
             var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
             var result = ElementType
