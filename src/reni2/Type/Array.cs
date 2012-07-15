@@ -224,8 +224,12 @@ namespace Reni.Type
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var objectResult = UniquePointer.Result(category, ObjectReference);
-            var argsResult = argsType.Conversion(category, IndexType);
+            var objectResult = UniquePointer
+                .Result(category, ObjectReference);
+            
+            var argsResult = argsType
+                .Conversion(category.Typed, IndexType)
+                .DereferencedAlignedResult();
 
             var result = _arrayAccessTypeCache
                 .Value
