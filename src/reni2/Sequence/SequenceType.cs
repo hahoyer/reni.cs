@@ -238,5 +238,8 @@ namespace Reni.Sequence
                 .UniquePointer
                 .ArgResult(c.Typed);
         }
+
+        internal Result UndecorateResult(Category category) { return Parent.Result(category, ArgResult); }
+
     }
 }

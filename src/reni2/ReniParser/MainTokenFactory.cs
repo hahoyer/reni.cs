@@ -140,6 +140,7 @@ namespace Reni.ReniParser
                 {"text_items", new TextItems()},
                 {"then", new ThenToken()},
                 {"to_number_of_base", new ToNumberOfBase()},
+                {"undecorate", new UndecorateToken()},
                 {"type", new TypeOperator()}
             };
         }

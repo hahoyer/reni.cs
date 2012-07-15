@@ -426,50 +426,76 @@ namespace Reni.Type
                 .Result(category, PointerArgResult(category));
         }
 
+        internal bool IsConvertable(TypeBase destination)
+        {
+            return CoreType == destination.CoreType
+                   || Converter(destination) != null;
+        }
+
         internal Result Conversion(Category category, TypeBase destination)
         {
             if(category <= (Category.Type.Replenished))
-                return destination.Result(category);
+                return destination.SmartReference.Result(category);
 
-            var smartConversionResult = ArgResult(category.Typed).SmartConversionResult(destination);
-            if(smartConversionResult != null)
-                return smartConversionResult;
+            var obviousConversionResult = ObviousConversion(category.Typed, destination);
+            if(obviousConversionResult != null)
+                return obviousConversionResult;
 
-            var searchResult = SmartConverter(destination);
+            var searchResult = Converter(destination);
             if(searchResult == null)
             {
                 NotImplementedMethod(category, destination);
                 return null;
             }
 
-            var rawResult = searchResult.Result(category.Typed);
-            var result = rawResult.ReplaceArg(ArgResult);
-            return result.PostConversionResult(destination) & category;
+            var result = searchResult.Result(category.Typed);
+            return result
+                       .Type
+                       .ObviousConversion(category, destination)
+                       .ReplaceArg(result)
+                   & category;
         }
 
-        SearchResult SmartConverter(TypeBase destination)
+        Result ObviousConversion(Category category, TypeBase destination)
         {
-            var searchResult = Converter(destination);
-            if(searchResult != null)
-                return searchResult;
+            if(CoreType != destination.CoreType)
+                return null;
 
-            if(Reference != null)
-                searchResult = Reference.TargetType.Converter(destination);
-            if(searchResult != null)
-                return searchResult;
+            if(Reference == null)
+                return SmartLocalReferenceResult(category);
 
-            if(destination.Reference != null)
-                searchResult = Converter(destination.Reference.TargetType);
-            return searchResult;
+            return ArgResult(category);
         }
 
-        internal SearchResult Converter(TypeBase destination)
+        internal Result ObviousExactConversion(Category category, TypeBase destination)
+        {
+            if(CoreType != destination.CoreType)
+                return null;
+
+            if(Reference == null && destination.Reference != null)
+                return SmartLocalReferenceResult(category);
+
+            var result = ArgResult(category);
+
+            if(this != destination)
+            {
+                if(Reference != null)
+                    result = result.DereferenceResult();
+
+                if(destination is Aligner)
+                    result = result.Align(Root.DefaultRefAlignParam.AlignBits);
+                else if(Reference == null)
+                    result = result.UnalignedResult();
+            }
+
+            return result;
+        }
+
+        SearchResult Converter(TypeBase destination)
         {
             return
                 Search<ISuffixFeature>(destination.ConversionProvider);
         }
-
-        internal bool IsConvertable(TypeBase destination) { return SmartConverter(destination) != null; }
 
         internal Result TextItemResult(Category category)
         {
@@ -521,12 +547,16 @@ namespace Reni.Type
                 );
         }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, Aligner>.Convert(Aligner type) { return type.UnAlignConversion(this); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Aligner>.Convert(Aligner type)
+        {
+            NotImplementedMethod(type);
+            return null;
+        }
         ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return Convert(type); }
 
         protected virtual ISuffixFeature Convert(TypeBase type)
         {
-            if(type == this)
+            if(type.CoreType == CoreType)
                 return Extension.Feature(DereferenceReferenceResult);
 
             return null;

@@ -29,7 +29,6 @@ using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.Text;
-using Reni.FeatureTest.TypeType;
 
 namespace Reni.FeatureTest
 {
@@ -41,7 +40,7 @@ namespace Reni.FeatureTest
                 @"
 systemdata:
 {
-    Memory: (0 type * 200000) sequence instance (0);
+    Memory: (0 type * ('100' to_number_of_base 256) sequence instance (0);
     FreePointer: reference Memory;
 };
 
@@ -90,7 +89,7 @@ Text:
     [TwoFunctions]
     [FromTypeAndFunction]
     [HalloWelt]
-    [SequenceOfType]
+    [ElementAccess]
     //[LowPriority]
     public sealed class Text1 : TextStruct
     {

@@ -151,13 +151,14 @@ namespace Reni.Type
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
 
-            var argsConverter = argsType.Converter(ElementType.UnAlignedType);
-            var newCount = argsConverter != null ? 1 : argsType.ArrayLength(ElementType.UnAlignedType);
-            var newElementsResult
-                = argsConverter == null
-                      ? argsType.Conversion(category, ElementType.UniqueArray(newCount))
-                      : argsConverter.Result(category).DereferenceResult().Align(Root.DefaultRefAlignParam.AlignBits);
+            var isElementArg = argsType.IsConvertable(ElementType.UnAlignedType);
+            var newCount = isElementArg ? 1 : argsType.ArrayLength(ElementType.UnAlignedType);
+            var newElementsResultRaw
+                = isElementArg
+                      ? argsType.Conversion(category, ElementType.UnAlignedType)
+                      : argsType.Conversion(category, ElementType.UniqueArray(newCount));
 
+            var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
             var result = ElementType
                 .UniqueArray(Count + newCount)
                 .Result(category, newElementsResult + oldElementsResult);

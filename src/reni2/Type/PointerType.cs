@@ -98,16 +98,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal override Result SmartLocalReferenceResult(Category category)
-        {
-            return UniqueAlign(Root.DefaultRefAlignParam.AlignBits)
-                .Result
-                (category
-                 , () => LocalReferenceCode().Dereference(Root.DefaultRefAlignParam.RefSize)
-                 , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
-                );
-        }
-
+        internal override Result SmartLocalReferenceResult(Category category){return ArgResult(category);}
         protected override Array ObtainArray(int count) { return ValueType.UniqueArray(count); }
 
         internal override ISuffixFeature AlignConversion(TypeBase destination)

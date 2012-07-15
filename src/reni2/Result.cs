@@ -698,7 +698,7 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        Result UnalignedResult()
+        internal Result UnalignedResult()
         {
             Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
             return ((Aligner) Type)
@@ -837,14 +837,14 @@ namespace Reni
 
         internal Result PostConversionResult(TypeBase destination)
         {
-            var result = SmartConversionResult(destination);
+            var result = ObviousConversionResult(destination);
             if(result != null)
                 return result;
             DumpDataWithBreak("Wrong conversion result type", "destination", destination, "this", this);
             return null;
         }
 
-        internal Result SmartConversionResult(TypeBase destination)
+        Result ObviousConversionResult(TypeBase destination)
         {
             var type = Type;
             if(type == destination)
@@ -856,14 +856,14 @@ namespace Reni
 
             var reference = type.Reference;
             var unalignedDestinationType = destination as Aligner;
-            if (reference != null)
+            if(reference != null)
             {
                 if(reference.TargetType == destination)
                     return DereferenceResult();
 
                 if(unalignedDestinationType != null && reference.TargetType == unalignedDestinationType.Parent)
                     return DereferenceResult().Align(unalignedDestinationType.AlignBits);
-                
+
                 NotImplementedMethod(destination);
                 return null;
             }
@@ -901,6 +901,16 @@ namespace Reni
                 return result;
 
             return null;
+        }
+
+        internal Result DereferencedAlignedResult()
+        {
+            var destinationType = Type
+                .AutomaticDereferenceType
+                .UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
+            return Type
+                .ObviousExactConversion(CompleteCategory, destinationType)
+                .ReplaceArg(this);
         }
     }
 }

@@ -24,15 +24,13 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.UnitTest;
+using Reni.Feature;
+using Reni.Sequence;
 
-namespace Reni.FeatureTest.TypeType
+namespace Reni.TokenClasses
 {
-    [TestFixture]
-    [TargetSet(@"(0 type * 2) sequence dump_print;", "1")]
-    public sealed class SequenceOfType : CompilerTest
+    sealed class UndecorateToken : Defineable, ISearchPath<ISuffixFeature, SequenceType>
     {
-        [Test]
-        public override void Run() { BaseRun(); }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Extension.Feature(type.UndecorateResult); }
     }
 }

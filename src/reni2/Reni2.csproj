@@ -40,7 +40,6 @@
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
-    <Compile Include="FeatureTest\TypeType\SequenceOfType.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
     <Compile Include="Feature\Extension.cs" />
@@ -250,6 +249,7 @@
     <Compile Include="TokenClasses\TextItem.cs" />
     <Compile Include="TokenClasses\ThenToken.cs" />
     <Compile Include="TokenClasses\TokenClass.cs" />
+    <Compile Include="TokenClasses\UndecorateToken.cs" />
     <Compile Include="TokenClasses\UserSymbol.cs" />
     <Compile Include="TokenClasses\NewValueToken.cs" />
     <Compile Include="TypeRootSearchVisitor.cs" />

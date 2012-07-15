@@ -41,7 +41,7 @@ namespace Reni.Type
             : base(target)
         {
             _alignBits = alignBits;
-            StopByObjectId(-6);
+            StopByObjectId(9);
         }
 
         [DisableDump]
@@ -80,34 +80,6 @@ namespace Reni.Type
         protected override Result ParentConversionResult(Category category) { return Parent.UniquePointer.ArgResult(category); }
 
         ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type.AlignConversion(Parent); }
-
-        internal ISuffixFeature UnAlignConversion(TypeBase destination)
-        {
-            var childConverter = Parent.Converter(destination);
-            if(childConverter != null)
-                return new UnAlignConverter(this, childConverter);
-            return null;
-        }
-
-        sealed class UnAlignConverter : ConverterBase
-        {
-            [EnableDump]
-            readonly Aligner _sourceType;
-            [EnableDump]
-            readonly SearchResult _childConverter;
-            public UnAlignConverter(Aligner sourceType, SearchResult childConverter)
-            {
-                _sourceType = sourceType;
-                _childConverter = childConverter;
-            }
-
-            protected override Result Result(Category category)
-            {
-                return _childConverter
-                    .Result(category)
-                    .ReplaceArg(_sourceType.ParentConversionResult);
-            }
-        }
 
         public Result UnalignedResult(Category category) { return Parent.Result(category, () => ArgCode.BitCast(Parent.Size)); }
     }
