@@ -135,7 +135,8 @@ namespace Reni.Type
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
             return elementConstructorResult
                        .ReplaceArg(resultForArg)
-                       .Conversion(ElementType)
+                       .Conversion(ElementType.UnAlignedType)
+                       .ObviousExactConversion(ElementType)
                    & category;
         }
 

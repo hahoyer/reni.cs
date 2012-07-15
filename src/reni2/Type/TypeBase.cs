@@ -554,9 +554,11 @@ namespace Reni.Type
 
         ISuffixFeature ISearchPath<ISuffixFeature, Aligner>.Convert(Aligner type)
         {
-            NotImplementedMethod(type);
+            if (type.Parent == this)
+                return Extension.Feature(PointerArgResult);
             return null;
         }
+
         ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return Convert(type); }
 
         protected virtual ISuffixFeature Convert(TypeBase type)
