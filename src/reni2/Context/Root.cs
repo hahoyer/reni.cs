@@ -48,12 +48,6 @@ namespace Reni.Context
         [DisableDump]
         internal override Root RootContext { get { return this; } }
 
-        protected override Result CommonResult(Category category, CondSyntax condSyntax)
-        {
-            NotImplementedMethod(category, condSyntax);
-            return null;
-        }
-
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
         internal FunctionType FunctionInstance(Structure structure, FunctionSyntax body, TypeBase argsType)

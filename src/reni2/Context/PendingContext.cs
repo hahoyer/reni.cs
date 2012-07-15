@@ -79,20 +79,5 @@ namespace Reni.Context
             NotImplementedMethod(compileSyntax);
             return null;
         }
-
-        protected override Result CommonResult(Category category, CondSyntax condSyntax)
-        {
-            var pendingCategory = Parent.PendingCategory(condSyntax);
-            if(category <= pendingCategory)
-                return condSyntax.CommonResult
-                    (
-                        this,
-                        category,
-                        category <= Parent.PendingCategory(condSyntax.Then),
-                        condSyntax.Else != null && category <= Parent.PendingCategory(condSyntax.Else)
-                    );
-            NotImplementedMethod(category, condSyntax);
-            return null;
-        }
     }
 }

@@ -36,35 +36,8 @@ namespace Reni.Code
     [Serializable]
     abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
     {
-        static string _newCombinedReason;
-        readonly string _reason;
-
-        [DisableDump]
-        internal string ReasonForCombine { get { return _reason == "" ? DumpShortForDebug() : _reason; } }
-
-        [DisableDump]
-        internal string NewCombinedReason
-        {
-            private get
-            {
-                if(_newCombinedReason == null)
-                    return "";
-                var result = _newCombinedReason;
-                _newCombinedReason = null;
-                return result;
-            }
-            set
-            {
-                Tracer.Assert(_newCombinedReason == null);
-                _newCombinedReason = value;
-            }
-        }
-
-        [EnableDumpExcept("")]
-        internal string Reason { get { return _reason; } }
-
         protected CodeBase(int objectId)
-            : base(objectId) { _reason = NewCombinedReason; }
+            : base(objectId) { }
 
         [Node]
         [DisableDump]

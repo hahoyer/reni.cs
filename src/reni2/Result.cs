@@ -670,7 +670,12 @@ namespace Reni
             return result;
         }
 
-        internal Result Conversion(TypeBase target) { return Type.Conversion(CompleteCategory, target).ReplaceArg(this); }
+        internal Result Conversion(TypeBase target)
+        {
+            return Type
+                .Conversion(CompleteCategory, target)
+                .ReplaceArg(this);
+        }
 
         internal BitsConst Evaluate(IExecutionContext context)
         {
@@ -748,13 +753,6 @@ namespace Reni
 
         [DebuggerHidden]
         public static Result operator +(Result aResult, Result bResult) { return aResult.Sequence(bResult); }
-
-        internal Result ConvertToBitSequence(Category category)
-        {
-            return Type
-                .ConvertToBitSequence(category)
-                .ReplaceArg(this);
-        }
 
         internal Result SmartLocalReferenceResult()
         {
@@ -835,79 +833,18 @@ namespace Reni
 
         internal Result BitSequenceOperandConversion(Category category) { return Type.BitSequenceOperandConversion(category).ReplaceArg(this); }
 
-        internal Result PostConversionResult(TypeBase destination)
-        {
-            var result = ObviousConversionResult(destination);
-            if(result != null)
-                return result;
-            DumpDataWithBreak("Wrong conversion result type", "destination", destination, "this", this);
-            return null;
-        }
-
-        Result ObviousConversionResult(TypeBase destination)
-        {
-            var type = Type;
-            if(type == destination)
-                return this;
-
-            var coreType = type.CoreType;
-            if(coreType != destination.CoreType)
-                return null;
-
-            var reference = type.Reference;
-            var unalignedDestinationType = destination as Aligner;
-            if(reference != null)
-            {
-                if(reference.TargetType == destination)
-                    return DereferenceResult();
-
-                if(unalignedDestinationType != null && reference.TargetType == unalignedDestinationType.Parent)
-                    return DereferenceResult().Align(unalignedDestinationType.AlignBits);
-
-                NotImplementedMethod(destination);
-                return null;
-            }
-
-            var unalignedType = type as Aligner;
-            if(unalignedType != null)
-            {
-                if(unalignedType.Parent == destination)
-                    return UnalignedResult();
-
-                NotImplementedMethod(destination);
-                return null;
-            }
-
-            if(unalignedDestinationType != null)
-                return Align(unalignedDestinationType.AlignBits);
-
-            var result = this;
-            if(result.Type == destination)
-                return result;
-
-            result = result.SmartUn<Aligner>();
-            if(result.Type == destination)
-                return result;
-
-            if(result.Type.Reference == null)
-                return null;
-
-            result = result.DereferenceResult();
-            if(result.Type == destination)
-                return result;
-
-            result = result.SmartUn<Aligner>();
-            if(result.Type == destination)
-                return result;
-
-            return null;
-        }
-
         internal Result DereferencedAlignedResult()
         {
             var destinationType = Type
                 .AutomaticDereferenceType
                 .UniqueAlign(Root.DefaultRefAlignParam.AlignBits);
+            return Type
+                .ObviousExactConversion(CompleteCategory, destinationType)
+                .ReplaceArg(this);
+        }
+
+        internal Result ObviousExactConversion(TypeBase destinationType)
+        {
             return Type
                 .ObviousExactConversion(CompleteCategory, destinationType)
                 .ReplaceArg(this);

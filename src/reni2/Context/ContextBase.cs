@@ -146,15 +146,11 @@ namespace Reni.Context
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
-        protected abstract Result CommonResult(Category category, CondSyntax condSyntax);
+        
         internal virtual Structure ObtainRecentStructure() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
 
         internal Category PendingCategory(CompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
-
-        internal TypeBase CommonType(CondSyntax condSyntax) { return CommonResult(Category.Type, condSyntax).Type; }
-
-        internal CodeArgs CommonRefs(CondSyntax condSyntax) { return CommonResult(Category.CodeArgs, condSyntax).CodeArgs; }
 
         internal virtual bool? QuickIsDataLess(CompileSyntax compileSyntax) { return null; }
 
@@ -250,7 +246,7 @@ namespace Reni.Context
 
         internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
         {
-            var trace = feature.GetObjectId() == 9737  && category.HasCode;
+            var trace = feature.GetObjectId() == 9737 && category.HasCode;
             StartMethodDump(trace, category, left, leftType, feature, converterResult, right);
             try
             {

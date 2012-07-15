@@ -19,7 +19,6 @@ namespace Reni.Code
 
         internal override CodeBase CreateFiber(FiberItem subsequentElement)
         {
-            NewCombinedReason = ReasonForCombine + " " + subsequentElement.ReasonForCombine;
             var newResult = TryToCombine(subsequentElement);
             if(newResult == null)
                 return new Fiber(this, subsequentElement);

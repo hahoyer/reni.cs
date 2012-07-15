@@ -36,6 +36,7 @@ namespace Reni.Code
         {
             _holderName = holderName;
             _valueSize = valueSize;
+            StopByObjectId(-4);
         }
 
         [DisableDump]

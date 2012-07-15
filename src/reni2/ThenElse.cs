@@ -1,6 +1,7 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
-//     Copyright (C) 2011 - 2011 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -17,14 +18,18 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -39,6 +44,7 @@ namespace Reni
         [Node]
         internal readonly CompileSyntax Then;
 
+        [NotNull]
         [Node]
         internal readonly CompileSyntax Else;
 
@@ -48,79 +54,85 @@ namespace Reni
         {
             Cond = condSyntax;
             Then = thenSyntax;
-            Else = elseSyntax;
+            Else = elseSyntax ?? new EmptyList(thenToken, thenToken);
         }
 
         internal override Result ObtainResult(ContextBase context, Category category) { return InternalResult(context, category); }
 
-        internal Result CondResult(ContextBase context, Category category)
+        Result CondResult(ContextBase context, Category category)
         {
             return Cond
                 .Result(context, category.Typed)
                 .Conversion(TypeBase.Bit)
-                .Align(context.AlignBits)
                 .LocalBlock(category.Typed)
-                .Conversion(TypeBase.Bit);
+                .ObviousExactConversion(TypeBase.Bit);
         }
 
-        Result ElseResult(ContextBase context, Category category)
-        {
-            if(Else == null)
-                return TypeBase.Void.Result(category);
-            return CondBranchResult(context, category, Else);
-        }
+        Result ElseResult(ContextBase context, Category category) { return BranchResult(context, category, Else); }
+        Result ThenResult(ContextBase context, Category category) { return BranchResult(context, category, Then); }
 
-        Result ThenResult(ContextBase context, Category category) { return CondBranchResult(context, category, Then); }
-
-        Result CondBranchResult(ContextBase context, Category category, CompileSyntax syntax)
+        Result BranchResult(ContextBase context, Category category, CompileSyntax syntax)
         {
-            var branchResult = syntax.Result(context, category.Typed).AutomaticDereferenceResult();
+            var branchResult = syntax
+                .Result(context, category.Typed)
+                .AutomaticDereferenceResult();
+
             if((category - Category.Type).IsNone)
-                return branchResult.Align(context.RefAlignParam.AlignBits);
+                return branchResult
+                    .Align(context.RefAlignParam.AlignBits);
 
-            var commonType = context.CommonType(this);
-            var result = branchResult.Type
+            var commonType = CommonType(context);
+            return branchResult.Type
                 .Conversion(category.Typed, commonType)
-                .ReplaceArg(branchResult);
-            return result.LocalBlock(category);
+                .ReplaceArg(branchResult)
+                .LocalBlock(category.Typed)
+                .ObviousExactConversion(commonType)
+                & category;
         }
 
         Result InternalResult(ContextBase context, Category category)
         {
-            var commonType = context.CommonType(this);
-            if(category <= (Category.Type | Category.Size))
+            var commonType = CommonType(context);
+            if(category <= (Category.Type.Replenished))
                 return commonType.Result(category);
 
+            var branchCategory = category & Category.Code.Replenished;
             var condResult = CondResult(context, category);
-            return commonType.Result
-                (
-                    category,
-                    () => condResult.Code.ThenElse(ThenResult(context, Category.Code).Code, ElseResult(context, Category.Code).Code),
-                    () => condResult.CodeArgs + context.CommonRefs(this)
-                );
-        }
-
-        internal Result CommonResult(ContextBase context, Category category, bool thenIsPending, bool elseIsPending)
-        {
-            if(!thenIsPending)
-                return ThenResult(context, category);
-            if(!elseIsPending)
-                return ElseResult(context, category);
-            NotImplementedMethod(context, category, thenIsPending, elseIsPending);
-            return null;
-        }
-
-        internal Result CommonResult(ContextBase context, Category category)
-        {
-            Tracer.Assert(category <= (Category.Type | Category.CodeArgs));
-            var thenResult = ThenResult(context, category);
-            var elseResult = ElseResult(context, category);
-            var result = new Result
+            var thenResult = ThenResult(context, branchCategory);
+            var elseResult = ElseResult(context, branchCategory);
+            return commonType
+                .Result
                 (category
-                 , getType: () => thenResult.Type.CommonType(elseResult.Type)
-                 , getArgs: () => thenResult.CodeArgs + elseResult.CodeArgs
+                 , () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code)
+                 , () => condResult.CodeArgs + thenResult.CodeArgs + elseResult.CodeArgs
                 );
-            return result;
+        }
+
+        TypeBase CommonType(ContextBase context)
+        {
+            var pendingContext = context as PendingContext;
+            if(pendingContext == null)
+                return Then.Type(context).CommonType(Else.Type(context));
+
+            var parent = pendingContext.Parent;
+            return CommonPendingType(parent);
+        }
+
+        TypeBase CommonPendingType(ContextBase context)
+        {
+            if(!context.PendingCategory(this).HasType)
+            {
+                NotImplementedMethod(context);
+                return null;
+            }
+
+            if(!context.PendingCategory(Then).HasType)
+                return Then.Type(context);
+            if(!context.PendingCategory(Else).HasType)
+                return Else.Type(context);
+
+            NotImplementedMethod(context);
+            return null;
         }
 
         internal override string DumpShort() { return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")"; }
@@ -132,7 +144,7 @@ namespace Reni
         internal ThenSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax)
             : base(condSyntax, thenToken, thenSyntax, null) { }
 
-        internal override ReniParser.ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
+        internal override ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
     }
 
     [Serializable]

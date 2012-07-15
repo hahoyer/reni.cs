@@ -46,7 +46,7 @@ namespace Reni.Code
         {
             _unalignedCode = code;
             DestructorCode = destructorCode;
-            StopByObjectId(-1);
+            StopByObjectId(-8);
         }
 
         [DisableDump]
