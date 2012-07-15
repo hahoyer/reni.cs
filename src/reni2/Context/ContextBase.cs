@@ -146,11 +146,18 @@ namespace Reni.Context
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
-        
+
         internal virtual Structure ObtainRecentStructure() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
 
-        internal Category PendingCategory(CompileSyntax syntax) { return _cache.ResultCache[syntax].Data.PendingCategory; }
+        internal Category PendingCategory(CompileSyntax syntax)
+        {
+            return _cache
+                .ResultCache
+                .Value(syntax)
+                .Data
+                .PendingCategory;
+        }
 
         internal virtual bool? QuickIsDataLess(CompileSyntax compileSyntax) { return null; }
 
