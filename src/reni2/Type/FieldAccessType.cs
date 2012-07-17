@@ -81,7 +81,7 @@ namespace Reni.Type
         {
             return new Result
                 (category
-                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.Assignment(RefAlignParam, ValueType.Size)
+                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.Assignment(ValueType.Size)
                  , getArgs: CodeArgs.Arg
                 );
         }

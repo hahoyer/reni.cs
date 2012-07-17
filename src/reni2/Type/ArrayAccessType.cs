@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 
 namespace Reni.Type
@@ -41,28 +42,29 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + _array.IndexSize; }
 
-        internal override Result DestinationResult(Category category)
-        {
-            NotImplementedMethod(category);
-            return null;
-        }
+        internal override Result DestinationResult(Category category) { return Result(category, this); }
 
         internal override Result SetterResult(Category category)
         {
-            NotImplementedMethod(category);
-            return null;
+            return new Result
+                (category
+                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.ArrayAssignment(ValueType.Size, _array.IndexSize)
+                 , getArgs: CodeArgs.Arg
+                );
         }
 
         internal override Result GetterResult(Category category)
         {
+            var pointer = ValueType.UniquePointer;
             var codeAndRefs =
                 new Result
                     (category
-                     , getType: () => ValueType.UniquePointer
-                     , getCode: () => ArgCode.ArrayAccess(ValueType.Size, _array.IndexSize)
+                     , getType: () => pointer
+                     , getCode: () => ArrayAccess
                     );
 
-            return ValueType.UniquePointer.Result(category, codeAndRefs);
+            return pointer.Result(category, codeAndRefs);
         }
+        CodeBase ArrayAccess { get { return ArgCode.ArrayAccess(ValueType.Size, _array.IndexSize); } }
     }
 }

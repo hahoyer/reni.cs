@@ -48,8 +48,6 @@ namespace Reni
 
         internal void Search(ContextBase contextBase)
         {
-            if(IsSuccessFull)
-                return;
             contextBase.Search(this);
         }
 

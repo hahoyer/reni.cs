@@ -89,7 +89,7 @@ namespace Reni.Code
                 .Aggregate(FiberHead.CodeArgs, (current, fiberItem) => current.Sequence(fiberItem.CodeArgs));
         }
 
-        internal override CodeBase CreateFiber(FiberItem subsequentElement)
+        internal override CodeBase Add(FiberItem subsequentElement)
         {
             var lastFiberItems = new List<FiberItem> {subsequentElement};
             var fiberItems = new List<FiberItem>(_fiberItems);
@@ -145,7 +145,7 @@ namespace Reni.Code
         internal CodeBase ReCreate(CodeBase newHead, FiberItem[] newItems)
         {
             return (newHead ?? FiberHead)
-                .CreateFiber(newItems.Select((x, i) => x ?? FiberItems[i]));
+                .AddRange(newItems.Select((x, i) => x ?? FiberItems[i]));
         }
     }
 }

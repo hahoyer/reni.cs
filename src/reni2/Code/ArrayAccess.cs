@@ -34,6 +34,8 @@ namespace Reni.Code
         internal readonly Size ElementSize;
         internal readonly Size IndexSize;
         readonly string _callingMethodName;
+        static readonly BitArrayBinaryOp _plus = new BitArrayBinaryOp("Plus", Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize);
+        static readonly BitArrayBinaryOp _multiply = new BitArrayBinaryOp("Star", Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize, Root.DefaultRefAlignParam.RefSize);
         public ArrayAccess(Size elementSize, Size indexSize, string callingMethodName)
         {
             ElementSize = elementSize;
@@ -42,7 +44,51 @@ namespace Reni.Code
         }
         internal override Size InputSize { get { return Root.DefaultRefAlignParam.RefSize + IndexSize; } }
         internal override Size OutputSize { get { return Root.DefaultRefAlignParam.RefSize; } }
-        internal override void Visit(IVisitor visitor) { visitor.ArrayAccess(ElementSize,IndexSize); }
+        internal override void Visit(IVisitor visitor) { NotImplementedMethod(visitor); }
+        protected override Size GetAdditionalTemporarySize() { return Root.DefaultRefAlignParam.RefSize * 2; }
+
+        internal override CodeBase TryToCombineBack(List precedingElement)
+        {
+            var list = precedingElement.Data;
+            if (list.Length != 2)
+                return null;
+            
+            var targetArray = list[0];
+            if (targetArray.Size != Root.DefaultRefAlignParam.RefSize)
+                return null;
+
+            var index = list[1];
+            if (index.Size != IndexSize)
+                return null;
+
+            return targetArray.Sequence(IndexCalculation(index)).Add(_plus);
+        }
+        CodeBase IndexCalculation(CodeBase index)
+        {
+            var elementSize = BitsConst
+                .Convert(ElementSize.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits))
+                .Resize(Root.DefaultRefAlignParam.RefSize);
+            
+            return index
+                .BitCast(Root.DefaultRefAlignParam.RefSize)
+                .Sequence(CodeBase.BitsConst(elementSize))
+                .Add(_multiply);
+        }
+    }
+    sealed class ArrayAssignment : FiberItem
+    {
+        internal readonly Size ElementSize;
+        internal readonly Size IndexSize;
+        readonly string _callingMethodName;
+        public ArrayAssignment(Size elementSize, Size indexSize, string callingMethodName)
+        {
+            ElementSize = elementSize;
+            IndexSize = indexSize;
+            _callingMethodName = callingMethodName;
+        }
+        internal override Size InputSize { get { return Root.DefaultRefAlignParam.RefSize * 2 + IndexSize; } }
+        internal override Size OutputSize { get { return Size.Zero; } }
+        internal override void Visit(IVisitor visitor) { NotImplementedMethod(visitor); }
         protected override Size GetAdditionalTemporarySize() { return Root.DefaultRefAlignParam.RefSize * 2; }
     }
 }

@@ -88,40 +88,48 @@ namespace Reni.Code
 
         protected virtual CodeArgs GetRefsImplementation() { return CodeArgs.Void(); }
 
-        internal CodeBase Assignment(RefAlignParam refAlignParam, Size size)
+        internal CodeBase Assignment(Size size)
         {
+            var refAlignParam = Root.DefaultRefAlignParam;
             var alignedSize = size.ByteAlignedSize;
-            return CreateFiber(new Assign(refAlignParam, alignedSize));
+            return Add(new Assign(refAlignParam, alignedSize));
         }
 
 
-        internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode) { return CreateFiber(new ThenElse(thenCode, elseCode)); }
+        internal CodeBase ThenElse(CodeBase thenCode, CodeBase elseCode) { return Add(new ThenElse(thenCode, elseCode)); }
 
         internal LocalReference LocalReference(CodeBase destructorCode) { return new LocalReference(this, destructorCode); }
 
-        internal abstract CodeBase CreateFiber(FiberItem subsequentElement);
+        internal abstract CodeBase Add(FiberItem subsequentElement);
 
         internal CodeBase ReferencePlus(Size right)
         {
             if(right.IsZero)
                 return this;
-            return CreateFiber(new ReferencePlusConstant(right, CallingMethodName));
+            return Add(new ReferencePlusConstant(right, CallingMethodName));
         }
 
-        internal CodeBase ArrayAccess(Size elementSize, Size indexSize) { return CreateFiber(new ArrayAccess(elementSize, indexSize, CallingMethodName)); }
+        internal CodeBase ArrayAccess(Size elementSize, Size indexSize)
+        {
+            return Add(new ArrayAccess(elementSize,indexSize,CallingMethodName));
+        }
+        internal CodeBase ArrayAssignment(Size elementSize, Size indexSize)
+        {
+            return Add(new ArrayAssignment(elementSize, indexSize, CallingMethodName));
+        }
 
         internal CodeBase Dereference(Size targetSize)
         {
             if(Size.IsZero && targetSize.IsZero)
                 return this;
-            return CreateFiber(new Dereference(targetSize, targetSize));
+            return Add(new Dereference(targetSize, targetSize));
         }
 
         internal CodeBase BitCast(Size size)
         {
             if(Size == size)
                 return this;
-            return CreateFiber(new BitCast(size, Size, Size));
+            return Add(new BitCast(size, Size, Size));
         }
 
         internal CodeBase Sequence(params CodeBase[] data)
@@ -187,7 +195,7 @@ namespace Reni.Code
 
         protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Default(this); }
 
-        internal CodeBase Call(FunctionId index, Size resultSize) { return CreateFiber(new Call(index, resultSize, Size)); }
+        internal CodeBase Call(FunctionId index, Size resultSize) { return Add(new Call(index, resultSize, Size)); }
 
         internal CodeBase TryReplacePrimitiveRecursivity(FunctionId functionId)
         {
@@ -232,22 +240,22 @@ namespace Reni.Code
 
             var result = this;
             if(!resultSize.IsZero)
-                result = result.CreateFiber(new LocalBlockEnd(resultSize, intermediateSize));
+                result = result.Add(new LocalBlockEnd(resultSize, intermediateSize));
 
-            return result.CreateFiber(new Drop(Size, resultSize));
+            return result.Add(new Drop(Size, resultSize));
         }
 
-        internal CodeBase BitSequenceOperation(ISequenceOfBitBinaryOperation name, Size size, Size leftSize) { return CreateFiber(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
-        internal CodeBase DumpPrintNumber(Size leftSize) { return CreateFiber(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
-        internal CodeBase DumpPrintText(Size itemSize) { return CreateFiber(new DumpPrintTextOperation(Size, itemSize)); }
-        internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return CreateFiber(new BitArrayPrefixOp(feature, size, Size)); }
+        internal CodeBase BitSequenceOperation(string name, Size size, Size leftSize) { return Add(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
+        internal CodeBase DumpPrintNumber(Size leftSize) { return Add(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
+        internal CodeBase DumpPrintText(Size itemSize) { return Add(new DumpPrintTextOperation(Size, itemSize)); }
+        internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return Add(new BitArrayPrefixOp(feature, size, Size)); }
 
         internal static CodeBase LocalVariableReference(string holder, Size offset = null) { return new LocalVariableReference(holder, offset); }
 
-        internal CodeBase CreateFiber(IEnumerable<FiberItem> subsequentElement)
+        internal CodeBase AddRange(IEnumerable<FiberItem> subsequentElement)
         {
             return subsequentElement
-                .Aggregate(this, (current, fiberItem) => current.CreateFiber(fiberItem));
+                .Aggregate(this, (current, fiberItem) => current.Add(fiberItem));
         }
 
         internal void Execute(IExecutionContext context)
@@ -284,6 +292,6 @@ namespace Reni.Code
 
         internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern) { return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x))); }
 
-        static CodeBase LocalVariableDefinition(string holderName, CodeBase value) { return value.CreateFiber(new LocalVariableDefinition(holderName, value.Size)); }
+        static CodeBase LocalVariableDefinition(string holderName, CodeBase value) { return value.Add(new LocalVariableDefinition(holderName, value.Size)); }
     }
 }

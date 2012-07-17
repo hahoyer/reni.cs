@@ -85,26 +85,6 @@ namespace Reni.Code
         void IVisitor.ReferenceCode(IContextReference context) { throw new UnexpectedContextReference(context); }
         void IVisitor.RecursiveCallCandidate() { throw new UnexpectedRecursiveCallCandidate(); }
 
-        void IVisitor.ArrayAccess(Size elementSize, Size indexSize)
-        {
-            AddCode
-                ("data.Push(data.Pull({0}).BitCast({1}))"
-                 , indexSize.SaveByteCount
-                 , DataHandler.RefSize.ToInt()
-                );
-            AddCode
-                ("data.Push({0})"
-                 , BitsConst.Convert(elementSize.SaveByteCount).ByteSequence(DataHandler.RefSize));
-            AddCode
-                ("data.Star({0},{0},{0})"
-                 , RefBytes
-                );
-            AddCode
-                ("data.Plus({0},{0},{0})"
-                 , RefBytes
-                );
-        }
-
         void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
         {
             AddCode
@@ -170,14 +150,14 @@ namespace Reni.Code
                     );
         }
 
-        void IVisitor.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        void IVisitor.BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize)
         {
             var sizeBytes = size.SaveByteCount;
             var leftBytes = leftSize.SaveByteCount;
             var rightBytes = rightSize.SaveByteCount;
             AddCode
                 ("data.{0}(sizeBytes:{1}, leftBytes:{2}, rightBytes:{3})"
-                 , opToken.DataFunctionName
+                 , opToken
                  , sizeBytes
                  , leftBytes
                  , rightBytes

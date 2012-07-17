@@ -34,11 +34,11 @@ namespace Reni.Code
     {
         [Node]
         [DisableDump]
-        internal readonly ISequenceOfBitBinaryOperation OpToken;
+        internal readonly string OpToken;
 
         private readonly Size _size;
 
-        internal BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        internal BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize)
             : base(leftSize, rightSize)
         {
             OpToken = opToken;
@@ -54,7 +54,7 @@ namespace Reni.Code
         internal override void Visit(IVisitor visitor) { visitor.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
 
         [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> " + OpToken.DataFunctionName + " <" + RightSize + ">"; } }
+        public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> " + OpToken+ " <" + RightSize + ">"; } }
     }
 
     /// <summary>

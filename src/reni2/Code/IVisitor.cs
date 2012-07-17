@@ -31,9 +31,8 @@ namespace Reni.Code
 {
     interface IVisitor
     {
-        void ArrayAccess(Size elementSize, Size indexSize);
         void Assign(Size targetSize);
-        void BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize);
+        void BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize);
         void BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize);
         void BitCast(Size size, Size targetSize, Size significantSize);
         void BitsArray(Size size, BitsConst data);

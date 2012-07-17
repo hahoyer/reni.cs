@@ -91,11 +91,11 @@ namespace Reni.Code
             return new BitsStackData(GetBitsConst().Resize(dataSize),OutStream);
         }
 
-        internal StackData BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, StackData right)
+        internal StackData BitArrayBinaryOp(string opToken, Size size, StackData right)
         {
             var leftData = GetBitsConst();
             var rightData = right.GetBitsConst();
-            var resultData = leftData.BitArrayBinaryOp(opToken.DataFunctionName, size, rightData);
+            var resultData = leftData.BitArrayBinaryOp(opToken, size, rightData);
             return new BitsStackData(resultData, OutStream);
         }
 

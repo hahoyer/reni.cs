@@ -149,7 +149,7 @@ namespace Reni.Code
             Push(value.Dereference(size, dataSize));
         }
 
-        void IVisitor.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        void IVisitor.BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize)
         {
             var right = Pull(rightSize);
             var left = Pull(leftSize);
@@ -162,7 +162,6 @@ namespace Reni.Code
             Push(arg.BitArrayPrefixOp(opToken, size));
         }
 
-        void IVisitor.ArrayAccess(Size elementSize, Size indexSize) { throw new NotImplementedException(); }
         void IVisitor.Assign(Size targetSize)
         {
             var right = Pull(RefSize);

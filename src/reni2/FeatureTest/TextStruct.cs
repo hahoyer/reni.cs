@@ -40,7 +40,7 @@ namespace Reni.FeatureTest
                 @"
 systemdata:
 {
-    Memory: (0 type * ('100' to_number_of_base 256) sequence instance (0);
+    Memory: (0 type * ('100' to_number_of_base 256)) sequence instance (0);
     FreePointer: reference Memory;
 };
 
@@ -90,6 +90,7 @@ Text:
     [FromTypeAndFunction]
     [HalloWelt]
     [ElementAccess]
+    [ElementAccessVariableSetter]
     //[LowPriority]
     public sealed class Text1 : TextStruct
     {

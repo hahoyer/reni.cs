@@ -140,16 +140,15 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, dataSize);
         }
 
-        void IVisitor.BitArrayBinaryOp(ISequenceOfBitBinaryOperation opToken, Size size, Size leftSize, Size rightSize)
+        void IVisitor.BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize)
         {
             var formalLeftSubValue = PullInputValuesFromData(leftSize).Single();
             var formalRightSubValue = PullInputValuesFromData(leftSize, rightSize).Single();
             var startAddress = (_startAddress + leftSize + rightSize - size).ToInt();
-            var element = FormalValueAccess.BitArrayBinaryOp(opToken.DataFunctionName, formalLeftSubValue, formalRightSubValue);
+            var element = FormalValueAccess.BitArrayBinaryOp(opToken, formalLeftSubValue, formalRightSubValue);
             SetFormalValues(element, startAddress, size);
         }
 
-        void IVisitor.ArrayAccess(Size elementSize, Size indexSize) { throw new NotImplementedException(); }
         void IVisitor.Assign(Size targetSize) { ResetInputValuesOfData(RefSize * 2); }
         void IVisitor.BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize) { NotImplementedMethod(opToken, size, argSize); }
         void IVisitor.PrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }

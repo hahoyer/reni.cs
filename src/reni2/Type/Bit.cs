@@ -48,7 +48,7 @@ namespace Reni.Type
 
         internal override string DumpShort() { return "bit"; }
 
-        internal static CodeBase BitSequenceOperation(Size size, ISequenceOfBitBinaryOperation token, int objectBits, int argsBits)
+        internal static CodeBase BitSequenceOperation(Size size, string token, int objectBits, int argsBits)
         {
             var objectType = UniqueNumber(objectBits).UniqueAlign;
             var argsType = UniqueNumber(argsBits).UniqueAlign;

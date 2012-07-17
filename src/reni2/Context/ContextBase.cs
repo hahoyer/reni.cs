@@ -253,7 +253,7 @@ namespace Reni.Context
 
         internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
         {
-            var trace = feature.GetObjectId() == 9737 && category.HasCode;
+            var trace = feature.GetObjectId() == -10;
             StartMethodDump(trace, category, left, leftType, feature, converterResult, right);
             try
             {

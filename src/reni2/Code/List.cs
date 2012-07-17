@@ -47,10 +47,10 @@ namespace Reni.Code
                 var i = 0;
                 for(; i < _data.Length - 1; i++)
                     newData[i] = _data[i];
-                newData[i] = _data[i].CreateFiber(subsequentElement);
+                newData[i] = _data[i].Add(subsequentElement);
                 return List(newData);
             }
-            return null;
+            return subsequentElement.TryToCombineBack(this);
         }
 
         [DisableDump]

@@ -101,7 +101,7 @@ namespace Reni.Code
             {
                 var result = new TopData(precedingElement.Offset, OutputSize, InputDataSize);
                 return result
-                    .CreateFiber(new BitCast(OutputSize, OutputSize, InputDataSize));
+                    .Add(new BitCast(OutputSize, OutputSize, InputDataSize));
             }
             return null;
         }
@@ -110,7 +110,7 @@ namespace Reni.Code
         {
             if(precedingElement.Size == InputSize && OutputSize >= InputDataSize && OutputSize > InputSize)
                 return new TopFrameData(precedingElement.Offset, OutputSize, InputDataSize)
-                    .CreateFiber(new BitCast(OutputSize, OutputSize, InputDataSize));
+                    .Add(new BitCast(OutputSize, OutputSize, InputDataSize));
             return null;
         }
 
