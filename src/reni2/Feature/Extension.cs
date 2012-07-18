@@ -51,27 +51,24 @@ namespace Reni.Feature
         {
             Tracer.Assert(feature != null);
 
-            if(feature.MetaFunction != null)
-                return;
-
-            if(hasArg && feature.Function != null)
+            if(hasArg)
             {
-                if(!feature.Function.IsImplicit)
+                if (feature.MetaFunction != null)
                     return;
-                Tracer.AssertionFailed("!feature.Function.IsImplicit", feature.Dump);
+
+                Tracer.Assert(feature.Function != null, feature.Dump);
+                Tracer.Assert(!feature.Function.IsImplicit, feature.Dump);
+                return;
             }
 
-            if(feature.Function != null)
+            if (feature.Simple != null)
             {
-                if(feature.Function.IsImplicit)
-                    return;
-                Tracer.AssertionFailed("feature.Function.IsImplicit", feature.Dump);
+                Tracer.Assert(feature.Function == null || !feature.Function.IsImplicit, feature.Dump);
+                return;
             }
 
-            if(feature.Simple != null)
-                return;
-
-            Tracer.AssertionFailed("feature.Simple != null", feature.Dump);
+            Tracer.Assert(feature.Function != null, feature.Dump);
+            Tracer.Assert(feature.Function.IsImplicit, feature.Dump);
         }
 
         internal static Simple Feature(Func<Category, Result> function) { return new Simple(function); }

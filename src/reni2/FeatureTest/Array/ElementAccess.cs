@@ -38,8 +38,18 @@ namespace Reni.FeatureTest.Array
     }
 
     [TestFixture]
+    [ArrayFromPieces]
+    [TargetSet("x: <<5<<3; x dump_print", "array(#(#align3#)# (bit)sequence(4),(5, 3))")]
+    public sealed class ArrayVariable : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
     [ElementAccessVariable]
-    [TargetSet("x: <<5<<3<<5<<1<<3; x(3) := 2; x dump_print", "(5,3,5,2,3)")]
+    [ArrayVariable]
+    [TargetSet("x: <<5<<3<<5<<1<<3; x(3) := 2; x dump_print", "array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 2, 3))")]
     public sealed class ElementAccessVariableSetter : CompilerTest
     {
         [Test]
