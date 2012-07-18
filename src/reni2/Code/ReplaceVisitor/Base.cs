@@ -28,7 +28,10 @@ namespace Reni.Code.ReplaceVisitor
             var newListAsArray = newList.ToArray();
             if(newListAsArray.All(x => x == null))
                 return null;
-            var newListCompleted = newListAsArray.Select((x, i) => x ?? visitedObject.Data[i]).Where(x=>!x.IsEmpty).ToArray();
+            var newListCompleted = newListAsArray
+                .Select((x, i) => x ?? visitedObject.Data[i])
+                .Where(x=>!x.IsEmpty)
+                .ToArray();
 
             switch(newListCompleted.Length)
             {
@@ -38,7 +41,7 @@ namespace Reni.Code.ReplaceVisitor
                     return newListCompleted[0];
             }
             
-            return Code.List.Create(newListCompleted);
+            return CodeBase.List(newListCompleted);
         }
 
         protected override FiberItem ThenElse(ThenElse visitedObject, CodeBase newThen, CodeBase newElse)
