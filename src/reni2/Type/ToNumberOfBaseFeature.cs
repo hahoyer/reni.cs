@@ -40,7 +40,7 @@ namespace Reni.Type
         {
             var target = left.Evaluate(context).ToString(_type.Parent.ElementType.Size);
             var conversionBase = right.Evaluate(context).ToInt32();
-            Tracer.Assert(conversionBase >= 2 && conversionBase <= 36, conversionBase.ToString);
+            Tracer.Assert(conversionBase >= 2, conversionBase.ToString);
             var result = BitsConst.Convert(target, conversionBase);
             return TypeBase.Result(category, result)
                 .Align(context.RefAlignParam.AlignBits);

@@ -25,11 +25,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Feature;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    sealed class SequenceToken : Defineable, ISearchPath<ISuffixFeature, Type.Array>
+    sealed class SequenceToken 
+        : Defineable
+        , ISearchPath<ISuffixFeature, Type.Array>
+        , ISearchPath<ISuffixFeature, TypeType>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.SequenceResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.SequenceResult); }
     }
 }

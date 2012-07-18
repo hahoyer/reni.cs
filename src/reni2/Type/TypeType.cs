@@ -55,7 +55,7 @@ namespace Reni.Type
         }
 
         internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult) { return RawInstanceResult(category, getRightResult).SmartLocalReferenceResult() & category; }
-        
+
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             if(category <= Category.Type.Replenished)
@@ -101,6 +101,18 @@ namespace Reni.Type
             }
 
             return Result(category, BitsConst.Convert(count.Value));
+        }
+
+        internal Result SequenceResult(Category category)
+        {
+            var value = Value as Array;
+            return value == null
+                       ? null
+                       : value
+                             .UniqueSequence
+                             .TypeForTypeOperator
+                             .UniqueTypeType
+                             .Result(category);
         }
     }
 }

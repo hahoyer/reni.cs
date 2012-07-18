@@ -29,6 +29,7 @@ using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
 using Reni.FeatureTest.Text;
+using Reni.FeatureTest.TypeType;
 
 namespace Reni.FeatureTest
 {
@@ -91,6 +92,7 @@ Text:
     [HalloWelt]
     [ElementAccess]
     [ElementAccessVariableSetter]
+    [SequenceOfType]
     //[LowPriority]
     public sealed class Text1 : TextStruct
     {
