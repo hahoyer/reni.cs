@@ -111,11 +111,11 @@ namespace Reni.Code
 
         internal CodeBase ArrayAccess(Size elementSize, Size indexSize)
         {
-            return Add(new ArrayAccess(elementSize,indexSize,CallingMethodName));
+            return Add(new ArrayGetter(elementSize,indexSize,CallingMethodName));
         }
         internal CodeBase ArrayAssignment(Size elementSize, Size indexSize)
         {
-            return Add(new ArrayAssignment(elementSize, indexSize, CallingMethodName));
+            return Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
         }
 
         internal CodeBase Dereference(Size targetSize)
