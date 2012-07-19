@@ -202,6 +202,12 @@ namespace Reni.Type
                 .Result(category, UniquePointer.ArgResult(category));
         }
 
+        internal Result SequenceTypeResult(Category category)
+        {
+            return UniqueSequence
+                .UniqueTypeType
+                .Result(category);
+        }
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
             if(type.Parent != this)

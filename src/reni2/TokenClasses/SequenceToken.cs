@@ -29,12 +29,16 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    sealed class SequenceToken 
+    sealed class SequenceToken
         : Defineable
-        , ISearchPath<ISuffixFeature, Type.Array>
-        , ISearchPath<ISuffixFeature, TypeType>
+          , ISearchPath<ISuffixFeature, Type.Array>
+          , ISearchPath<ISuffixFeature, TypeType>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.SequenceResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.SequenceResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type)
+        {
+            var value = type.Value as Type.Array;
+            return value == null ? null : Extension.Feature(value.SequenceTypeResult);
+        }
     }
 }

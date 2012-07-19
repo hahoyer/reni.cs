@@ -103,16 +103,5 @@ namespace Reni.Type
             return Result(category, BitsConst.Convert(count.Value));
         }
 
-        internal Result SequenceResult(Category category)
-        {
-            var value = Value as Array;
-            return value == null
-                       ? null
-                       : value
-                             .UniqueSequence
-                             .TypeForTypeOperator
-                             .UniqueTypeType
-                             .Result(category);
-        }
     }
 }

@@ -84,7 +84,7 @@ namespace Reni.Sequence
 
         internal override int? SmartArrayLength(TypeBase elementType)
         {
-            if(elementType is SequenceType && IsConvertable(elementType)) 
+            if(elementType is SequenceType && IsConvertable(elementType))
                 return 1;
             NotImplementedMethod(elementType);
             return null;
@@ -156,7 +156,12 @@ namespace Reni.Sequence
             if(source.Element != Element)
             {
                 DumpDataWithBreak
-                    ("Element type dismatch", "category", category, "source", source, "destination", this, "result", result);
+                    ("Element type dismatch"
+                     , "category", category
+                     , "source", source
+                     , "destination", this
+                     , "result", result
+                    );
                 return null;
             }
 
@@ -186,10 +191,7 @@ namespace Reni.Sequence
             }
         }
 
-        Result UnalignedDereferencePointerResult(Category category)
-        {
-            return SmartPointer.ArgResult(category.Typed).DereferenceResult() & category;
-        }
+        Result UnalignedDereferencePointerResult(Category category) { return SmartPointer.ArgResult(category.Typed).DereferenceResult() & category; }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
@@ -240,6 +242,5 @@ namespace Reni.Sequence
         }
 
         internal Result UndecorateResult(Category category) { return Parent.Result(category, ArgResult); }
-
     }
 }
