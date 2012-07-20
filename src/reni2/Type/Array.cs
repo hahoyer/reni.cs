@@ -104,21 +104,27 @@ namespace Reni.Type
         {
             return Result
                 (category
-                 , c => ConstructorResultExec(c, argsType)
+                 , c => InternalConstructorResult(c, argsType)
                 );
         }
 
-        Result ConstructorResultExec(Category category, TypeBase argsType)
+        Result InternalConstructorResult(Category category, TypeBase argsType)
         {
             if(category.IsNone)
                 return null;
-            if(!(argsType is IFunctionFeature))
-            {
-                NotImplementedMethod(category, argsType);
-                return null;
-            }
+            
+            if(argsType == Void)
+                return Result(category, ()=>CodeBase.BitsConst(Size, BitsConst.Convert(0)));
 
-            var function = (IFunctionFeature) argsType;
+            var function = argsType as IFunctionFeature;
+            if(function != null)
+                return InternalConstructorResult(category, function);
+
+            NotImplementedMethod(category, argsType);
+            return null;
+        }
+        Result InternalConstructorResult(Category category, IFunctionFeature function)
+        {
             var indexType = Bit
                 .UniqueArray(BitsConst.Convert(Count).Size.ToInt())
                 .UniqueSequence.UniqueAlign;
@@ -232,7 +238,7 @@ namespace Reni.Type
         {
             var objectResult = UniquePointer
                 .Result(category, ObjectReference);
-            
+
             var argsResult = argsType
                 .Conversion(category.Typed, IndexType)
                 .DereferencedAlignedResult();

@@ -41,7 +41,7 @@ namespace Reni.FeatureTest
                 @"
 systemdata:
 {
-    Memory: (0 type * ('100' to_number_of_base 256)) sequence instance (0);
+    Memory: (0 type * ('100' to_number_of_base 256)) instance();
     FreePointer: reference Memory;
 };
 
@@ -93,6 +93,7 @@ Text:
     [ElementAccess]
     [ElementAccessVariableSetter]
     [SequenceOfType]
+    [DefaultInitialized]
     //[LowPriority]
     public sealed class Text1 : TextStruct
     {
