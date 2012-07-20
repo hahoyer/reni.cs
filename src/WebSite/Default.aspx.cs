@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project WebSite
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
@@ -17,12 +18,15 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Web.UI;
+using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni;
 
@@ -51,18 +55,15 @@ namespace WebSite
             }
             catch(Exception exception)
             {
-                return exception.Message; 
+                return exception.Message;
             }
             var result = stringStream.Result;
             return result;
         }
 
-        protected void ButtonOkClick(object sender, EventArgs e)
-        {
-            Result.Text = CompileAndRun(TbName.Text);
-        }
-
+        protected void ButtonOkClick(object sender, EventArgs e) { Result.Text = CompileAndRun(TbName.Text); }
     }
+
     sealed class StringStream : ReniObject, IOutStream
     {
         readonly StringBuilder _result = new StringBuilder();
@@ -70,4 +71,3 @@ namespace WebSite
         void IOutStream.Add(string text) { _result.Append(text); }
     }
 }
-
