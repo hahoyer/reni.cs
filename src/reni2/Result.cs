@@ -699,7 +699,7 @@ namespace Reni
             Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
             return Type
                 .Reference
-                .DereferenceResult(CompleteCategory)
+                .Converter.Result(CompleteCategory)
                 .ReplaceArg(this);
         }
 

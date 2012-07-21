@@ -47,6 +47,7 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
+    <Compile Include="IProxyType.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="PathItemSearchVisitor.cs" />

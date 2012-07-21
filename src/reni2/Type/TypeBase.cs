@@ -174,7 +174,7 @@ namespace Reni.Type
                 var result = Reference;
                 if(result == null)
                     return this;
-                return result.TargetType.AutomaticDereferenceType;
+                return result.Converter.TargetType.AutomaticDereferenceType;
             }
         }
 

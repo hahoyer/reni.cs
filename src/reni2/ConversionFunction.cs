@@ -25,39 +25,32 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Type;
 
 namespace Reni
 {
     sealed class ConversionFunction : ReniObject, IConversionFunction
     {
         static int _nextObjectId;
-        readonly ISearchContainerType _searchContainerType;
+        readonly IProxyType _proxyType;
 
-        internal ConversionFunction(ISearchContainerType searchContainerType)
+        internal ConversionFunction(IProxyType proxyType)
             : base(_nextObjectId++)
         {
-            _searchContainerType = searchContainerType;
+            _proxyType = proxyType;
             StopByObjectId(-1);
         }
-        Result IConversionFunction.Result(Category category) { return _searchContainerType.Converter.Result(category); }
+        Result IConversionFunction.Result(Category category) { return _proxyType.Converter.Result(category); }
         public override string NodeDump
         {
             get
             {
                 return base.NodeDump
                        + "["
-                       + ((ReniObject) _searchContainerType).NodeDump
+                       + ((ReniObject) _proxyType).NodeDump
                        + "=>"
-                       + _searchContainerType.TargetType.NodeDump
+                       + _proxyType.Converter.TargetType.NodeDump
                        + "]";
             }
         }
-    }
-
-    interface ISearchContainerType
-    {
-        IConverter Converter { get; }
-        TypeBase TargetType { get; }
     }
 }

@@ -29,7 +29,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    abstract class SetterTargetType : TypeBase, ISearchContainerType, IConverter, ISmartReference
+    abstract class SetterTargetType : TypeBase, IProxyType, IConverter, ISmartReference
     {
         [DisableDump]
         internal readonly ISuffixFeature AssignmentFeature;
@@ -39,11 +39,10 @@ namespace Reni.Type
             AssignmentFeature = new AssignmentFeature(this);
         }
 
-        IConverter ISearchContainerType.Converter { get { return this; } }
-        TypeBase ISearchContainerType.TargetType { get { return ValueType; } }
-        Result ISmartReference.DereferenceResult(Category category) { return GetterResult(category); }
+        IConverter IProxyType.Converter { get { return this; } }
+        IConverter ISmartReference.Converter { get { return this; } }
+        TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return GetterResult(category); }
-        TypeBase ISmartReference.TargetType { get { return ValueType; } }
 
         internal abstract TypeBase ValueType { get; }
         internal abstract Result DestinationResult(Category category);

@@ -33,7 +33,7 @@ namespace Reni.Type
 {
     sealed class PointerType
         : TypeBase
-          , ISearchContainerType
+          , IProxyType
           , IConverter
           , ISmartReference
     {
@@ -44,12 +44,13 @@ namespace Reni.Type
             _valueType = valueType;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is PointerType), valueType.Dump);
+            Tracer.Assert(!(valueType is ReferenceType), valueType.Dump);
             StopByObjectId(-10);
         }
 
-        TypeBase ISmartReference.TargetType { get { return ValueType; } }
-        TypeBase ISearchContainerType.TargetType { get { return ValueType; } }
-        IConverter ISearchContainerType.Converter { get { return this; } }
+        IConverter ISmartReference.Converter { get { return this; } }
+        IConverter IProxyType.Converter { get { return this; } }
+        TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
         internal override string DumpPrintText { get { return DumpShort(); } }
         [DisableDump]
@@ -64,8 +65,6 @@ namespace Reni.Type
         internal override TypeBase CoreType { get { return ValueType.CoreType; } }
 
         internal override string DumpShort() { return ValueType.DumpShort() + "[Pointer]"; }
-
-        Result ISmartReference.DereferenceResult(Category category) { return DereferenceResult(category); }
 
         internal override int? SmartSequenceLength(TypeBase elementType)
         {

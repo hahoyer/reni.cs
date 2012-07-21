@@ -27,6 +27,7 @@ namespace Reni.Type
 {
     interface IConverter
     {
+        TypeBase TargetType { get; }
         Result Result(Category category);
     }
 
@@ -46,6 +47,8 @@ namespace Reni.Type
             _first = first;
             _second = second;
         }
+
+        TypeBase IConverter.TargetType { get { return _second.TargetType; } }
 
         public Result Result(Category category)
         {
@@ -71,6 +74,7 @@ namespace Reni.Type
         readonly Func<Category, Result> _function;
 
         public FunctionalConverter(Func<Category, Result> function) { _function = function; }
+        TypeBase IConverter.TargetType { get { return _function(Category.Type).Type; } }
         public Result Result(Category category) { return _function(category); }
     }
 }

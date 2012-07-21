@@ -30,7 +30,7 @@ using Reni.Basics;
 namespace Reni.Type
 {
     [Serializable]
-    abstract class Child<TParent> : TypeBase, ISearchContainerType, IConverter
+    abstract class Child<TParent> : TypeBase, IProxyType, IConverter
         where TParent : TypeBase
     {
         readonly TParent _parent;
@@ -41,8 +41,8 @@ namespace Reni.Type
         [DisableDump]
         public TParent Parent { get { return _parent; } }
 
-        IConverter ISearchContainerType.Converter { get { return this; } }
-        TypeBase ISearchContainerType.TargetType { get { return _parent; } }
+        IConverter IProxyType.Converter { get { return this; } }
+        TypeBase IConverter.TargetType { get { return _parent; } }
         Result IConverter.Result(Category category) { return ParentConversionResult(category); }
         protected abstract Result ParentConversionResult(Category category);
     }

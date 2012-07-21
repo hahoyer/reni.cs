@@ -72,11 +72,11 @@ namespace Reni
                 if (IsSuccessFull)
                     return;
 
-                var isc = target as ISearchContainerType;
+                var isc = target as IProxyType;
                 if(isc == null)
                     return;
 
-                Tracer.Assert(isc.TargetType == child);
+                Tracer.Assert(isc.Converter.TargetType == child);
                 if (Trace) Tracer.FlaggedLine("child.Search(this)");
                 child.Search(this);
 
