@@ -69,15 +69,37 @@ namespace Reni.Type
 
         internal Result Repeat(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var count = right
-                .Result(context)
-                .AutomaticDereferenceResult()
-                .Evaluate(context.RootContext.ExecutionContext)
-                .ToInt32();
-            return Value.UniqueAlign
-                .UniqueArray(count)
-                .UniqueTypeType
-                .Result(category);
+            var trace = ObjectId == -54 && context.ObjectId == 20 && left.ObjectId == 225;
+            StartMethodDump(trace, context, category, left, right);
+            try
+            {
+                var countResult = right.Result(context).AutomaticDereferenceResult();
+                
+                Dump("countResult", countResult); 
+                BreakExecution();
+
+                var count = countResult
+                    .Evaluate(context.RootContext.ExecutionContext)
+                    .ToInt32();
+                
+                Dump("count", count);
+                BreakExecution();
+                
+                var type = Value
+                    .UniqueAlign
+                    .UniqueArray(count)
+                    .UniqueTypeType;
+                
+                Dump("type", type);
+                BreakExecution();
+                
+                return ReturnMethodDump(type.Result(category));
+
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
 
         internal Result Split(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)

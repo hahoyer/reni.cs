@@ -200,9 +200,12 @@ namespace Reni
         {
             if(_parameters.ParseOnly)
                 return;
+            var taraceFunctions = _parameters.Trace.Functions;
+            _parameters.Trace.Functions = false;
             _code.Ensure();
             for(var i = 0; i < Functions.Count; i++)
                 Functions[i].EnsureBodyCode();
+            _parameters.Trace.Functions = taraceFunctions;
         }
     }
 
