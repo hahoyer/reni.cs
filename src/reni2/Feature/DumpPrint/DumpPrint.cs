@@ -35,16 +35,16 @@ namespace Reni.Feature.DumpPrint
 {
     abstract class BitFeatureBase : ReniObject
     {
-        protected static Result Apply(Category category, ISmartReference objectReference)
+        protected static Result Apply(Category category, IReferenceType objectReferenceType)
         {
             return TypeBase.Void
-                .Result(category, () => BitSequenceDumpPrint(objectReference), CodeArgs.Arg);
+                .Result(category, () => BitSequenceDumpPrint(objectReferenceType), CodeArgs.Arg);
         }
 
-        static CodeBase BitSequenceDumpPrint(ISmartReference objectReference)
+        static CodeBase BitSequenceDumpPrint(IReferenceType objectReferenceType)
         {
-            var alignedSize = objectReference.Converter.TargetType.Size.Align(Root.DefaultRefAlignParam.AlignBits);
-            return objectReference.Type().ArgCode
+            var alignedSize = objectReferenceType.Converter.TargetType.Size.Align(Root.DefaultRefAlignParam.AlignBits);
+            return objectReferenceType.Type().ArgCode
                 .Dereference(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
@@ -67,7 +67,7 @@ namespace Reni.Feature.DumpPrint
 
         [EnableDump]
         internal TypeBase ObjectType { get { return _parent; } }
-        Result ISimpleFeature.Result(Category category) { return Apply(category, _parent.UniqueSmartReference); }
+        Result ISimpleFeature.Result(Category category) { return Apply(category, _parent.UniqueReferenceType); }
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
         ISimpleFeature IFeature.Simple { get { return this; } }
@@ -75,7 +75,7 @@ namespace Reni.Feature.DumpPrint
 
     sealed class BitFeature : BitFeatureBase, ISuffixFeature, ISimpleFeature
     {
-        Result ISimpleFeature.Result(Category category) { return Apply(category, TypeBase.Bit.UniqueSmartReference); }
+        Result ISimpleFeature.Result(Category category) { return Apply(category, TypeBase.Bit.UniqueReferenceType); }
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
         ISimpleFeature IFeature.Simple { get { return this; } }

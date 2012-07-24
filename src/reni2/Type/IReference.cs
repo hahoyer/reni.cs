@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
@@ -25,17 +24,17 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.Basics;
 
 namespace Reni.Type
 {
-    interface ISmartReference
+    interface IReferenceType
     {
         IConverter Converter { get; }
+        bool IsWeak { get; }
     }
 
-    static internal class ReferenceExtension
+    static class ReferenceExtension
     {
-        internal static TypeBase Type(this ISmartReference reference) { return (TypeBase) reference; }
+        internal static TypeBase Type(this IReferenceType referenceType) { return (TypeBase) referenceType; }
     }
 }

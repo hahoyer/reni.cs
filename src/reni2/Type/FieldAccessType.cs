@@ -61,16 +61,6 @@ namespace Reni.Type
 
         Size GetFieldOffset() { return _structure.FieldOffset(_position); }
 
-        internal override Result SmartLocalReferenceResult(Category category)
-        {
-            return UniqueAlign
-                .Result
-                (category
-                 , () => LocalReferenceCode().Dereference(Root.DefaultRefAlignParam.RefSize)
-                 , () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
-                );
-        }
-
         internal override Result GetterResult(Category category)
         {
             return ValueType.SmartPointer

@@ -679,7 +679,7 @@ namespace Reni
 
         internal BitsConst Evaluate(IExecutionContext context)
         {
-            Tracer.Assert(CodeArgs.IsNone);
+            Tracer.Assert(CodeArgs.IsNone, Dump);
             var result = Align(3).LocalBlock(CompleteCategory);
             return result.Code.Evaluate(context);
         }
@@ -689,7 +689,7 @@ namespace Reni
             Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
 
             var result = this;
-            while(result.Type.Reference != null)
+            while(result.Type.IsWeakReference)
                 result = result.DereferenceResult();
             return result;
         }
@@ -698,8 +698,9 @@ namespace Reni
         {
             Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
             return Type
-                .Reference
-                .Converter.Result(CompleteCategory)
+                .ReferenceType
+                .Converter
+                .Result(CompleteCategory)
                 .ReplaceArg(this);
         }
 
@@ -758,10 +759,10 @@ namespace Reni
         {
             if(Type.IsDataLess)
                 return this;
-            if(Type is ISmartReference)
+            if(Type is IReferenceType)
                 return this;
             return Type
-                .SmartLocalReferenceResult(CompleteCategory)
+                .LocalReferenceResult(CompleteCategory)
                 .ReplaceArg(this);
         }
 

@@ -56,7 +56,7 @@ namespace Reni.Type
             _elementType = elementType;
             _count = count;
             Tracer.Assert(count > 0);
-            Tracer.Assert(elementType.Reference == null);
+            Tracer.Assert(elementType.ReferenceType == null);
             Tracer.Assert(!elementType.IsDataLess);
             _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
             _textItemsCache = new SimpleCache<TextItemsType>(() => new TextItemsType(this));

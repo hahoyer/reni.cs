@@ -35,7 +35,7 @@ namespace Reni.Type
         : TypeBase
           , IProxyType
           , IConverter
-          , ISmartReference
+          , IReferenceType
     {
         readonly TypeBase _valueType;
 
@@ -48,7 +48,8 @@ namespace Reni.Type
             StopByObjectId(-10);
         }
 
-        IConverter ISmartReference.Converter { get { return this; } }
+        IConverter IReferenceType.Converter { get { return this; } }
+        bool IReferenceType.IsWeak { get { return true; } }
         IConverter IProxyType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
@@ -97,7 +98,6 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal override Result SmartLocalReferenceResult(Category category){return ArgResult(category);}
         protected override Array ObtainArray(int count) { return ValueType.UniqueArray(count); }
 
         internal override ISuffixFeature AlignConversion(TypeBase destination)

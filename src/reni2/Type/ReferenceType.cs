@@ -32,6 +32,9 @@ namespace Reni.Type
 {
     sealed class ReferenceType
         : TypeBase
+          , IProxyType
+          , IConverter
+          , IReferenceType
           , ISearchPath<ISuffixFeature, Array>
     {
         readonly TypeBase _elementType;
@@ -65,6 +68,16 @@ namespace Reni.Type
             if(type.ElementType != ElementType)
                 return null;
             return Extension.Feature(type.ConvertToReference(_count));
+        }
+        bool IReferenceType.IsWeak { get { return false; } }
+        IConverter IReferenceType.Converter { get { return this; } }
+        IConverter IProxyType.Converter { get { return this; } }
+        TypeBase IConverter.TargetType { get { return _elementType; } }
+        Result IConverter.Result(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+            ;
         }
     }
 }

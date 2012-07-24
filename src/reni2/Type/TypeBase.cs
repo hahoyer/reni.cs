@@ -54,7 +54,7 @@ namespace Reni.Type
             public readonly DictionaryEx<int, Aligner> Aligner;
             public readonly DictionaryEx<int, Array> Array;
             public readonly DictionaryEx<TypeBase, Pair> Pair;
-            public readonly SimpleCache<ISmartReference> Pointer;
+            public readonly SimpleCache<IReferenceType> Pointer;
             public readonly DictionaryEx<int, ReferenceType> Reference;
             public readonly SimpleCache<TypeType> TypeType;
             public readonly SimpleCache<FunctionInstanceType> FunctionInstanceType;
@@ -64,7 +64,7 @@ namespace Reni.Type
             public Cache(TypeBase parent)
             {
                 EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
-                Pointer = new SimpleCache<ISmartReference>(parent.ObtainPointer);
+                Pointer = new SimpleCache<IReferenceType>(parent.ObtainPointer);
                 Reference = new DictionaryEx<int, ReferenceType>(parent.ObtainReference);
                 Pair = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new DictionaryEx<int, Array>(parent.ObtainArray);
@@ -154,9 +154,9 @@ namespace Reni.Type
         internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
 
         [DisableDump]
-        internal TypeBase UniquePointer { get { return UniqueSmartReference.Type(); } }
+        internal TypeBase UniquePointer { get { return UniqueReferenceType.Type(); } }
         [DisableDump]
-        internal virtual ISmartReference UniqueSmartReference { get { return _cache.Pointer.Value; } }
+        internal virtual IReferenceType UniqueReferenceType { get { return _cache.Pointer.Value; } }
 
         [DisableDump]
         internal virtual ReferenceType SmartReference { get { return _cache.Reference.Value(1); } }
@@ -171,7 +171,7 @@ namespace Reni.Type
         {
             get
             {
-                var result = Reference;
+                var result = ReferenceType;
                 if(result == null)
                     return this;
                 return result.Converter.TargetType.AutomaticDereferenceType;
@@ -294,7 +294,10 @@ namespace Reni.Type
         internal virtual bool IsLambda { get { return false; } }
 
         [DisableDump]
-        internal virtual ISmartReference Reference { get { return this as ISmartReference; } }
+        internal virtual IReferenceType ReferenceType { get { return this as IReferenceType; } }
+
+        [DisableDump]
+        internal bool IsWeakReference { get { return ReferenceType != null && ReferenceType.IsWeak; } }
 
         [DisableDump]
         internal virtual IFeature Feature { get { return null; } }
@@ -348,7 +351,7 @@ namespace Reni.Type
 
         internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
 
-        internal virtual Result SmartLocalReferenceResult(Category category)
+        internal Result LocalReferenceResult(Category category)
         {
             if(IsDataLess)
                 return ArgResult(category);
@@ -361,6 +364,7 @@ namespace Reni.Type
                     () => Destructor(Category.CodeArgs).CodeArgs + CodeArgs.Arg()
                 );
         }
+
 
         internal CodeBase LocalReferenceCode()
         {
@@ -407,7 +411,7 @@ namespace Reni.Type
             }
         }
 
-        ISmartReference ObtainPointer() { return this as ISmartReference ?? new PointerType(this); }
+        IReferenceType ObtainPointer() { return this as IReferenceType ?? new PointerType(this); }
 
         ReferenceType ObtainReference(int count) { return new ReferenceType(AutomaticDereferenceType, count); }
 
@@ -466,8 +470,8 @@ namespace Reni.Type
             if(CoreType != destination.CoreType)
                 return null;
 
-            if(Reference == null)
-                return SmartLocalReferenceResult(category);
+            if(ReferenceType == null)
+                return LocalReferenceResult(category);
 
             return ArgResult(category);
         }
@@ -477,19 +481,19 @@ namespace Reni.Type
             if(CoreType != destination.CoreType)
                 return null;
 
-            if(Reference == null && destination.Reference != null)
-                return SmartLocalReferenceResult(category);
+            if(ReferenceType == null && destination.ReferenceType != null)
+                return LocalReferenceResult(category);
 
             var result = ArgResult(category);
 
             if(this != destination)
             {
-                if(Reference != null)
+                if(ReferenceType != null)
                     result = result.DereferenceResult();
 
                 if(destination is Aligner)
                     result = result.Align(Root.DefaultRefAlignParam.AlignBits);
-                else if(Reference == null)
+                else if(ReferenceType == null)
                     result = result.UnalignedResult();
             }
 
@@ -554,7 +558,7 @@ namespace Reni.Type
 
         ISuffixFeature ISearchPath<ISuffixFeature, Aligner>.Convert(Aligner type)
         {
-            if (type.Parent == this)
+            if(type.Parent == this)
                 return Extension.Feature(PointerArgResult);
             return null;
         }

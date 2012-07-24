@@ -29,7 +29,7 @@ using Reni.Feature;
 
 namespace Reni.Type
 {
-    abstract class SetterTargetType : TypeBase, IProxyType, IConverter, ISmartReference
+    abstract class SetterTargetType : TypeBase, IProxyType, IConverter, IReferenceType
     {
         [DisableDump]
         internal readonly ISuffixFeature AssignmentFeature;
@@ -40,7 +40,8 @@ namespace Reni.Type
         }
 
         IConverter IProxyType.Converter { get { return this; } }
-        IConverter ISmartReference.Converter { get { return this; } }
+        bool IReferenceType.IsWeak { get { return true; } }
+        IConverter IReferenceType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return GetterResult(category); }
 
