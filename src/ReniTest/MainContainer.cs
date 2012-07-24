@@ -51,7 +51,6 @@ namespace ReniTest
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
-            //new PrimitiveRecursiveFunctionWithDump().Run();
             Assembly.GetExecutingAssembly().RunTests();
             //InspectCompiler();
             //Reni.Proof.Main.Run();
