@@ -64,7 +64,7 @@ namespace Reni.Struct
                     .Statements[_position];
             }
         }
-        
+
         IMetaFunctionFeature IFeature.MetaFunction
         {
             get
@@ -73,8 +73,10 @@ namespace Reni.Struct
                 return syntax == null ? null : syntax.MetaFunctionFeature(_structure);
             }
         }
-        
-        IFunctionFeature IFeature.Function
+
+        IFunctionFeature IFeature.Function { get { return FunctionFeature; } }
+
+        IFunctionFeature FunctionFeature
         {
             get
             {
@@ -83,12 +85,21 @@ namespace Reni.Struct
                     return functionSyntax.FunctionFeature(_structure);
 
                 var feature = _structure.ValueType(_position).Feature;
-                if (feature == null)
+                if(feature == null)
                     return null;
                 return feature.Function;
             }
         }
 
-        ISimpleFeature IFeature.Simple { get { return this; } }
+        ISimpleFeature IFeature.Simple
+        {
+            get
+            {
+                var function = FunctionFeature;
+                if(function != null && function.IsImplicit)
+                    return null;
+                return this;
+            }
+        }
     }
 }
