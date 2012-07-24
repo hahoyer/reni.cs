@@ -20,21 +20,29 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.BitArrayOp;
+using Reni.FeatureTest.Struct;
 
 namespace Reni.FeatureTest.Function
 {
+    [LowPriority]
     [TestFixture]
-    [SimpleFunctionWithNonLocal]
-    [TargetSet(@"f: arg/\(arg + new_value)dump_print;f(100) := 2;", "102")]
-    public sealed class FunctionAssignment : CompilerTest
+    [TargetSet(@"a:(x: 100;f: arg+x/\); a f(1) function_instance ^ dump_print;", @"(100, (arg)+(x)/\)")]
+    [SomeVariables]
+    [Add2Numbers]
+    [AccessMember]
+    [FunctionWithNonLocal]
+    [Function]
+    [TwoFunctions]
+    [FunctionWithRefArg]
+    public sealed class FunctionInstanceContext : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
-
 }

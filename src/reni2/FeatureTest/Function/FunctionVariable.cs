@@ -25,21 +25,12 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
-using Reni.FeatureTest.BitArrayOp;
-using Reni.FeatureTest.Struct;
 
 namespace Reni.FeatureTest.Function
 {
-    [LowPriority]
     [TestFixture]
-    [TargetSet(@"a:(x: 100;f: arg+x/\); a f(1) function_instance ^ dump_print;", @"(100, (arg)+(x)/\)")]
-    [SomeVariables]
-    [Add2Numbers]
-    [AccessMember]
-    [FunctionWithNonLocal]
-    [Function]
-    [TwoFunctions]
-    [FunctionWithRefArg]
+    [SimpleFunction]
+    [TargetSet(@"f: arg/\;x: f; x(4)dump_print", "4")]
     public sealed class FunctionVariable : CompilerTest
     {
         [Test]

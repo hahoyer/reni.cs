@@ -56,7 +56,7 @@ system:
     
     NewMemory: 
     {
-        result: (arg elementType * arg length) reference (systemdata FreePointer enable_raw_conversion),
+        result: (arg elementType * MaxNumber32) reference (systemdata FreePointer enable_raw_conversion),
         initializer: arg initializer,
         (arg length) array foreach(result(arg) := initializer(arg) /\),
         systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
@@ -94,6 +94,7 @@ Text:
     [ElementAccessVariableSetter]
     [SequenceOfType]
     [DefaultInitialized]
+    [FunctionVariable]
     //[LowPriority]
     public sealed class Text1 : TextStruct
     {
