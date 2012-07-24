@@ -20,17 +20,22 @@
 
 #endregion
 
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.TypeType;
 
-namespace Reni.FeatureTest.Array
+namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
-    [Target("(<<5<<3<<5<<1) dump_print")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
-    public sealed class ArrayFromPieces : CompilerTest
+    [TargetSet(@"(3, (^ _A_T_ 0) := 5 enable_cut) dump_print", "(-3, )")]
+    [Assignments]
+    [ApplyTypeOperatorWithCut]
+    public sealed class AssignmentWithCut : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
-
 }

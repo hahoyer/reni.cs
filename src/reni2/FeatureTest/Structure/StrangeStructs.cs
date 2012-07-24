@@ -20,17 +20,25 @@
 
 #endregion
 
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 
-namespace Reni.FeatureTest.Array
+namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
-    [Target("(<<5<<3<<5<<1) dump_print")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
-    public sealed class ArrayFromPieces : CompilerTest
+    [AccessSimple]
+    [InnerAccess]
+    [AccessAndAdd]
+    [TargetSet(@"((one: 1) one) dump_print;", "1")]
+    [TargetSet(@"((one: 1,) one) dump_print;", "1")]
+    [TargetSet(@"((0,one: 1) one) dump_print;", "1")]
+    [TargetSet(@"((0,one: 1,) one) dump_print;", "1")]
+    public sealed class StrangeStructs : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
-
 }

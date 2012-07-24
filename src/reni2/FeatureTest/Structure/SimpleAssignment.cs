@@ -20,17 +20,20 @@
 
 #endregion
 
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 
-namespace Reni.FeatureTest.Array
+namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
-    [Target("(<<5<<3<<5<<1) dump_print")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
-    public sealed class ArrayFromPieces : CompilerTest
+    [InnerAccess]
+    [TargetSet(@"(10, (^ _A_T_ 0) := 4) dump_print", "(4, )")]
+    public sealed class SimpleAssignment : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
-
 }

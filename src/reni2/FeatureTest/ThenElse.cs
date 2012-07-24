@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
-using Reni.FeatureTest.Struct;
+using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.ThenElse
 {

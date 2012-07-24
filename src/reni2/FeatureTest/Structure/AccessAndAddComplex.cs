@@ -20,17 +20,23 @@
 
 #endregion
 
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.BitArrayOp;
 
-namespace Reni.FeatureTest.Array
+namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
-    [Target("(<<5<<3<<5<<1) dump_print")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
-    public sealed class ArrayFromPieces : CompilerTest
+    [AccessAndAdd]
+    [BitArrayOp.BitArrayOp]
+    [SubtractOddSizedNumber]
+    [TargetSet(" 1; 4;2050; (^ _A_T_ 0) + (^ _A_T_ 1) + (^ _A_T_ 2);(^ _A_T_ 3) dump_print;", "2055")]
+    public sealed class AccessAndAddComplex : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
-
 }

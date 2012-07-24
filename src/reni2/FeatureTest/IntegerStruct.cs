@@ -26,7 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.Function;
-using Reni.FeatureTest.Struct;
+using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.TypeType;
 
 namespace Reni.FeatureTest.Integer

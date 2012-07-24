@@ -20,17 +20,26 @@
 
 #endregion
 
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.Function;
 
-namespace Reni.FeatureTest.Array
+namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
-    [Target("(<<5<<3<<5<<1) dump_print")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
-    public sealed class ArrayFromPieces : CompilerTest
+    [InnerAccess]
+    [Function.Function]
+    [SimpleFunctionWithNonLocal]
+    [FunctionAssignment]
+    public sealed class PropertyVariable : CompilerTest
     {
+        protected override string Target { get { return @"x: 11/!\ ; x dump_print"; } }
+        protected override string Output { get { return "11"; } }
+
         [Test]
         public override void Run() { BaseRun(); }
     }
-
 }

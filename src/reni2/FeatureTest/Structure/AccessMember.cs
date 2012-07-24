@@ -1,7 +1,7 @@
 #region Copyright (C) 2012
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -22,15 +22,15 @@
 
 using HWClassLibrary.UnitTest;
 
-namespace Reni.FeatureTest.Array
+namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
-    [Target("(<<5<<3<<5<<1) dump_print")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
-    public sealed class ArrayFromPieces : CompilerTest
+    [TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a b dump_print", "222")]
+    [TargetSet(@"a: (a: 11, b:222, c:4, d: 2722); a c dump_print", "4")]
+    [InnerAccess]
+    public sealed class AccessMember : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
-
 }

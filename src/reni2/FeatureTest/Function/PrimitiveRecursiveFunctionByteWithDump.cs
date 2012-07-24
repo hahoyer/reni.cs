@@ -26,7 +26,7 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.BitArrayOp;
-using Reni.FeatureTest.Struct;
+using Reni.FeatureTest.Structure;
 using Reni.FeatureTest.ThenElse;
 
 namespace Reni.FeatureTest.Function
