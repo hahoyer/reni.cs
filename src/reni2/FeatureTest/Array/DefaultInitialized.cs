@@ -1,7 +1,7 @@
 #region Copyright (C) 2012
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -20,14 +20,18 @@
 
 #endregion
 
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 
 namespace Reni.FeatureTest.Array
 {
     [TestFixture]
-    [Target("(5 type * 5) instance (arg/\\) dump_print")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(0, 1, 2, 3, 4))")]
-    public sealed class FromTypeAndFunction : CompilerTest
+    [Target("(5 type * 5) instance () dump_print")]
+    [Output("array(#(#align3#)# (bit)sequence(4),(0, 0, 0, 0, 0))")]
+    public sealed class DefaultInitialized : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }

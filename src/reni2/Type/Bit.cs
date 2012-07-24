@@ -27,16 +27,20 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Sequence;
 
 namespace Reni.Type
 {
     [Serializable]
     sealed class Bit : TypeBase
     {
+        [DisableDump]
         internal override bool IsDataLess { get { return false; } }
+        [DisableDump]
         internal override string DumpPrintText { get { return "bit"; } }
 
         protected override Size GetSize() { return Size.Create(1); }
+
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, null);
@@ -55,6 +59,12 @@ namespace Reni.Type
             return objectType
                 .Pair(argsType).ArgCode
                 .BitSequenceOperation(token, size, Size.Create(objectBits).ByteAlignedSize);
+        }
+        
+        internal Result Enumeration(Category category, SequenceType sequenceType, Array array)
+        {
+            NotImplementedMethod(category, sequenceType, array);
+            return null;
         }
     }
 }

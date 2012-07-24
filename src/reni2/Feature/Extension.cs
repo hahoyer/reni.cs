@@ -73,6 +73,7 @@ namespace Reni.Feature
 
         internal static Simple Feature(Func<Category, Result> function) { return new Simple(function); }
         internal static Simple<T> Feature<T>(Func<Category, T, Result> function) { return new Simple<T>(function); }
+        internal static Simple<T1, T2> Feature<T1, T2>(Func<Category, T1, T2, Result> function) { return new Simple<T1, T2>(function); }
         
         internal static Function Feature(Func<Category, IContextReference, TypeBase, Result> function)
         {

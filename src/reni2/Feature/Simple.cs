@@ -47,26 +47,8 @@ namespace Reni.Feature
 
         public Simple(Func<Category, TType, Result> function) { _function = function; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, TType>.Convert(TType type) { return new ConvertedSimple<TType>(type, _function); }
-        IPrefixFeature ISearchPath<IPrefixFeature, TType>.Convert(TType type) { return new ConvertedSimple<TType>(type, _function); }
-    }
-
-    sealed class ConvertedSimple<TType>
-        : ReniObject, ISimpleFeature, ISuffixFeature
-          , IPrefixFeature
-    {
-        readonly TType _type;
-        readonly Func<Category, TType, Result> _function;
-        public ConvertedSimple(TType type, Func<Category, TType, Result> function)
-        {
-            _type = type;
-            _function = function;
-        }
-
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return null; } }
-        ISimpleFeature IFeature.Simple { get { return this; } }
-        Result ISimpleFeature.Result(Category category) { return _function(category, _type); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TType>.Convert(TType type) { return new Simple(category => _function(category, type)); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TType>.Convert(TType type) { return new Simple(category => _function(category, type)); }
     }
 
     sealed class Simple : SimpleBase, IPrefixFeature, ISuffixFeature
@@ -77,5 +59,16 @@ namespace Reni.Feature
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return null; } }
         ISimpleFeature IFeature.Simple { get { return this; } }
+    }
+
+    sealed class Simple<TType1, TType2>
+        : ReniObject
+          , ISearchPath<ISearchPath<ISuffixFeature, TType1>, TType2>
+    {
+        readonly Func<Category, TType1, TType2, Result> _function;
+        internal Simple(Func<Category, TType1, TType2, Result> function) { _function = function; }
+        ISearchPath<ISuffixFeature, TType1>
+            ISearchPath<ISearchPath<ISuffixFeature, TType1>, TType2>
+                .Convert(TType2 type) { return new Simple<TType1>((category,type1) => _function(category, type1, type)); }
     }
 }

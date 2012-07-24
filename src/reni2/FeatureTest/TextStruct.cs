@@ -28,6 +28,7 @@ using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
+using Reni.FeatureTest.Enumeration;
 using Reni.FeatureTest.Text;
 using Reni.FeatureTest.TypeType;
 
@@ -58,7 +59,7 @@ system:
     {
         result: (arg elementType * MaxNumber32) reference (systemdata FreePointer enable_raw_conversion),
         initializer: arg initializer,
-        (arg length) array foreach(result(arg) := initializer(arg) /\),
+        (arg length) enumeration foreach(result(arg) := initializer(arg) /\),
         systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
     } result /\
 }/!\ ;
@@ -95,6 +96,7 @@ Text:
     [SequenceOfType]
     [DefaultInitialized]
     [FunctionVariable]
+    [Simple]
     //[LowPriority]
     public sealed class Text1 : TextStruct
     {
