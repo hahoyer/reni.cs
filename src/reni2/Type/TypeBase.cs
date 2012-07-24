@@ -171,10 +171,9 @@ namespace Reni.Type
         {
             get
             {
-                var result = ReferenceType;
-                if(result == null)
-                    return this;
-                return result.Converter.TargetType.AutomaticDereferenceType;
+                if(IsWeakReference)
+                    return ReferenceType.Converter.TargetType.AutomaticDereferenceType;
+                return this;
             }
         }
 
