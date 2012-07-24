@@ -84,7 +84,6 @@ namespace Reni.Type
         [DisableDump]
         internal override ReferenceType SmartReference { get { return ElementType.UniqueReference(Count); } }
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
-        internal override IFeature Feature { get { return this; } }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
         protected override Size GetSize() { return ElementType.Size * _count; }

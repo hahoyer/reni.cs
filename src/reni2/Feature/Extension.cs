@@ -63,7 +63,7 @@ namespace Reni.Feature
 
             if (feature.Simple != null)
             {
-                Tracer.Assert(feature.Function == null || !feature.Function.IsImplicit, feature.Dump);
+                Tracer.Assert(feature.Function == null || !feature.Function.IsImplicit, ()=>"Ambiguity: Simple or ImplicitFunction? "+ feature.Dump());
                 return;
             }
 

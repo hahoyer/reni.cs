@@ -34,7 +34,7 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionBodyType : TypeBase, IFunctionFeature
+    sealed class FunctionBodyType : TypeBase, IFeature, IFunctionFeature, ISimpleFeature
     {
         [EnableDump]
         readonly Structure _structure;
@@ -46,7 +46,7 @@ namespace Reni.Struct
         {
             _structure = structure;
             _syntax = syntax;
-            _objectReferenceCache = new SimpleCache<IContextReference>(()=>new ContextReference());
+            _objectReferenceCache = new SimpleCache<IContextReference>(() => new ContextReference());
         }
 
         sealed class ContextReference : ReniObject, IContextReference
@@ -94,5 +94,13 @@ namespace Reni.Struct
             }
         }
         FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return this; } }
+        ISimpleFeature IFeature.Simple { get { return this; } }
+        Result ISimpleFeature.Result(Category category)
+        {
+            NotImplementedMethod(category);
+            return null;
+        }
     }
 }

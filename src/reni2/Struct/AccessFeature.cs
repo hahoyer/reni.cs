@@ -89,6 +89,6 @@ namespace Reni.Struct
             }
         }
 
-        ISimpleFeature IFeature.Simple { get { return Statement is FunctionSyntax ? null : this; } }
+        ISimpleFeature IFeature.Simple { get { return this; } }
     }
 }

@@ -299,7 +299,7 @@ namespace Reni.Type
         internal bool IsWeakReference { get { return ReferenceType != null && ReferenceType.IsWeak; } }
 
         [DisableDump]
-        internal virtual IFeature Feature { get { return null; } }
+        internal virtual IFeature Feature { get { return this as IFeature; } }
 
         [DisableDump]
         protected virtual ISearchTarget ConversionProvider { get { return this; } }
