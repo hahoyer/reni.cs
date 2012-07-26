@@ -28,7 +28,6 @@ using HWClassLibrary.UnitTest;
 using Reni.FeatureTest.Array;
 using Reni.FeatureTest.Function;
 using Reni.FeatureTest.Integer;
-using Reni.FeatureTest.Enumeration;
 using Reni.FeatureTest.Text;
 using Reni.FeatureTest.TypeType;
 
@@ -46,6 +45,8 @@ systemdata:
     FreePointer: reference Memory;
 };
 
+repeat: arg() while then repeat(arg)/\;
+
 system:
 {
     MaxNumber8: '7f' to_number_of_base 16 /!\ ;
@@ -54,12 +55,14 @@ system:
     MaxNumber64: '7fffffffffffffff' to_number_of_base 16 /!\ ;
 
     TextItemType: text_item(MaxNumber8) type /!\ ;
-    
+
     NewMemory: 
     {
         result: (arg elementType * MaxNumber32) reference (systemdata FreePointer enable_raw_conversion),
         initializer: arg initializer,
-        (arg length) enumeration foreach(result(arg) := initializer(arg) /\),
+        length: arg length,
+        position: 0,
+        repeat((while: position < length, result(position) := initializer(position), position :+ 1) /\),
         systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
     } result /\
 }/!\ ;
@@ -96,7 +99,7 @@ Text:
     [SequenceOfType]
     [DefaultInitialized]
     [FunctionVariable]
-    [Simple]
+    [Repeater]
     //[LowPriority]
     public sealed class Text1 : TextStruct
     {

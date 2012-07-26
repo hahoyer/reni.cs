@@ -131,7 +131,6 @@ namespace Reni.ReniParser
                 {"else", new ElseToken()},
                 {"enable_cut", new EnableCut()},
                 {"enable_raw_conversion", new EnableRawConversion()},
-                {"enumeration", new EnumerationToken()},
                 {"function_instance", new FunctionInstanceToken()},
                 {"instance", new InstanceToken()},
                 {"new_value", new NewValueToken()},

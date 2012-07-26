@@ -39,7 +39,6 @@
     <Compile Include="FeatureTest\Array\ElementAccess.cs" />
     <Compile Include="FeatureTest\Array\FromTypeAndFunction.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
-    <Compile Include="FeatureTest\Enumeration\Simple.cs" />
     <Compile Include="FeatureTest\Function\ConstantFunction.cs" />
     <Compile Include="FeatureTest\Function\Function.cs" />
     <Compile Include="FeatureTest\Function\FunctionInstanceContext.cs" />
@@ -56,6 +55,7 @@
     <Compile Include="FeatureTest\Function\PrimitiveRecursiveFunctionSmall.cs" />
     <Compile Include="FeatureTest\Function\PrimitiveRecursiveFunctionWithDump.cs" />
     <Compile Include="FeatureTest\Function\RecursiveFunction.cs" />
+    <Compile Include="FeatureTest\Function\Repeater.cs" />
     <Compile Include="FeatureTest\Function\SimpleFunction.cs" />
     <Compile Include="FeatureTest\Function\SimpleFunctionWithNonLocal.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
@@ -271,7 +271,6 @@
     <Compile Include="TokenClasses\ElseToken.cs" />
     <Compile Include="TokenClasses\EnableCut.cs" />
     <Compile Include="TokenClasses\EnableRawConversion.cs" />
-    <Compile Include="TokenClasses\EnumerationToken.cs" />
     <Compile Include="TokenClasses\Function.cs" />
     <Compile Include="TokenClasses\FunctionSyntax.cs" />
     <Compile Include="TokenClasses\InstanceToken.cs" />

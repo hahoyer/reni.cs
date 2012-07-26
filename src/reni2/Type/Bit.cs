@@ -27,7 +27,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Sequence;
 
 namespace Reni.Type
 {
@@ -59,12 +58,6 @@ namespace Reni.Type
             return objectType
                 .Pair(argsType).ArgCode
                 .BitSequenceOperation(token, size, Size.Create(objectBits).ByteAlignedSize);
-        }
-        
-        internal Result Enumeration(Category category, SequenceType sequenceType, Array array)
-        {
-            NotImplementedMethod(category, sequenceType, array);
-            return null;
         }
     }
 }

@@ -27,16 +27,28 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class ArgToken : Terminal
+    sealed class ArgToken : NonSuffix
     {
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
             return context
                 .FindRecentFunctionContextObject
                 .CreateArgReferenceResult(category);
+        }
+        public override Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right)
+        {
+            var argTokenResult = Result(context, category.Typed, token);
+            var rightResult = right.SmartReferenceResult(context, category.Typed);
+            var feature = argTokenResult.Type.Feature;
+            return feature
+                .Function
+                .ApplyResult(category, rightResult.Type)
+                .ReplaceArg(rightResult) 
+                & category;
         }
     }
 }

@@ -20,18 +20,25 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 
-namespace Reni.FeatureTest.Enumeration
+namespace Reni.FeatureTest.Function
 {
     [TestFixture]
-    [Target(@"5 enumeration array dump_print")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(0, 1, 2, 3, 4))")]
-    public sealed class Simple : CompilerTest
+    [Target(@"
+repeat: arg() while then repeat(arg)/\;
+
+count: 10,
+index: count type instance(0),
+repeat((while: index < count, index dump_print, ' ' dump_print, index := (index + 1)enable_cut) /\)
+")]
+    [Output("0 1 2 3 4 5 6 7 8 9 ")]
+    [Function]
+    public sealed class Repeater : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }

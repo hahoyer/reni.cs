@@ -62,10 +62,24 @@ namespace Reni.TokenClasses
         public abstract Result Result(ContextBase context, Category category, CompileSyntax left);
     }
 
+    abstract class NonSuffix : Special, ITerminal, IPrefix
+    {
+        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            left.AssertIsNull();
+            if (right == null)
+                return new TerminalSyntax(token, this);
+            return new PrefixSyntax(token, this, right.CheckedToCompiledSyntax());
+        }
+
+        public abstract Result Result(ContextBase context, Category category, TokenData token);
+        public abstract Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
+    }
+
     [Serializable]
     abstract class Prefix : Special, IPrefix
     {
-        public abstract Result Result(ContextBase context, Category category, CompileSyntax right);
+        public abstract Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
 
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
