@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,24 +18,28 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Parser;
+using Reni.ReniParser;
 
 namespace Reni.Syntax
 {
-    sealed class LeftParenthesis : ReniParser.ParsedSyntax
+    sealed class LeftParenthesis : ParsedSyntax
     {
         readonly int _leftLevel;
-        readonly ReniParser.ParsedSyntax _left;
-        readonly TokenClasses.LeftParenthesis _parenthesis;
-
         [EnableDump]
-        readonly ReniParser.ParsedSyntax _right;
+        readonly ParsedSyntax _left;
+        [EnableDump]
+        readonly TokenClasses.LeftParenthesis _parenthesis;
+        [EnableDump]
+        readonly ParsedSyntax _right;
 
-        public LeftParenthesis(int leftLevel, ReniParser.ParsedSyntax left, TokenClasses.LeftParenthesis parenthesis, TokenData token, ReniParser.ParsedSyntax right)
+        public LeftParenthesis(int leftLevel, ParsedSyntax left, TokenClasses.LeftParenthesis parenthesis, TokenData token, ParsedSyntax right)
             : base(token)
         {
             _leftLevel = leftLevel;
@@ -56,17 +61,18 @@ namespace Reni.Syntax
             return base.GetLastToken();
         }
 
-        internal override ReniParser.ParsedSyntax RightParenthesis(int level, TokenData token)
+        internal override ParsedSyntax RightParenthesis(int level, TokenData token)
         {
             if(level != _leftLevel)
                 throw new ParenthesisMissmatchException(this, level, token);
             var surroundedByParenthesis = SurroundedByParenthesis(token);
             if(_left == null)
                 return surroundedByParenthesis;
+            Tracer.Assert(_right != null, () => Dump() + "\ntoken=" + token.Dump());
             return new InfixSyntax(token, _left.ToCompiledSyntax(), _parenthesis, _right.ToCompiledSyntax());
         }
 
-        ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData token) { return _right == null ? new EmptyList(Token, token) : _right.SurroundedByParenthesis(Token, token); }
+        ParsedSyntax SurroundedByParenthesis(TokenData token) { return _right == null ? new EmptyList(Token, token) : _right.SurroundedByParenthesis(Token, token); }
 
         sealed class ParenthesisMissmatchException : Exception
         {

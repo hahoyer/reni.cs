@@ -33,6 +33,7 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.Sequence;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -203,7 +204,7 @@ namespace Reni.Type
         internal ReferenceType UniqueReference(int count) { return _cache.Reference.Value(count); }
         internal Array UniqueArray(int count) { return _cache.Array.Value(count); }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair.Value(this); }
-        internal static TypeBase UniqueNumber(int bitCount) { return Bit.UniqueArray(bitCount).UniqueSequence; }
+        internal static SequenceType UniqueNumber(int bitCount) { return Bit.UniqueArray(bitCount).UniqueSequence; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
         internal static Result VoidResult(Category category) { return Void.Result(category); }

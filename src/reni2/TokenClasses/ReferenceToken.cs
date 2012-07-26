@@ -61,7 +61,7 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        Result IPrefix.Result(ContextBase context, Category category, CompileSyntax right)
+        Result IPrefix.Result(ContextBase context, Category category, TokenData token, CompileSyntax right)
         {
             var rightType = right.Type(context).TypeForTypeOperator;
             return rightType.CreateReference(context, category, right);

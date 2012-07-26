@@ -40,7 +40,7 @@ namespace Reni.Struct
             Index = index;
             IsGetter = isGetter;
         }
-
+        public override string ToString() { return Dump(); }
         protected override string Dump(bool isRecursive) { return Index + "." + (IsGetter ? "get" : "set"); }
     }
 }

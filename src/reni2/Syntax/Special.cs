@@ -77,7 +77,7 @@ namespace Reni.Syntax
         internal override Result ObtainResult(ContextBase context, Category category)
         {
             return _prefix
-                .Result(context, category, _right);
+                .Result(context, category, Token, _right);
         }
 
         internal override string DumpShort() { return base.DumpShort() + "(" + _right.DumpShort() + ")"; }
@@ -165,7 +165,7 @@ namespace Reni.Syntax
 
     interface IPrefix
     {
-        Result Result(ContextBase context, Category category, CompileSyntax right);
+        Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
     }
 
     interface IInfix
