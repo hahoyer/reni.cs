@@ -85,7 +85,14 @@ namespace Reni
         internal ParsedSyntax Syntax { get { return _syntax.Value; } }
 
         [DisableDump]
-        internal string ExecutedCode { get { return _executedCode.Value; } }
+        internal string ExecutedCode
+        {
+            get
+            {
+                EnsureContainer();
+                return _executedCode.Value;
+            }
+        }
 
         [Node]
         [DisableDump]
@@ -122,7 +129,7 @@ namespace Reni
 
         CodeBase IExecutionContext.Function(FunctionId functionId)
         {
-            var item = _functionContainers.Value(functionId.Index);
+            var item = _functionContainers[functionId.Index];
             var container = functionId.IsGetter ? item.Getter : item.Setter;
             return container.Data;
         }
@@ -167,7 +174,7 @@ namespace Reni
             {
                 Tracer.FlaggedLine("main\n" + MainContainer.Dump());
                 for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + _functionContainers.Value(i).Dump());
+                    Tracer.FlaggedLine("function index=" + i + "\n" + _functionContainers[i].Dump());
             }
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(ExecutedCode);
@@ -175,7 +182,7 @@ namespace Reni
             Data.OutStream = _parameters.OutStream;
             try
             {
-                EnsureFunctionContainers();
+                EnsureContainer();
                 var assembly = Generator.CreateCSharpAssembly(MainContainer, _functionContainers, false, _parameters.Trace.GeneratorFilePosn, "Reni");
                 var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
                 methodInfo.Invoke(null, new object[0]);
@@ -188,10 +195,11 @@ namespace Reni
             Data.OutStream = null;
         }
 
-        void EnsureFunctionContainers()
+        void EnsureContainer()
         {
+            _mainContainer.Ensure();
             for(var i = 0; i < Functions.Count; i++)
-                _functionContainers.Value(i);
+                _functionContainers.Ensure(i);
         }
 
         void RunFromCode() { Code.Execute(this); }

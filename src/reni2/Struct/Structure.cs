@@ -131,11 +131,11 @@ namespace Reni.Struct
             public RecursionWhileObtainingStructSizeException(Structure structure) { _structure = structure; }
         }
 
-        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) { return _functionBodyTypeCache.Value(syntax); }
+        internal TypeBase UniqueFunctionalType(FunctionSyntax syntax) { return _functionBodyTypeCache[syntax]; }
 
-        TypeBase UniqueAccessType(int position) { return _accessTypesCache.Value(position); }
-        internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache.Value(position); }
-        FieldAccessType UniqueFieldAccessType(int position) { return _fieldAccessTypeCache.Value(position); }
+        TypeBase UniqueAccessType(int position) { return _accessTypesCache[position]; }
+        internal AccessFeature UniqueAccessFeature(int position) { return _accessFeaturesCache[position]; }
+        FieldAccessType UniqueFieldAccessType(int position) { return _fieldAccessTypeCache[position]; }
 
         TypeBase ObtainAccessType(int position)
         {

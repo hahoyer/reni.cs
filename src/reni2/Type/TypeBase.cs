@@ -160,7 +160,7 @@ namespace Reni.Type
         internal virtual IReferenceType UniqueReferenceType { get { return _cache.Pointer.Value; } }
 
         [DisableDump]
-        internal virtual ReferenceType SmartReference { get { return _cache.Reference.Value(1); } }
+        internal virtual ReferenceType SmartReference { get { return _cache.Reference[1]; } }
         [DisableDump]
         internal virtual TypeBase TypeForTypeOperator { get { return this; } }
 
@@ -197,13 +197,13 @@ namespace Reni.Type
                 var alignBits = Root.DefaultRefAlignParam.AlignBits;
                 if(Size.Align(alignBits) == Size)
                     return this;
-                return _cache.Aligner.Value(alignBits);
+                return _cache.Aligner[alignBits];
             }
         }
 
-        internal ReferenceType UniqueReference(int count) { return _cache.Reference.Value(count); }
-        internal Array UniqueArray(int count) { return _cache.Array.Value(count); }
-        protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair.Value(this); }
+        internal ReferenceType UniqueReference(int count) { return _cache.Reference[count]; }
+        internal Array UniqueArray(int count) { return _cache.Array[count]; }
+        protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair[this]; }
         internal static SequenceType UniqueNumber(int bitCount) { return Bit.UniqueArray(bitCount).UniqueSequence; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
         static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }

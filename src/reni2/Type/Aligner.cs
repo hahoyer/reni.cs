@@ -41,7 +41,7 @@ namespace Reni.Type
             : base(target)
         {
             _alignBits = alignBits;
-            StopByObjectId(9);
+            StopByObjectId(-9);
         }
 
         [DisableDump]

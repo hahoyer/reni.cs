@@ -21,7 +21,7 @@ namespace Reni.Code.ReplaceVisitor
         internal override CodeBase BitArray(BitArray visitedObject) { return null; }
         internal override CodeBase Default(CodeBase codeBase) { return null; }
 
-        internal override CodeBase LocalReference(LocalReference visitedObject) { return _internalRefs.Value(visitedObject); }
+        internal override CodeBase LocalReference(LocalReference visitedObject) { return _internalRefs[visitedObject]; }
 
         protected override CodeBase List(List visitedObject, IEnumerable<CodeBase> newList)
         {

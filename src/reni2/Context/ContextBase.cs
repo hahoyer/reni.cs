@@ -75,25 +75,25 @@ namespace Reni.Context
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts.Value(container).Value(position); }
+        internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts[container][position]; }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
         internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
-        internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures.Value(container).Value(accessPosition); }
-        internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects.Value(context); }
+        internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
+        internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects[context]; }
 
         internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search("context"); }
 
         //[DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
-            var cacheItem = _cache.ResultCache.Value(syntax);
+            var cacheItem = _cache.ResultCache[syntax];
             cacheItem.Update(category);
             var result = cacheItem.Data & category;
             Tracer.Assert(category == result.CompleteCategory);
             return result;
         }
 
-        internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache.Value(syntax).Data & category; }
+        internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache[syntax].Data & category; }
 
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
@@ -153,8 +153,7 @@ namespace Reni.Context
         internal Category PendingCategory(CompileSyntax syntax)
         {
             return _cache
-                .ResultCache
-                .Value(syntax)
+                .ResultCache[syntax]
                 .Data
                 .PendingCategory;
         }
@@ -204,7 +203,7 @@ namespace Reni.Context
                 Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(
                     container =>
                     new DictionaryEx<int, Structure>(
-                        position => new Structure(ContainerContextObjects.Value(container), position)));
+                        position => new Structure(ContainerContextObjects[container], position)));
                 ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>(container => new ContainerContextObject(container, target));
             }
 

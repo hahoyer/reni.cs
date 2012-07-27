@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +28,7 @@ using HWClassLibrary.Helper;
 
 namespace Reni
 {
-    public class T4Compiler
+    public sealed class T4Compiler
     {
         readonly string _text;
         readonly string _className;

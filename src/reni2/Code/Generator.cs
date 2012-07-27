@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -42,10 +41,7 @@ namespace Reni.Code
         internal static string MainFunctionName { get { return "MainFunction"; } }
         internal static string FunctionName(FunctionId functionId) { return (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index; }
 
-        internal static string CreateCSharpString(Container main, DictionaryEx<int, FunctionContainer> functions, bool useStatementAligner, string className)
-        {
-            return new CSharp_Generated(className, main, functions).TransformText(useStatementAligner);
-        }
+        internal static string CreateCSharpString(Container main, DictionaryEx<int, FunctionContainer> functions, bool useStatementAligner, string className) { return new CSharp_Generated(className, main, functions).TransformText(useStatementAligner); }
         internal static Assembly CreateCSharpAssembly(Container main, DictionaryEx<int, FunctionContainer> functions, bool align, bool traceFilePosn, string className) { return CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn); }
 
         static void CodeToFile(string name, string result, bool traceFilePosn)
@@ -71,18 +67,18 @@ namespace Reni.Code
 
             // Build the parameters for source compilation.
             var cp = new System.CodeDom.Compiler.CompilerParameters
-                     {
-                         GenerateInMemory = true,
-                         CompilerOptions = "/unsafe /debug",
-                         IncludeDebugInformation = true,
-                         TempFiles = new TempFileCollection(null, true)
-                     };
+            {
+                GenerateInMemory = true,
+                CompilerOptions = "/unsafe /debug",
+                IncludeDebugInformation = true,
+                TempFiles = new TempFileCollection(null, true)
+            };
             var referencedAssemblies
                 = new[]
-                  {
-                      Assembly.GetAssembly(typeof(Generator)).Location,
-                      Assembly.GetAssembly(typeof(HWClassLibrary.IO.File)).Location,
-                  };
+                {
+                    Assembly.GetAssembly(typeof(Generator)).Location,
+                    Assembly.GetAssembly(typeof(HWClassLibrary.IO.File)).Location,
+                };
             cp.ReferencedAssemblies.AddRange(referencedAssemblies);
             var cr = _provider.CompileAssemblyFromFile(cp, name);
 
@@ -124,10 +120,6 @@ namespace Reni.Code
             _functions = functions;
         }
 
-        internal string TransformText(bool useStatementAligner)
-        {
-            var result = TransformText();
-            return result;
-        }
+        internal string TransformText(bool useStatementAligner) { return TransformText(); }
     }
 }

@@ -145,7 +145,7 @@ namespace Reni.Sequence
             return result;
         }
 
-        internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache.Value(refAlignParam); }
+        internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache[refAlignParam]; }
 
         Result FlatConversion(Category category, SequenceType source)
         {
