@@ -42,6 +42,7 @@
     <Compile Include="FeatureTest\Function\ConstantFunction.cs" />
     <Compile Include="FeatureTest\Function\Function.cs" />
     <Compile Include="FeatureTest\Function\FunctionInstanceContext.cs" />
+    <Compile Include="FeatureTest\Function\FunctionOfFunction.cs" />
     <Compile Include="FeatureTest\Function\FunctionVariable.cs" />
     <Compile Include="FeatureTest\Function\FunctionWithNonLocal.cs" />
     <Compile Include="FeatureTest\Function\FunctionWithRefArg.cs" />
@@ -348,6 +349,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="FeatureTest\Enumeration\" />
   </ItemGroup>
   <Import Project="sys.targets" />
 </Project>

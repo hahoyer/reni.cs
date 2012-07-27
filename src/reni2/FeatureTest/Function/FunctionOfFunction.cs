@@ -25,37 +25,15 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
-using Reni.FeatureTest.DefaultOperations;
-using Reni.FeatureTest.Structure;
-using Reni.FeatureTest.ThenElse;
-using Reni.FeatureTest.TypeType;
 
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
-    [Target(@"
-repeat: arg() while then repeat(arg)/\;
-
-count: 10,
-index: count type instance(0),
-repeat
-(
-    (
-        while: index < count, 
-        index dump_print, 
-        ' ' dump_print, 
-        index := (index + 1)enable_cut
-    ) /\
-)
-")]
-    [Output("0 1 2 3 4 5 6 7 8 9 ")]
-    [Equal]
-    [Assignments]
-    [TypeOperator]
-    [BitArrayOp.BitArrayOp]
-    [UseThen]
-    [FunctionOfFunction]
-    public sealed class Repeater : CompilerTest
+    [TargetSet(@"f: arg()/\; x: 1; f(x/\) dump_print", "1")]
+    [Function]
+    [TwoFunctions]
+    [SimpleFunctionWithNonLocal]
+    public sealed class FunctionOfFunction : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
