@@ -36,12 +36,10 @@ namespace Reni.Sequence
 {
     [Serializable]
     sealed class SequenceType
-        : TagChild<Type.Array>
+        : TagChild<ArrayType>
           , ISearchPath<ISuffixFeature, SequenceType>
           , ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>
     {
-        [DisableDump]
-        internal readonly ISuffixFeature BitDumpPrintFeature;
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
         internal Result EnableCutFeature(Category category)
@@ -54,10 +52,9 @@ namespace Reni.Sequence
                 );
         }
 
-        public SequenceType(Type.Array parent)
+        public SequenceType(ArrayType parent)
             : base(parent)
         {
-            BitDumpPrintFeature = new BitSequenceFeatureClass(this);
             _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>
                 (refAlignParam => new ObjectReference(this, refAlignParam));
             StopByObjectId(-172);
@@ -107,7 +104,7 @@ namespace Reni.Sequence
                 Dump("result", result);
                 BreakExecution();
 
-                var type = (Type.Array) result.Type;
+                var type = (ArrayType) result.Type;
                 return ReturnMethodDump(type.UniqueSequence.Result(category, result));
             }
             finally

@@ -50,10 +50,8 @@ namespace Reni.Type
     {
         sealed class Cache
         {
-            public static readonly Bit Bit = new Bit();
-            public static readonly Void Void = new Void();
             public readonly DictionaryEx<int, Aligner> Aligner;
-            public readonly DictionaryEx<int, Array> Array;
+            public readonly DictionaryEx<int, ArrayType> Array;
             public readonly DictionaryEx<TypeBase, Pair> Pair;
             public readonly SimpleCache<IReferenceType> Pointer;
             public readonly DictionaryEx<int, ReferenceType> Reference;
@@ -68,7 +66,7 @@ namespace Reni.Type
                 Pointer = new SimpleCache<IReferenceType>(parent.ObtainPointer);
                 Reference = new DictionaryEx<int, ReferenceType>(parent.ObtainReference);
                 Pair = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
-                Array = new DictionaryEx<int, Array>(parent.ObtainArray);
+                Array = new DictionaryEx<int, ArrayType>(parent.ObtainArray);
                 Aligner = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
                 FunctionInstanceType = new SimpleCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
@@ -78,15 +76,17 @@ namespace Reni.Type
 
         static int _nextObjectId;
         readonly Cache _cache;
+        [DisableDump]
+        internal abstract Root RootContext { get; }
 
         [UsedImplicitly]
         static ReniObject _lastSearchVisitor;
 
         protected TypeBase()
-            : base(_nextObjectId++) { _cache = new Cache(this); }
-
-        internal static Void Void { get { return Cache.Void; } }
-        internal static TypeBase Bit { get { return Cache.Bit; } }
+            : base(_nextObjectId++)
+        {
+            _cache = new Cache(this);
+        }
 
         [Node]
         internal Size Size
@@ -201,13 +201,12 @@ namespace Reni.Type
             }
         }
 
+        Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.CodeArgs)); }
+
         internal ReferenceType UniqueReference(int count) { return _cache.Reference[count]; }
-        internal Array UniqueArray(int count) { return _cache.Array[count]; }
+        internal ArrayType UniqueArray(int count) { return _cache.Array[count]; }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair[this]; }
-        internal static SequenceType UniqueNumber(int bitCount) { return Bit.UniqueArray(bitCount).UniqueSequence; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
-        static Result VoidCodeAndRefs(Category category) { return VoidResult(category & (Category.Code | Category.CodeArgs)); }
-        internal static Result VoidResult(Category category) { return Void.Result(category); }
         internal virtual Result Destructor(Category category) { return VoidCodeAndRefs(category); }
         internal virtual Result ArrayDestructor(Category category, int count) { return VoidCodeAndRefs(category); }
         internal virtual Result Copier(Category category) { return VoidCodeAndRefs(category); }
@@ -263,7 +262,7 @@ namespace Reni.Type
 
         Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
 
-        internal Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, Bit).Align(BitsConst.SegmentAlignBits); }
+        internal Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, BitType).Align(BitsConst.SegmentAlignBits); }
 
         /// <summary>
         ///     Gets the icon key.
@@ -308,6 +307,10 @@ namespace Reni.Type
         internal virtual bool HasQuickSize { get { return true; } }
         [DisableDump]
         internal virtual TypeBase CoreType { get { return this; } }
+        [DisableDump]
+        internal VoidType VoidType { get { return RootContext.VoidType; } }
+        [DisableDump]
+        internal BitType BitType { get { return RootContext.BitType; } }
 
         TypeBase CreateSequenceType(TypeBase elementType)
         {
@@ -415,7 +418,7 @@ namespace Reni.Type
 
         ReferenceType ObtainReference(int count) { return new ReferenceType(AutomaticDereferenceType, count); }
 
-        protected virtual Array ObtainArray(int count) { return new Array(this, count); }
+        protected virtual ArrayType ObtainArray(int count) { return new ArrayType(this, count); }
 
         internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
         {
@@ -548,7 +551,7 @@ namespace Reni.Type
 
         internal Result DumpPrintTypeNameResult(Category category)
         {
-            return Void
+            return VoidType
                 .Result
                 (category
                  , () => CodeBase.DumpPrintText(DumpPrintText)
@@ -585,12 +588,6 @@ namespace Reni.Type
                  , UniquePointer.ArgResult(category.Typed));
         }
 
-        internal static Result Result(Category category, BitsConst bitsConst)
-        {
-            return UniqueNumber(bitsConst.Size.ToInt())
-                .Result(category, getCode: () => CodeBase.BitsConst(bitsConst));
-        }
-
         internal virtual Result InstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             NotImplementedMethod(category, getRightResult(Category.All));
@@ -605,6 +602,15 @@ namespace Reni.Type
             var targetResult = target.SmartReferenceResult(context, category.Typed);
             var convertedResult = targetResult.Conversion(SmartReference);
             return rawResult.ReplaceArg(convertedResult);
+        }
+
+        internal CodeBase DumpPrintNumber()
+        {
+            var alignedSize = Size.Align(Root.DefaultRefAlignParam.AlignBits);
+            return UniquePointer
+                .ArgCode
+                .Dereference(alignedSize)
+                .DumpPrintNumber(alignedSize);
         }
     }
 

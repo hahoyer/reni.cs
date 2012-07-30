@@ -27,6 +27,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 
 namespace Reni.Type
 {
@@ -45,6 +46,7 @@ namespace Reni.Type
                 return null;
             }
         }
+        internal override Root RootContext { get { return _objectType.RootContext; } }
 
         internal override string DumpShort() { return _objectType.DumpShort() + " type"; }
         

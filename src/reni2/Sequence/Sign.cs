@@ -33,10 +33,10 @@ namespace Reni.Sequence
 {
     sealed class Sign :
         SequenceOfBitOperation,
-        ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.Array>, Bit>,
+        ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>,
         ISequenceOfBitPrefixOperation
     {
-        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.Array> ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.Array>, Bit>.Convert(Bit type) { return new OperationPrefixFeature(type, this); }
+        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType> ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>.Convert(BitType type) { return new OperationPrefixFeature(type, this); }
 
         [DisableDump]
         string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }

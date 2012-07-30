@@ -277,7 +277,7 @@ namespace Reni.Struct
                 Dump("results", results);
                 BreakExecution();
                 var result = results
-                    .Aggregate(TypeBase.VoidResult(category), (current, next) => current + next);
+                    .Aggregate(parent.RootContext.VoidResult(category), (current, next) => current + next);
                 return ReturnMethodDump(result);
             }
             finally

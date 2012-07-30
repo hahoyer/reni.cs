@@ -53,7 +53,7 @@ namespace Reni.Struct
         internal RefAlignParam RefAlignParam { get { return Parent.RefAlignParam; } }
 
         [DisableDump]
-        internal TypeBase IndexType { get { return TypeBase.UniqueNumber(IndexSize.ToInt()); } }
+        internal TypeBase IndexType { get { return _parent.RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
 
         [DisableDump]
         internal Root RootContext { get { return Parent.RootContext; } }

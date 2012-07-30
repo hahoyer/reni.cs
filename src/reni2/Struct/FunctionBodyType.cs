@@ -46,16 +46,18 @@ namespace Reni.Struct
         {
             _structure = structure;
             _syntax = syntax;
-            _objectReferenceCache = new SimpleCache<IContextReference>(() => new ContextReference());
+            _objectReferenceCache = new SimpleCache<IContextReference>(() => new ContextReference(ObjectId));
         }
 
         sealed class ContextReference : ReniObject, IContextReference
         {
+            public ContextReference(int objectId):base(objectId) { }
             public Size Size { get { return Root.DefaultRefAlignParam.RefSize; } }
         }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _structure; } }
+        internal override Root RootContext { get { return _structure.RootContext; } }
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
         [DisableDump]
@@ -71,10 +73,11 @@ namespace Reni.Struct
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var trace = ObjectId == -23 && argsType.ObjectId == 1 && category.HasCode;
+            var trace = ObjectId > -23 && category.HasCode;
             StartMethodDump(trace, category, argsType);
             try
             {
+                BreakExecution();
                 var applyResult = Function(argsType).ApplyResult(category);
                 Dump("applyResult", applyResult);
                 BreakExecution();

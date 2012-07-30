@@ -6,12 +6,12 @@ using Reni.Sequence;
 
 namespace Reni.Type
 {
-    internal sealed class TextItemsType : TagChild<Array>
+    internal sealed class TextItemsType : TagChild<ArrayType>
     {
         [DisableDump]
         public readonly ISuffixFeature ToNumberOfBaseFeature;
 
-        public TextItemsType(Array parent)
+        public TextItemsType(ArrayType parent)
             : base(parent)
         {
             ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this);
@@ -39,7 +39,7 @@ namespace Reni.Type
                 Dump("result", result);
                 BreakExecution();
 
-                var type = (Array) result.Type;
+                var type = (ArrayType) result.Type;
                 return ReturnMethodDump(type.UniqueTextItemsType.Result(category, result));
             }
             finally
@@ -50,7 +50,8 @@ namespace Reni.Type
 
         internal Result DumpPrintTextResult(Category category)
         {
-            return Void.Result
+            return VoidType
+                .Result
                 (category
                  , DumpPrintCode
                  , CodeArgs.Arg

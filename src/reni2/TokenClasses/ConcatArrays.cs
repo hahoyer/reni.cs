@@ -34,13 +34,13 @@ namespace Reni.TokenClasses
     sealed class ConcatArrays :
         Defineable
         , ISearchPath<IPrefixFeature, TypeBase>
-        , ISearchPath<ISuffixFeature, Type.Array>
+        , ISearchPath<ISuffixFeature, Type.ArrayType>
         , ISearchPath<ISuffixFeature, SequenceType>
         , ISearchPath<ISuffixFeature, TextItemsType>
         , ISearchPath<ISearchPath<IPrefixFeature, PointerType>, TypeBase>
-        , ISearchPath<ISearchPath<ISuffixFeature, PointerType>, Type.Array>
+        , ISearchPath<ISearchPath<ISuffixFeature, PointerType>, Type.ArrayType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.ConcatArrays); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.ArrayType>.Convert(Type.ArrayType type) { return Extension.Feature(type.ConcatArrays); }
         IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return Extension.Feature(type.CreateArray); }
         ISearchPath<IPrefixFeature, PointerType>
             ISearchPath<ISearchPath<IPrefixFeature, PointerType>, TypeBase>.Convert(TypeBase type)
@@ -49,7 +49,7 @@ namespace Reni.TokenClasses
                 Extension.Feature<PointerType>(type.ConcatArrayFromReference);
         }
         ISearchPath<ISuffixFeature, PointerType>
-            ISearchPath<ISearchPath<ISuffixFeature, PointerType>, Type.Array>.Convert(Type.Array type)
+            ISearchPath<ISearchPath<ISuffixFeature, PointerType>, Type.ArrayType>.Convert(Type.ArrayType type)
         {
             return
                 Extension.Feature<PointerType>(type.ConcatArraysFromReference);

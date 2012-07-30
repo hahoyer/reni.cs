@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Basics;
+using Reni.Context;
 
 namespace Reni.Type
 {
@@ -38,11 +39,15 @@ namespace Reni.Type
 
         internal Pair(TypeBase first, TypeBase second)
         {
+            Tracer.Assert(first.RootContext == second.RootContext);
             _first = first;
             _second = second;
         }
 
+        [DisableDump]
         internal override bool IsDataLess { get { return _first.IsDataLess && _second.IsDataLess; } }
+        [DisableDump]
+        internal override Root RootContext { get { return _first.RootContext; } }
         protected override Size GetSize() { return _first.Size + _second.Size; }
 
         [DisableDump]

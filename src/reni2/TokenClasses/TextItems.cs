@@ -30,8 +30,8 @@ namespace Reni.TokenClasses
 {
     sealed class TextItems
         : Defineable
-          , ISearchPath<ISuffixFeature, Type.Array>
+          , ISearchPath<ISuffixFeature, Type.ArrayType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.TextItemsResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.ArrayType>.Convert(Type.ArrayType type) { return Extension.Feature(type.TextItemsResult); }
     }
 }

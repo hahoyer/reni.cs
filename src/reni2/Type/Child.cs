@@ -26,6 +26,7 @@ using HWClassLibrary.Debug;
 using System;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
+using Reni.Context;
 
 namespace Reni.Type
 {
@@ -37,6 +38,8 @@ namespace Reni.Type
 
         protected Child(TParent parent) { _parent = parent; }
 
+        [DisableDump]
+        sealed internal override Root RootContext { get { return _parent.RootContext; } }
         [Node]
         [DisableDump]
         public TParent Parent { get { return _parent; } }

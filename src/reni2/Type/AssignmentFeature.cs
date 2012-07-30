@@ -41,7 +41,7 @@ namespace Reni.Type
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
             if (category == Category.Type)
-                return TypeBase.Void.Result(category);
+                return _target.RootContext.VoidResult(category);
 
             var trace = ObjectId == -1;
             StartMethodDump(trace, category, argsType);
@@ -63,7 +63,7 @@ namespace Reni.Type
                 var resultForArg = destinationResult + sourceResult;
                 Dump("resultForArg", resultForArg);
 
-                var result = TypeBase.Void.Result(category, _target.SetterResult);
+                var result = _target.RootContext.VoidType.Result(category, _target.SetterResult);
                 Dump("result", result);
                 BreakExecution();
 

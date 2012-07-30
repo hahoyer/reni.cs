@@ -35,7 +35,7 @@ namespace Reni.Type
           , IProxyType
           , IConverter
           , IReferenceType
-          , ISearchPath<ISuffixFeature, Array>
+          , ISearchPath<ISuffixFeature, ArrayType>
     {
         readonly TypeBase _elementType;
         readonly int _count;
@@ -61,9 +61,10 @@ namespace Reni.Type
         }
 
         void AssertValid() { Tracer.Assert(!_elementType.IsDataLess); }
+        internal override Root RootContext { get { return _elementType.RootContext; } }
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, Array>.Convert(Array type)
+        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type)
         {
             if(type.ElementType != ElementType)
                 return null;

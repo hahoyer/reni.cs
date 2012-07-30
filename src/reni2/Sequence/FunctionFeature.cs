@@ -44,10 +44,12 @@ namespace Reni.Sequence
         {
             _objectType = objectType;
             _feature = feature;
+            Tracer.Assert(_objectType.Element == _objectType.BitType);
         }
 
         [DisableDump]
         internal override IContextReference ObjectReference { get { return GetObjectReference(); } }
+        internal override Root RootContext { get { return _objectType.RootContext; } }
         [DisableDump]
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         [DisableDump]
@@ -69,7 +71,6 @@ namespace Reni.Sequence
 
         internal override Result ApplyResult(Category category, TypeBase argsType)
         {
-            Tracer.Assert(_objectType.Element == TypeBase.Bit);
             var typedCategory = category.Typed;
             var result = Apply(category, _objectType.Count, argsType.SequenceLength(_objectType.Element));
             var objectResult = GetObjectReference().Result(typedCategory);
@@ -83,7 +84,7 @@ namespace Reni.Sequence
         Result Apply(Category category, int objSize, int argsSize)
         {
             var type = _feature.ResultType(objSize, argsSize);
-            return type.Result(category, () => Bit.BitSequenceOperation(type.Size, _feature.Definable.DataFunctionName, objSize, argsSize), CodeArgs.Arg);
+            return type.Result(category, () => _objectType.BitType.Apply(type.Size, _feature.Definable.DataFunctionName, objSize, argsSize), CodeArgs.Arg);
         }
     }
 }

@@ -63,9 +63,9 @@ namespace Reni
         {
             return Cond
                 .Result(context, category.Typed)
-                .Conversion(TypeBase.Bit)
+                .Conversion(context.RootContext.BitType)
                 .LocalBlock(category.Typed)
-                .ObviousExactConversion(TypeBase.Bit);
+                .ObviousExactConversion(context.RootContext.BitType);
         }
 
         Result ElseResult(ContextBase context, Category category) { return BranchResult(context, category, Else); }

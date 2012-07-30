@@ -39,6 +39,8 @@ namespace Reni.Type
         public TypeType(TypeBase value) { _value = value; }
 
         [DisableDump]
+        internal override Root RootContext { get { return _value.RootContext; } }
+        [DisableDump]
         internal override bool IsDataLess { get { return true; } }
         [DisableDump]
         internal TypeBase Value { get { return _value; } }
@@ -122,7 +124,7 @@ namespace Reni.Type
                 return null;
             }
 
-            return Result(category, BitsConst.Convert(count.Value));
+            return RootContext.BitType.Result(category, BitsConst.Convert(count.Value));
         }
 
     }

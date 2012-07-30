@@ -32,15 +32,15 @@ namespace Reni.Type
 {
     sealed class ArrayAccessType : SetterTargetType
     {
-        readonly Array _array;
+        readonly ArrayType _arrayType;
 
-        internal ArrayAccessType(Array array) { _array = array; }
+        internal ArrayAccessType(ArrayType arrayType) { _arrayType = arrayType; }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
-        internal override TypeBase ValueType { get { return _array.ElementType; } }
+        internal override TypeBase ValueType { get { return _arrayType.ElementType; } }
 
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + _array.IndexSize; }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + _arrayType.IndexSize; }
 
         internal override Result DestinationResult(Category category) { return Result(category, this); }
 
@@ -48,7 +48,7 @@ namespace Reni.Type
         {
             return new Result
                 (category
-                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.ArrayAssignment(ValueType.Size, _array.IndexSize)
+                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.ArrayAssignment(ValueType.Size, _arrayType.IndexSize)
                  , getArgs: CodeArgs.Arg
                 );
         }
@@ -65,6 +65,6 @@ namespace Reni.Type
 
             return pointer.Result(category, codeAndRefs);
         }
-        CodeBase ArrayAccess { get { return ArgCode.ArrayAccess(ValueType.Size, _array.IndexSize); } }
+        CodeBase ArrayAccess { get { return ArgCode.ArrayAccess(ValueType.Size, _arrayType.IndexSize); } }
     }
 }

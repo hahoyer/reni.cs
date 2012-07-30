@@ -36,7 +36,7 @@ namespace Reni.Feature
     {
         protected override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
-            var result = TypeBase.VoidResult(category).Clone();
+            var result = context.RootContext.VoidResult(category).Clone();
             if(category.HasType)
                 result.Type = left
                     .Type(context).TypeForTypeOperator

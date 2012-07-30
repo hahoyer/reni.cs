@@ -229,7 +229,7 @@ namespace Reni.Context
 
                 var rightResult
                     = right == null
-                          ? TypeBase.Void.Result(category.Typed)
+                          ? RootContext.VoidType.Result(category.Typed)
                           : right.SmartUnFunctionedReferenceResult(this, category);
                 Dump("rightResult", rightResult);
 

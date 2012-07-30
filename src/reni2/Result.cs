@@ -55,7 +55,7 @@ namespace Reni
             StopByObjectId(-804);
         }
 
-        internal Result(Category category, Func<bool> getDataLess = null, Func<Size> getSize = null, Func<TypeBase> getType = null, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
+        internal Result(Category category, Func<bool> getDataLess = null, Func<Size> getSize = null, Func<TypeBase> getType = null, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null, Root rootContext = null)
             : this()
         {
             var isDataLess = getDataLess == null ? null : new SimpleCache<bool>(getDataLess);
@@ -65,7 +65,7 @@ namespace Reni
             var codeArgs = getArgs == null ? null : new SimpleCache<CodeArgs>(getArgs);
 
             if(category.HasType)
-                _type = ObtainType(isDataLess, size, type, code);
+                _type = ObtainType(isDataLess, size, type, code, rootContext);
 
             if(category.HasCode)
                 _code = ObtainCode(isDataLess, size, type, code);
@@ -95,7 +95,7 @@ namespace Reni
             return null;
         }
 
-        TypeBase ObtainType(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode)
+        TypeBase ObtainType(SimpleCache<bool> getDataLess, SimpleCache<Size> getSize, SimpleCache<TypeBase> getType, SimpleCache<CodeBase> getCode, Root rootContext)
         {
             if(getType != null)
                 return getType.Value;
@@ -103,7 +103,7 @@ namespace Reni
             var isDataLess = TryObtainIsDataLess(getDataLess, getSize, getType, getCode);
 // ReSharper restore ExpressionIsAlwaysNull
             if(isDataLess == true)
-                return TypeBase.Void;
+                return rootContext.VoidType;
             Tracer.AssertionFailed("Type cannot be determned", ToString);
             return null;
         }
@@ -362,7 +362,7 @@ namespace Reni
             }
         }
 
-        bool IsDirty
+        internal bool IsDirty
         {
             get { return _isDirty; }
             set
@@ -380,7 +380,7 @@ namespace Reni
                     return false;
                 if(HasSize && !Size.IsZero)
                     return false;
-                if(HasType && !(Type is Type.Void))
+                if(HasType && !(Type is Type.VoidType))
                     return false;
                 if(HasCode && !Code.IsEmpty)
                     return false;
@@ -712,34 +712,6 @@ namespace Reni
                 .ReplaceArg(this);
         }
 
-        internal static Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)
-        {
-            var result = TypeBase.VoidResult(category);
-            if(!(category.HasCode || category.HasArgs))
-                return result;
-
-            if(category.HasCode)
-                result.Code = CodeBase.DumpPrintText("(");
-
-            for(var i = 0; i < count; i++)
-            {
-                var elemResult = elemResults(i);
-                result.IsDirty = true;
-                if(category.HasCode)
-                {
-                    if(i > 0)
-                        result.Code = result.Code.Sequence(CodeBase.DumpPrintText(", "));
-                    result.Code = result.Code.Sequence(elemResult.Code);
-                }
-                if(category.HasArgs)
-                    result.CodeArgs = result.CodeArgs.Sequence(elemResult.CodeArgs);
-                result.IsDirty = false;
-            }
-            if(category.HasCode)
-                result.Code = result.Code.Sequence(CodeBase.DumpPrintText(")"));
-            return result;
-        }
-
         [DebuggerHidden]
         public static Result operator &(Result result, Category category) { return result.Filter(category); }
 
@@ -780,7 +752,7 @@ namespace Reni
                 Tracer.Assert(size.IsZero || size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: 0 or RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is Type.Void || Type is PointerType, () => "Expected type: Void or PointerType\n" + Dump());
+                Tracer.Assert(Type is Type.VoidType || Type is PointerType, () => "Expected type: Void or PointerType\n" + Dump());
         }
 
         [DebuggerHidden]

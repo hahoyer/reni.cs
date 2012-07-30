@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Basics;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
@@ -36,29 +35,26 @@ namespace Reni.Feature.DumpPrint
         Defineable,
         ISearchPath<ISuffixFeature, TypeType>,
         ISearchPath<ISuffixFeature, FunctionBodyType>,
-        ISearchPath<ISuffixFeature, Bit>,
-        ISearchPath<ISuffixFeature, Type.Void>,
+        ISearchPath<ISuffixFeature, BitType>,
+        ISearchPath<ISuffixFeature, VoidType>,
         ISearchPath<ISuffixFeature, StructureType>,
-        ISearchPath<ISuffixFeature, Type.Array>,
+        ISearchPath<ISuffixFeature, ArrayType>,
         ISearchPath<ISuffixFeature, TextItemsType>,
         ISearchPath<ISuffixFeature, TextItemType>,
         ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>,
-        ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>, Bit>
+        ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>
     {
-        static readonly BitSequenceFeature _bitSequenceFeature = new BitSequenceFeature();
-        static readonly BitFeature _bitFeature = new BitFeature();
-
         ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.DumpPrintResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, Bit>.Convert(Bit type) { return _bitFeature; }
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.Void>.Convert(Type.Void type) { return Extension.Feature(type.DumpPrintResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, BitType>.Convert(BitType type) { return Extension.Feature(type.DumpPrintResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, VoidType>.Convert(VoidType type) { return Extension.Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType type) { return Extension.Feature(type.DumpPrintResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.DumpPrintResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.DumpPrintResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, TextItemType>.Convert(TextItemType type) { return Extension.Feature(type.DumpPrintTextResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, FunctionBodyType>.Convert(FunctionBodyType type) { return Extension.Feature(type.DumpPrintTextResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.DumpPrintTextResult); }
 
         ISearchPath<ISuffixFeature, PointerType> ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array> ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>, Bit>.Convert(Bit type) { return _bitSequenceFeature; }
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>.Convert(BitType type) { return Extension.Feature<SequenceType, ArrayType> (type.DumpPrintResult); }
 
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
     }

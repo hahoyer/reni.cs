@@ -31,13 +31,13 @@ namespace Reni.TokenClasses
 {
     sealed class SequenceToken
         : Defineable
-          , ISearchPath<ISuffixFeature, Type.Array>
+          , ISearchPath<ISuffixFeature, Type.ArrayType>
           , ISearchPath<ISuffixFeature, TypeType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.Array>.Convert(Type.Array type) { return Extension.Feature(type.SequenceResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, Type.ArrayType>.Convert(Type.ArrayType type) { return Extension.Feature(type.SequenceResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type)
         {
-            var value = type.Value as Type.Array;
+            var value = type.Value as Type.ArrayType;
             return value == null ? null : Extension.Feature(value.SequenceTypeResult);
         }
     }

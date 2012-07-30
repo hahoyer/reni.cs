@@ -8,20 +8,20 @@ namespace Reni.Sequence
     internal sealed class OperationPrefixFeature 
         : ReniObject
         , ISearchPath<IPrefixFeature, SequenceType>
-        , ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Array>
+        , ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>
     {
         [EnableDump]
         private readonly ISequenceOfBitPrefixOperation _definable;
 
-        private readonly Bit _bit;
+        private readonly BitType _bitType;
 
-        public OperationPrefixFeature(Bit bit, ISequenceOfBitPrefixOperation definable)
+        public OperationPrefixFeature(BitType bitType, ISequenceOfBitPrefixOperation definable)
         {
-            _bit = bit;
+            _bitType = bitType;
             _definable = definable;
         }
 
         IPrefixFeature ISearchPath<IPrefixFeature, SequenceType>.Convert(SequenceType type) { return type.PrefixFeature(_definable); }
-        ISearchPath<IPrefixFeature, SequenceType> ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Array>.Convert(Array type) { return this; }
+        ISearchPath<IPrefixFeature, SequenceType> ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>.Convert(ArrayType type) { return this; }
     }
 }

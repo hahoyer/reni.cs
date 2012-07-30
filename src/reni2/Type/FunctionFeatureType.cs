@@ -35,10 +35,7 @@ namespace Reni.Type
     {
         readonly FunctionalFeature _functionalFeature;
 
-        internal FunctionFeatureType(FunctionalFeature functionalFeature)
-        {
-            _functionalFeature = functionalFeature;
-        }
+        internal FunctionFeatureType(FunctionalFeature functionalFeature) { _functionalFeature = functionalFeature; }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
@@ -48,7 +45,8 @@ namespace Reni.Type
         internal override bool IsLambda { get { return true; } }
         [DisableDump]
         IContextReference IFunctionFeature.ObjectReference { get { return _functionalFeature.ObjectReference; } }
-
+        [DisableDump]
+        internal override Root RootContext { get { return _functionalFeature.RootContext; } }
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
         internal override string DumpShort() { return base.DumpShort() + "(" + _functionalFeature.DumpShort() + ")"; }
 

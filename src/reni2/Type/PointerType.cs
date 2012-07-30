@@ -50,6 +50,7 @@ namespace Reni.Type
 
         IConverter IReferenceType.Converter { get { return this; } }
         bool IReferenceType.IsWeak { get { return true; } }
+        internal override Root RootContext { get { return _valueType.RootContext; } }
         IConverter IProxyType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
@@ -98,7 +99,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        protected override Array ObtainArray(int count) { return ValueType.UniqueArray(count); }
+        protected override ArrayType ObtainArray(int count) { return ValueType.UniqueArray(count); }
 
         internal override ISuffixFeature AlignConversion(TypeBase destination)
         {

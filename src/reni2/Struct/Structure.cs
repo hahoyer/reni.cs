@@ -123,6 +123,8 @@ namespace Reni.Struct
 
         [DisableDump]
         internal bool IsDataLess { get { return ContainerContextObject.StructureIsDataLess(EndPosition); } }
+        [DisableDump]
+        internal Root RootContext { get { return ContainerContextObject.RootContext; } }
 
         sealed class RecursionWhileObtainingStructSizeException : Exception
         {
@@ -165,12 +167,10 @@ namespace Reni.Struct
 
         internal Result DumpPrintResultViaContextReference(Category category)
         {
-            return Result
-                .ConcatPrintResult
+            return RootContext.ConcatPrintResult
                 (category
                  , EndPosition
-                 , position => DumpPrintResultViaAccessReference(category, position)
-                );
+                 , position => DumpPrintResultViaAccessReference(category, position));
         }
 
         internal Result AccessViaThisReference(Category category, int position)

@@ -11,7 +11,7 @@ namespace Reni.Sequence
     internal abstract class FeatureBase 
         : ReniObject
         , ISearchPath<ISuffixFeature, SequenceType>
-        , ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>
+        , ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.ArrayType>
     {
         [EnableDump]
         internal readonly ISequenceOfBitBinaryOperation Definable;
@@ -19,7 +19,7 @@ namespace Reni.Sequence
         protected FeatureBase(ISequenceOfBitBinaryOperation definable) { Definable = definable; }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.Feature(this); }
-        ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.Array>.Convert(Type.Array type) { return this; }
+        ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.ArrayType>.Convert(Type.ArrayType type) { return this; }
 
         internal abstract TypeBase ResultType(int objSize, int argsSize);
     }

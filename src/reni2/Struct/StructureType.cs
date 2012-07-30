@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Type;
@@ -50,6 +51,7 @@ namespace Reni.Struct
         [DisableDump]
         internal Structure Structure { get { return _structure; } }
 
+        internal override Root RootContext { get { return _structure.RootContext; } }
         protected override Size GetSize() { return Structure.StructSize; }
 
         internal override string DumpShort() { return "type(" + Structure.DumpShort() + ")"; }

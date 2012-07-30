@@ -34,7 +34,7 @@ namespace Reni.Type
         public TextItemType(TypeBase parent)
             : base(parent)
         {
-            Tracer.Assert(!(parent is Array));
+            Tracer.Assert(!(parent is ArrayType));
             StopByObjectId(-10);
         }
 
@@ -50,7 +50,7 @@ namespace Reni.Type
 
         internal Result DumpPrintTextResult(Category category)
         {
-            return Void.Result
+            return VoidType.Result
                 (category
                  , DumpPrintCode
                  , CodeArgs.Arg

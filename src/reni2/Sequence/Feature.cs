@@ -31,13 +31,16 @@ namespace Reni.Sequence
 {
     sealed class Feature : FeatureBase
     {
-        public Feature(ISequenceOfBitBinaryOperation definable)
-            : base(definable) { }
+        readonly BitType _bitType;
+        public Feature(ISequenceOfBitBinaryOperation definable, BitType bitType)
+            : base(definable)
+        {
+            _bitType = bitType;
+        }
 
         internal override TypeBase ResultType(int objSize, int argsSize)
         {
-            return TypeBase
-                .UniqueNumber(Definable.ResultSize(objSize, argsSize));
+            return _bitType.UniqueNumber(Definable.ResultSize(objSize, argsSize));
         }
     }
 }

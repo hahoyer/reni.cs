@@ -26,7 +26,6 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -100,6 +99,5 @@ namespace Reni.Type
             return ValueType
                 .SmartArrayLength(elementType);
         }
-
     }
 }

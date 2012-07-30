@@ -27,6 +27,7 @@ using System;
 using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 
 namespace Reni.Type
 {
@@ -44,6 +45,8 @@ namespace Reni.Type
 
         [DisableDump]
         internal abstract IContextReference ObjectReference { get; }
+        [DisableDump]
+        internal abstract Root RootContext { get; }
 
         internal TypeBase UniqueFunctionalType() { return _functionalTypesCache.Value; }
 

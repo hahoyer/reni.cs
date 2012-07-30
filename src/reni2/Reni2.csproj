@@ -314,8 +314,8 @@
     <Compile Include="Struct\Container.cs" />
     <Compile Include="ThenElse.cs" />
     <Compile Include="Type\Aligner.cs" />
-    <Compile Include="Type\Array.cs" />
-    <Compile Include="Type\Bit.cs" />
+    <Compile Include="Type\ArrayType.cs" />
+    <Compile Include="Type\BitType.cs" />
     <Compile Include="Type\FunctionFeatureType.cs" />
     <Compile Include="Type\IReference.cs" />
     <Compile Include="Type\Pair.cs" />
@@ -329,7 +329,7 @@
     <Compile Include="Type\ToNumberOfBaseFeature.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
-    <Compile Include="Type\Void.cs" />
+    <Compile Include="Type\VoidType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Code\CSharp_Generated.tt">

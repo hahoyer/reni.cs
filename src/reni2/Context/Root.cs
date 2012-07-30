@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Struct;
@@ -36,13 +37,21 @@ namespace Reni.Context
     {
         [DisableDump]
         readonly FunctionList _functions;
-        [DisableDump] internal readonly IExecutionContext ExecutionContext;
+        [DisableDump]
+        internal readonly IExecutionContext ExecutionContext;
 
+        readonly SimpleCache<BitType> _bitCache;
+        readonly SimpleCache<VoidType> _voidCache;
+
+        internal BitType BitType { get { return _bitCache.Value; } }
+        internal VoidType VoidType { get { return _voidCache.Value; } }
 
         internal Root(FunctionList functions, IExecutionContext executionContext)
         {
             _functions = functions;
             ExecutionContext = executionContext;
+            _bitCache = new SimpleCache<BitType>(() => new BitType(this));
+            _voidCache = new SimpleCache<VoidType>(() => new VoidType(this));
         }
 
         [DisableDump]
@@ -55,6 +64,35 @@ namespace Reni.Context
             var alignedArgsType = argsType.UniqueAlign;
             var functionInstance = _functions.Find(body, structure, alignedArgsType);
             return functionInstance;
+        }
+        internal Result VoidResult(Category category) { return VoidType.Result(category); }
+
+        internal Result ConcatPrintResult(Category category, int count, Func<int, Result> elemResults)
+        {
+            var result = VoidResult(category);
+            if(!(category.HasCode || category.HasArgs))
+                return result;
+
+            if(category.HasCode)
+                result.Code = CodeBase.DumpPrintText("(");
+
+            for(var i = 0; i < count; i++)
+            {
+                var elemResult = elemResults(i);
+                result.IsDirty = true;
+                if(category.HasCode)
+                {
+                    if(i > 0)
+                        result.Code = result.Code.Sequence(CodeBase.DumpPrintText(", "));
+                    result.Code = result.Code.Sequence(elemResult.Code);
+                }
+                if(category.HasArgs)
+                    result.CodeArgs = result.CodeArgs.Sequence(elemResult.CodeArgs);
+                result.IsDirty = false;
+            }
+            if(category.HasCode)
+                result.Code = result.Code.Sequence(CodeBase.DumpPrintText(")"));
+            return result;
         }
     }
 }

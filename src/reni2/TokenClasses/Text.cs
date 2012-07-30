@@ -37,8 +37,8 @@ namespace Reni.TokenClasses
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
             var data = StripQutes(token.Name);
-            return TypeBase
-                .UniqueNumber(BitsConst.BitSize(data[0].GetType()))
+            return context
+                .RootContext.BitType.UniqueNumber(BitsConst.BitSize(data[0].GetType()))
                 .UniqueTextItemType
                 .UniqueArray(data.Length)
                 .UniqueTextItemsType
