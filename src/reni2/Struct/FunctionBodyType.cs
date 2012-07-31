@@ -57,6 +57,7 @@ namespace Reni.Struct
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _structure; } }
+        [DisableDump]
         internal override Root RootContext { get { return _structure.RootContext; } }
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
@@ -73,12 +74,19 @@ namespace Reni.Struct
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var trace = ObjectId > -23 && category.HasCode;
+            var trace = ObjectId > -23 && (category.HasArgs || category.HasCode);
             StartMethodDump(trace, category, argsType);
             try
             {
                 BreakExecution();
-                var applyResult = Function(argsType).ApplyResult(category);
+                
+                var functionType = Function(argsType);
+                
+                Dump("functionType", functionType); 
+                BreakExecution();
+
+                var applyResult = functionType.ApplyResult(category);
+                
                 Dump("applyResult", applyResult);
                 BreakExecution();
 

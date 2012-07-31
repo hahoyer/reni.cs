@@ -240,7 +240,6 @@ namespace Reni.Code
     }
 
     internal interface IExecutionContext
-
     {
         IOutStream OutStream { get; }
         bool IsTraceEnabled { get; }

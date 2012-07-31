@@ -43,9 +43,6 @@ namespace Reni.Context
         readonly SimpleCache<BitType> _bitCache;
         readonly SimpleCache<VoidType> _voidCache;
 
-        internal BitType BitType { get { return _bitCache.Value; } }
-        internal VoidType VoidType { get { return _voidCache.Value; } }
-
         internal Root(FunctionList functions, IExecutionContext executionContext)
         {
             _functions = functions;
@@ -56,6 +53,10 @@ namespace Reni.Context
 
         [DisableDump]
         internal override Root RootContext { get { return this; } }
+        [DisableDump]
+        internal BitType BitType { get { return _bitCache.Value; } }
+        [DisableDump]
+        internal VoidType VoidType { get { return _voidCache.Value; } }
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 

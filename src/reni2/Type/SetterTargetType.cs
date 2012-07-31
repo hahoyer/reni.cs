@@ -50,6 +50,7 @@ namespace Reni.Type
         internal abstract Result DestinationResult(Category category);
         internal abstract Result SetterResult(Category category);
         internal abstract Result GetterResult(Category category);
+        [DisableDump]
         internal override Root RootContext { get { return ValueType.RootContext; } }
         internal override void Search(SearchVisitor searchVisitor)
         {

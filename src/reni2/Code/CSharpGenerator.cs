@@ -82,7 +82,11 @@ namespace Reni.Code
         void IVisitor.BitCast(Size size, Size targetSize, Size significantSize) { AddCode("data.Push(data.Pull({0}).BitCast({1}).BitCast({2}))", targetSize.SaveByteCount, significantSize.ToInt(), size.ToInt()); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) { AddCode("data.Pull({0}).PrintText({1})", leftSize.SaveByteCount, itemSize.SaveByteCount); }
         void IVisitor.RecursiveCall() { AddCode("goto Start"); }
-        void IVisitor.ReferenceCode(IContextReference context) { throw new UnexpectedContextReference(context); }
+        void IVisitor.ReferenceCode(IContextReference context)
+        {
+            NotImplementedMethod(context);
+            throw new UnexpectedContextReference(context);
+        }
         void IVisitor.RecursiveCallCandidate() { throw new UnexpectedRecursiveCallCandidate(); }
 
         void IVisitor.Call(Size size, FunctionId functionId, Size argsAndRefsSize)
