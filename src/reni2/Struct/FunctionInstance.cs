@@ -36,6 +36,7 @@ namespace Reni.Struct
 {
     abstract class FunctionInstance : ReniObject
     {
+        [DisableDump]
         protected readonly FunctionType Parent;
         [Node]
         [EnableDump]
@@ -84,12 +85,10 @@ namespace Reni.Struct
                 return Code.Container.UnexpectedVisitOfPending;
             }
         }
+        
         internal Result CallResult(Category category)
         {
-            var localCategory = category - Category.CodeArgs - Category.Code;
-            if(category.HasCode)
-                localCategory |= Category.Size;
-            var result = Result(localCategory);
+            var result = Result(category.FunctionCall);
 
             if(category.HasArgs)
                 result.CodeArgs = CodeArgs.Arg();
@@ -100,6 +99,7 @@ namespace Reni.Struct
             return result;
         }
 
+        [DisableDump]
         protected virtual TypeBase CallType { get { return Parent; } }
 
         Result Result(Category category)
@@ -107,7 +107,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == -1 && !FunctionId.IsGetter && category.HasCode;
+            var trace = FunctionId.Index == 1 && FunctionId.IsGetter && category.HasArgs;
             StartMethodDump(trace, category);
             try
             {

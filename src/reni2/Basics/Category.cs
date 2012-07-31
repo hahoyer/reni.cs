@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 
 namespace Reni.Basics
 {
@@ -40,7 +39,7 @@ namespace Reni.Basics
         readonly bool _isDataLess;
 
         static readonly Category[] _cache = new Category[32];
-                                                     
+
         Category(bool isDataLess, bool size, bool type, bool code, bool args)
         {
             _code = code;
@@ -58,7 +57,7 @@ namespace Reni.Basics
                 return result;
             return _cache[IndexFromBool(isDataLess, size, type, code, args)] = new Category(isDataLess, size, type, code, args);
         }
-        
+
         static int IndexFromBool(params bool[] data) { return data.Aggregate(0, (c, n) => c * 2 + (n ? 1 : 0)); }
 
         [DebuggerHidden]
@@ -132,6 +131,15 @@ namespace Reni.Basics
                 if(HasArgs)
                     result |= CodeArgs;
                 return result;
+            }
+        }
+
+        internal Category FunctionCall
+        {
+            get
+            {
+                var result = this - CodeArgs - Code;
+                return HasCode ? result.Sized : result;
             }
         }
 
@@ -259,5 +267,6 @@ namespace Reni.Basics
         public static bool operator ==(Category left, Category right) { return Equals(left, right); }
 
         public static bool operator !=(Category left, Category right) { return !Equals(left, right); }
+        
     }
 }
