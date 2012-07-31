@@ -604,7 +604,7 @@ namespace Reni.Type
             return rawResult.ReplaceArg(convertedResult);
         }
 
-        internal CodeBase DumpPrintNumber()
+        internal CodeBase DumpPrintNumberCode()
         {
             var alignedSize = Size.Align(Root.DefaultRefAlignParam.AlignBits);
             return UniquePointer

@@ -33,15 +33,14 @@ namespace Reni.Sequence
 {
     abstract class SequenceOfBitOperation
         : Defineable
-          , ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.ArrayType>, BitType>
+          , ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>
           , ISequenceOfBitBinaryOperation
     {
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.ArrayType> ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.ArrayType>, BitType>.Convert(BitType type)
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>.Convert(BitType type)
         {
-            var bitType = type.BitType;
             if(IsCompareOperator)
-                return new CompareFeature(this, bitType);
-            return new Feature(this, bitType);
+                return new CompareFeature(this, type);
+            return new Feature(this, type);
         }
 
         [DisableDump]

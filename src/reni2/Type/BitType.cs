@@ -53,13 +53,13 @@ namespace Reni.Type
             Tracer.Assert(sequenceType.Parent == arrayType);
             Tracer.Assert(arrayType.ElementType == this);
             return VoidType
-                .Result(category, sequenceType.DumpPrintNumber, CodeArgs.Arg);
+                .Result(category, sequenceType.DumpPrintNumberCode, CodeArgs.Arg);
         }
 
         internal Result DumpPrintResult(Category category)
         {
             return VoidType
-                .Result(category, DumpPrintNumber, CodeArgs.Arg);
+                .Result(category, DumpPrintNumberCode, CodeArgs.Arg);
         }
 
         internal override void Search(SearchVisitor searchVisitor)
