@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,9 +18,10 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
@@ -31,36 +33,27 @@ namespace Reni
     sealed class ResultCache : ReniObject
     {
         readonly Result _data = new Result();
-        readonly Func<Category, bool, Result> _obtainResult;
         readonly Func<Category, Result> _obtainFlatResult;
+        readonly Func<Category, Result> _obtainPendingResult;
         internal string FunctionDump = "";
 
-        public ResultCache(Func<Category, bool, Result> obtainResult) { _obtainResult = obtainResult; }
-        public ResultCache(Func<Category, Result> obtainResult)
+        public ResultCache(Func<Category, Result> obtainResult, Func<Category, Result> obtainPendingResult = null)
         {
-            _obtainResult = ObtainFlatResult;
-            _obtainFlatResult = obtainResult;
-        }
-
-        Result ObtainFlatResult(Category category, bool isPending)
-        {
-            if(!isPending)
-                return _obtainFlatResult(category);
-            NotImplementedMethod(category, isPending);
-            return null;
+            _obtainFlatResult = obtainResult ?? NotSupported;
+            _obtainPendingResult = obtainPendingResult ?? NotSupported;
         }
 
         ResultCache(Result data)
         {
             _data = data;
-            _obtainResult = NotSupported;
+            _obtainFlatResult = NotSupported;
         }
 
         public static implicit operator ResultCache(Result x) { return new ResultCache(x); }
 
-        Result NotSupported(Category category, bool isPending)
+        Result NotSupported(Category category)
         {
-            NotImplementedMethod(category, isPending);
+            NotImplementedMethod(category);
             return null;
         }
 
@@ -95,7 +88,7 @@ namespace Reni
                 try
                 {
                     _data.PendingCategory |= localCategory;
-                    var result = _obtainResult(localCategory, false);
+                    var result = _obtainFlatResult(localCategory);
                     Tracer.Assert(localCategory <= result.CompleteCategory);
                     _data.Update(result);
                 }
@@ -108,20 +101,20 @@ namespace Reni
             var pendingCategory = category - _data.CompleteCategory;
             if(pendingCategory.HasAny)
             {
-                var pendingResult = _obtainResult(pendingCategory, true);
+                var pendingResult = _obtainPendingResult(pendingCategory);
                 Tracer.Assert(pendingResult.CompleteCategory == pendingCategory);
                 _data.Update(pendingResult);
             }
         }
 
         public static Result operator &(ResultCache resultCache, Category category) { return resultCache.GetCategories(category); }
-        
+
         Result GetCategories(Category category)
         {
             Update(category);
             return Data & category;
         }
-        
+
         bool HasIsDataLess
         {
             get { return _data.HasIsDataLess; }

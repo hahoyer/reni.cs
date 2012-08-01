@@ -116,17 +116,12 @@ namespace Reni.Context
         //[DebuggerHidden]
         ResultCache CreateCacheElement(CompileSyntax syntax)
         {
-            var result = new ResultCache((category, isPending) => ObtainResult(category, isPending, syntax));
+            var result = new ResultCache
+                (category => ObtainResult(category, syntax)
+                 , category => ObtainPendingResult(category, syntax)
+                );
             syntax.AddToCacheForDebug(this, result);
             return result;
-        }
-
-        //[DebuggerHidden]
-        Result ObtainResult(Category category, bool isPending, CompileSyntax syntax)
-        {
-            if(isPending)
-                return ObtainPendingResult(category, syntax);
-            return ObtainResult(category, syntax);
         }
 
         TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }

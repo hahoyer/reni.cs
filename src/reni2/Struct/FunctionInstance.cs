@@ -44,6 +44,7 @@ namespace Reni.Struct
 
         readonly SimpleCache<CodeBase> _bodyCodeCache;
         readonly SimpleCache<ContextBase> _contextCache;
+        readonly ResultCache _resultCache;
 
         protected FunctionInstance(FunctionType parent, CompileSyntax body)
         {
@@ -51,13 +52,13 @@ namespace Reni.Struct
             Parent = parent;
             _bodyCodeCache = new SimpleCache<CodeBase>(ObtainBodyCode);
             _contextCache = new SimpleCache<ContextBase>(ObtainCache);
+            _resultCache = new ResultCache(ObtainResult,ObtainPendingResult);
         }
 
         [Node]
         [DisableDump]
         internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
         [Node]
-        [DisableDump]
         string Description { get { return _body.DumpShort(); } }
         [Node]
         [DisableDump]
@@ -68,7 +69,7 @@ namespace Reni.Struct
         abstract protected Size RelevantValueSize { get; }
         [Node]
         [DisableDump]
-        internal CodeArgs CodeArgs { get { return Result(Category.CodeArgs).CodeArgs; } }
+        internal CodeArgs CodeArgs { get { return _resultCache.CodeArgs; } }
         protected abstract FunctionId FunctionId { get; }
         [Node]
         [DisableDump]
@@ -88,7 +89,7 @@ namespace Reni.Struct
         
         internal Result CallResult(Category category)
         {
-            var result = Result(category.FunctionCall);
+            var result = _resultCache & category.FunctionCall;
 
             if(category.HasArgs)
                 result.CodeArgs = CodeArgs.Arg();
@@ -102,12 +103,12 @@ namespace Reni.Struct
         [DisableDump]
         protected virtual TypeBase CallType { get { return Parent; } }
 
-        Result Result(Category category)
+        Result ObtainResult(Category category)
         {
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == 1 && FunctionId.IsGetter && category.HasArgs;
+            var trace = FunctionId.Index == 0 && FunctionId.IsGetter && category.HasArgs;
             StartMethodDump(trace, category);
             try
             {
@@ -133,6 +134,15 @@ namespace Reni.Struct
             }
         }
 
+        Result ObtainPendingResult(Category category)
+        {
+            if(category == Category.CodeArgs)
+                return new Result(category, getArgs:CodeArgs.Void);
+            NotImplementedMethod(category);
+            return null;
+
+        }
+
         CodeBase CreateContextRefCode()
         {
             return CodeBase
@@ -153,7 +163,7 @@ namespace Reni.Struct
             {
                 _isObtainBodyCodeActive = true;
                 var foreignRefsRef = CreateContextRefCode();
-                var visitResult = Result(Category.Code | Category.CodeArgs);
+                var visitResult = _resultCache & (Category.Code | Category.CodeArgs);
                 var result = visitResult
                     .ReplaceRefsForFunctionBody(Root.DefaultRefAlignParam.RefSize, foreignRefsRef)
                     .Code;
