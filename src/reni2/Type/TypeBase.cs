@@ -33,7 +33,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.Sequence;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -59,6 +58,7 @@ namespace Reni.Type
             public readonly SimpleCache<FunctionInstanceType> FunctionInstanceType;
             public readonly SimpleCache<TextItemType> TextItem;
             public readonly SimpleCache<EnableCut> EnableCut;
+            public readonly SimpleCache<Size> Size;
 
             public Cache(TypeBase parent)
             {
@@ -71,6 +71,7 @@ namespace Reni.Type
                 FunctionInstanceType = new SimpleCache<FunctionInstanceType>(() => new FunctionInstanceType(parent));
                 TypeType = new SimpleCache<TypeType>(() => new TypeType(parent));
                 TextItem = new SimpleCache<TextItemType>(() => new TextItemType(parent));
+                Size = new SimpleCache<Size>(parent.ObtainSize);
             }
         }
 
@@ -83,27 +84,24 @@ namespace Reni.Type
         static ReniObject _lastSearchVisitor;
 
         protected TypeBase()
-            : base(_nextObjectId++)
-        {
-            _cache = new Cache(this);
-        }
+            : base(_nextObjectId++) { _cache = new Cache(this); }
 
         [Node]
-        internal Size Size
-        {
-            get
-            {
-                if(IsDataLess)
-                    return Size.Zero;
-                return GetSize();
-            }
-        }
+        internal Size Size { get { return _cache.Size.Value; } }
 
         [NotNull]
         protected virtual Size GetSize()
         {
             NotImplementedMethod();
             return Size.Zero;
+        }
+
+        [NotNull]
+        Size ObtainSize()
+        {
+            if (IsDataLess)
+                return Size.Zero;
+            return GetSize();
         }
 
         [DisableDump]
