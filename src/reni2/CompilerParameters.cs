@@ -58,10 +58,6 @@ namespace Reni
 
             [Node]
             [EnableDump]
-            public bool CodeTree;
-
-            [Node]
-            [EnableDump]
             public bool ExecutedCode;
 
             [Node]
@@ -78,31 +74,24 @@ namespace Reni
 
             [Node]
             [EnableDump]
-            public bool CodeExecutor;
-            [Node]
-            [EnableDump]
             public bool GeneratorFilePosn;
 
             public void None()
             {
                 Source = false;
                 Syntax = false;
-                CodeTree = false;
                 CodeSequence = false;
                 ExecutedCode = false;
                 Functions = false;
-                CodeExecutor = false;
             }
 
             public void All()
             {
                 Source = true;
                 Syntax = true;
-                CodeTree = true;
                 CodeSequence = true;
                 ExecutedCode = true;
                 Functions = true;
-                CodeExecutor = true;
                 GeneratorFilePosn = true;
             }
         }

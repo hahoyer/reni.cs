@@ -36,16 +36,15 @@ namespace Reni.Context
     sealed class Root : ContextBase
     {
         [DisableDump]
-        readonly FunctionList _functions;
+        readonly FunctionList _functions = new FunctionList();
         [DisableDump]
         internal readonly IExecutionContext ExecutionContext;
 
         readonly SimpleCache<BitType> _bitCache;
         readonly SimpleCache<VoidType> _voidCache;
 
-        internal Root(FunctionList functions, IExecutionContext executionContext)
+        internal Root(IExecutionContext executionContext)
         {
-            _functions = functions;
             ExecutionContext = executionContext;
             _bitCache = new SimpleCache<BitType>(() => new BitType(this));
             _voidCache = new SimpleCache<VoidType>(() => new VoidType(this));
@@ -57,6 +56,8 @@ namespace Reni.Context
         internal BitType BitType { get { return _bitCache.Value; } }
         [DisableDump]
         internal VoidType VoidType { get { return _voidCache.Value; } }
+        [DisableDump]
+        internal int FunctionCount { get { return _functions.Count; } }
 
         internal static RefAlignParam DefaultRefAlignParam { get { return new RefAlignParam(BitsConst.SegmentAlignBits, Size.Create(32)); } }
 
@@ -95,5 +96,7 @@ namespace Reni.Context
                 result.Code = result.Code.Sequence(CodeBase.DumpPrintText(")"));
             return result;
         }
+
+        internal FunctionContainer Container(int index) { return _functions.Container(index); }
     }
 }

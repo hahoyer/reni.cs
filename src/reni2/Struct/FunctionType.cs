@@ -89,6 +89,17 @@ namespace Reni.Struct
             }
         }
 
+        [DisableDump]
+        internal FunctionContainer Container
+        {
+            get
+            {
+                var getter = _getter.Container;
+                var setter = _setter == null ? null : _setter.Container;
+                return new FunctionContainer(getter, setter);
+            }
+        }
+
         internal override Result SetterResult(Category category) { return _setter.CallResult(category); }
         internal override Result GetterResult(Category category) { return _getter.CallResult(category); }
         internal override Result DestinationResult(Category category) { return Result(category, this); }
@@ -102,14 +113,7 @@ namespace Reni.Struct
         }
 
         internal ContextBase CreateSubContext(bool useValue) { return new Reni.Context.Function(_structure.UniqueContext, ArgsType, useValue ? ValueType : null); }
-
-        internal FunctionContainer Serialize()
-        {
-            var getter = _getter.Serialize();
-            var setter = _setter == null ? null : _setter.Serialize();
-            return new FunctionContainer(getter, setter);
-        }
-
+        
         public string DumpFunction()
         {
             var result = "\n";

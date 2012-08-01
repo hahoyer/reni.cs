@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -32,35 +31,25 @@ using Reni.Struct;
 
 namespace Reni.Code
 {
-    /// <summary>
-    ///     base class for all compiled code items
-    /// </summary>
     sealed class Container : ReniObject
     {
         static int _nextObjectId;
         static readonly Container _unexpectedVisitOfPending = new Container("UnexpectedVisitOfPending");
+
         readonly string _description;
-
-        [EnableDump]
-        readonly Size _frameSize;
-
-        [DisableDump]
         readonly CodeBase _data;
+        internal readonly FunctionId FunctionId;
 
-        public Container(CodeBase data, string description, FunctionId functionId = null, Size frameSize = null)
+        public Container(CodeBase data, string description, FunctionId functionId = null)
             : base(_nextObjectId++)
         {
-            _frameSize = frameSize ?? Size.Zero;
             _description = description;
             FunctionId = functionId;
             _data = data;
             StopByObjectId(-10);
         }
 
-        Container(string errorText)
-        {
-            _description = errorText;
-        }
+        Container(string errorText) { _description = errorText; }
 
         [Node]
         [EnableDump]
@@ -72,22 +61,12 @@ namespace Reni.Code
 
         [Node]
         [DisableDump]
-        internal bool IsError { get { return _frameSize == null; } }
-
-        [Node]
-        [DisableDump]
         public Size MaxSize { get { return _data.TemporarySize; } }
 
         [Node]
         [DisableDump]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
-        public readonly FunctionId FunctionId;
 
-        internal BitsConst Evaluate()
-        {
-            NotImplementedMethod();
-            return null;
-        }
         public string GetCSharpStatements(int indent)
         {
             var generator = new CSharpGenerator(_data.TemporarySize.SaveByteCount);

@@ -75,18 +75,22 @@ namespace Reni.Struct
         [DisableDump]
         ContextBase Context { get { return _contextCache.Value; } }
 
-        internal Code.Container Serialize()
+        [DisableDump]
+        internal Code.Container Container
         {
-            try
+            get
             {
-                return new Code.Container(BodyCode, Description, FunctionId, FrameSize);
-            }
-            catch(UnexpectedVisitOfPending)
-            {
-                return Code.Container.UnexpectedVisitOfPending;
+                try
+                {
+                    return BodyCode.Container(Description, FunctionId, FrameSize);
+                }
+                catch(UnexpectedVisitOfPending)
+                {
+                    return Code.Container.UnexpectedVisitOfPending;
+                }
             }
         }
-        
+
         internal Result CallResult(Category category)
         {
             var result = _resultCache & category.FunctionCall;

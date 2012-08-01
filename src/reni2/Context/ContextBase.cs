@@ -29,6 +29,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Feature;
 using Reni.Struct;
 using Reni.Syntax;
@@ -75,11 +76,11 @@ namespace Reni.Context
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts[container][position]; }
+        internal ContextBase UniqueStructurePositionContext(Struct.Container container, int position) { return _cache.StructContexts[container][position]; }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
-        internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
-        internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
-        internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects[context]; }
+        internal Structure UniqueStructure(Struct.Container container) { return UniqueStructure(container, container.EndPosition); }
+        internal Structure UniqueStructure(Struct.Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
+        internal ContainerContextObject UniqueContainerContext(Struct.Container context) { return _cache.ContainerContextObjects[context]; }
 
         internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search("context"); }
 
@@ -167,15 +168,15 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Container, DictionaryEx<int, ContextBase>> StructContexts;
+            internal readonly DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>> StructContexts;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Container, DictionaryEx<int, Structure>> Structures;
+            internal readonly DictionaryEx<Struct.Container, DictionaryEx<int, Structure>> Structures;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Container, ContainerContextObject> ContainerContextObjects;
+            internal readonly DictionaryEx<Struct.Container, ContainerContextObject> ContainerContextObjects;
 
             [Node]
             [SmartNode]
@@ -188,18 +189,18 @@ namespace Reni.Context
             public Cache(ContextBase target)
             {
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
-                StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>(
+                StructContexts = new DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>>(
                     container =>
                     new DictionaryEx<int, ContextBase>(
                         position => new Struct.Context(target, container, position)));
                 PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(target));
                 RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<IFunctionContext>(target.ObtainRecentFunctionContext);
-                Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(
+                Structures = new DictionaryEx<Struct.Container, DictionaryEx<int, Structure>>(
                     container =>
                     new DictionaryEx<int, Structure>(
                         position => new Structure(ContainerContextObjects[container], position)));
-                ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>(container => new ContainerContextObject(container, target));
+                ContainerContextObjects = new DictionaryEx<Struct.Container, ContainerContextObject>(container => new ContainerContextObject(container, target));
             }
 
             [DisableDump]

@@ -59,7 +59,7 @@ namespace Reni.Context
             return _list[index];
         }
 
-        internal FunctionContainer Compile(int index) { return _list[index].Serialize(); }
+        internal FunctionContainer Container(int index) { return _list[index].Container; }
 
         int CreateFunctionInstance(TypeBase args, FunctionSyntax syntax, Structure structure)
         {

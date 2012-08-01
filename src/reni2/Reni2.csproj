@@ -23,6 +23,7 @@
     <Compile Include="Basics\Category.cs" />
     <Compile Include="Basics\RefAlignParam.cs" />
     <Compile Include="Basics\Size.cs" />
+    <Compile Include="Code\CodeContainer.cs" />
     <Compile Include="Code\CSharp_Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

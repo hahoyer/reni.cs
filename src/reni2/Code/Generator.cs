@@ -42,7 +42,7 @@ namespace Reni.Code
         internal static string FunctionName(FunctionId functionId) { return (functionId.IsGetter ? "GetFunction" : "SetFunction") + functionId.Index; }
 
         internal static string CreateCSharpString(Container main, DictionaryEx<int, FunctionContainer> functions, bool useStatementAligner, string className) { return new CSharp_Generated(className, main, functions).TransformText(useStatementAligner); }
-        internal static Assembly CreateCSharpAssembly(Container main, DictionaryEx<int, FunctionContainer> functions, bool align, bool traceFilePosn, string className) { return CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn); }
+        internal static Assembly CreateCSharpAssembly(Container main, DictionaryEx<int, FunctionContainer> functions, bool align, string className, bool traceFilePosn) { return CodeToAssembly(CreateCSharpString(main, functions, align, className), traceFilePosn); }
 
         static void CodeToFile(string name, string result, bool traceFilePosn)
         {
@@ -93,17 +93,17 @@ namespace Reni.Code
             for(var i = 0; i < cr.Count; i++)
                 Tracer.Line(cr[i].ToString());
 
-            throw new CompilerErrorException(cr);
+            throw new CSharpCompilerErrorException(cr);
         }
     }
 
-    sealed class CompilerErrorException : Exception
+    sealed class CSharpCompilerErrorException : Exception
     {
         readonly CompilerErrorCollection _compilerErrorCollection;
 
         public CompilerErrorCollection CompilerErrorCollection { get { return _compilerErrorCollection; } }
 
-        public CompilerErrorException(CompilerErrorCollection cr) { _compilerErrorCollection = cr; }
+        public CSharpCompilerErrorException(CompilerErrorCollection cr) { _compilerErrorCollection = cr; }
     }
 
 // ReSharper disable InconsistentNaming

@@ -40,15 +40,13 @@ namespace Reni
         readonly string _fileName;
         readonly CompilerParameters _parameters;
         readonly ITokenFactory _tokenFactory = new MainTokenFactory();
+        readonly Root _rootContext;
+        readonly string _className;
 
         readonly SimpleCache<Source> _source;
         readonly SimpleCache<ParsedSyntax> _syntax;
-        readonly SimpleCache<CodeBase> _code;
-        readonly SimpleCache<Code.Container> _mainContainer;
-        readonly DictionaryEx<int, FunctionContainer> _functionContainers;
-        readonly SimpleCache<string> _executedCode;
-        readonly SimpleCache<FunctionList> _functions;
-        readonly SimpleCache<ContextBase> _rootContext;
+        readonly SimpleCache<CodeContainer> _codeContainer;
+        readonly SimpleCache<string> _cSharpCode;
 
         /// <summary>
         ///     ctor from file
@@ -58,52 +56,32 @@ namespace Reni
         /// <param name="className"> </param>
         public Compiler(string fileName, CompilerParameters parameters = null, string className = null)
         {
+            _className = className ?? fileName.Symbolize();
             _fileName = fileName;
+            _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
+        
             _source = new SimpleCache<Source>(() => new Source(FileName.FileHandle()));
             _syntax = new SimpleCache<ParsedSyntax>(() => (ParsedSyntax) _tokenFactory.Parser.Compile(Source));
-            _mainContainer = new SimpleCache<Code.Container>(() => new Code.Container(Code, Source.Data));
-            _executedCode = new SimpleCache<string>(() => Generator.CreateCSharpString(MainContainer, _functionContainers, true, className ?? fileName.Symbolize()));
-            _functions = new SimpleCache<FunctionList>(() => new FunctionList());
-            _functionContainers = new DictionaryEx<int, FunctionContainer>(index => Functions.Compile(index));
-            _rootContext = new SimpleCache<ContextBase>(() => new Root(Functions, this));
-            _code = new SimpleCache<CodeBase>(() => Struct.Container.Create(Syntax).Code(RootContext));
+            _codeContainer = new SimpleCache<CodeContainer>(() => new CodeContainer(RootContext, Syntax, Source.Data));
+            _cSharpCode = new SimpleCache<string>(() => _codeContainer.Value.CreateCSharpString(_className));
         }
-
-        [Node]
-        [DisableDump]
-        internal FunctionList Functions { get { return _functions.Value; } }
 
         [DisableDump]
         string FileName { get { return _fileName; } }
-
         [DisableDump]
         Source Source { get { return _source.Value; } }
-
         [Node]
         [DisableDump]
         internal ParsedSyntax Syntax { get { return _syntax.Value; } }
-
-        [DisableDump]
-        internal string ExecutedCode
-        {
-            get
-            {
-                EnsureContainer();
-                return _executedCode.Value;
-            }
-        }
-
         [Node]
         [DisableDump]
-        CodeBase Code { get { return _code.Value; } }
-
+        CodeContainer CodeContainer { get { return _codeContainer.Value; } }
         [DisableDump]
-        Code.Container MainContainer { get { return _mainContainer.Value; } }
-
+        internal string CSharpCode { get { return _cSharpCode.Value; } }
         [Node]
         [DisableDump]
-        ContextBase RootContext { get { return _rootContext.Value; } }
+        Root RootContext { get { return _rootContext; } }
 
 
         internal static string FormattedNow
@@ -126,13 +104,7 @@ namespace Reni
 
         IOutStream IExecutionContext.OutStream { get { return _parameters.OutStream; } }
         bool IExecutionContext.IsTraceEnabled { get { return _parameters.Trace.Functions; } }
-
-        CodeBase IExecutionContext.Function(FunctionId functionId)
-        {
-            var item = _functionContainers[functionId.Index];
-            var container = functionId.IsGetter ? item.Getter : item.Setter;
-            return container.Data;
-        }
+        CodeBase IExecutionContext.Function(FunctionId functionId) { return CodeContainer.Function(functionId); }
 
         /// <summary>
         ///     Performs compilation
@@ -148,22 +120,6 @@ namespace Reni
             if(_parameters.ParseOnly)
                 return;
 
-            if(_parameters.Trace.Functions)
-            {
-                Materialize();
-                Tracer.FlaggedLine("functions, Count = " + Functions.Count);
-                for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine(Functions[i].DumpFunction());
-            }
-
-            if(_parameters.Trace.CodeTree)
-            {
-                Tracer.FlaggedLine("CodeTree");
-                Tracer.FlaggedLine("main\n" + Code.Dump());
-                for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + Functions[i].BodyCode.Dump());
-            }
-
             if(_parameters.RunFromCode)
             {
                 RunFromCode();
@@ -171,23 +127,21 @@ namespace Reni
             }
 
             if(_parameters.Trace.CodeSequence)
-            {
-                Tracer.FlaggedLine("main\n" + MainContainer.Dump());
-                for(var i = 0; i < Functions.Count; i++)
-                    Tracer.FlaggedLine("function index=" + i + "\n" + _functionContainers[i].Dump());
-            }
+                CodeContainer.Dump();
+
             if(_parameters.Trace.ExecutedCode)
-                Tracer.FlaggedLine(ExecutedCode);
+                Tracer.FlaggedLine(CSharpCode);
 
             Data.OutStream = _parameters.OutStream;
             try
             {
-                EnsureContainer();
-                var assembly = Generator.CreateCSharpAssembly(MainContainer, _functionContainers, false, _parameters.Trace.GeneratorFilePosn, "Reni");
-                var methodInfo = assembly.GetExportedTypes()[0].GetMethod(Generator.MainFunctionName);
-                methodInfo.Invoke(null, new object[0]);
+                CodeContainer
+                    .CreateCSharpAssembly(_className, _parameters.Trace.GeneratorFilePosn)
+                    .GetExportedTypes()[0]
+                    .GetMethod(Generator.MainFunctionName)
+                    .Invoke(null, new object[0]);
             }
-            catch(CompilerErrorException e)
+            catch(CSharpCompilerErrorException e)
             {
                 for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
                     _parameters.OutStream.Add(e.CompilerErrorCollection[i] + "\n");
@@ -195,25 +149,12 @@ namespace Reni
             Data.OutStream = null;
         }
 
-        void EnsureContainer()
-        {
-            _mainContainer.Ensure();
-            for(var i = 0; i < Functions.Count; i++)
-                _functionContainers.Ensure(i);
-        }
-
-        void RunFromCode() { Code.Execute(this); }
+        void RunFromCode() { _codeContainer.Value.Execute(this); }
 
         internal void Materialize()
         {
-            if(_parameters.ParseOnly)
-                return;
-            var taraceFunctions = _parameters.Trace.Functions;
-            _parameters.Trace.Functions = false;
-            _code.Ensure();
-            for(var i = 0; i < Functions.Count; i++)
-                Functions[i].EnsureBodyCode();
-            _parameters.Trace.Functions = taraceFunctions;
+            if(!_parameters.ParseOnly)
+                _codeContainer.Ensure();
         }
     }
 

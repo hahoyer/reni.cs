@@ -43,7 +43,7 @@ namespace Reni
             var f = fileName.FileHandle();
             f.String = _text;
             var compiler = new Compiler(fileName, className: _className);
-            return compiler.ExecutedCode;
+            return compiler.CSharpCode;
         }
     }
 }

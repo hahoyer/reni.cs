@@ -109,14 +109,8 @@ namespace Reni.Code
             return Add(new ReferencePlusConstant(right, CallingMethodName));
         }
 
-        internal CodeBase ArrayAccess(Size elementSize, Size indexSize)
-        {
-            return Add(new ArrayGetter(elementSize,indexSize,CallingMethodName));
-        }
-        internal CodeBase ArrayAssignment(Size elementSize, Size indexSize)
-        {
-            return Add(new ArraySetter(elementSize, indexSize, CallingMethodName));
-        }
+        internal CodeBase ArrayAccess(Size elementSize, Size indexSize) { return Add(new ArrayGetter(elementSize, indexSize, CallingMethodName)); }
+        internal CodeBase ArrayAssignment(Size elementSize, Size indexSize) { return Add(new ArraySetter(elementSize, indexSize, CallingMethodName)); }
 
         internal CodeBase Dereference(Size targetSize)
         {
@@ -281,6 +275,7 @@ namespace Reni.Code
         }
 
         internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
+        internal Container Container(string description, FunctionId functionId = null, Size frameSize = null) { return new Container(this, description, functionId); }
     }
 
     abstract class UnexpectedVisitOfPending : Exception

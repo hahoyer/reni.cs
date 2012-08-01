@@ -43,12 +43,6 @@ f1()dump_print;
     [ObjectFunction]
     public sealed class TwoFunctions1 : CompilerTest
     {
-        protected override void AssertValid(Compiler c)
-        {
-            var x = new ExpectedCompilationResult(c);
-            //Tracer.Assert(x.FunctionCount() == 2);
-        }
-
         [Test]
         public override void Run() { BaseRun(); }
     }
