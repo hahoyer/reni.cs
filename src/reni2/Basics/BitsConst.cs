@@ -258,11 +258,11 @@ namespace Reni.Basics
                 r = 10;
             var left = ToString((int) r);
 
-            outStream.Add(left);
+            outStream.AddData(left);
         }
 
         public void PrintNumber(IOutStream outStream) { PrintNumber(None(), outStream); }
-        public void PrintText(Size itemSize, IOutStream outStream) { outStream.Add(ToString(itemSize)); }
+        public void PrintText(Size itemSize, IOutStream outStream) { outStream.AddData(ToString(itemSize)); }
 
         public string ToString(Size itemSize)
         {

@@ -50,6 +50,7 @@ namespace ReniExe
 
     sealed class ConsoleStream : ReniObject, IOutStream
     {
-        public void Add(string text) { Console.Write(text); }
+        void IOutStream.AddData(string text) { Console.Write(text); }
+        void IOutStream.AddLog(string text) { Console.Write(text); }
     }
 }

@@ -144,7 +144,7 @@ namespace Reni
             catch(CSharpCompilerErrorException e)
             {
                 for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
-                    _parameters.OutStream.Add(e.CompilerErrorCollection[i] + "\n");
+                    _parameters.OutStream.AddLog(e.CompilerErrorCollection[i] + "\n");
             }
             Data.OutStream = null;
         }
@@ -160,6 +160,7 @@ namespace Reni
 
     public interface IOutStream
     {
-        void Add(string text);
+        void AddData(string text);
+        void AddLog(string text);
     }
 }

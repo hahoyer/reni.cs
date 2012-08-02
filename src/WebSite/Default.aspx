@@ -9,13 +9,18 @@
 
     <body>
         <form id="reniForm" runat="server">
-            &nbsp;<asp:TextBox id="TbName" runat="server" Height="123px" TextMode="MultiLine" Width="440px" />
+            &nbsp;<asp:TextBox id="Code" 
+                runat="server" Height="123px" 
+                TextMode="MultiLine" Width="880px" />
             <br />
             <asp:Button ID="Compile" Text="Compile and run" runat="server" 
-                OnClick="ButtonOkClick" Width="451px" />
+                OnClick="ButtonOkClick" Width="888px" Height="24px" />
             <br />
-            <asp:Label ID="Result" runat="server"/>
+        <p>
+            <asp:TextBox id="Result" runat="server" Height="123px" 
+                TextMode="MultiLine" Width="880px" style="margin-top: 0px" />
+            </p>
         </form>
-    </body>
+        </body>
 
 </html>

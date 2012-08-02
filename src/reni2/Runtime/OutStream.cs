@@ -11,14 +11,22 @@ namespace Reni.Runtime
     public sealed class OutStream : ReniObject, IOutStream
     {
         private string _data = "";
+        private string _log = "";
 
         internal string Data { get { return _data; } }
+        internal string Log { get { return _log; } }
 
-        void IOutStream.Add(string x)
+        void IOutStream.AddData(string x)
         {
             _data += x;
-            Tracer.Line("---------------------\n" + _data + "\n---------------------");
+            Tracer.Line("-data----------------\n" + _data + "\n---------------------");
             Tracer.Assert(_data.Length < 1000);
+        }
+
+        void IOutStream.AddLog(string x)
+        {
+            _log += x;
+            Tracer.Line("-log----------------\n" + _log + "\n---------------------");
         }
     }
 }

@@ -169,7 +169,7 @@ namespace Reni.Code
             left.Assign(targetSize, right);
         }
 
-        void IVisitor.PrintText(string dumpPrintText) { _context.OutStream.Add(dumpPrintText); }
+        void IVisitor.PrintText(string dumpPrintText) { _context.OutStream.AddData(dumpPrintText); }
 
         void IVisitor.List(CodeBase[] data)
         {

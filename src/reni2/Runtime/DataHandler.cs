@@ -168,7 +168,7 @@ namespace Reni.Runtime
 
         internal static void PrintNumber(this byte[] data) { PrintText(new BigInteger(data).ToString()); }
 
-        internal static void PrintText(this string text) { Data.OutStream.Add(text); }
+        internal static void PrintText(this string text) { Data.OutStream.AddData(text); }
         internal static void PrintText(this byte[] text) { new string(text.Select(x => (char) x).ToArray()).PrintText(); }
 
         internal static unsafe void AssignFromPointers(this byte[] leftData, byte[] rightData, int bytes)

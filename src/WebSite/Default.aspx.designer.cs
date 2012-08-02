@@ -31,13 +31,13 @@ namespace WebSite {
         protected global::System.Web.UI.HtmlControls.HtmlForm reniForm;
         
         /// <summary>
-        /// TbName control.
+        /// Code control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TbName;
+        protected global::System.Web.UI.WebControls.TextBox Code;
         
         /// <summary>
         /// Compile control.
@@ -55,6 +55,6 @@ namespace WebSite {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Result;
+        protected global::System.Web.UI.WebControls.TextBox Result;
     }
 }

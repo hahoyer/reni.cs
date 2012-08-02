@@ -49,25 +49,43 @@ namespace WebSite
             var stringStream = new StringStream();
             var parameters = new CompilerParameters {OutStream = stringStream};
             var c = new Compiler(fileName, parameters);
+
+            var exceptionText = "";
             try
             {
                 c.Exec();
             }
             catch(Exception exception)
             {
-                return exception.Message;
+                exceptionText = exception.Message;
             }
-            var result = stringStream.Result;
+
+            var result = "";
+
+            var log = stringStream.Log;
+            if(log != "")
+                result += "Log: \n" + log + "\n";
+
+            var data = stringStream.Data;
+            if (data != "")
+                result += "Data: \n" + data + "\n";
+
+            if (exceptionText != "")
+                result += "Exception: \n" + exceptionText;
+
             return result;
         }
 
-        protected void ButtonOkClick(object sender, EventArgs e) { Result.Text = CompileAndRun(TbName.Text); }
+        protected void ButtonOkClick(object sender, EventArgs e) { Result.Text = CompileAndRun(Code.Text); }
     }
 
     sealed class StringStream : ReniObject, IOutStream
     {
-        readonly StringBuilder _result = new StringBuilder();
-        internal string Result { get { return _result.ToString(); } }
-        void IOutStream.Add(string text) { _result.Append(text); }
+        readonly StringBuilder _data = new StringBuilder();
+        readonly StringBuilder _log = new StringBuilder();
+        internal string Data { get { return _data.ToString(); } }
+        internal string Log { get { return _log.ToString(); } }
+        void IOutStream.AddData(string text) { _data.Append(text); }
+        void IOutStream.AddLog(string text) { _log.Append(text); }
     }
 }
