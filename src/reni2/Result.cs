@@ -47,7 +47,7 @@ namespace Reni
         CodeBase _code;
         CodeArgs _codeArgs;
         Category _pendingCategory;
-        
+
         internal Result()
             : base(_nextObjectId++)
         {
@@ -410,7 +410,6 @@ namespace Reni
                 AssertValid();
             }
         }
-
 
         public override string DumpData()
         {

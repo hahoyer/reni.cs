@@ -132,6 +132,9 @@ namespace Reni
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(CSharpCode);
 
+            foreach(var t in Issues)
+                _parameters.OutStream.AddLog(t + "\n");
+
             Data.OutStream = _parameters.OutStream;
             try
             {
@@ -148,6 +151,8 @@ namespace Reni
             }
             Data.OutStream = null;
         }
+        
+        public IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
 
         void RunFromCode() { _codeContainer.Value.Execute(this); }
 

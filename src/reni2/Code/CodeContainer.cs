@@ -26,6 +26,7 @@ using System;
 using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Basics;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
@@ -38,13 +39,24 @@ namespace Reni.Code
         readonly DictionaryEx<int, FunctionContainer> _functions;
         public CodeContainer(Root rootContext, ParsedSyntax syntax, string description)
         {
-            _main = Struct.Container
+            _main = Struct
+                .Container
                 .Create(syntax)
-                .Code(rootContext)
+                .Code(rootContext)                
                 .Container(description);
             _functions = new DictionaryEx<int, FunctionContainer>(rootContext.Container);
             for(var i = 0; i < rootContext.FunctionCount; i++)
                 _functions.Ensure(i);
+        }
+
+        internal IEnumerable<IssueBase> Issues
+        {
+            get
+            {
+                return _main
+                    .Issues
+                    .Union(_functions.SelectMany(f => f.Value.Issues));
+            }
         }
 
         internal void Execute(IExecutionContext context) { _main.Data.Execute(context); }
@@ -67,13 +79,18 @@ namespace Reni.Code
             var container = functionId.IsGetter ? item.Getter : item.Setter;
             return container.Data;
         }
-        
+
         public override string DumpData()
         {
             var result = "main\n" + _main.Dump() + "\n";
-            for (var i = 0; i < _functions.Count; i++)
+            for(var i = 0; i < _functions.Count; i++)
                 result += "function index=" + i + "\n" + _functions[i].Dump() + "\n";
             return result;
         }
+    }
+
+    public class IssueBase : ReniObject
+    {
+        public static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
     }
 }

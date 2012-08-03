@@ -31,6 +31,7 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
@@ -184,10 +185,15 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
+            internal readonly DictionaryEx<ExpressionSyntax, Validation.IssueType> UndefinedSymbolType;
+
+            [Node]
+            [SmartNode]
             internal readonly SimpleCache<PendingContext> PendingContext;
 
             public Cache(ContextBase target)
             {
+                UndefinedSymbolType = new DictionaryEx<ExpressionSyntax, Validation.IssueType>(syntax => UndefinedSymbolIssue.CreateType(target, syntax));
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 StructContexts = new DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>>(
                     container =>
@@ -278,5 +284,7 @@ namespace Reni.Context
                 EndMethodDump();
             }
         }
+
+        internal Validation.IssueType UndefinedSymbolType(ExpressionSyntax syntax) { return _cache.UndefinedSymbolType[syntax]; }
     }
 }

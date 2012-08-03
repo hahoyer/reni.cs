@@ -20,32 +20,35 @@
 
 #endregion
 
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Basics;
+using Reni.Code;
+using Reni.Context;
+using Reni.Type;
 
-namespace Reni.Code
+namespace Reni.Validation
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class IssueType : TypeBase
     {
-        internal readonly Container Getter;
-        internal readonly Container Setter;
+        readonly IssueBase _issue;
+        readonly Root _rootContext;
 
-        public FunctionContainer(Container getter, Container setter)
+        internal IssueType(IssueBase issue, Root rootContext)
         {
-            Getter = getter;
-            Setter = setter;
+            _issue = issue;
+            _rootContext = rootContext;
         }
-        public IEnumerable<IssueBase> Issues
-        {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
-        }
+
+        [DisableDump]
+        internal override Root RootContext { get { return _rootContext; } }
+        [DisableDump]
+        internal override bool IsDataLess { get { return true; } }
+
+        internal Result Result(Category category) { return base.Result(category, getCode: Code); }
+
+        CodeBase Code() { return CodeBase.Issue(_issue); }
     }
 }

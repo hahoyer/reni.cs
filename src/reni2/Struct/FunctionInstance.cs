@@ -52,7 +52,7 @@ namespace Reni.Struct
             Parent = parent;
             _bodyCodeCache = new SimpleCache<CodeBase>(ObtainBodyCode);
             _contextCache = new SimpleCache<ContextBase>(ObtainCache);
-            _resultCache = new ResultCache(ObtainResult,ObtainPendingResult);
+            _resultCache = new ResultCache(ObtainResult, ObtainPendingResult);
         }
 
         [Node]
@@ -66,7 +66,7 @@ namespace Reni.Struct
         [DisableDump]
         protected Size ArgsPartSize { get { return Parent.ArgsType.Size + RelevantValueSize; } }
         [DisableDump]
-        abstract protected Size RelevantValueSize { get; }
+        protected abstract Size RelevantValueSize { get; }
         [Node]
         [DisableDump]
         internal CodeArgs CodeArgs { get { return _resultCache.CodeArgs; } }
@@ -112,7 +112,7 @@ namespace Reni.Struct
             if(IsStopByObjectIdActive)
                 return null;
 
-            var trace = FunctionId.Index == 0 && FunctionId.IsGetter && category.HasArgs;
+            var trace = FunctionId.Index < 0 && FunctionId.IsGetter && category.HasArgs;
             StartMethodDump(trace, category);
             try
             {
@@ -141,10 +141,9 @@ namespace Reni.Struct
         Result ObtainPendingResult(Category category)
         {
             if(category == Category.CodeArgs)
-                return new Result(category, getArgs:CodeArgs.Void);
+                return new Result(category, getArgs: CodeArgs.Void);
             NotImplementedMethod(category);
             return null;
-
         }
 
         CodeBase CreateContextRefCode()

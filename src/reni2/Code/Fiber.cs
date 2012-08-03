@@ -120,6 +120,15 @@ namespace Reni.Code
         }
 
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Fiber(this); }
+        internal override IEnumerable<IssueBase> Issues
+        {
+            get
+            {
+                return _fiberHead
+                    .Issues
+                    .Union(_fiberItems.SelectMany(item => item.Issues));
+            }
+        }
 
         [DisableDump]
         internal new bool HasArg

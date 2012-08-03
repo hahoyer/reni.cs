@@ -83,10 +83,7 @@ namespace Reni.ReniParser
 
                 var searchResult = context.Search(Left, _tokenClass);
                 if(searchResult == null)
-                {
-                    NotImplementedMethod(context, category);
-                    return null;
-                }
+                    return ReturnMethodDump(context.UndefinedSymbolType(this).Result(category));
 
                 Dump("searchResult", searchResult);
                 BreakExecution();

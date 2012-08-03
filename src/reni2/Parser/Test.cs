@@ -41,7 +41,7 @@ namespace Reni.Parser
             var syntaxPrototype = LikeSyntax.Expression(null, "f", LikeSyntax.Null);
             Parameters.Trace.Source = true;
             Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("SimpleFunction", @"f()", c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler("SimpleFunction", @"f()", expectedResult:c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace Reni.Parser
             var syntaxPrototype =
                 (LikeSyntax.Number(2) + LikeSyntax.Number(4)).dump_print;
             Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("Add2Numbers", @"(2+4) dump_print", c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler("Add2Numbers", @"(2+4) dump_print", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace Reni.Parser
                 new[] {0}
                 );
             Parameters.ParseOnly = true;
-            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3", c => syntaxPrototype.AssertLike(c.Syntax));
+            CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3", expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace Reni.Parser
                 );
             Parameters.ParseOnly = true;
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3; !converter: 4",
-                                     c => syntaxPrototype.AssertLike(c.Syntax));
+                                     expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
     }
 }

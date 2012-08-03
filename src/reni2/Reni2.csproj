@@ -31,9 +31,11 @@
     </Compile>
     <Compile Include="Code\FunctionContainer.cs" />
     <Compile Include="Code\Generator.cs" />
+    <Compile Include="Code\IssueCode.cs" />
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
     <Compile Include="Code\ArrayAccess.cs" />
+    <Compile Include="Context\UndefinedSymbolType.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
@@ -79,10 +81,12 @@
     <Compile Include="FeatureTest\Structure\SomeVariables.cs" />
     <Compile Include="FeatureTest\Structure\StrangeStructs.cs" />
     <Compile Include="FeatureTest\Structure\AccessMember.cs" />
+    <Compile Include="FeatureTest\TargetSetData.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
+    <Compile Include="FeatureTest\Validation\UndefinedVariable.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="Feature\Function.cs" />
@@ -331,6 +335,7 @@
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
+    <Compile Include="Validation\IssueType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Code\CSharp_Generated.tt">

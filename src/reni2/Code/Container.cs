@@ -66,6 +66,7 @@ namespace Reni.Code
         [Node]
         [DisableDump]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
+        public IEnumerable<IssueBase> Issues { get { return _data.Issues; } }
 
         public string GetCSharpStatements(int indent)
         {

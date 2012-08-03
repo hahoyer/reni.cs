@@ -24,28 +24,20 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 
 namespace Reni.Code
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class IssueCode : CodeBase
     {
-        internal readonly Container Getter;
-        internal readonly Container Setter;
+        static int _nextObjectId;
+        readonly IssueBase[] _issue;
 
-        public FunctionContainer(Container getter, Container setter)
-        {
-            Getter = getter;
-            Setter = setter;
-        }
-        public IEnumerable<IssueBase> Issues
-        {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
-        }
+        internal IssueCode(IssueBase issue)
+            : base(_nextObjectId++) { _issue = new[] {issue}; }
+        protected override Size GetSize() { return Size.Zero; }
+        internal override CodeBase Add(FiberItem subsequentElement) { throw new NotImplementedException(); }
+        internal override IEnumerable<IssueBase> Issues { get { return _issue; } }
+        internal override void Visit(IVisitor visitor) { }
     }
 }

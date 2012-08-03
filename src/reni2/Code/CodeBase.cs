@@ -37,7 +37,9 @@ namespace Reni.Code
     abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
     {
         protected CodeBase(int objectId)
-            : base(objectId) { }
+            : base(objectId)
+        {
+        }
 
         [Node]
         [DisableDump]
@@ -60,6 +62,7 @@ namespace Reni.Code
         [DisableDump]
         internal bool HasArg { get { return Visit(new HasArgVisitor()); } }
 
+        internal static CodeBase Issue(IssueBase issue) { return new IssueCode(issue); }
         internal static CodeBase BitsConst(Size size, BitsConst t) { return new BitArray(size, t); }
         internal static CodeBase BitsConst(BitsConst t) { return BitsConst(t.Size, t); }
         internal static CodeBase DumpPrintText(string dumpPrintText) { return new DumpPrintText(dumpPrintText); }
@@ -217,6 +220,9 @@ namespace Reni.Code
 
         [DisableDump]
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
+
+        [DisableDump]
+        abstract internal IEnumerable<IssueBase> Issues { get; }
 
         internal CodeBase LocalBlock(CodeBase copier)
         {

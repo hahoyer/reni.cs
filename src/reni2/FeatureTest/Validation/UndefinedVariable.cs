@@ -20,32 +20,28 @@
 
 #endregion
 
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.UnitTest;
+using Reni.Code;
 
-namespace Reni.Code
+namespace Reni.FeatureTest.Validation
 {
-    sealed class FunctionContainer : ReniObject
+    [TestFixture]
+    [Target(@"x dump_print;")]
+    [Output("")]
+    public sealed class UndefinedVariable : CompilerTest
     {
-        internal readonly Container Getter;
-        internal readonly Container Setter;
-
-        public FunctionContainer(Container getter, Container setter)
+        [Test]
+        public override void Run() { BaseRun(); }
+        internal override bool IsExpected(IEnumerable<IssueBase> issues)
         {
-            Getter = getter;
-            Setter = setter;
-        }
-        public IEnumerable<IssueBase> Issues
-        {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
+            var issue = issues.Single();
+            Tracer.DumpStaticMethodWithData(issue);
+            Tracer.TraceBreak();
+            return false;
         }
     }
 }

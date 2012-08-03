@@ -24,28 +24,24 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using Reni.Code;
+using Reni.ReniParser;
 
-namespace Reni.Code
+namespace Reni.Context
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class UndefinedSymbolIssue : IssueBase
     {
-        internal readonly Container Getter;
-        internal readonly Container Setter;
+        [EnableDump]
+        readonly ContextBase _target;
+        [EnableDump]
+        readonly ExpressionSyntax _syntax;
 
-        public FunctionContainer(Container getter, Container setter)
+        internal UndefinedSymbolIssue(ContextBase target, ExpressionSyntax syntax)
         {
-            Getter = getter;
-            Setter = setter;
+            _target = target;
+            _syntax = syntax;
         }
-        public IEnumerable<IssueBase> Issues
-        {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
-        }
+
+        internal static Reni.Validation.IssueType CreateType(ContextBase target, ExpressionSyntax syntax) { return new Validation.IssueType(new UndefinedSymbolIssue(target, syntax), target.RootContext); }
     }
 }

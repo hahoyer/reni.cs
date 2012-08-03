@@ -38,6 +38,7 @@ namespace Reni.Code
 
         protected override IEnumerable<CodeBase> AsList() { return _data; }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.List(this); }
+        internal override IEnumerable<IssueBase> Issues { get { return _data.SelectMany(data => data.Issues); } }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement)
         {

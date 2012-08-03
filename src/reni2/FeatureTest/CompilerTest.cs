@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.UnitTest;
+using Reni.Code;
 using Reni.Runtime;
 
 namespace Reni.FeatureTest
@@ -40,28 +41,27 @@ namespace Reni.FeatureTest
         static Dictionary<System.Type, CompilerTest> _cache;
         bool _needToRunDependants = true;
 
-        internal void CreateFileAndRunCompiler(string name, string text, string expectedOutput) { CreateFileAndRunCompiler(1, name, text, null, expectedOutput); }
-        internal void CreateFileAndRunCompiler(string name, string text, Action<Compiler> expectedResult) { CreateFileAndRunCompiler(1, name, text, expectedResult, ""); }
+        internal void CreateFileAndRunCompiler(string name, string text, string expectedOutput = null, Action<Compiler> expectedResult = null) { CreateFileAndRunCompiler(1, name, new TargetSetData(text, expectedOutput), expectedResult); }
 
-        void CreateFileAndRunCompiler(int depth, string name, string text, Action<Compiler> expectedResult, string expectedOutput)
+        void CreateFileAndRunCompiler(int depth, string name, TargetSetData targetSetData, Action<Compiler> expectedResult)
         {
             var fileName = name + ".reni";
             var f = fileName.FileHandle();
-            f.String = text;
-            InternalRunCompiler(depth + 1, fileName, expectedResult, expectedOutput);
+            f.String = targetSetData.Target;
+            InternalRunCompiler(depth + 1, fileName, expectedResult, targetSetData);
         }
 
-        void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, string expectedOutput)
+        void InternalRunCompiler(int depth, string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
         {
             Tracer.FlaggedLine(depth + 1, "Position of method tested", FilePositionTag.Test);
             if(TestRunner.IsModeErrorFocus)
                 Parameters.Trace.All();
 
             //Parameters.RunFromCode = true;
-            InternalRunCompiler(Parameters, fileName, expectedResult, expectedOutput);
+            InternalRunCompiler(Parameters, fileName, expectedResult, targetSet);
         }
 
-        static void InternalRunCompiler(CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, string expectedOutput)
+        void InternalRunCompiler(CompilerParameters compilerParameters, string fileName, Action<Compiler> expectedResult, TargetSetData targetSet)
         {
             var outStream = new OutStream();
             compilerParameters.OutStream = outStream;
@@ -75,13 +75,20 @@ namespace Reni.FeatureTest
 
             c.Exec();
 
-            if(outStream.Data == expectedOutput)
-                return;
-
-            Tracer.Line("---------------------\n" + outStream.Data + "\n---------------------");
-            Tracer.ThrowAssertionFailed(
-                "outStream.Data != expectedOutput",
-                () => "outStream.Data:" + outStream.Data + " expected: " + expectedOutput);
+            if(outStream.Data != targetSet.Output)
+            {
+                Tracer.Line("---------------------\n" + outStream.Data + "\n---------------------");
+                Tracer.ThrowAssertionFailed(
+                    "outStream.Data != targetSet.Output",
+                    () => "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output);
+            }
+            if(!IsExpected(c.Issues))
+            {
+                Tracer.Line("---------------------\n" + c.Issues + "\n---------------------");
+                Tracer.ThrowAssertionFailed(
+                    "!targetSet.IsExpected(c.Issues)",
+                    () => "c.Issues:" + c.Issues);
+            }
         }
 
         void RunDependant()
@@ -99,7 +106,7 @@ namespace Reni.FeatureTest
                 _cache = new Dictionary<System.Type, CompilerTest>();
 
             foreach(var tuple in TargetSet)
-                CreateFileAndRunCompiler(depth + 1, GetType().PrettyName(), tuple.Item1, AssertValid, tuple.Item2);
+                CreateFileAndRunCompiler(depth + 1, GetType().PrettyName(), tuple, AssertValid);
         }
 
 
@@ -119,20 +126,27 @@ namespace Reni.FeatureTest
                 ((CompilerTest) Activator.CreateInstance(dependsOnType)).RunDependant();
         }
 
-        IEnumerable<Tuple<string, string>> TargetSet
+        TargetSetData[] TargetSet
         {
             get
             {
-                var result = GetStringPairAttributes<TargetSetAttribute>();
-                if(Target != "")
-                    result = result.Concat(new[] {new Tuple<string, string>(Target, Output)}).ToArray();
+                var result = GetType()
+                    .GetAttributes<TargetSetAttribute>(true)
+                    .Select(tsa => tsa.TargetSet)
+                    .ToArray();
 
-                return result;
+                if(Target == "")
+                    return result;
+
+                return result
+                    .Concat(new[] {new TargetSetData(Target, Output)})
+                    .ToArray();
             }
         }
 
         protected virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
         protected virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
+        internal virtual bool IsExpected(IEnumerable<IssueBase> issues) { return !issues.Any(); }
 
         protected virtual IEnumerable<System.Type> DependsOn
         {
@@ -150,55 +164,6 @@ namespace Reni.FeatureTest
             return attrs.Length == 1 ? ((T) attrs[0]).Value : "";
         }
 
-        Tuple<string, string>[] GetStringPairAttributes<T>() where T : StringPairAttribute
-        {
-            return GetType()
-                .GetCustomAttributes(typeof(T), true)
-                .Select(x => ((StringPairAttribute) x).Value)
-                .ToArray();
-        }
-
         protected virtual void AssertValid(Compiler c) { }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    abstract class StringAttribute : Attribute
-    {
-        internal readonly string Value;
-        protected StringAttribute(string value) { Value = value; }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    sealed class OutputAttribute : StringAttribute
-    {
-        internal OutputAttribute(string value)
-            : base(value) { }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    sealed class TargetAttribute : StringAttribute
-    {
-        internal TargetAttribute(string value)
-            : base(value) { }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    sealed class InstanceCodeAttribute : StringAttribute
-    {
-        public InstanceCodeAttribute(string value)
-            : base(value) { }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    sealed class TargetSetAttribute : StringPairAttribute
-    {
-        internal TargetSetAttribute(string target, string output)
-            : base(new Tuple<string, string>(target, output)) { }
-    }
-
-    abstract class StringPairAttribute : Attribute
-    {
-        public readonly Tuple<string, string> Value;
-        protected StringPairAttribute(Tuple<string, string> value) { Value = value; }
     }
 }

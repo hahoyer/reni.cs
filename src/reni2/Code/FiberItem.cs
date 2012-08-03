@@ -85,6 +85,8 @@ namespace Reni.Code
         internal virtual bool HasArg { get { return false; } }
         [DisableDump]
         internal Size TemporarySize { get { return OutputSize + GetAdditionalTemporarySize(); } }
+        [DisableDump]
+        internal virtual IEnumerable<IssueBase> Issues { get { return IssueBase.Empty; } }
 
         protected virtual Size GetAdditionalTemporarySize() { return Size.Zero; }
 

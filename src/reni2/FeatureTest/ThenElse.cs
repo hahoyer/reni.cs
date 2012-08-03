@@ -51,3 +51,8 @@ namespace Reni.FeatureTest.ThenElse
         public override void Run() { BaseRun(); }
     }
 }
+
+namespace Reni.FeatureTest.Validation
+{
+}
+
