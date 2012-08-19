@@ -24,38 +24,31 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.Code;
-using Reni.Parser;
-using Reni.Validation;
+using Reni.Basics;
+using Reni.Context;
+using Reni.Syntax;
+using Reni.Type;
 
-namespace Reni.Context
+namespace Reni
 {
-    sealed class UndefinedSymbolIssue : IssueBase
+    sealed class SearchFailureResult : SearchResultBase
     {
-        internal interface IIssueSource 
-        {
-            string FileErrorPosition(string tag);
-        }
+        readonly ISearchTarget _source;
+        internal SearchFailureResult(ISearchTarget source)
+            : base(0) { _source = source; }
 
-        [EnableDump]
-        readonly ContextBase _context;
-        [EnableDump]
-        readonly IIssueSource _source;
+        internal override Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        {
+            if(left == null && right == null)
+                return (context.UndefinedSymbolType(_source).Result(category));
 
-        internal UndefinedSymbolIssue(ContextBase context, IIssueSource source)
-        {
-            _context = context;
-            _source = source;
+            NotImplementedMethod(context, category, left, right);
+            return null;
         }
-        internal static IssueType CreateType(ContextBase target, IIssueSource source) { return new IssueType(new UndefinedSymbolIssue(target, source), target.RootContext); }
-        internal override string LogDump
+        internal override Result Result(Category category)
         {
-            get
-            {
-                var result = _source.FileErrorPosition(Tag);
-                return result;
-            }
+            NotImplementedMethod(category);
+            return null;
         }
-        static string Tag { get { return "UNDEF_SYMBOL"; } }
     }
 }

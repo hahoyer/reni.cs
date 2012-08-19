@@ -24,38 +24,17 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.Code;
-using Reni.Parser;
-using Reni.Validation;
+using Reni.Basics;
+using Reni.Context;
+using Reni.Syntax;
 
-namespace Reni.Context
+namespace Reni.Type
 {
-    sealed class UndefinedSymbolIssue : IssueBase
+    abstract class SearchResultBase : ReniObject
     {
-        internal interface IIssueSource 
-        {
-            string FileErrorPosition(string tag);
-        }
-
-        [EnableDump]
-        readonly ContextBase _context;
-        [EnableDump]
-        readonly IIssueSource _source;
-
-        internal UndefinedSymbolIssue(ContextBase context, IIssueSource source)
-        {
-            _context = context;
-            _source = source;
-        }
-        internal static IssueType CreateType(ContextBase target, IIssueSource source) { return new IssueType(new UndefinedSymbolIssue(target, source), target.RootContext); }
-        internal override string LogDump
-        {
-            get
-            {
-                var result = _source.FileErrorPosition(Tag);
-                return result;
-            }
-        }
-        static string Tag { get { return "UNDEF_SYMBOL"; } }
+        protected SearchResultBase(int objectId)
+            : base(objectId) { }
+        internal abstract Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
+        internal abstract Result Result(Category category);
     }
 }

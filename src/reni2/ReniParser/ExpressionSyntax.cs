@@ -30,6 +30,7 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni.ReniParser
 {
@@ -56,7 +57,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = new[] {-64}.Contains(ObjectId) && category.HasType;
+            var trace = new[] {-23}.Contains(ObjectId) && category.HasType;
             StartMethodDump(trace, context, category);
             try
             {
@@ -81,10 +82,9 @@ namespace Reni.ReniParser
                     Dump("LeftType", Left.Type(context));
                 BreakExecution();
 
-                var searchResult = context.Search(Left, _tokenClass);
-                if(searchResult == null)
-                    return ReturnMethodDump(context.UndefinedSymbolType(this).Result(category));
-
+                SearchResultBase searchResult = context.Search(Left, _tokenClass);
+                Tracer.Assert(searchResult != null);
+ 
                 Dump("searchResult", searchResult);
                 BreakExecution();
 

@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
@@ -59,7 +60,7 @@ namespace Reni
 
         internal Result Data { get { return _data; } }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal void Update(Category category)
         {
             var localCategory = category - _data.CompleteCategory - _data.PendingCategory;

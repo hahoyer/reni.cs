@@ -29,12 +29,11 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
-using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Context
 {
@@ -77,15 +76,15 @@ namespace Reni.Context
         [UsedImplicitly]
         internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
 
-        internal ContextBase UniqueStructurePositionContext(Struct.Container container, int position) { return _cache.StructContexts[container][position]; }
+        internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts[container][position]; }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }
-        internal Structure UniqueStructure(Struct.Container container) { return UniqueStructure(container, container.EndPosition); }
-        internal Structure UniqueStructure(Struct.Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
-        internal ContainerContextObject UniqueContainerContext(Struct.Container context) { return _cache.ContainerContextObjects[context]; }
+        internal Structure UniqueStructure(Container container) { return UniqueStructure(container, container.EndPosition); }
+        internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
+        internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects[context]; }
 
         internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search("context"); }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
         {
             var cacheItem = _cache.ResultCache[syntax];
@@ -97,7 +96,7 @@ namespace Reni.Context
 
         internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache[syntax].Data & category; }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == -247 && ObjectId == 11;
@@ -115,7 +114,7 @@ namespace Reni.Context
             }
         }
 
-        //[DebuggerHidden]
+        [DebuggerHidden]
         ResultCache CreateCacheElement(CompileSyntax syntax)
         {
             var result = new ResultCache
@@ -128,18 +127,21 @@ namespace Reni.Context
 
         TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }
 
-        SearchResult Search(ISearchTarget target)
+        [NotNull]
+        SearchResultBase Search(ISearchTarget target)
         {
             var visitor = new ContextSearchVisitor(target);
             visitor.Search(this);
+
+            Tracer.Assert(visitor.SearchResult != null, visitor.Dump);
             return visitor.SearchResult;
         }
 
-        internal SearchResult Search(CompileSyntax syntax, ISearchTarget target)
+        internal SearchResultBase Search(CompileSyntax syntax, ISearchTarget target)
         {
-            return syntax == null
-                       ? Search(target)
-                       : Type(syntax).UnAlignedType.Search<ISuffixFeature>(target);
+            var result = syntax == null ? Search(target) : Type(syntax).UnAlignedType.Search<ISuffixFeature>(target);
+            Tracer.Assert(result != null, Dump);
+            return result;
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
@@ -169,15 +171,15 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>> StructContexts;
+            internal readonly DictionaryEx<Container, DictionaryEx<int, ContextBase>> StructContexts;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Struct.Container, DictionaryEx<int, Structure>> Structures;
+            internal readonly DictionaryEx<Container, DictionaryEx<int, Structure>> Structures;
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<Struct.Container, ContainerContextObject> ContainerContextObjects;
+            internal readonly DictionaryEx<Container, ContainerContextObject> ContainerContextObjects;
 
             [Node]
             [SmartNode]
@@ -185,7 +187,7 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<ExpressionSyntax, Validation.IssueType> UndefinedSymbolType;
+            internal readonly DictionaryEx<UndefinedSymbolIssue.IIssueSource, IssueType> UndefinedSymbolType;
 
             [Node]
             [SmartNode]
@@ -193,20 +195,20 @@ namespace Reni.Context
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new DictionaryEx<ExpressionSyntax, Validation.IssueType>(syntax => UndefinedSymbolIssue.CreateType(target, syntax));
+                UndefinedSymbolType = new DictionaryEx<UndefinedSymbolIssue.IIssueSource, IssueType>(source => UndefinedSymbolIssue.CreateType(target, source));
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
-                StructContexts = new DictionaryEx<Struct.Container, DictionaryEx<int, ContextBase>>(
+                StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>(
                     container =>
                     new DictionaryEx<int, ContextBase>(
                         position => new Struct.Context(target, container, position)));
                 PendingContext = new SimpleCache<PendingContext>(() => new PendingContext(target));
                 RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<IFunctionContext>(target.ObtainRecentFunctionContext);
-                Structures = new DictionaryEx<Struct.Container, DictionaryEx<int, Structure>>(
+                Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(
                     container =>
                     new DictionaryEx<int, Structure>(
                         position => new Structure(ContainerContextObjects[container], position)));
-                ContainerContextObjects = new DictionaryEx<Struct.Container, ContainerContextObject>(container => new ContainerContextObject(container, target));
+                ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>(container => new ContainerContextObject(container, target));
             }
 
             [DisableDump]
@@ -285,6 +287,6 @@ namespace Reni.Context
             }
         }
 
-        internal Validation.IssueType UndefinedSymbolType(ExpressionSyntax syntax) { return _cache.UndefinedSymbolType[syntax]; }
+        internal IssueType UndefinedSymbolType(UndefinedSymbolIssue.IIssueSource source) { return _cache.UndefinedSymbolType[source]; }
     }
 }

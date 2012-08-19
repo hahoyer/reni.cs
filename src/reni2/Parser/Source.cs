@@ -35,11 +35,11 @@ namespace Reni.Parser
 
         internal string SubString(int start, int length) { return _data.Substring(start, length); }
 
-        internal string FilePosn(int i, string flagText)
+        internal string FilePosn(int i, string flagText, string tag = null)
         {
             if(_file == null)
                 return "????";
-            return Tracer.FilePosn(_file.FullName, LineNr(i), ColNr(i) + 1, FilePositionTag.Debug) + flagText;
+            return Tracer.FilePosn(_file.FullName, LineNr(i), ColNr(i) + 1, tag??FilePositionTag.Debug.ToString()) + flagText;
         }
 
         private int LineNr(int iEnd)

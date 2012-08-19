@@ -86,13 +86,14 @@
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
-    <Compile Include="FeatureTest\Validation\UndefinedVariable.cs" />
+    <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="IProxyType.cs" />
+    <Compile Include="SearchFailureResult.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="PathItemSearchVisitor.cs" />
@@ -327,6 +328,7 @@
     <Compile Include="Type\PointerType.cs" />
     <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\SearchResult.cs" />
+    <Compile Include="Type\SearchResultBase.cs" />
     <Compile Include="Type\SetterTargetType.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemsType.cs" />

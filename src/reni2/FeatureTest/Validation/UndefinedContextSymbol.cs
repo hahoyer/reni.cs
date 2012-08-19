@@ -30,9 +30,43 @@ using Reni.Code;
 namespace Reni.FeatureTest.Validation
 {
     [TestFixture]
-    [Target(@"x dump_print;")]
+    [Target(@"x")]
     [Output("")]
-    public sealed class UndefinedVariable : CompilerTest
+    [LowPriority]
+    public sealed class UndefinedContextSymbol : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+        internal override bool IsExpected(IEnumerable<IssueBase> issues)
+        {
+            var issue = issues.Single();
+            Tracer.DumpStaticMethodWithData(issue);
+            Tracer.TraceBreak();
+            return false;
+        }
+    }
+
+    [TestFixture]
+    [Target(@"x: 3; x x")]
+    [Output("")]
+    public sealed class UndefinedSymbol : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+        internal override bool IsExpected(IEnumerable<IssueBase> issues)
+        {
+            var issue = issues.Single();
+            Tracer.DumpStaticMethodWithData(issue);
+            Tracer.TraceBreak();
+            return false;
+        }
+    }
+
+    [TestFixture]
+    [Target(@"x dump_print")]
+    [Output("")]
+    [UndefinedContextSymbol]
+    public sealed class UseOfUndefinedContextSymbol : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }

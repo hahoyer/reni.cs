@@ -24,9 +24,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Type;
 
 namespace Reni.Validation
@@ -41,7 +43,7 @@ namespace Reni.Validation
             _issue = issue;
             _rootContext = rootContext;
         }
-
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this); }
         [DisableDump]
         internal override Root RootContext { get { return _rootContext; } }
         [DisableDump]
@@ -50,5 +52,20 @@ namespace Reni.Validation
         internal Result Result(Category category) { return base.Result(category, getCode: Code); }
 
         CodeBase Code() { return CodeBase.Issue(_issue); }
+        public ISearchPath SearchResult(ISearchTarget target) { return new ImplicitSearchResult(this, target); }
+
+        sealed class ImplicitSearchResult : ReniObject, ISuffixFeature
+        {
+            readonly IssueType _parent;
+            readonly ISearchTarget _target;
+            public ImplicitSearchResult(IssueType parent, ISearchTarget target)
+            {
+                _parent = parent;
+                _target = target;
+            }
+            IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+            IFunctionFeature IFeature.Function { get { return null; } }
+            ISimpleFeature IFeature.Simple { get { return null; } }
+        }
     }
 }

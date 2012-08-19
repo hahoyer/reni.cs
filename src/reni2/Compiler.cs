@@ -133,7 +133,7 @@ namespace Reni
                 Tracer.FlaggedLine(CSharpCode);
 
             foreach(var t in Issues)
-                _parameters.OutStream.AddLog(t + "\n");
+                _parameters.OutStream.AddLog(t.LogDump + "\n");
 
             Data.OutStream = _parameters.OutStream;
             try

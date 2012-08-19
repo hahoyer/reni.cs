@@ -31,7 +31,7 @@ using Reni.Syntax;
 
 namespace Reni.Type
 {
-    abstract class SearchResult : ReniObject
+    abstract class SearchResult : SearchResultBase
     {
         static int _nextObjectId;
         [EnableDump]
@@ -47,7 +47,7 @@ namespace Reni.Type
             ConversionFunctions = conversionFunctions;
         }
 
-        internal Result Result(Category category)
+        internal override Result Result(Category category)
         {
             category = category.Typed;
             var featureResult = Feature.Simple.Result(category);
@@ -97,7 +97,7 @@ namespace Reni.Type
             }
         }
 
-        internal Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        internal override Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             return context
                 .FunctionResult(category, left, LeftType, Feature, ConverterResult, right);

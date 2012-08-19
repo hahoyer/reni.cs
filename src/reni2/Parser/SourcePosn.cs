@@ -62,7 +62,7 @@ namespace Reni.Parser
         ///     creates the file(line,col) string to be used with "Edit.GotoNextLocation" command of IDE
         /// </summary>
         /// <param name = "flagText">the flag text</param>
-        /// <returns>the "FileName(LineNr,ColNr): flagText: " string</returns>
+        /// <returns>the "FileName(LineNr,ColNr): tag: " string</returns>
         public string FilePosn(string flagText) { return _source.FilePosn(_position, flagText); }
 
         /// <summary>

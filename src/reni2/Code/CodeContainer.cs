@@ -89,8 +89,9 @@ namespace Reni.Code
         }
     }
 
-    public class IssueBase : ReniObject
+    public abstract class IssueBase : ReniObject
     {
-        public static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
+        internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
+        internal abstract string LogDump { get; }
     }
 }

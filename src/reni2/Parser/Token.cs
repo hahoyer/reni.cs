@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Context;
 
 namespace Reni.Parser
 {
@@ -48,7 +49,7 @@ namespace Reni.Parser
         internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
     }
 
-    sealed class TokenData : ReniObject
+    sealed class TokenData : ReniObject, UndefinedSymbolIssue.IIssueSource
     {
         static int _nextObjectId;
         readonly int _length;
@@ -73,5 +74,7 @@ namespace Reni.Parser
         internal string Name { get { return Source.SubString(Position, Length); } }
 
         internal string FilePosition { get { return "\n" + Source.FilePosn(Position, Name); } }
+        public TokenClass Token { get; private set; }
+        string UndefinedSymbolIssue.IIssueSource.FileErrorPosition(string errorTag) { return "\n" + Source.FilePosn(Position, Name, "error "+errorTag); }
     }
 }
