@@ -49,7 +49,7 @@ namespace Reni.Parser
         internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
     }
 
-    sealed class TokenData : ReniObject, UndefinedSymbolIssue.IIssueSource
+    sealed class TokenData : ReniObject
     {
         static int _nextObjectId;
         readonly int _length;
@@ -72,9 +72,8 @@ namespace Reni.Parser
         internal int Length { get { return _length; } }
         [DisableDump]
         internal string Name { get { return Source.SubString(Position, Length); } }
-
+        [DisableDump]
         internal string FilePosition { get { return "\n" + Source.FilePosn(Position, Name); } }
-        public TokenClass Token { get; private set; }
-        string UndefinedSymbolIssue.IIssueSource.FileErrorPosition(string errorTag) { return "\n" + Source.FilePosn(Position, Name, "error "+errorTag); }
+        internal string FileErrorPosition(string errorTag) { return "\n" + Source.FilePosn(Position, Name, "error " + errorTag); }
     }
 }

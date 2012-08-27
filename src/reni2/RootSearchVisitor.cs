@@ -26,18 +26,20 @@ using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Feature;
+using Reni.ReniParser;
 
 namespace Reni
 {
     abstract class RootSearchVisitor<TFeature> : SearchVisitor<TFeature>
         where TFeature : class, ISearchPath
     {
+        readonly DictionaryEx<System.Type, Probe> _probes;
         readonly ISearchTarget _target;
         protected TFeature Result { get; private set; }
 
         internal RootSearchVisitor(ISearchTarget target)
-            : base(new DictionaryEx<System.Type, string>())
         {
+            _probes = new DictionaryEx<System.Type, Probe>(Probe.Create);
             _target = target;
             ConversionFunctions = new IConversionFunction[0];
         }
@@ -55,5 +57,6 @@ namespace Reni
         }
 
         internal override ISearchTarget Target { get { return _target; } }
+        internal override DictionaryEx<System.Type, Probe> Probes { get { return _probes; } }
     }
 }

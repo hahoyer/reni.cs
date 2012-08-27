@@ -93,8 +93,8 @@
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="IProxyType.cs" />
-    <Compile Include="SearchFailureResult.cs" />
     <Compile Include="ReniObjectExtender.cs" />
+    <Compile Include="ReniParser\Probe.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="PathItemSearchVisitor.cs" />
     <Compile Include="Code\Arg.cs" />
@@ -328,7 +328,6 @@
     <Compile Include="Type\PointerType.cs" />
     <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\SearchResult.cs" />
-    <Compile Include="Type\SearchResultBase.cs" />
     <Compile Include="Type\SetterTargetType.cs" />
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemsType.cs" />

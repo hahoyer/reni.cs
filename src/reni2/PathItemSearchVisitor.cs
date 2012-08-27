@@ -24,7 +24,9 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Feature;
+using Reni.ReniParser;
 
 namespace Reni
 {
@@ -32,6 +34,7 @@ namespace Reni
         where TFeature : class, ISearchPath
         where TType : IDumpShortProvider
     {
+        internal override DictionaryEx<System.Type, Probe> Probes { get { return _parent.Probes; } }
         [DisableDump]
         readonly SearchVisitor<TFeature> _parent;
 
@@ -39,7 +42,6 @@ namespace Reni
         readonly TType _target;
 
         public PathItemSearchVisitor(SearchVisitor<TFeature> parent, TType target)
-            : base(parent.Probe)
         {
             _parent = parent;
             _target = target;

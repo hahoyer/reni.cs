@@ -48,7 +48,7 @@ namespace Reni.TokenClasses
         {
             var leftType = left.Type(context);
             var feature = leftType.Feature;
-            return context.FunctionResult(category, left, leftType, feature, null, right);
+            return context.FunctionResult(category, leftType, feature, null, left,right);
         }
     }
 }

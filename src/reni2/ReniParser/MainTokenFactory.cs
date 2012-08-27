@@ -101,48 +101,53 @@ namespace Reni.ReniParser
         ///     Creates the main token classes.
         /// </summary>
         /// <returns> </returns>
-        protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()
+        protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses() { return TokenClasses; }
+
+        internal new static DictionaryEx<string, TokenClasses.TokenClass> TokenClasses
         {
-            return new DictionaryEx<string, TokenClasses.TokenClass>
+            get
             {
-                {"@", new AtOperator()},
-                {"^", new ContextOperator()},
-                {":", new Colon()},
-                {":=", new Assignment()},
-                {"=", new Equal()},
-                {">", new CompareOperator()},
-                {">=", new CompareOperator()},
-                {"<", new CompareOperator()},
-                {"<=", new CompareOperator()},
-                {"<>", new NotEqual()},
-                {"<<", new ConcatArrays()},
-                {"-", new Sign()},
-                {"!", new Exclamation()},
-                {"+", new Sign()},
-                {"/", new Slash()},
-                {"/\\", new TokenClasses.Function()},
-                {"/!\\", new TokenClasses.Function(isImplicit: true)},
-                {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
-                {"/!\\/!\\", new TokenClasses.Function(isImplicit: true, isMetaFunction: true)},
-                {"*", new Star()},
-                {"_A_T_", new AtToken()},
-                {"arg", new ArgToken()},
-                {"dump_print", new DumpPrintToken()},
-                {"else", new ElseToken()},
-                {"enable_cut", new EnableCut()},
-                {"enable_raw_conversion", new EnableRawConversion()},
-                {"function_instance", new FunctionInstanceToken()},
-                {"instance", new InstanceToken()},
-                {"new_value", new NewValueToken()},
-                {"reference", new ReferenceToken()},
-                {"sequence", new SequenceToken()},
-                {"text_item", new TextItem()},
-                {"text_items", new TextItems()},
-                {"then", new ThenToken()},
-                {"to_number_of_base", new ToNumberOfBase()},
-                {"undecorate", new UndecorateToken()},
-                {"type", new TypeOperator()}
-            };
+                return new DictionaryEx<string, TokenClasses.TokenClass>
+                {
+                    {"@", new AtOperator()},
+                    {"^", new ContextOperator()},
+                    {":", new Colon()},
+                    {":=", new Assignment()},
+                    {"=", new Equal()},
+                    {">", new CompareOperator()},
+                    {">=", new CompareOperator()},
+                    {"<", new CompareOperator()},
+                    {"<=", new CompareOperator()},
+                    {"<>", new NotEqual()},
+                    {"<<", new ConcatArrays()},
+                    {"-", new Sign()},
+                    {"!", new Exclamation()},
+                    {"+", new Sign()},
+                    {"/", new Slash()},
+                    {"/\\", new TokenClasses.Function()},
+                    {"/!\\", new TokenClasses.Function(isImplicit: true)},
+                    {"/\\/\\", new TokenClasses.Function(isMetaFunction: true)},
+                    {"/!\\/!\\", new TokenClasses.Function(isImplicit: true, isMetaFunction: true)},
+                    {"*", new Star()},
+                    {"_A_T_", new AtToken()},
+                    {"arg", new ArgToken()},
+                    {"dump_print", new DumpPrintToken()},
+                    {"else", new ElseToken()},
+                    {"enable_cut", new EnableCut()},
+                    {"enable_raw_conversion", new EnableRawConversion()},
+                    {"function_instance", new FunctionInstanceToken()},
+                    {"instance", new InstanceToken()},
+                    {"new_value", new NewValueToken()},
+                    {"reference", new ReferenceToken()},
+                    {"sequence", new SequenceToken()},
+                    {"text_item", new TextItem()},
+                    {"text_items", new TextItems()},
+                    {"then", new ThenToken()},
+                    {"to_number_of_base", new ToNumberOfBase()},
+                    {"undecorate", new UndecorateToken()},
+                    {"type", new TypeOperator()}
+                };
+            }
         }
 
         protected override TokenClasses.TokenClass GetListClass() { return new List(); }

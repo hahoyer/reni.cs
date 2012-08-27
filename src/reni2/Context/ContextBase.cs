@@ -30,6 +30,7 @@ using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
@@ -62,9 +63,6 @@ namespace Reni.Context
         internal RefAlignParam RefAlignParam { get { return Root.DefaultRefAlignParam; } }
 
         [DisableDump]
-        internal int AlignBits { get { return RefAlignParam.AlignBits; } }
-
-        [DisableDump]
         internal abstract Root RootContext { get; }
 
         [DisableDump]
@@ -82,7 +80,7 @@ namespace Reni.Context
         internal Structure UniqueStructure(Container container, int accessPosition) { return _cache.Structures[container][accessPosition]; }
         internal ContainerContextObject UniqueContainerContext(Container context) { return _cache.ContainerContextObjects[context]; }
 
-        internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search("context"); }
+        internal virtual void Search(ContextSearchVisitor searchVisitor) { searchVisitor.Search(); }
 
         [DebuggerHidden]
         internal Result UniqueResult(Category category, CompileSyntax syntax)
@@ -125,23 +123,20 @@ namespace Reni.Context
             return result;
         }
 
-        TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }
+        internal TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }
 
-        [NotNull]
-        SearchResultBase Search(ISearchTarget target)
+        internal SearchResult Search(ISearchTarget target)
         {
             var visitor = new ContextSearchVisitor(target);
             visitor.Search(this);
-
-            Tracer.Assert(visitor.SearchResult != null, visitor.Dump);
             return visitor.SearchResult;
         }
 
-        internal SearchResultBase Search(CompileSyntax syntax, ISearchTarget target)
+        internal IEnumerable<Probe> Probes(ISearchTarget target)
         {
-            var result = syntax == null ? Search(target) : Type(syntax).UnAlignedType.Search<ISuffixFeature>(target);
-            Tracer.Assert(result != null, Dump);
-            return result;
+            NotImplementedMethod(target);
+            return null;
+
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
@@ -187,7 +182,7 @@ namespace Reni.Context
 
             [Node]
             [SmartNode]
-            internal readonly DictionaryEx<UndefinedSymbolIssue.IIssueSource, IssueType> UndefinedSymbolType;
+            internal readonly DictionaryEx<ExpressionSyntax, IssueType> UndefinedSymbolType;
 
             [Node]
             [SmartNode]
@@ -195,7 +190,7 @@ namespace Reni.Context
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new DictionaryEx<UndefinedSymbolIssue.IIssueSource, IssueType>(source => UndefinedSymbolIssue.CreateType(target, source));
+                UndefinedSymbolType = new DictionaryEx<ExpressionSyntax, IssueType>(syntax => UndefinedSymbolIssue.Type(target, syntax));
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
                 StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>(
                     container =>
@@ -254,10 +249,10 @@ namespace Reni.Context
             }
         }
 
-        internal Result FunctionResult(Category category, CompileSyntax left, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax right)
+        internal Result FunctionResult(Category category, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax left, CompileSyntax right)
         {
             var trace = feature is AccessFeature && feature.GetObjectId() == -1;
-            StartMethodDump(trace, category, left, leftType, feature, converterResult, right);
+            StartMethodDump(trace, category, leftType, feature, converterResult, left,right);
             try
             {
                 feature.AssertValid(right != null);
@@ -286,7 +281,5 @@ namespace Reni.Context
                 EndMethodDump();
             }
         }
-
-        internal IssueType UndefinedSymbolType(UndefinedSymbolIssue.IIssueSource source) { return _cache.UndefinedSymbolType[source]; }
     }
 }

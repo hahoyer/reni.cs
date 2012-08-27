@@ -121,7 +121,7 @@ namespace Reni.Parser
         protected virtual TTokenClass GetNumberClass() { return GetSyntaxError("unexpected number"); }
         protected virtual TTokenClass GetTextClass() { return GetSyntaxError("unexpected string"); }
 
-        private Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
+        internal Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
         protected ITokenClass TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }
     }
 }

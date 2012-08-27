@@ -24,7 +24,6 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Context;
 using Reni.Feature;
 using Reni.Type;
 
@@ -37,24 +36,12 @@ namespace Reni
         readonly TypeBase _type;
 
         internal TypeRootSearchVisitor(ISearchTarget target, TypeBase type)
-            : base(target)
-        {
-            _type = type;
-        }
+            : base(target) { _type = type; }
 
         [EnableDump]
-        internal string[] ProbeStr
-        {
-            get
-            {
-                return Probe
-                    .ToArray()
-                    .Select(pair => pair.Key.PrettySearchPath() + " [" + pair.Value + "]")
-                    .ToArray();
-            }
-        }
+        internal IEnumerable<string> ProbeStr { get { return Probes.Values.Select(probe => probe.LogDump); } }
 
-        internal SearchResultBase SearchResult
+        internal SearchResult SearchResult
         {
             get
             {

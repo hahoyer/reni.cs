@@ -111,12 +111,18 @@ namespace Reni.Syntax
             return result;
         }
 
-        internal Result OperationResult(ContextBase context, Category category, ISearchTarget target)
+        internal Result PrefixOperationResult(ContextBase context, Category category, ISearchTarget target)
         {
-            return Type(context)
-                .OperationResult<IPrefixFeature>(category, target);
+            var searchResult = Type(context).Search<IPrefixFeature>(target);
+            if (searchResult == null)
+                return null;
+            return searchResult.Result(category);
         }
 
+        internal IEnumerable<Probe> PrefixOperationProbes(ContextBase context, ISearchTarget target)
+        {
+            return Type(context).Probes<IPrefixFeature>(target);
+        }
 
         internal bool IsDataLessStructureElement(ContextBase context)
         {

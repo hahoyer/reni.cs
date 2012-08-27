@@ -26,6 +26,8 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.Code;
+using Reni.Context;
+using Reni.ReniParser;
 
 namespace Reni.FeatureTest.Validation
 {
@@ -37,12 +39,11 @@ namespace Reni.FeatureTest.Validation
     {
         [Test]
         public override void Run() { BaseRun(); }
-        internal override bool IsExpected(IEnumerable<IssueBase> issues)
+        protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issue = issues.Single();
             Tracer.DumpStaticMethodWithData(issue);
             Tracer.TraceBreak();
-            return false;
         }
     }
 
@@ -53,12 +54,9 @@ namespace Reni.FeatureTest.Validation
     {
         [Test]
         public override void Run() { BaseRun(); }
-        internal override bool IsExpected(IEnumerable<IssueBase> issues)
+        protected override void Verify(IEnumerable<IssueBase> issues)
         {
-            var issue = issues.Single();
-            Tracer.DumpStaticMethodWithData(issue);
-            Tracer.TraceBreak();
-            return false;
+            var issue = (UndefinedSymbolIssue) issues.Single();
         }
     }
 
@@ -70,12 +68,9 @@ namespace Reni.FeatureTest.Validation
     {
         [Test]
         public override void Run() { BaseRun(); }
-        internal override bool IsExpected(IEnumerable<IssueBase> issues)
+        protected override void Verify(IEnumerable<IssueBase> issues)
         {
-            var issue = issues.Single();
-            Tracer.DumpStaticMethodWithData(issue);
-            Tracer.TraceBreak();
-            return false;
+            var issue = (UndefinedSymbolIssue)issues.Single();
         }
     }
 }

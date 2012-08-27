@@ -82,12 +82,15 @@ namespace Reni.FeatureTest
                     "outStream.Data != targetSet.Output",
                     () => "outStream.Data:" + outStream.Data + " expected: " + targetSet.Output);
             }
-            if(!IsExpected(c.Issues))
+            
+            try
+            {
+                Verify(c.Issues);
+            }
+            catch(Exception)
             {
                 Tracer.Line("---------------------\n" + c.Issues + "\n---------------------");
-                Tracer.ThrowAssertionFailed(
-                    "!targetSet.IsExpected(c.Issues)",
-                    () => "c.Issues:" + c.Issues);
+                throw;
             }
         }
 
@@ -146,7 +149,7 @@ namespace Reni.FeatureTest
 
         protected virtual string Output { get { return GetStringAttribute<OutputAttribute>(); } }
         protected virtual string Target { get { return GetStringAttribute<TargetAttribute>(); } }
-        internal virtual bool IsExpected(IEnumerable<IssueBase> issues) { return !issues.Any(); }
+        protected virtual void Verify(IEnumerable<IssueBase> issues) { Tracer.Assert(!issues.Any());}
 
         protected virtual IEnumerable<System.Type> DependsOn
         {

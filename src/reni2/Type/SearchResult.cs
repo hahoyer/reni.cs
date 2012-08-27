@@ -27,11 +27,11 @@ using System;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Syntax;
+using Reni.ReniParser;
 
 namespace Reni.Type
 {
-    abstract class SearchResult : SearchResultBase
+    abstract class SearchResult : ReniObject
     {
         static int _nextObjectId;
         [EnableDump]
@@ -47,7 +47,7 @@ namespace Reni.Type
             ConversionFunctions = conversionFunctions;
         }
 
-        internal override Result Result(Category category)
+        internal Result Result(Category category)
         {
             category = category.Typed;
             var featureResult = Feature.Simple.Result(category);
@@ -97,10 +97,10 @@ namespace Reni.Type
             }
         }
 
-        internal override Result FunctionResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        internal Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax)
         {
             return context
-                .FunctionResult(category, left, LeftType, Feature, ConverterResult, right);
+                .FunctionResult(category, LeftType, Feature, ConverterResult, syntax.Left, syntax.Right);
         }
     }
 }

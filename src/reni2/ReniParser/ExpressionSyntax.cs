@@ -27,10 +27,10 @@ using System.Linq;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.Syntax;
 using Reni.TokenClasses;
-using Reni.Type;
 
 namespace Reni.ReniParser
 {
@@ -57,43 +57,46 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var trace = new[] {-23}.Contains(ObjectId) && category.HasType;
-            StartMethodDump(trace, context, category);
-            try
+            var result = Result(context, category);
+            if(result != null)
+                return result;
+
+            return UndefinedSymbolIssue.Type(context, this).Result(category);
+        }
+
+        internal Probe[] Probes(ContextBase context)
+        {
+            var result = new List<Probe>();
+            if(Left == null && Right != null)
+                result.AddRange(Right.PrefixOperationProbes(context, _tokenClass));
+
+            result.AddRange(Left == null
+                                ? context.Probes(_tokenClass)
+                                : context
+                                      .Type(Left)
+                                      .UnAlignedType
+                                      .Probes<ISuffixFeature>(_tokenClass));
+            return result.ToArray();
+        }
+
+        new Result Result(ContextBase context, Category category)
+        {
+            if(Left == null && Right != null)
             {
-                BreakExecution();
-
-                if(Left == null && Right != null)
-                {
-                    if(trace)
-                        Dump("RightType", Right.Type(context)); 
-
-                    var prefixOperationResult = Right.OperationResult(context, category, _tokenClass);
-                    if(prefixOperationResult != null)
-                    {
-                        Dump("prefixOperationResult", prefixOperationResult);
-                        BreakExecution();
-                        var result = prefixOperationResult.ReplaceArg(Right.SmartReferenceResult(context, category));
-                        return ReturnMethodDump(result);
-                    }
-                }
-
-                if (trace && Left != null)
-                    Dump("LeftType", Left.Type(context));
-                BreakExecution();
-
-                SearchResultBase searchResult = context.Search(Left, _tokenClass);
-                Tracer.Assert(searchResult != null);
- 
-                Dump("searchResult", searchResult);
-                BreakExecution();
-
-                return ReturnMethodDump(searchResult.FunctionResult(context, category, Left, Right));
+                var prefixOperationResult = Right.PrefixOperationResult(context, category, _tokenClass);
+                if(prefixOperationResult != null)
+                    return prefixOperationResult
+                        .ReplaceArg(Right.SmartReferenceResult(context, category));
             }
-            finally
-            {
-                EndMethodDump();
-            }
+
+            var searchResult
+                = Left == null
+                      ? context.Search(_tokenClass)
+                      : context
+                            .Type(Left)
+                            .UnAlignedType
+                            .Search<ISuffixFeature>(_tokenClass);
+            return searchResult == null ? null : searchResult.FunctionResult(context, category, this);
         }
 
         internal override string DumpShort()
@@ -122,6 +125,7 @@ namespace Reni.ReniParser
                 return result;
             }
         }
+        internal string FileErrorPosition(string errorTag) { return Token.FileErrorPosition(errorTag); }
     }
 
     // Lord of the weed

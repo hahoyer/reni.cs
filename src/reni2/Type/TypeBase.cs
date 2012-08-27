@@ -33,8 +33,10 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -337,7 +339,7 @@ namespace Reni.Type
             return -1;
         }
 
-        internal SearchResultBase Search<TFeature>(ISearchTarget target)
+        internal SearchResult Search<TFeature>(ISearchTarget target)
             where TFeature : class, IFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
@@ -348,6 +350,14 @@ namespace Reni.Type
             if(Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
+        }
+
+        public IEnumerable<Probe> Probes<TFeature>(ISearchTarget target)
+            where TFeature : class, IFeature
+        {
+            var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
+            Search(visitor);
+            return visitor.Probes.Values;
         }
 
         internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
@@ -389,14 +399,6 @@ namespace Reni.Type
                  , getCode: () => CodeBase.ReferenceCode(target).ReferencePlus(offset).Dereference(Size)
                 );
         }
-        internal Result OperationResult<TFeature>(Category category, ISearchTarget target)
-            where TFeature : class, IFeature
-        {
-            var feature = Search<TFeature>(target);
-            Tracer.Assert(feature != null, Dump);
-            var result = feature.Result(category);
-            return result;
-        }
 
         IReferenceType ObtainPointer() { return this as IReferenceType ?? new PointerType(this); }
 
@@ -409,8 +411,13 @@ namespace Reni.Type
             return UniqueAlign.ArgCode
                 .BitSequenceOperation(token, Size);
         }
+
         [NotNull]
-        internal Result GenericDumpPrintResult(Category category) { return OperationResult<ISuffixFeature>(category, _dumpPrintToken.Value); }
+        internal Result GenericDumpPrintResult(Category category)
+        {
+            return Search<ISuffixFeature>(_dumpPrintToken.Value)
+                .Result(category);
+        }
 
         static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create);
 
@@ -486,7 +493,7 @@ namespace Reni.Type
             return result;
         }
 
-        SearchResultBase Converter(TypeBase destination)
+        SearchResult Converter(TypeBase destination)
         {
             return
                 Search<ISuffixFeature>(destination.ConversionProvider);

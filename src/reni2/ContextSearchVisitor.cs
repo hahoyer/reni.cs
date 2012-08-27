@@ -36,13 +36,13 @@ namespace Reni
         internal ContextSearchVisitor(ISearchTarget target)
             : base(target) { }
 
-        internal SearchResultBase SearchResult
+        internal SearchResult SearchResult
         {
             get
             {
                 if(IsSuccessFull)
                     return new ContextSearchResult(Result, ConversionFunctions);
-                return new SearchFailureResult(Target);
+                return null;
             }
         }
 

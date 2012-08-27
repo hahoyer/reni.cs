@@ -24,38 +24,38 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Code;
-using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Validation;
 
 namespace Reni.Context
 {
     sealed class UndefinedSymbolIssue : IssueBase
     {
-        internal interface IIssueSource 
-        {
-            string FileErrorPosition(string tag);
-        }
-
         [EnableDump]
         readonly ContextBase _context;
         [EnableDump]
-        readonly IIssueSource _source;
+        readonly ExpressionSyntax _syntax;
 
-        internal UndefinedSymbolIssue(ContextBase context, IIssueSource source)
+        internal UndefinedSymbolIssue(ContextBase context, ExpressionSyntax syntax)
         {
             _context = context;
-            _source = source;
+            _syntax = syntax;
         }
-        internal static IssueType CreateType(ContextBase target, IIssueSource source) { return new IssueType(new UndefinedSymbolIssue(target, source), target.RootContext); }
+
         internal override string LogDump
         {
             get
             {
-                var result = _source.FileErrorPosition(Tag);
+                var result = _syntax.FileErrorPosition(Tag);
+                result += ("\n"+Probes.Where(p=>p.HasImplementations).Select(x=>x.LogDump).Format("\n")).Indent();
                 return result;
             }
         }
         static string Tag { get { return "UNDEF_SYMBOL"; } }
+        [DisableDump]
+        Probe[] Probes { get { return _syntax.Probes(_context); } }
+        internal static IssueType Type(ContextBase context, ExpressionSyntax syntax) { return new IssueType(new UndefinedSymbolIssue(context, syntax), context.RootContext); }
     }
 }

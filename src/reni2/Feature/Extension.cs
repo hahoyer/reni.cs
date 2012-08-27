@@ -106,5 +106,6 @@ namespace Reni.Feature
             var types = type.GetGenericArguments();
             return PrettySearchPath(types[0]) + " -> " + types[1].PrettyName();
         }
+
     }
 }
