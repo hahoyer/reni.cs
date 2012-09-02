@@ -51,21 +51,13 @@ namespace ReniTest
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
-            Assembly.GetExecutingAssembly().RunTests();
-            //InspectCompiler();
+            //Assembly.GetExecutingAssembly().RunTests();
+            InspectCompiler();
             //Reni.Proof.Main.Run();
         }
 
-        const string Target = @"
-f1: ((
-  y: 3;
-  f: y/\;
-  f(2)
-) _A_T_ 2)/\;
-
-f1()dump_print;
-";
-        const string Output = "3";
+        const string Target = @"f: arg()/\; x: 1; f(x/\) dump_print";
+        const string Output = "1";
         static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
 
         static Compiler CreateCompiler(string text)

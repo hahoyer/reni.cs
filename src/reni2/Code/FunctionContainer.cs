@@ -24,12 +24,15 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 
 namespace Reni.Code
 {
     sealed class FunctionContainer : ReniObject
     {
+        [Node]
         internal readonly Container Getter;
+        [Node]
         internal readonly Container Setter;
 
         public FunctionContainer(Container getter, Container setter)

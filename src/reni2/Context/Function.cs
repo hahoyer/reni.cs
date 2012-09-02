@@ -44,7 +44,7 @@ namespace Reni.Context
             _valueType = valueType;
         }
 
-        Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
+        Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
 
         internal override IFunctionContext ObtainRecentFunctionContext() { return this; }
 
@@ -60,7 +60,7 @@ namespace Reni.Context
             if(_valueType == null)
                 throw new ValueCannotBeUsedHereException();
             return _valueType.UniquePointer
-                .ContextAccessResult(category.Typed, this, (ArgsType.Size + RefAlignParam.RefSize) * -1)
+                .ContextAccessResult(category.Typed, this, (ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
                 & category;
         }
     }

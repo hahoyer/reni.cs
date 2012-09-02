@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Struct;
@@ -36,8 +37,10 @@ namespace Reni.Context
     sealed class Root : ContextBase
     {
         [DisableDump]
+        [Node]
         readonly FunctionList _functions = new FunctionList();
         [DisableDump]
+        [Node]
         internal readonly IExecutionContext ExecutionContext;
 
         readonly SimpleCache<BitType> _bitCache;
@@ -53,8 +56,10 @@ namespace Reni.Context
         [DisableDump]
         internal override Root RootContext { get { return this; } }
         [DisableDump]
+        [Node]
         internal BitType BitType { get { return _bitCache.Value; } }
         [DisableDump]
+        [Node]
         internal VoidType VoidType { get { return _voidCache.Value; } }
         [DisableDump]
         internal int FunctionCount { get { return _functions.Count; } }

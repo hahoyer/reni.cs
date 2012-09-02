@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
+using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -46,12 +47,18 @@ namespace Reni.Struct
         {
             _structure = structure;
             _syntax = syntax;
-            _objectReferenceCache = new SimpleCache<IContextReference>(() => new ContextReference(ObjectId));
+            _objectReferenceCache = new SimpleCache<IContextReference>(() => new ContextReference(this));
         }
 
         sealed class ContextReference : ReniObject, IContextReference
         {
-            public ContextReference(int objectId):base(objectId) { }
+            [Node]
+            readonly FunctionBodyType _parent;
+            public ContextReference(FunctionBodyType parent):base(parent.ObjectId)
+            {
+                _parent = parent;
+                StopByObjectId(-5);
+            }
             public Size Size { get { return Root.DefaultRefAlignParam.RefSize; } }
         }
 

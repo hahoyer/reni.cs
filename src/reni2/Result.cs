@@ -236,20 +236,26 @@ namespace Reni
             }
         }
 
-        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes()
+        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() { return TreeNodes; }
+
+        [DisableDump]
+        internal IEnumerable<TreeNode> TreeNodes
         {
-            if(_pendingCategory.HasAny)
-                yield return Dump().CreateNamedNode("Pending", "Pending");
-            if(HasIsDataLess)
-                yield return IsDataLess.CreateNamedNode("IsDataLess", "Logical");
-            if(HasSize)
-                yield return Size.FormatForView().CreateNamedNode("Size", "Number");
-            if(HasType)
-                yield return Type.CreateNamedNode("Type", "Type");
-            if(HasCode)
-                yield return Code.CreateNamedNode("Code", "Code");
-            if(HasArgs)
-                yield return CodeArgs.Data.CreateNamedNode("CodeArgs", "CodeArgs");
+            get
+            {
+                if(_pendingCategory.HasAny)
+                    yield return Dump().CreateNamedNode("Pending", "Pending");
+                if(HasIsDataLess)
+                    yield return IsDataLess.CreateNamedNode("IsDataLess", "Logical");
+                if(HasSize)
+                    yield return Size.FormatForView().CreateNamedNode("Size", "Number");
+                if(HasType)
+                    yield return Type.CreateNamedNode("Type", "Type");
+                if(HasCode)
+                    yield return Code.CreateNamedNode("Code", "Code");
+                if(HasArgs)
+                    yield return CodeArgs.Data.CreateNamedNode("CodeArgs", "CodeArgs");
+            }
         }
 
         internal bool? FindIsDataLess
@@ -380,7 +386,7 @@ namespace Reni
                     return false;
                 if(HasSize && !Size.IsZero)
                     return false;
-                if(HasType && !(Type is Type.VoidType))
+                if(HasType && !(Type is VoidType))
                     return false;
                 if(HasCode && !Code.IsEmpty)
                     return false;
@@ -751,7 +757,7 @@ namespace Reni
                 Tracer.Assert(size.IsZero || size == Root.DefaultRefAlignParam.RefSize, () => "Expected size: 0 or RefSize\n" + Dump());
 
             if(HasType)
-                Tracer.Assert(Type is Type.VoidType || Type is PointerType, () => "Expected type: Void or PointerType\n" + Dump());
+                Tracer.Assert(Type is VoidType || Type is PointerType, () => "Expected type: Void or PointerType\n" + Dump());
         }
 
         [DebuggerHidden]

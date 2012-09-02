@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
@@ -36,7 +37,6 @@ using Reni.Feature.DumpPrint;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -51,14 +51,23 @@ namespace Reni.Type
     {
         sealed class Cache
         {
+            [Node, SmartNode]
             public readonly DictionaryEx<int, Aligner> Aligner;
+            [Node, SmartNode]
             public readonly DictionaryEx<int, ArrayType> Array;
+            [Node, SmartNode]
             public readonly DictionaryEx<TypeBase, Pair> Pair;
+            [Node, SmartNode]
             public readonly SimpleCache<IReferenceType> Pointer;
+            [Node, SmartNode]
             public readonly DictionaryEx<int, ReferenceType> Reference;
+            [Node, SmartNode]
             public readonly SimpleCache<TypeType> TypeType;
+            [Node, SmartNode]
             public readonly SimpleCache<FunctionInstanceType> FunctionInstanceType;
+            [Node, SmartNode]
             public readonly SimpleCache<TextItemType> TextItem;
+            [Node, SmartNode]
             public readonly SimpleCache<EnableCut> EnableCut;
             public readonly SimpleCache<Size> Size;
 
@@ -78,8 +87,10 @@ namespace Reni.Type
         }
 
         static int _nextObjectId;
+        [Node, SmartNode]
         readonly Cache _cache;
         [DisableDump]
+        [Node]
         internal abstract Root RootContext { get; }
 
         [UsedImplicitly]
@@ -533,7 +544,7 @@ namespace Reni.Type
         internal virtual ISuffixFeature AlignConversion(TypeBase destination)
         {
             var childConverter = Converter(destination);
-            var searchResult = childConverter as SearchResult;
+            var searchResult = childConverter;
             if(searchResult != null)
                 return new AlignConverter(searchResult);
 
@@ -603,6 +614,7 @@ namespace Reni.Type
                 .Dereference(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
+
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature

@@ -69,6 +69,7 @@ namespace Reni
 
         [DisableDump]
         string FileName { get { return _fileName; } }
+        [Node]
         [DisableDump]
         Source Source { get { return _source.Value; } }
         [Node]
@@ -78,6 +79,7 @@ namespace Reni
         [DisableDump]
         CodeContainer CodeContainer { get { return _codeContainer.Value; } }
         [DisableDump]
+        [Node]
         internal string CSharpCode { get { return _cSharpCode.Value; } }
         [Node]
         [DisableDump]
@@ -127,7 +129,7 @@ namespace Reni
             }
 
             if(_parameters.Trace.CodeSequence)
-                CodeContainer.Dump();
+                Tracer.FlaggedLine("Code\n" + CodeContainer.Dump());
 
             if(_parameters.Trace.ExecutedCode)
                 Tracer.FlaggedLine(CSharpCode);

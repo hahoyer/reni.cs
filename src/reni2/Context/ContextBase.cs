@@ -41,7 +41,6 @@ namespace Reni.Context
     /// <summary>
     ///     Base class for compiler environments
     /// </summary>
-    [Serializable]
     abstract class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
     {
         static int _nextId;
@@ -57,12 +56,8 @@ namespace Reni.Context
 
         string IIconKeyProvider.IconKey { get { return "Context"; } }
 
+        [DisableDump]
         [Node]
-        [DisableDump]
-        [DebuggerHidden]
-        internal RefAlignParam RefAlignParam { get { return Root.DefaultRefAlignParam; } }
-
-        [DisableDump]
         internal abstract Root RootContext { get; }
 
         [DisableDump]
@@ -72,7 +67,7 @@ namespace Reni.Context
         internal IFunctionContext FindRecentFunctionContextObject { get { return _cache.RecentFunctionContextObject.Value; } }
 
         [UsedImplicitly]
-        internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(RefAlignParam.AlignBits); }
+        internal int SizeToPacketCount(Size size) { return size.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits); }
 
         internal ContextBase UniqueStructurePositionContext(Container container, int position) { return _cache.StructContexts[container][position]; }
         PendingContext UniquePendingContext { get { return _cache.PendingContext.Value; } }

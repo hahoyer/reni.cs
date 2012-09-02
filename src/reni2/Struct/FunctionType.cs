@@ -80,16 +80,6 @@ namespace Reni.Struct
         }
 
         [DisableDump]
-        public CodeBasePair BodyCode
-        {
-            get
-            {
-                return
-                    new CodeBasePair(_getter.BodyCode, _setter == null ? null : _setter.BodyCode);
-            }
-        }
-
-        [DisableDump]
         internal FunctionContainer Container
         {
             get
@@ -104,13 +94,6 @@ namespace Reni.Struct
         internal override Result GetterResult(Category category) { return _getter.CallResult(category); }
         internal override Result DestinationResult(Category category) { return Result(category, this); }
         protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
-
-        internal void EnsureBodyCode()
-        {
-            _getter.EnsureBodyCode();
-            if(_setter != null)
-                _setter.EnsureBodyCode();
-        }
 
         internal ContextBase CreateSubContext(bool useValue) { return new Reni.Context.Function(_structure.UniqueContext, ArgsType, useValue ? ValueType : null); }
         
@@ -151,18 +134,6 @@ namespace Reni.Struct
             searchVisitor.Search(this, () => ValueType);
             if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
-        }
-    }
-
-    sealed class CodeBasePair : ReniObject
-    {
-        internal readonly CodeBase Getter;
-        internal readonly CodeBase Setter;
-
-        internal CodeBasePair(CodeBase getter, CodeBase setter)
-        {
-            Getter = getter;
-            Setter = setter;
         }
     }
 }

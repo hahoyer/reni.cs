@@ -44,7 +44,7 @@ namespace Reni.Type
             var result = BitsConst.Convert(target, conversionBase);
             return _type
                 .RootContext.BitType.Result(category, result)
-                .Align(context.RefAlignParam.AlignBits);
+                .Align(Root.DefaultRefAlignParam.AlignBits);
         }
 
         IMetaFunctionFeature IFeature.MetaFunction { get { return this; } }

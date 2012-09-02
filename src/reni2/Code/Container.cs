@@ -38,6 +38,7 @@ namespace Reni.Code
 
         readonly string _description;
         readonly CodeBase _data;
+        [Node]
         internal readonly FunctionId FunctionId;
 
         public Container(CodeBase data, string description, FunctionId functionId = null)
@@ -66,7 +67,8 @@ namespace Reni.Code
         [Node]
         [DisableDump]
         public static Container UnexpectedVisitOfPending { get { return _unexpectedVisitOfPending; } }
-        public IEnumerable<IssueBase> Issues { get { return _data.Issues; } }
+        [Node]
+        public IssueBase[] Issues { get { return _data.Issues.ToArray(); } }
 
         public string GetCSharpStatements(int indent)
         {

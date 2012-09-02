@@ -24,14 +24,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using HWClassLibrary.Debug;
+using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Type;
 
 namespace Reni
 {
-    sealed class ResultCache : ReniObject
+    sealed class ResultCache : ReniObject, ITreeNodeSupport
     {
         readonly Result _data = new Result();
         readonly Func<Category, Result> _obtainFlatResult;
@@ -230,5 +232,7 @@ namespace Reni
             result += Data.DumpData();
             return result;
         }
+
+        IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() { return _data.TreeNodes; }
     }
 }

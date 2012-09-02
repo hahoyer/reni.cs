@@ -26,7 +26,7 @@ using System;
 using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Basics;
+using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
@@ -35,14 +35,15 @@ namespace Reni.Code
 {
     sealed class CodeContainer : ReniObject
     {
+        [Node]
         readonly Container _main;
+        [Node]
         readonly DictionaryEx<int, FunctionContainer> _functions;
         public CodeContainer(Root rootContext, ParsedSyntax syntax, string description)
         {
-            _main = Struct
-                .Container
+            _main = Struct.Container
                 .Create(syntax)
-                .Code(rootContext)                
+                .Code(rootContext)
                 .Container(description);
             _functions = new DictionaryEx<int, FunctionContainer>(rootContext.Container);
             for(var i = 0; i < rootContext.FunctionCount; i++)
