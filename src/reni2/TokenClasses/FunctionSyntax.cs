@@ -42,12 +42,12 @@ namespace Reni.TokenClasses
         readonly bool _isMetaFunction;
         public readonly CompileSyntax Setter;
 
-        public FunctionSyntax(TokenData token, CompileSyntax getter, bool isImplicit, bool isMetaFunction, CompileSyntax setter)
+        public FunctionSyntax(TokenData token, CompileSyntax setter, bool isImplicit, bool isMetaFunction, CompileSyntax getter)
             : base(token)
         {
             Getter = getter;
-            _isImplicit = isImplicit;
             Setter = setter;
+            _isImplicit = isImplicit;
             _isMetaFunction = isMetaFunction;
         }
 
@@ -78,9 +78,10 @@ namespace Reni.TokenClasses
             get
             {
                 return
-                    (Getter == null ? "" : Getter.DumpPrintText)
+                    (Setter == null ? "" : Setter.DumpPrintText)
                     + Tag
-                    + (Setter == null ? "" : Setter.DumpPrintText);
+                    + (Getter == null ? "" : Getter.DumpPrintText)
+                    ;
             }
         }
 
@@ -88,7 +89,7 @@ namespace Reni.TokenClasses
         {
             var getter = Getter == null ? "" : "(" + Getter.DumpShort() + ")";
             var setter = Setter == null ? "" : "(" + Setter.DumpShort() + ")";
-            return getter + base.DumpShort() + setter;
+            return setter + base.DumpShort() + getter;
         }
 
         internal IMetaFunctionFeature MetaFunctionFeature(Structure structure)
