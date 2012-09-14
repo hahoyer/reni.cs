@@ -20,36 +20,21 @@
 
 #endregion
 
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
-using Reni.Validation;
+using HWClassLibrary.Helper;
 
-namespace Reni.Code
+namespace Reni.Validation
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class IssueId : EnumEx
     {
-        [Node]
-        internal readonly Container Getter;
-        [Node]
-        internal readonly Container Setter;
-
-        public FunctionContainer(Container getter, Container setter)
-        {
-            Getter = getter;
-            Setter = setter;
-        }
-        public IEnumerable<IssueBase> Issues
-        {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
-        }
+        [DisableDump]
+        public static readonly IssueId MissingFunctionGetter = new IssueId();
+        [DisableDump]
+        public static readonly IssueId UndefinedSymbol = new IssueId();
+        [DisableDump]
+        public static readonly IssueId ConsequentialError = new IssueId();
     }
 }

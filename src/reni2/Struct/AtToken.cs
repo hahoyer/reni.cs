@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,15 +28,26 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Syntax;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.Struct
 {
-    internal sealed class AtToken : Infix
+    sealed class AtToken : Infix
     {
         public override Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right)
         {
             return left
                 .AtTokenResult(callContext, category, right);
+        }
+        protected override IssueId LeftMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+        protected override IssueId RightMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
         }
     }
 }

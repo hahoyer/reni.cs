@@ -28,6 +28,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Validation
@@ -37,7 +38,7 @@ namespace Reni.Validation
         readonly IssueBase _issue;
         readonly Root _rootContext;
 
-        internal IssueType(IssueBase issue, Root rootContext)
+        public IssueType(IssueBase issue, Root rootContext)
         {
             _issue = issue;
             _rootContext = rootContext;
@@ -48,23 +49,36 @@ namespace Reni.Validation
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
 
-        internal Result Result(Category category) { return base.Result(category, getCode: Code); }
+        internal Result Result(Category category) { return Result(category, getCode: Code); }
+        TypeBase ConsequentialErrorType { get { return _issue.ConsequentialError.Type(RootContext); } }
 
         CodeBase Code() { return CodeBase.Issue(_issue); }
         public ISearchPath SearchResult(ISearchTarget target) { return new ImplicitSearchResult(this, target); }
 
-        sealed class ImplicitSearchResult : ReniObject, ISuffixFeature
+        sealed class ImplicitSearchResult
+            : ReniObject
+              , ISuffixFeature
+              , ISearchPath<ISuffixFeature, FunctionType>, ISimpleFeature
+
         {
+            [EnableDump]
             readonly IssueType _parent;
+            [EnableDump]
             readonly ISearchTarget _target;
+
             public ImplicitSearchResult(IssueType parent, ISearchTarget target)
             {
                 _parent = parent;
                 _target = target;
             }
+
             IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
             IFunctionFeature IFeature.Function { get { return null; } }
-            ISimpleFeature IFeature.Simple { get { return null; } }
+            ISimpleFeature IFeature.Simple { get { return this; } }
+
+            ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return this; }
+            Result ISimpleFeature.Result(Category category) { return _parent.ConsequentialErrorType.Result(category); }
         }
+
     }
 }

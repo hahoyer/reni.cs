@@ -24,32 +24,26 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
+using Reni.Parser;
+using Reni.Syntax;
 using Reni.Validation;
 
-namespace Reni.Code
+namespace Reni.ReniParser
 {
-    sealed class FunctionContainer : ReniObject
+    static class ParsedSyntaxExtension
     {
-        [Node]
-        internal readonly Container Getter;
-        [Node]
-        internal readonly Container Setter;
-
-        public FunctionContainer(Container getter, Container setter)
+        internal static CompileSyntax CheckedToCompiledSyntax(this ParsedSyntax parsedSyntax, TokenData token, Func<IssueId> getError)
         {
-            Getter = getter;
-            Setter = setter;
+            if(parsedSyntax == null)
+                return new CompileSyntaxError(token, getError());
+            return parsedSyntax.ToCompiledSyntax();
         }
-        public IEnumerable<IssueBase> Issues
+
+        internal static CompileSyntax ToCompiledSyntaxOrNull(this ParsedSyntax parsedSyntax)
         {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
+            if(parsedSyntax == null)
+                return null;
+            return parsedSyntax.ToCompiledSyntax();
         }
     }
 }

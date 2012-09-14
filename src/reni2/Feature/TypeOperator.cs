@@ -28,7 +28,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Syntax;
 using Reni.TokenClasses;
-using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.Feature
 {
@@ -42,6 +42,16 @@ namespace Reni.Feature
                     .Type(context).TypeForTypeOperator
                     .UniqueTypeType;
             return result;
+        }
+        protected override IssueId RightMustBeNullIssue()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+        protected override IssueId LeftMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
         }
     }
 }

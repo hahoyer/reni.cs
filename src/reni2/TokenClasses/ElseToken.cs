@@ -4,6 +4,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Parser;
 using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -12,9 +13,19 @@ namespace Reni.TokenClasses
     {
         protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
         {
-            left.AssertIsNotNull();
-            right.AssertIsNotNull();
-            return left.CreateElseSyntax(token, right.CheckedToCompiledSyntax());
+            if (left == null)
+                return LeftMustNotBeNullError();
+            return left.CreateElseSyntax(token, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
+        }
+        IssueId RightMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+        CompileSyntaxError LeftMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
         }
     }
 }

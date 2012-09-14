@@ -24,32 +24,30 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
+using Reni.Basics;
+using Reni.Context;
+using Reni.ReniParser;
+using Reni.Syntax;
 using Reni.Validation;
 
-namespace Reni.Code
+namespace Reni.TokenClasses
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class FunctionInstanceToken : Suffix
     {
-        [Node]
-        internal readonly Container Getter;
-        [Node]
-        internal readonly Container Setter;
-
-        public FunctionContainer(Container getter, Container setter)
+        protected override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
-            Getter = getter;
-            Setter = setter;
+            var leftResult = left.Result(context, category.Typed);
+            return leftResult.Type.UniqueFunctionInstanceType.Result(category, leftResult);
         }
-        public IEnumerable<IssueBase> Issues
+        protected override IssueId RightMustBeNullIssue()
         {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
+            NotImplementedMethod();
+            return null;
+        }
+        protected override IssueId LeftMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
         }
     }
 }

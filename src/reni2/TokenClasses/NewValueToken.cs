@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System.Linq;
 using System.Collections.Generic;
 using System;
@@ -24,11 +27,18 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     sealed class NewValueToken : Terminal
     {
+        protected override CompileSyntaxError LeftAndRightMustBeNull(ParsedSyntax left, ParsedSyntax right)
+        {
+            NotImplementedMethod(left, right);
+            return null;
+        }
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
             return context

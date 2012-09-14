@@ -24,32 +24,17 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
-using Reni.Validation;
 
-namespace Reni.Code
+namespace Reni.Validation
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class ConsequentialError : IssueBase
     {
-        [Node]
-        internal readonly Container Getter;
-        [Node]
-        internal readonly Container Setter;
+        [EnableDump]
+        readonly IssueBase _issueBase;
 
-        public FunctionContainer(Container getter, Container setter)
-        {
-            Getter = getter;
-            Setter = setter;
-        }
-        public IEnumerable<IssueBase> Issues
-        {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
-        }
+        public ConsequentialError(IssueBase issueBase)
+            : base(IssueId.ConsequentialError) { _issueBase = issueBase; }
+
+        internal override string LogDump { get { return ToString(); } }
     }
 }

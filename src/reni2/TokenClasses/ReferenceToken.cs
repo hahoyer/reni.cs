@@ -30,6 +30,7 @@ using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -41,14 +42,20 @@ namespace Reni.TokenClasses
                 return new PrefixSyntax
                     (token
                      , this
-                     , right.CheckedToCompiledSyntax()
+                     , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                     );
             return new InfixSyntax
                 (token
-                 , left.CheckedToCompiledSyntax()
+                 , left.ToCompiledSyntax()
                  , this
-                 , right.CheckedToCompiledSyntax()
+                 , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
+        }
+
+        IssueId RightMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
         }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)

@@ -27,6 +27,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Syntax;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -36,7 +37,17 @@ namespace Reni.TokenClasses
         {
             return left
                 .Type(context)
-                .InstanceResult(category, c=>context.ResultAsReference(c, right));
+                .InstanceResult(category, c => context.ResultAsReference(c, right));
+        }
+        protected override IssueId LeftMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
+        }
+        protected override IssueId RightMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
         }
     }
 }

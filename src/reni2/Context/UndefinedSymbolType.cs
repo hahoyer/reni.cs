@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Code;
 using Reni.ReniParser;
 using Reni.Validation;
 
@@ -39,6 +38,7 @@ namespace Reni.Context
         readonly ExpressionSyntax _syntax;
 
         internal UndefinedSymbolIssue(ContextBase context, ExpressionSyntax syntax)
+            : base(IssueId.UndefinedSymbol)
         {
             _context = context;
             _syntax = syntax;
@@ -49,11 +49,10 @@ namespace Reni.Context
             get
             {
                 var result = _syntax.FileErrorPosition(Tag);
-                result += ("\n"+Probes.Where(p=>p.HasImplementations).Select(x=>x.LogDump).Format("\n")).Indent();
+                result += ("\n" + Probes.Where(p => p.HasImplementations).Select(x => x.LogDump).Format("\n")).Indent();
                 return result;
             }
         }
-        static string Tag { get { return "UNDEF_SYMBOL"; } }
         [DisableDump]
         Probe[] Probes { get { return _syntax.Probes(_context); } }
         internal static IssueType Type(ContextBase context, ExpressionSyntax syntax) { return new IssueType(new UndefinedSymbolIssue(context, syntax), context.RootContext); }

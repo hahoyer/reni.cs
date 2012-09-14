@@ -32,6 +32,7 @@ using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Runtime;
 using Reni.Struct;
+using Reni.Validation;
 
 namespace Reni
 {
@@ -153,8 +154,8 @@ namespace Reni
             }
             Data.OutStream = null;
         }
-        
-        public IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
+
+        internal IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
 
         void RunFromCode() { _codeContainer.Value.Execute(this); }
 

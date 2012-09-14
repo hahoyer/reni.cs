@@ -27,12 +27,19 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Syntax;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     sealed class ArgToken : NonSuffix
     {
+        protected override CompileSyntaxError LeftMustBeNull(ParsedSyntax left)
+        {
+            NotImplementedMethod(left);
+            return null;
+        }
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
             return context
@@ -45,10 +52,10 @@ namespace Reni.TokenClasses
             var rightResult = right.SmartReferenceResult(context, category.Typed);
             var feature = argTokenResult.Type.Feature;
             return feature
-                .Function
-                .ApplyResult(category, rightResult.Type)
-                .ReplaceArg(rightResult) 
-                & category;
+                       .Function
+                       .ApplyResult(category, rightResult.Type)
+                       .ReplaceArg(rightResult)
+                   & category;
         }
     }
 }

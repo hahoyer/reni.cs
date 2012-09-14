@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,16 +27,23 @@ using HWClassLibrary.Debug;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
     [Serializable]
     sealed class Colon : TokenClass
     {
-        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            left.AssertIsNotNull();
+            if(left == null)
+                return LeftMustNotBeNullError();
             return left.CreateDeclarationSyntax(token, right);
+        }
+        CompileSyntaxError LeftMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
         }
     }
 
@@ -45,30 +55,48 @@ namespace Reni.TokenClasses
         [DisableDump]
         protected override ITokenFactory NewTokenFactory { get { return _tokenFactory; } }
 
-        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            left.AssertIsNull();
-            right.AssertIsNull();
+            if(left != null)
+                return LeftMustBeNullError(left);
+            if(right == null)
+                return RightMustNotBeNullError();
             return new ExclamationSyntax(token);
+        }
+        CompileSyntaxError LeftMustBeNullError(ParsedSyntax left)
+        {
+            NotImplementedMethod(left);
+            return null;
+        }
+        CompileSyntaxError RightMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
         }
     }
 
     [Serializable]
     sealed class ConverterToken : TokenClass
     {
-        protected override ReniParser.ParsedSyntax Syntax(ReniParser.ParsedSyntax left, TokenData token, ReniParser.ParsedSyntax right)
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            right.AssertIsNull();
+            if (right != null)
+                return RightMustBeNullError(right);
             return ((DeclarationExtensionSyntax) left).ExtendByConverter(token);
+        }
+        CompileSyntaxError RightMustBeNullError(ParsedSyntax right)
+        {
+            NotImplementedMethod(right);
+            return null;
         }
     }
 
-    abstract class DeclarationExtensionSyntax : ReniParser.ParsedSyntax
+    abstract class DeclarationExtensionSyntax : ParsedSyntax
     {
         protected DeclarationExtensionSyntax(TokenData token)
             : base(token) { }
 
-        internal virtual ReniParser.ParsedSyntax ExtendByConverter(TokenData token)
+        internal virtual ParsedSyntax ExtendByConverter(TokenData token)
         {
             NotImplementedMethod(token);
             return null;
@@ -82,7 +110,18 @@ namespace Reni.TokenClasses
         internal ConverterDeclarationSyntax(TokenData token, TokenData otherToken)
             : base(token) { _token = otherToken; }
 
-        internal override ReniParser.ParsedSyntax CreateDeclarationSyntax(TokenData token, ReniParser.ParsedSyntax right) { return new ConverterSyntax(_token, right.CheckedToCompiledSyntax()); }
+        internal override ParsedSyntax CreateDeclarationSyntax(TokenData token, ParsedSyntax right)
+        {
+            return new ConverterSyntax
+                (_token
+                 , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
+                );
+        }
+        IssueId RightMustNotBeNullError()
+        {
+            NotImplementedMethod();
+            return null;
+        }
     }
 
     sealed class ExclamationSyntax : DeclarationExtensionSyntax
@@ -90,6 +129,12 @@ namespace Reni.TokenClasses
         internal ExclamationSyntax(TokenData token)
             : base(token) { }
 
-        internal override ReniParser.ParsedSyntax ExtendByConverter(TokenData token) { return new ConverterDeclarationSyntax(Token, token); }
+        internal override ParsedSyntax ExtendByConverter(TokenData token)
+        {
+            return new ConverterDeclarationSyntax
+                (Token
+                 , token
+                );
+        }
     }
 }

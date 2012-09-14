@@ -25,9 +25,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
-using Reni.Code;
 using Reni.Context;
-using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation
 {
@@ -54,10 +53,7 @@ namespace Reni.FeatureTest.Validation
     {
         [Test]
         public override void Run() { BaseRun(); }
-        protected override void Verify(IEnumerable<IssueBase> issues)
-        {
-            var issue = (UndefinedSymbolIssue) issues.Single();
-        }
+        protected override void Verify(IEnumerable<IssueBase> issues) { var issue = (UndefinedSymbolIssue) issues.Single(); }
     }
 
     [TestFixture]
@@ -68,9 +64,6 @@ namespace Reni.FeatureTest.Validation
     {
         [Test]
         public override void Run() { BaseRun(); }
-        protected override void Verify(IEnumerable<IssueBase> issues)
-        {
-            var issue = (UndefinedSymbolIssue)issues.Single();
-        }
+        protected override void Verify(IEnumerable<IssueBase> issues) { var issue = (UndefinedSymbolIssue) issues.Single(); }
     }
 }

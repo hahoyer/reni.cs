@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,20 +18,28 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
 using Reni.Parser;
-using Reni.Struct;
+using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.TokenClasses;
+using Reni.Validation;
 
 namespace Reni.Context
 {
-    internal sealed class ContextOperator : NonPrefix
+    sealed class ContextOperator : NonPrefix
     {
+        protected override CompileSyntaxError RightMustBeNull(ParsedSyntax right)
+        {
+            NotImplementedMethod(right);
+            return null;
+        }
         public override Result Result(ContextBase context, Category category, TokenData token)
         {
             return context
@@ -39,22 +49,21 @@ namespace Reni.Context
 
         public override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
-            StartMethodDump(false, context,category,left);
+            StartMethodDump(false, context, category, left);
             try
             {
                 BreakExecution();
                 var leftResult = left.Type(context);
                 Dump("leftResult", leftResult);
                 BreakExecution();
-                
+
                 var structure = leftResult.FindRecentStructure;
                 Dump("structure", structure);
                 BreakExecution();
-                if (structure.IsDataLess)
+                if(structure.IsDataLess)
                 {
-                    NotImplementedMethod(context,category,left);
+                    NotImplementedMethod(context, category, left);
                     return null;
-
                 }
                 var result = structure.ReferenceType.Result(category, structure.ContainerContextObject);
                 return ReturnMethodDump(result);

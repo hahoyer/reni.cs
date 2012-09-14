@@ -30,6 +30,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Struct;
+using Reni.Validation;
 
 namespace Reni.Code
 {
@@ -90,9 +91,4 @@ namespace Reni.Code
         }
     }
 
-    public abstract class IssueBase : ReniObject
-    {
-        internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
-        internal abstract string LogDump { get; }
-    }
 }

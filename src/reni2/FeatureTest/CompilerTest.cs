@@ -28,6 +28,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.UnitTest;
 using Reni.Code;
 using Reni.Runtime;
+using Reni.Validation;
 
 namespace Reni.FeatureTest
 {

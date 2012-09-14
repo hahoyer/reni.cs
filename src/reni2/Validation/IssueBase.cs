@@ -24,32 +24,28 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
-using Reni.Validation;
+using HWClassLibrary.Helper;
+using Reni.Context;
+using Reni.Type;
 
-namespace Reni.Code
+namespace Reni.Validation
 {
-    sealed class FunctionContainer : ReniObject
+    public abstract class IssueBase : ReniObject
     {
-        [Node]
-        internal readonly Container Getter;
-        [Node]
-        internal readonly Container Setter;
+        internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
+        readonly SimpleCache<ConsequentialError> _consequentialError;
+        readonly IssueId _issueId;
+        
+        internal IssueBase(IssueId issueId)
+        {
+            _issueId = issueId;
+            _consequentialError = new SimpleCache<ConsequentialError>(()=>new ConsequentialError(this));
+        }
 
-        public FunctionContainer(Container getter, Container setter)
-        {
-            Getter = getter;
-            Setter = setter;
-        }
-        public IEnumerable<IssueBase> Issues
-        {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
-        }
+        internal abstract string LogDump { get; }
+        [DisableDump]
+        internal ConsequentialError ConsequentialError { get { return _consequentialError.Value; } }
+        protected string Tag { get { return _issueId.Tag; } }
+        internal TypeBase Type(Root rootContext) { return new IssueType(this, rootContext); }
     }
 }

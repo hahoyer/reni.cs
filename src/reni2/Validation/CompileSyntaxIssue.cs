@@ -24,31 +24,24 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
-using Reni.Validation;
+using Reni.Parser;
 
-namespace Reni.Code
+namespace Reni.Validation
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class CompileSyntaxIssue : IssueBase
     {
-        [Node]
-        internal readonly Container Getter;
-        [Node]
-        internal readonly Container Setter;
+        [EnableDump]
+        readonly TokenData _tokenData;
 
-        public FunctionContainer(Container getter, Container setter)
-        {
-            Getter = getter;
-            Setter = setter;
-        }
-        public IEnumerable<IssueBase> Issues
+        internal CompileSyntaxIssue(IssueId issueId, TokenData tokenData)
+            : base(issueId) { _tokenData = tokenData; }
+
+        internal override string LogDump
         {
             get
             {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
+                var result = _tokenData.FileErrorPosition(Tag);
+                return result;
             }
         }
     }

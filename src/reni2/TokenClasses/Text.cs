@@ -28,7 +28,8 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Parser;
-using Reni.Type;
+using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -45,6 +46,12 @@ namespace Reni.TokenClasses
                 .Result(category, () => CodeBase.BitsConst(BitsConst.ConvertAsText(data)), CodeArgs.Void);
         }
 
+        protected override CompileSyntaxError LeftAndRightMustBeNull(ParsedSyntax left, ParsedSyntax right)
+        {
+            NotImplementedMethod(left, right);
+            return null;
+        }
+        
         static string StripQutes(string text)
         {
             var result = "";

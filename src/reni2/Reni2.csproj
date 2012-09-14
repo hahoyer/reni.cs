@@ -94,6 +94,7 @@
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="IProxyType.cs" />
     <Compile Include="ReniObjectExtender.cs" />
+    <Compile Include="ReniParser\ParsedSyntaxExtension.cs" />
     <Compile Include="ReniParser\Probe.cs" />
     <Compile Include="ResultCache.cs" />
     <Compile Include="PathItemSearchVisitor.cs" />
@@ -279,6 +280,7 @@
     <Compile Include="TokenClasses\EnableCut.cs" />
     <Compile Include="TokenClasses\EnableRawConversion.cs" />
     <Compile Include="TokenClasses\Function.cs" />
+    <Compile Include="TokenClasses\FunctionInstanceToken.cs" />
     <Compile Include="TokenClasses\FunctionSyntax.cs" />
     <Compile Include="TokenClasses\InstanceToken.cs" />
     <Compile Include="TokenClasses\ReferenceToken.cs" />
@@ -336,6 +338,11 @@
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
+    <Compile Include="Validation\CompileSyntaxError.cs" />
+    <Compile Include="Validation\CompileSyntaxIssue.cs" />
+    <Compile Include="Validation\ConsequentialError.cs" />
+    <Compile Include="Validation\IssueBase.cs" />
+    <Compile Include="Validation\IssueId.cs" />
     <Compile Include="Validation\IssueType.cs" />
   </ItemGroup>
   <ItemGroup>

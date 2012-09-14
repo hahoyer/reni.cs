@@ -21,35 +21,37 @@
 #endregion
 
 using System.Linq;
-using System.Collections.Generic;
-using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.TreeStructure;
-using Reni.Validation;
+using HWClassLibrary.Helper;
+using Reni.Basics;
+using Reni.Context;
+using Reni.Parser;
+using Reni.Syntax;
 
-namespace Reni.Code
+namespace Reni.Validation
 {
-    sealed class FunctionContainer : ReniObject
+    sealed class CompileSyntaxError : CompileSyntax
     {
-        [Node]
-        internal readonly Container Getter;
-        [Node]
-        internal readonly Container Setter;
+        [EnableDump]
+        readonly IssueId _issueId;
+        readonly SimpleCache<CompileSyntaxIssue> _issueCache;
+        
+        public CompileSyntaxError(TokenData token, IssueId issueId)
+            : base(token)
+        {
+            _issueId = issueId;
+            _issueCache = new SimpleCache<CompileSyntaxIssue>(()=> new CompileSyntaxIssue(_issueId,Token));
+        }
 
-        public FunctionContainer(Container getter, Container setter)
+        CompileSyntaxIssue Issue { get { return _issueCache.Value; } }
+
+        internal override Result ObtainResult(ContextBase context, Category category)
         {
-            Getter = getter;
-            Setter = setter;
+            return Type(context)
+                .Result(category);
         }
-        public IEnumerable<IssueBase> Issues
-        {
-            get
-            {
-                var result = Getter.Issues;
-                if(Setter == null)
-                    return result;
-                return result.Union(Setter.Issues);
-            }
-        }
+
+        new IssueType Type(ContextBase context) { return new IssueType(Issue, context.RootContext); }
+        
     }
 }
