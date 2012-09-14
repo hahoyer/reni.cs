@@ -23,6 +23,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
+using Reni.Validation;
 
 namespace Reni.Code
 {
@@ -48,12 +49,12 @@ namespace Reni.Code
 
         void AssertValid()
         {
-            Tracer.Assert(!_fiberHead.IsNonFiberHeadList, Dump());
-            Tracer.Assert(_fiberItems.Length > 0, Dump());
+            Tracer.Assert(!_fiberHead.IsNonFiberHeadList, Dump);
+            Tracer.Assert(_fiberItems.Length > 0, Dump);
             var lastSize = _fiberHead.Size;
             foreach(var t in _fiberItems)
             {
-                Tracer.Assert(lastSize == t.InputSize, Dump());
+                Tracer.Assert(lastSize == t.InputSize, Dump);
                 lastSize = t.OutputSize;
             }
         }
