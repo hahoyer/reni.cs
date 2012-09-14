@@ -56,7 +56,7 @@ namespace ReniTest
             //Reni.Proof.Main.Run();
         }
 
-        const string Target = @"f: arg()/\; x: 1; f(x/\) dump_print";
+        const string Target = @"f: /\arg(); x: 1; f(/\x) dump_print";
         const string Output = "1";
         static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
 

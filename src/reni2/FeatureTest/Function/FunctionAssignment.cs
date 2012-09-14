@@ -30,7 +30,7 @@ namespace Reni.FeatureTest.Function
 {
     [TestFixture]
     [SimpleFunctionWithNonLocal]
-    [TargetSet(@"f: arg/\(arg + new_value)dump_print;f(100) := 2;", "102")]
+    [TargetSet(@"f: (arg + new_value)dump_print/\arg;f(100) := 2;", "102")]
     public sealed class FunctionAssignment : CompilerTest
     {
         [Test]

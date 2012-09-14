@@ -44,7 +44,7 @@ namespace Reni.FeatureTest.Function
     [SimpleFunction]
     [TwoFunctions1]
     [FunctionWithRefArg]
-    [Target(@"f: {1000 type instance({arg = 1 then 1 else (arg * f[arg type instance((arg-1)enable_cut)])}enable_cut)}/\;f(4)dump_print")]
+    [Target(@"f: /\{1000 type instance({arg = 1 then 1 else (arg * f[arg type instance((arg-1)enable_cut)])}enable_cut)};f(4)dump_print")]
     [Output("24")]
     public sealed class RecursiveFunction : CompilerTest
     {

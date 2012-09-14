@@ -27,13 +27,13 @@ namespace Reni.FeatureTest.BlogExamples
     [TestFixture]
     [TargetSet("\"Hello world\" dump_print", "Hello world")]
     [TargetSet(@"Viersich: 4;
-EinsDazu: arg + 1 /\;
+EinsDazu: /\ arg + 1 ;
 Konstrukt: 
-(
+/\(
     Simpel: arg; 
     Pelsim: EinsDazu(arg); 
-    Fun: Simpel+ EinsDazu(arg) /\
-) /\;
+    Fun: /\ Simpel+ EinsDazu(arg)
+);
 lorum: Konstrukt(23);
 ipsum: Konstrukt(8);
 ipsum Pelsim := 15;

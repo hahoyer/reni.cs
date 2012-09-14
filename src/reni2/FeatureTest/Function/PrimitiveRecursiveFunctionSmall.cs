@@ -32,7 +32,7 @@ namespace Reni.FeatureTest.Function
     ///     Recursive function that will result in a stack overflow, except when compiled as a loop
     /// </summary>
     [TestFixture]
-    [Target(@"i: 400000 type instance(400); f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()")]
+    [Target(@"i: 400000 type instance(400); f: /\i > 0 then (i := (i - 1)enable_cut; f());f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionByteWithDump]
     public sealed class PrimitiveRecursiveFunctionSmall : CompilerTest

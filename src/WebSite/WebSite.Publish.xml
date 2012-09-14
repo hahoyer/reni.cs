@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <publishData>
   <publishProfile publishUrl="\\marika\reni2\" deleteExistingFiles="False" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="True" profileName="Profile1" publishMethod="FileSystem" replaceMatchingFiles="True" userName="" savePWD="False" userPWD="" SelectedForPublish="True">
-    <file relUrl="bin/Reni.dll" publishTime="08/02/2012 00:51:57" />
+    <file relUrl="bin/Reni.dll" publishTime="09/10/2012 10:44:29" />
     <file relUrl="Scripts/jquery-1.4.1.min.js" publishTime="04/12/2012 20:43:43" />
     <file relUrl="Scripts/jquery-1.4.1-vsdoc.js" publishTime="04/12/2012 20:43:43" />
-    <file relUrl="bin/WebSite.pdb" publishTime="08/02/2012 04:15:04" />
+    <file relUrl="bin/WebSite.pdb" publishTime="09/10/2012 10:44:29" />
     <file relUrl="Web.config" publishTime="06/27/2012 21:49:08" />
-    <file relUrl="bin/WebSite.dll" publishTime="08/02/2012 04:15:04" />
+    <file relUrl="bin/WebSite.dll" publishTime="09/10/2012 10:44:29" />
     <file relUrl="Default.aspx" publishTime="08/02/2012 04:30:19" />
-    <file relUrl="bin/HWClassLibrary.dll" publishTime="07/29/2012 11:19:01" />
-    <file relUrl="bin/Reni.pdb" publishTime="08/02/2012 00:51:57" />
+    <file relUrl="bin/HWClassLibrary.dll" publishTime="09/09/2012 11:37:52" />
+    <file relUrl="bin/Reni.pdb" publishTime="09/10/2012 10:44:29" />
     <file relUrl="Scripts/jquery-1.4.1.js" publishTime="04/12/2012 20:43:43" />
-    <file relUrl="bin/HWClassLibrary.pdb" publishTime="07/29/2012 11:19:01" />
+    <file relUrl="bin/HWClassLibrary.pdb" publishTime="09/09/2012 11:37:52" />
   </publishProfile>
 </publishData>

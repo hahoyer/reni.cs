@@ -30,7 +30,7 @@ namespace Reni.FeatureTest.Function
 {
     [TestFixture]
     [ObjectProperty]
-    [Target(@"f: (value: arg, x: value/\)/\;f(2) x(100) dump_print")]
+    [Target(@"f: /\(value: arg, x: /\value);f(2) x(100) dump_print")]
     [Output("2")]
     public sealed class ObjectFunction1 : CompilerTest
     {

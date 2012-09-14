@@ -31,7 +31,7 @@ using Reni.FeatureTest.Structure;
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
-    [Target(@"x: 100;f: arg+x/\;f(2) dump_print;")]
+    [Target(@"x: 100;f: /\arg+x;f(2) dump_print;")]
     [Output("102")]
     [InnerAccess]
     [SomeVariables]

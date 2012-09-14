@@ -25,7 +25,7 @@ using HWClassLibrary.UnitTest;
 namespace Reni.FeatureTest.Array
 {
     [TestFixture]
-    [Target("(5 type * 5) instance (arg/\\) dump_print")]
+    [Target("(5 type * 5) instance (/\\arg) dump_print")]
     [Output("array(#(#align3#)# (bit)sequence(4),(0, 1, 2, 3, 4))")]
     public sealed class FromTypeAndFunction : CompilerTest
     {

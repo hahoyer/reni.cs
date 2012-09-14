@@ -29,7 +29,7 @@ using HWClassLibrary.UnitTest;
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
-    [Target(@"f: arg/\;g: f(arg)/\;x:4; g(x)dump_print")]
+    [Target(@"f: /\arg;g: /\f(arg);x:4; g(x)dump_print")]
     [Output("4")]
     [SimpleFunction]
     public sealed class FunctionWithRefArg : CompilerTest

@@ -29,7 +29,7 @@ using HWClassLibrary.UnitTest;
 namespace Reni.FeatureTest.Function
 {
     [TestFixture]
-    [Target(@"i: 400000; f: i > 0 then (i := (i - 1)enable_cut; f())/\;f()")]
+    [Target(@"i: 400000; f: /\i > 0 then (i := (i - 1)enable_cut; f());f()")]
     [Output("")]
     [PrimitiveRecursiveFunctionSmall]
     //[LowPriority]

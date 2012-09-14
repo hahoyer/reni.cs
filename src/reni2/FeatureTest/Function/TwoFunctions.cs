@@ -40,11 +40,11 @@ namespace Reni.FeatureTest.Function
                 return
                     @"
 x: 100;
-f1: ((
+f1: /\((
   y: 3;
-  f: arg*y+x/\;
+  f: /\arg*y+x;
   f(2)
-) _A_T_ 2)/\;
+) _A_T_ 2);
 
 f1()dump_print;
 ";

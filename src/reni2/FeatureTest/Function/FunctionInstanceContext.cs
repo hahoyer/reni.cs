@@ -32,7 +32,7 @@ namespace Reni.FeatureTest.Function
 {
     [LowPriority]
     [TestFixture]
-    [TargetSet(@"a:(x: 100;f: arg+x/\); a f(1) function_instance ^ dump_print;", @"(100, (arg)+(x)/\)")]
+    [TargetSet(@"a:(x: 100;f: /\arg+x); a f(1) function_instance ^ dump_print;", @"(100, (arg)+(x)/\)")]
     [SomeVariables]
     [Add2Numbers]
     [AccessMember]

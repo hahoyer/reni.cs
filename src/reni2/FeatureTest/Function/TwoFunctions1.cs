@@ -30,11 +30,11 @@ namespace Reni.FeatureTest.Function
 {
     [TestFixture]
     [Target(@"
-f1: ((
+f1: /\((
   y: 3;
-  f: y/\;
+  f: /\y;
   f(2)
-) _A_T_ 2)/\;
+) _A_T_ 2);
 
 f1()dump_print;
 ")]
