@@ -59,8 +59,8 @@ namespace Reni.TokenClasses
         {
             if(left != null)
                 return LeftMustBeNullError(left);
-            if(right == null)
-                return RightMustNotBeNullError();
+            if(right != null)
+                return RightMustBeNullError(right);
             return new ExclamationSyntax(token);
         }
         CompileSyntaxError LeftMustBeNullError(ParsedSyntax left)
@@ -68,9 +68,9 @@ namespace Reni.TokenClasses
             NotImplementedMethod(left);
             return null;
         }
-        CompileSyntaxError RightMustNotBeNullError()
+        CompileSyntaxError RightMustBeNullError(ParsedSyntax rigth)
         {
-            NotImplementedMethod();
+            NotImplementedMethod(rigth);
             return null;
         }
     }
