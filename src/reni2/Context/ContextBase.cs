@@ -129,9 +129,9 @@ namespace Reni.Context
 
         internal IEnumerable<Probe> Probes(ISearchTarget target)
         {
-            NotImplementedMethod(target);
-            return null;
-
+            var visitor = new ContextSearchVisitor(target);
+            visitor.Search(this);
+            return visitor.Probes.Values;
         }
 
         protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return UniquePendingContext.Result(category, syntax); }
