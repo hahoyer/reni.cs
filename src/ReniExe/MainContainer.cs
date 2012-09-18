@@ -39,7 +39,7 @@ namespace ReniExe
             var c = new Compiler(args[0], p);
             try
             {
-                c.Exec();
+                c.Exececute();
             }
             catch(Exception exception)
             {

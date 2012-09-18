@@ -1,6 +1,6 @@
-﻿#region Copyright (C) 2012
+#region Copyright (C) 2012
 
-//     Project WebSite
+//     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
@@ -20,21 +20,21 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Web.UI;
+using System.Collections.Generic;
+using System;
+using System.Text;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
-using Reni;
 
-namespace WebSite
+namespace Reni
 {
-    public partial class Default : Page
+    sealed class StringStream : ReniObject, IOutStream
     {
-        protected void Page_Load(object sender, EventArgs e) { }
-
-        protected void ButtonOkClick(object sender, EventArgs e) { Result.Text = Compiler.FlatExecute(Code.Text); }
+        readonly StringBuilder _data = new StringBuilder();
+        readonly StringBuilder _log = new StringBuilder();
+        internal string Data { get { return _data.ToString(); } }
+        internal string Log { get { return _log.ToString(); } }
+        void IOutStream.AddData(string text) { _data.Append(text); }
+        void IOutStream.AddLog(string text) { _log.Append(text); }
     }
 }

@@ -74,7 +74,7 @@ namespace Reni.FeatureTest
                 expectedResult(c);
             }
 
-            c.Exec();
+            c.Exececute();
 
             if(outStream.Data != targetSet.Output)
             {

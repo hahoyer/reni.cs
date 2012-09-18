@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
@@ -112,7 +113,7 @@ namespace Reni
         /// <summary>
         ///     Performs compilation
         /// </summary>
-        public void Exec()
+        public void Exececute()
         {
             if(_parameters.Trace.Source)
                 Tracer.Line("Dump Source\n" + Source.Dump());
@@ -163,6 +164,46 @@ namespace Reni
         {
             if(!_parameters.ParseOnly)
                 _codeContainer.Ensure();
+        }
+        
+        public static string FlatExecute(string text)
+        {
+            var fileName =
+                Environment.GetEnvironmentVariable("temp")
+                + "\\reni.server\\"
+                + Thread.CurrentThread.ManagedThreadId
+                + ".reni";
+            var fileHandle = fileName.FileHandle();
+            fileHandle.AssumeDirectoryOfFileExists();
+            fileHandle.String = text;
+            var stringStream = new StringStream();
+            var parameters = new CompilerParameters {OutStream = stringStream};
+            var c = new Compiler(fileName, parameters);
+
+            var exceptionText = "";
+            try
+            {
+                c.Exececute();
+            }
+            catch(Exception exception)
+            {
+                exceptionText = exception.Message;
+            }
+
+            var result = "";
+
+            var log = stringStream.Log;
+            if(log != "")
+                result += "Log: \n" + log + "\n";
+
+            var data = stringStream.Data;
+            if(data != "")
+                result += "Data: \n" + data + "\n";
+
+            if(exceptionText != "")
+                result += "Exception: \n" + exceptionText;
+
+            return result;
         }
     }
 

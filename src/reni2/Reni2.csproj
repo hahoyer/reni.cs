@@ -228,6 +228,7 @@
     <Compile Include="Sequence\Sign.cs" />
     <Compile Include="Sequence\Slash.cs" />
     <Compile Include="Sequence\Star.cs" />
+    <Compile Include="StringStream.cs" />
     <Compile Include="Struct\ContainerContextObject.cs" />
     <Compile Include="Struct\Context.cs" />
     <Compile Include="Struct\FunctionBodyType.cs" />
