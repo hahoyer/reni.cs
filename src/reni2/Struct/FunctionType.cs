@@ -29,7 +29,6 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -47,6 +46,7 @@ namespace Reni.Struct
         [NotNull]
         [Node]
         readonly GetterFunction _getter;
+        readonly bool _isValid;
 
         internal FunctionType(int index, FunctionSyntax body, Structure structure, TypeBase argsType)
         {
@@ -56,11 +56,20 @@ namespace Reni.Struct
             _structure = structure;
             ArgsType = argsType;
             StopByObjectId(-10);
+            _isValid = true;
         }
 
         internal override TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
-        internal override bool IsDataLess { get { return CodeArgs.IsNone && ArgsType.IsDataLess; } }
+        internal override bool IsDataLess
+        {
+            get
+            {
+                Tracer.Assert(_isValid);
+                Tracer.Assert(!CodeArgs.Size.IsZero);
+                return CodeArgs.IsNone && ArgsType.IsDataLess;
+            }
+        }
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _structure; } }
         [DisableDump]
@@ -93,10 +102,15 @@ namespace Reni.Struct
         internal override Result SetterResult(Category category) { return _setter.CallResult(category); }
         internal override Result GetterResult(Category category) { return _getter.CallResult(category); }
         internal override Result DestinationResult(Category category) { return Result(category, this); }
-        protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
+        protected override Size GetSize()
+        {
+            Tracer.Assert(_isValid);
+            Tracer.Assert(!CodeArgs.Size.IsZero);
+            return ArgsType.Size + CodeArgs.Size;
+        }
 
         internal ContextBase CreateSubContext(bool useValue) { return new Reni.Context.Function(_structure.UniqueContext, ArgsType, useValue ? ValueType : null); }
-        
+
         public string DumpFunction()
         {
             var result = "\n";
