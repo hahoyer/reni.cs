@@ -80,7 +80,7 @@ namespace Reni.TokenClasses
     {
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            if (right != null)
+            if(right != null)
                 return RightMustBeNullError(right);
             return ((DeclarationExtensionSyntax) left).ExtendByConverter(token);
         }

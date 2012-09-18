@@ -32,7 +32,8 @@ namespace Reni.FeatureTest.Function
     [TargetSet(@"f: /\arg(); x: 1; f(/\x) dump_print", "1")]
     [Function]
     [TwoFunctions]
-    [SimpleFunctionWithNonLocal, LowPriority]
+    [SimpleFunctionWithNonLocal]
+    [LowPriority]
     public sealed class FunctionOfFunction : CompilerTest
     {
         [Test]

@@ -48,6 +48,8 @@ namespace Reni.Code
 
             return newResult;
         }
+
+        [DisableDump]
         internal override IEnumerable<IssueBase> Issues { get { return IssueBase.Empty; } }
 
         [DisableDump]

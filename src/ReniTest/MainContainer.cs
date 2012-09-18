@@ -32,6 +32,7 @@ using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
 using Reni.FeatureTest.TypeType;
+using Reni.FeatureTest.Validation;
 using Reni.Runtime;
 
 namespace ReniTest
@@ -43,7 +44,10 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //if(false)
+            new UseOfUndefinedContextSymbol().Run();
+            var x = Compiler.FlatExecute("aaa: 1,aaa dump_print");
+                
+                //if(false)
 #pragma warning disable 162
                 ExecTest();
 #pragma warning restore 162
