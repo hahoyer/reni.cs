@@ -46,6 +46,6 @@ namespace Reni.Validation
         [DisableDump]
         internal ConsequentialError ConsequentialError { get { return _consequentialError.Value; } }
         protected string Tag { get { return _issueId.Tag; } }
-        internal TypeBase Type(Root rootContext) { return new IssueType(this, rootContext); }
+        internal IssueType Type(Root rootContext) { return new IssueType(this, rootContext); }
     }
 }

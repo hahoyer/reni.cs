@@ -50,7 +50,7 @@ namespace Reni.Validation
         internal override bool IsDataLess { get { return true; } }
 
         internal Result Result(Category category) { return Result(category, getCode: Code); }
-        TypeBase ConsequentialErrorType { get { return _issue.ConsequentialError.Type(RootContext); } }
+        IssueType ConsequentialErrorType { get { return _issue.ConsequentialError.Type(RootContext); } }
 
         CodeBase Code() { return CodeBase.Issue(_issue); }
         public ISearchPath SearchResult(ISearchTarget target) { return new ImplicitSearchResult(this, target); }

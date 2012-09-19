@@ -64,6 +64,12 @@ namespace Reni.FeatureTest.Validation
     {
         [Test]
         public override void Run() { BaseRun(); }
-        protected override void Verify(IEnumerable<IssueBase> issues) { var issue = (UndefinedSymbolIssue) issues.Single(); }
+        protected override void Verify(IEnumerable<IssueBase> issues)
+        {
+            var issueArray = issues.ToArray();
+            Tracer.Assert(issueArray.Length == 2);
+            Tracer.Assert(issueArray[0] is UndefinedSymbolIssue);
+            Tracer.Assert(issueArray[1] is ConsequentialError);
+        }
     }
 }
