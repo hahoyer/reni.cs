@@ -37,9 +37,9 @@ namespace Reni.Struct
 {
     sealed class FunctionBodyType : TypeBase, IFeature, IFunctionFeature, ISimpleFeature
     {
-        [EnableDump]
+        [EnableDump,Node]
         readonly Structure _structure;
-        [EnableDump]
+        [EnableDump,Node]
         readonly FunctionSyntax _syntax;
         readonly SimpleCache<IContextReference> _objectReferenceCache;
 

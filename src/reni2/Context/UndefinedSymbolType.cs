@@ -30,15 +30,15 @@ using Reni.Validation;
 
 namespace Reni.Context
 {
-    sealed class UndefinedSymbolIssue : IssueBase
+    sealed class UndefinedSymbolIssue : SyntaxIssue
+
     {
         [EnableDump]
         readonly ContextBase _context;
-        [EnableDump]
         readonly ExpressionSyntax _syntax;
 
         internal UndefinedSymbolIssue(ContextBase context, ExpressionSyntax syntax)
-            : base(IssueId.UndefinedSymbol)
+            : base(syntax, IssueId.UndefinedSymbol)
         {
             _context = context;
             _syntax = syntax;
@@ -48,7 +48,7 @@ namespace Reni.Context
         {
             get
             {
-                var result = _syntax.FileErrorPosition(Tag);
+                var result = base.LogDump;
                 result += ("\n" + Probes.Where(p => p.HasImplementations).Select(x => x.LogDump).Format("\n")).Indent();
                 return result;
             }
@@ -56,5 +56,16 @@ namespace Reni.Context
         [DisableDump]
         Probe[] Probes { get { return _syntax.Probes(_context); } }
         internal static IssueType Type(ContextBase context, ExpressionSyntax syntax) { return new IssueType(new UndefinedSymbolIssue(context, syntax), context.RootContext); }
+    }
+
+    abstract class SyntaxIssue : IssueBase
+    {
+        [EnableDump]
+        readonly ExpressionSyntax _syntax;
+
+        internal SyntaxIssue(ExpressionSyntax syntax, IssueId issueId)
+            : base(issueId) { _syntax = syntax; }
+
+        internal override string LogDump { get { return _syntax.FileErrorPosition(Tag); } }
     }
 }

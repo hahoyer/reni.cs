@@ -55,7 +55,7 @@ namespace Reni.Validation
         CodeBase Code() { return CodeBase.Issue(_issue); }
         public ISearchPath SearchResult(ISearchTarget target) { return new ImplicitSearchResult(this, target); }
 
-        sealed class ImplicitSearchResult
+        internal sealed class ImplicitSearchResult
             : ReniObject
               , ISuffixFeature
               , ISearchPath<ISuffixFeature, FunctionType>, ISimpleFeature
@@ -77,7 +77,7 @@ namespace Reni.Validation
             ISimpleFeature IFeature.Simple { get { return this; } }
 
             ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return this; }
-            Result ISimpleFeature.Result(Category category) { return _parent.ConsequentialErrorType.Result(category); }
+            Result ISimpleFeature.Result(Category category) { return _parent.Result(category) + _parent.ConsequentialErrorType.Result(category); }
         }
 
     }

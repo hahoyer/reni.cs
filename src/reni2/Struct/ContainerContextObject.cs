@@ -24,6 +24,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
@@ -45,8 +46,9 @@ namespace Reni.Struct
         }
 
         Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
-
+        [Node]
         internal Container Container { get { return _container; } }
+        [Node]
         internal ContextBase Parent { get { return _parent; } }
 
         [DisableDump]

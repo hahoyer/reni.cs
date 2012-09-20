@@ -26,7 +26,6 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
-using Reni.Type;
 
 namespace Reni.Validation
 {
@@ -35,11 +34,11 @@ namespace Reni.Validation
         internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
         readonly SimpleCache<ConsequentialError> _consequentialError;
         readonly IssueId _issueId;
-        
+
         internal IssueBase(IssueId issueId)
         {
             _issueId = issueId;
-            _consequentialError = new SimpleCache<ConsequentialError>(()=>new ConsequentialError(this));
+            _consequentialError = new SimpleCache<ConsequentialError>(() => new ConsequentialError(this));
         }
 
         internal abstract string LogDump { get; }
