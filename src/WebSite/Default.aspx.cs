@@ -35,6 +35,6 @@ namespace WebSite
     {
         protected void Page_Load(object sender, EventArgs e) { }
 
-        protected void ButtonOkClick(object sender, EventArgs e) { Result.Text = Compiler.FlatExecute(Code.Text); }
+        protected void ButtonOkClick(object sender, EventArgs e) { Result.Text = Compiler.FlatExecute(Code.Text, isFakedName: true); }
     }
 }

@@ -166,7 +166,7 @@ namespace Reni
                 _codeContainer.Ensure();
         }
         
-        public static string FlatExecute(string text)
+        public static string FlatExecute(string text, bool isFakedName = false)
         {
             var fileName =
                 Environment.GetEnvironmentVariable("temp")
@@ -194,7 +194,11 @@ namespace Reni
 
             var log = stringStream.Log;
             if(log != "")
+            {
+                if (isFakedName)
+                    log = log.Replace(fileName, "source");
                 result += "Log: \n" + log + "\n";
+            }
 
             var data = stringStream.Data;
             if(data != "")
