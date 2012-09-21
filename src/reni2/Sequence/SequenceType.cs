@@ -30,6 +30,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -87,11 +88,11 @@ namespace Reni.Sequence
             return null;
         }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => Parent);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)

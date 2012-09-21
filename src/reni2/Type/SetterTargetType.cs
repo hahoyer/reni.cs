@@ -27,6 +27,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.ReniParser;
 
 namespace Reni.Type
 {
@@ -52,11 +53,11 @@ namespace Reni.Type
         internal abstract Result GetterResult(Category category);
         [DisableDump]
         internal override Root RootContext { get { return ValueType.RootContext; } }
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, ()=>ValueType);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
     }
 }

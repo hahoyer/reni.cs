@@ -74,7 +74,7 @@ namespace Reni
 
                 if(Trace)
                     Tracer.FlaggedLine("child.Search(pathItemVisitor)");
-                child.Search(pathItemVisitor);
+                child.Search(pathItemVisitor, null);
                 if(IsSuccessFull)
                     return;
 
@@ -85,7 +85,7 @@ namespace Reni
                 Tracer.Assert(isc.Converter.TargetType == child);
                 if(Trace)
                     Tracer.FlaggedLine("child.Search(this)");
-                child.Search(this);
+                child.Search(this, null);
 
                 if(!IsSuccessFull)
                     return;
@@ -108,7 +108,7 @@ namespace Reni
             Search(structureType, null);
         }
 
-        internal abstract void Search(IssueType target);
+        internal abstract void Search(IssueType target, ExpressionSyntax syntax);
     }
 
     interface IConversionFunction
@@ -131,9 +131,9 @@ namespace Reni
             Probes.Ensure(typeof(TFeature));
             InternalResult = Target as TFeature;
         }
-        internal override void Search(IssueType target)
+        internal override void Search(IssueType target, ExpressionSyntax syntax)
         {
-            var searchResult = target.SearchResult(Target);
+            var searchResult = target.SearchResult(Target, syntax);
             var internalResult = searchResult as TFeature;
             Tracer.Assert(internalResult != null, ()=>typeof(TFeature).PrettyName());
             InternalResult = internalResult;

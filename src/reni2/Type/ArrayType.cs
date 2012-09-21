@@ -30,6 +30,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.Sequence;
 
 namespace Reni.Type
@@ -92,11 +93,11 @@ namespace Reni.Type
         internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
         internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => ElementType);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         internal Result TextItemsResult(Category category) { return UniqueTextItemsType.PointerResult(category, PointerArgResult); }

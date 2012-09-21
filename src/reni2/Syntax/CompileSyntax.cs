@@ -113,7 +113,7 @@ namespace Reni.Syntax
 
         internal Result PrefixOperationResult(ContextBase context, Category category, ISearchTarget target)
         {
-            var searchResult = Type(context).Search<IPrefixFeature>(target);
+            var searchResult = Type(context).Search<IPrefixFeature>(target, null);
             if (searchResult == null)
                 return null;
             return searchResult.Result(category);

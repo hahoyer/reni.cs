@@ -2,6 +2,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.Sequence;
 
 namespace Reni.Type
@@ -20,11 +21,11 @@ namespace Reni.Type
         [DisableDump]
         protected override string TagTitle { get { return "text_items"; } }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => Parent);
             if (!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }

@@ -28,6 +28,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Type;
 
@@ -43,17 +44,17 @@ namespace Reni.Validation
             _issue = issue;
             _rootContext = rootContext;
         }
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this); }
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax) { searchVisitor.Search(this, syntax); }
         [DisableDump]
         internal override Root RootContext { get { return _rootContext; } }
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
 
         internal Result Result(Category category) { return Result(category, getCode: Code); }
-        IssueType ConsequentialErrorType { get { return _issue.ConsequentialError.Type(RootContext); } }
+        IssueType ConsequentialErrorType(ExpressionSyntax syntax) { return _issue.ConsequentialError(syntax).Type(RootContext); }
 
         CodeBase Code() { return CodeBase.Issue(_issue); }
-        public ISearchPath SearchResult(ISearchTarget target) { return new ImplicitSearchResult(this, target); }
+        public ISearchPath SearchResult(ISearchTarget target, ExpressionSyntax syntax) { return new ImplicitSearchResult(this, target, syntax); }
 
         internal sealed class ImplicitSearchResult
             : ReniObject
@@ -65,11 +66,13 @@ namespace Reni.Validation
             readonly IssueType _parent;
             [EnableDump]
             readonly ISearchTarget _target;
+            readonly ExpressionSyntax _syntax;
 
-            public ImplicitSearchResult(IssueType parent, ISearchTarget target)
+            public ImplicitSearchResult(IssueType parent, ISearchTarget target, ExpressionSyntax syntax)
             {
                 _parent = parent;
                 _target = target;
+                _syntax = syntax;
             }
 
             IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
@@ -77,8 +80,7 @@ namespace Reni.Validation
             ISimpleFeature IFeature.Simple { get { return this; } }
 
             ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return this; }
-            Result ISimpleFeature.Result(Category category) { return _parent.Result(category) + _parent.ConsequentialErrorType.Result(category); }
+            Result ISimpleFeature.Result(Category category) { return _parent.Result(category) + _parent.ConsequentialErrorType(_syntax).Result(category); }
         }
-
     }
 }

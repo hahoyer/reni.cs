@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -49,11 +50,11 @@ namespace Reni.Type
 
         internal override string DumpShort() { return "(" + Value.DumpShort() + ") type"; }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, null);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult) { return RawInstanceResult(category, getRightResult).SmartLocalReferenceResult() & category; }

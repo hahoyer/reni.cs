@@ -27,6 +27,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.ReniParser;
 
 namespace Reni.Type
 {
@@ -70,11 +71,11 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
         internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => Parent);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         protected override Result ParentConversionResult(Category category) { return Parent.UniquePointer.ArgResult(category); }

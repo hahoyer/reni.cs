@@ -24,17 +24,17 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using Reni.Context;
+using Reni.ReniParser;
 
 namespace Reni.Validation
 {
-    sealed class ConsequentialError : IssueBase
+    sealed class ConsequentialError : SyntaxIssue
     {
         [EnableDump]
         readonly IssueBase _issueBase;
 
-        public ConsequentialError(IssueBase issueBase)
-            : base(IssueId.ConsequentialError) { _issueBase = issueBase; }
-
-        internal override string LogDump { get { return ToString(); } }
+        public ConsequentialError(ExpressionSyntax syntax, IssueBase issueBase)
+            : base(syntax, IssueId.ConsequentialError) { _issueBase = issueBase; }
     }
 }

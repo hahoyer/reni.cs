@@ -30,6 +30,7 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -70,7 +71,7 @@ namespace Reni.Struct
         internal override bool IsDataLess { get { return true; } }
         [DisableDump]
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
-        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax) { searchVisitor.Search(this, null); }
         internal Result DumpPrintTextResult(Category category) { return DumpPrintTypeNameResult(category); }
 
         [DisableDump]

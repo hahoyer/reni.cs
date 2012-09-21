@@ -27,6 +27,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -92,11 +93,11 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => ValueType);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         protected override ArrayType ObtainArray(int count) { return ValueType.UniqueArray(count); }

@@ -246,7 +246,7 @@ namespace Reni.Context
 
         internal Result FunctionResult(Category category, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax left, CompileSyntax right)
         {
-            var trace = feature is IssueType.ImplicitSearchResult && feature.GetObjectId() == 44;
+            var trace = feature is IssueType.ImplicitSearchResult && feature.GetObjectId() == -44;
             StartMethodDump(trace, category, leftType, feature, converterResult, left,right);
             try
             {

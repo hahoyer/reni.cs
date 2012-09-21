@@ -28,6 +28,7 @@ using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.ReniParser;
 using Reni.Sequence;
 
 namespace Reni.Type
@@ -62,11 +63,11 @@ namespace Reni.Type
                 .Result(category, DumpPrintNumberCode, CodeArgs.Arg);
         }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, null);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }

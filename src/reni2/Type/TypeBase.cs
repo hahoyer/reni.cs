@@ -350,13 +350,13 @@ namespace Reni.Type
             return -1;
         }
 
-        internal SearchResult Search<TFeature>(ISearchTarget target)
+        internal SearchResult Search<TFeature>(ISearchTarget target, ExpressionSyntax syntax)
             where TFeature : class, IFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
             var former = SearchVisitor.Trace;
             SearchVisitor.Trace = false;
-            Search(visitor);
+            Search(visitor, syntax);
             SearchVisitor.Trace = former;
             if(Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
@@ -367,11 +367,11 @@ namespace Reni.Type
             where TFeature : class, IFeature
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
-            Search(visitor);
+            Search(visitor, null);
             return visitor.Probes.Values;
         }
 
-        internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
+        internal virtual void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax) { searchVisitor.Search(this, null); }
 
         internal Result LocalReferenceResult(Category category)
         {
@@ -426,7 +426,7 @@ namespace Reni.Type
         [NotNull]
         internal Result GenericDumpPrintResult(Category category)
         {
-            return Search<ISuffixFeature>(_dumpPrintToken.Value)
+            return Search<ISuffixFeature>(_dumpPrintToken.Value, null)
                 .Result(category);
         }
 
@@ -507,7 +507,7 @@ namespace Reni.Type
         SearchResult Converter(TypeBase destination)
         {
             return
-                Search<ISuffixFeature>(destination.ConversionProvider);
+                Search<ISuffixFeature>(destination.ConversionProvider,null);
         }
 
         internal Result TextItemResult(Category category)

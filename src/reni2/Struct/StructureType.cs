@@ -28,6 +28,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni.Struct
@@ -56,11 +57,11 @@ namespace Reni.Struct
 
         internal override string DumpShort() { return "type(" + Structure.DumpShort() + ")"; }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         internal void SearchNameSpace<TFeature>(SearchVisitor<TFeature> searchVisitor)

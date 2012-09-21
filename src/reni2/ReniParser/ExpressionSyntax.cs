@@ -95,7 +95,7 @@ namespace Reni.ReniParser
                       : context
                             .Type(Left)
                             .UnAlignedType
-                            .Search<ISuffixFeature>(_tokenClass);
+                            .Search<ISuffixFeature>(_tokenClass, this);
             return searchResult == null ? null : searchResult.FunctionResult(context, category, this);
         }
 

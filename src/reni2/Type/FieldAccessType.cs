@@ -26,6 +26,7 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.ReniParser;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -81,11 +82,11 @@ namespace Reni.Type
                 .AddToReference(GetFieldOffset);
         }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => ValueType);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
 
         internal override int? SmartSequenceLength(TypeBase elementType)

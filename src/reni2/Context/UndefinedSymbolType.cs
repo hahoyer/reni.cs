@@ -49,7 +49,10 @@ namespace Reni.Context
             get
             {
                 var result = base.LogDump;
-                result += ("\n" + Probes.Where(p => p.HasImplementations).Select(x => x.LogDump).Format("\n")).Indent();
+                var probes = Probes.Where(p => p.HasImplementations).ToArray();
+                if (probes.Length == 0)
+                    return result;
+                result += ("\n" + probes.Select(x => x.LogDump).Format("\n")).Indent();
                 return result;
             }
         }

@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.ReniParser;
 
 namespace Reni.Type
 {
@@ -35,11 +36,11 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => Parent);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
     }
 }

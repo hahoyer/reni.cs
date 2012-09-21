@@ -29,6 +29,7 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.ReniParser;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -66,7 +67,7 @@ namespace Reni.Struct
             get
             {
                 Tracer.Assert(_isValid);
-                Tracer.Assert(!CodeArgs.Size.IsZero);
+                //Tracer.Assert(!CodeArgs.Size.IsZero);
                 return CodeArgs.IsNone && ArgsType.IsDataLess;
             }
         }
@@ -105,7 +106,7 @@ namespace Reni.Struct
         protected override Size GetSize()
         {
             Tracer.Assert(_isValid);
-            Tracer.Assert(!CodeArgs.Size.IsZero);
+            //Tracer.Assert(!CodeArgs.Size.IsZero);
             return ArgsType.Size + CodeArgs.Size;
         }
 
@@ -143,11 +144,11 @@ namespace Reni.Struct
                 );
         }
 
-        internal override void Search(SearchVisitor searchVisitor)
+        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => ValueType);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor);
+                base.Search(searchVisitor, syntax);
         }
     }
 }

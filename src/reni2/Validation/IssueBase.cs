@@ -26,24 +26,24 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Context;
+using Reni.ReniParser;
 
 namespace Reni.Validation
 {
     public abstract class IssueBase : ReniObject
     {
         internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
-        readonly SimpleCache<ConsequentialError> _consequentialError;
+        readonly DictionaryEx<ExpressionSyntax, ConsequentialError> _consequentialError;
         readonly IssueId _issueId;
 
         internal IssueBase(IssueId issueId)
         {
             _issueId = issueId;
-            _consequentialError = new SimpleCache<ConsequentialError>(() => new ConsequentialError(this));
+            _consequentialError = new DictionaryEx<ExpressionSyntax, ConsequentialError>(syntax => new ConsequentialError(syntax,this));
         }
 
         internal abstract string LogDump { get; }
-        [DisableDump]
-        internal ConsequentialError ConsequentialError { get { return _consequentialError.Value; } }
+        internal ConsequentialError ConsequentialError(ExpressionSyntax syntax) { return _consequentialError[syntax]; }
         protected string Tag { get { return _issueId.Tag; } }
         internal IssueType Type(Root rootContext) { return new IssueType(this, rootContext); }
     }
