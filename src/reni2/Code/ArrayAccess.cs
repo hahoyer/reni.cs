@@ -50,12 +50,10 @@ namespace Reni.Code
                 .Convert(ElementSize.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits))
                 .Resize(Root.DefaultRefAlignParam.RefSize);
 
-            return index
-                .BitCast(Root.DefaultRefAlignParam.RefSize)
-                .Sequence(CodeBase.BitsConst(elementSize))
+            return (index.BitCast(Root.DefaultRefAlignParam.RefSize) + CodeBase.BitsConst(elementSize))
                 .Add(AddressMultiply);
         }
-        
+
         protected CodeBase AddressCalculation(CodeBase[] list)
         {
             var targetArray = list[0];
@@ -66,8 +64,7 @@ namespace Reni.Code
             if(index.Size != IndexSize)
                 return null;
 
-            return targetArray
-                .Sequence(IndexCalculation(index))
+            return (targetArray + IndexCalculation(index))
                 .Add(AddressPlus);
         }
     }
@@ -105,11 +102,10 @@ namespace Reni.Code
                 return null;
 
             var value = list[2];
-            if (value.Size != Root.DefaultRefAlignParam.RefSize)
+            if(value.Size != Root.DefaultRefAlignParam.RefSize)
                 return null;
 
-            return AddressCalculation(list)
-                .Sequence(value)
+            return (AddressCalculation(list) + value)
                 .Assignment(ElementSize);
         }
     }

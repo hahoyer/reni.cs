@@ -83,7 +83,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
         [DisableDump]
-        internal override ReferenceType SmartReference { get { return ElementType.UniqueReference(Count); } }
+        protected override ReferenceType SmartReference { get { return ElementType.UniqueReference(Count); } }
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
         [DisableDump]
         internal override Root RootContext { get { return _elementType.RootContext; } }
@@ -114,9 +114,9 @@ namespace Reni.Type
         {
             if(category.IsNone)
                 return null;
-            
+
             if(argsType == VoidType)
-                return Result(category, ()=>CodeBase.BitsConst(Size, BitsConst.Convert(0)));
+                return Result(category, () => CodeBase.BitsConst(Size, BitsConst.Convert(0)));
 
             var function = argsType as IFunctionFeature;
             if(function != null)
@@ -192,12 +192,11 @@ namespace Reni.Type
             for(var i = 0; i < Count; i++)
             {
                 if(i > 0)
-                    code = code.Sequence(CodeBase.DumpPrintText(", "));
+                    code = code + CodeBase.DumpPrintText(", ");
                 var elemCode = elementDumpPrint.ReplaceArg(elementReference, argCode.ReferencePlus(ElementType.Size * i));
-                code = code.Sequence(elemCode);
+                code = code + elemCode;
             }
-            code = code.Sequence(CodeBase.DumpPrintText("))"));
-            return code;
+            return code + CodeBase.DumpPrintText("))");
         }
 
         internal Result SequenceResult(Category category)

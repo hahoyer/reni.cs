@@ -90,15 +90,15 @@ namespace Reni.Context
                 if(category.HasCode)
                 {
                     if(i > 0)
-                        result.Code = result.Code.Sequence(CodeBase.DumpPrintText(", "));
-                    result.Code = result.Code.Sequence(elemResult.Code);
+                        result.Code = result.Code + CodeBase.DumpPrintText(", ");
+                    result.Code = result.Code + elemResult.Code;
                 }
                 if(category.HasArgs)
                     result.CodeArgs = result.CodeArgs.Sequence(elemResult.CodeArgs);
                 result.IsDirty = false;
             }
             if(category.HasCode)
-                result.Code = result.Code.Sequence(CodeBase.DumpPrintText(")"));
+                result.Code = result.Code + CodeBase.DumpPrintText(")");
             return result;
         }
 

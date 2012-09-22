@@ -29,7 +29,7 @@ using Reni.Basics;
 using Reni.Code.ReplaceVisitor;
 using Reni.Context;
 using Reni.Struct;
-using Reni.Type;                  
+using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.Code
@@ -38,9 +38,7 @@ namespace Reni.Code
     abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
     {
         protected CodeBase(int objectId)
-            : base(objectId)
-        {
-        }
+            : base(objectId) { }
 
         [Node]
         [DisableDump]
@@ -130,7 +128,7 @@ namespace Reni.Code
             return Add(new BitCast(size, Size, Size));
         }
 
-        internal CodeBase Sequence(params CodeBase[] data)
+        CodeBase Sequence(params CodeBase[] data)
         {
             var extendedData = new CodeBase[data.Length + 1];
             extendedData[0] = this;
@@ -223,7 +221,7 @@ namespace Reni.Code
         public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
 
         [DisableDump]
-        abstract internal IEnumerable<IssueBase> Issues { get; }
+        internal abstract IEnumerable<IssueBase> Issues { get; }
 
         internal CodeBase LocalBlock(CodeBase copier)
         {
@@ -283,6 +281,8 @@ namespace Reni.Code
 
         internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
         internal Container Container(string description, FunctionId functionId = null, Size frameSize = null) { return new Container(this, description, functionId); }
+
+        public static CodeBase operator +(CodeBase a, CodeBase b) { return a.Sequence(b); }
     }
 
     abstract class UnexpectedVisitOfPending : Exception
@@ -290,7 +290,7 @@ namespace Reni.Code
 
     static class CodeBaseExtender
     {
-        internal static CodeBase ToSequence(this IEnumerable<CodeBase> x) { return x.Aggregate(CodeBase.Void, (code, result) => code.Sequence(result)); }
+        internal static CodeBase ToSequence(this IEnumerable<CodeBase> x) { return x.Aggregate(CodeBase.Void, (code, result) => code + result); }
 
         internal static CodeBase ToLocalVariables(this IEnumerable<CodeBase> codeBases, string holderPattern) { return CodeBase.List(codeBases.Select((x, i) => LocalVariableDefinition(string.Format(holderPattern, i), x))); }
 

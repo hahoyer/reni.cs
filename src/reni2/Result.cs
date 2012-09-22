@@ -555,7 +555,7 @@ namespace Reni
             if(category.HasType)
                 Type = Type.Pair(other.Type);
             if(category.HasCode)
-                Code = Code.Sequence(other.Code);
+                Code = Code + other.Code;
             if(category.HasArgs)
                 CodeArgs = CodeArgs.Sequence(other.CodeArgs);
             IsDirty = false;

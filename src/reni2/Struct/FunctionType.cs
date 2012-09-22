@@ -139,7 +139,7 @@ namespace Reni.Struct
                 return Result(category);
             return Result
                 (category
-                 , () => CodeArgs.ToCode().Sequence(ArgsType.ArgCode)
+                 , () => CodeArgs.ToCode() + ArgsType.ArgCode
                  , () => CodeArgs + CodeArgs.Arg()
                 );
         }

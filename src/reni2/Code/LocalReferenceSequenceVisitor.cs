@@ -118,8 +118,7 @@ namespace Reni.Code
                 BreakExecution();
                 if(!copier.IsEmpty && alignedInternal.Size > Size.Zero && alignedInternal.Size < resultSize)
                     gap = CodeBase.BitsConst(resultSize - alignedInternal.Size, BitsConst.None());
-                var statement = alignedInternal
-                    .Sequence(gap, alignedBody, DestructorCode)
+                var statement = (alignedInternal + gap + alignedBody + DestructorCode)
                     .LocalBlockEnd(copier, resultSize);
                 Dump("statement", statement);
                 BreakExecution();
