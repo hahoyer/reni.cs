@@ -72,4 +72,21 @@ namespace Reni.FeatureTest.Validation
             Tracer.Assert(issueArray[1] is ConsequentialError);
         }
     }
+    [TestFixture]
+    [Target(@"x x dump_print")]
+    [Output("")]
+    [UseOfUndefinedContextSymbol]
+    public sealed class IndirectUseOfUndefinedContextSymbol : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+        protected override void Verify(IEnumerable<IssueBase> issues)
+        {
+            var issueArray = issues.ToArray();
+            Tracer.Assert(issueArray.Length == 3);
+            Tracer.Assert(issueArray[0] is UndefinedSymbolIssue);
+            Tracer.Assert(issueArray[1] is ConsequentialError);
+            Tracer.Assert(issueArray[2] is ConsequentialError);
+        }
+    }
 }

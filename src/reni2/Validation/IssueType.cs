@@ -53,7 +53,7 @@ namespace Reni.Validation
         internal Result Result(Category category) { return Result(category, getCode: Code); }
         IssueType ConsequentialErrorType(ExpressionSyntax syntax) { return _issue.ConsequentialError(syntax).Type(RootContext); }
 
-        CodeBase Code() { return CodeBase.Issue(_issue); }
+        CodeBase Code() { return _issue.Code; }
         public ISearchPath SearchResult(ISearchTarget target, ExpressionSyntax syntax) { return new ImplicitSearchResult(this, target, syntax); }
 
         internal sealed class ImplicitSearchResult
@@ -80,7 +80,12 @@ namespace Reni.Validation
             ISimpleFeature IFeature.Simple { get { return this; } }
 
             ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return this; }
-            Result ISimpleFeature.Result(Category category) { return _parent.Result(category) + _parent.ConsequentialErrorType(_syntax).Result(category); }
+            Result ISimpleFeature.Result(Category category)
+            {
+                return _parent
+                    .ConsequentialErrorType(_syntax)
+                    .Result(category);
+            }
         }
     }
 }

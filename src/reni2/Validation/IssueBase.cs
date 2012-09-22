@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 
@@ -46,5 +47,6 @@ namespace Reni.Validation
         internal ConsequentialError ConsequentialError(ExpressionSyntax syntax) { return _consequentialError[syntax]; }
         protected string Tag { get { return _issueId.Tag; } }
         internal IssueType Type(Root rootContext) { return new IssueType(this, rootContext); }
+        internal virtual CodeBase Code { get { return CodeBase.Issue(this); } }
     }
 }

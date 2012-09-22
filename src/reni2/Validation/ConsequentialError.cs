@@ -24,6 +24,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 
@@ -36,5 +37,6 @@ namespace Reni.Validation
 
         public ConsequentialError(ExpressionSyntax syntax, IssueBase issueBase)
             : base(syntax, IssueId.ConsequentialError) { _issueBase = issueBase; }
+        internal override CodeBase Code { get { return _issueBase.Code + base.Code; } }
     }
 }
