@@ -35,6 +35,7 @@
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
     <Compile Include="Code\ArrayAccess.cs" />
+    <Compile Include="Context\SyntaxIssue.cs" />
     <Compile Include="Context\UndefinedSymbolType.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />

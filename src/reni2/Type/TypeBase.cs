@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
@@ -171,7 +170,7 @@ namespace Reni.Type
         internal virtual IReferenceType UniqueReferenceType { get { return _cache.Pointer.Value; } }
 
         [DisableDump]
-        internal virtual ReferenceType SmartReference { get { return _cache.Reference[1]; } }
+        protected virtual ReferenceType SmartReference { get { return _cache.Reference[1]; } }
         [DisableDump]
         internal virtual TypeBase TypeForTypeOperator { get { return this; } }
 
@@ -273,7 +272,7 @@ namespace Reni.Type
 
         Result ConvertToSequence(Category category, TypeBase elementType) { return Conversion(category, CreateSequenceType(elementType)); }
 
-        internal Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, BitType).Align(BitsConst.SegmentAlignBits); }
+        Result ConvertToBitSequence(Category category) { return ConvertToSequence(category, BitType).Align(BitsConst.SegmentAlignBits); }
 
         /// <summary>
         ///     Gets the icon key.
@@ -310,10 +309,10 @@ namespace Reni.Type
         internal bool IsWeakReference { get { return ReferenceType != null && ReferenceType.IsWeak; } }
 
         [DisableDump]
-        internal virtual IFeature Feature { get { return this as IFeature; } }
+        internal IFeature Feature { get { return this as IFeature; } }
 
         [DisableDump]
-        protected virtual ISearchTarget ConversionProvider { get { return this; } }
+        ISearchTarget ConversionProvider { get { return this; } }
         [DisableDump]
         internal virtual bool HasQuickSize { get { return true; } }
         [DisableDump]
@@ -387,8 +386,7 @@ namespace Reni.Type
                 );
         }
 
-
-        internal CodeBase LocalReferenceCode()
+        CodeBase LocalReferenceCode()
         {
             return ArgCode
                 .LocalReference(Destructor(Category.Code).Code);
