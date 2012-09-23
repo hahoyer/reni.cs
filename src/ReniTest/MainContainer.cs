@@ -44,9 +44,6 @@ namespace ReniTest
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            new UseOfUndefinedContextSymbol().Run();
-            var x = Compiler.FlatExecute("aaa: 1,aaa dump_print");
-                
                 //if(false)
 #pragma warning disable 162
                 ExecTest();
