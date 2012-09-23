@@ -76,15 +76,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
-        internal override bool IsDataLess
-        {
-            get
-            {
-                //Tracer.Assert(_isValid);
-                //Tracer.Assert(!CodeArgs.Size.IsZero);
-                return CodeArgs.IsNone && ArgsType.IsDataLess;
-            }
-        }
+        internal override bool IsDataLess { get { return CodeArgs.IsNone && ArgsType.IsDataLess; } }
         [DisableDump]
         internal override Structure FindRecentStructure { get { return _structure; } }
         [DisableDump]
@@ -108,12 +100,7 @@ namespace Reni.Struct
         internal override Result SetterResult(Category category) { return _setter.CallResult(category); }
         internal override Result GetterResult(Category category) { return _getter.CallResult(category); }
         internal override Result DestinationResult(Category category) { return Result(category, this); }
-        protected override Size GetSize()
-        {
-            Tracer.Assert(_isValid);
-            Tracer.Assert(!CodeArgs.Size.IsZero);
-            return ArgsType.Size + CodeArgs.Size;
-        }
+        protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
 
         internal ContextBase CreateSubContext(bool useValue) { return new Reni.Context.Function(_structure.UniqueContext, ArgsType, useValue ? ValueType : null); }
 
@@ -149,7 +136,7 @@ namespace Reni.Struct
                 );
         }
 
-        Result ObtainPendingApplyResult(Category category) { return new Result(category, getType:()=>this, getArgs:CodeArgs.Void); }
+        Result ObtainPendingApplyResult(Category category) { return new Result(category, getType: () => this, getArgs: CodeArgs.Void); }
 
         public Result ApplyResult(Category category) { return _applyResultCache & category; }
 
