@@ -261,6 +261,8 @@ namespace Reni.Struct
 
         internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
+            if (category.IsNone)
+                return new Result();
             var trace = ObjectId == -1 && category.HasSize;
             StartMethodDump(trace, category, parent, fromPosition, fromNotPosition);
             try

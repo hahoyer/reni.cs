@@ -51,7 +51,7 @@ namespace Reni.Struct
             _body = body;
             Parent = parent;
             _bodyCodeCache = new SimpleCache<CodeBase>(ObtainBodyCode);
-            _contextCache = new SimpleCache<ContextBase>(ObtainCache);
+            _contextCache = new SimpleCache<ContextBase>(ObtainContext);
             _resultCache = new ResultCache(ObtainResult, ObtainPendingResult);
         }
 
@@ -140,8 +140,8 @@ namespace Reni.Struct
 
         Result ObtainPendingResult(Category category)
         {
-            if(category == Category.CodeArgs)
-                return new Result(category, getArgs: CodeArgs.Void);
+            if(category <= (Category.CodeArgs | Category.Type))
+                return new Result(category, getType: () => _body.Type(Context), getArgs: CodeArgs.Void);
             NotImplementedMethod(category);
             return null;
         }
@@ -188,7 +188,7 @@ namespace Reni.Struct
             return result;
         }
 
-        ContextBase ObtainCache() { return Parent.CreateSubContext(!IsGetter); }
+        ContextBase ObtainContext() { return Parent.CreateSubContext(!IsGetter); }
         bool IsGetter { get { return FunctionId.IsGetter; } }
     }
 }

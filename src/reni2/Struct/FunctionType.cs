@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -48,6 +49,8 @@ namespace Reni.Struct
         [Node]
         readonly GetterFunction _getter;
         readonly bool _isValid;
+        readonly SimpleCache<CodeArgs> _codeArgsCache;
+        readonly ResultCache _applyResultCache;
 
         internal FunctionType(int index, FunctionSyntax body, Structure structure, TypeBase argsType)
         {
@@ -56,17 +59,28 @@ namespace Reni.Struct
             _index = index;
             _structure = structure;
             ArgsType = argsType;
+            _codeArgsCache = new SimpleCache<CodeArgs>(ObtainCodeArgs);
+            _applyResultCache = new ResultCache(ObtainApplyResult, ObtainPendingApplyResult);
             StopByObjectId(-10);
             _isValid = true;
         }
 
+        CodeArgs ObtainCodeArgs()
+        {
+            var result = _getter.CodeArgs;
+            if(_setter != null)
+                result += _setter.CodeArgs;
+            return result;
+        }
+
+        [DisableDump]
         internal override TypeBase ValueType { get { return _getter.ReturnType; } }
         [DisableDump]
         internal override bool IsDataLess
         {
             get
             {
-                Tracer.Assert(_isValid);
+                //Tracer.Assert(_isValid);
                 //Tracer.Assert(!CodeArgs.Size.IsZero);
                 return CodeArgs.IsNone && ArgsType.IsDataLess;
             }
@@ -78,16 +92,7 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        internal CodeArgs CodeArgs
-        {
-            get
-            {
-                var result = _getter.CodeArgs;
-                if(_setter != null)
-                    result += _setter.CodeArgs;
-                return result;
-            }
-        }
+        CodeArgs CodeArgs { get { return _codeArgsCache.Value; } }
 
         [DisableDump]
         internal FunctionContainer Container
@@ -106,7 +111,7 @@ namespace Reni.Struct
         protected override Size GetSize()
         {
             Tracer.Assert(_isValid);
-            //Tracer.Assert(!CodeArgs.Size.IsZero);
+            Tracer.Assert(!CodeArgs.Size.IsZero);
             return ArgsType.Size + CodeArgs.Size;
         }
 
@@ -133,7 +138,7 @@ namespace Reni.Struct
             return result;
         }
 
-        public Result ApplyResult(Category category)
+        Result ObtainApplyResult(Category category)
         {
             if(IsDataLess)
                 return Result(category);
@@ -144,6 +149,11 @@ namespace Reni.Struct
                 );
         }
 
+        Result ObtainPendingApplyResult(Category category) { return new Result(category, getType:()=>this, getArgs:CodeArgs.Void); }
+
+        public Result ApplyResult(Category category) { return _applyResultCache & category; }
+
+        internal override bool HasQuickSize { get { return false; } }
         internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => ValueType);

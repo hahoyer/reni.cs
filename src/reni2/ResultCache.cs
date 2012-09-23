@@ -62,7 +62,7 @@ namespace Reni
 
         internal Result Data { get { return _data; } }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal void Update(Category category)
         {
             var localCategory = category - _data.CompleteCategory - _data.PendingCategory;

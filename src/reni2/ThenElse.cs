@@ -79,11 +79,11 @@ namespace Reni
 
             var commonType = CommonType(context);
             return branchResult.Type
-                .Conversion(category.Typed, commonType)
-                .ReplaceArg(branchResult)
-                .LocalBlock(category.Typed)
-                .ObviousExactConversion(commonType)
-                & category;
+                       .Conversion(category.Typed, commonType)
+                       .ReplaceArg(branchResult)
+                       .LocalBlock(category.Typed)
+                       .ObviousExactConversion(commonType)
+                   & category;
         }
 
         Result InternalResult(ContextBase context, Category category)
@@ -141,6 +141,13 @@ namespace Reni
             : base(condSyntax, thenToken, thenSyntax, null) { }
 
         internal override ParsedSyntax CreateElseSyntax(TokenData token, CompileSyntax elseSyntax) { return new ThenElseSyntax(Cond, Token, Then, token, elseSyntax); }
+
+        internal override Result ObtainPendingResult(ContextBase context, Category category)
+        {
+            return context
+                .RootContext
+                .VoidResult(category);
+        }
     }
 
     [Serializable]

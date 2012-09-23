@@ -80,7 +80,7 @@ namespace Reni.Syntax
         internal override CompileSyntax ToCompiledSyntax() { return this; }
         internal void AddToCacheForDebug(ContextBase context, object cacheItem) { ResultCache.Add(context, cacheItem); }
         internal Result Result(ContextBase context) { return Result(context, Category.All); }
-        [DebuggerHidden]
+        //[DebuggerHidden]
         internal Result Result(ContextBase context, Category category) { return context.UniqueResult(category, this); }
         Result FindResult(ContextBase context, Category category) { return context.FindResult(category, this); }
         internal BitsConst Evaluate(ContextBase context) { return Result(context).Evaluate(context.RootContext.ExecutionContext); }
@@ -152,6 +152,12 @@ namespace Reni.Syntax
             return Result(context, category.Typed)
                 .SmartUn<Struct.FunctionType>()
                 .SmartLocalReferenceResult();
+        }
+
+        virtual internal Result ObtainPendingResult(ContextBase context, Category category)
+        {
+            NotImplementedMethod(context,category);
+            return null;
         }
     }
 }

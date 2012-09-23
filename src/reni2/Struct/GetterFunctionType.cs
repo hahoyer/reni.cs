@@ -24,9 +24,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Basics;
-using Reni.Context;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -36,10 +34,7 @@ namespace Reni.Struct
     {
         readonly FunctionId _functionId;
         public GetterFunction(FunctionType parent, int index, CompileSyntax body)
-            : base(parent, body)
-        {
-            _functionId = FunctionId.Getter(index);
-        }
+            : base(parent, body) { _functionId = FunctionId.Getter(index); }
 
         [DisableDump]
         internal TypeBase ReturnType { get { return CallResult(Category.Type).Type; } }

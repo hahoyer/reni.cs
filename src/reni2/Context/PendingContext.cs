@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +29,7 @@ using Reni.Syntax;
 
 namespace Reni.Context
 {
+    [Obsolete]
     sealed class PendingContext : Child
     {
         internal PendingContext(ContextBase parent)
@@ -54,7 +58,7 @@ namespace Reni.Context
                 localCategory -= Category.IsDataLess;
                 if(localCategory.HasAny)
                 {
-                    var newResult = syntax.ObtainResult(this, localCategory);
+                    var newResult = syntax.ObtainPendingResult(this, localCategory);
                     Tracer.Assert(newResult.CompleteCategory == localCategory);
                     result.Update(newResult);
                 }
