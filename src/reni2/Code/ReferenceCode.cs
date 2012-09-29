@@ -56,6 +56,6 @@ namespace Reni.Code
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.ContextRef(this); }
         internal override void Visit(IVisitor visitor) { visitor.ReferenceCode(Context); }
 
-        public override string DumpData() { return ((ReniObject) _context).DumpShort(); }
+        public override string DumpData() { return ((ReniObject) _context).GetNodeDump(); }
     }
 }

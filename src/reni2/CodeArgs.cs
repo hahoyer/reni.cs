@@ -95,7 +95,9 @@ namespace Reni
         }
 
         internal static CodeArgs Create(IContextReference contextReference) { return new CodeArgs(contextReference); }
-
+        
+        internal override string GetNodeDump() { return base.GetNodeDump(); }
+        
         public override string DumpData()
         {
             var result = "";
@@ -173,7 +175,7 @@ namespace Reni
                 NotImplementedMethod();
                 return null;
             } }
-            internal override string DumpShort() { return "CodeArg"; }
+            internal override string GetNodeDump() { return "CodeArg"; }
         }
     }
 }

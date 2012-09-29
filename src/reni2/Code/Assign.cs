@@ -1,5 +1,7 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,16 +29,16 @@ using Reni.Basics;
 namespace Reni.Code
 {
     [Serializable]
-    internal sealed class Assign : FiberItem
+    sealed class Assign : FiberItem
     {
         [DisableDump]
-        private readonly RefAlignParam _refAlignParam;
+        readonly RefAlignParam _refAlignParam;
 
-        public override string NodeDump { get { return base.NodeDump + " TargetSize=" + _targetSize + " RefSize=" + _refAlignParam.RefSize; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " TargetSize=" + _targetSize + " RefSize=" + _refAlignParam.RefSize; }
         internal override void Visit(IVisitor visitor) { visitor.Assign(_targetSize); }
 
         [DisableDump]
-        private readonly Size _targetSize;
+        readonly Size _targetSize;
 
         public Assign(RefAlignParam refAlignParam, Size targetSize)
         {
@@ -43,10 +47,9 @@ namespace Reni.Code
         }
 
         [DisableDump]
-        internal override Size InputSize { get { return _refAlignParam.RefSize*2; } }
+        internal override Size InputSize { get { return _refAlignParam.RefSize * 2; } }
 
         [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
-
     }
 }

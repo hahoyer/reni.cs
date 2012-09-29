@@ -40,17 +40,14 @@ namespace Reni
             StopByObjectId(-1);
         }
         Result IConversionFunction.Result(Category category) { return _proxyType.Converter.Result(category); }
-        public override string NodeDump
+        internal override string GetNodeDump()
         {
-            get
-            {
-                return base.NodeDump
-                       + "["
-                       + ((ReniObject) _proxyType).NodeDump
-                       + "=>"
-                       + _proxyType.Converter.TargetType.NodeDump
-                       + "]";
-            }
+            return base.GetNodeDump()
+                   + "["
+                   + ((ReniObject) _proxyType).NodeDump
+                   + "=>"
+                   + _proxyType.Converter.TargetType.NodeDump
+                   + "]";
         }
     }
 }

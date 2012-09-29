@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -45,7 +48,7 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        public override string NodeDump { get { return base.NodeDump + " Holder=" + _holderName + " ValueSize=" + _valueSize; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " Holder=" + _holderName + " ValueSize=" + _valueSize; }
         internal override void Visit(IVisitor visitor) { visitor.LocalVariableDefinition(_holderName, _valueSize); }
     }
 }

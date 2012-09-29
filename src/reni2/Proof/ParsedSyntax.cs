@@ -67,7 +67,7 @@ namespace Reni.Proof
         internal virtual string SmartDump(ISmartDumpToken @operator)
         {
             NotImplementedMethod(@operator);
-            return DumpShort();
+            return GetNodeDump();
         }
 
         protected virtual ParsedSyntax IsolateClause(string variable)

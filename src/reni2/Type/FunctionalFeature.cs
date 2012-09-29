@@ -50,7 +50,7 @@ namespace Reni.Type
 
         internal TypeBase UniqueFunctionalType() { return _functionalTypesCache.Value; }
 
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
+        string IDumpShortProvider.DumpShort() { return GetNodeDump(); }
 
         internal abstract Result ApplyResult(Category category, TypeBase argsType);
     }

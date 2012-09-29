@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,13 +34,13 @@ namespace Reni.Code
     ///     Bit array operation
     /// </summary>
     [Serializable]
-    internal sealed class BitArrayBinaryOp : BinaryOp
+    sealed class BitArrayBinaryOp : BinaryOp
     {
         [Node]
         [DisableDump]
         internal readonly string OpToken;
 
-        private readonly Size _size;
+        readonly Size _size;
 
         internal BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize)
             : base(leftSize, rightSize)
@@ -53,21 +57,20 @@ namespace Reni.Code
 
         internal override void Visit(IVisitor visitor) { visitor.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> " + OpToken+ " <" + RightSize + ">"; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " <" + LeftSize + "> " + OpToken + " <" + RightSize + ">"; }
     }
 
     /// <summary>
     ///     Bit array prefix operation
     /// </summary>
     [Serializable]
-    internal sealed class BitArrayPrefixOp : FiberItem
+    sealed class BitArrayPrefixOp : FiberItem
     {
         [Node]
         [DisableDump]
         internal readonly ISequenceOfBitPrefixOperation OpToken;
 
-        private readonly Size _size;
+        readonly Size _size;
 
         [Node]
         [DisableDump]
@@ -90,15 +93,14 @@ namespace Reni.Code
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " " + OpToken.DataFunctionName + " " + ArgSize; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " " + OpToken.DataFunctionName + " " + ArgSize; }
     }
 
     /// <summary>
     ///     Dump and print
     /// </summary>
     [Serializable]
-    internal sealed class DumpPrintNumberOperation : BinaryOp
+    sealed class DumpPrintNumberOperation : BinaryOp
     {
         internal DumpPrintNumberOperation(Size leftSize, Size rightSize)
             : base(leftSize, rightSize) { }
@@ -106,17 +108,16 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " <" + LeftSize + "> dump_print <" + RightSize + ">"; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " <" + LeftSize + "> dump_print <" + RightSize + ">"; }
 
         internal override void Visit(IVisitor visitor) { visitor.PrintNumber(LeftSize, RightSize); }
     }
 
     [Serializable]
-    internal sealed class DumpPrintTextOperation : FiberItem
+    sealed class DumpPrintTextOperation : FiberItem
     {
-        private readonly Size _leftSize;
-        private readonly Size _itemSize;
+        readonly Size _leftSize;
+        readonly Size _itemSize;
         internal DumpPrintTextOperation(Size leftSize, Size itemSize)
         {
             _leftSize = leftSize;
@@ -126,24 +127,22 @@ namespace Reni.Code
         internal override Size InputSize { get { return _leftSize; } }
         [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " <" + InputSize + "> dump_print_text("+_itemSize+")"; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " <" + InputSize + "> dump_print_text(" + _itemSize + ")"; }
         internal override void Visit(IVisitor visitor) { visitor.PrintText(InputSize, _itemSize); }
     }
 
     [Serializable]
-    internal sealed class DumpPrintText : FiberHead
+    sealed class DumpPrintText : FiberHead
     {
         [Node]
         [EnableDump]
-        private readonly string _dumpPrintText;
+        readonly string _dumpPrintText;
 
         internal DumpPrintText(string dumpPrintText) { _dumpPrintText = dumpPrintText; }
 
         protected override Size GetSize() { return Size.Zero; }
         internal override void Visit(IVisitor visitor) { visitor.PrintText(_dumpPrintText); }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " dump_print " + _dumpPrintText.Quote(); } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " dump_print " + _dumpPrintText.Quote(); }
     }
 }

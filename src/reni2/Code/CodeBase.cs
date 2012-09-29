@@ -217,8 +217,7 @@ namespace Reni.Code
         /// <value> The icon key. </value>
         string IIconKeyProvider.IconKey { get { return "Code"; } }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " Size=" + Size; } }
+        internal override string GetNodeDump() { { return base.GetNodeDump() + " Size=" + Size; } }
 
         [DisableDump]
         internal abstract IEnumerable<IssueBase> Issues { get; }

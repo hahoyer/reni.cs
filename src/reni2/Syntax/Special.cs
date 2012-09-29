@@ -80,7 +80,7 @@ namespace Reni.Syntax
                 .Result(context, category, Token, _right);
         }
 
-        internal override string DumpShort() { return base.DumpShort() + "(" + _right.DumpShort() + ")"; }
+        internal override string GetNodeDump() { return base.GetNodeDump() + "(" + _right.GetNodeDump() + ")"; }
         protected override TokenData GetFirstToken() { return Token; }
         protected override TokenData GetLastToken() { return _right.LastToken; }
     }
@@ -114,14 +114,14 @@ namespace Reni.Syntax
                 .Result(context, category, _left, _right);
         }
 
-        internal override string DumpShort()
+        internal override string GetNodeDump()
         {
             var result = "(";
-            result += _left.DumpShort();
+            result += _left.GetNodeDump();
             result += ")";
-            result += base.DumpShort();
+            result += base.GetNodeDump();
             result += "(";
-            result += _right.DumpShort();
+            result += _right.GetNodeDump();
             result += ")";
             return result;
         }
@@ -152,7 +152,7 @@ namespace Reni.Syntax
                 .Result(context, category, _left);
         }
 
-        internal override string DumpShort() { return "(" + _left.DumpShort() + ")" + base.DumpShort(); }
+        internal override string GetNodeDump() { return "(" + _left.GetNodeDump() + ")" + base.GetNodeDump(); }
 
         protected override TokenData GetFirstToken() { return _left.FirstToken; }
         protected override TokenData GetLastToken() { return Token; }

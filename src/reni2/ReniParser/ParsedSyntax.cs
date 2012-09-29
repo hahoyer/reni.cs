@@ -86,7 +86,7 @@ namespace Reni.ReniParser
             Container.IsInContainerDump = false;
             var isInDump = _isInDump;
             _isInDump = true;
-            var result = DumpShort();
+            var result = GetNodeDump();
             if(!IsDetailedDumpRequired)
                 return result;
             if(!isInDump)

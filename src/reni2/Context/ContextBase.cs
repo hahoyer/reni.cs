@@ -52,7 +52,7 @@ namespace Reni.Context
         protected ContextBase()
             : base(_nextId++) { _cache = new Cache(this); }
 
-        string IDumpShortProvider.DumpShort() { return DumpShort(); }
+        string IDumpShortProvider.DumpShort() { return GetNodeDump(); }
 
         string IIconKeyProvider.IconKey { get { return "Context"; } }
 
@@ -82,14 +82,18 @@ namespace Reni.Context
             var cacheItem = _cache.ResultCache[syntax];
             cacheItem.Update(category);
             var result = cacheItem.Data & category;
+
+            var pendingCategory = category - result.CompleteCategory;
+            if(pendingCategory.HasAny)
+                result.Update(ObtainPendingResult(pendingCategory, syntax));
             Tracer.Assert(category == result.CompleteCategory);
             return result;
         }
 
         internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache[syntax].Data & category; }
 
-        [DebuggerHidden]
-        Result ObtainResult(Category category, CompileSyntax syntax)
+        //[DebuggerHidden]
+        Result ObtainResult(Category category, CompileSyntax syntax)                 
         {
             var trace = syntax.ObjectId == -247 && ObjectId == 11;
             StartMethodDump(trace, category, syntax);
@@ -106,13 +110,10 @@ namespace Reni.Context
             }
         }
 
-        [DebuggerHidden]
+        //[DebuggerHidden]
         ResultCache CreateCacheElement(CompileSyntax syntax)
         {
-            var result = new ResultCache
-                (category => ObtainResult(category, syntax)
-                 , category => ObtainPendingResult(category, syntax)
-                );
+            var result = new ResultCache(category => ObtainResult(category, syntax));
             syntax.AddToCacheForDebug(this, result);
             return result;
         }

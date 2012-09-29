@@ -90,8 +90,7 @@ namespace Reni.Code
             return new BitArray(OutputSize, bitsConst);
         }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " InputSize=" + InputSize + " InputDataSize=" + InputDataSize; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " InputSize=" + InputSize + " InputDataSize=" + InputDataSize; }
 
         internal override void Visit(IVisitor visitor) { visitor.BitCast(OutputSize, InputSize, InputDataSize); }
 

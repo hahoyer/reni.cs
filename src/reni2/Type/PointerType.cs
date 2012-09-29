@@ -55,7 +55,7 @@ namespace Reni.Type
         IConverter IProxyType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
-        internal override string DumpPrintText { get { return DumpShort(); } }
+        internal override string DumpPrintText { get { return GetNodeDump(); } }
         [DisableDump]
         TypeBase ValueType { get { return _valueType; } }
         [DisableDump]
@@ -67,7 +67,7 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase CoreType { get { return ValueType.CoreType; } }
 
-        internal override string DumpShort() { return ValueType.DumpShort() + "[Pointer]"; }
+        internal override string GetNodeDump() { return ValueType.GetNodeDump() + "[Pointer]"; }
 
         internal override int? SmartSequenceLength(TypeBase elementType)
         {

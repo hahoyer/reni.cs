@@ -1,6 +1,5 @@
 #region Copyright (C) 2012
 
-// 
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -62,8 +61,7 @@ namespace Reni.Code
 
         protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Call(this); }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize; }
 
         internal override void Visit(IVisitor visitor) { visitor.Call(OutputSize, FunctionId, ArgsAndRefsSize); }
 

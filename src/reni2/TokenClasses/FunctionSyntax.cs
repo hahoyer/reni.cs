@@ -85,11 +85,11 @@ namespace Reni.TokenClasses
             }
         }
 
-        internal override string DumpShort()
+        internal override string GetNodeDump()
         {
-            var getter = Getter == null ? "" : "(" + Getter.DumpShort() + ")";
-            var setter = Setter == null ? "" : "(" + Setter.DumpShort() + ")";
-            return setter + base.DumpShort() + getter;
+            var getter = Getter == null ? "" : "(" + Getter.GetNodeDump() + ")";
+            var setter = Setter == null ? "" : "(" + Setter.GetNodeDump() + ")";
+            return setter + base.GetNodeDump() + getter;
         }
 
         internal IMetaFunctionFeature MetaFunctionFeature(Structure structure)

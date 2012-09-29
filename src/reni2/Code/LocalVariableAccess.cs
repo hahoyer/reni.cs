@@ -1,5 +1,7 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,16 +29,16 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    internal sealed class LocalVariableAccess : FiberHead
+    sealed class LocalVariableAccess : FiberHead
     {
-        private static int _nextObjectId;
+        static int _nextObjectId;
         [DisableDump]
         [Node]
         internal readonly string Holder;
         [DisableDump]
         [Node]
         internal readonly Size Offset;
-        private readonly Size _size;
+        readonly Size _size;
         [DisableDump]
         [Node]
         internal readonly Size DataSize;
@@ -49,17 +53,13 @@ namespace Reni.Code
             StopByObjectId(-10);
         }
 
-        [DisableDump]
-        public override string NodeDump
+        internal override string GetNodeDump()
         {
-            get
-            {
-                return base.NodeDump
-                       + " Holder=" + Holder
-                       + " Offset=" + Offset
-                       + " DataSize=" + DataSize
-                    ;
-            }
+            return base.GetNodeDump()
+                   + " Holder=" + Holder
+                   + " Offset=" + Offset
+                   + " DataSize=" + DataSize
+                ;
         }
 
         protected override Size GetSize() { return _size; }

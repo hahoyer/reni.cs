@@ -66,8 +66,7 @@ namespace Reni.Code
 
         internal override void Visit(IVisitor visitor) { visitor.BitsArray(Size, Data); }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " Data=" + Data; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " Data=" + Data; }
 
         internal new static BitArray Void { get { return new BitArray(Size.Create(0), Basics.BitsConst.None()); } }
     }

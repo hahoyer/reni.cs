@@ -68,9 +68,9 @@ namespace Reni.Basics
             return Create(size);
         }
 
-        protected override string Dump(bool isRecursion) { return DumpShort(); }
+        protected override string Dump(bool isRecursion) { return GetNodeDump(); }
 
-        internal override string DumpShort() { return _value.ToString(); }
+        internal override string GetNodeDump() { return _value.ToString(); }
 
         public Size Align(int alignBits)
         {

@@ -55,7 +55,7 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
 
-        public override string NodeDump { get { return base.NodeDump + "{" + _structure.NodeDump + "@" + _position + "}"; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + "{" + _structure.NodeDump + "@" + _position + "}"; }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
 

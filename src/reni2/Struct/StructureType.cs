@@ -55,7 +55,7 @@ namespace Reni.Struct
         internal override Root RootContext { get { return _structure.RootContext; } }
         protected override Size GetSize() { return Structure.StructSize; }
 
-        internal override string DumpShort() { return "type(" + Structure.DumpShort() + ")"; }
+        internal override string GetNodeDump() { return "type(" + Structure.GetNodeDump() + ")"; }
 
         internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {

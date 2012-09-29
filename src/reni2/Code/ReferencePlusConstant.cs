@@ -52,8 +52,7 @@ namespace Reni.Code
             Tracer.Assert(!_right.IsZero);
         }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + " Right=" + _right; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " Right=" + _right; }
 
         internal override void Visit(IVisitor visitor) { visitor.ReferencePlus(_right); }
 

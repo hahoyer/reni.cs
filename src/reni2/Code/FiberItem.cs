@@ -73,8 +73,7 @@ namespace Reni.Code
         [DisableDump]
         internal Size DeltaSize { get { return OutputSize - InputSize; } }
 
-        [DisableDump]
-        public override string NodeDump { get { return base.NodeDump + DumpSignature; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + DumpSignature; }
 
         [DisableDump]
         string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }

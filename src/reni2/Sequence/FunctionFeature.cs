@@ -59,7 +59,7 @@ namespace Reni.Sequence
         IFunctionFeature IFeature.Function { get { return this; } }
         ISimpleFeature IFeature.Simple { get { return null; } }
 
-        internal override string DumpShort() { return base.DumpShort() + " " + _feature.Definable.DataFunctionName; }
+        internal override string GetNodeDump() { return base.GetNodeDump() + " " + _feature.Definable.DataFunctionName; }
 
         Result Result(Category category)
         {

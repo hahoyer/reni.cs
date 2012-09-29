@@ -31,7 +31,7 @@ using HWClassLibrary.TreeStructure;
 namespace Reni
 {
     [AdditionalNodeInfo("NodeDump")]
-    [DebuggerDisplay("{NodeDump}.{ObjectId}")]
+    [DebuggerDisplay("{NodeDump}")]
     public abstract class ReniObject : Dumpable
     {
         static int _nextObjectId;
@@ -46,14 +46,14 @@ namespace Reni
         internal int ObjectId { get { return _objectId; } }
 
         [DisableDump]
-        public virtual string NodeDump { get { return DumpShort(); } }
-
-        internal virtual string DumpShort() { return GetType().PrettyName() + "." + ObjectId; }
+        public string NodeDump { get { return GetNodeDump() + "." + ObjectId; } }
+        
+        internal virtual string GetNodeDump() { return GetType().PrettyName(); }
 
         internal string DumpShortForDebug()
         {
             if(Debugger.IsAttached)
-                return DumpShort();
+                return GetNodeDump();
             return "";
         }
 

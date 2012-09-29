@@ -70,7 +70,7 @@ namespace Reni.Type
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ApplyTypeOperator(Result argResult) { return Parent.ApplyTypeOperator(argResult); }
-        internal override string DumpShort() { return base.DumpShort() + "(" + Parent.DumpShort() + ")"; }
+        internal override string GetNodeDump() { return base.GetNodeDump() + "(" + Parent.GetNodeDump() + ")"; }
         internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, () => Parent);

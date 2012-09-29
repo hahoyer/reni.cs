@@ -19,7 +19,7 @@ namespace Reni.Syntax
             _right = right ?? new EmptyList(token, token);
         }
 
-        internal override string DumpShort() { return "(" + _left.DumpShort() + ", " + _right.DumpShort() + ")"; }
+        internal override string GetNodeDump() { return "(" + _left.GetNodeDump() + ", " + _right.GetNodeDump() + ")"; }
 
         internal override ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData leftToken, TokenData rightToken)
         {

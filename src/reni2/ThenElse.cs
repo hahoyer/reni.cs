@@ -131,7 +131,7 @@ namespace Reni
             return null;
         }
 
-        internal override string DumpShort() { return "(" + Cond.DumpShort() + ")then(" + Then.DumpShort() + ")"; }
+        internal override string GetNodeDump() { return "(" + Cond.GetNodeDump() + ")then(" + Then.GetNodeDump() + ")"; }
     }
 
     [Serializable]
@@ -160,10 +160,10 @@ namespace Reni
             CompileSyntax elseSyntax)
             : base(condSyntax, thenToken, thenSyntax, elseSyntax) { _elseToken = elseToken; }
 
-        internal override string DumpShort()
+        internal override string GetNodeDump()
         {
-            return base.DumpShort() + "else(" +
-                   Else.DumpShort() + ")";
+            return base.GetNodeDump() + "else(" +
+                   Else.GetNodeDump() + ")";
         }
     }
 }

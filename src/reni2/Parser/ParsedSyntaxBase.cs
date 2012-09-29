@@ -23,7 +23,7 @@ namespace Reni.Parser
         [DisableDump]
         string IIconKeyProvider.IconKey { get { return "Syntax"; } }
 
-        string IParsedSyntax.DumpShort() { return DumpShort(); }
+        string IParsedSyntax.DumpShort() { return GetNodeDump(); }
 
         [DisableDump]
         TokenData IParsedSyntax.Token { get { return Token; } }
@@ -46,7 +46,7 @@ namespace Reni.Parser
         protected virtual TokenData GetFirstToken() { return Token; }
         protected virtual TokenData GetLastToken() { return Token; }
 
-        internal override string DumpShort() { return Token.Name; }
+        internal override string GetNodeDump() { return Token.Name; }
         protected virtual string FilePosition() { return Token.FilePosition; }
     }
 }

@@ -202,9 +202,9 @@ namespace Reni.Basics
         [DebuggerHidden]
         public static Category operator -(Category x, Category y) { return CreateCategory(x.HasIsDataLess && !y.HasIsDataLess, x.HasSize && !y.HasSize, x.HasType && !y.HasType, x.HasCode && !y.HasCode, x.HasArgs && !y.HasArgs); }
 
-        protected override string Dump(bool isRecursion) { return DumpShort(); }
+        protected override string Dump(bool isRecursion) { return GetNodeDump(); }
 
-        internal override string DumpShort()
+        internal override string GetNodeDump()
         {
             var result = "";
             if(HasIsDataLess)

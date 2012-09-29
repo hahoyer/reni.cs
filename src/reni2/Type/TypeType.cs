@@ -48,7 +48,7 @@ namespace Reni.Type
 
         internal override string DumpPrintText { get { return "(" + Value.DumpPrintText + "()) type"; } }
 
-        internal override string DumpShort() { return "(" + Value.DumpShort() + ") type"; }
+        internal override string GetNodeDump() { return "(" + Value.GetNodeDump() + ") type"; }
 
         internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {

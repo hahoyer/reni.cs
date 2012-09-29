@@ -1,3 +1,25 @@
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +32,10 @@ using Reni.TokenClasses;
 namespace Reni.ReniParser
 {
     [Serializable]
-    internal sealed class DefineableToken : ReniObject, IIconKeyProvider
+    sealed class DefineableToken : ReniObject, IIconKeyProvider
     {
-        private readonly TokenData _data;
-        private readonly Defineable _tokenClass;
+        readonly TokenData _data;
+        readonly Defineable _tokenClass;
 
         internal DefineableToken(Defineable tokenClass, TokenData tokenData)
         {
@@ -29,7 +51,6 @@ namespace Reni.ReniParser
         [DisableDump]
         public string IconKey { get { return "Symbol"; } }
 
-        [DisableDump]
-        public override string NodeDump { get { return Data.Name.Quote() + "." + ObjectId; } }
+        internal override string GetNodeDump() { return Data.Name.Quote(); }
     }
 }

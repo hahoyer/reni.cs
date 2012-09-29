@@ -89,6 +89,6 @@ namespace Reni.Type
             throw new NotImplementedException();
         }
 
-        internal override string DumpShort() { return "pair." + ObjectId; }
+        internal override string GetNodeDump() { return "pair." + ObjectId; }
     }
 }

@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,16 +29,13 @@ using HWClassLibrary.TreeStructure;
 
 namespace Reni.Parser
 {
-    internal abstract class TokenClass : ReniObject, IIconKeyProvider, ITokenClass
+    abstract class TokenClass : ReniObject, IIconKeyProvider, ITokenClass
     {
-        private static int _nextObjectId;
-        private string _name;
+        static int _nextObjectId;
+        string _name;
 
         protected TokenClass()
-            : base(_nextObjectId++)
-        {
-            StopByObjectId(-31);
-        }
+            : base(_nextObjectId++) { StopByObjectId(-31); }
 
         [DisableDump]
         string ITokenClass.Name { set { _name = value; } }
@@ -48,8 +49,7 @@ namespace Reni.Parser
         [DisableDump]
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
 
-        [DisableDump]
-        public override string NodeDump { get { return GetType().PrettyName() + "("+ Name.Quote() +")"; } }
+        internal override string GetNodeDump() { return base.GetNodeDump() + "(" + Name.Quote() + ")"; }
 
         [Node]
         [DisableDump]

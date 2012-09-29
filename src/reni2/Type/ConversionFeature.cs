@@ -48,7 +48,7 @@ namespace Reni.Type
         }
         internal override Root RootContext { get { return _objectType.RootContext; } }
 
-        internal override string DumpShort() { return _objectType.DumpShort() + " type"; }
+        internal override string GetNodeDump() { return _objectType.GetNodeDump() + " type"; }
         
         internal override Result ApplyResult(Category category, TypeBase argsType)
         {
