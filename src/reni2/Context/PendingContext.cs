@@ -35,43 +35,6 @@ namespace Reni.Context
         internal PendingContext(ContextBase parent)
             : base(parent) { }
 
-        internal Result Result(Category category, CompileSyntax syntax)
-        {
-            var trace = ObjectId == 4 && syntax.ObjectId == 244;
-            StartMethodDump(trace, category, syntax);
-            try
-            {
-                BreakExecution();
-                if(category.HasCode)
-                {
-                    NotImplementedMethod(category, syntax);
-                    return null;
-                }
-
-                var result = new Result();
-                var localCategory = category;
-                if(category.HasArgs)
-                    result.CodeArgs = CodeArgs.Void();
-                localCategory -= Category.CodeArgs;
-                if(category.HasIsDataLess)
-                    result.IsDataLess = true;
-                localCategory -= Category.IsDataLess;
-                if(localCategory.HasAny)
-                {
-                    var newResult = syntax.ObtainPendingResult(this, localCategory);
-                    Tracer.Assert(newResult.CompleteCategory == localCategory);
-                    result.Update(newResult);
-                }
-
-                Tracer.Assert(result.CompleteCategory == category);
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
-        }
-
         protected override Result ObtainPendingResult(Category category, CompileSyntax syntax)
         {
             NotImplementedMethod(category, syntax);

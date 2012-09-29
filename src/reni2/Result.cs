@@ -575,6 +575,13 @@ namespace Reni
             return this;
         }
 
+        internal Result ReplaceArg(ResultCache resultCache)
+        {
+            if (HasArg)
+                return InternalReplaceArg(category => resultCache & category);
+            return this;
+        }
+
         internal Result ReplaceArg(Result resultForArg)
         {
             if(HasArg && resultForArg != null)

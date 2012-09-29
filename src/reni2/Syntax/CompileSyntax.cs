@@ -149,16 +149,16 @@ namespace Reni.Syntax
         
         internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)
         {
-            return Result(context, category.Typed)
+            Result result = Result(context, category.Typed);
+            if (result == null)
+                return null;
+            return result
                 .SmartUn<Struct.FunctionType>()
                 .SmartLocalReferenceResult();
         }
 
         virtual internal Result ObtainPendingResult(ContextBase context, Category category)
         {
-            if(category == Category.CodeArgs)
-                return new Result(category, getArgs:CodeArgs.Void);
-            NotImplementedMethod(context,category);
             return null;
         }
     }

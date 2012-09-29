@@ -48,7 +48,6 @@ namespace Reni.Struct
         [NotNull]
         [Node]
         readonly GetterFunction _getter;
-        readonly bool _isValid;
         readonly SimpleCache<CodeArgs> _codeArgsCache;
         readonly ResultCache _applyResultCache;
 
@@ -62,7 +61,6 @@ namespace Reni.Struct
             _codeArgsCache = new SimpleCache<CodeArgs>(ObtainCodeArgs);
             _applyResultCache = new ResultCache(ObtainApplyResult);
             StopByObjectId(-10);
-            _isValid = true;
         }
 
         CodeArgs ObtainCodeArgs()
@@ -143,8 +141,6 @@ namespace Reni.Struct
                 return null;
             return codeArgs + CodeArgs.Arg();
         }
-
-        Result ObtainPendingApplyResult(Category category) { return new Result(category, getType: () => this, getArgs: CodeArgs.Void); }
 
         public Result ApplyResult(Category category) { return _applyResultCache & category; }
 

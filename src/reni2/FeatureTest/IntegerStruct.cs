@@ -87,7 +87,6 @@ Integer8:
     [InstanceCode("Integer8(23) clone")]
     [Create]
     [TwoFunctions1]
-    [RecursiveFunction]
     public sealed class Clone : IntegerStruct
     {
         [Test]

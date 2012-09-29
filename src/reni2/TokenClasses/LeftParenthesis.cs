@@ -29,6 +29,7 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
@@ -46,9 +47,7 @@ namespace Reni.TokenClasses
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            var leftType = left.Type(context);
-            var feature = leftType.Feature;
-            return context.FunctionResult(category, leftType, feature, null, left,right);
+            return FeatureInstance.ObjectResult(context, category, left, right);
         }
     }
 }

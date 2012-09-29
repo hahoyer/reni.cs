@@ -39,7 +39,7 @@ ipsum: Konstrukt(8);
 ipsum Pelsim := 15;
 (Viersich, ipsum Simpel, ipsum Pelsim, ipsum Fun(7), lorum Simpel, lorum Fun(18)) dump_print"
         , "(4, 8, 15, 16, 23, 42)")]
-    sealed class Post120617 : CompilerTest
+    public sealed class Post120617 : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }

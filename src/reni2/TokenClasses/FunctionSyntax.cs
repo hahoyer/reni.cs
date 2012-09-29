@@ -31,7 +31,6 @@ using Reni.Feature;
 using Reni.Parser;
 using Reni.Struct;
 using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.TokenClasses
 {
@@ -99,6 +98,7 @@ namespace Reni.TokenClasses
             NotImplementedMethod(structure);
             return null;
         }
+
         internal IFunctionFeature FunctionFeature(Structure structure)
         {
             if(_isMetaFunction)

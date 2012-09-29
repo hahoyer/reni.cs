@@ -46,30 +46,6 @@ namespace Reni.Feature
 
         internal static string Dump(this IFeature feature) { return Tracer.Dump(feature); }
 
-        internal static void AssertValid(this IFeature feature, bool hasArg)
-        {
-            Tracer.Assert(feature != null);
-
-            if(hasArg)
-            {
-                if (feature.MetaFunction != null)
-                    return;
-
-                Tracer.Assert(feature.Function != null, feature.Dump);
-                Tracer.Assert(!feature.Function.IsImplicit, feature.Dump);
-                return;
-            }
-
-            if (feature.Simple != null)
-            {
-                Tracer.Assert(feature.Function == null || !feature.Function.IsImplicit, ()=>"Ambiguity: Simple or ImplicitFunction? "+ feature.Dump());
-                return;
-            }
-
-            Tracer.Assert(feature.Function != null, feature.Dump);
-            Tracer.Assert(feature.Function.IsImplicit, feature.Dump);
-        }
-
         internal static Simple Feature(Func<Category, Result> function) { return new Simple(function); }
         internal static Simple<T> Feature<T>(Func<Category, T, Result> function) { return new Simple<T>(function); }
         internal static Simple<T1, T2> Feature<T1, T2>(Func<Category, T1, T2, Result> function) { return new Simple<T1, T2>(function); }
@@ -105,6 +81,5 @@ namespace Reni.Feature
             var types = type.GetGenericArguments();
             return PrettySearchPath(types[0]) + " -> " + types[1].PrettyName();
         }
-
     }
 }

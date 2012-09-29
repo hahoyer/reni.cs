@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.Syntax;
@@ -37,15 +38,16 @@ namespace Reni.Struct
 
         [EnableDump]
         readonly Structure _structure;
-
         [EnableDump]
         readonly int _position;
+        readonly SimpleCache<IFunctionFeature > _functionFeature;
 
         internal AccessFeature(Structure structure, int position)
             : base(_nextObjectId++)
         {
             _structure = structure;
             _position = position;
+            _functionFeature = new SimpleCache<IFunctionFeature>(ObtainFunctionFeature);
         }
 
         Result ISimpleFeature.Result(Category category)
@@ -75,20 +77,18 @@ namespace Reni.Struct
         }
 
         IFunctionFeature IFeature.Function { get { return FunctionFeature; } }
+        IFunctionFeature FunctionFeature { get { return _functionFeature.Value; } }
 
-        IFunctionFeature FunctionFeature
+        IFunctionFeature ObtainFunctionFeature()
         {
-            get
-            {
-                var functionSyntax = Statement as FunctionSyntax;
-                if(functionSyntax != null)
-                    return functionSyntax.FunctionFeature(_structure);
+            var functionSyntax = Statement as FunctionSyntax;
+            if(functionSyntax != null)
+                return functionSyntax.FunctionFeature(_structure);
 
-                var feature = _structure.ValueType(_position).Feature;
-                if(feature == null)
-                    return null;
-                return feature.Function;
-            }
+            var feature = _structure.ValueType(_position).Feature;
+            if(feature == null)
+                return null;
+            return feature.Function;
         }
 
         ISimpleFeature IFeature.Simple

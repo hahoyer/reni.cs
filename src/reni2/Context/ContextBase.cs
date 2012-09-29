@@ -22,14 +22,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
-using Reni.Feature;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
@@ -83,7 +81,13 @@ namespace Reni.Context
 
             var pendingCategory = category - result.CompleteCategory;
             if(pendingCategory.HasAny)
-                result.Update(ObtainPendingResult(pendingCategory, syntax));
+            {
+                return null;
+                var pendingResult = syntax.ObtainPendingResult(this, pendingCategory);
+                if(pendingResult == null)
+                    return null;
+                result.Update(pendingResult);
+            }
             Tracer.Assert(category == result.CompleteCategory);
             return result;
         }
@@ -91,7 +95,7 @@ namespace Reni.Context
         internal Result FindResult(Category category, CompileSyntax syntax) { return _cache.ResultCache[syntax].Data & category; }
 
         //[DebuggerHidden]
-        Result ObtainResult(Category category, CompileSyntax syntax)                 
+        Result ObtainResult(Category category, CompileSyntax syntax)
         {
             var trace = syntax.ObjectId == -247 && ObjectId == 11;
             StartMethodDump(trace, category, syntax);
@@ -204,70 +208,19 @@ namespace Reni.Context
                 .SmartLocalReferenceResult();
         }
 
-        Result FunctionResult(Category category, TypeBase objectType, IFeature feature, CompileSyntax right)
+        internal Result ResultForObject(Category category, CompileSyntax syntax)
         {
-            var trace = feature.GetObjectId() == -10 && category.HasCode;
-            StartMethodDump(trace, category, objectType, feature, right);
-            try
-            {
-                var function = feature.Function;
-                if(right == null && (function == null || !function.IsImplicit))
-                    return ReturnMethodDump(feature.Simple.Result(category));
-
-                var rightResult
-                    = right == null
-                          ? RootContext.VoidType.Result(category.Typed)
-                          : right.SmartUnFunctionedReferenceResult(this, category);
-                Dump("rightResult", rightResult);
-
-                BreakExecution();
-                var applyResult = function.ApplyResult(category, rightResult.Type);
-                Dump("applyResult", applyResult);
-                BreakExecution();
-
-                var replaceArg = applyResult.ReplaceArg(rightResult);
-                Dump("replaceArg", replaceArg);
-
-                var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.SmartPointer.ArgResult(c));
-                return ReturnMethodDump(result);
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            if(syntax == null)
+                return null;
+            return syntax.SmartReferenceResult(this, category);
         }
 
-        internal Result FunctionResult(Category category, TypeBase leftType, IFeature feature, Func<Category, Result> converterResult, CompileSyntax left, CompileSyntax right)
+        internal Result ResultForArgs(Category category, CompileSyntax syntax)
         {
-            var trace = feature is IssueType.ImplicitSearchResult && feature.GetObjectId() == -44;
-            StartMethodDump(trace, category, leftType, feature, converterResult, left,right);
-            try
-            {
-                feature.AssertValid(right != null);
+            if(syntax == null)
+                return RootContext.VoidType.Result(category.Typed);
 
-                var metaFeature = feature.MetaFunction;
-                if(metaFeature != null)
-                    return ReturnMethodDump(metaFeature.ApplyResult(this, category, left, right));
-
-                var leftResult = left != null ? left.SmartReferenceResult(this, category) : null;
-                Dump("leftResult", leftResult);
-
-                BreakExecution();
-                var functionResult = FunctionResult(category, leftType, feature, right);
-                Dump("functionResult", functionResult);
-                if(trace)
-                    Dump("converterResult", converterResult(Category.All));
-                BreakExecution();
-
-                var result = functionResult.ReplaceArg(converterResult);
-                Dump("result", result);
-
-                return ReturnMethodDump(result.ReplaceArg(leftResult));
-            }
-            finally
-            {
-                EndMethodDump();
-            }
+            return syntax.SmartUnFunctionedReferenceResult(this, category);
         }
     }
 }
