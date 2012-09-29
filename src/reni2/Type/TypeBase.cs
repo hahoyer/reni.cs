@@ -43,7 +43,6 @@ namespace Reni.Type
     abstract class TypeBase
         : ReniObject
           , IContextReference
-          , IDumpShortProvider
           , IIconKeyProvider
           , ISearchTarget
           , ISearchPath<ISuffixFeature, Aligner>, ISearchPath<ISuffixFeature, TypeBase>
@@ -133,8 +132,6 @@ namespace Reni.Type
 
         [DisableDump]
         internal virtual TypeBase[] ToList { get { return new[] {this}; } }
-
-        string IDumpShortProvider.DumpShort() { return GetNodeDump(); }
 
         string ISearchTarget.StructFeatureName { get { return null; } }
 

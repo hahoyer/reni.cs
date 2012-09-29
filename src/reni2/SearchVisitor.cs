@@ -38,8 +38,7 @@ namespace Reni
     {
         internal static bool Trace;
 
-        protected abstract SearchVisitor PathItem<TType>(TType target)
-            where TType : IDumpShortProvider;
+        protected abstract SearchVisitor PathItem<TType>(TType target);
 
         internal abstract bool IsSuccessFull { get; }
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
@@ -49,10 +48,9 @@ namespace Reni
         internal abstract void Search();
 
         internal void Search<TType>(TType target, Func<TypeBase> getChild)
-            where TType : IDumpShortProvider
         {
             if(Trace)
-                Tracer.FlaggedLine(1, " >>> " + target.DumpShort());
+                Tracer.FlaggedLine(1, " >>> " + target.NodeDump());
             if(Trace)
                 Tracer.IndentStart();
             try
@@ -96,7 +94,7 @@ namespace Reni
                 if(Trace)
                     Tracer.IndentEnd();
                 if(Trace)
-                    Tracer.FlaggedLine(1, " <<< " + target.DumpShort());
+                    Tracer.FlaggedLine(1, " <<< " + target.NodeDump());
             }
         }
 

@@ -41,7 +41,7 @@ namespace Reni.Context
     /// <summary>
     ///     Base class for compiler environments
     /// </summary>
-    abstract class ContextBase : ReniObject, IDumpShortProvider, IIconKeyProvider
+    abstract class ContextBase : ReniObject, IIconKeyProvider
     {
         static int _nextId;
 
@@ -51,8 +51,6 @@ namespace Reni.Context
 
         protected ContextBase()
             : base(_nextId++) { _cache = new Cache(this); }
-
-        string IDumpShortProvider.DumpShort() { return GetNodeDump(); }
 
         string IIconKeyProvider.IconKey { get { return "Context"; } }
 

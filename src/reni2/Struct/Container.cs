@@ -40,7 +40,7 @@ namespace Reni.Struct
     ///     Structured data, context free version
     /// </summary>
     [Serializable]
-    sealed class Container : CompileSyntax, IDumpShortProvider
+    sealed class Container : CompileSyntax
     {
         readonly TokenData _firstToken;
         readonly TokenData _lastToken;
@@ -174,8 +174,6 @@ namespace Reni.Struct
             IsInContainerDump = isInDump;
             return result;
         }
-
-        string IDumpShortProvider.DumpShort() { return GetNodeDump(); }
 
         internal StructurePosition Find(string name)
         {

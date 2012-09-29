@@ -31,7 +31,7 @@ using Reni.Context;
 
 namespace Reni.Type
 {
-    abstract class FunctionalFeature : ReniObject, IDumpShortProvider
+    abstract class FunctionalFeature : ReniObject
     {
         static int _nextObjectId;
         readonly SimpleCache<TypeBase> _functionalTypesCache;
@@ -49,9 +49,6 @@ namespace Reni.Type
         internal abstract Root RootContext { get; }
 
         internal TypeBase UniqueFunctionalType() { return _functionalTypesCache.Value; }
-
-        string IDumpShortProvider.DumpShort() { return GetNodeDump(); }
-
         internal abstract Result ApplyResult(Category category, TypeBase argsType);
     }
 }

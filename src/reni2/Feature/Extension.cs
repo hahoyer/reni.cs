@@ -38,7 +38,6 @@ namespace Reni.Feature
     {
         internal static TFeature CheckedConvert<TFeature, TType>(this ISearchPath<TFeature, TType> feature, TType target)
             where TFeature : class, IFeature
-            where TType : IDumpShortProvider
         {
             if(feature == null)
                 return null;

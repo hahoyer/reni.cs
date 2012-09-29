@@ -47,7 +47,7 @@ namespace Reni
 
         [DisableDump]
         public string NodeDump { get { return GetNodeDump() + "." + ObjectId; } }
-        
+
         internal virtual string GetNodeDump() { return GetType().PrettyName(); }
 
         internal string DumpShortForDebug()
@@ -97,8 +97,14 @@ namespace Reni
         }
     }
 
-    interface IDumpShortProvider
+    static class ReniObjectExtension
     {
-        string DumpShort();
+        internal static string NodeDump(this object o)
+        {
+            var r = o as ReniObject;
+            if(r != null)
+                return r.NodeDump;
+            return o.ToString();
+        }
     }
 }

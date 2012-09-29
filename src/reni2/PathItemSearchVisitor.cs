@@ -32,7 +32,6 @@ namespace Reni
 {
     sealed class PathItemSearchVisitor<TFeature, TType> : SearchVisitor<ISearchPath<TFeature, TType>>
         where TFeature : class, ISearchPath
-        where TType : IDumpShortProvider
     {
         internal override DictionaryEx<System.Type, Probe> Probes { get { return _parent.Probes; } }
         [DisableDump]
