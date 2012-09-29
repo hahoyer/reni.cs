@@ -60,7 +60,7 @@ namespace Reni.Struct
             _structure = structure;
             ArgsType = argsType;
             _codeArgsCache = new SimpleCache<CodeArgs>(ObtainCodeArgs);
-            _applyResultCache = new ResultCache(ObtainApplyResult, ObtainPendingApplyResult);
+            _applyResultCache = new ResultCache(ObtainApplyResult);
             StopByObjectId(-10);
             _isValid = true;
         }
@@ -84,7 +84,10 @@ namespace Reni.Struct
 
         [Node]
         [DisableDump]
-        CodeArgs CodeArgs { get { return _codeArgsCache.Value; } }
+        CodeArgs CodeArgs { get { return ObtainCodeArgs(); } }
+        // remark: the result of this property must not be chached here, 
+        // since there are recursive calls possible 
+        // and they have to be catched at result cache of contexts
 
         [DisableDump]
         internal FunctionContainer Container
@@ -127,13 +130,18 @@ namespace Reni.Struct
 
         Result ObtainApplyResult(Category category)
         {
-            if(IsDataLess)
-                return Result(category);
             return Result
                 (category
                  , () => CodeArgs.ToCode() + ArgsType.ArgCode
-                 , () => CodeArgs + CodeArgs.Arg()
+                 , ObtainApplyCodeArgs
                 );
+        }
+        CodeArgs ObtainApplyCodeArgs()
+        {
+            var codeArgs = CodeArgs;
+            if(codeArgs == null)
+                return null;
+            return codeArgs + CodeArgs.Arg();
         }
 
         Result ObtainPendingApplyResult(Category category) { return new Result(category, getType: () => this, getArgs: CodeArgs.Void); }

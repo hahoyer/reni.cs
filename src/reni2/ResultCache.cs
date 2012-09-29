@@ -36,20 +36,18 @@ namespace Reni
     sealed class ResultCache : ReniObject, ITreeNodeSupport
     {
         readonly Result _data = new Result();
-        readonly Func<Category, Result> _obtainFlatResult;
-        readonly Func<Category, Result> _obtainPendingResult;
+        readonly Func<Category, Result> _obtainResult;
         internal string FunctionDump = "";
 
-        public ResultCache(Func<Category, Result> obtainResult, Func<Category, Result> obtainPendingResult = null)
+        public ResultCache(Func<Category, Result> obtainResult)
         {
-            _obtainFlatResult = obtainResult ?? NotSupported;
-            _obtainPendingResult = obtainPendingResult ?? NotSupported;
+            _obtainResult = obtainResult ?? NotSupported;
         }
 
         ResultCache(Result data)
         {
             _data = data;
-            _obtainFlatResult = NotSupported;
+            _obtainResult = NotSupported;
         }
 
         public static implicit operator ResultCache(Result x) { return new ResultCache(x); }
@@ -91,22 +89,14 @@ namespace Reni
                 try
                 {
                     _data.PendingCategory |= localCategory;
-                    var result = _obtainFlatResult(localCategory);
-                    Tracer.Assert(localCategory <= result.CompleteCategory);
+                    var result = _obtainResult(localCategory);
+                    Tracer.Assert(localCategory - Category.CodeArgs <= result.CompleteCategory - Category.CodeArgs);
                     _data.Update(result);
                 }
                 finally
                 {
                     _data.PendingCategory = oldPendingCategory;
                 }
-            }
-
-            var pendingCategory = category - _data.CompleteCategory;
-            if(pendingCategory.HasAny)
-            {
-                var pendingResult = _obtainPendingResult(pendingCategory);
-                Tracer.Assert(pendingResult.CompleteCategory == pendingCategory);
-                _data.Update(pendingResult);
             }
         }
 

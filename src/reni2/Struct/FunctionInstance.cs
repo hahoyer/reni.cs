@@ -52,14 +52,14 @@ namespace Reni.Struct
             Parent = parent;
             _bodyCodeCache = new SimpleCache<CodeBase>(ObtainBodyCode);
             _contextCache = new SimpleCache<ContextBase>(ObtainContext);
-            _resultCache = new ResultCache(ObtainResult, ObtainPendingResult);
+            _resultCache = new ResultCache(ObtainResult);
         }
 
         [Node]
         [DisableDump]
         internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
         [Node]
-        string Description { get { return _body.DumpShort(); } }
+        string Description { get { return _body.GetNodeDump(); } }
         [Node]
         [DisableDump]
         protected Size FrameSize { get { return Parent.Size + RelevantValueSize; } }
@@ -183,7 +183,7 @@ namespace Reni.Struct
         public string DumpFunction()
         {
             var result = "\n";
-            result += "body=" + _body.DumpShort();
+            result += "body=" + _body.GetNodeDump();
             result += "\n";
             return result;
         }

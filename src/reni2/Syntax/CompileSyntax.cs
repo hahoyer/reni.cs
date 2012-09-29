@@ -156,6 +156,8 @@ namespace Reni.Syntax
 
         virtual internal Result ObtainPendingResult(ContextBase context, Category category)
         {
+            if(category == Category.CodeArgs)
+                return new Result(category, getArgs:CodeArgs.Void);
             NotImplementedMethod(context,category);
             return null;
         }

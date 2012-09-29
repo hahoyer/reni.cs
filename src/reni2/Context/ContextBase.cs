@@ -99,7 +99,7 @@ namespace Reni.Context
             {
                 BreakExecution();
                 var result = syntax.ObtainResult(this, category.Replenished);
-                Tracer.Assert(category <= result.CompleteCategory);
+                Tracer.Assert(category - Category.CodeArgs <= result.CompleteCategory - Category.CodeArgs);
                 return ReturnMethodDump(result);
             }
             finally

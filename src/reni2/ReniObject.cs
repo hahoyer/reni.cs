@@ -35,19 +35,34 @@ namespace Reni
     public abstract class ReniObject : Dumpable
     {
         static int _nextObjectId;
-        readonly int _objectId;
+        readonly int? _objectId;
 
         protected ReniObject()
             : this(_nextObjectId++) { }
 
-        protected ReniObject(int nextObjectId) { _objectId = nextObjectId; }
+        protected ReniObject(int? nextObjectId) { _objectId = nextObjectId; }
 
         [DisableDump]
-        internal int ObjectId { get { return _objectId; } }
+        internal int ObjectId
+        {
+            get
+            {
+                Tracer.Assert(_objectId != null);
+                return _objectId.Value;
+            }
+        }
 
         [DisableDump]
-        public string NodeDump { get { return GetNodeDump() + "." + ObjectId; } }
-
+        internal string NodeDump
+        {
+            get
+            {
+                var result = GetNodeDump();
+                if(_objectId == null)
+                    return result;
+                return result + "." + ObjectId;
+            }
+        }
         internal virtual string GetNodeDump() { return GetType().PrettyName(); }
 
         internal string DumpShortForDebug()
