@@ -41,6 +41,7 @@ namespace Reni.Basics
         static readonly Category[] _cache = new Category[32];
 
         Category(bool isDataLess, bool size, bool type, bool code, bool args)
+            : base(null)
         {
             _code = code;
             _type = type;
