@@ -66,6 +66,7 @@ namespace Reni.Struct
         CodeArgs ObtainCodeArgs()
         {
             var result = _getter.CodeArgs;
+            Tracer.Assert(result != null);
             if(_setter != null)
                 result += _setter.CodeArgs;
             return result;
@@ -137,8 +138,7 @@ namespace Reni.Struct
         CodeArgs ObtainApplyCodeArgs()
         {
             var codeArgs = CodeArgs;
-            if(codeArgs == null)
-                return null;
+            Tracer.Assert(codeArgs != null);
             return codeArgs + CodeArgs.Arg();
         }
 

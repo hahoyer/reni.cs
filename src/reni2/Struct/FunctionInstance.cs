@@ -69,7 +69,15 @@ namespace Reni.Struct
         protected abstract Size RelevantValueSize { get; }
         [Node]
         [DisableDump]
-        internal CodeArgs CodeArgs { get { return _resultCache.CodeArgs; } }
+        internal CodeArgs CodeArgs { get
+        {
+            var result = _resultCache.CodeArgs;
+            if(result == null) // Recursive call 
+                return CodeArgs.Void(); // So, that nothing will be added from this site
+            Tracer.Assert(result != null);
+            return result;
+        }
+        }
         protected abstract FunctionId FunctionId { get; }
         [Node]
         [DisableDump]
@@ -117,8 +125,8 @@ namespace Reni.Struct
             try
             {
                 BreakExecution();
-                var rawResult = _body.Result(Context, category.Typed).Clone();
-
+                var rawResult = Context.UniqueResult(category.Typed, _body);
+                       Tracer.Assert(rawResult.CompleteCategory == category.Typed);
                 Dump("rawResult", rawResult);
                 BreakExecution();
                 var postProcessedResult = rawResult

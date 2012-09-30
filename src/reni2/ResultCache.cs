@@ -90,7 +90,7 @@ namespace Reni
                 {
                     _data.PendingCategory |= localCategory;
                     var result = _obtainResult(localCategory);
-                    Tracer.Assert(localCategory - Category.CodeArgs <= result.CompleteCategory - Category.CodeArgs);
+                    Tracer.Assert(localCategory <= result.CompleteCategory);
                     _data.Update(result);
                 }
                 finally

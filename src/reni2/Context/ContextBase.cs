@@ -82,10 +82,8 @@ namespace Reni.Context
             var pendingCategory = category - result.CompleteCategory;
             if(pendingCategory.HasAny)
             {
-                return null;
                 var pendingResult = syntax.ObtainPendingResult(this, pendingCategory);
-                if(pendingResult == null)
-                    return null;
+                Tracer.Assert(pendingCategory <= pendingResult.CompleteCategory);
                 result.Update(pendingResult);
             }
             Tracer.Assert(category == result.CompleteCategory);
@@ -103,7 +101,7 @@ namespace Reni.Context
             {
                 BreakExecution();
                 var result = syntax.ObtainResult(this, category.Replenished);
-                Tracer.Assert(category - Category.CodeArgs <= result.CompleteCategory - Category.CodeArgs);
+                Tracer.Assert(category <= result.CompleteCategory);
                 return ReturnMethodDump(result);
             }
             finally
@@ -135,8 +133,6 @@ namespace Reni.Context
             visitor.Search(this);
             return visitor.Probes.Values;
         }
-
-        protected virtual Result ObtainPendingResult(Category category, CompileSyntax syntax) { return syntax.ObtainPendingResult(this, category); }
 
         internal virtual Structure ObtainRecentStructure() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }

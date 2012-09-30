@@ -159,7 +159,9 @@ namespace Reni.Syntax
 
         virtual internal Result ObtainPendingResult(ContextBase context, Category category)
         {
+            NotImplementedMethod(context,category);
             return null;
+
         }
     }
 }

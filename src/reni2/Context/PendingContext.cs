@@ -35,7 +35,7 @@ namespace Reni.Context
         internal PendingContext(ContextBase parent)
             : base(parent) { }
 
-        protected override Result ObtainPendingResult(Category category, CompileSyntax syntax)
+        protected Result ObtainPendingResult(Category category, CompileSyntax syntax)
         {
             NotImplementedMethod(category, syntax);
             return null;
