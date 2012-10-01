@@ -61,7 +61,7 @@ namespace Reni.ReniParser
             if(result == null)
                 return UndefinedSymbolIssue.Type(context, this).Result(category);
 
-            Tracer.Assert(category == result.CompleteCategory);
+            Tracer.Assert(category <= result.CompleteCategory);
             return result;
         }
 

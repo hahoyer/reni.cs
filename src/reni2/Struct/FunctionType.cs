@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
@@ -48,8 +47,6 @@ namespace Reni.Struct
         [NotNull]
         [Node]
         readonly GetterFunction _getter;
-        readonly SimpleCache<CodeArgs> _codeArgsCache;
-        readonly ResultCache _applyResultCache;
 
         internal FunctionType(int index, FunctionSyntax body, Structure structure, TypeBase argsType)
         {
@@ -58,8 +55,6 @@ namespace Reni.Struct
             _index = index;
             _structure = structure;
             ArgsType = argsType;
-            _codeArgsCache = new SimpleCache<CodeArgs>(ObtainCodeArgs);
-            _applyResultCache = new ResultCache(ObtainApplyResult);
             StopByObjectId(-10);
         }
 
@@ -127,26 +122,13 @@ namespace Reni.Struct
             return result;
         }
 
-        Result ObtainApplyResult(Category category)
+        public Result ApplyResult(Category category)
         {
             var result = Result
                 (category
-                , () => CodeArgs.ToCode() + ArgsType.ArgCode
-                , ObtainApplyCodeArgs
+                 , () => CodeArgs.ToCode() + ArgsType.ArgCode
+                 , () => CodeArgs + CodeArgs.Arg()
                 );
-            Tracer.Assert(category == result.CompleteCategory);
-            return result;
-        }
-        CodeArgs ObtainApplyCodeArgs()
-        {
-            var codeArgs = CodeArgs;
-            Tracer.Assert(codeArgs != null);
-            return codeArgs + CodeArgs.Arg();
-        }
-
-        public Result ApplyResult(Category category)
-        {
-            var result = ObtainApplyResult(category);
             Tracer.Assert(category == result.CompleteCategory);
             return result;
         }
