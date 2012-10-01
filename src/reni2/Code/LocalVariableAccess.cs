@@ -53,7 +53,7 @@ namespace Reni.Code
             StopByObjectId(-10);
         }
 
-        internal override string GetNodeDump()
+        protected override string GetNodeDump()
         {
             return base.GetNodeDump()
                    + " Holder=" + Holder

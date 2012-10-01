@@ -100,13 +100,13 @@ namespace Reni.ReniParser
             return searchResult == null ? null : searchResult.FunctionResult(context, category, this);
         }
 
-        internal override string GetNodeDump()
+        protected override string GetNodeDump()
         {
             var result = base.GetNodeDump();
             if(Left != null)
-                result = "(" + Left.GetNodeDump() + ")" + result;
+                result = "(" + Left.NodeDump + ")" + result;
             if(Right != null)
-                result += "(" + Right.GetNodeDump() + ")";
+                result += "(" + Right.NodeDump + ")";
             return result;
         }
 

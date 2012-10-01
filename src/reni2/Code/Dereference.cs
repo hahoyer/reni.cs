@@ -50,7 +50,7 @@ namespace Reni.Code
         [DisableDump]
         internal Size DataSize { get { return _dataSize; } }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " DataSize=" + DataSize; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " DataSize=" + DataSize; }
 
         [DisableDump]
         internal override Size InputSize { get { return Root.DefaultRefAlignParam.RefSize; } }

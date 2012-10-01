@@ -57,7 +57,7 @@ namespace Reni.Code
 
         internal override void Visit(IVisitor visitor) { visitor.BitArrayBinaryOp(OpToken, OutputSize, LeftSize, RightSize); }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " <" + LeftSize + "> " + OpToken + " <" + RightSize + ">"; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " <" + LeftSize + "> " + OpToken + " <" + RightSize + ">"; }
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ namespace Reni.Code
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " " + OpToken.DataFunctionName + " " + ArgSize; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " " + OpToken.DataFunctionName + " " + ArgSize; }
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " <" + LeftSize + "> dump_print <" + RightSize + ">"; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " <" + LeftSize + "> dump_print <" + RightSize + ">"; }
 
         internal override void Visit(IVisitor visitor) { visitor.PrintNumber(LeftSize, RightSize); }
     }
@@ -127,7 +127,7 @@ namespace Reni.Code
         internal override Size InputSize { get { return _leftSize; } }
         [DisableDump]
         internal override Size OutputSize { get { return Size.Zero; } }
-        internal override string GetNodeDump() { return base.GetNodeDump() + " <" + InputSize + "> dump_print_text(" + _itemSize + ")"; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " <" + InputSize + "> dump_print_text(" + _itemSize + ")"; }
         internal override void Visit(IVisitor visitor) { visitor.PrintText(InputSize, _itemSize); }
     }
 
@@ -143,6 +143,6 @@ namespace Reni.Code
         protected override Size GetSize() { return Size.Zero; }
         internal override void Visit(IVisitor visitor) { visitor.PrintText(_dumpPrintText); }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " dump_print " + _dumpPrintText.Quote(); }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " dump_print " + _dumpPrintText.Quote(); }
     }
 }

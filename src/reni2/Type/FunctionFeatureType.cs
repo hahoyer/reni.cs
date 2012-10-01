@@ -48,7 +48,7 @@ namespace Reni.Type
         [DisableDump]
         internal override Root RootContext { get { return _functionalFeature.RootContext; } }
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
-        internal override string GetNodeDump() { return base.GetNodeDump() + "(" + _functionalFeature.GetNodeDump() + ")"; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + "(" + _functionalFeature.NodeDump + ")"; }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {

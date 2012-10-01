@@ -84,7 +84,7 @@ namespace Reni.Code
         void IVisitor.RecursiveCall() { AddCode("goto Start"); }
         void IVisitor.ReferenceCode(IContextReference context)
         {
-            AddCode("data.Push({0})", ((ReniObject) context).GetNodeDump());
+            AddCode("data.Push({0})", context.NodeDump());
             return;
             NotImplementedMethod(context);
             throw new UnexpectedContextReference(context);

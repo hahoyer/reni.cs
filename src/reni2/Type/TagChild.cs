@@ -41,7 +41,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
         protected override Size GetSize() { return Parent.Size; }
-        internal override string GetNodeDump() { return Parent.GetNodeDump() + "[" + TagTitle + "]"; }
+        protected override string GetNodeDump() { return Parent.NodeDump + "[" + TagTitle + "]"; }
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
         internal override Result ArrayDestructor(Category category, int count) { return Parent.ArrayDestructor(category, count); }
         internal override Result Copier(Category category) { return Parent.Copier(category); }

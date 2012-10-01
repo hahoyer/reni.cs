@@ -84,10 +84,10 @@ namespace Reni.TokenClasses
             }
         }
 
-        internal override string GetNodeDump()
+        protected override string GetNodeDump()
         {
-            var getter = Getter == null ? "" : "(" + Getter.GetNodeDump() + ")";
-            var setter = Setter == null ? "" : "(" + Setter.GetNodeDump() + ")";
+            var getter = Getter == null ? "" : "(" + Getter.NodeDump + ")";
+            var setter = Setter == null ? "" : "(" + Setter.NodeDump + ")";
             return setter + base.GetNodeDump() + getter;
         }
 

@@ -56,6 +56,6 @@ namespace Reni.Code
         [DisableDump]
         protected Size DataSize { get { return _dataSize; } }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " Offset=" + Offset + " DataSize=" + _dataSize; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " Offset=" + Offset + " DataSize=" + _dataSize; }
     }
 }

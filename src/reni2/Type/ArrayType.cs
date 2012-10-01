@@ -148,7 +148,7 @@ namespace Reni.Type
                    & category;
         }
 
-        internal override string GetNodeDump() { return ElementType.GetNodeDump() + "*" + Count; }
+        protected override string GetNodeDump() { return ElementType.NodeDump + "*" + Count; }
 
         internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
         internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }

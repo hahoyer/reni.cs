@@ -51,6 +51,6 @@ namespace Reni.ReniParser
         [DisableDump]
         public string IconKey { get { return "Symbol"; } }
 
-        internal override string GetNodeDump() { return Data.Name.Quote(); }
+        protected override string GetNodeDump() { return Data.Name.Quote(); }
     }
 }

@@ -34,7 +34,7 @@ namespace Reni.Code
         [DisableDump]
         readonly RefAlignParam _refAlignParam;
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " TargetSize=" + _targetSize + " RefSize=" + _refAlignParam.RefSize; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " TargetSize=" + _targetSize + " RefSize=" + _refAlignParam.RefSize; }
         internal override void Visit(IVisitor visitor) { visitor.Assign(_targetSize); }
 
         [DisableDump]

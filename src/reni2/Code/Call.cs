@@ -61,7 +61,7 @@ namespace Reni.Code
 
         protected override FiberItem VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Call(this); }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " FunctionId=" + FunctionId + " ArgsAndRefsSize=" + ArgsAndRefsSize; }
 
         internal override void Visit(IVisitor visitor) { visitor.Call(OutputSize, FunctionId, ArgsAndRefsSize); }
 

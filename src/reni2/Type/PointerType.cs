@@ -67,7 +67,7 @@ namespace Reni.Type
         [DisableDump]
         internal override TypeBase CoreType { get { return ValueType.CoreType; } }
 
-        internal override string GetNodeDump() { return ValueType.GetNodeDump() + "[Pointer]"; }
+        protected override string GetNodeDump() { return ValueType.NodeDump + "[Pointer]"; }
 
         internal override int? SmartSequenceLength(TypeBase elementType)
         {

@@ -46,7 +46,7 @@ namespace Reni.Parser
         protected virtual TokenData GetFirstToken() { return Token; }
         protected virtual TokenData GetLastToken() { return Token; }
 
-        internal override string GetNodeDump() { return Token.Name; }
+        protected override string GetNodeDump() { return Token.Name; }
         protected virtual string FilePosition() { return Token.FilePosition; }
     }
 }

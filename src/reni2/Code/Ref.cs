@@ -44,7 +44,7 @@ namespace Reni.Code
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " Offset=" + Offset; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " Offset=" + Offset; }
 
         [Node]
         [DisableDump]

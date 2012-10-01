@@ -72,7 +72,7 @@ namespace Reni.Type
 
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
 
-        internal override string GetNodeDump() { return "bit"; }
+        protected override string GetNodeDump() { return "bit"; }
         internal SequenceType UniqueNumber(int bitCount) { return UniqueArray(bitCount).UniqueSequence; }
         internal Result Result(Category category, BitsConst bitsConst)
         {

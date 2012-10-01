@@ -49,7 +49,7 @@ namespace Reni.Parser
         [DisableDump]
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + "(" + Name.Quote() + ")"; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + "(" + Name.Quote() + ")"; }
 
         [Node]
         [DisableDump]

@@ -47,6 +47,6 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize { get { return _afterSize; } }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " BeforeSize=" + _beforeSize + " AfterSize=" + _afterSize; }
     }
 }

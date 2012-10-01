@@ -88,7 +88,7 @@ namespace Reni.Struct
         [DisableDump]
         internal TypeBase ReferenceType { get { return Type.SmartPointer; } }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + "(" + ContainerContextObject.GetNodeDump() + "@" + EndPosition + ")"; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + "(" + ContainerContextObject.NodeDump + "@" + EndPosition + ")"; }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return ContainerContextObject.RefAlignParam; } }

@@ -52,7 +52,7 @@ namespace Reni.Code
         [Node]
         internal override bool IsRelativeReference { get { return true; } }
 
-        internal override string GetNodeDump()
+        protected override string GetNodeDump()
         {
             return base.GetNodeDump()
                    + " Holder=" + Holder

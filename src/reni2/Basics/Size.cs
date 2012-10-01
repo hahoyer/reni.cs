@@ -70,7 +70,7 @@ namespace Reni.Basics
 
         protected override string Dump(bool isRecursion) { return GetNodeDump(); }
 
-        internal override string GetNodeDump() { return _value.ToString(); }
+        protected override string GetNodeDump() { return _value.ToString(); }
 
         public Size Align(int alignBits)
         {

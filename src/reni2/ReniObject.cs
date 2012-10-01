@@ -63,9 +63,10 @@ namespace Reni
                 return result + "." + ObjectId;
             }
         }
-        internal virtual string GetNodeDump() { return GetType().PrettyName(); }
 
-        internal string DumpShortForDebug()
+        protected virtual string GetNodeDump() { return GetType().PrettyName(); }
+
+        internal string NodeDumpForDebug()
         {
             if(Debugger.IsAttached)
                 return GetNodeDump();

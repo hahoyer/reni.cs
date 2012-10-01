@@ -112,7 +112,7 @@ namespace Reni
                 .UniqueAlign;
         }
 
-        internal override string GetNodeDump() { return "(" + Cond.GetNodeDump() + ")then(" + Then.GetNodeDump() + ")"; }
+        protected override string GetNodeDump() { return "(" + Cond.NodeDump + ")then(" + Then.NodeDump + ")"; }
     }
 
     [Serializable]
@@ -141,10 +141,10 @@ namespace Reni
             CompileSyntax elseSyntax)
             : base(condSyntax, thenToken, thenSyntax, elseSyntax) { _elseToken = elseToken; }
 
-        internal override string GetNodeDump()
+        protected override string GetNodeDump()
         {
             return base.GetNodeDump() + "else(" +
-                   Else.GetNodeDump() + ")";
+                   Else.NodeDump + ")";
         }
     }
 }

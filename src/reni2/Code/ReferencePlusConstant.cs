@@ -52,7 +52,7 @@ namespace Reni.Code
             Tracer.Assert(!_right.IsZero);
         }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " Right=" + _right; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " Right=" + _right; }
 
         internal override void Visit(IVisitor visitor) { visitor.ReferencePlus(_right); }
 

@@ -40,7 +40,7 @@ namespace Reni
             StopByObjectId(-1);
         }
         Result IConversionFunction.Result(Category category) { return _proxyType.Converter.Result(category); }
-        internal override string GetNodeDump()
+        protected override string GetNodeDump()
         {
             return base.GetNodeDump()
                    + "["

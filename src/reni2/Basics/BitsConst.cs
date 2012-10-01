@@ -289,7 +289,7 @@ namespace Reni.Basics
         }
 
         public override string ToString() { return DumpValue(); }
-        internal override string GetNodeDump() { return base.GetNodeDump() + " " + ToString(); }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " " + ToString(); }
 
         public unsafe Int64 ToInt64()
         {

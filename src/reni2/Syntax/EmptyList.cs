@@ -17,7 +17,7 @@ namespace Reni.Syntax
             : base(leftToken) { _rightToken = rightToken; }
 
         protected override TokenData GetLastToken() { return _rightToken; }
-        internal override string GetNodeDump() { return "()"; }
+        protected override string GetNodeDump() { return "()"; }
 
         internal override Result ObtainResult(ContextBase context, Category category) { return context.RootContext.VoidResult(category); }
     }

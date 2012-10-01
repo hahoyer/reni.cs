@@ -101,7 +101,7 @@ namespace Reni
 
         internal static CodeArgs Create(IContextReference contextReference) { return new CodeArgs(contextReference); }
 
-        internal override string GetNodeDump()
+        protected override string GetNodeDump()
         {
             if(Count > 5)
                 return base.GetNodeDump() + " Count = " + Count;
@@ -188,7 +188,7 @@ namespace Reni
                     return null;
                 }
             }
-            internal override string GetNodeDump() { return "CodeArg"; }
+            protected override string GetNodeDump() { return "CodeArg"; }
         }
     }
 }

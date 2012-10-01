@@ -40,7 +40,7 @@ namespace Reni.ReniParser
             StopByObjectId(-876);
         }
 
-        internal override string GetNodeDump() { return Defineable.Name + ": " + Definition.GetNodeDump(); }
+        protected override string GetNodeDump() { return Defineable.Name + ": " + Definition.NodeDump; }
 
         internal override ParsedSyntax SurroundedByParenthesis(TokenData leftToken, TokenData rightToken) { return Container.Create(leftToken, rightToken, this); }
     }

@@ -54,6 +54,6 @@ namespace Reni.Code
 
         internal override void Visit(IVisitor visitor) { visitor.LocalBlockEnd(OutputSize, _intermediateSize); }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + " IntermediateSize=" + _intermediateSize; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " IntermediateSize=" + _intermediateSize; }
     }
 }

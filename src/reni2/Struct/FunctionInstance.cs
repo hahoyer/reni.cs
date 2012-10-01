@@ -59,7 +59,7 @@ namespace Reni.Struct
         [DisableDump]
         internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
         [Node]
-        string Description { get { return _body.GetNodeDump(); } }
+        string Description { get { return _body.NodeDump; } }
         [Node]
         [DisableDump]
         protected Size FrameSize { get { return Parent.Size + RelevantValueSize; } }
@@ -191,7 +191,7 @@ namespace Reni.Struct
         public string DumpFunction()
         {
             var result = "\n";
-            result += "body=" + _body.GetNodeDump();
+            result += "body=" + _body.NodeDump;
             result += "\n";
             return result;
         }

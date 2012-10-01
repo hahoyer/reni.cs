@@ -49,7 +49,7 @@ namespace Reni.Sequence
         }
 
         Size IContextReference.Size{ get { return _refAlignParam.RefSize; } }
-        internal override string GetNodeDump() { return base.GetNodeDump() + "(" + _objectType.GetNodeDump() + ")"; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + "(" + _objectType.NodeDump + ")"; }
         internal Result Result(Category category) { return _objectType.ReferenceInCode(category, this); }
     }
 }

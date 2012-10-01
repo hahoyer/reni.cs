@@ -36,7 +36,7 @@ namespace Reni.Code
         readonly string _reason;
 
         [DisableDump]
-        internal string ReasonForCombine { get { return _reason == "" ? DumpShortForDebug() : _reason; } }
+        internal string ReasonForCombine { get { return _reason == "" ? NodeDumpForDebug() : _reason; } }
 
         [DisableDump]
         string NewCombinedReason
@@ -73,7 +73,7 @@ namespace Reni.Code
         [DisableDump]
         internal Size DeltaSize { get { return OutputSize - InputSize; } }
 
-        internal override string GetNodeDump() { return base.GetNodeDump() + DumpSignature; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + DumpSignature; }
 
         [DisableDump]
         string DumpSignature { get { return "(" + InputSize + "==>" + OutputSize + ")"; } }

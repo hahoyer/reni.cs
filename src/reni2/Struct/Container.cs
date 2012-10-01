@@ -94,7 +94,7 @@ namespace Reni.Struct
         [DisableDump]
         internal Size IndexSize { get { return Size.AutoSize(Statements.Length); } }
 
-        internal override string GetNodeDump() { return "container." + ObjectId; }
+        protected override string GetNodeDump() { return "container." + ObjectId; }
 
         sealed class PreContainer : ReniObject
         {

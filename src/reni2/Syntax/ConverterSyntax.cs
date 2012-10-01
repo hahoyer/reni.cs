@@ -14,7 +14,7 @@ namespace Reni.Syntax
         internal ConverterSyntax(TokenData token, CompileSyntax body)
             : base(token) { Body = body; }
 
-        internal override string GetNodeDump() { return "converter (" + Body.GetNodeDump() + ")"; }
+        protected override string GetNodeDump() { return "converter (" + Body.NodeDump + ")"; }
 
         internal override ReniParser.ParsedSyntax SurroundedByParenthesis(TokenData leftToken, TokenData rightToken) { return Container.Create(leftToken, rightToken, this); }
     }
