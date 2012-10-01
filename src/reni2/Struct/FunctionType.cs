@@ -79,9 +79,6 @@ namespace Reni.Struct
         [Node]
         [DisableDump]
         CodeArgs CodeArgs { get { return ObtainCodeArgs(); } }
-        // remark: the result of this property must not be chached here, 
-        // since there are recursive calls possible 
-        // and they have to be catched at result cache of contexts
 
         [DisableDump]
         internal FunctionContainer Container
@@ -122,6 +119,8 @@ namespace Reni.Struct
             return result;
         }
 
+        // remark: watch out when caching anything here. 
+        // This may hinder the recursive call detection, located at result cache of context. 
         public Result ApplyResult(Category category)
         {
             var result = Result

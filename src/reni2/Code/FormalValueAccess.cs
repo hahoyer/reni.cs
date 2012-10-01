@@ -92,7 +92,7 @@ namespace Reni.Code
             _rightSubValue = rightSubValue;
         }
 
-        protected override char DumpShort() { return _operation[0]; }
+        protected override char GetNodeDump() { return _operation[0]; }
 
         protected override string Dump(bool isRecursion) { return "(" + _leftSubValue + ")" + _operation + "(" + _rightSubValue + ")"; }
     }
@@ -101,7 +101,7 @@ namespace Reni.Code
     {
         readonly IFormalValue _formalSubValue;
         public DereferenceValue(IFormalValue formalSubValue) { _formalSubValue = formalSubValue; }
-        protected override char DumpShort() { return 'd'; }
+        protected override char GetNodeDump() { return 'd'; }
 
         protected override string Dump(bool isRecursion) { return "(" + _formalSubValue.Dump() + ")d"; }
     }
@@ -130,7 +130,7 @@ namespace Reni.Code
             return _points[_index + right];
         }
 
-        protected override char DumpShort() { return _name; }
+        protected override char GetNodeDump() { return _name; }
 
         public static void Ensure(FormalPointer[] points, int index)
         {
@@ -147,10 +147,10 @@ namespace Reni.Code
             var fillCount = 2 * size - text.Length - 1;
             if(fillCount >= 0)
                 return " " + "<".Repeat(fillCount / 2) + text + ">".Repeat(fillCount - fillCount / 2);
-            return " " + (DumpShort() + "").Repeat(2 * size - 1);
+            return " " + (GetNodeDump() + "").Repeat(2 * size - 1);
         }
 
-        protected new abstract char DumpShort();
+        protected new abstract char GetNodeDump();
 
         string IFormalValue.Dump(int index, int size)
         {
@@ -185,7 +185,7 @@ namespace Reni.Code
             _functionId = functionId;
         }
 
-        protected override char DumpShort() { return 'F'; }
+        protected override char GetNodeDump() { return 'F'; }
 
         protected override string Dump(bool isRecursion) { return "F" + _functionId + "(" + _formalSubValues.Aggregate("", (x, y) => (x == "" ? "" : x + ", ") + y.Dump()) + ")"; }
     }
@@ -196,7 +196,7 @@ namespace Reni.Code
         public VariableValue(char name) { _name = name; }
         bool _isPointer;
 
-        protected override char DumpShort() { return 'V'; }
+        protected override char GetNodeDump() { return 'V'; }
 
         protected override string Dump(bool isRecursion)
         {
@@ -224,7 +224,7 @@ namespace Reni.Code
             _right = right;
         }
 
-        protected override char DumpShort() { return 'P'; }
+        protected override char GetNodeDump() { return 'P'; }
 
         protected override string Dump(bool isRecursion) { return _variableValue.Dump() + FormatRight(); }
 

@@ -106,29 +106,10 @@ namespace Reni
 
         TypeBase CommonType(ContextBase context)
         {
-            var pendingContext = context as PendingContext;
-            if(pendingContext == null)
-                return Then.Type(context).CommonType(Else.Type(context)).UniqueAlign;
-
-            var parent = pendingContext.Parent;
-            return CommonPendingType(parent).UniqueAlign;
-        }
-
-        TypeBase CommonPendingType(ContextBase context)
-        {
-            if(!context.PendingCategory(this).HasType)
-            {
-                NotImplementedMethod(context);
-                return null;
-            }
-
-            if(!context.PendingCategory(Then).HasType)
-                return Then.Type(context);
-            if(!context.PendingCategory(Else).HasType)
-                return Else.Type(context);
-
-            NotImplementedMethod(context);
-            return null;
+            return Then
+                .Type(context)
+                .CommonType(Else.Type(context))
+                .UniqueAlign;
         }
 
         internal override string GetNodeDump() { return "(" + Cond.GetNodeDump() + ")then(" + Then.GetNodeDump() + ")"; }
