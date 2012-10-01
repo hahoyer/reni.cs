@@ -94,14 +94,27 @@ namespace Reni.Context
         /// <param name="category"> the categories in result </param>
         /// <param name="getArgs"> the function that provides the categories for the actual arguments. If treating a simple feature, this is not used </param>
         /// <returns> </returns>
-        Result Result(Category category, Func<Category, Result> getArgs) { return Simple == null ? ApplyResult(category, getArgs) : Simple.Result(category); }
+        Result Result(Category category, Func<Category, Result> getArgs)
+        {
+            if(Simple == null)
+            {
+                var applyResult = ApplyResult(category, getArgs);
+                Tracer.Assert(category == applyResult.CompleteCategory);
+                return applyResult;
+            }
+
+            var result = Simple.Result(category);
+            Tracer.Assert(category == result.CompleteCategory);
+            return result;
+        }
 
         Result ApplyResult(Category category, Func<Category, Result> getArgs)
         {
             var function = _feature.Function;
             var args = new ResultCache(getArgs);
-            return function
-                .ApplyResult(category, args.Type)
+            var applyResult = function.ApplyResult(category, args.Type);
+            Tracer.Assert(category == applyResult.CompleteCategory);
+            return applyResult
                 .ReplaceArg(args)
                 .ReplaceAbsolute(function.ObjectReference, c => _objectType.SmartPointer.ArgResult(c));
         }
@@ -125,6 +138,7 @@ namespace Reni.Context
                 return metaFeature.ApplyResult(context, category, left, right);
 
             var rawResult = Result(category, c => context.ResultForArgs(c, right));
+            Tracer.Assert(category == rawResult.CompleteCategory);
             return rawResult
                 .ReplaceArg(_converterResult)
                 .ReplaceArg(c => context.ResultForObject(c, left));

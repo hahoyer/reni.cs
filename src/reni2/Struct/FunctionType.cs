@@ -129,11 +129,13 @@ namespace Reni.Struct
 
         Result ObtainApplyResult(Category category)
         {
-            return Result
+            var result = Result
                 (category
-                 , () => CodeArgs.ToCode() + ArgsType.ArgCode
-                 , ObtainApplyCodeArgs
+                , () => CodeArgs.ToCode() + ArgsType.ArgCode
+                , ObtainApplyCodeArgs
                 );
+            Tracer.Assert(category == result.CompleteCategory);
+            return result;
         }
         CodeArgs ObtainApplyCodeArgs()
         {
@@ -142,7 +144,12 @@ namespace Reni.Struct
             return codeArgs + CodeArgs.Arg();
         }
 
-        public Result ApplyResult(Category category) { return _applyResultCache & category; }
+        public Result ApplyResult(Category category)
+        {
+            var result = ObtainApplyResult(category);
+            Tracer.Assert(category == result.CompleteCategory);
+            return result;
+        }
 
         internal override bool HasQuickSize { get { return false; } }
         internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)

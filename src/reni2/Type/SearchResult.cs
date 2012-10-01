@@ -99,8 +99,10 @@ namespace Reni.Type
 
         internal Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax)
         {
-            var f = new FeatureInstance(LeftType, Feature, ConverterResult, syntax.Right == null);
-            return f.Result(context, category, syntax.Left, syntax.Right);
+            return FeatureInstance(syntax.Right == null)
+                .Result(context, category, syntax.Left, syntax.Right);
         }
+
+        FeatureInstance FeatureInstance(bool hasNoArg) { return new FeatureInstance(LeftType, Feature, ConverterResult, hasNoArg); }
     }
 }

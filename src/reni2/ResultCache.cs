@@ -105,6 +105,7 @@ namespace Reni
         Result GetCategories(Category category)
         {
             Update(category);
+            Tracer.Assert(category <= Data.CompleteCategory);
             return Data & category;
         }
 

@@ -58,10 +58,11 @@ namespace Reni.ReniParser
         internal override Result ObtainResult(ContextBase context, Category category)
         {
             var result = Result(context, category);
-            if(result != null)
-                return result;
+            if(result == null)
+                return UndefinedSymbolIssue.Type(context, this).Result(category);
 
-            return UndefinedSymbolIssue.Type(context, this).Result(category);
+            Tracer.Assert(category == result.CompleteCategory);
+            return result;
         }
 
         internal Probe[] Probes(ContextBase context)

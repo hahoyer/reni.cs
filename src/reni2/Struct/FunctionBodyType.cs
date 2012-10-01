@@ -94,6 +94,7 @@ namespace Reni.Struct
                 BreakExecution();
 
                 var applyResult = functionType.ApplyResult(category);
+                Tracer.Assert(category == applyResult.CompleteCategory);
                 
                 Dump("applyResult", applyResult);
                 BreakExecution();
