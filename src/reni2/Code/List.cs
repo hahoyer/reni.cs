@@ -62,7 +62,7 @@ namespace Reni.Code
             get
             {
                 for(var i = 0; i < _data.Length - 1; i++)
-                    if(!_data[i].Size.IsZero)
+                    if(!_data[i].IsDataLess)
                         return false;
                 return true;
             }

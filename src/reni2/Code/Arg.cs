@@ -39,7 +39,7 @@ namespace Reni.Code
             : base(_nextObjectId++)
         {
             _type = type;
-            StopByObjectId(-9);
+            StopByObjectId(7);
         }
 
         [Node]

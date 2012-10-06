@@ -40,11 +40,14 @@ namespace Reni
         static int _nextId;
         readonly List<IContextReference> _data;
         SizeArray _sizesCache;
+        readonly SimpleCache<IContextReference[]> _sortedDataCache;
+        public static int NextOrder;
 
         CodeArgs()
             : base(_nextId++)
         {
             _data = new List<IContextReference>();
+            _sortedDataCache = new SimpleCache<IContextReference[]>(ObtainSortedData);
             StopByObjectId(-10);
         }
 
@@ -86,6 +89,7 @@ namespace Reni
         public IContextReference this[int i] { get { return _data[i]; } }
         public Size Size { get { return Sizes.Size; } }
         public bool IsNone { get { return Count == 0; } }
+        public IContextReference[] SortedData { get { return _sortedDataCache.Value; } }
 
         internal static CodeArgs Void() { return new CodeArgs(); }
         internal static CodeArgs Arg() { return new CodeArgs(CodeArg.Instance); }
@@ -137,10 +141,42 @@ namespace Reni
             return new CodeArgs(r);
         }
 
+        IContextReference[] ObtainSortedData() { return _data.OrderBy(codeArg => codeArg.Order).ToArray(); }
         public CodeArgs WithoutArg() { return Without(CodeArg.Instance); }
         public CodeArgs Without(CodeArgs other) { return other._data.Aggregate(this, (current, refInCode) => current.Without(refInCode)); }
         public bool Contains(IContextReference context) { return _data.Contains(context); }
-        public bool Contains(CodeArgs other) { return other._data.All(Contains); }
+        public bool Contains(CodeArgs other)
+        {
+            if (Count < other.Count)
+                return false;
+
+            for (int i = 0, j = 0; i < Count; i++)
+            {
+                var delta = SortedData[i].Order - other.SortedData[j].Order;
+                
+                if(delta > 0)
+                    return false;
+
+                if(delta == 0)
+                {
+                    j++;
+                    if(j == other.Count)
+                        return true;
+                }
+            }
+            return false;
+        }
+        public bool IsEqual(CodeArgs other)
+        {
+            if(Count != other.Count)
+                return false;
+
+            for(var i = 0; i < Count; i++)
+                if(SortedData[i].Order != other.SortedData[i].Order)
+                    return false;
+
+            return true;
+        }
 
         internal CodeBase ToCode()
         {
@@ -178,7 +214,7 @@ namespace Reni
         public static CodeArgs operator -(CodeArgs x, IContextReference y) { return x.Without(y); }
         IEnumerable<TreeNode> ITreeNodeSupport.CreateNodes() { return _data.CreateNodes(); }
 
-        sealed class CodeArg : Singleton<CodeArg,ReniObject>, IContextReference
+        sealed class CodeArg : Singleton<CodeArg, ReniObject>, IContextReference
         {
             Size IContextReference.Size
             {
@@ -188,6 +224,7 @@ namespace Reni
                     return null;
                 }
             }
+            int IContextReference.Order { get { return -1; } }
             protected override string GetNodeDump() { return "CodeArg"; }
         }
     }

@@ -503,40 +503,23 @@ namespace Reni
 
         void AssertValid()
         {
-            if(IsDirty)
+            if (IsDirty)
                 return;
 
-            var isDataLess = QuickFindIsDataLess;
-            if(isDataLess != null)
-            {
-                if(HasIsDataLess && IsDataLess != isDataLess.Value)
-                    Tracer.AssertionFailed(@"IsDataLess==isDataLess", () => "IsDataLess differs " + Dump());
-                if(HasSize && Size.IsZero != isDataLess.Value)
-                    Tracer.AssertionFailed(@"Size.IsZero==isDataLess.Value", () => "Size differs " + Dump());
-                if(HasType && Type.HasQuickSize && Type.IsDataLess != isDataLess.Value)
-                    Tracer.AssertionFailed(@"Type.IsDataLess==isDataLess.Value", () => "Type IsDataLess property differs " + Dump());
-                if(HasCode && Code.Size.IsZero != isDataLess.Value)
-                    Tracer.AssertionFailed(@"Code.Size.IsZero==isDataLess.Value", () => "Code size differs " + Dump());
-            }
-
-            var size = QuickFindSize;
-            if(size != null)
-            {
-                if(HasSize && Size != size)
-                    Tracer.AssertionFailed(@"Size==size", () => "Size differs " + Dump());
-                if(HasType && Type.HasQuickSize && Type.Size != size)
-                    Tracer.AssertionFailed(@"Type.Size==size", () => "Type size differs " + Dump());
-                if(HasCode && Code.Size != size)
-                    Tracer.AssertionFailed(@"Code.Size==size", () => "Code size differs " + Dump());
-            }
-
+            if(HasIsDataLess && HasSize)
+                Tracer.Assert(Size.IsZero == IsDataLess, ()=>"Size and IsDataLess differ: " + Dump());
+            if(HasIsDataLess && HasType && Type.HasQuickSize)
+                Tracer.Assert(Type.IsDataLess == IsDataLess, () => "Type and IsDataLess differ: " + Dump());
+            if(HasIsDataLess && HasCode)
+                Tracer.Assert(Code.IsDataLess == IsDataLess, () => "Code and IsDataLess differ: " + Dump());
+            if (HasSize && HasType && Type.HasQuickSize)
+                Tracer.Assert(Type.Size == Size, () => "Type and Size differ: " + Dump());
+            if(HasSize && HasCode)
+                Tracer.Assert(Code.Size == Size, () => "Code and Size differ: " + Dump());
+            if (HasType && HasCode && Type.HasQuickSize)
+                Tracer.Assert(Code.Size == Type.Size, () => "Code and Type differ: " + Dump());
             if(HasArgs && HasCode)
-            {
-                var refs = CodeArgs;
-                var codeRefs = Code.CodeArgs;
-                if(!(refs.Contains(codeRefs) && codeRefs.Contains(refs)))
-                    Tracer.AssertionFailed(@"CodeArgs.Contains(codeRefs)", () => "Code and CodeArgs differ " + Dump());
-            }
+                Tracer.Assert(Code.CodeArgs.IsEqual(CodeArgs), () => "Code and CodeArgs differ: " + Dump());
 
             Tracer.Assert((CompleteCategory & PendingCategory) == Category.None);
         }
@@ -577,7 +560,7 @@ namespace Reni
 
         internal Result ReplaceArg(ResultCache resultCache)
         {
-            if (HasArg)
+            if(HasArg)
                 return InternalReplaceArg(category => resultCache & category);
             return this;
         }

@@ -31,5 +31,6 @@ namespace Reni.Code
     interface IContextReference
     {
         Size Size { get; }
+        int Order { get; }
     }
 }

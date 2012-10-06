@@ -57,13 +57,16 @@ namespace Reni.Struct
         {
             [Node]
             readonly FunctionBodyType _parent;
+            readonly int _order;
             public ContextReference(FunctionBodyType parent)
                 : base(parent.ObjectId)
             {
+                _order = CodeArgs.NextOrder++;
                 _parent = parent;
                 StopByObjectId(-5);
             }
-            public Size Size { get { return Root.DefaultRefAlignParam.RefSize; } }
+            int IContextReference.Order { get { return _order; } }
+            Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
             [EnableDump]
             FunctionSyntax Syntax { get { return _parent._syntax; } }
         }

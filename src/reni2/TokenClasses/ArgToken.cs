@@ -40,7 +40,17 @@ namespace Reni.TokenClasses
             NotImplementedMethod(left);
             return null;
         }
-        public override Result Result(ContextBase context, Category category, TokenData token) { return context.ArgReferenceResult(category); }
-        public override Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right) { return context.FunctionalArgResult(category, right); }
+
+        public override Result Result(ContextBase context, Category category, TokenData token)
+        {
+            return context
+                .ArgReferenceResult(category);
+        }
+        
+        public override Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right)
+        {
+            return context
+                .FunctionalArgResult(category, right);
+        }
     }
 }

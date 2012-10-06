@@ -95,7 +95,11 @@ namespace Reni.Type
         static ReniObject _lastSearchVisitor;
 
         protected TypeBase()
-            : base(_nextObjectId++) { _cache = new Cache(this); }
+            : base(_nextObjectId++)
+        {
+            _order = CodeArgs.NextOrder++;
+            _cache = new Cache(this);
+        }
 
         [Node]
         internal Size Size { get { return _cache.Size.Value; } }
@@ -125,6 +129,7 @@ namespace Reni.Type
             }
         }
 
+        int IContextReference.Order { get { return _order; } }
         Size IContextReference.Size { get { return Size; } }
 
         [DisableDump]
@@ -426,6 +431,7 @@ namespace Reni.Type
         }
 
         static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create);
+        readonly int _order;
 
         internal Result CreateArray(Category category)
         {

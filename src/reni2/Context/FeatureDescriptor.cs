@@ -24,7 +24,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Basics;
 using Reni.Feature;
 using Reni.Syntax;
@@ -49,7 +48,7 @@ namespace Reni.Context
             if(hasNoObject)
                 Tracer.Assert(!Feature.HasCodeArgs(context, objectType, ConverterResult, right));
 
-            if(right!= null)
+            if(right != null)
             {
                 Tracer.Assert(Feature.Function != null, Feature.Dump);
                 Tracer.Assert(!Feature.Function.IsImplicit, Feature.Dump);
@@ -98,7 +97,7 @@ namespace Reni.Context
         /// <returns> </returns>
         internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
-            AssertValid(context, left == null, Type,right);
+            AssertValid(context, left == null, Type, right);
 
             var metaFeature = Feature.MetaFunction;
             if(metaFeature != null)
@@ -131,17 +130,22 @@ namespace Reni.Context
 
     sealed class FunctionalObjectDescriptor : FunctionalFeatureDescriptor
     {
-        readonly SimpleCache<TypeBase> _typeCache;
-        internal FunctionalObjectDescriptor(ContextBase context, CompileSyntax left) { _typeCache = new SimpleCache<TypeBase>(() => context.Type(left)); }
-        internal override TypeBase Type { get { return _typeCache.Value; } }
+        readonly ContextBase _context;
+        readonly CompileSyntax _left;
+        internal FunctionalObjectDescriptor(ContextBase context, CompileSyntax left)
+        {
+            _context = context;
+            _left = left;
+        }
+        internal override TypeBase Type { get { return _context.Type(_left); } }
         protected override Func<Category, Result> ConverterResult { get { return null; } }
     }
 
     sealed class FunctionalArgDescriptor : FunctionalFeatureDescriptor
     {
-        readonly Func<Category, Result> _coverterResult;
-        internal FunctionalArgDescriptor(ContextBase context) { _coverterResult = context.ArgReferenceResult; }
-        protected override Func<Category, Result> ConverterResult { get { return _coverterResult; } }
-        internal override TypeBase Type { get { return _coverterResult(Category.Type).Type; } }
+        readonly ContextBase _context;
+        internal FunctionalArgDescriptor(ContextBase context) { _context = context; }
+        protected override Func<Category, Result> ConverterResult { get { return _context.ArgReferenceResult; } }
+        internal override TypeBase Type { get { return _context.ArgReferenceResult(Category.Type).Type; } }
     }
 }

@@ -37,14 +37,18 @@ namespace Reni.Context
         internal readonly TypeBase ArgsType;
         [Node]
         readonly TypeBase _valueType;
+        readonly int _order;
+        
         internal Function(ContextBase parent, TypeBase argsType, TypeBase valueType = null)
             : base(parent)
         {
+            _order = CodeArgs.NextOrder++;
             ArgsType = argsType;
             _valueType = valueType;
         }
 
         Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
+        int IContextReference.Order { get { return _order; } }
 
         internal override IFunctionContext ObtainRecentFunctionContext() { return this; }
 

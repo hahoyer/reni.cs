@@ -37,14 +37,17 @@ namespace Reni.Struct
         static int _nextObjectId;
         readonly Container _container;
         readonly ContextBase _parent;
+        readonly int _order;
 
         internal ContainerContextObject(Container container, ContextBase parent)
             : base(_nextObjectId++)
         {
+            _order = CodeArgs.NextOrder++;
             _container = container;
             _parent = parent;
         }
 
+        int IContextReference.Order { get { return _order; } }
         Size IContextReference.Size { get { return RefAlignParam.RefSize; } }
         [Node]
         internal Container Container { get { return _container; } }

@@ -39,16 +39,19 @@ namespace Reni.Sequence
 
         [DisableDump]
         readonly RefAlignParam _refAlignParam;
+        readonly int _order;
 
         internal ObjectReference(SequenceType objectType, RefAlignParam refAlignParam)
             : base(_nextObjectId++)
         {
+            _order = CodeArgs.NextOrder++;
             _objectType = objectType;
             _refAlignParam = refAlignParam;
             StopByObjectId(-1);
         }
 
-        Size IContextReference.Size{ get { return _refAlignParam.RefSize; } }
+        int IContextReference.Order { get { return _order; } }
+        Size IContextReference.Size { get { return _refAlignParam.RefSize; } }
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + _objectType.NodeDump + ")"; }
         internal Result Result(Category category) { return _objectType.ReferenceInCode(category, this); }
     }

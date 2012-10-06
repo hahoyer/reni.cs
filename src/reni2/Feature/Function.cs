@@ -36,10 +36,12 @@ namespace Reni.Feature
         [EnableDump]
         readonly Func<Category, IContextReference, TypeBase, Result> _function;
         static int _nextObjectId;
+        readonly int _order;
 
         protected FunctionBase(Func<Category, IContextReference, TypeBase, Result> function)
             : base(_nextObjectId++)
         {
+            _order = CodeArgs.NextOrder++;
             _function = function;
             Tracer.Assert(_function.Target is IContextReference);
         }
@@ -48,6 +50,7 @@ namespace Reni.Feature
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return this; } }
         Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
+        int IContextReference.Order { get { return _order; } }
     }
 
     sealed class Function : FunctionBase, ISuffixFeature

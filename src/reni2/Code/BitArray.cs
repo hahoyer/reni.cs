@@ -53,14 +53,14 @@ namespace Reni.Code
 
         protected override IEnumerable<CodeBase> AsList()
         {
-            if(Size.IsZero)
+            if(IsDataLess)
                 return new CodeBase[0];
             return new[] {this};
         }
         protected override TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.BitArray(this); }
 
         [DisableDump]
-        internal override bool IsEmpty { get { return Size.IsZero; } }
+        internal override bool IsEmpty { get { return IsDataLess; } }
 
         protected override CodeBase TryToCombine(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
