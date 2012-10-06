@@ -503,20 +503,20 @@ namespace Reni
 
         void AssertValid()
         {
-            if (IsDirty)
+            if(IsDirty)
                 return;
 
             if(HasIsDataLess && HasSize)
-                Tracer.Assert(Size.IsZero == IsDataLess, ()=>"Size and IsDataLess differ: " + Dump());
+                Tracer.Assert(Size.IsZero == IsDataLess, () => "Size and IsDataLess differ: " + Dump());
             if(HasIsDataLess && HasType && Type.HasQuickSize)
                 Tracer.Assert(Type.IsDataLess == IsDataLess, () => "Type and IsDataLess differ: " + Dump());
             if(HasIsDataLess && HasCode)
                 Tracer.Assert(Code.IsDataLess == IsDataLess, () => "Code and IsDataLess differ: " + Dump());
-            if (HasSize && HasType && Type.HasQuickSize)
+            if(HasSize && HasType && Type.HasQuickSize)
                 Tracer.Assert(Type.Size == Size, () => "Type and Size differ: " + Dump());
             if(HasSize && HasCode)
                 Tracer.Assert(Code.Size == Size, () => "Code and Size differ: " + Dump());
-            if (HasType && HasCode && Type.HasQuickSize)
+            if(HasType && HasCode && Type.HasQuickSize)
                 Tracer.Assert(Code.Size == Type.Size, () => "Code and Type differ: " + Dump());
             if(HasArgs && HasCode)
                 Tracer.Assert(Code.CodeArgs.IsEqual(CodeArgs), () => "Code and CodeArgs differ: " + Dump());
