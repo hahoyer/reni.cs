@@ -40,22 +40,7 @@ namespace Reni.TokenClasses
             NotImplementedMethod(left);
             return null;
         }
-        public override Result Result(ContextBase context, Category category, TokenData token)
-        {
-            return context
-                .FindRecentFunctionContextObject
-                .CreateArgReferenceResult(category);
-        }
-        public override Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right)
-        {
-            var argTokenResult = Result(context, category.Typed, token);
-            var rightResult = right.SmartReferenceResult(context, category.Typed);
-            var feature = argTokenResult.Type.Feature;
-            return feature
-                       .Function
-                       .ApplyResult(category, rightResult.Type)
-                       .ReplaceArg(rightResult)
-                   & category;
-        }
+        public override Result Result(ContextBase context, Category category, TokenData token) { return context.ArgReferenceResult(category); }
+        public override Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right) { return context.FunctionalArgResult(category, right); }
     }
 }

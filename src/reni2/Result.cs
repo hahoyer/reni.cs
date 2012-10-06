@@ -709,10 +709,10 @@ namespace Reni
         internal Result DereferenceResult()
         {
             Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
-            return Type
-                .ReferenceType
-                .Converter
-                .Result(CompleteCategory)
+            var referenceType = Type.ReferenceType;
+            var converter = referenceType.Converter;
+            var result = converter.Result(CompleteCategory);
+            return result
                 .ReplaceArg(this);
         }
 

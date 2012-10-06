@@ -191,7 +191,11 @@ namespace Reni.Code
 
         protected virtual TResult VisitImplementation<TResult>(Visitor<TResult> actual) { return actual.Default(this); }
 
-        internal CodeBase Call(FunctionId index, Size resultSize) { return Add(new Call(index, resultSize, Size)); }
+        internal CodeBase Call(FunctionId index, Size resultSize)
+        {
+            var subsequentElement = new Call(index, resultSize, Size);
+            return Add(subsequentElement);
+        }
 
         internal CodeBase TryReplacePrimitiveRecursivity(FunctionId functionId)
         {

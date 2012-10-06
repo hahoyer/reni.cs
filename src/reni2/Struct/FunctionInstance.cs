@@ -64,19 +64,21 @@ namespace Reni.Struct
         [DisableDump]
         protected Size FrameSize { get { return Parent.Size + RelevantValueSize; } }
         [DisableDump]
-        protected Size ArgsPartSize { get { return Parent.ArgsType.Size + RelevantValueSize; } }
+        Size ArgsPartSize { get { return Parent.ArgsType.Size + RelevantValueSize; } }
         [DisableDump]
         protected abstract Size RelevantValueSize { get; }
         [Node]
         [DisableDump]
-        internal CodeArgs CodeArgs { get
+        internal CodeArgs CodeArgs
         {
-            var result = _resultCache.CodeArgs;
-            if(result == null) // Recursive call 
-                return CodeArgs.Void(); // So, that nothing will be added from this site
-            Tracer.Assert(result != null);
-            return result;
-        }
+            get
+            {
+                var result = _resultCache.CodeArgs;
+                if(result == null) // Recursive call 
+                    return CodeArgs.Void(); // So, that nothing will be added from this site
+                Tracer.Assert(result != null);
+                return result;
+            }
         }
         protected abstract FunctionId FunctionId { get; }
         [Node]
@@ -124,20 +126,33 @@ namespace Reni.Struct
             StartMethodDump(trace, category);
             try
             {
+                if (trace)
+                    category = category | Category.Code;
                 BreakExecution();
                 var rawResult = Context.UniqueResult(category.Typed, _body);
-                       Tracer.Assert(rawResult.CompleteCategory == category.Typed);
+                Tracer.Assert(rawResult.CompleteCategory == category.Typed);
+                if (rawResult.FindArgs != null)
+                    Tracer.Assert(!rawResult.SmartArgs.Contains(CodeArgs.Arg()), rawResult.Dump);
+                
                 Dump("rawResult", rawResult);
                 BreakExecution();
-                var postProcessedResult = rawResult
-                    .AutomaticDereferenceResult()
+
+                var automaticDereferenceResult = rawResult
+                    .AutomaticDereferenceResult();
+                
+                Dump("automaticDereferenceResult", automaticDereferenceResult);
+                BreakExecution();
+
+                var postProcessedResult = automaticDereferenceResult
                     .Align(Root.DefaultRefAlignParam.AlignBits)
                     .LocalBlock(category);
 
                 Dump("postProcessedResult", postProcessedResult);
                 BreakExecution();
+                
                 var result = postProcessedResult
                     .ReplaceAbsolute(Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
+               
                 return ReturnMethodDump(result);
             }
             finally
@@ -146,22 +161,12 @@ namespace Reni.Struct
             }
         }
 
-        Result ObtainPendingResult(Category category)
-        {
-            if(category <= (Category.CodeArgs | Category.Type))
-                return new Result(category, getType: () => _body.Type(Context), getArgs: CodeArgs.Void);
-            NotImplementedMethod(category);
-            return null;
-        }
-
         CodeBase CreateContextRefCode()
         {
             return CodeBase
                 .FrameRef(Root.DefaultRefAlignParam)
                 .ReferencePlus(ArgsPartSize);
         }
-
-        internal void EnsureBodyCode() { _bodyCodeCache.Ensure(); }
 
         bool _isObtainBodyCodeActive;
 

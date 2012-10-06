@@ -33,7 +33,6 @@ namespace Reni.FeatureTest.Function
     [Function]
     [TwoFunctions]
     [SimpleFunctionWithNonLocal]
-    [LowPriority]
     public sealed class FunctionOfFunction : CompilerTest
     {
         [Test]

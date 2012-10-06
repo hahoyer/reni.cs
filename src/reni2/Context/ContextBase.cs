@@ -95,7 +95,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -93 && ObjectId == 7;
+            var trace = syntax.ObjectId == -32 && ObjectId == 4 && category.HasArgs;
             StartMethodDump(trace, category, syntax);
             try
             {
@@ -136,14 +136,6 @@ namespace Reni.Context
 
         internal virtual Structure ObtainRecentStructure() { return null; }
         internal virtual IFunctionContext ObtainRecentFunctionContext() { return null; }
-
-        internal Category PendingCategory(CompileSyntax syntax)
-        {
-            return _cache
-                .ResultCache[syntax]
-                .Data
-                .PendingCategory;
-        }
 
         internal virtual bool? QuickIsDataLess(CompileSyntax compileSyntax) { return null; }
 
@@ -204,19 +196,39 @@ namespace Reni.Context
                 .SmartLocalReferenceResult();
         }
 
-        internal Result ResultForObject(Category category, CompileSyntax syntax)
+        internal Result ArgReferenceResult(Category category)
         {
-            if(syntax == null)
-                return null;
-            return syntax.SmartReferenceResult(this, category);
+            return FindRecentFunctionContextObject
+                .CreateArgReferenceResult(category);
         }
-
-        internal Result ResultForArgs(Category category, CompileSyntax syntax)
+        internal Result ArgsResult(Category c, CompileSyntax right) { return right == null ? RootContext.VoidType.Result(c.Typed) : right.SmartUnFunctionedReferenceResult(this, c); }
+        internal Result ObjectResult(Category category1, CompileSyntax left) { return left == null ? null : left.SmartReferenceResult(this, category1.Typed); }
+        
+        /// <summary>
+        ///     Obtains the feature result of a functional argument object. 
+        ///     Actual arguments, if provided, as well as object reference are replaced.
+        /// </summary>
+        /// <param name="category"> the categories in result </param>
+        /// <param name="right"> the expression of the argument of the call. Must not be null </param>
+        /// <returns> </returns>
+        internal Result FunctionalArgResult(Category category, CompileSyntax right)
         {
-            if(syntax == null)
-                return RootContext.VoidType.Result(category.Typed);
-
-            return syntax.SmartUnFunctionedReferenceResult(this, category);
+            var functionalArgDescriptor = new FunctionalArgDescriptor(this);
+            return functionalArgDescriptor.Result(category, this, null, right);
+        }
+        
+        /// <summary>
+        ///     Obtains the feature result of a functional object. 
+        ///     Actual arguments, if provided, as well as object reference are replaced.
+        /// </summary>
+        /// <param name="category"> the categories in result </param>
+        /// <param name="left"> the expression left to the feature access, if provided </param>
+        /// <param name="right"> the expression right to the feature access, if provided </param>
+        /// <returns> </returns>
+        internal Result FunctionalObjectResult(Category category, CompileSyntax left, CompileSyntax right)
+        {
+            var functionalObjectDescriptor = new FunctionalObjectDescriptor(this, left);
+            return functionalObjectDescriptor.Result(category, this, left, right);
         }
     }
 }

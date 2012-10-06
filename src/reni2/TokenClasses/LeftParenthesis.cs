@@ -47,7 +47,7 @@ namespace Reni.TokenClasses
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            return FeatureInstance.ObjectResult(context, category, left, right);
+            return context.FunctionalObjectResult(category, left, right);
         }
     }
 }

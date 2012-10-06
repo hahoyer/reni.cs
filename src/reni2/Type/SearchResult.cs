@@ -28,6 +28,7 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.ReniParser;
+using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -99,10 +100,8 @@ namespace Reni.Type
 
         internal Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax)
         {
-            return FeatureInstance(syntax.Right == null)
-                .Result(context, category, syntax.Left, syntax.Right);
+            var objectDescriptor = new CallDescriptor(LeftType, Feature, ConverterResult);
+            return objectDescriptor.Result(category, context, syntax.Left, syntax.Right);
         }
-
-        FeatureInstance FeatureInstance(bool hasNoArg) { return new FeatureInstance(LeftType, Feature, ConverterResult, hasNoArg); }
     }
 }

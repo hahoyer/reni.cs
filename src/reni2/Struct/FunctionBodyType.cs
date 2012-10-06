@@ -38,9 +38,11 @@ namespace Reni.Struct
 {
     sealed class FunctionBodyType : TypeBase, IFeature, IFunctionFeature, ISimpleFeature
     {
-        [EnableDump,Node]
+        [EnableDump]
+        [Node]
         readonly Structure _structure;
-        [EnableDump,Node]
+        [EnableDump]
+        [Node]
         readonly FunctionSyntax _syntax;
         readonly SimpleCache<IContextReference> _objectReferenceCache;
 
@@ -55,12 +57,15 @@ namespace Reni.Struct
         {
             [Node]
             readonly FunctionBodyType _parent;
-            public ContextReference(FunctionBodyType parent):base(parent.ObjectId)
+            public ContextReference(FunctionBodyType parent)
+                : base(parent.ObjectId)
             {
                 _parent = parent;
                 StopByObjectId(-5);
             }
             public Size Size { get { return Root.DefaultRefAlignParam.RefSize; } }
+            [EnableDump]
+            FunctionSyntax Syntax { get { return _parent._syntax; } }
         }
 
         [DisableDump]
@@ -82,20 +87,20 @@ namespace Reni.Struct
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var trace = ObjectId < -23 && (category.HasArgs || category.HasCode);
+            var trace = ObjectId < 0 && (category.HasCode || category.HasArgs);
             StartMethodDump(trace, category, argsType);
             try
             {
                 BreakExecution();
-                
+
                 var functionType = Function(argsType);
-                
-                Dump("functionType", functionType); 
+
+                Dump("functionType", functionType);
                 BreakExecution();
 
                 var applyResult = functionType.ApplyResult(category);
                 Tracer.Assert(category == applyResult.CompleteCategory);
-                
+
                 Dump("applyResult", applyResult);
                 BreakExecution();
 
