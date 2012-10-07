@@ -42,9 +42,12 @@ repeat
 (
     /\(
         while: index < count, 
-        index dump_print, 
-        ' ' dump_print, 
-        index := (index + 1)enable_cut
+        while then
+        (
+            index dump_print, 
+            ' ' dump_print, 
+            index := (index + 1)enable_cut
+        )
     ) 
 )
 ")]

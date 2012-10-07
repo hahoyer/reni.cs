@@ -19,7 +19,7 @@ namespace Reni.Runtime
         void IOutStream.AddData(string x)
         {
             _data += x;
-            Tracer.Line("-data----------------\n" + _data + "\n---------------------");
+            Tracer.Line("-data----------------\n" + _data + "|<--\n---------------------");
             Tracer.Assert(_data.Length < 1000);
         }
 

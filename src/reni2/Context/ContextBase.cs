@@ -234,7 +234,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, IFeature feature, TypeBase objectType, CompileSyntax right)
         {
-            var trace = feature.GetObjectId() == 5 && category.HasCode;
+            var trace = feature.GetObjectId() == -5 && category.HasCode;
             StartMethodDump(trace, category, feature, objectType, right);
             try
             {
