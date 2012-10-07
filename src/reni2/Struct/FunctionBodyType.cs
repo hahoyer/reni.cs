@@ -90,7 +90,7 @@ namespace Reni.Struct
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            var trace = ObjectId < 0 && (category.HasCode || category.HasArgs);
+            var trace = ObjectId == -5 && (category.HasCode);
             StartMethodDump(trace, category, argsType);
             try
             {

@@ -55,7 +55,7 @@ namespace Reni.Context
         Result IFunctionContext.CreateArgReferenceResult(Category category)
         {
             return ArgsType
-                .ContextAccessResult(category.Typed, this, ArgsType.Size * -1)
+                .ContextAccessResult(category.Typed, this, () => ArgsType.Size * -1)
                 & category;
         }
 
@@ -64,7 +64,7 @@ namespace Reni.Context
             if(_valueType == null)
                 throw new ValueCannotBeUsedHereException();
             return _valueType.UniquePointer
-                .ContextAccessResult(category.Typed, this, (ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
+                .ContextAccessResult(category.Typed, this, ()=>(ArgsType.Size + Root.DefaultRefAlignParam.RefSize) * -1)
                 & category;
         }
     }

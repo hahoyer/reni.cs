@@ -400,14 +400,14 @@ namespace Reni.Type
                 .Result(category, target);
         }
 
-        internal Result ContextAccessResult(Category category, IContextReference target, Size offset)
+        internal Result ContextAccessResult(Category category, IContextReference target, Func<Size> getOffset)
         {
             if(IsDataLess)
                 return Result(category);
             return new Result
                 (category
                  , getType: () => this
-                 , getCode: () => CodeBase.ReferenceCode(target).ReferencePlus(offset).Dereference(Size)
+                 , getCode: () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).Dereference(Size)
                 );
         }
 

@@ -82,7 +82,7 @@ namespace Reni.Feature
             return PrettySearchPath(types[0]) + " -> " + types[1].PrettyName();
         }
 
-        static ISimpleFeature SimpleFeature(this IFeature feature, bool hasNoArg)
+        internal static ISimpleFeature SimpleFeature(this IFeature feature, bool hasNoArg)
         {
             if(!hasNoArg)
                 return null;
@@ -96,22 +96,11 @@ namespace Reni.Feature
 
         internal static bool HasCodeArgs(this IFeature feature, ContextBase context, TypeBase objectType, Func<Category, Result> converterResult, CompileSyntax right)
         {
-            return feature.Result(context, Category.CodeArgs, objectType, right)
-                .ReplaceArg(converterResult).CodeArgs.HasArg;
-        }
-
-        internal static Result Result(this IFeature feature, ContextBase context, Category category, TypeBase objectType, CompileSyntax right)
-        {
-            var simpleFeature = feature.SimpleFeature(right == null);
-            if (simpleFeature != null)
-                return simpleFeature.Result(category);
-
-            var function = feature.Function;
-            var applyResult = function.ApplyResult(category, context.ArgsResult(Category.Type, right).Type);
-            Tracer.Assert(category == applyResult.CompleteCategory);
-            return applyResult
-                .ReplaceArg(c => context.ArgsResult(c, right))
-                .ReplaceAbsolute(function.ObjectReference, c => objectType.SmartPointer.ArgResult(c));
+            return context
+                .Result(Category.CodeArgs, feature, objectType, right)
+                .ReplaceArg(converterResult)
+                .CodeArgs
+                .HasArg;
         }
     }
 }

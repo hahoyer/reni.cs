@@ -28,6 +28,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
 using Reni.Basics;
+using Reni.Feature;
 using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
@@ -203,7 +204,7 @@ namespace Reni.Context
         }
         internal Result ArgsResult(Category c, CompileSyntax right) { return right == null ? RootContext.VoidType.Result(c.Typed) : right.SmartUnFunctionedReferenceResult(this, c); }
         internal Result ObjectResult(Category category1, CompileSyntax left) { return left == null ? null : left.SmartReferenceResult(this, category1.Typed); }
-        
+
         /// <summary>
         ///     Obtains the feature result of a functional argument object. 
         ///     Actual arguments, if provided, as well as object reference are replaced.
@@ -216,7 +217,7 @@ namespace Reni.Context
             var functionalArgDescriptor = new FunctionalArgDescriptor(this);
             return functionalArgDescriptor.Result(category, this, null, right);
         }
-        
+
         /// <summary>
         ///     Obtains the feature result of a functional object. 
         ///     Actual arguments, if provided, as well as object reference are replaced.
@@ -229,6 +230,35 @@ namespace Reni.Context
         {
             var functionalObjectDescriptor = new FunctionalObjectDescriptor(this, left);
             return functionalObjectDescriptor.Result(category, this, left, right);
+        }
+
+        internal Result Result(Category category, IFeature feature, TypeBase objectType, CompileSyntax right)
+        {
+            var trace = feature.GetObjectId() == 5 && category.HasCode;
+            StartMethodDump(trace, category, feature, objectType, right);
+            try
+            {
+                var simpleFeature = feature.SimpleFeature(right == null);
+                if(simpleFeature != null)
+                    return ReturnMethodDump(simpleFeature.Result(category));
+
+                var function = feature.Function;
+                var applyResult = function.ApplyResult(category, ArgsResult(Category.Type, right).Type);
+                Tracer.Assert(category == applyResult.CompleteCategory);
+                Dump("applyResult", applyResult);
+                var replaceArg = applyResult.ReplaceArg(c => ArgsResult(c, right));
+                Dump("replaceArg", replaceArg);
+                Dump("function.ObjectReference", function.ObjectReference);
+                Dump("objectType.SmartPointer", objectType.SmartPointer);
+                BreakExecution();
+
+                var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.SmartPointer.ArgResult(c));
+                return ReturnMethodDump(result);
+            }
+            finally
+            {
+                EndMethodDump();
+            }
         }
     }
 }

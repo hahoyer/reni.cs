@@ -26,6 +26,7 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Feature;
+using Reni.Struct;
 using Reni.Syntax;
 using Reni.Type;
 
@@ -73,7 +74,7 @@ namespace Reni.Context
             {
                 BreakExecution();
 
-                var resultFromObject = Feature.Result(context, category, Type, right)
+                var resultFromObject = context.Result(category, Feature, Type, right)
                     .ReplaceArg(ConverterResult);
                 Tracer.Assert(category == resultFromObject.CompleteCategory);
 
@@ -123,12 +124,7 @@ namespace Reni.Context
         protected override Func<Category, Result> ConverterResult { get { return _converterResult; } }
     }
 
-    abstract class FunctionalFeatureDescriptor : FeatureDescriptor
-    {
-        protected override sealed IFeature Feature { get { return Type.Feature; } }
-    }
-
-    sealed class FunctionalObjectDescriptor : FunctionalFeatureDescriptor
+    sealed class FunctionalObjectDescriptor : FeatureDescriptor
     {
         readonly ContextBase _context;
         readonly CompileSyntax _left;
@@ -139,13 +135,24 @@ namespace Reni.Context
         }
         internal override TypeBase Type { get { return _context.Type(_left); } }
         protected override Func<Category, Result> ConverterResult { get { return null; } }
+        protected override IFeature Feature { get { return Type.Feature; } }
     }
 
-    sealed class FunctionalArgDescriptor : FunctionalFeatureDescriptor
+    sealed class FunctionalArgDescriptor : FeatureDescriptor
     {
         readonly ContextBase _context;
         internal FunctionalArgDescriptor(ContextBase context) { _context = context; }
-        protected override Func<Category, Result> ConverterResult { get { return _context.ArgReferenceResult; } }
-        internal override TypeBase Type { get { return _context.ArgReferenceResult(Category.Type).Type; } }
+
+        [DisableDump]
+        FunctionBodyType FunctionBodyType { get { return (FunctionBodyType) _context.ArgReferenceResult(Category.Type).Type; } }
+        [DisableDump]
+        Structure Structure { get { return FunctionBodyType.FindRecentStructure; } }
+
+        [DisableDump]
+        protected override Func<Category, Result> ConverterResult { get { return Structure.StructReferenceViaContextReference; } }
+        [DisableDump]
+        internal override TypeBase Type { get { return Structure.Type; } }
+        [DisableDump]
+        protected override IFeature Feature { get { return FunctionBodyType.Feature; } }
     }
 }
