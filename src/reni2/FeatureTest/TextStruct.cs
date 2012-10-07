@@ -100,7 +100,7 @@ Text:
     [DefaultInitialized]
     [FunctionVariable]
     [Repeater]
-    //[LowPriority]
+    [LowPriority]
     public sealed class Text1 : TextStruct
     {
         [Test]
