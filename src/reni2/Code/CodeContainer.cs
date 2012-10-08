@@ -36,43 +36,52 @@ namespace Reni.Code
 {
     sealed class CodeContainer : ReniObject
     {
+        readonly Root _rootContext;
         [Node]
-        readonly Container _main;
+        readonly SimpleCache<Container> _mainCache;
         [Node]
         readonly DictionaryEx<int, FunctionContainer> _functions;
+
         public CodeContainer(Root rootContext, ParsedSyntax syntax, string description)
         {
-            _main = Struct.Container
-                .Create(syntax)
-                .Code(rootContext)
-                .Container(description);
-            _functions = new DictionaryEx<int, FunctionContainer>(rootContext.Container);
-            for(var i = 0; i < rootContext.FunctionCount; i++)
-                _functions.Ensure(i);
+            _rootContext = rootContext;
+            _mainCache = new SimpleCache<Container>(() => rootContext.MainContainer(syntax, description));
+            _functions = new DictionaryEx<int, FunctionContainer>(_rootContext.FunctionContainer);
         }
 
         internal IEnumerable<IssueBase> Issues
         {
             get
             {
-                return _main
+                return Main
                     .Issues
-                    .Union(_functions.SelectMany(f => f.Value.Issues));
+                    .Union(Functions.SelectMany(f => f.Value.Issues));
             }
         }
 
-        internal void Execute(IExecutionContext context) { _main.Data.Execute(context); }
+        DictionaryEx<int, FunctionContainer> Functions
+        {
+            get
+            {
+                for (var i = 0; i < _rootContext.FunctionCount; i++)
+                    _functions.Ensure(i);
+                return _functions;
+            }
+        }
+        Container Main { get { return _mainCache.Value; } }
+
+        internal void Execute(IExecutionContext context) { Main.Data.Execute(context); }
 
         internal string CreateCSharpString(string className)
         {
             return Generator
-                .CreateCSharpString(_main, _functions, true, className);
+                .CreateCSharpString(Main, Functions, true, className);
         }
 
         internal Assembly CreateCSharpAssembly(string className, bool generatorFilePosn)
         {
             return Generator
-                .CreateCSharpAssembly(_main, _functions, false, className, generatorFilePosn);
+                .CreateCSharpAssembly(Main, Functions, false, className, generatorFilePosn);
         }
 
         public CodeBase Function(FunctionId functionId)
@@ -84,11 +93,10 @@ namespace Reni.Code
 
         public override string DumpData()
         {
-            var result = "main\n" + _main.Dump() + "\n";
-            for(var i = 0; i < _functions.Count; i++)
+            var result = "main\n" + Main.Dump() + "\n";
+            for (var i = 0; i < _rootContext.FunctionCount; i++)
                 result += "function index=" + i + "\n" + _functions[i].Dump() + "\n";
             return result;
         }
     }
-
 }

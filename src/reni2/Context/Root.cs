@@ -28,6 +28,7 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
+using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
@@ -102,6 +103,14 @@ namespace Reni.Context
             return result;
         }
 
-        internal FunctionContainer Container(int index) { return _functions.Container(index); }
+        internal FunctionContainer FunctionContainer(int index) { return _functions.Container(index); }
+
+        internal Code.Container MainContainer(ParsedSyntax syntax, string description)
+        {
+            return Struct.Container
+                .Create(syntax)
+                .Code(this)
+                .Container(description);
+        }
     }
 }
