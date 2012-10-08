@@ -60,9 +60,6 @@ namespace Reni.Struct
         internal CodeBase BodyCode { get { return _bodyCodeCache.Value; } }
         [Node]
         string Description { get { return _body.NodeDump; } }
-        [Node]
-        [DisableDump]
-        protected Size FrameSize { get { return Parent.Size + RelevantValueSize; } }
         [DisableDump]
         Size ArgsPartSize { get { return Parent.ArgsType.Size + RelevantValueSize; } }
         [DisableDump]
@@ -92,7 +89,7 @@ namespace Reni.Struct
             {
                 try
                 {
-                    return BodyCode.Container(Description, FunctionId, FrameSize);
+                    return BodyCode.Container(Description, FunctionId);
                 }
                 catch(UnexpectedVisitOfPending)
                 {

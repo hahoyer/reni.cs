@@ -286,7 +286,7 @@ namespace Reni.Code
         }
 
         internal static CodeBase Arg(TypeBase type) { return new Arg(type); }
-        internal Container Container(string description, FunctionId functionId = null, Size frameSize = null) { return new Container(this, description, functionId); }
+        internal Container Container(string description, FunctionId functionId = null) { return new Container(this, description, functionId); }
 
         public static CodeBase operator +(CodeBase a, CodeBase b) { return a.Sequence(b); }
     }
