@@ -29,12 +29,12 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
+
     [Serializable]
     sealed class SequenceType
         : TagChild<ArrayType>

@@ -57,14 +57,18 @@ namespace Reni.Type
                 base.Search(searchVisitor, syntax);
         }
 
-        internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult) { return RawInstanceResult(category, getRightResult).SmartLocalReferenceResult() & category; }
+        internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
+        {
+            return RawInstanceResult(category.Typed, getRightResult)
+                       .SmartLocalReferenceResult() & category;
+        }
 
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             if(category <= Category.Type.Replenished)
                 return Value.Result(category.Typed);
             return Value
-                .ConstructorResult(category.Typed, getRightResult(Category.Type).Type)
+                .ConstructorResult(category, getRightResult(Category.Type).Type)
                 .ReplaceArg(getRightResult);
         }
 
@@ -77,27 +81,26 @@ namespace Reni.Type
             try
             {
                 var countResult = right.Result(context).AutomaticDereferenceResult();
-                
-                Dump("countResult", countResult); 
+
+                Dump("countResult", countResult);
                 BreakExecution();
 
                 var count = countResult
                     .Evaluate(context.RootContext.ExecutionContext)
                     .ToInt32();
-                
+
                 Dump("count", count);
                 BreakExecution();
-                
+
                 var type = Value
                     .UniqueAlign
                     .UniqueArray(count)
                     .UniqueTypeType;
-                
+
                 Dump("type", type);
                 BreakExecution();
-                
-                return ReturnMethodDump(type.Result(category));
 
+                return ReturnMethodDump(type.Result(category));
             }
             finally
             {
@@ -127,6 +130,5 @@ namespace Reni.Type
 
             return RootContext.BitType.Result(category, BitsConst.Convert(count.Value));
         }
-
     }
 }

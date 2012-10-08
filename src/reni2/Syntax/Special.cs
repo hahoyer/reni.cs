@@ -114,6 +114,15 @@ namespace Reni.Syntax
                 .Result(context, category, _left, _right);
         }
 
+        internal override Result ObtainPendingResult(ContextBase context, Category category)
+        {
+            var pendingProvider = _infix as IPendingProvider;
+            if(pendingProvider != null)
+            return pendingProvider
+                .ObtainResult(context, category, _left, _right);
+            return base.ObtainPendingResult(context, category);
+        }
+
         protected override string GetNodeDump()
         {
             var result = "(";
@@ -127,6 +136,11 @@ namespace Reni.Syntax
         }
         protected override TokenData GetFirstToken() { return _left.FirstToken; }
         protected override TokenData GetLastToken() { return _right.LastToken; }
+    }
+
+    interface IPendingProvider
+    {
+        Result ObtainResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right);
     }
 
     sealed class SuffixSyntax : SpecialSyntax

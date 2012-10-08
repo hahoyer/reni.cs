@@ -34,7 +34,7 @@ namespace Reni.Struct
 {
     sealed class AtToken : Infix
     {
-        public override Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right)
+        protected override Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right)
         {
             return left
                 .AtTokenResult(callContext, category, right);

@@ -116,7 +116,10 @@ namespace Reni.TokenClasses
     [Serializable]
     abstract class Infix : Special, IInfix
     {
-        public abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
+        Result IInfix.Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right) { return Result(callContext, category, left, right); }
+
+        protected abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
+        
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             return new InfixSyntax
