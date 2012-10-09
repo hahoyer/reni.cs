@@ -178,7 +178,7 @@ namespace Reni.Parser
                 errorPosition = 2;
 
 
-            while(sp[i] != '\0' && IsWhiteSpace(sp[i]) && sp.SubString(i + 1, endOfComment.Length) != endOfComment)
+            while(!(sp[i] == '\0' || IsWhiteSpace(sp[i]) && sp.SubString(i + 1, endOfComment.Length) == endOfComment))
                 i++;
             if(sp[i] == '\0')
                 return Token(_syntaxErrorEOFComment, sp, i);
