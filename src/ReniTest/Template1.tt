@@ -6,5 +6,18 @@
 <#@ import namespace="global::Reni" #>// <#= DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") #> 
 <#= new T4Compiler(@"
 f: arg/\;
-f(1);   
+repeat: /\arg while() then(arg body(), repeat(arg));
+
+count: 10,
+index: count type instance(0),
+repeat
+(
+    while: /\ index < count, 
+    body: /\
+    (
+        index dump_print, 
+        ' ' dump_print, 
+        index := (index + 1)enable_cut
+    )
+)
 ").Code() #>     

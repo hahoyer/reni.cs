@@ -40,44 +40,42 @@ namespace Reni.FeatureTest
             return
                 @"
 systemdata:
-{
-    Memory: (0 type * ('100' to_number_of_base 256)) instance();
-    FreePointer: reference Memory;
+{ Memory: (0 type * ('100' to_number_of_base 256)) instance()
+; FreePointer: reference Memory
 };
 
-repeat: /\arg() while then repeat(arg);
+repeat: /\arg while() then(arg body(), repeat(arg));
 
-system:
-/!\{
-    MaxNumber8: /!\ '7f' to_number_of_base 16 ;
-    MaxNumber16: /!\ '7fff' to_number_of_base 16 ;
-    MaxNumber32: /!\ '7fffffff' to_number_of_base 16 ;
-    MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16 ;
+system: /!\
+{ MaxNumber8: /!\ '7f' to_number_of_base 16 
+; MaxNumber16: /!\ '7fff' to_number_of_base 16 
+; MaxNumber32: /!\ '7fffffff' to_number_of_base 16 
+; MaxNumber64: /!\ '7fffffffffffffff' to_number_of_base 16 
 
-    TextItemType: /!\ text_item(MaxNumber8) type ;
+; TextItemType: /!\ text_item(MaxNumber8) type 
 
-    NewMemory: 
-    /\ {
-        result: (arg elementType * MaxNumber32) reference (systemdata FreePointer enable_raw_conversion),
-        initializer: arg initializer,
-        length: arg length,
-        position: 0,
-        repeat(/\(while: position < length, result(position) := initializer(position), position :+ 1) ),
-        systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
+; NewMemory: /\ 
+    { result: (arg elementType * MaxNumber32) reference (systemdata FreePointer enable_raw_conversion)
+    , initializer: arg initializer
+    , length: arg length
+    , position: 0
+    , repeat
+        ( while: /\ position < length
+        , body: /\ (result(position) := initializer(position), position :+ 1) 
+        )
+    , systemdata FreePointer := systemdata FreePointer + (arg elementType size * arg length)
     } result 
-} ;
+};
 
-Text: 
-/\{
-    data: (system TextItemType * system MaxNumber32) reference arg;
-    _length: system MaxNumber32 type instance (arg type / system TextItemType);
-    AfterCopy: data:= system NewMemory
-     /\(
-        elementType: system TextItemType, 
-        length: _length, 
-        initializer: /\ data(arg)
-    );
-    AfterCopy()
+Text: /\
+{ data: (system TextItemType * system MaxNumber32) reference arg
+; _length: system MaxNumber32 type instance (arg type / system TextItemType)
+; AfterCopy: data:= system NewMemory /\
+    ( elementType: system TextItemType
+    , length: _length
+    , initializer: /\ data(arg)
+    )
+; AfterCopy()
 }
 ";
         }
@@ -100,7 +98,6 @@ Text:
     [DefaultInitialized]
     [FunctionVariable]
     [Repeater]
-    [LowPriority]
     public sealed class Text1 : TextStruct
     {
         [Test]

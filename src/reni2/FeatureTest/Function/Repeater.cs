@@ -39,17 +39,15 @@ repeat: /\arg() while then repeat(arg);
 count: 10,
 index: count type instance(0),
 repeat
-(
-    /\(
-        while: index < count, 
-        while then
-        (
-            index dump_print, 
-            ' ' dump_print, 
-            index := (index + 1)enable_cut
-        )
-    ) 
-)
+(/\(
+    while: index < count, 
+    while then
+    (
+        index dump_print, 
+        ' ' dump_print, 
+        index := (index + 1)enable_cut
+    )
+))
 ")]
     [Output("0 1 2 3 4 5 6 7 8 9 ")]
     [Equal]
@@ -58,6 +56,31 @@ repeat
     [BitArrayOp.BitArrayOp]
     [UseThen]
     [FunctionOfFunction]
+    public sealed class SimpleRepeater: CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [Target(@"
+repeat: /\arg while() then(arg body(), repeat(arg));
+
+count: 10,
+index: count type instance(0),
+repeat
+(
+    while: /\ index < count, 
+    body: /\
+    (
+        index dump_print, 
+        ' ' dump_print, 
+        index := (index + 1)enable_cut
+    )
+)
+")]
+    [Output("0 1 2 3 4 5 6 7 8 9 ")]
+    [SimpleRepeater]
     public sealed class Repeater : CompilerTest
     {
         [Test]
