@@ -44,4 +44,16 @@ ipsum Pelsim := 15;
         [Test]
         public override void Run() { BaseRun(); }
     }
+
+    [TestFixture]
+    [TargetSet("\"Hello world\"#(* Das ist ein Kommentar *)#dump_print", "Hello world")]
+    [TargetSet("\"Hello world\"#(ignorieren Das ist ein Kommentar\n ignorieren)#dump_print", "Hello world")]
+    [TargetSet("\"Hello world\"# Das ist der auszugebende String\ndump_print # ... und damit wird er ausgegeben", "Hello world")]
+    public sealed class Post1201009 : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+
 }

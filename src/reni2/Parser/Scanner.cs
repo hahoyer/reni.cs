@@ -166,7 +166,7 @@ namespace Reni.Parser
             int? errorPosition = null;
             var i = 3;
             var endOfComment = closingParenthesis + "#";
-            if(IsSymbol(sp[2]))
+            if(IsSymbol(sp[2]) || sp[2] == '#')
                 endOfComment = sp[2] + endOfComment;
             else if(IsAlpha(sp[2]))
             {
@@ -191,8 +191,8 @@ namespace Reni.Parser
 
         private static void SingleLineComment(SourcePosn sp)
         {
-            var i = 2;
-            while(sp[i - 1] != '\0' && sp[i - 1] != '\n')
+            var i = 1;
+            while(sp[i] != '\0' && sp[i] != '\n')
                 i++;
             sp.Incr(i);
         }
