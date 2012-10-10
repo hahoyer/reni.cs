@@ -210,7 +210,7 @@ namespace Reni.Parser
         private static Token Text(SourcePosn sourcePosn, ITokenFactory tokenFactory)
         {
             var position = 1;
-            while(sourcePosn[position] != '\0')
+            while (sourcePosn[position] != '\0' && sourcePosn[position] != '\n')
             {
                 position++;
                 if (sourcePosn[position - 1] == sourcePosn[0])
