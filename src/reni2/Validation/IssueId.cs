@@ -38,6 +38,6 @@ namespace Reni.Validation
         public static readonly IssueId ConsequentialError = new IssueId();
         public static readonly IssueId BeginOfComment = new IssueId();
         public static readonly IssueId EOFInComment = new IssueId();
-        public static readonly IssueId EOFInString = new IssueId();
+        public static readonly IssueId EOLInString = new IssueId();
     }
 }
