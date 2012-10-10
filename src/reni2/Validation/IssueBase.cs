@@ -35,17 +35,17 @@ namespace Reni.Validation
     {
         internal static readonly IEnumerable<IssueBase> Empty = new IssueBase[0];
         readonly DictionaryEx<ExpressionSyntax, ConsequentialError> _consequentialError;
-        readonly IssueId _issueId;
+        internal readonly IssueId IssueId;
 
         internal IssueBase(IssueId issueId)
         {
-            _issueId = issueId;
+            IssueId = issueId;
             _consequentialError = new DictionaryEx<ExpressionSyntax, ConsequentialError>(syntax => new ConsequentialError(syntax,this));
         }
 
         internal abstract string LogDump { get; }
         internal ConsequentialError ConsequentialError(ExpressionSyntax syntax) { return _consequentialError[syntax]; }
-        protected string Tag { get { return _issueId.Tag; } }
+        protected string Tag { get { return IssueId.Tag; } }
         internal IssueType Type(Root rootContext) { return new IssueType(this, rootContext); }
         internal virtual CodeBase Code { get { return CodeBase.Issue(this); } }
     }

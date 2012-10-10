@@ -24,20 +24,25 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.Code;
-using Reni.Context;
-using Reni.Parser;
-using Reni.ReniParser;
+using HWClassLibrary.UnitTest;
+using Reni.Validation;
 
-namespace Reni.Validation
+namespace Reni.FeatureTest.Validation
 {
-    sealed class ConsequentialError : SyntaxIssue
+    [TestFixture]
+    [Target(@"1 #( asdf )# dump_print")]
+    [Output("")]
+    [UseOfUndefinedContextSymbol]
+    public sealed class SyntaxErrorComment : CompilerTest
     {
-        [EnableDump]
-        readonly IssueBase _issueBase;
-
-        public ConsequentialError(ExpressionSyntax syntax, IssueBase issueBase)
-            : base(syntax, IssueId.ConsequentialError) { _issueBase = issueBase; }
-        internal override CodeBase Code { get { return _issueBase.Code + base.Code; } }
+        [Test]
+        public override void Run() { BaseRun(); }
+        protected override void Verify(IEnumerable<IssueBase> issues)
+        {
+            var issueArray = issues.ToArray();
+            Tracer.Assert(issueArray.Length == 2);
+            Tracer.Assert(issueArray[0].IssueId == IssueId.BeginOfComment);
+            Tracer.Assert(issueArray[1] is ConsequentialError);
+        }
     }
 }

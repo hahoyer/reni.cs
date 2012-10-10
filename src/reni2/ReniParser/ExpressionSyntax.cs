@@ -126,7 +126,6 @@ namespace Reni.ReniParser
                 return result;
             }
         }
-        internal string FileErrorPosition(string errorTag) { return Token.FileErrorPosition(errorTag); }
     }
 
     // Lord of the weed

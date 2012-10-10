@@ -48,5 +48,6 @@ namespace Reni.Parser
 
         protected override string GetNodeDump() { return Token.Name; }
         protected virtual string FilePosition() { return Token.FilePosition; }
+        internal string FileErrorPosition(string errorTag) { return Token.FileErrorPosition(errorTag); }
     }
 }

@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,11 +18,12 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Context;
 
 namespace Reni.Parser
 {
@@ -62,6 +64,7 @@ namespace Reni.Parser
             _source = source;
             _length = length;
             _position = position;
+            StopByObjectId(-2);
         }
 
         [DisableDump]

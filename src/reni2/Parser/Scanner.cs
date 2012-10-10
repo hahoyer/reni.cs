@@ -20,6 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Context;
+using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni.Parser
 {
@@ -183,10 +186,13 @@ namespace Reni.Parser
             if(sp[i] == '\0')
                 return Token(_syntaxErrorEOFComment, sp, i);
 
-            sp.Incr(i + 1 + endOfComment.Length);
+            var commentEndPosition = i + 1 + endOfComment.Length;
             if(errorPosition == null)
+            {
+                sp.Incr(commentEndPosition);
                 return null;
-            return Token(_syntaxErrorBeginComment, sp, i);
+            }
+            return Token(_syntaxErrorBeginComment, sp, commentEndPosition);
         }
 
         private static void SingleLineComment(SourcePosn sp)
@@ -197,9 +203,9 @@ namespace Reni.Parser
             sp.Incr(i);
         }
 
-        private static readonly SyntaxError _syntaxErrorEOFComment = new SyntaxError("unexpected end of file in comment");
-        private static readonly SyntaxError _syntaxErrorBeginComment = new SyntaxError("invalid opening character for comment");
-        private static readonly SyntaxError _syntaxErrorEOFString = new SyntaxError("unexpected end of file in string");
+        private static readonly SyntaxError _syntaxErrorEOFComment = new SyntaxError(IssueId.EOFInComment, true);
+        private static readonly SyntaxError _syntaxErrorBeginComment = new SyntaxError(IssueId.BeginOfComment, true);
+        private static readonly SyntaxError _syntaxErrorEOFString = new SyntaxError(IssueId.EOFInString, false);
 
         private static Token Text(SourcePosn sourcePosn, ITokenFactory tokenFactory)
         {
@@ -224,5 +230,11 @@ namespace Reni.Parser
             foreach(var t in chars)
                 _charType[t] = type;
         }
+    }
+
+    class CommentError : SyntaxIssue
+    {
+        public CommentError(ParsedSyntaxBase syntax, IssueId issueId)
+            : base(syntax, issueId) {}
     }
 }

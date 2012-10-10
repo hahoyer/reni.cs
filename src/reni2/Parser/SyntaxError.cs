@@ -1,5 +1,7 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,29 +18,30 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Validation;
 
 namespace Reni.Parser
 {
-    /// <summary>
-    ///     Error token to singal syntax errors
-    /// </summary>
-    internal sealed class SyntaxError : ReniObject, ITokenClass
+    sealed class SyntaxError : ReniObject, ITokenClass
     {
-        private string _message;
+        readonly IssueId _issueId;
+        readonly bool _isWhiteSpace;
 
-        /// <summary>
-        ///     ctor
-        /// </summary>
-        /// <param name = "message">the error message</param>
-        public SyntaxError(string message) { _message = message; }
+        public SyntaxError(IssueId issueId, bool isWhiteSpace)
+        {
+            _issueId = issueId;
+            _isWhiteSpace = isWhiteSpace;
+        }
 
         string ITokenClass.Name { set { throw new NotImplementedException(); } }
-        string ITokenClass.PrioTableName(string name) { throw new NotImplementedException(); }
-        ITokenFactory ITokenClass.NewTokenFactory { get { throw new NotImplementedException(); } }
-        IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { throw new NotImplementedException(); }
+        string ITokenClass.PrioTableName(string name) { return "<syntaxerror>"; }
+        ITokenFactory ITokenClass.NewTokenFactory { get { return null; } }
+        IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return new CompileSyntaxError(token, _issueId); }
     }
 }

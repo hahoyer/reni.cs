@@ -20,21 +20,20 @@
 
 #endregion
 
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.ReniParser;
 using Reni.Validation;
 
-namespace Reni.Context
+namespace Reni.Parser
 {
     abstract class SyntaxIssue : IssueBase
     {
         [EnableDump]
-        readonly ExpressionSyntax _syntax;
+        readonly ParsedSyntaxBase _syntax;
 
-        internal SyntaxIssue(ExpressionSyntax syntax, IssueId issueId)
+        internal SyntaxIssue(ParsedSyntaxBase syntax, IssueId issueId)
             : base(issueId) { _syntax = syntax; }
 
         internal override string LogDump { get { return _syntax.FileErrorPosition(Tag); } }

@@ -98,6 +98,7 @@ Text: /\
     [DefaultInitialized]
     [FunctionVariable]
     [Repeater]
+    [LowPriority]
     public sealed class Text1 : TextStruct
     {
         [Test]
