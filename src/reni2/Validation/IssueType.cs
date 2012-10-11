@@ -50,7 +50,7 @@ namespace Reni.Validation
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
 
-        internal Result Result(Category category) { return Result(category, getCode: Code); }
+        internal Result IssueResult(Category category) { return Result(category, getCode: Code); }
         IssueType ConsequentialErrorType(ExpressionSyntax syntax) { return _issue.ConsequentialError(syntax).Type(RootContext); }
 
         CodeBase Code() { return _issue.Code; }
@@ -84,7 +84,7 @@ namespace Reni.Validation
             {
                 return _parent
                     .ConsequentialErrorType(_syntax)
-                    .Result(category);
+                    .IssueResult(category);
             }
         }
     }

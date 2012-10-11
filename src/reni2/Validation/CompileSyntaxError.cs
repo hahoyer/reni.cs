@@ -20,6 +20,8 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -34,24 +36,41 @@ namespace Reni.Validation
     {
         [EnableDump]
         readonly IssueId _issueId;
+        readonly CompileSyntaxError _next;
         readonly SimpleCache<CompileSyntaxIssue> _issueCache;
-        
-        public CompileSyntaxError(TokenData token, IssueId issueId)
+
+        public CompileSyntaxError(TokenData token, IssueId issueId, CompileSyntaxError next = null)
             : base(token)
         {
             _issueId = issueId;
-            _issueCache = new SimpleCache<CompileSyntaxIssue>(()=> new CompileSyntaxIssue(_issueId,Token));
+            _next = next;
+            _issueCache = new SimpleCache<CompileSyntaxIssue>(() => new CompileSyntaxIssue(_issueId, Token));
         }
 
         CompileSyntaxIssue Issue { get { return _issueCache.Value; } }
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            return Type(context)
-                .Result(category);
+            var result = Chain
+                .Select(error => error.IssueType(context).IssueResult(category))
+                .Aggregate(context.RootContext.VoidType.Result(category), (x, y) => x + y);
+            return result;
         }
 
-        new IssueType Type(ContextBase context) { return new IssueType(Issue, context.RootContext); }
-        
+        [DisableDump]
+        IEnumerable<CompileSyntaxError> Chain
+        {
+            get
+            {
+                var current = this;
+                do
+                {
+                    yield return current;
+                    current = current._next;
+                } while(current != null);
+            }
+        }
+
+        IssueType IssueType(ContextBase context) { return new IssueType(Issue, context.RootContext); }
     }
 }

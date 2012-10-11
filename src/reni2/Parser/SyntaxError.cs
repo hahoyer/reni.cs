@@ -30,18 +30,21 @@ namespace Reni.Parser
 {
     sealed class SyntaxError : ReniObject, ITokenClass
     {
+        [EnableDump]
         readonly IssueId _issueId;
-        readonly bool _isWhiteSpace;
 
-        public SyntaxError(IssueId issueId, bool isWhiteSpace)
-        {
-            _issueId = issueId;
-            _isWhiteSpace = isWhiteSpace;
-        }
+        public SyntaxError(IssueId issueId) { _issueId = issueId; }
 
         string ITokenClass.Name { set { throw new NotImplementedException(); } }
-        string ITokenClass.PrioTableName(string name) { return "<syntaxerror>"; }
+        string ITokenClass.PrioTableName(string name) { return PrioTable.SyntaxError; }
         ITokenFactory ITokenClass.NewTokenFactory { get { return null; } }
-        IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return new CompileSyntaxError(token, _issueId); }
+        IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right)
+        {
+            return new CompileSyntaxError
+                (token
+                 , _issueId
+                 , right as CompileSyntaxError
+                );
+        }
     }
 }
