@@ -42,10 +42,10 @@ namespace Reni.ReniParser
                      "+?-",
                      "?--"
                  },
-                 new[] {"(", "[", "{", "<frame>"},
-                 new[] {")", "]", "}", "<end>"}
+                 new[] {"(", "[", "{", PrioTable.Frame},
+                 new[] {")", "]", "}", PrioTable.End}
                 );
-            prioTable += PrioTable.Left("<common>");
+            prioTable += PrioTable.Left(PrioTable.Common);
             return prioTable;
         }
 

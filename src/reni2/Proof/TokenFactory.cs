@@ -35,7 +35,7 @@ namespace Reni.Proof
 
         protected override PrioTable GetPrioTable()
         {
-            var x = PrioTable.Left("<common>");
+            var x = PrioTable.Left(PrioTable.Common);
 
             x += PrioTable.Right("^");
             x += PrioTable.Left("*", "/", "\\", "gcd");
@@ -58,8 +58,8 @@ namespace Reni.Proof
                      "+?-",
                      "?--"
                  },
-                 new[] {"(", "[", "{", "<frame>"},
-                 new[] {")", "]", "}", "<end>"}
+                 new[] {"(", "[", "{", PrioTable.Frame},
+                 new[] {")", "]", "}", PrioTable.End}
                 );
             //Tracer.FlaggedLine("\n"+x+"\n");
             return x;

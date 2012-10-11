@@ -39,7 +39,7 @@ namespace Reni.ReniParser
     {
         protected override PrioTable GetPrioTable()
         {
-            var x = PrioTable.Left("<common>");
+            var x = PrioTable.Left(PrioTable.Common);
             x += PrioTable.Left
                 ("reference"
                  , "_A_T_", "_N_E_X_T_"
@@ -86,12 +86,25 @@ namespace Reni.ReniParser
                     "+?-",
                     "?--"
                 },
-                 new[] {"(", "[", "{", "<frame>"},
-                 new[] {")", "]", "}", "<end>"}
+                 new[] {"(", "[", "{"},
+                 new[] {")", "]", "}"}
                 );
-            //x.Correct("(", "<common>", '-');
-            //x.Correct("[", "<common>", '-');
-            //x.Correct("{", "<common>", '-');
+            //x.Correct("(", PrioTable.Common, '-');
+            //x.Correct("[", PrioTable.Common, '-');
+            //x.Correct("{", PrioTable.Common, '-');
+
+            x += PrioTable.Right(PrioTable.SyntaxError);
+
+            x = x.Level
+                (new[]
+                {
+                    "++-",
+                    "+?-",
+                    "?--"
+                },
+                 new[] { PrioTable.Frame },
+                 new[] { PrioTable.End }
+                );
 
             //Tracer.FlaggedLine("\n"+x.ToString());
             return x;

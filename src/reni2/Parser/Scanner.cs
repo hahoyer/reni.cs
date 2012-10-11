@@ -203,9 +203,9 @@ namespace Reni.Parser
             sp.Incr(i);
         }
 
-        private static readonly SyntaxError _syntaxErrorEOFComment = new SyntaxError(IssueId.EOFInComment, true);
-        private static readonly SyntaxError _syntaxErrorBeginComment = new SyntaxError(IssueId.BeginOfComment, true);
-        private static readonly SyntaxError _syntaxErrorEOLString = new SyntaxError(IssueId.EOLInString, false);
+        private static readonly SyntaxError _syntaxErrorEOFComment = new SyntaxError(IssueId.EOFInComment);
+        private static readonly SyntaxError _syntaxErrorBeginComment = new SyntaxError(IssueId.BeginOfComment);
+        private static readonly SyntaxError _syntaxErrorEOLString = new SyntaxError(IssueId.EOLInString);
 
         private static Token Text(SourcePosn sourcePosn, ITokenFactory tokenFactory)
         {

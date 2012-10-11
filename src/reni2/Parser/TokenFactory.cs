@@ -79,14 +79,14 @@ namespace Reni.Parser
         private TTokenClass InternalGetRightParenthesisClass(int i)
         {
             var result = GetRightParenthesisClass(i);
-            result.Name = i == 0 ? "<end>" : " }])".Substring(i, 1);
+            result.Name = i == 0 ? PrioTable.End : " }])".Substring(i, 1);
             return result;
         }
 
         private TTokenClass InternalGetLeftParenthesisClass(int i)
         {
             var result = GetLeftParenthesisClass(i);
-            result.Name = i == 0 ? "<frame>" : " {[(".Substring(i, 1);
+            result.Name = i == 0 ? PrioTable.Frame : " {[(".Substring(i, 1);
             return result;
         }
 

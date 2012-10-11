@@ -14,6 +14,11 @@ namespace Reni.Parser
     [Serializable]
     internal sealed class PrioTable
     {
+        internal const string Common = "<common>";
+        internal const string End = "<end>";
+        internal const string Frame = "<frame>";
+        internal const string SyntaxError = "<syntaxerror>";
+
         private readonly string[] _token;
         private readonly SimpleCache<char[,]> _dataCache;
 
@@ -200,25 +205,32 @@ namespace Reni.Parser
                     return (i);
 
             for(var i = 0; i < Length; i++)
-                if(_token[i] == "<common>")
+                if(_token[i] == Common)
                     return (i);
 
-            throw new NotImplementedException("missing <common> entry in priority table");
+            throw new NotImplementedException("missing "+Common+" entry in priority table");
         }
 
         /// <summary>
-        ///     Define a prio table with tokens that have the sam priority and are left associative
+        ///     Define a prio table with tokens that have the same priority and are left associative
         /// </summary>
         /// <param name = "x"></param>
         /// <returns></returns>
         public static PrioTable Left(params string[] x) { return new PrioTable('-', x); }
 
         /// <summary>
-        ///     Define a prio table with tokens that have the sam priority and are right associative
+        ///     Define a prio table with tokens that have the same priority and are right associative
         /// </summary>
         /// <param name = "x"></param>
         /// <returns></returns>
         public static PrioTable Right(params string[] x) { return new PrioTable('+', x); }
+
+        /// <summary>
+        ///     Define a prio table with tokens that have the same priority and are like a list
+        /// </summary>
+        /// <param name = "x"></param>
+        /// <returns></returns>
+        public static PrioTable List(params string[] x) { return new PrioTable('=', x); }
 
         /// <summary>
         ///     Define a prio table that adds a parenthesis level. 
@@ -289,7 +301,7 @@ namespace Reni.Parser
             return n;
         }
 
-        private static bool IsNormalName(string name) { return name != "<frame>" && name != "<end>" && name != "<common>"; }
+        private static bool IsNormalName(string name) { return name != Frame && name != End && name != Common && name != SyntaxError; }
 
         /// <summary>
         ///     Returns the priority information of a pair of tokens
