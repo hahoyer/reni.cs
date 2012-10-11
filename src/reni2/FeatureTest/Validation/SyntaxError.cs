@@ -23,7 +23,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Text.RegularExpressions;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 using HWClassLibrary.UnitTest;
 using Reni.Validation;
 
@@ -40,9 +42,44 @@ namespace Reni.FeatureTest.Validation
         protected override void Verify(IEnumerable<IssueBase> issues)
         {
             var issueArray = issues.ToArray();
-            Tracer.Assert(issueArray.Length == 2);
-            Tracer.Assert(issueArray[0].IssueId == IssueId.BeginOfComment);
-            Tracer.Assert(issueArray[1] is ConsequentialError);
+            var i = 0;
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(1, 3, IssueId.BeginOfComment, "#( asdf )#"));
+            Tracer.Assert(issueArray.Length == i);
+        }
+    }
+
+    [TestFixture]
+    [Target(@"
+' hallo
+world'
+")]
+    [Output("")]
+    public sealed class SyntaxErrorString : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+        protected override void Verify(IEnumerable<IssueBase> issues)
+        {
+            var issueArray = issues.ToArray();
+            var i = 0;
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(2, 1, IssueId.EOLInString, "' hallo\r"));
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(3, 6, IssueId.EOLInString, "'\r"));
+            Tracer.Assert(issueArray.Length == i);
+        }
+    }
+
+    static class SyntaxErrorExpansion
+    {
+        const string Pattern = ".*\\.reni\\({0},{1}\\): error {2}: (.*)";
+
+        internal static bool IsLogdumpLike(this IssueBase target, int line, int column, IssueId issueId, string text)
+        {
+            if(target.IssueId != issueId)
+                return false;
+
+            return new Regex(Pattern.ReplaceArgs(line, column, issueId)).Match(target.LogDump).Groups[1]
+                       .Value
+                   == text;
         }
     }
 }

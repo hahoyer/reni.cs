@@ -49,7 +49,6 @@ namespace ReniTest
                 ExecTest();
 #pragma warning restore 162
 
-
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
             Assembly.GetExecutingAssembly().RunTests();
