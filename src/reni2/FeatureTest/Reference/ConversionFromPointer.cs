@@ -20,26 +20,28 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.Array;
+using Reni.FeatureTest.Text;
+using Reni.FeatureTest.TypeType;
 
-namespace Reni.FeatureTest.BlogExamples
+namespace Reni.FeatureTest.Reference
 {
     [TestFixture]
-    [TargetSet("\"Hello world\" dump_print", "Hello world")]
-    [TargetSet(@"Viersich: 4;
-EinsDazu: /\ arg + 1 ;
-Konstrukt: 
-/\(
-    Simpel: arg; 
-    Pelsim: EinsDazu(arg); 
-    Fun: /\ Simpel+ EinsDazu(arg)
-);
-lorum: Konstrukt(23);
-ipsum: Konstrukt(8);
-ipsum Pelsim := 15;
-(Viersich, ipsum Simpel, ipsum Pelsim, ipsum Fun(7), lorum Simpel, lorum Fun(18)) dump_print"
-        , "(4, 8, 15, 16, 23, 42)")]
-    public sealed class Post120617 : CompilerTest
+    [TypeOperator]
+    [Hallo]
+    [ElementAccessVariable]
+    [Target(@"
+x: 'Hallo World';
+y: (x(0) type * 1000) reference (x);
+y type dump_print
+")]
+    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
+    public sealed class ConversionFromPointer : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }

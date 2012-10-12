@@ -70,7 +70,7 @@ system: /!\
 Text: /\
 { data: (system TextItemType * system MaxNumber32) reference arg
 ; _length: system MaxNumber32 type instance (arg type / system TextItemType)
-; AfterCopy: data:= system NewMemory /\
+; AfterCopy: (data:= system NewMemory) /\
     ( elementType: system TextItemType
     , length: _length
     , initializer: /\ data(arg)

@@ -34,3 +34,7 @@ namespace Reni.FeatureTest.Array
     }
 
 }
+
+namespace Reni.FeatureTest.Reference
+{
+}

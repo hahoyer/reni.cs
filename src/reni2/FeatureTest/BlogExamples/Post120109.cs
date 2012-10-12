@@ -20,26 +20,19 @@
 
 #endregion
 
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 
 namespace Reni.FeatureTest.BlogExamples
 {
     [TestFixture]
-    [TargetSet("\"Hello world\" dump_print", "Hello world")]
-    [TargetSet(@"Viersich: 4;
-EinsDazu: /\ arg + 1 ;
-Konstrukt: 
-/\(
-    Simpel: arg; 
-    Pelsim: EinsDazu(arg); 
-    Fun: /\ Simpel+ EinsDazu(arg)
-);
-lorum: Konstrukt(23);
-ipsum: Konstrukt(8);
-ipsum Pelsim := 15;
-(Viersich, ipsum Simpel, ipsum Pelsim, ipsum Fun(7), lorum Simpel, lorum Fun(18)) dump_print"
-        , "(4, 8, 15, 16, 23, 42)")]
-    public sealed class Post120617 : CompilerTest
+    [TargetSet("\"Hello world\"#(* Das ist ein Kommentar *)#dump_print", "Hello world")]
+    [TargetSet("\"Hello world\"#(ignorieren Das ist ein Kommentar\n ignorieren)#dump_print", "Hello world")]
+    [TargetSet("\"Hello world\"# Das ist der auszugebende String\ndump_print # ... und damit wird er ausgegeben", "Hello world")]
+    public sealed class Post120109 : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
