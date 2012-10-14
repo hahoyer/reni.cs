@@ -53,6 +53,9 @@ namespace Reni.Type
         internal abstract Result GetterResult(Category category);
         [DisableDump]
         internal override Root RootContext { get { return ValueType.RootContext; } }
+        [DisableDump]
+        sealed internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
+
         internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
         {
             searchVisitor.Search(this, ()=>ValueType);

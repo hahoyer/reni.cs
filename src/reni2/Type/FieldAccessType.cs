@@ -52,8 +52,6 @@ namespace Reni.Type
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
         [DisableDump]
         IContextReference ObjectReference { get { return this; } }
-        [DisableDump]
-        internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
 
         protected override string GetNodeDump() { return base.GetNodeDump() + "{" + _structure.NodeDump + "@" + _position + "}"; }
 
