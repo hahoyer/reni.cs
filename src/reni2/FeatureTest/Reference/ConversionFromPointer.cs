@@ -38,9 +38,28 @@ namespace Reni.FeatureTest.Reference
     [Target(@"
 x: 'Hallo World';
 y: (x(0) type * 1000) reference (x);
-y type dump_print
+y(0) dump_print;
 ")]
-    [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
+    [Output("Hallo W")]
+    public sealed class ConversionFromPointerSimple : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+    [TestFixture]
+    [ConversionFromPointerSimple]
+    [Target(@"
+x: 'Hallo World';
+y: (x(0) type * 1000) reference (x);
+y(0) dump_print;
+y(1) dump_print;
+y(2) dump_print;
+y(3) dump_print;
+y(4) dump_print;
+y(5) dump_print;
+y(6) dump_print;
+")]
+    [Output("Hallo W")]
     public sealed class ConversionFromPointer : CompilerTest
     {
         [Test]
