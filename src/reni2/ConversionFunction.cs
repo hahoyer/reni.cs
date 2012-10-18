@@ -39,7 +39,12 @@ namespace Reni
             _proxyType = proxyType;
             StopByObjectId(-1);
         }
-        Result IConversionFunction.Result(Category category) { return _proxyType.Converter.Result(category); }
+        Result IConversionFunction.Result(Category category)
+        {
+            return _proxyType
+                .Converter
+                .Result(category);
+        }
         protected override string GetNodeDump()
         {
             return base.GetNodeDump()

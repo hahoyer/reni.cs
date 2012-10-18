@@ -28,40 +28,26 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Feature;
 using Reni.ReniParser;
 using Reni.Sequence;
 
 namespace Reni.Type
 {
-    /// <summary>
-    ///     Fixed sized array of a type
-    /// </summary>
-    [Serializable]
     sealed class ArrayType
-        : TypeBase
-          , ISearchPath<ISuffixFeature, SequenceType>, IFeature, IFunctionFeature
+        : RepeaterType
+          , ISearchPath<ISuffixFeature, SequenceType>
     {
-        readonly TypeBase _elementType;
-        readonly int _count;
         [Node]
         readonly SimpleCache<SequenceType> _sequenceCache;
         [Node]
         readonly SimpleCache<TextItemsType> _textItemsCache;
-        [Node]
-        readonly SimpleCache<ArrayAccessType> _arrayAccessTypeCache;
 
         public ArrayType(TypeBase elementType, int count)
+            : base(elementType, count)
         {
-            _elementType = elementType;
-            _count = count;
-            Tracer.Assert(count > 0);
-            Tracer.Assert(elementType.ReferenceType == null);
-            Tracer.Assert(!elementType.IsDataLess);
             _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
             _textItemsCache = new SimpleCache<TextItemsType>(() => new TextItemsType(this));
-            _arrayAccessTypeCache = new SimpleCache<ArrayAccessType>(() => new ArrayAccessType(this));
         }
 
         [Node]
@@ -70,26 +56,14 @@ namespace Reni.Type
         [Node]
         [DisableDump]
         internal TextItemsType UniqueTextItemsType { get { return _textItemsCache.Value; } }
-        [Node]
-        [DisableDump]
-        internal int Count { get { return _count; } }
-        [Node]
-        [DisableDump]
-        internal TypeBase ElementType { get { return _elementType; } }
-        [DisableDump]
-        internal Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
-        [DisableDump]
-        TypeBase IndexType { get { return RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
         [DisableDump]
         protected override ReferenceType SmartReference { get { return ElementType.UniqueReference(Count); } }
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
-        [DisableDump]
-        internal override Root RootContext { get { return _elementType.RootContext; } }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
-        protected override Size GetSize() { return ElementType.Size * _count; }
+        protected override Size GetSize() { return ElementType.Size * Count; }
         internal override Result Destructor(Category category) { return ElementType.ArrayDestructor(category, Count); }
         internal override Result Copier(Category category) { return ElementType.ArrayCopier(category, Count); }
 
@@ -230,29 +204,5 @@ namespace Reni.Type
                 .UniqueReference(count)
                 .Result(category, UniquePointer.ArgResult);
         }
-
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return this; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
-
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
-        {
-            var objectResult = UniquePointer
-                .Result(category, ObjectReference);
-
-            var argsResult = argsType
-                .Conversion(category.Typed, IndexType)
-                .DereferencedAlignedResult();
-
-            var result = _arrayAccessTypeCache
-                .Value
-                .Result(category, objectResult + argsResult);
-
-            return result;
-        }
-
-        bool IFunctionFeature.IsImplicit { get { return false; } }
-        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
-        IContextReference ObjectReference { get { return UniquePointer; } }
     }
 }

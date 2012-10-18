@@ -74,7 +74,7 @@ namespace Reni.Type
 
         Result ConverterResult(Category category)
         {
-            var trace = ObjectId == -12 && category.HasCode;
+            var trace = ObjectId == -8 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {

@@ -58,7 +58,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
         [DisableDump]
-        internal override IReferenceType UniqueReferenceType { get { return Parent.UniqueReferenceType; } }
+        internal override IReferenceType UniquePointerType { get { return Parent.UniquePointerType; } }
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
         [DisableDump]

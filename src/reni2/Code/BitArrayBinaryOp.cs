@@ -47,7 +47,7 @@ namespace Reni.Code
         {
             OpToken = opToken;
             _size = size;
-            StopByObjectId(-381);
+            StopByObjectId(-3);
         }
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }

@@ -39,14 +39,14 @@ namespace Reni.Context
 
         protected abstract Func<Category, Result> ConverterResult { get; }
 
-        void AssertValid(ContextBase context, bool hasNoObject, TypeBase objectType, CompileSyntax right)
+        void AssertValid(ContextBase context, bool mustNotHaveCodeArgs, TypeBase objectType, CompileSyntax right)
         {
             Tracer.Assert(Feature != null);
 
             if(Feature.MetaFunction != null)
                 return;
 
-            if(hasNoObject)
+            if(mustNotHaveCodeArgs)
                 Tracer.Assert(!Feature.HasCodeArgs(context, objectType, ConverterResult, right));
 
             if(right != null)
@@ -68,17 +68,23 @@ namespace Reni.Context
 
         Result ApplyResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
-            var trace = context.ObjectId == -4 && category.HasArgs && left == null && right != null && right.ObjectId == 31;
+            var trace = context.ObjectId == -4 && category.HasArgs && right == null && left != null && left.ObjectId == 83;
             StartMethodDump(trace, category, context, left, right);
             try
             {
                 BreakExecution();
 
-                var resultFromObject = context.Result(category, Feature, Type, right)
-                    .ReplaceArg(ConverterResult);
-                Tracer.Assert(category == resultFromObject.CompleteCategory);
+                var resultFromObject = context.Result(category, Feature, Type, right);
 
-                var result = resultFromObject.ReplaceArg(c => context.ObjectResult(c, left));
+                Dump("resultFromObject", resultFromObject);
+                BreakExecution();
+                
+                var convertedResult = resultFromObject.ReplaceArg(ConverterResult);
+                Tracer.Assert(category == convertedResult.CompleteCategory);
+
+                Dump("convertedResult", convertedResult); 
+
+                var result = convertedResult.ReplaceArg(c => context.ObjectResult(c, left));
                 return ReturnMethodDump(result);
             }
             finally
@@ -98,7 +104,7 @@ namespace Reni.Context
         /// <returns> </returns>
         internal Result Result(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
-            AssertValid(context, left == null, Type, right);
+            AssertValid(context, category.HasArgs && left == null, Type, right);
 
             var metaFeature = Feature.MetaFunction;
             if(metaFeature != null)

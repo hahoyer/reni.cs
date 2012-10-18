@@ -52,7 +52,7 @@ namespace Reni
             : base(_nextObjectId++)
         {
             _pendingCategory = Category.None;
-            StopByObjectId(-804);
+            StopByObjectId(-88);
         }
 
         internal Result(Category category, Func<bool> getDataLess = null, Func<Size> getSize = null, Func<TypeBase> getType = null, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null, Root rootContext = null)

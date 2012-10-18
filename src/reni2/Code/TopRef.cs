@@ -32,7 +32,7 @@ namespace Reni.Code
     sealed class TopRef : Ref
     {
         public TopRef(Size offset)
-            : base(offset) { StopByObjectId(-64); }
+            : base(offset) { StopByObjectId(-55); }
 
         public TopRef()
             : this(Size.Zero) { }

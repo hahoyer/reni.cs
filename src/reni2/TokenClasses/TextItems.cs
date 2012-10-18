@@ -25,13 +25,14 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Feature;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
     sealed class TextItems
         : Defineable
-          , ISearchPath<ISuffixFeature, Type.ArrayType>
+          , ISearchPath<ISuffixFeature, ArrayType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.ArrayType>.Convert(Type.ArrayType type) { return Extension.Feature(type.TextItemsResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.TextItemsResult); }
     }
 }

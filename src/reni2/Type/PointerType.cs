@@ -51,6 +51,7 @@ namespace Reni.Type
 
         IConverter IReferenceType.Converter { get { return this; } }
         bool IReferenceType.IsWeak { get { return true; } }
+        [DisableDump]
         internal override Root RootContext { get { return _valueType.RootContext; } }
         IConverter IProxyType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }

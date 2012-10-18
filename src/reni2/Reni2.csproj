@@ -306,7 +306,7 @@
     <Compile Include="TokenClasses\NewValueToken.cs" />
     <Compile Include="TypeRootSearchVisitor.cs" />
     <Compile Include="TypeSearchResult.cs" />
-    <Compile Include="Type\ArrayAccessType.cs" />
+    <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\AssignmentFeature.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
@@ -335,6 +335,7 @@
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\PointerType.cs" />
     <Compile Include="Type\ReferenceType.cs" />
+    <Compile Include="Type\RepeaterType.cs" />
     <Compile Include="Type\SearchResult.cs" />
     <Compile Include="Type\SetterTargetType.cs" />
     <Compile Include="Type\TagChild.cs" />

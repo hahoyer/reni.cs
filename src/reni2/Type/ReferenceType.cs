@@ -25,34 +25,28 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 
 namespace Reni.Type
 {
     sealed class ReferenceType
-        : TypeBase
+        : RepeaterType
           , IProxyType
           , IConverter
           , IReferenceType
           , ISearchPath<ISuffixFeature, ArrayType>
     {
-        readonly TypeBase _elementType;
-        readonly int _count;
-
         internal ReferenceType(TypeBase elementType, int count)
+            : base(elementType, count)
         {
-            _elementType = elementType;
-            _count = count;
-            AssertValid();
+            StopByObjectId(-22);
         }
 
-        [EnableDump]
-        TypeBase ElementType { get { return _elementType; } }
-        [EnableDump]
-        int Count { get { return _count; } }
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
+        internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")reference(" + Count + ")"; } }
 
         internal Result EnableRawConversion(Category category)
         {
@@ -60,25 +54,24 @@ namespace Reni.Type
             return null;
         }
 
-        void AssertValid() { Tracer.Assert(!_elementType.IsDataLess); }
-        internal override Root RootContext { get { return _elementType.RootContext; } }
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
         ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type)
         {
             if(type.ElementType != ElementType)
                 return null;
-            return Extension.Feature(type.ConvertToReference(_count));
+            return Extension.Feature(type.ConvertToReference(Count));
         }
         bool IReferenceType.IsWeak { get { return false; } }
         IConverter IReferenceType.Converter { get { return this; } }
         IConverter IProxyType.Converter { get { return this; } }
-        TypeBase IConverter.TargetType { get { return _elementType; } }
+        TypeBase IConverter.TargetType { get { return ElementType; } }
+
         Result IConverter.Result(Category category)
         {
             NotImplementedMethod(category);
             return null;
-            ;
         }
+
     }
 }

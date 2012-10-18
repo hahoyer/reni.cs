@@ -167,9 +167,9 @@ namespace Reni.Type
         internal EnableCut UniqueEnableCutType { get { return _cache.EnableCut.Value; } }
 
         [DisableDump]
-        internal TypeBase UniquePointer { get { return UniqueReferenceType.Type(); } }
+        internal TypeBase UniquePointer { get { return UniquePointerType.Type(); } }
         [DisableDump]
-        internal virtual IReferenceType UniqueReferenceType { get { return _cache.Pointer.Value; } }
+        internal virtual IReferenceType UniquePointerType { get { return _cache.Pointer.Value; } }
 
         [DisableDump]
         protected virtual ReferenceType SmartReference { get { return _cache.Reference[1]; } }
@@ -311,7 +311,7 @@ namespace Reni.Type
         internal bool IsWeakReference { get { return ReferenceType != null && ReferenceType.IsWeak; } }
 
         [DisableDump]
-        internal IFeature Feature { get { return this as IFeature; } }
+        virtual internal IFeature Feature { get { return this as IFeature; } }
 
         [DisableDump]
         ISearchTarget ConversionProvider { get { return this; } }
@@ -356,7 +356,7 @@ namespace Reni.Type
         {
             var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
             var former = SearchVisitor.Trace;
-            SearchVisitor.Trace = false;
+            SearchVisitor.Trace = target is ReferenceType && target.GetObjectId() == 55;
             Search(visitor, syntax);
             SearchVisitor.Trace = former;
             if(Debugger.IsAttached && !visitor.IsSuccessFull)

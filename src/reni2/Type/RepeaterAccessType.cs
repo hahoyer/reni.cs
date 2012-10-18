@@ -30,17 +30,17 @@ using Reni.Context;
 
 namespace Reni.Type
 {
-    sealed class ArrayAccessType : SetterTargetType
+    sealed class RepeaterAccessType : SetterTargetType
     {
-        readonly ArrayType _arrayType;
+        readonly RepeaterType _repeaterType;
 
-        internal ArrayAccessType(ArrayType arrayType) { _arrayType = arrayType; }
+        internal RepeaterAccessType(RepeaterType repeaterType) { _repeaterType = repeaterType; }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
-        internal override TypeBase ValueType { get { return _arrayType.ElementType; } }
+        internal override TypeBase ValueType { get { return _repeaterType.ElementType; } }
 
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + _arrayType.IndexSize; }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + _repeaterType.IndexSize; }
 
         internal override Result DestinationResult(Category category) { return Result(category, this); }
 
@@ -48,23 +48,31 @@ namespace Reni.Type
         {
             return new Result
                 (category
-                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.ArrayAssignment(ValueType.Size, _arrayType.IndexSize)
+                 , getCode: SetterCode
                  , getArgs: CodeArgs.Arg
                 );
         }
-
         internal override Result GetterResult(Category category)
         {
-            var pointer = ValueType.UniquePointer;
-            var codeAndRefs =
-                new Result
-                    (category
-                     , getType: () => pointer
-                     , getCode: () => ArrayAccess
-                    );
-
-            return pointer.Result(category, codeAndRefs);
+            return ValueType
+                .UniquePointer
+                .Result(category, () => GetterCode);
         }
-        CodeBase ArrayAccess { get { return ArgCode.ArrayAccess(ValueType.Size, _arrayType.IndexSize); } }
+
+        CodeBase SetterCode()
+        {
+            return Pair(ValueType.SmartPointer)
+                .ArgCode
+                .ArrayAssignment(ValueType.Size, _repeaterType.IndexSize);
+        }
+
+        CodeBase GetterCode
+        {
+            get
+            {
+                return ArgCode
+                    .ArrayAccess(ValueType.Size, _repeaterType.IndexSize);
+            }
+        }
     }
 }

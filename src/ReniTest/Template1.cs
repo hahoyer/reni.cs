@@ -24,37 +24,118 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Runtime;
 
 namespace ReniTest
 {
     public static class Reni
     {
         // 
-//f: arg/\;
-//repeat: /\arg while() then(arg body(), repeat(arg));
-//
-//count: 10,
-//index: count type instance(0),
-//repeat
-//(
-//    while: /\ index < count, 
-//    body: /\
-//    (
-//        index dump_print, 
-//        ' ' dump_print, 
-//        index := (index + 1)enable_cut
-//    )
-//)
-// 
+        //x: 'Hallo World';
+        //y: (x(0) type * 1000) reference (x);
+        //y(0) dump_print;
+        //y(1) dump_print;
+        //y(2) dump_print;
+        //y(3) dump_print;
+        //y(4) dump_print;
+        //y(5) dump_print;
+        //y(6) dump_print;
+        // 
         public static void MainFunction()
         {
-            return;
+            var data = Data.Create(27);
+            data.Push(72, 97, 108, 108, 111, 32, 87, 111, 114, 108, 100);
+            data.Push(0);
+            var h_4_0 = data.Pull(1);
+            data.Push(h_4_0.Get(1, 0).BitCast(1).BitCast(8));
+            var h_4_1 = data.Pull(1);
+            data.Push(h_4_1.Get(1, 0).BitCast(1).BitCast(16));
+            var h_4_2 = data.Pull(2);
+            data.Push(data.Address(0));
+            data.Push(h_4_2.Get(2, 0).BitCast(16).BitCast(32));
+            data.Push(1, 0, 0, 0);
+            data.Star(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Push(data.Pull(4).Dereference(1));
+            data.Pull(1).PrintText(1);
+            data.Push(1);
+            var h_6_0 = data.Pull(1);
+            data.Push(h_6_0.Get(1, 0).BitCast(2).BitCast(8));
+            var h_6_1 = data.Pull(1);
+            data.Push(h_6_1.Get(1, 0).BitCast(2).BitCast(16));
+            var h_6_2 = data.Pull(2);
+            data.Push(data.Address(0));
+            data.Push(h_6_2.Get(2, 0).BitCast(16).BitCast(32));
+            data.Push(1, 0, 0, 0);
+            data.Star(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Push(data.Pull(4).Dereference(1));
+            data.Pull(1).PrintText(1);
+            data.Push(2);
+            var h_8_0 = data.Pull(1);
+            data.Push(h_8_0.Get(1, 0).BitCast(3).BitCast(8));
+            var h_8_1 = data.Pull(1);
+            data.Push(h_8_1.Get(1, 0).BitCast(3).BitCast(16));
+            var h_8_2 = data.Pull(2);
+            data.Push(data.Address(0));
+            data.Push(h_8_2.Get(2, 0).BitCast(16).BitCast(32));
+            data.Push(1, 0, 0, 0);
+            data.Star(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Push(data.Pull(4).Dereference(1));
+            data.Pull(1).PrintText(1);
+            data.Push(3);
+            var h_10_0 = data.Pull(1);
+            data.Push(h_10_0.Get(1, 0).BitCast(3).BitCast(8));
+            var h_10_1 = data.Pull(1);
+            data.Push(h_10_1.Get(1, 0).BitCast(3).BitCast(16));
+            var h_10_2 = data.Pull(2);
+            data.Push(data.Address(0));
+            data.Push(h_10_2.Get(2, 0).BitCast(16).BitCast(32));
+            data.Push(1, 0, 0, 0);
+            data.Star(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Push(data.Pull(4).Dereference(1));
+            data.Pull(1).PrintText(1);
+            data.Push(4);
+            var h_12_0 = data.Pull(1);
+            data.Push(h_12_0.Get(1, 0).BitCast(4).BitCast(8));
+            var h_12_1 = data.Pull(1);
+            data.Push(h_12_1.Get(1, 0).BitCast(4).BitCast(16));
+            var h_12_2 = data.Pull(2);
+            data.Push(data.Address(0));
+            data.Push(h_12_2.Get(2, 0).BitCast(16).BitCast(32));
+            data.Push(1, 0, 0, 0);
+            data.Star(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Push(data.Pull(4).Dereference(1));
+            data.Pull(1).PrintText(1);
+            data.Push(5);
+            var h_14_0 = data.Pull(1);
+            data.Push(h_14_0.Get(1, 0).BitCast(4).BitCast(8));
+            var h_14_1 = data.Pull(1);
+            data.Push(h_14_1.Get(1, 0).BitCast(4).BitCast(16));
+            var h_14_2 = data.Pull(2);
+            data.Push(data.Address(0));
+            data.Push(h_14_2.Get(2, 0).BitCast(16).BitCast(32));
+            data.Push(1, 0, 0, 0);
+            data.Star(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Push(data.Pull(4).Dereference(1));
+            data.Pull(1).PrintText(1);
+            data.Push(6);
+            var h_16_0 = data.Pull(1);
+            data.Push(h_16_0.Get(1, 0).BitCast(4).BitCast(8));
+            var h_16_1 = data.Pull(1);
+            data.Push(h_16_1.Get(1, 0).BitCast(4).BitCast(16));
+            var h_16_2 = data.Pull(2);
+            data.Push(data.Address(0));
+            data.Push(h_16_2.Get(2, 0).BitCast(16).BitCast(32));
+            data.Push(1, 0, 0, 0);
+            data.Star(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
+            data.Push(data.Pull(4).Dereference(1));
+            data.Pull(1).PrintText(1);
         }
-
-        // ((arg.38)while(().46).47)then(container.0.0).82 
-
-        // (index.144)<(count.145).146 
-
-        // container.1.1 
     }
 }
