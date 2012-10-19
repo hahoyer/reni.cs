@@ -41,7 +41,7 @@ namespace Reni.FeatureTest
                 @"
 systemdata:
 { Memory: (0 type * ('100' to_number_of_base 256)) instance()
-; FreePointer: reference Memory
+; FreePointer: Memory reference
 };
 
 repeat: /\arg while() then(arg body(), repeat(arg));
@@ -55,7 +55,7 @@ system: /!\
 ; TextItemType: /!\ text_item(MaxNumber8) type 
 
 ; NewMemory: /\ 
-    { result: (arg elementType * MaxNumber32) reference (systemdata FreePointer enable_raw_conversion)
+    { result: (arg elementType * MaxNumber32) type (systemdata FreePointer enable_raw_conversion) 
     , initializer: arg initializer
     , length: arg length
     , position: 0

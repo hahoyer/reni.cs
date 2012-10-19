@@ -26,9 +26,7 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.ReniParser;
 using Reni.Syntax;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
@@ -38,16 +36,6 @@ namespace Reni.TokenClasses
         {
             var leftResult = left.Result(context, category.Typed);
             return leftResult.Type.UniqueFunctionInstanceType.Result(category, leftResult);
-        }
-        protected override IssueId RightMustBeNullIssue()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-        protected override IssueId LeftMustNotBeNullError()
-        {
-            NotImplementedMethod();
-            return null;
         }
     }
 }

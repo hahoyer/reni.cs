@@ -37,10 +37,11 @@ namespace Reni.FeatureTest.Reference
     [ElementAccessVariable]
     [Target(@"
 x: 'Hallo World';
-y: (x(0) type * 1000) reference (x);
-y(0) dump_print;
+y: x(0) reference;
+y dump_print;
+(y+1) dump_print;
 ")]
-    [Output("Hallo W")]
+    [Output("Ha")]
     public sealed class ConversionFromPointerSimple : CompilerTest
     {
         [Test]

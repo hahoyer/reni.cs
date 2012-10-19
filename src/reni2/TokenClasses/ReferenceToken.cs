@@ -26,52 +26,18 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.Parser;
-using Reni.ReniParser;
 using Reni.Syntax;
-using Reni.Type;
 using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class ReferenceToken : Special, IInfix, IPrefix
+    sealed class ReferenceToken : Suffix
     {
-        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        protected override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
-            if(left == null)
-                return new PrefixSyntax
-                    (token
-                     , this
-                     , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
-                    );
-            return new InfixSyntax
-                (token
-                 , left.ToCompiledSyntax()
-                 , this
-                 , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
-                );
+            var rightType = left.Type(context).TypeForTypeOperator;
+            return rightType.CreateReference(context, category, left);
         }
 
-        IssueId RightMustNotBeNullError()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-
-        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-        {
-            var leftType = left.Type(context) as TypeType;
-            if(leftType != null)
-                return leftType.Value.CreateReference(context, category, right);
-
-            NotImplementedMethod(context, category, left, right, "leftType", left.Type(context));
-            return null;
-        }
-
-        Result IPrefix.Result(ContextBase context, Category category, TokenData token, CompileSyntax right)
-        {
-            var rightType = right.Type(context).TypeForTypeOperator;
-            return rightType.CreateReference(context, category, right);
-        }
     }
 }

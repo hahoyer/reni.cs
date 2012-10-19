@@ -109,8 +109,9 @@ namespace Reni.TokenClasses
                 return right.MustBeNullError(RightMustBeNullIssue);
             return new SuffixSyntax(token, left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError), this);
         }
-        protected abstract IssueId RightMustBeNullIssue();
-        protected abstract IssueId LeftMustNotBeNullError();
+
+        static IssueId RightMustBeNullIssue() { return IssueId.UnexpectedRightOperand; }
+        static IssueId LeftMustNotBeNullError() { return IssueId.MissingLeftOperand; }
     }
 
     [Serializable]

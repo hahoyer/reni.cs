@@ -28,7 +28,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Syntax;
 using Reni.TokenClasses;
-using Reni.Validation;
 
 namespace Reni.Feature
 {
@@ -36,22 +35,14 @@ namespace Reni.Feature
     {
         protected override Result Result(ContextBase context, Category category, CompileSyntax left)
         {
-            var result = context.RootContext.VoidResult(category).Clone();
             if(category.HasType)
-                result.Type = left
+                return left
                     .Type(context).TypeForTypeOperator
-                    .UniqueTypeType;
-            return result;
-        }
-        protected override IssueId RightMustBeNullIssue()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-        protected override IssueId LeftMustNotBeNullError()
-        {
-            NotImplementedMethod();
-            return null;
+                    .UniqueTypeType
+                    .Result(category);
+            return context
+                .RootContext
+                .VoidResult(category);
         }
     }
 }
