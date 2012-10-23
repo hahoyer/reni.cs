@@ -55,7 +55,7 @@ system: /!\
 ; TextItemType: /!\ text_item(MaxNumber8) type 
 
 ; NewMemory: /\ 
-    { result: (arg elementType * MaxNumber32) type (systemdata FreePointer enable_raw_conversion) 
+    { result: (arg elementType * MaxNumber32) type (systemdata FreePointer enable_raw_conversion)
     , initializer: arg initializer
     , length: arg length
     , position: 0

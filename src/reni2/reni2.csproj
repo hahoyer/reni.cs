@@ -35,12 +35,14 @@
     <Compile Include="Code\IVisitor.cs" />
     <Compile Include="Code\None.cs" />
     <Compile Include="Code\ArrayAccess.cs" />
+    <Compile Include="Context\FeatureDescriptor.cs" />
     <Compile Include="Context\UndefinedSymbolType.cs" />
     <Compile Include="FeatureTest\Array\ArrayFromPieces.cs" />
     <Compile Include="FeatureTest\Array\CombineArraysFromPieces.cs" />
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
     <Compile Include="FeatureTest\Array\ElementAccess.cs" />
     <Compile Include="FeatureTest\Array\FromTypeAndFunction.cs" />
+    <Compile Include="FeatureTest\BlogExamples\Post120109.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\Function\ConstantFunction.cs" />
     <Compile Include="FeatureTest\Function\Function.cs" />
@@ -65,6 +67,7 @@
     <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions1.cs" />
     <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
+    <Compile Include="FeatureTest\Reference\ConversionFromPointer.cs" />
     <Compile Include="FeatureTest\Structure\Access.cs" />
     <Compile Include="FeatureTest\Structure\AccessAndAdd.cs" />
     <Compile Include="FeatureTest\Structure\AccessAndAddComplex.cs" />
@@ -86,6 +89,7 @@
     <Compile Include="FeatureTest\TypeType\ApplyTypeOperatorWithCut.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperator.cs" />
     <Compile Include="FeatureTest\TypeType\TypeOperatorWithVariable.cs" />
+    <Compile Include="FeatureTest\Validation\SyntaxError.cs" />
     <Compile Include="FeatureTest\Validation\UndefinedContextSymbol.cs" />
     <Compile Include="Feature\Extension.cs" />
     <Compile Include="Feature\FeatureResult.cs" />
@@ -93,6 +97,7 @@
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="IProxyType.cs" />
+    <Compile Include="Parser\SyntaxIssue.cs" />
     <Compile Include="ReniObjectExtender.cs" />
     <Compile Include="ReniParser\ParsedSyntaxExtension.cs" />
     <Compile Include="ReniParser\Probe.cs" />
@@ -158,7 +163,6 @@
     <Compile Include="Context\ContextBase.cs" />
     <Compile Include="Context\ContextOperator.cs" />
     <Compile Include="Context\FunctionList.cs" />
-    <Compile Include="Context\PendingContext.cs" />
     <Compile Include="Context\ReplacePrimitiveRecursivity.cs" />
     <Compile Include="ExpectedCompilationResult.cs" />
     <Compile Include="FeatureTest\BitArrayOp.cs" />
@@ -228,6 +232,7 @@
     <Compile Include="Sequence\Sign.cs" />
     <Compile Include="Sequence\Slash.cs" />
     <Compile Include="Sequence\Star.cs" />
+    <Compile Include="Singleton.cs" />
     <Compile Include="StringStream.cs" />
     <Compile Include="Struct\ContainerContextObject.cs" />
     <Compile Include="Struct\Context.cs" />
@@ -301,7 +306,7 @@
     <Compile Include="TokenClasses\NewValueToken.cs" />
     <Compile Include="TypeRootSearchVisitor.cs" />
     <Compile Include="TypeSearchResult.cs" />
-    <Compile Include="Type\ArrayAccessType.cs" />
+    <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\AssignmentFeature.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
@@ -330,6 +335,7 @@
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\PointerType.cs" />
     <Compile Include="Type\ReferenceType.cs" />
+    <Compile Include="Type\RepeaterType.cs" />
     <Compile Include="Type\SearchResult.cs" />
     <Compile Include="Type\SetterTargetType.cs" />
     <Compile Include="Type\TagChild.cs" />
