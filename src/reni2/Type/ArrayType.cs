@@ -196,9 +196,9 @@ namespace Reni.Type
             return Extension.Feature(type.ReferenceConversionResult);
         }
 
-        internal Func<Category, Result> ConvertToReference(int count) { return category => ConvertToReferenceX(category, count); }
+        internal Func<Category, Result> ConvertToReference(int count) { return category => ConvertToReference(category, count); }
 
-        Result ConvertToReferenceX(Category category, int count)
+        Result ConvertToReference(Category category, int count)
         {
             return ElementType
                 .UniqueReference(count)
