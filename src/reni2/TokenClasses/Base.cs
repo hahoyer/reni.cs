@@ -35,7 +35,11 @@ namespace Reni.TokenClasses
 {
     [Serializable]
     abstract class Special : TokenClass
-    {}
+    {
+        protected static IssueId LeftMustNotBeNullError() { return IssueId.MissingLeftOperand; }
+        protected static IssueId RightMustNotBeNullError() { return IssueId.MissingRightOperand; }
+        protected static IssueId RightMustBeNullIssue() { return IssueId.UnexpectedRightOperand; }
+    }
 
     abstract class Terminal : Special, ITerminal
     {
@@ -93,7 +97,6 @@ namespace Reni.TokenClasses
             return new PrefixSyntax(token, this, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
         }
         protected abstract CompileSyntaxError LeftMustBeNull(ParsedSyntax left);
-        protected abstract IssueId RightMustNotBeNullError();
     }
 
     [Serializable]
@@ -109,9 +112,6 @@ namespace Reni.TokenClasses
                 return right.MustBeNullError(RightMustBeNullIssue);
             return new SuffixSyntax(token, left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError), this);
         }
-
-        static IssueId RightMustBeNullIssue() { return IssueId.UnexpectedRightOperand; }
-        static IssueId LeftMustNotBeNullError() { return IssueId.MissingLeftOperand; }
     }
 
     [Serializable]
@@ -130,7 +130,5 @@ namespace Reni.TokenClasses
                  , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
         }
-        protected abstract IssueId LeftMustNotBeNullError();
-        protected abstract IssueId RightMustNotBeNullError();
     }
 }

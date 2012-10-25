@@ -50,6 +50,6 @@ namespace Reni.TokenClasses
                  , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
         }
-        static IssueId RightMustNotBeNullError() { return IssueId.MissingFunctionGetter; }
+        new static IssueId RightMustNotBeNullError() { return IssueId.MissingFunctionGetter; }
     }
 }

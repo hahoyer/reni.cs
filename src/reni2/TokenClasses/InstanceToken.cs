@@ -48,15 +48,5 @@ namespace Reni.TokenClasses
             return null;
         }
 
-        protected override IssueId LeftMustNotBeNullError()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-        protected override IssueId RightMustNotBeNullError()
-        {
-            NotImplementedMethod();
-            return null;
-        }
     }
 }

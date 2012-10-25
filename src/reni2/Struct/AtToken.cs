@@ -39,15 +39,5 @@ namespace Reni.Struct
             return left
                 .AtTokenResult(callContext, category, right);
         }
-        protected override IssueId LeftMustNotBeNullError()
-        {
-            NotImplementedMethod();
-            return null;
-        }
-        protected override IssueId RightMustNotBeNullError()
-        {
-            NotImplementedMethod();
-            return null;
-        }
     }
 }
