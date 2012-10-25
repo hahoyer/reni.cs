@@ -44,11 +44,11 @@ namespace Reni.Type
         [DisableDump]
         internal override IFeature Feature { get { return Parent.Feature; } }
 
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => Parent);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }

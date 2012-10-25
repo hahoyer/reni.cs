@@ -88,11 +88,11 @@ namespace Reni.Sequence
             return null;
         }
 
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => Parent);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
 
         internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)

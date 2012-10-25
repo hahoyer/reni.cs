@@ -354,25 +354,25 @@ namespace Reni.Type
         internal SearchResult Search<TFeature>(ISearchTarget target, ExpressionSyntax syntax)
             where TFeature : class, IFeature
         {
-            var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
+            var visitor = new TypeRootSearchVisitor<TFeature>(target, this,syntax);
             var former = SearchVisitor.Trace;
             SearchVisitor.Trace = target is ReferenceType && target.GetObjectId() == 55;
-            Search(visitor, syntax);
+            Search(visitor);
             SearchVisitor.Trace = former;
             if(Debugger.IsAttached && !visitor.IsSuccessFull)
                 _lastSearchVisitor = visitor;
             return visitor.SearchResult;
         }
 
-        public IEnumerable<Probe> Probes<TFeature>(ISearchTarget target)
+        public IEnumerable<Probe> Probes<TFeature>(ISearchTarget target, ExpressionSyntax syntax)
             where TFeature : class, IFeature
         {
-            var visitor = new TypeRootSearchVisitor<TFeature>(target, this);
-            Search(visitor, null);
+            var visitor = new TypeRootSearchVisitor<TFeature>(target, this, syntax);
+            Search(visitor);
             return visitor.Probes.Values;
         }
 
-        internal virtual void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax) { searchVisitor.Search(this, null); }
+        internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
 
         internal Result LocalReferenceResult(Category category)
         {
@@ -463,10 +463,9 @@ namespace Reni.Type
             }
 
             var result = searchResult.Result(category.Typed);
-            return result
-                       .Type
-                       .ObviousConversion(category, destination)
-                       .ReplaceArg(result)
+            var typeBase = result.Type;
+            var obviousConversion = typeBase.ObviousConversion(category, destination);
+            return obviousConversion.ReplaceArg(result)
                    & category;
         }
 
@@ -596,7 +595,7 @@ namespace Reni.Type
             NotImplementedMethod(category, getRightResult(Category.All));
             return null;
         }
-        internal Result CreateReference(ContextBase context, Category category, CompileSyntax target)
+        internal Result CreateReference(ContextBase context, Category category, CompileSyntax target, int toInt32)
         {
             var rawResult = SmartReference.ArgResult(category);
             if(category <= Category.Type.Replenished)

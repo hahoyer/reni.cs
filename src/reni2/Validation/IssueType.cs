@@ -44,7 +44,7 @@ namespace Reni.Validation
             _issue = issue;
             _rootContext = rootContext;
         }
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax) { searchVisitor.Search(this, syntax); }
+        internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this); }
         [DisableDump]
         internal override Root RootContext { get { return _rootContext; } }
         [DisableDump]
@@ -54,7 +54,7 @@ namespace Reni.Validation
         IssueType ConsequentialErrorType(ExpressionSyntax syntax) { return _issue.ConsequentialError(syntax).Type(RootContext); }
 
         CodeBase Code() { return _issue.Code; }
-        public ISearchPath SearchResult(ISearchTarget target, ExpressionSyntax syntax) { return new ImplicitSearchResult(this, target, syntax); }
+        internal ISearchPath SearchResult(ISearchTarget target, ExpressionSyntax syntax) { return new ImplicitSearchResult(this, target, syntax); }
 
         internal sealed class ImplicitSearchResult
             : ReniObject

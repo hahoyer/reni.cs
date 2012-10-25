@@ -36,11 +36,11 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "enable_cut"; } }
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => Parent);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
     }
 }

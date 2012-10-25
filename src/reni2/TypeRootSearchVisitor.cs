@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni
@@ -35,8 +36,8 @@ namespace Reni
         [EnableDump]
         readonly TypeBase _type;
 
-        internal TypeRootSearchVisitor(ISearchTarget target, TypeBase type)
-            : base(target) { _type = type; }
+        internal TypeRootSearchVisitor(ISearchTarget target, TypeBase type, ExpressionSyntax syntax)
+            : base(target, syntax) { _type = type; }
 
         [EnableDump]
         internal IEnumerable<string> ProbeStr { get { return Probes.Values.Select(probe => probe.LogDump); } }

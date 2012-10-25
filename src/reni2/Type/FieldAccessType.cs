@@ -80,11 +80,11 @@ namespace Reni.Type
                 .AddToReference(GetFieldOffset);
         }
 
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => ValueType);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
 
         internal override int? SmartSequenceLength(TypeBase elementType)

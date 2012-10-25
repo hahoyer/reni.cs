@@ -72,7 +72,7 @@ namespace Reni
 
                 if(Trace)
                     Tracer.FlaggedLine("child.Search(pathItemVisitor)");
-                child.Search(pathItemVisitor, null);
+                child.Search(pathItemVisitor);
                 if(IsSuccessFull)
                     return;
 
@@ -83,7 +83,7 @@ namespace Reni
                 Tracer.Assert(isc.Converter.TargetType == child);
                 if(Trace)
                     Tracer.FlaggedLine("child.Search(this)");
-                child.Search(this, null);
+                child.Search(this);
 
                 if(!IsSuccessFull)
                     return;
@@ -106,7 +106,7 @@ namespace Reni
             Search(structureType, null);
         }
 
-        internal abstract void Search(IssueType target, ExpressionSyntax syntax);
+        internal abstract void Search(IssueType target);
     }
 
     interface IConversionFunction
@@ -117,6 +117,9 @@ namespace Reni
     abstract class SearchVisitor<TFeature> : SearchVisitor
         where TFeature : class, ISearchPath
     {
+        readonly ExpressionSyntax _syntax;
+        
+        protected SearchVisitor(ExpressionSyntax syntax) { _syntax = syntax; }
 
         internal abstract TFeature InternalResult { set; }
         internal abstract ISearchTarget Target { get; }
@@ -129,15 +132,16 @@ namespace Reni
             Probes.Ensure(typeof(TFeature));
             InternalResult = Target as TFeature;
         }
-        internal override void Search(IssueType target, ExpressionSyntax syntax)
+
+        internal override void Search(IssueType target)
         {
-            var searchResult = target.SearchResult(Target, syntax);
+            var searchResult = target.SearchResult(Target, _syntax);
             var internalResult = searchResult as TFeature;
             Tracer.Assert(internalResult != null, ()=>typeof(TFeature).PrettyName());
             InternalResult = internalResult;
         }
 
-        protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target); }
+        protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target, _syntax); }
     }
 
     interface ISearchTarget 

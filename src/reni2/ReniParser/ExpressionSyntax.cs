@@ -76,7 +76,7 @@ namespace Reni.ReniParser
                                 : context
                                       .Type(Left)
                                       .UnAlignedType
-                                      .Probes<ISuffixFeature>(_tokenClass));
+                                      .Probes<ISuffixFeature>(_tokenClass, this));
             return result.ToArray();
         }
 

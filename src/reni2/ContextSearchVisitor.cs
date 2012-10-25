@@ -27,14 +27,15 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
+using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni
 {
     sealed class ContextSearchVisitor : RootSearchVisitor<IContextFeature>
     {
-        internal ContextSearchVisitor(ISearchTarget target)
-            : base(target) { }
+        internal ContextSearchVisitor(ISearchTarget target, ExpressionSyntax syntax)
+            : base(target, syntax) { }
 
         internal SearchResult SearchResult
         {
@@ -46,10 +47,7 @@ namespace Reni
             }
         }
 
-        internal void Search(ContextBase contextBase)
-        {
-            contextBase.Search(this);
-        }
+        internal void Search(ContextBase contextBase) { contextBase.Search(this); }
 
         internal void Search(Struct.Context context)
         {

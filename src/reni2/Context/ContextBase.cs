@@ -123,14 +123,14 @@ namespace Reni.Context
 
         internal SearchResult Search(ISearchTarget target)
         {
-            var visitor = new ContextSearchVisitor(target);
+            var visitor = new ContextSearchVisitor(target, null);
             visitor.Search(this);
             return visitor.SearchResult;
         }
 
         internal IEnumerable<Probe> Probes(ISearchTarget target)
         {
-            var visitor = new ContextSearchVisitor(target);
+            var visitor = new ContextSearchVisitor(target, null);
             visitor.Search(this);
             return visitor.Probes.Values;
         }

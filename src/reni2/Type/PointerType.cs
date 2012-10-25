@@ -94,11 +94,11 @@ namespace Reni.Type
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => ValueType);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
 
         protected override ArrayType ObtainArray(int count) { return ValueType.UniqueArray(count); }

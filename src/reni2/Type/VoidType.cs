@@ -36,11 +36,11 @@ namespace Reni.Type
     {
         readonly Root _rootContext;
         public VoidType(Root rootContext) { _rootContext = rootContext; }
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, null);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
         protected override ISuffixFeature Convert(TypeBase sourceType) { return sourceType.IsDataLess ? Extension.Feature(c => Result(c, sourceType.ArgResult)) : null; }
         protected override TypeBase ReversePair(TypeBase first) { return first; }

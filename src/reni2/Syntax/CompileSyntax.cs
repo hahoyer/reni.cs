@@ -33,6 +33,7 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
+using Reni.Struct;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -54,7 +55,7 @@ namespace Reni.Syntax
         [DisableDump]
         internal bool IsLambda { get { return GetIsLambda(); } }
         [DisableDump]
-        internal virtual bool? IsDataLess { get { return IsLambda ? (bool?)true : null; } }
+        internal virtual bool? IsDataLess { get { return IsLambda ? (bool?) true : null; } }
         [DisableDump]
         internal virtual string DumpPrintText
         {
@@ -114,15 +115,12 @@ namespace Reni.Syntax
         internal Result PrefixOperationResult(ContextBase context, Category category, ISearchTarget target)
         {
             var searchResult = Type(context).Search<IPrefixFeature>(target, null);
-            if (searchResult == null)
+            if(searchResult == null)
                 return null;
             return searchResult.Result(category);
         }
 
-        internal IEnumerable<Probe> PrefixOperationProbes(ContextBase context, ISearchTarget target)
-        {
-            return Type(context).Probes<IPrefixFeature>(target);
-        }
+        internal IEnumerable<Probe> PrefixOperationProbes(ContextBase context, ISearchTarget target) { return Type(context).Probes<IPrefixFeature>(target, null); }
 
         internal bool IsDataLessStructureElement(ContextBase context)
         {
@@ -136,9 +134,9 @@ namespace Reni.Syntax
 
             var type = FindResult(context, Category.Type).Type;
             if(type != null)
-                return type.SmartUn<Struct.FunctionType>().IsDataLess;
+                return type.SmartUn<FunctionType>().IsDataLess;
 
-            return Type(context).SmartUn<Struct.FunctionType>().IsDataLess;
+            return Type(context).SmartUn<FunctionType>().IsDataLess;
         }
 
         internal Result SmartReferenceResult(ContextBase context, Category category)
@@ -146,22 +144,21 @@ namespace Reni.Syntax
             return Result(context, category.Typed)
                 .SmartLocalReferenceResult();
         }
-        
+
         internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)
         {
-            Result result = Result(context, category.Typed);
-            if (result == null)
+            var result = Result(context, category.Typed);
+            if(result == null)
                 return null;
             return result
-                .SmartUn<Struct.FunctionType>()
+                .SmartUn<FunctionType>()
                 .SmartLocalReferenceResult();
         }
 
-        virtual internal Result ObtainPendingResult(ContextBase context, Category category)
+        internal virtual Result ObtainPendingResult(ContextBase context, Category category)
         {
-            NotImplementedMethod(context,category);
+            NotImplementedMethod(context, category);
             return null;
-
         }
     }
 }

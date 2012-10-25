@@ -37,7 +37,8 @@ namespace Reni
         readonly ISearchTarget _target;
         protected TFeature Result { get; private set; }
 
-        internal RootSearchVisitor(ISearchTarget target)
+        internal RootSearchVisitor(ISearchTarget target, ExpressionSyntax syntax)
+            : base(syntax)
         {
             _probes = new DictionaryEx<System.Type, Probe>(Probe.Create);
             _target = target;

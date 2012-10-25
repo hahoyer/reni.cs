@@ -57,11 +57,11 @@ namespace Reni.Struct
 
         protected override string GetNodeDump() { return "type(" + Structure.NodeDump + ")"; }
 
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
 
         internal void SearchNameSpace<TFeature>(SearchVisitor<TFeature> searchVisitor)

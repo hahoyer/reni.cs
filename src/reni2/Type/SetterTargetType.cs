@@ -27,7 +27,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.ReniParser;
 
 namespace Reni.Type
 {
@@ -35,11 +34,8 @@ namespace Reni.Type
     {
         [DisableDump]
         internal readonly ISuffixFeature AssignmentFeature;
-        
-        protected SetterTargetType()
-        {
-            AssignmentFeature = new AssignmentFeature(this);
-        }
+
+        protected SetterTargetType() { AssignmentFeature = new AssignmentFeature(this); }
 
         IConverter IProxyType.Converter { get { return this; } }
         bool IReferenceType.IsWeak { get { return true; } }
@@ -54,13 +50,13 @@ namespace Reni.Type
         [DisableDump]
         internal override Root RootContext { get { return ValueType.RootContext; } }
         [DisableDump]
-        sealed internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
+        internal override sealed TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
 
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
-            searchVisitor.Search(this, ()=>ValueType);
+            searchVisitor.Search(this, () => ValueType);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
     }
 }

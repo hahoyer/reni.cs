@@ -50,11 +50,11 @@ namespace Reni.Type
 
         protected override string GetNodeDump() { return "(" + Value.NodeDump + ") type"; }
 
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, null);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
 
         internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)

@@ -40,7 +40,8 @@ namespace Reni
         [EnableDump]
         readonly TType _target;
 
-        public PathItemSearchVisitor(SearchVisitor<TFeature> parent, TType target)
+        public PathItemSearchVisitor(SearchVisitor<TFeature> parent, TType target, ExpressionSyntax syntax)
+            : base(syntax)
         {
             _parent = parent;
             _target = target;

@@ -63,11 +63,11 @@ namespace Reni.Type
                 .Result(category, DumpPrintNumberCode, CodeArgs.Arg);
         }
 
-        internal override void Search(SearchVisitor searchVisitor, ExpressionSyntax syntax)
+        internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, null);
             if(!searchVisitor.IsSuccessFull)
-                base.Search(searchVisitor, syntax);
+                base.Search(searchVisitor);
         }
 
         protected override string Dump(bool isRecursion) { return GetType().PrettyName(); }
