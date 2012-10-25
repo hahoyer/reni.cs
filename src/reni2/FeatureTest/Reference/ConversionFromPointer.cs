@@ -40,14 +40,16 @@ x: 'Hallo World';
 y: x(0) reference;
 y type dump_print;
 ")]
-    [Output("")]
-    public sealed class ConversionFromPointerSimple : CompilerTest
+    [Output("((bit)sequence(8) #(# text_item #)#)reference(1)")]
+    public sealed class TypeOfConversionFromPointer : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
+
+    
     [TestFixture]
-    [ConversionFromPointerSimple]
+    [TypeOfConversionFromPointer]
     [Target(@"
 x: 'Hallo World';
 y: (x(0) type * 1000) reference (x);
