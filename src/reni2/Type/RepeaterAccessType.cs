@@ -30,17 +30,26 @@ using Reni.Context;
 
 namespace Reni.Type
 {
-    sealed class RepeaterAccessType : SetterTargetType
+    sealed class RepeaterAccessType
+        : SetterTargetType
     {
-        readonly RepeaterType _repeaterType;
+        [DisableDump]
+        internal readonly RepeaterType RepeaterType;
 
-        internal RepeaterAccessType(RepeaterType repeaterType) { _repeaterType = repeaterType; }
+        internal RepeaterAccessType(RepeaterType repeaterType) { RepeaterType = repeaterType; }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
-        internal override TypeBase ValueType { get { return _repeaterType.ElementType; } }
+        internal override TypeBase ValueType { get { return RepeaterType.ElementType; } }
 
-        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + _repeaterType.IndexSize; }
+        protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize + RepeaterType.IndexSize; }
+
+        internal override void Search(SearchVisitor searchVisitor)
+        {
+            searchVisitor.Search(this, () => ValueType);
+            if(!searchVisitor.IsSuccessFull)
+                base.Search(searchVisitor);
+        }
 
         internal override Result DestinationResult(Category category) { return Result(category, this); }
 
@@ -63,7 +72,7 @@ namespace Reni.Type
         {
             return Pair(ValueType.SmartPointer)
                 .ArgCode
-                .ArrayAssignment(ValueType.Size, _repeaterType.IndexSize);
+                .ArrayAssignment(ValueType.Size, RepeaterType.IndexSize);
         }
 
         CodeBase GetterCode
@@ -71,8 +80,20 @@ namespace Reni.Type
             get
             {
                 return ArgCode
-                    .ArrayAccess(ValueType.Size, _repeaterType.IndexSize);
+                    .ArrayAccess(ValueType.Size, RepeaterType.IndexSize);
             }
+        }
+
+        internal Func<Category, Result> ConvertToReference(int count) { return category => ConvertToReference(category, count); }
+
+        Result ConvertToReference(Category category, int count)
+        {
+            var result = RepeaterType
+                .ElementType
+                .UniqueReference(count)
+                .Result(category, GetterResult);
+            var xx = result.Dump();
+            return result;
         }
     }
 }

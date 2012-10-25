@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 
@@ -37,12 +36,11 @@ namespace Reni.Type
           , IConverter
           , IReferenceType
           , ISearchPath<ISuffixFeature, ArrayType>
+          , ISearchPath<ISuffixFeature, RepeaterAccessType>
+
     {
         internal ReferenceType(TypeBase elementType, int count)
-            : base(elementType, count)
-        {
-            StopByObjectId(-22);
-        }
+            : base(elementType, count) { StopByObjectId(-22); }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
@@ -62,6 +60,14 @@ namespace Reni.Type
                 return null;
             return Extension.Feature(type.ConvertToReference(Count));
         }
+        
+        ISuffixFeature ISearchPath<ISuffixFeature, RepeaterAccessType>.Convert(RepeaterAccessType type)
+        {
+            if (type.RepeaterType.ElementType != ElementType)
+                return null;
+            return Extension.Feature(type.ConvertToReference(Count));
+        }
+
         bool IReferenceType.IsWeak { get { return false; } }
         IConverter IReferenceType.Converter { get { return this; } }
         IConverter IProxyType.Converter { get { return this; } }
@@ -72,6 +78,5 @@ namespace Reni.Type
             NotImplementedMethod(category);
             return null;
         }
-
     }
 }

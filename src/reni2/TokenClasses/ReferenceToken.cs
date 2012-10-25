@@ -26,18 +26,38 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Parser;
+using Reni.ReniParser;
 using Reni.Syntax;
-using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class ReferenceToken : Suffix
+    sealed class ReferenceToken : Special, ISuffix, IInfix
     {
-        protected override Result Result(ContextBase context, Category category, CompileSyntax left)
+        protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            var rightType = left.Type(context).TypeForTypeOperator;
-            return rightType.CreateReference(context, category, left);
+            var leftSyntax = left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError);
+            if(right == null)
+                return new SuffixSyntax
+                    (token
+                     , leftSyntax
+                     , this
+                    );
+            return new InfixSyntax
+                (token
+                 , leftSyntax
+                 , this
+                 , right.ToCompiledSyntax()
+                );
         }
 
+        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right) { return Result(context, category, left, right.Evaluate(context).ToInt32()); }
+        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left) { return Result(context, category, left, 1); }
+
+        static Result Result(ContextBase context, Category category, CompileSyntax left, int count)
+        {
+            var leftType = left.Type(context).TypeForTypeOperator;
+            return leftType.CreateReference(context, category, left, count);
+        }
     }
 }

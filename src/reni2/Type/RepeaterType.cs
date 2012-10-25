@@ -64,7 +64,7 @@ namespace Reni.Type
         [DisableDump]
         IContextReference ObjectReference { get { return UniquePointer; } }
         [DisableDump]
-        TypeBase IndexType { get { return RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
+        internal TypeBase IndexType { get { return RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
         [DisableDump]
         internal Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
 
@@ -89,6 +89,15 @@ namespace Reni.Type
                 .Result(category, objectResult + argsResult);
 
             return result;
+        }
+
+        internal Func<Category, Result> ConvertToReference(int count) { return category => ConvertToReference(category, count); }
+
+        Result ConvertToReference(Category category, int count)
+        {
+            return ElementType
+                .UniqueReference(count)
+                .Result(category, UniquePointer.ArgResult);
         }
     }
 }
