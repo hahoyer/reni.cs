@@ -65,7 +65,7 @@ namespace Reni.Context
                     NotImplementedMethod(context, category, left);
                     return null;
                 }
-                var result = structure.ReferenceType.Result(category, structure.ContainerContextObject);
+                var result = structure.PointerKind.Result(category, structure.ContainerContextObject);
                 return ReturnMethodDump(result);
             }
             finally

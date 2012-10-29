@@ -70,7 +70,7 @@ namespace Reni.Type
 
         CodeBase SetterCode()
         {
-            return Pair(ValueType.SmartPointer)
+            return Pair(ValueType.PointerKind)
                 .ArgCode
                 .ArrayAssignment(ValueType.Size, RepeaterType.IndexSize);
         }

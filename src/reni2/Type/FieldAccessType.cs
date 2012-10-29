@@ -61,7 +61,7 @@ namespace Reni.Type
 
         internal override Result GetterResult(Category category)
         {
-            return ValueType.SmartPointer
+            return ValueType.PointerKind
                 .Result(category, ArgResult(category.Typed).AddToReference(GetFieldOffset));
         }
 
@@ -69,7 +69,7 @@ namespace Reni.Type
         {
             return new Result
                 (category
-                 , getCode: () => Pair(ValueType.SmartPointer).ArgCode.Assignment(ValueType.Size)
+                 , getCode: () => Pair(ValueType.PointerKind).ArgCode.Assignment(ValueType.Size)
                  , getArgs: CodeArgs.Arg
                 );
         }

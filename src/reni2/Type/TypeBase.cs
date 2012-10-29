@@ -191,7 +191,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal TypeBase SmartPointer
+        internal TypeBase PointerKind
         {
             get
             {
@@ -449,7 +449,7 @@ namespace Reni.Type
         internal Result Conversion(Category category, TypeBase destination)
         {
             if(category <= (Category.Type.Replenished))
-                return destination.SmartReference.Result(category);
+                return destination.PointerKind.Result(category);
 
             var obviousConversionResult = ObviousConversion(category.Typed, destination);
             if(obviousConversionResult != null)

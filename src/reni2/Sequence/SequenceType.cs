@@ -48,7 +48,7 @@ namespace Reni.Sequence
             return UniqueEnableCutType
                 .Result
                 (category
-                 , () => SmartPointer.ArgCode.Dereference(Size)
+                 , () => PointerKind.ArgCode.Dereference(Size)
                  , CodeArgs.Arg
                 );
         }
@@ -189,7 +189,7 @@ namespace Reni.Sequence
             }
         }
 
-        Result UnalignedDereferencePointerResult(Category category) { return SmartPointer.ArgResult(category.Typed).DereferenceResult() & category; }
+        Result UnalignedDereferencePointerResult(Category category) { return PointerKind.ArgResult(category.Typed).DereferenceResult() & category; }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {

@@ -86,7 +86,7 @@ namespace Reni.Struct
         internal StructureType Type { get { return _typeCache.Value; } }
 
         [DisableDump]
-        internal TypeBase ReferenceType { get { return Type.SmartPointer; } }
+        internal TypeBase PointerKind { get { return Type.PointerKind; } }
 
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + ContainerContextObject.NodeDump + "@" + EndPosition + ")"; }
 
@@ -180,7 +180,7 @@ namespace Reni.Struct
                 return resultType.Result(category);
 
             return resultType
-                .Result(category, ReferenceType.ArgResult(category));
+                .Result(category, PointerKind.ArgResult(category));
         }
 
         internal FunctionType Function(FunctionSyntax body, TypeBase argsType)
@@ -205,7 +205,7 @@ namespace Reni.Struct
             if(IsDataLess)
                 return Type.Result(category);
 
-            return ReferenceType
+            return PointerKind
                 .Result
                 (category
                  , StructReferenceCodeViaContextReference

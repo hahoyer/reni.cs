@@ -113,7 +113,7 @@ namespace Reni.Struct
         {
             return Parent
                 .UniqueStructure(Container, accessPosition)
-                .ReferenceType.ArgCode
+                .PointerKind.ArgCode
                 .ReferencePlus(ContextReferenceOffsetFromAccessPoint(accessPosition));
         }
 

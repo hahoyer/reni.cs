@@ -249,10 +249,10 @@ namespace Reni.Context
                 var replaceArg = applyResult.ReplaceArg(c => ArgsResult(c, right));
                 Dump("replaceArg", replaceArg);
                 Dump("function.ObjectReference", function.ObjectReference);
-                Dump("objectType.SmartPointer", objectType.SmartPointer);
+                Dump("objectType.PointerKind", objectType.PointerKind);
                 BreakExecution();
 
-                var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.SmartPointer.ArgResult(c));
+                var result = replaceArg.ReplaceAbsolute(function.ObjectReference, c => objectType.PointerKind.ArgResult(c));
                 return ReturnMethodDump(result);
             }
             finally
