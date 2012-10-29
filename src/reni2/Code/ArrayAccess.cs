@@ -50,7 +50,11 @@ namespace Reni.Code
                 .Convert(ElementSize.SizeToPacketCount(Root.DefaultRefAlignParam.AlignBits))
                 .Resize(Root.DefaultRefAlignParam.RefSize);
 
-            return (index.BitCast(Root.DefaultRefAlignParam.RefSize) + CodeBase.BitsConst(elementSize))
+
+            var castedIndex = index.BitCast(Root.DefaultRefAlignParam.RefSize);
+            if (elementSize.ToInt64() == 1)
+                return castedIndex;
+            return (castedIndex + CodeBase.BitsConst(elementSize))
                 .Add(AddressMultiply);
         }
 
