@@ -45,7 +45,7 @@ namespace Reni.Code
         {
             Holder = holder;
             Offset = offset ?? Size.Zero;
-            StopByObjectId(-10);
+            StopByObjectId(8);
         }
 
         [DisableDump]

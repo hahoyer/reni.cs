@@ -33,7 +33,7 @@ namespace Reni.FeatureTest.Reference
 {
     [TestFixture]
     [TypeOperator]
-    [Hallo]
+    [Hallo01234]
     [ElementAccessVariable]
     [Target(@"
 x: 'Hallo World';
@@ -46,22 +46,15 @@ y type dump_print;
         [Test]
         public override void Run() { BaseRun(); }
     }
-
-    
+   
     [TestFixture]
     [TypeOfConversionFromPointer]
     [Target(@"
 x: 'Hallo World';
-y: (x(0) type * 1000) reference (x);
+y: x(0) reference;
 y(0) dump_print;
-y(1) dump_print;
-y(2) dump_print;
-y(3) dump_print;
-y(4) dump_print;
-y(5) dump_print;
-y(6) dump_print;
 ")]
-    [Output("Hallo W")]
+    [Output("H")]
     public sealed class ConversionFromPointer : CompilerTest
     {
         [Test]

@@ -50,7 +50,8 @@ namespace Reni.Code
             Offset = offset;
             _size = size;
             DataSize = dataSize;
-            StopByObjectId(-10);
+            StopByObjectId(6);
+            StopByObjectId(7);
         }
 
         protected override string GetNodeDump()

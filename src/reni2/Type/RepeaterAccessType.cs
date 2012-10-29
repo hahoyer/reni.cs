@@ -92,7 +92,6 @@ namespace Reni.Type
                 .ElementType
                 .UniqueReference(count)
                 .Result(category, GetterResult);
-            var xx = result.Dump();
             return result;
         }
     }

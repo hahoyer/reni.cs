@@ -1,5 +1,7 @@
-﻿//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -15,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -44,8 +48,8 @@ namespace Reni.Code
                 l.Add(fiberItem);
             _fiberItems = l.ToArray();
             AssertValid();
-            
-            StopByObjectId(-32);
+
+            StopByObjectId(-61);
         }
 
         void AssertValid()
@@ -73,7 +77,7 @@ namespace Reni.Code
         {
             var result = _fiberHead.TemporarySize;
             var sizeSoFar = _fiberHead.Size;
-            foreach (var codeBase in _fiberItems)
+            foreach(var codeBase in _fiberItems)
             {
                 sizeSoFar -= codeBase.InputSize;
                 var newResult = sizeSoFar + codeBase.TemporarySize;

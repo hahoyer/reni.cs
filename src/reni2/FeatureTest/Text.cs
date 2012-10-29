@@ -39,6 +39,24 @@ namespace Reni.FeatureTest.Text
     }
 
     [TestFixture]
+    [TargetSet(@"
+x: 'Hallo';
+x(0) dump_print;
+x(1) dump_print;
+x(2) dump_print;
+x(3) dump_print;
+x(4) dump_print;
+", "Hallo")]
+    [Hallo]
+    [ElementAccessVariable]
+    [ArrayVariable]
+    public sealed class Hallo01234 : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
     [TargetSet("'Hal''lo' dump_print", "Hal'lo")]
     [Hallo]
     public sealed class HalloApo : CompilerTest
