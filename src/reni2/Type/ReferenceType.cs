@@ -34,7 +34,6 @@ namespace Reni.Type
         : RepeaterType
           , IProxyType
           , IConverter
-          , IReferenceType
           , ISearchPath<ISuffixFeature, ArrayType>
           , ISearchPath<ISuffixFeature, RepeaterAccessType>
 
@@ -68,8 +67,6 @@ namespace Reni.Type
             return Extension.Feature(type.ConvertToReference(Count));
         }
 
-        bool IReferenceType.IsWeak { get { return false; } }
-        IConverter IReferenceType.Converter { get { return this; } }
         IConverter IProxyType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ElementType; } }
 

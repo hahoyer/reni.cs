@@ -51,10 +51,15 @@ namespace Reni.TokenClasses
                 );
         }
 
-        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right) { return Result(context, category, left, right.Evaluate(context).ToInt32()); }
+        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        {
+            if(context.Type(right) == context.RootContext.VoidType)
+                return Result(context, category, left, null);
+            return Result(context, category, left, right.Evaluate(context).ToInt32());
+        }
         Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left) { return Result(context, category, left, 1); }
 
-        static Result Result(ContextBase context, Category category, CompileSyntax left, int count)
+        static Result Result(ContextBase context, Category category, CompileSyntax left, int? count)
         {
             var leftType = left.Type(context).TypeForTypeOperator;
             return leftType.CreateReference(context, category, left, count);

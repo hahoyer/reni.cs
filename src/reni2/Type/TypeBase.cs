@@ -49,23 +49,32 @@ namespace Reni.Type
     {
         sealed class Cache
         {
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly DictionaryEx<int, Aligner> Aligner;
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly DictionaryEx<int, ArrayType> Array;
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly DictionaryEx<TypeBase, Pair> Pair;
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly SimpleCache<IReferenceType> Pointer;
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly DictionaryEx<int, ReferenceType> Reference;
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly SimpleCache<TypeType> TypeType;
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly SimpleCache<FunctionInstanceType> FunctionInstanceType;
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly SimpleCache<TextItemType> TextItem;
-            [Node, SmartNode]
+            [Node]
+            [SmartNode]
             public readonly SimpleCache<EnableCut> EnableCut;
             public readonly SimpleCache<Size> Size;
 
@@ -85,7 +94,8 @@ namespace Reni.Type
         }
 
         static int _nextObjectId;
-        [Node, SmartNode]
+        [Node]
+        [SmartNode]
         readonly Cache _cache;
         [DisableDump]
         [Node]
@@ -311,7 +321,7 @@ namespace Reni.Type
         internal bool IsWeakReference { get { return ReferenceType != null && ReferenceType.IsWeak; } }
 
         [DisableDump]
-        virtual internal IFeature Feature { get { return this as IFeature; } }
+        internal virtual IFeature Feature { get { return this as IFeature; } }
 
         [DisableDump]
         ISearchTarget ConversionProvider { get { return this; } }
@@ -354,7 +364,7 @@ namespace Reni.Type
         internal SearchResult Search<TFeature>(ISearchTarget target, ExpressionSyntax syntax)
             where TFeature : class, IFeature
         {
-            var visitor = new TypeRootSearchVisitor<TFeature>(target, this,syntax);
+            var visitor = new TypeRootSearchVisitor<TFeature>(target, this, syntax);
             var former = SearchVisitor.Trace;
             SearchVisitor.Trace = target is ReferenceType && target.GetObjectId() == 55;
             Search(visitor);
@@ -507,7 +517,7 @@ namespace Reni.Type
         SearchResult Converter(TypeBase destination)
         {
             return
-                Search<ISuffixFeature>(destination.ConversionProvider,null);
+                Search<ISuffixFeature>(destination.ConversionProvider, null);
         }
 
         internal Result TextItemResult(Category category)
@@ -595,15 +605,23 @@ namespace Reni.Type
             NotImplementedMethod(category, getRightResult(Category.All));
             return null;
         }
-        internal Result CreateReference(ContextBase context, Category category, CompileSyntax target, int toInt32)
+        
+        internal Result CreateReference(ContextBase context, Category category, CompileSyntax target, int? count)
         {
-            var rawResult = SmartReference.ArgResult(category);
+            var rawResult = Reference(count).UniquePointer.ArgResult(category);
             if(category <= Category.Type.Replenished)
                 return rawResult;
 
-            var targetResult = target.SmartReferenceResult(context, category.Typed);
+            var targetResult = target.PointerKindResult(context, category.Typed);
             var convertedResult = targetResult.Conversion(SmartReference);
             return rawResult.ReplaceArg(convertedResult);
+        }
+        
+        ReferenceType Reference(int? count)
+        {
+            if(count == null)
+                return SmartReference;
+            return UniqueReference(count.Value);
         }
 
         internal CodeBase DumpPrintNumberCode()
@@ -614,7 +632,6 @@ namespace Reni.Type
                 .Dereference(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
-
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature
