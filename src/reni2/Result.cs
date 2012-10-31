@@ -722,7 +722,7 @@ namespace Reni
         [DebuggerHidden]
         public static Result operator +(Result aResult, Result bResult) { return aResult.Sequence(bResult); }
 
-        internal Result SmartLocalReferenceResult()
+        internal Result LocalPointerKindResult()
         {
             if(Type.IsDataLess)
                 return this;

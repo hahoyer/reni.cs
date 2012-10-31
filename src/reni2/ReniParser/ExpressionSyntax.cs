@@ -87,7 +87,7 @@ namespace Reni.ReniParser
                 var prefixOperationResult = Right.PrefixOperationResult(context, category, _tokenClass);
                 if(prefixOperationResult != null)
                     return prefixOperationResult
-                        .ReplaceArg(Right.SmartReferenceResult(context, category));
+                        .ReplaceArg(Right.PointerKindResult(context, category));
             }
 
             var searchResult

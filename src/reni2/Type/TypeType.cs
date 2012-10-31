@@ -26,7 +26,6 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
-using Reni.ReniParser;
 using Reni.Struct;
 using Reni.Syntax;
 
@@ -60,7 +59,7 @@ namespace Reni.Type
         internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
         {
             return RawInstanceResult(category.Typed, getRightResult)
-                       .SmartLocalReferenceResult() & category;
+                       .LocalPointerKindResult() & category;
         }
 
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)

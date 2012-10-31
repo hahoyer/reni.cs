@@ -50,7 +50,7 @@ namespace Reni.Type
                 BreakExecution();
                 var sourceResult = argsType
                     .Conversion(category.Typed, _target.ValueType)
-                    .SmartLocalReferenceResult();
+                    .LocalPointerKindResult();
                 Dump("sourceResult", sourceResult);
                 BreakExecution();
 

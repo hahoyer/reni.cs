@@ -90,7 +90,7 @@ namespace Reni.Type
                 for(var i = 1; i < results.Length; i++)
                     result = result.ReplaceArg(results[i]);
 
-                return ReturnMethodDump(result.SmartLocalReferenceResult());
+                return ReturnMethodDump(result.LocalPointerKindResult());
             }
             finally
             {

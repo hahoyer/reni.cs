@@ -181,7 +181,7 @@ namespace Reni.Sequence
                     Dump("forArg", forArg(Category.All));
                 var result = flatResult.ReplaceArg(forArg);
                 Dump("result", result);
-                return ReturnMethodDump(result.SmartLocalReferenceResult());
+                return ReturnMethodDump(result.LocalPointerKindResult());
             }
             finally
             {

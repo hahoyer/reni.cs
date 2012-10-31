@@ -194,7 +194,7 @@ namespace Reni.Context
         internal Result ResultAsReference(Category category, CompileSyntax syntax)
         {
             return UniqueResult(category.Typed, syntax)
-                .SmartLocalReferenceResult();
+                .LocalPointerKindResult();
         }
 
         internal Result ArgReferenceResult(Category category)
@@ -203,7 +203,7 @@ namespace Reni.Context
                 .CreateArgReferenceResult(category);
         }
         internal Result ArgsResult(Category c, CompileSyntax right) { return right == null ? RootContext.VoidType.Result(c.Typed) : right.SmartUnFunctionedReferenceResult(this, c); }
-        internal Result ObjectResult(Category category1, CompileSyntax left) { return left == null ? null : left.SmartReferenceResult(this, category1.Typed); }
+        internal Result ObjectResult(Category category1, CompileSyntax left) { return left == null ? null : left.PointerKindResult(this, category1.Typed); }
 
         /// <summary>
         ///     Obtains the feature result of a functional argument object. 
@@ -234,7 +234,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, IFeature feature, TypeBase objectType, CompileSyntax right)
         {
-            var trace = ObjectId == 4 && feature is AccessFeature && feature.GetObjectId() == 1 && category.HasCode;
+            var trace = ObjectId == -4 && feature is AccessFeature && feature.GetObjectId() == 1 && category.HasCode;
             StartMethodDump(trace, category, feature, objectType, right);
             try
             {
