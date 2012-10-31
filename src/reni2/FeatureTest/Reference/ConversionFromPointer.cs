@@ -41,14 +41,28 @@ y: x(0) reference;
 y type dump_print;
 ")]
     [Output("((bit)sequence(8) #(# text_item #)#)reference(1)")]
-    public sealed class TypeOfConversionFromPointer : CompilerTest
+    public sealed class TypeOfConversionFromArrayElement : CompilerTest
     {
         [Test]
         public override void Run() { BaseRun(); }
     }
-   
+
     [TestFixture]
-    [TypeOfConversionFromPointer]
+    [TypeOfConversionFromArrayElement]
+    [Target(@"
+x: 'Hallo World';
+y: x reference();
+y type dump_print;
+")]
+    [Output("((bit)sequence(8) #(# text_item #)#)reference(1)")]
+    public sealed class TypeOfConversionFromArray : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [TypeOfConversionFromArray]
     [Target(@"
 x: 'Hallo World';
 y: x(0) reference;

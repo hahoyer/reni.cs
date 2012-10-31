@@ -27,7 +27,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.ReniParser;
 using Reni.Struct;
 
 namespace Reni.Type
@@ -45,7 +44,6 @@ namespace Reni.Type
             _valueType = valueType;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is PointerType), valueType.Dump);
-            Tracer.Assert(!(valueType is ReferenceType), valueType.Dump);
             StopByObjectId(-10);
         }
 
