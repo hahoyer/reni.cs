@@ -132,7 +132,7 @@ namespace Reni.Code
             SetFormalValues(element, startAddress, RefSize);
         }
 
-        void IVisitor.Dereference(Size size, Size dataSize)
+        void IVisitor.DePointer(Size size, Size dataSize)
         {
             var formalSubValue = PullInputValuesFromData(RefSize).Single();
             var startAddress = (_startAddress + RefSize - size).ToInt();

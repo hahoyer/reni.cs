@@ -61,7 +61,7 @@ namespace Reni.TokenClasses
 
         static Result Result(ContextBase context, Category category, CompileSyntax left, int? count)
         {
-            var leftType = left.Type(context).TypeForTypeOperator;
+            var leftType = left.Type(context).TypeForReference;
             return leftType.CreateReference(context, category, left, count);
         }
     }

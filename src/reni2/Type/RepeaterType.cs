@@ -41,11 +41,11 @@ namespace Reni.Type
         [Node]
         readonly TypeBase _elementType;
         [Node]
-        readonly int _count;
+        readonly int? _count;
         [Node]
         readonly SimpleCache<RepeaterAccessType> _arrayAccessTypeCache;
 
-        protected RepeaterType(TypeBase elementType, int count)
+        protected RepeaterType(TypeBase elementType, int? count)
         {
             _elementType = elementType;
             _count = count;
@@ -56,7 +56,14 @@ namespace Reni.Type
         }
 
         [Node]
-        internal int Count { get { return _count; } }
+        internal int Count
+        {
+            get
+            {
+                Tracer.Assert(_count != null,_elementType.Dump);
+                return _count.Value;
+            }
+        }
         [Node]
         internal TypeBase ElementType { get { return _elementType; } }
         [DisableDump]
@@ -71,7 +78,7 @@ namespace Reni.Type
         IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
         IFunctionFeature IFeature.Function { get { return this; } }
         ISimpleFeature IFeature.Simple { get { return null; } }
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category,argsType); }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }
         bool IFunctionFeature.IsImplicit { get { return false; } }
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
 

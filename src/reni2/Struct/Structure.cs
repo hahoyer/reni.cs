@@ -247,7 +247,7 @@ namespace Reni.Struct
         {
             return ContainerContextObject
                 .AccessType(EndPosition, position)
-                .UnAlignedType;
+                .TypeForStructureElement;
         }
 
         internal StructurePosition Search(ISearchTarget target)

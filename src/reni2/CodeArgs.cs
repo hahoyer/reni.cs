@@ -198,7 +198,7 @@ namespace Reni
                     BreakExecution();
                     Tracer.Assert(referenceInCode.Size == refSize);
                     reference = reference.ReferencePlus(refSize * -1);
-                    result = result.ReplaceAbsolute(referenceInCode, () => reference.Dereference(refSize));
+                    result = result.ReplaceAbsolute(referenceInCode, () => reference.DePointer(refSize));
                     Dump("result", result);
                 }
                 return ReturnMethodDump(result);

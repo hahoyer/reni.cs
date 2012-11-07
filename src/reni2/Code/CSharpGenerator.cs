@@ -72,12 +72,12 @@ namespace Reni.Code
 
         void IVisitor.BitsArray(Size size, BitsConst data) { AddCode("data.Push({0})", data.ByteSequence(size)); }
         void IVisitor.LocalVariableDefinition(string holderName, Size valueSize) { AddCode("var {0} = data.Pull({1})", holderName, valueSize.SaveByteCount); }
-        void IVisitor.LocalVariableReference(string holder, Size offset) { AddCode("data.Push({0}.Address({1}))", holder, offset.SaveByteCount); }
-        void IVisitor.ReferencePlus(Size size) { AddCode("data.ReferencePlus({0})", size.SaveByteCount); }
+        void IVisitor.LocalVariableReference(string holder, Size offset) { AddCode("data.Push({0}.Pointer({1}))", holder, offset.SaveByteCount); }
+        void IVisitor.ReferencePlus(Size size) { AddCode("data.PointerPlus({0})", size.SaveByteCount); }
         void IVisitor.PrintNumber(Size leftSize, Size rightSize) { AddCode("data.Pull({0}).PrintNumber()", leftSize.SaveByteCount); }
         void IVisitor.PrintText(string dumpPrintText) { AddCode("Data.PrintText({0})", dumpPrintText.Quote()); }
-        void IVisitor.TopRef(Size offset) { AddCode("data.Push(data.Address({0}))", offset.SaveByteCount); }
-        void IVisitor.TopFrameRef(Size offset) { AddCode("data.Push(frame.Address({0}))", offset.SaveByteCount); }
+        void IVisitor.TopRef(Size offset) { AddCode("data.Push(data.Pointer({0}))", offset.SaveByteCount); }
+        void IVisitor.TopFrameRef(Size offset) { AddCode("data.Push(frame.Pointer({0}))", offset.SaveByteCount); }
         void IVisitor.Assign(Size targetSize) { AddCode("data.Assign({0})", targetSize.SaveByteCount); }
         void IVisitor.BitCast(Size size, Size targetSize, Size significantSize) { AddCode("data.Push(data.Pull({0}).BitCast({1}).BitCast({2}))", targetSize.SaveByteCount, significantSize.ToInt(), size.ToInt()); }
         void IVisitor.PrintText(Size leftSize, Size itemSize) { AddCode("data.Pull({0}).PrintText({1})", leftSize.SaveByteCount, itemSize.SaveByteCount); }
@@ -131,10 +131,10 @@ namespace Reni.Code
                 );
         }
 
-        void IVisitor.Dereference(Size size, Size dataSize)
+        void IVisitor.DePointer(Size size, Size dataSize)
         {
             AddCode
-                ("data.Push(data.Pull({0}).Dereference({1}){2})"
+                ("data.Push(data.Pull({0}).DePointer({1}){2})"
                  , RefBytes
                  , dataSize.ByteCount
                  , BitCast(size, dataSize)

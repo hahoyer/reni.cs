@@ -146,17 +146,17 @@ namespace Reni.Code
             return new FiberItem[] {bitArrayOp, new BitCast(OutputSize, OutputSize, InputDataSize)};
         }
 
-        internal override FiberItem[] TryToCombineBack(Dereference preceding)
+        internal override FiberItem[] TryToCombineBack(DePointer preceding)
         {
             if(InputSize == OutputSize && InputDataSize <= preceding.DataSize)
             {
-                var dereference = new Dereference(OutputSize, InputDataSize);
+                var dereference = new DePointer(OutputSize, InputDataSize);
                 return new FiberItem[] {dereference};
             }
 
             if(InputSize < OutputSize)
             {
-                var dereference = new Dereference(OutputSize, preceding.DataSize);
+                var dereference = new DePointer(OutputSize, preceding.DataSize);
                 if(OutputSize == InputDataSize)
                     return new FiberItem[] {dereference};
                 return new FiberItem[] {dereference, new BitCast(OutputSize, OutputSize, InputDataSize)};

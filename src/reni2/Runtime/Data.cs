@@ -84,9 +84,9 @@ namespace Reni.Runtime
         }
         void EnsureLength() { Tracer.Assert(StartIndex >= 0); }
 
-        public Data Address(int offset) { return Create(_data.Address(StartIndex + offset)); }
-        public void ReferencePlus(int offset) { _data.DoRefPlus(StartIndex, offset); }
-        public Data Dereference(int bytes) { return Create(_data.Dereference(StartIndex, bytes)); }
+        public Data Pointer(int offset) { return Create(_data.Pointer(StartIndex + offset)); }
+        public void PointerPlus(int offset) { _data.DoRefPlus(StartIndex, offset); }
+        public Data DePointer(int bytes) { return Create(_data.Dereference(StartIndex, bytes)); }
         public Data Get(int bytes, int offset) { return Create(_data.Get(StartIndex + offset, bytes)); }
         public Data GetFromBack(int bytes, int offset) { return Create(_data.Get(_data.Length + offset, bytes)); }
         public void PrintNumber() { GetBytes().PrintNumber(); }
@@ -111,7 +111,7 @@ namespace Reni.Runtime
             return Create(y.ToByteArray());
         }
 
-        string Dump { get { return Address(0).AddressDump + ": " + DataDump; } }
+        string Dump { get { return Pointer(0).AddressDump + ": " + DataDump; } }
 
         string DataDump
         {

@@ -37,7 +37,7 @@ namespace Reni.Code
         void BitCast(Size size, Size targetSize, Size significantSize);
         void BitsArray(Size size, BitsConst data);
         void Call(Size outputSize, FunctionId functionId, Size argsAndRefsSize);
-        void Dereference(Size size, Size dataSize);
+        void DePointer(Size size, Size dataSize);
         void Drop(Size beforeSize, Size afterSize);
         void PrintNumber(Size leftSize, Size rightSize);
         void PrintText(Size leftSize, Size itemSize);

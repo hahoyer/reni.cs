@@ -143,7 +143,7 @@ namespace Reni.Code
 
         void IVisitor.ReferencePlus(Size right) { Push(Pull(RefSize).RefPlus(right)); }
 
-        void IVisitor.Dereference(Size size, Size dataSize)
+        void IVisitor.DePointer(Size size, Size dataSize)
         {
             var value = Pull(RefSize);
             Push(value.Dereference(size, dataSize));

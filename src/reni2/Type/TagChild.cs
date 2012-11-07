@@ -47,6 +47,6 @@ namespace Reni.Type
         internal override Result Copier(Category category) { return Parent.Copier(category); }
         internal override Result ArrayCopier(Category category, int count) { return Parent.ArrayCopier(category, count); }
         protected override Result ParentConversionResult(Category category) { return Parent.PointerResult(category, PointerArgResult); }
-        internal Result ReferenceConversionResult(Category category) { return ReferenceConversionResult(category, Parent); }
+        internal Result PointerConversionResult(Category category) { return PointerConversionResult(category, Parent); }
     }
 }

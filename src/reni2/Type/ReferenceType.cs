@@ -38,7 +38,7 @@ namespace Reni.Type
           , ISearchPath<ISuffixFeature, RepeaterAccessType>
 
     {
-        internal ReferenceType(TypeBase elementType, int count)
+        internal ReferenceType(TypeBase elementType, int? count)
             : base(elementType, count) { StopByObjectId(-22); }
 
         [DisableDump]

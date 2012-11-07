@@ -114,7 +114,7 @@ namespace Reni.Runtime
 
         public static void Set(byte[] dest, int destStart, params byte[] source) { source.CopyTo(dest, destStart); }
 
-        internal static unsafe byte[] Address(this byte[] data, int dataStart)
+        internal static unsafe byte[] Pointer(this byte[] data, int dataStart)
         {
             var bytes = RefBytes;
 

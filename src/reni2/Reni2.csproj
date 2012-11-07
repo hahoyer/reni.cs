@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectGuid>{EBB73C84-6622-4183-A28F-B0DFF606006B}</ProjectGuid>
@@ -154,7 +154,7 @@
     <Compile Include="Code\Top.cs" />
     <Compile Include="Code\TopData.cs" />
     <Compile Include="Code\TopRef.cs" />
-    <Compile Include="Code\Dereference.cs" />
+    <Compile Include="Code\DePointer.cs" />
     <Compile Include="Code\Visitor.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="CompilerParameters.cs" />

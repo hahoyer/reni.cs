@@ -51,18 +51,18 @@ namespace ReniTest
             var h_1_1 = data.Pull(1);
             data.Push(h_1_1.Get(1, 0).BitCast(1).BitCast(8));
             var h_1_2 = data.Pull(1);
-            data.Push(data.Address(0));
+            data.Push(data.Pointer(0));
             data.Push(h_1_2.Get(1, 0).BitCast(8).BitCast(32));
             data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
             var h_2_0 = data.Pull(1);
             data.Push(h_2_0.Get(1, 0).BitCast(1).BitCast(8));
             var h_2_1 = data.Pull(1);
             data.Push(h_2_1.Get(1, 0).BitCast(1).BitCast(8));
-            var h_2_2 = data.Pull(4).Dereference(1);
-            data.Push(data.Address(0));
+            var h_2_2 = data.Pull(4).DePointer(1);
+            data.Push(data.Pointer(0));
             data.Push(h_2_2.Get(1, 0).BitCast(8).BitCast(32));
             data.Plus(sizeBytes: 4, leftBytes: 4, rightBytes: 4);
-            data.Push(data.Pull(4).Dereference(1));
+            data.Push(data.Pull(4).DePointer(1));
             data.Pull(1).PrintText(1);
         }
     }

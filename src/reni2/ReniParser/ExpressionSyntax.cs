@@ -75,7 +75,7 @@ namespace Reni.ReniParser
                                 ? context.Probes(_tokenClass)
                                 : context
                                       .Type(Left)
-                                      .UnAlignedType
+                                      .TypeForSearchProbes
                                       .Probes<ISuffixFeature>(_tokenClass, this));
             return result.ToArray();
         }
@@ -95,7 +95,7 @@ namespace Reni.ReniParser
                       ? context.Search(_tokenClass)
                       : context
                             .Type(Left)
-                            .UnAlignedType
+                            .TypeForSearchProbes
                             .Search<ISuffixFeature>(_tokenClass, this);
             return searchResult == null ? null : searchResult.FunctionResult(context, category, this);
         }

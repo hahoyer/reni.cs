@@ -114,11 +114,11 @@ namespace Reni.Code
         internal CodeBase ArrayAccess(Size elementSize, Size indexSize) { return Add(new ArrayGetter(elementSize, indexSize, CallingMethodName)); }
         internal CodeBase ArrayAssignment(Size elementSize, Size indexSize) { return Add(new ArraySetter(elementSize, indexSize, CallingMethodName)); }
 
-        internal CodeBase Dereference(Size targetSize)
+        internal CodeBase DePointer(Size targetSize)
         {
             if(Size.IsZero && targetSize.IsZero)
                 return this;
-            return Add(new Dereference(targetSize, targetSize));
+            return Add(new DePointer(targetSize, targetSize));
         }
 
         internal CodeBase BitCast(Size size)

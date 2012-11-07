@@ -27,7 +27,6 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.ReniParser;
 
 namespace Reni.Type
 {
@@ -86,7 +85,7 @@ namespace Reni.Type
         {
             return UniquePointer
                 .ArgCode
-                .Dereference(Size)
+                .DePointer(Size)
                 .DumpPrintText(Parent.ElementType.Size);
         }
     }

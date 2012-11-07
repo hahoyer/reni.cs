@@ -25,9 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
-using Reni.ReniParser;
 
 namespace Reni.Type
 {
@@ -48,21 +46,16 @@ namespace Reni.Type
         [DisableDump]
         internal int AlignBits { get { return _alignBits; } }
         [DisableDump]
-        internal override Size UnrefSize { get { return Parent.UnrefSize; } }
-        [DisableDump]
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
-        [DisableDump]
-        internal override TypeBase UnAlignedType { get { return Parent; } }
+
         [DisableDump]
         internal override IReferenceType ReferenceType { get { return Parent.ReferenceType; } }
         [DisableDump]
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
         [DisableDump]
         internal override IReferenceType UniquePointerType { get { return Parent.UniquePointerType; } }
-        [DisableDump]
-        internal override TypeBase TypeForTypeOperator { get { return Parent.TypeForTypeOperator; } }
-        [DisableDump]
-        internal override TypeBase CoreType { get { return Parent.CoreType; } }
+
+        internal override Result DeAlign(Category category) { return Parent.Result(category, ArgResult); }
 
         protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
         internal override int? SmartSequenceLength(TypeBase elementType) { return Parent.SmartSequenceLength(elementType); }

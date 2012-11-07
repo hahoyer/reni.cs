@@ -48,7 +48,7 @@ namespace Reni.Sequence
             return UniqueEnableCutType
                 .Result
                 (category
-                 , () => PointerKind.ArgCode.Dereference(Size)
+                 , () => PointerKind.ArgCode.DePointer(Size)
                  , CodeArgs.Arg
                 );
         }

@@ -61,10 +61,6 @@ namespace Reni.Type
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
-        [DisableDump]
-        internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
-        [DisableDump]
-        internal override TypeBase CoreType { get { return ValueType.CoreType; } }
 
         protected override string GetNodeDump() { return ValueType.NodeDump + "[Pointer]"; }
 
@@ -85,13 +81,22 @@ namespace Reni.Type
             return ValueType
                 .Result
                 (category
-                 , () => ArgCode.Dereference(ValueType.Size)
+                 , () => ArgCode.DePointer(ValueType.Size)
                  , CodeArgs.Arg
                 );
         }
 
         protected override Size GetSize() { return Root.DefaultRefAlignParam.RefSize; }
 
+        internal override ResultCache DePointer(Category category)
+        {
+            return ValueType
+                .Result
+                (category
+                 , () => ArgCode.DePointer(ValueType.Size)
+                 , CodeArgs.Arg
+                );
+        }
         internal override void Search(SearchVisitor searchVisitor)
         {
             searchVisitor.Search(this, () => ValueType);

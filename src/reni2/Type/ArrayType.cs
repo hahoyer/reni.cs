@@ -58,7 +58,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
         [DisableDump]
-        protected override ReferenceType SmartReference { get { return ElementType.UniqueReference(Count); } }
+        protected override ReferenceType ArrayReference { get { return ElementType.UniqueReference(Count); } }
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
@@ -116,10 +116,12 @@ namespace Reni.Type
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
             return elementConstructorResult
                        .ReplaceArg(resultForArg)
-                       .Conversion(ElementType.UnAlignedType)
+                       .Conversion(ElementAccessType)
                        .ObviousExactConversion(ElementType)
                    & category;
         }
+       
+        TypeBase ElementAccessType { get { return ElementType.TypeForArrayElement; } }
 
         protected override string GetNodeDump() { return ElementType.NodeDump + "*" + Count; }
 
@@ -132,11 +134,11 @@ namespace Reni.Type
                 .Result(category.Typed, objectReference)
                 .DereferenceResult();
 
-            var isElementArg = argsType.IsConvertable(ElementType.UnAlignedType);
-            var newCount = isElementArg ? 1 : argsType.ArrayLength(ElementType.UnAlignedType);
+            var isElementArg = argsType.IsConvertable(ElementAccessType);
+            var newCount = isElementArg ? 1 : argsType.ArrayLength(ElementAccessType);
             var newElementsResultRaw
                 = isElementArg
-                      ? argsType.Conversion(category.Typed, ElementType.UnAlignedType)
+                      ? argsType.Conversion(category.Typed, ElementAccessType)
                       : argsType.Conversion(category.Typed, ElementType.UniqueArray(newCount));
 
             var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
@@ -192,7 +194,7 @@ namespace Reni.Type
         {
             if(type.Parent != this)
                 return null;
-            return Extension.Feature(type.ReferenceConversionResult);
+            return Extension.Feature(type.PointerConversionResult);
         }
     }
 }
