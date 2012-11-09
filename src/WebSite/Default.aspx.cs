@@ -32,9 +32,6 @@ namespace WebSite
     public partial class Default : Page
     {
         protected string[] ResultText = new string[0];
-        protected void OnTextChanged(object sender, EventArgs e)
-        {
-            ResultText = Compiler.FlatExecute(Code.Text, isFakedName: true).Split('\n');
-        }
+        protected void OnTextChanged(object sender, EventArgs e) { ResultText = Compiler.FlatExecute(Code.Text, isFakedName: true).Split('\n'); }
     }
 }

@@ -32,10 +32,10 @@ namespace WebSite
 {
     public partial class Parser : Page
     {
-        protected void Page_Load(object sender, EventArgs e) { DateTimeNow.Text = DateTime.Now.Format(); }
+        protected string PrioTableText;
         protected void OnTextChanged(object sender, EventArgs e)
         {
-            PrioTable.Text = Services.FormatPrioTable(PrioList.Text);
+            PrioTableText = Services.FormatPrioTable(PrioList.Text);
         }
     }
 }

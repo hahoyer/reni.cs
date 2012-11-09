@@ -30,7 +30,7 @@
             <br />
             <div align="right">
                 For more information see: 
-                <a href="http://hahoyer-compiler.blogspot.de">http://hahoyer-compiler.blogspot.de</a>
+                <a href="http://hahoyer-compiler.blogspot.de" target="_blank">hahoyer-compiler.blogspot.de</a>
             </div>
         </form>
         </body>
