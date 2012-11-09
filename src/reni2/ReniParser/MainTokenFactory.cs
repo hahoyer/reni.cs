@@ -39,7 +39,7 @@ namespace Reni.ReniParser
     {
         protected override PrioTable GetPrioTable()
         {
-            var x = PrioTable.Left(PrioTable.Common);
+            var x = PrioTable.Left(PrioTable.Any);
             x += PrioTable.Left
                 ("reference"
                  , "_A_T_", "_N_E_X_T_"
@@ -64,47 +64,23 @@ namespace Reni.ReniParser
 
             x += PrioTable.Right(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
 
-            x = x.Level
-                (new[]
-                {
-                    "+--",
-                    "+?+",
-                    "?-+"
-                },
-                 new[] {"then"},
-                 new[] {"else"}
-                );
+            x = x.ThenElseLevel("then","else");
             x += PrioTable.Right("!");
             x += PrioTable.Left("/\\", "/!\\", "/\\/\\", "/!\\/!\\");
             x += PrioTable.Right(":");
             x += PrioTable.Right(",");
             x += PrioTable.Right(";");
-            x = x.Level
-                (new[]
-                {
-                    "++-",
-                    "+?-",
-                    "?--"
-                },
-                 new[] {"(", "[", "{"},
+            x = x.ParenthesisLevel
+                (new[] {"(", "[", "{"},
                  new[] {")", "]", "}"}
                 );
-            //x.Correct("(", PrioTable.Common, '-');
-            //x.Correct("[", PrioTable.Common, '-');
-            //x.Correct("{", PrioTable.Common, '-');
+            //x.Correct("(", PrioTable.Any, '-');
+            //x.Correct("[", PrioTable.Any, '-');
+            //x.Correct("{", PrioTable.Any, '-');
 
-            x += PrioTable.Right(PrioTable.SyntaxError);
+            x += PrioTable.Right(PrioTable.Error);
 
-            x = x.Level
-                (new[]
-                {
-                    "++-",
-                    "+?-",
-                    "?--"
-                },
-                 new[] { PrioTable.Frame },
-                 new[] { PrioTable.End }
-                );
+            x = x.ParenthesisLevel(PrioTable.BeginOfText,PrioTable.EndOfText);
 
             //Tracer.FlaggedLine("\n"+x.ToString());
             return x;

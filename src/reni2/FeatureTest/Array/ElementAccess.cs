@@ -31,6 +31,7 @@ namespace Reni.FeatureTest.Array
     [TestFixture]
     [ArrayFromPieces]
     [TargetSet("((<<5<<3<<5<<1<<3) (3)) dump_print", "1")]
+    [LowPriority]
     public sealed class ElementAccess : CompilerTest
     {
         [Test]
@@ -40,6 +41,7 @@ namespace Reni.FeatureTest.Array
     [TestFixture]
     [ArrayFromPieces]
     [TargetSet("x: <<5<<3; x dump_print", "array(#(#align3#)# (bit)sequence(4),(5, 3))")]
+    [LowPriority]
     public sealed class ArrayVariable : CompilerTest
     {
         [Test]

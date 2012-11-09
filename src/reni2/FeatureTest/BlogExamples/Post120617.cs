@@ -21,10 +21,12 @@
 #endregion
 
 using HWClassLibrary.UnitTest;
+using Reni.FeatureTest.Structure;
 
 namespace Reni.FeatureTest.BlogExamples
 {
     [TestFixture]
+    [AccessSimple1]
     [TargetSet("\"Hello world\" dump_print", "Hello world")]
     [TargetSet(@"Viersich: 4;
 EinsDazu: /\ arg + 1 ;

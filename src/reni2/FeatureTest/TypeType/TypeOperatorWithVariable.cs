@@ -30,6 +30,7 @@ using Reni.FeatureTest.Structure;
 namespace Reni.FeatureTest.TypeType
 {
     [TestFixture]
+    [InnerAccess]
     public sealed class TypeOperatorWithVariable : CompilerTest
     {
         protected override string Target { get { return @"x: 0; x type dump_print"; } }

@@ -29,7 +29,6 @@ using HWClassLibrary.UnitTest;
 namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
-    [AccessSimple]
     [Target(@"(1, 2, 3, 4, 5, 6) dump_print")]
     [Output("(1, 2, 3, 4, 5, 6)")]
     public sealed class DumpPrint : CompilerTest

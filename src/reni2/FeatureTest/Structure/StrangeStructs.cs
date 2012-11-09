@@ -29,7 +29,7 @@ using HWClassLibrary.UnitTest;
 namespace Reni.FeatureTest.Structure
 {
     [TestFixture]
-    [AccessSimple]
+    [AccessSimple1]
     [InnerAccess]
     [AccessAndAdd]
     [TargetSet(@"((one: 1) one) dump_print;", "1")]
