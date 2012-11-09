@@ -4,22 +4,34 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head id="Head1" runat="server">
-        <title></title>
+        <title>Reni Compiler Tool</title>
     </head>            
 
     <body>
-        <form id="reniForm" runat="server">
-            &nbsp;<asp:TextBox id="Code" 
-                runat="server" Height="123px" 
-                TextMode="MultiLine" Width="880px" />
+        <form id="reniForm" runat="server" >
+            Enter text to compile and press tab:
             <br />
-            <asp:Button ID="Compile" Text="Compile and run" runat="server" 
-                OnClick="ButtonOkClick" Width="888px" Height="24px" />
+            <asp:TextBox 
+                id="Code" 
+                runat="server" 
+                TextMode="MultiLine" 
+                Rows="5" 
+                Columns="80"
+                AutoPostBack="True"
+                OnTextChanged="OnTextChanged"
+                />
             <br />
-        <p>
-            <asp:TextBox id="Result" runat="server" Height="123px" 
-                TextMode="MultiLine" Width="880px" style="margin-top: 0px" />
-            </p>
+            <div>
+                <% foreach(var line in ResultText){ %>
+                    <div><%= line %></div>
+                <% } %>
+            </div>
+            <br />
+            <br />
+            <div align="right">
+                For more information see: 
+                <a href="http://hahoyer-compiler.blogspot.de">http://hahoyer-compiler.blogspot.de</a>
+            </div>
         </form>
         </body>
 

@@ -23,18 +23,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Web.UI;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni;
 
 namespace WebSite
 {
     public partial class Default : Page
     {
-        protected void Page_Load(object sender, EventArgs e) { }
-
-        protected void ButtonOkClick(object sender, EventArgs e) { Result.Text = Compiler.FlatExecute(Code.Text, isFakedName: true); }
+        protected string[] ResultText = new string[0];
+        protected void OnTextChanged(object sender, EventArgs e)
+        {
+            ResultText = Compiler.FlatExecute(Code.Text, isFakedName: true).Split('\n');
+        }
     }
 }
