@@ -36,19 +36,14 @@ namespace Reni.Parser
     [Serializable]
     sealed class PrioTable
     {
-        internal const string Common = "<common>";
-        internal const string End = "<end>";
-        internal const string Frame = "<frame>";
-        internal const string SyntaxError = "<syntaxerror>";
+        internal const string Any = "(any)";
+        internal const string EndOfText = "(eot)";
+        internal const string BeginOfText = "(bot)";
+        internal const string Error = "(err)";
 
         readonly string[] _token;
         readonly SimpleCache<char[,]> _dataCache;
 
-        /// <summary>
-        ///     asis
-        /// </summary>
-        /// <param name="obj"> </param>
-        /// <returns> </returns>
         public override bool Equals(object obj)
         {
             var x = obj as PrioTable;
@@ -64,10 +59,6 @@ namespace Reni.Parser
             return x.Equals(y);
         }
 
-        /// <summary>
-        ///     asis
-        /// </summary>
-        /// <returns> </returns>
         public override int GetHashCode() { return _token.GetHashCode() + _dataCache.GetHashCode(); }
 
         public static bool operator !=(PrioTable x, PrioTable y)
@@ -106,28 +97,46 @@ namespace Reni.Parser
             return head0 + "\n" + head1 + "\n" + result;
         }
 
-        public PrioTable FromText(string text) { return FromText(text.Split('\n')); }
+        public static PrioTable FromText(string text) { return FromText(text.Split(new[] {'\n', '\r'})); }
 
-        public PrioTable FromText(string[] text) { return FromText(text.Select(l => l.Split(new[] {' ', '\t'})).ToArray()); }
+        static PrioTable FromText(string[] text) { return FromText(text.Select(l => l.Split(new[] {' ', '\t'})).ToArray()); }
 
-        PrioTable FromText(string[][] text)
+        static PrioTable FromText(string[][] text)
         {
-            var result = new PrioTable();
+            var result = Left(Any);
             foreach(var line in text)
             {
+                var data = line.Skip(1).ToArray();
+                int tokenCount = data.Length / 2;
                 switch(line[0])
                 {
                     case "Left":
-                        result = result += Left(line.Skip(1).ToArray());
+                        result += Left(data);
+                        break;
+                    case "Right":
+                        result += Right(data);
+                        break;
+                    case "ParLevel":
+                        result = result.ParenthesisLevel
+                            (data.Take(tokenCount).ToArray()
+                             , data.Skip(tokenCount).Take(tokenCount).ToArray()
+                            );
+                        break;
+                    case "TELevel":
+                        result = result.ThenElseLevel
+                            (data.Take(tokenCount).ToArray()
+                             , data.Skip(tokenCount).Take(tokenCount).ToArray()
+                            );
+                        break;
+                    case "-":
+                    case "+":
+                    case "=":
+                        result.Correct(data[0], data[1], line[0][0]);
                         break;
                 }
-                var table = FromTextLine(line);
-                result = result + table;
             }
-            return result;
+            return result.ParenthesisLevel(BeginOfText,EndOfText);
         }
-
-        PrioTable FromTextLine(string[] line) { throw new NotImplementedException(); }
 
         char[,] AllocData()
         {
@@ -151,6 +160,17 @@ namespace Reni.Parser
         ///     Returns number of token in table
         /// </summary>
         int Length { get { return _token.Length; } }
+
+        static int Find(int i, params string[][] x)
+        {
+            for(var j = 0; j < x.Length; j++)
+            {
+                i -= x[j].Length;
+                if(i < 0)
+                    return j;
+            }
+            return x.Length;
+        }
 
         PrioTable() { _dataCache = new SimpleCache<char[,]>(AllocData); }
 
@@ -184,17 +204,6 @@ namespace Reni.Parser
                     }
         }
 
-        static int Find(int i, params string[][] x)
-        {
-            for(var j = 0; j < x.Length; j++)
-            {
-                i -= x[j].Length;
-                if(i < 0)
-                    return j;
-            }
-            return x.Length;
-        }
-
         PrioTable(PrioTable x, string[] data, string[] left, string[] right)
             : this()
         {
@@ -217,14 +226,11 @@ namespace Reni.Parser
                             _dataCache.Value[i, j] = '+';
                 }
         }
-
         /// <summary>
-        ///     Obtain the index in token list. 
-        ///     Empty string is considered as "end" in angle brackets. 
-        ///     If name is not found the entry "common" in angle brackets is used
         /// </summary>
-        /// <param name="name"> </param>
-        /// <returns> </returns>
+        //     Obtain the index in token list. 
+        //     Empty string is considered as "end" in angle brackets. 
+        //     If name is not found the entry "common" in angle brackets is used
         public int Index(string name)
         {
             for(var i = 0; i < Length; i++)
@@ -232,10 +238,10 @@ namespace Reni.Parser
                     return (i);
 
             for(var i = 0; i < Length; i++)
-                if(_token[i] == Common)
+                if(_token[i] == Any)
                     return (i);
 
-            throw new NotImplementedException("missing " + Common + " entry in priority table");
+            throw new NotImplementedException("missing " + Any + " entry in priority table");
         }
 
         /// <summary>
@@ -268,7 +274,12 @@ namespace Reni.Parser
         /// <param name="lToken"> list of strings that play the role of left parenthesis </param>
         /// <param name="rToken"> list of strings that play the role of right parenthesis </param>
         /// <returns> </returns>
-        public PrioTable Level(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
+        PrioTable Level(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
+
+        public PrioTable ParenthesisLevel(string[] lToken, string[] rToken) { return Level(ParenthesisTable, lToken, rToken); }
+        public PrioTable ThenElseLevel(string[] lToken, string[] rToken) { return Level(ThenElseTable, lToken, rToken); }
+        public PrioTable ParenthesisLevel(string lToken, string rToken) { return Level(ParenthesisTable, new[] {lToken}, new[] {rToken}); }
+        public PrioTable ThenElseLevel(string lToken, string rToken) { return Level(ThenElseTable, new[] {lToken}, new[] {rToken}); }
 
         public static PrioTable operator +(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
 
@@ -313,7 +324,7 @@ namespace Reni.Parser
             return n;
         }
 
-        static bool IsNormalName(string name) { return name != Frame && name != End && name != Common && name != SyntaxError; }
+        static bool IsNormalName(string name) { return name != BeginOfText && name != EndOfText && name != Any && name != Error; }
 
         /// <summary>
         ///     Returns the priority information of a pair of tokens
@@ -351,5 +362,17 @@ namespace Reni.Parser
                 return result;
             }
         }
+        internal static readonly string[] ParenthesisTable = new[]
+        {
+            "++-",
+            "+?-",
+            "?--"
+        };
+        internal static readonly string[] ThenElseTable = new[]
+        {
+            "+--",
+            "+?+",
+            "?-+"
+        };
     }
 }

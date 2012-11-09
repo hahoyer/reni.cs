@@ -1,4 +1,5 @@
-﻿// 
+﻿#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +30,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class DeclarationTokenFactory : TokenFactory<TokenClasses.TokenClass>
+    sealed class DeclarationTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
         internal static DeclarationTokenFactory Instance { get { return new DeclarationTokenFactory(); } }
 
@@ -35,26 +38,21 @@ namespace Reni.ReniParser
         {
             var prioTable = PrioTable.Left("!");
             prioTable += PrioTable.Left("converter");
-            prioTable = prioTable.Level
-                (new[]
-                 {
-                     "++-",
-                     "+?-",
-                     "?--"
-                 },
-                 new[] {"(", "[", "{", PrioTable.Frame},
-                 new[] {")", "]", "}", PrioTable.End}
+            prioTable = prioTable.ParenthesisLevel
+                (
+                    new[] {"(", "[", "{", PrioTable.BeginOfText},
+                    new[] {")", "]", "}", PrioTable.EndOfText}
                 );
-            prioTable += PrioTable.Left(PrioTable.Common);
+            prioTable += PrioTable.Left(PrioTable.Any);
             return prioTable;
         }
 
         protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()
         {
             return new DictionaryEx<string, TokenClasses.TokenClass>
-                   {
-                       {"converter", new ConverterToken()},
-                   };
+            {
+                {"converter", new ConverterToken()},
+            };
         }
 
         protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }

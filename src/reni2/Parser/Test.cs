@@ -101,5 +101,7 @@ aa)#dump_print
             CreateFileAndRunCompiler("UseAlternativePrioTable", @"!converter: 3; !converter: 4",
                                      expectedResult: c => syntaxPrototype.AssertLike(c.Syntax));
         }
+
+
     }
 }

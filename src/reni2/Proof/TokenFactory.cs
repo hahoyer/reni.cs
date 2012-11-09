@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +30,7 @@ using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    sealed class TokenFactory : TokenFactory<TokenClasses.TokenClass>
+    sealed class TokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
         internal static TokenFactory Instance { get { return new TokenFactory(); } }
 
@@ -35,7 +38,7 @@ namespace Reni.Proof
 
         protected override PrioTable GetPrioTable()
         {
-            var x = PrioTable.Left(PrioTable.Common);
+            var x = PrioTable.Left(PrioTable.Any);
 
             x += PrioTable.Right("^");
             x += PrioTable.Left("*", "/", "\\", "gcd");
@@ -51,15 +54,10 @@ namespace Reni.Proof
             x += PrioTable.Right(",");
             x += PrioTable.Right(";");
 
-            x = x.Level
-                (new[]
-                 {
-                     "++-",
-                     "+?-",
-                     "?--"
-                 },
-                 new[] {"(", "[", "{", PrioTable.Frame},
-                 new[] {")", "]", "}", PrioTable.End}
+            x = x.ParenthesisLevel
+                (
+                    new[] {"(", "[", "{", PrioTable.BeginOfText},
+                    new[] {")", "]", "}", PrioTable.EndOfText}
                 );
             //Tracer.FlaggedLine("\n"+x+"\n");
             return x;

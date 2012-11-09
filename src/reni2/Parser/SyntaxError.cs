@@ -36,7 +36,7 @@ namespace Reni.Parser
         public SyntaxError(IssueId issueId) { _issueId = issueId; }
 
         string ITokenClass.Name { set { throw new NotImplementedException(); } }
-        string ITokenClass.PrioTableName(string name) { return PrioTable.SyntaxError; }
+        string ITokenClass.PrioTableName(string name) { return PrioTable.Error; }
         ITokenFactory ITokenClass.NewTokenFactory { get { return null; } }
         IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right)
         {
