@@ -90,7 +90,7 @@ namespace Reni.Parser
             return result;
         }
 
-        ParserInst ITokenFactory.Parser { get { return new ParserInst(new Scanner(), this); } }
+        ParserInst ITokenFactory.Parser { get { return new ParserInst(new ReniScanner(), this); } }
         PrioTable ITokenFactory.PrioTable { get { return _prioTable.Value; } }
 
         ITokenClass ITokenFactory.TokenClass(string name)
@@ -104,11 +104,10 @@ namespace Reni.Parser
             return result;
         }
 
-        ITokenClass ITokenFactory.ListClass { get { return _listClass.Value; } }
         ITokenClass ITokenFactory.NumberClass { get { return _numberClass.Value; } }
         ITokenClass ITokenFactory.TextClass { get { return _textClass.Value; } }
-        ITokenClass ITokenFactory.RightParenthesisClass(int level) { return _righParenthesis[level]; }
-        ITokenClass ITokenFactory.LeftParenthesisClass(int level) { return _leftParenthesis[level]; }
+        ITokenClass ITokenFactory.BeginOfText { get { return _leftParenthesis[0]; } }
+        ITokenClass ITokenFactory.EndOfText { get { return _righParenthesis[0]; } }
 
         protected abstract TTokenClass GetSyntaxError(string message);
         protected abstract PrioTable GetPrioTable();

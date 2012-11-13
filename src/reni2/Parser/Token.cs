@@ -38,7 +38,7 @@ namespace Reni.Parser
             _tokenClass = tokenClass;
         }
 
-        internal TokenData Data { get { return _data; } }
+        TokenData Data { get { return _data; } }
 
         internal ITokenClass TokenClass { get { return _tokenClass; } }
 
@@ -49,6 +49,20 @@ namespace Reni.Parser
         internal string PrioTableName { get { return TokenClass.PrioTableName(Data.Name); } }
 
         internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
+
+        internal static Token CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, ITokenClass tokenClass) { return CreateAndAdvance(sourcePosn, getLength, (sp, l) => tokenClass); }
+        internal static Token CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<string, ITokenClass> getTokenClass) { return CreateAndAdvance(sourcePosn, getLength, (sp, l) => getTokenClass(sp.SubString(0, l))); }
+
+        static Token CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<SourcePosn, int, ITokenClass> getTokenClass)
+        {
+            var length = getLength(sourcePosn);
+            if(length == null)
+                return null;
+
+            var result = new Token(getTokenClass(sourcePosn, length.Value), sourcePosn.Source, sourcePosn.Position, length.Value);
+            sourcePosn .Incr(length.Value);
+            return result;
+        }
     }
 
     sealed class TokenData : ReniObject
@@ -68,11 +82,11 @@ namespace Reni.Parser
         }
 
         [DisableDump]
-        internal Source Source { get { return _source; } }
+        Source Source { get { return _source; } }
         [DisableDump]
-        internal int Position { get { return _position; } }
+        int Position { get { return _position; } }
         [DisableDump]
-        internal int Length { get { return _length; } }
+        int Length { get { return _length; } }
         [DisableDump]
         internal string Name { get { return Source.SubString(Position, Length); } }
         [DisableDump]

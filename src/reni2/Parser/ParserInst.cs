@@ -33,10 +33,10 @@ namespace Reni.Parser
     [Serializable]
     sealed class ParserInst
     {
-        readonly IScanner _scanner;
+        readonly Scanner _scanner;
         readonly ITokenFactory _tokenFactory;
 
-        public ParserInst(IScanner scanner, ITokenFactory tokenFactory)
+        public ParserInst(Scanner scanner, ITokenFactory tokenFactory)
         {
             _scanner = scanner;
             _tokenFactory = tokenFactory;
@@ -49,7 +49,7 @@ namespace Reni.Parser
         /// <returns> </returns>
         public IParsedSyntax Compile(Source source)
         {
-            var sourcePosn = new SourcePosn(source, 0);
+            var sourcePosn = source + 0;
             var stack = new Stack<PushedSyntax>();
             stack.Push(new PushedSyntax(sourcePosn, _tokenFactory));
             while(true)
@@ -64,7 +64,7 @@ namespace Reni.Parser
 
                     if(relation != '-')
                     {
-                        if(token.TokenClass == _tokenFactory.RightParenthesisClass(0))
+                        if(token.TokenClass == _tokenFactory.EndOfText)
                             return token.Syntax(result, null);
                         stack.Push(new PushedSyntax(result, token, token.TokenClass.NewTokenFactory ?? stack.Peek().TokenFactory));
                         result = null;
@@ -72,10 +72,5 @@ namespace Reni.Parser
                 } while(result != null);
             }
         }
-    }
-
-    interface IScanner
-    {
-        Token CreateToken(SourcePosn sourcePosn, ITokenFactory tokenFactory);
     }
 }

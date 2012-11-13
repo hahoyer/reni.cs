@@ -1,4 +1,26 @@
-﻿using System;
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -6,10 +28,10 @@ using HWClassLibrary.IO;
 
 namespace Reni.Parser
 {
-    internal sealed class Source : ReniObject
+    sealed class Source : ReniObject
     {
-        private readonly string _data;
-        private readonly File _file;
+        readonly string _data;
+        readonly File _file;
 
         internal Source(File file)
         {
@@ -39,21 +61,19 @@ namespace Reni.Parser
         {
             if(_file == null)
                 return "????";
-            return Tracer.FilePosn(_file.FullName, LineNr(i), ColNr(i) + 1, tag??FilePositionTag.Debug.ToString()) + flagText;
+            return Tracer.FilePosn(_file.FullName, LineNr(i), ColNr(i) + 1, tag ?? FilePositionTag.Debug.ToString()) + flagText;
         }
 
-        private int LineNr(int iEnd)
+        int LineNr(int iEnd)
         {
             var result = 0;
             for(var i = 0; i < iEnd; i++)
-            {
                 if(_data[i] == '\n')
                     result++;
-            }
             return result;
         }
 
-        private int ColNr(int iEnd)
+        int ColNr(int iEnd)
         {
             var result = 0;
             for(var i = 0; i < iEnd; i++)
@@ -66,5 +86,7 @@ namespace Reni.Parser
         }
 
         protected override string Dump(bool isRecursion) { return FilePosn(0, "see there"); }
+
+        public static SourcePosn operator +(Source x, int y) { return new SourcePosn(x, y); }
     }
 }

@@ -100,7 +100,11 @@
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="IProxyType.cs" />
+    <Compile Include="Parser\Match.cs" />
+    <Compile Include="Parser\MatchExtension.cs" />
     <Compile Include="Parser\PrioTableTest.cs" />
+    <Compile Include="Parser\ReniScanner.cs" />
+    <Compile Include="Parser\Scanner.cs" />
     <Compile Include="Parser\Services.cs" />
     <Compile Include="Parser\SyntaxIssue.cs" />
     <Compile Include="ReniObjectExtender.cs" />
@@ -254,7 +258,6 @@
     <Compile Include="T4Compiler.cs" />
     <Compile Include="ConversionFunction.cs" />
     <Compile Include="Parser\IParsedSyntax.cs" />
-    <Compile Include="Parser\Scanner.cs" />
     <Compile Include="Feature\DumpPrint\DumpPrint.cs" />
     <Compile Include="Feature\TypeOperator.cs" />
     <Compile Include="Parser\TokenFactory.cs" />
@@ -371,6 +374,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>

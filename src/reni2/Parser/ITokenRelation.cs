@@ -10,10 +10,9 @@ namespace Reni.Parser
         ITokenClass TokenClass(string name);
         ParserInst Parser { get; }
         PrioTable PrioTable { get; }
-        ITokenClass ListClass { get; }
         ITokenClass NumberClass { get; }
         ITokenClass TextClass { get; }
-        ITokenClass RightParenthesisClass(int level);
-        ITokenClass LeftParenthesisClass(int level);
+        ITokenClass BeginOfText { get; }
+        ITokenClass EndOfText { get; }
     }
 }

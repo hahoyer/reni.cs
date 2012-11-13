@@ -28,7 +28,7 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class SyntaxError : ReniObject, ITokenClass
+    sealed class SyntaxError : ReniObject, ITokenClass, Match.IError
     {
         [EnableDump]
         readonly IssueId _issueId;

@@ -19,10 +19,12 @@ namespace Reni.Parser
             _left = left;
             _token = token;
             _tokenFactory = tokenFactory;
+            if(ObjectId > 1000)
+                return;
         }
 
         internal PushedSyntax(SourcePosn sourcePosn, ITokenFactory tokenFactory)
-            : this(null, new Token(tokenFactory.LeftParenthesisClass(0), sourcePosn.Source, sourcePosn.Position, 0), tokenFactory) { }
+            : this(null, new Token(tokenFactory.BeginOfText, sourcePosn.Source, sourcePosn.Position, 0), tokenFactory) { }
 
         internal ITokenFactory TokenFactory { get { return _tokenFactory; } }
 

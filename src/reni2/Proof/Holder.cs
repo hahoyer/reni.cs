@@ -28,7 +28,7 @@ namespace Reni.Proof
 {
     sealed class Holder : ReniObject
     {
-        static readonly ParserInst _parser = new ParserInst(new Scanner(), Main.TokenFactory);
+        static readonly ParserInst _parser = new ParserInst(new ReniScanner(), Main.TokenFactory);
         readonly string _text;
         readonly ClauseSyntax _statement;
 

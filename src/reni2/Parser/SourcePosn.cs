@@ -1,4 +1,26 @@
-﻿using System;
+﻿#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
@@ -9,10 +31,10 @@ namespace Reni.Parser
     ///     Source and position for compilation process
     /// </summary>
     [Serializable]
-    internal sealed class SourcePosn : ReniObject
+    sealed class SourcePosn : ReniObject
     {
-        private readonly Source _source;
-        private int _position;
+        readonly Source _source;
+        int _position;
 
         /// <summary>
         ///     ctor from source and position
@@ -42,13 +64,13 @@ namespace Reni.Parser
         ///     Advance position
         /// </summary>
         /// <param name = "i">number characters to move</param>
-        public void Incr(int i) { _position += i; }
+        public void Incr(int i = 1) { _position += i; }
 
         /// <summary>
         ///     Checks if at or beyond end of source
         /// </summary>
-        /// <returns></returns>
-        public bool IsEnd() { return _source.IsEnd(_position); }
+        /// <value> </value>
+        public bool IsEnd { get { return _source.IsEnd(_position); } }
 
         /// <summary>
         ///     Obtains a piece
@@ -69,6 +91,23 @@ namespace Reni.Parser
         ///     Default dump behaviour
         /// </summary>
         /// <returns>The file position of sourec file</returns>
-        protected override string Dump(bool isRecursion) { return "\n"+FilePosn("see there"); }
+        protected override string Dump(bool isRecursion) { return "\n" + FilePosn("see there"); }
+
+        public static SourcePosn operator +(SourcePosn x, int y) { return x._source + (x._position + y); }
+
+        public static int operator -(SourcePosn x, SourcePosn y)
+        {
+            Tracer.Assert(x.Source == y.Source);
+            return x.Position - y.Position;
+        }
+
+        public int? Match(IMatch automaton) { return automaton.Match(this); }
+
+        public bool StartsWith(string data)
+        {
+            var length = data.Length;
+            return !Source.IsEnd(Position+length - 1)
+                   && Source.SubString(Position, length) == data;
+        }
     }
 }
