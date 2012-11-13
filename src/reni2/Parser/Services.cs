@@ -29,6 +29,6 @@ namespace Reni.Parser
 {
     public static class Services
     {
-        public static string FormatPrioTable(string text) { return PrioTable.FromText(text).ToString(); }
+        public static PrioTable FormatPrioTable(string text) { return PrioTable.FromText(text); }
     }
 }

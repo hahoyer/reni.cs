@@ -60,6 +60,10 @@
   <ItemGroup>
     <Content Include="Default.aspx" />
     <Content Include="Parser.aspx" />
+    <Content Include="Parser.css" />
+    <Content Include="Resources\Stack.Match.bmp" />
+    <Content Include="Resources\Stack.Pull.bmp" />
+    <Content Include="Resources\Stack.Push.bmp" />
     <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
     <Content Include="Scripts\jquery-1.4.1.js" />
     <Content Include="Scripts\jquery-1.4.1.min.js" />

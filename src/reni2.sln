@@ -2,8 +2,32 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{71905A24-D1C7-468D-8E25-553FA67DA2D9}"
 	ProjectSection(SolutionItems) = preProject
+		Resources\Bool.ico = Resources\Bool.ico
+		Resources\Cache.bmp = Resources\Cache.bmp
+		Resources\Chip.ico = Resources\Chip.ico
+		Resources\Code.bmp = Resources\Code.bmp
+		Resources\Code.ico = Resources\Code.ico
+		Resources\CodeError.ico = Resources\CodeError.ico
+		Resources\Context.ico = Resources\Context.ico
+		Resources\Dictionary.ico = Resources\Dictionary.ico
+		Resources\empty.bmp = Resources\empty.bmp
+		Resources\empty_o.bmp = Resources\empty_o.bmp
+		Resources\Key.ico = Resources\Key.ico
 		..\LICENSE = ..\LICENSE
+		Resources\List.ico = Resources\List.ico
+		Resources\ListItem.ico = Resources\ListItem.ico
+		Resources\Number.ico = Resources\Number.ico
+		Resources\Ok.bmp = Resources\Ok.bmp
+		Resources\OnOff.ico = Resources\OnOff.ico
 		..\README = ..\README
+		Resources\Size.ico = Resources\Size.ico
+		Resources\Stack.Push.ico = Resources\Stack.Push.ico
+		Resources\String.ico = Resources\String.ico
+		Resources\Symbol.bmp = Resources\Symbol.bmp
+		Resources\Syntax.bmp = Resources\Syntax.bmp
+		Resources\Type.ico = Resources\Type.ico
+		Resources\Unknown.bmp = Resources\Unknown.bmp
+		Resources\UnknownCache.bmp = Resources\UnknownCache.bmp
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reni2", "reni2\Reni2.csproj", "{EBB73C84-6622-4183-A28F-B0DFF606006B}"

@@ -25,17 +25,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
 using Reni.Parser;
 
 namespace WebSite
 {
     public partial class Parser : Page
     {
-        protected string PrioTableText;
-        protected void OnTextChanged(object sender, EventArgs e)
+        protected PrioTable PrioTable = PrioTable.FromText("");
+        protected void OnPrioListChanged(object sender, EventArgs e)
         {
-            PrioTableText = Services.FormatPrioTable(PrioList.Text);
+            if (PrioList.Text == "?")
+                PrioList.Text = @"Left not
+Left and
+Left or
+Left * /
+Left + -
+Left = <>
+Right :=
+TELevel then else
+Left function
+Right :
+Right , ;
+ParLevel ( { ) }
+";
+            PrioTable = Services.FormatPrioTable(PrioList.Text);
+        }
+
+
+        protected void OnProgramChanged(object sender, EventArgs e) { 
         }
     }
 }

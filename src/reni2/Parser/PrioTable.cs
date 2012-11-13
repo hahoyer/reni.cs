@@ -34,7 +34,7 @@ namespace Reni.Parser
     ///     Priority table used in parsing to create the syntax tree.
     /// </summary>
     [Serializable]
-    sealed class PrioTable
+    public sealed class PrioTable
     {
         internal const string Any = "(any)";
         internal const string EndOfText = "(eot)";
@@ -107,7 +107,7 @@ namespace Reni.Parser
             foreach(var line in text)
             {
                 var data = line.Skip(1).ToArray();
-                int tokenCount = data.Length / 2;
+                var tokenCount = data.Length / 2;
                 switch(line[0])
                 {
                     case "Left":
@@ -135,7 +135,9 @@ namespace Reni.Parser
                         break;
                 }
             }
-            return result.ParenthesisLevel(BeginOfText,EndOfText);
+            result = result.ParenthesisLevel(BeginOfText, EndOfText);
+            result.Sort();
+            return result;
         }
 
         char[,] AllocData()
@@ -276,10 +278,10 @@ namespace Reni.Parser
         /// <returns> </returns>
         PrioTable Level(string[] data, string[] lToken, string[] rToken) { return new PrioTable(this, data, lToken, rToken); }
 
-        public PrioTable ParenthesisLevel(string[] lToken, string[] rToken) { return Level(ParenthesisTable, lToken, rToken); }
-        public PrioTable ThenElseLevel(string[] lToken, string[] rToken) { return Level(ThenElseTable, lToken, rToken); }
-        public PrioTable ParenthesisLevel(string lToken, string rToken) { return Level(ParenthesisTable, new[] {lToken}, new[] {rToken}); }
-        public PrioTable ThenElseLevel(string lToken, string rToken) { return Level(ThenElseTable, new[] {lToken}, new[] {rToken}); }
+        public PrioTable ParenthesisLevel(string[] lToken, string[] rToken) { return Level(_parenthesisTable, lToken, rToken); }
+        public PrioTable ThenElseLevel(string[] lToken, string[] rToken) { return Level(_thenElseTable, lToken, rToken); }
+        public PrioTable ParenthesisLevel(string lToken, string rToken) { return Level(_parenthesisTable, new[] {lToken}, new[] {rToken}); }
+        public PrioTable ThenElseLevel(string lToken, string rToken) { return Level(_thenElseTable, new[] {lToken}, new[] {rToken}); }
 
         public static PrioTable operator +(PrioTable x, PrioTable y) { return new PrioTable(x, y); }
 
@@ -338,6 +340,9 @@ namespace Reni.Parser
         /// <returns> </returns>
         public char Relation(string newTokenName, string recentTokenName)
         {
+            if(newTokenName == BeginOfText || recentTokenName == EndOfText)
+                return ' ';
+
             //Tracer.FlaggedLine("\"" + _token[New] + "\" on \"" + _token[recentToken] + "\" --> \"" + _dataCache[New, recentToken] + "\"");
             return _dataCache.Value[Index(newTokenName), Index(recentTokenName)];
         }
@@ -345,6 +350,8 @@ namespace Reni.Parser
         //For debug only
         [Node]
         public string[] Token { get { return _token; } }
+        public IEnumerable<string> NewToken { get { return _token.Where(t => t != BeginOfText); } }
+        public IEnumerable<string> RecentToken { get { return _token.Where(t => t != EndOfText); } }
 
         //For debug only
         [Node]
@@ -362,17 +369,75 @@ namespace Reni.Parser
                 return result;
             }
         }
-        internal static readonly string[] ParenthesisTable = new[]
+        static readonly string[] _parenthesisTable = new[]
         {
             "++-",
             "+?-",
             "?--"
         };
-        internal static readonly string[] ThenElseTable = new[]
+        static readonly string[] _thenElseTable = new[]
         {
             "+--",
             "+?+",
             "?-+"
         };
+
+        void Sort()
+        {
+            while(SortOne())
+                continue;
+        }
+        bool SortOne()
+        {
+            var comparer = new PrioComparer(this);
+            var newOrder = Length.Array(i => i).OrderBy(d => d, comparer);
+            var toDo = newOrder
+                .Select((iOld, iNew) => new {iOld, iNew})
+                .FirstOrDefault(x => x.iOld != x.iNew);
+            if(toDo == null)
+                return false;
+
+            Exchange(toDo.iOld, toDo.iNew);
+            return true;
+        }
+
+        void Exchange(int iOld, int iNew)
+        {
+            Exchange(ref _token[iOld], ref _token[iNew]);
+            var data = _dataCache.Value;
+            for(var i = 0; i < Length; i++)
+            {
+                Exchange(ref data[i, iOld], ref data[i, iNew]);
+                Exchange(ref data[iOld, i], ref data[iNew, i]);
+            }
+        }
+
+        static void Exchange<T>(ref T iOld, ref T iNew)
+        {
+            var t = iOld;
+            iOld = iNew;
+            iNew = t;
+        }
+
+
+        sealed class PrioComparer : Comparer<int>
+        {
+            readonly PrioTable _parent;
+            public PrioComparer(PrioTable parent) { _parent = parent; }
+            public override int Compare(int x, int y)
+            {
+                var result = 0;
+                result = _parent.NoPluses(x).CompareTo(_parent.NoPluses(y));
+                if (result != 0)
+                    return result;
+                result = _parent.NoMinuses(x).CompareTo(_parent.NoMinuses(y));
+                if(result != 0)
+                    return result;
+                return x.CompareTo(y);
+            }
+        }
+
+        int NoPluses(int x) { return Data[x].Count(d => d != '+'); }
+        int NoMinuses(int x) { return Data[x].Count(d => d != '-'); }
     }
 }
