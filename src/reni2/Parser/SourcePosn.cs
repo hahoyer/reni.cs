@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
-using HWClassLibrary.Helper;
+using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
@@ -33,7 +33,7 @@ namespace Reni.Parser
     ///     Source and position for compilation process
     /// </summary>
     [Serializable]
-    [DebuggerDisplay("{ToString()}")]
+    [DebuggerDisplay("{NodeDump} {DumpBeforeCurrent}[{DumpCurrent}]{DumpAfterCurrent}")]
     sealed class SourcePosn : ReniObject
     {
         readonly Source _source;
@@ -96,30 +96,32 @@ namespace Reni.Parser
         /// <returns>The file position of sourec file</returns>
         protected override string Dump(bool isRecursion) { return "\n" + FilePosn("see there"); }
 
-        public override string ToString() { return base.ToString() + PrettyDump; }
-        string PrettyDump { get { return (DumpBeforeCurrent + "[" + ("" + Current).Quote() + "]" + DumpAfterCurrent); } }
+        [UsedImplicitly]
+        string DumpCurrent { get { return IsEnd ? "" : ("" + Current); } }
 
         const int DumpWidth = 10;
 
+        [UsedImplicitly]
         string DumpAfterCurrent
         {
             get
             {
                 var length = Math.Min(DumpWidth, Source.Length - Position - 1);
 
-                var result = Source.SubString(Position + 1, length).Quote();
+                var result = Source.SubString(Position + 1, length);
                 if(length == DumpWidth)
                     result += "...";
                 return result;
             }
         }
 
+        [UsedImplicitly]
         string DumpBeforeCurrent
         {
             get
             {
                 var start = Math.Max(0, Position - DumpWidth);
-                var result = Source.SubString(start, Position - start).Quote();
+                var result = Source.SubString(start, Position - start);
                 if(Position >= DumpWidth)
                     result = "..." + result;
                 return result;
