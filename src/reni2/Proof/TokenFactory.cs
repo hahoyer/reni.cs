@@ -68,6 +68,14 @@ namespace Reni.Proof
             var result =
                 new DictionaryEx<string, TokenClasses.TokenClass>
                 {
+                    {"{", new LeftParenthesis(1)},
+                    {"[", new LeftParenthesis(2)},
+                    {"(", new LeftParenthesis(3)},
+                    {"}", new RightParenthesis(1)},
+                    {"]", new RightParenthesis(2)},
+                    {")", new RightParenthesis(3)},
+                    {",", new List()},
+                    {";", new List()},
                     {"=", new Equal()},
                     {"-", new Minus()},
                     {"&", new And()},
@@ -79,10 +87,8 @@ namespace Reni.Proof
                 };
             return result;
         }
-
-        protected override TokenClasses.TokenClass GetListClass() { return new List(); }
-        protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
-        protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
+        protected override TokenClasses.TokenClass GetEndOfTextClass() { return new RightParenthesis(0); }
+        protected override TokenClasses.TokenClass GetBeginOfTextClass() { return new LeftParenthesis(0); }
         protected override TokenClasses.TokenClass GetNumberClass() { return new TokenClasses.Number(); }
 
         internal Minus Minus { get { return (Minus) TokenClass("-"); } }

@@ -98,6 +98,14 @@ namespace Reni.ReniParser
             {
                 return new DictionaryEx<string, TokenClasses.TokenClass>
                 {
+                    {"{", new LeftParenthesis(1)},
+                    {"[", new LeftParenthesis(2)},
+                    {"(", new LeftParenthesis(3)},
+                    {"}", new RightParenthesis(1)},
+                    {"]", new RightParenthesis(2)},
+                    {")", new RightParenthesis(3)},
+                    {",", new List()},
+                    {";", new List()},
                     {"@", new AtOperator()},
                     {"^", new ContextOperator()},
                     {":", new Colon()},
@@ -139,9 +147,8 @@ namespace Reni.ReniParser
             }
         }
 
-        protected override TokenClasses.TokenClass GetListClass() { return new List(); }
-        protected override TokenClasses.TokenClass GetRightParenthesisClass(int level) { return new RightParenthesis(level); }
-        protected override TokenClasses.TokenClass GetLeftParenthesisClass(int level) { return new LeftParenthesis(level); }
+        protected override TokenClasses.TokenClass GetEndOfTextClass() { return new RightParenthesis(0); }
+        protected override TokenClasses.TokenClass GetBeginOfTextClass() { return new LeftParenthesis(0); }
         protected override TokenClasses.TokenClass GetNumberClass() { return new TokenClasses.Number(); }
         protected override TokenClasses.TokenClass GetNewTokenClass(string name) { return new UserSymbol(name); }
         protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
