@@ -31,9 +31,9 @@ namespace Reni.Parser
     sealed class ReniScanner : Scanner
     {
         readonly char[] _charType = new char[256];
-        readonly IMatch _whiteSpaces;
-        readonly IMatch _any;
-        readonly IMatch _text;
+        readonly Match _whiteSpaces;
+        readonly Match _any;
+        readonly Match _text;
         readonly SyntaxError _invalidTextEnd = new SyntaxError(IssueId.EOLInString);
         readonly SyntaxError _invalidComment = new SyntaxError(IssueId.EOFInComment);
         readonly SyntaxError _unexpectedSyntaxError = new SyntaxError(IssueId.UnexpectedSyntaxError);
@@ -41,58 +41,35 @@ namespace Reni.Parser
 
         public ReniScanner()
         {
-            _whiteSpaces = Match.IsTrue(IsWhiteSpace)
-                .Else
-                ("#" +Match.Break+ (" " + Match.Find(IsLineEndChar))
-                           .Else("(#" + "#)#".Find())
-                           .Else(_invalidComment)
-                )
+            var alpha = Match.Letter.Else("_");
+            var symbol1 = "({[)}];,".AnyChar();
+            var textFrame = "'\"".AnyChar();
+            var symbol = "°^!²§³$%&/=?\\@€*+~><|:.-".AnyChar();
+
+            var identifier =
+                (alpha + (alpha.Else(Match.Digit)).Repeat())
+                    .Else(symbol.Repeat(1));
+
+            _any = symbol1.Else(identifier);
+
+            _whiteSpaces = Match.WhiteSpace
+                .Else("# " + Match.LineEnd.Find)
+                .Else("#( " + " )#".Box().Find)
+                .Else("#(" + _any.Value(id => (" " + id + ")#").Box().Find))
+                .Else("#" + _invalidComment)
                 .Repeat();
 
-            _number = Match.IsTrue(IsDigit).Repeat(1);
+            _number = Match.Digit.Repeat(1);
 
-            _any = Match.IsTrue(IsSingleCharSymbol)
-                .Else(Match.IsTrue(IsAlpha) + Match.IsTrue(IsAlphaNum).Repeat())
-                .Else(Match.IsTrue(IsSymbol).Repeat(1));
-
-            _text = Match.IsTrue(IsTextFrameChar)
+            _text = textFrame
                 .Value
-                (head
+                (head                       
                  =>
                 {
-                    var textEnd = head.Else(Match.IsTrue(IsLineEndChar) + _invalidTextEnd);
-                    return textEnd.Find() + (head + textEnd.Find()).Repeat();
+                    var textEnd = head.Else(Match.LineEnd + _invalidTextEnd);
+                    return textEnd.Find + (head + textEnd.Find).Repeat();
                 });
-
-            InitCharType();
         }
-
-        void InitCharType()
-        {
-            _charType[0] = '?';
-            for(var i = 1; i < 256; i++)
-                _charType[i] = '*';
-            SetCharType(' ', " \t\n\r");
-            SetCharType('0', "0123456789");
-            SetCharType('a', "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM_");
-            SetCharType('.', "({[)}];,");
-            SetCharType('?', "#'\"");
-        }
-
-        void SetCharType(char type, IEnumerable<char> chars)
-        {
-            foreach(var t in chars)
-                _charType[t] = type;
-        }
-
-        bool IsDigit(char @char) { return _charType[@char] == '0'; }
-        bool IsAlpha(char @char) { return _charType[@char] == 'a'; }
-        bool IsSymbol(char @char) { return _charType[@char] == '*'; }
-        bool IsSingleCharSymbol(char @char) { return _charType[@char] == '.'; }
-        bool IsWhiteSpace(char @char) { return _charType[@char] == ' '; }
-        bool IsAlphaNum(char @char) { return IsAlpha(@char) || IsDigit(@char); }
-        static bool IsLineEndChar(char @char) { return @char == '\n' && @char == '\r'; }
-        static bool IsTextFrameChar(char @char) { return @char == '\'' && @char == '"'; }
 
         protected override int WhiteSpace(SourcePosn sourcePosn)
         {
@@ -115,12 +92,10 @@ namespace Reni.Parser
             {
                 throw new Exception
                     (sourcePosn
-                    , exception.Error as SyntaxError ?? _unexpectedSyntaxError
-                    , exception.SourcePosn - sourcePosn
+                     , exception.Error as SyntaxError ?? _unexpectedSyntaxError
+                     , exception.SourcePosn - sourcePosn
                     );
             }
         }
-
     }
 }
-

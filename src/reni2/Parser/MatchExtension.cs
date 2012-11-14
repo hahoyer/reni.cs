@@ -35,8 +35,7 @@ namespace Reni.Parser
             return box == null ? data : box.UnBox;
         }
 
-        internal static Match Find(this string x) { return (x.Box()).Find(); }
-
+        internal static Match AnyChar(this string data) { return new Match(new AnyCharMatch(data)); }
         internal static Match Box(this Match.IError error) { return new Match(new ErrorMatch(error)); }
         internal static Match Box(this string data) { return new Match(new CharMatch(data)); }
         internal static Match Box(this IMatch data) { return data as Match ?? new Match(data); }
@@ -65,6 +64,14 @@ namespace Reni.Parser
                 var result = _data.Length;
                 return sourcePosn.StartsWith(_data) ? (int?) result : null;
             }
+        }
+
+        sealed class AnyCharMatch : ReniObject, IMatch
+        {
+            [EnableDump]
+            readonly string _data;
+            public AnyCharMatch(string data) { _data = data; }
+            int? IMatch.Match(SourcePosn sourcePosn) { return _data.Contains(sourcePosn.Current) ? (int?) 1 : null; }
         }
 
         sealed class ElseMatch : ReniObject, IMatch

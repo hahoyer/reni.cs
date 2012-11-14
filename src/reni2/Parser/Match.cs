@@ -50,11 +50,15 @@ namespace Reni.Parser
         internal Match Repeat(int minCount = 0, int? maxCount = null) { return _data.Repeat(minCount, maxCount); }
         internal Match Else(IMatch other) { return _data.Else(other); }
         internal Match Value(Func<string, IMatch> func) { return new Match(new ValueMatch(_data, func)); }
-        internal Match Find() { return new Match(new FindMatch(_data)); }
+        internal Match Find { get { return new Match(new FindMatch(_data)); } }
 
-        internal static Match IsTrue(Func<char, bool> func) { return new Match(new FunctionalMatch(func, true)); }
-        internal static Match IsFalse(Func<char, bool> func) { return new Match(new FunctionalMatch(func, false)); }
-        internal static Match Find(Func<char, bool> func) { return (IsTrue(func)).Find(); }
+        internal static Match WhiteSpace { get { return Box(char.IsWhiteSpace); } }
+        internal static Match LineEnd { get { return "\n\r".AnyChar(); } }
+        internal static Match Digit { get { return Box(char.IsDigit); } }
+        internal static Match Letter { get { return Box(char.IsLetter); } }
+        public Match Not { get { return new Match(new NotMatch(this)); } }
+
+        internal static Match Box(Func<char, bool> func) { return new Match(new FunctionalMatch(func, true)); }
 
         public static Match operator +(string x, Match y) { return x.Box() + y; }
         public static Match operator +(Match x, string y) { return x + y.Box(); }
@@ -63,6 +67,17 @@ namespace Reni.Parser
         public static Match operator +(Match x, IError y) { return x + y.Box(); }
 
         public static Match operator +(Match x, Match y) { return new Match(new Sequence(x.UnBox(), y.UnBox())); }
+
+        sealed class NotMatch : ReniObject, IMatch
+        {
+            readonly IMatch _data;
+            public NotMatch(IMatch data) { _data = data; }
+            int? IMatch.Match(SourcePosn sourcePosn)
+            {
+                var result = _data.Match(sourcePosn);
+                return result == null ? 1 : (int?)null;
+            }
+        }
 
         sealed class Sequence : ReniObject, IMatch
         {
@@ -105,12 +120,12 @@ namespace Reni.Parser
 
             int? IMatch.Match(SourcePosn sourcePosn)
             {
-                var current = sourcePosn;
+                var current = sourcePosn.Clone;
                 while(true)
                 {
                     var result = _data.Match(current);
                     if(result != null)
-                        return current - sourcePosn + result;
+                        return (current - sourcePosn) + result;
 
                     if(current.IsEnd)
                         return null;
@@ -138,7 +153,7 @@ namespace Reni.Parser
                 if(length == null)
                     return null;
                 var value = sourcePosn.SubString(0, length.Value);
-                return _func(value).Match(sourcePosn + length.Value);
+                return length.Value + _func(value).Match(sourcePosn + length.Value);
             }
         }
 

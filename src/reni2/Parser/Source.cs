@@ -53,7 +53,8 @@ namespace Reni.Parser
 
         public string Data { get { return _data; } }
 
-        internal bool IsEnd(int posn) { return _data.Length <= posn; }
+        internal bool IsEnd(int posn) { return Length <= posn; }
+        internal int Length { get { return _data.Length; } }
 
         internal string SubString(int start, int length) { return _data.Substring(start, length); }
 
