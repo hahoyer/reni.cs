@@ -53,9 +53,9 @@ namespace Reni.Parser
             _any = symbol1.Else(identifier);
 
             _whiteSpaces = Match.WhiteSpace
-                .Else("# " + Match.LineEnd.Find)
-                .Else("#( " + " )#".Box().Find)
-                .Else("#(" + _any.Value(id => (" " + id + ")#").Box().Find))
+                .Else("#" + " \t".AnyChar() + Match.LineEnd.Find)
+                .Else("#(" + Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
+                .Else("#(" + _any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
                 .Else("#" + _invalidComment)
                 .Repeat();
 
