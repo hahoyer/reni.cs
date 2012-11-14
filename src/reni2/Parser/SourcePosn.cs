@@ -22,8 +22,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Helper;
 
 namespace Reni.Parser
 {
@@ -31,6 +33,7 @@ namespace Reni.Parser
     ///     Source and position for compilation process
     /// </summary>
     [Serializable]
+    [DebuggerDisplay("{ToString()}")]
     sealed class SourcePosn : ReniObject
     {
         readonly Source _source;
@@ -93,6 +96,37 @@ namespace Reni.Parser
         /// <returns>The file position of sourec file</returns>
         protected override string Dump(bool isRecursion) { return "\n" + FilePosn("see there"); }
 
+        public override string ToString() { return base.ToString() + PrettyDump; }
+        string PrettyDump { get { return (DumpBeforeCurrent + "[" + ("" + Current).Quote() + "]" + DumpAfterCurrent); } }
+
+        const int DumpWidth = 10;
+
+        string DumpAfterCurrent
+        {
+            get
+            {
+                var length = Math.Min(DumpWidth, Source.Length - Position - 1);
+
+                var result = Source.SubString(Position + 1, length).Quote();
+                if(length == DumpWidth)
+                    result += "...";
+                return result;
+            }
+        }
+
+        string DumpBeforeCurrent
+        {
+            get
+            {
+                var start = Math.Max(0, Position - DumpWidth);
+                var result = Source.SubString(start, Position - start).Quote();
+                if(Position >= DumpWidth)
+                    result = "..." + result;
+                return result;
+            }
+        }
+        public SourcePosn Clone { get { return new SourcePosn(Source, Position); } }
+
         public static SourcePosn operator +(SourcePosn x, int y) { return x._source + (x._position + y); }
 
         public static int operator -(SourcePosn x, SourcePosn y)
@@ -106,7 +140,7 @@ namespace Reni.Parser
         public bool StartsWith(string data)
         {
             var length = data.Length;
-            return !Source.IsEnd(Position+length - 1)
+            return !Source.IsEnd(Position + length - 1)
                    && Source.SubString(Position, length) == data;
         }
     }

@@ -20,6 +20,10 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 
 namespace Reni.FeatureTest.Array
@@ -27,6 +31,7 @@ namespace Reni.FeatureTest.Array
     [TestFixture]
     [Target("((<<5<<3) << (<<5<<1<<3)) dump_print")]
     [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1, 3))")]
+    [ArrayFromPieces]
     public sealed class CombineArraysFromPieces : CompilerTest
     {
         [Test]

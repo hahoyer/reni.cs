@@ -31,6 +31,7 @@ namespace Reni.FeatureTest.Array
     [TestFixture]
     [Target("(5 type * 5) instance () dump_print")]
     [Output("array(#(#align3#)# (bit)sequence(4),(0, 0, 0, 0, 0))")]
+    [LowPriority]
     public sealed class DefaultInitialized : CompilerTest
     {
         [Test]
