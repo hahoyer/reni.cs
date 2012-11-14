@@ -101,7 +101,7 @@ namespace Reni.Code
         internal CodeBase LocalBlock(CodeBase body, CodeBase copier)
         {
             Tracer.Assert(!body.HasArg, body.Dump);
-            var trace = ObjectId == 2;
+            var trace = ObjectId == -2;
             StartMethodDump(trace, body, copier);
             try
             {

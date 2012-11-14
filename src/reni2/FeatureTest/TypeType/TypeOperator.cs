@@ -20,12 +20,17 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.Parser;
 
 namespace Reni.FeatureTest.TypeType
 {
     [TestFixture]
+    [PrioTableTest]
     public sealed class TypeOperator : CompilerTest
     {
         protected override string Target { get { return @"31 type dump_print"; } }

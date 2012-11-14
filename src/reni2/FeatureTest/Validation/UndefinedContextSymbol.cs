@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
 using Reni.Context;
+using Reni.Parser;
 using Reni.Validation;
 
 namespace Reni.FeatureTest.Validation
@@ -34,6 +35,7 @@ namespace Reni.FeatureTest.Validation
     [Target(@"x")]
     [Output("")]
     [LowPriority]
+    [PrioTableTest]
     public sealed class UndefinedContextSymbol : CompilerTest
     {
         [Test]
@@ -47,6 +49,7 @@ namespace Reni.FeatureTest.Validation
     }
 
     [TestFixture]
+    [PrioTableTest]
     [Target(@"x: 3; x x")]
     [Output("")]
     public sealed class UndefinedSymbol : CompilerTest
@@ -72,6 +75,7 @@ namespace Reni.FeatureTest.Validation
             Tracer.Assert(issueArray[1] is ConsequentialError);
         }
     }
+
     [TestFixture]
     [Target(@"x x dump_print")]
     [Output("")]

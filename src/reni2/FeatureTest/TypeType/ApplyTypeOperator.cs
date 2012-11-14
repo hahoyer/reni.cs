@@ -25,10 +25,12 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.UnitTest;
+using Reni.Parser;
 
 namespace Reni.FeatureTest.TypeType
 {
     [TestFixture]
+    [PrioTableTest]
     public sealed class ApplyTypeOperator : CompilerTest
     {
         protected override string Target { get { return @"(31 type instance (28))dump_print"; } }
