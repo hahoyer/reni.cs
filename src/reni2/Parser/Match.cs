@@ -53,7 +53,8 @@ namespace Reni.Parser
         internal Match Find { get { return new Match(new FindMatch(_data)); } }
 
         internal static Match WhiteSpace { get { return Box(char.IsWhiteSpace); } }
-        internal static Match LineEnd { get { return "\n\r".AnyChar(); } }
+        internal static Match LineEnd { get { return "\n\r".AnyChar().Else(End); } }
+        internal static IMatch End { get { return new Match(new EndMatch()); } }
         internal static Match Digit { get { return Box(char.IsDigit); } }
         internal static Match Letter { get { return Box(char.IsLetter); } }
         public Match Not { get { return new Match(new NotMatch(this)); } }
@@ -75,7 +76,7 @@ namespace Reni.Parser
             int? IMatch.Match(SourcePosn sourcePosn)
             {
                 var result = _data.Match(sourcePosn);
-                return result == null ? 1 : (int?)null;
+                return result == null ? 1 : (int?) null;
             }
         }
 
@@ -155,6 +156,11 @@ namespace Reni.Parser
                 var value = sourcePosn.SubString(0, length.Value);
                 return length.Value + _func(value).Match(sourcePosn + length.Value);
             }
+        }
+
+        sealed class EndMatch : ReniObject, IMatch
+        {
+            int? IMatch.Match(SourcePosn sourcePosn) { return sourcePosn.IsEnd ? 0 : (int?) null; }
         }
 
         sealed class BreakMatch : IMatch
