@@ -20,6 +20,7 @@
 
 #endregion
 
+using System.Drawing;
 using System.Linq;
 using System.Collections.Generic;
 using System;
@@ -30,5 +31,16 @@ namespace Reni.Parser
     public static class Services
     {
         public static PrioTable FormatPrioTable(string text) { return PrioTable.FromText(text); }
+        
+        public static Image SyntaxGraph(PrioTable prioTable, string text)
+        {
+            var frame = new Rectangle(0, 0, 800, 600);
+            var bitmap = new Bitmap(frame.Size.Width, frame.Size.Height);
+            var graphics = Graphics.FromImage(bitmap);
+            var font = new Font("Arial", 16);
+            var brush = new SolidBrush(Color.Black);
+            graphics.DrawString(text, font, brush, 400, 300);
+            return bitmap;
+        }
     }
 }

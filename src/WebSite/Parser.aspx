@@ -62,6 +62,8 @@
                 AutoPostBack="True"
                 TextMode="MultiLine" 
                 />
+
+            <asp:PlaceHolder ID="SyntaxTree" runat="server" />
         </div>
     </form>
 </body>

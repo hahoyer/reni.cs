@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using HWClassLibrary.Debug;
 using Reni.Parser;
 
@@ -34,8 +35,11 @@ namespace WebSite
         protected PrioTable PrioTable = PrioTable.FromText("");
         protected void OnPrioListChanged(object sender, EventArgs e)
         {
-            if (PrioList.Text == "?")
-                PrioList.Text = @"Left not
+            if(PrioList.Text == "?")
+                PrioList.Text = PreparedPrioTableText;
+            PrioTable = Services.FormatPrioTable(PrioList.Text);
+        }
+        const string PreparedPrioTableText = @"Left not
 Left and
 Left or
 Left * /
@@ -48,11 +52,13 @@ Right :
 Right , ;
 ParLevel ( { ) }
 ";
-            PrioTable = Services.FormatPrioTable(PrioList.Text);
-        }
 
-
-        protected void OnProgramChanged(object sender, EventArgs e) { 
+        protected void OnProgramChanged(object sender, EventArgs e)
+        {
+            var i = Services.SyntaxGraph(PrioTable, Program.Text);
+            var hi = new HtmlImage();
+            SyntaxTree.Controls.Clear();
+            SyntaxTree.Controls.Add(hi);
         }
     }
 }
