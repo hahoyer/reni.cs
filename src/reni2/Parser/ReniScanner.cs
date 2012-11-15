@@ -30,7 +30,6 @@ namespace Reni.Parser
 {
     sealed class ReniScanner : Scanner
     {
-        readonly char[] _charType = new char[256];
         readonly Match _whiteSpaces;
         readonly Match _any;
         readonly Match _text;

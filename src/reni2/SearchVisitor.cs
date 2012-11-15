@@ -137,7 +137,7 @@ namespace Reni
         {
             var searchResult = target.SearchResult(Target, _syntax);
             var internalResult = searchResult as TFeature;
-            Tracer.Assert(internalResult != null, ()=>typeof(TFeature).PrettyName());
+            //Tracer.Assert(internalResult != null, ()=>typeof(TFeature).PrettyName());
             InternalResult = internalResult;
         }
 
