@@ -56,9 +56,7 @@ ParLevel ( { ) }
         protected void OnProgramChanged(object sender, EventArgs e)
         {
             var i = Services.SyntaxGraph(PrioTable, Program.Text);
-            var hi = new HtmlImage();
-            SyntaxTree.Controls.Clear();
-            SyntaxTree.Controls.Add(hi);
+            var control = SyntaxTree;
         }
     }
 }
