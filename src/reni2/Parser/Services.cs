@@ -20,6 +20,7 @@
 
 #endregion
 
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Collections.Generic;
@@ -38,9 +39,19 @@ namespace Reni.Parser
             var bitmap = new Bitmap(frame.Size.Width, frame.Size.Height);
             var graphics = Graphics.FromImage(bitmap);
             var font = new Font("Arial", 16);
-            var brush = new SolidBrush(Color.Black);
-            graphics.DrawString(text, font, brush, 400, 300);
+            var brush = new SolidBrush(Color.White);
+            graphics.FillRectangle(brush, frame);
+            graphics.DrawString(text, new Font("Arial", 16), new SolidBrush(Color.Blue), 400, 300);
             return bitmap;
+        }
+
+        public static string ToBase64(this Image image)
+        {
+            var ic = new ImageConverter();
+            Tracer.Assert(image != null, ()=>"image != null");
+            var convertTo = (byte[]) ic.ConvertTo(image, typeof(byte[]));
+            Tracer.Assert(convertTo != null, ()=>"convertTo != null");
+            return Convert.ToBase64String(inArray: convertTo, options: Base64FormattingOptions.InsertLineBreaks);
         }
     }
 }

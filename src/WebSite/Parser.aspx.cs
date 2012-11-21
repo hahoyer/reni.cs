@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using HWClassLibrary.Debug;
 using Reni.Parser;
 
@@ -55,8 +54,11 @@ ParLevel ( { ) }
 
         protected void OnProgramChanged(object sender, EventArgs e)
         {
-            var i = Services.SyntaxGraph(PrioTable, Program.Text);
-            var control = SyntaxTree;
+            SyntaxTree.ImageUrl
+                = "data:image/png;base64,"
+                  + Services
+                        .SyntaxGraph(PrioTable, Program.Text)
+                        .ToBase64();
         }
     }
 }
