@@ -3,10 +3,9 @@
 <html lang="de-de">
     <head>
         <meta charset="utf-8" />
-        <title>@Page.Title - hahoyer</title>
+        <title>@Page.Title</title>
         <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
         <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
-        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <script src="~/Scripts/jquery-1.7.1.min.js"></script>
         <script src="~/Scripts/jquery-ui-1.8.20.js"></script>
         <script src="~/Scripts/modernizr-2.5.3.js"></script>
@@ -22,7 +21,7 @@
                     <nav>
                         <ul id="menu">
                             <li><a href="~/">Home</a></li>
-                            <li><a href="~/reni">Reni Tester</a></li>
+                            <li><a href="~/Reni">Reni Tester</a></li>
                             <li><a href="~/Contact">Contact</a></li>
                         </ul>
                     </nav>
@@ -39,7 +38,9 @@
             <div class="content-wrapper">
                 <div class="float-left">
                     <p>&copy; @DateTime.Now.Year - hahoyer HoyerWare</p>
-                    <p align="right">Uhr: @DateTime.Now.Format()</p>
+                </div>
+                <div class="float-right">
+                    <p >Uhr: @DateTime.Now.Format()</p>
                 </div>
             </div>
         </footer>
