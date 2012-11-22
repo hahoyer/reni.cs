@@ -1,0 +1,50 @@
+﻿@using System
+@using System.Collections.Generic
+@using System.Linq
+@using HWClassLibrary.Debug
+@using Reni
+@functions {
+    IEnumerable<string> ResultText
+    {
+        get
+        {
+            if(Code == null)
+                return new string[0];
+            return Compiler.FlatExecute(Code, isFakedName: true).Split('\n');
+        }
+    }
+
+    string Code { get { return Request.Form["Code"]; } }
+}
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Reni Tester";
+}
+
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@Page.Title.</h1>
+                <h2>Der Compiler-Tester.</h2>
+            </hgroup>
+            <p>
+                Gib das Programm ein und drücke die Taste.
+            </p>
+        </div>
+    </section>
+}
+<form method="POST">
+    <div>
+        <textarea name="Code" rows= 5 cols = 80>@Code</textarea>
+        <input type="submit" value="."/>
+    </div>     
+</form>
+<br />
+
+<div>
+    @foreach(var line in ResultText)
+    {
+        <div>@line</div>
+    }
+</div>

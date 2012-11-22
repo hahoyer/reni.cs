@@ -218,7 +218,9 @@ ul#menu {
         background-image: -o-linear-gradient(left, #7ac0da 0%, #a4d4e6 100%);
         background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #7ac0da), color-stop(1, #a4d4e6));
         background-image: -webkit-linear-gradient(left, #7ac0da 0%, #a4d4e6 100%);
+/* ReSharper disable InvalidValue */
         background-image: linear-gradient(left, #7ac0da 0%, #a4d4e6 100%);
+/* ReSharper restore InvalidValue */
         color: #3e5667;
         padding: 20px 40px 30px 40px;
     }

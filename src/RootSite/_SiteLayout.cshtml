@@ -1,5 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using HWClassLibrary.Helper
+<!DOCTYPE html>
+<html lang="de-de">
     <head>
         <meta charset="utf-8" />
         <title>@Page.Title - hahoyer</title>
@@ -18,26 +19,10 @@
                     <p class="site-title"><a href="~/"></a></p>
                 </div>
                 <div class="float-right">
-                    <section id="login">
-                        @if (WebSecurity.IsAuthenticated) {
-                            <text>
-                                Hello, <a class="email" href="~/Account/Manage" title="Manage">@WebSecurity.CurrentUserName</a>!
-                                <form id="logoutForm" action="~/Account/Logout" method="post">
-                                    @AntiForgery.GetHtml()
-                                    <a href="javascript:document.getElementById('logoutForm').submit()">Log out</a>
-                                </form>
-                            </text>
-                        } else {
-                            <ul>
-                                <li><a href="~/Account/Register">Register</a></li>
-                                <li><a href="~/Account/Login">Log in</a></li>
-                            </ul>
-                        }
-                    </section>
                     <nav>
                         <ul id="menu">
                             <li><a href="~/">Home</a></li>
-                            <li><a href="~/About">About</a></li>
+                            <li><a href="~/reni">Reni Tester</a></li>
                             <li><a href="~/Contact">Contact</a></li>
                         </ul>
                     </nav>
@@ -54,6 +39,7 @@
             <div class="content-wrapper">
                 <div class="float-left">
                     <p>&copy; @DateTime.Now.Year - hahoyer HoyerWare</p>
+                    <p align="right">Uhr: @DateTime.Now.Format()</p>
                 </div>
             </div>
         </footer>
