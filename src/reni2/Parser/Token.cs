@@ -46,7 +46,7 @@ namespace Reni.Parser
         public override string DumpData() { return Data.Name; }
 
         [DisableDump]
-        internal string PrioTableName { get { return TokenClass.PrioTableName(Data.Name); } }
+        internal string Name { get { return TokenClass.Name; } }
 
         internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
 
