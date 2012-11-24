@@ -35,7 +35,7 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
+    sealed class MainTokenFactory : TokenFactory<TokenClasses.TokenClass>
     {
         protected override PrioTable GetPrioTable()
         {
@@ -64,7 +64,7 @@ namespace Reni.ReniParser
 
             x += PrioTable.Right(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
 
-            x = x.ThenElseLevel("then","else");
+            x = x.ThenElseLevel("then", "else");
             x += PrioTable.Right("!");
             x += PrioTable.Left("/\\", "/!\\", "/\\/\\", "/!\\/!\\");
             x += PrioTable.Right(":");
@@ -80,7 +80,7 @@ namespace Reni.ReniParser
 
             x += PrioTable.Right(PrioTable.Error);
 
-            x = x.ParenthesisLevel(PrioTable.BeginOfText,PrioTable.EndOfText);
+            x = x.ParenthesisLevel(PrioTable.BeginOfText, PrioTable.EndOfText);
 
             //Tracer.FlaggedLine("\n"+x.ToString());
             return x;
@@ -92,7 +92,7 @@ namespace Reni.ReniParser
         /// <returns> </returns>
         protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses() { return TokenClasses; }
 
-        internal new static DictionaryEx<string, TokenClasses.TokenClass> TokenClasses
+        internal static DictionaryEx<string, TokenClasses.TokenClass> TokenClasses
         {
             get
             {

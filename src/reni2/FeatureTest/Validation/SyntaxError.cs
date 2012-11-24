@@ -32,8 +32,8 @@ using Reni.Validation;
 namespace Reni.FeatureTest.Validation
 {
     [TestFixture]
-    [Target(@"1 #( asdf )# dump_print")]
-    [Output("")]
+    [Target(@"1 #(x asdf y)# dump_print")]
+    [Output("1")]
     [UseOfUndefinedContextSymbol]
     public sealed class SyntaxErrorComment : CompilerTest
     {
@@ -43,7 +43,7 @@ namespace Reni.FeatureTest.Validation
         {
             var issueArray = issues.ToArray();
             var i = 0;
-            Tracer.Assert(issueArray[i++].IsLogdumpLike(1, 3, IssueId.BeginOfComment, "#( asdf )#"));
+            Tracer.Assert(issueArray[i++].IsLogdumpLike(1, 3, IssueId.BeginOfComment, "#(x asdf y)#"));
             Tracer.Assert(issueArray.Length == i);
         }
     }
