@@ -82,7 +82,6 @@ namespace Reni.Parser
             return result;
         }
 
-        ParserInst ITokenFactory.Parser { get { return new ParserInst(new ReniScanner(), this); } }
         PrioTable ITokenFactory.PrioTable { get { return _prioTable.Value; } }
 
         ITokenClass ITokenFactory.TokenClass(string name)
@@ -111,7 +110,7 @@ namespace Reni.Parser
         protected virtual TTokenClass GetNumberClass() { return GetSyntaxError("unexpected number"); }
         protected virtual TTokenClass GetTextClass() { return GetSyntaxError("unexpected string"); }
 
-        internal Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
+        Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
         protected ITokenClass TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }
     }
 }
