@@ -1,0 +1,105 @@
+﻿@using System.Drawing
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using HWClassLibrary.Debug
+@using Reni.Parser
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Parser Tester";
+    var prioList = Request.Form["PrioList"];
+
+    const string preparedPrioTableText = @"Left not
+Left and
+Left or
+Left * /
+Left + -
+Left = <>
+Right :=
+TELevel then else
+Left function
+Right :
+Right , ;
+ParLevel ( { ) }
+";
+    if(prioList == "?")
+    {
+        prioList = preparedPrioTableText;
+    }
+    var prioTable = Services.FormatPrioTable(prioList ?? "");
+    var code = Request.Form["Code"];
+
+    var imageUrl
+        = "data:image/png;base64,"
+          + Services
+                .SyntaxGraph(prioTable, code, new Size(800, 600))
+                .ToBase64();
+}
+
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@Page.Title.</h1>
+                <h2>Teste verschiede Features des Parsers.</h2>
+            </hgroup>
+            <p>
+                Links gibt man Prioritätsregeln ein. 
+                Mit der Tab-Taste wird dann daraus die Prioritätstabelle.
+
+            </p>
+        </div>
+    </section>
+}
+
+<form method="POST">
+    <div class="float-left">
+        <textarea name="PrioList" rows="20" cols="20" onchange=" submit() ">@prioList</textarea>
+    </div>     
+    <div class="float-left">
+        <table id="PrioTable" class="white_table">
+            <tr >
+                <th/>
+                @foreach(var recentTokenName in prioTable.RecentToken)
+                {
+                    <th>@recentTokenName</th>
+                }
+            </tr>
+            
+            @foreach(var newTokenName in prioTable.NewToken)
+            {
+                <tr>
+                    <th>@newTokenName</th>
+                    @foreach(var recentTokenName in prioTable.RecentToken)
+                    {
+                        <td>
+                            @switch(prioTable.Relation(newTokenName, recentTokenName))
+                            {
+                                case '+':
+                                    <img src="~/Resources/Stack.Push.bmp" alt="<-"/>
+                                    break;
+                                case '-':
+                                    <img src="~/Resources/Stack.Pull.bmp" alt="^^"/>
+                                    break;
+                                default:
+                                    <img src="~/Resources/Stack.Match.bmp" alt="="/>
+                                    break;
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+    </div>     
+    <div class="float-left">
+        <div>
+            <textarea name="Code" rows="2" cols="50" onchange=" submit() ">@code</textarea>
+
+        </div>
+        <div>
+            <img src="@imageUrl"/>
+        </div>
+    </div>
+</form>
+<br />
+

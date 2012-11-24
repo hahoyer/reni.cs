@@ -100,6 +100,7 @@
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="IProxyType.cs" />
+    <Compile Include="Parser\SyntaxDrawer.cs" />
     <Compile Include="Parser\Match.cs" />
     <Compile Include="Parser\MatchExtension.cs" />
     <Compile Include="Parser\PrioTableTest.cs" />
@@ -183,7 +184,7 @@
     <Compile Include="Feature\DumpPrint\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
     <Compile Include="Parser\ITokenClass.cs" />
-    <Compile Include="Parser\ITokenRelation.cs" />
+    <Compile Include="Parser\ITokenFactory.cs" />
     <Compile Include="Parser\ParsedSyntaxBase.cs" />
     <Compile Include="Parser\SyntaxError.cs" />
     <Compile Include="Parser\TokenClass.cs" />

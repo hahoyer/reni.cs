@@ -90,9 +90,6 @@ h5, h6 {
         text-decoration: none;
     }
 
-p.AlignRight {
-    alignment-adjust: text-before-edge
-}
 /* main layout
 ----------------------------------------------------------*/
 .content-wrapper {
@@ -143,40 +140,6 @@ footer {
     outline: none;
     text-decoration: none;
 }
-
-
-/* login
-----------------------------------------------------------*/
-#login {
-    display: block;
-    font-size: .85em;
-    margin: 0 0 10px;
-    text-align: right;
-}
-
-    #login a {
-        background-color: #d3dce0;
-        margin-left: 10px;
-        margin-right: 3px;
-        padding: 2px 3px;
-        text-decoration: none;
-    }
-
-    #login a.email {
-        background: none;
-        margin: 0;
-        padding: 0;
-        text-decoration: underline;
-    }
-
-    #login ul {
-        margin: 0;
-    }
-
-    #login li {
-        display: inline;
-        list-style: none;
-    }
 
 
 /* menu
@@ -377,19 +340,8 @@ label.checkbox {
     display: inline;
 }
 
-input, textarea {
-    border: 1px solid #e2e2e2;
-    background: #fff;
-    color: #333;
-    font-size: 1.2em;
-    margin: 5px 0 6px 0;
-    padding: 5px;
-    width: 300px;
-}
-
 textarea {
-    font-family: inherit;
-    width: 500px;
+    font-family: monospace;
 }
 
     input:focus, textarea:focus {
@@ -422,6 +374,35 @@ textarea {
         padding: 4px;
         margin-right: 4px;
     }
+
+.white_table{
+    font-family: monospace;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    text-align: center;
+    background: white;
+}
+
+table {
+    border: 1px solid;
+    background: gray;
+}
+
+th {
+    font-family: monospace bold;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    text-align: center;
+    background: #e2e2e2;
+}
+
+td {
+    font-family: monospace;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    text-align: center;
+    background: white;
+}
 
 /* info and errors */
 .message-info {
@@ -477,233 +458,3 @@ input[type="checkbox"].input-validation-error {
     display: none;
 }
 
-
-/* tables
-----------------------------------------------------------*/
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin-top: 0.75em;
-    border: 0 none;
-}
-
-th {
-    font-size: 1.2em;
-    text-align: left;
-    border: none 0px;
-    padding-left: 0;
-}
-
-    th a {
-        display: block;
-        position: relative;
-    }
-
-    th a:link, th a:visited, th a:active, th a:hover {
-        color: #333;
-        font-weight: 600;
-        text-decoration: none;
-        padding: 0;
-    }
-
-    th a:hover {
-        color: #000;
-    }
-
-    th.asc a, th.desc a {
-        margin-right: .75em;
-    }
-
-    th.asc a:after, th.desc a:after {
-        display: block;
-        position: absolute;
-        right: 0em;
-        top: 0;
-        font-size: 0.75em;
-    }
-
-    th.asc a:after {
-        content: '▲';
-    }
-
-    th.desc a:after {
-        content: '▼';
-    }
-
-td {
-    padding: 0.25em 2em 0.25em 0em;
-    border: 0 none;
-}
-
-tr.pager td {
-    padding: 0 0.25em 0 0;
-}
-
-
-/********************
-*   Mobile Styles   *
-********************/
-@media only screen and (max-width: 850px) {
-
-    /* header
-    ----------------------------------------------------------*/
-    header .float-left,
-    header .float-right {
-        float: none;
-    }
-
-    /* logo */
-    header .site-title {
-        margin: 10px;
-        text-align: center;
-    }
-
-    /* login */
-    #login {
-        font-size: .85em;
-        margin: 0 0 12px;
-        text-align: center;
-    }
-
-        #login ul {
-            margin: 5px 0;
-            padding: 0;
-        }
-
-        #login li {
-            display: inline;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        #login a {
-            background: none;
-            color: #999;
-            font-weight: 600;
-            margin: 2px;
-            padding: 0;
-        }
-
-        #login a:hover {
-            color: #333;
-        }
-
-    /* menu */
-    nav {
-        margin-bottom: 5px;
-    }
-
-    ul#menu {
-        margin: 0;
-        padding: 0;
-        text-align: center;
-    }
-
-        ul#menu li {
-            margin: 0;
-            padding: 0;
-        }
-
-
-    /* main layout
-    ----------------------------------------------------------*/
-    .main-content,
-    .featured + .main-content {
-        background-position: 10px 0;
-    }
-
-    .content-wrapper {
-        padding-right: 10px;
-        padding-left: 10px;
-    }
-
-    .featured .content-wrapper {
-        padding: 10px;
-    }
-
-    /* page content */
-    article, aside {
-        float: none;
-        width: 100%;
-    }
-
-    /* ordered list */
-    ol.round {
-        list-style-type: none;
-        padding-left: 0;
-    }
-
-        ol.round li {
-            padding-left: 10px;
-            margin: 25px 0;
-        }
-
-            ol.round li.zero,
-            ol.round li.one,
-            ol.round li.two,
-            ol.round li.three,
-            ol.round li.four,
-            ol.round li.five,
-            ol.round li.six,
-            ol.round li.seven,
-            ol.round li.eight,
-            ol.round li.nine {
-                background: none;
-            }
-
-     /* features */
-     section.feature {
-        float: none;
-        padding: 10px;
-        width: auto;
-     }
-
-        section.feature img {
-            color: #999;
-            content: attr(alt);
-            font-size: 1.5em;
-            font-weight: 600;
-        }
-
-    /* forms */
-    input {
-        width: 90%;
-    }
-
-    /* login page */
-    #loginForm {
-        border-right: none;
-        float: none;
-        width: auto;
-    }
-
-        #loginForm .validation-error {
-            display: block;
-            margin-left: 15px;
-        }
-
-    #socialLoginForm {
-        margin-left: 0;
-        float: none;
-        width: auto;
-    }
-
-
-    /* footer
-    ----------------------------------------------------------*/
-    footer .float-left,
-    footer .float-right {
-        float: none;
-    }
-
-    footer {
-        text-align: center;
-        height: auto;
-        padding: 10px 0;
-    }
-
-        footer p {
-            margin: 0;
-        }
-}
