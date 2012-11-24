@@ -45,6 +45,7 @@
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
     <Compile Include="FeatureTest\Array\ElementAccess.cs" />
     <Compile Include="FeatureTest\Array\FromTypeAndFunction.cs" />
+    <Compile Include="FeatureTest\Array\SimpleArrayFromPiece.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120109.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\Function\ConstantFunction.cs" />

@@ -30,8 +30,16 @@ namespace Reni.FeatureTest.Array
 {
     [TestFixture]
     [ArrayFromPieces]
+    [TargetSet("((<<5) (0)) dump_print", "5")]
+    public sealed class ElementAccessSimple : CompilerTest
+    {
+        [Test]
+        public override void Run() { BaseRun(); }
+    }
+
+    [TestFixture]
+    [ElementAccessSimple]
     [TargetSet("((<<5<<3<<5<<1<<3) (3)) dump_print", "1")]
-    [LowPriority]
     public sealed class ElementAccess : CompilerTest
     {
         [Test]

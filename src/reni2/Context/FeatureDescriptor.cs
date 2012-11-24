@@ -68,7 +68,7 @@ namespace Reni.Context
 
         Result ApplyResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
-            var trace = context.ObjectId == -4 && category.HasArgs && left == null && right != null && right.ObjectId == 56;
+            var trace = context.ObjectId == 1 && category.HasArgs && right == null && left != null && left.ObjectId == 188;
             StartMethodDump(trace, category, context, left, right);
             try
             {
