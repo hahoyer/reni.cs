@@ -23,7 +23,7 @@ namespace Reni.Parser
         [DisableDump]
         string IIconKeyProvider.IconKey { get { return "Syntax"; } }
 
-        string IParsedSyntax.DumpShort() { return GetNodeDump(); }
+        string IParsedSyntax.GetNodeDump() { return GetNodeDump(); }
 
         [DisableDump]
         TokenData IParsedSyntax.Token { get { return Token; } }

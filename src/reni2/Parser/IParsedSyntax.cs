@@ -39,6 +39,6 @@ namespace Reni.Parser
         TokenData LastToken { get; }
 
         string Dump();
-        string DumpShort();
+        string GetNodeDump();
     }
 }
