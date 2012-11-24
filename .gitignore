@@ -19,3 +19,6 @@ obj/
 /src/Performance.psess
 /src/ReniTest120609.vsp
 /src/WebSite/Properties/PublishProfiles/Profile1.pubxml
+
+*.dll
+*.pdb
