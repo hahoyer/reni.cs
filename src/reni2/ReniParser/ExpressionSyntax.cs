@@ -109,6 +109,7 @@ namespace Reni.ReniParser
                 result += "(" + Right.NodeDump + ")";
             return result;
         }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[]{Left,Right}; } }
 
         internal override TokenData FirstToken { get { return Left == null ? Token : Left.FirstToken; } }
 

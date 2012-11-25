@@ -29,7 +29,7 @@ using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
-    abstract class ParsedSyntaxBase : ReniObject, IParsedSyntax
+    abstract class ParsedSyntaxBase : ReniObject, IParsedSyntax, IGraphTarget
     {
         [UsedImplicitly]
         internal static bool IsDetailedDumpRequired = true;
@@ -46,14 +46,6 @@ namespace Reni.Parser
         string IIconKeyProvider.IconKey { get { return "Syntax"; } }
 
         string IParsedSyntax.GetNodeDump() { return GetNodeDump(); }
-
-        IParsedSyntax IParsedSyntax.Left { get { return Left; } }
-        IParsedSyntax IParsedSyntax.Right { get { return Right; } }
-
-        [DisableDump]
-        protected virtual IParsedSyntax Left { get { return null; } }
-        [DisableDump]
-        protected virtual IParsedSyntax Right { get { return null; } }
 
         [DisableDump]
         TokenData IParsedSyntax.Token { get { return Token; } }
@@ -76,5 +68,10 @@ namespace Reni.Parser
         protected override string GetNodeDump() { return Token.Name; }
         protected virtual string FilePosition() { return Token.FilePosition; }
         internal string FileErrorPosition(string errorTag) { return Token.FileErrorPosition(errorTag); }
+        
+        string IGraphTarget.Title { get { return Token.Name; } }
+        IGraphTarget[] IGraphTarget.Children { get { return Children.ToArray<IGraphTarget>(); } }
+        
+        protected virtual ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[0]; } }
     }
 }

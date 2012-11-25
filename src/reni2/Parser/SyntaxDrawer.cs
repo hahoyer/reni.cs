@@ -41,7 +41,7 @@ namespace Reni.Parser
         readonly StringFormat _stringFormat;
         readonly Pen _linePen;
 
-        SyntaxDrawer(IParsedSyntax syntax)
+        SyntaxDrawer(IGraphTarget syntax)
         {
             _stringFormat = new StringFormat(StringFormatFlags.NoWrap);
             _font = new Font(FontFamily.Families.Single(f1 => f1.Name == "Arial"), 16);
@@ -60,29 +60,15 @@ namespace Reni.Parser
             _graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
         }
 
-        internal static Image DrawBitmap(IParsedSyntax syntax)
+        internal static Image DrawBitmap(IGraphTarget syntax)
         {
             var drawer = new SyntaxDrawer(syntax);
             drawer.BuildBitmap(new Point(drawer._sizeBase / 2, drawer._sizeBase / 2), syntax);
             return drawer.Bitmap;
         }
 
-        Syntax Create(IParsedSyntax syntax)
-        {
-            return syntax.Left == null
-                       ? (
-                             syntax.Right == null
-                                 ? (Syntax) new Terminal(syntax.Token.Name, this)
-                                 : new Prefix(syntax.Token.Name, syntax.Right, this)
-                         )
-                       : (
-                             syntax.Right == null
-                                 ? (Syntax) new Suffix(syntax.Left, syntax.Token.Name, this)
-                                 : new Infix(syntax.Left, syntax.Token.Name, syntax.Right, this)
-                         );
-        }
+        Syntax Create(IGraphTarget syntax) { return syntax == null ? null : new Syntax(this, syntax.Title, syntax.Children); }
 
-        int MinChildrenShift { get { return _sizeBase; } }
         Size Gap { get { return new Size(_sizeBase, _sizeBase); } }
         Image Bitmap { get { return _bitmap; } }
 
@@ -122,143 +108,116 @@ namespace Reni.Parser
         Size NodeSize(string nodeName) { return new Size(NodeWidth(nodeName), NodeHeight(nodeName)); }
         int NodeHeight(string nodeName) { return _sizeBase * 2; }
         int NodeWidth(string nodeName) { return Math.Max(TextWidth(nodeName), _sizeBase) + _sizeBase; }
-        void BuildBitmap(Point point, IParsedSyntax syntax) { Create(syntax).Draw(point); }
-        int Height(IParsedSyntax syntax) { return Create(syntax).Height; }
-        int Width(IParsedSyntax syntax) { return Create(syntax).Width; }
+        void BuildBitmap(Point point, IGraphTarget syntax) { Create(syntax).Draw(point); }
+        int Height(IGraphTarget syntax) { return Create(syntax).Height; }
+        int Width(IGraphTarget syntax) { return Create(syntax).Width; }
 
-        abstract class Syntax : ReniObject
+        sealed class Syntax : ReniObject
         {
             readonly string _name;
-            protected readonly SyntaxDrawer Drawer;
+            readonly Syntax[] _children;
+            readonly SyntaxDrawer _drawer;
 
-            protected Syntax(string name, SyntaxDrawer drawer)
+            internal Syntax(SyntaxDrawer drawer, string name, IGraphTarget[] children)
             {
                 _name = name;
-                Drawer = drawer;
+                _drawer = drawer;
+                _children = children.Select(drawer.Create).ToArray();
             }
-            internal abstract int Height { get; }
-            internal abstract int Width { get; }
-            internal abstract void Draw(Point origin);
 
-            protected void DrawNode(Point origin) { Drawer.DrawNode(origin, _name); }
-            protected int NodeHeight { get { return Drawer.NodeHeight(_name); } }
-            protected int NodeWidth { get { return Drawer.NodeWidth(_name); } }
-            protected abstract Size Anchor { get; }
-            protected int OneChildWidth(int width)
+            bool HasChildren { get { return _children.Any(c => c != null); } }
+            static int SaveWidth(Syntax syntax) { return syntax == null ? 0 : syntax.Width; }
+            static int SaveHeight(Syntax syntax) { return syntax == null ? 0 : syntax.Height; }
+            static int SaveAnchorWidth(Syntax syntax) { return syntax == null ? 0 : syntax.Anchor.Width; }
+
+            internal int Height { get { return NodeHeight + (HasChildren ? _drawer.Gap.Height + ChildrenHeight : 0); } }
+            internal int Width { get { return Math.Max(NodeWidth, HasChildren ? ChildrenWidth : 0); } }
+
+            int NodeHeight { get { return _drawer.NodeHeight(_name); } }
+            int NodeWidth { get { return _drawer.NodeWidth(_name); } }
+
+            Size Anchor { get { return new Size(AnchorOffset, NodeHeight / 2); } }
+            int NodeOffset { get { return AnchorOffset - NodeWidth / 2; } }
+            int ChildrenOffset { get { return -Math.Min(0, (ChildrenWidth - NodeWidth) / 2); } }
+
+            internal void Draw(Point origin)
             {
-                var nw = NodeWidth;
-                var halfDelta = (width - nw) / 2;
-                return nw
-                       + Math.Max(0, halfDelta - Drawer.MinChildrenShift)
-                       + Math.Max(0, halfDelta + Drawer.MinChildrenShift);
+                if(HasChildren)
+                    DrawChildren(origin);
+                DrawNode(origin);
             }
-            protected int NonTerminalHeight(int height) { return NodeHeight + Drawer.Gap.Height + height; }
-            protected Size CalculateAchor(Syntax syntax, int factor)
+
+            void DrawNode(Point origin) { _drawer.DrawNode(origin + new Size(NodeOffset, 0), _name); }
+
+            void DrawChildren(Point origin)
             {
-                return new Size
-                    (Math.Max(NodeWidth / 2, syntax.Width / 2 + factor * Drawer.MinChildrenShift)
-                     , NodeHeight / 2
-                    );
+                var offsets = ChildOffsets.ToArray();
+                for(var index = 0; index < _children.Length; index++)
+                    if(_children[index] != null)
+                    {
+                        _drawer.DrawLine
+                            (origin + Anchor
+                             , origin + offsets[index] + _children[index].Anchor
+                            );
+                        _children[index].Draw(origin + offsets[index]);
+                    }
             }
 
-            protected void Draw(Point origin, Syntax syntax, int factor)
-            {
-                var rawNodeOffset = (syntax.Width - NodeWidth) / 2 + factor * Drawer.MinChildrenShift;
-                
-                var nodeOffset = Math.Max(0, rawNodeOffset);
-                var nodeShift = new Size(nodeOffset, 0);
-                
-                var childOffset = -Math.Min(0, rawNodeOffset);
-                var childShift = new Size(childOffset, NodeHeight + Drawer.Gap.Height);
-                
-                Drawer.DrawLine(origin + Anchor, origin + childShift + syntax.Anchor);
-                DrawNode(origin + nodeShift);
-                syntax.Draw(origin + childShift);
-            }
-
-            protected void Draw(Point origin, Syntax left, Syntax right)
-            {
-                var rawNodeOffset = (InfixWidth(left, right) - NodeWidth) / 2;
-
-                var nodeOffset = Math.Max(0, rawNodeOffset);
-                var nodeShift = new Size(nodeOffset, 0);
-
-                var leftOffset = -Math.Min(0, rawNodeOffset);
-                var leftShift = new Size(leftOffset, NodeHeight + Drawer.Gap.Height);
-
-                var rightOffset = leftOffset + left.Width + Drawer.Gap.Width;
-                var rightShift = new Size(rightOffset, NodeHeight + Drawer.Gap.Height);
-                
-                Drawer.DrawLine(origin + Anchor, origin + leftShift + left.Anchor);
-                Drawer.DrawLine(origin + Anchor, origin + rightShift + right.Anchor);
-                DrawNode(origin + nodeShift);
-                left.Draw(origin + leftShift);
-                right.Draw(origin + rightShift);
-            }
-
-            protected int InfixWidth(Syntax left, Syntax right)
-            {
-                var nw = NodeWidth;
-                var cw = left.Width + Drawer.Gap.Width + right.Width;
-                return Math.Max(nw, cw);
-            }
-        }
-
-        sealed class Infix : Syntax
-        {
-            readonly Syntax _left;
-            readonly Syntax _right;
-            public Infix(IParsedSyntax left, string name, IParsedSyntax right, SyntaxDrawer drawer)
-                : base(name, drawer)
-            {
-                _left = drawer.Create(left);
-                _right = drawer.Create(right);
-            }
-            internal override int Height
+            IEnumerable<Size> ChildOffsets
             {
                 get
                 {
-                    return
-                        NodeHeight
-                        + Math.Max(_left.Height, _right.Height)
-                        + Drawer.Gap.Height;
+                    Tracer.Assert(HasChildren);
+                    var height = NodeHeight + _drawer.Gap.Height;
+                    var currentWidthOffset = ChildrenOffset;
+                    foreach(var syntax in _children)
+                    {
+                        yield return new Size(currentWidthOffset, height);
+                        currentWidthOffset += SaveWidth(syntax) + _drawer.Gap.Width;
+                    }
+                    yield break;
                 }
             }
-            internal override int Width { get { return InfixWidth(_left, _right); } }
-            internal override void Draw(Point origin) { Draw(origin, _left, _right); }
-            protected override Size Anchor { get { return new Size(Width / 2, NodeHeight / 2); } }
-        }
 
-        sealed class Suffix : Syntax
-        {
-            readonly Syntax _left;
-            public Suffix(IParsedSyntax left, string name, SyntaxDrawer drawer)
-                : base(name, drawer) { _left = drawer.Create(left); }
-            internal override int Height { get { return NonTerminalHeight(_left.Height); } }
-            internal override int Width { get { return OneChildWidth(_left.Width); } }
-            internal override void Draw(Point origin) { Draw(origin, _left, 1); }
-            protected override Size Anchor { get { return CalculateAchor(_left, 1); } }
-        }
+            int ChildrenWidth
+            {
+                get
+                {
+                    Tracer.Assert(HasChildren);
+                    var gapWidth = _drawer.Gap.Width * (_children.Length - 1);
+                    var effectiveChildrenWidth
+                        = _children
+                            .Select(SaveWidth)
+                            .Sum();
+                    return gapWidth + effectiveChildrenWidth;
+                }
+            }
 
-        sealed class Prefix : Syntax
-        {
-            readonly Syntax _right;
-            public Prefix(string name, IParsedSyntax right, SyntaxDrawer drawer)
-                : base(name, drawer) { _right = drawer.Create(right); }
-            internal override int Height { get { return NonTerminalHeight(_right.Height); } }
-            internal override int Width { get { return OneChildWidth(_right.Width); } }
-            internal override void Draw(Point origin) { Draw(origin, _right, -1); }
-            protected override Size Anchor { get { return CalculateAchor(_right, -1); } }
-        }
+            int ChildrenHeight
+            {
+                get
+                {
+                    Tracer.Assert(HasChildren);
+                    return _children.Select(SaveHeight).Max();
+                }
+            }
 
-        sealed class Terminal : Syntax
-        {
-            public Terminal(string name, SyntaxDrawer drawer)
-                : base(name, drawer) { }
-            internal override int Height { get { return NodeHeight; } }
-            internal override int Width { get { return NodeWidth; } }
-            internal override void Draw(Point origin) { DrawNode(origin); }
-            protected override Size Anchor { get { return new Size(NodeWidth / 2, NodeHeight / 2); } }
+
+            int AnchorOffset
+            {
+                get
+                {
+                    if(!HasChildren)
+                        return NodeWidth / 2;
+
+                    var childAnchors = _children.Select(SaveAnchorWidth);
+                    return
+                        ChildOffsets
+                            .Select((o, i) => o.Width + childAnchors.ElementAt(i))
+                            .Sum()
+                        / _children.Length;
+                }
+            }
         }
     }
 }

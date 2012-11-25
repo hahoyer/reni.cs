@@ -20,36 +20,16 @@
 
 #endregion
 
-using System.Drawing;
 using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.ReniParser;
 
 namespace Reni.Parser
 {
-    public static class Services
+    interface IGraphTarget
     {
-        public static PrioTable FormatPrioTable(string text) { return PrioTable.FromText(text); }
-
-        public static Image SyntaxGraph(PrioTable prioTable, string code)
-        {
-            if(code == null)
-                return new Bitmap(1, 1);
-
-            var parser = new ParserInst(new ReniScanner(), new MainTokenFactory(prioTable));
-            var syntax = (IGraphTarget) parser.Compile(new Source(code));
-            return SyntaxDrawer.DrawBitmap(syntax);
-        }
-
-        public static string ToBase64(this Image image)
-        {
-            var ic = new ImageConverter();
-            Tracer.Assert(image != null, () => "image != null");
-            var convertTo = (byte[]) ic.ConvertTo(image, typeof(byte[]));
-            Tracer.Assert(convertTo != null, () => "convertTo != null");
-            return Convert.ToBase64String(convertTo, Base64FormattingOptions.InsertLineBreaks);
-        }
+        string Title { get; }
+        IGraphTarget[] Children { get; }
     }
 }

@@ -95,6 +95,8 @@ namespace Reni.Struct
         internal Size IndexSize { get { return Size.AutoSize(Statements.Length); } }
 
         protected override string GetNodeDump() { return "container." + ObjectId; }
+        
+        protected override ParsedSyntaxBase[] Children { get { return Statements.ToArray<ParsedSyntaxBase>(); } }
 
         sealed class PreContainer : ReniObject
         {
