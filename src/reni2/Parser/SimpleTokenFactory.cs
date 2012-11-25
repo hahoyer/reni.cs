@@ -138,8 +138,7 @@ namespace Reni.Parser
 
             public virtual Syntax Match(int level, TokenData token)
             {
-                NotImplementedMethod(level, token);
-                return null;
+                return new InfixSyntax(this, token, null);
             }
         }
 
