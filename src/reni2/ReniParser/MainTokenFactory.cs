@@ -37,53 +37,62 @@ namespace Reni.ReniParser
 {
     sealed class MainTokenFactory : TokenFactory<TokenClasses.TokenClass>
     {
-        protected override PrioTable GetPrioTable()
+        public MainTokenFactory(PrioTable prioTable)
+            : base(prioTable) {}
+
+        public MainTokenFactory()
+            : base(PrioTable) { }
+
+        static PrioTable PrioTable
         {
-            var x = PrioTable.Left(PrioTable.Any);
-            x += PrioTable.Left
-                ("reference"
-                 , "_A_T_", "_N_E_X_T_"
-                 , "to_number_of_base"
-                );
+            get
+            {
+                var x = PrioTable.Left(PrioTable.Any);
+                x += PrioTable.Left
+                    ("reference"
+                     , "_A_T_", "_N_E_X_T_"
+                     , "to_number_of_base"
+                    );
 
-            x += PrioTable.Left("<<");
+                x += PrioTable.Left("<<");
 
-            x += PrioTable.Left("~");
-            x += PrioTable.Left("&");
-            x += PrioTable.Left("|");
+                x += PrioTable.Left("~");
+                x += PrioTable.Left("&");
+                x += PrioTable.Left("|");
 
-            x += PrioTable.Left("*", "/", "\\");
-            x += PrioTable.Left("+", "-");
+                x += PrioTable.Left("*", "/", "\\");
+                x += PrioTable.Left("+", "-");
 
-            x += PrioTable.Left("<", ">", "<=", ">=");
-            x += PrioTable.Left("=", "<>");
+                x += PrioTable.Left("<", ">", "<=", ">=");
+                x += PrioTable.Left("=", "<>");
 
-            x += PrioTable.Left("!~");
-            x += PrioTable.Left("!&!");
-            x += PrioTable.Left("!|!");
+                x += PrioTable.Left("!~");
+                x += PrioTable.Left("!&!");
+                x += PrioTable.Left("!|!");
 
-            x += PrioTable.Right(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
+                x += PrioTable.Right(":=", "prototype", ":+", ":-", ":*", ":/", ":\\");
 
-            x = x.ThenElseLevel("then", "else");
-            x += PrioTable.Right("!");
-            x += PrioTable.Left("/\\", "/!\\", "/\\/\\", "/!\\/!\\");
-            x += PrioTable.Right(":");
-            x += PrioTable.Right(",");
-            x += PrioTable.Right(";");
-            x = x.ParenthesisLevel
-                (new[] {"(", "[", "{"},
-                 new[] {")", "]", "}"}
-                );
-            //x.Correct("(", PrioTable.Any, '-');
-            //x.Correct("[", PrioTable.Any, '-');
-            //x.Correct("{", PrioTable.Any, '-');
+                x = x.ThenElseLevel("then", "else");
+                x += PrioTable.Right("!");
+                x += PrioTable.Left("/\\", "/!\\", "/\\/\\", "/!\\/!\\");
+                x += PrioTable.Right(":");
+                x += PrioTable.Right(",");
+                x += PrioTable.Right(";");
+                x = x.ParenthesisLevel
+                    (new[] {"(", "[", "{"},
+                     new[] {")", "]", "}"}
+                    );
+                //x.Correct("(", PrioTable.Any, '-');
+                //x.Correct("[", PrioTable.Any, '-');
+                //x.Correct("{", PrioTable.Any, '-');
 
-            x += PrioTable.Right(PrioTable.Error);
+                x += PrioTable.Right(PrioTable.Error);
 
-            x = x.ParenthesisLevel(PrioTable.BeginOfText, PrioTable.EndOfText);
+                x = x.ParenthesisLevel(PrioTable.BeginOfText, PrioTable.EndOfText);
 
-            //Tracer.FlaggedLine("\n"+x.ToString());
-            return x;
+                //Tracer.FlaggedLine("\n"+x.ToString());
+                return x;
+            }
         }
 
         /// <summary>

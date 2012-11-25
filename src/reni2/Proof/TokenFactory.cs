@@ -32,35 +32,41 @@ namespace Reni.Proof
 {
     sealed class TokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
+        TokenFactory()
+            : base(PrioTable) { }
+       
         internal static TokenFactory Instance { get { return new TokenFactory(); } }
 
         protected override TokenClasses.TokenClass GetNewTokenClass(string name) { return new UserSymbol(); }
 
-        protected override PrioTable GetPrioTable()
+        static PrioTable PrioTable
         {
-            var x = PrioTable.Left(PrioTable.Any);
+            get
+            {
+                var x = PrioTable.Left(PrioTable.Any);
 
-            x += PrioTable.Right("^");
-            x += PrioTable.Left("*", "/", "\\", "gcd");
-            x += PrioTable.Left("+", "-");
+                x += PrioTable.Right("^");
+                x += PrioTable.Left("*", "/", "\\", "gcd");
+                x += PrioTable.Left("+", "-");
 
-            x += PrioTable.Left("<", ">", "<=", ">=");
-            x += PrioTable.Left("=", "<>");
+                x += PrioTable.Left("<", ">", "<=", ">=");
+                x += PrioTable.Left("=", "<>");
 
-            x += PrioTable.Left("elem");
-            x += PrioTable.Left("&");
-            x += PrioTable.Left("|");
+                x += PrioTable.Left("elem");
+                x += PrioTable.Left("&");
+                x += PrioTable.Left("|");
 
-            x += PrioTable.Right(",");
-            x += PrioTable.Right(";");
+                x += PrioTable.Right(",");
+                x += PrioTable.Right(";");
 
-            x = x.ParenthesisLevel
-                (
-                    new[] {"(", "[", "{", PrioTable.BeginOfText},
-                    new[] {")", "]", "}", PrioTable.EndOfText}
-                );
-            //Tracer.FlaggedLine("\n"+x+"\n");
-            return x;
+                x = x.ParenthesisLevel
+                    (
+                        new[] {"(", "[", "{", PrioTable.BeginOfText},
+                        new[] {")", "]", "}", PrioTable.EndOfText}
+                    );
+                //Tracer.FlaggedLine("\n"+x+"\n");
+                return x;
+            }
         }
 
         protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()

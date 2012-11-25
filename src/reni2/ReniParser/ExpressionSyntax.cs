@@ -110,9 +110,9 @@ namespace Reni.ReniParser
             return result;
         }
 
-        protected override TokenData GetFirstToken() { return Left == null ? Token : Left.FirstToken; }
+        internal override TokenData FirstToken { get { return Left == null ? Token : Left.FirstToken; } }
 
-        protected override TokenData GetLastToken() { return Right == null ? Token : Right.LastToken; }
+        internal override TokenData LastToken { get { return Right == null ? Token : Right.LastToken; } }
 
         internal override string DumpPrintText
         {

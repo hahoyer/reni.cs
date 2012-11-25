@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -16,6 +17,8 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -52,8 +55,8 @@ namespace Reni.Syntax
                 .Result(context, category, Token);
         }
 
-        protected override TokenData GetFirstToken() { return Token; }
-        protected override TokenData GetLastToken() { return Token; }
+        internal override TokenData FirstToken { get { return Token; } }
+        internal override TokenData LastToken { get { return Token; } }
     }
 
     [Serializable]
@@ -81,8 +84,8 @@ namespace Reni.Syntax
         }
 
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + _right.NodeDump + ")"; }
-        protected override TokenData GetFirstToken() { return Token; }
-        protected override TokenData GetLastToken() { return _right.LastToken; }
+        internal override TokenData FirstToken { get { return Token; } }
+        internal override TokenData LastToken { get { return _right.LastToken; } }
     }
 
     [Serializable]
@@ -118,8 +121,8 @@ namespace Reni.Syntax
         {
             var pendingProvider = _infix as IPendingProvider;
             if(pendingProvider != null)
-            return pendingProvider
-                .ObtainResult(context, category, _left, _right);
+                return pendingProvider
+                    .ObtainResult(context, category, _left, _right);
             return base.ObtainPendingResult(context, category);
         }
 
@@ -134,8 +137,8 @@ namespace Reni.Syntax
             result += ")";
             return result;
         }
-        protected override TokenData GetFirstToken() { return _left.FirstToken; }
-        protected override TokenData GetLastToken() { return _right.LastToken; }
+        internal override TokenData FirstToken { get { return _left.FirstToken; } }
+        internal override TokenData LastToken { get { return _right.LastToken; } }
     }
 
     interface IPendingProvider
@@ -168,8 +171,8 @@ namespace Reni.Syntax
 
         protected override string GetNodeDump() { return "(" + _left.NodeDump + ")" + base.GetNodeDump(); }
 
-        protected override TokenData GetFirstToken() { return _left.FirstToken; }
-        protected override TokenData GetLastToken() { return Token; }
+        internal override TokenData FirstToken { get { return _left.FirstToken; } }
+        internal override TokenData LastToken { get { return Token; } }
     }
 
     interface ITerminal

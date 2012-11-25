@@ -66,9 +66,9 @@ namespace Reni.Struct
         [SmartNode]
         internal int[] Converters { get { return _converters; } }
 
-        protected override TokenData GetFirstToken() { return _firstToken; }
+        internal override TokenData FirstToken { get { return _firstToken; } }
 
-        protected override TokenData GetLastToken() { return _lastToken; }
+        internal override TokenData LastToken { get { return _lastToken; } }
 
         Container(TokenData leftToken, TokenData rightToken, CompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters)
             : base(leftToken, _nextObjectId++)
@@ -259,7 +259,7 @@ namespace Reni.Struct
 
         internal Result StructureResult(Category category, ContextBase parent, int fromPosition, int fromNotPosition)
         {
-            if (category.IsNone)
+            if(category.IsNone)
                 return new Result();
             var trace = ObjectId == -1 && category.HasSize;
             StartMethodDump(trace, category, parent, fromPosition, fromNotPosition);
@@ -311,7 +311,7 @@ namespace Reni.Struct
                 .Length
                 .Array(i => i)
                 .Where(i => !InternalInnerIsDataLess(parent, i))
-                .Select(i=> i.ToString() + "="+ InnerResult(Category.Size,parent,i).Size.ToString())
+                .Select(i => i.ToString() + "=" + InnerResult(Category.Size, parent, i).Size.ToString())
                 .ToArray();
         }
     }
