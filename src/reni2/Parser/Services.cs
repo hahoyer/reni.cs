@@ -38,7 +38,7 @@ namespace Reni.Parser
             if(code == null)
                 return new Bitmap(1, 1);
 
-            var parser = new ParserInst(new ReniScanner(), new MainTokenFactory(prioTable));
+            var parser = new ParserInst(new ReniScanner(), new SimpleTokenFactory(prioTable));
             var syntax = (IGraphTarget) parser.Compile(new Source(code));
             return SyntaxDrawer.DrawBitmap(syntax);
         }

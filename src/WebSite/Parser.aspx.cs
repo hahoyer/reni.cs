@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Web.UI;
 using HWClassLibrary.Debug;
@@ -58,7 +57,7 @@ ParLevel ( { ) }
             SyntaxTree.ImageUrl
                 = "data:image/png;base64,"
                   + Services
-                        .SyntaxGraph(PrioTable, Program.Text,new Size(800,600))
+                        .SyntaxGraph(PrioTable, Program.Text)
                         .ToBase64();
         }
     }

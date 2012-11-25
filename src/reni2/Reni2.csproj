@@ -102,6 +102,7 @@
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="IProxyType.cs" />
     <Compile Include="Parser\IGraphTarget.cs" />
+    <Compile Include="Parser\SimpleTokenFactory.cs" />
     <Compile Include="Parser\SyntaxDrawer.cs" />
     <Compile Include="Parser\Match.cs" />
     <Compile Include="Parser\MatchExtension.cs" />
