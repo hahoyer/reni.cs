@@ -22,8 +22,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
+using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
@@ -60,11 +62,12 @@ namespace Reni.Parser
                 return null;
 
             var result = new Token(getTokenClass(sourcePosn, length.Value), sourcePosn.Source, sourcePosn.Position, length.Value);
-            sourcePosn .Incr(length.Value);
+            sourcePosn.Incr(length.Value);
             return result;
         }
     }
 
+    [DebuggerDisplay("{NodeDump} {DumpBeforeCurrent}[{DumpCurrent}]{DumpAfterCurrent}")]
     sealed class TokenData : ReniObject
     {
         static int _nextObjectId;
@@ -92,5 +95,44 @@ namespace Reni.Parser
         [DisableDump]
         internal string FilePosition { get { return "\n" + Source.FilePosn(Position, Name); } }
         internal string FileErrorPosition(string errorTag) { return "\n" + Source.FilePosn(Position, Name, "error " + errorTag); }
+
+        [UsedImplicitly]
+        string DumpCurrent { get { return Name; } }
+
+        const int DumpWidth = 10;
+
+        [UsedImplicitly]
+        string DumpAfterCurrent
+        {
+            get
+            {
+                if(Source.IsEnd(Position + Length))
+                    return "";
+                var length = Math.Min(DumpWidth, Source.Length - Position - Length);
+                var result = Source.SubString(Position + Length, length);
+                if(length == DumpWidth)
+                    result += "...";
+                return result;
+            }
+        }
+
+        [UsedImplicitly]
+        string DumpBeforeCurrent
+        {
+            get
+            {
+                var start = Math.Max(0, Position - DumpWidth);
+                var result = Source.SubString(start, Position - start);
+                if(Position >= DumpWidth)
+                    result = "..." + result;
+                return result;
+            }
+        }
+        public TokenData Combine(TokenData other)
+        {
+            Tracer.Assert(Source == other.Source);
+            Tracer.Assert(Position + Length <= other.Position);
+            return new TokenData(Source, Position, other.Position + other.Length - Position);
+        }
     }
 }
