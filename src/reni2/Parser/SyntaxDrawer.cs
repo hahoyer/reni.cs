@@ -72,13 +72,13 @@ namespace Reni.Parser
             return syntax.Left == null
                        ? (
                              syntax.Right == null
-                                 ? (Syntax) new Terminal(syntax.TokenClassName, this)
-                                 : new Prefix(syntax.TokenClassName, syntax.Right, this)
+                                 ? (Syntax) new Terminal(syntax.Token.Name, this)
+                                 : new Prefix(syntax.Token.Name, syntax.Right, this)
                          )
                        : (
                              syntax.Right == null
-                                 ? (Syntax) new Suffix(syntax.Left, syntax.TokenClassName, this)
-                                 : new Infix(syntax.Left, syntax.TokenClassName, syntax.Right, this)
+                                 ? (Syntax) new Suffix(syntax.Left, syntax.Token.Name, this)
+                                 : new Infix(syntax.Left, syntax.Token.Name, syntax.Right, this)
                          );
         }
 

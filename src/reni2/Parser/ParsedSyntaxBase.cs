@@ -1,3 +1,25 @@
+#region Copyright (C) 2012
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2012 Harald Hoyer
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//     
+//     Comments, bugs and suggestions to hahoyer at yahoo.de
+
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +29,12 @@ using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
-    internal class ParsedSyntaxBase : ReniObject, IParsedSyntax
+    abstract class ParsedSyntaxBase : ReniObject, IParsedSyntax
     {
         [UsedImplicitly]
         internal static bool IsDetailedDumpRequired = true;
 
-        private readonly TokenData _token;
+        readonly TokenData _token;
 
         protected ParsedSyntaxBase(TokenData token) { _token = token; }
 
@@ -25,26 +47,31 @@ namespace Reni.Parser
 
         string IParsedSyntax.GetNodeDump() { return GetNodeDump(); }
 
+        IParsedSyntax IParsedSyntax.Left { get { return Left; } }
+        IParsedSyntax IParsedSyntax.Right { get { return Right; } }
+
+        [DisableDump]
+        protected virtual IParsedSyntax Left { get { return null; } }
+        [DisableDump]
+        protected virtual IParsedSyntax Right { get { return null; } }
+
         [DisableDump]
         TokenData IParsedSyntax.Token { get { return Token; } }
 
         [DisableDump]
-        TokenData IParsedSyntax.FirstToken { get { return GetFirstToken(); } }
+        TokenData IParsedSyntax.FirstToken { get { return FirstToken; } }
 
         [DisableDump]
-        TokenData IParsedSyntax.LastToken { get { return GetLastToken(); } }
+        TokenData IParsedSyntax.LastToken { get { return LastToken; } }
 
         [DisableDump]
         internal TokenData Token { get { return _token; } }
 
         [DisableDump]
-        internal TokenData FirstToken { get { return GetFirstToken(); } }
+        internal virtual TokenData FirstToken { get { return Token; } }
 
         [DisableDump]
-        internal TokenData LastToken { get { return GetLastToken(); } }
-
-        protected virtual TokenData GetFirstToken() { return Token; }
-        protected virtual TokenData GetLastToken() { return Token; }
+        internal virtual TokenData LastToken { get { return Token; } }
 
         protected override string GetNodeDump() { return Token.Name; }
         protected virtual string FilePosition() { return Token.FilePosition; }

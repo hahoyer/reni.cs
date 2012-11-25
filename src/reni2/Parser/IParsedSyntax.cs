@@ -31,8 +31,6 @@ namespace Reni.Parser
     interface IParsedSyntax : IIconKeyProvider
     {
         [DisableDump]
-        string TokenClassName { get; }
-        [DisableDump]
         IParsedSyntax Left { get; }
         [DisableDump]
         IParsedSyntax Right { get; }
