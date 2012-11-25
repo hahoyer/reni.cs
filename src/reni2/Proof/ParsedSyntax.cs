@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +31,7 @@ using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    abstract class ParsedSyntax : Parser.ParsedSyntaxBase, IComparable<ParsedSyntax>
+    abstract class ParsedSyntax : ParsedSyntaxBase, IComparable<ParsedSyntax>
     {
         protected ParsedSyntax(TokenData token)
             : base(token) { }
