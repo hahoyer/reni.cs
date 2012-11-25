@@ -25,13 +25,14 @@ ParLevel ( { ) }
     {
         prioList = preparedPrioTableText;
     }
-    var prioTable = Services.FormatPrioTable(prioList ?? "");
+    var prioTable = (prioList ?? "").FormatPrioTable();
     var code = Request.Form["Code"];
 
     var imageUrl
         = "data:image/png;base64,"
-          + Services
-                .SyntaxGraph(prioTable, code)
+          + prioTable
+          .SyntaxGraph(code)
+                .SaveToFile("SyntaxTree.bmp")
                 .ToBase64();
 }
 
@@ -44,8 +45,14 @@ ParLevel ( { ) }
             </hgroup>
             <p>
                 Links gibt man Prioritätsregeln ein. 
+                Eine Zeile - eine Regel. Jede Regel beginnt mit einem der Schlüsselworte "Left", "Right", "TELevel" oder "ParLevel".
+                Danach folgen ein oder meherere Token.
                 Mit der Tab-Taste wird dann daraus die Prioritätstabelle.
-
+                Mit ? und Tab kann man sich ein Beispiel abrufen. 
+            </p>
+            <p>
+                Das rechte Editfeld erlaubt die Eingabe eines Ausdrucks, der mit Hilfe der Prioritätstabelle in einen Syntaxbaum verwandelt wird. 
+                Auch hier wird die Verarbeitung durch Tab angestossen.
             </p>
         </div>
     </section>

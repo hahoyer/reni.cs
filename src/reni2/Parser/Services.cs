@@ -25,15 +25,14 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
-using Reni.ReniParser;
 
 namespace Reni.Parser
 {
     public static class Services
     {
-        public static PrioTable FormatPrioTable(string text) { return PrioTable.FromText(text); }
+        public static PrioTable FormatPrioTable(this string text) { return PrioTable.FromText(text); }
 
-        public static Image SyntaxGraph(PrioTable prioTable, string code)
+        public static Image SyntaxGraph(this PrioTable prioTable, string code)
         {
             if(code == null)
                 return new Bitmap(1, 1);
@@ -51,5 +50,12 @@ namespace Reni.Parser
             Tracer.Assert(convertTo != null, () => "convertTo != null");
             return Convert.ToBase64String(convertTo, Base64FormattingOptions.InsertLineBreaks);
         }
+
+        public static Image SaveToFile(this Image image, string fileName)
+        {
+            //image.Save(fileName);
+            return image;
+        }
+
     }
 }

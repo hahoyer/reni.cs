@@ -44,7 +44,7 @@ namespace Reni.Parser
         SyntaxDrawer(IGraphTarget syntax)
         {
             _stringFormat = new StringFormat(StringFormatFlags.NoWrap);
-            _font = new Font(FontFamily.Families.Single(f1 => f1.Name == "Arial"), 16);
+            _font = new Font(FontFamily.Families.Single(f1 => f1.Name == "Arial"), 10);
             _lineBrush = new SolidBrush(Color.Black);
             _linePen = new Pen(_lineBrush, 1);
             _nodeBrush = new SolidBrush(Color.LightBlue);
@@ -73,7 +73,7 @@ namespace Reni.Parser
         Image Bitmap { get { return _bitmap; } }
 
         void DrawNode(Point origin, string nodeName)
-        {
+        {                                     
             var size = NodeSize(nodeName);
             var arcSize = new Size(2 * _sizeBase, 2 * _sizeBase);
             var bodyWidth = new Size(size.Width - 2 * _sizeBase, 0);

@@ -60,7 +60,7 @@ namespace ReniTest
         static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
         static void ShowSyntaxTree()
         {
-            var prioTable = Services.FormatPrioTable(@"Left not
+            var prioTable = @"Left not
 Left and
 Left or
 Left * /
@@ -72,9 +72,8 @@ Left function
 Right :
 Right , ;
 ParLevel ( { ) }
-"
-                );
-            var image = Services.SyntaxGraph(prioTable, "a <> b then (a :=b) else (x(); y(a,d))");
+".FormatPrioTable();
+            var image = prioTable.SyntaxGraph("a <> b then (a :=b) else (x(); y(a,d))");
             var mainForm = new Form
             {
                 ClientSize = image.Size, 
