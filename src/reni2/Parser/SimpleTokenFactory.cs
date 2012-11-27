@@ -70,13 +70,11 @@ namespace Reni.Parser
             protected virtual TokenData FirstToken { get { return _token; } }
             [DisableDump]
             internal virtual TokenData LastToken { get { return _token; } }
-            [DisableDump]
             public string Title { get { return _token.Name; } }
             [DisableDump]
             public IGraphTarget[] Children { get { return new[] {Left, Right}; } }
-            [DisableDump]
+
             protected virtual IGraphTarget Right { get { return null; } }
-            [DisableDump]
             protected virtual IGraphTarget Left { get { return null; } }
 
             string IParsedSyntax.Dump() { return Dump(); }
@@ -134,12 +132,11 @@ namespace Reni.Parser
             {
                 public TerminalSyntax(TokenData token)
                     : base(token) { }
+                internal override Syntax ParenthesisMatch(TokenData token, Syntax argument) { return CreateSyntax(null, FirstToken, argument); }
             }
 
-            public virtual Syntax Match(int level, TokenData token)
-            {
-                return new InfixSyntax(this, token, null);
-            }
+            internal virtual Syntax Match(int level, TokenData token) { return new InfixSyntax(this, token, null); }
+            internal virtual Syntax ParenthesisMatch(TokenData token, Syntax argument) { return CreateSyntax(this, token, argument); }
         }
 
         internal new abstract class TokenClass : ReniObject, ITokenClass
@@ -157,6 +154,7 @@ namespace Reni.Parser
 
         sealed class CloseToken : TokenClass
         {
+            [EnableDump]
             readonly int _level;
             public CloseToken(int level) { _level = level; }
             protected override Syntax CreateSyntax(Syntax left, TokenData token, Syntax right)
@@ -169,30 +167,34 @@ namespace Reni.Parser
 
         sealed class OpenToken : TokenClass
         {
+            [EnableDump]
             readonly int _level;
             public OpenToken(int level) { _level = level; }
-            protected override Syntax CreateSyntax(Syntax left, TokenData token, Syntax right)
-            {
-                Tracer.Assert(left == null);
-                return new OpenSyntax(token, right, _level);
-            }
+            protected override Syntax CreateSyntax(Syntax left, TokenData token, Syntax right) { return new OpenSyntax(left, token, right, _level); }
         }
 
         sealed class OpenSyntax : Syntax
         {
+            readonly Syntax _left;
             readonly Syntax _right;
+            [EnableDump]
             readonly int _level;
-            public OpenSyntax(TokenData token, Syntax right, int level)
+            public OpenSyntax(Syntax left, TokenData token, Syntax right, int level)
                 : base(token)
             {
+                _left = left;
                 _right = right;
                 _level = level;
             }
+            protected override IGraphTarget Left { get { return _left; } }
             protected override IGraphTarget Right { get { return _right; } }
-            public override Syntax Match(int level, TokenData token)
+            internal override Syntax Match(int level, TokenData token)
             {
                 Tracer.Assert(_level == level);
-                return _right?? new EmptySyntax(FirstToken.Combine(token));
+                var argument = _right ?? new EmptySyntax(FirstToken.Combine(token));
+                if(_left == null)
+                    return argument;
+                return _left.ParenthesisMatch(FirstToken, argument);
             }
 
             internal override TokenData LastToken { get { return _right.LastToken; } }
@@ -202,7 +204,6 @@ namespace Reni.Parser
         {
             public EmptySyntax(TokenData token)
                 : base(token) { }
-
         }
     }
 }
