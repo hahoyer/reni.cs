@@ -86,6 +86,8 @@ namespace Reni.Syntax
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + _right.NodeDump + ")"; }
         internal override TokenData FirstToken { get { return Token; } }
         internal override TokenData LastToken { get { return _right.LastToken; } }
+
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {null, _right}; } }
     }
 
     [Serializable]
@@ -139,6 +141,7 @@ namespace Reni.Syntax
         }
         internal override TokenData FirstToken { get { return _left.FirstToken; } }
         internal override TokenData LastToken { get { return _right.LastToken; } }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {_left, _right}; } }
     }
 
     interface IPendingProvider
@@ -173,6 +176,7 @@ namespace Reni.Syntax
 
         internal override TokenData FirstToken { get { return _left.FirstToken; } }
         internal override TokenData LastToken { get { return Token; } }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {_left}; } }
     }
 
     interface ITerminal
