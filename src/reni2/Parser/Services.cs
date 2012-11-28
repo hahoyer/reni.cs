@@ -25,6 +25,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using Reni.Graphics;
 
 namespace Reni.Parser
 {
@@ -53,7 +54,7 @@ namespace Reni.Parser
 
         public static Image SaveToFile(this Image image, string fileName)
         {
-            //image.Save(fileName);
+            image.Save(fileName);
             return image;
         }
 

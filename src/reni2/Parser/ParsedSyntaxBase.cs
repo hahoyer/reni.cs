@@ -26,6 +26,7 @@ using System.Linq;
 using System;
 using HWClassLibrary.TreeStructure;
 using JetBrains.Annotations;
+using Reni.Graphics;
 
 namespace Reni.Parser
 {

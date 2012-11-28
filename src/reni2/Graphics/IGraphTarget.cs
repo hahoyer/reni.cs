@@ -20,12 +20,7 @@
 
 #endregion
 
-using System.Linq;
-using System.Collections.Generic;
-using System;
-using HWClassLibrary.Debug;
-
-namespace Reni.Parser
+namespace Reni.Graphics
 {
     interface IGraphTarget
     {

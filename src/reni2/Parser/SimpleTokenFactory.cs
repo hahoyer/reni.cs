@@ -26,6 +26,7 @@ using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
+using Reni.Graphics;
 
 namespace Reni.Parser
 {

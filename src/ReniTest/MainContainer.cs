@@ -73,7 +73,7 @@ Right :
 Right , ;
 ParLevel ( { ) }
 ".FormatPrioTable();
-            var image = prioTable.SyntaxGraph("a <> b then (a :=b) else (x(); y(a,d))");
+            var image = prioTable.SyntaxGraph("(x a)(b)");
             var mainForm = new Form
             {
                 ClientSize = image.Size, 
