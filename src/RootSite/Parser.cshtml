@@ -2,6 +2,7 @@
 @using System.Collections.Generic
 @using System.Linq
 @using HWClassLibrary.Debug
+@using Helper.SVG
 @using Reni.Parser
 @{
     Layout = "~/_SiteLayout.cshtml";
@@ -31,7 +32,7 @@ ParLevel ( { ) }
     var imageUrl
         = "data:image/png;base64,"
           + prioTable
-          .SyntaxGraph(code)
+                .SyntaxGraph(code)
                 .SaveToFile("SyntaxTree.bmp")
                 .ToBase64();
 }
@@ -105,6 +106,7 @@ ParLevel ( { ) }
         <div>
             <img src="@imageUrl"/>
         </div>
+        @Html.Raw(Root.Create(prioTable.Syntax(code)).SerializeObject())
     </div>
 </form>
 <br />

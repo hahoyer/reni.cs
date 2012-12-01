@@ -1,6 +1,6 @@
 #region Copyright (C) 2012
 
-//     Project Reni2
+//     Project RootSite
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
@@ -20,11 +20,26 @@
 
 #endregion
 
-namespace Reni.Graphics
+using System.Linq;
+using System.Collections.Generic;
+using System;
+using System.Xml.Serialization;
+using HWClassLibrary.Debug;
+
+namespace Helper.SVG
 {
-    public interface IGraphTarget
+    public sealed class SVG
     {
-        string Title { get; }
-        IGraphTarget[] Children { get; }
+        [XmlAttribute("width")]
+        public string Width;
+        [XmlAttribute("height")]
+        public string Height;
+        [XmlAttribute("viewbox")]
+        public string ViewBox;
+
+        readonly List<Content> _content = new List<Content>();
+        [XmlElement("rect", typeof(Rect))]
+        [XmlElement("circle", typeof(Circle))]
+        public List<Content> Items { get { return _content; } }
     }
 }

@@ -35,12 +35,17 @@ namespace Reni.Parser
 
         public static Image SyntaxGraph(this PrioTable prioTable, string code)
         {
-            if(code == null)
-                return new Bitmap(1, 1);
+            var syntax = Syntax(prioTable, code);
+            return syntax == null ? new Bitmap(1, 1) : SyntaxDrawer.DrawBitmap(syntax);
+        }
+
+        public static IGraphTarget Syntax(this PrioTable prioTable, string code)
+        {
+            if (code == null)
+                return null;
 
             var parser = new ParserInst(new ReniScanner(), new SimpleTokenFactory(prioTable));
-            var syntax = (IGraphTarget) parser.Compile(new Source(code));
-            return SyntaxDrawer.DrawBitmap(syntax);
+            return (IGraphTarget)parser.Compile(new Source(code));
         }
 
         public static string ToBase64(this Image image)
