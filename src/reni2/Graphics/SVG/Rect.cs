@@ -26,21 +26,17 @@ using System;
 using System.Xml.Serialization;
 using HWClassLibrary.Debug;
 
-namespace Helper.SVG
+namespace Reni.Graphics.SVG
 {
-    public sealed class Circle : Content
+    public sealed class Rect : Content
     {
-        [XmlAttribute("cx")]
-        public int Cx;
-        [XmlAttribute("cy")]
-        public int Cy;
-        [XmlAttribute("r")]
-        public int R;
-        [XmlAttribute("fill")]
-        public string Fill;
-        [XmlAttribute("stroke")]
-        public string Stroke;
-        [XmlAttribute("stroke-width")]
-        public int StrokeWidth;
+        [XmlAttribute("x")]
+        public int X;
+        [XmlAttribute("y")]
+        public int Y;
+        [XmlAttribute("width")]
+        public int Width;
+        [XmlAttribute("height")]
+        public int Height;
     }
 }

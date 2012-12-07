@@ -32,13 +32,13 @@ namespace Reni.Graphics
     {
         readonly string _name;
         readonly Syntax[] _children;
-        readonly SyntaxDrawer _drawer;
+        readonly ISyntaxDrawer _drawer;
 
-        internal Syntax(SyntaxDrawer drawer, string name, IGraphTarget[] children)
+        Syntax(ISyntaxDrawer drawer, string name, IGraphTarget[] children)
         {
             _name = name;
             _drawer = drawer;
-            _children = children.Select(drawer.Create).ToArray();
+            _children = children.Select(target => Create(target, drawer)).ToArray();
         }
 
         bool HasChildren { get { return _children.Any(c => c != null); } }
@@ -134,5 +134,15 @@ namespace Reni.Graphics
                     / _children.Length;
             }
         }
+        internal static Syntax Create(IGraphTarget syntax, ISyntaxDrawer syntaxDrawer) { return syntax == null ? null : new Syntax(syntaxDrawer, syntax.Title, syntax.Children); }
+    }
+
+    interface ISyntaxDrawer
+    {
+        Size Gap { get; }
+        int NodeHeight(string nodeName);
+        int NodeWidth(string name);
+        void DrawNode(Point origin, string nodeName);
+        void DrawLine(Point start, Point end);
     }
 }

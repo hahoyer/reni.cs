@@ -1,6 +1,6 @@
 #region Copyright (C) 2012
 
-//     Project RootSite
+//     Project Reni2
 //     Copyright (C) 2012 - 2012 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,14 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Xml.Serialization;
 using HWClassLibrary.Debug;
 
-namespace Helper.SVG
+namespace Reni.Graphics.SVG
 {
-    public abstract class Content
-    {}
+    public sealed class Path : Content
+    {
+        [XmlAttribute("d")]
+        public string PathData;
+    }
 }

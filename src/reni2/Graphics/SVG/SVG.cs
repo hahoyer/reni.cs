@@ -26,7 +26,7 @@ using System;
 using System.Xml.Serialization;
 using HWClassLibrary.Debug;
 
-namespace Helper.SVG
+namespace Reni.Graphics.SVG
 {
     public sealed class SVG
     {
@@ -40,6 +40,8 @@ namespace Helper.SVG
         readonly List<Content> _content = new List<Content>();
         [XmlElement("rect", typeof(Rect))]
         [XmlElement("circle", typeof(Circle))]
+        [XmlElement("path", typeof(Path))]
+        [XmlElement("text", typeof(Text))]
         public List<Content> Items { get { return _content; } }
     }
 }

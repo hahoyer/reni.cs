@@ -101,6 +101,14 @@
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
     <Compile Include="Graphics\IGraphTarget.cs" />
+    <Compile Include="Graphics\SVG\Circle.cs" />
+    <Compile Include="Graphics\SVG\Content.cs" />
+    <Compile Include="Graphics\SVG\Path.cs" />
+    <Compile Include="Graphics\SVG\Rect.cs" />
+    <Compile Include="Graphics\SVG\Root.cs" />
+    <Compile Include="Graphics\SVG\SVG.cs" />
+    <Compile Include="Graphics\SVG\SyntaxDrawer.cs" />
+    <Compile Include="Graphics\SVG\Text.cs" />
     <Compile Include="Graphics\Syntax.cs" />
     <Compile Include="Graphics\SyntaxDrawer.cs" />
     <Compile Include="IProxyType.cs" />

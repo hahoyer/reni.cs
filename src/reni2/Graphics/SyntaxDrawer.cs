@@ -30,7 +30,7 @@ using HWClassLibrary.Debug;
 
 namespace Reni.Graphics
 {
-    sealed class SyntaxDrawer : ReniObject
+    sealed class SyntaxDrawer : ReniObject, ISyntaxDrawer
     {
         readonly System.Drawing.Graphics _graphics;
         readonly Font _font;
@@ -40,8 +40,9 @@ namespace Reni.Graphics
         readonly int _sizeBase;
         readonly StringFormat _stringFormat;
         readonly Pen _linePen;
+        readonly Syntax _syntax;
 
-        SyntaxDrawer(IGraphTarget syntax)
+        SyntaxDrawer(IGraphTarget target)
         {
             _stringFormat = new StringFormat(StringFormatFlags.NoWrap);
             _font = new Font(FontFamily.Families.Single(f1 => f1.Name == "Arial"), 10);
@@ -51,8 +52,9 @@ namespace Reni.Graphics
             _graphics = System.Drawing.Graphics.FromImage(new Bitmap(1, 1));
             _sizeBase = (_font.Height * 8) / 10;
 
-            var width = Width(syntax) + _sizeBase + 1;
-            var height = Height(syntax) + _sizeBase + 1;
+            _syntax = Syntax.Create(target, this);
+            var width = _syntax.Width + _sizeBase + 1;
+            var height = _syntax.Height + _sizeBase + 1;
             _bitmap = new Bitmap(width, height);
             _graphics = System.Drawing.Graphics.FromImage(_bitmap);
             var frame = new Rectangle(0, 0, width, height);
@@ -60,19 +62,17 @@ namespace Reni.Graphics
             _graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
         }
 
-        internal static Image DrawBitmap(IGraphTarget syntax)
+        internal static Image DrawBitmap(IGraphTarget syntax) { return new SyntaxDrawer(syntax).Draw(); }
+        
+        Image Draw()
         {
-            var drawer = new SyntaxDrawer(syntax);
-            drawer.BuildBitmap(new Point(drawer._sizeBase / 2, drawer._sizeBase / 2), syntax);
-            return drawer.Bitmap;
+            _syntax.Draw(new Point(_sizeBase / 2, _sizeBase / 2));
+            return _bitmap;
         }
 
-        internal Syntax Create(IGraphTarget syntax) { return syntax == null ? null : new Syntax(this, syntax.Title, syntax.Children); }
+        Size ISyntaxDrawer.Gap { get { return new Size(_sizeBase, _sizeBase); } }
 
-        internal Size Gap { get { return new Size(_sizeBase, _sizeBase); } }
-        Image Bitmap { get { return _bitmap; } }
-
-        internal void DrawNode(Point origin, string nodeName)
+        void ISyntaxDrawer.DrawNode(Point origin, string nodeName)
         {
             var size = NodeSize(nodeName);
             var arcSize = new Size(2 * _sizeBase, 2 * _sizeBase);
@@ -95,7 +95,7 @@ namespace Reni.Graphics
             _graphics.DrawString(nodeName, _font, _lineBrush, new Rectangle(origin, size), s);
         }
 
-        internal void DrawLine(Point start, Point end) { _graphics.DrawLine(_linePen, start, end); }
+        void ISyntaxDrawer.DrawLine(Point start, Point end) { _graphics.DrawLine(_linePen, start, end); }
 
         int TextWidth(string nodeName)
         {
@@ -105,11 +105,8 @@ namespace Reni.Graphics
                        .Width;
         }
 
-        Size NodeSize(string nodeName) { return new Size(NodeWidth(nodeName), NodeHeight(nodeName)); }
-        internal int NodeHeight(string nodeName) { return _sizeBase * 2; }
-        internal int NodeWidth(string nodeName) { return Math.Max(TextWidth(nodeName), _sizeBase) + _sizeBase; }
-        void BuildBitmap(Point point, IGraphTarget syntax) { Create(syntax).Draw(point); }
-        int Height(IGraphTarget syntax) { return Create(syntax).Height; }
-        int Width(IGraphTarget syntax) { return Create(syntax).Width; }
+        Size NodeSize(string nodeName) { return new Size(((ISyntaxDrawer) this).NodeWidth(nodeName), ((ISyntaxDrawer) this).NodeHeight(nodeName)); }
+        int ISyntaxDrawer.NodeHeight(string nodeName) { return _sizeBase * 2; }
+        int ISyntaxDrawer.NodeWidth(string nodeName) { return Math.Max(TextWidth(nodeName), _sizeBase) + _sizeBase; }
     }
 }

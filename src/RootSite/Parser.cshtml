@@ -2,7 +2,7 @@
 @using System.Collections.Generic
 @using System.Linq
 @using HWClassLibrary.Debug
-@using Helper.SVG
+@using Reni.Graphics.SVG
 @using Reni.Parser
 @{
     Layout = "~/_SiteLayout.cshtml";
@@ -28,13 +28,6 @@ ParLevel ( { ) }
     }
     var prioTable = (prioList ?? "").FormatPrioTable();
     var code = Request.Form["Code"];
-
-    var imageUrl
-        = "data:image/png;base64,"
-          + prioTable
-                .SyntaxGraph(code)
-                .SaveToFile("SyntaxTree.bmp")
-                .ToBase64();
 }
 
 @section featured {
@@ -101,10 +94,6 @@ ParLevel ( { ) }
     <div class="float-left">
         <div>
             <textarea name="Code" rows="2" cols="50" onchange=" submit() ">@code</textarea>
-
-        </div>
-        <div>
-            <img src="@imageUrl"/>
         </div>
         @Html.Raw(Root.Create(prioTable.Syntax(code)).SerializeObject())
     </div>
