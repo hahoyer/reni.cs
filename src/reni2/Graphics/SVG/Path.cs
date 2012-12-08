@@ -57,9 +57,6 @@ namespace Reni.Graphics.SVG
                 _sweepFlag = sweepFlag;
             }
 
-            public Arc(int radius, Size end, bool largeArcFlag, bool sweepFlag, int xAxisRotation = 0)
-                : this(new Size(radius, radius), end, largeArcFlag, sweepFlag, xAxisRotation) { }
-
             internal override Size Size { get { return _end; } }
             internal override string FormatElement
             {
@@ -67,7 +64,7 @@ namespace Reni.Graphics.SVG
                 {
                     return
                         "a"
-                        + FormatPair(_radii)
+                        + _radii.FormatPair()
                         + " "
                         + _xAxisRotation
                         + " "
@@ -113,7 +110,7 @@ namespace Reni.Graphics.SVG
             internal override string FormatElement { get { return IsVisible ? "h" + _length : "m" + FormatSize; } }
         }
 
-        sealed class VerticalLine : Element
+        internal sealed class VerticalLine : Element
         {
             [EnableDump]
             readonly int _length;
@@ -133,14 +130,24 @@ namespace Reni.Graphics.SVG
 
             internal abstract Size Size { get; }
             internal abstract string FormatElement { get; }
-            internal string FormatSize { get { return FormatPair(Size); } }
-            protected static string FormatPair(Size size) { return size.Width + "," + size.Height; }
+            internal string FormatSize { get { return Size.FormatPair(); } }
         }
+    }
 
-        internal static string Format(params Element[] path)
+    static class PathExtension
+    {
+        internal static Path.Element MoveTo(this Size end) { return new Path.Line(end, isVisible: false); }
+        internal static Path.Element MoveTo(this Point end) { return new Path.Line(new Size(end.X,end.Y), isVisible: false); }
+        internal static Path.Element LineTo(this Size end) { return new Path.Line(end); }
+        internal static Path.Element HorizontalLine(this int length) { return new Path.HorizontalLine(length); }
+        internal static Path.Element VerticalLine(this int length) { return new Path.VerticalLine(length); }
+        internal static Path.Element Arc(this Size radii, Size end, bool largeArcFlag, bool sweepFlag, int xAxisRotation = 0) { return new Path.Arc(radii, end, largeArcFlag, sweepFlag, xAxisRotation); }
+        internal static Path.Element Arc(this int radius, Size end, bool largeArcFlag, bool sweepFlag, int xAxisRotation = 0) { return new Path.Arc(new Size(radius, radius), end, largeArcFlag, sweepFlag, xAxisRotation); }
+        
+        internal static string Format(this Point start, params Path.Element[] path)
         {
-            var current = new Point(0, 0);
-            var result = "M0,0";
+            var current = start;
+            var result = "M" + current.FormatPair();
             foreach(var t in path)
             {
                 result += " ";
@@ -150,7 +157,9 @@ namespace Reni.Graphics.SVG
 
             return result;
         }
-
-        internal static string CloseAndFormat(params Element[] path) { return Format(path) + " Z"; }
+        
+        internal static string CloseAndFormat(this Point start, params Path.Element[] path) { return Format(start, path) + " Z"; }
+        internal static string FormatPair(this Size size) { return size.Width + "," + size.Height; }
+        internal static string FormatPair(this Point point) { return point.X + "," + point.Y; }
     }
 }

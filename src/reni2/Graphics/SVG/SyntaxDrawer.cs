@@ -42,7 +42,7 @@ namespace Reni.Graphics.SVG
 
         internal SyntaxDrawer(IGraphTarget target)
         {
-            _fontFamily = "Arial";
+            _fontFamily = "Lucida Console";
             _stroke = "Black";
             _tick = 1;
             _fillColor = "LightBlue";
@@ -81,13 +81,12 @@ namespace Reni.Graphics.SVG
                 (
                     new Path
                     {
-                        PathData = Path.CloseAndFormat
-                        (
-                            new Path.Line(lineOrigin, isVisible: false),
-                            new Path.HorizontalLine(bodyWidth),
-                            new Path.Arc(SizeBase, new Size(0, SizeBase * 2), false, true),
-                            new Path.HorizontalLine(-bodyWidth),
-                            new Path.Arc(SizeBase, new Size(0, -SizeBase * 2), false, true)
+                        PathData = (origin + new Size(SizeBase, 0))
+                        .CloseAndFormat
+                        (bodyWidth.HorizontalLine()
+                         , SizeBase.Arc(new Size(0, SizeBase * 2), false, true)
+                         , (-bodyWidth).HorizontalLine()
+                         , SizeBase.Arc(new Size(0, -SizeBase * 2), false, true)
                         ),
                         Fill = _fillColor,
                         Stroke = _stroke,
@@ -101,13 +100,18 @@ namespace Reni.Graphics.SVG
         Content CreateText(string text, Point center)
         {
             var size = TextSize(text);
-            var start = center + new Size(-size.Width / 2, size.Height / 3);
+
+            var start =
+                center
+                - new Size(size.Width / 2, size.Height / 2)
+                + new Size(0, size.Height * 4 / 5);
+
             return new Text
             {
                 Data = text,
                 Start = start,
                 FontFamily = _font.FontFamily.Name,
-                Size = (float) (_font.Size * 1.4),
+                Size = _font.Size * 7 / 5,
                 Fill = _stroke
             };
         }
@@ -118,11 +122,7 @@ namespace Reni.Graphics.SVG
         {
             return new Path
             {
-                PathData = Path.Format
-                    (
-                        new Path.Line(new Size(start), isVisible: false),
-                        new Path.Line(new Size(end.X - start.X, end.Y - start.Y))
-                    ),
+                PathData = start.Format(new Size(end.X - start.X, end.Y - start.Y).LineTo()),
                 Stroke = _stroke,
                 StrokeWidth = _tick
             };
