@@ -81,13 +81,13 @@ namespace Reni.Graphics.SVG
                 (
                     new Path
                     {
-                        PathData = PathElement.Format
+                        PathData = Path.CloseAndFormat
                         (
-                            new LineElement(lineOrigin, isVisible: false),
-                            new HorizontalLineElement(bodyWidth),
-                            new ArcElement(SizeBase, new Size(0, SizeBase * 2), false, true),
-                            new HorizontalLineElement(-bodyWidth),
-                            new ArcElement(SizeBase, new Size(0, -SizeBase * 2), false, true)
+                            new Path.Line(lineOrigin, isVisible: false),
+                            new Path.HorizontalLine(bodyWidth),
+                            new Path.Arc(SizeBase, new Size(0, SizeBase * 2), false, true),
+                            new Path.HorizontalLine(-bodyWidth),
+                            new Path.Arc(SizeBase, new Size(0, -SizeBase * 2), false, true)
                         ),
                         Fill = _fillColor,
                         Stroke = _stroke,
@@ -101,7 +101,7 @@ namespace Reni.Graphics.SVG
         Content CreateText(string text, Point center)
         {
             var size = TextSize(text);
-            var start = center + new Size(-size.Width / 2, size.Height / 2);
+            var start = center + new Size(-size.Width / 2, size.Height / 3);
             return new Text
             {
                 Data = text,
@@ -118,10 +118,10 @@ namespace Reni.Graphics.SVG
         {
             return new Path
             {
-                PathData = PathElement.Format
+                PathData = Path.Format
                     (
-                        new LineElement(new Size(start), isVisible: false),
-                        new LineElement(new Size(end.X - start.X, end.Y - start.Y))
+                        new Path.Line(new Size(start), isVisible: false),
+                        new Path.Line(new Size(end.X - start.X, end.Y - start.Y))
                     ),
                 Stroke = _stroke,
                 StrokeWidth = _tick
