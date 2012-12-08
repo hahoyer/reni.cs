@@ -47,7 +47,7 @@ namespace Reni.Graphics
         static int SaveAnchorWidth(Syntax syntax) { return syntax == null ? 0 : syntax.Anchor.Width; }
 
         internal int Height { get { return NodeHeight + (HasChildren ? _drawer.Gap.Height + ChildrenHeight : 0); } }
-        internal int Width { get { return Math.Max(NodeWidth, HasChildren ? ChildrenWidth : 0); } }
+        internal int Width { get { return Math.Max(NodeOffset + NodeWidth, HasChildren ? ChildrenWidth : 0); } }
 
         int NodeHeight { get { return _drawer.NodeHeight(_name); } }
         int NodeWidth { get { return _drawer.NodeWidth(_name); } }
