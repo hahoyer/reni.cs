@@ -29,12 +29,15 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using HWClassLibrary.Debug;
+using Reni.Parser;
 
 namespace Reni.Graphics.SVG
 {
     [XmlRoot("div")]
     public sealed class Root
     {
+        public SVG Svg;
+
         public string SerializeObject()
         {
             var sb = new StringBuilder();
@@ -61,7 +64,6 @@ namespace Reni.Graphics.SVG
 
         public static Root Create(IGraphTarget target) { return new SyntaxDrawer(target).Draw(); }
 
-        public SVG Svg;
     }
 
 }

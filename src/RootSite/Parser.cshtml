@@ -2,13 +2,17 @@
 @using System.Collections.Generic
 @using System.Linq
 @using HWClassLibrary.Debug
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using HWClassLibrary.Debug
 @using Reni.Graphics.SVG
 @using Reni.Parser
 @{
     Layout = "~/_SiteLayout.cshtml";
     Page.Title = "Parser Tester";
     var prioList = Request.Form["PrioList"];
-
+    const bool useImages = true;
     const string preparedPrioTableText = @"Left not
 Left and
 Left or
@@ -17,7 +21,7 @@ Left + -
 Left = <>
 Right :=
 TELevel then else
-Left function
+Left /\
 Right :
 Right , ;
 ParLevel ( { ) }
@@ -28,6 +32,9 @@ ParLevel ( { ) }
     }
     var prioTable = (prioList ?? "").FormatPrioTable();
     var code = Request.Form["Code"];
+    var left = "<-";
+    var up = "^^";
+    var match = "=";
 }
 
 @section featured {
@@ -35,7 +42,7 @@ ParLevel ( { ) }
         <div class="content-wrapper">
             <hgroup class="title">
                 <h1>@Page.Title.</h1>
-                <h2>Teste verschiede Features des Parsers.</h2>
+                <h2>Teste verschiedene Features des Parsers.</h2>
             </hgroup>
             <p>
                 Links gibt man Prioritätsregeln ein. 
@@ -57,7 +64,7 @@ ParLevel ( { ) }
         <textarea name="PrioList" rows="20" cols="20" onchange=" submit() ">@prioList</textarea>
     </div>     
     <div class="float-left">
-        <table id="PrioTable" class="white_table">
+        <table id="PrioTable" class="white_table" >
             <tr >
                 <th/>
                 @foreach(var recentTokenName in prioTable.RecentToken)
@@ -76,13 +83,34 @@ ParLevel ( { ) }
                             @switch(prioTable.Relation(newTokenName, recentTokenName))
                             {
                                 case '+':
-                                    <img src="~/Resources/Stack.Push.bmp" alt="<-"/>
+                                    if(useImages)
+                                    {
+                                        <img src="~/Resources/Stack.Push.bmp" alt="<-"/>
+                                    }
+                                    else
+                                    {
+                                        @left
+                                    }
                                     break;
                                 case '-':
-                                    <img src="~/Resources/Stack.Pull.bmp" alt="^^"/>
+                                    if(useImages)
+                                    {
+                                        <img src="~/Resources/Stack.Pull.bmp" alt="^^"/>
+                                    }
+                                    else
+                                    {
+                                        @up
+                                    }
                                     break;
                                 default:
-                                    <img src="~/Resources/Stack.Match.bmp" alt="="/>
+                                    if(useImages)
+                                    {
+                                        <img src="~/Resources/Stack.Match.bmp" alt="="/>
+                                    }
+                                    else
+                                    {
+                                        @match
+                                    }
                                     break;
                             }
                         </td>
