@@ -31,7 +31,6 @@ namespace Reni.Graphics.SVG
     sealed class SyntaxDrawer : ReniObject, ISyntaxDrawer
     {
         readonly Syntax _syntax;
-        int SizeBase { get { return (int) (_tick * 10); } }
         readonly Root _root;
         readonly float _tick;
         readonly string _stroke;
@@ -48,7 +47,6 @@ namespace Reni.Graphics.SVG
             _fillColor = "LightBlue";
             _font = new Font(FontFamily.Families.Single(f1 => f1.Name == _fontFamily), _tick * 10);
             _graphics = System.Drawing.Graphics.FromImage(new Bitmap(1, 1));
-
             _root = new Root {Svg = new SVG()};
             _syntax = Syntax.Create(target, this);
         }
@@ -66,7 +64,7 @@ namespace Reni.Graphics.SVG
             return _root;
         }
 
-
+        int SizeBase { get { return (int)(_tick * 10); } }
         Size ISyntaxDrawer.Gap { get { return new Size(SizeBase, SizeBase); } }
         int ISyntaxDrawer.NodeHeight(string nodeName) { return Math.Max(TextSize(nodeName).Height, SizeBase) + SizeBase; }
         int ISyntaxDrawer.NodeWidth(string nodeName) { return Math.Max(TextSize(nodeName).Width, SizeBase) + SizeBase; }
@@ -75,7 +73,6 @@ namespace Reni.Graphics.SVG
         {
             var size = NodeSize(nodeName);
             var bodyWidth = size.Width - 2 * SizeBase;
-            var lineOrigin = new Size(origin.X + SizeBase, origin.Y);
 
             _root.Svg.Items.Add
                 (
