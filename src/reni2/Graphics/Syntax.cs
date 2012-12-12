@@ -54,7 +54,7 @@ namespace Reni.Graphics
 
         Size Anchor { get { return new Size(AnchorOffset, NodeHeight / 2); } }
         int NodeOffset { get { return AnchorOffset - NodeWidth / 2; } }
-        int ChildrenOffset { get { return -Math.Min(0, (ChildrenWidth - NodeWidth) / 2); } }
+        int ChildrenOffset { get { return Math.Max(0, (NodeWidth - ChildrenWidth) / 2); } }
 
         internal void Draw(Point origin)
         {
@@ -63,7 +63,11 @@ namespace Reni.Graphics
             DrawNode(origin);
         }
 
-        void DrawNode(Point origin) { _drawer.DrawNode(origin + new Size(NodeOffset, 0), _name); }
+        void DrawNode(Point origin)
+        {
+            Tracer.Assert(NodeOffset >= 0, () => NodeOffset.ToString());
+            _drawer.DrawNode(origin + new Size(NodeOffset, 0), _name);
+        }
 
         void DrawChildren(Point origin)
         {
@@ -123,15 +127,16 @@ namespace Reni.Graphics
         {
             get
             {
-                if(!HasChildren)
-                    return NodeWidth / 2;
-
-                var childAnchors = _children.Select(SaveAnchorWidth);
-                return
-                    ChildOffsets
-                        .Select((o, i) => o.Width + childAnchors.ElementAt(i))
-                        .Sum()
-                    / _children.Length;
+                var result = 0;
+                if(HasChildren)
+                {
+                    var childAnchors = _children.Select(SaveAnchorWidth);
+                    result = ChildOffsets
+                                 .Select((o, i) => o.Width + childAnchors.ElementAt(i))
+                                 .Sum()
+                             / _children.Length;
+                }
+                return Math.Max(result, NodeWidth / 2);
             }
         }
         internal static Syntax Create(IGraphTarget syntax, ISyntaxDrawer syntaxDrawer) { return syntax == null ? null : new Syntax(syntaxDrawer, syntax.Title, syntax.Children); }
