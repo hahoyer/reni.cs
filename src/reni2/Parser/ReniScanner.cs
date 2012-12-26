@@ -34,6 +34,7 @@ namespace Reni.Parser
         readonly Match _any;
         readonly Match _text;
         readonly SyntaxError _invalidTextEnd = new SyntaxError(IssueId.EOLInString);
+        readonly SyntaxError _invalidLineComment = new SyntaxError(IssueId.EOFInLineComment);
         readonly SyntaxError _invalidComment = new SyntaxError(IssueId.EOFInComment);
         readonly SyntaxError _unexpectedSyntaxError = new SyntaxError(IssueId.UnexpectedSyntaxError);
         readonly IMatch _number;
@@ -55,7 +56,8 @@ namespace Reni.Parser
                 .Else("#" + " \t".AnyChar() + Match.LineEnd.Find)
                 .Else("#(" + Match.WhiteSpace + (Match.WhiteSpace + ")#").Find)
                 .Else("#(" + _any.Value(id => (Match.WhiteSpace + id + ")#").Box().Find))
-                .Else("#" + _invalidComment)
+                .Else("#(" + Match.End.Find + _invalidComment)
+                .Else("#" + Match.End.Find + _invalidLineComment)
                 .Repeat();
 
             _number = Match.Digit.Repeat(1);

@@ -31,19 +31,19 @@ namespace Reni.Parser
     abstract class TokenFactory<TTokenClass> : ReniObject, ITokenFactory
         where TTokenClass : class, ITokenClass
     {
+        readonly PrioTable _prioTable;
         readonly SimpleCache<DictionaryEx<string, TTokenClass>> _tokenClasses;
-        readonly SimpleCache<PrioTable> _prioTable;
         readonly SimpleCache<TTokenClass> _numberClass;
         readonly SimpleCache<TTokenClass> _textClass;
         readonly SimpleCache<TTokenClass> _beginOfText;
         readonly SimpleCache<TTokenClass> _endOfText;
 
-        internal TokenFactory()
+        internal TokenFactory(PrioTable prioTable)
         {
+            _prioTable = prioTable;
             _endOfText = new SimpleCache<TTokenClass>(InternalGetEndOfTextClass);
             _beginOfText = new SimpleCache<TTokenClass>(InternalGetBeginOfTextClass);
             _numberClass = new SimpleCache<TTokenClass>(InternalGetNumberClass);
-            _prioTable = new SimpleCache<PrioTable>(GetPrioTable);
             _tokenClasses = new SimpleCache<DictionaryEx<string, TTokenClass>>(InternalGetTokenClasses);
             _textClass = new SimpleCache<TTokenClass>(InternalGetTextClass);
         }
@@ -82,8 +82,7 @@ namespace Reni.Parser
             return result;
         }
 
-        ParserInst ITokenFactory.Parser { get { return new ParserInst(new ReniScanner(), this); } }
-        PrioTable ITokenFactory.PrioTable { get { return _prioTable.Value; } }
+        PrioTable ITokenFactory.PrioTable { get { return _prioTable; } }
 
         ITokenClass ITokenFactory.TokenClass(string name)
         {
@@ -102,7 +101,6 @@ namespace Reni.Parser
         ITokenClass ITokenFactory.EndOfText { get { return _endOfText.Value; } }
 
         protected abstract TTokenClass GetSyntaxError(string message);
-        protected abstract PrioTable GetPrioTable();
         protected abstract DictionaryEx<string, TTokenClass> GetTokenClasses();
 
         protected virtual TTokenClass GetEndOfTextClass() { return GetSyntaxError("unexpected end of text".Quote()); }
@@ -111,7 +109,7 @@ namespace Reni.Parser
         protected virtual TTokenClass GetNumberClass() { return GetSyntaxError("unexpected number"); }
         protected virtual TTokenClass GetTextClass() { return GetSyntaxError("unexpected string"); }
 
-        internal Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
+        Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
         protected ITokenClass TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }
     }
 }

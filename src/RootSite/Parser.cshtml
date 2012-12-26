@@ -1,0 +1,130 @@
+﻿@using System
+@using System.Collections.Generic
+@using System.Linq
+@using HWClassLibrary.Debug
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using HWClassLibrary.Debug
+@using Reni.Graphics.SVG
+@using Reni.Parser
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Parser Tester";
+    var prioList = Request.Form["PrioList"];
+    const bool useImages = true;
+    const string preparedPrioTableText = @"Left not
+Left and
+Left or
+Left * /
+Left + -
+Left = <>
+Right :=
+TELevel then else
+Left /\
+Right :
+Right , ;
+ParLevel ( { ) }
+";
+    if(prioList == "?")
+    {
+        prioList = preparedPrioTableText;
+    }
+    var prioTable = (prioList ?? "").FormatPrioTable();
+    var code = Request.Form["Code"];
+    var left = "<-";
+    var up = "^^";
+    var match = "=";
+}
+
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@Page.Title.</h1>
+                <h2>Teste verschiedene Features des Parsers.</h2>
+            </hgroup>
+            <p>
+                Links gibt man Prioritätsregeln ein. 
+                Eine Zeile - eine Regel. Jede Regel beginnt mit einem der Schlüsselworte "Left", "Right", "TELevel" oder "ParLevel".
+                Danach folgen ein oder meherere Token.
+                Mit der Tab-Taste wird dann daraus die Prioritätstabelle.
+                Mit ? und Tab kann man sich ein Beispiel abrufen. 
+            </p>
+            <p>
+                Das rechte Editfeld erlaubt die Eingabe eines Ausdrucks, der mit Hilfe der Prioritätstabelle in einen Syntaxbaum verwandelt wird. 
+                Auch hier wird die Verarbeitung durch Tab angestossen.
+            </p>
+        </div>
+    </section>
+}
+
+<form method="POST">
+    <div class="float-left">
+        <textarea name="PrioList" rows="20" cols="20" onchange=" submit() ">@prioList</textarea>
+    </div>     
+    <div class="float-left">
+        <table id="PrioTable" class="white_table" >
+            <tr >
+                <th/>
+                @foreach(var recentTokenName in prioTable.RecentToken)
+                {
+                    <th>@recentTokenName</th>
+                }
+            </tr>
+            
+            @foreach(var newTokenName in prioTable.NewToken)
+            {
+                <tr>
+                    <th>@newTokenName</th>
+                    @foreach(var recentTokenName in prioTable.RecentToken)
+                    {
+                        <td>
+                            @switch(prioTable.Relation(newTokenName, recentTokenName))
+                            {
+                                case '+':
+                                    if(useImages)
+                                    {
+                                        <img src="~/Resources/Stack.Push.bmp" alt="<-"/>
+                                    }
+                                    else
+                                    {
+                                        @left
+                                    }
+                                    break;
+                                case '-':
+                                    if(useImages)
+                                    {
+                                        <img src="~/Resources/Stack.Pull.bmp" alt="^^"/>
+                                    }
+                                    else
+                                    {
+                                        @up
+                                    }
+                                    break;
+                                default:
+                                    if(useImages)
+                                    {
+                                        <img src="~/Resources/Stack.Match.bmp" alt="="/>
+                                    }
+                                    else
+                                    {
+                                        @match
+                                    }
+                                    break;
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+    </div>     
+    <div class="float-left">
+        <div>
+            <textarea name="Code" rows="2" cols="50" onchange=" submit() ">@code</textarea>
+        </div>
+        @Html.Raw(Root.Create(prioTable.Syntax(code)).SerializeObject())
+    </div>
+</form>
+<br />
+

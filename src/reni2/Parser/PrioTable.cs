@@ -108,21 +108,21 @@ namespace Reni.Parser
             {
                 var data = line.Skip(1).ToArray();
                 var tokenCount = data.Length / 2;
-                switch(line[0])
+                switch(line[0].ToLowerInvariant())
                 {
-                    case "Left":
+                    case "left":
                         result += Left(data);
                         break;
-                    case "Right":
+                    case "right":
                         result += Right(data);
                         break;
-                    case "ParLevel":
+                    case "parlevel":
                         result = result.ParenthesisLevel
                             (data.Take(tokenCount).ToArray()
                              , data.Skip(tokenCount).Take(tokenCount).ToArray()
                             );
                         break;
-                    case "TELevel":
+                    case "televel":
                         result = result.ThenElseLevel
                             (data.Take(tokenCount).ToArray()
                              , data.Skip(tokenCount).Take(tokenCount).ToArray()
@@ -135,6 +135,7 @@ namespace Reni.Parser
                         break;
                 }
             }
+
             result = result.ParenthesisLevel(BeginOfText, EndOfText);
             result.Sort();
             return result;
@@ -210,22 +211,58 @@ namespace Reni.Parser
             : this()
         {
             _token = AllocTokens(left, x._token, right);
+            for(var i = 0; i < left.Length; i++)
+                for(var j = 0; j < left.Length; j++)
+                    _dataCache.Value[i, j] = data[0][0];
+
+            for(var i = 0; i < x._token.Length; i++)
+                for(var j = 0; j < left.Length; j++)
+                {
+                    _dataCache.Value[i + left.Length, j] = data[1][0];
+                    _dataCache.Value[j, i + left.Length] = data[0][1];
+                }
+
+            for(var i = 0; i < x._token.Length; i++)
+                for(var j = 0; j < x._token.Length; j++)
+                    _dataCache.Value[i + left.Length, j + left.Length] = x._dataCache.Value[i, j];
+
+            for(var i = 0; i < right.Length; i++)
+                for(var j = 0; j < left.Length; j++)
+                {
+                    _dataCache.Value[i + left.Length + x._token.Length, j]
+                        = i < j ? '+' : i > j ? '-' : '=';
+                    _dataCache.Value[j, i + left.Length + x._token.Length] = data[0][2];
+                }
+
+            for(var i = 0; i < right.Length; i++)
+                for(var j = 0; j < x._token.Length; j++)
+                {
+                    _dataCache.Value[i + left.Length + x._token.Length, j + left.Length] = data[2][1];
+                    _dataCache.Value[j + left.Length, i + left.Length + x._token.Length] = data[1][2];
+                }
+
+            for(var i = 0; i < right.Length; i++)
+                for(var j = 0; j < right.Length; j++)
+                    _dataCache.Value[i + left.Length + x._token.Length, j + left.Length + x._token.Length] = data[2][2];
+
+
             for(var i = 0; i < Length; i++)
                 for(var j = 0; j < Length; j++)
                 {
                     var iData = Find(i, left, x._token);
                     var jData = Find(j, left, x._token);
-                    _dataCache.Value[i, j] = data[iData][jData];
+                    var prioChar = data[iData][jData];
 
                     if(iData == 1 && jData == 1)
-                        _dataCache.Value[i, j] = x._dataCache.Value[i - left.Length, j - left.Length];
+                        prioChar = x._dataCache.Value[i - left.Length, j - left.Length];
                     else if(iData == 2 && jData == 0)
                         if(j < i - left.Length - x.Length)
-                            _dataCache.Value[i, j] = '-';
+                            prioChar = '-';
                         else if(j == i - left.Length - x.Length)
-                            _dataCache.Value[i, j] = '=';
+                            prioChar = '=';
                         else
-                            _dataCache.Value[i, j] = '+';
+                            prioChar = '+';
+                    Tracer.Assert(prioChar == _dataCache.Value[i, j]);
                 }
         }
         /// <summary>
@@ -405,11 +442,11 @@ namespace Reni.Parser
         {
             Exchange(ref _token[iOld], ref _token[iNew]);
             var data = _dataCache.Value;
+            var olddata = data.Clone();
             for(var i = 0; i < Length; i++)
-            {
                 Exchange(ref data[i, iOld], ref data[i, iNew]);
+            for(var i = 0; i < Length; i++)
                 Exchange(ref data[iOld, i], ref data[iNew, i]);
-            }
         }
 
         static void Exchange<T>(ref T iOld, ref T iNew)
@@ -426,14 +463,13 @@ namespace Reni.Parser
             public PrioComparer(PrioTable parent) { _parent = parent; }
             public override int Compare(int x, int y)
             {
-                var result = 0;
-                result = _parent.NoPluses(x).CompareTo(_parent.NoPluses(y));
-                if (result != 0)
+                var result = _parent.NoPluses(x).CompareTo(_parent.NoPluses(y));
+                if(result != 0)
                     return result;
                 result = _parent.NoMinuses(x).CompareTo(_parent.NoMinuses(y));
                 if(result != 0)
                     return result;
-                return x.CompareTo(y);
+                return String.Compare(_parent.Token[x], _parent.Token[y], StringComparison.Ordinal);
             }
         }
 

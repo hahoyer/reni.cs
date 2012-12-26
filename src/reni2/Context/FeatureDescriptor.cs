@@ -68,21 +68,21 @@ namespace Reni.Context
 
         Result ApplyResult(Category category, ContextBase context, CompileSyntax left, CompileSyntax right)
         {
-            var trace = context.ObjectId == -4 && category.HasArgs && left == null && right != null && right.ObjectId == 56;
+            var trace = context.ObjectId == 1 && category.HasArgs && right == null && left != null && left.ObjectId == 152;
             StartMethodDump(trace, category, context, left, right);
             try
             {
-                BreakExecution();
-
                 var resultFromObject = context.Result(category, Feature, Type, right);
 
                 Dump("resultFromObject", resultFromObject);
-                BreakExecution();
                 
                 var convertedResult = resultFromObject.ReplaceArg(ConverterResult);
                 Tracer.Assert(category == convertedResult.CompleteCategory);
 
-                Dump("convertedResult", convertedResult); 
+                Dump("convertedResult", convertedResult);
+                if(trace)
+                    Dump("objectResult", context.ObjectResult(Category.All, left));
+                BreakExecution();
 
                 var result = convertedResult.ReplaceArg(c => context.ObjectResult(c, left));
                 return ReturnMethodDump(result);

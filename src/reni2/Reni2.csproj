@@ -45,6 +45,7 @@
     <Compile Include="FeatureTest\Array\DefaultInitialized.cs" />
     <Compile Include="FeatureTest\Array\ElementAccess.cs" />
     <Compile Include="FeatureTest\Array\FromTypeAndFunction.cs" />
+    <Compile Include="FeatureTest\Array\SimpleArrayFromPiece.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120109.cs" />
     <Compile Include="FeatureTest\BlogExamples\Post120617.cs" />
     <Compile Include="FeatureTest\Function\ConstantFunction.cs" />
@@ -99,7 +100,19 @@
     <Compile Include="Feature\Function.cs" />
     <Compile Include="Feature\MetaFunction.cs" />
     <Compile Include="Feature\Simple.cs" />
+    <Compile Include="Graphics\IGraphTarget.cs" />
+    <Compile Include="Graphics\SVG\Circle.cs" />
+    <Compile Include="Graphics\SVG\Content.cs" />
+    <Compile Include="Graphics\SVG\Path.cs" />
+    <Compile Include="Graphics\SVG\Rect.cs" />
+    <Compile Include="Graphics\SVG\Root.cs" />
+    <Compile Include="Graphics\SVG\SVG.cs" />
+    <Compile Include="Graphics\SVG\SyntaxDrawer.cs" />
+    <Compile Include="Graphics\SVG\Text.cs" />
+    <Compile Include="Graphics\Syntax.cs" />
+    <Compile Include="Graphics\SyntaxDrawer.cs" />
     <Compile Include="IProxyType.cs" />
+    <Compile Include="Parser\SimpleTokenFactory.cs" />
     <Compile Include="Parser\Match.cs" />
     <Compile Include="Parser\MatchExtension.cs" />
     <Compile Include="Parser\PrioTableTest.cs" />
@@ -183,7 +196,7 @@
     <Compile Include="Feature\DumpPrint\DumpPrintToken.cs" />
     <Compile Include="Feature\Interfaces.cs" />
     <Compile Include="Parser\ITokenClass.cs" />
-    <Compile Include="Parser\ITokenRelation.cs" />
+    <Compile Include="Parser\ITokenFactory.cs" />
     <Compile Include="Parser\ParsedSyntaxBase.cs" />
     <Compile Include="Parser\SyntaxError.cs" />
     <Compile Include="Parser\TokenClass.cs" />

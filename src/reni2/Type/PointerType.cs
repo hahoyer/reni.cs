@@ -60,6 +60,8 @@ namespace Reni.Type
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
         [DisableDump]
+        internal override IFeature Feature { get { return ValueType.Feature; } }
+        [DisableDump]
         internal override bool IsDataLess { get { return false; } }
 
         protected override string GetNodeDump() { return ValueType.NodeDump + "[Pointer]"; }

@@ -30,15 +30,11 @@ namespace Reni.Parser
 {
     interface IParsedSyntax : IIconKeyProvider
     {
-        // Helper methods
-
         [DisableDump]
         TokenData Token { get; }
-
         TokenData FirstToken { get; }
         TokenData LastToken { get; }
-
         string Dump();
-        string DumpShort();
+        string GetNodeDump();
     }
 }

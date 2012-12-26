@@ -32,7 +32,7 @@ using HWClassLibrary.TreeStructure;
 using HWClassLibrary.UnitTest;
 using Reni;
 using Reni.FeatureTest.TypeType;
-using Reni.FeatureTest.Validation;
+using Reni.Parser;
 using Reni.Runtime;
 
 namespace ReniTest
@@ -43,9 +43,8 @@ namespace ReniTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-                //if(false)
-                ExecTest();
+            //if(false)
+            ExecTest();
 
             if(Debugger.IsAttached)
                 TestRunner.IsModeErrorFocus = true;
@@ -57,6 +56,31 @@ namespace ReniTest
         const string Target = @"f: /\arg(); x: 1; f(/\x) dump_print";
         const string Output = "1";
         static void InspectCompiler() { Application.Run(new TreeForm {Target = CreateCompiler(Target)}); }
+        static void ShowSyntaxTree()
+        {
+            var prioTable = @"Left not
+Left and
+Left or
+Left * /
+Left + -
+Left = <>
+Right :=
+TELevel then else
+Left function
+Right :
+Right , ;
+ParLevel ( { ) }
+".FormatPrioTable();
+            var image = prioTable.SyntaxGraph("(x a)(b)");
+            var mainForm = new Form
+            {
+                ClientSize = image.Size, 
+                BackgroundImage = image, 
+                BackgroundImageLayout = ImageLayout.Stretch
+            };
+
+            Application.Run(mainForm);
+        }
 
         static Compiler CreateCompiler(string text)
         {

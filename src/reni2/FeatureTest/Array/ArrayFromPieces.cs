@@ -29,9 +29,9 @@ using HWClassLibrary.UnitTest;
 namespace Reni.FeatureTest.Array
 {
     [TestFixture]
+    [SimpleArrayFromPiece]
     [Target("(<<5<<3<<5<<1) dump_print")]
     [Output("array(#(#align3#)# (bit)sequence(4),(5, 3, 5, 1))")]
-    [LowPriority]
     public sealed class ArrayFromPieces : CompilerTest
     {
         [Test]

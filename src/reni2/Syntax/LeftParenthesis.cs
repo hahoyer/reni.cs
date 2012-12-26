@@ -48,17 +48,23 @@ namespace Reni.Syntax
             _right = right;
         }
 
-        protected override TokenData GetFirstToken()
+        internal override TokenData FirstToken
         {
-            if(_left != null)
-                return _left.LastToken;
-            return base.GetFirstToken();
+            get
+            {
+                if(_left != null)
+                    return _left.LastToken;
+                return base.FirstToken;
+            }
         }
-        protected override TokenData GetLastToken()
+        internal override TokenData LastToken
         {
-            if(_right != null)
-                return _right.LastToken;
-            return base.GetLastToken();
+            get
+            {
+                if(_right != null)
+                    return _right.LastToken;
+                return base.LastToken;
+            }
         }
 
         internal override ParsedSyntax RightParenthesis(int level, TokenData token)

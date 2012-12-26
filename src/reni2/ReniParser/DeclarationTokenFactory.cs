@@ -32,19 +32,24 @@ namespace Reni.ReniParser
 {
     sealed class DeclarationTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
+        public DeclarationTokenFactory()
+            : base(PrioTable) { }
         internal static DeclarationTokenFactory Instance { get { return new DeclarationTokenFactory(); } }
 
-        protected override PrioTable GetPrioTable()
+        static PrioTable PrioTable
         {
-            var prioTable = PrioTable.Left("!");
-            prioTable += PrioTable.Left("converter");
-            prioTable = prioTable.ParenthesisLevel
-                (
-                    new[] {"(", "[", "{", PrioTable.BeginOfText},
-                    new[] {")", "]", "}", PrioTable.EndOfText}
-                );
-            prioTable += PrioTable.Left(PrioTable.Any);
-            return prioTable;
+            get
+            {
+                var prioTable = PrioTable.Left("!");
+                prioTable += PrioTable.Left("converter");
+                prioTable = prioTable.ParenthesisLevel
+                    (
+                        new[] {"(", "[", "{", PrioTable.BeginOfText},
+                        new[] {")", "]", "}", PrioTable.EndOfText}
+                    );
+                prioTable += PrioTable.Left(PrioTable.Any);
+                return prioTable;
+            }
         }
 
         protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()

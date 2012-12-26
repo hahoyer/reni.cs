@@ -28,15 +28,15 @@ namespace Reni.Parser
 
         internal ITokenFactory TokenFactory { get { return _tokenFactory; } }
 
-        internal char Relation(string newTokenName) { return _tokenFactory.PrioTable.Relation(newTokenName, _token.PrioTableName); }
+        internal char Relation(string newTokenName) { return _tokenFactory.PrioTable.Relation(newTokenName, _token.Name); }
 
         public IParsedSyntax Syntax(IParsedSyntax args) { return _token.Syntax(_left, args); }
 
         public override string ToString()
         {
             if(_left == null)
-                return "null " + _token.PrioTableName;
-            return _left.DumpShort() + " " + _token.PrioTableName + " " + _tokenFactory;
+                return "null " + _token.Name;
+            return _left.GetNodeDump() + " " + _token.Name + " " + _tokenFactory;
         }
     }
 }

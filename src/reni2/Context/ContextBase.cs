@@ -202,8 +202,16 @@ namespace Reni.Context
             return FindRecentFunctionContextObject
                 .CreateArgReferenceResult(category);
         }
-        internal Result ArgsResult(Category c, CompileSyntax right) { return right == null ? RootContext.VoidType.Result(c.Typed) : right.SmartUnFunctionedReferenceResult(this, c); }
-        internal Result ObjectResult(Category category1, CompileSyntax left) { return left == null ? null : left.PointerKindResult(this, category1.Typed); }
+        Result ArgsResult(Category category, CompileSyntax right) { return right == null ? RootContext.VoidType.Result(category.Typed) : right.SmartUnFunctionedReferenceResult(this, category); }
+        
+        internal Result ObjectResult(Category category, CompileSyntax left)
+        {
+            if(left == null)
+                return null;
+            var resultType = Type(left).TypeForSearchProbes;
+            Result result = UniqueResult(category.Typed, left);
+            return result.Conversion(resultType);
+        }
 
         /// <summary>
         ///     Obtains the feature result of a functional argument object. 

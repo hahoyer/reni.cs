@@ -25,22 +25,44 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using Reni.Graphics;
 
 namespace Reni.Parser
 {
     public static class Services
     {
-        public static PrioTable FormatPrioTable(string text) { return PrioTable.FromText(text); }
-        
-        public static Image SyntaxGraph(PrioTable prioTable, string text)
+        public static PrioTable FormatPrioTable(this string text) { return PrioTable.FromText(text); }
+
+        public static Image SyntaxGraph(this PrioTable prioTable, string code)
         {
-            var frame = new Rectangle(0, 0, 800, 600);
-            var bitmap = new Bitmap(frame.Size.Width, frame.Size.Height);
-            var graphics = Graphics.FromImage(bitmap);
-            var font = new Font("Arial", 16);
-            var brush = new SolidBrush(Color.Black);
-            graphics.DrawString(text, font, brush, 400, 300);
-            return bitmap;
+            var syntax = Syntax(prioTable, code);
+            return syntax == null ? new Bitmap(1, 1) : SyntaxDrawer.DrawBitmap(syntax);
         }
+
+        public static IGraphTarget Syntax(this PrioTable prioTable, string code)
+        {
+            if (code == null)
+                return null;
+
+            var parser = new ParserInst(new ReniScanner(), new SimpleTokenFactory(prioTable));
+            return (IGraphTarget)parser.Compile(new Source(code));
+        }
+
+        public static string ToBase64(this Image image)
+        {
+            var ic = new ImageConverter();
+            Tracer.Assert(image != null, () => "image != null");
+            var convertTo = (byte[]) ic.ConvertTo(image, typeof(byte[]));
+            Tracer.Assert(convertTo != null, () => "convertTo != null");
+            return Convert.ToBase64String(convertTo, Base64FormattingOptions.InsertLineBreaks);
+        }
+
+        public static Image SaveToFile(this Image image, string fileName)
+        {
+            image.Save(fileName);
+            return image;
+        }
+
     }
 }
+

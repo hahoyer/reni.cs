@@ -106,8 +106,9 @@ namespace Reni.Parser
         {
             get
             {
+                if(IsEnd)
+                    return "";
                 var length = Math.Min(DumpWidth, Source.Length - Position - 1);
-
                 var result = Source.SubString(Position + 1, length);
                 if(length == DumpWidth)
                     result += "...";

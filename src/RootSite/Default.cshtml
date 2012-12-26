@@ -1,0 +1,46 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "hahoyer";
+}
+
+@section featured {
+<section class="featured">
+    <div class="content-wrapper">
+        <hgroup class="title">
+            <h1>@Page.Title.</h1>
+            <h2>Meine Seite.</h2>
+        </hgroup>
+        <p>
+            Hier ist mal verlinkt, was ich so mache. 
+            Momentan sind das meine Blogs und meine Programmiersprache "reni".
+        </p>
+    </div>
+</section>
+}
+
+<h3>Also:</h3>
+
+<ol class="round">
+    <li class="one">
+        <h5>Blog über das Leben ...</h5>
+        ... beziehungsweise die Bugs desselben.  
+        <a href="http://hahoyer-agmg.blogspot.de/">Aufrufen</a> und von hinten her lesen, wegen der Spannung.
+    </li>
+
+    <li class="two">
+        <h5>Reni</h5>
+        Das ist meine Sprache. Da gibt es auch einen Blog (<a href="http://hahoyer-compiler.blogspot.de/">Aufrufen</a>).
+    </li>
+    <h3>... sowie verschiedene kleine Helferlein:</h3>
+    <li class="three">
+        <h5>Tester</h5>
+        Eine sehr simple Seite, um Reni-Programme einzugeben, zu kompilieren und auszuführen.  
+        <a href="~/Reni.cshtml">Aufrufen…</a>
+    </li>
+
+    <li class="four">
+        <h5>Parser</h5>
+        Ein Seite, auf der man ein wenig mit dem Parser von Reni herumspielen kann.  
+        <a href="~/Parser.cshtml">Aufrufen…</a>
+    </li>
+</ol>

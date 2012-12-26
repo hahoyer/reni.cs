@@ -58,7 +58,7 @@ namespace Reni.Parser
                 IParsedSyntax result = null;
                 do
                 {
-                    var relation = stack.Peek().Relation(token.PrioTableName);
+                    var relation = stack.Peek().Relation(token.Name);
                     if(relation != '+')
                         result = stack.Pop().Syntax(result);
 

@@ -41,11 +41,11 @@ namespace Reni
     {
         readonly string _fileName;
         readonly CompilerParameters _parameters;
-        readonly ITokenFactory _tokenFactory = new MainTokenFactory();
         readonly Root _rootContext;
         readonly string _className;
 
         readonly SimpleCache<Source> _source;
+        readonly SimpleCache<ParserInst> _parser;
         readonly SimpleCache<ParsedSyntax> _syntax;
         readonly SimpleCache<CodeContainer> _codeContainer;
         readonly SimpleCache<string> _cSharpCode;
@@ -64,7 +64,8 @@ namespace Reni
             _parameters = parameters ?? new CompilerParameters();
         
             _source = new SimpleCache<Source>(() => new Source(FileName.FileHandle()));
-            _syntax = new SimpleCache<ParsedSyntax>(() => (ParsedSyntax) _tokenFactory.Parser.Compile(Source));
+            _parser = new SimpleCache<ParserInst>(() => new ParserInst(new ReniScanner(), new MainTokenFactory()));
+            _syntax = new SimpleCache<ParsedSyntax>(() => (ParsedSyntax) _parser.Value.Compile(Source));
             _codeContainer = new SimpleCache<CodeContainer>(() => new CodeContainer(RootContext, Syntax, Source.Data));
             _cSharpCode = new SimpleCache<string>(() => _codeContainer.Value.CreateCSharpString(_className));
         }

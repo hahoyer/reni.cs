@@ -38,7 +38,7 @@ namespace Reni.Parser
             : base(_nextObjectId++) { StopByObjectId(-31); }
 
         [DisableDump]
-        string ITokenClass.Name { set { _name = value; } }
+        string ITokenClass.Name { get { return Name; } set { Name = value; } }
 
         [DisableDump]
         ITokenFactory ITokenClass.NewTokenFactory { get { return NewTokenFactory; } }
@@ -50,12 +50,11 @@ namespace Reni.Parser
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
 
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + Name.Quote() + ")"; }
-
+                                        
         [Node]
         [DisableDump]
         internal string Name { get { return _name; } set { _name = value; } }
 
-        string ITokenClass.PrioTableName(string name) { return PrioTableName(name); }
         IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return Syntax(left, token, right); }
 
         protected virtual IParsedSyntax Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right)
@@ -63,8 +62,6 @@ namespace Reni.Parser
             NotImplementedMethod(left, token, right);
             return null;
         }
-
-        protected virtual string PrioTableName(string name) { return Name; }
 
         public override string ToString() { return base.ToString() + " Name=" + _name.Quote(); }
     }

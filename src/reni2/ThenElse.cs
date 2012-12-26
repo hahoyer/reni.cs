@@ -58,6 +58,7 @@ namespace Reni
         }
 
         internal override Result ObtainResult(ContextBase context, Category category) { return InternalResult(context, category); }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] { Cond, Then, Else}; } }
 
         Result CondResult(ContextBase context, Category category)
         {
