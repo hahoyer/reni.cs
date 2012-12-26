@@ -513,7 +513,10 @@ namespace Reni.Type
                 return null;
             }
 
-            var result = searchResult.Result(category.Typed);
+            var result = searchResult
+                .Result(category.Typed)
+                .ReplaceArg(c=>ObviousExactConversion(c.Typed,TypeForConversion));
+
             var obviousConversion = result.Type.ObviousConversion(category, destination);
             return obviousConversion.ReplaceArg(result) & category;
         }

@@ -1,4 +1,5 @@
-// 
+#region Copyright (C) 2012
+
 //     Project Reni2
 //     Copyright (C) 2011 - 2012 Harald Hoyer
 // 
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +27,6 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using JetBrains.Annotations;
 using Reni.Basics;
-using Reni.Type;
 
 namespace Reni.Code.ReplaceVisitor
 {
@@ -54,9 +56,13 @@ namespace Reni.Code.ReplaceVisitor
         {
             if(ActualArg.Type == visitedObject.Type)
                 return Actual;
-            if(ActualArg.Type.UniquePointer == visitedObject.Type)
-                return Actual.LocalReference(ActualArg.Type.Destructor(Category.Code).Code);
-
+            var conversion = ActualArg
+                .Type
+                .ObviousExactConversion(Category.Code.Typed, visitedObject.Type);
+            if(conversion != null)
+                return conversion
+                    .ReplaceArg(ActualArg)
+                    .Code;
             throw new SizeException(Actual, visitedObject);
         }
 
