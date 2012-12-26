@@ -43,8 +43,6 @@ namespace ReniTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            ShowSyntaxTree();
-            return;
             //if(false)
             ExecTest();
 

@@ -46,7 +46,8 @@ namespace Reni.ReniParser
         [Node]
         internal readonly CompileSyntax Right;
 
-        internal ExpressionSyntax(Defineable tokenClass, CompileSyntax left, TokenData token, CompileSyntax right)
+        internal ExpressionSyntax
+            (Defineable tokenClass, CompileSyntax left, TokenData token, CompileSyntax right)
             : base(token)
         {
             _tokenClass = tokenClass;
@@ -71,12 +72,15 @@ namespace Reni.ReniParser
             if(Left == null && Right != null)
                 result.AddRange(Right.PrefixOperationProbes(context, _tokenClass));
 
-            result.AddRange(Left == null
-                                ? context.Probes(_tokenClass)
-                                : context
-                                      .Type(Left)
-                                      .TypeForSearchProbes
-                                      .Probes<ISuffixFeature>(_tokenClass, this));
+            result.AddRange
+                (
+                    Left == null
+                        ? context.Probes(_tokenClass)
+                        : context
+                              .Type(Left)
+                              .TypeForSearchProbes
+                              .Probes<ISuffixFeature>(_tokenClass, this)
+                );
             return result.ToArray();
         }
 
@@ -84,7 +88,8 @@ namespace Reni.ReniParser
         {
             if(Left == null && Right != null)
             {
-                var prefixOperationResult = Right.PrefixOperationResult(context, category, _tokenClass);
+                var prefixOperationResult = Right.PrefixOperationResult
+                    (context, category, _tokenClass);
                 if(prefixOperationResult != null)
                     return prefixOperationResult
                         .ReplaceArg(Right.PointerKindResult(context, category));
@@ -97,7 +102,9 @@ namespace Reni.ReniParser
                             .Type(Left)
                             .TypeForSearchProbes
                             .Search<ISuffixFeature>(_tokenClass, this);
-            return searchResult == null ? null : searchResult.FunctionResult(context, category, this);
+            return searchResult == null
+                       ? null
+                       : searchResult.FunctionResult(context, category, this);
         }
 
         protected override string GetNodeDump()
@@ -109,7 +116,7 @@ namespace Reni.ReniParser
                 result += "(" + Right.NodeDump + ")";
             return result;
         }
-        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[]{Left,Right}; } }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Left, Right}; } }
 
         internal override TokenData FirstToken { get { return Left == null ? Token : Left.FirstToken; } }
 

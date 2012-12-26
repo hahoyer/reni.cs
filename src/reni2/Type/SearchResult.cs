@@ -28,7 +28,6 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.ReniParser;
-using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -46,6 +45,7 @@ namespace Reni.Type
             Tracer.Assert(feature != null);
             Feature = feature;
             ConversionFunctions = conversionFunctions;
+            StopByObjectId(-1);
         }
 
         internal Result Result(Category category)

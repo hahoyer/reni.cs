@@ -60,7 +60,7 @@ namespace Reni
                 var result = GetNodeDump();
                 if(_objectId == null)
                     return result;
-                return result + "." + ObjectId;
+                return result + "." + ObjectId + "i";
             }
         }
 
