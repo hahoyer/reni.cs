@@ -57,7 +57,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal override ResultCache DePointer(Category category)
+        internal ResultCache ForceDePointer(Category category)
         {
             var result = GetterResult(category.Typed);
             return result.Type.DePointer(category).Data.ReplaceArg(result);
