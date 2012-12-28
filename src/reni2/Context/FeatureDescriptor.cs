@@ -75,6 +75,8 @@ namespace Reni.Context
                 var resultFromObject = context.Result(category, Feature, Type, right);
 
                 Dump("resultFromObject", resultFromObject);
+                if (trace)
+                    Dump("ConverterResult", ConverterResult(Category.All));
                 
                 var convertedResult = resultFromObject.ReplaceArg(ConverterResult);
                 Tracer.Assert(category == convertedResult.CompleteCategory);

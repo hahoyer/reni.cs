@@ -43,7 +43,7 @@ namespace Reni.Context
         {
             _context = context;
             _syntax = syntax;
-            StopByObjectId(53);
+            StopByObjectId(266);
         }
 
         internal override string LogDump
