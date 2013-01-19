@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -109,7 +109,7 @@ namespace Reni
         {
             if(Count > 5)
                 return base.GetNodeDump() + " Count = " + Count;
-            return "{" + _data.Select(contextReference => contextReference.NodeDump()).Format(",") + "}";
+            return "{" + _data.Select(contextReference => contextReference.NodeDump()).Stringify(",") + "}";
         }
 
         public override string DumpData()
@@ -147,13 +147,13 @@ namespace Reni
         public bool Contains(IContextReference context) { return _data.Contains(context); }
         public bool Contains(CodeArgs other)
         {
-            if (Count < other.Count)
+            if(Count < other.Count)
                 return false;
 
-            for (int i = 0, j = 0; i < Count; i++)
+            for(int i = 0, j = 0; i < Count; i++)
             {
                 var delta = SortedData[i].Order - other.SortedData[j].Order;
-                
+
                 if(delta > 0)
                     return false;
 

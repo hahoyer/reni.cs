@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -52,9 +52,9 @@ namespace Reni.Context
             {
                 var result = base.LogDump;
                 var probes = Probes.Where(p => p.HasImplementations).ToArray();
-                if (probes.Length == 0)
+                if(probes.Length == 0)
                     return result;
-                result += ("\n" + probes.Select(x => x.LogDump).Format("\n")).Indent();
+                result += ("\n" + probes.Select(x => x.LogDump).Stringify("\n")).Indent();
                 return result;
             }
         }

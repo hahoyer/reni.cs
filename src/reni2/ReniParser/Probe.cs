@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -49,18 +49,17 @@ namespace Reni.ReniParser
                 .TokenClasses
                 .Where(pair => pair.Value.GetType().Implements(type))
                 .Select(pair => pair.Key);
-
         }
 
         internal string LogDump
         {
             get
             {
-                var result = _subTypesCache.Value.Select(x => x.PrettyName()).Format(" ");
+                var result = _subTypesCache.Value.Select(x => x.PrettyName()).Stringify(" ");
                 if(HasImplementations)
                 {
                     result += " (implemented as: ";
-                    result += _instancesCache.Value.Select(x => x.Quote()).Format(" ");
+                    result += _instancesCache.Value.Select(x => x.Quote()).Stringify(" ");
                     result += ")";
                 }
                 return result;
