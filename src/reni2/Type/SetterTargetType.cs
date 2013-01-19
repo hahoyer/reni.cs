@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -62,5 +62,8 @@ namespace Reni.Type
             var result = GetterResult(category.Typed);
             return result.Type.DePointer(category).Data.ReplaceArg(result);
         }
+
+        [DisableDump]
+        internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
     }
 }

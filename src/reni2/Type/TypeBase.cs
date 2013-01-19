@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -42,10 +42,10 @@ namespace Reni.Type
     [Serializable]
     abstract class TypeBase
         : ReniObject
-          , IContextReference
-          , IIconKeyProvider
-          , ISearchTarget
-          , ISearchPath<ISuffixFeature, Aligner>, ISearchPath<ISuffixFeature, TypeBase>
+            , IContextReference
+            , IIconKeyProvider
+            , ISearchTarget
+            , ISearchPath<ISuffixFeature, Aligner>, ISearchPath<ISuffixFeature, TypeBase>
     {
         sealed class Cache
         {
@@ -238,19 +238,21 @@ namespace Reni.Type
             if(IsDataLess)
                 return Result(category);
             return new Result
-                (category
-                 , getType: () => this
-                 , getCode: () => CodeBase.ReferenceCode(target)
+                (
+                category,
+                getType: () => this,
+                getCode: () => CodeBase.ReferenceCode(target)
                 );
         }
 
         internal Result Result(Category category, Result codeAndRefs)
         {
             return new Result
-                (category
-                 , getType: () => this
-                 , getCode: () => codeAndRefs.Code
-                 , getArgs: () => codeAndRefs.CodeArgs
+                (
+                category,
+                getType: () => this,
+                getCode: () => codeAndRefs.Code,
+                getArgs: () => codeAndRefs.CodeArgs
                 );
         }
 
@@ -259,19 +261,21 @@ namespace Reni.Type
             var localCategory = category & (Category.Code | Category.CodeArgs);
             var codeAndRefs = getCodeAndRefs(localCategory);
             return Result
-                (category
-                 , () => codeAndRefs.Code
-                 , () => codeAndRefs.CodeArgs
+                (
+                    category,
+                    () => codeAndRefs.Code,
+                    () => codeAndRefs.CodeArgs
                 );
         }
 
         internal Result Result(Category category, Func<CodeBase> getCode = null, Func<CodeArgs> getArgs = null)
         {
             return new Result
-                (category
-                 , getType: () => this
-                 , getCode: getCode
-                 , getArgs: getArgs
+                (
+                category,
+                getType: () => this,
+                getCode: getCode,
+                getArgs: getArgs
                 );
         }
 
@@ -351,7 +355,7 @@ namespace Reni.Type
         internal TypeBase TypeForArrayElement { get { return DeAlign(Category.Type).Type; } }
 
         [DisableDump]
-        internal TypeBase TypeForTypeOperator
+        internal virtual TypeBase TypeForTypeOperator
         {
             get
             {
@@ -456,9 +460,10 @@ namespace Reni.Type
             if(IsDataLess)
                 return Result(category);
             return new Result
-                (category
-                 , getType: () => this
-                 , getCode: () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
+                (
+                category,
+                getType: () => this,
+                getCode: () => CodeBase.ReferenceCode(target).ReferencePlus(getOffset()).DePointer(Size)
                 );
         }
 
@@ -494,7 +499,7 @@ namespace Reni.Type
         internal bool IsConvertable(TypeBase destination)
         {
             return TypeForConversion == destination.TypeForConversion
-                   || Converter(destination) != null;
+                || Converter(destination) != null;
         }
 
         internal Result Conversion(Category category, TypeBase destination)
@@ -515,7 +520,7 @@ namespace Reni.Type
 
             var result = searchResult
                 .Result(category.Typed)
-                .ReplaceArg(c=>ObviousExactConversion(c.Typed,TypeForConversion));
+                .ReplaceArg(c => ObviousExactConversion(c.Typed, TypeForConversion));
 
             var obviousConversion = result.Type.ObviousConversion(category, destination);
             return obviousConversion.ReplaceArg(result) & category;
@@ -607,9 +612,10 @@ namespace Reni.Type
         {
             return VoidType
                 .Result
-                (category
-                 , () => CodeBase.DumpPrintText(DumpPrintText)
-                 , CodeArgs.Void
+                (
+                    category,
+                    () => CodeBase.DumpPrintText(DumpPrintText),
+                    CodeArgs.Void
                 );
         }
 
