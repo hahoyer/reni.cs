@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ namespace Reni.Type
 {
     sealed class ArrayType
         : RepeaterType
-          , ISearchPath<ISuffixFeature, SequenceType>
+            , ISearchPath<ISuffixFeature, SequenceType>
     {
         [Node]
         readonly SimpleCache<SequenceType> _sequenceCache;
@@ -58,7 +58,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
         [DisableDump]
-        protected override ReferenceType ArrayReference { get { return ElementType.UniqueReference(Count); } }
+        protected override ReferenceType UniqueArrayReference { get { return ElementType.UniqueReference(Count); } }
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
@@ -78,8 +78,9 @@ namespace Reni.Type
         internal override Result ConstructorResult(Category category, TypeBase argsType)
         {
             return Result
-                (category
-                 , c => InternalConstructorResult(c, argsType)
+                (
+                    category,
+                    c => InternalConstructorResult(c, argsType)
                 );
         }
 
@@ -115,12 +116,12 @@ namespace Reni.Type
             var resultForArg = indexType
                 .Result(category.Typed, () => CodeBase.BitsConst(indexType.Size, BitsConst.Convert(i)));
             return elementConstructorResult
-                       .ReplaceArg(resultForArg)
-                       .Conversion(ElementAccessType)
-                       .ObviousExactConversion(ElementType)
-                   & category;
+                .ReplaceArg(resultForArg)
+                .Conversion(ElementAccessType)
+                .ObviousExactConversion(ElementType)
+                & category;
         }
-       
+
         TypeBase ElementAccessType { get { return ElementType.TypeForArrayElement; } }
 
         protected override string GetNodeDump() { return ElementType.NodeDump + "*" + Count; }
@@ -138,8 +139,8 @@ namespace Reni.Type
             var newCount = isElementArg ? 1 : argsType.ArrayLength(ElementAccessType);
             var newElementsResultRaw
                 = isElementArg
-                      ? argsType.Conversion(category.Typed, ElementAccessType)
-                      : argsType.Conversion(category.Typed, ElementType.UniqueArray(newCount));
+                    ? argsType.Conversion(category.Typed, ElementAccessType)
+                    : argsType.Conversion(category.Typed, ElementType.UniqueArray(newCount));
 
             var newElementsResult = newElementsResultRaw.DereferencedAlignedResult();
             var result = ElementType
@@ -152,9 +153,10 @@ namespace Reni.Type
         {
             return VoidType
                 .Result
-                (category
-                 , CreateDumpPrintCode
-                 , () => ElementType.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
+                (
+                    category,
+                    CreateDumpPrintCode,
+                    () => ElementType.GenericDumpPrintResult(Category.CodeArgs).CodeArgs
                 );
         }
 

@@ -179,7 +179,7 @@ namespace Reni.Type
         internal virtual IReferenceType UniquePointerType { get { return _cache.Pointer.Value; } }
 
         [DisableDump]
-        protected virtual ReferenceType ArrayReference { get { return _cache.Reference[null]; } }
+        protected virtual ReferenceType UniqueArrayReference { get { return _cache.Reference[null]; } }
 
         [DisableDump]
         internal CodeBase ArgCode { get { return CodeBase.Arg(this); } }
@@ -366,14 +366,7 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal TypeBase TypeForReference
-        {
-            get
-            {
-                NotImplementedMethod();
-                return null;
-            }
-        }
+        internal virtual TypeBase ElementTypeForReference { get { return this; } }
 
         internal virtual Result DeAlign(Category category) { return ArgResult(category); }
         internal virtual ResultCache DeFunction(Category category) { return ArgResult(category); }
@@ -666,7 +659,7 @@ namespace Reni.Type
         ReferenceType Reference(int? count)
         {
             if(count == null)
-                return ArrayReference;
+                return UniqueArrayReference;
             return UniqueReference(count.Value);
         }
 

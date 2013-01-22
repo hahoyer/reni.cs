@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -38,31 +38,18 @@ namespace Reni.TokenClasses
         {
             var leftSyntax = left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError);
             if(right == null)
-                return new SuffixSyntax
-                    (token
-                     , leftSyntax
-                     , this
-                    );
-            return new InfixSyntax
-                (token
-                 , leftSyntax
-                 , this
-                 , right.ToCompiledSyntax()
-                );
+                return new SuffixSyntax(token, leftSyntax, this);
+            return new InfixSyntax(token, leftSyntax, this, right.ToCompiledSyntax());
         }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
-            if(context.Type(right) == context.RootContext.VoidType)
-                return Result(context, category, left, null);
-            return Result(context, category, left, right.Evaluate(context).ToInt32());
+            var count = context.Type(right) == context.RootContext.VoidType
+                ? (int?) null
+                : right.Evaluate(context).ToInt32();
+            return left.ReferenceResult(context, category, count);
         }
-        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left) { return Result(context, category, left, 1); }
 
-        static Result Result(ContextBase context, Category category, CompileSyntax left, int? count)
-        {
-            var leftType = left.Type(context).TypeForReference;
-            return leftType.CreateReference(context, category, left, count);
-        }
+        Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left) { return left.ReferenceResult(context, category, 1); }
     }
 }
