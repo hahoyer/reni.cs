@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,8 @@ namespace Reni.Type
         protected override string TagTitle { get { return "text_items"; } }
         [DisableDump]
         internal override IFeature Feature { get { return Parent.Feature; } }
+        [DisableDump]
+        public override TypeBase ArrayElementType { get { return Parent.ArrayElementType; } }
 
         internal override void Search(SearchVisitor searchVisitor)
         {
@@ -75,9 +77,12 @@ namespace Reni.Type
         {
             return VoidType
                 .Result
-                (category
-                 , DumpPrintCode
-                 , CodeArgs.Arg
+                (
+                    category
+                    ,
+                    DumpPrintCode
+                    ,
+                    CodeArgs.Arg
                 );
         }
 

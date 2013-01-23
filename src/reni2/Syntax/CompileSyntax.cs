@@ -160,12 +160,5 @@ namespace Reni.Syntax
             NotImplementedMethod(context, category);
             return null;
         }
-
-        internal Result ReferenceResult(ContextBase context, Category category, int? count)
-        {
-            return Type(context)
-                .ElementTypeForReference
-                .CreateReference(context, category, this, count);
-        }
     }
 }

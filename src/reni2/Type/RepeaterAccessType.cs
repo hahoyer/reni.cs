@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ namespace Reni.Type
         : SetterTargetType
     {
         [DisableDump]
-        internal readonly RepeaterType RepeaterType;
+        internal readonly IRepeaterType RepeaterType;
 
-        internal RepeaterAccessType(RepeaterType repeaterType) { RepeaterType = repeaterType; }
+        internal RepeaterAccessType(IRepeaterType repeaterType) { RepeaterType = repeaterType; }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
@@ -56,9 +56,12 @@ namespace Reni.Type
         internal override Result SetterResult(Category category)
         {
             return new Result
-                (category
-                 , getCode: SetterCode
-                 , getArgs: CodeArgs.Arg
+                (
+                category
+                ,
+                getCode: SetterCode
+                ,
+                getArgs: CodeArgs.Arg
                 );
         }
         internal override Result GetterResult(Category category)
@@ -82,17 +85,6 @@ namespace Reni.Type
                 return ArgCode
                     .ArrayAccess(ValueType.Size, RepeaterType.IndexSize);
             }
-        }
-
-        internal Func<Category, Result> ConvertToReference(int count) { return category => ConvertToReference(category, count); }
-
-        Result ConvertToReference(Category category, int count)
-        {
-            var result = RepeaterType
-                .ElementType
-                .UniqueReference(count)
-                .Result(category, GetterResult);
-            return result;
         }
     }
 }

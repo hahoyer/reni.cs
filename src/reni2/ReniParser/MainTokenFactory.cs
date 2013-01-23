@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -35,10 +35,10 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    sealed class MainTokenFactory : TokenFactory<TokenClasses.TokenClass>
+    sealed class MainTokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
     {
         public MainTokenFactory(PrioTable prioTable)
-            : base(prioTable) {}
+            : base(prioTable) { }
 
         public MainTokenFactory()
             : base(PrioTable) { }
@@ -49,9 +49,13 @@ namespace Reni.ReniParser
             {
                 var x = PrioTable.Left(PrioTable.Any);
                 x += PrioTable.Left
-                    ("reference"
-                     , "_A_T_", "_N_E_X_T_"
-                     , "to_number_of_base"
+                    (
+                        "reference"
+                        ,
+                        "_A_T_",
+                        "_N_E_X_T_"
+                        ,
+                        "to_number_of_base"
                     );
 
                 x += PrioTable.Left("<<");
@@ -79,8 +83,9 @@ namespace Reni.ReniParser
                 x += PrioTable.Right(",");
                 x += PrioTable.Right(";");
                 x = x.ParenthesisLevel
-                    (new[] {"(", "[", "{"},
-                     new[] {")", "]", "}"}
+                    (
+                        new[] {"(", "[", "{"},
+                        new[] {")", "]", "}"}
                     );
                 //x.Correct("(", PrioTable.Any, '-');
                 //x.Correct("[", PrioTable.Any, '-');
@@ -144,7 +149,6 @@ namespace Reni.ReniParser
                     {"function_instance", new FunctionInstanceToken()},
                     {"instance", new InstanceToken()},
                     {"new_value", new NewValueToken()},
-                    {"reference", new ReferenceToken()},
                     {"sequence", new SequenceToken()},
                     {"text_item", new TextItem()},
                     {"text_items", new TextItems()},

@@ -35,7 +35,6 @@ using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.ReniParser;
 using Reni.Struct;
-using Reni.Syntax;
 
 namespace Reni.Type
 {
@@ -63,9 +62,6 @@ namespace Reni.Type
             public readonly SimpleCache<IReferenceType> Pointer;
             [Node]
             [SmartNode]
-            public readonly DictionaryEx<int?, ReferenceType> Reference;
-            [Node]
-            [SmartNode]
             public readonly SimpleCache<TypeType> TypeType;
             [Node]
             [SmartNode]
@@ -82,7 +78,6 @@ namespace Reni.Type
             {
                 EnableCut = new SimpleCache<EnableCut>(() => new EnableCut(parent));
                 Pointer = new SimpleCache<IReferenceType>(parent.ObtainPointer);
-                Reference = new DictionaryEx<int?, ReferenceType>(parent.ObtainReference);
                 Pair = new DictionaryEx<TypeBase, Pair>(first => new Pair(first, parent));
                 Array = new DictionaryEx<int, ArrayType>(parent.ObtainArray);
                 Aligner = new DictionaryEx<int, Aligner>(alignBits => new Aligner(parent, alignBits));
@@ -179,9 +174,6 @@ namespace Reni.Type
         internal virtual IReferenceType UniquePointerType { get { return _cache.Pointer.Value; } }
 
         [DisableDump]
-        protected virtual ReferenceType UniqueArrayReference { get { return _cache.Reference[null]; } }
-
-        [DisableDump]
         internal CodeBase ArgCode { get { return CodeBase.Arg(this); } }
 
         [DisableDump]
@@ -220,7 +212,6 @@ namespace Reni.Type
 
         Result VoidCodeAndRefs(Category category) { return RootContext.VoidResult(category & (Category.Code | Category.CodeArgs)); }
 
-        internal ReferenceType UniqueReference(int count) { return _cache.Reference[count]; }
         internal ArrayType UniqueArray(int count) { return _cache.Array[count]; }
         protected virtual TypeBase ReversePair(TypeBase first) { return first._cache.Pair[this]; }
         internal virtual TypeBase Pair(TypeBase second) { return second.ReversePair(this); }
@@ -366,7 +357,16 @@ namespace Reni.Type
         }
 
         [DisableDump]
-        internal virtual TypeBase ElementTypeForReference { get { return this; } }
+        internal virtual TypeBase ElementTypeForReference
+        {
+            get
+            {
+                return DeFunction(Category.Type).Type
+                    .DePointer(Category.Type).Type
+                    .DeAlign(Category.Type).Type;
+                ;
+            }
+        }
 
         internal virtual Result DeAlign(Category category) { return ArgResult(category); }
         internal virtual ResultCache DeFunction(Category category) { return ArgResult(category); }
@@ -462,7 +462,15 @@ namespace Reni.Type
 
         IReferenceType ObtainPointer() { return this as IReferenceType ?? new PointerType(this); }
 
-        ReferenceType ObtainReference(int? count) { return new ReferenceType(AutomaticDereferenceType, count); }
+        [DisableDump]
+        public virtual TypeBase ArrayElementType
+        {
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
+        }
 
         protected virtual ArrayType ObtainArray(int count) { return new ArrayType(this, count); }
 
@@ -643,24 +651,6 @@ namespace Reni.Type
         {
             NotImplementedMethod(category, getRightResult(Category.All));
             return null;
-        }
-
-        internal Result CreateReference(ContextBase context, Category category, CompileSyntax target, int? count)
-        {
-            var rawResult = Reference(count).UniquePointer.ArgResult(category);
-            if(category <= Category.Type.Replenished)
-                return rawResult;
-
-            var targetResult = target.PointerKindResult(context, category.Typed);
-            var convertedResult = targetResult.Conversion(Reference(count).UniquePointer);
-            return rawResult.ReplaceArg(convertedResult);
-        }
-
-        ReferenceType Reference(int? count)
-        {
-            if(count == null)
-                return UniqueArrayReference;
-            return UniqueReference(count.Value);
         }
 
         internal CodeBase DumpPrintNumberCode()

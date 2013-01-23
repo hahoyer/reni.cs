@@ -28,26 +28,41 @@ using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
 using Reni.Sequence;
 
 namespace Reni.Type
 {
     sealed class ArrayType
-        : RepeaterType
-            , ISearchPath<ISuffixFeature, SequenceType>
+        : TypeBase, IRepeaterType
+            , ISearchPath<ISuffixFeature, SequenceType>, IFeature, IFunctionFeature
     {
         [Node]
         readonly SimpleCache<SequenceType> _sequenceCache;
         [Node]
         readonly SimpleCache<TextItemsType> _textItemsCache;
+        [Node]
+        TypeBase _elementType;
+        [Node]
+        int _count;
+        [Node]
+        SimpleCache<RepeaterAccessType> _arrayAccessTypeCache;
 
         public ArrayType(TypeBase elementType, int count)
-            : base(elementType, count)
         {
+            _elementType = elementType;
+            _count = count;
+            Tracer.Assert(count > 0);
+            Tracer.Assert(elementType.ReferenceType == null);
+            Tracer.Assert(!elementType.IsDataLess);
+            _arrayAccessTypeCache = new SimpleCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
             _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
             _textItemsCache = new SimpleCache<TextItemsType>(() => new TextItemsType(this));
         }
+
+        TypeBase IRepeaterType.ElementType { get { return ElementType; } }
+        Size IRepeaterType.IndexSize { get { return IndexSize; } }
 
         [Node]
         [DisableDump]
@@ -58,7 +73,7 @@ namespace Reni.Type
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
         [DisableDump]
-        protected override ReferenceType UniqueArrayReference { get { return ElementType.UniqueReference(Count); } }
+        public override TypeBase ArrayElementType { get { return ElementType; } }
         internal override string DumpPrintText { get { return "(" + ElementType.DumpPrintText + ")array(" + Count + ")"; } }
 
         internal override int? SmartArrayLength(TypeBase elementType) { return ElementType.IsConvertable(elementType) ? Count : base.SmartArrayLength(elementType); }
@@ -123,6 +138,23 @@ namespace Reni.Type
         }
 
         TypeBase ElementAccessType { get { return ElementType.TypeForArrayElement; } }
+        [Node]
+        internal int Count { get { return _count; } }
+        [Node]
+        internal TypeBase ElementType { get { return _elementType; } }
+
+        [DisableDump]
+        internal override sealed Root RootContext { get { return _elementType.RootContext; } }
+        [DisableDump]
+        IContextReference ObjectReference { get { return UniquePointer; } }
+        [DisableDump]
+        internal TypeBase IndexType { get { return RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
+        Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
+        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
+        IFunctionFeature IFeature.Function { get { return this; } }
+        ISimpleFeature IFeature.Simple { get { return null; } }
+        bool IFunctionFeature.IsImplicit { get { return false; } }
+        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
 
         protected override string GetNodeDump() { return ElementType.NodeDump + "*" + Count; }
 
@@ -197,6 +229,22 @@ namespace Reni.Type
             if(type.Parent != this)
                 return null;
             return Extension.Feature(type.PointerConversionResult);
+        }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }
+        Result ApplyResult(Category category, TypeBase argsType)
+        {
+            var objectResult = UniquePointer
+                .Result(category, ObjectReference);
+
+            var argsResult = argsType
+                .Conversion(category.Typed, IndexType)
+                .DereferencedAlignedResult();
+
+            var result = _arrayAccessTypeCache
+                .Value
+                .Result(category, objectResult + argsResult);
+
+            return result;
         }
     }
 }

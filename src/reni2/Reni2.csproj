@@ -71,7 +71,6 @@
     <Compile Include="FeatureTest\Function\TwoFunctions.cs" />
     <Compile Include="FeatureTest\Function\TwoFunctions1.cs" />
     <Compile Include="FeatureTest\Helper\LikeSyntax.cs" />
-    <Compile Include="FeatureTest\Reference\ConversionFromPointer.cs" />
     <Compile Include="FeatureTest\Structure\Access.cs" />
     <Compile Include="FeatureTest\Structure\AccessAndAdd.cs" />
     <Compile Include="FeatureTest\Structure\AccessAndAddComplex.cs" />
@@ -310,7 +309,6 @@
     <Compile Include="TokenClasses\FunctionInstanceToken.cs" />
     <Compile Include="TokenClasses\FunctionSyntax.cs" />
     <Compile Include="TokenClasses\InstanceToken.cs" />
-    <Compile Include="TokenClasses\ReferenceToken.cs" />
     <Compile Include="TokenClasses\TextItems.cs" />
     <Compile Include="TokenClasses\ToNumberOfBase.cs" />
     <Compile Include="TokenClasses\LeftParenthesis.cs" />
@@ -355,7 +353,6 @@
     <Compile Include="Type\IReference.cs" />
     <Compile Include="Type\Pair.cs" />
     <Compile Include="Type\PointerType.cs" />
-    <Compile Include="Type\ReferenceType.cs" />
     <Compile Include="Type\RepeaterType.cs" />
     <Compile Include="Type\SearchResult.cs" />
     <Compile Include="Type\SetterTargetType.cs" />
@@ -395,6 +392,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="FeatureTest\Enumeration\" />
+    <Folder Include="FeatureTest\Reference\" />
   </ItemGroup>
   <Import Project="sys.targets" />
 </Project>

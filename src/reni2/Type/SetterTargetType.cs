@@ -65,6 +65,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal override TypeBase TypeForTypeOperator { get { return ValueType.TypeForTypeOperator; } }
+        [DisableDump]
         internal override TypeBase ElementTypeForReference { get { return ValueType.ElementTypeForReference; } }
     }
 }
