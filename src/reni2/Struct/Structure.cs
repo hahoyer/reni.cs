@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ namespace Reni.Struct
         {
             var position = rightResult
                 .Conversion(IndexType)
-                .DereferenceResult()
+				.DereferenceResult
                 .Evaluate(ContainerContextObject.RootContext.ExecutionContext)
                 .ToInt32();
             return AccessViaThisReference(category, position);
@@ -168,9 +168,10 @@ namespace Reni.Struct
         internal Result DumpPrintResultViaContextReference(Category category)
         {
             return RootContext.ConcatPrintResult
-                (category
-                 , EndPosition
-                 , position => DumpPrintResultViaAccessReference(category, position));
+                (
+                    category,
+					EndPosition,
+                    position => DumpPrintResultViaAccessReference(category, position));
         }
 
         internal Result AccessViaThisReference(Category category, int position)
@@ -207,9 +208,10 @@ namespace Reni.Struct
 
             return PointerKind
                 .Result
-                (category
-                 , StructReferenceCodeViaContextReference
-                 , () => CodeArgs.Create(ContainerContextObject)
+                (
+                    category,
+                    StructReferenceCodeViaContextReference,
+                    () => CodeArgs.Create(ContainerContextObject)
                 );
         }
 

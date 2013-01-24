@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -77,9 +77,9 @@ namespace Reni.ReniParser
                     Left == null
                         ? context.Probes(_tokenClass)
                         : context
-                              .Type(Left)
-                              .TypeForSearchProbes
-                              .Probes<ISuffixFeature>(_tokenClass, this)
+                            .Type(Left)
+                            .TypeForSearchProbes
+                            .Probes<ISuffixFeature>(_tokenClass, this)
                 );
             return result.ToArray();
         }
@@ -97,14 +97,14 @@ namespace Reni.ReniParser
 
             var searchResult
                 = Left == null
-                      ? context.Search(_tokenClass)
-                      : context
-                            .Type(Left)
-                            .TypeForSearchProbes
-                            .Search<ISuffixFeature>(_tokenClass, this);
+                    ? context.Search(_tokenClass)
+                    : context
+                        .Type(Left)
+                        .TypeForSearchProbes
+                        .Search<ISuffixFeature>(_tokenClass, this);
             return searchResult == null
-                       ? null
-                       : searchResult.FunctionResult(context, category, this);
+                ? null
+                : searchResult.FunctionResult(context, category, this);
         }
 
         protected override string GetNodeDump()
@@ -116,10 +116,11 @@ namespace Reni.ReniParser
                 result += "(" + Right.NodeDump + ")";
             return result;
         }
+        [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Left, Right}; } }
-
+        [DisableDump]
         internal override TokenData FirstToken { get { return Left == null ? Token : Left.FirstToken; } }
-
+        [DisableDump]
         internal override TokenData LastToken { get { return Right == null ? Token : Right.LastToken; } }
 
         internal override string DumpPrintText

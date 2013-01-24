@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -29,17 +29,15 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
-using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
-
     [Serializable]
     sealed class SequenceType
         : TagChild<ArrayType>
-          , ISearchPath<ISuffixFeature, SequenceType>
-          , ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>
+            , ISearchPath<ISuffixFeature, SequenceType>
+            , ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>
     {
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
@@ -47,9 +45,12 @@ namespace Reni.Sequence
         {
             return UniqueEnableCutType
                 .Result
-                (category
-                 , () => PointerKind.ArgCode.DePointer(Size)
-                 , CodeArgs.Arg
+                (
+                    category
+                    ,
+                    () => PointerKind.ArgCode.DePointer(Size)
+                    ,
+                    CodeArgs.Arg
                 );
         }
 
@@ -117,9 +118,12 @@ namespace Reni.Sequence
         Result ExtendFrom(Category category, int oldCount)
         {
             var result = Result
-                (category
-                 , () => Element.UniqueArray(oldCount).UniqueSequence.ArgCode.BitCast(Size)
-                 , CodeArgs.Arg
+                (
+                    category
+                    ,
+                    () => Element.UniqueArray(oldCount).UniqueSequence.ArgCode.BitCast(Size)
+                    ,
+                    CodeArgs.Arg
                 );
             return result;
         }
@@ -136,9 +140,12 @@ namespace Reni.Sequence
             var newType = Element.UniqueArray(tempNewCount).UniqueSequence;
             var result = newType
                 .Result
-                (category
-                 , () => ArgCode.BitCast(newType.Size)
-                 , CodeArgs.Arg
+                (
+                    category
+                    ,
+                    () => ArgCode.BitCast(newType.Size)
+                    ,
+                    CodeArgs.Arg
                 );
             return result;
         }
@@ -154,11 +161,20 @@ namespace Reni.Sequence
             if(source.Element != Element)
             {
                 DumpDataWithBreak
-                    ("Element type dismatch"
-                     , "category", category
-                     , "source", source
-                     , "destination", this
-                     , "result", result
+                    (
+                        "Element type dismatch"
+                        ,
+                        "category",
+                        category
+                        ,
+                        "source",
+                        source
+                        ,
+                        "destination",
+                        this
+                        ,
+                        "result",
+                        result
                     );
                 return null;
             }
@@ -181,7 +197,7 @@ namespace Reni.Sequence
                     Dump("forArg", forArg(Category.All));
                 var result = flatResult.ReplaceArg(forArg);
                 Dump("result", result);
-                return ReturnMethodDump(result.LocalPointerKindResult());
+                return ReturnMethodDump(result.LocalPointerKindResult);
             }
             finally
             {
@@ -189,13 +205,13 @@ namespace Reni.Sequence
             }
         }
 
-        Result UnalignedDereferencePointerResult(Category category) { return PointerKind.ArgResult(category.Typed).DereferenceResult() & category; }
+        Result UnalignedDereferencePointerResult(Category category) { return PointerKind.ArgResult(category.Typed).DereferenceResult & category; }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
         {
             return Count < type.Count
-                       ? null
-                       : Extension.Feature(c => ConversionAsReference(c, type));
+                ? null
+                : Extension.Feature(c => ConversionAsReference(c, type));
         }
 
         ISearchPath<ISuffixFeature, EnableCut>

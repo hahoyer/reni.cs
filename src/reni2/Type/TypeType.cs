@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -56,11 +56,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult)
-        {
-            return RawInstanceResult(category.Typed, getRightResult)
-                       .LocalPointerKindResult() & category;
-        }
+        internal override Result InstanceResult(Category category, Func<Category, Result> getRightResult) { return RawInstanceResult(category.Typed, getRightResult).LocalPointerKindResult & category; }
 
         Result RawInstanceResult(Category category, Func<Category, Result> getRightResult)
         {
@@ -79,7 +75,7 @@ namespace Reni.Type
             StartMethodDump(trace, context, category, left, right);
             try
             {
-                var countResult = right.Result(context).AutomaticDereferenceResult();
+                var countResult = right.Result(context).AutomaticDereferenceResult;
 
                 Dump("countResult", countResult);
                 BreakExecution();

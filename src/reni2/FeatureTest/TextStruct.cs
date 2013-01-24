@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ system: /!\
 ; TextItemType: /!\ text_item(MaxNumber8) type 
 
 ; NewMemory: /\ 
-    { result: (arg elementType * MaxNumber32) type (systemdata FreePointer enable_raw_conversion)
+    { result: (arg elementType * MaxNumber32) type instance (systemdata FreePointer enable_raw_conversion)
     , initializer: arg initializer
     , length: arg length
     , position: 0
@@ -68,7 +68,7 @@ system: /!\
 };
 
 Text: /\
-{ data: (system TextItemType * system MaxNumber32) type (arg)
+{ data: (system TextItemType * system MaxNumber32) type instance (arg)
 ; _length: system MaxNumber32 type instance (arg type / system TextItemType)
 ; AfterCopy: /\ data:= system NewMemory
     ( elementType: system TextItemType
@@ -76,12 +76,13 @@ Text: /\
     , initializer: /\ data(arg)
     )
 ; AfterCopy()
+; dump_print: /\(_data dump_print);
 }
 ";
         }
 
         public override void Run() { }
-        protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print"; } }
+        protected override string Target { get { return Definition() + "; " + InstanceCode + " dump_print()"; } }
         protected virtual string InstanceCode { get { return GetStringAttribute<InstanceCodeAttribute>(); } }
     }
 
@@ -98,7 +99,6 @@ Text: /\
     [DefaultInitialized]
     [FunctionVariable]
     [Repeater]
-    [LowPriority]
     public sealed class Text1 : TextStruct
     {
         [Test]

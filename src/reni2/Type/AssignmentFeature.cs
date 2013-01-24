@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ namespace Reni.Type
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType)
         {
-            if (category == Category.Type)
+            if(category == Category.Type)
                 return _target.RootContext.VoidResult(category);
 
             var trace = ObjectId == -1;
@@ -49,8 +49,7 @@ namespace Reni.Type
             {
                 BreakExecution();
                 var sourceResult = argsType
-                    .Conversion(category.Typed, _target.ValueType)
-                    .LocalPointerKindResult();
+                    .Conversion(category.Typed, _target.ValueType).LocalPointerKindResult;
                 Dump("sourceResult", sourceResult);
                 BreakExecution();
 

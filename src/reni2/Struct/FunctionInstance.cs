@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -123,20 +123,19 @@ namespace Reni.Struct
             StartMethodDump(trace, category);
             try
             {
-                if (trace)
+                if(trace)
                     category = category | Category.Code;
                 BreakExecution();
                 var rawResult = Context.UniqueResult(category.Typed, _body);
                 Tracer.Assert(rawResult.CompleteCategory == category.Typed);
-                if (rawResult.FindArgs != null)
+                if(rawResult.FindArgs != null)
                     Tracer.Assert(!rawResult.SmartArgs.Contains(CodeArgs.Arg()), rawResult.Dump);
-                
+
                 Dump("rawResult", rawResult);
                 BreakExecution();
 
-                var automaticDereferenceResult = rawResult
-                    .AutomaticDereferenceResult();
-                
+                var automaticDereferenceResult = rawResult.AutomaticDereferenceResult;
+
                 Dump("automaticDereferenceResult", automaticDereferenceResult);
                 BreakExecution();
 
@@ -146,10 +145,10 @@ namespace Reni.Struct
 
                 Dump("postProcessedResult", postProcessedResult);
                 BreakExecution();
-                
+
                 var result = postProcessedResult
                     .ReplaceAbsolute(Context.FindRecentFunctionContextObject, CreateContextRefCode, CodeArgs.Void);
-               
+
                 return ReturnMethodDump(result);
             }
             finally

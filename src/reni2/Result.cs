@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -555,7 +555,8 @@ namespace Reni
             return result;
         }
 
-        internal Result Clone() { return Filter(CompleteCategory); }
+        [DisableDump]
+        internal Result Clone { get { return Filter(CompleteCategory); } }
 
         void AssertValid()
         {
@@ -606,7 +607,7 @@ namespace Reni
 
         Result Sequence(Result second)
         {
-            var result = Clone();
+            var result = Clone;
             result.Add(second);
             return result;
         }
@@ -655,7 +656,7 @@ namespace Reni
                     result.Code = Code.ReplaceArg(getResultForArg(Category.Type | Category.Code));
                 if(HasArgs)
                     result.CodeArgs = CodeArgs.WithoutArg()
-                                      + getResultForArg(Category.CodeArgs).CodeArgs;
+                        + getResultForArg(Category.CodeArgs).CodeArgs;
             }
             result.IsDirty = false;
             return result;
@@ -727,7 +728,7 @@ namespace Reni
                 return this;
             if(SmartArgs.Count == 0)
                 return this;
-            var result = Clone();
+            var result = Clone;
             result.IsDirty = true;
             result.Code = SmartArgs.ReplaceRefsForFunctionBody(Code, refSize, replacement);
             result.CodeArgs = replacement.CodeArgs;
@@ -762,32 +763,44 @@ namespace Reni
             return result.Code.Evaluate(context);
         }
 
-        internal Result AutomaticDereferenceResult()
+        [DisableDump]
+        internal Result AutomaticDereferenceResult
         {
-            Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
+            get
+            {
+                Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
 
-            var result = this;
-            while(result.Type.IsWeakReference)
-                result = result.DereferenceResult();
-            return result;
+                var result = this;
+                while(result.Type.IsWeakReference)
+                    result = result.DereferenceResult;
+                return result;
+            }
         }
 
-        internal Result DereferenceResult()
+        [DisableDump]
+        internal Result DereferenceResult
         {
-            Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
-            var referenceType = Type.ReferenceType;
-            var converter = referenceType.Converter;
-            var result = converter.Result(CompleteCategory);
-            return result
-                .ReplaceArg(this);
+            get
+            {
+                Tracer.Assert(HasType, () => "Dereference requires type category:\n " + Dump());
+                var referenceType = Type.ReferenceType;
+                var converter = referenceType.Converter;
+                var result = converter.Result(CompleteCategory);
+                return result
+                    .ReplaceArg(this);
+            }
         }
 
-        internal Result UnalignedResult()
+        [DisableDump]
+        internal Result UnalignedResult
         {
-            Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
-            return ((Aligner) Type)
-                .UnalignedResult(CompleteCategory)
-                .ReplaceArg(this);
+            get
+            {
+                Tracer.Assert(HasType, () => "UnalignedResult requires type category:\n " + Dump());
+                return ((Aligner) Type)
+                    .UnalignedResult(CompleteCategory)
+                    .ReplaceArg(this);
+            }
         }
 
         [DebuggerHidden]
@@ -797,7 +810,7 @@ namespace Reni
         public static Result operator |(Result aResult, Result bResult)
         {
             Tracer.Assert((aResult.CompleteCategory & bResult.CompleteCategory).IsNone);
-            var result = aResult.Clone();
+            var result = aResult.Clone;
             result.Update(bResult);
             return result;
         }
@@ -805,15 +818,19 @@ namespace Reni
         [DebuggerHidden]
         public static Result operator +(Result aResult, Result bResult) { return aResult.Sequence(bResult); }
 
-        internal Result LocalPointerKindResult()
+        [DisableDump]
+        internal Result LocalPointerKindResult
         {
-            if(Type.IsDataLess)
-                return this;
-            if(Type is IReferenceType)
-                return this;
-            return Type
-                .LocalReferenceResult(CompleteCategory)
-                .ReplaceArg(this);
+            get
+            {
+                if(Type.IsDataLess)
+                    return this;
+                if(Type is IReferenceType)
+                    return this;
+                return Type
+                    .LocalReferenceResult(CompleteCategory)
+                    .ReplaceArg(this);
+            }
         }
 
         internal Result ContextReferenceViaStructReference(Structure accessPoint)
@@ -880,7 +897,7 @@ namespace Reni
         {
             if(!HasCode)
                 return this;
-            var result = Clone();
+            var result = Clone;
             result.Code = func(Code);
             return result;
         }

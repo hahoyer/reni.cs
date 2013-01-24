@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ namespace Reni.Context
         //[DebuggerHidden]
         Result ObtainResult(Category category, CompileSyntax syntax)
         {
-            var trace = syntax.ObjectId == -32 && ObjectId == 4 && category.HasArgs;
+            var trace = syntax.ObjectId == -2060 && ObjectId == 15 && category.HasType;
             StartMethodDump(trace, category, syntax);
             try
             {
@@ -172,19 +172,25 @@ namespace Reni.Context
 
             public Cache(ContextBase target)
             {
-                UndefinedSymbolType = new DictionaryEx<ExpressionSyntax, IssueType>(syntax => UndefinedSymbolIssue.Type(target, syntax));
+                UndefinedSymbolType = new DictionaryEx<ExpressionSyntax, IssueType>
+                    (syntax => UndefinedSymbolIssue.Type(target, syntax));
                 ResultCache = new DictionaryEx<CompileSyntax, ResultCache>(target.CreateCacheElement);
-                StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>(
+                StructContexts = new DictionaryEx<Container, DictionaryEx<int, ContextBase>>
+                    (
                     container =>
-                    new DictionaryEx<int, ContextBase>(
-                        position => new Struct.Context(target, container, position)));
+                        new DictionaryEx<int, ContextBase>
+                            (
+                            position => new Struct.Context(target, container, position)));
                 RecentStructure = new SimpleCache<Structure>(target.ObtainRecentStructure);
                 RecentFunctionContextObject = new SimpleCache<IFunctionContext>(target.ObtainRecentFunctionContext);
-                Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>(
+                Structures = new DictionaryEx<Container, DictionaryEx<int, Structure>>
+                    (
                     container =>
-                    new DictionaryEx<int, Structure>(
-                        position => new Structure(ContainerContextObjects[container], position)));
-                ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>(container => new ContainerContextObject(container, target));
+                        new DictionaryEx<int, Structure>
+                            (
+                            position => new Structure(ContainerContextObjects[container], position)));
+                ContainerContextObjects = new DictionaryEx<Container, ContainerContextObject>
+                    (container => new ContainerContextObject(container, target));
             }
 
             [DisableDump]
@@ -194,7 +200,7 @@ namespace Reni.Context
         internal Result ResultAsReference(Category category, CompileSyntax syntax)
         {
             return UniqueResult(category.Typed, syntax)
-                .LocalPointerKindResult();
+                .LocalPointerKindResult;
         }
 
         internal Result ArgReferenceResult(Category category)
@@ -202,19 +208,24 @@ namespace Reni.Context
             return FindRecentFunctionContextObject
                 .CreateArgReferenceResult(category);
         }
-        Result ArgsResult(Category category, CompileSyntax right) { return right == null ? RootContext.VoidType.Result(category.Typed) : right.SmartUnFunctionedReferenceResult(this, category); }
-        
+        Result ArgsResult(Category category, CompileSyntax right)
+        {
+            return right == null
+                ? RootContext.VoidType.Result(category.Typed)
+                : right.SmartUnFunctionedReferenceResult(this, category);
+        }
+
         internal Result ObjectResult(Category category, CompileSyntax left)
         {
             if(left == null)
                 return null;
             var resultType = Type(left).TypeForSearchProbes;
-            Result result = UniqueResult(category.Typed, left);
+            var result = UniqueResult(category.Typed, left);
             return result.Conversion(resultType);
         }
 
         /// <summary>
-        ///     Obtains the feature result of a functional argument object. 
+        ///     Obtains the feature result of a functional argument object.
         ///     Actual arguments, if provided, as well as object reference are replaced.
         /// </summary>
         /// <param name="category"> the categories in result </param>
@@ -227,7 +238,7 @@ namespace Reni.Context
         }
 
         /// <summary>
-        ///     Obtains the feature result of a functional object. 
+        ///     Obtains the feature result of a functional object.
         ///     Actual arguments, if provided, as well as object reference are replaced.
         /// </summary>
         /// <param name="category"> the categories in result </param>

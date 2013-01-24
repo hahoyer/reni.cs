@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,11 @@ namespace Reni
         [Node]
         internal readonly CompileSyntax Else;
 
-        protected CondSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax,
+        protected CondSyntax
+            (
+            CompileSyntax condSyntax,
+            TokenData thenToken,
+            CompileSyntax thenSyntax,
             CompileSyntax elseSyntax)
             : base(thenToken)
         {
@@ -58,7 +62,7 @@ namespace Reni
         }
 
         internal override Result ObtainResult(ContextBase context, Category category) { return InternalResult(context, category); }
-        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] { Cond, Then, Else}; } }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Cond, Then, Else}; } }
 
         Result CondResult(ContextBase context, Category category)
         {
@@ -75,16 +79,15 @@ namespace Reni
         Result BranchResult(ContextBase context, Category category, CompileSyntax syntax)
         {
             var branchResult = syntax
-                .Result(context, category.Typed)
-                .AutomaticDereferenceResult();
+                .Result(context, category.Typed).AutomaticDereferenceResult;
 
             var commonType = CommonType(context);
             return branchResult.Type
-                       .Conversion(category.Typed, commonType)
-                       .ReplaceArg(branchResult)
-                       .LocalBlock(category.Typed)
-                       .ObviousExactConversion(commonType)
-                   & category;
+                .Conversion(category.Typed, commonType)
+                .ReplaceArg(branchResult)
+                .LocalBlock(category.Typed)
+                .ObviousExactConversion(commonType)
+                & category;
         }
 
         Result InternalResult(ContextBase context, Category category)
@@ -99,9 +102,12 @@ namespace Reni
             var elseResult = ElseResult(context, branchCategory);
             return commonType
                 .Result
-                (category
-                 , () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code)
-                 , () => condResult.CodeArgs + thenResult.CodeArgs + elseResult.CodeArgs
+                (
+                    category
+                    ,
+                    () => condResult.Code.ThenElse(thenResult.Code, elseResult.Code)
+                    ,
+                    () => condResult.CodeArgs + thenResult.CodeArgs + elseResult.CodeArgs
                 );
         }
 
@@ -138,14 +144,19 @@ namespace Reni
         [Node]
         readonly TokenData _elseToken;
 
-        public ThenElseSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax, TokenData elseToken,
+        public ThenElseSyntax
+            (
+            CompileSyntax condSyntax,
+            TokenData thenToken,
+            CompileSyntax thenSyntax,
+            TokenData elseToken,
             CompileSyntax elseSyntax)
             : base(condSyntax, thenToken, thenSyntax, elseSyntax) { _elseToken = elseToken; }
 
         protected override string GetNodeDump()
         {
             return base.GetNodeDump() + "else(" +
-                   Else.NodeDump + ")";
+                Else.NodeDump + ")";
         }
     }
 }

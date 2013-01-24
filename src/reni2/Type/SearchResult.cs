@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ namespace Reni.Type
                 for(var i = 1; i < results.Length; i++)
                     result = result.ReplaceArg(results[i]);
 
-                return ReturnMethodDump(result.LocalPointerKindResult());
+                return ReturnMethodDump(result.LocalPointerKindResult);
             }
             finally
             {

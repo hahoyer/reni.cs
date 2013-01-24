@@ -164,8 +164,7 @@ namespace Reni.Type
         internal Result InternalConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
         {
             var oldElementsResult = UniquePointer
-                .Result(category.Typed, objectReference)
-                .DereferenceResult();
+                .Result(category.Typed, objectReference).DereferenceResult;
 
             var isElementArg = argsType.IsConvertable(ElementAccessType);
             var newCount = isElementArg ? 1 : argsType.ArrayLength(ElementAccessType);

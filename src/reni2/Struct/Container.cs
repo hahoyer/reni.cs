@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -70,7 +70,13 @@ namespace Reni.Struct
 
         internal override TokenData LastToken { get { return _lastToken; } }
 
-        Container(TokenData leftToken, TokenData rightToken, CompileSyntax[] statements, DictionaryEx<string, int> dictionary, int[] converters)
+        Container
+            (
+            TokenData leftToken,
+            TokenData rightToken,
+            CompileSyntax[] statements,
+            DictionaryEx<string, int> dictionary,
+            int[] converters)
             : base(leftToken, _nextObjectId++)
         {
             _firstToken = leftToken;
@@ -95,7 +101,7 @@ namespace Reni.Struct
         internal Size IndexSize { get { return Size.AutoSize(Statements.Length); } }
 
         protected override string GetNodeDump() { return "container." + ObjectId; }
-        
+
         protected override ParsedSyntaxBase[] Children { get { return Statements.ToArray<ParsedSyntaxBase>(); } }
 
         sealed class PreContainer : ReniObject
@@ -214,7 +220,7 @@ namespace Reni.Struct
                     .Result(uniqueChildContext, category.Typed)
                     .SmartUn<FunctionType>();
                 Dump("result", result);
-                return ReturnMethodDump(result.AutomaticDereferenceResult());
+                return ReturnMethodDump(result.AutomaticDereferenceResult);
             }
             finally
             {

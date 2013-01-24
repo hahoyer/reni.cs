@@ -551,12 +551,12 @@ namespace Reni.Type
             if(this != destination)
             {
                 if(ReferenceType != null)
-                    result = result.DereferenceResult();
+                    result = result.DereferenceResult;
 
                 if(destination is Aligner)
                     result = result.Align(Root.DefaultRefAlignParam.AlignBits);
                 else if(ReferenceType == null)
-                    result = result.UnalignedResult();
+                    result = result.UnalignedResult;
             }
 
             return result;
@@ -588,14 +588,12 @@ namespace Reni.Type
         Result DereferenceReferenceResult(Category category)
         {
             return UniquePointer
-                .ArgResult(category.Typed)
-                .DereferenceResult();
+                .ArgResult(category.Typed).DereferenceResult;
         }
 
         internal Result BitSequenceOperandConversion(Category category)
         {
-            return ConvertToBitSequence(category)
-                .AutomaticDereferenceResult()
+            return ConvertToBitSequence(category).AutomaticDereferenceResult
                 .Align(BitsConst.SegmentAlignBits);
         }
 

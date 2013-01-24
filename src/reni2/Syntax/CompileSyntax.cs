@@ -139,11 +139,7 @@ namespace Reni.Syntax
             return Type(context).SmartUn<FunctionType>().IsDataLess;
         }
 
-        internal Result PointerKindResult(ContextBase context, Category category)
-        {
-            return Result(context, category.Typed)
-                .LocalPointerKindResult();
-        }
+        internal Result PointerKindResult(ContextBase context, Category category) { return Result(context, category.Typed).LocalPointerKindResult; }
 
         internal Result SmartUnFunctionedReferenceResult(ContextBase context, Category category)
         {
@@ -151,8 +147,7 @@ namespace Reni.Syntax
             if(result == null)
                 return null;
             return result
-                .SmartUn<FunctionType>()
-                .LocalPointerKindResult();
+                .SmartUn<FunctionType>().LocalPointerKindResult;
         }
 
         internal virtual Result ObtainPendingResult(ContextBase context, Category category)

@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -55,7 +55,9 @@ namespace Reni.Syntax
                 .Result(context, category, Token);
         }
 
+        [DisableDump]
         internal override TokenData FirstToken { get { return Token; } }
+        [DisableDump]
         internal override TokenData LastToken { get { return Token; } }
     }
 
@@ -84,9 +86,11 @@ namespace Reni.Syntax
         }
 
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + _right.NodeDump + ")"; }
+        [DisableDump]
         internal override TokenData FirstToken { get { return Token; } }
+        [DisableDump]
         internal override TokenData LastToken { get { return _right.LastToken; } }
-
+        [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {null, _right}; } }
     }
 
