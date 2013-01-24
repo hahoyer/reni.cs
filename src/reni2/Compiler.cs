@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ namespace Reni
             _fileName = fileName;
             _rootContext = new Root(this);
             _parameters = parameters ?? new CompilerParameters();
-        
+
             _source = new SimpleCache<Source>(() => new Source(FileName.FileHandle()));
             _parser = new SimpleCache<ParserInst>(() => new ParserInst(new ReniScanner(), new MainTokenFactory()));
             _syntax = new SimpleCache<ParsedSyntax>(() => (ParsedSyntax) _parser.Value.Compile(Source));
@@ -87,7 +87,8 @@ namespace Reni
         [Node]
         [DisableDump]
         Root RootContext { get { return _rootContext; } }
-
+        [DisableDump]
+        bool IsInExecutionPhase { get; set; }
 
         internal static string FormattedNow
         {
@@ -108,7 +109,8 @@ namespace Reni
         }
 
         IOutStream IExecutionContext.OutStream { get { return _parameters.OutStream; } }
-        bool IExecutionContext.IsTraceEnabled { get { return _parameters.Trace.Functions; } }
+        bool IExecutionContext.IsTraceEnabled { get { return IsInExecutionPhase && _parameters.Trace.Functions; } }
+
         CodeBase IExecutionContext.Function(FunctionId functionId) { return CodeContainer.Function(functionId); }
 
         /// <summary>
@@ -143,18 +145,24 @@ namespace Reni
             Data.OutStream = _parameters.OutStream;
             try
             {
-                CodeContainer
+                var method = CodeContainer
                     .CreateCSharpAssembly(_className, _parameters.Trace.GeneratorFilePosn)
                     .GetExportedTypes()[0]
-                    .GetMethod(Generator.MainFunctionName)
-                    .Invoke(null, new object[0]);
+                    .GetMethod(Generator.MainFunctionName);
+
+                IsInExecutionPhase = true;
+                method.Invoke(null, new object[0]);
             }
             catch(CSharpCompilerErrorException e)
             {
                 for(var i = 0; i < e.CompilerErrorCollection.Count; i++)
                     _parameters.OutStream.AddLog(e.CompilerErrorCollection[i] + "\n");
             }
-            Data.OutStream = null;
+            finally
+            {
+                IsInExecutionPhase = false;
+                Data.OutStream = null;
+            }
         }
 
         internal IEnumerable<IssueBase> Issues { get { return CodeContainer.Issues; } }
@@ -166,14 +174,14 @@ namespace Reni
             if(!_parameters.ParseOnly)
                 _codeContainer.Ensure();
         }
-        
+
         public static string FlatExecute(string text, bool isFakedName = false)
         {
             var fileName =
                 Environment.GetEnvironmentVariable("temp")
-                + "\\reni.server\\"
-                + Thread.CurrentThread.ManagedThreadId
-                + ".reni";
+                    + "\\reni.server\\"
+                    + Thread.CurrentThread.ManagedThreadId
+                    + ".reni";
             var fileHandle = fileName.FileHandle();
             fileHandle.AssumeDirectoryOfFileExists();
             fileHandle.String = text;
@@ -196,7 +204,7 @@ namespace Reni
             var log = stringStream.Log;
             if(log != "")
             {
-                if (isFakedName)
+                if(isFakedName)
                     log = log.Replace(fileName, "source");
                 result += "Log: \n" + log + "\n";
             }
