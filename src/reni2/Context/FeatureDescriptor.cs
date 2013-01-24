@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -52,13 +52,16 @@ namespace Reni.Context
             if(right != null)
             {
                 Tracer.Assert(Feature.Function != null, Feature.Dump);
-                Tracer.Assert(!Feature.Function.IsImplicit, Feature.Dump);
+                Tracer.Assert(Feature.Function == null || !Feature.Function.IsImplicit, Feature.Dump);
                 return;
             }
 
             if(Feature.Simple != null)
             {
-                Tracer.Assert(Feature.Function == null || !Feature.Function.IsImplicit, () => "Ambiguity: Simple or ImplicitFunction? " + Feature.Dump());
+                Tracer.Assert
+                    (
+                        Feature.Function == null || !Feature.Function.IsImplicit,
+                        () => "Ambiguity: Simple or ImplicitFunction? " + Feature.Dump());
                 return;
             }
 
@@ -75,9 +78,9 @@ namespace Reni.Context
                 var resultFromObject = context.Result(category, Feature, Type, right);
 
                 Dump("resultFromObject", resultFromObject);
-                if (trace)
+                if(trace)
                     Dump("ConverterResult", ConverterResult(Category.All));
-                
+
                 var convertedResult = resultFromObject.ReplaceArg(ConverterResult);
                 Tracer.Assert(category == convertedResult.CompleteCategory);
 
@@ -95,7 +98,7 @@ namespace Reni.Context
             }
         }
         /// <summary>
-        ///     Obtains the feature result. 
+        ///     Obtains the feature result.
         ///     Special case of a meta feature is treated here.
         ///     Actual arguments, if provided, as well as object reference are replaced.
         /// </summary>
