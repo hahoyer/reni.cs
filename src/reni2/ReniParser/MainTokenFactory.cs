@@ -50,11 +50,8 @@ namespace Reni.ReniParser
                 var x = PrioTable.Left(PrioTable.Any);
                 x += PrioTable.Left
                     (
-                        "reference"
-                        ,
                         "_A_T_",
-                        "_N_E_X_T_"
-                        ,
+                        "_N_E_X_T_",
                         "to_number_of_base"
                     );
 
@@ -144,6 +141,7 @@ namespace Reni.ReniParser
                     {"arg", new ArgToken()},
                     {"dump_print", new DumpPrintToken()},
                     {"else", new ElseToken()},
+                    {"enable_array_oversize", new EnableArrayOverSize()},
                     {"enable_cut", new EnableCut()},
                     {"enable_raw_conversion", new EnableRawConversion()},
                     {"function_instance", new FunctionInstanceToken()},
