@@ -55,7 +55,7 @@ system: /!\
 ; TextItemType: /!\ text_item(MaxNumber8) type 
 
 ; NewMemory: /\ 
-    { result: (arg elementType * MaxNumber32) type instance (systemdata FreePointer enable_raw_conversion)
+    { result: (arg elementType * MaxNumber32) instance (systemdata FreePointer enable_raw_conversion)
     , initializer: arg initializer
     , length: arg length
     , position: 0
@@ -68,7 +68,7 @@ system: /!\
 };
 
 Text: /\
-{ data: (system TextItemType * system MaxNumber32) type instance (arg)
+{ data: (system TextItemType * system MaxNumber32) instance (arg enable_array_oversize)
 ; _length: system MaxNumber32 type instance (arg type / system TextItemType)
 ; AfterCopy: /\ data:= system NewMemory
     ( elementType: system TextItemType
