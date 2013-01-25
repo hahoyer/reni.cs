@@ -72,7 +72,8 @@ namespace Reni.Parser
         
         string IGraphTarget.Title { get { return Token.Name; } }
         IGraphTarget[] IGraphTarget.Children { get { return Children.ToArray<IGraphTarget>(); } }
-        
+
+        [DisableDump]
         protected virtual ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[0]; } }
     }
 }

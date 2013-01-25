@@ -48,6 +48,7 @@ namespace Reni.Syntax
             _right = right;
         }
 
+        [DisableDump]
         internal override TokenData FirstToken
         {
             get
@@ -57,6 +58,8 @@ namespace Reni.Syntax
                 return base.FirstToken;
             }
         }
+
+        [DisableDump]
         internal override TokenData LastToken
         {
             get

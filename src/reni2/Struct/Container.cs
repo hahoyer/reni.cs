@@ -66,8 +66,10 @@ namespace Reni.Struct
         [SmartNode]
         internal int[] Converters { get { return _converters; } }
 
+        [DisableDump]
         internal override TokenData FirstToken { get { return _firstToken; } }
 
+        [DisableDump]
         internal override TokenData LastToken { get { return _lastToken; } }
 
         Container
@@ -102,6 +104,7 @@ namespace Reni.Struct
 
         protected override string GetNodeDump() { return "container." + ObjectId; }
 
+        [DisableDump]
         protected override ParsedSyntaxBase[] Children { get { return Statements.ToArray<ParsedSyntaxBase>(); } }
 
         sealed class PreContainer : ReniObject
