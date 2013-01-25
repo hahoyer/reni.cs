@@ -37,26 +37,27 @@ namespace Reni.Type
     sealed class ArrayType
         : TypeBase, IRepeaterType
             , ISearchPath<ISuffixFeature, SequenceType>, IFeature, IFunctionFeature
+            , ISearchPath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>
     {
         [Node]
+        internal readonly TypeBase ElementType;
+        [Node]
+        internal readonly int Count;
+
+        readonly SimpleCache<RepeaterAccessType> _arrayAccessTypeCache;
+        readonly SimpleCache<EnableArrayOverSizeType> _enableArrayOverSizeTypeCache;
         readonly SimpleCache<SequenceType> _sequenceCache;
-        [Node]
         readonly SimpleCache<TextItemsType> _textItemsCache;
-        [Node]
-        TypeBase _elementType;
-        [Node]
-        int _count;
-        [Node]
-        SimpleCache<RepeaterAccessType> _arrayAccessTypeCache;
 
         public ArrayType(TypeBase elementType, int count)
         {
-            _elementType = elementType;
-            _count = count;
+            ElementType = elementType;
+            Count = count;
             Tracer.Assert(count > 0);
             Tracer.Assert(elementType.ReferenceType == null);
             Tracer.Assert(!elementType.IsDataLess);
             _arrayAccessTypeCache = new SimpleCache<RepeaterAccessType>(() => new RepeaterAccessType(this));
+            _enableArrayOverSizeTypeCache = new SimpleCache<EnableArrayOverSizeType>(() => new EnableArrayOverSizeType(this));
             _sequenceCache = new SimpleCache<SequenceType>(() => new SequenceType(this));
             _textItemsCache = new SimpleCache<TextItemsType>(() => new TextItemsType(this));
         }
@@ -70,6 +71,9 @@ namespace Reni.Type
         [Node]
         [DisableDump]
         internal TextItemsType UniqueTextItemsType { get { return _textItemsCache.Value; } }
+        [Node]
+        [DisableDump]
+        internal EnableArrayOverSizeType EnableArrayOverSizeType { get { return _enableArrayOverSizeTypeCache.Value; } }
         [DisableDump]
         internal override bool IsDataLess { get { return Count == 0 || ElementType.IsDataLess; } }
         [DisableDump]
@@ -138,13 +142,9 @@ namespace Reni.Type
         }
 
         TypeBase ElementAccessType { get { return ElementType.TypeForArrayElement; } }
-        [Node]
-        internal int Count { get { return _count; } }
-        [Node]
-        internal TypeBase ElementType { get { return _elementType; } }
 
         [DisableDump]
-        internal override sealed Root RootContext { get { return _elementType.RootContext; } }
+        internal override sealed Root RootContext { get { return ElementType.RootContext; } }
         [DisableDump]
         IContextReference ObjectReference { get { return UniquePointer; } }
         [DisableDump]
@@ -229,6 +229,15 @@ namespace Reni.Type
                 return null;
             return Extension.Feature(type.PointerConversionResult);
         }
+        
+        ISearchPath<ISuffixFeature, EnableArrayOverSizeType> ISearchPath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>.Convert(ArrayType type)
+        {
+            if(ElementType != type.ElementType)
+                return null;
+            NotImplementedMethod(type);
+            return null;
+        }
+
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }
         Result ApplyResult(Category category, TypeBase argsType)
         {
@@ -245,5 +254,17 @@ namespace Reni.Type
 
             return result;
         }
+
+        internal Result EnableArrayOverSizeFeature(Category category)
+        {
+            return EnableArrayOverSizeType
+                .Result
+                (
+                    category,
+                    () => PointerKind.ArgCode.DePointer(Size),
+                    CodeArgs.Arg
+                );
+        }
+        
     }
 }

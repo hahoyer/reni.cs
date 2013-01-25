@@ -303,6 +303,7 @@
     <Compile Include="TokenClasses\DefinableTokenSyntax.cs" />
     <Compile Include="TokenClasses\Defineable.cs" />
     <Compile Include="TokenClasses\ElseToken.cs" />
+    <Compile Include="TokenClasses\EnableArrayOverSize.cs" />
     <Compile Include="TokenClasses\EnableCut.cs" />
     <Compile Include="TokenClasses\EnableRawConversion.cs" />
     <Compile Include="TokenClasses\Function.cs" />
@@ -325,6 +326,7 @@
     <Compile Include="TokenClasses\NewValueToken.cs" />
     <Compile Include="TypeRootSearchVisitor.cs" />
     <Compile Include="TypeSearchResult.cs" />
+    <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\AssignmentFeature.cs" />
     <Compile Include="Type\Child.cs" />

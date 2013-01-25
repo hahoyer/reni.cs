@@ -36,7 +36,11 @@ namespace Reni.Type
     {
         readonly TypeBase _value;
 
-        public TypeType(TypeBase value) { _value = value; }
+        public TypeType(TypeBase value)
+        {
+            _value = value;
+            StopByObjectId(61);
+        }
 
         [DisableDump]
         internal override Root RootContext { get { return _value.RootContext; } }
