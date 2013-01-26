@@ -90,7 +90,6 @@ namespace Reni.Parser
         int Position { get { return _position; } }
         [DisableDump]
         int Length { get { return _length; } }
-        [DisableDump]
         internal string Name { get { return Source.SubString(Position, Length); } }
         [DisableDump]
         internal string FilePosition { get { return "\n" + Source.FilePosn(Position, Name); } }

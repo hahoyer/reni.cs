@@ -36,6 +36,7 @@ namespace Reni.Validation
 {
     sealed class IssueType : TypeBase
     {
+        [EnableDump]
         readonly IssueBase _issue;
         readonly Root _rootContext;
 

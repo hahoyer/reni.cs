@@ -38,6 +38,9 @@ namespace Reni.Context
         readonly ContextBase _context;
         readonly ExpressionSyntax _syntax;
 
+        [EnableDump]
+        TokenData Token { get { return _syntax.Token; } }
+
         internal UndefinedSymbolIssue(ContextBase context, ExpressionSyntax syntax)
             : base(syntax, IssueId.UndefinedSymbol)
         {
