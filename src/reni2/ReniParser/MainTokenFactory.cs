@@ -159,12 +159,12 @@ namespace Reni.ReniParser
             }
         }
 
-        protected override TokenClasses.TokenClass GetEndOfTextClass() { return new RightParenthesis(0); }
-        protected override TokenClasses.TokenClass GetBeginOfTextClass() { return new LeftParenthesis(0); }
-        protected override TokenClasses.TokenClass GetNumberClass() { return new TokenClasses.Number(); }
-        protected override TokenClasses.TokenClass GetNewTokenClass(string name) { return new UserSymbol(name); }
+        protected override TokenClasses.TokenClass GetEndOfText() { return new RightParenthesis(0); }
+        protected override TokenClasses.TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
+        protected override TokenClasses.TokenClass GetNumber() { return new TokenClasses.Number(); }
+        protected override TokenClasses.TokenClass GetNewToken(string name) { return new UserSymbol(name); }
         protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
-        protected override TokenClasses.TokenClass GetTextClass() { return new Text(); }
+        protected override TokenClasses.TokenClass GetText() { return new Text(); }
     }
 
     sealed class SyntaxError : TokenClasses.TokenClass

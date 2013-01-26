@@ -40,8 +40,8 @@ namespace Reni.Parser
             {
                 sourcePosn.Incr(WhiteSpace(sourcePosn));
                 return Token.CreateAndAdvance(sourcePosn, sp => sp.IsEnd ? (int?) 0 : null, tokenFactory.EndOfText)
-                       ?? Token.CreateAndAdvance(sourcePosn, Number, tokenFactory.NumberClass)
-                       ?? Token.CreateAndAdvance(sourcePosn, Text, tokenFactory.TextClass)
+                       ?? Token.CreateAndAdvance(sourcePosn, Number, tokenFactory.Number)
+                       ?? Token.CreateAndAdvance(sourcePosn, Text, tokenFactory.Text)
                        ?? Token.CreateAndAdvance(sourcePosn, Any, tokenFactory.TokenClass)
                        ?? WillReturnNull(sourcePosn);
             }

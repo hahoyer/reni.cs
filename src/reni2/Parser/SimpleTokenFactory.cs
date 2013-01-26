@@ -46,11 +46,11 @@ namespace Reni.Parser
                 {")", new CloseToken(3)},
             };
         }
-        protected override TokenClass GetEndOfTextClass() { return new CloseToken(0); }
-        protected override TokenClass GetBeginOfTextClass() { return new OpenToken(0); }
-        protected override TokenClass GetNewTokenClass(string name) { return CommonTokenClass; }
-        protected override TokenClass GetNumberClass() { return CommonTokenClass; }
-        protected override TokenClass GetTextClass() { return CommonTokenClass; }
+        protected override TokenClass GetEndOfText() { return new CloseToken(0); }
+        protected override TokenClass GetBeginOfText() { return new OpenToken(0); }
+        protected override TokenClass GetNewToken(string name) { return CommonTokenClass; }
+        protected override TokenClass GetNumber() { return CommonTokenClass; }
+        protected override TokenClass GetText() { return CommonTokenClass; }
         static TokenClass CommonTokenClass { get { return new AnyTokenClass(); } }
 
         internal abstract class Syntax : ReniObject, IParsedSyntax, IGraphTarget

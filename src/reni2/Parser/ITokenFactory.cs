@@ -31,8 +31,8 @@ namespace Reni.Parser
     {
         ITokenClass TokenClass(string name);
         PrioTable PrioTable { get; }
-        ITokenClass NumberClass { get; }
-        ITokenClass TextClass { get; }
+        ITokenClass Number { get; }
+        ITokenClass Text { get; }
         ITokenClass BeginOfText { get; }
         ITokenClass EndOfText { get; }
     }

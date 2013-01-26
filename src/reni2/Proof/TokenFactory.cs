@@ -37,7 +37,7 @@ namespace Reni.Proof
        
         internal static TokenFactory Instance { get { return new TokenFactory(); } }
 
-        protected override TokenClasses.TokenClass GetNewTokenClass(string name) { return new UserSymbol(); }
+        protected override TokenClasses.TokenClass GetNewToken(string name) { return new UserSymbol(); }
 
         static PrioTable PrioTable
         {
@@ -93,9 +93,9 @@ namespace Reni.Proof
                 };
             return result;
         }
-        protected override TokenClasses.TokenClass GetEndOfTextClass() { return new RightParenthesis(0); }
-        protected override TokenClasses.TokenClass GetBeginOfTextClass() { return new LeftParenthesis(0); }
-        protected override TokenClasses.TokenClass GetNumberClass() { return new TokenClasses.Number(); }
+        protected override TokenClasses.TokenClass GetEndOfText() { return new RightParenthesis(0); }
+        protected override TokenClasses.TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
+        protected override TokenClasses.TokenClass GetNumber() { return new TokenClasses.Number(); }
 
         internal Minus Minus { get { return (Minus) TokenClass("-"); } }
         internal Equal Equal { get { return (Equal) TokenClass("="); } }
