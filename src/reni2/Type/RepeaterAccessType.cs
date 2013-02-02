@@ -31,7 +31,7 @@ using Reni.Context;
 namespace Reni.Type
 {
     sealed class RepeaterAccessType
-        : SetterTargetType
+        : DataSetterTargetType
     {
         [DisableDump]
         internal readonly IRepeaterType RepeaterType;
@@ -51,40 +51,13 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal override Result DestinationResult(Category category) { return Result(category, this); }
-
-        internal override Result SetterResult(Category category)
-        {
-            return new Result
-                (
-                category
-                ,
-                getCode: SetterCode
-                ,
-                getArgs: CodeArgs.Arg
-                );
-        }
-        internal override Result GetterResult(Category category)
-        {
-            return ValueType
-                .UniquePointer
-                .Result(category, () => GetterCode);
-        }
-
-        CodeBase SetterCode()
+        protected override CodeBase SetterCode()
         {
             return Pair(ValueType.PointerKind)
                 .ArgCode
                 .ArrayAssignment(ValueType.Size, RepeaterType.IndexSize);
         }
 
-        CodeBase GetterCode
-        {
-            get
-            {
-                return ArgCode
-                    .ArrayAccess(ValueType.Size, RepeaterType.IndexSize);
-            }
-        }
+        protected override CodeBase GetterCode() { return ArgCode.ArrayAccess(ValueType.Size, RepeaterType.IndexSize); }
     }
 }

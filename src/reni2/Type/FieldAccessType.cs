@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ using Reni.Struct;
 
 namespace Reni.Type
 {
-    sealed class FieldAccessType : SetterTargetType
+    sealed class FieldAccessType : DataSetterTargetType
     {
         [EnableDump]
         readonly Structure _structure;
@@ -49,34 +49,28 @@ namespace Reni.Type
         internal override bool IsDataLess { get { return false; } }
         [DisableDump]
         RefAlignParam RefAlignParam { get { return _structure.RefAlignParam; } }
-        [DisableDump]
-        IContextReference ObjectReference { get { return this; } }
 
         protected override string GetNodeDump() { return base.GetNodeDump() + "{" + _structure.NodeDump + "@" + _position + "}"; }
 
         protected override Size GetSize() { return RefAlignParam.RefSize; }
 
-        Size GetFieldOffset() { return _structure.FieldOffset(_position); }
+        Size FieldOffset { get { return _structure.FieldOffset(_position); } }
 
-        internal override Result GetterResult(Category category)
-        {
-            return ValueType.PointerKind
-                .Result(category, ArgResult(category.Typed).AddToReference(GetFieldOffset));
-        }
+        protected override CodeBase GetterCode() { return ArgCode.ReferencePlus(FieldOffset); }
 
-        internal override Result SetterResult(Category category)
+        protected override CodeBase SetterCode()
         {
-            return new Result
-                (category
-                 , getCode: () => Pair(ValueType.PointerKind).ArgCode.Assignment(ValueType.Size)
-                 , getArgs: CodeArgs.Arg
-                );
+            return
+                Pair(ValueType.PointerKind)
+                    .ArgCode
+                    .Assignment(ValueType.Size);
         }
 
         internal override Result DestinationResult(Category category)
         {
-            return Result(category, ObjectReference)
-                .AddToReference(GetFieldOffset);
+            return base
+                .DestinationResult(category)
+                .AddToReference(() => FieldOffset);
         }
 
         internal override void Search(SearchVisitor searchVisitor)

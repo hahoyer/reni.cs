@@ -27,6 +27,7 @@ using System.Reflection;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Feature;
+using Reni.TokenClasses;
 
 namespace Reni
 {
@@ -52,21 +53,26 @@ namespace Reni
                 .Where(ppt => !ppt.provider.IsGenericParameter)
                 .ToArray();
 
-            var x = ppts
+            var toImplement = ppts
                 .Where(ppt => !ppt.provider.Implements(InterfaceType(ppt.path, ppt.token)))
-                .GroupBy(ppt => ppt.provider)
-                .Select
+                .GroupBy(ppt => ppt.token.IsSubclassOf(typeof(Defineable)))
+                .ToDictionary
                 (
-                    g => DumpSearchPathsGroup
+                    gTokenClass => gTokenClass.Key,
+                    gTokenClass => gTokenClass.GroupBy(ppt => ppt.provider)
+                        .Select
                         (
-                            g.Key,
-                            g.Select(ppt => DumpInterface(ppt.provider, ppt.path, ppt.token)),
-                            g.Select(ppt => DumpMembers(ppt.provider, ppt.path, ppt.token))
+                            gProvider => DumpSearchPathsGroup
+                                (
+                                    gProvider.Key,
+                                    gProvider.Select(ppt => DumpInterface(ppt.provider, ppt.path, ppt.token)),
+                                    gProvider.Select(ppt => DumpMembers(ppt.provider, ppt.path, ppt.token))
+                                )
                         )
-                )
-                .Stringify("\n========================================\n");
+                        .Stringify("\n========================================\n")
+                );
 
-            var y = ppts
+            var toRemove = ppts
                 .Where(ppt => ppt.provider.Implements(InterfaceType(ppt.path, ppt.token)))
                 .GroupBy(ppt => ppt.token)
                 .Select
@@ -81,9 +87,11 @@ namespace Reni
 
             Tracer.FlaggedLine
                 (
-                    "\n" + x
+                    "\n" + toImplement[true]
+                        + "\n\n\n---------------------------------------\nConverters:\n---------------------------------------\n"
+                        + toImplement[false] 
                         + "\n\n\n---------------------------------------\nTo remove:\n---------------------------------------\n"
-                        + y);
+                        + toRemove);
         }
 
         static string DumpSearchPathsGroup(System.Type key, IEnumerable<string> interfaces, IEnumerable<string> members)

@@ -35,16 +35,20 @@ using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.ReniParser;
 using Reni.Struct;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     [Serializable]
     abstract class TypeBase
         : ReniObject
-            , IContextReference
+            , IContextReferenceProvider
             , IIconKeyProvider
             , ISearchTarget
             , ISearchPath<ISuffixFeature, Aligner>, ISearchPath<ISuffixFeature, TypeBase>
+            , IFeaturePath<IPrefixFeature, ConcatArrays>
+            , IFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>
+            , IFeaturePath<IPrefixFeature, TextItem>
     {
         sealed class Cache
         {
@@ -102,11 +106,13 @@ namespace Reni.Type
         protected TypeBase()
             : base(_nextObjectId++)
         {
-            _order = CodeArgs.NextOrder++;
             _cache = new Cache(this);
         }
 
         TPath ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetFeature<TPath>(typeBase); }
+        IPrefixFeature IFeaturePath<IPrefixFeature, ConcatArrays>.Feature { get { return Extension.Feature(CreateArray); } }
+        ISearchPath<IPrefixFeature, PointerType> IFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>.Feature { get { return Extension.Feature<PointerType>(ConcatArrayFromReference); } }
+        IPrefixFeature IFeaturePath<IPrefixFeature, TextItem>.Feature { get { return Extension.Feature(TextItemResult); } }
 
         [Node]
         internal Size Size { get { return _cache.Size.Value; } }
@@ -136,8 +142,7 @@ namespace Reni.Type
             }
         }
 
-        int IContextReference.Order { get { return _order; } }
-        Size IContextReference.Size { get { return Size; } }
+        IContextReference IContextReferenceProvider.ContextReference { get { return UniquePointerType; } }
 
         [DisableDump]
         internal virtual TypeBase[] ToList { get { return new[] {this}; } }
@@ -490,7 +495,6 @@ namespace Reni.Type
         }
 
         static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create);
-        readonly int _order;
 
         internal Result CreateArray(Category category)
         {
@@ -661,7 +665,7 @@ namespace Reni.Type
                 .DePointer(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
- 
+
         internal TPath GetFeature<TPath, TTarget>()
             where TPath : class
         {
@@ -675,10 +679,9 @@ namespace Reni.Type
             }
             NotImplementedMethod("features", features);
             return null;
-
         }
 
-        virtual internal IEnumerable<Tuple<TPath, TypeBase>> GetFeatures<TPath, TTarget>()
+        internal virtual IEnumerable<Tuple<TPath, TypeBase>> GetFeatures<TPath, TTarget>()
             where TPath : class
         {
             var featurePath = this as IFeaturePath<TPath, TTarget>;

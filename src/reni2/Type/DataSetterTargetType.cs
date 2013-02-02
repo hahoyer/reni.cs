@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2013 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,18 +24,31 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using Reni.Basics;
 using Reni.Code;
 
 namespace Reni.Type
 {
-    interface IReferenceType : IContextReference
+    abstract class DataSetterTargetType : SetterTargetType
     {
-        IConverter Converter { get; }
-        bool IsWeak { get; }
-    }
+        protected override Result SetterResult(Category category)
+        {
+            return new Result
+                (
+                category,
+                getCode: SetterCode,
+                getArgs: CodeArgs.Arg
+                );
+        }
 
-    static class ReferenceExtension
-    {
-        internal static TypeBase Type(this IReferenceType referenceType) { return (TypeBase) referenceType; }
+        protected override Result GetterResult(Category category)
+        {
+            return ValueType
+                .PointerKind
+                .Result(category, GetterCode);
+        }
+
+        protected abstract CodeBase SetterCode();
+        protected abstract CodeBase GetterCode();
     }
 }

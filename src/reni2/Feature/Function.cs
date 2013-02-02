@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -26,12 +26,11 @@ using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
-using Reni.Context;
 using Reni.Type;
 
 namespace Reni.Feature
 {
-    abstract class FunctionBase : ReniObject, IFunctionFeature, IContextReference
+    abstract class FunctionBase : ReniObject, IFunctionFeature
     {
         [EnableDump]
         readonly Func<Category, IContextReference, TypeBase, Result> _function;
@@ -43,14 +42,13 @@ namespace Reni.Feature
         {
             _order = CodeArgs.NextOrder++;
             _function = function;
-            Tracer.Assert(_function.Target is IContextReference);
+            Tracer.Assert(_function.Target is IContextReferenceProvider);
         }
 
-        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _function(category, this, argsType); }
+        Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _function(category, ObjectReference, argsType); }
         bool IFunctionFeature.IsImplicit { get { return false; } }
-        IContextReference IFunctionFeature.ObjectReference { get { return this; } }
-        Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
-        int IContextReference.Order { get { return _order; } }
+        IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
+        IContextReference ObjectReference { get { return ((IContextReferenceProvider) _function.Target).ContextReference; } }
     }
 
     sealed class Function : FunctionBase, ISuffixFeature
@@ -65,8 +63,8 @@ namespace Reni.Feature
 
     sealed class Function<TType>
         : FunctionBase
-          , ISearchPath<ISuffixFeature, TType>
-          , ISuffixFeature
+            , ISearchPath<ISuffixFeature, TType>
+            , ISuffixFeature
     {
         public Function(Func<Category, IContextReference, TypeBase, Result> function)
             : base(function) { }

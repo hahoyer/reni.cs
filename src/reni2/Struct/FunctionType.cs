@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
-using Reni.ReniParser;
 using Reni.TokenClasses;
 using Reni.Type;
 
@@ -89,9 +88,8 @@ namespace Reni.Struct
             }
         }
 
-        internal override Result SetterResult(Category category) { return _setter.CallResult(category); }
-        internal override Result GetterResult(Category category) { return _getter.CallResult(category); }
-        internal override Result DestinationResult(Category category) { return Result(category, this); }
+        protected override Result SetterResult(Category category) { return _setter.CallResult(category); }
+        protected override Result GetterResult(Category category) { return _getter.CallResult(category); }
         protected override Size GetSize() { return ArgsType.Size + CodeArgs.Size; }
 
         internal ContextBase CreateSubContext(bool useValue) { return new Reni.Context.Function(_structure.UniqueContext, ArgsType, useValue ? ValueType : null); }
@@ -123,8 +121,8 @@ namespace Reni.Struct
         {
             var result = Result
                 (category
-                 , () => CodeArgs.ToCode() + ArgsType.ArgCode
-                 , () => CodeArgs + CodeArgs.Arg()
+                    , () => CodeArgs.ToCode() + ArgsType.ArgCode
+                    , () => CodeArgs + CodeArgs.Arg()
                 );
             Tracer.Assert(category == result.CompleteCategory);
             return result;

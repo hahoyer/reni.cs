@@ -25,28 +25,73 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    abstract class SetterTargetType : TypeBase, IProxyType, IConverter, IReferenceType
+    abstract class SetterTargetType
+        : TypeBase
+            , IProxyType
+            , IConverter
+            , IReferenceType
+            , IFeaturePath<ISuffixFeature, Assignment>
     {
-        [DisableDump]
-        internal readonly ISuffixFeature AssignmentFeature;
+        readonly int _order;
 
-        protected SetterTargetType() { AssignmentFeature = new AssignmentFeature(this); }
+        protected SetterTargetType() { _order = CodeArgs.NextOrder++; }
 
+        Size IContextReference.Size { get { return Size; } }
+        int IContextReference.Order { get { return _order; } }
         IConverter IProxyType.Converter { get { return this; } }
         bool IReferenceType.IsWeak { get { return true; } }
         IConverter IReferenceType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return GetterResult(category); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, Assignment>.Feature { get { return Extension.Feature(AssignmentResult); } }
+
+        internal Result AssignmentResult(Category category, IContextReference objectReference, TypeBase argsType)
+        {
+            if(category == Category.Type)
+                return RootContext.VoidResult(category);
+
+            var trace = ObjectId == -1;
+            StartMethodDump(trace, category, argsType);
+            try
+            {
+                BreakExecution();
+                var sourceResult = argsType
+                    .Conversion(category.Typed, ValueType).LocalPointerKindResult;
+                Dump("sourceResult", sourceResult);
+                BreakExecution();
+
+                var destinationResult = DestinationResult(category.Typed)
+                    .ReplaceArg(Result(category.Typed, objectReference));
+                Dump("destinationResult", destinationResult);
+                BreakExecution();
+
+                var resultForArg = destinationResult + sourceResult;
+                Dump("resultForArg", resultForArg);
+
+                var result = RootContext.VoidType.Result(category, SetterResult);
+                Dump("result", result);
+                BreakExecution();
+
+                return ReturnMethodDump(result.ReplaceArg(resultForArg));
+            }
+            finally
+            {
+                EndMethodDump();
+            }
+        }
 
         internal abstract TypeBase ValueType { get; }
-        internal abstract Result DestinationResult(Category category);
-        internal abstract Result SetterResult(Category category);
-        internal abstract Result GetterResult(Category category);
+        internal virtual Result DestinationResult(Category category) { return ArgResult(category); }
+        protected abstract Result SetterResult(Category category);
+        protected abstract Result GetterResult(Category category);
+
         [DisableDump]
         internal override Root RootContext { get { return ValueType.RootContext; } }
 
