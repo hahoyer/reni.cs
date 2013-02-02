@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -26,11 +26,14 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
-using Reni.ReniParser;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
 
 namespace Reni.Type
 {
-    sealed class TextItemType : TagChild<TypeBase>
+    sealed class TextItemType
+        : TagChild<TypeBase>
+            , IFeaturePath<ISuffixFeature, DumpPrintToken>
     {
         public TextItemType(TypeBase parent)
             : base(parent)
@@ -38,6 +41,8 @@ namespace Reni.Type
             Tracer.Assert(!(parent is ArrayType));
             StopByObjectId(-10);
         }
+
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
 
         [DisableDump]
         protected override string TagTitle { get { return "text_item"; } }
@@ -53,8 +58,8 @@ namespace Reni.Type
         {
             return VoidType.Result
                 (category
-                 , DumpPrintCode
-                 , CodeArgs.Arg
+                    , DumpPrintCode
+                    , CodeArgs.Arg
                 );
         }
 

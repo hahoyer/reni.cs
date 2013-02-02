@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -30,13 +30,14 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.ReniParser;
+using Reni.Feature.DumpPrint;
 using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Struct
 {
     sealed class FunctionBodyType : TypeBase, IFeature, IFunctionFeature, ISimpleFeature
+        , IFeaturePath<ISuffixFeature, DumpPrintToken>
     {
         [EnableDump]
         [Node]
@@ -85,6 +86,8 @@ namespace Reni.Struct
         [DisableDump]
         IContextReference ObjectReference { get { return _objectReferenceCache.Value; } }
 
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
 
@@ -110,8 +113,8 @@ namespace Reni.Struct
                 var result = applyResult
                     .ReplaceAbsolute
                     (_structure.ContainerContextObject
-                     , () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_structure.StructSize)
-                     , () => CodeArgs.Create(ObjectReference)
+                        , () => CodeBase.ReferenceCode(ObjectReference).ReferencePlus(_structure.StructSize)
+                        , () => CodeArgs.Create(ObjectReference)
                     );
 
                 return ReturnMethodDump(result);

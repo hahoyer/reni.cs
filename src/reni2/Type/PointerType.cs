@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Struct;
@@ -33,20 +34,24 @@ namespace Reni.Type
 {
     sealed class PointerType
         : TypeBase
-          , IProxyType
-          , IConverter
-          , IReferenceType
+            , IProxyType
+            , IConverter
+            , IReferenceType
     {
         readonly TypeBase _valueType;
+        readonly int _order;
 
         internal PointerType(TypeBase valueType)
         {
+            _order = CodeArgs.NextOrder++;
             _valueType = valueType;
             Tracer.Assert(!valueType.IsDataLess, valueType.Dump);
             Tracer.Assert(!(valueType is PointerType), valueType.Dump);
             StopByObjectId(-10);
         }
 
+        Size IContextReference.Size { get { return Size; } }
+        int IContextReference.Order { get { return _order; } }
         IConverter IReferenceType.Converter { get { return this; } }
         bool IReferenceType.IsWeak { get { return true; } }
         [DisableDump]
@@ -83,8 +88,8 @@ namespace Reni.Type
             return ValueType
                 .Result
                 (category
-                 , () => ArgCode.DePointer(ValueType.Size)
-                 , CodeArgs.Arg
+                    , () => ArgCode.DePointer(ValueType.Size)
+                    , CodeArgs.Arg
                 );
         }
 
@@ -95,8 +100,8 @@ namespace Reni.Type
             return ValueType
                 .Result
                 (category
-                 , () => ArgCode.DePointer(ValueType.Size)
-                 , CodeArgs.Arg
+                    , () => ArgCode.DePointer(ValueType.Size)
+                    , CodeArgs.Arg
                 );
         }
         internal override void Search(SearchVisitor searchVisitor)

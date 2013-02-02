@@ -337,6 +337,6 @@ namespace Reni.Struct
 
         ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
         internal IContextFeature ConvertToContextFeature(Structure accessPoint) { return Convert(accessPoint); }
-        AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(_position); }
+        internal AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(_position); }
     }
 }

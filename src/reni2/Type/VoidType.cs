@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,12 +27,13 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.ReniParser;
+using Reni.Feature.DumpPrint;
 
 namespace Reni.Type
 {
     [Serializable]
     sealed class VoidType : TypeBase
+        , IFeaturePath<ISuffixFeature, DumpPrintToken>
     {
         readonly Root _rootContext;
         public VoidType(Root rootContext) { _rootContext = rootContext; }
@@ -42,6 +43,7 @@ namespace Reni.Type
             if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
         protected override ISuffixFeature Convert(TypeBase sourceType) { return sourceType.IsDataLess ? Extension.Feature(c => Result(c, sourceType.ArgResult)) : null; }
         protected override TypeBase ReversePair(TypeBase first) { return first; }
         [DisableDump]

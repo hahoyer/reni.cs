@@ -253,7 +253,7 @@ namespace Reni.Context
 
         internal Result Result(Category category, IFeature feature, TypeBase objectType, CompileSyntax right)
         {
-            var trace = ObjectId == -4 && feature is AccessFeature && feature.GetObjectId() == 1 && category.HasCode;
+            var trace = ObjectId == 3 && feature is FunctionBase && feature.GetObjectId() == 0 && category.HasCode;
             StartMethodDump(trace, category, feature, objectType, right);
             try
             {

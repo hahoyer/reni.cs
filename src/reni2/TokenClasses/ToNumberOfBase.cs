@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2013
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,21 +18,19 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Feature;
-using Reni.Sequence;
 using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class ToNumberOfBase : Defineable<ToNumberOfBase>, ISearchPath<ISuffixFeature, TextItemsType>
+    sealed class ToNumberOfBase : Defineable<ToNumberOfBase>, ISearchPath<ISuffixFeature, TextItemsType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { 
-            return type
-            .ToNumberOfBaseFeature; }
-
+        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.ToNumberOfBaseResult); }
     }
 }

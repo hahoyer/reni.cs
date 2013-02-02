@@ -29,6 +29,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Feature;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -37,11 +38,14 @@ namespace Reni.Sequence
     sealed class SequenceType
         : TagChild<ArrayType>
             , ISearchPath<ISuffixFeature, SequenceType>
-            , ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>
+            , ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
+, IFeaturePath<ISuffixFeature, ConcatArrays>
+, IFeaturePath<ISuffixFeature, TokenClasses.EnableCut>
+, IFeaturePath<ISuffixFeature, UndecorateToken>
     {
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
-        internal Result EnableCutFeature(Category category)
+        internal Result EnableCutResult(Category category)
         {
             return UniqueEnableCutType
                 .Result
@@ -59,6 +63,10 @@ namespace Reni.Sequence
                 (refAlignParam => new ObjectReference(this, refAlignParam));
             StopByObjectId(-172);
         }
+
+        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, TokenClasses.EnableCut>.Feature { get { return Extension.Feature(EnableCutResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, UndecorateToken>.Feature { get { return Extension.Feature(UndecorateTokenResult); } }
 
         [DisableDump]
         protected override string TagTitle { get { return "Sequence"; } }
@@ -94,7 +102,7 @@ namespace Reni.Sequence
                 base.Search(searchVisitor);
         }
 
-        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
+        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
             var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category, objectReference, argsType);
@@ -212,11 +220,11 @@ namespace Reni.Sequence
                 : Extension.Feature(c => ConversionAsReference(c, type));
         }
 
-        ISearchPath<ISuffixFeature, EnableCut>
-            ISearchPath<ISearchPath<ISuffixFeature, EnableCut>, SequenceType>.Convert(SequenceType type)
+        ISearchPath<ISuffixFeature, Type.EnableCut>
+            ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.Convert(SequenceType type)
         {
             return
-                Extension.Feature<EnableCut>((c, t) => ConvertFromEnableCut(c, type));
+                Extension.Feature<Type.EnableCut>((c, t) => ConvertFromEnableCut(c, type));
         }
 
         Result ConvertFromEnableCut(Category category, SequenceType source)
@@ -253,6 +261,6 @@ namespace Reni.Sequence
                 .ArgResult(c.Typed);
         }
 
-        internal Result UndecorateResult(Category category) { return Parent.Result(category, ArgResult); }
+        internal Result UndecorateTokenResult(Category category) { return Parent.Result(category, ArgResult); }
     }
 }

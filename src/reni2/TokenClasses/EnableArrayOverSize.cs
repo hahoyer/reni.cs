@@ -33,6 +33,6 @@ namespace Reni.TokenClasses
         : Defineable<EnableArrayOverSize>
             , ISearchPath<ISuffixFeature, ArrayType>
     {
-        public ISuffixFeature Convert(ArrayType type) { return Extension.Feature(type.EnableArrayOverSizeFeature); }
+        public ISuffixFeature Convert(ArrayType type) { return Extension.Feature(type.EnableArrayOverSizeResult); }
     }
 }

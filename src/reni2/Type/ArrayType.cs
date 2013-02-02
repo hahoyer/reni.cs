@@ -30,14 +30,24 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
 using Reni.Sequence;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class ArrayType
         : TypeBase, IRepeaterType
-            , ISearchPath<ISuffixFeature, SequenceType>, IFeature, IFunctionFeature
+            , ISearchPath<ISuffixFeature, SequenceType>
+            , IFeature
+            , IFunctionFeature
             , ISearchPath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>
+            , IFeaturePath<ISuffixFeature, DumpPrintToken>
+            , IFeaturePath<ISuffixFeature, ConcatArrays>
+            , IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>
+            , IFeaturePath<ISuffixFeature, EnableArrayOverSize>
+            , IFeaturePath<ISuffixFeature, TextItems>
+            , IFeaturePath<ISuffixFeature, SequenceToken>
     {
         [Node]
         internal readonly TypeBase ElementType;
@@ -64,6 +74,13 @@ namespace Reni.Type
 
         TypeBase IRepeaterType.ElementType { get { return ElementType; } }
         Size IRepeaterType.IndexSize { get { return IndexSize; } }
+
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
+        ISearchPath<ISuffixFeature, PointerType> IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>.Feature { get { return Extension.Feature<PointerType>(ConcatArrayFromReference); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, EnableArrayOverSize>.Feature { get { return Extension.Feature(EnableArrayOverSizeResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, TextItems>.Feature { get { return Extension.Feature(TextItemsResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceToken>.Feature { get { return Extension.Feature(SequenceTokenResult); } }
 
         [Node]
         [DisableDump]
@@ -146,7 +163,7 @@ namespace Reni.Type
         [DisableDump]
         internal override sealed Root RootContext { get { return ElementType.RootContext; } }
         [DisableDump]
-        IContextReference ObjectReference { get { return UniquePointer; } }
+        IContextReference ObjectReference { get { return UniquePointerType; } }
         [DisableDump]
         internal TypeBase IndexType { get { return RootContext.BitType.UniqueNumber(IndexSize.ToInt()); } }
         Size IndexSize { get { return Size.AutoSize(Count).Align(Root.DefaultRefAlignParam.AlignBits); } }
@@ -158,7 +175,7 @@ namespace Reni.Type
 
         protected override string GetNodeDump() { return ElementType.NodeDump + "*" + Count; }
 
-        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
+        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
         internal Result ConcatArraysFromReference(Category category, IContextReference objectReference, TypeBase argsType) { return InternalConcatArrays(category, objectReference, argsType); }
 
         internal Result InternalConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
@@ -229,7 +246,7 @@ namespace Reni.Type
                 return null;
             return Extension.Feature(type.PointerConversionResult);
         }
-        
+
         ISearchPath<ISuffixFeature, EnableArrayOverSizeType> ISearchPath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>.Convert(ArrayType type)
         {
             if(ElementType != type.ElementType)
@@ -255,7 +272,7 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result EnableArrayOverSizeFeature(Category category)
+        internal Result EnableArrayOverSizeResult(Category category)
         {
             return EnableArrayOverSizeType
                 .Result
@@ -265,6 +282,5 @@ namespace Reni.Type
                     CodeArgs.Arg
                 );
         }
-        
     }
 }

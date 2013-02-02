@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -34,13 +34,13 @@ namespace Reni.TokenClasses
     sealed class ConcatArrays :
         Defineable<ConcatArrays>
         , ISearchPath<IPrefixFeature, TypeBase>
-        , ISearchPath<ISuffixFeature, Type.ArrayType>
+        , ISearchPath<ISuffixFeature, ArrayType>
         , ISearchPath<ISuffixFeature, SequenceType>
         , ISearchPath<ISuffixFeature, TextItemsType>
         , ISearchPath<ISearchPath<IPrefixFeature, PointerType>, TypeBase>
-        , ISearchPath<ISearchPath<ISuffixFeature, PointerType>, Type.ArrayType>
+        , ISearchPath<ISearchPath<ISuffixFeature, PointerType>, ArrayType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.ArrayType>.Convert(Type.ArrayType type) { return Extension.Feature(type.ConcatArrays); }
+        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.ConcatArraysResult); }
         IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return Extension.Feature(type.CreateArray); }
         ISearchPath<IPrefixFeature, PointerType>
             ISearchPath<ISearchPath<IPrefixFeature, PointerType>, TypeBase>.Convert(TypeBase type)
@@ -49,13 +49,13 @@ namespace Reni.TokenClasses
                 Extension.Feature<PointerType>(type.ConcatArrayFromReference);
         }
         ISearchPath<ISuffixFeature, PointerType>
-            ISearchPath<ISearchPath<ISuffixFeature, PointerType>, Type.ArrayType>.Convert(Type.ArrayType type)
+            ISearchPath<ISearchPath<ISuffixFeature, PointerType>, ArrayType>.Convert(ArrayType type)
         {
             return
                 Extension.Feature<PointerType>(type.ConcatArraysFromReference);
         }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Extension.Feature(type.ConcatArrays); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.ConcatArrays); }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Extension.Feature(type.ConcatArraysResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.ConcatArraysResult); }
     }
 }

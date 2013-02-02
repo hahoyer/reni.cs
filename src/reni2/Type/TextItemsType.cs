@@ -26,17 +26,36 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
+using Reni.Context;
 using Reni.Feature;
+using Reni.Feature.DumpPrint;
+using Reni.Syntax;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    sealed class TextItemsType : TagChild<ArrayType>
+    sealed class TextItemsType
+        : TagChild<ArrayType>
+            , IFeaturePath<ISuffixFeature, DumpPrintToken>
+            , IFeaturePath<ISuffixFeature, ConcatArrays>
+            , IFeaturePath<ISuffixFeature, ToNumberOfBase>
     {
-        [DisableDump]
-        public readonly ISuffixFeature ToNumberOfBaseFeature;
-
         public TextItemsType(ArrayType parent)
-            : base(parent) { ToNumberOfBaseFeature = new ToNumberOfBaseFeature(this); }
+            : base(parent) { }
+
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, ToNumberOfBase>.Feature { get { return Extension.Feature(ToNumberOfBaseResult); } }
+
+        internal Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        {
+            var target = left.Evaluate(context).ToString(Parent.ElementType.Size);
+            var conversionBase = right.Evaluate(context).ToInt32();
+            Tracer.Assert(conversionBase >= 2, conversionBase.ToString);
+            var result = BitsConst.Convert(target, conversionBase);
+            return RootContext.BitType.Result(category, result)
+                .Align(Root.DefaultRefAlignParam.AlignBits);
+        }
 
         [DisableDump]
         protected override string TagTitle { get { return "text_items"; } }
@@ -54,7 +73,7 @@ namespace Reni.Type
 
         internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }
 
-        internal Result ConcatArrays(Category category, IContextReference objectReference, TypeBase argsType)
+        internal Result ConcatArraysResult(Category category, IContextReference objectReference, TypeBase argsType)
         {
             var trace = ObjectId == -1 && category.HasCode;
             StartMethodDump(trace, category, objectReference, argsType);

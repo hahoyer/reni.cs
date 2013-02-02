@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -28,12 +28,14 @@ using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.ReniParser;
 using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class StructureType : TypeBase
+    sealed class StructureType
+        : TypeBase
+            , IFeaturePath<ISuffixFeature, DumpPrintToken>
+            , IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, DumpPrintToken>
     {
         readonly Structure _structure;
 
@@ -45,6 +47,9 @@ namespace Reni.Struct
             _structure = structure;
             DumpPrintReferenceFeature = new StructReferenceFeature(this);
         }
+
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+        ISearchPath<ISuffixFeature, PointerType> IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, DumpPrintToken>.Feature { get { return DumpPrintReferenceFeature; } }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }

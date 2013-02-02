@@ -328,9 +328,9 @@
     <Compile Include="TokenClasses\NewValueToken.cs" />
     <Compile Include="TypeRootSearchVisitor.cs" />
     <Compile Include="TypeSearchResult.cs" />
+    <Compile Include="Type\DataSetterTargetType.cs" />
     <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
-    <Compile Include="Type\AssignmentFeature.cs" />
     <Compile Include="Type\Child.cs" />
     <Compile Include="Type\ConversionFeature.cs" />
     <Compile Include="Type\ConversionParameter.cs" />
@@ -363,7 +363,6 @@
     <Compile Include="Type\TagChild.cs" />
     <Compile Include="Type\TextItemsType.cs" />
     <Compile Include="Type\TextItemType.cs" />
-    <Compile Include="Type\ToNumberOfBaseFeature.cs" />
     <Compile Include="Type\TypeBase.cs" />
     <Compile Include="Type\TypeType.cs" />
     <Compile Include="Type\VoidType.cs" />
