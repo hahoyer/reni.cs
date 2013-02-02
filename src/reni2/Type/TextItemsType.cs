@@ -73,7 +73,7 @@ namespace Reni.Type
             }
         }
 
-        internal Result DumpPrintTextResult(Category category)
+        internal Result DumpPrintTokenResult(Category category)
         {
             return VoidType
                 .Result

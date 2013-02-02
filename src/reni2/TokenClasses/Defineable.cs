@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
@@ -44,5 +44,12 @@ namespace Reni.TokenClasses
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
         string ISearchTarget.StructFeatureName { get { return Name; } }
+        TPath ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetFeature<TPath>(typeBase); }
+        protected virtual TPath GetFeature<TPath>(TypeBase typeBase) where TPath: class { return null; }
+    }
+
+    abstract class Defineable<TTarget> : Defineable
+    {
+        protected override TPath GetFeature<TPath>(TypeBase provider) { return provider.GetFeature<TPath, TTarget>(); }
     }
 }

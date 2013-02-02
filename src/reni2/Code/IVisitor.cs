@@ -33,7 +33,7 @@ namespace Reni.Code
     {
         void Assign(Size targetSize);
         void BitArrayBinaryOp(string opToken, Size size, Size leftSize, Size rightSize);
-        void BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize);
+        void BitArrayPrefixOp(string operation, Size size, Size argSize);
         void BitCast(Size size, Size targetSize, Size significantSize);
         void BitsArray(Size size, BitsConst data);
         void Call(Size outputSize, FunctionId functionId, Size argsAndRefsSize);

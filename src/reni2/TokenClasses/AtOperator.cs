@@ -29,7 +29,7 @@ using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
-    sealed class AtOperator : Defineable
+    sealed class AtOperator : Defineable<AtOperator>
     {
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {

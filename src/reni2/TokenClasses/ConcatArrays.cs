@@ -32,7 +32,7 @@ using Reni.Type;
 namespace Reni.TokenClasses
 {
     sealed class ConcatArrays :
-        Defineable
+        Defineable<ConcatArrays>
         , ISearchPath<IPrefixFeature, TypeBase>
         , ISearchPath<ISuffixFeature, Type.ArrayType>
         , ISearchPath<ISuffixFeature, SequenceType>

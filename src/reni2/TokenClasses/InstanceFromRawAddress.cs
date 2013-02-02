@@ -27,6 +27,6 @@ using HWClassLibrary.Debug;
 
 namespace Reni.TokenClasses
 {
-    sealed class InstanceFromRawAddress : Defineable
+    sealed class InstanceFromRawAddress : Defineable<InstanceFromRawAddress>
     {}
 }

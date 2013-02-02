@@ -26,13 +26,22 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
+using Reni.Feature;
+using Reni.Feature.DumpPrint;
+using Reni.Sequence;
 using Reni.Struct;
 using Reni.Syntax;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     [Serializable]
     sealed class TypeType : TypeBase
+        , IFeaturePath<ISuffixFeature, DumpPrintToken>
+        , IFeaturePath<ISuffixFeature, Slash>
+        , IFeaturePath<ISuffixFeature, Star>
+        , IFeaturePath<ISuffixFeature, SequenceToken>
+
     {
         readonly TypeBase _value;
 
@@ -40,6 +49,18 @@ namespace Reni.Type
         {
             _value = value;
             StopByObjectId(61);
+        }
+
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, Slash>.Feature { get { return Extension.Feature(SlashResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, Star>.Feature { get { return Extension.Feature(StarResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceToken>.Feature
+        {
+            get
+            {
+                var value = Value as ArrayType;
+                return value == null ? null : Extension.Feature(value.SequenceTypeResult);
+            }
         }
 
         [DisableDump]
@@ -71,9 +92,9 @@ namespace Reni.Type
                 .ReplaceArg(getRightResult);
         }
 
-        internal Result DumpPrintResult(Category category) { return Value.DumpPrintTypeNameResult(category); }
+        internal Result DumpPrintTokenResult(Category category) { return Value.DumpPrintTypeNameResult(category); }
 
-        internal Result Repeat(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        internal Result StarResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             var trace = ObjectId == -54 && context.ObjectId == 20 && left.ObjectId == 225;
             StartMethodDump(trace, context, category, left, right);
@@ -107,7 +128,7 @@ namespace Reni.Type
             }
         }
 
-        internal Result Split(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
+        internal Result SlashResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
             var rightType = right
                 .Type(context)

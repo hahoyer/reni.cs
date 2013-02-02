@@ -111,6 +111,7 @@
     <Compile Include="Graphics\Syntax.cs" />
     <Compile Include="Graphics\SyntaxDrawer.cs" />
     <Compile Include="IProxyType.cs" />
+    <Compile Include="MetaData.cs" />
     <Compile Include="Parser\SimpleTokenFactory.cs" />
     <Compile Include="Parser\Match.cs" />
     <Compile Include="Parser\MatchExtension.cs" />

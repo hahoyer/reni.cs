@@ -31,7 +31,19 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    sealed class Sign :
+    sealed class Plus:
+        SequenceOfBitOperation,
+        ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>,
+        ISequenceOfBitPrefixOperation
+    {
+        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType> ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>.Convert(BitType type) { return new OperationPrefixFeature(type, this); }
+
+        [DisableDump]
+        string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
+
+        protected override int ResultSize(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
+    }
+    sealed class Minus :
         SequenceOfBitOperation,
         ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>,
         ISequenceOfBitPrefixOperation

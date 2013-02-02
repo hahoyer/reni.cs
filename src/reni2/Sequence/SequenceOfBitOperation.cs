@@ -32,7 +32,7 @@ using Reni.Type;
 namespace Reni.Sequence
 {
     abstract class SequenceOfBitOperation
-        : Defineable
+        : Defineable<SequenceOfBitOperation>
           , ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>
           , ISequenceOfBitBinaryOperation
     {

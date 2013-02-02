@@ -141,16 +141,16 @@ namespace Reni.Code
                 );
         }
 
-        void IVisitor.BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize)
+        void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize)
         {
             var sizeBytes = size.SaveByteCount;
             var argBytes = argSize.SaveByteCount;
             if(sizeBytes == argBytes)
-                AddCode("data.{0}Prefix(bytes:{1})", opToken.DataFunctionName, sizeBytes);
+                AddCode("data.{0}Prefix(bytes:{1})", operation, sizeBytes);
             else
                 AddCode
                     ("data.{0}Prefix(sizeBytes:{1}, argBytes:{2})"
-                     , opToken.DataFunctionName
+                     , operation
                      , sizeBytes
                      , argBytes
                     );

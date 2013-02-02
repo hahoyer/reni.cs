@@ -80,7 +80,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override string DumpPrintText { get { return _syntax.DumpPrintText; } }
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
-        internal Result DumpPrintTextResult(Category category) { return DumpPrintTypeNameResult(category); }
+        internal Result DumpPrintTokenResult(Category category) { return DumpPrintTypeNameResult(category); }
 
         [DisableDump]
         IContextReference ObjectReference { get { return _objectReferenceCache.Value; } }

@@ -49,7 +49,7 @@ namespace Reni.Sequence
         Result ISimpleFeature.Result(Category category)
         {
             return _objectType
-                .Result(category, () => _objectType.BitSequenceOperation(_definable), CodeArgs.Arg)
+                .Result(category, () => _objectType.BitSequenceOperation(_definable.DataFunctionName), CodeArgs.Arg)
                 .ReplaceArg
                 (
                     category1

@@ -99,10 +99,10 @@ namespace Reni.Code
             return new BitsStackData(resultData, OutStream);
         }
 
-        internal StackData BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size)
+        internal StackData BitArrayPrefixOp(string operation, Size size)
         {
             var argData = GetBitsConst();
-            var resultData = argData.BitArrayPrefixOp(opToken.DataFunctionName, size);
+            var resultData = argData.BitArrayPrefixOp(operation, size);
             return new BitsStackData(resultData, OutStream);
         }
 

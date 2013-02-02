@@ -156,10 +156,10 @@ namespace Reni.Code
             Push(left.BitArrayBinaryOp(opToken, size, right));
         }
 
-        public void BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize)
+        public void BitArrayPrefixOp(string operation, Size size, Size argSize)
         {
             var arg = Pull(argSize);
-            Push(arg.BitArrayPrefixOp(opToken, size));
+            Push(arg.BitArrayPrefixOp(operation, size));
         }
 
         void IVisitor.Assign(Size targetSize)

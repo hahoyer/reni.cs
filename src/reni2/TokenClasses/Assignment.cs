@@ -30,7 +30,7 @@ using Reni.Type;
 namespace Reni.TokenClasses
 {
     sealed class Assignment
-        : Defineable
+        : Defineable<Assignment>
           , ISearchPath<ISuffixFeature, SetterTargetType>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, SetterTargetType>.Convert(SetterTargetType type) { return type.AssignmentFeature; }

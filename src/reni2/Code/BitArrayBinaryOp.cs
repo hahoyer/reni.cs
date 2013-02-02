@@ -68,7 +68,7 @@ namespace Reni.Code
     {
         [Node]
         [DisableDump]
-        internal readonly ISequenceOfBitPrefixOperation OpToken;
+        internal readonly string Operation;
 
         readonly Size _size;
 
@@ -76,11 +76,11 @@ namespace Reni.Code
         [DisableDump]
         internal readonly Size ArgSize;
 
-        internal BitArrayPrefixOp(ISequenceOfBitPrefixOperation name, Size size, Size argSize)
+        internal BitArrayPrefixOp(string operation, Size size, Size argSize)
         {
-            OpToken = name;
             _size = size;
             ArgSize = argSize;
+            Operation = operation;
         }
 
         [DisableDump]
@@ -89,11 +89,11 @@ namespace Reni.Code
         [DisableDump]
         internal override Size OutputSize { get { return _size; } }
 
-        internal override void Visit(IVisitor visitor) { visitor.BitArrayPrefixOp(OpToken, OutputSize, ArgSize); }
+        internal override void Visit(IVisitor visitor) { visitor.BitArrayPrefixOp(Operation, OutputSize, ArgSize); }
 
         protected override FiberItem[] TryToCombineImplementation(FiberItem subsequentElement) { return subsequentElement.TryToCombineBack(this); }
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + " " + OpToken.DataFunctionName + " " + ArgSize; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " " + Operation + " " + ArgSize; }
     }
 
     /// <summary>

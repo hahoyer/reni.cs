@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ namespace Reni
         where TFeature : class, ISearchPath
     {
         readonly ExpressionSyntax _syntax;
-        
+
         protected SearchVisitor(ExpressionSyntax syntax) { _syntax = syntax; }
 
         internal abstract TFeature InternalResult { set; }
@@ -144,8 +144,9 @@ namespace Reni
         protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target, _syntax); }
     }
 
-    interface ISearchTarget 
+    interface ISearchTarget
     {
         string StructFeatureName { get; }
+        TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class;
     }
 }

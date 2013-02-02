@@ -49,7 +49,7 @@ namespace Reni.Type
                 base.Search(searchVisitor);
         }
 
-        internal Result DumpPrintTextResult(Category category)
+        internal Result DumpPrintTokenResult(Category category)
         {
             return VoidType.Result
                 (category

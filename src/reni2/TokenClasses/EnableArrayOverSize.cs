@@ -30,7 +30,7 @@ using Reni.Type;
 namespace Reni.TokenClasses
 {
     sealed class EnableArrayOverSize
-        : Defineable
+        : Defineable<EnableArrayOverSize>
             , ISearchPath<ISuffixFeature, ArrayType>
     {
         public ISuffixFeature Convert(ArrayType type) { return Extension.Feature(type.EnableArrayOverSizeFeature); }

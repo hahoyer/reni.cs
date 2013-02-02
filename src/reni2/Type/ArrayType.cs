@@ -180,7 +180,7 @@ namespace Reni.Type
             return result;
         }
 
-        internal Result DumpPrintResult(Category category)
+        internal Result DumpPrintTokenResult(Category category)
         {
             return VoidType
                 .Result
@@ -207,7 +207,7 @@ namespace Reni.Type
             return code + CodeBase.DumpPrintText("))");
         }
 
-        internal Result SequenceResult(Category category)
+        internal Result SequenceTokenResult(Category category)
         {
             return ElementType
                 .AutomaticDereferenceType

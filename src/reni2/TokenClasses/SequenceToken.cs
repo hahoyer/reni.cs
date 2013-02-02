@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -30,14 +30,14 @@ using Reni.Type;
 namespace Reni.TokenClasses
 {
     sealed class SequenceToken
-        : Defineable
-          , ISearchPath<ISuffixFeature, Type.ArrayType>
-          , ISearchPath<ISuffixFeature, TypeType>
+        : Defineable<SequenceToken>
+            , ISearchPath<ISuffixFeature, ArrayType>
+            , ISearchPath<ISuffixFeature, TypeType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, Type.ArrayType>.Convert(Type.ArrayType type) { return Extension.Feature(type.SequenceResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.SequenceTokenResult); }
         ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type)
         {
-            var value = type.Value as Type.ArrayType;
+            var value = type.Value as ArrayType;
             return value == null ? null : Extension.Feature(value.SequenceTypeResult);
         }
     }

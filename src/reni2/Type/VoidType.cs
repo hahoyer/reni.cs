@@ -51,6 +51,6 @@ namespace Reni.Type
         internal override TypeBase Pair(TypeBase second) { return second; }
         internal override string DumpPrintText { get { return "void"; } }
         protected override string GetNodeDump() { return "void"; }
-        internal Result DumpPrintResult(Category category) { return Result(category); }
+        internal Result DumpPrintTokenResult(Category category) { return Result(category); }
     }
 }

@@ -84,7 +84,7 @@ namespace Reni.Sequence
         Result Apply(Category category, int objSize, int argsSize)
         {
             var type = _feature.ResultType(objSize, argsSize);
-            return type.Result(category, () => _objectType.BitType.Apply(type.Size, _feature.Definable.DataFunctionName, objSize, argsSize), CodeArgs.Arg);
+            return type.Result(category, () => _objectType.BitType.ApplyCode(type.Size, _feature.Definable.DataFunctionName, objSize, argsSize), CodeArgs.Arg);
         }
     }
 }

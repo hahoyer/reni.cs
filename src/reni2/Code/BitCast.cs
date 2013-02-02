@@ -135,10 +135,7 @@ namespace Reni.Code
             if(InputSize == OutputSize)
                 return null;
 
-            var bitArrayOp = new BitArrayPrefixOp(
-                precedingElement.OpToken,
-                precedingElement.OutputSize + OutputSize - InputSize,
-                precedingElement.ArgSize);
+            var bitArrayOp = new BitArrayPrefixOp(precedingElement.Operation, precedingElement.OutputSize + OutputSize - InputSize, precedingElement.ArgSize);
 
             if(InputDataSize == OutputSize)
                 return new FiberItem[] {bitArrayOp};

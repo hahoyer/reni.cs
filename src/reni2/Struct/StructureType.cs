@@ -80,7 +80,7 @@ namespace Reni.Struct
         [DisableDump]
         internal override bool IsDataLess { get { return Structure.IsDataLess; } }
 
-        internal Result DumpPrintResult(Category category) { return Structure.DumpPrintResultViaStructReference(category); }
+        internal Result DumpPrintTokenResult(Category category) { return Structure.DumpPrintResultViaStructReference(category); }
 
         [DisableDump]
         internal override bool HasQuickSize { get { return false; } }

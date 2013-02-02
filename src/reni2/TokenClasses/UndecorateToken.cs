@@ -29,7 +29,7 @@ using Reni.Sequence;
 
 namespace Reni.TokenClasses
 {
-    sealed class UndecorateToken : Defineable, ISearchPath<ISuffixFeature, SequenceType>
+    sealed class UndecorateToken : Defineable<UndecorateToken>, ISearchPath<ISuffixFeature, SequenceType>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return Extension.Feature(type.UndecorateResult); }
     }

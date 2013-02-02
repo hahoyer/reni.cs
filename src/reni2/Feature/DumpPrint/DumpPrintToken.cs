@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ using Reni.Type;
 namespace Reni.Feature.DumpPrint
 {
     sealed class DumpPrintToken :
-        Defineable,
+        Defineable<DumpPrintToken>,
         ISearchPath<ISuffixFeature, TypeType>,
         ISearchPath<ISuffixFeature, FunctionBodyType>,
         ISearchPath<ISuffixFeature, BitType>,
@@ -44,18 +44,22 @@ namespace Reni.Feature.DumpPrint
         ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>,
         ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>
     {
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.DumpPrintResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, BitType>.Convert(BitType type) { return Extension.Feature(type.DumpPrintResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, VoidType>.Convert(VoidType type) { return Extension.Feature(type.DumpPrintResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType type) { return Extension.Feature(type.DumpPrintResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.DumpPrintResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TextItemType>.Convert(TextItemType type) { return Extension.Feature(type.DumpPrintTextResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, FunctionBodyType>.Convert(FunctionBodyType type) { return Extension.Feature(type.DumpPrintTextResult); }
-        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.DumpPrintTextResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.DumpPrintTokenResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, BitType>.Convert(BitType type) { return Extension.Feature(type.DumpPrintTokenResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, VoidType>.Convert(VoidType type) { return Extension.Feature(type.DumpPrintTokenResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType type) { return Extension.Feature(type.DumpPrintTokenResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.DumpPrintTokenResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TextItemType>.Convert(TextItemType type) { return Extension.Feature(type.DumpPrintTokenResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, FunctionBodyType>.Convert(FunctionBodyType type) { return Extension.Feature(type.DumpPrintTokenResult); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { return Extension.Feature(type.DumpPrintTokenResult); }
 
-        ISearchPath<ISuffixFeature, PointerType> ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>.Convert(StructureType type) { return type.DumpPrintReferenceFeature; }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>.Convert(BitType type) { return Extension.Feature<SequenceType, ArrayType> (type.DumpPrintResult); }
+        ISearchPath<ISuffixFeature, PointerType> ISearchPath<ISearchPath<ISuffixFeature, PointerType>, StructureType>.Convert
+            (StructureType type) { return type.DumpPrintReferenceFeature; }
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>
+            ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>.Convert(BitType type) { return Extension.Feature<SequenceType, ArrayType>(type.DumpPrintTokenResult); }
 
         internal static DumpPrintToken Create() { return new DumpPrintToken {Name = "<dump_print>"}; }
     }
+
+
 }

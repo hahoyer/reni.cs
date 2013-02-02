@@ -254,7 +254,7 @@ namespace Reni.Code
         internal CodeBase BitSequenceOperation(string name, Size size, Size leftSize) { return Add(new BitArrayBinaryOp(name, size, leftSize, Size - leftSize)); }
         internal CodeBase DumpPrintNumber(Size leftSize) { return Add(new DumpPrintNumberOperation(leftSize, Size - leftSize)); }
         internal CodeBase DumpPrintText(Size itemSize) { return Add(new DumpPrintTextOperation(Size, itemSize)); }
-        internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation feature, Size size) { return Add(new BitArrayPrefixOp(feature, size, Size)); }
+        internal CodeBase BitSequenceOperation(string operation, Size size) { return Add(new BitArrayPrefixOp(operation, size, Size)); }
 
         internal static CodeBase LocalVariableReference(string holder, Size offset = null) { return new LocalVariableReference(holder, offset); }
 

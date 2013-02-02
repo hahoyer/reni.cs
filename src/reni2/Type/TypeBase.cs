@@ -106,6 +106,8 @@ namespace Reni.Type
             _cache = new Cache(this);
         }
 
+        TPath ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetFeature<TPath>(typeBase); }
+
         [Node]
         internal Size Size { get { return _cache.Size.Value; } }
 
@@ -474,7 +476,7 @@ namespace Reni.Type
 
         protected virtual ArrayType ObtainArray(int count) { return new ArrayType(this, count); }
 
-        internal CodeBase BitSequenceOperation(ISequenceOfBitPrefixOperation token)
+        internal CodeBase BitSequenceOperation(string token)
         {
             return UniqueAlign.ArgCode
                 .BitSequenceOperation(token, Size);
@@ -659,6 +661,35 @@ namespace Reni.Type
                 .DePointer(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
+ 
+        internal TPath GetFeature<TPath, TTarget>()
+            where TPath : class
+        {
+            var features = GetFeatures<TPath, TTarget>().ToArray();
+            switch(features.Length)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return features[0].Item1;
+            }
+            NotImplementedMethod("features", features);
+            return null;
+
+        }
+
+        virtual internal IEnumerable<Tuple<TPath, TypeBase>> GetFeatures<TPath, TTarget>()
+            where TPath : class
+        {
+            var featurePath = this as IFeaturePath<TPath, TTarget>;
+            if(featurePath != null)
+                yield return new Tuple<TPath, TypeBase>(featurePath.Feature, this);
+
+            yield break;
+        }
+
+        internal TPath GetFeature<TPath>(ISearchTarget target) where TPath : class { return target.GetFeature<TPath>(this); }
+        protected virtual TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class { return null; }
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature

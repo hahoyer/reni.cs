@@ -150,7 +150,7 @@ namespace Reni.Code
         }
 
         void IVisitor.Assign(Size targetSize) { ResetInputValuesOfData(RefSize * 2); }
-        void IVisitor.BitArrayPrefixOp(ISequenceOfBitPrefixOperation opToken, Size size, Size argSize) { NotImplementedMethod(opToken, size, argSize); }
+        void IVisitor.BitArrayPrefixOp(string operation, Size size, Size argSize) { NotImplementedMethod(operation, size, argSize); }
         void IVisitor.PrintText(string dumpPrintText) { NotImplementedMethod(dumpPrintText); }
         void IVisitor.List(CodeBase[] data) { NotImplementedMethod(data); }
         void IVisitor.Fiber(FiberHead fiberHead, FiberItem[] fiberItems) { NotImplementedMethod(fiberHead, fiberItems); }

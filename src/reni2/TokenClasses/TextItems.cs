@@ -30,7 +30,7 @@ using Reni.Type;
 namespace Reni.TokenClasses
 {
     sealed class TextItems
-        : Defineable
+        : Defineable<TextItems>
           , ISearchPath<ISuffixFeature, ArrayType>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.TextItemsResult); }

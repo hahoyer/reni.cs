@@ -25,19 +25,30 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Sequence;
+using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    class CompareOperator : SequenceOfBitOperation
+    abstract class CompareOperator : SequenceOfBitOperation
     {
         [EnableDumpExcept(true)]
         protected override bool IsCompareOperator { get { return true; } }
         protected override int ResultSize(int objSize, int argSize) { return 1; }
     }
 
-    sealed class Equal : CompareOperator
+    sealed class Equal : CompareOperator, ICompareResult
     {}
 
-    sealed class NotEqual : CompareOperator
+    sealed class NotEqual : CompareOperator, ICompareResult
     {}
+    sealed class Less : CompareOperator, ICompareResult
+    { }
+
+    sealed class Greater: CompareOperator, ICompareResult
+    { }
+    sealed class LessEqual: CompareOperator, ICompareResult
+    { }
+
+    sealed class GreaterEqual: CompareOperator, ICompareResult
+    { }
 }

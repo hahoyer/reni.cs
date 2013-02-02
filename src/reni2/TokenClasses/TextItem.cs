@@ -31,7 +31,7 @@ using Reni.Type;
 namespace Reni.TokenClasses
 {
     sealed class TextItem 
-        : Defineable
+        : Defineable<TextItem>
         , ISearchPath<IPrefixFeature, TypeBase>
         , ISearchPath<IPrefixFeature, FunctionType>
     {

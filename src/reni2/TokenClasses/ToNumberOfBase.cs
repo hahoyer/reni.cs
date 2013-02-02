@@ -26,7 +26,7 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    internal sealed class ToNumberOfBase : Defineable, ISearchPath<ISuffixFeature, TextItemsType>
+    internal sealed class ToNumberOfBase : Defineable<ToNumberOfBase>, ISearchPath<ISuffixFeature, TextItemsType>
     {
         ISuffixFeature ISearchPath<ISuffixFeature, TextItemsType>.Convert(TextItemsType type) { 
             return type
