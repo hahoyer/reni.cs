@@ -28,15 +28,16 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.Type;
 
 namespace Reni.Sequence
 {
     sealed class PrefixFeature : ReniObject, IPrefixFeature, ISimpleFeature
     {
         readonly SequenceType _objectType;
-        readonly ISequenceOfBitPrefixOperation _definable;
+        readonly BitType.IPrefix _definable;
 
-        internal PrefixFeature(SequenceType objectType, ISequenceOfBitPrefixOperation definable)
+        internal PrefixFeature(SequenceType objectType, BitType.IPrefix definable)
         {
             _objectType = objectType;
             _definable = definable;
@@ -49,7 +50,7 @@ namespace Reni.Sequence
         Result ISimpleFeature.Result(Category category)
         {
             return _objectType
-                .Result(category, () => _objectType.BitSequenceOperation(_definable.DataFunctionName), CodeArgs.Arg)
+                .Result(category, () => _objectType.BitSequenceOperation(_definable.Name), CodeArgs.Arg)
                 .ReplaceArg
                 (
                     category1

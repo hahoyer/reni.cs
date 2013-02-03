@@ -50,7 +50,7 @@ namespace Reni.Type
         IConverter IReferenceType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return GetterResult(category); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, Assignment>.Feature { get { return Extension.Feature(AssignmentResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, Assignment>.GetFeature(Assignment target) { return Extension.Feature(AssignmentResult); }
 
         internal Result AssignmentResult(Category category, IContextReference objectReference, TypeBase argsType)
         {

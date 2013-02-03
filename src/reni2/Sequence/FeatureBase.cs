@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
-using Reni.Code;
 using Reni.Feature;
 using Reni.Type;
 
@@ -14,9 +13,9 @@ namespace Reni.Sequence
         , ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.ArrayType>
     {
         [EnableDump]
-        internal readonly ISequenceOfBitBinaryOperation Definable;
+        internal readonly BitType.IOperation Definable;
 
-        protected FeatureBase(ISequenceOfBitBinaryOperation definable) { Definable = definable; }
+        protected FeatureBase(BitType.IOperation definable) { Definable = definable; }
 
         ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.Feature(this); }
         ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, Type.ArrayType>.Convert(Type.ArrayType type) { return this; }

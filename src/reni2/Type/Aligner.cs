@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -31,9 +31,11 @@ namespace Reni.Type
 {
     sealed class Aligner
         : Child<TypeBase>
-          , ISearchPath<ISuffixFeature, TypeBase>
+            , ISearchPath<ISuffixFeature, TypeBase>
+            , IFeaturePath<ISuffixFeature, TypeBase>
 
     {
+        [DisableDump]
         readonly int _alignBits;
 
         public Aligner(TypeBase target, int alignBits)
@@ -43,8 +45,9 @@ namespace Reni.Type
             StopByObjectId(-9);
         }
 
-        [DisableDump]
-        internal int AlignBits { get { return _alignBits; } }
+        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type.AlignConversion(Parent); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, TypeBase>.GetFeature(TypeBase target) { return Parent == target ? Extension.Feature(PointerArgResult) : null; }
+
         [DisableDump]
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
 
@@ -57,7 +60,7 @@ namespace Reni.Type
 
         internal override Result DeAlign(Category category) { return Parent.Result(category, ArgResult); }
 
-        protected override Size GetSize() { return Parent.Size.Align(AlignBits); }
+        protected override Size GetSize() { return Parent.Size.Align(_alignBits); }
         internal override int? SmartSequenceLength(TypeBase elementType) { return Parent.SmartSequenceLength(elementType); }
         internal override int? SmartArrayLength(TypeBase elementType) { return Parent.SmartArrayLength(elementType); }
         internal override Result Destructor(Category category) { return Parent.Destructor(category); }
@@ -72,8 +75,6 @@ namespace Reni.Type
         }
 
         protected override Result ParentConversionResult(Category category) { return Parent.UniquePointer.ArgResult(category); }
-
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type.AlignConversion(Parent); }
 
         public Result UnalignedResult(Category category) { return Parent.Result(category, () => ArgCode.BitCast(Parent.Size)); }
     }

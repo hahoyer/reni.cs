@@ -48,8 +48,8 @@ namespace Reni.Struct
             DumpPrintReferenceFeature = new StructReferenceFeature(this);
         }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
-        ISearchPath<ISuffixFeature, PointerType> IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, DumpPrintToken>.Feature { get { return DumpPrintReferenceFeature; } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
+        ISearchPath<ISuffixFeature, PointerType> IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, DumpPrintToken>.GetFeature(DumpPrintToken target) { return DumpPrintReferenceFeature; }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }

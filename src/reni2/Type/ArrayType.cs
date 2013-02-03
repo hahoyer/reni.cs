@@ -41,13 +41,13 @@ namespace Reni.Type
             , ISearchPath<ISuffixFeature, SequenceType>
             , IFeature
             , IFunctionFeature
-            , ISearchPath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>
             , IFeaturePath<ISuffixFeature, DumpPrintToken>
             , IFeaturePath<ISuffixFeature, ConcatArrays>
             , IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>
             , IFeaturePath<ISuffixFeature, EnableArrayOverSize>
             , IFeaturePath<ISuffixFeature, TextItems>
             , IFeaturePath<ISuffixFeature, SequenceToken>
+            , IFeaturePath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>
     {
         [Node]
         internal readonly TypeBase ElementType;
@@ -75,12 +75,20 @@ namespace Reni.Type
         TypeBase IRepeaterType.ElementType { get { return ElementType; } }
         Size IRepeaterType.IndexSize { get { return IndexSize; } }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
-        ISearchPath<ISuffixFeature, PointerType> IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>.Feature { get { return Extension.Feature<PointerType>(ConcatArrayFromReference); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, EnableArrayOverSize>.Feature { get { return Extension.Feature(EnableArrayOverSizeResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, TextItems>.Feature { get { return Extension.Feature(TextItemsResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceToken>.Feature { get { return Extension.Feature(SequenceTokenResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature(ConcatArraysResult); }
+        ISearchPath<ISuffixFeature, PointerType> IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature<PointerType>(ConcatArrayFromReference); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, EnableArrayOverSize>.GetFeature(EnableArrayOverSize target) { return Extension.Feature(EnableArrayOverSizeResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, TextItems>.GetFeature(TextItems target) { return Extension.Feature(TextItemsResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceToken>.GetFeature(SequenceToken target) { return Extension.Feature(SequenceTokenResult); }
+        ISearchPath<ISuffixFeature, EnableArrayOverSizeType> IFeaturePath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>.GetFeature(ArrayType target)
+        {
+            if(ElementType != target.ElementType)
+                return null;
+            NotImplementedMethod(target);
+            return null;
+        }
+
 
         [Node]
         [DisableDump]
@@ -240,20 +248,7 @@ namespace Reni.Type
                 .UniqueTypeType
                 .Result(category);
         }
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
-        {
-            if(type.Parent != this)
-                return null;
-            return Extension.Feature(type.PointerConversionResult);
-        }
-
-        ISearchPath<ISuffixFeature, EnableArrayOverSizeType> ISearchPath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>.Convert(ArrayType type)
-        {
-            if(ElementType != type.ElementType)
-                return null;
-            NotImplementedMethod(type);
-            return null;
-        }
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.ConversionFeature(this); }
 
         Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return ApplyResult(category, argsType); }
         Result ApplyResult(Category category, TypeBase argsType)

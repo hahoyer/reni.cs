@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -72,10 +72,10 @@ namespace Reni.Feature
         /// <returns> </returns>
         Result ApplyResult(Category category, TypeBase argsType);
         /// <summary>
-        /// Gets a value indicating whether this function requires implicit call (i. e. call without argument list). 
+        ///     Gets a value indicating whether this function requires implicit call (i. e. call without argument list).
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if this instance is implicit; otherwise, <c>false</c>.
+        ///     <c>true</c> if this instance is implicit; otherwise, <c>false</c>.
         /// </value>
         [DisableDump]
         bool IsImplicit { get; }
@@ -86,5 +86,10 @@ namespace Reni.Feature
     interface IMetaFunctionFeature
     {
         Result ApplyResult(ContextBase contextBase, Category category, CompileSyntax left, CompileSyntax right);
+    }
+
+    interface IFeaturePath<out TPath, in TTarget>
+    {
+        TPath GetFeature(TTarget target);
     }
 }

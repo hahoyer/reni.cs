@@ -44,12 +44,23 @@ namespace Reni.TokenClasses
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
         string ISearchTarget.StructFeatureName { get { return Name; } }
-        TPath ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetFeature<TPath>(typeBase); }
-        protected virtual TPath GetFeature<TPath>(TypeBase typeBase) where TPath: class { return null; }
+        IEnumerable<TPath> ISearchTarget.GetFeature<TPath>(TypeBase typeBase)
+        {
+            var result = GetFeature<TPath>(typeBase);
+            if(result == null)
+                yield break;
+            yield return result;
+        }
+        protected virtual TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class { return null; }
     }
 
     abstract class Defineable<TTarget> : Defineable
+        where TTarget : class
     {
-        protected override TPath GetFeature<TPath>(TypeBase provider) { return provider.GetFeature<TPath, TTarget>(); }
+        protected override TPath GetFeature<TPath>(TypeBase provider)
+        {
+            return provider.GetFeature<TPath, TTarget>(this as TTarget)
+                ?? base.GetFeature<TPath>(provider);
+        }
     }
 }

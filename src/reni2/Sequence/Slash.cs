@@ -30,9 +30,11 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    sealed class Slash : SequenceOfBitOperation, ISearchPath<ISuffixFeature, TypeType>
+    sealed class Slash 
+        : Operation
+        , ISearchPath<ISuffixFeature, TypeType>
     {
-        protected override int ResultSize(int objSize, int argSize) { return BitsConst.DivideSize(objSize, argSize); }
+        protected override int Signature(int objSize, int argSize) { return BitsConst.DivideSize(objSize, argSize); }
         ISuffixFeature ISearchPath<ISuffixFeature, TypeType>.Convert(TypeType type) { return Extension.Feature(type.SlashResult); }
     }
 }

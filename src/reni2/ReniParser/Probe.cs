@@ -47,7 +47,7 @@ namespace Reni.ReniParser
         {
             return MainTokenFactory
                 .TokenClasses
-                .Where(pair => pair.Value.GetType().Implements(type))
+                .Where(pair => pair.Value.GetType().Is(type))
                 .Select(pair => pair.Key);
         }
 

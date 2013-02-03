@@ -24,7 +24,6 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -32,7 +31,7 @@ namespace Reni.Sequence
     sealed class Feature : FeatureBase
     {
         readonly BitType _bitType;
-        public Feature(ISequenceOfBitBinaryOperation definable, BitType bitType)
+        public Feature(BitType.IOperation definable, BitType bitType)
             : base(definable)
         {
             _bitType = bitType;
@@ -40,7 +39,7 @@ namespace Reni.Sequence
 
         internal override TypeBase ResultType(int objSize, int argsSize)
         {
-            return _bitType.UniqueNumber(Definable.ResultSize(objSize, argsSize));
+            return _bitType.UniqueNumber(Definable.Signature(objSize, argsSize));
         }
     }
 }

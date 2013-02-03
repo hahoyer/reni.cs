@@ -45,10 +45,12 @@ namespace Reni.Type
             , IContextReferenceProvider
             , IIconKeyProvider
             , ISearchTarget
-            , ISearchPath<ISuffixFeature, Aligner>, ISearchPath<ISuffixFeature, TypeBase>
+            , ISearchPath<ISuffixFeature, Aligner>
+            , ISearchPath<ISuffixFeature, TypeBase>
             , IFeaturePath<IPrefixFeature, ConcatArrays>
             , IFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>
             , IFeaturePath<IPrefixFeature, TextItem>
+            , IFeaturePath<ISuffixFeature, TypeBase>
     {
         sealed class Cache
         {
@@ -104,15 +106,13 @@ namespace Reni.Type
         static ReniObject _lastSearchVisitor;
 
         protected TypeBase()
-            : base(_nextObjectId++)
-        {
-            _cache = new Cache(this);
-        }
+            : base(_nextObjectId++) { _cache = new Cache(this); }
 
-        TPath ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetFeature<TPath>(typeBase); }
-        IPrefixFeature IFeaturePath<IPrefixFeature, ConcatArrays>.Feature { get { return Extension.Feature(CreateArray); } }
-        ISearchPath<IPrefixFeature, PointerType> IFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>.Feature { get { return Extension.Feature<PointerType>(ConcatArrayFromReference); } }
-        IPrefixFeature IFeaturePath<IPrefixFeature, TextItem>.Feature { get { return Extension.Feature(TextItemResult); } }
+        IEnumerable<TPath> ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetConversions<TPath>(typeBase); }
+        IPrefixFeature IFeaturePath<IPrefixFeature, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature(CreateArray); }
+        ISearchPath<IPrefixFeature, PointerType> IFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature<PointerType>(ConcatArrayFromReference); }
+        IPrefixFeature IFeaturePath<IPrefixFeature, TextItem>.GetFeature(TextItem target) { return Extension.Feature(TextItemResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, TypeBase>.GetFeature(TypeBase target) { return TypeForConversion == target.TypeForConversion ? Extension.Feature(DereferenceReferenceResult) : null; }
 
         [Node]
         internal Size Size { get { return _cache.Size.Value; } }
@@ -371,7 +371,6 @@ namespace Reni.Type
                 return DeFunction(Category.Type).Type
                     .DePointer(Category.Type).Type
                     .DeAlign(Category.Type).Type;
-                ;
             }
         }
 
@@ -666,33 +665,15 @@ namespace Reni.Type
                 .DumpPrintNumber(alignedSize);
         }
 
-        internal TPath GetFeature<TPath, TTarget>()
-            where TPath : class
-        {
-            var features = GetFeatures<TPath, TTarget>().ToArray();
-            switch(features.Length)
-            {
-                case 0:
-                    return null;
-                case 1:
-                    return features[0].Item1;
-            }
-            NotImplementedMethod("features", features);
-            return null;
-        }
-
-        internal virtual IEnumerable<Tuple<TPath, TypeBase>> GetFeatures<TPath, TTarget>()
+        internal virtual TPath GetFeature<TPath, TTarget>(TTarget target)
             where TPath : class
         {
             var featurePath = this as IFeaturePath<TPath, TTarget>;
-            if(featurePath != null)
-                yield return new Tuple<TPath, TypeBase>(featurePath.Feature, this);
-
-            yield break;
+            return featurePath == null ? null : featurePath.GetFeature(target);
         }
 
-        internal TPath GetFeature<TPath>(ISearchTarget target) where TPath : class { return target.GetFeature<TPath>(this); }
-        protected virtual TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class { return null; }
+        internal IEnumerable<TPath> GetFeatures<TPath>(ISearchTarget target) where TPath : class { return target.GetFeature<TPath>(this); }
+        protected virtual IEnumerable<TPath> GetConversions<TPath>(TypeBase typeBase) where TPath : class { return null; }
     }
 
     abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature

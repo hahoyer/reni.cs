@@ -31,15 +31,16 @@ using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    sealed class ConcatArrays :
-        Defineable<ConcatArrays>
-        , ISearchPath<IPrefixFeature, TypeBase>
-        , ISearchPath<ISuffixFeature, ArrayType>
-        , ISearchPath<ISuffixFeature, SequenceType>
-        , ISearchPath<ISuffixFeature, TextItemsType>
-        , ISearchPath<ISearchPath<IPrefixFeature, PointerType>, TypeBase>
-        , ISearchPath<ISearchPath<ISuffixFeature, PointerType>, ArrayType>
+    sealed class ConcatArrays
+        : Defineable
+            , ISearchPath<IPrefixFeature, TypeBase>
+            , ISearchPath<ISuffixFeature, ArrayType>
+            , ISearchPath<ISuffixFeature, SequenceType>
+            , ISearchPath<ISuffixFeature, TextItemsType>
+            , ISearchPath<ISearchPath<IPrefixFeature, PointerType>, TypeBase>
+            , ISearchPath<ISearchPath<ISuffixFeature, PointerType>, ArrayType>
     {
+        protected override TPath GetFeature<TPath>(TypeBase provider) { return provider.GetFeature<TPath, ConcatArrays>(this) ?? base.GetFeature<TPath>(provider); }
         ISuffixFeature ISearchPath<ISuffixFeature, ArrayType>.Convert(ArrayType type) { return Extension.Feature(type.ConcatArraysResult); }
         IPrefixFeature ISearchPath<IPrefixFeature, TypeBase>.Convert(TypeBase type) { return Extension.Feature(type.CreateArray); }
         ISearchPath<IPrefixFeature, PointerType>

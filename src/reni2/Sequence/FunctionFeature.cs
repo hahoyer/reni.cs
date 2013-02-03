@@ -59,7 +59,7 @@ namespace Reni.Sequence
         IFunctionFeature IFeature.Function { get { return this; } }
         ISimpleFeature IFeature.Simple { get { return null; } }
 
-        protected override string GetNodeDump() { return base.GetNodeDump() + " " + _feature.Definable.DataFunctionName; }
+        protected override string GetNodeDump() { return base.GetNodeDump() + " " + _feature.Definable.Name; }
 
         Result Result(Category category)
         {
@@ -84,7 +84,7 @@ namespace Reni.Sequence
         Result Apply(Category category, int objSize, int argsSize)
         {
             var type = _feature.ResultType(objSize, argsSize);
-            return type.Result(category, () => _objectType.BitType.ApplyCode(type.Size, _feature.Definable.DataFunctionName, objSize, argsSize), CodeArgs.Arg);
+            return type.Result(category, () => _objectType.BitType.ApplyCode(type.Size, _feature.Definable.Name, objSize, argsSize), CodeArgs.Arg);
         }
     }
 }

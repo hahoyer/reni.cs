@@ -43,9 +43,9 @@ namespace Reni.Type
         public TextItemsType(ArrayType parent)
             : base(parent) { }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, ToNumberOfBase>.Feature { get { return Extension.Feature(ToNumberOfBaseResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature(ConcatArraysResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, ToNumberOfBase>.GetFeature(ToNumberOfBase target) { return Extension.Feature(ToNumberOfBaseResult); }
 
         internal Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {

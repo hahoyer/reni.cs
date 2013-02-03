@@ -28,6 +28,7 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Feature;
 using Reni.TokenClasses;
+using Reni.Type;
 
 namespace Reni
 {
@@ -38,58 +39,65 @@ namespace Reni
             var ppts = Assembly
                 .GetExecutingAssembly()
                 .GetReferencedTypes()
-                .SelectMany(t => t.GetInterfaces().Select(i => new {t, i}))
-                .Where(ti => ti.i.IsGenericType && ti.i.GetGenericTypeDefinition() == typeof(ISearchPath<,>))
+                .SelectMany(t => t.GetDirectInterfaces().Select(i => new {Type = t, Interface = i}))
+                .Where(ti => ti.Interface.GetGenericType() == typeof(ISearchPath<,>))
                 .Select
                 (
                     ti =>
                         new
                         {
-                            provider = ti.i.GetGenericArguments()[1],
-                            path = ti.i.GetGenericArguments()[0],
-                            token = ti.t,
-                            @interface = ti.i
+                            provider = ti.Interface.GetGenericArguments()[1],
+                            path = ti.Interface.GetGenericArguments()[0],
+                            target = ti.Type,
+                            @interface = ti.Interface
                         })
                 .Where(ppt => !ppt.provider.IsGenericParameter)
-                .ToArray();
+                .ToDictionaryEx(ppt => ppt.provider.Is(InterfaceType(ppt.path, ppt.target)));
 
-            var toImplement = ppts
-                .Where(ppt => !ppt.provider.Implements(InterfaceType(ppt.path, ppt.token)))
-                .GroupBy(ppt => ppt.token.IsSubclassOf(typeof(Defineable)))
-                .ToDictionary
-                (
-                    gTokenClass => gTokenClass.Key,
-                    gTokenClass => gTokenClass.GroupBy(ppt => ppt.provider)
-                        .Select
-                        (
-                            gProvider => DumpSearchPathsGroup
-                                (
-                                    gProvider.Key,
-                                    gProvider.Select(ppt => DumpInterface(ppt.provider, ppt.path, ppt.token)),
-                                    gProvider.Select(ppt => DumpMembers(ppt.provider, ppt.path, ppt.token))
-                                )
-                        )
-                        .Stringify("\n========================================\n")
-                );
+            var toImplement = ppts[false]
+                .ToDictionaryEx(ppt => ppt.target.Is<Defineable>() || ppt.target.Is<TypeBase>());
 
-            var toRemove = ppts
-                .Where(ppt => ppt.provider.Implements(InterfaceType(ppt.path, ppt.token)))
-                .GroupBy(ppt => ppt.token)
+            var toImplementString = toImplement[true]
+                .GroupBy(ppt => ppt.provider)
                 .Select
                 (
-                    g => DumpSearchPathsGroup
+                    gProvider => DumpSearchPathsGroup
                         (
-                            g.Key,
-                            g.Select(ppt => ppt.@interface.PrettyName())
+                            gProvider.Key,
+                            gProvider.Select(ppt => DumpInterface(ppt.provider, ppt.path, ppt.target)),
+                            gProvider.Select(ppt => DumpMembers(ppt.provider, ppt.path, ppt.target))
                         )
                 )
                 .Stringify("\n========================================\n");
 
+            var unknown = toImplement[false]
+                .GroupBy(ppt => ppt.target)
+                .Select
+                (
+                    g =>
+                        g.Key.PrettyName()
+                            + ("\n" + g.Select(ppt => ppt.@interface.PrettyName()).Stringify("\n")).Indent()
+                            + "\n"
+                )
+                .Stringify("\n");
+
+            var toRemove = ppts[true]
+                .GroupBy(ppt => ppt.target)
+                .Select
+                (
+                    g =>
+                        g.Key.PrettyName()
+                            + ("\n" + g.Select(ppt => ppt.@interface.PrettyName()).Stringify("\n")).Indent()
+                            + "\n"
+                )
+                .Stringify("\n");
+
             Tracer.FlaggedLine
                 (
-                    "\n" + toImplement[true]
-                        + "\n\n\n---------------------------------------\nConverters:\n---------------------------------------\n"
-                        + toImplement[false] 
+                    "\n"
+                        + toImplementString
+                        + "\n\n\n---------------------------------------\nUnknown:\n---------------------------------------\n"
+                        + unknown
                         + "\n\n\n---------------------------------------\nTo remove:\n---------------------------------------\n"
                         + toRemove);
         }
@@ -102,13 +110,6 @@ namespace Reni
                 + "\n---Members:\n"
                 + members.Stringify("\n");
         }
-        static string DumpSearchPathsGroup(System.Type key, IEnumerable<string> interfaces)
-        {
-            return key.PrettyName()
-                + "\n"
-                + interfaces.Stringify("\n")
-                ;
-        }
         static string DumpInterface(System.Type provider, System.Type path, System.Type token) { return ", " + InterfaceName(path, token); }
         static string InterfaceName(System.Type path, System.Type token) { return InterfaceType(path, token).PrettyName(); }
         static System.Type InterfaceType(System.Type path, System.Type token) { return typeof(IFeaturePath<,>).MakeGenericType(path, token); }
@@ -118,14 +119,9 @@ namespace Reni
             return path.PrettyName()
                 + " "
                 + InterfaceName(path, token)
-                + ".Feature { get { return Extension.Feature("
+                + ".GetFeature(" + token.Name + " target) { return Extension.Feature("
                 + token.Name
-                + "Result); } }";
+                + "Result); }";
         }
-    }
-
-    interface IFeaturePath<out TPath, TTarget>
-    {
-        TPath Feature { get; }
     }
 }

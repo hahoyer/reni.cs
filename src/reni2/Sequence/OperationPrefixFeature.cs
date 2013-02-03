@@ -11,11 +11,11 @@ namespace Reni.Sequence
         , ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>
     {
         [EnableDump]
-        private readonly ISequenceOfBitPrefixOperation _definable;
+        private readonly BitType.IPrefix _definable;
 
         private readonly BitType _bitType;
 
-        public OperationPrefixFeature(BitType bitType, ISequenceOfBitPrefixOperation definable)
+        public OperationPrefixFeature(BitType bitType, BitType.IPrefix definable)
         {
             _bitType = bitType;
             _definable = definable;

@@ -42,7 +42,7 @@ namespace Reni.Type
             StopByObjectId(-10);
         }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
 
         [DisableDump]
         protected override string TagTitle { get { return "text_item"; } }

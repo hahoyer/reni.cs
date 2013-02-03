@@ -39,9 +39,12 @@ namespace Reni.Sequence
         : TagChild<ArrayType>
             , ISearchPath<ISuffixFeature, SequenceType>
             , ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
-, IFeaturePath<ISuffixFeature, ConcatArrays>
-, IFeaturePath<ISuffixFeature, TokenClasses.EnableCut>
-, IFeaturePath<ISuffixFeature, UndecorateToken>
+            , IFeaturePath<ISuffixFeature, ConcatArrays>
+            , IFeaturePath<ISuffixFeature, TokenClasses.EnableCut>
+            , IFeaturePath<ISuffixFeature, UndecorateToken>
+            , IFeaturePath<ISuffixFeature, SequenceType>
+            , IFeaturePath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
+            , IFeaturePath<ISuffixFeature, ArrayType>
     {
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
@@ -59,14 +62,27 @@ namespace Reni.Sequence
         public SequenceType(ArrayType parent)
             : base(parent)
         {
-            _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>
-                (refAlignParam => new ObjectReference(this, refAlignParam));
+            _objectReferencesCache = new DictionaryEx<RefAlignParam, ObjectReference>(refAlignParam => new ObjectReference(this, refAlignParam));
             StopByObjectId(-172);
         }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.Feature { get { return Extension.Feature(ConcatArraysResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, TokenClasses.EnableCut>.Feature { get { return Extension.Feature(EnableCutResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, UndecorateToken>.Feature { get { return Extension.Feature(UndecorateTokenResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature(ConcatArraysResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, TokenClasses.EnableCut>.GetFeature(TokenClasses.EnableCut target) { return Extension.Feature(EnableCutResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, UndecorateToken>.GetFeature(UndecorateToken target) { return Extension.Feature(UndecorateTokenResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceType>.GetFeature(SequenceType target) { return ConversionFeature(target); }
+        ISearchPath<ISuffixFeature, Type.EnableCut>
+            IFeaturePath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.GetFeature(SequenceType target) { return ConversionFeatureWithCut(target); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, ArrayType>.GetFeature(ArrayType target) { return ConversionFeature(target); }
+
+        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return type.ConversionFeature(this); }
+
+        ISearchPath<ISuffixFeature, Type.EnableCut>
+            ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.Convert(SequenceType type) { return type.ConversionFeatureWithCut(this); }
+        ISearchPath<ISuffixFeature, Type.EnableCut> ConversionFeatureWithCut(SequenceType destination)
+        {
+            return
+                Extension.Feature<Type.EnableCut>((c, t) => ConvertWithCut(c, destination));
+        }
 
         [DisableDump]
         protected override string TagTitle { get { return "Sequence"; } }
@@ -79,7 +95,21 @@ namespace Reni.Sequence
         internal override string DumpPrintText { get { return "(" + Element.DumpPrintText + ")sequence(" + Count + ")"; } }
 
         internal new ISuffixFeature Feature(FeatureBase featureBase) { return new FunctionFeature(this, featureBase); }
-        internal IPrefixFeature PrefixFeature(ISequenceOfBitPrefixOperation definable) { return new PrefixFeature(this, definable); }
+        internal IPrefixFeature PrefixFeature(BitType.IPrefix definable) { return new PrefixFeature(this, definable); }
+
+        ISuffixFeature ConversionFeature(SequenceType destination)
+        {
+            return destination.Count >= Count
+                ? Extension.Feature(c => ConversionAsReference(c, destination))
+                : null;
+        }
+
+        internal ISuffixFeature ConversionFeature(ArrayType destination)
+        {
+            return Parent == destination
+                ? Extension.Feature(PointerConversionResult)
+                : null;
+        }
 
         internal override int? SmartSequenceLength(TypeBase elementType)
         {
@@ -158,47 +188,39 @@ namespace Reni.Sequence
 
         internal ObjectReference UniqueObjectReference(RefAlignParam refAlignParam) { return _objectReferencesCache[refAlignParam]; }
 
-        Result FlatConversion(Category category, SequenceType source)
+        Result FlatConversion(Category category, SequenceType destination)
         {
-            var result = source.ArgResult(category.Typed);
-            if(source.Count > Count)
-                result = source.RemoveElementsAtEnd(category, Count);
+            var result = ArgResult(category.Typed);
+            if(Count > destination.Count)
+                result = RemoveElementsAtEnd(category, destination.Count);
 
-            if(source.Element != Element)
+            if(Element != destination.Element)
             {
                 DumpDataWithBreak
                     (
-                        "Element type dismatch"
-                        ,
-                        "category",
-                        category
-                        ,
-                        "source",
-                        source
-                        ,
-                        "destination",
-                        this
-                        ,
-                        "result",
-                        result
+                        "Element type dismatch",
+                        "category", category,
+                        "source", this,
+                        "destination", destination,
+                        "result", result
                     );
                 return null;
             }
 
-            if(source.Count < Count)
-                result = ExtendFrom(category, source.Count).ReplaceArg(result);
+            if(Count < destination.Count)
+                result = destination.ExtendFrom(category, Count).ReplaceArg(result);
             return result;
         }
 
-        Result ConversionAsReference(Category category, SequenceType source)
+        Result ConversionAsReference(Category category, SequenceType destination)
         {
             var trace = ObjectId == -3;
-            StartMethodDump(trace, category, source);
+            StartMethodDump(trace, category, this);
             try
             {
-                var flatResult = FlatConversion(category, source);
+                var flatResult = FlatConversion(category, destination);
                 Dump("flatResult", flatResult);
-                Func<Category, Result> forArg = source.UnalignedDereferencePointerResult;
+                Func<Category, Result> forArg = UnalignedDereferencePointerResult;
                 if(trace)
                     Dump("forArg", forArg(Category.All));
                 var result = flatResult.ReplaceArg(forArg);
@@ -213,34 +235,20 @@ namespace Reni.Sequence
 
         Result UnalignedDereferencePointerResult(Category category) { return PointerKind.ArgResult(category.Typed).DereferenceResult & category; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type)
-        {
-            return Count < type.Count
-                ? null
-                : Extension.Feature(c => ConversionAsReference(c, type));
-        }
-
-        ISearchPath<ISuffixFeature, Type.EnableCut>
-            ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>.Convert(SequenceType type)
-        {
-            return
-                Extension.Feature<Type.EnableCut>((c, t) => ConvertFromEnableCut(c, type));
-        }
-
-        Result ConvertFromEnableCut(Category category, SequenceType source)
+        Result ConvertWithCut(Category category, SequenceType destination)
         {
             var trace = ObjectId == -10;
-            StartMethodDump(trace, category, source);
+            StartMethodDump(trace, category, this);
             try
             {
-                var result = ConversionAsReference(category, source);
+                var result = ConversionAsReference(category, destination);
                 Dump("result", result);
 
-                Func<Category, Result> forArg = source.RemoveEnableCutReferenceResult;
+                Func<Category, Result> forArg = RemoveEnableCutReferenceResult;
                 if(trace)
                     Dump("forArg", forArg(Category.All));
 
-                return ReturnMethodDump(result.ReplaceArg(source.RemoveEnableCutReferenceResult));
+                return ReturnMethodDump(result.ReplaceArg(RemoveEnableCutReferenceResult));
             }
             finally
             {

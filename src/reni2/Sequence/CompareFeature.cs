@@ -24,7 +24,6 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Code;
 using Reni.Type;
 
 namespace Reni.Sequence
@@ -32,7 +31,7 @@ namespace Reni.Sequence
     sealed class CompareFeature : FeatureBase
     {
         readonly BitType _bitType;
-        internal CompareFeature(ISequenceOfBitBinaryOperation definable, BitType bitType)
+        internal CompareFeature(BitType.IOperation definable, BitType bitType)
             : base(definable) { _bitType = bitType; }
 
         internal override TypeBase ResultType(int objSize, int argsSize) { return _bitType; }

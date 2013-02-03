@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,34 +25,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Basics;
-using Reni.Code;
 using Reni.Feature;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
-    sealed class Plus:
-        SequenceOfBitOperation,
-        ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>,
-        ISequenceOfBitPrefixOperation
+    sealed class Sign
+        : Operation
+            , ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, BitType>
+            , BitType.IPrefix
     {
-        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType> ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>.Convert(BitType type) { return new OperationPrefixFeature(type, this); }
+        protected override TPath GetFeature<TPath>(TypeBase provider) { return provider.GetFeature<TPath, Sign>(this) ?? base.GetFeature<TPath>(provider); }
 
-        [DisableDump]
-        string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
-
-        protected override int ResultSize(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
-    }
-    sealed class Minus :
-        SequenceOfBitOperation,
-        ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>,
-        ISequenceOfBitPrefixOperation
-    {
-        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType> ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, Type.ArrayType>, BitType>.Convert(BitType type) { return new OperationPrefixFeature(type, this); }
-
-        [DisableDump]
-        string ISequenceOfBitPrefixOperation.DataFunctionName { get { return DataFunctionName; } }
-
-        protected override int ResultSize(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
+        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType> ISearchPath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, BitType>.Convert(BitType type) { return new OperationPrefixFeature(type, this); }
+        string BitType.IPrefix.Name { get { return DataFunctionName; } }
+        protected override int Signature(int objSize, int argSize) { return BitsConst.PlusSize(objSize, argSize); }
     }
 }

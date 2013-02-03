@@ -49,7 +49,7 @@ namespace Reni.Type
         }
 
         internal Result Result(Category category)
-        {
+        {                                  
             category = category.Typed;
             var featureResult = Feature.Simple.Result(category);
             if(!featureResult.HasArg)

@@ -31,7 +31,6 @@ using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
 using Reni.Sequence;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
@@ -39,35 +38,26 @@ namespace Reni.Type
     sealed class BitType : TypeBase
         , IFeaturePath<ISuffixFeature, DumpPrintToken>
         , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, DumpPrintToken>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Minus>
-        , IFeaturePath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, Minus>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Slash>
-        , IFeaturePath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, Plus>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Plus>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Star>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Equal>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, NotEqual>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Less>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, LessEqual>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Greater>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, GreaterEqual>
+        , IFeaturePath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, Sign>
+        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Operation>
     {
         sealed class PrefixFeature
             : DictionaryEx<int, BitsPrefixFeature>
                 , ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>
-            , ISearchPath<IPrefixFeature, SequenceType>
+                , ISearchPath<IPrefixFeature, SequenceType>
         {
-            public PrefixFeature(string operation, BitType parent) : base(count => new BitsPrefixFeature(operation, count, parent)) { }
+            public PrefixFeature(IPrefix operation, BitType parent)
+                : base(count => new BitsPrefixFeature(operation, count, parent)) { }
             ISearchPath<IPrefixFeature, SequenceType> ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>.Convert(ArrayType type) { return this; }
             IPrefixFeature ISearchPath<IPrefixFeature, SequenceType>.Convert(SequenceType type) { return this[type.Count]; }
         }
 
         sealed class BitsPrefixFeature : IPrefixFeature, ISimpleFeature
         {
-            readonly string _operation;
+            readonly IPrefix _operation;
             readonly int _count;
             readonly BitType _parent;
-            public BitsPrefixFeature(string operation, int count, BitType parent)
+            public BitsPrefixFeature(IPrefix operation, int count, BitType parent)
             {
                 _operation = operation;
                 _count = count;
@@ -76,11 +66,7 @@ namespace Reni.Type
             IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
             IFunctionFeature IFeature.Function { get { return null; } }
             ISimpleFeature IFeature.Simple { get { return this; } }
-
-            Result ISimpleFeature.Result(Category category)
-            {
-                return _parent.PrefixResult(category, _operation, _count);
-            }
+            Result ISimpleFeature.Result(Category category) { return _parent.PrefixResult(category, _operation.Name, _count); }
         }
 
         sealed class OperationFeature
@@ -88,85 +74,54 @@ namespace Reni.Type
                 , ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>
                 , ISearchPath<ISuffixFeature, SequenceType>
         {
-            public readonly string Operation;
-            public OperationFeature(string operation, Func<int, int, int> signature, BitType parent)
-                : base(count => new BitsFeature(operation, count, parent, signature)) 
-            {
-                Operation = operation;
-            }
-            public OperationFeature(string operation, BitType parent)
-                : this(operation, (x, y) => 1, parent)
-            {
-                Operation = operation;
-            }
+            public OperationFeature(IOperation operation, BitType parent)
+                : base(count => new BitsFeature(operation, count, parent)) { }
             ISearchPath<ISuffixFeature, SequenceType> ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>.Convert(ArrayType type) { return this; }
             ISuffixFeature ISearchPath<ISuffixFeature, SequenceType>.Convert(SequenceType type) { return this[type.Count]; }
         }
 
         sealed class BitsFeature : ISuffixFeature, IFunctionFeature, IContextReference
         {
-            readonly string _operation;
+            readonly IOperation _operation;
             readonly int _count;
             readonly BitType _parent;
-            readonly Func<int, int, int> _signature;
             readonly int _order = CodeArgs.NextOrder++;
 
-            public BitsFeature(string operation, int count, BitType parent, Func<int, int, int> signature)
+            public BitsFeature(IOperation operation, int count, BitType parent)
             {
                 _operation = operation;
                 _count = count;
                 _parent = parent;
-                _signature = signature;
             }
             IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
             IFunctionFeature IFeature.Function { get { return this; } }
             ISimpleFeature IFeature.Simple { get { return null; } }
-         
+
             bool IFunctionFeature.IsImplicit { get { return false; } }
             IContextReference IFunctionFeature.ObjectReference { get { return this; } }
-            Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _parent.ApplyResult(category, _operation, _signature, _count, argsType); }
+            Result IFunctionFeature.ApplyResult(Category category, TypeBase argsType) { return _parent.ApplyResult(category, _operation, _count, argsType); }
 
             Size IContextReference.Size { get { return Root.DefaultRefAlignParam.RefSize; } }
             int IContextReference.Order { get { return _order; } }
         }
 
         readonly Root _rootContext;
-        readonly DictionaryEx<string, OperationFeature> _compareFeatures;
-        readonly IDictionary<string, OperationFeature> _operationFeatures;
-        readonly DictionaryEx<string, PrefixFeature> _prefixFeatures;
+        readonly DictionaryEx<IOperation, OperationFeature> _operationFeatures;
+        readonly DictionaryEx<IPrefix, PrefixFeature> _prefixFeatures;
 
         internal BitType(Root rootContext)
         {
-            _compareFeatures = new DictionaryEx<string, OperationFeature>(operation => new OperationFeature(operation, this));
-            _prefixFeatures = new DictionaryEx<string, PrefixFeature>(operation => new PrefixFeature(operation, this));
-            _operationFeatures = new[]
-            {
-                new OperationFeature("Plus", BitsConst.PlusSize, this),
-                new OperationFeature("Minus", BitsConst.PlusSize, this),
-                new OperationFeature("Star", BitsConst.MultiplySize, this),
-                new OperationFeature("Slash", BitsConst.DivideSize, this)
-            }
-                .ToDictionary(o => o.Operation);
+            _operationFeatures = new DictionaryEx<IOperation, OperationFeature>(operation => new OperationFeature(operation, this));
+            _prefixFeatures = new DictionaryEx<IPrefix, PrefixFeature>(operation => new PrefixFeature(operation, this));
             _rootContext = rootContext;
         }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, DumpPrintToken>.Feature { get { return Extension.Feature<SequenceType, ArrayType>(DumpPrintTokenResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature<SequenceType, ArrayType>(DumpPrintTokenResult); }
 
 
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Less>.Feature { get { return _compareFeatures["Less"]; } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, LessEqual>.Feature { get { return _compareFeatures["LessEqual"]; } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Greater>.Feature { get { return _compareFeatures["Greater"]; } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, GreaterEqual>.Feature { get { return _compareFeatures["GreaterEqual"]; } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Equal>.Feature { get { return _compareFeatures["Equal"]; } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, NotEqual>.Feature { get { return _compareFeatures["NotEqual"]; } }
-
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Minus>.Feature { get { return _operationFeatures["Minus"]; } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Plus>.Feature { get { return _operationFeatures["Plus"]; } }
-        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, Minus>.Feature { get { return _prefixFeatures["Minus"]; } }
-        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, Plus>.Feature { get { return _prefixFeatures["Plus"]; } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Slash>.Feature { get { return _operationFeatures["Slash"]; } }
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Star>.Feature { get { return _operationFeatures["Star"]; } }
+        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Operation>.GetFeature(Operation target) { return _operationFeatures[target]; }
+        ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType> IFeaturePath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, Sign>.GetFeature(Sign target) { return _prefixFeatures[target]; }
 
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
@@ -215,12 +170,26 @@ namespace Reni.Type
                 .Pair(argsType).ArgCode
                 .BitSequenceOperation(token, size, Size.Create(objectBits).ByteAlignedSize);
         }
-        Result ApplyResult(Category category, string operation, Func<int,int,int> signature, int objectBitCount, TypeBase argsType)
+
+        internal interface IOperation
+        {
+            int Signature(int objectBitCount, int argsBitCount);
+            [DisableDump]
+            string Name { get; }
+        }
+
+        internal interface IPrefix
+        {
+            [DisableDump]
+            string Name { get; }
+        }
+
+        Result ApplyResult(Category category, IOperation operation, int objectBitCount, TypeBase argsType)
         {
             var typedCategory = category.Typed;
             var argsBitCount = argsType.SequenceLength(this);
-            var resultBitCount = signature(objectBitCount, argsBitCount);
-            var result = UniqueNumber(resultBitCount).Result(category, () => ApplyCode(Size.Create(resultBitCount), operation, objectBitCount, argsBitCount), CodeArgs.Arg);
+            var resultBitCount = operation.Signature(objectBitCount, argsBitCount);
+            var result = UniqueNumber(resultBitCount).Result(category, () => ApplyCode(Size.Create(resultBitCount), operation.Name, objectBitCount, argsBitCount), CodeArgs.Arg);
             var objectResult = UniqueNumber(objectBitCount).UniqueObjectReference(Root.DefaultRefAlignParam).Result(typedCategory);
             var convertedObjectResult = objectResult.BitSequenceOperandConversion(typedCategory);
             var convertedArgsResult = argsType.BitSequenceOperandConversion(typedCategory);
@@ -239,12 +208,6 @@ namespace Reni.Type
                             .UniquePointer
                             .ArgResult(category1.Typed).AutomaticDereferenceResult
                             .Align(Root.DefaultRefAlignParam.AlignBits));
-
         }
-
     }
-
-
-    interface ICompareResult
-    {}
 }

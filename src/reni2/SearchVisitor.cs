@@ -147,6 +147,6 @@ namespace Reni
     interface ISearchTarget
     {
         string StructFeatureName { get; }
-        TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class;
+        IEnumerable<TPath> GetFeature<TPath>(TypeBase typeBase) where TPath : class;
     }
 }

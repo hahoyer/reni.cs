@@ -51,16 +51,13 @@ namespace Reni.Type
             StopByObjectId(61);
         }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, Slash>.Feature { get { return Extension.Feature(SlashResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, Star>.Feature { get { return Extension.Feature(StarResult); } }
-        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceToken>.Feature
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, Slash>.GetFeature(Slash target) { return Extension.Feature(SlashResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, Star>.GetFeature(Star target) { return Extension.Feature(StarResult); }
+        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceToken>.GetFeature(SequenceToken target)
         {
-            get
-            {
-                var value = Value as ArrayType;
-                return value == null ? null : Extension.Feature(value.SequenceTypeResult);
-            }
+            var value = Value as ArrayType;
+            return value == null ? null : Extension.Feature(value.SequenceTypeResult);
         }
 
         [DisableDump]

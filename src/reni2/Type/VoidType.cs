@@ -43,7 +43,7 @@ namespace Reni.Type
             if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
         protected override ISuffixFeature Convert(TypeBase sourceType) { return sourceType.IsDataLess ? Extension.Feature(c => Result(c, sourceType.ArgResult)) : null; }
         protected override TypeBase ReversePair(TypeBase first) { return first; }
         [DisableDump]

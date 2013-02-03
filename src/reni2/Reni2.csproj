@@ -147,8 +147,6 @@
     <Compile Include="Code\FrameData.cs" />
     <Compile Include="Code\HasArgVisitor.cs" />
     <Compile Include="Code\IFormalValue.cs" />
-    <Compile Include="Code\ISequenceOfBitBinaryOperation.cs" />
-    <Compile Include="Code\ISequenceOfBitPrefixOperation.cs" />
     <Compile Include="Code\List.cs" />
     <Compile Include="Code\LocalReference.cs" />
     <Compile Include="Code\IContextReference.cs" />
@@ -250,7 +248,7 @@
     <Compile Include="Sequence\PrefixFeature.cs" />
     <Compile Include="Sequence\SequenceType.cs" />
     <Compile Include="Sequence\OperationPrefixFeature.cs" />
-    <Compile Include="Sequence\SequenceOfBitOperation.cs" />
+    <Compile Include="Sequence\Operation.cs" />
     <Compile Include="Sequence\Sign.cs" />
     <Compile Include="Sequence\Slash.cs" />
     <Compile Include="Sequence\Star.cs" />
@@ -299,7 +297,7 @@
     <Compile Include="TokenClasses\AtOperator.cs" />
     <Compile Include="TokenClasses\Base.cs" />
     <Compile Include="TokenClasses\Colon.cs" />
-    <Compile Include="TokenClasses\CompareOperator.cs" />
+    <Compile Include="TokenClasses\CompareOperation.cs" />
     <Compile Include="TokenClasses\ConcatArrays.cs" />
     <Compile Include="TokenClasses\DefinableTokenSyntax.cs" />
     <Compile Include="TokenClasses\Defineable.cs" />
