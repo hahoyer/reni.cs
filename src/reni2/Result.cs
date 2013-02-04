@@ -36,7 +36,6 @@ using Reni.Type;
 
 namespace Reni
 {
-    [Serializable]
     sealed class Result : ReniObject, ITreeNodeSupport
     {
         static int _nextObjectId = 1;

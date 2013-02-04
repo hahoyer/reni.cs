@@ -35,7 +35,6 @@ using Reni.Type;
 
 namespace Reni
 {
-    [Serializable]
     abstract class CondSyntax : CompileSyntax
     {
         [Node]
@@ -63,7 +62,7 @@ namespace Reni
 
         internal override Result ObtainResult(ContextBase context, Category category) { return InternalResult(context, category); }
         [DisableDump]
-        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] { Cond, Then, Else }; } }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {Cond, Then, Else}; } }
 
         Result CondResult(ContextBase context, Category category)
         {
@@ -123,7 +122,6 @@ namespace Reni
         protected override string GetNodeDump() { return "(" + Cond.NodeDump + ")then(" + Then.NodeDump + ")"; }
     }
 
-    [Serializable]
     sealed class ThenSyntax : CondSyntax
     {
         internal ThenSyntax(CompileSyntax condSyntax, TokenData thenToken, CompileSyntax thenSyntax)
@@ -139,7 +137,6 @@ namespace Reni
         }
     }
 
-    [Serializable]
     sealed class ThenElseSyntax : CondSyntax
     {
         [Node]

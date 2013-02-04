@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    [Serializable]
     abstract class Special : TokenClass
     {
         protected static IssueId LeftMustNotBeNullError() { return IssueId.MissingLeftOperand; }
@@ -45,7 +44,7 @@ namespace Reni.TokenClasses
     {
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            if (left != null || right != null)
+            if(left != null || right != null)
                 return LeftAndRightMustBeNull(left, right);
             return new TerminalSyntax(token, this);
         }
@@ -59,9 +58,9 @@ namespace Reni.TokenClasses
     {
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            if (right != null)
+            if(right != null)
                 return RightMustBeNull(right);
-            if (left == null)
+            if(left == null)
                 return new TerminalSyntax(token, this);
             return new SuffixSyntax(token, left.ToCompiledSyntax(), this);
         }
@@ -74,9 +73,9 @@ namespace Reni.TokenClasses
     {
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            if (left != null)
+            if(left != null)
                 return LeftMustBeNull(right);
-            if (right == null)
+            if(right == null)
                 return new TerminalSyntax(token, this);
             return new PrefixSyntax(token, this, right.ToCompiledSyntax());
         }
@@ -85,21 +84,19 @@ namespace Reni.TokenClasses
         public abstract Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
     }
 
-    [Serializable]
     abstract class Prefix : Special, IPrefix
     {
         public abstract Result Result(ContextBase context, Category category, TokenData token, CompileSyntax right);
 
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            if (left != null)
+            if(left != null)
                 return LeftMustBeNull(right);
             return new PrefixSyntax(token, this, right.CheckedToCompiledSyntax(token, RightMustNotBeNullError));
         }
         protected abstract CompileSyntaxError LeftMustBeNull(ParsedSyntax left);
     }
 
-    [Serializable]
     abstract class Suffix : Special, ISuffix
     {
         Result ISuffix.Result(ContextBase context, Category category, CompileSyntax left) { return Result(context, category, left); }
@@ -108,26 +105,25 @@ namespace Reni.TokenClasses
 
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
-            if (right != null)
+            if(right != null)
                 return right.MustBeNullError(RightMustBeNullIssue);
             return new SuffixSyntax(token, left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError), this);
         }
     }
 
-    [Serializable]
     abstract class Infix : Special, IInfix
     {
         Result IInfix.Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right) { return Result(callContext, category, left, right); }
 
         protected abstract Result Result(ContextBase callContext, Category category, CompileSyntax left, CompileSyntax right);
-        
+
         protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
         {
             return new InfixSyntax
                 (token
-                 , left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError)
-                 , this
-                 , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
+                    , left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError)
+                    , this
+                    , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
         }
     }

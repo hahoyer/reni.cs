@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ namespace Reni.Parser
     /// <summary>
     ///     Source and position for compilation process
     /// </summary>
-    [Serializable]
     [DebuggerDisplay("{NodeDump} {DumpBeforeCurrent}[{DumpCurrent}]{DumpAfterCurrent}")]
     sealed class SourcePosn : ReniObject
     {
@@ -42,8 +41,8 @@ namespace Reni.Parser
         /// <summary>
         ///     ctor from source and position
         /// </summary>
-        /// <param name = "source"></param>
-        /// <param name = "position"></param>
+        /// <param name="source"></param>
+        /// <param name="position"></param>
         public SourcePosn(Source source, int position)
         {
             _position = position;
@@ -66,7 +65,7 @@ namespace Reni.Parser
         /// <summary>
         ///     Advance position
         /// </summary>
-        /// <param name = "i">number characters to move</param>
+        /// <param name="i">number characters to move</param>
         public void Incr(int i = 1) { _position += i; }
 
         /// <summary>
@@ -78,15 +77,15 @@ namespace Reni.Parser
         /// <summary>
         ///     Obtains a piece
         /// </summary>
-        /// <param name = "start">start position</param>
-        /// <param name = "length">number of characters</param>
+        /// <param name="start">start position</param>
+        /// <param name="length">number of characters</param>
         /// <returns></returns>
         public string SubString(int start, int length) { return _source.SubString(_position + start, length); }
 
         /// <summary>
         ///     creates the file(line,col) string to be used with "Edit.GotoNextLocation" command of IDE
         /// </summary>
-        /// <param name = "flagText">the flag text</param>
+        /// <param name="flagText">the flag text</param>
         /// <returns>the "FileName(LineNr,ColNr): tag: " string</returns>
         public string FilePosn(string flagText) { return _source.FilePosn(_position, flagText); }
 
@@ -144,7 +143,7 @@ namespace Reni.Parser
         {
             var length = data.Length;
             return !Source.IsEnd(Position + length - 1)
-                   && Source.SubString(Position, length) == data;
+                && Source.SubString(Position, length) == data;
         }
     }
 }

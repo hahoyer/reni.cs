@@ -39,7 +39,6 @@ namespace Reni.Struct
     /// <summary>
     ///     Structured data, context free version
     /// </summary>
-    [Serializable]
     sealed class Container : CompileSyntax
     {
         readonly TokenData _firstToken;
@@ -327,7 +326,7 @@ namespace Reni.Struct
         }
     }
 
-    [Serializable]
+
     sealed class StructurePosition : ReniObject, ISearchPath<ISuffixFeature, StructureType>
     {
         [EnableDump]

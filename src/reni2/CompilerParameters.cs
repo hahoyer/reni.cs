@@ -1,6 +1,7 @@
-﻿// 
+﻿#region Copyright (C) 2013
+
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -17,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +31,6 @@ namespace Reni
     /// <summary>
     ///     Parameters for compilation
     /// </summary>
-    [Serializable]
     public sealed class CompilerParameters
     {
         internal static CompilerParameters CreateTraceAll()
@@ -49,7 +51,6 @@ namespace Reni
         public bool RunFromCode;
         public IOutStream OutStream;
 
-        [Serializable]
         public sealed class TraceParamters
         {
             [Node]

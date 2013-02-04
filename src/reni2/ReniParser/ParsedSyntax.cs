@@ -32,7 +32,6 @@ using Reni.Validation;
 
 namespace Reni.ReniParser
 {
-    [Serializable]
     abstract class ParsedSyntax : ParsedSyntaxBase
     {
         protected ParsedSyntax(TokenData token)

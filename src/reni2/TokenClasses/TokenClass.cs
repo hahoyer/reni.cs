@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,13 +25,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Reni.Parser;
+using Reni.ReniParser;
 
 namespace Reni.TokenClasses
 {
     /// <summary>
     ///     Base clas for compiler tokens
     /// </summary>
-    [Serializable]
     abstract class TokenClass : Parser.TokenClass
     {
         protected override sealed IParsedSyntax Syntax
@@ -41,12 +41,12 @@ namespace Reni.TokenClasses
             )
         {
             return
-                Syntax((ReniParser.ParsedSyntax) left, token, (ReniParser.ParsedSyntax) right);
+                Syntax((ParsedSyntax) left, token, (ParsedSyntax) right);
         }
-        protected abstract ReniParser.ParsedSyntax Syntax
-            (ReniParser.ParsedSyntax left
+        protected abstract ParsedSyntax Syntax
+            (ParsedSyntax left
                 , TokenData token
-                , ReniParser.ParsedSyntax right
+                , ParsedSyntax right
             );
     }
 }

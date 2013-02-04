@@ -28,7 +28,6 @@ using Reni.Basics;
 
 namespace Reni.Code
 {
-    [Serializable]
     sealed class TopRef : Ref
     {
         public TopRef(Size offset)
@@ -42,7 +41,6 @@ namespace Reni.Code
         internal override void Visit(IVisitor visitor) { visitor.TopRef(Offset); }
     }
 
-    [Serializable]
     sealed class TopFrameRef : Ref
     {
         public TopFrameRef()

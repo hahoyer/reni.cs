@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ using Reni.Validation;
 
 namespace Reni.Code
 {
-    [Serializable]
     abstract class CodeBase : ReniObject, IIconKeyProvider, IFormalCodeItem
     {
         protected CodeBase(int objectId)
@@ -139,14 +138,14 @@ namespace Reni.Code
         protected virtual IEnumerable<CodeBase> AsList() { return new[] {this}; }
 
         internal CodeBase ReplaceArg(TypeBase type, CodeBase code) { return ReplaceArg(new Result {Type = type, Code = code}); }
-       
+
         internal CodeBase ReplaceArg(Result arg)
         {
             try
             {
                 var result = arg.Code.IsRelativeReference
-                                 ? Visit(new ReplaceRelRefArg(arg))
-                                 : Visit(new ReplaceAbsoluteArg(arg));
+                    ? Visit(new ReplaceRelRefArg(arg))
+                    : Visit(new ReplaceAbsoluteArg(arg));
                 return result ?? this;
             }
             catch(ReplaceArg.SizeException sizeException)

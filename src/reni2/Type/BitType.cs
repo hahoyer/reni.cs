@@ -34,7 +34,6 @@ using Reni.Sequence;
 
 namespace Reni.Type
 {
-    [Serializable]
     sealed class BitType : TypeBase
         , IFeaturePath<ISuffixFeature, DumpPrintToken>
         , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, DumpPrintToken>

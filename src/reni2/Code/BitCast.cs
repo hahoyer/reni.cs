@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ namespace Reni.Code
     /// <summary>
     ///     Expression to change size of an expression
     /// </summary>
-    [Serializable]
     sealed class BitCast : FiberItem
     {
         static int _nextId;
@@ -66,9 +65,9 @@ namespace Reni.Code
         {
             return new LocalVariableAccess
                 (precedingElement.Holder
-                 , precedingElement.Offset
-                 , OutputSize
-                 , InputDataSize.Min(precedingElement.DataSize)
+                    , precedingElement.Offset
+                    , OutputSize
+                    , InputDataSize.Min(precedingElement.DataSize)
                 );
         }
 

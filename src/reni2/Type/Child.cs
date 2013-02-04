@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ using Reni.Context;
 
 namespace Reni.Type
 {
-    [Serializable]
     abstract class Child<TParent> : TypeBase, IProxyType, IConverter
         where TParent : TypeBase
     {
@@ -39,7 +38,7 @@ namespace Reni.Type
         protected Child(TParent parent) { _parent = parent; }
 
         [DisableDump]
-        sealed internal override Root RootContext { get { return _parent.RootContext; } }
+        internal override sealed Root RootContext { get { return _parent.RootContext; } }
         [Node]
         [DisableDump]
         public TParent Parent { get { return _parent; } }

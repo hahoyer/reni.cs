@@ -330,8 +330,6 @@
     <Compile Include="Type\EnableArrayOverSizeType.cs" />
     <Compile Include="Type\RepeaterAccessType.cs" />
     <Compile Include="Type\Child.cs" />
-    <Compile Include="Type\ConversionFeature.cs" />
-    <Compile Include="Type\ConversionParameter.cs" />
     <Compile Include="Type\Converter.cs" />
     <Compile Include="Type\CreateArrayFromReferenceFeature.cs" />
     <Compile Include="Type\EmptyFunctionFeatureProvider.cs" />
@@ -340,7 +338,6 @@
     <Compile Include="Type\FieldAccessType.cs" />
     <Compile Include="Type\FunctionalFeature.cs" />
     <Compile Include="Type\FunctionInstanceType.cs" />
-    <Compile Include="Type\IFunctionFeature.cs" />
     <Compile Include="CodeArgs.cs" />
     <Compile Include="ReniException.cs" />
     <Compile Include="ReniObject.cs" />

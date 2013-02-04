@@ -31,14 +31,12 @@ using Reni.Parser;
 
 namespace Reni.Syntax
 {
-    [Serializable]
     abstract class SpecialSyntax : CompileSyntax
     {
         protected SpecialSyntax(TokenData token)
             : base(token) { }
     }
 
-    [Serializable]
     sealed class TerminalSyntax : SpecialSyntax
     {
         [Node]
@@ -61,7 +59,6 @@ namespace Reni.Syntax
         internal override TokenData LastToken { get { return Token; } }
     }
 
-    [Serializable]
     sealed class PrefixSyntax : SpecialSyntax
     {
         [Node]
@@ -94,7 +91,6 @@ namespace Reni.Syntax
         protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {null, _right}; } }
     }
 
-    [Serializable]
     sealed class InfixSyntax : SpecialSyntax
     {
         [Node]
@@ -148,7 +144,7 @@ namespace Reni.Syntax
         [DisableDump]
         internal override TokenData LastToken { get { return _right.LastToken; } }
         [DisableDump]
-        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] { _left, _right }; } }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {_left, _right}; } }
     }
 
     interface IPendingProvider
@@ -186,7 +182,7 @@ namespace Reni.Syntax
         [DisableDump]
         internal override TokenData LastToken { get { return Token; } }
         [DisableDump]
-        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] { _left }; } }
+        protected override ParsedSyntaxBase[] Children { get { return new ParsedSyntaxBase[] {_left}; } }
     }
 
     interface ITerminal

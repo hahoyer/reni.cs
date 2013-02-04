@@ -39,7 +39,6 @@ using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    [Serializable]
     abstract class TypeBase
         : ReniObject
             , IContextReferenceProvider

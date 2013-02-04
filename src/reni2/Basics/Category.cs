@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ using HWClassLibrary.Debug;
 namespace Reni.Basics
 {
     [Dump("Dump")]
-    [Serializable]
     sealed class Category : ReniObject, IEquatable<Category>
     {
         readonly bool _code;
@@ -167,10 +166,10 @@ namespace Reni.Basics
         {
             return
                 HasCode == x.HasCode
-                && HasArgs == x.HasArgs
-                && HasSize == x.HasSize
-                && HasType == x.HasType
-                && HasIsDataLess == x.HasIsDataLess
+                    && HasArgs == x.HasArgs
+                    && HasSize == x.HasSize
+                    && HasType == x.HasType
+                    && HasIsDataLess == x.HasIsDataLess
                 ;
         }
 
@@ -178,10 +177,10 @@ namespace Reni.Basics
         {
             return
                 (!HasCode && x.HasCode)
-                || (!HasArgs && x.HasArgs)
-                || (!HasSize && x.HasSize)
-                || (!HasType && x.HasType)
-                || (!HasIsDataLess && x.HasIsDataLess)
+                    || (!HasArgs && x.HasArgs)
+                    || (!HasSize && x.HasSize)
+                    || (!HasType && x.HasType)
+                    || (!HasIsDataLess && x.HasIsDataLess)
                 ;
         }
 
@@ -231,10 +230,10 @@ namespace Reni.Basics
             if(ReferenceEquals(this, obj))
                 return true;
             return obj._code.Equals(_code)
-                   && obj._type.Equals(_type)
-                   && obj._args.Equals(_args)
-                   && obj._size.Equals(_size)
-                   && obj._isDataLess.Equals(_isDataLess)
+                && obj._type.Equals(_type)
+                && obj._args.Equals(_args)
+                && obj._size.Equals(_size)
+                && obj._isDataLess.Equals(_isDataLess)
                 ;
         }
 
@@ -268,6 +267,5 @@ namespace Reni.Basics
         public static bool operator ==(Category left, Category right) { return Equals(left, right); }
 
         public static bool operator !=(Category left, Category right) { return !Equals(left, right); }
-        
     }
 }

@@ -34,7 +34,6 @@ using Reni.TokenClasses;
 
 namespace Reni.ReniParser
 {
-    [Serializable]
     sealed class ExpressionSyntax : CompileSyntax
     {
         [Node]

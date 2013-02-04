@@ -1,5 +1,7 @@
-//     Compiler for programming language "Reni"
-//     Copyright (C) 2011 Harald Hoyer
+#region Copyright (C) 2013
+
+//     Project Reni2
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -16,6 +18,8 @@
 //     
 //     Comments, bugs and suggestions to hahoyer at yahoo.de
 
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +32,7 @@ namespace Reni.Code
     /// <summary>
     ///     Binary operations
     /// </summary>
-    [Serializable]
-    internal abstract class BinaryOp : FiberItem
+    abstract class BinaryOp : FiberItem
     {
         [DisableDump]
         [Node]

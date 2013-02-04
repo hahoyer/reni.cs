@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ namespace Reni.Code
     /// <summary>
     ///     Combination of TopRef and Unref
     /// </summary>
-    [Serializable]
     sealed class TopData : Top
     {
         public TopData(Size offset, Size size, Size dataSize)
@@ -51,7 +50,6 @@ namespace Reni.Code
     /// <summary>
     ///     Combination of TopFrameRef and Unref
     /// </summary>
-    [Serializable]
     sealed class TopFrameData : Top
     {
         public TopFrameData(Size offset, Size size, Size dataSize)

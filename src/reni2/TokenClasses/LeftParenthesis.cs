@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -29,11 +29,9 @@ using Reni.Context;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
-using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    [Serializable]
     sealed class LeftParenthesis : TokenClass, IInfix
     {
         readonly int _level;
@@ -45,9 +43,6 @@ namespace Reni.TokenClasses
 
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, left, this, token, right); }
 
-        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
-        {
-            return context.FunctionalObjectResult(category, left, right);
-        }
+        Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right) { return context.FunctionalObjectResult(category, left, right); }
     }
 }

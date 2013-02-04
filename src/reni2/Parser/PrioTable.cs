@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ namespace Reni.Parser
     /// <summary>
     ///     Priority table used in parsing to create the syntax tree.
     /// </summary>
-    [Serializable]
     public sealed class PrioTable
     {
         internal const string Any = "(any)";
@@ -71,7 +70,7 @@ namespace Reni.Parser
         /// <summary>
         ///     shows the table in table form.
         ///     The characters have the following meaning:
-        ///     Plus: New token is higher the found token, 
+        ///     Plus: New token is higher the found token,
         ///     Minus: Found token is higher than new token
         ///     Equal sign: New token and found token are matching
         /// </summary>
@@ -119,13 +118,13 @@ namespace Reni.Parser
                     case "parlevel":
                         result = result.ParenthesisLevel
                             (data.Take(tokenCount).ToArray()
-                             , data.Skip(tokenCount).Take(tokenCount).ToArray()
+                                , data.Skip(tokenCount).Take(tokenCount).ToArray()
                             );
                         break;
                     case "televel":
                         result = result.ThenElseLevel
                             (data.Take(tokenCount).ToArray()
-                             , data.Skip(tokenCount).Take(tokenCount).ToArray()
+                                , data.Skip(tokenCount).Take(tokenCount).ToArray()
                             );
                         break;
                     case "-":
@@ -305,8 +304,8 @@ namespace Reni.Parser
         public static PrioTable List(params string[] x) { return new PrioTable('=', x); }
 
         /// <summary>
-        ///     Define a prio table that adds a parenthesis level. 
-        ///     LToken and RToken should have the same number of elements. 
+        ///     Define a prio table that adds a parenthesis level.
+        ///     LToken and RToken should have the same number of elements.
         ///     Elements of these lists that have the same index are considered as matching
         /// </summary>
         /// <param name="data"> contains a 3 by 3 character table. The characters have the following meaning: 0,0: left TokenClass finds left TokenClass; 0,1: left TokenClass finds TokenClass defined so far; 0,2: left TokenClass finds right TokenClass; 1,0: TokenClass defined so far finds left TokenClass; 1,1: ignored, Table for already defined Tokens used (use '?'); 1,2: TokenClass defined so far finds right TokenClass; 2,0: ignored, "-=+"-Table generated (use '?'); 2,1: right TokenClass finds TokenClass defined so far; 2,2: right TokenClass finds right TokenClass </param>
@@ -368,7 +367,7 @@ namespace Reni.Parser
         /// <summary>
         ///     Returns the priority information of a pair of tokens
         ///     The characters have the following meaning:
-        ///     Plus: New token is higher the recent token, 
+        ///     Plus: New token is higher the recent token,
         ///     Minus: Recent token is higher than new token
         ///     Equal sign: New token and recent token are matching
         /// </summary>

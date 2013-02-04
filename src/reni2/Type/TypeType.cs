@@ -35,7 +35,6 @@ using Reni.TokenClasses;
 
 namespace Reni.Type
 {
-    [Serializable]
     sealed class TypeType : TypeBase
         , IFeaturePath<ISuffixFeature, DumpPrintToken>
         , IFeaturePath<ISuffixFeature, Slash>

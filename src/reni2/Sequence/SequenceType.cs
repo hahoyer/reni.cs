@@ -34,7 +34,6 @@ using Reni.Type;
 
 namespace Reni.Sequence
 {
-    [Serializable]
     sealed class SequenceType
         : TagChild<ArrayType>
             , ISearchPath<ISuffixFeature, SequenceType>

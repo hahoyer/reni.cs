@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    [Serializable]
     sealed class Colon : TokenClass
     {
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
@@ -47,7 +46,6 @@ namespace Reni.TokenClasses
         }
     }
 
-    [Serializable]
     sealed class Exclamation : TokenClass
     {
         static readonly ITokenFactory _tokenFactory = DeclarationTokenFactory.Instance;
@@ -75,7 +73,6 @@ namespace Reni.TokenClasses
         }
     }
 
-    [Serializable]
     sealed class ConverterToken : TokenClass
     {
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
@@ -114,7 +111,7 @@ namespace Reni.TokenClasses
         {
             return new ConverterSyntax
                 (_token
-                 , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
+                    , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
         }
         IssueId RightMustNotBeNullError()
@@ -133,7 +130,7 @@ namespace Reni.TokenClasses
         {
             return new ConverterDeclarationSyntax
                 (Token
-                 , token
+                    , token
                 );
         }
     }

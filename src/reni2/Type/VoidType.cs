@@ -31,7 +31,6 @@ using Reni.Feature.DumpPrint;
 
 namespace Reni.Type
 {
-    [Serializable]
     sealed class VoidType : TypeBase
         , IFeaturePath<ISuffixFeature, DumpPrintToken>
     {
