@@ -27,13 +27,15 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.Feature
 {
     interface ISearchPath
-    {}
+    {
+    }
 
     interface ISearchPath<out TOutType, in TInType> : ISearchPath
         where TOutType : ISearchPath
@@ -91,5 +93,27 @@ namespace Reni.Feature
     interface IFeaturePath<out TPath, in TTarget>
     {
         TPath GetFeature(TTarget target);
+    }
+
+    interface ISearchResult
+    {
+        Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax);
+        Result Result(Category category);
+    }
+
+    interface IConversionFunction
+    {
+        Result Result(Category category);
+    }
+
+    interface ISearchTarget
+    {
+        string StructFeatureName { get; }
+        TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class;
+    }
+
+    interface IFeatureProvider
+    {
+        TPath GetFeature<TPath>(ISearchTarget target) where TPath : class;
     }
 }

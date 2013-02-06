@@ -121,16 +121,23 @@ namespace Reni.Context
 
     sealed class CallDescriptor : FeatureDescriptor
     {
-        readonly TypeBase _type;
+        readonly TypeBase _definingType;
         readonly IFeature _feature;
         readonly Func<Category, Result> _converterResult;
-        public CallDescriptor(TypeBase type, IFeature feature, Func<Category, Result> converterResult)
+        public CallDescriptor(TypeBase definingType, IFeature feature, Func<Category, Result> converterResult)
         {
-            _type = type;
+            _definingType = definingType;
             _feature = feature;
             _converterResult = converterResult;
         }
-        internal override TypeBase Type { get { return _type; } }
+        internal override TypeBase Type
+        {
+            get
+            {
+                var result = ConverterResult(Category.Type);
+                return result != null ? result.Type : _definingType;
+            }
+        }
         protected override IFeature Feature { get { return _feature; } }
         protected override Func<Category, Result> ConverterResult { get { return _converterResult; } }
     }

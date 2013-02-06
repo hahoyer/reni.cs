@@ -25,6 +25,7 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using Reni.Basics;
 using Reni.Feature;
 using Reni.ReniParser;
 
@@ -52,7 +53,14 @@ namespace Reni
         {
             set
             {
-                Tracer.Assert(Result == null || Result == value);
+                if(Result != null && !Result.IsEqual(value))
+                {
+                    var rrr = ((ISimpleFeature)Result).Result(Category.All);
+                    var vvv = ((ISimpleFeature)value).Result(Category.All);
+                }
+
+                Tracer.Assert(Result == null || Result.IsEqual(value), ()=> "Result= "+Result +"\nvalue= "+value);
+
                 Result = value;
             }
         }

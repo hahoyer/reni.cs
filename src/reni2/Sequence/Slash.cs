@@ -31,7 +31,7 @@ using Reni.Type;
 namespace Reni.Sequence
 {
     sealed class Slash 
-        : Operation
+        : Operation<Slash>
         , ISearchPath<ISuffixFeature, TypeType>
     {
         protected override int Signature(int objSize, int argSize) { return BitsConst.DivideSize(objSize, argSize); }

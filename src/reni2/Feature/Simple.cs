@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Sequence;
 
 namespace Reni.Feature
 {
@@ -36,6 +37,27 @@ namespace Reni.Feature
         protected SimpleBase(Func<Category, Result> function)
             : base(_nextObjectId++) { _function = function; }
         Result ISimpleFeature.Result(Category category) { return _function(category); }
+
+        public bool IsEqual(SimpleBase other)
+        {
+            if(_function == other._function)
+                return true;
+            if(_function.Method != other._function.Method)
+                return false;
+
+            if(_function.Target == other._function.Target)
+                return true;
+            if(_function.Target.GetType() != other._function.Target.GetType())
+                return false;
+
+            var simple = _function.Target as Simple<SequenceType>;
+            if(simple != null)
+                return simple.IsEqual((Simple<SequenceType>) other._function.Target);
+
+            Tracer.ConditionalBreak(true);
+
+            return false;
+        }
     }
 
     sealed class Simple<TType>
@@ -47,8 +69,25 @@ namespace Reni.Feature
 
         public Simple(Func<Category, TType, Result> function) { _function = function; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, TType>.Convert(TType type) { return new Simple(category => _function(category, type)); }
-        IPrefixFeature ISearchPath<IPrefixFeature, TType>.Convert(TType type) { return new Simple(category => _function(category, type)); }
+        ISuffixFeature ISearchPath<ISuffixFeature, TType>.Convert(TType type) { return Extension.Feature(category => _function(category, type)); }
+        IPrefixFeature ISearchPath<IPrefixFeature, TType>.Convert(TType type) { return Extension.Feature(category => _function(category, type)); }
+
+        public bool IsEqual(Simple<TType> other)
+        {
+            if (_function == other._function)
+                return true;
+            if (_function.Method != other._function.Method)
+                return false;
+
+            if (_function.Target == other._function.Target)
+                return true;
+            if (_function.Target.GetType() != other._function.Target.GetType())
+                return false;
+
+            Tracer.ConditionalBreak(true);
+
+            return false;
+        }
     }
 
     sealed class Simple : SimpleBase, IPrefixFeature, ISuffixFeature

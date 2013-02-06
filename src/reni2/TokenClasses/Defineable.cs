@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Type;
@@ -44,13 +45,7 @@ namespace Reni.TokenClasses
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
         string ISearchTarget.StructFeatureName { get { return Name; } }
-        IEnumerable<TPath> ISearchTarget.GetFeature<TPath>(TypeBase typeBase)
-        {
-            var result = GetFeature<TPath>(typeBase);
-            if(result == null)
-                yield break;
-            yield return result;
-        }
+        TPath ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetFeature<TPath>(typeBase); }
         protected virtual TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class { return null; }
     }
 

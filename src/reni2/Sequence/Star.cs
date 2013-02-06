@@ -31,7 +31,7 @@ using Reni.Type;
 namespace Reni.Sequence
 {
     sealed class Star 
-        : Operation
+        : Operation<Star>
         , ISearchPath<ISuffixFeature, TypeType>
     {
         protected override int Signature(int objSize, int argSize) { return BitsConst.MultiplySize(objSize, argSize); }

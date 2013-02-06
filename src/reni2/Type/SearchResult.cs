@@ -31,25 +31,25 @@ using Reni.ReniParser;
 
 namespace Reni.Type
 {
-    abstract class SearchResult : ReniObject
+    abstract class SearchResult : ReniObject, ISearchResult
     {
         static int _nextObjectId;
         [EnableDump]
         internal readonly IFeature Feature;
         [EnableDump]
-        internal readonly IConversionFunction[] ConversionFunctions;
+        readonly IConversionFunction[] _conversionFunctions;
 
         internal SearchResult(IFeature feature, IConversionFunction[] conversionFunctions)
             : base(_nextObjectId++)
         {
             Tracer.Assert(feature != null);
             Feature = feature;
-            ConversionFunctions = conversionFunctions;
+            _conversionFunctions = conversionFunctions;
             StopByObjectId(-1);
         }
 
-        internal Result Result(Category category)
-        {                                  
+        Result ISearchResult.Result(Category category)
+        {
             category = category.Typed;
             var featureResult = Feature.Simple.Result(category);
             if(!featureResult.HasArg)
@@ -63,24 +63,15 @@ namespace Reni.Type
         [DisableDump]
         protected abstract TypeBase DefiningType { get; }
 
-        TypeBase LeftType
-        {
-            get
-            {
-                var result = ConverterResult(Category.Type);
-                return result != null ? result.Type : DefiningType;
-            }
-        }
-
         Result ConverterResult(Category category)
         {
             var trace = ObjectId == -8 && category.HasCode;
             StartMethodDump(trace, category);
             try
             {
-                if(ConversionFunctions.Length == 0)
+                if(_conversionFunctions.Length == 0)
                     return null;
-                var results = ConversionFunctions
+                var results = _conversionFunctions
                     .Select((cf, i) => cf.Result(category.Typed))
                     .ToArray();
                 Dump("results", results);
@@ -98,9 +89,9 @@ namespace Reni.Type
             }
         }
 
-        internal Result FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax)
+        Result ISearchResult.FunctionResult(ContextBase context, Category category, ExpressionSyntax syntax)
         {
-            var objectDescriptor = new CallDescriptor(LeftType, Feature, ConverterResult);
+            var objectDescriptor = new CallDescriptor(DefiningType, Feature, ConverterResult);
             return objectDescriptor.Result(category, context, syntax.Left, syntax.Right);
         }
     }

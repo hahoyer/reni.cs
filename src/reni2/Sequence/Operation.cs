@@ -49,4 +49,14 @@ namespace Reni.Sequence
         [DisableDumpExcept(true)]
         protected virtual bool IsCompareOperator { get { return false; } }
     }
+
+    abstract class Operation<TTarget> : Operation
+        where TTarget : class
+    {
+        protected override TPath GetFeature<TPath>(TypeBase provider)
+        {
+            return provider.GetFeature<TPath, TTarget>(this as TTarget)
+                ?? base.GetFeature<TPath>(provider);
+        }
+    }
 }

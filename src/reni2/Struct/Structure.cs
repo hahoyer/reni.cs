@@ -29,6 +29,7 @@ using HWClassLibrary.TreeStructure;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Feature;
 using Reni.TokenClasses;
 using Reni.Type;
 

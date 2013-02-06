@@ -64,7 +64,7 @@ namespace Reni.Code
             get
             {
                 for (var i = 0; i < _rootContext.FunctionCount; i++)
-                    _functions.Ensure(i);
+                    _functions.IsValid(i, true);
                 return _functions;
             }
         }

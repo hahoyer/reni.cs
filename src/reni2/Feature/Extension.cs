@@ -36,6 +36,13 @@ namespace Reni.Feature
 {
     static class Extension
     {
+        static readonly DictionaryEx<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction> _metaFunctionCache
+            = new DictionaryEx<Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result>, MetaFunction>
+                (function => new MetaFunction(function));
+
+        static readonly DictionaryEx<Func<Category, Result>, Simple> _simpleCache
+            = new DictionaryEx<Func<Category, Result>, Simple>(function => new Simple(function));
+
         internal static TFeature CheckedConvert<TFeature, TType>(this ISearchPath<TFeature, TType> feature, TType target)
             where TFeature : class, IFeature
         {
@@ -46,7 +53,7 @@ namespace Reni.Feature
 
         internal static string Dump(this IFeature feature) { return Tracer.Dump(feature); }
 
-        internal static Simple Feature(Func<Category, Result> function) { return new Simple(function); }
+        internal static Simple Feature(Func<Category, Result> function) { return _simpleCache[function]; }
         internal static Simple<T> Feature<T>(Func<Category, T, Result> function) { return new Simple<T>(function); }
         internal static Simple<T1, T2> Feature<T1, T2>(Func<Category, T1, T2, Result> function) { return new Simple<T1, T2>(function); }
         
@@ -64,8 +71,7 @@ namespace Reni.Feature
         
         internal static MetaFunction Feature(Func<ContextBase, Category, CompileSyntax, CompileSyntax, Result> function)
         {
-            return
-                new MetaFunction(function);
+            return _metaFunctionCache[function];
         }
 
         [UsedImplicitly]
@@ -101,6 +107,19 @@ namespace Reni.Feature
                 .ReplaceArg(converterResult)
                 .CodeArgs
                 .HasArg;
+        }
+
+        internal static bool IsEqual(this ISearchPath one, ISearchPath other)
+        {
+            if(one == other)
+                return true;
+            if(one.GetType() != other.GetType())
+                return false;
+            var simple = one as SimpleBase;
+            if(simple != null)
+                return simple.IsEqual((SimpleBase)other);
+            Tracer.ConditionalBreak(true);
+            return false;
         }
     }
 }

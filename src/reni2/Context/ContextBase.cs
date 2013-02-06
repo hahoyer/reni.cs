@@ -121,7 +121,7 @@ namespace Reni.Context
 
         internal TypeBase Type(CompileSyntax syntax) { return UniqueResult(Category.Type, syntax).Type; }
 
-        internal SearchResult Search(ISearchTarget target)
+        internal ISearchResult Search(ISearchTarget target)
         {
             var visitor = new ContextSearchVisitor(target, null);
             visitor.Search(this);

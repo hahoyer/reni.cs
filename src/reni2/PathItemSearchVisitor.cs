@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -30,32 +30,39 @@ using Reni.ReniParser;
 
 namespace Reni
 {
-    sealed class PathItemSearchVisitor<TFeature, TType> : SearchVisitor<ISearchPath<TFeature, TType>>
+    sealed class PathItemSearchVisitor<TFeature, TProvider> : SearchVisitor<ISearchPath<TFeature, TProvider>>
         where TFeature : class, ISearchPath
+        where TProvider : IFeatureProvider
     {
         internal override DictionaryEx<System.Type, Probe> Probes { get { return _parent.Probes; } }
         [DisableDump]
         readonly SearchVisitor<TFeature> _parent;
 
         [EnableDump]
-        readonly TType _target;
+        readonly TProvider _provider;
 
-        public PathItemSearchVisitor(SearchVisitor<TFeature> parent, TType target, ExpressionSyntax syntax)
+        public PathItemSearchVisitor(SearchVisitor<TFeature> parent, TProvider provider, ExpressionSyntax syntax)
             : base(syntax)
         {
             _parent = parent;
-            _target = target;
+            _provider = provider;
+        }
+
+        internal override void Search()
+        {
+            base.Search();
+            _parent.InternalResult = _provider.GetFeature<TFeature>(Target);
         }
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
         internal override ISearchTarget Target { get { return _parent.Target; } }
 
-        internal override ISearchPath<TFeature, TType> InternalResult
+        internal override ISearchPath<TFeature, TProvider> InternalResult
         {
             set
             {
                 if(value != null)
-                    _parent.InternalResult = value.Convert(_target);
+                    _parent.InternalResult = value.Convert(_provider);
             }
         }
         internal override IConversionFunction[] ConversionFunctions { get { return _parent.ConversionFunctions; } set { _parent.ConversionFunctions = value; } }

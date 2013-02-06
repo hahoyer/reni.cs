@@ -172,7 +172,7 @@ namespace Reni
         internal void Materialize()
         {
             if(!_parameters.ParseOnly)
-                _codeContainer.Ensure();
+                _codeContainer.IsValid = true;
         }
 
         public static string FlatExecute(string text, bool isFakedName = false)

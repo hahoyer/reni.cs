@@ -37,7 +37,7 @@ namespace Reni
         internal ContextSearchVisitor(ISearchTarget target, ExpressionSyntax syntax)
             : base(target, syntax) { }
 
-        internal SearchResult SearchResult
+        internal ISearchResult SearchResult
         {
             get
             {

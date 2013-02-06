@@ -189,7 +189,7 @@ namespace Reni.Struct
         {
             if(name == null)
                 return null;
-            if(!Dictionary.ContainsKey(name))
+            if(!Dictionary.IsValid(name))
                 return null;
 
             var position = Dictionary[name];

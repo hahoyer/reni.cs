@@ -25,7 +25,6 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Basics;
 using Reni.Feature;
 using Reni.ReniParser;
 using Reni.Struct;
@@ -38,7 +37,7 @@ namespace Reni
     {
         internal static bool Trace;
 
-        protected abstract SearchVisitor PathItem<TType>(TType target);
+        protected abstract SearchVisitor PathItem<TProvider>(TProvider provider) where TProvider : IFeatureProvider;
 
         internal abstract bool IsSuccessFull { get; }
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
@@ -47,15 +46,16 @@ namespace Reni
         protected abstract void SearchNameSpace(StructureType structureType);
         internal abstract void Search();
 
-        internal void Search<TType>(TType target, Func<TypeBase> getChild)
+        internal void Search<TProvider>(TProvider provider, Func<TypeBase> getChild)
+            where TProvider : IFeatureProvider
         {
             if(Trace)
-                Tracer.FlaggedLine(1, " >>> " + target.NodeDump());
+                Tracer.FlaggedLine(1, " >>> " + provider.NodeDump());
             if(Trace)
                 Tracer.IndentStart();
             try
             {
-                var pathItemVisitor = PathItem(target);
+                var pathItemVisitor = PathItem(provider);
 
                 if(Trace)
                     Tracer.FlaggedLine("pathItemVisitor.Search()");
@@ -76,7 +76,7 @@ namespace Reni
                 if(IsSuccessFull)
                     return;
 
-                var isc = target as IProxyType;
+                var isc = provider as IProxyType;
                 if(isc == null)
                     return;
 
@@ -94,7 +94,7 @@ namespace Reni
                 if(Trace)
                     Tracer.IndentEnd();
                 if(Trace)
-                    Tracer.FlaggedLine(1, " <<< " + target.NodeDump());
+                    Tracer.FlaggedLine(1, " <<< " + provider.NodeDump());
             }
         }
 
@@ -107,11 +107,6 @@ namespace Reni
         }
 
         internal abstract void Search(IssueType target);
-    }
-
-    interface IConversionFunction
-    {
-        Result Result(Category category);
     }
 
     abstract class SearchVisitor<TFeature> : SearchVisitor
@@ -129,7 +124,7 @@ namespace Reni
         internal override void Search()
         {
             Tracer.Assert(!IsSuccessFull, () => Tracer.Dump(Probes));
-            Probes.Ensure(typeof(TFeature));
+            Probes.IsValid(typeof(TFeature), true);
             InternalResult = Target as TFeature;
         }
 
@@ -141,12 +136,6 @@ namespace Reni
             InternalResult = internalResult;
         }
 
-        protected override SearchVisitor PathItem<TType>(TType target) { return new PathItemSearchVisitor<TFeature, TType>(this, target, _syntax); }
-    }
-
-    interface ISearchTarget
-    {
-        string StructFeatureName { get; }
-        IEnumerable<TPath> GetFeature<TPath>(TypeBase typeBase) where TPath : class;
+        protected override SearchVisitor PathItem<TProvider>(TProvider provider) { return new PathItemSearchVisitor<TFeature, TProvider>(this, provider, _syntax); }
     }
 }

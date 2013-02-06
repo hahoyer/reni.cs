@@ -25,6 +25,7 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Feature;
 
 namespace Reni
 {
