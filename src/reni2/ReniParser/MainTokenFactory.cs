@@ -20,11 +20,8 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.Parser;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
@@ -32,6 +29,10 @@ using Reni.Parser;
 using Reni.Sequence;
 using Reni.Struct;
 using Reni.TokenClasses;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HWClassLibrary.Debug;
 
 namespace Reni.ReniParser
 {
@@ -101,7 +102,7 @@ namespace Reni.ReniParser
         ///     Creates the main token classes.
         /// </summary>
         /// <returns> </returns>
-        protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses() { return TokenClasses; }
+        protected override DictionaryEx<string, TokenClasses.TokenClass> GetPredefinedTokenClasses() { return TokenClasses; }
 
         internal static DictionaryEx<string, TokenClasses.TokenClass> TokenClasses
         {
@@ -162,7 +163,7 @@ namespace Reni.ReniParser
         protected override TokenClasses.TokenClass GetEndOfText() { return new RightParenthesis(0); }
         protected override TokenClasses.TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
         protected override TokenClasses.TokenClass GetNumber() { return new TokenClasses.Number(); }
-        protected override TokenClasses.TokenClass GetNewToken(string name) { return new UserSymbol(name); }
+        protected override TokenClasses.TokenClass GetTokenClass(string name) { return new UserSymbol(name); }
         protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
         protected override TokenClasses.TokenClass GetText() { return new Text(); }
     }

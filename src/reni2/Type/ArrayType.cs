@@ -150,7 +150,7 @@ namespace Reni.Type
                 .UniqueSequence.UniqueAlign;
             var constructorResult = function.ApplyResult(category.Typed, indexType);
             var elements = Count
-                .Array(i => ElementConstructorResult(category, constructorResult, i, indexType))
+                .Select(i => ElementConstructorResult(category, constructorResult, i, indexType))
                 .Aggregate(VoidType.Result(category), (c, n) => n + c);
             return Result(category, elements);
         }

@@ -75,7 +75,7 @@ namespace Reni.Struct
             var searchVisitorChild = searchVisitor as SearchVisitor<ISuffixFeature>;
             if(searchVisitorChild == null || searchVisitorChild.IsSuccessFull)
                 return;
-            searchVisitorChild.InternalResult = Structure
+            searchVisitorChild.InternalResultProvider = Structure
                 .Search(searchVisitorChild.Target)
                 .CheckedConvert(this);
         }

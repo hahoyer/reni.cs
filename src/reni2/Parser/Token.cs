@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ namespace Reni.Parser
         [DisableDump]
         internal string Name { get { return TokenClass.Name; } }
 
-        internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
+        internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right = null) { return TokenClass.Syntax(left, Data, right); }
 
         internal static Token CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, ITokenClass tokenClass) { return CreateAndAdvance(sourcePosn, getLength, (sp, l) => tokenClass); }
         internal static Token CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<string, ITokenClass> getTokenClass) { return CreateAndAdvance(sourcePosn, getLength, (sp, l) => getTokenClass(sp.SubString(0, l))); }
@@ -62,7 +62,7 @@ namespace Reni.Parser
                 return null;
 
             var result = new Token(getTokenClass(sourcePosn, length.Value), sourcePosn.Source, sourcePosn.Position, length.Value);
-            sourcePosn.Incr(length.Value);
+            sourcePosn.Position += length.Value;
             return result;
         }
     }

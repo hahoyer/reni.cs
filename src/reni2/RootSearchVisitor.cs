@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ using System.Linq;
 using System.Collections.Generic;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Basics;
 using Reni.Feature;
 using Reni.ReniParser;
 
@@ -36,7 +35,8 @@ namespace Reni
     {
         readonly DictionaryEx<System.Type, Probe> _probes;
         readonly ISearchTarget _target;
-        protected TFeature Result { get; private set; }
+        protected TFeature ResultProvider { get; private set; }
+        protected TFeature ResultTarget { get; private set; }
 
         internal RootSearchVisitor(ISearchTarget target, ExpressionSyntax syntax)
             : base(syntax)
@@ -47,21 +47,24 @@ namespace Reni
         }
 
         internal override sealed IConversionFunction[] ConversionFunctions { get; set; }
-        internal override bool IsSuccessFull { get { return Result != null; } }
+        internal override bool IsSuccessFull { get { return ResultProvider != null; } }
+        internal override bool IsSuccessFullTarget { get { return ResultTarget != null; } }
 
-        internal override TFeature InternalResult
+        internal override TFeature InternalResultProvider
         {
             set
             {
-                if(Result != null && !Result.IsEqual(value))
-                {
-                    var rrr = ((ISimpleFeature)Result).Result(Category.All);
-                    var vvv = ((ISimpleFeature)value).Result(Category.All);
-                }
+                Tracer.Assert(ResultProvider == null || value == null || ResultProvider == value, () => "Result= " + ResultProvider + "\nvalue= " + value);
+                ResultProvider = value;
+            }
+        }
 
-                Tracer.Assert(Result == null || Result.IsEqual(value), ()=> "Result= "+Result +"\nvalue= "+value);
-
-                Result = value;
+        internal override TFeature InternalResultTarget
+        {
+            set
+            {
+                Tracer.Assert(ResultTarget == null || value == null || ResultTarget == value, () => "ResultTarget= " + ResultTarget + "\nvalue= " + value);
+                ResultTarget = value;
             }
         }
 

@@ -40,6 +40,7 @@ namespace Reni
         protected abstract SearchVisitor PathItem<TProvider>(TProvider provider) where TProvider : IFeatureProvider;
 
         internal abstract bool IsSuccessFull { get; }
+        internal abstract bool IsSuccessFullTarget { get; }
         internal abstract IConversionFunction[] ConversionFunctions { set; get; }
         internal void Add(IConversionFunction conversionFunction) { ConversionFunctions = ConversionFunctions.Concat(new[] {conversionFunction}).ToArray(); }
 
@@ -116,7 +117,8 @@ namespace Reni
 
         protected SearchVisitor(ExpressionSyntax syntax) { _syntax = syntax; }
 
-        internal abstract TFeature InternalResult { set; }
+        internal abstract TFeature InternalResultProvider { set; }
+        internal abstract TFeature InternalResultTarget { set; }
         internal abstract ISearchTarget Target { get; }
         internal abstract DictionaryEx<System.Type, Probe> Probes { get; }
 
@@ -125,7 +127,7 @@ namespace Reni
         {
             Tracer.Assert(!IsSuccessFull, () => Tracer.Dump(Probes));
             Probes.IsValid(typeof(TFeature), true);
-            InternalResult = Target as TFeature;
+            InternalResultTarget = Target as TFeature;
         }
 
         internal override void Search(IssueType target)
@@ -133,7 +135,7 @@ namespace Reni
             var searchResult = target.SearchResult(Target, _syntax);
             var internalResult = searchResult as TFeature;
             //Tracer.Assert(internalResult != null, ()=>typeof(TFeature).PrettyName());
-            InternalResult = internalResult;
+            InternalResultTarget = internalResult;
         }
 
         protected override SearchVisitor PathItem<TProvider>(TProvider provider) { return new PathItemSearchVisitor<TFeature, TProvider>(this, provider, _syntax); }

@@ -285,7 +285,6 @@
     <Compile Include="Syntax\ConverterSyntax.cs" />
     <Compile Include="Runtime\OutStream.cs" />
     <Compile Include="Parser\ParserInst.cs" />
-    <Compile Include="Parser\PrioTable.cs" />
     <Compile Include="Parser\PushedSyntax.cs" />
     <Compile Include="Parser\Source.cs" />
     <Compile Include="Parser\SourcePosn.cs" />

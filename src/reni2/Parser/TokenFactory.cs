@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.Parser;
 
 namespace Reni.Parser
 {
@@ -44,7 +45,7 @@ namespace Reni.Parser
             _endOfText = new SimpleCache<TTokenClass>(InternalGetEndOfText);
             _beginOfText = new SimpleCache<TTokenClass>(InternalGetBeginOfText);
             _number = new SimpleCache<TTokenClass>(InternalGetNumber);
-            _tokenClasses = new SimpleCache<DictionaryEx<string, TTokenClass>>(InternalGetTokenClasses);
+            _tokenClasses = new SimpleCache<DictionaryEx<string, TTokenClass>>(GetTokenClasses);
             _text = new SimpleCache<TTokenClass>(InternalGetText);
         }
         TTokenClass InternalGetBeginOfText()
@@ -60,11 +61,18 @@ namespace Reni.Parser
             return result;
         }
 
-        DictionaryEx<string, TTokenClass> InternalGetTokenClasses()
+        DictionaryEx<string, TTokenClass> GetTokenClasses()
         {
-            var result = GetTokenClasses();
+            var result = new DictionaryEx<string, TTokenClass>(GetPredefinedTokenClasses(), InternalGetTokenClass);
             foreach(var pair in result)
                 pair.Value.Name = pair.Key;
+            return result;
+        }
+
+        TTokenClass InternalGetTokenClass(string name)
+        {
+            var result = GetTokenClass(name);
+            result.Name = name;
             return result;
         }
 
@@ -84,16 +92,7 @@ namespace Reni.Parser
 
         PrioTable ITokenFactory.PrioTable { get { return _prioTable; } }
 
-        ITokenClass ITokenFactory.TokenClass(string name)
-        {
-            TTokenClass result;
-            if(TokenClasses.TryGetValue(name, out result))
-                return result;
-            result = GetNewToken(name);
-            result.Name = name;
-            TokenClasses.Add(name, result);
-            return result;
-        }
+        ITokenClass ITokenFactory.TokenClass(string name) { return TokenClasses[name]; }
 
         ITokenClass ITokenFactory.Number { get { return _number.Value; } }
         ITokenClass ITokenFactory.Text { get { return _text.Value; } }
@@ -101,15 +100,15 @@ namespace Reni.Parser
         ITokenClass ITokenFactory.EndOfText { get { return _endOfText.Value; } }
 
         protected abstract TTokenClass GetSyntaxError(string message);
-        protected abstract DictionaryEx<string, TTokenClass> GetTokenClasses();
+        protected abstract DictionaryEx<string, TTokenClass> GetPredefinedTokenClasses();
 
         protected virtual TTokenClass GetEndOfText() { return GetSyntaxError("unexpected end of text".Quote()); }
         protected virtual TTokenClass GetBeginOfText() { return GetSyntaxError("unexpected begin of text".Quote()); }
-        protected virtual TTokenClass GetNewToken(string name) { return GetSyntaxError("invalid symbol: " + name.Quote()); }
+        protected virtual TTokenClass GetTokenClass(string name) { return GetSyntaxError("invalid symbol: " + name.Quote()); }
         protected virtual TTokenClass GetNumber() { return GetSyntaxError("unexpected number"); }
         protected virtual TTokenClass GetText() { return GetSyntaxError("unexpected string"); }
 
-        Dictionary<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
+        DictionaryEx<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
         protected ITokenClass TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }
     }
 }

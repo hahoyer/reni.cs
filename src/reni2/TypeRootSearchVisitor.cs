@@ -47,7 +47,7 @@ namespace Reni
             get
             {
                 if(IsSuccessFull)
-                    return new TypeSearchResult(Result, ConversionFunctions, _type);
+                    return new TypeSearchResult(ResultProvider, ConversionFunctions, _type);
                 return null;
             }
         }

@@ -51,20 +51,31 @@ namespace Reni
         internal override void Search()
         {
             base.Search();
-            _parent.InternalResult = _provider.GetFeature<TFeature>(Target);
+            _parent.InternalResultProvider = _provider.GetFeature<TFeature>(Target);
         }
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
+        internal override bool IsSuccessFullTarget { get { return _parent.IsSuccessFullTarget; } }
         internal override ISearchTarget Target { get { return _parent.Target; } }
 
-        internal override ISearchPath<TFeature, TProvider> InternalResult
+        internal override ISearchPath<TFeature, TProvider> InternalResultProvider
         {
             set
             {
                 if(value != null)
-                    _parent.InternalResult = value.Convert(_provider);
+                    _parent.InternalResultProvider = value.Convert(_provider);
             }
         }
+
+        internal override ISearchPath<TFeature, TProvider> InternalResultTarget
+        {
+            set
+            {
+                if (value != null)
+                    _parent.InternalResultTarget = value.Convert(_provider);
+            }
+        }
+
         internal override IConversionFunction[] ConversionFunctions { get { return _parent.ConversionFunctions; } set { _parent.ConversionFunctions = value; } }
     }
 }

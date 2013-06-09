@@ -64,7 +64,7 @@ namespace Reni.Parser
                     if(relation != '-')
                     {
                         if(token.TokenClass == _tokenFactory.EndOfText)
-                            return token.Syntax(result, null);
+                            return token.Syntax(result);
                         stack.Push(new PushedSyntax(result, token, token.TokenClass.NewTokenFactory ?? stack.Peek().TokenFactory));
                         result = null;
                     }

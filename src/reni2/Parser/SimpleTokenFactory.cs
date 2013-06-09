@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.Parser;
 using HWClassLibrary.TreeStructure;
 using Reni.Graphics;
 
@@ -36,7 +37,7 @@ namespace Reni.Parser
             : base(prioTable) { }
 
         protected override TokenClass GetSyntaxError(string message) { throw new Exception("Syntax error: " + message); }
-        protected override DictionaryEx<string, TokenClass> GetTokenClasses()
+        protected override DictionaryEx<string, TokenClass> GetPredefinedTokenClasses()
         {
             return new DictionaryEx<string, TokenClass>
             {
@@ -48,7 +49,7 @@ namespace Reni.Parser
         }
         protected override TokenClass GetEndOfText() { return new CloseToken(0); }
         protected override TokenClass GetBeginOfText() { return new OpenToken(0); }
-        protected override TokenClass GetNewToken(string name) { return CommonTokenClass; }
+        protected override TokenClass GetTokenClass(string name) { return CommonTokenClass; }
         protected override TokenClass GetNumber() { return CommonTokenClass; }
         protected override TokenClass GetText() { return CommonTokenClass; }
         static TokenClass CommonTokenClass { get { return new AnyTokenClass(); } }

@@ -245,7 +245,7 @@ namespace Reni.Struct
             StartMethodDump(trace, parent, accessPosition);
             try
             {
-                var subStatementIds = accessPosition.Array(i => i).ToArray();
+                var subStatementIds = accessPosition.Select(i => i).ToArray();
                 Dump("subStatementIds", subStatementIds);
                 BreakExecution();
                 if(subStatementIds.Any(position => InternalInnerIsDataLess(position) == false))
@@ -278,7 +278,7 @@ namespace Reni.Struct
                 Dump("Statements", Statements);
 
                 var results = (fromNotPosition - fromPosition)
-                    .Array(i => fromPosition + i)
+                    .Select(i => fromPosition + i)
                     .Where(position => !Statements[position].IsLambda)
                     .Select(position => InnerResult(category, parent, position))
                     .Select(r => r.Align(Root.DefaultRefAlignParam.AlignBits))
@@ -319,7 +319,7 @@ namespace Reni.Struct
         {
             return Statements
                 .Length
-                .Array(i => i)
+                .Select(i => i)
                 .Where(i => !InternalInnerIsDataLess(parent, i))
                 .Select(i => i.ToString() + "=" + InnerResult(Category.Size, parent, i).Size.ToString())
                 .ToArray();
