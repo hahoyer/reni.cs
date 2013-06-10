@@ -42,6 +42,7 @@ namespace Reni.TokenClasses
         internal int Level { get { return _level; } }
 
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, left, this, token, right); }
+        protected override ParsedSyntax Prefix(TokenData token, ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, null, this, token, right);; }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right) { return context.FunctionalObjectResult(category, left, right); }
     }

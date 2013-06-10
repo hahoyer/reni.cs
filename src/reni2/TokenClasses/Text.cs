@@ -33,7 +33,7 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class Text : Terminal
+    sealed class Text : TerminalToken
     {
         public override Result Result(ContextBase context, Category category, TokenData token)
         {

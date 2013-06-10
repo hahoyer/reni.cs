@@ -40,15 +40,12 @@ namespace Reni.TokenClasses
         protected static IssueId RightMustBeNullIssue() { return IssueId.UnexpectedRightOperand; }
     }
 
-    abstract class Terminal : Special, ITerminal
+    abstract class TerminalToken : Special, ITerminal
     {
-        protected override sealed ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right)
-        {
-            if(left != null || right != null)
-                return LeftAndRightMustBeNull(left, right);
-            return new TerminalSyntax(token, this);
-        }
-
+        sealed protected override ParsedSyntax Terminal(TokenData token) { return new TerminalSyntax(token, this); }
+        sealed protected override ParsedSyntax Prefix(TokenData token, ParsedSyntax right) { return LeftAndRightMustBeNull(null, right); }
+        sealed protected override ParsedSyntax Suffix(ParsedSyntax left, TokenData token) { return LeftAndRightMustBeNull(left, null); ; }
+        sealed protected override ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right) { return LeftAndRightMustBeNull(left, right); }
         protected abstract CompileSyntaxError LeftAndRightMustBeNull(ParsedSyntax left, ParsedSyntax right);
 
         public abstract Result Result(ContextBase context, Category category, TokenData token);
@@ -121,9 +118,9 @@ namespace Reni.TokenClasses
         {
             return new InfixSyntax
                 (token
-                    , left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError)
-                    , this
-                    , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
+                 , left.CheckedToCompiledSyntax(token, LeftMustNotBeNullError)
+                 , this
+                 , right.CheckedToCompiledSyntax(token, RightMustNotBeNullError)
                 );
         }
     }

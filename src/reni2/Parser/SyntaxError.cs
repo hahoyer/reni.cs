@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -29,22 +29,19 @@ using Reni.Validation;
 
 namespace Reni.Parser
 {
-    sealed class SyntaxError : ReniObject, ITokenClass, Match.IError
+    sealed class SyntaxError : ReniObject, IType<IParsedSyntax>, Match.IError
     {
         [EnableDump]
         readonly IssueId _issueId;
 
         public SyntaxError(IssueId issueId) { _issueId = issueId; }
 
-        string ITokenClass.Name { get { return PrioTable.Error; } set { throw new NotImplementedException(); } }
-        ITokenFactory ITokenClass.NewTokenFactory { get { return null; } }
-        IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right)
+        IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right)
         {
-            return new CompileSyntaxError
-                (token
-                 , _issueId
-                 , right as CompileSyntaxError
-                );
+            NotImplementedMethod(left, part, right);
+            return null;
         }
+        string IType<IParsedSyntax>.PrioTableName { get { return PrioTable.Error; } }
+        bool IType<IParsedSyntax>.IsEnd { get { return false; } }
     }
 }

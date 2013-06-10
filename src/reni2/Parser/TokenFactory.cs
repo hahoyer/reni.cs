@@ -30,7 +30,7 @@ using HWClassLibrary.Parser;
 namespace Reni.Parser
 {
     abstract class TokenFactory<TTokenClass> : ReniObject, ITokenFactory
-        where TTokenClass : class, ITokenClass
+        where TTokenClass : class, IType<IParsedSyntax>, INameProvider
     {
         readonly PrioTable _prioTable;
         readonly SimpleCache<DictionaryEx<string, TTokenClass>> _tokenClasses;
@@ -92,12 +92,11 @@ namespace Reni.Parser
 
         PrioTable ITokenFactory.PrioTable { get { return _prioTable; } }
 
-        ITokenClass ITokenFactory.TokenClass(string name) { return TokenClasses[name]; }
+        IType<IParsedSyntax> ITokenFactory.TokenClass(string name) { return TokenClasses[name]; }
 
-        ITokenClass ITokenFactory.Number { get { return _number.Value; } }
-        ITokenClass ITokenFactory.Text { get { return _text.Value; } }
-        ITokenClass ITokenFactory.BeginOfText { get { return _beginOfText.Value; } }
-        ITokenClass ITokenFactory.EndOfText { get { return _endOfText.Value; } }
+        IType<IParsedSyntax> ITokenFactory.Number { get { return _number.Value; } }
+        IType<IParsedSyntax> ITokenFactory.Text { get { return _text.Value; } }
+        IType<IParsedSyntax> ITokenFactory.EndOfText { get { return _endOfText.Value; } }
 
         protected abstract TTokenClass GetSyntaxError(string message);
         protected abstract DictionaryEx<string, TTokenClass> GetPredefinedTokenClasses();
@@ -109,6 +108,6 @@ namespace Reni.Parser
         protected virtual TTokenClass GetText() { return GetSyntaxError("unexpected string"); }
 
         DictionaryEx<string, TTokenClass> TokenClasses { get { return _tokenClasses.Value; } }
-        protected ITokenClass TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }
+        protected IType<IParsedSyntax> TokenClass(string name) { return ((ITokenFactory) this).TokenClass(name); }
     }
 }

@@ -24,6 +24,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Parser;
 
 namespace Reni.Parser
 {
@@ -34,23 +35,23 @@ namespace Reni.Parser
         protected abstract int? Text(SourcePosn sourcePosn);
         protected abstract int? Any(SourcePosn sourcePosn);
 
-        internal Token CreateToken(SourcePosn sourcePosn, ITokenFactory tokenFactory)
+        internal Item<IParsedSyntax> CreateToken(SourcePosn sourcePosn, ITokenFactory tokenFactory)
         {
             try
             {
                 sourcePosn.Position += WhiteSpace(sourcePosn);
-                return Token.CreateAndAdvance(sourcePosn, sp => sp.IsEnd ? (int?) 0 : null, tokenFactory.EndOfText)
-                    ?? Token.CreateAndAdvance(sourcePosn, Number, tokenFactory.Number)
-                    ?? Token.CreateAndAdvance(sourcePosn, Text, tokenFactory.Text)
-                    ?? Token.CreateAndAdvance(sourcePosn, Any, tokenFactory.TokenClass)
+                return CreateAndAdvance(sourcePosn, sp => sp.IsEnd ? (int?) 0 : null, tokenFactory.EndOfText)
+                    ?? CreateAndAdvance(sourcePosn, Number, tokenFactory.Number)
+                    ?? CreateAndAdvance(sourcePosn, Text, tokenFactory.Text)
+                    ?? CreateAndAdvance(sourcePosn, Any, tokenFactory.TokenClass)
                     ?? WillReturnNull(sourcePosn);
             }
             catch(Exception exception)
             {
-                return Token.CreateAndAdvance(exception.SourcePosn, sp => exception.Length, exception.TokenClass);
+                return CreateAndAdvance(exception.SourcePosn, sp => exception.Length, exception.TokenClass);
             }
         }
-        Token WillReturnNull(SourcePosn sourcePosn)
+        Item<IParsedSyntax> WillReturnNull(SourcePosn sourcePosn)
         {
             NotImplementedMethod(sourcePosn);
             return null;
@@ -59,15 +60,33 @@ namespace Reni.Parser
         internal sealed class Exception : System.Exception
         {
             public readonly SourcePosn SourcePosn;
-            public readonly ITokenClass TokenClass;
+            public readonly IType<IParsedSyntax> TokenClass;
             public readonly int Length;
 
-            public Exception(SourcePosn sourcePosn, ITokenClass tokenClass, int length)
+            public Exception(SourcePosn sourcePosn, IType<IParsedSyntax> tokenClass, int length)
             {
                 SourcePosn = sourcePosn;
                 TokenClass = tokenClass;
                 Length = length;
             }
+        }
+
+        static Item<IParsedSyntax> CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, IType<IParsedSyntax> tokenClass) { return CreateAndAdvance(sourcePosn, getLength, (sp, l) => tokenClass); }
+        static Item<IParsedSyntax> CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<string, IType<IParsedSyntax>> getTokenClass) { return CreateAndAdvance(sourcePosn, getLength, (sp, l) => getTokenClass(sp.SubString(0, l))); }
+       
+        static Item<IParsedSyntax> CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<SourcePosn, int, IType<IParsedSyntax>> getTokenClass)
+        {
+            var length = getLength(sourcePosn);
+            if(length == null)
+                return null;
+
+            var result = new Item<IParsedSyntax>
+                (
+                getTokenClass(sourcePosn, length.Value), 
+                TokenData.Span(sourcePosn, length.Value  )
+                );
+            sourcePosn.Position += length.Value;
+            return result;
         }
     }
 }
