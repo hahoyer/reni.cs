@@ -35,10 +35,10 @@ using Reni.Sequence;
 namespace Reni.Type
 {
     sealed class BitType : TypeBase
-        , IFeaturePath<ISuffixFeature, DumpPrintToken>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, DumpPrintToken>
-        , IFeaturePath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, Sign>
-        , IFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Operation>
+        , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
+        , INamedFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, DumpPrintToken>
+        , INamedFeaturePath<ISearchPath<ISearchPath<IPrefixFeature, SequenceType>, ArrayType>, Sign>
+        , INamedFeaturePath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, Operation>
     {
         sealed class PrefixFeature
             : DictionaryEx<int, BitsPrefixFeature>

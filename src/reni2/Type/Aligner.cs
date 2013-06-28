@@ -32,8 +32,7 @@ namespace Reni.Type
     sealed class Aligner
         : Child<TypeBase>
             , ISearchPath<ISuffixFeature, TypeBase>
-            , IFeaturePath<ISuffixFeature, TypeBase>
-
+            , IConversionFeaturePath<ISuffixFeature, TypeBase>
     {
         [DisableDump]
         readonly int _alignBits;

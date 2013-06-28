@@ -27,6 +27,7 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
+using Reni.Parser;
 using Reni.ReniParser;
 using Reni.Syntax;
 using Reni.Type;
@@ -58,6 +59,9 @@ namespace Reni.Feature
 
     interface IContextFeature : IFeature
     {}
+
+    interface IConversionFeature : IFeature
+    { }
 
     interface ISimpleFeature
     {
@@ -93,6 +97,16 @@ namespace Reni.Feature
     interface IFeaturePath<out TPath, in TTarget>
     {
         TPath GetFeature(TTarget target);
+    }
+
+    interface IConversionFeaturePath<out TPath, in TTarget>: IFeaturePath<TPath, TTarget>
+        where TTarget: TypeBase
+    {
+    }
+
+    interface INamedFeaturePath<out TPath, in TTarget>: IFeaturePath<TPath, TTarget>
+        where TTarget : TokenClass
+    {
     }
 
     interface ISearchResult

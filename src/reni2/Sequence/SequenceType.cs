@@ -38,12 +38,12 @@ namespace Reni.Sequence
         : TagChild<ArrayType>
             , ISearchPath<ISuffixFeature, SequenceType>
             , ISearchPath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
-            , IFeaturePath<ISuffixFeature, ConcatArrays>
-            , IFeaturePath<ISuffixFeature, TokenClasses.EnableCut>
-            , IFeaturePath<ISuffixFeature, UndecorateToken>
-            , IFeaturePath<ISuffixFeature, SequenceType>
-            , IFeaturePath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
-            , IFeaturePath<ISuffixFeature, ArrayType>
+            , INamedFeaturePath<ISuffixFeature, ConcatArrays>
+            , INamedFeaturePath<ISuffixFeature, TokenClasses.EnableCut>
+            , INamedFeaturePath<ISuffixFeature, UndecorateToken>
+            , IConversionFeaturePath<ISuffixFeature, SequenceType>
+            , IConversionFeaturePath<ISearchPath<ISuffixFeature, Type.EnableCut>, SequenceType>
+            , IConversionFeaturePath<ISuffixFeature, ArrayType>
     {
         readonly DictionaryEx<RefAlignParam, ObjectReference> _objectReferencesCache;
 
@@ -154,10 +154,8 @@ namespace Reni.Sequence
         {
             var result = Result
                 (
-                    category
-                    ,
-                    () => Element.UniqueArray(oldCount).UniqueSequence.ArgCode.BitCast(Size)
-                    ,
+                    category,
+                    () => Element.UniqueArray(oldCount).UniqueSequence.ArgCode.BitCast(Size),
                     CodeArgs.Arg
                 );
             return result;

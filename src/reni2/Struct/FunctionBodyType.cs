@@ -37,7 +37,7 @@ using Reni.Type;
 namespace Reni.Struct
 {
     sealed class FunctionBodyType : TypeBase, IFeature, IFunctionFeature, ISimpleFeature
-        , IFeaturePath<ISuffixFeature, DumpPrintToken>
+        , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
     {
         [EnableDump]
         [Node]

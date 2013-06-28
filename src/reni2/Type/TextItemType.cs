@@ -33,7 +33,7 @@ namespace Reni.Type
 {
     sealed class TextItemType
         : TagChild<TypeBase>
-            , IFeaturePath<ISuffixFeature, DumpPrintToken>
+            , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
     {
         public TextItemType(TypeBase parent)
             : base(parent)

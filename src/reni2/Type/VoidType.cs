@@ -32,7 +32,7 @@ using Reni.Feature.DumpPrint;
 namespace Reni.Type
 {
     sealed class VoidType : TypeBase
-        , IFeaturePath<ISuffixFeature, DumpPrintToken>
+        , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
     {
         readonly Root _rootContext;
         public VoidType(Root rootContext) { _rootContext = rootContext; }

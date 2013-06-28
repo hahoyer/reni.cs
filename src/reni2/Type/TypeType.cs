@@ -36,10 +36,10 @@ using Reni.TokenClasses;
 namespace Reni.Type
 {
     sealed class TypeType : TypeBase
-        , IFeaturePath<ISuffixFeature, DumpPrintToken>
-        , IFeaturePath<ISuffixFeature, Slash>
-        , IFeaturePath<ISuffixFeature, Star>
-        , IFeaturePath<ISuffixFeature, SequenceToken>
+        , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
+        , INamedFeaturePath<ISuffixFeature, Slash>
+        , INamedFeaturePath<ISuffixFeature, Star>
+        , INamedFeaturePath<ISuffixFeature, SequenceToken>
 
     {
         readonly TypeBase _value;

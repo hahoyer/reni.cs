@@ -41,13 +41,13 @@ namespace Reni.Type
             , ISearchPath<ISuffixFeature, SequenceType>
             , IFeature
             , IFunctionFeature
-            , IFeaturePath<ISuffixFeature, DumpPrintToken>
-            , IFeaturePath<ISuffixFeature, ConcatArrays>
-            , IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>
-            , IFeaturePath<ISuffixFeature, EnableArrayOverSize>
-            , IFeaturePath<ISuffixFeature, TextItems>
-            , IFeaturePath<ISuffixFeature, SequenceToken>
-            , IFeaturePath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>
+            , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
+            , INamedFeaturePath<ISuffixFeature, ConcatArrays>
+            , INamedFeaturePath<ISearchPath<ISuffixFeature, PointerType>, ConcatArrays>
+            , INamedFeaturePath<ISuffixFeature, EnableArrayOverSize>
+            , INamedFeaturePath<ISuffixFeature, TextItems>
+            , INamedFeaturePath<ISuffixFeature, SequenceToken>
+            , IConversionFeaturePath<ISearchPath<ISuffixFeature, EnableArrayOverSizeType>, ArrayType>
     {
         [Node]
         internal readonly TypeBase ElementType;

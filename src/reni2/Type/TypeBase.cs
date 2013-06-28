@@ -46,10 +46,10 @@ namespace Reni.Type
             , ISearchTarget
             , ISearchPath<ISuffixFeature, Aligner>
             , ISearchPath<ISuffixFeature, TypeBase>
-            , IFeaturePath<IPrefixFeature, ConcatArrays>
-            , IFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>
-            , IFeaturePath<IPrefixFeature, TextItem>
-            , IFeaturePath<ISuffixFeature, TypeBase>, IFeatureProvider
+            , INamedFeaturePath<IPrefixFeature, ConcatArrays>
+            , INamedFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>
+            , INamedFeaturePath<IPrefixFeature, TextItem>
+            , IConversionFeaturePath<ISuffixFeature, TypeBase>, IFeatureProvider
     {
         sealed class Cache
         {
@@ -580,7 +580,7 @@ namespace Reni.Type
         ISearchResult Converter(TypeBase destination)
         {
             return
-                Search<ISuffixFeature>(destination.ConversionProvider, null);
+                Search<IConversionFeature>(destination.ConversionProvider, null);
         }
 
         internal Result TextItemResult(Category category)

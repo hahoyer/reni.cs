@@ -34,8 +34,8 @@ namespace Reni.Struct
 {
     sealed class StructureType
         : TypeBase
-            , IFeaturePath<ISuffixFeature, DumpPrintToken>
-            , IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, DumpPrintToken>, IFeatureProvider
+            , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
+            , INamedFeaturePath<ISearchPath<ISuffixFeature, PointerType>, DumpPrintToken>, IFeatureProvider
     {
         readonly Structure _structure;
 

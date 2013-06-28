@@ -37,7 +37,7 @@ namespace Reni.Type
             , IProxyType
             , IConverter
             , IReferenceType
-            , IFeaturePath<ISuffixFeature, Assignment>
+            , INamedFeaturePath<ISuffixFeature, Assignment>
     {
         readonly int _order;
 

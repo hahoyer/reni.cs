@@ -36,9 +36,9 @@ namespace Reni.Type
 {
     sealed class TextItemsType
         : TagChild<ArrayType>
-            , IFeaturePath<ISuffixFeature, DumpPrintToken>
-            , IFeaturePath<ISuffixFeature, ConcatArrays>
-            , IFeaturePath<ISuffixFeature, ToNumberOfBase>
+            , INamedFeaturePath<ISuffixFeature, DumpPrintToken>
+            , INamedFeaturePath<ISuffixFeature, ConcatArrays>
+            , INamedFeaturePath<ISuffixFeature, ToNumberOfBase>
     {
         public TextItemsType(ArrayType parent)
             : base(parent) { }

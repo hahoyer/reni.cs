@@ -36,7 +36,52 @@ namespace Reni
     {
         public static void DumpSearchPaths()
         {
-            var ppts = Assembly
+            var toImplement = ProviderTargetPaths(false)
+                .ToDictionaryEx(ppt => ppt.Target.Is<Defineable>() || ppt.Target.Is<TypeBase>());
+
+            var toImplementString = toImplement[true]
+                .GroupBy(ppt => ppt.Provider)
+                .Select(DumpSearchPathsGroup)
+                .Stringify("\n========================================\n");
+
+            var unknown = toImplement[false]
+                .GroupBy(ppt => ppt.Target)
+                .Select(PrettyName)
+                .Stringify("\n");
+
+            var toRemove = ProviderTargetPaths(true)
+                .GroupBy(ppt => ppt.Target)
+                .Select(PrettyName)
+                .Stringify("\n");
+
+            Tracer.FlaggedLine
+                (
+                    "\n"
+                    + toImplementString
+                    + "\n\n\n---------------------------------------\nUnknown:\n---------------------------------------\n"
+                    + unknown
+                    + "\n\n\n---------------------------------------\nTo remove:\n---------------------------------------\n"
+                    + toRemove);
+        }
+        static string DumpSearchPathsGroup(IGrouping<System.Type, ProviderTargetPath> gProvider)
+        {
+            return gProvider.Key.PrettyName()
+                   + "\n---Interfaces:\n"
+                   + gProvider.Select(ppt => DumpInterface(ppt.Path, ppt.Target)).Stringify("\n")
+                   + "\n---Members:\n"
+                   + gProvider.Select(ppt => DumpMembers(ppt.Path, ppt.Target)).Stringify("\n");
+        }
+
+        static string PrettyName(IGrouping<System.Type, ProviderTargetPath> g)
+        {
+            return g.Key.PrettyName()
+                   + ("\n" + g.Select(ppt => ppt.Interface.PrettyName()).Stringify("\n")).Indent()
+                   + "\n";
+        }
+
+        static IEnumerable<ProviderTargetPath> ProviderTargetPaths()
+        {
+            return Assembly
                 .GetExecutingAssembly()
                 .GetReferencedTypes()
                 .SelectMany(t => t.GetDirectInterfaces().Select(i => new {Type = t, Interface = i}))
@@ -44,84 +89,42 @@ namespace Reni
                 .Select
                 (
                     ti =>
-                        new
-                        {
-                            provider = ti.Interface.GetGenericArguments()[1],
-                            path = ti.Interface.GetGenericArguments()[0],
-                            target = ti.Type,
-                            @interface = ti.Interface
-                        })
-                .Where(ppt => !ppt.provider.IsGenericParameter)
-                .ToDictionaryEx(ppt => ppt.provider.Is(InterfaceType(ppt.path, ppt.target)));
-
-            var toImplement = ppts[false]
-                .ToDictionaryEx(ppt => ppt.target.Is<Defineable>() || ppt.target.Is<TypeBase>());
-
-            var toImplementString = toImplement[true]
-                .GroupBy(ppt => ppt.provider)
-                .Select
-                (
-                    gProvider => DumpSearchPathsGroup
-                        (
-                            gProvider.Key,
-                            gProvider.Select(ppt => DumpInterface(ppt.provider, ppt.path, ppt.target)),
-                            gProvider.Select(ppt => DumpMembers(ppt.provider, ppt.path, ppt.target))
-                        )
-                )
-                .Stringify("\n========================================\n");
-
-            var unknown = toImplement[false]
-                .GroupBy(ppt => ppt.target)
-                .Select
-                (
-                    g =>
-                        g.Key.PrettyName()
-                            + ("\n" + g.Select(ppt => ppt.@interface.PrettyName()).Stringify("\n")).Indent()
-                            + "\n"
-                )
-                .Stringify("\n");
-
-            var toRemove = ppts[true]
-                .GroupBy(ppt => ppt.target)
-                .Select
-                (
-                    g =>
-                        g.Key.PrettyName()
-                            + ("\n" + g.Select(ppt => ppt.@interface.PrettyName()).Stringify("\n")).Indent()
-                            + "\n"
-                )
-                .Stringify("\n");
-
-            Tracer.FlaggedLine
-                (
-                    "\n"
-                        + toImplementString
-                        + "\n\n\n---------------------------------------\nUnknown:\n---------------------------------------\n"
-                        + unknown
-                        + "\n\n\n---------------------------------------\nTo remove:\n---------------------------------------\n"
-                        + toRemove);
+                    new ProviderTargetPath
+                    {
+                        Provider = ti.Interface.GetGenericArguments()[1],
+                        Path = ti.Interface.GetGenericArguments()[0],
+                        Target = ti.Type,
+                        Interface = ti.Interface
+                    })
+                .Where(ppt => !ppt.Provider.IsGenericParameter);
         }
 
-        static string DumpSearchPathsGroup(System.Type key, IEnumerable<string> interfaces, IEnumerable<string> members)
+        static IEnumerable<ProviderTargetPath> ProviderTargetPaths(bool isWellKnown)
         {
-            return key.PrettyName()
-                + "\n---Interfaces:\n"
-                + interfaces.Stringify("\n")
-                + "\n---Members:\n"
-                + members.Stringify("\n");
+            return ProviderTargetPaths()
+                .Where(ppt => isWellKnown == ppt.Provider.Is(InterfaceType(ppt.Path, ppt.Target)));
         }
-        static string DumpInterface(System.Type provider, System.Type path, System.Type token) { return ", " + InterfaceName(path, token); }
+
+        static string DumpInterface(System.Type path, System.Type token) { return ", " + InterfaceName(path, token); }
         static string InterfaceName(System.Type path, System.Type token) { return InterfaceType(path, token).PrettyName(); }
         static System.Type InterfaceType(System.Type path, System.Type token) { return typeof(IFeaturePath<,>).MakeGenericType(path, token); }
 
-        static string DumpMembers(System.Type provider, System.Type path, System.Type token)
+        static string DumpMembers(System.Type path, System.Type token)
         {
             return path.PrettyName()
-                + " "
-                + InterfaceName(path, token)
-                + ".GetFeature(" + token.Name + " target) { return Extension.Feature("
-                + token.Name
-                + "Result); }";
+                   + " "
+                   + InterfaceName(path, token)
+                   + ".GetFeature(" + token.Name + " target) { return Extension.Feature("
+                   + token.Name
+                   + "Result); }";
         }
+    }
+
+    sealed class ProviderTargetPath
+    {
+        public System.Type Provider;
+        public System.Type Path;
+        public System.Type Target;
+        public System.Type Interface;
     }
 }
