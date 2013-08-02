@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
+using HWClassLibrary.Parser;
 using HWClassLibrary.TreeStructure;
 using Reni.Graphics;
 
@@ -36,7 +37,7 @@ namespace Reni.Parser
             : base(prioTable) { }
 
         protected override TokenClass GetSyntaxError(string message) { throw new Exception("Syntax error: " + message); }
-        protected override DictionaryEx<string, TokenClass> GetTokenClasses()
+        protected override DictionaryEx<string, TokenClass> GetPredefinedTokenClasses()
         {
             return new DictionaryEx<string, TokenClass>
             {
@@ -48,7 +49,7 @@ namespace Reni.Parser
         }
         protected override TokenClass GetEndOfText() { return new CloseToken(0); }
         protected override TokenClass GetBeginOfText() { return new OpenToken(0); }
-        protected override TokenClass GetNewToken(string name) { return CommonTokenClass; }
+        protected override TokenClass GetTokenClass(string name) { return CommonTokenClass; }
         protected override TokenClass GetNumber() { return CommonTokenClass; }
         protected override TokenClass GetText() { return CommonTokenClass; }
         static TokenClass CommonTokenClass { get { return new AnyTokenClass(); } }
@@ -140,12 +141,13 @@ namespace Reni.Parser
             internal virtual Syntax ParenthesisMatch(TokenData token, Syntax argument) { return CreateSyntax(this, token, argument); }
         }
 
-        internal new abstract class TokenClass : ReniObject, ITokenClass
+        internal new abstract class TokenClass : ReniObject, IType<IParsedSyntax>, INameProvider
         {
-            string ITokenClass.Name { get; set; }
-            ITokenFactory ITokenClass.NewTokenFactory { get { return null; } }
-            IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return CreateSyntax((Syntax) left, token, (Syntax) right); }
+            IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right) { return CreateSyntax((Syntax) left,(TokenData) part,(Syntax) right); }
+            string IType<IParsedSyntax>.PrioTableName { get { throw new NotImplementedException(); } }
+            bool IType<IParsedSyntax>.IsEnd { get { throw new NotImplementedException(); } }
             protected abstract Syntax CreateSyntax(Syntax left, TokenData token, Syntax right);
+            string INameProvider.Name { set { throw new NotImplementedException(); } }
         }
 
         sealed class AnyTokenClass : TokenClass

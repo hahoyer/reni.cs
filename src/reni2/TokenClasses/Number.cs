@@ -32,7 +32,7 @@ using Reni.Validation;
 
 namespace Reni.TokenClasses
 {
-    sealed class Number : Terminal
+    sealed class Number : TerminalToken
     {
         protected override CompileSyntaxError LeftAndRightMustBeNull(ParsedSyntax left, ParsedSyntax right)
         {

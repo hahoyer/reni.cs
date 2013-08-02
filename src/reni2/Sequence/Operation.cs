@@ -32,15 +32,8 @@ namespace Reni.Sequence
 {
     abstract class Operation
         : Defineable<Operation>
-            , ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>, BitType.IOperation
+            , BitType.IOperation
     {
-        ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType> ISearchPath<ISearchPath<ISearchPath<ISuffixFeature, SequenceType>, ArrayType>, BitType>.Convert(BitType type)
-        {
-            if(IsCompareOperator)
-                return new CompareFeature(this, type);
-            return new Feature(this, type);
-        }
-
         int BitType.IOperation.Signature(int objectBitCount, int argsBitCount) { return Signature(objectBitCount, argsBitCount); }
         string BitType.IOperation.Name { get { return DataFunctionName; } }
 
@@ -51,12 +44,12 @@ namespace Reni.Sequence
     }
 
     abstract class Operation<TTarget> : Operation
-        where TTarget : class
+        where TTarget : Defineable
     {
-        protected override TPath GetFeature<TPath>(TypeBase provider)
+        protected override IFeatureImplementation GetFeature(TypeBase provider)
         {
-            return provider.GetFeature<TPath, TTarget>(this as TTarget)
-                ?? base.GetFeature<TPath>(provider);
+            return provider.GetFeature(this as TTarget)
+                ?? base.GetFeature(provider);
         }
     }
 }

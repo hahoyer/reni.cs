@@ -32,7 +32,7 @@ using Reni.Syntax;
 
 namespace Reni.TokenClasses
 {
-    sealed class LeftParenthesis : TokenClass, IInfix
+    sealed class LeftParenthesis : TokenClass, IInfix, ITerminal
     {
         readonly int _level;
 
@@ -42,7 +42,14 @@ namespace Reni.TokenClasses
         internal int Level { get { return _level; } }
 
         protected override ParsedSyntax Syntax(ParsedSyntax left, TokenData token, ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, left, this, token, right); }
+        protected override ParsedSyntax Prefix(TokenData token, ParsedSyntax right) { return new Syntax.LeftParenthesis(_level, null, this, token, right); }
+        protected override ParsedSyntax Terminal(TokenData token) { return new EmptyList.Half(token); }
 
         Result IInfix.Result(ContextBase context, Category category, CompileSyntax left, CompileSyntax right) { return context.FunctionalObjectResult(category, left, right); }
+        Result ITerminal.Result(ContextBase context, Category category, TokenData token)
+        {
+            NotImplementedMethod(context, category, token);
+            return null;
+        }
     }
 }

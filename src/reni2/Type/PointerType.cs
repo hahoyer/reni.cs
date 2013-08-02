@@ -54,18 +54,24 @@ namespace Reni.Type
         int IContextReference.Order { get { return _order; } }
         IConverter IReferenceType.Converter { get { return this; } }
         bool IReferenceType.IsWeak { get { return true; } }
+
         [DisableDump]
         internal override Root RootContext { get { return _valueType.RootContext; } }
+
         IConverter IProxyType.Converter { get { return this; } }
         TypeBase IConverter.TargetType { get { return ValueType; } }
         Result IConverter.Result(Category category) { return DereferenceResult(category); }
         internal override string DumpPrintText { get { return GetNodeDump(); } }
+
         [DisableDump]
         TypeBase ValueType { get { return _valueType; } }
+
         [DisableDump]
         internal override Structure FindRecentStructure { get { return ValueType.FindRecentStructure; } }
+
         [DisableDump]
-        internal override IFeature Feature { get { return ValueType.Feature; } }
+        internal override IFeatureImplementation Feature { get { return ValueType.Feature; } }
+
         [DisableDump]
         internal override bool IsDataLess { get { return false; } }
 
@@ -113,12 +119,6 @@ namespace Reni.Type
 
         protected override ArrayType ObtainArray(int count) { return ValueType.UniqueArray(count); }
 
-        internal override ISuffixFeature AlignConversion(TypeBase destination)
-        {
-            if(destination != ValueType)
-                return null;
-
-            return Extension.Feature(ArgResult);
-        }
+        internal override IFeatureImplementation AlignConversion(TypeBase destination) { return destination == ValueType ? Extension.Feature(ArgResult) : null; }
     }
 }

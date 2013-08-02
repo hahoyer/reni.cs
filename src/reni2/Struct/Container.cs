@@ -26,6 +26,7 @@ using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using HWClassLibrary.TreeStructure;
+using JetBrains.Annotations;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
@@ -245,7 +246,7 @@ namespace Reni.Struct
             StartMethodDump(trace, parent, accessPosition);
             try
             {
-                var subStatementIds = accessPosition.Array(i => i).ToArray();
+                var subStatementIds = accessPosition.Select(i => i).ToArray();
                 Dump("subStatementIds", subStatementIds);
                 BreakExecution();
                 if(subStatementIds.Any(position => InternalInnerIsDataLess(position) == false))
@@ -278,7 +279,7 @@ namespace Reni.Struct
                 Dump("Statements", Statements);
 
                 var results = (fromNotPosition - fromPosition)
-                    .Array(i => fromPosition + i)
+                    .Select(i => fromPosition + i)
                     .Where(position => !Statements[position].IsLambda)
                     .Select(position => InnerResult(category, parent, position))
                     .Select(r => r.Align(Root.DefaultRefAlignParam.AlignBits))
@@ -319,7 +320,7 @@ namespace Reni.Struct
         {
             return Statements
                 .Length
-                .Array(i => i)
+                .Select(i => i)
                 .Where(i => !InternalInnerIsDataLess(parent, i))
                 .Select(i => i.ToString() + "=" + InnerResult(Category.Size, parent, i).Size.ToString())
                 .ToArray();
@@ -327,14 +328,14 @@ namespace Reni.Struct
     }
 
 
-    sealed class StructurePosition : ReniObject, ISearchPath<ISuffixFeature, StructureType>
+    sealed class StructurePosition : ReniObject, IPathFeature<IFeature, StructureType>
     {
         [EnableDump]
         readonly int _position;
 
         internal StructurePosition(int position) { _position = position; }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
+        IFeature IPathFeature<IFeature, StructureType>.Convert(StructureType structureType) { return Convert(structureType.Structure); }
         internal IContextFeature ConvertToContextFeature(Structure accessPoint) { return Convert(accessPoint); }
         internal AccessFeature Convert(Structure accessPoint) { return accessPoint.UniqueAccessFeature(_position); }
     }

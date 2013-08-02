@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -27,22 +27,24 @@ using HWClassLibrary.Debug;
 using Reni.Basics;
 using Reni.Context;
 using Reni.Feature;
-using Reni.ReniParser;
+using Reni.Struct;
 using Reni.Type;
+using Reni.Validation;
 
 namespace Reni
 {
-    sealed class ContextSearchVisitor : RootSearchVisitor<IContextFeature>
+    sealed class ContextSearchVisitor : SearchVisitor
     {
-        internal ContextSearchVisitor(ISearchTarget target, ExpressionSyntax syntax)
-            : base(target, syntax) { }
+        readonly ISearchTarget _target;
+
+        internal ContextSearchVisitor(ISearchTarget target) { _target = target; }
 
         internal ISearchResult SearchResult
         {
             get
             {
                 if(IsSuccessFull)
-                    return new ContextSearchResult(Result, ConversionFunctions);
+                    return new ContextSearchResult(ResultProvider, ConversionFunctions);
                 return null;
             }
         }
@@ -52,12 +54,17 @@ namespace Reni
         internal void Search(Struct.Context context)
         {
             var accessPoint = context.Structure;
-            var feature = accessPoint.Search(Target);
+            var feature = accessPoint.Search(_target);
             if(feature == null)
                 return;
-            InternalResult = feature.ConvertToContextFeature(accessPoint);
+            InternalResultProvider = feature.ConvertToContextFeature(accessPoint);
             Add(new ConversionFunction(context));
         }
+
+        [DisableDump]
+        IContextFeature InternalResultProvider { get; set; }
+        [DisableDump]
+        IFeatureImplementation ResultProvider { get; set; }
 
         sealed class ConversionFunction : ReniObject, IConversionFunction
         {
@@ -65,11 +72,26 @@ namespace Reni
             public ConversionFunction(Struct.Context parent) { _parent = parent; }
             Result IConversionFunction.Result(Category category) { return _parent.ObjectResult(category); }
         }
+
+        protected override SearchVisitor PathItem<TProvider>(TProvider provider) { throw new NotImplementedException(); }
+
+        [DisableDump]
+        internal override bool IsSuccessFull { get { return false; } }
+
+        [DisableDump]
+        internal override bool IsSuccessFullTarget { get { return false; } }
+
+        [DisableDump]
+        internal override IConversionFunction[] ConversionFunctions { get; set; }
+
+        protected override void SearchNameSpace(StructureType structureType) { throw new NotImplementedException(); }
+        internal override void Search() { NotImplementedMethod(); }
+        internal override void Search(IssueType target) { throw new NotImplementedException(); }
     }
 
     sealed class ContextSearchResult : SearchResult
     {
-        internal ContextSearchResult(IContextFeature feature, IConversionFunction[] conversionFunctions)
+        internal ContextSearchResult(IFeatureImplementation feature, IConversionFunction[] conversionFunctions)
             : base(feature, conversionFunctions) { }
 
         [DisableDump]

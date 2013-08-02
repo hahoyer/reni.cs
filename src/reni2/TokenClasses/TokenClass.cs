@@ -24,6 +24,7 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Parser;
 using Reni.Parser;
 using Reni.ReniParser;
 
@@ -32,21 +33,55 @@ namespace Reni.TokenClasses
     /// <summary>
     ///     Base clas for compiler tokens
     /// </summary>
-    abstract class TokenClass : Parser.TokenClass
+    abstract class TokenClass : Parser.TokenClass, IOperator<ParsedSyntax>
     {
-        protected override sealed IParsedSyntax Syntax
+        protected override sealed IParsedSyntax Create
             (IParsedSyntax left
-                , TokenData token
-                , IParsedSyntax right
+             , IPart<IParsedSyntax> token
+             , IParsedSyntax right
             )
         {
             return
-                Syntax((ParsedSyntax) left, token, (ParsedSyntax) right);
+                this.Operation((ParsedSyntax) left, (TokenData) token, (ParsedSyntax) right);
         }
-        protected abstract ParsedSyntax Syntax
+
+        ParsedSyntax IOperator<ParsedSyntax>.Terminal(IOperatorPart token) { return Terminal((TokenData) token); }
+        ParsedSyntax IOperator<ParsedSyntax>.Prefix(IOperatorPart token, ParsedSyntax right) { return Prefix((TokenData) token, right); }
+        ParsedSyntax IOperator<ParsedSyntax>.Suffix(ParsedSyntax left, IOperatorPart token) { return Suffix(left, (TokenData) token); }
+        ParsedSyntax IOperator<ParsedSyntax>.Infix(ParsedSyntax left, IOperatorPart token, ParsedSyntax right) { return Infix(left, (TokenData) token, right); }
+
+        protected virtual ParsedSyntax Syntax
             (ParsedSyntax left
-                , TokenData token
-                , ParsedSyntax right
-            );
+             , TokenData token
+             , ParsedSyntax right
+            )
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
+
+        protected virtual ParsedSyntax Terminal(TokenData token)
+        {
+            NotImplementedMethod(token);
+            return null;
+        }
+
+        protected virtual ParsedSyntax Prefix(TokenData token, ParsedSyntax right)
+        {
+            NotImplementedMethod(token, right);
+            return null;
+        }
+
+        protected virtual ParsedSyntax Suffix(ParsedSyntax left, TokenData token)
+        {
+            NotImplementedMethod(left, token);
+            return null;
+        }
+
+        protected virtual ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right)
+        {
+            NotImplementedMethod(left, token, right);
+            return null;
+        }
     }
 }

@@ -24,15 +24,9 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Reni.Feature;
-using Reni.Type;
 
 namespace Reni.TokenClasses
 {
-    sealed class Assignment
-        : Defineable<Assignment>
-            , ISearchPath<ISuffixFeature, SetterTargetType>
-    {
-        ISuffixFeature ISearchPath<ISuffixFeature, SetterTargetType>.Convert(SetterTargetType type) { return Extension.Feature(type.AssignmentResult); }
-    }
+    sealed class Assignment: Defineable<Assignment>
+    {}
 }

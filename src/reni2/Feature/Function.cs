@@ -51,28 +51,14 @@ namespace Reni.Feature
         IContextReference ObjectReference { get { return ((IContextReferenceProvider) _function.Target).ContextReference; } }
     }
 
-    sealed class Function : FunctionBase, ISuffixFeature
+    sealed class Function : FunctionBase, IFeatureImplementation
     {
         public Function(Func<Category, IContextReference, TypeBase, Result> function)
             : base(function) { }
 
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return this; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return this; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return null; } }
     }
 
-    sealed class Function<TType>
-        : FunctionBase
-            , ISearchPath<ISuffixFeature, TType>
-            , ISuffixFeature
-    {
-        public Function(Func<Category, IContextReference, TypeBase, Result> function)
-            : base(function) { }
-
-        ISuffixFeature ISearchPath<ISuffixFeature, TType>.Convert(TType type) { return this; }
-
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return this; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
-    }
 }

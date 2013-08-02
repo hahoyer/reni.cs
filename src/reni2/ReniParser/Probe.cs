@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
-using Reni.Feature;
 
 namespace Reni.ReniParser
 {
@@ -33,13 +32,11 @@ namespace Reni.ReniParser
     {
         static readonly DictionaryEx<System.Type, Probe> _probes = new DictionaryEx<System.Type, Probe>(type => new Probe(type));
         readonly System.Type _type;
-        readonly SimpleCache<System.Type[]> _subTypesCache;
         readonly SimpleCache<string[]> _instancesCache;
 
         Probe(System.Type type)
         {
             _type = type;
-            _subTypesCache = new SimpleCache<System.Type[]>(() => ParseSearchPath(_type).ToArray());
             _instancesCache = new SimpleCache<string[]>(() => FindInstances(_type).ToArray());
         }
 
@@ -51,31 +48,9 @@ namespace Reni.ReniParser
                 .Select(pair => pair.Key);
         }
 
-        internal string LogDump
-        {
-            get
-            {
-                var result = _subTypesCache.Value.Select(x => x.PrettyName()).Stringify(" ");
-                if(HasImplementations)
-                {
-                    result += " (implemented as: ";
-                    result += _instancesCache.Value.Select(x => x.Quote()).Stringify(" ");
-                    result += ")";
-                }
-                return result;
-            }
-        }
-
         internal bool HasImplementations { get { return _instancesCache.Value.Any(); } }
+        internal string LogDump { get { throw new NotImplementedException(); } }
+
         internal static Probe Create(System.Type type) { return _probes[type]; }
-
-        static IEnumerable<System.Type> ParseSearchPath(System.Type searchPathType)
-        {
-            if(!searchPathType.IsGenericType || searchPathType.GetGenericTypeDefinition() != typeof(ISearchPath<,>))
-                return new[] {searchPathType};
-
-            var types = searchPathType.GetGenericArguments();
-            return ParseSearchPath(types[0]).Union(new[] {types[1]});
-        }
     }
 }

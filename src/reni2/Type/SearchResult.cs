@@ -35,11 +35,11 @@ namespace Reni.Type
     {
         static int _nextObjectId;
         [EnableDump]
-        internal readonly IFeature Feature;
+        internal readonly IFeatureImplementation Feature;
         [EnableDump]
         readonly IConversionFunction[] _conversionFunctions;
 
-        internal SearchResult(IFeature feature, IConversionFunction[] conversionFunctions)
+        internal SearchResult(IFeatureImplementation feature, IConversionFunction[] conversionFunctions)
             : base(_nextObjectId++)
         {
             Tracer.Assert(feature != null);

@@ -137,7 +137,7 @@ namespace Reni.Parser
 
                     if(current.IsEnd)
                         return null;
-                    current.Incr();
+                    current.Position += 1;
                 }
             }
         }

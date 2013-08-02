@@ -24,16 +24,16 @@ using HWClassLibrary.Debug;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using HWClassLibrary.Parser;
 
 namespace Reni.Parser
 {
     interface ITokenFactory
     {
-        ITokenClass TokenClass(string name);
+        IType<IParsedSyntax> TokenClass(string name);
         PrioTable PrioTable { get; }
-        ITokenClass Number { get; }
-        ITokenClass Text { get; }
-        ITokenClass BeginOfText { get; }
-        ITokenClass EndOfText { get; }
+        IType<IParsedSyntax> Number { get; }
+        IType<IParsedSyntax> Text { get; }
+        IType<IParsedSyntax> EndOfText { get; }
     }
 }

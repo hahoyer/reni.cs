@@ -44,5 +44,9 @@ namespace Reni.TokenClasses
             NotImplementedMethod(left, token, right);
             return null;
         }
+        
+        protected override ParsedSyntax Suffix(ParsedSyntax left, TokenData token) { return left.RightParenthesis(_level, token); }
+
+        protected override bool IsEnd { get { return _level==0; } }
     }
 }

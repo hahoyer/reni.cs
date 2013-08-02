@@ -27,11 +27,12 @@ using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
 using Reni.Feature;
 using Reni.ReniParser;
+using Reni.Validation;
 
 namespace Reni
 {
-    sealed class PathItemSearchVisitor<TFeature, TProvider> : SearchVisitor<ISearchPath<TFeature, TProvider>>
-        where TFeature : class, ISearchPath
+    sealed class PathItemSearchVisitor<TFeature, TProvider>: SearchVisitor<IPathFeature<TFeature, TProvider>>
+        where TFeature : class, IFeature
         where TProvider : IFeatureProvider
     {
         internal override DictionaryEx<System.Type, Probe> Probes { get { return _parent.Probes; } }
@@ -51,20 +52,29 @@ namespace Reni
         internal override void Search()
         {
             base.Search();
-            _parent.InternalResult = _provider.GetFeature<TFeature>(Target);
+            _parent.InternalResultProvider = _provider.GetFeature(Target);
         }
+        
+        internal override void Search(IssueType target) { throw new NotImplementedException(); }
 
         internal override bool IsSuccessFull { get { return _parent.IsSuccessFull; } }
+        internal override bool IsSuccessFullTarget { get { return _parent.IsSuccessFullTarget; } }
         internal override ISearchTarget Target { get { return _parent.Target; } }
 
-        internal override ISearchPath<TFeature, TProvider> InternalResult
+        internal override IFeatureImplementation InternalResultProvider
         {
             set
             {
-                if(value != null)
-                    _parent.InternalResult = value.Convert(_provider);
             }
         }
+
+        internal override IFeatureImplementation InternalResultTarget
+        {
+            set
+            {
+            }
+        }
+
         internal override IConversionFunction[] ConversionFunctions { get { return _parent.ConversionFunctions; } set { _parent.ConversionFunctions = value; } }
     }
 }

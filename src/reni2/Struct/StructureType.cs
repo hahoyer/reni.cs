@@ -34,22 +34,27 @@ namespace Reni.Struct
 {
     sealed class StructureType
         : TypeBase
-            , IFeaturePath<ISuffixFeature, DumpPrintToken>
-            , IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, DumpPrintToken>, IFeatureProvider
+            , ISymbolFeature<DumpPrintToken>
+            , IPathFeature<ISymbolFeature<DumpPrintToken>, PointerType>
     {
         readonly Structure _structure;
 
-        [DisableDump]
-        internal readonly ISearchPath<ISuffixFeature, PointerType> DumpPrintReferenceFeature;
+        internal StructureType(Structure structure) { _structure = structure; }
 
-        internal StructureType(Structure structure)
+        IFeatureImplementation ISymbolFeature<DumpPrintToken>.Feature
         {
-            _structure = structure;
-            DumpPrintReferenceFeature = new StructReferenceFeature(this);
+            get
+            {
+                NotImplementedMethod();
+                return null;
+            }
         }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
-        ISearchPath<ISuffixFeature, PointerType> IFeaturePath<ISearchPath<ISuffixFeature, PointerType>, DumpPrintToken>.GetFeature(DumpPrintToken target) { return DumpPrintReferenceFeature; }
+        ISymbolFeature<DumpPrintToken> IPathFeature<ISymbolFeature<DumpPrintToken>, PointerType>.Convert(PointerType target)
+        {
+            NotImplementedMethod(target);
+            return null;
+        }
 
         [DisableDump]
         internal RefAlignParam RefAlignParam { get { return Structure.RefAlignParam; } }
@@ -70,18 +75,17 @@ namespace Reni.Struct
         }
 
         internal void SearchNameSpace<TFeature>(SearchVisitor<TFeature> searchVisitor)
-            where TFeature : class, ISearchPath
+            where TFeature : class, IFeature
         {
-            var searchVisitorChild = searchVisitor as SearchVisitor<ISuffixFeature>;
+            var searchVisitorChild = searchVisitor as SearchVisitor<IFeature>;
             if(searchVisitorChild == null || searchVisitorChild.IsSuccessFull)
                 return;
-            searchVisitorChild.InternalResult = Structure
-                .Search(searchVisitorChild.Target)
-                .CheckedConvert(this);
+            searchVisitorChild.InternalResultProvider = (IFeatureImplementation) Structure.Search(searchVisitorChild.Target).CheckedConvert(this);
         }
 
         [DisableDump]
         internal override Structure FindRecentStructure { get { return Structure; } }
+
         [DisableDump]
         internal override bool IsDataLess { get { return Structure.IsDataLess; } }
 

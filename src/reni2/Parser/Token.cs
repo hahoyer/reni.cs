@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,57 +25,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Parser;
 using JetBrains.Annotations;
 
 namespace Reni.Parser
 {
-    sealed class Token : ReniObject
-    {
-        readonly TokenData _data;
-        readonly ITokenClass _tokenClass;
-
-        internal Token(ITokenClass tokenClass, Source source, int position, int length)
-        {
-            _data = new TokenData(source, position, length);
-            _tokenClass = tokenClass;
-        }
-
-        TokenData Data { get { return _data; } }
-
-        internal ITokenClass TokenClass { get { return _tokenClass; } }
-
-        public override string ToString() { return Data.FilePosition; }
-        public override string DumpData() { return Data.Name; }
-
-        [DisableDump]
-        internal string Name { get { return TokenClass.Name; } }
-
-        internal IParsedSyntax Syntax(IParsedSyntax left, IParsedSyntax right) { return TokenClass.Syntax(left, Data, right); }
-
-        internal static Token CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, ITokenClass tokenClass) { return CreateAndAdvance(sourcePosn, getLength, (sp, l) => tokenClass); }
-        internal static Token CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<string, ITokenClass> getTokenClass) { return CreateAndAdvance(sourcePosn, getLength, (sp, l) => getTokenClass(sp.SubString(0, l))); }
-
-        static Token CreateAndAdvance(SourcePosn sourcePosn, Func<SourcePosn, int?> getLength, Func<SourcePosn, int, ITokenClass> getTokenClass)
-        {
-            var length = getLength(sourcePosn);
-            if(length == null)
-                return null;
-
-            var result = new Token(getTokenClass(sourcePosn, length.Value), sourcePosn.Source, sourcePosn.Position, length.Value);
-            sourcePosn.Incr(length.Value);
-            return result;
-        }
-    }
-
     [DebuggerDisplay("{NodeDump} {DumpBeforeCurrent}[{DumpCurrent}]{DumpAfterCurrent}")]
-    sealed class TokenData : ReniObject
+    sealed class TokenData : ReniObject, IPart<IParsedSyntax>, IOperatorPart
     {
         static int _nextObjectId;
         readonly int _length;
         readonly Source _source;
         readonly int _position;
 
-        internal TokenData(Source source, int position, int length)
+        TokenData(Source source, int position, int length)
             : base(_nextObjectId++)
         {
             _source = source;
@@ -132,6 +95,18 @@ namespace Reni.Parser
             Tracer.Assert(Source == other.Source);
             Tracer.Assert(Position + Length <= other.Position);
             return new TokenData(Source, Position, other.Position + other.Length - Position);
+        }
+
+        internal static TokenData Span(SourcePosn first, IPosition<IParsedSyntax> other)
+        {
+            var length = ((Position)other).SourcePosn - first;
+            return new TokenData(first.Source, first.Position, length);
+            throw new NotImplementedException();
+        }
+        internal static TokenData Span(SourcePosn first, int length)
+        {
+            return new TokenData(first.Source, first.Position, length);
+            throw new NotImplementedException();
         }
     }
 }

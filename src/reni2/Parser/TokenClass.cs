@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
+using HWClassLibrary.Parser;
 using HWClassLibrary.TreeStructure;
 
 namespace Reni.Parser
@@ -37,31 +38,25 @@ namespace Reni.Parser
         protected TokenClass()
             : base(_nextObjectId++) { StopByObjectId(-31); }
 
-        [DisableDump]
-        string ITokenClass.Name { get { return Name; } set { Name = value; } }
-
-        [DisableDump]
-        ITokenFactory ITokenClass.NewTokenFactory { get { return NewTokenFactory; } }
-
-        [DisableDump]
         string IIconKeyProvider.IconKey { get { return "Symbol"; } }
-
-        [DisableDump]
+        [EnableDumpExcept(null)]
         protected virtual ITokenFactory NewTokenFactory { get { return null; } }
+        string INameProvider.Name { set { Name = value; } }
+
+        IParsedSyntax IType<IParsedSyntax>.Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right) { return Create(left, part, right); }
+        string IType<IParsedSyntax>.PrioTableName { get { return Name; } }
+        bool IType<IParsedSyntax>.IsEnd { get { return IsEnd; } }
+
+        abstract protected IParsedSyntax Create(IParsedSyntax left, IPart<IParsedSyntax> part, IParsedSyntax right);
 
         protected override string GetNodeDump() { return base.GetNodeDump() + "(" + Name.Quote() + ")"; }
-                                        
+
         [Node]
         [DisableDump]
         internal string Name { get { return _name; } set { _name = value; } }
 
-        IParsedSyntax ITokenClass.Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right) { return Syntax(left, token, right); }
-
-        protected virtual IParsedSyntax Syntax(IParsedSyntax left, TokenData token, IParsedSyntax right)
-        {
-            NotImplementedMethod(left, token, right);
-            return null;
-        }
+        [DisableDump]
+        protected virtual bool IsEnd { get { return false; } }
 
         public override string ToString() { return base.ToString() + " Name=" + _name.Quote(); }
     }

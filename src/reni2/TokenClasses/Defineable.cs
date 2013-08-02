@@ -27,6 +27,7 @@ using HWClassLibrary.Debug;
 using Reni.Feature;
 using Reni.Parser;
 using Reni.ReniParser;
+using Reni.Syntax;
 using Reni.Type;
 
 namespace Reni.TokenClasses
@@ -41,21 +42,25 @@ namespace Reni.TokenClasses
                 return new ExpressionSyntax(this, null, token, right.ToCompiledSyntaxOrNull());
             return left.CreateSyntaxOrDeclaration(this, token, right);
         }
+        sealed protected override ParsedSyntax Terminal(TokenData token) { return new DefinableTokenSyntax(this, token); }
+        sealed protected override ParsedSyntax Prefix(TokenData token, ParsedSyntax right) { return new ExpressionSyntax(this, null, token, (CompileSyntax)right); ; }
+        sealed protected override ParsedSyntax Suffix(ParsedSyntax left, TokenData token) { return left.CreateSyntaxOrDeclaration(this, token, null); }
+        sealed protected override ParsedSyntax Infix(ParsedSyntax left, TokenData token, ParsedSyntax right) { return left.CreateSyntaxOrDeclaration(this, token, right); }
 
         [DisableDump]
         protected string DataFunctionName { get { return Name.Symbolize(); } }
         string ISearchTarget.StructFeatureName { get { return Name; } }
-        TPath ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetFeature<TPath>(typeBase); }
-        protected virtual TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class { return null; }
+        IFeatureImplementation ISearchTarget.GetFeature(TypeBase typeBase) { return GetFeature(typeBase); }
+        protected virtual IFeatureImplementation GetFeature(TypeBase typeBase) { return null; }
     }
 
     abstract class Defineable<TTarget> : Defineable
-        where TTarget : class
+        where TTarget : Defineable
     {
-        protected override TPath GetFeature<TPath>(TypeBase provider)
+        protected override IFeatureImplementation GetFeature(TypeBase provider)
         {
-            return provider.GetFeature<TPath, TTarget>(this as TTarget)
-                ?? base.GetFeature<TPath>(provider);
+            return provider.GetFeature(this as TTarget)
+                ?? base.GetFeature(provider);
         }
     }
 }

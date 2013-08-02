@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.ReniParser;
-using Reni.Struct;
 using Reni.Type;
 
 namespace Reni.Validation
@@ -46,8 +45,10 @@ namespace Reni.Validation
             _rootContext = rootContext;
         }
         internal override void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this); }
+
         [DisableDump]
         internal override Root RootContext { get { return _rootContext; } }
+
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
 
@@ -55,12 +56,9 @@ namespace Reni.Validation
         IssueType ConsequentialErrorType(ExpressionSyntax syntax) { return _issue.ConsequentialError(syntax).Type(RootContext); }
 
         CodeBase Code() { return _issue.Code; }
-        internal ISearchPath SearchResult(ISearchTarget target, ExpressionSyntax syntax) { return new ImplicitSearchResult(this, target, syntax); }
 
         internal sealed class ImplicitSearchResult
             : ReniObject
-              , ISuffixFeature
-              , ISearchPath<ISuffixFeature, FunctionType>, ISimpleFeature
 
         {
             [EnableDump]
@@ -74,18 +72,6 @@ namespace Reni.Validation
                 _parent = parent;
                 _target = target;
                 _syntax = syntax;
-            }
-
-            IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-            IFunctionFeature IFeature.Function { get { return null; } }
-            ISimpleFeature IFeature.Simple { get { return this; } }
-
-            ISuffixFeature ISearchPath<ISuffixFeature, FunctionType>.Convert(FunctionType type) { return this; }
-            Result ISimpleFeature.Result(Category category)
-            {
-                return _parent
-                    .ConsequentialErrorType(_syntax)
-                    .IssueResult(category);
             }
         }
     }

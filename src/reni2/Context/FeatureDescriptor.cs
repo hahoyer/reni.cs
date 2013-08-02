@@ -35,7 +35,7 @@ namespace Reni.Context
     abstract class FeatureDescriptor : ReniObject
     {
         internal abstract TypeBase Type { get; }
-        protected abstract IFeature Feature { get; }
+        protected abstract IFeatureImplementation Feature { get; }
 
         protected abstract Func<Category, Result> ConverterResult { get; }
 
@@ -122,9 +122,9 @@ namespace Reni.Context
     sealed class CallDescriptor : FeatureDescriptor
     {
         readonly TypeBase _definingType;
-        readonly IFeature _feature;
+        readonly IFeatureImplementation _feature;
         readonly Func<Category, Result> _converterResult;
-        public CallDescriptor(TypeBase definingType, IFeature feature, Func<Category, Result> converterResult)
+        public CallDescriptor(TypeBase definingType, IFeatureImplementation feature, Func<Category, Result> converterResult)
         {
             _definingType = definingType;
             _feature = feature;
@@ -138,7 +138,7 @@ namespace Reni.Context
                 return result != null ? result.Type : _definingType;
             }
         }
-        protected override IFeature Feature { get { return _feature; } }
+        protected override IFeatureImplementation Feature { get { return _feature; } }
         protected override Func<Category, Result> ConverterResult { get { return _converterResult; } }
     }
 
@@ -153,7 +153,7 @@ namespace Reni.Context
         }
         internal override TypeBase Type { get { return _context.Type(_left); } }
         protected override Func<Category, Result> ConverterResult { get { return null; } }
-        protected override IFeature Feature { get { return Type.Feature; } }
+        protected override IFeatureImplementation Feature { get { return Type.Feature; } }
     }
 
     sealed class FunctionalArgDescriptor : FeatureDescriptor
@@ -171,6 +171,6 @@ namespace Reni.Context
         [DisableDump]
         internal override TypeBase Type { get { return Structure.Type; } }
         [DisableDump]
-        protected override IFeature Feature { get { return FunctionBodyType.Feature; } }
+        protected override IFeatureImplementation Feature { get { return FunctionBodyType.Feature; } }
     }
 }

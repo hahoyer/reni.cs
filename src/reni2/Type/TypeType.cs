@@ -36,10 +36,10 @@ using Reni.TokenClasses;
 namespace Reni.Type
 {
     sealed class TypeType : TypeBase
-        , IFeaturePath<ISuffixFeature, DumpPrintToken>
-        , IFeaturePath<ISuffixFeature, Slash>
-        , IFeaturePath<ISuffixFeature, Star>
-        , IFeaturePath<ISuffixFeature, SequenceToken>
+        ,ISymbolFeature <DumpPrintToken>
+        ,ISymbolFeature <Slash>
+        ,ISymbolFeature <Star>
+        ,ISymbolFeature <SequenceToken>
 
     {
         readonly TypeBase _value;
@@ -50,14 +50,10 @@ namespace Reni.Type
             StopByObjectId(61);
         }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, Slash>.GetFeature(Slash target) { return Extension.Feature(SlashResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, Star>.GetFeature(Star target) { return Extension.Feature(StarResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, SequenceToken>.GetFeature(SequenceToken target)
-        {
-            var value = Value as ArrayType;
-            return value == null ? null : Extension.Feature(value.SequenceTypeResult);
-        }
+        IFeatureImplementation ISymbolFeature<DumpPrintToken>.Feature { get { throw new NotImplementedException(); } }
+        IFeatureImplementation ISymbolFeature<Slash>.Feature { get { throw new NotImplementedException(); } }
+        IFeatureImplementation ISymbolFeature<Star>.Feature { get { throw new NotImplementedException(); } }
+        IFeatureImplementation ISymbolFeature<SequenceToken>.Feature { get { throw new NotImplementedException(); } }
 
         [DisableDump]
         internal override Root RootContext { get { return _value.RootContext; } }

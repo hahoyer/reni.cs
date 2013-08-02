@@ -28,24 +28,15 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
-using Reni.Feature.DumpPrint;
 using Reni.Syntax;
-using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class TextItemsType
         : TagChild<ArrayType>
-            , IFeaturePath<ISuffixFeature, DumpPrintToken>
-            , IFeaturePath<ISuffixFeature, ConcatArrays>
-            , IFeaturePath<ISuffixFeature, ToNumberOfBase>
     {
         public TextItemsType(ArrayType parent)
             : base(parent) { }
-
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature(ConcatArraysResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, ToNumberOfBase>.GetFeature(ToNumberOfBase target) { return Extension.Feature(ToNumberOfBaseResult); }
 
         internal Result ToNumberOfBaseResult(ContextBase context, Category category, CompileSyntax left, CompileSyntax right)
         {
@@ -59,8 +50,10 @@ namespace Reni.Type
 
         [DisableDump]
         protected override string TagTitle { get { return "text_items"; } }
+
         [DisableDump]
-        internal override IFeature Feature { get { return Parent.Feature; } }
+        internal override IFeatureImplementation Feature { get { return Parent.Feature; } }
+
         [DisableDump]
         public override TypeBase ArrayElementType { get { return Parent.ArrayElementType; } }
 

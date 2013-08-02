@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HWClassLibrary.Debug;
 using HWClassLibrary.Helper;
@@ -33,7 +32,6 @@ using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
-using Reni.ReniParser;
 using Reni.Struct;
 using Reni.TokenClasses;
 
@@ -44,12 +42,7 @@ namespace Reni.Type
             , IContextReferenceProvider
             , IIconKeyProvider
             , ISearchTarget
-            , ISearchPath<ISuffixFeature, Aligner>
-            , ISearchPath<ISuffixFeature, TypeBase>
-            , IFeaturePath<IPrefixFeature, ConcatArrays>
-            , IFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>
-            , IFeaturePath<IPrefixFeature, TextItem>
-            , IFeaturePath<ISuffixFeature, TypeBase>, IFeatureProvider
+            , IFeatureProvider
     {
         sealed class Cache
         {
@@ -97,6 +90,7 @@ namespace Reni.Type
         [Node]
         [SmartNode]
         readonly Cache _cache;
+
         [DisableDump]
         [Node]
         internal abstract Root RootContext { get; }
@@ -107,11 +101,9 @@ namespace Reni.Type
         protected TypeBase()
             : base(_nextObjectId++) { _cache = new Cache(this); }
 
-        TPath ISearchTarget.GetFeature<TPath>(TypeBase typeBase) { return GetConversions<TPath>(typeBase).SingleOrDefault(); }
-        IPrefixFeature IFeaturePath<IPrefixFeature, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature(CreateArray); }
-        ISearchPath<IPrefixFeature, PointerType> IFeaturePath<ISearchPath<IPrefixFeature, PointerType>, ConcatArrays>.GetFeature(ConcatArrays target) { return Extension.Feature<PointerType>(ConcatArrayFromReference); }
-        IPrefixFeature IFeaturePath<IPrefixFeature, TextItem>.GetFeature(TextItem target) { return Extension.Feature(TextItemResult); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, TypeBase>.GetFeature(TypeBase target) { return TypeForConversion == target.TypeForConversion ? Extension.Feature(DereferenceReferenceResult) : null; }
+        IFeatureImplementation ISearchTarget.GetFeature(TypeBase typeBase) { return GetConversions(typeBase).SingleOrDefault(); }
+
+        IContextReference IContextReferenceProvider.ContextReference { get { return UniquePointerType; } }
 
         [Node]
         internal Size Size { get { return _cache.Size.Value; } }
@@ -141,7 +133,6 @@ namespace Reni.Type
             }
         }
 
-        IContextReference IContextReferenceProvider.ContextReference { get { return UniquePointerType; } }
 
         [DisableDump]
         internal virtual TypeBase[] ToList { get { return new[] {this}; } }
@@ -176,6 +167,7 @@ namespace Reni.Type
 
         [DisableDump]
         internal TypeBase UniquePointer { get { return UniquePointerType.Type(); } }
+
         [DisableDump]
         internal virtual IReferenceType UniquePointerType { get { return _cache.Pointer.Value; } }
 
@@ -314,14 +306,17 @@ namespace Reni.Type
         internal bool IsWeakReference { get { return ReferenceType != null && ReferenceType.IsWeak; } }
 
         [DisableDump]
-        internal virtual IFeature Feature { get { return this as IFeature; } }
+        internal virtual IFeatureImplementation Feature { get { return this as IFeatureImplementation; } }
 
         [DisableDump]
         ISearchTarget ConversionProvider { get { return this; } }
+
         [DisableDump]
         internal virtual bool HasQuickSize { get { return true; } }
+
         [DisableDump]
         internal VoidType VoidType { get { return RootContext.VoidType; } }
+
         [DisableDump]
         internal BitType BitType { get { return RootContext.BitType; } }
 
@@ -404,36 +399,22 @@ namespace Reni.Type
             return -1;
         }
 
-        internal virtual TPath GetFeature<TPath, TTarget>(TTarget target)
-            where TPath : class
+        internal virtual IFeatureImplementation GetFeature<TTarget>(TTarget target)
+            where TTarget : Defineable
         {
-            var featurePath = this as IFeaturePath<TPath, TTarget>;
-            return featurePath == null ? null : featurePath.GetFeature(target);
+            var featurePath = this as ISymbolFeature<TTarget>;
+            return featurePath == null ? null : featurePath.Feature;
         }
 
-        TPath IFeatureProvider.GetFeature<TPath>(ISearchTarget target) { return target.GetFeature<TPath>(this); }
-        protected virtual IEnumerable<TPath> GetConversions<TPath>(TypeBase typeBase) where TPath : class { yield break; }
+        IFeatureImplementation IFeatureProvider.GetFeature(ISearchTarget target) { return target.GetFeature(this); }
+        protected virtual IEnumerable<IFeatureImplementation> GetConversions(TypeBase typeBase) { yield break; }
 
-        internal ISearchResult Search<TFeature>(ISearchTarget target, ExpressionSyntax syntax)
-            where TFeature : class, IFeature
+        internal ISearchResult SuffixSearch(ISearchTarget target) { return new SuffixSearchResult(this, target.GetFeature(this)); }
+
+        internal ISearchResult ContextSearch(ISearchTarget target)
         {
-
-            var visitor = new TypeRootSearchVisitor<TFeature>(target, this, syntax);
-            var former = SearchVisitor.Trace;
-            SearchVisitor.Trace = target is PointerType && target.GetObjectId() == 10;
-            Search(visitor);
-            SearchVisitor.Trace = former;
-            if(Debugger.IsAttached && !visitor.IsSuccessFull)
-                _lastSearchVisitor = visitor;
-            return visitor.SearchResult;
-        }
-
-        public IEnumerable<Probe> Probes<TFeature>(ISearchTarget target, ExpressionSyntax syntax)
-            where TFeature : class, IFeature
-        {
-            var visitor = new TypeRootSearchVisitor<TFeature>(target, this, syntax);
-            Search(visitor);
-            return visitor.Probes.Values;
+            NotImplementedMethod(target);
+            return null;
         }
 
         internal virtual void Search(SearchVisitor searchVisitor) { searchVisitor.Search(this, null); }
@@ -497,11 +478,7 @@ namespace Reni.Type
         }
 
         [NotNull]
-        internal Result GenericDumpPrintResult(Category category)
-        {
-            return Search<ISuffixFeature>(_dumpPrintToken.Value, null)
-                .Result(category);
-        }
+        internal Result GenericDumpPrintResult(Category category) { return SuffixSearch(_dumpPrintToken.Value).Result(category); }
 
         static readonly SimpleCache<DumpPrintToken> _dumpPrintToken = new SimpleCache<DumpPrintToken>(DumpPrintToken.Create);
 
@@ -577,11 +554,7 @@ namespace Reni.Type
             return result;
         }
 
-        ISearchResult Converter(TypeBase destination)
-        {
-            return
-                Search<ISuffixFeature>(destination.ConversionProvider, null);
-        }
+        ISearchResult Converter(TypeBase destination) { return ContextSearch(destination.ConversionProvider); }
 
         internal Result TextItemResult(Category category)
         {
@@ -612,7 +585,7 @@ namespace Reni.Type
                 .Align(BitsConst.SegmentAlignBits);
         }
 
-        internal virtual ISuffixFeature AlignConversion(TypeBase destination)
+        internal virtual IFeatureImplementation AlignConversion(TypeBase destination)
         {
             var childConverter = Converter(destination);
             var searchResult = childConverter;
@@ -633,16 +606,14 @@ namespace Reni.Type
                 );
         }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, Aligner>.Convert(Aligner type)
+        Simple Convert(Aligner type)
         {
             if(type.Parent == this)
                 return Extension.Feature(PointerArgResult);
             return null;
         }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return Convert(type); }
-
-        protected virtual ISuffixFeature Convert(TypeBase type)
+        protected virtual Simple Convert(TypeBase type)
         {
             if(type.TypeForConversion == TypeForConversion)
                 return Extension.Feature(DereferenceReferenceResult);
@@ -674,15 +645,14 @@ namespace Reni.Type
                 .DePointer(alignedSize)
                 .DumpPrintNumber(alignedSize);
         }
-
     }
 
 
-    abstract class ConverterBase : ReniObject, ISuffixFeature, ISimpleFeature
+    abstract class ConverterBase : ReniObject, IFeatureImplementation, ISimpleFeature
     {
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return null; } }
-        ISimpleFeature IFeature.Simple { get { return this; } }
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return null; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return this; } }
         Result ISimpleFeature.Result(Category category) { return Result(category); }
         protected abstract Result Result(Category category);
     }

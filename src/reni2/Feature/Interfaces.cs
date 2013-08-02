@@ -29,35 +29,44 @@ using Reni.Code;
 using Reni.Context;
 using Reni.ReniParser;
 using Reni.Syntax;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Feature
 {
-    interface ISearchPath
+
+    interface IFeature
+    { }
+
+    interface IContextFeature
+    { }
+
+    interface IPathFeature<out TOutType, in TInType> : IFeature
+        where TOutType : IFeature
+        where TInType : IFeatureProvider
     {
+        TOutType Convert(TInType target);
     }
 
-    interface ISearchPath<out TOutType, in TInType> : ISearchPath
-        where TOutType : ISearchPath
-    {
-        TOutType Convert(TInType type);
-    }
-
-    interface IFeature : ISearchPath
+    interface IFeatureImplementation 
     {
         IMetaFunctionFeature MetaFunction { get; }
         IFunctionFeature Function { get; }
         ISimpleFeature Simple { get; }
     }
 
-    interface ISuffixFeature : IFeature
-    {}
+    interface ISymbolFeature<TInType> : IFeature
+        where TInType : Defineable
+    {
+        IFeatureImplementation Feature { get; }
+    }
 
-    interface IPrefixFeature : IFeature
-    {}
+    interface IContextFeature<TInType> : IContextFeature
+        where TInType : Defineable
+    { }
 
-    interface IContextFeature : IFeature
-    {}
+    interface IConversionFeature : IFeature
+    { }
 
     interface ISimpleFeature
     {
@@ -109,11 +118,11 @@ namespace Reni.Feature
     interface ISearchTarget
     {
         string StructFeatureName { get; }
-        TPath GetFeature<TPath>(TypeBase typeBase) where TPath : class;
+        IFeatureImplementation GetFeature(TypeBase typeBase);
     }
 
     interface IFeatureProvider
     {
-        TPath GetFeature<TPath>(ISearchTarget target) where TPath : class;
+        IFeatureImplementation GetFeature(ISearchTarget target);
     }
 }

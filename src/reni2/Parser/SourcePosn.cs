@@ -35,8 +35,8 @@ namespace Reni.Parser
     [DebuggerDisplay("{NodeDump} {DumpBeforeCurrent}[{DumpCurrent}]{DumpAfterCurrent}")]
     sealed class SourcePosn : ReniObject
     {
-        readonly Source _source;
-        int _position;
+        public readonly Source Source;
+        public int Position;
 
         /// <summary>
         ///     ctor from source and position
@@ -45,34 +45,25 @@ namespace Reni.Parser
         /// <param name="position"></param>
         public SourcePosn(Source source, int position)
         {
-            _position = position;
-            _source = source;
+            Position = position;
+            Source = source;
         }
-
-        public Source Source { get { return _source; } }
-        public int Position { get { return _position; } }
 
         /// <summary>
         ///     The current character
         /// </summary>
-        public char Current { get { return _source[_position]; } }
+        public char Current { get { return Source[Position]; } }
 
         /// <summary>
         ///     Natuaral indexer
         /// </summary>
-        public char this[int index] { get { return _source[_position + index]; } }
-
-        /// <summary>
-        ///     Advance position
-        /// </summary>
-        /// <param name="i">number characters to move</param>
-        public void Incr(int i = 1) { _position += i; }
+        public char this[int index] { get { return Source[Position + index]; } }
 
         /// <summary>
         ///     Checks if at or beyond end of source
         /// </summary>
         /// <value> </value>
-        public bool IsEnd { get { return _source.IsEnd(_position); } }
+        public bool IsEnd { get { return Source.IsEnd(Position); } }
 
         /// <summary>
         ///     Obtains a piece
@@ -80,14 +71,14 @@ namespace Reni.Parser
         /// <param name="start">start position</param>
         /// <param name="length">number of characters</param>
         /// <returns></returns>
-        public string SubString(int start, int length) { return _source.SubString(_position + start, length); }
+        public string SubString(int start, int length) { return Source.SubString(Position + start, length); }
 
         /// <summary>
         ///     creates the file(line,col) string to be used with "Edit.GotoNextLocation" command of IDE
         /// </summary>
         /// <param name="flagText">the flag text</param>
         /// <returns>the "FileName(LineNr,ColNr): tag: " string</returns>
-        public string FilePosn(string flagText) { return _source.FilePosn(_position, flagText); }
+        public string FilePosn(string flagText) { return Source.FilePosn(Position, flagText); }
 
         /// <summary>
         ///     Default dump behaviour
@@ -129,7 +120,7 @@ namespace Reni.Parser
         }
         public SourcePosn Clone { get { return new SourcePosn(Source, Position); } }
 
-        public static SourcePosn operator +(SourcePosn x, int y) { return x._source + (x._position + y); }
+        public static SourcePosn operator +(SourcePosn x, int y) { return x.Source + (x.Position + y); }
 
         public static int operator -(SourcePosn x, SourcePosn y)
         {

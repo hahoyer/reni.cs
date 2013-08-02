@@ -25,14 +25,16 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
+using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
 using Reni.Feature.DumpPrint;
+using Reni.TokenClasses;
 
 namespace Reni.Type
 {
     sealed class VoidType : TypeBase
-        , IFeaturePath<ISuffixFeature, DumpPrintToken>
+        , ISymbolFeature<DumpPrintToken>
     {
         readonly Root _rootContext;
         public VoidType(Root rootContext) { _rootContext = rootContext; }
@@ -42,16 +44,20 @@ namespace Reni.Type
             if(!searchVisitor.IsSuccessFull)
                 base.Search(searchVisitor);
         }
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
-        protected override ISuffixFeature Convert(TypeBase sourceType) { return sourceType.IsDataLess ? Extension.Feature(c => Result(c, sourceType.ArgResult)) : null; }
+
+        IFeatureImplementation ISymbolFeature<DumpPrintToken>.Feature { get { return Extension.Feature(DumpPrintTokenResult); } }
+
         protected override TypeBase ReversePair(TypeBase first) { return first; }
+
         [DisableDump]
         internal override Root RootContext { get { return _rootContext; } }
+
         [DisableDump]
         internal override bool IsDataLess { get { return true; } }
+
         internal override TypeBase Pair(TypeBase second) { return second; }
         internal override string DumpPrintText { get { return "void"; } }
         protected override string GetNodeDump() { return "void"; }
-        internal Result DumpPrintTokenResult(Category category) { return Result(category); }
+        Result DumpPrintTokenResult(Category category) { return Result(category); }
     }
 }

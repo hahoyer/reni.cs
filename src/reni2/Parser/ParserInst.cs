@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Parser;
 
 namespace Reni.Parser
 {
@@ -48,6 +49,13 @@ namespace Reni.Parser
         /// <returns> </returns>
         public IParsedSyntax Compile(Source source)
         {
+            IPosition<IParsedSyntax> sourcePosn = new Position(source, this);
+            return sourcePosn.Parse(_tokenFactory.PrioTable);
+        }
+
+        [Obsolete("", true)]
+        public IParsedSyntax OldCompile(Source source)
+        {
             var sourcePosn = source + 0;
             var stack = new Stack<PushedSyntax>();
             stack.Push(new PushedSyntax(sourcePosn, _tokenFactory));
@@ -63,13 +71,30 @@ namespace Reni.Parser
 
                     if(relation != '-')
                     {
-                        if(token.TokenClass == _tokenFactory.EndOfText)
-                            return token.Syntax(result, null);
-                        stack.Push(new PushedSyntax(result, token, token.TokenClass.NewTokenFactory ?? stack.Peek().TokenFactory));
+                        if(token.Type == _tokenFactory.EndOfText)
+                            return token.Create(null, result);
+                        stack.Push(new PushedSyntax(result, token, stack.Peek().TokenFactory));
                         result = null;
                     }
                 } while(result != null);
             }
         }
+
+        internal Item<IParsedSyntax> GetItemAndAdvance(SourcePosn sourcePosn) { return _scanner.CreateToken(sourcePosn, _tokenFactory); }
+    }
+
+    sealed class Position : ReniObject, IPosition<IParsedSyntax>
+    {
+        internal readonly SourcePosn SourcePosn;
+        readonly ParserInst _parserInst;
+
+        public Position(Source source, ParserInst parserInst)
+        {
+            SourcePosn = source + 0;
+            _parserInst = parserInst;
+        }
+
+        Item<IParsedSyntax> IPosition<IParsedSyntax>.GetItemAndAdvance(Stack<OpenItem<IParsedSyntax>> stack) { return _parserInst.GetItemAndAdvance(SourcePosn); }
+        IPart<IParsedSyntax> IPosition<IParsedSyntax>.Span(IPosition<IParsedSyntax> end) { return TokenData.Span(SourcePosn, end); }
     }
 }

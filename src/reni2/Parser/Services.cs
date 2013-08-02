@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2012 - 2012 Harald Hoyer
+//     Copyright (C) 2012 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using HWClassLibrary.Debug;
+using HWClassLibrary.Parser;
 using Reni.Graphics;
 
 namespace Reni.Parser
@@ -41,11 +42,11 @@ namespace Reni.Parser
 
         public static IGraphTarget Syntax(this PrioTable prioTable, string code)
         {
-            if (code == null)
+            if(code == null)
                 return null;
 
             var parser = new ParserInst(new ReniScanner(), new SimpleTokenFactory(prioTable));
-            return (IGraphTarget)parser.Compile(new Source(code));
+            return (IGraphTarget) parser.Compile(new Source(code));
         }
 
         public static string ToBase64(this Image image)
@@ -62,7 +63,5 @@ namespace Reni.Parser
             image.Save(fileName);
             return image;
         }
-
     }
 }
-

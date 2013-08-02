@@ -1,7 +1,7 @@
-﻿#region Copyright (C) 2012
+﻿#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -39,23 +39,11 @@ namespace Reni.Parser
             _data = _file.String;
         }
 
-        internal Source(string data) { _data = data; }
-
-        internal char this[int index]
-        {
-            get
-            {
-                if(IsEnd(index))
-                    return '\0';
-                return _data[index];
-            }
-        }
-
         public string Data { get { return _data; } }
-
+        internal Source(string data) { _data = data; }
+        internal char this[int index] { get { return IsEnd(index) ? '\0' : _data[index]; } }
         internal bool IsEnd(int posn) { return Length <= posn; }
         internal int Length { get { return _data.Length; } }
-
         internal string SubString(int start, int length) { return _data.Substring(start, length); }
 
         internal string FilePosn(int i, string flagText, string tag = null)
@@ -67,23 +55,16 @@ namespace Reni.Parser
 
         int LineNr(int iEnd)
         {
-            var result = 0;
-            for(var i = 0; i < iEnd; i++)
-                if(_data[i] == '\n')
-                    result++;
-            return result;
+            return _data
+                .Take(iEnd)
+                .Count(c => c == '\n');
         }
 
         int ColNr(int iEnd)
         {
-            var result = 0;
-            for(var i = 0; i < iEnd; i++)
-            {
-                result++;
-                if(_data[i] == '\n')
-                    result = 0;
-            }
-            return result;
+            return _data
+                .Take(iEnd)
+                .Aggregate(0, (current, c) => c == '\n' ? 0 : current + 1);
         }
 
         protected override string Dump(bool isRecursion) { return FilePosn(0, "see there"); }

@@ -25,15 +25,11 @@ using System.Collections.Generic;
 using System.Linq;
 using HWClassLibrary.Debug;
 using Reni.Basics;
-using Reni.Feature;
 
 namespace Reni.Type
 {
     sealed class Aligner
         : Child<TypeBase>
-            , ISearchPath<ISuffixFeature, TypeBase>
-            , IFeaturePath<ISuffixFeature, TypeBase>
-
     {
         [DisableDump]
         readonly int _alignBits;
@@ -45,16 +41,15 @@ namespace Reni.Type
             StopByObjectId(-9);
         }
 
-        ISuffixFeature ISearchPath<ISuffixFeature, TypeBase>.Convert(TypeBase type) { return type.AlignConversion(Parent); }
-        ISuffixFeature IFeaturePath<ISuffixFeature, TypeBase>.GetFeature(TypeBase target) { return Parent == target ? Extension.Feature(PointerArgResult) : null; }
-
         [DisableDump]
         internal override string DumpPrintText { get { return "#(#align" + _alignBits + "#)# " + Parent.DumpPrintText; } }
 
         [DisableDump]
         internal override IReferenceType ReferenceType { get { return Parent.ReferenceType; } }
+
         [DisableDump]
         internal override bool IsDataLess { get { return Parent.IsDataLess; } }
+
         [DisableDump]
         internal override IReferenceType UniquePointerType { get { return Parent.UniquePointerType; } }
 

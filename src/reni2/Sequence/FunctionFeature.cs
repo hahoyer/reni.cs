@@ -29,21 +29,25 @@ using Reni.Basics;
 using Reni.Code;
 using Reni.Context;
 using Reni.Feature;
+using Reni.TokenClasses;
 using Reni.Type;
 
 namespace Reni.Sequence
 {
-    sealed class FunctionFeature : FunctionalFeature, ISuffixFeature, IFunctionFeature
+    sealed class FunctionFeature : FunctionalFeature, IFunctionFeature
     {
+        internal interface ISequenceFeature
+        {
+            TypeBase ResultType(int objSize, int argsSize);
+            BitType.IOperation Definable { get; }
+        }
+
         readonly SequenceType _objectType;
+        ISequenceFeature _feature;
 
-        [EnableDump]
-        readonly FeatureBase _feature;
-
-        internal FunctionFeature(SequenceType objectType, FeatureBase feature)
+        internal FunctionFeature(SequenceType objectType)
         {
             _objectType = objectType;
-            _feature = feature;
             Tracer.Assert(_objectType.Element == _objectType.BitType);
         }
 
@@ -54,12 +58,6 @@ namespace Reni.Sequence
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         [DisableDump]
         bool IFunctionFeature.IsImplicit { get { return false; } }
-
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return this; } }
-        ISimpleFeature IFeature.Simple { get { return null; } }
-
-        protected override string GetNodeDump() { return base.GetNodeDump() + " " + _feature.Definable.Name; }
 
         Result Result(Category category)
         {

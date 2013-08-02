@@ -57,7 +57,7 @@ namespace Reni.ReniParser
 
         internal override Result ObtainResult(ContextBase context, Category category)
         {
-            var result = Result(context, category);
+            var result = ResultBySearch(context, category);
             if(result == null)
                 return UndefinedSymbolIssue.Type(context, this).IssueResult(category);
 
@@ -65,46 +65,21 @@ namespace Reni.ReniParser
             return result;
         }
 
-        internal Probe[] Probes(ContextBase context)
+        Result ResultBySearch(ContextBase context, Category category)
         {
-            var result = new List<Probe>();
-            if(Left == null && Right != null)
-                result.AddRange(Right.PrefixOperationProbes(context, _tokenClass));
-
-            result.AddRange
-                (
-                    Left == null
-                        ? context.Probes(_tokenClass)
-                        : context
-                            .Type(Left)
-                            .TypeForSearchProbes
-                            .Probes<ISuffixFeature>(_tokenClass, this)
-                );
-            return result.ToArray();
-        }
-
-        new Result Result(ContextBase context, Category category)
-        {
-            if(Left == null && Right != null)
-            {
-                var prefixOperationResult = Right.PrefixOperationResult
-                    (context, category, _tokenClass);
-                if(prefixOperationResult != null)
-                    return prefixOperationResult
-                        .ReplaceArg(Right.PointerKindResult(context, category));
-            }
-
             var searchResult
                 = Left == null
                     ? context.Search(_tokenClass)
                     : context
                         .Type(Left)
                         .TypeForSearchProbes
-                        .Search<ISuffixFeature>(_tokenClass, this);
+                        .SuffixSearch(_tokenClass);
             return searchResult == null
                 ? null
                 : searchResult.FunctionResult(context, category, this);
         }
+
+        internal Probe[] Probes(ContextBase context) { throw new NotImplementedException(); }
 
         protected override string GetNodeDump()
         {
@@ -134,6 +109,7 @@ namespace Reni.ReniParser
                 return result;
             }
         }
+
     }
 
     // Lord of the weed

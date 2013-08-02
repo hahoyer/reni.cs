@@ -1,7 +1,7 @@
-#region Copyright (C) 2012
+#region Copyright (C) 2013
 
 //     Project Reni2
-//     Copyright (C) 2011 - 2012 Harald Hoyer
+//     Copyright (C) 2011 - 2013 Harald Hoyer
 // 
 //     This program is free software: you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,19 +25,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using HWClassLibrary.Helper;
-using Reni.Parser;
+using HWClassLibrary.Parser;
 using Reni.Proof.TokenClasses;
 
 namespace Reni.Proof
 {
-    sealed class TokenFactory : Parser.TokenFactory<TokenClasses.TokenClass>
+    sealed class TokenFactory : Parser.TokenFactory<TokenClass>
     {
         TokenFactory()
             : base(PrioTable) { }
-       
+
         internal static TokenFactory Instance { get { return new TokenFactory(); } }
 
-        protected override TokenClasses.TokenClass GetNewToken(string name) { return new UserSymbol(); }
+        protected override TokenClass GetTokenClass(string name) { return new UserSymbol(); }
 
         static PrioTable PrioTable
         {
@@ -69,10 +69,10 @@ namespace Reni.Proof
             }
         }
 
-        protected override DictionaryEx<string, TokenClasses.TokenClass> GetTokenClasses()
+        protected override DictionaryEx<string, TokenClass> GetPredefinedTokenClasses()
         {
             var result =
-                new DictionaryEx<string, TokenClasses.TokenClass>
+                new DictionaryEx<string, TokenClass>
                 {
                     {"{", new LeftParenthesis(1)},
                     {"[", new LeftParenthesis(2)},
@@ -93,17 +93,17 @@ namespace Reni.Proof
                 };
             return result;
         }
-        protected override TokenClasses.TokenClass GetEndOfText() { return new RightParenthesis(0); }
-        protected override TokenClasses.TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
-        protected override TokenClasses.TokenClass GetNumber() { return new TokenClasses.Number(); }
+        protected override TokenClass GetEndOfText() { return new RightParenthesis(0); }
+        protected override TokenClass GetBeginOfText() { return new LeftParenthesis(0); }
+        protected override TokenClass GetNumber() { return new TokenClasses.Number(); }
 
         internal Minus Minus { get { return (Minus) TokenClass("-"); } }
         internal Equal Equal { get { return (Equal) TokenClass("="); } }
         internal Plus Plus { get { return (Plus) TokenClass("+"); } }
 
-        protected override TokenClasses.TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
+        protected override TokenClass GetSyntaxError(string message) { return new SyntaxError(message); }
 
-        sealed class SyntaxError : TokenClasses.TokenClass
+        sealed class SyntaxError : TokenClass
         {
             readonly string _message;
             public SyntaxError(string message) { _message = message; }

@@ -36,8 +36,8 @@ using Reni.Type;
 
 namespace Reni.Struct
 {
-    sealed class FunctionBodyType : TypeBase, IFeature, IFunctionFeature, ISimpleFeature
-        , IFeaturePath<ISuffixFeature, DumpPrintToken>
+    sealed class FunctionBodyType : TypeBase, IFunctionFeature, ISimpleFeature
+        , ISymbolFeature<DumpPrintToken>, IFeatureImplementation
     {
         [EnableDump]
         [Node]
@@ -86,7 +86,7 @@ namespace Reni.Struct
         [DisableDump]
         IContextReference ObjectReference { get { return _objectReferenceCache.Value; } }
 
-        ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
+        //ISuffixFeature IFeaturePath<ISuffixFeature, DumpPrintToken>.GetFeature(DumpPrintToken target) { return Extension.Feature(DumpPrintTokenResult); }
 
         IContextReference IFunctionFeature.ObjectReference { get { return ObjectReference; } }
         bool IFunctionFeature.IsImplicit { get { return _syntax.IsImplicit; } }
@@ -125,13 +125,14 @@ namespace Reni.Struct
             }
         }
         FunctionType Function(TypeBase argsType) { return _structure.Function(_syntax, argsType); }
-        IMetaFunctionFeature IFeature.MetaFunction { get { return null; } }
-        IFunctionFeature IFeature.Function { get { return this; } }
-        ISimpleFeature IFeature.Simple { get { return this; } }
+        IMetaFunctionFeature IFeatureImplementation.MetaFunction { get { return null; } }
+        IFunctionFeature IFeatureImplementation.Function { get { return this; } }
+        ISimpleFeature IFeatureImplementation.Simple { get { return this; } }
         Result ISimpleFeature.Result(Category category)
         {
             NotImplementedMethod(category);
             return null;
         }
+        IFeatureImplementation ISymbolFeature<DumpPrintToken>.Feature { get { return this; } }
     }
 }
